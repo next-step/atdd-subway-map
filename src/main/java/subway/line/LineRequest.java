@@ -1,10 +1,10 @@
-package subway.lane;
+package subway.line;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import subway.station.Station;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class LaneRequest {
+public class LineRequest {
 
   private String name;
   private Station inbound;
@@ -22,7 +22,7 @@ public class LaneRequest {
     return outbound;
   }
 
-  public LaneRequest(String name, Station inbound, Station outbound) {
+  public LineRequest(String name, Station inbound, Station outbound) {
     this.name = name;
     this.inbound = inbound;
     this.outbound = outbound;

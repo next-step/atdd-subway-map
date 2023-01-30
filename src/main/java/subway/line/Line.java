@@ -1,17 +1,15 @@
-package subway.lane;
+package subway.line;
 
 import javax.persistence.*;
 import subway.station.Station;
 
 @Entity
-public class Lane {
+public class Line {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "id", nullable = false)
   private Long id;
 
-  @Column(name = "name")
   private String name; // 노선 번호
 
   @ManyToOne(cascade = CascadeType.ALL)
@@ -20,9 +18,9 @@ public class Lane {
   @ManyToOne(cascade = CascadeType.ALL)
   private Station outboundStation; // 하행역
 
-  public Lane() {}
+  public Line() {}
 
-  public Lane(String name, Station inboundStation, Station outboundStation) {
+  public Line(String name, Station inboundStation, Station outboundStation) {
     this.name = name;
     this.inboundStation = inboundStation;
     this.outboundStation = outboundStation;

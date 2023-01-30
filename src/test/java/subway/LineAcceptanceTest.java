@@ -15,16 +15,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
-import subway.Mocks.MockLane;
+import subway.Mocks.MockLine;
 import subway.Mocks.MockStation;
-import subway.lane.Lane;
-import subway.lane.LaneRequest;
+import subway.line.Line;
+import subway.line.LineRequest;
 import subway.station.Station;
 
 @DisplayName("지하철 노선 관리 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @DirtiesContext(classMode = ClassMode.AFTER_CLASS)
-public class LaneAcceptanceTest {
+public class LineAcceptanceTest {
 
   /**
    * When 지하철 노선을 생성하면
@@ -34,7 +34,7 @@ public class LaneAcceptanceTest {
   @Test
   void 지하철_노선_생성_테스트() {
     // when
-    Lane line = 지하철_노선_생성(MockLane.서울2호선, MockStation.서울대입구역, MockStation.봉천역);
+    Line line = 지하철_노선_생성(MockLine.서울2호선, MockStation.서울대입구역, MockStation.봉천역);
 
     assertThat(
         지하철_노선_조회(line.getId()).jsonPath().getString("name")
@@ -49,8 +49,8 @@ public class LaneAcceptanceTest {
   @DisplayName("지하철노선 목록 조회 테스트")
   @Test
   void 지하철_노선_목록_조회_테스트() {
-    Lane line1 = 지하철_노선_생성(MockLane.서울2호선, MockStation.서울대입구역, MockStation.봉천역);
-    Lane line2 = 지하철_노선_생성(MockLane.신분당선, MockStation.강남역, MockStation.신사역);
+    Line line1 = 지하철_노선_생성(MockLine.서울2호선, MockStation.서울대입구역, MockStation.봉천역);
+    Line line2 = 지하철_노선_생성(MockLine.신분당선, MockStation.강남역, MockStation.신사역);
 
     assertThat(
         지하철_노선_목록_조회().jsonPath().getList("name", String.class)
@@ -66,7 +66,7 @@ public class LaneAcceptanceTest {
   @Test
   void 지하철_노선_조회_테스트() {
     // given
-    Lane created = 지하철_노선_생성(MockLane.서울2호선, MockStation.서울대입구역, MockStation.봉천역);
+    Line created = 지하철_노선_생성(MockLine.서울2호선, MockStation.서울대입구역, MockStation.봉천역);
 
     // when
     ExtractableResponse<Response> show = 지하철_노선_조회(created.getId());
@@ -84,13 +84,13 @@ public class LaneAcceptanceTest {
   @Test
   void 지하철_노선_수정_테스트() {
     // given
-    Lane created = 지하철_노선_생성(MockLane.서울2호선, MockStation.서울대입구역, MockStation.봉천역);
+    Line created = 지하철_노선_생성(MockLine.서울2호선, MockStation.서울대입구역, MockStation.봉천역);
 
     // when
-    Lane updated = 지하철_노선_수정(created.getId(), "이름이_바뀐_2호선", MockStation.서울대입구역, MockStation.봉천역);
+    Line updated = 지하철_노선_수정(created.getId(), "이름이_바뀐_2호선", MockStation.서울대입구역, MockStation.봉천역);
 
     // then
-    Lane show = 지하철_노선_조회(updated.getId()).as(Lane.class);
+    Line show = 지하철_노선_조회(updated.getId()).as(Line.class);
     assertAll(
         () -> assertThat(show.getName()).isEqualTo(updated.getName()),
         () -> assertThat(show.getInboundStation()).isEqualTo(updated.getInboundStation()),
@@ -107,7 +107,7 @@ public class LaneAcceptanceTest {
   @Test
   void 지하철_노선_삭제_테스트() {
     // given
-    Lane line = 지하철_노선_생성(MockLane.서울2호선, MockStation.서울대입구역, MockStation.봉천역);
+    Line line = 지하철_노선_생성(MockLine.서울2호선, MockStation.서울대입구역, MockStation.봉천역);
 
     // when
     지하철_노선_삭제(line.getId());
@@ -116,20 +116,20 @@ public class LaneAcceptanceTest {
     assertThat(지하철_노선_조회(line.getId()).statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
   }
 
-  private Lane 지하철_노선_생성(String name, Station inbound, Station outbound) {
-    LaneRequest request = new LaneRequest(name, inbound, outbound);
+  private Line 지하철_노선_생성(String name, Station inbound, Station outbound) {
+    LineRequest request = new LineRequest(name, inbound, outbound);
 
     return RestAssured
         .given().body(request).contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when().post("/lane")
+        .when().post("/line")
         .then()
-        .extract().body().as(Lane.class);
+        .extract().body().as(Line.class);
   }
 
   private ExtractableResponse<Response> 지하철_노선_조회(Long id) {
     return RestAssured
         .given().contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when().get("/lane/" + id)
+        .when().get("/line/" + id)
         .then()
         .extract();
   }
@@ -137,24 +137,24 @@ public class LaneAcceptanceTest {
   private ExtractableResponse<Response> 지하철_노선_목록_조회() {
     return RestAssured
         .given().contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when().get("/lanes")
+        .when().get("/lines")
         .then()
         .extract();
   }
 
-  private Lane 지하철_노선_수정(Long id, String name, Station inbound, Station outbound) {
-    LaneRequest request = new LaneRequest(name, inbound, outbound);
+  private Line 지하철_노선_수정(Long id, String name, Station inbound, Station outbound) {
+    LineRequest request = new LineRequest(name, inbound, outbound);
 
     return RestAssured
         .given().body(request).contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when().patch("/lane/" + id)
+        .when().patch("/line/" + id)
         .then()
-        .extract().body().as(Lane.class);
+        .extract().body().as(Line.class);
   }
 
   private void 지하철_노선_삭제(Long id) {
     RestAssured
         .given().log().all().contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when().delete("/lane/" + id);
+        .when().delete("/line/" + id);
   }
 }

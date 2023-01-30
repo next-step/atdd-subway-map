@@ -11,7 +11,7 @@ public class Mocks {
     public static Station 신사역 = new Station("신사역");
   }
 
-  public static class MockLane {
+  public static class MockLine {
     public static String 서울2호선 = "서울2호선";
     public static String 신분당선 = "신분당선";
   }

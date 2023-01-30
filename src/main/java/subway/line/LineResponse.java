@@ -1,11 +1,11 @@
-package subway.lane;
+package subway.line;
 
-public class LaneResponse {
+public class LineResponse {
 
   private Long id;
   private String name;
 
-  public LaneResponse(Long id, String name) {
+  public LineResponse(Long id, String name) {
     this.id = id;
     this.name = name;
   }
