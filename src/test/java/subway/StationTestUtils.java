@@ -11,6 +11,8 @@ import org.springframework.http.MediaType;
 
 public class StationTestUtils {
 
+  private StationTestUtils() {}
+
   public static List<Long> 지하철역_생성(Collection<String> names) {
     return names.stream().map(StationTestUtils::지하철역_생성).collect(Collectors.toList());
   }
@@ -28,16 +30,16 @@ public class StationTestUtils {
           .extract().jsonPath().getLong("id");
   }
 
-  public static RequestSpecification prepareRestAssuredGiven(Map<String, String> body) {
-    return prepareRestAssuredGiven().body(body);
+  public static RequestSpecification 인수테스트_Given_준비(Map<String, String> body) {
+    return 인수테스트_Given_준비().body(body);
   }
 
-  public static RequestSpecification prepareRestAssuredGiven() {
+  private static RequestSpecification 인수테스트_Given_준비() {
     return RestAssured.given().log().all().contentType(MediaType.APPLICATION_JSON_VALUE);
   }
 
   public static List<String> 지하철역_조회() {
-    return StationTestUtils.prepareRestAssuredGiven()
+    return 인수테스트_Given_준비()
         .when().get("/stations")
         .then().log().all()
         .extract().jsonPath().getList("name", String.class);

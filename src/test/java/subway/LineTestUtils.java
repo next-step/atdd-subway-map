@@ -9,6 +9,9 @@ import subway.line.LineRequest;
 import subway.station.Station;
 
 public class LineTestUtils {
+
+  private LineTestUtils() {}
+
   public static Line 지하철_노선_생성(String name, Station inbound, Station outbound) {
     LineRequest request = new LineRequest(name, inbound, outbound);
 

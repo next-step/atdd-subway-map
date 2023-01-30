@@ -16,6 +16,7 @@ import subway.Mocks.MockStation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static subway.StationTestUtils.인수테스트_Given_준비;
 import static subway.StationTestUtils.지하철역_삭제;
 import static subway.StationTestUtils.지하철역_생성;
 import static subway.StationTestUtils.지하철역_조회;
@@ -36,7 +37,7 @@ public class StationAcceptanceTest {
         Map<String, String> params = new HashMap<>();
         params.put("name", MockStation.강남역.getName());
 
-        ExtractableResponse<Response> response = StationTestUtils.prepareRestAssuredGiven(params)
+        ExtractableResponse<Response> response = 인수테스트_Given_준비(params)
             .when().post("/stations")
             .then().log().all()
             .extract();
