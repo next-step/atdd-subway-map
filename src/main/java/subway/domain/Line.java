@@ -1,16 +1,13 @@
 package subway.domain;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import javax.persistence.CascadeType;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 
 @Entity
 public class Line {
@@ -23,8 +20,8 @@ public class Line {
 
     private String color;
 
-    @OneToMany(mappedBy = "line", cascade = CascadeType.PERSIST, orphanRemoval = true)
-    private List<Section> sections = new ArrayList<>();
+    @Embedded
+    private Sections sections = new Sections();
 
     public Line() {
     }
@@ -47,16 +44,11 @@ public class Line {
         if (sections.isEmpty()) {
             return Collections.emptyList();
         }
-
-        List<Station> stations = sections.stream()
-            .map(Section::getDownStation)
-            .collect(Collectors.toList());
-        stations.add(0, sections.get(0).getUpStation());
-        return stations;
+        return sections.getStations();
     }
 
     public void removeSection() {
-        sections.remove(sections.size() - 1);
+        sections.remove();
     }
 
     public Long getId() {
@@ -69,9 +61,5 @@ public class Line {
 
     public String getColor() {
         return color;
-    }
-
-    public List<Section> getSections() {
-        return sections;
     }
 }
