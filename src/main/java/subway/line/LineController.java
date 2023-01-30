@@ -42,4 +42,12 @@ public class LineController {
 
         lineService.editLine(lineId, lineEditRequest);
     }
+
+    @DeleteMapping("/{lineId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteLine(@PathVariable final Long lineId) {
+
+        lineService.deleteById(lineId);
+    }
+
 }

@@ -4,7 +4,6 @@ import io.restassured.response.*;
 import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.*;
 import org.springframework.http.*;
-import org.springframework.test.annotation.*;
 
 import java.util.*;
 
@@ -41,7 +40,7 @@ public class LineAcceptanceTest {
         // Then
         assertThat(createResponse.statusCode()).isEqualTo(201);
 
-        final var findResponse = getById(1L);
+        final var findResponse = getById();
         assertThat(findResponse.jsonPath().getLong("id")).isEqualTo(1L);
         assertThat(findResponse.jsonPath().getString("name")).isEqualTo(LINE_1);
         assertThat(findResponse.jsonPath().getString("color")).isEqualTo(BG_COLOR_600);
@@ -49,11 +48,11 @@ public class LineAcceptanceTest {
         assertThat(findResponse.jsonPath().getString("stations[1].name")).isEqualTo(STATION_2);
     }
 
-    private static ExtractableResponse<Response> getById(final Long lineId) {
+    private static ExtractableResponse<Response> getById() {
         return given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
-                .get(LINE_PATH + "/" + lineId.toString())
+                .get(LINE_PATH + "/1")
                 .then().log().all()
                 .extract();
     }
@@ -89,12 +88,7 @@ public class LineAcceptanceTest {
         createLine(LINE_2, UP_STATION_ID_1, UP_STATION_ID_3);
 
         // When
-        final var response = given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .get(LINE_PATH)
-                .then().log().all()
-                .extract();
+        final var response = getAllLines();
 
         // Then
         final var names = response.jsonPath().getList("name", String.class);
@@ -105,6 +99,15 @@ public class LineAcceptanceTest {
 
         final var stations2 = response.jsonPath().getList("stations[1].id", Long.class);
         assertThat(stations2).containsAnyOf(1L, 3L);
+    }
+
+    private static ExtractableResponse<Response> getAllLines() {
+        return given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .get(LINE_PATH)
+                .then().log().all()
+                .extract();
     }
 
     @Test
@@ -132,10 +135,29 @@ public class LineAcceptanceTest {
         // Then
         assertThat(response.statusCode()).isEqualTo(200);
 
-        final var findResponse = getById(1L);
+        final var findResponse = getById();
         assertThat(findResponse.jsonPath().getString("name")).isEqualTo(updateName);
         assertThat(findResponse.jsonPath().getString("color")).isEqualTo(updateColor);
     }
 
+    @Test
+    @DisplayName("노선 삭제")
+    void deleteLine() throws Exception {
+        // Given
+        createLine(LINE_1, UP_STATION_ID_1, UP_STATION_ID_2);
+
+        // When
+        final var response = given().log().all()
+                .when()
+                .delete(LINE_PATH + "/1")
+                .then().log().all()
+                .extract();
+
+        // Then
+        assertThat(response.statusCode()).isEqualTo(204);
+
+        final var findResponses = getAllLines();
+        assertThat(findResponses.jsonPath().getList("id", Long.class)).isEmpty();
+    }
 
 }
