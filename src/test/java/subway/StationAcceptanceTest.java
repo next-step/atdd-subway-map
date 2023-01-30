@@ -1,15 +1,10 @@
 package subway;
 
 import io.restassured.RestAssured;
-import io.restassured.builder.RequestSpecBuilder;
-import io.restassured.http.ContentType;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import io.restassured.specification.RequestSpecification;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 
 import java.util.HashMap;
@@ -19,19 +14,10 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-class StationAcceptanceTest {
+class StationAcceptanceTest extends BaseAcceptance {
 
     private static final String 강남역 = "강남역";
     private static final String 논현역 = "논현역";
-    private static RequestSpecification REQUEST_SPEC;
-
-    @BeforeEach
-    public void setUp() {
-        RequestSpecBuilder reqBuilder = new RequestSpecBuilder();
-        reqBuilder.setContentType(ContentType.JSON);
-        REQUEST_SPEC = reqBuilder.build();
-    }
 
     /**
      * When 지하철역을 생성하면
