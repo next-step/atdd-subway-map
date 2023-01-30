@@ -54,4 +54,9 @@ public class LineService {
         line.changeLineInfo(lineRequest.getName(), lineRequest.getColor(),
                 lineRequest.getUpStationId(), lineRequest.getDownStationId(), lineRequest.getDistance());
     }
+
+    @Transactional
+    public void deleteLine(Long id) {
+        lineRepository.deleteById(id);
+    }
 }
