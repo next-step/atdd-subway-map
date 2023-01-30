@@ -51,9 +51,31 @@ class SectionTest {
         section2.changeLine(newLine);
 
         //then
-        assertThat(oldLine.getSections().size()).isEqualTo(1);
+        assertThat(oldLine.sectionsSize()).isEqualTo(1);
         assertThat(oldLine.getLastSection()).isEqualTo(section1);
         assertThat(section2.getLine()).isEqualTo(newLine);
+    }
+
+    @Test
+    void 구간에서_노선을_삭제한다() {
+        //given
+        Line line = Line.builder()
+                .color("red")
+                .name("노선")
+                .build();
+
+        Section section = createSectionFixTrue(1L, 2L);
+        Section section2 = createSectionFixTrue(2L, 3L);
+        line.addSection(section);
+        line.addSection(section2);
+
+        //when
+        section2.removeLine();
+
+        //then
+        assertThat(line.sectionsSize()).isEqualTo(1);
+        assertThat(line.getLastSection()).isEqualTo(section);
+        assertThat(section2.getLine()).isNull();
     }
 
     public static Section createSectionFixTrue() {
