@@ -1,4 +1,4 @@
-package subway;
+package subway.station;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional(readOnly = true)
 public class StationService {
-    private StationRepository stationRepository;
+    private final StationRepository stationRepository;
 
     public StationService(StationRepository stationRepository) {
         this.stationRepository = stationRepository;
@@ -25,6 +25,11 @@ public class StationService {
         return stationRepository.findAll().stream()
                 .map(this::createStationResponse)
                 .collect(Collectors.toList());
+    }
+
+    public Station findOneById(Long id) {
+        return stationRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("해당하는 id의 지하철 역이 존재하지 않습니다."));
     }
 
     @Transactional
