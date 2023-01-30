@@ -41,24 +41,10 @@ public class SubwayLineTest {
 	void createLine() {
 		// when
 		LineRequest lineRequest = new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10);
-
-		ExtractableResponse<Response> response = RestAssured
-			.given().log().all()
-			.body(lineRequest)
-			.contentType(MediaType.APPLICATION_JSON_VALUE)
-			.when().post("/lines")
-			.then().log().all()
-			.extract();
+		createLine(lineRequest);
 
 		// then
-		assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-		// then
-		List<String> lineNames =
-			RestAssured.given().log().all()
-				.when().get("/lines")
-				.then().log().all()
-				.extract().jsonPath().getList("name", String.class);
+		List<String> lineNames = showLines().jsonPath().getList("name", String.class);
 		assertThat(lineNames).containsAnyOf("신분당선");
 	}
 
@@ -71,35 +57,15 @@ public class SubwayLineTest {
 	@Test
 	void showLineList() {
 		// given
-		LineRequest lineRequest = new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10);
+		LineRequest lineRequest1 = new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10);
 		LineRequest lineRequest2 = new LineRequest("분당선", "bg-green-600", 1L, 3L, 10);
 
-		ExtractableResponse<Response> createResponse1 = RestAssured
-			.given().log().all()
-			.body(lineRequest)
-			.contentType(MediaType.APPLICATION_JSON_VALUE)
-			.when().post("/lines")
-			.then().log().all()
-			.extract();
-		assertThat(createResponse1.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-		ExtractableResponse<Response> createResponse2 = RestAssured
-			.given().log().all()
-			.body(lineRequest2)
-			.contentType(MediaType.APPLICATION_JSON_VALUE)
-			.when().post("/lines")
-			.then().log().all()
-			.extract();
-		assertThat(createResponse2.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+		createLine(lineRequest1);
+		createLine(lineRequest2);
 
 		// when
-		List<String> lineNames = RestAssured
-			.given().log().all()
-			.when().get("/lines")
-			.then().log().all()
-			.extract().jsonPath().getList("name", String.class);
-
 		// then
+		List<String> lineNames = showLines().jsonPath().getList("name", String.class);
 		assertThat(lineNames.size()).isEqualTo(2);
 		assertThat(lineNames).containsAnyOf("신분당선", "분당선");
 	}
@@ -115,29 +81,14 @@ public class SubwayLineTest {
 		// given
 		LineRequest lineRequest = new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10);
 
-		ExtractableResponse<Response> createResponse = RestAssured
-			.given().log().all()
-			.body(lineRequest)
-			.contentType(MediaType.APPLICATION_JSON_VALUE)
-			.when().post("/lines")
-			.then().log().all()
-			.extract();
-		assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-		long id = createResponse.jsonPath().getLong("id");
+		long id = createLine(lineRequest).jsonPath().getLong("id");
 
 		// when
-		ExtractableResponse<Response> showResponse = RestAssured
-			.given().log().all()
-			.when().get("/lines/{id}", id)
-			.then().log().all()
-			.extract();
-
 		// then
 		Assertions.assertAll(
-			() -> assertThat(showResponse.jsonPath().getLong("id")).isEqualTo(id),
-			() -> assertThat(showResponse.jsonPath().getString("name")).isEqualTo("신분당선"),
-			() -> assertThat(showResponse.jsonPath().getString("color")).isEqualTo("bg-red-600")
+			() -> assertThat(showLineById(id).jsonPath().getLong("id")).isEqualTo(id),
+			() -> assertThat(showLineById(id).jsonPath().getString("name")).isEqualTo("신분당선"),
+			() -> assertThat(showLineById(id).jsonPath().getString("color")).isEqualTo("bg-red-600")
 		);
 	}
 
@@ -152,41 +103,16 @@ public class SubwayLineTest {
 		// given
 		LineRequest lineRequest = new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10);
 
-		ExtractableResponse<Response> createResponse = RestAssured
-			.given().log().all()
-			.body(lineRequest)
-			.contentType(MediaType.APPLICATION_JSON_VALUE)
-			.when().post("/lines")
-			.then().log().all()
-			.extract();
-		assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-		long id = createResponse.jsonPath().getLong("id");
+		long id = createLine(lineRequest).jsonPath().getLong("id");
 
 		// when
-		Map<String, String> params = new HashMap<>();
-		params.put("name", "다른분당선");
-		params.put("color", "bg-red-600");
-
-		RestAssured
-			.given().log().all()
-			.body(params)
-			.contentType(MediaType.APPLICATION_JSON_VALUE)
-			.when().put("/lines/{id}", id)
-			.then().log().all()
-			.assertThat().statusCode(200);
+		updateLine(id, "다른분당선", "bg-red-600");
 
 		// then
-		ExtractableResponse<Response> showResponse = RestAssured
-			.given().log().all()
-			.when().get("/lines/{id}", id)
-			.then().log().all()
-			.extract();
-
 		Assertions.assertAll(
-			() -> assertThat(showResponse.jsonPath().getLong("id")).isEqualTo(id),
-			() -> assertThat(showResponse.jsonPath().getString("name")).isEqualTo("다른분당선"),
-			() -> assertThat(showResponse.jsonPath().getString("color")).isEqualTo("bg-red-600")
+			() -> assertThat(showLineById(id).jsonPath().getLong("id")).isEqualTo(id),
+			() -> assertThat(showLineById(id).jsonPath().getString("name")).isEqualTo("다른분당선"),
+			() -> assertThat(showLineById(id).jsonPath().getString("color")).isEqualTo("bg-red-600")
 		);
 	}
 
@@ -201,6 +127,16 @@ public class SubwayLineTest {
 		// given
 		LineRequest lineRequest = new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10);
 
+		long id = createLine(lineRequest).jsonPath().getLong("id");
+
+		// when
+		deleteLine(id);
+
+		// then
+		assertThat(showLineById(id).jsonPath().getLong("id")).isNotEqualTo(id);
+	}
+
+	private ExtractableResponse<Response> createLine(LineRequest lineRequest) {
 		ExtractableResponse<Response> response = RestAssured
 			.given().log().all()
 			.body(lineRequest)
@@ -209,22 +145,58 @@ public class SubwayLineTest {
 			.then().log().all()
 			.extract();
 
-		long id = response.jsonPath().getLong("id");
+		assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+		return response;
+	}
 
-		// when
-		RestAssured
+	private ExtractableResponse<Response> showLines() {
+		ExtractableResponse<Response> response = RestAssured
 			.given().log().all()
-			.when().delete("/lines/{id}", id)
+			.when().get("/lines")
 			.then().log().all()
-			.assertThat().statusCode(204);
+			.extract();
 
-		// then
-		long showId = RestAssured
+		assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+		return response;
+	}
+
+	private ExtractableResponse<Response> showLineById(Long id) {
+		ExtractableResponse<Response> response = RestAssured
 			.given().log().all()
 			.when().get("/lines/{id}", id)
 			.then().log().all()
-			.extract().jsonPath().getLong("id");
-		assertThat(showId).isNotEqualTo(id);
+			.extract();
+
+		assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+		return response;
+	}
+
+	private ExtractableResponse<Response> updateLine(Long id, String name, String color) {
+		Map<String, String> params = new HashMap<>();
+		params.put("name", name);
+		params.put("color", color);
+
+		ExtractableResponse<Response> response = RestAssured
+			.given().log().all()
+			.body(params)
+			.contentType(MediaType.APPLICATION_JSON_VALUE)
+			.when().put("/lines/{id}", id)
+			.then().log().all()
+			.extract();
+
+		assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+		return response;
+	}
+
+	private ExtractableResponse<Response> deleteLine(Long id) {
+		ExtractableResponse<Response> response = RestAssured
+			.given().log().all()
+			.when().delete("/lines/{id}", id)
+			.then().log().all()
+			.extract();
+
+		assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+		return response;
 	}
 
 	private void createStation(String stationName) {
