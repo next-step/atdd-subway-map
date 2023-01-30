@@ -1,4 +1,4 @@
-package subway.line.service.dto;
+package subway.line.application.dto;
 
 public class LineUpdateRequest {
 
