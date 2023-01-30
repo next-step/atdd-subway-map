@@ -2,6 +2,7 @@ package subway.domain;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -23,9 +24,6 @@ public class Line {
     @Column(length = 20, nullable = false)
     private String color;
 
-    @Column(nullable = false)
-    private Long distance;
-
     @OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private final List<Section> sections = new ArrayList<>();
 
@@ -35,7 +33,6 @@ public class Line {
     public Line(String name, String color, Station upStation, Station downStation, Long distance) {
         this.name = name;
         this.color = color;
-        this.distance = distance;
         this.sections.add(new Section(this, upStation, downStation, distance));
     }
 
@@ -59,10 +56,24 @@ public class Line {
     }
 
     public Long getDistance() {
-        return distance;
+        return sections.stream()
+            .map(Section::getDistance)
+            .reduce(0L, Long::sum);
     }
 
     public List<Section> getSections() {
         return sections;
+    }
+
+    public void addSection(Section section) {
+        sections.add(section);
+    }
+
+    public void removeSection(Long stationId) {
+        var lastSection = sections.stream()
+            .filter(section -> !Objects.equals(section.getDownStation().getId(), stationId))
+            .findFirst().orElseThrow();
+
+        sections.remove(lastSection);
     }
 }
