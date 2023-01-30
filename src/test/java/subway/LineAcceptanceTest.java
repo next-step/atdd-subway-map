@@ -141,12 +141,48 @@ public class LineAcceptanceTest {
         // when
         ExtractableResponse<Response> response =
                 RestAssured.given().log().all()
-                        .when().get("/lines/"+lineId)
+                        .when().get("/lines/" + lineId)
                         .then().log().all()
                         .extract();
 
         // then
         assertThat(response.body().jsonPath().getString("name")).isEqualTo("신분당선");
         assertThat(response.body().jsonPath().getList("stations.id", String.class)).containsExactlyInAnyOrder(station1Id, station2Id);
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 수정하면
+     * Then 해당 지하철 노선 정보는 수정된다
+     */
+    @DisplayName("지하철노선을 수정한다.")
+    @Test
+    void modifyLine() {
+        // given
+        String station1Id = createStation("강남역");
+        String station2Id = createStation("신논현역");
+
+        String lineId = createLine("신분당선", station1Id, station2Id);
+
+        // when
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "다른분당선");
+        params.put("color", "bg-blue-600");
+
+        ExtractableResponse<Response> response =
+                RestAssured.given().log().all()
+                        .body(params)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .when().put("/lines/" + lineId)
+                        .then().log().all()
+                        .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertThat(RestAssured.given().log().all()
+                .when().get("/lines/" + lineId)
+                .then().log().all()
+                .extract().body().jsonPath().getString("name")
+        ).isEqualTo("다른분당선");
     }
 }
