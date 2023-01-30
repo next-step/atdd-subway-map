@@ -108,7 +108,9 @@ class LineAcceptanceTest extends AcceptanceTest {
     private void 노선_목록에서_조회_가능하다(String... lineNames) {
         final List<String> createdLineNames = 노선_목록_이름들을_조회한다();
 
-        assertThat(createdLineNames).contains(lineNames);
+        assertThat(createdLineNames)
+            .hasSizeGreaterThanOrEqualTo(lineNames.length)
+            .contains(lineNames);
     }
 
     private void 노선_목록에서_조회_불가능하다(String... lineNames) {

@@ -68,7 +68,9 @@ class StationAcceptanceTest extends AcceptanceTest {
     private void 지하철역_목록에서_조회_가능하다(List<String> stationNames) {
         final List<String> createdStationNames = 지하철역_이름들을_조회한다();
 
-        assertThat(createdStationNames).containsAll(stationNames);
+        assertThat(createdStationNames)
+            .hasSizeGreaterThanOrEqualTo(stationNames.size())
+            .containsAll(stationNames);
     }
 
     private void 지하철역_목록에서_조회_가능하다(String... stationNames) {
