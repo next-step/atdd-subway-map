@@ -14,6 +14,9 @@ import org.springframework.test.annotation.DirtiesContext;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static subway.extracts.ResponseExtracts.상태코드;
+import static subway.extracts.StationExtracts.지하철역_목록_조회_응답_역_이름_추출;
+import static subway.extracts.StationExtracts.지하철역_생성_응답_ID_추출;
 import static subway.requests.StationRequests.*;
 
 @DisplayName("지하철역 관련 기능")
@@ -37,15 +40,15 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 생성한다.")
     @Test
     void createStation() {
+        // given
+        String stationName = "강남역";
+
         // when
-        ExtractableResponse<Response> 지하철역_생성_응답 = 지하철역_생성_요청하기("강남역");
+        ExtractableResponse<Response> 지하철역_생성_응답 = 지하철역_생성_요청하기(stationName);
 
         // then
-        assertThat(지하철역_생성_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-        // then
-        List<String> stationNames = 지하철역_목록_조회_요청하기().jsonPath().getList("name", String.class);
-        assertThat(stationNames).containsAnyOf("강남역");
+        assertThat(상태코드(지하철역_생성_응답)).isEqualTo(HttpStatus.CREATED);
+        assertThat(지하철역_목록_조회_응답_역_이름_추출(지하철역_목록_조회_요청하기())).containsAnyOf(stationName);
     }
 
     /**
@@ -64,8 +67,8 @@ public class StationAcceptanceTest {
         ExtractableResponse<Response> 지하철역_목록_조회_응답 = 지하철역_목록_조회_요청하기();
 
         // then
-        assertThat(지하철역_목록_조회_응답.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(지하철역_목록_조회_응답.jsonPath().getList("name", String.class))
+        assertThat(상태코드(지하철역_목록_조회_응답)).isEqualTo(HttpStatus.OK);
+        assertThat(지하철역_목록_조회_응답_역_이름_추출(지하철역_목록_조회_응답))
                 .hasSize(2)
                 .containsExactlyElementsOf(stationNames);
     }
@@ -80,13 +83,13 @@ public class StationAcceptanceTest {
     void deleteStation() {
         // given
         String 지하철역_이름 = "강남역";
-        String 지하철역_ID = 지하철역_생성_요청하기(지하철역_이름).jsonPath().getString("id");
+        String 지하철역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기(지하철역_이름));
 
         // when
         ExtractableResponse<Response> 지하철역_삭제_응답 = 지하철역_삭제_요청하기(지하철역_ID);
 
         // then
-        assertThat(지하철역_삭제_응답.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-        assertThat(지하철역_목록_조회_요청하기().jsonPath().getList("name", String.class)).doesNotContain(지하철역_이름);
+        assertThat(상태코드(지하철역_삭제_응답)).isEqualTo(HttpStatus.NO_CONTENT);
+        assertThat(지하철역_목록_조회_응답_역_이름_추출(지하철역_목록_조회_요청하기())).doesNotContain(지하철역_이름);
     }
 }

@@ -12,6 +12,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static subway.extracts.LineExtracts.*;
+import static subway.extracts.ResponseExtracts.상태코드;
+import static subway.extracts.StationExtracts.지하철역_생성_응답_ID_추출;
 import static subway.requests.LineRequests.*;
 import static subway.requests.StationRequests.지하철역_생성_요청하기;
 
@@ -35,16 +38,16 @@ public class LineAcceptanceTest {
     @DisplayName("지하철노선을 생성한다.")
     @Test
     void createLine() {
-        String 강남역_ID = 지하철역_생성_요청하기("강남역").body().jsonPath().getString("id");
-        String 양재역_ID = 지하철역_생성_요청하기("양재역").body().jsonPath().getString("id");
+        String 강남역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("강남역"));
+        String 양재역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("양재역"));
         String lineName = "신분당선";
 
         // when
         ExtractableResponse<Response> 지하철노선_생성_응답 = 지하철노선_생성_요청하기(lineName, 강남역_ID, 양재역_ID);
 
         // then
-        assertThat(지하철노선_생성_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(지하철노선_목록_조회_요청하기().jsonPath().getString("name")).contains(lineName);
+        assertThat(상태코드(지하철노선_생성_응답)).isEqualTo(HttpStatus.CREATED);
+        assertThat(지하철노선_목록_조회_응답_노선_이름_추출(지하철노선_목록_조회_요청하기())).contains(lineName);
     }
 
     /**
@@ -56,9 +59,9 @@ public class LineAcceptanceTest {
     @Test
     void readLines() {
         // given
-        String 강남역_ID = 지하철역_생성_요청하기("강남역").body().jsonPath().getString("id");
-        String 신논현역_ID = 지하철역_생성_요청하기("신논현역").body().jsonPath().getString("id");
-        String 논현역_ID = 지하철역_생성_요청하기("논현역").body().jsonPath().getString("id");
+        String 강남역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("강남역"));
+        String 신논현역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("신논현역"));
+        String 논현역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("논현역"));
 
         지하철노선_생성_요청하기("신분당선", 강남역_ID, 신논현역_ID);
         지하철노선_생성_요청하기("신분당선", 신논현역_ID, 논현역_ID);
@@ -67,7 +70,7 @@ public class LineAcceptanceTest {
         ExtractableResponse<Response> 지하철노선_목록_조회_응답 = 지하철노선_목록_조회_요청하기();
 
         // then
-        assertThat(지하철노선_목록_조회_응답.body().jsonPath().getList("id")).hasSize(2);
+        assertThat(지하철노선_목록_조회_응답_ID_추출(지하철노선_목록_조회_응답)).hasSize(2);
     }
 
     /**
@@ -80,17 +83,17 @@ public class LineAcceptanceTest {
     void readLine() {
         // given
         String 노선_이름 = "신분당선";
-        String 강남역_ID = 지하철역_생성_요청하기("강남역").body().jsonPath().getString("id");
-        String 신논현역_ID = 지하철역_생성_요청하기("신논현역").body().jsonPath().getString("id");
+        String 강남역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("강남역"));
+        String 신논현역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("신논현역"));
 
-        String lineId = 지하철노선_생성_요청하기(노선_이름, 강남역_ID, 신논현역_ID).body().jsonPath().getString("id");
+        String lineId = 지하철노선_생성_응답_ID_추출(지하철노선_생성_요청하기(노선_이름, 강남역_ID, 신논현역_ID));
 
         // when
         ExtractableResponse<Response> 지하철노선_조회_응답 = 지하철노선_조회_요청하기(lineId);
 
         // then
-        assertThat(지하철노선_조회_응답.body().jsonPath().getString("name")).isEqualTo(노선_이름);
-        assertThat(지하철노선_조회_응답.body().jsonPath().getList("stations.id", String.class)).containsExactlyInAnyOrder(강남역_ID, 신논현역_ID);
+        assertThat(지하철노선_조회_응답_노선_이름_추출(지하철노선_조회_응답)).isEqualTo(노선_이름);
+        assertThat(지하철노선_조회_역_ID_추출(지하철노선_조회_응답)).containsExactlyInAnyOrder(강남역_ID, 신논현역_ID);
     }
 
     /**
@@ -102,10 +105,10 @@ public class LineAcceptanceTest {
     @Test
     void modifyLine() {
         // given
-        String 강남역_ID = 지하철역_생성_요청하기("강남역").body().jsonPath().getString("id");
-        String 신논현역_ID = 지하철역_생성_요청하기("신논현역").body().jsonPath().getString("id");
+        String 강남역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("강남역"));
+        String 신논현역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("신논현역"));
 
-        String 노선_ID = 지하철노선_생성_요청하기("신분당선", 강남역_ID, 신논현역_ID).body().jsonPath().getString("id");
+        String 노선_ID = 지하철노선_생성_응답_ID_추출(지하철노선_생성_요청하기("신분당선", 강남역_ID, 신논현역_ID));
 
         String 새로운_노선_이름 = "다른분당선";
 
@@ -113,8 +116,8 @@ public class LineAcceptanceTest {
         ExtractableResponse<Response> 지하철노선_수정_응답 = 지하철노선_수정_요청하기(노선_ID, 새로운_노선_이름, "bg-blue-600");
 
         // then
-        assertThat(지하철노선_수정_응답.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-        assertThat(지하철노선_조회_요청하기(노선_ID).body().jsonPath().getString("name")).isEqualTo(새로운_노선_이름);
+        assertThat(상태코드(지하철노선_수정_응답)).isEqualTo(HttpStatus.NO_CONTENT);
+        assertThat(지하철노선_조회_응답_노선_이름_추출(지하철노선_조회_요청하기(노선_ID))).isEqualTo(새로운_노선_이름);
     }
 
 
@@ -127,16 +130,16 @@ public class LineAcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        String 강남역_ID = 지하철역_생성_요청하기("강남역").body().jsonPath().getString("id");
-        String 신논현역_ID = 지하철역_생성_요청하기("신논현역").body().jsonPath().getString("id");
+        String 강남역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("강남역"));
+        String 신논현역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("신논현역"));
 
-        String 노선_ID = 지하철노선_생성_요청하기("신분당선", 강남역_ID, 신논현역_ID).body().jsonPath().getString("id");
+        String 노선_ID = 지하철노선_생성_응답_ID_추출(지하철노선_생성_요청하기("신분당선", 강남역_ID, 신논현역_ID));
 
         // when
         ExtractableResponse<Response> 지하철역_삭제_응답 = 지하철노선_삭제_요청하기(노선_ID);
 
         // then
-        assertThat(지하철역_삭제_응답.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-        assertThat(지하철노선_목록_조회_요청하기().body().jsonPath().getList("id")).isEmpty();
+        assertThat(상태코드(지하철역_삭제_응답)).isEqualTo(HttpStatus.NO_CONTENT);
+        assertThat(지하철노선_목록_조회_응답_ID_추출(지하철노선_목록_조회_요청하기()));
     }
 }
