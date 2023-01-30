@@ -1,4 +1,4 @@
-package subway;
+package subway.station;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -9,7 +9,7 @@ public class StationApiClient {
 
     private static final String ENDPOINT_STATIONS = "/stations";
 
-    static ExtractableResponse<Response> requestCreateStation(String name) {
+    public static ExtractableResponse<Response> requestCreateStation(String name) {
         StationRequest req = new StationRequest(name);
 
         return RestAssured.given().log().all()
