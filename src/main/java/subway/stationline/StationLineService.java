@@ -52,5 +52,10 @@ public class StationLineService {
         stationLine.updateNameAndColor(request.getName(), request.getColor());
     }
 
+    @Transactional
+    public void deleteStationLine(Long stationLineId) {
+        stationLineRepository.deleteById(stationLineId);
+    }
+
 
 }

@@ -37,5 +37,10 @@ public class StationLineController {
         return ResponseEntity.ok().build();
     }
 
+    @DeleteMapping("/lines/{stationLineId}")
+    public ResponseEntity<Void> deleteStationLine(@PathVariable Long stationLineId) {
+        stationLineService.deleteStationLine(stationLineId);
+        return ResponseEntity.noContent().build();
+    }
 
 }

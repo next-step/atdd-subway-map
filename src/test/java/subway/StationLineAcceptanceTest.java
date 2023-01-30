@@ -7,13 +7,16 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
+import subway.stationline.StationLineRepository;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -23,6 +26,10 @@ import static subway.StationUtils.*;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationLineAcceptanceTest {
+
+    @Autowired
+    StationLineRepository stationLineRepository;
+
     @BeforeEach
     void setup() {
         StationUtils.createStation(GANG_NAM_STATION);
@@ -150,8 +157,8 @@ public class StationLineAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         assertThatThrownBy(() -> {
-            StationUtils.selectStationLine(1L);
-        }).isInstanceOf(IllegalArgumentException.class);
+            stationLineRepository.findById(1L).orElseThrow();
+        }).isInstanceOf(NoSuchElementException.class);
     }
 
 }
