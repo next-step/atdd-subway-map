@@ -3,7 +3,6 @@ package subway;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.apache.http.HttpHeaders;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,19 +12,20 @@ import subway.route.LineRequest;
 import subway.route.LineResponse;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관리 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {
-    private static final String BASE_URL = "/lines";
-
     private static final String ID = "id";
     private static final String NAME = "name";
     private static final String COLOR = "color";
     private static final String STATIONS = "stations";
 
+    private static final String BASE_URL = "/lines";
+    private static final String DETAIL_URL = "/lines/{" + ID + "}";
 
     private static final String NAME_VALUE1 = "신분당선";
     private static final String COLOR_VALUE1 = "bg-red-600";
@@ -98,6 +98,41 @@ public class LineAcceptanceTest {
         );
     }
 
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 조회하면
+     * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
+     */
+    @DisplayName("지하철노선 조회")
+    @Test
+    void getLineTest() {
+        //given
+        Long upStationId = 지하철역생성후ID반환(StationAcceptanceTest.GANGNAM);
+        Long downStationId = 지하철역생성후ID반환(StationAcceptanceTest.YANGJAE);
+        ExtractableResponse<Response> createLineResponse = createLineWithLineRequest(NAME_VALUE1, COLOR_VALUE1, upStationId, downStationId);
+        long id = createLineResponse.jsonPath().getLong(ID);
+
+        // when
+        ExtractableResponse<Response> response = getLine(id);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        LineResponse lineResponse = response.body().as(LineResponse.class);
+        assertThat(lineResponse.getId()).isEqualTo(id);
+        assertThat(lineResponse.getName()).isEqualTo(NAME_VALUE1);
+        assertThat(lineResponse.getColor()).isEqualTo(COLOR_VALUE1);
+//        assertThat(lineResponse.getStations())
+//                .extracting(NAME).contains(StationAcceptanceTest.GANGNAM, StationAcceptanceTest.YANGJAE);
+    }
+
+    private ExtractableResponse<Response> getLine(long id) {
+        return RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().get(DETAIL_URL, Map.of(ID, id))
+                .then().log().all()
+                .extract();
+    }
+
     private static ExtractableResponse<Response> createLineWithLineRequest(String name, String color, Long upStationId, Long downStationId) {
         LineRequest lineRequest = new LineRequest(name, color, upStationId, downStationId, DISTANCE_VALUE);
         ExtractableResponse<Response> response = createLine(lineRequest);
@@ -114,8 +149,8 @@ public class LineAcceptanceTest {
         return response;
     }
 
-    private static Long 지하철역생성후ID반환(String gangnam) {
-        ExtractableResponse<Response> 강남역 = StationAcceptanceTest.createSubwayStation(gangnam);
+    private static Long 지하철역생성후ID반환(String stationName) {
+        ExtractableResponse<Response> 강남역 = StationAcceptanceTest.createSubwayStation(stationName);
         Long upStationId = StationAcceptanceTest.extractStationId(강남역);
         return upStationId;
     }
