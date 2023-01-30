@@ -50,10 +50,7 @@ public class LineService {
     public LineResponse updateLine(Long id, LineRequest lineRequest) {
         Line line = lineRepository.findById(id).orElseThrow(LineNotFoundException::new);
 
-        Station upStation = stationService.findStation(lineRequest.getUpStationId());
-        Station downStation = stationService.findStation(lineRequest.getDownStationId());
-
-        Line updatedLine = line.updateLine(lineRequest.getName(), lineRequest.getColor(), upStation, downStation, lineRequest.getDistance());
+        Line updatedLine = line.updateLine(lineRequest.getName(), lineRequest.getColor());
         return LineResponse.createLineResponse(lineRepository.save(updatedLine));
     }
 

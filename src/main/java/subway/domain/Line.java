@@ -1,12 +1,15 @@
 package subway.domain;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import javax.persistence.OneToMany;
 
 @Entity
 public class Line {
@@ -20,16 +23,11 @@ public class Line {
     @Column(length = 20, nullable = false)
     private String color;
 
-    @OneToOne
-    @JoinColumn(name = "up_station_id")
-    private Station upStation;
-
-    @OneToOne
-    @JoinColumn(name = "down_station_id")
-    private Station downStation;
-
     @Column(nullable = false)
     private Long distance;
+
+    @OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
+    private final List<Section> sections = new ArrayList<>();
 
     protected Line() {
     }
@@ -37,17 +35,13 @@ public class Line {
     public Line(String name, String color, Station upStation, Station downStation, Long distance) {
         this.name = name;
         this.color = color;
-        this.upStation = upStation;
-        this.downStation = downStation;
         this.distance = distance;
+        this.sections.add(new Section(this, upStation, downStation, distance));
     }
 
-    public Line updateLine(String name, String color, Station upStation, Station downStation, Long distance) {
+    public Line updateLine(String name, String color) {
         this.name = name;
         this.color = color;
-        this.upStation = upStation;
-        this.downStation = downStation;
-        this.distance = distance;
 
         return this;
     }
@@ -64,15 +58,11 @@ public class Line {
         return color;
     }
 
-    public Station getUpStation() {
-        return upStation;
-    }
-
-    public Station getDownStation() {
-        return downStation;
-    }
-
     public Long getDistance() {
         return distance;
+    }
+
+    public List<Section> getSections() {
+        return sections;
     }
 }
