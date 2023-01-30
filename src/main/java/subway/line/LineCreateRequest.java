@@ -1,5 +1,7 @@
 package subway.line;
 
+import subway.station.Station;
+
 public class LineCreateRequest {
     private final String name;
     private final String color;
@@ -13,6 +15,16 @@ public class LineCreateRequest {
         this.upStationId = upStationId;
         this.downStationId = downStationId;
         this.distance = distance;
+    }
+
+    public Line toEntity(Station upStation, Station downStation) {
+        return new Line.Builder()
+                .name(this.name)
+                .color(this.color)
+                .upStation(upStation)
+                .downStation(downStation)
+                .distance(this.distance)
+                .build();
     }
 
     public String getName() {

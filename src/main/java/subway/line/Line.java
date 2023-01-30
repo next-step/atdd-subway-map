@@ -33,16 +33,6 @@ public class Line {
         this.distance = distance;
     }
 
-    public static Line of(final LineCreateRequest createRequest, final Station upStation, final Station downStation) {
-        return new Line(
-                createRequest.getName(),
-                createRequest.getColor(),
-                upStation,
-                downStation,
-                createRequest.getDistance()
-        );
-    }
-
     public void update(final LineUpdateRequest lineUpdateRequest) {
         this.name = lineUpdateRequest.getName();
         this.color = lineUpdateRequest.getColor();
@@ -70,5 +60,45 @@ public class Line {
 
     public Integer getDistance() {
         return distance;
+    }
+
+    private Line(Builder builder) {
+        this(builder.name, builder.color, builder.upStation, builder.downStation, builder.distance);
+    }
+    static class Builder {
+        private String name;
+        private String color;
+        private Station upStation;
+        private Station downStation;
+        private Integer distance;
+
+        public Builder name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Builder color(String color) {
+            this.color = color;
+            return this;
+        }
+
+        public Builder upStation(Station upStation) {
+            this.upStation = upStation;
+            return this;
+        }
+
+        public Builder downStation(Station downStation) {
+            this.downStation = downStation;
+            return this;
+        }
+
+        public Builder distance(Integer distance) {
+            this.distance = distance;
+            return this;
+        }
+
+        public Line build() {
+            return new Line(this);
+        }
     }
 }
