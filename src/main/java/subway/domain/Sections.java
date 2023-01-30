@@ -3,7 +3,6 @@ package subway.domain;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import javax.persistence.CascadeType;
@@ -29,10 +28,7 @@ public class Sections {
 
     public void removeSection(Long stationId) {
         validateRemoveSection(stationId);
-        var lastSection = sections.stream()
-            .filter(section -> !Objects.equals(section.getDownStation().getId(), stationId))
-            .findFirst().orElseThrow();
-
+        var lastSection = sections.get(sections.size() - 1);
         sections.remove(lastSection);
     }
 
