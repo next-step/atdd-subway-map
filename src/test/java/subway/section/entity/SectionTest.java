@@ -2,10 +2,9 @@ package subway.section.entity;
 
 import org.junit.jupiter.api.Test;
 import subway.line.entity.Line;
-import subway.station.entity.Station;
-import subway.util.RandomUtil;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static subway.common.TestFixTure.createSectionFixTrue;
 
 class SectionTest {
 
@@ -76,18 +75,5 @@ class SectionTest {
         assertThat(line.sectionsSize()).isEqualTo(1);
         assertThat(line.getLastSection()).isEqualTo(section);
         assertThat(section2.getLine()).isNull();
-    }
-
-    public static Section createSectionFixTrue() {
-        return createSectionFixTrue(RandomUtil.getLandomLong(), RandomUtil.getLandomLong());
-    }
-
-    public static Section createSectionFixTrue(Long upStationId, Long downStationId) {
-        return Section.builder()
-                .id(RandomUtil.getLandomLong())
-                .upStation(new Station(upStationId, "역2"))
-                .downStation(new Station(downStationId, "역1"))
-                .distance(RandomUtil.getLandomLong())
-                .build();
     }
 }

@@ -1,13 +1,10 @@
 package subway.section.entity;
 
 import org.junit.jupiter.api.Test;
-import subway.line.entity.Line;
-import subway.station.entity.Station;
-import subway.util.RandomUtil;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
-import static subway.section.entity.SectionTest.createSectionFixTrue;
+import static subway.common.TestFixTure.createSectionFixTrue;
 
 class SectionsTest {
 
