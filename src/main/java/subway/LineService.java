@@ -40,7 +40,14 @@ public class LineService {
                 .map(line -> createLineResponse(line))
                 .collect(Collectors.toList());
     }
-    
+
+    public LineResponse readLine(Long lineId) {
+        Line line = lineRepository.findById(lineId)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 노선입니다."));
+
+        return createLineResponse(line);
+    }
+
     private LineResponse createLineResponse(Line line) {
         return new LineResponse(
                 line.getId(),
