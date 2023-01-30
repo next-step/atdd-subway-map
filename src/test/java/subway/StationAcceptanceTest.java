@@ -8,20 +8,21 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("지하철역 관련 기능")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationAcceptanceTest {
 
-    private final String stationName = "name";
+    private static final String STATION_NAME = "name";
 
     /**
      * When 지하철역을 생성하면
@@ -36,11 +37,16 @@ public class StationAcceptanceTest {
         params.put("name", "강남역");
 
         ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
+                RestAssured.given()
+                        .log()
+                        .all()
                         .body(params)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/stations")
-                        .then().log().all()
+                        .when()
+                        .post("/stations")
+                        .then()
+                        .log()
+                        .all()
                         .extract();
 
         // then
@@ -48,10 +54,17 @@ public class StationAcceptanceTest {
 
         // then
         List<String> stationNames =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
+                RestAssured.given()
+                        .log()
+                        .all()
+                        .when()
+                        .get("/stations")
+                        .then()
+                        .log()
+                        .all()
+                        .extract()
+                        .jsonPath()
+                        .getList("name", String.class);
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
@@ -70,25 +83,12 @@ public class StationAcceptanceTest {
         insertStation(강남역);
         insertStation(서울대입구역);
 
-        // when & then
-        RestAssured
-                .given()
-                .accept(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .get("/stations")
-                .then()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .assertThat()
-                .body(stationName, hasSize(2))
-                .and()
-                .body(stationName, containsInAnyOrder(equalTo(서울대입구역), equalTo(강남역)));
-
         // when
         List<String> stationNames = getStations();
 
         // then
         assertAll(
-                () -> assertEquals(2, stationNames.size()),
+                () -> assertThat(stationNames.size()).isEqualTo(2),
                 () -> assertTrue(stationNames.containsAll(List.of(서울대입구역, 강남역)))
         );
     }
@@ -109,22 +109,10 @@ public class StationAcceptanceTest {
         RestAssured
                 .given()
                 .when()
-                .delete("/stations/{id}", 1)
+                    .delete("/stations/{id}", 1)
                 .then()
-                .statusCode(HttpStatus.NO_CONTENT.value());
+                    .statusCode(HttpStatus.NO_CONTENT.value());
 
-
-        // when & then
-        RestAssured
-                .given()
-                .accept(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .get("/stations")
-                .then()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(stationName, not(hasItem(서울대입구역)));
-
-        // when
         List<String> stations = getStations();
 
         // then
@@ -134,21 +122,24 @@ public class StationAcceptanceTest {
     private List<String> getStations() {
         return RestAssured
                 .given()
-                .accept(MediaType.APPLICATION_JSON_VALUE)
+                    .accept(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .get("/stations")
                 .then()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .extract()
-                .jsonPath().getList(stationName, String.class);
+                .jsonPath()
+                .getList(STATION_NAME, String.class);
     }
 
     private void insertStation(String station) {
-        Map<String, String> param = Map.of(stationName, station);
+        Map<String, String> param = Map.of(STATION_NAME, station);
 
-        RestAssured.given()
-                .body(param)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations");
+        RestAssured
+                .given()
+                    .body(param)
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                    .post("/stations");
     }
 }
