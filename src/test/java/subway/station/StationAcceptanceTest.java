@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import subway.station.dto.StationRequest;
 import subway.station.dto.StationResponse;
 
@@ -17,6 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class StationAcceptanceTest {
     /**
      * When 지하철역을 생성하면
@@ -96,7 +98,17 @@ public class StationAcceptanceTest {
         assertThat(stationNames).doesNotContain(강남역_request.getName());
     }
 
-    private ExtractableResponse<Response> 지하철역을_생성한다(StationRequest request) {
+    public static StationResponse 지하철역이_생성됨(String name) {
+        var request = new StationRequest() {{
+            setName(name);
+        }};
+        var response = 지하철역을_생성한다(request);
+        //  then
+        지하철역이_정상적으로_생성(response);
+        return response.as(StationResponse.class);
+    }
+
+    public static ExtractableResponse<Response> 지하철역을_생성한다(StationRequest request) {
         return RestAssured.given().log().all()
                 .body(request)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -121,7 +133,7 @@ public class StationAcceptanceTest {
                 .extract();
     }
 
-    private void 지하철역이_정상적으로_생성(ExtractableResponse<Response> response) {
+    public static void 지하철역이_정상적으로_생성(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
 
