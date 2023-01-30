@@ -7,6 +7,7 @@ import subway.station.entity.Station;
 import javax.persistence.*;
 
 
+@Builder
 @ToString
 @Getter
 @Entity
@@ -34,15 +35,8 @@ public class Section {
     @Column(length = 20, nullable = false)
     private long distance;
 
-    @Builder
-    public Section(Station downStation, Station upStation, long distance) {
-        this.downStation = downStation;
-        this.upStation = upStation;
-        this.distance = distance;
-    }
-
     public void changeLine(Line newLine) {
-        if (line != null && newLine.equals(newLine)) {
+        if (line != null && line.equals(newLine)) {
             return;
         }
 
@@ -60,5 +54,14 @@ public class Section {
 
     public Long downStationId() {
         return downStation.getId();
+    }
+
+    public void removeLine() {
+        if (line == null) {
+            return;
+        }
+
+        line.remove(this);
+        line = null;
     }
 }

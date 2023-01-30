@@ -3,6 +3,7 @@ package subway.line.entity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import subway.section.entity.Section;
 import subway.section.entity.Sections;
 import subway.station.entity.Station;
@@ -10,6 +11,7 @@ import subway.station.entity.Station;
 import javax.persistence.*;
 import java.util.List;
 
+@ToString
 @Getter
 @Entity
 @NoArgsConstructor
@@ -26,6 +28,7 @@ public class Line {
     @Column(length = 20, nullable = false)
     private String color;
 
+    @ToString.Exclude
     @Embedded
     private Sections sections;
 
@@ -75,6 +78,10 @@ public class Line {
 
     public Section getLastSection() {
         return sections.last();
+    }
+
+    public int sectionsSize() {
+        return sections.size();
     }
 }
 

@@ -9,7 +9,6 @@ import subway.station.entity.Station;
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
-import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,7 +18,7 @@ import java.util.stream.Collectors;
 @Embeddable
 @AllArgsConstructor
 @NoArgsConstructor
-public class Sections extends AbstractList<Section> {
+public class Sections {
 
     public static final String IS_NOT_LAST_SECTION_DOWN_STATION = "마지막 구간의 하행역이 아닙니다.";
     public static final String LINE_SECTION_IS_ONLY_ONE = "노선에 구간이 하나 입니다.";
@@ -31,20 +30,63 @@ public class Sections extends AbstractList<Section> {
         return new Sections(values);
     }
 
-    @Override
     public Section get(int index) {
         return values.get(index);
     }
 
-    @Override
     public int size() {
         return values.size();
     }
 
-    @Override
     public boolean add(Section section) {
         validateForAdd(section);
         return values.add(section);
+    }
+
+    public void add(Line line, Station upStation, Station downStation, long distance) {
+        Section section = Section.builder()
+                .upStation(upStation)
+                .downStation(downStation)
+                .distance(distance)
+                .build();
+
+        if (values.contains(section)) {
+            return;
+        }
+
+        add(section);
+        section.changeLine(line);
+    }
+
+    public void remove(Section section) {
+        if (!values.contains(section)) {
+            return;
+        }
+
+        validateRemove(section.downStationId());
+        values.remove(section);
+        section.removeLine();
+    }
+
+    public void validateRemove(Long downStationId) {
+        if (!last().downStationId().equals(downStationId)) {
+            throw new IllegalArgumentException(IS_NOT_LAST_SECTION_DOWN_STATION);
+        }
+
+        if (values.size() <= 1) {
+            throw new IllegalArgumentException(LINE_SECTION_IS_ONLY_ONE);
+        }
+    }
+
+    public void removeByStationId(Long downStationId) {
+        validateRemove(downStationId);
+        values.stream()
+                .filter(section -> section.downStationId().equals(downStationId))
+                .findAny()
+                .ifPresent(section -> {
+                    values.remove(section);
+                    section.removeLine();
+                });
     }
 
     private void validateForAdd(Section newSection) {
@@ -91,33 +133,8 @@ public class Sections extends AbstractList<Section> {
         return values.get(values.size() - 1);
     }
 
-    public void validateRemove(Long stationId) {
-        if (!last().downStationId().equals(stationId)) {
-            throw new IllegalArgumentException(IS_NOT_LAST_SECTION_DOWN_STATION);
-        }
 
-        if (values.size() <= 1) {
-            throw new IllegalArgumentException(LINE_SECTION_IS_ONLY_ONE);
-        }
-    }
-
-    public void removeByStationId(Long stationId) {
-        validateRemove(stationId);
-        values.removeIf(section -> section.downStationId().equals(stationId));
-    }
-
-    public void add(Line line, Station upStation, Station downStation, long distance) {
-        Section section = Section.builder()
-                .upStation(upStation)
-                .downStation(downStation)
-                .distance(distance)
-                .build();
-
-        if (values.contains(section)) {
-            return;
-        }
-
-        add(section);
-        section.changeLine(line);
+    public boolean contains(Section section) {
+        return values.contains(section);
     }
 }
