@@ -23,4 +23,12 @@ public class LineResponse {
   public String getName() {
     return name;
   }
+
+  public Station getInboundStation() {
+    return inboundStation;
+  }
+
+  public Station getOutboundStation() {
+    return outboundStation;
+  }
 }

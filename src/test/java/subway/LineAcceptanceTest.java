@@ -36,9 +36,13 @@ public class LineAcceptanceTest {
     // when
     Line line = 지하철_노선_생성(MockLine.서울2호선, MockStation.서울대입구역, MockStation.봉천역);
 
-    assertThat(
-        지하철_노선_조회(line.getId()).jsonPath().getString("name")
-    ).isEqualTo(line.getName());
+    ExtractableResponse<Response> response = 지하철_노선_조회(line.getId());
+
+    assertAll(
+        () -> assertThat(response.jsonPath().getString("name")).isEqualTo(line.getName()),
+        () -> assertThat(response.jsonPath().getString("inboundStation.name")).isEqualTo(MockStation.서울대입구역.getName()),
+        () -> assertThat(response.jsonPath().getString("outboundStation.name")).isEqualTo(MockStation.봉천역.getName())
+    );
   }
 
   /**
@@ -93,8 +97,8 @@ public class LineAcceptanceTest {
     Line show = 지하철_노선_조회(updated.getId()).as(Line.class);
     assertAll(
         () -> assertThat(show.getName()).isEqualTo(updated.getName()),
-        () -> assertThat(show.getInboundStation()).isEqualTo(updated.getInboundStation()),
-        () -> assertThat(show.getOutboundStation()).isEqualTo(updated.getOutboundStation())
+        () -> assertThat(show.getInboundStation().getName()).isEqualTo(updated.getInboundStation().getName()),
+        () -> assertThat(show.getOutboundStation().getName()).isEqualTo(updated.getOutboundStation().getName())
     );
   }
 
@@ -130,7 +134,7 @@ public class LineAcceptanceTest {
     return RestAssured
         .given().contentType(MediaType.APPLICATION_JSON_VALUE)
         .when().get("/lines/" + id)
-        .then()
+        .then().log().all()
         .extract();
   }
 
