@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import subway.route.LineRequest;
 import subway.route.LineResponse;
 
@@ -15,10 +16,10 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DisplayName("지하철 노선 관리 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class LineAcceptanceTest {
     private static final String ID = "id";
     private static final String NAME = "name";
@@ -104,7 +105,7 @@ public class LineAcceptanceTest {
      * When 생성한 지하철 노선을 조회하면
      * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
      */
-    @DisplayName("지하철노선을 조회합니다.")
+    @DisplayName("지하철 노선을 조회합니다.")
     @Test
     void getLineTest() {
         //given
@@ -131,7 +132,7 @@ public class LineAcceptanceTest {
      * When 생성한 지하철 노선을 수정하면
      * Then 해당 지하철 노선 정보는 수정된다
      */
-    @DisplayName("지하철노선을 수정합니다.")
+    @DisplayName("지하철 노선을 수정합니다.")
     @Test
     void updateLineTest() {
         // given
@@ -161,7 +162,7 @@ public class LineAcceptanceTest {
      * When 생성한 지하철 노선을 삭제하면
      * Then 해당 지하철 노선 정보는 삭제된다
      */
-    @DisplayName("지하철노선을 삭제합니다.")
+    @DisplayName("지하철 노선을 삭제합니다.")
     @Test
     void deleteLineTest() {
         // given

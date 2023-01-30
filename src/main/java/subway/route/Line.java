@@ -1,12 +1,8 @@
 package subway.route;
 
-import subway.StationResponse;
+import subway.Station;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import java.util.List;
+import javax.persistence.*;
 
 @Entity
 public class Line {
@@ -19,20 +15,24 @@ public class Line {
 
     private String color;
 
-    private Long upStationId;
+    @OneToOne
+    @JoinColumn(name = "upStationId")
+    private Station upStation;
 
-    private Long downStationId;
+    @OneToOne
+    @JoinColumn(name = "downStationId")
+    private Station downStation;
 
     private Long distance;
 
     public Line() {
     }
 
-    public Line(String name, String color, Long upStationId, Long downStationId, Long distance) {
+    public Line(String name, String color, Station upStation, Station downStation, Long distance) {
         this.name = name;
         this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
+        this.upStation = upStation;
+        this.downStation = downStation;
         this.distance = distance;
     }
 
@@ -48,23 +48,23 @@ public class Line {
         return color;
     }
 
-    public Long getUpStationId() {
-        return upStationId;
+    public Station getUpStation() {
+        return upStation;
     }
 
-    public Long getDownStationId() {
-        return downStationId;
+    public Station getDownStation() {
+        return downStation;
     }
 
     public Long getDistance() {
         return distance;
     }
 
-    public void changeLineInfo(String name, String color, Long upStationId, Long downStationId, Long distance) {
+    public void changeLineInfo(String name, String color, Station upStation, Station downStation, Long distance) {
         this.name = name;
         this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
+        this.upStation = upStation;
+        this.downStation = downStation;
         this.distance = distance;
     }
 }
