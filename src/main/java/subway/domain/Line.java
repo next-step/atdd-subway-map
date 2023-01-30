@@ -32,6 +32,19 @@ public class Line {
         this(null, name, color, sections);
     }
 
+    public void updateLine(final String changeName, final String changeColor) {
+        this.name = changeName;
+        this.color = changeColor;
+    }
+
+    public void addSection(final Station upStation, final Station downStation, final Integer distance) {
+        this.sections.addSection(this, new Section(this, upStation, downStation, distance));
+    }
+
+    public void removeSection(final Station station) {
+        this.sections.removeSection(station);
+    }
+
     public Long getId() {
         return id;
     }
@@ -46,19 +59,6 @@ public class Line {
 
     public Sections getSections() {
         return sections;
-    }
-
-    public void updateLine(final String changeName, final String changeColor) {
-        this.name = changeName;
-        this.color = changeColor;
-    }
-
-    public void addSection(final Station upStation, final Station downStation, final Integer distance) {
-        this.sections.addSection(this, new Section(this, upStation, downStation, distance));
-    }
-
-    public void removeSection(final Station station) {
-        this.sections.removeSection(station);
     }
 
     @Override

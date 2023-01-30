@@ -49,6 +49,18 @@ public class Section {
         this(null, null, upStation, downStation, distance);
     }
 
+    public boolean matchUpStation(final Station station) {
+        return this.upStation.equals(station);
+    }
+
+    public boolean matchDownStation(final Station station) {
+        return this.downStation.equals(station);
+    }
+
+    public void addLine(final Line line) {
+        this.line = line;
+    }
+
     public Long getId() {
         return id;
     }
@@ -67,18 +79,6 @@ public class Section {
 
     public Integer getDistance() {
         return distance;
-    }
-
-    public boolean matchUpStation(final Station station) {
-        return this.upStation.equals(station);
-    }
-
-    public boolean matchDownStation(final Station station) {
-        return this.downStation.equals(station);
-    }
-
-    public void addLine(final Line line) {
-        this.line = line;
     }
 
     @Override
