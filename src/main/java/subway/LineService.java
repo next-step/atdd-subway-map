@@ -77,4 +77,12 @@ public class LineService {
 
         line.modify(newName, newColor);
     }
+
+    @Transactional
+    public void deleteLine(Long lineId) {
+        lineRepository.findById(lineId)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 노선입니다."));
+
+        lineRepository.deleteById(lineId);
+    }
 }
