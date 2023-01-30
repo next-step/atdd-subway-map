@@ -54,7 +54,7 @@ public class LineService {
 
     public void updateLine(final Long id, LineUpdateRequest lineUpdateRequest) {
         final Line line = lineRepository.getLine(id);
-        line.update(lineUpdateRequest);
+        line.update(lineUpdateRequest.getName(), lineUpdateRequest.getColor());
     }
 
     public void deleteLine(final Long id) {
