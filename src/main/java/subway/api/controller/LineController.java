@@ -4,7 +4,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import subway.api.dto.LineRequest;
 import subway.api.dto.LineResponse;
-import subway.domain.station.service.LineService;
+import subway.domain.service.LineService;
 
 import java.net.URI;
 import java.util.List;

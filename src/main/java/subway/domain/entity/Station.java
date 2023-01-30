@@ -1,4 +1,4 @@
-package subway.domain.station.entity;
+package subway.domain.entity;
 
 import javax.persistence.*;
 

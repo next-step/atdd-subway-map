@@ -1,13 +1,13 @@
-package subway.domain.station.service;
+package subway.domain.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.api.dto.LineRequest;
 import subway.api.dto.LineResponse;
-import subway.domain.station.entity.Line;
-import subway.domain.station.entity.Station;
-import subway.domain.station.repository.LineRepository;
-import subway.domain.station.repository.StationRepository;
+import subway.domain.entity.Line;
+import subway.domain.entity.Station;
+import subway.domain.repository.LineRepository;
+import subway.domain.repository.StationRepository;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;

@@ -1,6 +1,6 @@
 package subway.api.dto;
 
-import subway.domain.station.entity.Station;
+import subway.domain.entity.Station;
 
 import java.util.List;
 
