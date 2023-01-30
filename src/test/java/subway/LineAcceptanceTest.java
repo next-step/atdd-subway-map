@@ -56,7 +56,7 @@ public class LineAcceptanceTest {
     @Test
     void createLine() {
         지하철_노선_생성("이호선", "green", 강남역, 잠실역, 5L);
-        List<String> lineNames = 지하철_노선_조회();
+        List<String> lineNames = 지하철_노선_목록_조회();
         assertThat(lineNames)
                 .hasSize(1)
                 .containsAnyOf("이호선");
@@ -68,17 +68,17 @@ public class LineAcceptanceTest {
         지하철_노선_생성("이호선", "green", 강남역, 잠실역, 10L);
         지하철_노선_생성("팔호선", "green", 잠실역, 천호역, 15L);
 
-        List<String> lineNames = 지하철_노선_조회();
+        List<String> lineNames = 지하철_노선_목록_조회();
         assertThat(lineNames)
                 .hasSize(2)
                 .contains("이호선", "팔호선");
     }
 
-    @DisplayName("지하철노선 조회 by id 성공")
+    @DisplayName("지하철노선 조회 성공")
     @Test
     void find_Line() {
         Long 이호선 = 지하철_노선_생성("이호선", "green", 강남역, 잠실역, 5L);
-        String name = 지하철_노선_조회_by_id(이호선);
+        String name = 지하철_노선_조회(이호선);
         assertThat(name).isEqualTo("이호선");
     }
 
@@ -86,7 +86,9 @@ public class LineAcceptanceTest {
     @Test
     void modify_line() {
         Long 이호선 = 지하철_노선_생성("이호선", "green", 강남역, 잠실역, 5L);
-        지하철_노선_수정(이호선, "blue");
+        지하철_노선_수정(이호선, "신분당선", "blue");
+        String name = 지하철_노선_조회(이호선);
+        assertThat(name).isEqualTo("신분당선");
     }
 
     @DisplayName("지하철노선 삭제 성공")
@@ -108,8 +110,9 @@ public class LineAcceptanceTest {
                     .extract();
     }
 
-    private ExtractableResponse<Response> 지하철_노선_수정(Long id, String color) {
+    private ExtractableResponse<Response> 지하철_노선_수정(Long id, String name, String color) {
         Map<String, String> params = new HashMap<>();
+        params.put("name", name);
         params.put("color", color);
 
         return given().log().all()
@@ -143,7 +146,7 @@ public class LineAcceptanceTest {
                     .extract().jsonPath().getLong("id");
     }
 
-    List<String> 지하철_노선_조회() {
+    List<String> 지하철_노선_목록_조회() {
         return given().log().all()
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
@@ -154,7 +157,7 @@ public class LineAcceptanceTest {
                     .extract().jsonPath().getList("name", String.class);
     }
 
-    String 지하철_노선_조회_by_id(Long id) {
+    String 지하철_노선_조회(Long id) {
         return given().log().all()
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
                     .pathParam("id", id)
