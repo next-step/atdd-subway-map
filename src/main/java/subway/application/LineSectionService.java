@@ -5,7 +5,6 @@ import org.springframework.transaction.annotation.Transactional;
 import subway.domain.Line;
 import subway.domain.Station;
 import subway.ui.dto.LineSectionRequest;
-import subway.ui.dto.LineSectionResponse;
 
 @Service
 @Transactional(readOnly = true)
@@ -34,10 +33,5 @@ public class LineSectionService {
         final Station downStation = stationService.findById(stationId);
         final Line line = lineService.findById(lineId);
         line.removeSection(downStation);
-    }
-
-    public LineSectionResponse findSectionByline(final Long id) {
-
-        return LineSectionResponse.createResponse(lineService.findById(id));
     }
 }
