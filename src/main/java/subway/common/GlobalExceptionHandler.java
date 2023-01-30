@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import subway.common.exception.AlreadyExistException;
 import subway.common.exception.NoDeleteOneSectionException;
-import subway.common.exception.NoRegisterSectionException;
+import subway.common.exception.NoLastSectionException;
 import subway.common.exception.NoRegisterStationException;
 
 @RestControllerAdvice
@@ -19,8 +19,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
-    @ExceptionHandler(NoRegisterSectionException.class)
-    protected ResponseEntity<ErrorResponse> handleNoRegisterSectionException(NoRegisterSectionException e) {
+    @ExceptionHandler(NoLastSectionException.class)
+    protected ResponseEntity<ErrorResponse> handleNoLastSectionException(NoLastSectionException e) {
         final ErrorResponse errorResponse = new ErrorResponse(e.getMessage());
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
