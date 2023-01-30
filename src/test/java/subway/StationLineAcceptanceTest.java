@@ -128,8 +128,8 @@ public class StationLineAcceptanceTest {
 
         JsonPath jsonPath = StationUtils.selectStationLine(1L).jsonPath();
 
-        assertThat(jsonPath.<String>get("name")).isEqualTo(BUN_DANG_NAME);
-        assertThat(jsonPath.<String>get("color")).isEqualTo(LINE_GREEN);
+        assertThat(jsonPath.getString("name")).isEqualTo(BUN_DANG_NAME);
+        assertThat(jsonPath.getString("color")).isEqualTo(LINE_GREEN);
     }
 
     /**

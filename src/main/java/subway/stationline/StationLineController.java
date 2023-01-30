@@ -2,10 +2,7 @@ package subway.stationline;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import subway.stationline.dto.StationLineCreateRequest;
-import subway.stationline.dto.StationLineCreateResponse;
-import subway.stationline.dto.StationLineReadListResponse;
-import subway.stationline.dto.StationLineReadResponse;
+import subway.stationline.dto.*;
 
 import java.net.URI;
 import java.util.List;
@@ -33,4 +30,12 @@ public class StationLineController {
     public ResponseEntity<StationLineReadResponse> readStationLine(@PathVariable Long stationLineId) {
         return ResponseEntity.ok(stationLineService.readStationLine(stationLineId));
     }
+
+    @PutMapping("/lines/{stationLineId}")
+    public ResponseEntity<Void> readStationLine(@PathVariable Long stationLineId, @RequestBody StationLineUpdateRequest request) {
+        stationLineService.updateStationLine(stationLineId, request);
+        return ResponseEntity.ok().build();
+    }
+
+
 }

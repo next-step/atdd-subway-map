@@ -4,10 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.station.Station;
 import subway.station.StationRepository;
-import subway.stationline.dto.StationLineCreateRequest;
-import subway.stationline.dto.StationLineCreateResponse;
-import subway.stationline.dto.StationLineReadListResponse;
-import subway.stationline.dto.StationLineReadResponse;
+import subway.stationline.dto.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,6 +44,12 @@ public class StationLineService {
         Station upStation = stationRepository.findById(stationLine.getUpStationId()).orElseThrow();
         Station downStation = stationRepository.findById(stationLine.getDownStationId()).orElseThrow();
         return new StationLineReadResponse(stationLine, List.of(upStation, downStation));
+    }
+
+    @Transactional
+    public void updateStationLine(Long stationLineId, StationLineUpdateRequest request) {
+        StationLine stationLine = stationLineRepository.findById(stationLineId).orElseThrow();
+        stationLine.updateNameAndColor(request.getName(), request.getColor());
     }
 
 
