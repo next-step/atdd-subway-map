@@ -44,9 +44,7 @@ public class StationAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames =
-                selectStationNames();
-        assertThat(stationNames).containsAnyOf("강남역");
+        assertThat(selectStationNames()).containsAnyOf("강남역");
     }
 
     /**
@@ -83,8 +81,7 @@ public class StationAcceptanceTest {
         deleteStation(response.header("Location"));
 
         // then
-        List<String> stationNames = selectStationNames();
-        assertThat(stationNames).doesNotContain("강변역");
+        assertThat(selectStationNames()).doesNotContain("강변역");
     }
 
     private ExtractableResponse<Response> createStation(String stationName) {
