@@ -50,11 +50,12 @@ class LineAcceptanceTest {
     void createLine() {
         // when
         ExtractableResponse<Response> createResponse = 지하철_분당선_생성();
-        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
         List<String> lineNames = 지하철_노선_목록_이름_조회();
+
         assertThat(lineNames).contains(LINE_분당선);
+        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
 
     /**
@@ -74,6 +75,7 @@ class LineAcceptanceTest {
 
         // then
         List<String> lineNames = getResponse.jsonPath().getList("name", String.class);
+
         assertThat(lineNames).hasSize(2).contains(LINE_분당선, LINE_3호선);
     }
 
@@ -108,10 +110,11 @@ class LineAcceptanceTest {
 
         // when
         ExtractableResponse<Response> putResponse = 지하철_노선_수정(lineId, "새로운 분당선", "lightyellow");
-        assertThat(putResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         // then
         ExtractableResponse<Response> getResponse = 지하철_노선_조회(lineId);
+
+        assertThat(putResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(getResponse.jsonPath().getString("name")).isEqualTo("새로운 분당선");
         assertThat(getResponse.jsonPath().getString("color")).isEqualTo("lightyellow");
     }
@@ -129,10 +132,11 @@ class LineAcceptanceTest {
 
         // when
         ExtractableResponse<Response> deleteResponse = 지하철_노선_삭제(lineId);
-        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         // then
         List<String> lineNames = 지하철_노선_목록_이름_조회();
+
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
         assertThat(lineNames).doesNotContain(LINE_분당선);
     }
 
