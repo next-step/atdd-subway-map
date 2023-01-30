@@ -83,16 +83,15 @@ class LineAcceptanceTest extends BaseAcceptance {
         assertThat(actualResponse.jsonPath().getLong("[0].id")).isEqualTo(given_신분당선_id);
         assertThat(actualResponse.jsonPath().getString("[0].name")).isEqualTo("신분당선");
         assertThat(actualResponse.jsonPath().getString("[0].color")).isEqualTo("bg-red-600");
-        List<StationResponse> _0_indexStations = actualResponse.jsonPath().getList("[0].stations", StationResponse.class);
-        assertThat(_0_indexStations).containsExactlyInAnyOrder(new StationResponse(1L, "지하철역"), new StationResponse(2L, "새로운지하철역"));
+        List<StationResponse> firstStations = actualResponse.jsonPath().getList("[0].stations", StationResponse.class);
+        assertThat(firstStations).containsExactlyInAnyOrder(new StationResponse(1L, "지하철역"), new StationResponse(2L, "새로운지하철역"));
 
         assertThat(actualResponse.jsonPath().getLong("[1].id")).isEqualTo(given_분당선_id);
         assertThat(actualResponse.jsonPath().getString("[1].name")).isEqualTo("분당선");
         assertThat(actualResponse.jsonPath().getString("[1].color")).isEqualTo("bg-green-600");
-        List<StationResponse> _1_indexStations = actualResponse.jsonPath().getList("[1].stations", StationResponse.class);
-        assertThat(_1_indexStations).containsExactlyInAnyOrder(new StationResponse(1L, "지하철역"), new StationResponse(3L, "새로운지하철역"));
+        List<StationResponse> secondStation = actualResponse.jsonPath().getList("[1].stations", StationResponse.class);
+        assertThat(secondStation).containsExactlyInAnyOrder(new StationResponse(1L, "지하철역"), new StationResponse(3L, "새로운지하철역"));
     }
-
 
     /**
      * Given 지하철 노선을 생성하고
