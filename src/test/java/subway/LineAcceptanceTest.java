@@ -43,7 +43,6 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선을 생성합니다.")
     @Test
     void createLineTest() {
-
         // when
         Long upStationId = 지하철역생성후ID반환(StationAcceptanceTest.GANGNAM);
         Long downStationId = 지하철역생성후ID반환(StationAcceptanceTest.YANGJAE);
@@ -119,12 +118,7 @@ public class LineAcceptanceTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        LineResponse lineResponse = response.body().as(LineResponse.class);
-        assertThat(lineResponse.getId()).isEqualTo(id);
-        assertThat(lineResponse.getName()).isEqualTo(NAME_VALUE1);
-        assertThat(lineResponse.getColor()).isEqualTo(COLOR_VALUE1);
-        assertThat(lineResponse.getStations())
-                .extracting(NAME).contains(StationAcceptanceTest.GANGNAM, StationAcceptanceTest.YANGJAE);
+        노선응답값검증(response, id, NAME_VALUE1, COLOR_VALUE1, StationAcceptanceTest.GANGNAM, StationAcceptanceTest.YANGJAE);
     }
 
     /**
@@ -149,12 +143,7 @@ public class LineAcceptanceTest {
         // then
         assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
         ExtractableResponse<Response> response = getLine(id);
-        LineResponse lineResponse = response.body().as(LineResponse.class);
-        assertThat(lineResponse.getId()).isEqualTo(id);
-        assertThat(lineResponse.getName()).isEqualTo(NAME_VALUE2);
-        assertThat(lineResponse.getColor()).isEqualTo(COLOR_VALUE2);
-        assertThat(lineResponse.getStations())
-                .extracting(NAME).contains(StationAcceptanceTest.HAGYE, StationAcceptanceTest.JUNGGYE);
+        노선응답값검증(response, id, NAME_VALUE2, COLOR_VALUE2, StationAcceptanceTest.HAGYE, StationAcceptanceTest.JUNGGYE);
     }
 
     /**
@@ -234,5 +223,14 @@ public class LineAcceptanceTest {
                 .then().log().all()
                 .extract();
         return allLines.jsonPath().getList("", LineResponse.class);
+    }
+
+    private static void 노선응답값검증(ExtractableResponse<Response> response, long id, String nameValue1, String colorValue1, String... stations) {
+        LineResponse lineResponse = response.body().as(LineResponse.class);
+        assertThat(lineResponse.getId()).isEqualTo(id);
+        assertThat(lineResponse.getName()).isEqualTo(nameValue1);
+        assertThat(lineResponse.getColor()).isEqualTo(colorValue1);
+        assertThat(lineResponse.getStations())
+                .extracting(NAME).contains(stations);
     }
 }
