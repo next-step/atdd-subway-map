@@ -51,4 +51,12 @@ public class LineService {
 				.map(this::createLineResponse)
 				.collect(Collectors.toList());
 	}
+
+	public LineResponse findLine(Long id) {
+		return lineRepository.findById(id).stream()
+				.map(this::createLineResponse)
+				.findFirst()
+				.orElseThrow(EntityNotFoundException::new);
+	}
+
 }
