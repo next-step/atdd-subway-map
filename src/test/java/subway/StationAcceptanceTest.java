@@ -1,13 +1,12 @@
 package subway;
 
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
 import io.restassured.response.ValidatableResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.jdbc.Sql;
 
 import java.util.HashMap;
 import java.util.List;
@@ -17,6 +16,7 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
 
 @DisplayName("지하철역 관련 기능")
+@Sql("/sql/truncate-tables.sql")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationAcceptanceTest {
     /**
@@ -27,7 +27,7 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 생성한다.")
     @Test
     void createStation() {
-        postStation("강남역").statusCode(HttpStatus.CREATED.value());
+        역_생성("강남역").statusCode(HttpStatus.CREATED.value());
 
         given().log().all().
         when()
@@ -45,7 +45,7 @@ public class StationAcceptanceTest {
     @Test
     void createStations() {
         List.of("강남역", "교대역")
-                .forEach(this::postStation);
+                .forEach(this::역_생성);
 
         given().log().all().
         when()
@@ -55,7 +55,6 @@ public class StationAcceptanceTest {
                 .body("name", contains("강남역", "교대역"));
     }
 
-
     /**
      * Given 지하철역을 생성하고
      * When 그 지하철역을 삭제하면
@@ -64,8 +63,8 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역 2개를 생성하고 그중 1개를 삭제한다.")
     @Test
     void deleteStation() {
-        postStation("교대역");
-        ExtractableResponse<Response> createResponse = postStation("강남역").extract();
+        역_생성("교대역");
+        var createResponse = 역_생성("강남역").extract();
 
         given().log().all().
         when()
@@ -81,7 +80,7 @@ public class StationAcceptanceTest {
                 .body("name", not(contains("강남역")));
     }
 
-    private ValidatableResponse postStation(String stationName) {
+    private ValidatableResponse 역_생성(String stationName) {
         Map<String, String> params = new HashMap<>();
         params.put("name", stationName);
 

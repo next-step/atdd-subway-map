@@ -2,13 +2,16 @@ package subway.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import subway.dto.StationRequest;
-import subway.dto.StationResponse;
 import subway.domain.Station;
-import subway.domain.repository.StationRepository;
+import subway.dto.station.StationRequest;
+import subway.dto.station.StationResponse;
+import subway.exception.SubwayException;
+import subway.repository.StationRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static subway.exception.SubwayExceptionStatus.STATION_NOT_FOUND;
 
 @Service
 @Transactional(readOnly = true)
@@ -28,7 +31,12 @@ public class StationService {
     public List<StationResponse> findAllStations() {
         return stationRepository.findAll().stream()
                 .map(StationResponse::from)
-                .collect(Collectors.toList());
+                .collect(Collectors.toUnmodifiableList());
+    }
+
+    public Station findStation(Long stationId) {
+        return stationRepository.findById(stationId)
+                .orElseThrow(() -> new SubwayException(STATION_NOT_FOUND));
     }
 
     @Transactional
