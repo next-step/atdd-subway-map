@@ -199,7 +199,7 @@ public class SubwayLineTest {
 		return response;
 	}
 
-	private void createStation(String stationName) {
+	private ExtractableResponse<Response> createStation(String stationName) {
 		Map<String, String> params = new HashMap<>();
 		params.put("name", stationName);
 
@@ -212,5 +212,6 @@ public class SubwayLineTest {
 			.extract();
 
 		assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+		return response;
 	}
 }

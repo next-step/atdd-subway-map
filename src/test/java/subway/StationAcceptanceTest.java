@@ -9,14 +9,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationAcceptanceTest {
 	/**
@@ -28,27 +29,11 @@ public class StationAcceptanceTest {
 	@Test
 	void createStation() {
 		// when
-		Map<String, String> params = new HashMap<>();
-		params.put("name", "강남역");
-
-		ExtractableResponse<Response> response =
-			RestAssured.given().log().all()
-				.body(params)
-				.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.when().post("/stations")
-				.then().log().all()
-				.extract();
+		String stationName = "강남역";
+		createStation(stationName);
 
 		// then
-		assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-		// then
-		List<String> stationNames =
-			RestAssured.given().log().all()
-				.when().get("/stations")
-				.then().log().all()
-				.extract().jsonPath().getList("name", String.class);
-		assertThat(stationNames).containsAnyOf("강남역");
+		assertThat(showStation().jsonPath().getList("name", String.class)).containsAnyOf(stationName);
 	}
 
 	/**
@@ -63,19 +48,14 @@ public class StationAcceptanceTest {
 		// given
 		String stationName1 = "강남역";
 		String stationName2 = "교대역";
+
 		createStation(stationName1);
 		createStation(stationName2);
 
 		// when
-		List<String> stationNames = RestAssured
-			.given().log().all()
-			.when().get("/stations")
-			.then().log().all()
-			.extract().jsonPath().getList("name", String.class);
-
 		// then
-		assertThat(stationNames.size()).isEqualTo(2);
-		assertThat(stationNames).containsAnyOf(stationName1, stationName2);
+		assertThat(showStation().jsonPath().getList("name", String.class).size()).isEqualTo(2);
+		assertThat(showStation().jsonPath().getList("name", String.class)).containsAnyOf(stationName1, stationName2);
 	}
 
 	/**
@@ -88,42 +68,51 @@ public class StationAcceptanceTest {
 	@Test
 	void deleteStation() {
 		// given
-		Map<String, String> params = new HashMap<>();
 		String stationName = "강남역";
+		long id = createStation(stationName).jsonPath().getLong("id");
 
+		// when
+		deleteStationById(id);
+
+		// then
+		assertThat(showStation().jsonPath().getList("name", String.class)).doesNotContain(stationName);
+	}
+
+	private ExtractableResponse<Response> createStation(String stationName) {
+		Map<String, String> params = new HashMap<>();
 		params.put("name", stationName);
-		Long id = RestAssured.given().log().all()
+
+		ExtractableResponse<Response> response = RestAssured
+			.given().log().all()
 			.body(params)
 			.contentType(MediaType.APPLICATION_JSON_VALUE)
 			.when().post("/stations")
 			.then().log().all()
-			.extract().jsonPath().getLong("id");
+			.extract();
 
-		// when
-		RestAssured
+		assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+		return response;
+	}
+
+	private ExtractableResponse<Response> showStation() {
+		ExtractableResponse<Response> response = RestAssured
+			.given().log().all()
+			.when().get("/stations")
+			.then().log().all()
+			.extract();
+
+		assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+		return response;
+	}
+
+	private ExtractableResponse<Response> deleteStationById(Long id) {
+		ExtractableResponse<Response> response = RestAssured
 			.given().log().all()
 			.when().delete("/stations/{id}", id)
 			.then().log().all()
-			.assertThat().statusCode(204);
+			.extract();
 
-		// then
-		List<String> stationNames =
-			RestAssured.given().log().all()
-				.when().get("/stations")
-				.then().log().all()
-				.extract().jsonPath().getList("name", String.class);
-		assertThat(stationNames).doesNotContain(stationName);
-	}
-
-	private void createStation(String stationName) {
-		Map<String, String> params = new HashMap<>();
-		params.put("name", stationName);
-
-		RestAssured.given().log().all()
-			.body(params)
-			.contentType(MediaType.APPLICATION_JSON_VALUE)
-			.when().post("/stations")
-			.then().log().all()
-			.assertThat().statusCode(201);
+		assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+		return response;
 	}
 }
