@@ -1,6 +1,7 @@
 package subway.line;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -40,4 +41,9 @@ public class LineService {
             .orElseThrow(() -> new IllegalArgumentException("Not Exists Station"));
     }
 
+    public LineResponse getLine(Long id) {
+        Line line = lineRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("Not Exists Station"));
+        return LineResponse.of(line);
+    }
 }
