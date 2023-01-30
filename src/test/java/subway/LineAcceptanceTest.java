@@ -194,7 +194,40 @@ public class LineAcceptanceTest {
 	 * When 생성한 지하철 노선을 삭제하면
 	 * Then 해당 지하철 노선 정보는 삭제된다
 	 */
-	//TODO: 지하철노선 삭제
+	@DisplayName("지하철 노선을 삭제한다.")
+	@Test
+	void deleteLine() {
+		//given
+		Map<String, String> station1 = new HashMap<>();
+		station1.put("name", "지하철역");
+		createStationResponse(station1);
+
+		Map<String, String> station2 = new HashMap<>();
+		station2.put("name", "새로운 지하철역");
+		createStationResponse(station2);
+
+		Map<String, Object> line1 = new HashMap<>();
+		line1.put("name", "신분당선");
+		line1.put("color", "bg-red-600");
+		line1.put("upStationId", 1);
+		line1.put("downStationId", 2);
+		line1.put("distance", 10);
+		ExtractableResponse<Response> lineResponse = createLineResponse(line1);
+		long id = lineResponse.response().jsonPath().getLong("id");
+
+		//when
+		ExtractableResponse<Response> response = deleteLineResponse(id);
+
+		//then
+		assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+	}
+
+	private ExtractableResponse<Response> deleteLineResponse(long id) {
+		return RestAssured.given().log().all()
+				.given().param("id", id)
+				.when().delete("/stations/{id}")
+				.then().log().all().extract();
+	}
 
 	private ExtractableResponse<Response> getLinesResponse() {
 		return RestAssured.given().log().all()
