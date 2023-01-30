@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,12 +15,20 @@ import org.springframework.http.MediaType;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import subway.line.LineRequest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관리 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class SubwayLineTest {
+
+	@BeforeEach
+	void createStations() {
+		createStation("신분당선");
+		createStation("새로운지하철역");
+		createStation("또다른지하철역");
+	}
 
 	/**
 	 * When 지하철 노선을 생성하면
@@ -29,7 +38,7 @@ public class SubwayLineTest {
 	@Test
 	void createLine() {
 		// when
-		LineRequest lineRequest = new LineRequest("신분당선", "bg-red-600", 1, 2, 10);
+		LineRequest lineRequest = new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10);
 
 		ExtractableResponse<Response> response = RestAssured
 			.given().log().all()
@@ -60,8 +69,8 @@ public class SubwayLineTest {
 	@Test
 	void showLineList() {
 		// given
-		LineRequest lineRequest = new LineRequest("신분당선", "bg-red-600", 1, 2, 10);
-		LineRequest lineRequest2 = new LineRequest("분당선", "bg-green-600", 1, 3, 10);
+		LineRequest lineRequest = new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10);
+		LineRequest lineRequest2 = new LineRequest("분당선", "bg-green-600", 1L, 3L, 10);
 
 		ExtractableResponse<Response> createResponse1 = RestAssured
 			.given().log().all()
@@ -102,7 +111,7 @@ public class SubwayLineTest {
 	@Test
 	void showLine() {
 		// given
-		LineRequest lineRequest = new LineRequest("신분당선", "bg-red-600", 1, 2, 10);
+		LineRequest lineRequest = new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10);
 
 		ExtractableResponse<Response> createResponse = RestAssured
 			.given().log().all()
@@ -139,7 +148,7 @@ public class SubwayLineTest {
 	@Test
 	void updateLine() {
 		// given
-		LineRequest lineRequest = new LineRequest("신분당선", "bg-red-600", 1, 2, 10);
+		LineRequest lineRequest = new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10);
 
 		ExtractableResponse<Response> createResponse = RestAssured
 			.given().log().all()
@@ -188,7 +197,7 @@ public class SubwayLineTest {
 	@Test
 	void deleteLine() {
 		// given
-		LineRequest lineRequest = new LineRequest("신분당선", "bg-red-600", 1, 2, 10);
+		LineRequest lineRequest = new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10);
 
 		ExtractableResponse<Response> response = RestAssured
 			.given().log().all()
@@ -216,19 +225,18 @@ public class SubwayLineTest {
 		assertThat(showId).isNotEqualTo(id);
 	}
 
-	class LineRequest {
-		public String name;
-		public String color;
-		public int upStationsId;
-		public int downStationsId;
-		public int distance;
+	private void createStation(String stationName) {
+		Map<String, String> params = new HashMap<>();
+		params.put("name", stationName);
 
-		public LineRequest(String name, String color, int upStationsId, int downStationsId, int distance) {
-			this.name = name;
-			this.color = color;
-			this.upStationsId = upStationsId;
-			this.downStationsId = downStationsId;
-			this.distance = distance;
-		}
+		ExtractableResponse<Response> response = RestAssured
+			.given().log().all()
+			.body(params)
+			.contentType(MediaType.APPLICATION_JSON_VALUE)
+			.when().post("/stations")
+			.then().log().all()
+			.extract();
+
+		assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 	}
 }
