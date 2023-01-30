@@ -8,6 +8,9 @@ import subway.line.dto.LineResponse;
 import subway.line.dto.LineUpdateRequest;
 import subway.line.entity.Line;
 import subway.line.service.LineService;
+import subway.section.dto.SectionCreateRequest;
+import subway.section.dto.SectionResponse;
+import subway.section.entity.Section;
 import subway.station.entity.Station;
 import subway.station.repository.StationRepository;
 
@@ -55,4 +58,17 @@ public class LineController {
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/lines/{lineId}/sections")
+    public ResponseEntity<SectionResponse> saveSection(@PathVariable Long lineId, @RequestBody SectionCreateRequest request) {
+        Station downStation = stationRepository.findById(request.getDownStationId()).orElseThrow();
+        Station upStation = stationRepository.findById(request.getUpStationId()).orElseThrow();
+        Section section = lineService.saveSection(lineId, request.toEntity(downStation, upStation));
+        return ResponseEntity.created(URI.create("lines/" + request.getLineId() + "/sections")).body(SectionResponse.from(section));
+    }
+
+    @DeleteMapping("/lines/{lineId}/sections")
+    public ResponseEntity<Void> delete(@PathVariable Long lineId, Long stationId) {
+        lineService.deleteSection(lineId, stationId);
+        return ResponseEntity.noContent().build();
+    }
 }

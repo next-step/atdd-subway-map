@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import subway.line.dto.LineUpdateRequest;
 import subway.line.entity.Line;
 import subway.line.repository.LineRepository;
+import subway.section.entity.Section;
 import subway.section.repository.SectionRepository;
 import subway.station.repository.StationRepository;
 
@@ -48,5 +49,19 @@ public class LineService {
         Line line = lineRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 노선은 삭제 할 수 없습니다. di:" + id));
         lineRepository.delete(line);
+    }
+
+    @Transactional
+    public Section saveSection(Long lineId, Section section) {
+        Line line = lineRepository.findById(lineId).orElseThrow();
+        line.addSection(section);
+        return line.getLastSection();
+    }
+
+    @Transactional
+    public void deleteSection(Long lineId, Long stationId) {
+        Line line = lineRepository.findById(lineId)
+                .orElseThrow(() -> new IllegalArgumentException("노선을 찾을 수 없습니다. id : " + lineId));
+        line.removeSectionByStationId(stationId);
     }
 }
