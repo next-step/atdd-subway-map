@@ -33,9 +33,9 @@ public class Line {
         this.distance = distance;
     }
 
-    public void update(final LineUpdateRequest lineUpdateRequest) {
-        this.name = lineUpdateRequest.getName();
-        this.color = lineUpdateRequest.getColor();
+    public void update(final String name, final String color) {
+        this.name = name;
+        this.color = color;
     }
 
     public Long getId() {
