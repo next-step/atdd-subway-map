@@ -20,18 +20,45 @@ import io.restassured.response.Response;
 import subway.line.LineRequest;
 
 @DisplayName("지하철 노선 관련 기능")
-@DirtiesContext
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class LineAcceptanceTest {
 
-    public static final String  반도선= "반도선";
+    public static final String 반도선 = "반도선";
+    public static final String 제주선 = "제주선";
     public static final String 한라산역 = "한라산역";
     public static final String 백두산역 = "백두산역";
+    public static final String 서귀포역 = "서귀포역";
 
     @BeforeEach
     void setUp() {
         setUpStation(한라산역);
         setUpStation(백두산역);
+        setUpStation(서귀포역);
+    }
+
+    /**
+     * 지하철 노선 목록 조회
+     * Given 2개의 지하철 노선을 생성하고
+     * When 지하철 노선 목록을 조회하면
+     * Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
+     */
+    @Test
+    void 노선_목록_조회_테스트() {
+        // given
+        List<LineRequest> lineRequests =
+            List.of(
+                LineRequest.of(반도선, "red", 1, 2, 10),
+                LineRequest.of(제주선, "green", 1, 3, 10)
+            );
+        lineRequests.forEach(LineAcceptanceTest::노선_생성);
+
+        // when
+        List<String> lines = 노선_목록_조회();
+
+        // then
+        assertThat(lines).containsExactly(반도선, 제주선);
+        assertThat(lines.size()).isEqualTo(lineRequests.size());
     }
 
     /**
@@ -44,22 +71,26 @@ class LineAcceptanceTest {
         LineRequest request = LineRequest.of(반도선, "red", 1, 2, 10);
 
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
+        ExtractableResponse<Response> response = 노선_생성(request);
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        // then
+        List<String> lineNames = 노선_목록_조회();
+        assertThat(lineNames).contains(반도선);
+    }
+
+    private static ExtractableResponse<Response> 노선_생성(LineRequest request) {
+        return RestAssured.given().log().all()
             .body(request)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .when()
             .post("/lines")
             .then().log().all()
             .extract();
-
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-        // then
-        List<String> lineNames = getLines();
-        assertThat(lineNames).contains(반도선);
     }
 
-    private static List<String> getLines() {
+    private static List<String> 노선_목록_조회() {
         return RestAssured.given().log().all()
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .when()
