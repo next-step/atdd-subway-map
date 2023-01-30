@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import subway.subway.StationRepository;
 
 import java.util.HashMap;
 import java.util.List;
@@ -98,7 +99,7 @@ public class StationAcceptanceTest {
 
 
     @DisplayName("주어진 이름의 지하철역을 생성한다.")
-    private Long createStation(String station) {
+    public Long createStation(String station) {
         Map<String, String> params = new HashMap<>();
         params.put("name", station);
 
@@ -115,7 +116,7 @@ public class StationAcceptanceTest {
     }
 
     @DisplayName("지하철역 목록을 조회한다.")
-    private List<String> getStationNameList() {
+    public List<String> getStationNameList() {
         var response = RestAssured.given().log().all()
                 .when().get("/stations")
                 .then().log().all()
