@@ -12,6 +12,7 @@ import org.springframework.http.MediaType;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -50,7 +51,7 @@ public class StationAcceptanceTest {
     @Test
     void getStationList() {
         // given
-        String stationName1 = "역삼역";
+        String stationName1 = "강남역";
         String stationName2 = "방배역";
 
         ExtractableResponse<Response> createResponse1 =
@@ -81,7 +82,31 @@ public class StationAcceptanceTest {
      * When 그 지하철역을 삭제하면
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
-    // TODO: 지하철역 제거 인수 테스트 메서드 생성
+    @DisplayName("지하철역을 제거한다.")
+    @Test
+    void deleteStation() {
+        // given
+        String stationName = "강남역";
+
+        ExtractableResponse<Response> createResponse =
+            createStationResponse(createParams(stationName));
+
+        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        long stationId = createResponse.body().jsonPath().getLong("id");
+
+        // when
+        ExtractableResponse<Response> response = deleteStationResponse(stationId);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        // then
+        List<String> stationNames =
+            getStationListResponse().jsonPath().getList("name", String.class);
+
+        assertThat(stationNames).doesNotContain(stationName);
+    }
 
 
     private Map<String, String> createParams(String name) {
@@ -102,6 +127,13 @@ public class StationAcceptanceTest {
     private ExtractableResponse<Response> getStationListResponse() {
         return RestAssured.given().log().all()
             .when().get("/stations")
+            .then().log().all()
+            .extract();
+    }
+
+    private ExtractableResponse<Response> deleteStationResponse(long stationId) {
+        return RestAssured.given().log().all()
+            .when().delete("/stations/{id}", stationId)
             .then().log().all()
             .extract();
     }
