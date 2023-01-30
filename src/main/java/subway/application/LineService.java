@@ -72,4 +72,10 @@ public class LineService {
         Line line = findLineById(id);
         addSection(line, sectionRequest.getUpStationId(), sectionRequest.getDownStationId(), sectionRequest.getDistance());
     }
+
+    @Transactional
+    public void deleteSection(Long lineId, Long stationId) {
+        Line line = findLineById(lineId);
+        line.removeSection();
+    }
 }

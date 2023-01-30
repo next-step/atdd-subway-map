@@ -11,7 +11,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import io.restassured.RestAssured;
@@ -22,39 +21,66 @@ import io.restassured.response.Response;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class SectionAcceptanceTest {
 
+    private static final String 송파역 = "송파역";
+    private static final String 가락시장역 = "가락시장역";
+    private static final String 문정역 = "문정역";
+
+    private Long id_송파역;
+    private Long id_가락시장역;
+    private Long id_문정역;
+    private Long id_8호선;
+
     @Autowired
     private DatabaseTruncation databaseTruncation;
 
     @BeforeEach
     void setup() {
         databaseTruncation.execute();
+
+        id_송파역 = 지하철_역_생성(송파역);
+        id_가락시장역 = 지하철_역_생성(가락시장역);
+        id_문정역 = 지하철_역_생성(문정역);
+
+        id_8호선 = 지하철_노선_생성("8호선", "pink", id_송파역, id_가락시장역).jsonPath().getLong("id");
     }
 
     /**
-     * Given 지하철 역과 노선을 생성하고
      * When 지하철 노선에 새로운 구간을 추가하면
      * Then 지하철 노선 조회 시 추가된 구간을 찾을 수 있다
      */
     @DisplayName("지하철 노선에 구간을 추가한다.")
     @Test
     void addSection() {
-        // given
-        Long id_송파역 = 지하철_역_생성("송파역");
-        Long id_가락시장역 = 지하철_역_생성("가락시장역");
-        Long id_문정역 = 지하철_역_생성("문정역");
-        Long id_8호선 = 지하철_노선_생성("8호선", "pink", id_송파역, id_가락시장역).jsonPath().getLong("id");
-
         // when
-        지하철_구간_생성(id_8호선, id_가락시장역, id_문정역, 10);
+        지하철_노선에_구간_추가(id_8호선, id_가락시장역, id_문정역, 10);
 
         // then
         ExtractableResponse<Response> response = 지하철_노선_조회(id_8호선);
 
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.jsonPath().getList("stations.id", Long.class)).containsExactly(id_송파역, id_가락시장역, id_문정역);
     }
 
-    private static ExtractableResponse<Response> 지하철_구간_생성(Long lineId, Long upStationId, Long downStationId, long distance) {
+    /**
+     * Given 지하철 노선에 새로운 구간을 추가하고
+     * When 지하철 노선의 마지막 구간을 제거하면
+     * Then 지하철 노선에서 해당 구간이 제거된다
+     */
+    @DisplayName("지하철 노선의 구간을 제거한다.")
+    @Test
+    void deleteSection() {
+        // given
+        지하철_노선에_구간_추가(id_8호선, id_가락시장역, id_문정역, 10);
+
+        // when
+        지하철_노선에_구간_제거(id_8호선, id_문정역);
+
+        // then
+        ExtractableResponse<Response> response = 지하철_노선_조회(id_8호선);
+
+        assertThat(response.jsonPath().getList("stations.id", Long.class)).containsExactly(id_송파역, id_가락시장역);
+    }
+
+    private static ExtractableResponse<Response> 지하철_노선에_구간_추가(Long lineId, Long upStationId, Long downStationId, long distance) {
         Map<String, Object> sectionParam = new HashMap<>();
         sectionParam.put("upStationId", upStationId);
         sectionParam.put("downStationId", downStationId);
@@ -67,6 +93,17 @@ class SectionAcceptanceTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
             .when()
                 .post("/lines/{id}/sections", lineId)
+            .then()
+                .log().all()
+            .extract();
+    }
+
+    private static ExtractableResponse<Response> 지하철_노선에_구간_제거(Long lineId, Long stationId) {
+        return RestAssured
+            .given()
+                .log().all()
+            .when()
+                .delete("/lines/{id}/sections?stationId={stationId}", lineId, stationId)
             .then()
                 .log().all()
             .extract();

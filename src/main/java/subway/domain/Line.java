@@ -55,6 +55,10 @@ public class Line {
         return stations;
     }
 
+    public void removeSection() {
+        sections.remove(sections.size() - 1);
+    }
+
     public Long getId() {
         return id;
     }
