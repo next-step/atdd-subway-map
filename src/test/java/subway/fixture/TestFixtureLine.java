@@ -94,6 +94,14 @@ public class TestFixtureLine {
                 .extract();
     }
 
+    public static ExtractableResponse<Response> 지하철_노선_구간_조회_요청(final Long lineId) {
+        return RestAssured
+                .given().log().all()
+                .when().get("/lines/" + lineId)
+                .then().log().all()
+                .extract();
+    }
+
     public static void 지하철_노선_조회됨(final ExtractableResponse<Response> response, final String lineName, final String lineColor, final int countOfStation) {
         final JsonPath jsonPath = response.response().body().jsonPath();
 

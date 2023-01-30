@@ -40,9 +40,9 @@ class LineSectionAcceptanceTest extends AcceptanceTest {
 
         지하철_노선_추가됨(이호선_응답);
 
-        final ExtractableResponse<Response> 지하철_노선_구간_목록_조회_응답 = 지하철_노선_구간_목록_조회_요청(이호선);
+        final ExtractableResponse<Response> 지하철_노선_구간_조회_응답 = 지하철_노선_구간_조회_요청(이호선);
 
-        지하철_노선_구간_목록_중_등록_구간_조회됨(지하철_노선_구간_목록_조회_응답, 2);
+        지하철_노선_구간_조회됨(지하철_노선_구간_조회_응답, 3, 강남역, 잠실역, 잠실역);
     }
 
     @DisplayName("노선 구간 추가 시 상행종점역은 노선에 등록되어 있지 않아서 구간 등록이 불가능하다.")
@@ -75,9 +75,9 @@ class LineSectionAcceptanceTest extends AcceptanceTest {
 
         지하철_노선_구간_삭제됨(지하철_노선_구간_삭제_응답);
 
-        final ExtractableResponse<Response> 지하철_노선_구간_목록_조회_응답 = 지하철_노선_구간_목록_조회_요청(이호선);
+        final ExtractableResponse<Response> 지하철_노선_구간_조회_응답 = 지하철_노선_구간_조회_요청(이호선);
 
-        지하철_노선_구간_목록_중_등록_구간_조회됨(지하철_노선_구간_목록_조회_응답, 1);
+        지하철_노선_구간_조회됨(지하철_노선_구간_조회_응답, 2, 잠실역, 잠실역);
     }
 
     @DisplayName("노선 구간 제거 시 구간이 하나인 경우 삭제 불가로 구간 삭제가 불가능하다.")

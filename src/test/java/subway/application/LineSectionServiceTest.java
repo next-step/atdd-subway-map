@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
-import static subway.fixture.TestFixtureLine.노선_추가_등록;
+import static subway.fixture.TestFixtureSection.구간_복수_등록;
 import static subway.fixture.TestFixtureSection.구간_신규_등록;
 
 @DisplayName("지하철 구간 응용 서비스 테스트")
@@ -106,10 +106,10 @@ class LineSectionServiceTest {
 
         final Station 상행종점_강남역 = new Station(1L, "강남역");
         final Station 하행종점_잠실역 = new Station(2L, "잠실역");
-        final Section 첫번째_구간 = new Section(1L, 상행종점_강남역, 하행종점_잠실역, 10);
-        final Line 이호선 = new Line(1L, "2호선", "bg-red-600", 구간_신규_등록(첫번째_구간));
         final Station 하행종점_몽총토성역 = new Station(4L, "몽촌토성역");
-        노선_추가_등록(이호선, 하행종점_잠실역, 하행종점_몽총토성역, 10);
+        final Section 첫번째_구간 = new Section(1L, 상행종점_강남역, 하행종점_잠실역, 10);
+        final Section 두번째_구간 = new Section(2L, 하행종점_잠실역, 하행종점_몽총토성역, 10);
+        final Line 이호선 = new Line(1L, "2호선", "bg-red-600", 구간_복수_등록(첫번째_구간, 두번째_구간));
 
         when(stationService.findById(anyLong())).thenReturn(하행종점_몽총토성역);
         when(lineService.findById(anyLong())).thenReturn(이호선);
@@ -148,10 +148,10 @@ class LineSectionServiceTest {
 
         final Station 상행종점_강남역 = new Station(1L, "강남역");
         final Station 하행종점_잠실역 = new Station(2L, "잠실역");
-        final Section 첫번째_구간 = new Section(1L, 상행종점_강남역, 하행종점_잠실역, 10);
-        final Line 이호선 = new Line(1L, "2호선", "bg-red-600", 구간_신규_등록(첫번째_구간));
         final Station 하행종점_몽총토성역 = new Station(4L, "몽촌토성역");
-        노선_추가_등록(이호선, 하행종점_잠실역, 하행종점_몽총토성역, 10);
+        final Section 첫번째_구간 = new Section(1L, 상행종점_강남역, 하행종점_잠실역, 10);
+        final Section 두번째_구간 = new Section(2L, 하행종점_잠실역, 하행종점_몽총토성역, 10);
+        final Line 이호선 = new Line(1L, "2호선", "bg-red-600", 구간_복수_등록(첫번째_구간, 두번째_구간));
         final Station 노선_등록되지_않는_양재역 = new Station(5L, "양재역");
 
         when(stationService.findById(anyLong())).thenReturn(노선_등록되지_않는_양재역);
@@ -170,10 +170,10 @@ class LineSectionServiceTest {
 
         final Station 상행종점_강남역 = new Station(1L, "강남역");
         final Station 하행종점_잠실역 = new Station(2L, "잠실역");
-        final Section 첫번째_구간 = new Section(1L, 상행종점_강남역, 하행종점_잠실역, 10);
-        final Line 이호선 = new Line(1L, "2호선", "bg-red-600", 구간_신규_등록(첫번째_구간));
         final Station 하행종점_몽총토성역 = new Station(4L, "몽촌토성역");
-        노선_추가_등록(이호선, 하행종점_잠실역, 하행종점_몽총토성역, 10);
+        final Section 첫번째_구간 = new Section(1L, 상행종점_강남역, 하행종점_잠실역, 10);
+        final Section 두번째_구간 = new Section(2L, 하행종점_잠실역, 하행종점_몽총토성역, 10);
+        final Line 이호선 = new Line(1L, "2호선", "bg-red-600", 구간_복수_등록(첫번째_구간, 두번째_구간));
 
         when(stationService.findById(anyLong())).thenReturn(상행종점_강남역);
         when(lineService.findById(anyLong())).thenReturn(이호선);
