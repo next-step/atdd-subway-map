@@ -1,18 +1,13 @@
 package subway;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("지하철 노선 관련 기능")
@@ -27,14 +22,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     void 노선_생성() {
         // when
         final String 신분당선 = "신분당선";
-        노선을_생성한다(신분당선, "bg-red-600", 1, 2, 10);
+        노선을_생성한다(신분당선, "bg-red-600", "강남역", "잠실역", 10);
 
         // then
-        final ExtractableResponse<Response> response = 노선_목록을_조회한다();
-        final List<String> lineNames = response.body().jsonPath().getList("name", String.class);
-
-        assertThat(lineNames).isNotEmpty()
-            .contains(신분당선);
+        노선_목록에서_조회_가능하다(신분당선);
     }
 
     /**
@@ -48,16 +39,11 @@ class LineAcceptanceTest extends AcceptanceTest {
         // given
         final String 신분당선 = "신분당선";
         final String 이호선 = "2호선";
-        노선을_생성한다(신분당선, "bg-red-600", 1, 2, 10);
-        노선을_생성한다(이호선, "green", 3, 4, 20);
+        노선을_생성한다(신분당선, "bg-red-600", "강남역", "잠실역", 10);
+        노선을_생성한다(이호선, "green", "서울역", "명동역", 20);
 
-        // when
-        final ExtractableResponse<Response> lineResponse = 노선_목록을_조회한다();
-        final List<String> lineNames = lineResponse.jsonPath().getList("name", String.class);
-
-        // then
-        assertThat(lineNames).hasSize(2)
-            .contains(신분당선, 이호선);
+        // when then
+        노선_목록에서_조회_가능하다(신분당선, 이호선);
     }
 
     /**
@@ -70,15 +56,12 @@ class LineAcceptanceTest extends AcceptanceTest {
     void 노선_조회() {
         // given
         final String 신분당선 = "신분당선";
-        final ExtractableResponse<Response> createdResponse = 노선을_생성한다(신분당선, "bg-red-600", 1, 2, 10);
+        final String color = "bg-red-600";
+        final long lineId = 노선을_생성한다(신분당선, color, "강남역", "잠실역", 10)
+            .body().jsonPath().getLong("id");
 
-        // when
-        final int lineId = createdResponse.body().jsonPath().get("id");
-        final ExtractableResponse<Response> lineResponse = 노선을_조회한다(lineId);
-
-        // then
-        final String lineName = lineResponse.body().jsonPath().get("name");
-        assertThat(lineName).isEqualTo(lineName);
+        // when then
+        노선을_확인한다(lineId, 신분당선, color);
     }
 
     /**
@@ -90,8 +73,8 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 노선_수정() {
         // given
-        final int lineId = 노선을_생성한다("신분당선", "bg-red-600", 1, 2, 10)
-            .body().jsonPath().get("id");
+        final long lineId = 노선을_생성한다("신분당선", "bg-red-600", "강남역", "잠실역", 10)
+            .body().jsonPath().getLong("id");
 
         // when
         final String 다른분당선 = "다른분당선";
@@ -99,14 +82,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         노선을_수정한다(lineId, 다른분당선, green);
 
         // then
-        final ExtractableResponse<Response> lineResponse = 노선을_조회한다(lineId);
-        final String lineName = lineResponse.body().jsonPath().get("name");
-        final String lineColor = lineResponse.body().jsonPath().get("color");
-
-        assertAll(
-            () -> assertThat(lineName).isEqualTo(다른분당선),
-            () -> assertThat(lineColor).isEqualTo(green)
-        );
+        노선을_확인한다(lineId, 다른분당선, green);
     }
 
     /**
@@ -119,84 +95,41 @@ class LineAcceptanceTest extends AcceptanceTest {
     void 노선_삭제() {
         // given
         final String 신분당선 = "신분당선";
-        final int lineId = 노선을_생성한다(신분당선, "bg-red-600", 1, 2, 10)
-            .body().jsonPath().get("id");
+        final long lineId = 노선을_생성한다(신분당선, "bg-red-600", "강남역", "잠실역", 10)
+            .body().jsonPath().getLong("id");
 
         // when
         노선을_삭제한다(lineId);
 
         // then
+        노선_목록에서_조회_불가능하다(신분당선);
+    }
+
+    private void 노선_목록에서_조회_가능하다(String... lineNames) {
+        final List<String> createdLineNames = 노선_목록_이름들을_조회한다();
+
+        assertThat(createdLineNames).contains(lineNames);
+    }
+
+    private void 노선_목록에서_조회_불가능하다(String... lineNames) {
+        final List<String> createdLineNames = 노선_목록_이름들을_조회한다();
+
+        assertThat(createdLineNames).doesNotContain(lineNames);
+    }
+
+    private List<String> 노선_목록_이름들을_조회한다() {
         final ExtractableResponse<Response> lineResponse = 노선_목록을_조회한다();
-        final List<String> lineNames = lineResponse.body().jsonPath().getList("name", String.class);
-
-        assertThat(lineNames).doesNotContain(신분당선);
+        return lineResponse.body().jsonPath().getList("name", String.class);
     }
 
-    private ExtractableResponse<Response> 노선을_생성한다(
-        String name,
-        String color,
-        long upStationId,
-        long downStationId,
-        int distance
-    ) {
-        final Map<String, Object> params = Map.of(
-            "name", name,
-            "color", color,
-            "upStationId", upStationId,
-            "downStationId", downStationId,
-            "distance", distance
+    private void 노선을_확인한다(long lineId, String name, String color) {
+        final ExtractableResponse<Response> lineResponse = 노선을_조회한다(lineId);
+        final String lineName = lineResponse.body().jsonPath().get("name");
+        final String lineColor = lineResponse.body().jsonPath().get("color");
+
+        assertAll(
+            () -> assertThat(lineName).isEqualTo(name),
+            () -> assertThat(lineColor).isEqualTo(color)
         );
-        return RestAssured.given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .body(params)
-            .when().post("/lines")
-            .then().log().all()
-            .statusCode(HttpStatus.CREATED.value())
-            .header("Location", containsString("lines"))
-            .extract();
     }
-
-    private ExtractableResponse<Response> 노선_목록을_조회한다() {
-        return RestAssured.given().log().all()
-            .when().get("/lines")
-            .then().log().all()
-            .statusCode(HttpStatus.OK.value())
-            .extract();
-    }
-
-    private ExtractableResponse<Response> 노선을_조회한다(long lineId) {
-        return RestAssured.given().log().all()
-            .when().get("/lines/{id}", lineId)
-            .then().log().all()
-            .statusCode(HttpStatus.OK.value())
-            .extract();
-    }
-
-    private ExtractableResponse<Response> 노선을_수정한다(
-        long lineId,
-        String name,
-        String color
-    ) {
-        final Map<String, Object> params = Map.of(
-            "name", name,
-            "color", color
-        );
-        return RestAssured.given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .body(params)
-            .when().put("/lines/{id}", lineId)
-            .then().log().all()
-            .statusCode(HttpStatus.OK.value())
-            .extract();
-    }
-
-    private void 노선을_삭제한다(int lineId) {
-        RestAssured.given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().delete("/lines/{id}", lineId)
-            .then().log().all()
-            .statusCode(HttpStatus.NO_CONTENT.value())
-            .extract();
-    }
-
 }
