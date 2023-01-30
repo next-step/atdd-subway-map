@@ -9,8 +9,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
-import subway.route.LineRequest;
-import subway.route.LineResponse;
+import subway.line.LineRequest;
+import subway.line.LineResponse;
 
 import java.util.List;
 import java.util.Map;

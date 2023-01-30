@@ -1,4 +1,4 @@
-package subway.route;
+package subway.line;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

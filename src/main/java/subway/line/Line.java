@@ -1,6 +1,6 @@
-package subway.route;
+package subway.line;
 
-import subway.Station;
+import subway.station.Station;
 
 import javax.persistence.*;
 

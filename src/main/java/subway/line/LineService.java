@@ -1,10 +1,10 @@
-package subway.route;
+package subway.line;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import subway.Station;
-import subway.StationResponse;
-import subway.StationService;
+import subway.station.Station;
+import subway.station.StationResponse;
+import subway.station.StationService;
 
 import java.util.List;
 import java.util.stream.Collectors;

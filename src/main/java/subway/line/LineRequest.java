@@ -1,4 +1,4 @@
-package subway.route;
+package subway.line;
 
 public class LineRequest {
     private String name;
