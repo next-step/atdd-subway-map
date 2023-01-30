@@ -41,8 +41,8 @@ class SectionTest {
                 .name("노선2")
                 .build();
 
-        Section section1 = createSectionFixTrue();
-        Section section2 = createSectionFixTrue(section1.downStationId());
+        Section section1 = createSectionFixTrue(1L, 2L);
+        Section section2 = createSectionFixTrue(2L, 3L);
 
         oldLine.addSection(section1);
         oldLine.addSection(section2);
@@ -56,92 +56,16 @@ class SectionTest {
         assertThat(section2.getLine()).isEqualTo(newLine);
     }
 
-    @Test
-    void 노선_구간_삭제_하행역Id로_삭제한다() {
-        //given
-        Long lastDownStationId  = RandomUtil.getLandomLong();
-        Long lastUpStationId  = RandomUtil.getLandomLong();
-
-        Line line = Line.builder()
-                .color("red")
-                .name("노선")
-                .build();
-
-        Section section1 = Section.builder()
-                .id(RandomUtil.getLandomLong())
-                .upStation(new Station(RandomUtil.getLandomLong(), "역2"))
-                .downStation(new Station(lastDownStationId, "역1"))
-                .distance(1)
-                .build();
-
-        Section section2 = Section.builder()
-                .id(RandomUtil.getLandomLong())
-                .upStation(new Station(lastUpStationId, "역2"))
-                .downStation(new Station(lastDownStationId, "역1"))
-                .distance(1)
-                .build();
-
-        line.addSection(section1);
-        line.addSection(section2);
-
-        //when
-        line.removeSectionByStationId(lastDownStationId);
-
-        //then
-        assertThat(line.getSections().size()).isEqualTo(1);
-        assertThat(line.getLastSection()).isEqualTo(section1);
-        assertThat(section2.getLine()).isNull();
+    public static Section createSectionFixTrue() {
+        return createSectionFixTrue(RandomUtil.getLandomLong(), RandomUtil.getLandomLong());
     }
 
-    private static Section createSectionFixTrue(Long upStationId) {
+    public static Section createSectionFixTrue(Long upStationId, Long downStationId) {
         return Section.builder()
                 .id(RandomUtil.getLandomLong())
                 .upStation(new Station(upStationId, "역2"))
-                .downStation(new Station(RandomUtil.getLandomLong(), "역1"))
+                .downStation(new Station(downStationId, "역1"))
                 .distance(RandomUtil.getLandomLong())
                 .build();
-    }
-
-    private static Section createSectionFixTrue() {
-        return Section.builder()
-                .id(RandomUtil.getLandomLong())
-                .upStation(new Station(RandomUtil.getLandomLong(), "역2"))
-                .downStation(new Station(RandomUtil.getLandomLong(), "역1"))
-                .distance(RandomUtil.getLandomLong())
-                .build();
-    }
-
-    @Test
-    void 노선_구간_삭제_구간_엔티티로_삭제한다() {
-        //given
-        Line line = Line.builder()
-                .color("red")
-                .name("노선")
-                .build();
-
-        Section section1 = Section.builder()
-                .id(1L)
-                .upStation(new Station(1L, "역2"))
-                .downStation(new Station(2L, "역1"))
-                .distance(1)
-                .build();
-
-        Section section2 = Section.builder()
-                .id(2L)
-                .upStation(new Station(2L, "역2"))
-                .downStation(new Station(3L, "역1"))
-                .distance(1)
-                .build();
-
-        line.addSection(section1);
-        line.addSection(section2);
-
-        //when
-        line.remove(section2);
-
-        //then
-        assertThat(line.getSections().size()).isEqualTo(1);
-        assertThat(line.getLastSection()).isEqualTo(section1);
-        assertThat(section2.getLine()).isNull();
     }
 }

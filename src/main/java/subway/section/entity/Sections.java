@@ -26,8 +26,12 @@ public class Sections {
     @OneToMany(mappedBy = "line", orphanRemoval = true, cascade = CascadeType.ALL)
     private List<Section> values = new ArrayList<>();
 
-    public static Sections from(List<Section> values) {
-        return new Sections(values);
+    public static Sections from(Section... inputSections) {
+        Sections newSections = new Sections();
+        for (Section section : inputSections) {
+            newSections.add(section);
+        }
+        return newSections;
     }
 
     public Section get(int index) {
@@ -38,9 +42,9 @@ public class Sections {
         return values.size();
     }
 
-    public boolean add(Section section) {
+    public void add(Section section) {
         validateForAdd(section);
-        return values.add(section);
+        values.add(section);
     }
 
     public void add(Line line, Station upStation, Station downStation, long distance) {
@@ -80,13 +84,11 @@ public class Sections {
 
     public void removeByStationId(Long downStationId) {
         validateRemove(downStationId);
+
         values.stream()
                 .filter(section -> section.downStationId().equals(downStationId))
                 .findAny()
-                .ifPresent(section -> {
-                    values.remove(section);
-                    section.removeLine();
-                });
+                .ifPresent(this::remove);
     }
 
     private void validateForAdd(Section newSection) {

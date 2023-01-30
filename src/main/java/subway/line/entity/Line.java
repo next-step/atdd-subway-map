@@ -33,10 +33,10 @@ public class Line {
     private Sections sections;
 
     @Builder
-    public Line(String name, String color, List<Section> values) {
+    public Line(String name, String color) {
         this.name = name;
         this.color = color;
-        this.sections = (values == null) ? new Sections() : Sections.from(values);
+        this.sections = new Sections();
     }
 
     public static Line of(String name, String color) {
