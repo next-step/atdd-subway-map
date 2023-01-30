@@ -66,4 +66,15 @@ public class LineService {
                 station.getName()
         );
     }
+
+    @Transactional
+    public void modifyLine(Long lineId, LineModifyRequest lineModifyRequest) {
+        String newName = lineModifyRequest.getName();
+        String newColor = lineModifyRequest.getColor();
+
+        Line line = lineRepository.findById(lineId)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 노선입니다."));
+
+        line.modify(newName, newColor);
+    }
 }

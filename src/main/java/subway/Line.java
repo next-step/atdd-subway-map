@@ -61,6 +61,11 @@ public class Line {
         return distance;
     }
 
+    public void modify(String name, String color) {
+        this.name = name;
+        this.color = color;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
