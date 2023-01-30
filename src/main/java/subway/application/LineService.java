@@ -9,62 +9,48 @@ import org.springframework.transaction.annotation.Transactional;
 import subway.domain.Line;
 import subway.domain.LineRepository;
 import subway.domain.Station;
-import subway.domain.StationRepository;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 import subway.dto.StationResponse;
 import subway.exception.LineNotFoundException;
-import subway.exception.StationNotFoundException;
 
 @Transactional(readOnly = true)
 @Service
 public class LineService {
 
     private final LineRepository lineRepository;
-    private final StationRepository stationRepository;
+    private final StationService stationService;
 
-    public LineService(LineRepository lineRepository, StationRepository stationRepository) {
+    public LineService(LineRepository lineRepository, StationService stationService) {
         this.lineRepository = lineRepository;
-        this.stationRepository = stationRepository;
+        this.stationService = stationService;
     }
 
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
-        Station upStation = findStationById(lineRequest.getUpStationId());
-        Station downStation = findStationById(lineRequest.getDownStationId());
+        StationResponse upStation = stationService.findById(lineRequest.getUpStationId());
+        StationResponse downStation = stationService.findById(lineRequest.getDownStationId());
 
         Line line = lineRepository.save(new Line(
             lineRequest.getName(),
             lineRequest.getColor(),
-            upStation,
-            downStation,
+            upStation.getId(),
+            downStation.getId(),
             lineRequest.getDistance()
         ));
-
-        return createLineResponse(line);
-    }
-
-    private Station findStationById(Long id) {
-        return stationRepository.findById(id)
-            .orElseThrow(() -> new StationNotFoundException(id));
-    }
-
-    private LineResponse createLineResponse(Line line) {
-        List<Station> stations = List.of(line.getUpStation(), line.getDownStation());
 
         return new LineResponse(
             line.getId(),
             line.getName(),
             line.getColor(),
-            stations.stream()
-                .map(station -> new StationResponse(station.getId(), station.getName()))
-                .collect(Collectors.toList())
+            List.of(upStation, downStation)
         );
     }
 
     public LineResponse findLine(Long id) {
         Line line = findLineById(id);
-        return createLineResponse(line);
+        List<Station> stations = stationService.findAllByIds(List.of(line.getUpStation(), line.getDownStation()));
+        return new LineResponse(line, stations);
     }
 
     private Line findLineById(Long id) {
@@ -74,7 +60,10 @@ public class LineService {
 
     public List<LineResponse> findAllLines() {
         return lineRepository.findAll().stream()
-            .map(this::createLineResponse)
+            .map(line -> {
+                List<Station> stations = stationService.findAllByIds(List.of(line.getUpStation(), line.getDownStation()));
+                return new LineResponse(line, stations);
+            })
             .collect(Collectors.toList());
     }
 

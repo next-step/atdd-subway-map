@@ -1,11 +1,9 @@
 package subway.domain;
 
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
 
 @Entity
 public class Line {
@@ -18,22 +16,20 @@ public class Line {
 
     private String color;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Station upStation;
+    private Long upStation;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Station downStation;
+    private Long downStation;
 
     private Long distance;
 
     public Line() {
     }
 
-    public Line(String name, String color, Station upStation, Station downStation, Long distance) {
+    public Line(String name, String color, Long upStationId, Long downStationId, Long distance) {
         this.name = name;
         this.color = color;
-        this.upStation = upStation;
-        this.downStation = downStation;
+        this.upStation = upStationId;
+        this.downStation = downStationId;
         this.distance = distance;
     }
 
@@ -54,11 +50,11 @@ public class Line {
         return color;
     }
 
-    public Station getUpStation() {
+    public Long getUpStation() {
         return upStation;
     }
 
-    public Station getDownStation() {
+    public Long getDownStation() {
         return downStation;
     }
 
