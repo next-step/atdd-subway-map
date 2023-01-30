@@ -16,9 +16,7 @@ import java.util.List;
 @Transactional(readOnly = true)
 @Service
 public class LineService {
-    private final StationRepository stationRepository;
     private final LineRepository lineRepository;
-    private final SectionRepository sectionRepository;
 
     @Transactional
     public Line save(Line entity) {

@@ -48,14 +48,13 @@ public class Sections extends AbstractList<Section> {
     }
 
     private void validateForAdd(Section newSection) {
-        // 이미 저장 되어있거나 구간이 없으면 항상 통과하므로 검증할 필요가 없다.
         if (values.isEmpty() || values.contains(newSection)) {
             return;
         }
 
-        Long lastSectionDownStationId = this.last().getDownStation().getId();
-        Long newSectionUpStationId = newSection.getUpStation().getId();
-        Long newSectionDownStationId = newSection.getDownStation().getId();
+        Long lastSectionDownStationId = this.last().downStationId();
+        Long newSectionUpStationId = newSection.upStationId();
+        Long newSectionDownStationId = newSection.downStationId();
 
         if (!lastSectionDownStationId.equals(newSectionUpStationId)) {
             throw new IllegalArgumentException(String.format("마지막 구간의 하행역과 추가하려는 구간의 상행역이 다릅니다. 하행역 id:%d, 상행역 id:%d"
