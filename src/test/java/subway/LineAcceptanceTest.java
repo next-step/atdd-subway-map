@@ -131,4 +131,34 @@ class LineAcceptanceTest {
             .extract();
     }
 
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 조회하면
+     * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
+     */
+    @DisplayName("지하철 노선을 조회한다.")
+    @Test
+    void getLine() {
+        // given
+        ExtractableResponse<Response> createResponse = 지하철_노선_생성(LINE_분당선, "yellow", 수서역_id, 복정역_id, 10L);
+        long lineId = createResponse.jsonPath().getLong("id");
+
+        // when
+        ExtractableResponse<Response> getResponse = 지하철_노선_조회(lineId);
+
+        // then
+        assertThat(getResponse.jsonPath().getString("name")).isEqualTo(LINE_분당선);
+    }
+
+    private ExtractableResponse<Response> 지하철_노선_조회(Long id) {
+        return RestAssured
+            .given()
+                .log().all()
+            .when()
+                .get("/lines/{id}", id)
+            .then()
+                .log().all()
+            .extract();
+    }
+
 }
