@@ -14,6 +14,8 @@ import java.util.List;
 @Embeddable
 public class Sections {
 
+    private static final int ONE_SECTION = 1;
+
     @OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private List<Section> sections = new ArrayList<>();
 
@@ -46,7 +48,7 @@ public class Sections {
 
     private void validateOnlyOneSection() {
 
-        if (this.sections.size() == 1) {
+        if (this.sections.size() == ONE_SECTION) {
             throw new NoDeleteOneSectionException("구간이 1개인 경우 삭제할 수 없습니다.");
         }
     }
