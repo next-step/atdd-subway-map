@@ -14,7 +14,8 @@ public class RestAssuredClient {
         return RestAssured.given().log().all()
                 .body(request)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post(path)
+                .when()
+                .post(path)
                 .then().log().all()
                 .extract();
     }
@@ -23,7 +24,8 @@ public class RestAssuredClient {
             String path
     ) {
         return RestAssured.given().log().all()
-                .when().get(path)
+                .when()
+                .get(path)
                 .then().log().all()
                 .extract();
     }
@@ -32,7 +34,8 @@ public class RestAssuredClient {
             String path
     ) {
         return RestAssured.given().log().all()
-                .when().delete(path)
+                .when()
+                .delete(path)
                 .then().log().all()
                 .extract();
     }
@@ -44,7 +47,8 @@ public class RestAssuredClient {
         return RestAssured.given().log().all()
                 .body(request)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().put(path)
+                .when()
+                .put(path)
                 .then().log().all()
                 .extract();
     }

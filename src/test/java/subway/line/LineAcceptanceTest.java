@@ -40,6 +40,8 @@ public class LineAcceptanceTest {
     private long 서울대입구역_아이디;
     private long 신논현역_아이디;
     private long 낙성대역_아이디;
+    private LineRequest 신분당선_생성_요청;
+    private LineRequest 이호선_생성_요청;
 
     @BeforeEach
     void setUp() {
@@ -50,6 +52,21 @@ public class LineAcceptanceTest {
         서울대입구역_아이디 = 지하철역_생성(서울대입구역_생성_요청);
         신논현역_아이디 = 지하철역_생성(낙성대역_생성_요청);
         낙성대역_아이디 = 지하철역_생성(신논현역_생성_요청);
+
+        신분당선_생성_요청 = new LineRequest(
+                "신분당선",
+                LineFixtures.RED,
+                강남역_아이디,
+                서울대입구역_아이디,
+                10L
+        );
+        이호선_생성_요청 = new LineRequest(
+                "2호선",
+                LineFixtures.BLUE,
+                신논현역_아이디,
+                낙성대역_아이디,
+                10L
+        );
     }
 
     @DisplayName("지하철 노선을 생성한다.")
@@ -161,20 +178,4 @@ public class LineAcceptanceTest {
         ExtractableResponse<Response> 신분당선_조회_응답 = RestAssuredClient.get(생성_헤더(신분당선_생성_응답));
         응답_코드가_일치한다(신분당선_조회_응답.statusCode(), HttpStatus.NOT_FOUND);
     }
-
-    private final LineRequest 신분당선_생성_요청 = new LineRequest(
-            "신분당선",
-            LineFixtures.RED,
-            강남역_아이디,
-            서울대입구역_아이디,
-            10L
-    );
-
-    private final LineRequest 이호선_생성_요청 = new LineRequest(
-            "2호선",
-            LineFixtures.BLUE,
-            신논현역_아이디,
-            낙성대역_아이디,
-            10L
-    );
 }
