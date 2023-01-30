@@ -24,11 +24,11 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine() {
         // when
-        ExtractableResponse<Response> response = createLineResponse(new LineRequest("신분당선", "bg-red-600", GANG_NAM_STATION.getId(), YEOK_SAM_STATION.getId(), 5));
+        ExtractableResponse<Response> response = createLineResponse(new LineRequest("신분당선", "bg-red-600", 1L, 2L, 5));
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        
+
         // then
         List<String> lineNames =
                 RestAssured.given().log().all()
@@ -56,8 +56,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void showLines() {
         // given
-        ExtractableResponse<Response> shinBunDang = createLineResponse(new LineRequest("신분당선", "bg-red-600", GANG_NAM_STATION.getId(), YEOK_SAM_STATION.getId(), 5));
-        ExtractableResponse<Response> bunDang = createLineResponse(new LineRequest("분당선", "bg-red-700", GANG_NAM_STATION.getId(), YEOK_SAM_STATION.getId(), 5));
+        ExtractableResponse<Response> shinBunDang = createLineResponse(new LineRequest("신분당선", "bg-red-600", 1L, 2L, 5));
+        ExtractableResponse<Response> bunDang = createLineResponse(new LineRequest("분당선", "bg-red-700", 1L, 2L, 5));
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -85,7 +85,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void showLine() {
         // given
-        ExtractableResponse<Response> shinBunDang = createLineResponse(new LineRequest("신분당선", "bg-red-600", GANG_NAM_STATION.getId(), YEOK_SAM_STATION.getId(), 5));
+        ExtractableResponse<Response> shinBunDang = createLineResponse(new LineRequest("신분당선", "bg-red-600", 1L, 2L, 5));
 
         // when
         long id = shinBunDang.jsonPath().getLong("id");
@@ -113,7 +113,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void modifyLine() {
         // given
-        ExtractableResponse<Response> shinBunDang = createLineResponse(new LineRequest("신분당선", "bg-red-600", GANG_NAM_STATION.getId(), YEOK_SAM_STATION.getId(), 5));
+        ExtractableResponse<Response> shinBunDang = createLineResponse(new LineRequest("신분당선", "bg-red-600", 1L, 2L, 5));
 
         // when
         long id = shinBunDang.jsonPath().getLong("id");
@@ -145,7 +145,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        ExtractableResponse<Response> shinBunDang = createLineResponse(new LineRequest("신분당선", "bg-red-600", GANG_NAM_STATION.getId(), YEOK_SAM_STATION.getId(), 5));
+        ExtractableResponse<Response> shinBunDang = createLineResponse(new LineRequest("신분당선", "bg-red-600", 1L, 2L, 5));
 
         // when
         long id = shinBunDang.jsonPath().getLong("id");
