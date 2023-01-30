@@ -16,15 +16,15 @@ public class LineService {
   }
 
   @Transactional
-  public LineResponse saveLine(LineRequest request) {
-    Line line = lineRepository.save(new Line(request.getName(), request.getInbound(), request.getOutbound()));
-    return createServiceResponse(line);
+  public LineResponse saveLine(Line line) {
+    Line created = lineRepository.save(line);
+    return createServiceResponse(created);
   }
 
-  public LineResponse showLine(Long id) {
+  public Optional<LineResponse> showLine(Long id) {
     Optional<Line> optionalLine = lineRepository.findById(id);
 
-    return optionalLine.map(this::createServiceResponse).orElse(null);
+    return optionalLine.map(this::createServiceResponse);
   }
 
   public List<LineResponse> showLines() {
@@ -37,18 +37,16 @@ public class LineService {
     lineRepository.deleteById(id);
   }
 
-  public LineResponse updateLine(Long id, LineRequest request) {
+  public Optional<LineResponse> updateLine(Long id, LineRequest request) {
     Optional<Line> optionalLine = lineRepository.findById(id);
 
-    if (optionalLine.isPresent()) {
-      Line line = optionalLine.get();
-      line.updateLine(request.getName(), request.getInbound(), request.getOutbound());
-      return createServiceResponse(lineRepository.save(line));
-    }
-    return null;
+    return optionalLine.map(line ->
+            line.updateLine(request.getName(), request.getInbound(), request.getOutbound())
+        ).map(lineRepository::save)
+        .map(this::createServiceResponse);
   }
 
   private LineResponse createServiceResponse(Line line) {
-    return new LineResponse(line.getId(), line.getName());
+    return new LineResponse(line.getId(), line.getName(), line.getInboundStation(), line.getOutboundStation());
   }
 }

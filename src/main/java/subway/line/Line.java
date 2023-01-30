@@ -47,9 +47,10 @@ public class Line {
     return outboundStation;
   }
 
-  public void updateLine(String name, Station inboundStation, Station outboundStation) {
+  public Line updateLine(String name, Station inboundStation, Station outboundStation) {
     this.name = name;
     this.inboundStation = inboundStation;
     this.outboundStation = outboundStation;
+    return this;
   }
 }
