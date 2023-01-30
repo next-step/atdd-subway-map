@@ -17,14 +17,14 @@ public class LineSectionController {
     }
 
     @PostMapping("/{id}/sections")
-    public ResponseEntity<Void> createLine(@PathVariable final Long id, @RequestBody final LineSectionRequest lineSectionRequest) {
+    public ResponseEntity<Void> addSection(@PathVariable final Long id, @RequestBody final LineSectionRequest lineSectionRequest) {
 
         lineSectionService.addSection(id, lineSectionRequest);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}/sections")
-    public ResponseEntity<Void> createLine(@PathVariable final Long id, @RequestParam final Long stationId) {
+    public ResponseEntity<Void> removeLine(@PathVariable final Long id, @RequestParam final Long stationId) {
 
         lineSectionService.removeSection(id, stationId);
         return ResponseEntity.noContent().build();
