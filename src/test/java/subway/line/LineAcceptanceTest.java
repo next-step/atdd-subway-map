@@ -12,15 +12,21 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import subway.common.DatabaseCleaner;
 import subway.common.Endpoints;
-import subway.common.LineFixtures;
-import subway.station.StationResponse;
-import subway.utils.JsonBodyParam;
 import subway.utils.RestAssuredClient;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static subway.common.TestHelper.노선을_생성한다;
+import static subway.common.TestHelper.노선의_정보가_일치한다;
+import static subway.common.TestHelper.생성_헤더;
+import static subway.common.TestHelper.응답_코드가_일치한다;
+import static subway.station.StationAcceptanceTest.지하철역_생성;
+import static subway.station.StationFixtures.강남역_생성_요청;
+import static subway.station.StationFixtures.낙성대역_생성_요청;
+import static subway.station.StationFixtures.서울대입구역_생성_요청;
+import static subway.station.StationFixtures.신논현역_생성_요청;
 
 @DisplayName("지하철 노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -30,27 +36,26 @@ public class LineAcceptanceTest {
 
     @Autowired
     private DatabaseCleaner databaseCleaner;
+    private long 강남역_아이디;
+    private long 서울대입구역_아이디;
+    private long 신논현역_아이디;
+    private long 낙성대역_아이디;
 
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
         databaseCleaner.execute();
+
+        강남역_아이디 = 지하철역_생성(강남역_생성_요청);
+        서울대입구역_아이디 = 지하철역_생성(서울대입구역_생성_요청);
+        신논현역_아이디 = 지하철역_생성(낙성대역_생성_요청);
+        낙성대역_아이디 = 지하철역_생성(신논현역_생성_요청);
     }
 
-    /**
-     * When 지하철 노선을 생성하면
-     * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다.
-     */
     @DisplayName("지하철 노선을 생성한다.")
     @Test
     void createLine() {
-        ExtractableResponse<Response> 강남역_생성_응답 = RestAssuredClient.post(Endpoints.STATIONS, new JsonBodyParam("name", "강남역").toMap());
-        ExtractableResponse<Response> 서울대입구역_생성_응답 = RestAssuredClient.post(Endpoints.STATIONS, new JsonBodyParam("name", "서울대입구역").toMap());
-
-        // when 지하철 노선을 생성하면
-        long 강남역_아이디 = 강남역_생성_응답.jsonPath().getLong("id");
-        long 서울대입구역_아이디 = 서울대입구역_생성_응답.jsonPath().getLong("id");
-
+        // Given 지하철 노선을 생성하면
         var response = RestAssuredClient.post(
                 Endpoints.LINES,
                 new LineRequest(
@@ -61,61 +66,29 @@ public class LineAcceptanceTest {
                         10L
                 )
         );
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        응답_코드가_일치한다(response.statusCode(), HttpStatus.CREATED);
 
-        // then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다.
+        // When 지하철 노선 목록 조회 시
         List<LineResponse> lineResponses = RestAssuredClient.get(Endpoints.LINES).jsonPath().getList(".", LineResponse.class);
-        assertThat(lineResponses).hasSize(1);
 
-        var lineResponse = lineResponses.get(0);
-        assertThat(lineResponse.getName()).isEqualTo("신분당선");
-        assertThat(lineResponse.getColor()).isEqualTo(LineFixtures.RED);
-        assertThat(lineResponse.getStations()).hasSize(2);
-        assertThat(lineResponse.getStations().stream().map(StationResponse::getId))
-                .containsExactly(
-                        강남역_아이디,
-                        서울대입구역_아이디
-                );
+        // Then 생성한 노선을 찾을 수 있다.
+        assertThat(lineResponses).hasSize(1);
+        var 신분당선_응답 = lineResponses.get(0);
+        노선의_정보가_일치한다(
+                신분당선_응답,
+                "신분당선",
+                LineFixtures.RED,
+                강남역_아이디,
+                서울대입구역_아이디
+        );
     }
 
-    /**
-     * Given 2개의 지하철 노선을 생성하고
-     * When 지하철 노선 목록을 조회하면
-     * Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
-     */
     @DisplayName("여러 개의 지하철 노선을 조회한다.")
     @Test
     void findAllLines() {
-        ExtractableResponse<Response> 강남역_생성_응답 = RestAssuredClient.post(Endpoints.STATIONS, new JsonBodyParam("name", "강남역").toMap());
-        ExtractableResponse<Response> 서울대입구역_생성_응답 = RestAssuredClient.post(Endpoints.STATIONS, new JsonBodyParam("name", "서울대입구역").toMap());
-
         // Given 지하철 노선을 생성하고
-        long 강남역_아이디 = 강남역_생성_응답.jsonPath().getLong("id");
-        long 서울대입구역_아이디 = 서울대입구역_생성_응답.jsonPath().getLong("id");
-
-        var 신분당선_생성 = RestAssuredClient.post(
-                Endpoints.LINES,
-                new LineRequest(
-                        "신분당선",
-                        LineFixtures.RED,
-                        강남역_아이디,
-                        서울대입구역_아이디,
-                        10L
-                )
-        );
-        assertThat(신분당선_생성.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-        var 이호선_생성 = RestAssuredClient.post(
-                Endpoints.LINES,
-                new LineRequest(
-                        "2호선",
-                        LineFixtures.BLUE,
-                        강남역_아이디,
-                        서울대입구역_아이디,
-                        10L
-                )
-        );
-        assertThat(이호선_생성.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        var 신분당선_생성_응답 = 노선을_생성한다(신분당선_생성_요청);
+        var 이호선_생성_응답 = 노선을_생성한다(이호선_생성_요청);
 
         // When 지하철 노선 목록을 조회하면
         List<LineResponse> lineResponses = RestAssuredClient.get(Endpoints.LINES).jsonPath().getList(".", LineResponse.class);
@@ -123,136 +96,85 @@ public class LineAcceptanceTest {
         // Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
         assertThat(lineResponses).hasSize(2);
         var lineNames = lineResponses.stream().map(LineResponse::getName).collect(Collectors.toList());
-        assertThat(lineNames).containsExactly("신분당선", "2호선");
+        assertThat(lineNames).containsExactly(신분당선_생성_요청.getName(), 이호선_생성_요청.getName());
     }
 
-    /**
-     * Given 지하철 노선을 생성하고
-     * When 생성한 지하철 노선을 조회하면
-     * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
-     */
     @DisplayName("특정 지하철 노선을 조회한다.")
     @Test
     void findLineById() {
-        ExtractableResponse<Response> 강남역_생성_응답 = RestAssuredClient.post(Endpoints.STATIONS, new JsonBodyParam("name", "강남역").toMap());
-        ExtractableResponse<Response> 서울대입구역_생성_응답 = RestAssuredClient.post(Endpoints.STATIONS, new JsonBodyParam("name", "서울대입구역").toMap());
-
         // Given 지하철 노선을 생성하고
-        long 강남역_아이디 = 강남역_생성_응답.jsonPath().getLong("id");
-        long 서울대입구역_아이디 = 서울대입구역_생성_응답.jsonPath().getLong("id");
-
-        String lineName = "신분당선";
-        String color = LineFixtures.RED;
-        long upStationId = 강남역_아이디;
-        long downStationId = 서울대입구역_아이디;
-
-        var 신분당선_생성 = RestAssuredClient.post(
-                Endpoints.LINES,
-                new LineRequest(
-                        lineName,
-                        color,
-                        upStationId,
-                        downStationId,
-                        10L
-                )
-        );
-        assertThat(신분당선_생성.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        var 신분당선_생성_응답 = 노선을_생성한다(신분당선_생성_요청);
 
         // When 생성한 지하철 노선을 조회하면
-        var path = 신분당선_생성.header("Location");
-        var 신분당선_조회 = RestAssuredClient.get(path);
-        var 신분당선_응답 = 신분당선_조회.as(LineResponse.class);
+        var 신분당선_응답 = RestAssuredClient.get(생성_헤더(신분당선_생성_응답)).as(LineResponse.class);
 
         // Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
-        assertThat(신분당선_응답.getName()).isEqualTo(lineName);
-        assertThat(신분당선_응답.getColor()).isEqualTo(color);
-        assertThat(신분당선_응답.getStations().stream().map(StationResponse::getId)).containsExactly(upStationId, downStationId);
+        노선의_정보가_일치한다(
+                신분당선_응답,
+                신분당선_생성_요청.getName(),
+                신분당선_생성_요청.getColor(),
+                신분당선_생성_요청.getUpStationId(),
+                신분당선_생성_요청.getDownStationId()
+        );
     }
 
-    /**
-     * Given 지하철 노선을 생성하고
-     * When 생성한 지하철 노선을 수정하면
-     * Then 해당 지하철 노선 정보는 수정된다
-     */
     @DisplayName("특정 지하철 노선을 수정한다.")
     @Test
     void updateLineById() {
-        ExtractableResponse<Response> 강남역_생성_응답 = RestAssuredClient.post(Endpoints.STATIONS, new JsonBodyParam("name", "강남역").toMap());
-        ExtractableResponse<Response> 서울대입구역_생성_응답 = RestAssuredClient.post(Endpoints.STATIONS, new JsonBodyParam("name", "서울대입구역").toMap());
-
         // Given 지하철 노선을 생성하고
-        long 강남역_아이디 = 강남역_생성_응답.jsonPath().getLong("id");
-        long 서울대입구역_아이디 = 서울대입구역_생성_응답.jsonPath().getLong("id");
-
-        String lineName = "신분당선";
-        String color = LineFixtures.RED;
-        long upStationId = 강남역_아이디;
-        long downStationId = 서울대입구역_아이디;
-
-        var 신분당선_생성 = RestAssuredClient.post(
-                Endpoints.LINES,
-                new LineRequest(
-                        lineName,
-                        color,
-                        upStationId,
-                        downStationId,
-                        10L
-                )
-        );
-        assertThat(신분당선_생성.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        var 신분당선_생성_응답 = 노선을_생성한다(신분당선_생성_요청);
 
         // When 생성한 지하철 노선을 수정하면
-        var path = 신분당선_생성.header("Location");
-
         String updateLineName = "4호선";
         String updateColor = LineFixtures.GREEN;
-        var updateLineResponse = RestAssuredClient.put(path, new UpdateLineRequest(
-                updateLineName,
-                updateColor
-        ));
+        var updateLineResponse = RestAssuredClient.put(
+                생성_헤더(신분당선_생성_응답),
+                new UpdateLineRequest(
+                        updateLineName,
+                        updateColor
+                )
+        );
 
         // Then line is updated.
         var 사호선_응답 = updateLineResponse.as(LineResponse.class);
-        assertThat(사호선_응답.getName()).isEqualTo(updateLineName);
-        assertThat(사호선_응답.getColor()).isEqualTo(updateColor);
-        assertThat(사호선_응답.getStations().stream().map(StationResponse::getId)).containsExactly(upStationId, downStationId);
+        노선의_정보가_일치한다(
+                사호선_응답,
+                updateLineName,
+                updateColor,
+                신분당선_생성_요청.getUpStationId(),
+                신분당선_생성_요청.getDownStationId()
+        );
     }
 
-    /**
-     * Given 지하철 노선을 생성하고
-     * When 생성한 지하철 노선을 삭제하면
-     * Then 해당 지하철 노선 정보는 삭제된다
-     */
     @DisplayName("특정 지하철 노선을 삭제한다.")
     @Test
     void deleteLineById() {
-        ExtractableResponse<Response> 강남역_생성_응답 = RestAssuredClient.post(Endpoints.STATIONS, new JsonBodyParam("name", "강남역").toMap());
-        ExtractableResponse<Response> 서울대입구역_생성_응답 = RestAssuredClient.post(Endpoints.STATIONS, new JsonBodyParam("name", "서울대입구역").toMap());
-
         // Given 지하철 노선을 생성하고
-        long 강남역_아이디 = 강남역_생성_응답.jsonPath().getLong("id");
-        long 서울대입구역_아이디 = 서울대입구역_생성_응답.jsonPath().getLong("id");
-
-        var 신분당선_생성 = RestAssuredClient.post(
-                Endpoints.LINES,
-                new LineRequest(
-                        "신분당선",
-                        LineFixtures.RED,
-                        강남역_아이디,
-                        서울대입구역_아이디,
-                        10L
-                )
-        );
-        assertThat(신분당선_생성.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        var 신분당선_path = 신분당선_생성.header("Location");
+        var 신분당선_생성_응답 = 노선을_생성한다(신분당선_생성_요청);
 
         // When 생성한 노선을 삭제하면
-        ExtractableResponse<Response> 신분당선_삭제_응답 = RestAssuredClient.delete(신분당선_path);
-        assertThat(신분당선_삭제_응답.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        ExtractableResponse<Response> 신분당선_삭제_응답 = RestAssuredClient.delete(생성_헤더(신분당선_생성_응답));
+        응답_코드가_일치한다(신분당선_삭제_응답.statusCode(), HttpStatus.NO_CONTENT);
 
         // Then 해당 지하철 노선 정보는 삭제된다.
         // = 해당 지하철 노선 정보 조회 시 NOT_FOUND를 응답받는다.
-        ExtractableResponse<Response> 신분당선_조회_응답 = RestAssuredClient.get(신분당선_path);
-        assertThat(신분당선_조회_응답.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+        ExtractableResponse<Response> 신분당선_조회_응답 = RestAssuredClient.get(생성_헤더(신분당선_생성_응답));
+        응답_코드가_일치한다(신분당선_조회_응답.statusCode(), HttpStatus.NOT_FOUND);
     }
+
+    private final LineRequest 신분당선_생성_요청 = new LineRequest(
+            "신분당선",
+            LineFixtures.RED,
+            강남역_아이디,
+            서울대입구역_아이디,
+            10L
+    );
+
+    private final LineRequest 이호선_생성_요청 = new LineRequest(
+            "2호선",
+            LineFixtures.BLUE,
+            신논현역_아이디,
+            낙성대역_아이디,
+            10L
+    );
 }

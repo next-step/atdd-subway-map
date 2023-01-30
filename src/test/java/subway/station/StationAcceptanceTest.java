@@ -1,24 +1,24 @@
 package subway.station;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import subway.common.DatabaseCleaner;
-import subway.common.Endpoints;
 import io.restassured.RestAssured;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.annotation.DirtiesContext;
-import subway.utils.JsonBodyParam;
+import subway.common.DatabaseCleaner;
+import subway.common.Endpoints;
+import subway.common.Request;
 import subway.utils.RestAssuredClient;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static subway.common.TestHelper.응답_코드가_일치한다;
+import static subway.station.StationFixtures.강남역_생성_요청;
+import static subway.station.StationFixtures.서울대입구역_생성_요청;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -35,19 +35,12 @@ public class StationAcceptanceTest {
         databaseCleaner.execute();
     }
 
-    /**
-     * When 지하철역을 생성하면
-     * Then 지하철역이 생성된다
-     * Then 지하철역 목록 조회 시 생성한 역을 찾을 수 있다
-     */
     @DisplayName("지하철역을 생성한다.")
     @Test
     void createStation() {
         // when
-        var response = RestAssuredClient.post(Endpoints.STATIONS, new JsonBodyParam("name", "강남역").toMap());
-
-        // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        var response = RestAssuredClient.post(Endpoints.STATIONS, 강남역_생성_요청);
+        응답_코드가_일치한다(response.statusCode(), HttpStatus.CREATED);
 
         // then
         List<String> stationNames = RestAssuredClient.get(Endpoints.STATIONS)
@@ -61,8 +54,8 @@ public class StationAcceptanceTest {
     @Test
     void findAllStations() {
         // Given 2개의 지하철역을 생성하고
-        RestAssuredClient.post(Endpoints.STATIONS, new JsonBodyParam("name", "강남역").toMap());
-        RestAssuredClient.post(Endpoints.STATIONS, new JsonBodyParam("name", "서울대입구역").toMap());
+        지하철역_생성(강남역_생성_요청);
+        지하철역_생성(서울대입구역_생성_요청);
 
         // When 지하철역 목록을 조회하면
         List<String> stationNames = RestAssuredClient.get(Endpoints.STATIONS)
@@ -78,11 +71,8 @@ public class StationAcceptanceTest {
     @Test
     void deleteAllStations() {
         // Given 지하철역을 생성하고
-        ExtractableResponse<Response> 강남역_생성_응답 = RestAssuredClient.post(Endpoints.STATIONS, new JsonBodyParam("name", "강남역").toMap());
-        ExtractableResponse<Response> 서울대입구역_생성_응답 = RestAssuredClient.post(Endpoints.STATIONS, new JsonBodyParam("name", "서울대입구역").toMap());
-
-        Long 강남역_아이디 = 강남역_생성_응답.jsonPath().getLong("id");
-        Long 서울대입구역_아이디 = 서울대입구역_생성_응답.jsonPath().getLong("id");
+        Long 강남역_아이디 = 지하철역_생성(강남역_생성_요청);
+        Long 서울대입구역_아이디 = 지하철역_생성(서울대입구역_생성_요청);
 
         // When 그 지하철역을 삭제하면
         RestAssuredClient.delete(Endpoints.endpointWithParam(Endpoints.STATIONS, 강남역_아이디));
@@ -96,5 +86,8 @@ public class StationAcceptanceTest {
         assertThat(stationIds).doesNotContain(강남역_아이디);
     }
 
-
+    public static long 지하철역_생성(Request stationRequest) {
+        return RestAssuredClient.post(Endpoints.STATIONS, stationRequest)
+                .jsonPath().getLong("id");
+    }
 }

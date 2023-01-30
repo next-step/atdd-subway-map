@@ -1,4 +1,4 @@
-package subway.common;
+package subway.line;
 
 public class LineFixtures {
     public static final String RED = "bg-red-600";
