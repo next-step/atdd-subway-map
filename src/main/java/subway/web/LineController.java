@@ -3,7 +3,7 @@ package subway.web;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import subway.application.service.LineLoadService;
+import subway.application.service.LineLoadUseCase;
 import subway.application.service.input.LineCommandUseCase;
 import subway.web.request.LineCreateRequest;
 import subway.web.request.LineUpdateRequest;
@@ -17,29 +17,29 @@ import java.util.stream.Collectors;
 public class LineController {
 
     private final LineCommandUseCase lineCommandUseCase;
-    private final LineLoadService lineLoadService;
+    private final LineLoadUseCase lineLoadUseCase;
 
-    public LineController(LineCommandUseCase lineCommandUseCase, LineLoadService lineLoadService) {
+    public LineController(LineCommandUseCase lineCommandUseCase, LineLoadUseCase lineLoadService) {
         this.lineCommandUseCase = lineCommandUseCase;
-        this.lineLoadService = lineLoadService;
+        this.lineLoadUseCase = lineLoadService;
     }
 
     @PostMapping("/lines")
     public ResponseEntity<CreateLineResponse> createLine(@RequestBody LineCreateRequest stationRequest) {
         Long createdLineId = lineCommandUseCase.createLine(stationRequest.toDomain());
-        CreateLineResponse response = CreateLineResponse.from(lineLoadService.loadLine(createdLineId));
+        CreateLineResponse response = CreateLineResponse.from(lineLoadUseCase.loadLine(createdLineId));
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/lines/{lineId}")
     public ResponseEntity<LineResponse> lines(@PathVariable Long lineId) {
-        LineResponse line = LineResponse.from(lineLoadService.loadLine(lineId));
+        LineResponse line = LineResponse.from(lineLoadUseCase.loadLine(lineId));
         return ResponseEntity.status(HttpStatus.OK).body(line);
     }
 
     @GetMapping("/lines")
     public ResponseEntity<List<LineResponse>> lines() {
-        List<LineResponse> lineResponses = lineLoadService.loadLines().stream()
+        List<LineResponse> lineResponses = lineLoadUseCase.loadLines().stream()
             .map(LineResponse::from)
             .collect(Collectors.toList());
 
