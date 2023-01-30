@@ -1,9 +1,16 @@
 package subway.domain;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
 @Entity
 public class Line {
@@ -16,26 +23,36 @@ public class Line {
 
     private String color;
 
-    private Long upStation;
-
-    private Long downStation;
-
-    private Long distance;
+    @OneToMany(mappedBy = "line", cascade = CascadeType.PERSIST, orphanRemoval = true)
+    private List<Section> sections = new ArrayList<>();
 
     public Line() {
     }
 
-    public Line(String name, String color, Long upStationId, Long downStationId, Long distance) {
+    public Line(String name, String color) {
         this.name = name;
         this.color = color;
-        this.upStation = upStationId;
-        this.downStation = downStationId;
-        this.distance = distance;
     }
 
     public void update(String name, String color) {
         this.name = name;
         this.color = color;
+    }
+
+    public void addSection(Section section) {
+        this.sections.add(section);
+    }
+
+    public List<Station> getAllStations() {
+        if (sections.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<Station> stations = sections.stream()
+            .map(Section::getDownStation)
+            .collect(Collectors.toList());
+        stations.add(0, sections.get(0).getUpStation());
+        return stations;
     }
 
     public Long getId() {
@@ -50,15 +67,7 @@ public class Line {
         return color;
     }
 
-    public Long getUpStation() {
-        return upStation;
-    }
-
-    public Long getDownStation() {
-        return downStation;
-    }
-
-    public Long getDistance() {
-        return distance;
+    public List<Section> getSections() {
+        return sections;
     }
 }

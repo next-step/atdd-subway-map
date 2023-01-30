@@ -143,10 +143,9 @@ class LineAcceptanceTest {
 
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
         assertThat(getResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
-
     }
 
-    private Long 지하철_역_생성(String name) {
+    static Long 지하철_역_생성(String name) {
         Map<String, String> param = new HashMap<>();
         param.put("name", name);
 
@@ -164,13 +163,20 @@ class LineAcceptanceTest {
             .getLong("id");
     }
 
-    private ExtractableResponse<Response> 지하철_노선_생성(String name, String color, Long upStationId, Long downStationId, Long distance) {
+    private ExtractableResponse<Response> 지하철_분당선_생성() {
+        return 지하철_노선_생성(LINE_분당선, "yellow", 수서역_id, 복정역_id);
+    }
+
+    private ExtractableResponse<Response> 지하철_3호선_생성() {
+        return 지하철_노선_생성(LINE_3호선, "brown", 수서역_id, 오금역_id);
+    }
+
+    static ExtractableResponse<Response> 지하철_노선_생성(String name, String color, Long upStationId, Long downStationId) {
         Map<String, Object> param = new HashMap<>();
         param.put("name", name);
         param.put("color", color);
         param.put("upStationId", upStationId);
         param.put("downStationId", downStationId);
-        param.put("distance", distance);
 
         return RestAssured
             .given()
@@ -184,15 +190,7 @@ class LineAcceptanceTest {
             .extract();
     }
 
-    private ExtractableResponse<Response> 지하철_분당선_생성() {
-        return 지하철_노선_생성(LINE_분당선, "yellow", 수서역_id, 복정역_id, 10L);
-    }
-
-    private ExtractableResponse<Response> 지하철_3호선_생성() {
-        return 지하철_노선_생성(LINE_3호선, "brown", 수서역_id, 오금역_id, 20L);
-    }
-
-    private ExtractableResponse<Response> 지하철_노선_목록_조회() {
+    static ExtractableResponse<Response> 지하철_노선_목록_조회() {
         return RestAssured
             .given()
                 .log().all()
@@ -203,11 +201,11 @@ class LineAcceptanceTest {
             .extract();
     }
 
-    private List<String> 지하철_노선_목록_이름_조회() {
+    static List<String> 지하철_노선_목록_이름_조회() {
         return 지하철_노선_목록_조회().jsonPath().getList("name", String.class);
     }
 
-    private ExtractableResponse<Response> 지하철_노선_조회(Long id) {
+    static ExtractableResponse<Response> 지하철_노선_조회(Long id) {
         return RestAssured
             .given()
                 .log().all()
@@ -218,7 +216,7 @@ class LineAcceptanceTest {
             .extract();
     }
 
-    private ExtractableResponse<Response> 지하철_노선_수정(Long id, String name, String color) {
+    static ExtractableResponse<Response> 지하철_노선_수정(Long id, String name, String color) {
         Map<String, String> updateParam = new HashMap<>();
         updateParam.put("name", name);
         updateParam.put("color", color);
@@ -235,7 +233,7 @@ class LineAcceptanceTest {
             .extract();
     }
 
-    private ExtractableResponse<Response> 지하철_노선_삭제(Long id) {
+    static ExtractableResponse<Response> 지하철_노선_삭제(Long id) {
         return RestAssured
             .given()
                 .log().all()

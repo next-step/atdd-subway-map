@@ -8,10 +8,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import subway.domain.Line;
 import subway.domain.LineRepository;
+import subway.domain.Section;
 import subway.domain.Station;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
-import subway.dto.StationResponse;
+import subway.dto.SectionRequest;
 import subway.exception.LineNotFoundException;
 
 @Transactional(readOnly = true)
@@ -28,29 +29,20 @@ public class LineService {
 
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
-        StationResponse upStation = stationService.findById(lineRequest.getUpStationId());
-        StationResponse downStation = stationService.findById(lineRequest.getDownStationId());
+        Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor()));
+        addSection(line, lineRequest.getUpStationId(), lineRequest.getDownStationId(), lineRequest.getDistance());
+        return new LineResponse(line);
+    }
 
-        Line line = lineRepository.save(new Line(
-            lineRequest.getName(),
-            lineRequest.getColor(),
-            upStation.getId(),
-            downStation.getId(),
-            lineRequest.getDistance()
-        ));
-
-        return new LineResponse(
-            line.getId(),
-            line.getName(),
-            line.getColor(),
-            List.of(upStation, downStation)
-        );
+    private void addSection(Line line, Long upStationId, Long downStationId, long distance) {
+        Station upStation = stationService.findById(upStationId);
+        Station downStation = stationService.findById(downStationId);
+        line.addSection(new Section(line, upStation, downStation, distance));
     }
 
     public LineResponse findLine(Long id) {
         Line line = findLineById(id);
-        List<Station> stations = stationService.findAllByIds(List.of(line.getUpStation(), line.getDownStation()));
-        return new LineResponse(line, stations);
+        return new LineResponse(line);
     }
 
     private Line findLineById(Long id) {
@@ -60,10 +52,7 @@ public class LineService {
 
     public List<LineResponse> findAllLines() {
         return lineRepository.findAll().stream()
-            .map(line -> {
-                List<Station> stations = stationService.findAllByIds(List.of(line.getUpStation(), line.getDownStation()));
-                return new LineResponse(line, stations);
-            })
+            .map(LineResponse::new)
             .collect(Collectors.toList());
     }
 
@@ -76,5 +65,11 @@ public class LineService {
     @Transactional
     public void deleteLineById(Long id) {
         lineRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void addSection(Long id, SectionRequest sectionRequest) {
+        Line line = findLineById(id);
+        addSection(line, sectionRequest.getUpStationId(), sectionRequest.getDownStationId(), sectionRequest.getDistance());
     }
 }

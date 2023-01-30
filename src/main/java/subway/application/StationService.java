@@ -15,7 +15,7 @@ import subway.exception.StationNotFoundException;
 @Service
 @Transactional(readOnly = true)
 public class StationService {
-    private StationRepository stationRepository;
+    private final StationRepository stationRepository;
 
     public StationService(StationRepository stationRepository) {
         this.stationRepository = stationRepository;
@@ -33,19 +33,14 @@ public class StationService {
                 .collect(Collectors.toList());
     }
 
-    public StationResponse findById(Long id) {
-        Station station = stationRepository.findById(id)
+    public Station findById(Long id) {
+        return stationRepository.findById(id)
             .orElseThrow(() -> new StationNotFoundException(id));
-        return new StationResponse(station);
     }
 
     @Transactional
     public void deleteStationById(Long id) {
         stationRepository.deleteById(id);
-    }
-
-    public List<Station> findAllByIds(List<Long> stationIds) {
-        return stationRepository.findAllById(stationIds);
     }
 
     private StationResponse createStationResponse(Station station) {
