@@ -6,12 +6,13 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.annotation.DirtiesContext;
-import subway.common.LineFixtures;
+import subway.common.DatabaseCleaner;
 import subway.common.Endpoints;
+import subway.common.LineFixtures;
 import subway.station.StationResponse;
 import subway.utils.JsonBodyParam;
 import subway.utils.RestAssuredClient;
@@ -22,15 +23,18 @@ import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class LineAcceptanceTest {
     @LocalServerPort
     int port;
 
+    @Autowired
+    private DatabaseCleaner databaseCleaner;
+
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
+        databaseCleaner.execute();
     }
 
     /**

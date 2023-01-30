@@ -1,5 +1,7 @@
 package subway.station;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import subway.common.DatabaseCleaner;
 import subway.common.Endpoints;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -19,15 +21,18 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class StationAcceptanceTest {
     @LocalServerPort
     int port;
 
+    @Autowired
+    private DatabaseCleaner databaseCleaner;
+
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
+        databaseCleaner.execute();
     }
 
     /**
