@@ -1,6 +1,7 @@
 package subway;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class LineResponse {
 
@@ -24,10 +25,12 @@ public class LineResponse {
         return stations;
     }
 
-    public LineResponse(Long id, String name, String color, List<StationResponse> stations) {
-        this.id = id;
-        this.name = name;
-        this.color = color;
-        this.stations = stations;
+    public LineResponse(Line line, List<Station> stations) {
+        this.id = line.getId();
+        this.name = line.getName();
+        this.color = line.getColor();
+        this.stations = stations.stream()
+            .map(StationResponse::from)
+            .collect(Collectors.toList());
     }
 }

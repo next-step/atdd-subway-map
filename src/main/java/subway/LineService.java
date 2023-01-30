@@ -34,24 +34,19 @@ public class LineService {
     }
 
     private LineResponse createLineResponse(Line line) {
-        return new LineResponse(
-            line.getId(),
-            line.getName(),
-            line.getColor(),
+        return new LineResponse(line,
             stationRepository.findByIdIn(
                 List.of(
                     line.getUpStationId(),
                     line.getDownStationId()
-                )).stream()
-                .map(StationResponse::from)
-                .collect(Collectors.toList())
+                ))
         );
     }
 
+    @Transactional
     public void updateLine(Long id, UpdateLineRequest request) {
         Line line = lineRepository.findById(id).orElseThrow(IllegalArgumentException::new);
         line.updateNameAndColor(request.getName(), request.getColor());
-        lineRepository.save(line);
     }
 
     public void deleteLineById(Long id) {
