@@ -8,11 +8,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import subway.dto.LineRequest;
@@ -22,11 +20,13 @@ import subway.dto.LineRequest;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @Sql("/init.sql")
 public class LineAcceptanceTest {
+    private final SubwayRestApiClient client = new SubwayRestApiClient();
+
     @DisplayName("지하철 노선을 생성한다.")
     @Test
     void createLine() {
         // when
-        ExtractableResponse<Response> response = createLine(new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10L));
+        ExtractableResponse<Response> response = client.createLine(new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10L));
 
         // then
         validateStatusCode(response, HttpStatus.CREATED);
@@ -37,11 +37,11 @@ public class LineAcceptanceTest {
     @Test
     void findLines() {
         // given
-        createLine(new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10L));
-        createLine(new LineRequest("분당선", "bg-red-600", 2L, 3L, 10L));
+        client.createLine(new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10L));
+        client.createLine(new LineRequest("분당선", "bg-red-600", 2L, 3L, 10L));
 
         // when
-        ExtractableResponse<Response> response = findAllLines();
+        ExtractableResponse<Response> response = client.findAllLines();
         List<String> lineNames = response.jsonPath().getList("name", String.class);
 
         // then
@@ -54,11 +54,11 @@ public class LineAcceptanceTest {
     @Test
     void findLineById() {
         // given
-        var line = createLine(new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10L));
+        var line = client.createLine(new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10L));
         long lineId = line.jsonPath().getLong("id");
 
         // when
-        ExtractableResponse<Response> response = findLineById(lineId);
+        ExtractableResponse<Response> response = client.findLineById(lineId);
 
         // then
         validateStatusCode(response, HttpStatus.OK);
@@ -69,11 +69,11 @@ public class LineAcceptanceTest {
     @Test
     void updateLine() {
         // given
-        var line = createLine(new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10L));
+        var line = client.createLine(new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10L));
         long lineId = line.jsonPath().getLong("id");
 
         // when
-        ExtractableResponse<Response> response = updateLine(lineId, new LineRequest("분당선", "bg-yellow-600", 2L, 3L, 100L));
+        ExtractableResponse<Response> response = client.updateLine(lineId, new LineRequest("분당선", "bg-yellow-600", 2L, 3L, 100L));
 
         // then
         validateStatusCode(response, HttpStatus.OK);
@@ -85,12 +85,12 @@ public class LineAcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        var line = createLine(new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10L));
+        var line = client.createLine(new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10L));
         long lineId = line.jsonPath().getLong("id");
 
         // when
-        ExtractableResponse<Response> deleteResponse = deleteLine(lineId);
-        ExtractableResponse<Response> findResponse = findLineById(lineId);
+        ExtractableResponse<Response> deleteResponse = client.deleteLine(lineId);
+        ExtractableResponse<Response> findResponse = client.findLineById(lineId);
 
         // then
         validateStatusCode(deleteResponse, HttpStatus.NO_CONTENT);
@@ -115,44 +115,5 @@ public class LineAcceptanceTest {
 
     private <T> void validateFieldBodyHasSize(List<T> actual, int expected) {
         assertThat(actual).hasSize(expected);
-    }
-
-    private ExtractableResponse<Response> createLine(LineRequest lineRequest) {
-        return RestAssured.given().log().all()
-            .body(lineRequest)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().post("/lines")
-            .then().log().all()
-            .extract();
-    }
-
-    private ExtractableResponse<Response> findAllLines() {
-        return RestAssured.given().log().all()
-            .when().get("/lines")
-            .then().log().all()
-            .extract();
-    }
-
-    private ExtractableResponse<Response> findLineById(Long lineId) {
-        return RestAssured.given().log().all()
-            .when().get("/lines/{id}", lineId)
-            .then().log().all()
-            .extract();
-    }
-
-    private ExtractableResponse<Response> updateLine(Long lineId, LineRequest lineRequest) {
-        return RestAssured.given().log().all()
-            .body(lineRequest)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().put("/lines/{id}", lineId)
-            .then().log().all()
-            .extract();
-    }
-
-    private ExtractableResponse<Response> deleteLine(Long lineId) {
-        return RestAssured.given().log().all()
-            .when().delete("/lines/{id}", lineId)
-            .then().log().all()
-            .extract();
     }
 }
