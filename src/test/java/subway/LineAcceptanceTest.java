@@ -32,10 +32,10 @@ class LineAcceptanceTest extends LineAcceptConstants {
     @Test
     void createLineTest() {
         // given
-        createLine(이호선);
+        지하철_노선_생성(이호선);
 
         // when
-        List<String> lineNames = getLineNames();
+        List<String> lineNames = 지하철_노선_이름_목록_조회();
 
         // then
         assertThat(lineNames.size()).isEqualTo(1);
@@ -51,11 +51,11 @@ class LineAcceptanceTest extends LineAcceptConstants {
     @Test
     void getLinesTest() {
         // given
-        createLine(이호선);
-        createLine(신분당선);
+        지하철_노선_생성(이호선);
+        지하철_노선_생성(신분당선);
 
         // when
-        final List<String> lineNames = getLineNames();
+        final List<String> lineNames = 지하철_노선_이름_목록_조회();
 
         // then
         assertThat(lineNames.size()).isEqualTo(2);
@@ -71,10 +71,10 @@ class LineAcceptanceTest extends LineAcceptConstants {
     @Test
     void getLineTest() {
         // given
-        createLine(이호선);
+        지하철_노선_생성(이호선);
 
         // when
-        final LineResponse lineResponse = getLine();
+        final LineResponse lineResponse = 지하철_노선_단건_조회();
 
         // then
         assertThat(lineResponse.getName()).isEqualTo((String) 이호선.get(LINE_NAME));
@@ -89,14 +89,14 @@ class LineAcceptanceTest extends LineAcceptConstants {
     @Test
     void updateLineTest() {
         // given
-        createLine(신분당선);
+        지하철_노선_생성(신분당선);
 
         // when
         final String newLineName = "구분당선";
         final String newLinColor = "bg-red-600";
-        updateLine(newLineName, newLinColor);
+        지하철_노선_수정(newLineName, newLinColor);
 
-        final LineResponse lineResponse = getLine();
+        final LineResponse lineResponse = 지하철_노선_단건_조회();
 
         // then
         assertThat(lineResponse.getName()).isEqualTo(newLineName);
@@ -112,17 +112,17 @@ class LineAcceptanceTest extends LineAcceptConstants {
     @Test
     void deleteLineTest() {
         // given
-        createLine(신분당선);
+        지하철_노선_생성(신분당선);
 
         // when
-        deleteLine();
+        지하철_노선_삭제();
 
         // then
-        final List<LineResponse> lines = getLines();
+        final List<LineResponse> lines = 지하철_노선_목록_조회();
         assertThat(lines.isEmpty()).isTrue();
     }
 
-    private void createLine(final Map<String, Object> line) {
+    private void 지하철_노선_생성(final Map<String, Object> line) {
         RestAssured
                 .given()
                     .contentType(APPLICATION_JSON_VALUE)
@@ -135,7 +135,7 @@ class LineAcceptanceTest extends LineAcceptConstants {
                     .body("name", Matchers.equalTo(line.get(LINE_NAME)));
     }
 
-    private List<LineResponse> getLines() {
+    private List<LineResponse> 지하철_노선_목록_조회() {
         return RestAssured
                 .given()
                     .accept(APPLICATION_JSON_VALUE)
@@ -148,13 +148,13 @@ class LineAcceptanceTest extends LineAcceptConstants {
                 .getList("", LineResponse.class);
     }
 
-    private List<String> getLineNames() {
-        return getLines().stream()
+    private List<String> 지하철_노선_이름_목록_조회() {
+        return 지하철_노선_목록_조회().stream()
                 .map(LineResponse::getName)
                 .collect(Collectors.toList());
     }
 
-    private static LineResponse getLine() {
+    private static LineResponse 지하철_노선_단건_조회() {
         return RestAssured
                 .given()
                     .accept(APPLICATION_JSON_VALUE)
@@ -168,7 +168,7 @@ class LineAcceptanceTest extends LineAcceptConstants {
                 .getObject("", LineResponse.class);
     }
 
-    private void updateLine(final String newLineName, final String newLinColor) {
+    private void 지하철_노선_수정(final String newLineName, final String newLinColor) {
         RestAssured
                 .given()
                     .contentType(APPLICATION_JSON_VALUE)
@@ -179,7 +179,7 @@ class LineAcceptanceTest extends LineAcceptConstants {
                    .statusCode(HttpStatus.OK.value());
     }
 
-    private void deleteLine() {
+    private void 지하철_노선_삭제() {
         RestAssured
                 .given()
                 .when()
