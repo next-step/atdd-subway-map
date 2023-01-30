@@ -35,7 +35,7 @@ public class StationAcceptanceTest {
     void createStation() {
         // when
         Map<String, String> params = new HashMap<>();
-        params.put("name", MockStation.강남역.getName());
+        params.put("name", MockStation.강남역);
 
         ExtractableResponse<Response> response = 인수테스트_Given_준비(params)
             .when().post("/stations")
@@ -47,7 +47,7 @@ public class StationAcceptanceTest {
 
         // then
         List<String> stationNames = 지하철역_조회();
-        assertThat(stationNames).containsAnyOf(MockStation.강남역.getName());
+        assertThat(stationNames).containsAnyOf(MockStation.강남역);
     }
 
     /**
@@ -59,7 +59,7 @@ public class StationAcceptanceTest {
     @DisplayName("등록된 지하철역 목록을 조회한다.")
     void showStations() {
         // given
-        지하철역_생성(List.of(MockStation.서울대입구역.getName(), MockStation.봉천역.getName()));
+        지하철역_생성(List.of(MockStation.서울대입구역, MockStation.봉천역));
 
         // when
         List<String> stationNames = 지하철역_조회();
@@ -68,7 +68,7 @@ public class StationAcceptanceTest {
         assertAll(
             () -> assertThat(stationNames.size()).isEqualTo(2),
             () -> assertThat(stationNames).containsAll(
-                List.of(MockStation.서울대입구역.getName(), MockStation.봉천역.getName())
+                List.of(MockStation.서울대입구역, MockStation.봉천역)
             )
         );
     }

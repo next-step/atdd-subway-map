@@ -1,28 +1,27 @@
 package subway.line;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import subway.station.Station;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class LineRequest {
 
   private String name;
-  private Station inbound;
-  private Station outbound;
+  private String inbound;
+  private String outbound;
 
   public String getName() {
     return name;
   }
 
-  public Station getInbound() {
+  public String getInbound() {
     return inbound;
   }
 
-  public Station getOutbound() {
+  public String getOutbound() {
     return outbound;
   }
 
-  public LineRequest(String name, Station inbound, Station outbound) {
+  public LineRequest(String name, String inbound, String outbound) {
     this.name = name;
     this.inbound = inbound;
     this.outbound = outbound;

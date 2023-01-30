@@ -8,10 +8,12 @@ import static subway.LineTestUtils.지하철_노선_삭제;
 import static subway.LineTestUtils.지하철_노선_생성;
 import static subway.LineTestUtils.지하철_노선_수정;
 import static subway.LineTestUtils.지하철_노선_조회;
+import static subway.StationTestUtils.지하철역_생성;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,8 +26,13 @@ import subway.line.Line;
 
 @DisplayName("지하철 노선 관리 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@DirtiesContext(classMode = ClassMode.AFTER_CLASS)
+@DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 public class LineAcceptanceTest {
+
+  @BeforeEach
+  void createStation() {
+    지하철역_생성(List.of(MockStation.서울대입구역, MockStation.봉천역));
+  }
 
   /**
    * When 지하철 노선을 생성하면
@@ -41,8 +48,8 @@ public class LineAcceptanceTest {
 
     assertAll(
         () -> assertThat(response.jsonPath().getString("name")).isEqualTo(line.getName()),
-        () -> assertThat(response.jsonPath().getString("inboundStation.name")).isEqualTo(MockStation.서울대입구역.getName()),
-        () -> assertThat(response.jsonPath().getString("outboundStation.name")).isEqualTo(MockStation.봉천역.getName())
+        () -> assertThat(response.jsonPath().getString("inboundStation.name")).isEqualTo(MockStation.서울대입구역),
+        () -> assertThat(response.jsonPath().getString("outboundStation.name")).isEqualTo(MockStation.봉천역)
     );
   }
 

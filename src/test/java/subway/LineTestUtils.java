@@ -6,13 +6,12 @@ import io.restassured.response.Response;
 import org.springframework.http.MediaType;
 import subway.line.Line;
 import subway.line.LineRequest;
-import subway.station.Station;
 
 public class LineTestUtils {
 
   private LineTestUtils() {}
 
-  public static Line 지하철_노선_생성(String name, Station inbound, Station outbound) {
+  public static Line 지하철_노선_생성(String name, String inbound, String outbound) {
     LineRequest request = new LineRequest(name, inbound, outbound);
 
     return RestAssured
@@ -38,7 +37,7 @@ public class LineTestUtils {
         .extract();
   }
 
-  public static Line 지하철_노선_수정(Long id, String name, Station inbound, Station outbound) {
+  public static Line 지하철_노선_수정(Long id, String name, String inbound, String outbound) {
     LineRequest request = new LineRequest(name, inbound, outbound);
 
     return RestAssured

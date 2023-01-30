@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import subway.station.Station;
 
 @RestController
 public class LineController {
@@ -28,8 +29,8 @@ public class LineController {
   @PostMapping("/lines")
   public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest request) {
     return ResponseEntity.ok().body(lineService.saveLine(
-        new Line(request.getName(), request.getInbound(), request.getOutbound())
-    ));
+        request.getName(), request.getInbound(), request.getOutbound())
+    );
   }
 
   /**
@@ -63,7 +64,7 @@ public class LineController {
    */
   @PatchMapping("/lines/{id}")
   public ResponseEntity<LineResponse> patchLine(@PathVariable Long id, @RequestBody LineRequest request) {
-    Optional<LineResponse> response = lineService.updateLine(id,request);
+    Optional<LineResponse> response = lineService.updateLine(id,request.getName(), request.getInbound(), request.getOutbound());
     if (response.isEmpty()) {
       return ResponseEntity.notFound().build();
     }

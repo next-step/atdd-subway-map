@@ -5,19 +5,25 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.station.Station;
+import subway.station.StationRepository;
 
 @Service
 public class LineService {
 
   private final LineRepository lineRepository;
+  private final StationRepository stationRepository;
 
-  public LineService(LineRepository repository) {
+  public LineService(LineRepository repository, StationRepository stationRepository) {
     this.lineRepository = repository;
+    this.stationRepository = stationRepository;
   }
 
   @Transactional
-  public LineResponse saveLine(Line line) {
-    Line created = lineRepository.save(line);
+  public LineResponse saveLine(String name, String inboundName, String outboundName) {
+    Station inbound = stationRepository.findByName(inboundName);
+    Station outbound = stationRepository.findByName(outboundName);
+    Line created = lineRepository.save(new Line(name, inbound, outbound));
     return createServiceResponse(created);
   }
 
@@ -37,12 +43,13 @@ public class LineService {
     lineRepository.deleteById(id);
   }
 
-  public Optional<LineResponse> updateLine(Long id, LineRequest request) {
+  public Optional<LineResponse> updateLine(Long id, String name, String inboundName, String outboundName) {
+    Station inbound = stationRepository.findByName(inboundName);
+    Station outbound = stationRepository.findByName(outboundName);
     Optional<Line> optionalLine = lineRepository.findById(id);
 
-    return optionalLine.map(line ->
-            line.updateLine(request.getName(), request.getInbound(), request.getOutbound())
-        ).map(lineRepository::save)
+    return optionalLine.map(line -> line.updateLine(name, inbound, outbound))
+        .map(lineRepository::save)
         .map(this::createServiceResponse);
   }
 

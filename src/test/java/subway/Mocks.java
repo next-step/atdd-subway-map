@@ -1,14 +1,12 @@
 package subway;
 
-import subway.station.Station;
-
 public class Mocks {
 
   public static class MockStation {
-    public static Station 서울대입구역 = new Station("서울대입구역");
-    public static Station 봉천역 = new Station("봉천역");
-    public static Station 강남역 = new Station("강남역");
-    public static Station 신사역 = new Station("신사역");
+    public static String 서울대입구역 = "서울대입구역";
+    public static String 봉천역 = "봉천역";
+    public static String 강남역 = "강남역";
+    public static String 신사역 = "신사역";
   }
 
   public static class MockLine {
