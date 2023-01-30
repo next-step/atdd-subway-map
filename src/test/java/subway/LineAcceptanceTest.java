@@ -101,7 +101,7 @@ public class LineAcceptanceTest {
 		List<String> lineNames = response.jsonPath().getList("name", String.class);
 		//then
 		assertAll(
-				() -> assertThat(lineNames).containsExactly("신분당선","분당선"),
+				() -> assertThat(lineNames).containsExactly("신분당선", "분당선"),
 				() -> assertEquals(lineNames.size(), 2)
 		);
 	}
@@ -148,7 +148,46 @@ public class LineAcceptanceTest {
 	 * When 생성한 지하철 노선을 수정하면
 	 * Then 해당 지하철 노선 정보는 수정된다
 	 */
-	//TODO: 지하철노선 수정
+	@DisplayName("지하철 노선을 수정한다.")
+	@Test
+	void updateLine() {
+		//given
+		Map<String, String> station1 = new HashMap<>();
+		station1.put("name", "지하철역");
+		createStationResponse(station1);
+
+		Map<String, String> station2 = new HashMap<>();
+		station2.put("name", "새로운 지하철역");
+		createStationResponse(station2);
+
+		Map<String, Object> line1 = new HashMap<>();
+		line1.put("name", "신분당선");
+		line1.put("color", "bg-red-600");
+		line1.put("upStationId", 1);
+		line1.put("downStationId", 2);
+		line1.put("distance", 10);
+		ExtractableResponse<Response> lineResponse = createLineResponse(line1);
+		long id = lineResponse.response().jsonPath().getLong("id");
+
+		//when
+		Map<String, String> updateInfoParam = new HashMap<>();
+		updateInfoParam.put("name", "다른분당선");
+		updateInfoParam.put("color", "bg-red-600");
+		updateStationResponse(updateInfoParam, id);
+
+		ExtractableResponse<Response> response = getLineResponse(id);
+		String lineName = response.jsonPath().getString("name");
+		String lineColor = response.jsonPath().getString("color");
+
+		//then
+		assertAll(
+				() -> assertThat(id).isEqualTo(1),
+				() -> assertThat(lineName).isEqualTo("다른분당선"),
+				() -> assertThat(lineColor).isEqualTo("bg-red-600")
+		);
+
+	}
+
 
 	/**
 	 * Given 지하철 노선을 생성하고
@@ -165,7 +204,7 @@ public class LineAcceptanceTest {
 
 	private ExtractableResponse<Response> getLineResponse(long id) {
 		return RestAssured.given().log().all()
-				.given().pathParam("id",id)
+				.given().pathParam("id", id)
 				.when().get("/lines/{id}")
 				.then().log().all().extract();
 	}
@@ -183,6 +222,15 @@ public class LineAcceptanceTest {
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
 				.body(param)
 				.when().post("/stations")
+				.then().log().all().extract();
+	}
+
+	private static ExtractableResponse<Response> updateStationResponse(Map<String, String> param, Long id) {
+		return RestAssured.given().log().all()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.body(param)
+				.given().pathParam("id", id)
+				.when().put("/lines/{id}")
 				.then().log().all().extract();
 	}
 }
