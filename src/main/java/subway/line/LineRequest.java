@@ -1,8 +1,5 @@
 package subway.line;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class LineRequest {
 
   private String name;
