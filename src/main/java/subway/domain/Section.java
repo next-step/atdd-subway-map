@@ -44,6 +44,14 @@ public class Section {
         return id;
     }
 
+    public boolean canAddSection(Section other) {
+        return downStation.isSameStation(other.upStation);
+    }
+
+    public boolean canRemoveSection(Long stationId) {
+        return downStation.isSameStation(stationId);
+    }
+
     public Station getUpStation() {
         return upStation;
     }
