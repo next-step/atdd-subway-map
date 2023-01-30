@@ -79,28 +79,9 @@ public class StationAcceptanceTest {
         //given
         Map<String, String> params = new HashMap<>();
         params.put("name", firstStationName);
-
-        ExtractableResponse<Response> firstCreateResponse = RestAssured
-                .given()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/stations")
-                .then()
-                .extract();
-        Assertions.assertThat(firstCreateResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
+        saveStation(params);
         params.put("name", secondStationName);
-
-        ExtractableResponse<Response> secondCreateResponse = RestAssured
-                .given()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/stations")
-                .then()
-                .extract();
-        Assertions.assertThat(secondCreateResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        saveStation(params);
 
         //when
         ExtractableResponse<Response> readResponse = RestAssured
@@ -114,6 +95,18 @@ public class StationAcceptanceTest {
 
         //then
         Assertions.assertThat(stationNames.containsAll(List.of(firstStationName, secondStationName)));
+    }
+
+    private void saveStation(Map<String, String> params) {
+        ExtractableResponse<Response> firstCreateResponse = RestAssured
+                .given()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/stations")
+                .then()
+                .extract();
+        Assertions.assertThat(firstCreateResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
 
     /**
