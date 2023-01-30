@@ -112,7 +112,23 @@ public class StationLineAcceptanceTest {
      */
     @Test
     void updateStationLine() {
+        StationUtils.createStationLine(SIN_BUN_DANG_STATION_LINE);
 
+        Map<String, Object> body = new HashMap<>();
+        body.put("name", BUN_DANG_NAME);
+        body.put("color", LINE_GREEN);
+        ExtractableResponse<Response> response =
+                RestAssured
+                        .given().spec(getRequestSpecification()).body(body).log().all()
+                        .when().put("/lines/1")
+                        .then().log().all().extract();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        JsonPath jsonPath = StationUtils.selectStationLine(1L).jsonPath();
+
+        assertThat(jsonPath.<String>get("name")).isEqualTo(BUN_DANG_NAME);
+        assertThat(jsonPath.<String>get("color")).isEqualTo(LINE_GREEN);
     }
 
     /**
