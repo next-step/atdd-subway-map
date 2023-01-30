@@ -23,14 +23,13 @@ public class LineController {
 
     @GetMapping("/lines")
     public ResponseEntity<List<LineResponse>> showLines() {
-        List<LineResponse> lineResponses = lineService.findAllStations();
+        List<LineResponse> lineResponses = lineService.findAllLines();
         return ResponseEntity.ok(lineResponses);
     }
 
     @GetMapping("/lines/{id}")
     public ResponseEntity<LineResponse> getLine(
             @PathVariable(name = "id") Long id) {
-        LineResponse lineResponse = new LineResponse(id, "신분당선", "bg-red-600", null);
-        return ResponseEntity.ok(lineResponse);
+        return ResponseEntity.ok(lineService.findLine(id));
     }
 }

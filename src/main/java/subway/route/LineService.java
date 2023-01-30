@@ -28,11 +28,18 @@ public class LineService {
         return new LineResponse(newLine.getId(), newLine.getName(), newLine.getColor(),stationResponses);
     }
 
-    public List<LineResponse> findAllStations() {
+    public List<LineResponse> findAllLines() {
         List<Line> lines = lineRepository.findAll();
         return lines.stream().map(line -> {
             List<StationResponse> stations = stationService.findAllById(List.of(line.getUpStationId(), line.getDownStationId()));
             return new LineResponse(line.getId(), line.getName(), line.getColor(), stations);
         }).collect(Collectors.toList());
+    }
+
+    public LineResponse findLine(Long id) {
+        Line line = lineRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 노선은 존재하지 않습니다."));
+        List<StationResponse> stations = stationService.findAllById(List.of(line.getUpStationId(), line.getDownStationId()));
+        return new LineResponse(line.getId(), line.getName(), line.getColor(), stations);
     }
 }
