@@ -38,26 +38,14 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .body(params)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/stations")
-                        .then().log().all()
-                        .extract();
+        ExtractableResponse<Response> response = createStation("강남역");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
         List<String> stationNames =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
+                selectStationNames();
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
@@ -70,30 +58,14 @@ public class StationAcceptanceTest {
     @Test
     void selectStation() {
         // given
-        createStations("강변역");
-        createStations("잠실역");
+        createStation("강변역");
+        createStation("잠실역");
 
         // when
-        int stationCount =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class).size();
+        int stationCount = selectStationNames().size();
 
         // then
         assertThat(stationCount).isEqualTo(2);
-    }
-
-    private ExtractableResponse<Response> createStations(String stationName) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", stationName);
-
-        return RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
     }
 
     /**
@@ -105,20 +77,39 @@ public class StationAcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        ExtractableResponse<Response> response = createStations("강변역");
+        ExtractableResponse<Response> response = createStation("강변역");
 
         // when
-        RestAssured.given().log().all()
-                .when().delete(response.header("Location"))
-                .then().log().all();
+        deleteStation(response.header("Location"));
 
         // then
-        List<String> stationNames = RestAssured.given().log().all()
+        List<String> stationNames = selectStationNames();
+        assertThat(stationNames).doesNotContain("강변역");
+    }
+
+    private ExtractableResponse<Response> createStation(String stationName) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", stationName);
+
+        return RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+    }
+
+    private List<String> selectStationNames() {
+        return RestAssured.given().log().all()
                 .when().get("/stations")
                 .then().log().all()
                 .extract().jsonPath().getList("name", String.class);
+    }
 
-        assertThat(stationNames).doesNotContain("강변역");
+    private void deleteStation(String path) {
+        RestAssured.given().log().all()
+                .when().delete(path)
+                .then().log().all();
     }
 
 }
