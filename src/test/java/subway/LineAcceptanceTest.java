@@ -16,7 +16,7 @@ public class LineAcceptanceTest {
     @LocalServerPort private int port;
 
     @BeforeAll
-    private void setup() {
+    private void setupForClass() {
         RestAssured.port = port;
     }
 
