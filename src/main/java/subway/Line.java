@@ -17,4 +17,30 @@ public class Line {
 
     @Column(name = "downStationId")
     private Long downStationId;
+
+    public Line() {
+
+    }
+
+    public Line(String name, Long upStationId, Long downStationId) {
+        this.name = name;
+        this.upStationId = upStationId;
+        this.downStationId = downStationId;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Long getUpStationId() {
+        return upStationId;
+    }
+
+    public Long getDownStationId() {
+        return downStationId;
+    }
 }
