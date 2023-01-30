@@ -50,7 +50,7 @@ public class LineAcceptanceTest {
 		assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
 		// then
-		ExtractableResponse<Response> response = getLineResponse();
+		ExtractableResponse<Response> response = getLinesResponse();
 		List<String> lineNames = response.jsonPath().getList("name", String.class);
 
 		assertAll(
@@ -97,7 +97,7 @@ public class LineAcceptanceTest {
 		createLineResponse(line2);
 
 		//when
-		ExtractableResponse<Response> response = getLineResponse();
+		ExtractableResponse<Response> response = getLinesResponse();
 		List<String> lineNames = response.jsonPath().getList("name", String.class);
 		//then
 		assertAll(
@@ -112,7 +112,36 @@ public class LineAcceptanceTest {
 	 * When 생성한 지하철 노선을 조회하면
 	 * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
 	 */
-	//TODO: 지하철노선 조회
+	@DisplayName("지하철 노선을 조회한다.")
+	@Test
+	void showLine() {
+		//given
+		Map<String, String> station1 = new HashMap<>();
+		station1.put("name", "지하철역");
+		createStationResponse(station1);
+
+		Map<String, String> station2 = new HashMap<>();
+		station2.put("name", "새로운 지하철역");
+		createStationResponse(station2);
+
+		Map<String, Object> line1 = new HashMap<>();
+		line1.put("name", "신분당선");
+		line1.put("color", "bg-red-600");
+		line1.put("upStationId", 1);
+		line1.put("downStationId", 2);
+		line1.put("distance", 10);
+		ExtractableResponse<Response> lineResponse = createLineResponse(line1);
+		long id = lineResponse.response().jsonPath().getLong("id");
+
+		//when
+		ExtractableResponse<Response> response = getLineResponse(id);
+		String lineName = response.jsonPath().getString("name");
+
+		//then
+		assertAll(
+				() -> assertThat(lineName).isEqualTo("신분당선")
+		);
+	}
 
 	/**
 	 * Given 지하철 노선을 생성하고
@@ -128,9 +157,16 @@ public class LineAcceptanceTest {
 	 */
 	//TODO: 지하철노선 삭제
 
-	private ExtractableResponse<Response> getLineResponse() {
+	private ExtractableResponse<Response> getLinesResponse() {
 		return RestAssured.given().log().all()
 				.when().get("/lines")
+				.then().log().all().extract();
+	}
+
+	private ExtractableResponse<Response> getLineResponse(long id) {
+		return RestAssured.given().log().all()
+				.given().pathParam("id",id)
+				.when().get("/lines/{id}")
 				.then().log().all().extract();
 	}
 
