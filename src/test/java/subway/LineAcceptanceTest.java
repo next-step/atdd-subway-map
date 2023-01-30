@@ -36,12 +36,107 @@ class LineAcceptanceTest {
 
     @BeforeEach
     void setup() {
-        수서역_id = createStation(STATION_수서역);
-        복정역_id = createStation(STATION_복정역);
-        오금역_id = createStation(STATION_오금역);
+        수서역_id = 지하철_역_생성(STATION_수서역);
+        복정역_id = 지하철_역_생성(STATION_복정역);
+        오금역_id = 지하철_역_생성(STATION_오금역);
     }
 
-    private Long createStation(String name) {
+    /**
+     * When 지하철 노선을 생성하면
+     * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
+     */
+    @DisplayName("지하철 노선을 생성한다.")
+    @Test
+    void createLine() {
+        // when
+        ExtractableResponse<Response> createResponse = 지하철_분당선_생성();
+        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        // then
+        List<String> lineNames = 지하철_노선_목록_이름_조회();
+        assertThat(lineNames).contains(LINE_분당선);
+    }
+
+    /**
+     * Given 2개의 지하철 노선을 생성하고
+     * When 지하철 노선 목록을 조회하면
+     * Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
+     */
+    @DisplayName("지하철 노선 목록을 조회한다.")
+    @Test
+    void getLines() {
+        // given
+        지하철_분당선_생성();
+        지하철_3호선_생성();
+
+        // when
+        ExtractableResponse<Response> getResponse = 지하철_노선_목록_조회();
+
+        // then
+        List<String> lineNames = getResponse.jsonPath().getList("name", String.class);
+        assertThat(lineNames).hasSize(2).contains(LINE_분당선, LINE_3호선);
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 조회하면
+     * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
+     */
+    @DisplayName("지하철 노선을 조회한다.")
+    @Test
+    void getLine() {
+        // given
+        Long lineId = 지하철_분당선_생성().jsonPath().getLong("id");
+
+        // when
+        ExtractableResponse<Response> getResponse = 지하철_노선_조회(lineId);
+
+        // then
+        assertThat(getResponse.jsonPath().getString("name")).isEqualTo(LINE_분당선);
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 수정하면
+     * Then 해당 지하철 노선 정보는 수정된다
+     */
+    @DisplayName("지하철 노선을 수정한다.")
+    @Test
+    void updateLine() {
+        // given
+        Long lineId = 지하철_분당선_생성().jsonPath().getLong("id");
+
+        // when
+        ExtractableResponse<Response> putResponse = 지하철_노선_수정(lineId, "새로운 분당선", "lightyellow");
+        assertThat(putResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        // then
+        ExtractableResponse<Response> getResponse = 지하철_노선_조회(lineId);
+        assertThat(getResponse.jsonPath().getString("name")).isEqualTo("새로운 분당선");
+        assertThat(getResponse.jsonPath().getString("color")).isEqualTo("lightyellow");
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 삭제하면
+     * Then 해당 지하철 노선 정보는 삭제된다
+     */
+    @DisplayName("지하철 노선을 삭제한다.")
+    @Test
+    void deleteLine() {
+        // given
+        Long lineId = 지하철_분당선_생성().jsonPath().getLong("id");
+
+        // when
+        ExtractableResponse<Response> deleteResponse = 지하철_노선_삭제(lineId);
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        // then
+        List<String> lineNames = 지하철_노선_목록_이름_조회();
+        assertThat(lineNames).doesNotContain(LINE_분당선);
+    }
+
+    private Long 지하철_역_생성(String name) {
         Map<String, String> param = new HashMap<>();
         param.put("name", name);
 
@@ -57,22 +152,6 @@ class LineAcceptanceTest {
             .extract()
             .jsonPath()
             .getLong("id");
-    }
-
-    /**
-     * When 지하철 노선을 생성하면
-     * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
-     */
-    @DisplayName("지하철 노선을 생성한다.")
-    @Test
-    void createLine() {
-        // when
-        ExtractableResponse<Response> createResponse = 지하철_노선_생성(LINE_분당선, "yellow", 수서역_id, 복정역_id, 10L);
-        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-        // then
-        List<String> lineNames = 지하철_노선_목록_이름_조회();
-        assertThat(lineNames).contains(LINE_분당선);
     }
 
     private ExtractableResponse<Response> 지하철_노선_생성(String name, String color, Long upStationId, Long downStationId, Long distance) {
@@ -95,28 +174,12 @@ class LineAcceptanceTest {
             .extract();
     }
 
-    private List<String> 지하철_노선_목록_이름_조회() {
-        return 지하철_노선_목록_조회().jsonPath().getList("name", String.class);
+    private ExtractableResponse<Response> 지하철_분당선_생성() {
+        return 지하철_노선_생성(LINE_분당선, "yellow", 수서역_id, 복정역_id, 10L);
     }
 
-    /**
-     * Given 2개의 지하철 노선을 생성하고
-     * When 지하철 노선 목록을 조회하면
-     * Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
-     */
-    @DisplayName("지하철 노선 목록을 조회한다.")
-    @Test
-    void getLines() {
-        // given
-        지하철_노선_생성(LINE_분당선, "yellow", 수서역_id, 복정역_id, 10L);
-        지하철_노선_생성(LINE_3호선, "brown", 수서역_id, 오금역_id, 20L);
-
-        // when
-        ExtractableResponse<Response> getResponse = 지하철_노선_목록_조회();
-
-        // then
-        List<String> lineNames = getResponse.jsonPath().getList("name", String.class);
-        assertThat(lineNames).hasSize(2).contains(LINE_분당선, LINE_3호선);
+    private ExtractableResponse<Response> 지하철_3호선_생성() {
+        return 지하철_노선_생성(LINE_3호선, "brown", 수서역_id, 오금역_id, 20L);
     }
 
     private ExtractableResponse<Response> 지하철_노선_목록_조회() {
@@ -130,23 +193,8 @@ class LineAcceptanceTest {
             .extract();
     }
 
-    /**
-     * Given 지하철 노선을 생성하고
-     * When 생성한 지하철 노선을 조회하면
-     * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
-     */
-    @DisplayName("지하철 노선을 조회한다.")
-    @Test
-    void getLine() {
-        // given
-        ExtractableResponse<Response> createResponse = 지하철_노선_생성(LINE_분당선, "yellow", 수서역_id, 복정역_id, 10L);
-        long lineId = createResponse.jsonPath().getLong("id");
-
-        // when
-        ExtractableResponse<Response> getResponse = 지하철_노선_조회(lineId);
-
-        // then
-        assertThat(getResponse.jsonPath().getString("name")).isEqualTo(LINE_분당선);
+    private List<String> 지하철_노선_목록_이름_조회() {
+        return 지하철_노선_목록_조회().jsonPath().getList("name", String.class);
     }
 
     private ExtractableResponse<Response> 지하철_노선_조회(Long id) {
@@ -158,28 +206,6 @@ class LineAcceptanceTest {
             .then()
                 .log().all()
             .extract();
-    }
-
-    /**
-     * Given 지하철 노선을 생성하고
-     * When 생성한 지하철 노선을 수정하면
-     * Then 해당 지하철 노선 정보는 수정된다
-     */
-    @DisplayName("지하철 노선을 수정한다.")
-    @Test
-    void updateLine() {
-        // given
-        ExtractableResponse<Response> createResponse = 지하철_노선_생성(LINE_분당선, "yellow", 수서역_id, 복정역_id, 10L);
-        long lineId = createResponse.jsonPath().getLong("id");
-
-        // when
-        ExtractableResponse<Response> putResponse = 지하철_노선_수정(lineId, "새로운 분당선", "lightyellow");
-        assertThat(putResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
-
-        // then
-        ExtractableResponse<Response> getResponse = 지하철_노선_조회(lineId);
-        assertThat(getResponse.jsonPath().getString("name")).isEqualTo("새로운 분당선");
-        assertThat(getResponse.jsonPath().getString("color")).isEqualTo("lightyellow");
     }
 
     private ExtractableResponse<Response> 지하철_노선_수정(Long id, String name, String color) {
@@ -197,27 +223,6 @@ class LineAcceptanceTest {
             .then()
                 .log().all()
             .extract();
-    }
-
-    /**
-     * Given 지하철 노선을 생성하고
-     * When 생성한 지하철 노선을 삭제하면
-     * Then 해당 지하철 노선 정보는 삭제된다
-     */
-    @DisplayName("지하철 노선을 삭제한다.")
-    @Test
-    void deleteLine() {
-        // given
-        ExtractableResponse<Response> createResponse = 지하철_노선_생성(LINE_분당선, "yellow", 수서역_id, 복정역_id, 10L);
-        long lineId = createResponse.jsonPath().getLong("id");
-
-        // when
-        ExtractableResponse<Response> deleteResponse = 지하철_노선_삭제(lineId);
-        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-
-        // then
-        List<String> lineNames = 지하철_노선_목록_이름_조회();
-        assertThat(lineNames).doesNotContain(LINE_분당선);
     }
 
     private ExtractableResponse<Response> 지하철_노선_삭제(Long id) {
