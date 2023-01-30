@@ -38,7 +38,7 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         String stationsName = "강남역";
-        createStation(stationsName);
+        지하철_노선에_지하철역_등록_요청(stationsName);
 
         // then
         List<String> stationNames =
@@ -60,13 +60,13 @@ public class StationAcceptanceTest {
     void getStations() {
         String gangNamStation = "강남역";
         String songPaStation = "송파역";
-        createStation(gangNamStation);
-        createStation(songPaStation);
+        지하철_노선에_지하철역_등록_요청(gangNamStation);
+        지하철_노선에_지하철역_등록_요청(songPaStation);
 
-        JsonPath stationJsonPath = findStations();
+        JsonPath stationJsonPath = 전체_지하철역_조회();
 
-        assertThat(stationJsonPath.get("[0].name").toString()).isEqualTo(gangNamStation);
-        assertThat(stationJsonPath.get("[1].name").toString()).isEqualTo(songPaStation);
+        assertThat(stationJsonPath.getString("[0].name").toString()).isEqualTo(gangNamStation);
+        assertThat(stationJsonPath.getString("[1].name").toString()).isEqualTo(songPaStation);
     }
 
 
@@ -81,7 +81,7 @@ public class StationAcceptanceTest {
     @Test
     void deleteStation() {
         String stationName = "강남역";
-        createStation(stationName);
+        지하철_노선에_지하철역_등록_요청(stationName);
 
         ExtractableResponse<Response> response =
                 RestAssured.given().log().all()
@@ -92,11 +92,11 @@ public class StationAcceptanceTest {
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
-        List<String> stationNames = findStations().getList("name", String.class);
+        List<String> stationNames = 전체_지하철역_조회().getList("name", String.class);
         assertThat(stationNames).isNotIn(stationName);
     }
 
-    private void createStation(String stationName) {
+    private void 지하철_노선에_지하철역_등록_요청(String stationName) {
         // when
         Map<String, String> params = new HashMap<>();
         params.put("name", stationName);
@@ -113,10 +113,14 @@ public class StationAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
 
-    private JsonPath findStations() {
-        return RestAssured.given().log().all()
+    private JsonPath 전체_지하철역_조회() {
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .when().get("/stations")
                 .then().log().all()
-                .extract().jsonPath();
+                .extract();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        return response.jsonPath();
     }
 }
