@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DisplayName("지하철 노선 관리 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -153,6 +154,36 @@ public class LineAcceptanceTest {
         assertThat(lineResponse.getColor()).isEqualTo(COLOR_VALUE2);
         assertThat(lineResponse.getStations())
                 .extracting(NAME).contains(StationAcceptanceTest.HAGYE, StationAcceptanceTest.JUNGGYE);
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 삭제하면
+     * Then 해당 지하철 노선 정보는 삭제된다
+     */
+    @DisplayName("지하철노선을 삭제합니다.")
+    @Test
+    void deleteLineTest() {
+        // given
+        Long upStationId = 지하철역생성후ID반환(StationAcceptanceTest.GANGNAM);
+        Long downStationId = 지하철역생성후ID반환(StationAcceptanceTest.YANGJAE);
+        ExtractableResponse<Response> createLineResponse = createLineWithLineRequest(NAME_VALUE1, COLOR_VALUE1, upStationId, downStationId);
+        long id = createLineResponse.jsonPath().getLong(ID);
+
+        // when
+        ExtractableResponse<Response> deleteResponse = deleteLine(id);
+
+        // then
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertThat(getLine(id).statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    }
+
+    private ExtractableResponse<Response> deleteLine(long id) {
+        return RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().delete(DETAIL_URL, Map.of(ID, id))
+                .then().log().all()
+                .extract();
     }
 
     private ExtractableResponse<Response> updateLine(long id, String name, String color, Long upStationId, Long downStationId, Long distance) {
