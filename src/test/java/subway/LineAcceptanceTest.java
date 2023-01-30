@@ -125,6 +125,46 @@ public class LineAcceptanceTest {
                 .extracting(NAME).contains(StationAcceptanceTest.GANGNAM, StationAcceptanceTest.YANGJAE);
     }
 
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 수정하면
+     * Then 해당 지하철 노선 정보는 수정된다
+     */
+    @DisplayName("지하철노선을 수정합니다.")
+    @Test
+    void updateLineTest() {
+        // given
+        Long upStationId = 지하철역생성후ID반환(StationAcceptanceTest.GANGNAM);
+        Long downStationId = 지하철역생성후ID반환(StationAcceptanceTest.YANGJAE);
+        Long changeUpStationId = 지하철역생성후ID반환(StationAcceptanceTest.HAGYE);
+        Long changeDownStationId = 지하철역생성후ID반환(StationAcceptanceTest.JUNGGYE);
+        ExtractableResponse<Response> createLineResponse = createLineWithLineRequest(NAME_VALUE1, COLOR_VALUE1, upStationId, downStationId);
+        long id = createLineResponse.jsonPath().getLong(ID);
+
+        // when
+        ExtractableResponse<Response> updateResponse = updateLine(id, NAME_VALUE2, COLOR_VALUE2, changeUpStationId, changeDownStationId, DISTANCE_VALUE + DISTANCE_VALUE);
+
+        // then
+        assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+        ExtractableResponse<Response> response = getLine(id);
+        LineResponse lineResponse = response.body().as(LineResponse.class);
+        assertThat(lineResponse.getId()).isEqualTo(id);
+        assertThat(lineResponse.getName()).isEqualTo(NAME_VALUE2);
+        assertThat(lineResponse.getColor()).isEqualTo(COLOR_VALUE2);
+        assertThat(lineResponse.getStations())
+                .extracting(NAME).contains(StationAcceptanceTest.HAGYE, StationAcceptanceTest.JUNGGYE);
+    }
+
+    private ExtractableResponse<Response> updateLine(long id, String name, String color, Long upStationId, Long downStationId, Long distance) {
+        LineRequest lineRequest = new LineRequest(name, color, upStationId, downStationId, distance);
+        return RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(lineRequest)
+                .when().put(DETAIL_URL, Map.of(ID, id))
+                .then().log().all()
+                .extract();
+    }
+
     private ExtractableResponse<Response> getLine(long id) {
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
