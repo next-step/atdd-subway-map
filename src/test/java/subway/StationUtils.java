@@ -71,8 +71,16 @@ public class StationUtils {
     }
 
     public static ExtractableResponse<Response> createStationLine(Map<String, Object> body) {
-        return RestAssured.given().spec(getRequestSpecification()).body(body)
+        return RestAssured
+                .given().spec(getRequestSpecification()).body(body)
                 .when().post("/lines")
+                .then().extract();
+    }
+
+    public static ExtractableResponse<Response> selectStationLine(long stationLineId) {
+        return RestAssured
+                .given().spec(getRequestSpecification())
+                .when().get("/lines/" + stationLineId)
                 .then().extract();
     }
 
