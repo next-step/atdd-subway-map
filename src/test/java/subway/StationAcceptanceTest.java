@@ -92,7 +92,6 @@ public class StationAcceptanceTest {
     void deleteStation() {
         // given
         ExtractableResponse<Response> gangNam = createStationResponse("강남역");
-        ExtractableResponse<Response> yorkSam = createStationResponse("역삼역");
 
         // when
         long id = gangNam.jsonPath().getLong("id");
