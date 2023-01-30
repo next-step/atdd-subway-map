@@ -32,12 +32,12 @@ public class LineService {
         return LineResponse.of(line);
     }
 
-    public List<LineResponse> findAllLines() {
+    public List<LineResponse> getLines() {
         List<Line> lines = lineRepository.findAll();
         return lines.stream().map(LineResponse::of).collect(Collectors.toList());
     }
 
-    public LineResponse findById(Long id) {
+    public LineResponse getLine(Long id) {
         Line line = lineRepository.findById(id).orElseThrow(RuntimeException::new);
         return LineResponse.of(line);
     }

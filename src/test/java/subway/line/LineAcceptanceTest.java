@@ -103,23 +103,17 @@ public class LineAcceptanceTest {
     @Test
     void Should_지하철노선을_생성하고_When_특정한_지하철노선을_조회하면_Then_특정한_지하철노선이_조회된다() {
         // given
-        LineResponse 이호선_생성 = 지하철노선이_생성됨(new LineRequest("2호선", "blue", 강남역.getId(), 역삼역.getId(), 10L));
-
-        ExtractableResponse<Response> linesResponse = 지하철노선을_조회한다();
-        List<LineResponse> lines = 지하철노선_목록이_정상적으로_조회(linesResponse);
-        var 이호선findByAll = lines.stream()
-                                                .filter(line -> 이호선_생성.getName().equals(line.getName()))
-                                                .findFirst()
-                                                .get();
+        LineResponse 이호선_생성_응답 = 지하철노선이_생성됨(new LineRequest("2호선", "blue", 강남역.getId(), 역삼역.getId(), 10L));
+        LineResponse 이호선 = 노선목록에서_특정_지하철역을_조회(이호선_생성_응답.getId());
 
         //when
-        ExtractableResponse<Response> lineResponse = 특정_지하철노선을_조회한다(이호선findByAll.getId());
+        ExtractableResponse<Response> lineResponse = 특정_지하철노선을_조회한다(이호선.getId());
 
         // then
-        var 이호선 = 지하철노선이_정상적으로_조회(lineResponse);
+        var 이호선_단일_조회 = 지하철노선이_정상적으로_조회(lineResponse);
         assertAll(() -> {
-            assertThat(이호선.getName()).isEqualTo("2호선");
-            assertThat(이호선.getStationIds()).containsExactlyInAnyOrderElementsOf(List.of(강남역.getId(), 역삼역.getId()));
+            assertThat(이호선_단일_조회.getName()).isEqualTo("2호선");
+            assertThat(이호선_단일_조회.getStationIds()).containsExactlyInAnyOrderElementsOf(List.of(강남역.getId(), 역삼역.getId()));
         });
     }
 
@@ -134,24 +128,19 @@ public class LineAcceptanceTest {
     void Should_지하철노선을_생성하고_When_지하철노선을_수정하면_Then_해당_지하철노선이_수정된다() {
         // given
         var 이호선_request = new LineRequest("2호선", "blue", 강남역.getId(), 역삼역.getId(), 10L);
-        지하철노선이_생성됨(이호선_request);
+        LineResponse 이호선_생성_응답 = 지하철노선이_생성됨(이호선_request);
+        LineResponse 이호선 = 노선목록에서_특정_지하철역을_조회(이호선_생성_응답.getId());
 
-        ExtractableResponse<Response> linesResponse = 지하철노선을_조회한다();
-        List<LineResponse> lines = 지하철노선_목록이_정상적으로_조회(linesResponse);
-        var 이호선findByAll = lines.stream()
-                .filter(line -> 이호선_request.getName().equals(line.getName()))
-                .findFirst()
-                .get();
 
         //when
         var 이호선_update_request = new LineRequest(이호선_request.getName(), "green", 신논현역.getId(), 이호선_request.getDownStationId(), 이호선_request.getDistance());
-        ExtractableResponse<Response> lineResponse = 지하철노선을_수정한다(이호선findByAll.getId(), 이호선_update_request);
+        ExtractableResponse<Response> lineResponse = 지하철노선을_수정한다(이호선.getId(), 이호선_update_request);
 
         // then
         assertHttpStatus(lineResponse.statusCode(), HttpStatus.OK.value());
 
         // then
-        ExtractableResponse<Response> updateLineResponse = 특정_지하철노선을_조회한다(이호선findByAll.getId());
+        ExtractableResponse<Response> updateLineResponse = 특정_지하철노선을_조회한다(이호선.getId());
         var 이호선_update = 지하철노선이_정상적으로_조회(updateLineResponse);
         assertAll(() -> {
             assertThat(이호선_update.getName()).isEqualTo("2호선");
@@ -171,17 +160,11 @@ public class LineAcceptanceTest {
     @Test
     void Should_지하철노선을_생성하고_When_지하철노선을_삭제하면_Then_해당_지하철노선이_삭제된다() {
         // given
-        LineResponse 이호선 = 지하철노선이_생성됨(new LineRequest("2호선", "blue", 강남역.getId(), 역삼역.getId(), 10L));
-
-        ExtractableResponse<Response> linesResponse = 지하철노선을_조회한다();
-        List<LineResponse> lines = 지하철노선_목록이_정상적으로_조회(linesResponse);
-        var 이호선findByAll = lines.stream()
-                .filter(line -> 이호선.getName().equals(line.getName()))
-                .findFirst()
-                .get();
+        LineResponse 이호선_생성_응답 = 지하철노선이_생성됨(new LineRequest("2호선", "blue", 강남역.getId(), 역삼역.getId(), 10L));
+        LineResponse 이호선 = 노선목록에서_특정_지하철역을_조회(이호선_생성_응답.getId());
 
         //when
-        ExtractableResponse<Response> lineResponse = 지하철노선을_삭제한다(이호선findByAll.getId());
+        ExtractableResponse<Response> lineResponse = 지하철노선을_삭제한다(이호선.getId());
 
         // then
         assertHttpStatus(lineResponse.statusCode(), HttpStatus.NO_CONTENT.value());
@@ -190,6 +173,15 @@ public class LineAcceptanceTest {
         var linesResponseLastest = 지하철노선을_조회한다();
         List<LineResponse> lines_lastest = 지하철노선_목록이_정상적으로_조회(linesResponseLastest);
         assertThat(lines_lastest).isEmpty();
+    }
+
+    private LineResponse 노선목록에서_특정_지하철역을_조회(Long id) {
+        ExtractableResponse<Response> linesResponse = 지하철노선을_조회한다();
+        List<LineResponse> lines = 지하철노선_목록이_정상적으로_조회(linesResponse);
+        return lines.stream()
+                .filter(line -> id.equals(line.getId()))
+                .findFirst()
+                .get();
     }
 
     private ExtractableResponse<Response> 지하철노선을_생성한다(LineRequest request) {
