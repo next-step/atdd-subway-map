@@ -41,6 +41,10 @@ public class Sections {
         this.sections.remove(lastSection);
     }
 
+    public List<Section> getSections() {
+        return sections;
+    }
+
     private void validateAddStation(final Section section) {
         validateMatchDownStation(section.getUpStation());
         validateNoneMatchStation(section.getDownStation());
@@ -81,9 +85,5 @@ public class Sections {
                 .filter(section -> section.getDownStation().equals(station))
                 .findFirst()
                 .orElseThrow(() -> new NoRegisterStationException("해당 역으로 등록된 마지막 구간이 존재하지 않습니다."));
-    }
-
-    public List<Section> getSections() {
-        return sections;
     }
 }
