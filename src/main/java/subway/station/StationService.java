@@ -1,4 +1,4 @@
-package subway;
+package subway.station;
 
 import java.util.List;
 import java.util.stream.Collectors;
