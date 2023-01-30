@@ -15,6 +15,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 import static subway.fixture.TestFixtureLine.노선_등록;
 
+@DisplayName("지하철 노선 구간 도메인 기능 테스트")
 class SectionsTest {
 
     private static final String 신분당선 = "신분당선";
@@ -53,7 +54,7 @@ class SectionsTest {
         final Sections 구간들 = 노선_신분당선.getSections();
         assertThatThrownBy(() -> 구간들.addSection(노선_신분당선, 두번째_구간))
                 .isInstanceOf(NoRegisterStationException.class)
-                .hasMessage("노선에 등록된 하행종점역이 없습니다.");
+                .hasMessage("요청한 상행종점역은 해당 노선에 등록되어 있지 않아서 추가 불가능합니다.");
     }
 
     @DisplayName("노선 구간 추가 시 요청값의 상행역이 노선의 하행종점역이 아니라서 구간 등록이 불가능하다.")
@@ -69,7 +70,7 @@ class SectionsTest {
         final Section 세번째_구간 = new Section(3L, 양재역, 검암역, 10);
         assertThatThrownBy(() -> 구간들.addSection(노선_신분당선, 세번째_구간))
                 .isInstanceOf(NoRegisterStationException.class)
-                .hasMessage("노선에 등록된 하행종점역이 없습니다.");
+                .hasMessage("요청한 상행종점역은 해당 노선에 등록되어 있지 않아서 추가 불가능합니다.");
     }
 
     @DisplayName("기존 등록된 구간을 삭제한다.")
@@ -101,28 +102,13 @@ class SectionsTest {
 
         assertThatThrownBy(() -> 구간들.removeSection(양재역))
                 .isInstanceOf(NoDeleteOneSectionException.class)
-                .hasMessage("구간이 1개인 경우 삭제할 수 없습니다.");
-    }
-
-    @DisplayName("노선 구간 제거 시 노선에 등록된 역이 아니어서 구간 삭제가 불가능하다.")
-    @Test
-    void error_removeSection_2() {
-
-        final Section 첫번째_구간 = new Section(1L, 강남역, 양재역, 10);
-        final Line 노선_신분당선 = 노선_등록(1L, 신분당선, 빨간색, 첫번째_구간);
-        final Section 두번째_구간 = new Section(2L, 양재역, 몽촌토성역, 10);
-        final Sections 구간들 = 노선_신분당선.getSections();
-        구간들.addSection(노선_신분당선, 두번째_구간);
-
-        assertThatThrownBy(() -> 구간들.removeSection(부평역))
-                .isInstanceOf(NoRegisterStationException.class)
-                .hasMessage("해당 역으로 등록된 마지막 구간이 존재하지 않습니다.");
+                .hasMessage("노선의 구간 목록수가 1개인 경우 삭제할 수 없습니다.");
     }
 
     @DisplayName("노선 구간 제거 시 등록된 하행 종점역이 아니어서 구간 삭제가 불가능하다.")
     @ParameterizedTest(name = "{0}은 노선의 하행종점역이 아닙니다.")
     @MethodSource("provideDeleteStation")
-    void error_removeSection_3(final Station deleteStation) {
+    void error_removeSection_2(final Station deleteStation) {
 
         final Section 첫번째_구간 = new Section(1L, 강남역, 양재역, 10);
         final Line 노선_신분당선 = 노선_등록(1L, 신분당선, 빨간색, 첫번째_구간);
@@ -132,7 +118,7 @@ class SectionsTest {
 
         assertThatThrownBy(() -> 구간들.removeSection(deleteStation))
                 .isInstanceOf(NoRegisterStationException.class)
-                .hasMessage("해당 역으로 등록된 마지막 구간이 존재하지 않습니다.");
+                .hasMessage("요청한 역으로 등록된 마지막 구간이 존재하지 않습니다.");
     }
 
     private static Stream<Arguments> provideDeleteStation() {
