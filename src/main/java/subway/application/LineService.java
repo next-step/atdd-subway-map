@@ -63,14 +63,24 @@ public class LineService {
     }
 
     public LineResponse findLine(Long id) {
-        Line line = lineRepository.findById(id)
-            .orElseThrow(() -> new LineNotFoundException(id));
+        Line line = findLineById(id);
         return createLineResponse(line);
+    }
+
+    private Line findLineById(Long id) {
+        return lineRepository.findById(id)
+            .orElseThrow(() -> new LineNotFoundException(id));
     }
 
     public List<LineResponse> findAllLines() {
         return lineRepository.findAll().stream()
             .map(this::createLineResponse)
             .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void updateLine(Long id, LineRequest lineRequest) {
+        Line line = findLineById(id);
+        line.update(lineRequest.getName(), lineRequest.getColor());
     }
 }

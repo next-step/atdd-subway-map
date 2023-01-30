@@ -55,7 +55,6 @@ class LineAcceptanceTest {
             .then()
                 .log().all()
             .extract()
-            .body()
             .jsonPath()
             .getLong("id");
     }
@@ -161,4 +160,42 @@ class LineAcceptanceTest {
             .extract();
     }
 
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 수정하면
+     * Then 해당 지하철 노선 정보는 수정된다
+     */
+    @DisplayName("지하철 노선을 수정한다.")
+    @Test
+    void updateLine() {
+        // given
+        ExtractableResponse<Response> createResponse = 지하철_노선_생성(LINE_분당선, "yellow", 수서역_id, 복정역_id, 10L);
+        long lineId = createResponse.jsonPath().getLong("id");
+
+        // when
+        ExtractableResponse<Response> putResponse = 지하철_노선_수정(lineId, "새로운 분당선", "lightyellow");
+        assertThat(putResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        // then
+        ExtractableResponse<Response> getResponse = 지하철_노선_조회(lineId);
+        assertThat(getResponse.jsonPath().getString("name")).isEqualTo("새로운 분당선");
+        assertThat(getResponse.jsonPath().getString("color")).isEqualTo("lightyellow");
+    }
+
+    private ExtractableResponse<Response> 지하철_노선_수정(Long id, String name, String color) {
+        Map<String, String> updateParam = new HashMap<>();
+        updateParam.put("name", name);
+        updateParam.put("color", color);
+
+        return RestAssured
+            .given()
+                .log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(updateParam)
+            .when()
+                .put("/lines/{id}", id)
+            .then()
+                .log().all()
+            .extract();
+    }
 }
