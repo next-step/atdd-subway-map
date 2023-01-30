@@ -108,7 +108,7 @@ public class LineAcceptanceTest {
         assertThat(response.body().jsonPath().getList("id")).hasSize(2);
     }
 
-    private void createLine(String lineName, String upStationId, String downStationId) {
+    private String createLine(String lineName, String upStationId, String downStationId) {
         Map<String, String> params = new HashMap<>();
         params.put("name", lineName);
         params.put("color", "bg-red-600");
@@ -116,11 +116,37 @@ public class LineAcceptanceTest {
         params.put("downStationId", downStationId);
         params.put("distance", "10");
 
-        RestAssured.given().log().all()
+        return RestAssured.given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/lines")
                 .then().log().all()
-                .extract();
+                .extract().jsonPath().getString("id");
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 조회하면
+     * Then 생성한 지하철 노선의 정보를 응답 받을 수 있다.
+     */
+    @DisplayName("지하철노선을 조회한다.")
+    @Test
+    void readLine() {
+        // given
+        String station1Id = createStation("강남역");
+        String station2Id = createStation("신논현역");
+
+        String lineId = createLine("신분당선", station1Id, station2Id);
+
+        // when
+        ExtractableResponse<Response> response =
+                RestAssured.given().log().all()
+                        .when().get("/lines/"+lineId)
+                        .then().log().all()
+                        .extract();
+
+        // then
+        assertThat(response.body().jsonPath().getString("name")).isEqualTo("신분당선");
+        assertThat(response.body().jsonPath().getList("stations.id", String.class)).containsExactlyInAnyOrder(station1Id, station2Id);
     }
 }
