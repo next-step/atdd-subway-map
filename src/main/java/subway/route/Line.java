@@ -1,9 +1,12 @@
 package subway.route;
 
+import subway.StationResponse;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import java.util.List;
 
 @Entity
 public class Line {
@@ -55,5 +58,13 @@ public class Line {
 
     public Long getDistance() {
         return distance;
+    }
+
+    public void changeLineInfo(String name, String color, Long upStationId, Long downStationId, Long distance) {
+        this.name = name;
+        this.color = color;
+        this.upStationId = upStationId;
+        this.downStationId = downStationId;
+        this.distance = distance;
     }
 }

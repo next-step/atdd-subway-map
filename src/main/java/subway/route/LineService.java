@@ -42,4 +42,16 @@ public class LineService {
         List<StationResponse> stations = stationService.findAllById(List.of(line.getUpStationId(), line.getDownStationId()));
         return new LineResponse(line.getId(), line.getName(), line.getColor(), stations);
     }
+
+    @Transactional
+    public void updateLine(Long id, LineRequest lineRequest) {
+        Line line = lineRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 노선은 존재하지 않습니다."));
+        List<StationResponse> stations = stationService.findAllById(List.of(lineRequest.getUpStationId(), lineRequest.getDownStationId()));
+        if (stations.isEmpty() || stations.size() < 2) {
+            throw new IllegalArgumentException("해당 지하철역은 존재하지 않습니다.");
+        }
+        line.changeLineInfo(lineRequest.getName(), lineRequest.getColor(),
+                lineRequest.getUpStationId(), lineRequest.getDownStationId(), lineRequest.getDistance());
+    }
 }
