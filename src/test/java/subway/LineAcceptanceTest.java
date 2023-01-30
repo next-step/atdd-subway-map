@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("지하철 노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -27,22 +28,33 @@ public class LineAcceptanceTest {
 	@Test
 	void createLine() {
 		//when
-		Map<String, Object> params = new HashMap<>();
-		params.put("name", "신분당선");
-		params.put("color", "bg-red-600");
-		params.put("upStationId", 1);
-		params.put("downStationId", 2);
-		params.put("distance", 10);
+		Map<String, String> station1 = new HashMap<>();
+		station1.put("name", "지하철역");
+		createStationResponse(station1);
 
-		ExtractableResponse<Response> createResponse = createLineResponse(params);
+		Map<String, String> station2 = new HashMap<>();
+		station2.put("name", "새로운 지하철역");
+		createStationResponse(station2);
+
+		Map<String, Object> lineParams = new HashMap<>();
+		lineParams.put("name", "신분당선");
+		lineParams.put("color", "bg-red-600");
+		lineParams.put("upStationId", 1);
+		lineParams.put("downStationId", 2);
+		lineParams.put("distance", 10);
+
+		ExtractableResponse<Response> createResponse = createLineResponse(lineParams);
 
 		// then
 		assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
 		// then
 		ExtractableResponse<Response> response = getLineResponse();
-		List<String> stationNames = response.jsonPath().getList("name", String.class);
-		assertThat(stationNames).containsAnyOf("신분당선");
+		List<String> lineNames = response.jsonPath().getList("name", String.class);
+
+		assertAll(
+				() -> assertThat(lineNames).containsAnyOf("신분당선")
+		);
 	}
 
 	private ExtractableResponse<Response> getLineResponse() {
@@ -56,6 +68,14 @@ public class LineAcceptanceTest {
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
 				.body(params)
 				.when().post("/lines")
+				.then().log().all().extract();
+	}
+
+	private static ExtractableResponse<Response> createStationResponse(Map<String, String> param) {
+		return RestAssured.given().log().all()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.body(param)
+				.when().post("/stations")
 				.then().log().all().extract();
 	}
 
