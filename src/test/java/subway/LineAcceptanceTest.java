@@ -224,8 +224,8 @@ public class LineAcceptanceTest {
 
 	private ExtractableResponse<Response> deleteLineResponse(long id) {
 		return RestAssured.given().log().all()
-				.given().param("id", id)
-				.when().delete("/stations/{id}")
+				.given().pathParam("id", id)
+				.when().delete("/lines/{id}")
 				.then().log().all().extract();
 	}
 
