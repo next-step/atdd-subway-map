@@ -1,6 +1,6 @@
 package subway.line.web.controller;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 
 @RequestMapping("lines")
 @RestController
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class LineController {
 
     private final LineService lineService;
@@ -61,8 +61,6 @@ public class LineController {
     }
 
     private LineResponse createResponse(Line line) {
-        if (line == null) return null;
-
         StationResponse upStation = stationService.findStation(line.getUpStationId());
         StationResponse downStation = stationService.findStation(line.getDownStationId());
 

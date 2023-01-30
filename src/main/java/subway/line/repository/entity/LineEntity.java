@@ -30,6 +30,7 @@ public class LineEntity {
     private Integer distance;
 
     public LineEntity(Line line) {
+        this.id = line.getId();
         this.name = line.getName();
         this.color = line.getColor();
         this.upStationId = line.getUpStationId();

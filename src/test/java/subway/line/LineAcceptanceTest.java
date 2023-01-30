@@ -1,7 +1,6 @@
 package subway.line;
 
 import io.restassured.RestAssured;
-import io.restassured.path.json.exception.JsonPathException;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
@@ -11,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 import subway.RestTestUtils;
+import subway.line.business.constant.LineConstants;
 import subway.line.web.dto.LineRequest;
 import subway.line.web.dto.LineUpdateRequest;
 
@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @Sql(value = "/init.sql")
 @DisplayName("지하철 노선 관련 기능")
@@ -134,7 +134,10 @@ public class LineAcceptanceTest {
 
         // then
         var response = getLine(createId);
-        assertThrows(JsonPathException.class, () -> RestTestUtils.getLongFromResponse(response, "id"));
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
+                () -> assertThat(response.asString()).isEqualTo(LineConstants.LINE_NOT_EXIST)
+        );
     }
 
     private List<LineRequest> getRequests() {
@@ -191,7 +194,7 @@ public class LineAcceptanceTest {
         return RestAssured.given().log().all()
                 .when().get("/lines/"+id)
                 .then().log().all()
-                .statusCode(HttpStatus.OK.value())
+//                .statusCode(HttpStatus.OK.value())
                 .extract();
     }
 

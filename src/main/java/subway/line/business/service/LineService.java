@@ -1,17 +1,20 @@
 package subway.line.business.service;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.line.business.constant.LineConstants;
 import subway.line.business.model.Line;
 import subway.line.repository.LineRepository;
 import subway.line.repository.entity.LineEntity;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class LineService {
 
     private final LineRepository lineRepository;
@@ -26,13 +29,14 @@ public class LineService {
     }
 
     public Line getLine(Long lineId) {
-        LineEntity entity = lineRepository.findById(lineId).orElse(null);
-        return entity != null ? entity.toLine() : null;
+        return lineRepository.findById(lineId)
+                .orElseThrow(() -> new NoSuchElementException(LineConstants.LINE_NOT_EXIST))
+                .toLine();
     }
 
     @Transactional
     public void modify(Long id, String name, String color) {
-        LineEntity entity = lineRepository.findById(id).get();
+        LineEntity entity = new LineEntity(getLine(id));
         lineRepository.save(entity.modify(name, color));
     }
 
