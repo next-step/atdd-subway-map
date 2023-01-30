@@ -138,9 +138,19 @@ public class StationLineAcceptanceTest {
      */
     @Test
     void deleteStationLine() {
+        StationUtils.createStationLine(SIN_BUN_DANG_STATION_LINE);
 
+        ExtractableResponse<Response> response =
+                RestAssured
+                        .given().spec(getRequestSpecification()).log().all()
+                        .when().delete("/lines/1")
+                        .then().log().all().extract();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        assertThatThrownBy(() -> {
+            StationUtils.selectStationLine(1L);
+        }).isInstanceOf(IllegalArgumentException.class);
     }
-
-
 
 }
