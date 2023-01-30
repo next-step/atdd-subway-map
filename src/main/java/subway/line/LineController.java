@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,16 +36,24 @@ public class LineController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<LineResponse> getLines(@PathVariable Long id) {
+    public ResponseEntity<LineResponse> getLine(@PathVariable Long id) {
         LineResponse response = lineService.getLine(id);
         return ResponseEntity.ok().body(response);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<LineResponse> updateLines(
+    public ResponseEntity<LineResponse> updateLine(
         @PathVariable Long id, @RequestBody LineRequest request
     ) {
         LineResponse response = lineService.updateLine(id, request);
         return ResponseEntity.ok().body(response);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<LineResponse> deleteLine(
+        @PathVariable Long id
+    ) {
+        lineService.deleteLine(id);
+        return ResponseEntity.noContent().build();
     }
 }

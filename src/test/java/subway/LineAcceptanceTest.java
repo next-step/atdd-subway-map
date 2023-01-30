@@ -1,6 +1,7 @@
 package subway;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -10,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
@@ -35,6 +37,26 @@ class LineAcceptanceTest {
         setUpStation(한라산역);
         setUpStation(백두산역);
         setUpStation(서귀포역);
+    }
+
+    /**
+     * 지하철노선 삭제
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 삭제하면
+     * Then 해당 지하철 노선 정보는 삭제된다
+     */
+    @Test
+    void 노선_삭제_테스트() {
+
+        // given
+        LineRequest lineRequests = LineRequest.of(제주선, "green", 1, 3, 10);
+        long lineId = LineAcceptanceTest.노선_생성(lineRequests).jsonPath().getLong("id");
+
+        // when
+        ExtractableResponse<Response> response = 노선_삭제(lineId);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
     /**
@@ -153,6 +175,15 @@ class LineAcceptanceTest {
                 .when().post("/stations")
                 .then().log().all()
                 .extract();
+    }
+
+    private ExtractableResponse<Response> 노선_삭제(long id) {
+        return RestAssured.given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when()
+            .delete("/lines/{id}", id)
+            .then().log().all()
+            .extract();
     }
 
     private ExtractableResponse<Response> 노선_수정(long id, LineRequest request) {

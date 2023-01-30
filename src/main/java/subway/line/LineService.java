@@ -57,4 +57,8 @@ public class LineService {
         line.modify(request, downStation, upStation);
         return LineResponse.of(line);
     }
+
+    public void deleteLine(Long id) {
+        lineRepository.deleteById(id);
+    }
 }
