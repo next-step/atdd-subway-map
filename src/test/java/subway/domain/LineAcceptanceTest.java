@@ -2,8 +2,6 @@ package subway.domain;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,8 +15,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD;
-import static subway.common.SetupTest.분당선_노선을_생성한다;
-import static subway.common.SetupTest.신분당선_노선을_생성한다;
+import static subway.common.SetupTest.*;
 
 @DisplayName("지하철 노선을 관리한다.")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -144,33 +141,4 @@ public class LineAcceptanceTest {
         assertThat(지하철노선_목록을_조회한다().jsonPath().getList("name").contains(deleteLineName)).isFalse();
     }
 
-    private ExtractableResponse<Response> 지하철노선_목록을_조회한다() {
-        return RestAssured.given().log().all()
-                .when().get("/lines")
-                .then().log().all()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> 지하철노선을_조회한다(int id) {
-        return RestAssured.given().log().all()
-                .when().get("/lines/{id}",id)
-                .then().log().all()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> 지하철노선을_수정한다(int id, Map<String, String> param1) {
-        return RestAssured.given().log().all()
-                .body(param1)
-                .contentType(ContentType.JSON)
-                .when().put("/lines/{id}", id)
-                .then().log().all()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> 지하철노선을_삭제한다(int id) {
-        return RestAssured.given().log().all()
-                .when().delete("/lines/{id}",id)
-                .then().log().all()
-                .extract();
-    }
 }

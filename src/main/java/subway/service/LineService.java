@@ -36,11 +36,17 @@ public class LineService {
     }
 
     private LineResponse createLineResponse(Line line) {
-        List<Station> stationList = new ArrayList<>();
-        stationList.add(stationService.findById(line.getUpStationId()));
-        stationList.add(stationService.findById(line.getDownStationId()));
+        try {
+            List<Station> stationList = new ArrayList<>();
+            stationList.add(stationService.findById(line.getUpStationId()));
+            stationList.add(stationService.findById(line.getDownStationId()));
 
-        return new LineResponse(line.getId(), line.getName(), line.getColor(), stationList);
+            return new LineResponse(line.getId(), line.getName(), line.getColor(), stationList);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+
+            return new LineResponse();
+        }
     }
 
     public LineResponse findLineById(Long id) {
@@ -56,13 +62,7 @@ public class LineService {
     public void updateLine(Long id, LineRequest lineRequest) {
         Line line = lineRepository.findById(id).get();
 
-        if (! line.getName().equals(lineRequest.getName())) {
-            line.changeName(lineRequest.getName());
-        }
-
-        if (! line.getColor().equals(lineRequest.getColor())) {
-            line.changeColor(lineRequest.getColor());
-        }
+        line.change(lineRequest.getName(), lineRequest.getColor());
 
         lineRepository.save(line);
     }

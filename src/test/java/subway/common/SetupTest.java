@@ -4,9 +4,12 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.springframework.http.HttpStatus;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static subway.common.DomainApiTest.지하철노선을_생성한다;
 
 public class SetupTest {
     public static void 분당선_노선을_생성한다() {
@@ -30,14 +33,5 @@ public class SetupTest {
         param.put("distance", 10);
 
         지하철노선을_생성한다(param);
-    }
-
-    private static ExtractableResponse<Response> 지하철노선을_생성한다(Map<String, Object> param) {
-        return RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .body(param)
-                .when().post("/lines")
-                .then().log().all()
-                .extract();
     }
 }

@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.validation.constraints.NotBlank;
 
 @Entity
 @Getter
@@ -15,7 +16,9 @@ public class Line {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @NotBlank(message = "name is not blank")
     private String name;
+    @NotBlank(message = "color is not blank")
     private String color;
     private Long upStationId;
     private Long downStationId;
@@ -32,11 +35,8 @@ public class Line {
         this.distance = distance;
     }
 
-    public void changeName(String name) {
+    public void change(String name, String color){
         this.name = name;
-    }
-
-    public void changeColor(String color){
         this.color = color;
     }
 }
