@@ -12,7 +12,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static subway.StationUtils.*;
 
 @DisplayName("지하철 역 노선 관련 기능")
@@ -83,7 +87,22 @@ public class StationLineAcceptanceTest {
      */
     @Test
     void selectStationLine() {
+        StationUtils.createStationLine(SIN_BUN_DANG_STATION_LINE);
 
+        ExtractableResponse<Response> response =
+                RestAssured
+                        .given().spec(getRequestSpecification()).log().all()
+                        .when().get("/lines/1")
+                        .then().log().all().extract();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.contentType()).isEqualTo(MediaType.APPLICATION_JSON_VALUE);
+
+        JsonPath jsonPath = response.jsonPath();
+
+        assertThat(jsonPath.<Long>get("id")).isEqualTo(1L);
+        assertThat(jsonPath.<String>get("name")).isEqualTo(SIN_BUN_DANG_NAME);
+        assertThat(jsonPath.<String>get("color")).isEqualTo(LINE_RED);
     }
 
     /**
