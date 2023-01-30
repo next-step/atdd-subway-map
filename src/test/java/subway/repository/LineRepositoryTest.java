@@ -1,6 +1,5 @@
 package subway.repository;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,13 +25,9 @@ class LineRepositoryTest {
 
     @BeforeEach
     void save() {
+        lineRepository.deleteAllInBatch();
         shinBunDangLine = lineRepository.save(SHIN_BUN_DANG_LINE);
         bunDangLine = lineRepository.save(BUN_DANG_LINE);
-    }
-
-    @AfterEach
-    void delete() {
-        lineRepository.deleteAllInBatch();
     }
 
     @DisplayName("지하철 노선 목록 조회")
@@ -54,7 +49,24 @@ class LineRepositoryTest {
                 .orElseThrow(LineNotFoundException::new);
 
         // then
-        assertThat(line.getName()).isEqualTo("신분당선");
+        assertThat(line).isEqualTo(shinBunDangLine);
+    }
+
+    @DisplayName("지하철 노선 수정")
+    @Test
+    void modify() {
+        // given
+        Line line = lineRepository.findById(shinBunDangLine.getId())
+                .orElseThrow(LineNotFoundException::new);
+
+        // when
+        line.modifyLine("당당선", "bg-red-700");
+        Line modifiedLine = lineRepository.save(line);
+
+        // then
+        assertThat(modifiedLine.getName()).isEqualTo("당당선");
+        assertThat(modifiedLine.getColor()).isEqualTo("bg-red-700");
+        assertThat(line.getName()).isEqualTo("당당선");
     }
 
     @DisplayName("지하철 노선 삭제")
