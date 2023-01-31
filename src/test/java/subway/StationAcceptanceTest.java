@@ -1,7 +1,6 @@
 package subway;
 
 import io.restassured.RestAssured;
-import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,16 +8,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.http.HttpStatus;
+import subway.util.ExtractionUtils;
+import subway.util.ValidationUtils;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static subway.MockStation.강남역;
 import static subway.MockStation.서초역;
 import static subway.MockStation.신촌역;
-import static subway.StationApi.STATION_ID_KEY;
-import static subway.StationApi.STATION_NAME_KEY;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -44,28 +39,11 @@ public class StationAcceptanceTest {
         ExtractableResponse<Response> responseOfCreateStation = StationApi.createStation(강남역);
 
         // then
-        checkStationCreated(responseOfCreateStation);
+        ValidationUtils.checkStationCreated(responseOfCreateStation);
 
         // then
         ExtractableResponse<Response> responseOfShowStations = StationApi.showStations();
-        checkStationExistence(responseOfShowStations, 강남역);
-    }
-
-    private void checkStationCreated(ExtractableResponse<Response> response) {
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-    }
-
-    private void checkStationExistence(ExtractableResponse<Response> response, MockStation... stations) {
-        JsonPath jsonPath = response.jsonPath();
-        for (MockStation station : stations) {
-            assertTrue(jsonPath.getList(STATION_NAME_KEY).contains(station.name()));
-        }
-    }
-    private void checkStationNotExistence(ExtractableResponse<Response> response, MockStation... stations) {
-        JsonPath jsonPath = response.jsonPath();
-        for (MockStation station : stations) {
-            assertFalse(jsonPath.getList(STATION_NAME_KEY).contains(station.name()));
-        }
+        ValidationUtils.checkStationExistence(responseOfShowStations, 강남역);
     }
 
     /**
@@ -84,8 +62,8 @@ public class StationAcceptanceTest {
         ExtractableResponse<Response> responseOfShowStations = StationApi.showStations();
 
         // Then
-        checkStationCount(responseOfShowStations, 2);
-        checkStationExistence(responseOfShowStations, 강남역, 서초역);
+        ValidationUtils.checkStationCount(responseOfShowStations, 2);
+        ValidationUtils.checkStationExistence(responseOfShowStations, 강남역, 서초역);
     }
 
     /**
@@ -102,23 +80,13 @@ public class StationAcceptanceTest {
         StationApi.createStation(신촌역);
 
         // When
-        Long stationId = extractStationId(responseOfCreateStation);
+        Long stationId = ExtractionUtils.getStationId(responseOfCreateStation);
         StationApi.deleteStation(stationId);
 
         // Then
         ExtractableResponse<Response> responseOfShowStations = StationApi.showStations();
-        checkStationCount(responseOfShowStations, 2);
-        checkStationNotExistence(responseOfShowStations, 서초역);
-        checkStationExistence(responseOfShowStations, 강남역, 신촌역);
-    }
-    
-    private Long extractStationId(ExtractableResponse<Response> response) {
-        JsonPath jsonPath = response.jsonPath();
-        return jsonPath.getLong(STATION_ID_KEY);
-    }
-    
-    private void checkStationCount(ExtractableResponse<Response> response, int expected) {
-        JsonPath jsonPath = response.jsonPath();
-        assertThat(jsonPath.getList("")).hasSize(expected);
+        ValidationUtils.checkStationCount(responseOfShowStations, 2);
+        ValidationUtils.checkStationNotExistence(responseOfShowStations, 서초역);
+        ValidationUtils.checkStationExistence(responseOfShowStations, 강남역, 신촌역);
     }
 }
