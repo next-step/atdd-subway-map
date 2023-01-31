@@ -1,19 +1,21 @@
-package subway.station;
+package subway.station.repository.entity;
+
+import subway.station.business.model.Station;
 
 import javax.persistence.*;
 
 @Entity
-public class Station {
+public class StationEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(length = 20, nullable = false)
     private String name;
 
-    public Station() {
+    public StationEntity() {
     }
 
-    public Station(String name) {
+    public StationEntity(String name) {
         this.name = name;
     }
 
@@ -24,4 +26,12 @@ public class Station {
     public String getName() {
         return name;
     }
+
+    public Station toStation() {
+        return Station.builder()
+                .id(id)
+                .name(name)
+                .build();
+    }
+
 }
