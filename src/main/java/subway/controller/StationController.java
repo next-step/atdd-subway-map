@@ -1,5 +1,6 @@
 package subway.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import subway.controller.request.StationRequest;
@@ -9,17 +10,14 @@ import subway.service.StationService;
 import java.net.URI;
 import java.util.List;
 
+@RequiredArgsConstructor
 @RestController
 public class StationController {
-    private StationService stationService;
-
-    public StationController(StationService stationService) {
-        this.stationService = stationService;
-    }
+    private final StationService stationService;
 
     @PostMapping("/stations")
-    public ResponseEntity<StationResponse> createStation(@RequestBody StationRequest stationRequest) {
-        StationResponse station = stationService.saveStation(stationRequest);
+    public ResponseEntity<StationResponse> create(@RequestBody StationRequest stationRequest) {
+        StationResponse station = stationService.create(stationRequest);
         return ResponseEntity.created(URI.create("/stations/" + station.getId())).body(station);
     }
 

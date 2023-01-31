@@ -3,8 +3,10 @@ package subway.controller.response;
 import lombok.Builder;
 import lombok.Getter;
 import subway.repository.entity.Line;
+import subway.repository.entity.Station;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Builder
 @Getter
@@ -18,12 +20,16 @@ public class LineResponse {
 
     private List<StationResponse> stations;
 
-    public static LineResponse from(final Line stationLine, final List<StationResponse> collect) {
+    public static LineResponse from(final Line line, final List<Station> stations) {
+        List<StationResponse> stationResponses = stations.stream()
+                .map(StationResponse::from)
+                .collect(Collectors.toList());
+
         return LineResponse.builder()
-                .id(stationLine.getId())
-                .name(stationLine.getName())
-                .color(stationLine.getColor())
-                .stations(collect)
+                .id(line.getId())
+                .name(line.getName())
+                .color(line.getColor())
+                .stations(stationResponses)
                 .build();
     }
 }

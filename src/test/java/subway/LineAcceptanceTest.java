@@ -1,8 +1,6 @@
 package subway;
 
 import io.restassured.RestAssured;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -19,6 +17,7 @@ import subway.util.MapHelper;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static io.restassured.http.ContentType.JSON;
@@ -60,25 +59,37 @@ class LineAcceptanceTest {
     @DisplayName("지하철 노선을 생성한다.")
     @Test
     void createLine()  {
-        // given & when
-        ExtractableResponse<Response> response = 지하철_라인생성(신분당선);
+        // given
+        // 지하철 노선을 생성하면
+        LineResponse createdLine = 지하철노선_생성(신분당선);
+
+        // when
+        // 지하철 노선 목록 조회 시
+        List<LineResponse> selectedLines = 지하철노선_목록조회();
+
+        Optional<LineResponse> maybeLine = selectedLines.stream()
+                .filter(line -> line.getId().equals(createdLine.getId()))
+                .findFirst();
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat((String) response.jsonPath().get("name")).isEqualTo(NAME);
+        // 생성한 노선이 존재한다
+        assertThat(maybeLine).isNotEmpty();
     }
 
     @DisplayName("지하철 노선 목록을 조회한다.")
     @Test
     void findAllLine() {
         // given
-        지하철_라인생성(신분당선);
-        지하철_라인생성(이호선);
+        // 2개의 지하철 노선을 생성하고
+        지하철노선_생성(신분당선);
+        지하철노선_생성(이호선);
 
         // when
-        final List<String> lineNames = 지하철_목록의_이름_조회();
+        // 지하철 노선 목록을 조회하면
+        final List<String> lineNames = 지하철노선목록의_이름_조회();
 
         // then
+        // 2개의 노선이 존재한다
         assertThat(lineNames).hasSize(2);
     }
 
@@ -87,53 +98,63 @@ class LineAcceptanceTest {
     @Test
     void getLineTest() {
         // given
-        지하철_라인생성(신분당선);
+        // 지하철 노선을 생성하고
+        LineResponse createdLine = 지하철노선_생성(신분당선);
 
         // when
-        ExtractableResponse<Response> response = 지하철노선을_조회한다();
+        // 생성한 노선을 조회하면
+        LineResponse selectedLine = 지하철노선_단건조회(createdLine.getId());
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat((String) response.jsonPath().get("name")).isEqualTo(NAME);
+        // 생성한 노선이 존재한다
+        assertThat(selectedLine.getId()).isEqualTo(createdLine.getId());
     }
 
     @DisplayName("지하철 노선을 수정한다.")
     @Test
     void updateLine() {
         // given
-        지하철_라인생성(신분당선);
+        // 지하철 노선을 생성하고
+        LineResponse createdLine = 지하철노선_생성(신분당선);
 
-        Map<String, String> map = new HashMap<>();
         String updateName = "개정된 신분당선";
         String updateColor = "bg-red-500";
 
         // when
+        // 생성한 노선을 수정하면
         지하철_노선을_수정한다(updateName, updateColor);
 
-        final ExtractableResponse<Response> response = 지하철노선을_조회한다();
-
         // then
-        assertThat((String) response.jsonPath().get("name")).isEqualTo(updateName);
-        assertThat((String) response.jsonPath().get("color")).isEqualTo(updateColor);
+        // 생성한 노선 정보가 수정되어있다
+        LineResponse selectedLine = 지하철노선_단건조회(createdLine.getId());
+        assertThat(selectedLine.getName()).isEqualTo(updateName);
+        assertThat(selectedLine.getColor()).isEqualTo(updateColor);
     }
 
     @DisplayName("지하철 노선을 삭제한다.")
     @Test
     void deleteLine() {
         // given
-        지하철_라인생성(신분당선);
+        // 지하철 노선을 생성하고
+        LineResponse createdLine = 지하철노선_생성(신분당선);
 
         // when
-        지하철_노선을_삭제한다();
+        // 생성한 노선을 삭제하면
+        지하철_노선을_삭제한다(createdLine.getId());
 
         // then
-        final List<LineResponse> response = 지하철_목록조회();
-        assertThat(response).isEmpty();
+        // 노선 목록 조회 시 삭제된 노선이 존재하지 않는다
+        List<LineResponse> selectedLines = 지하철노선_목록조회();
+
+        Optional<LineResponse> maybeLine = selectedLines.stream()
+                .filter(line -> line.getId().equals(createdLine.getId()))
+                .findFirst();
+
+        assertThat(maybeLine).isEmpty();
     }
 
     @Comment("지하철 노선을 생성하는 메서드")
-    private ExtractableResponse<Response> 지하철_라인생성(final Map<String, Object> line) {
-
+    private LineResponse 지하철노선_생성(final Map<String, Object> line) {
         final LineRequest param = MapHelper.readValue(line, LineRequest.class);
 
         return RestAssured.given().log().all()
@@ -141,19 +162,19 @@ class LineAcceptanceTest {
                 .body(param)
                 .when().post(LINE_PATH)
                 .then().log().all()
-                .extract();
+                .extract().jsonPath().getObject("", LineResponse.class);
     }
 
 
     @Comment("지하철 노선 목록의 이름을 반환하는 함수")
-    private List<String> 지하철_목록의_이름_조회() {
-        return 지하철_목록조회().stream()
+    private List<String> 지하철노선목록의_이름_조회() {
+        return 지하철노선_목록조회().stream()
                 .map(LineResponse::getName)
                 .collect(Collectors.toList());
     }
 
     @Comment("지하철 노선 목록을 반환하는 함수")
-    private List<LineResponse> 지하철_목록조회() {
+    private List<LineResponse> 지하철노선_목록조회() {
         return RestAssured
                 .given().accept(APPLICATION_JSON_VALUE)
                 .when().get(LINE_PATH)
@@ -175,21 +196,21 @@ class LineAcceptanceTest {
     }
 
     @Comment("지하철 노선을 조회하는 메서드")
-    private ExtractableResponse<Response> 지하철노선을_조회한다() {
+    private LineResponse 지하철노선_단건조회(Long id) {
         return RestAssured.given().log().all()
-                .when().get("/lines/{id}",1)
+                .when().get("/lines/{id}",id)
                 .then().log().all()
-                .extract();
+                .extract().jsonPath().getObject("",LineResponse.class);
     }
 
     @Comment("지하철 노선을 삭제하는 메서드")
-    private void 지하철_노선을_삭제한다() {
+    private void 지하철_노선을_삭제한다(Long id) {
         RestAssured
                 .given()
                 .when()
-                .delete("/lines/{id}", 1)
+                .delete("/lines/{id}", id)
                 .then()
-                .statusCode(HttpStatus.NO_CONTENT.value());
+                .statusCode(HttpStatus.OK.value());
     }
 
 }
