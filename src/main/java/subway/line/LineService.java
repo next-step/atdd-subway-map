@@ -67,7 +67,7 @@ public class LineService {
         Line line = findOne(id);
 
         if(!sectionService.isAppendable(line, sectionRequest)) {
-            // TODO: throw an error
+            throw new IllegalArgumentException("등록할 수 없는 구간입니다");
         }
 
         Station newStation = this.stationService.findOne(sectionRequest.getDownStationId());
