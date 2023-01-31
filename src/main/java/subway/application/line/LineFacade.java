@@ -9,6 +9,7 @@ import subway.domain.line.service.LineService;
 import subway.domain.station.Station;
 import subway.domain.station.service.StationService;
 import subway.presentation.line.dto.request.LineRequest;
+import subway.presentation.line.dto.request.LineUpdateRequest;
 import subway.presentation.line.dto.response.LineResponse;
 
 import java.util.List;
@@ -35,6 +36,11 @@ public class LineFacade {
     @Transactional(readOnly = true)
     public LineResponse getLine(Long lineId) {
         return lineService.getLine(lineId);
+    }
+
+    @Transactional
+    public void updateLine(Long lineId, LineUpdateRequest request) {
+        lineService.updateLine(lineId,request);
     }
 
 }

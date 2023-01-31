@@ -41,4 +41,9 @@ public class Line {
     public List<Station> getStationList() {
         return stations.getStationList();
     }
+
+    public void update(String name, String color) {
+        this.name = name;
+        this.color = color;
+    }
 }

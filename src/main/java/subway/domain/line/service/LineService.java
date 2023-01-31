@@ -10,6 +10,7 @@ import subway.global.error.ErrorCode;
 import subway.global.error.exception.NotFoundException;
 import subway.infrastructure.line.LineRepository;
 import subway.presentation.line.dto.request.LineRequest;
+import subway.presentation.line.dto.request.LineUpdateRequest;
 import subway.presentation.line.dto.response.LineResponse;
 
 import java.util.List;
@@ -43,5 +44,12 @@ public class LineService {
         Line line = lineRepository.findByIdWithStations(lineId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_LINE));
         return LineResponse.of(line);
+    }
+
+    @Transactional
+    public void updateLine(Long lineId, LineUpdateRequest request) {
+        Line line = lineRepository.findById(lineId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_LINE));
+        line.update(request.getName(), request.getColor());
     }
 }

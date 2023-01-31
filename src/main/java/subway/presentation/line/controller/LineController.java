@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import subway.application.line.LineFacade;
 import subway.presentation.line.dto.request.LineRequest;
+import subway.presentation.line.dto.request.LineUpdateRequest;
 import subway.presentation.line.dto.response.LineResponse;
 
 import java.net.URI;
@@ -28,9 +29,17 @@ public class LineController {
         return ResponseEntity.ok(lineFacade.getAllLines());
     }
 
-
     @GetMapping("/{lineId}")
     public ResponseEntity<LineResponse> getLine(@PathVariable Long lineId) {
         return ResponseEntity.ok(lineFacade.getLine(lineId));
+    }
+
+    @PutMapping("/{lineId}")
+    public ResponseEntity<Void> updateLine(
+            @PathVariable Long lineId,
+            @RequestBody LineUpdateRequest request
+    ) {
+        lineFacade.updateLine(lineId, request);
+        return ResponseEntity.ok().build();
     }
 }

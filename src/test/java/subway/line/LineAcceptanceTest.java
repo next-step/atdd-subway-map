@@ -115,7 +115,7 @@ public class LineAcceptanceTest {
     /**
      * Given 1개의 지하철 노선을 생성하고
      * When 지하철 노선을 수정했을 때
-     * Then 200 응답을 받느다.
+     * Then 200 응답을 받는다.
      */
     @DisplayName("지하철노선을 수정한다.")
     @Test
