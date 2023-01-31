@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
+import subway.exception.LineNotFoundException;
 import subway.line.LineCreateRequest;
 import subway.line.LineResponse;
 import subway.line.LineUpdateRequest;
@@ -165,6 +166,21 @@ public class LineAcceptanceTest {
         // then
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
         assertThat(getLine(id).statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    }
+
+    /**
+     * When 지하철 생성없이 지하철을 삭제하면
+     * Then 500에러와 함께 예외메시지 응답이온다.
+     */
+    @DisplayName("지하철 노선을 삭제 시 지하철 노선이 존재하지 않는다면 예외가 발생합니다.")
+    @Test
+    void deleteLineIfNotExistException() {
+        // when
+        ExtractableResponse<Response> deleteResponse = deleteLine(1L);
+
+        // then
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        assertThat(deleteResponse.jsonPath().getString("message")).isEqualTo(LineNotFoundException.EXCEPTION_MESSAGE);
     }
 
     private ExtractableResponse<Response> deleteLine(long id) {
