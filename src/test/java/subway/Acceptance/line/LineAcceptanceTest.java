@@ -90,9 +90,11 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         // when
         long id = shinBunDang.jsonPath().getLong("id");
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
+        ExtractableResponse<Response> response = RestAssured.given()
+                .pathParam("id", id)
+                .log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/lines/" + id)
+                .when().get("/lines/{id}")
                 .then().log().all()
                 .extract();
 
@@ -117,10 +119,12 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         // when
         long id = shinBunDang.jsonPath().getLong("id");
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
+        ExtractableResponse<Response> response = RestAssured.given()
+                .pathParam("id", id)
+                .log().all()
                 .body(new LineRequest("당당선", "bg-red-500"))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().put("/lines/" + id)
+                .when().put("/lines/{id}")
                 .then().log().all()
                 .extract();
 
@@ -128,9 +132,11 @@ public class LineAcceptanceTest extends AcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         // then
-        String lineName = RestAssured.given().log().all()
+        String lineName = RestAssured.given()
+                .pathParam("id", id)
+                .log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/lines/" + id)
+                .when().get("/lines/{id}")
                 .then().log().all()
                 .extract().jsonPath().getString("name");
         assertThat(lineName).isEqualTo("당당선");
@@ -149,9 +155,11 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         // when
         long id = shinBunDang.jsonPath().getLong("id");
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
+        ExtractableResponse<Response> response = RestAssured.given()
+                .pathParam("id", id)
+                .log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().delete("/lines/" + id)
+                .when().delete("/lines/{id}")
                 .then().log().all()
                 .extract();
 

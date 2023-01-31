@@ -88,9 +88,11 @@ public class StationAcceptanceTest extends AcceptanceTest {
 
         // when
         long id = gangNam.jsonPath().getLong("id");
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
+        ExtractableResponse<Response> response = RestAssured.given()
+                .pathParam("id", id)
+                .log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().delete("/stations/" + id)
+                .when().delete("/stations/{id}")
                 .then().log().all()
                 .extract();
 
