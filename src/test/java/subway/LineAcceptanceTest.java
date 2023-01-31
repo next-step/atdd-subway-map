@@ -9,8 +9,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
-import subway.line.LineRequest;
+import subway.line.LineCreateRequest;
 import subway.line.LineResponse;
+import subway.line.LineUpdateRequest;
 
 import java.util.List;
 import java.util.Map;
@@ -75,8 +76,8 @@ public class LineAcceptanceTest {
         Long downStationId2 = 지하철역생성후ID반환(StationAcceptanceTest.JUNGGYE);
 
         // when
-        LineRequest lineRequest = new LineRequest(NAME_VALUE1, COLOR_VALUE1, upStationId, downStationId, DISTANCE_VALUE);
-        LineRequest lineRequest2 = new LineRequest(NAME_VALUE2, COLOR_VALUE2, upStationId2, downStationId2, DISTANCE_VALUE);
+        LineCreateRequest lineRequest = new LineCreateRequest(NAME_VALUE1, COLOR_VALUE1, upStationId, downStationId, DISTANCE_VALUE);
+        LineCreateRequest lineRequest2 = new LineCreateRequest(NAME_VALUE2, COLOR_VALUE2, upStationId2, downStationId2, DISTANCE_VALUE);
         createLine(lineRequest);
         createLine(lineRequest2);
 
@@ -132,18 +133,16 @@ public class LineAcceptanceTest {
         // given
         Long upStationId = 지하철역생성후ID반환(StationAcceptanceTest.GANGNAM);
         Long downStationId = 지하철역생성후ID반환(StationAcceptanceTest.YANGJAE);
-        Long changeUpStationId = 지하철역생성후ID반환(StationAcceptanceTest.HAGYE);
-        Long changeDownStationId = 지하철역생성후ID반환(StationAcceptanceTest.JUNGGYE);
         ExtractableResponse<Response> createLineResponse = createLineWithLineRequest(NAME_VALUE1, COLOR_VALUE1, upStationId, downStationId);
         long id = createLineResponse.jsonPath().getLong(ID);
 
         // when
-        ExtractableResponse<Response> updateResponse = updateLine(id, NAME_VALUE2, COLOR_VALUE2, changeUpStationId, changeDownStationId, DISTANCE_VALUE + DISTANCE_VALUE);
+        ExtractableResponse<Response> updateResponse = updateLine(id, NAME_VALUE2, COLOR_VALUE2, DISTANCE_VALUE + DISTANCE_VALUE);
 
         // then
         assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
         ExtractableResponse<Response> response = getLine(id);
-        노선응답값검증(response, id, NAME_VALUE2, COLOR_VALUE2, StationAcceptanceTest.HAGYE, StationAcceptanceTest.JUNGGYE);
+        노선응답값검증(response, id, NAME_VALUE2, COLOR_VALUE2, StationAcceptanceTest.GANGNAM, StationAcceptanceTest.YANGJAE);
     }
 
     /**
@@ -176,8 +175,8 @@ public class LineAcceptanceTest {
                 .extract();
     }
 
-    private ExtractableResponse<Response> updateLine(long id, String name, String color, Long upStationId, Long downStationId, Long distance) {
-        LineRequest lineRequest = new LineRequest(name, color, upStationId, downStationId, distance);
+    private ExtractableResponse<Response> updateLine(long id, String name, String color, Long distance) {
+        LineUpdateRequest lineRequest = new LineUpdateRequest(name, color, distance);
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(lineRequest)
@@ -195,12 +194,12 @@ public class LineAcceptanceTest {
     }
 
     private static ExtractableResponse<Response> createLineWithLineRequest(String name, String color, Long upStationId, Long downStationId) {
-        LineRequest lineRequest = new LineRequest(name, color, upStationId, downStationId, DISTANCE_VALUE);
+        LineCreateRequest lineRequest = new LineCreateRequest(name, color, upStationId, downStationId, DISTANCE_VALUE);
         ExtractableResponse<Response> response = createLine(lineRequest);
         return response;
     }
 
-    private static ExtractableResponse<Response> createLine(LineRequest lineRequest) {
+    private static ExtractableResponse<Response> createLine(LineCreateRequest lineRequest) {
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .body(lineRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)

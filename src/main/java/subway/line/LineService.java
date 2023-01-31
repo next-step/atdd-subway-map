@@ -22,7 +22,7 @@ public class LineService {
     }
 
     @Transactional
-    public LineResponse saveLine(LineRequest lineRequest) {
+    public LineResponse saveLine(LineCreateRequest lineRequest) {
         Station upStation = stationService.findStation(lineRequest.getUpStationId());
         Station downStation = stationService.findStation(lineRequest.getDownStationId());
 
@@ -47,15 +47,10 @@ public class LineService {
     }
 
     @Transactional
-    public void updateLine(Long id, LineRequest lineRequest) {
+    public void updateLine(Long id, LineCreateRequest lineRequest) {
         Line line = lineRepository.findById(id)
                 .orElseThrow(LineNotFoundException::new);
-
-        Station upStation = stationService.findStation(lineRequest.getUpStationId());
-        Station downStation = stationService.findStation(lineRequest.getDownStationId());
-
-        line.changeLineInfo(lineRequest.getName(), lineRequest.getColor(),
-                upStation, downStation, lineRequest.getDistance());
+        line.changeNameAndColor(lineRequest.getName(), lineRequest.getColor());
     }
 
     @Transactional

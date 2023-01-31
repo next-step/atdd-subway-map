@@ -1,6 +1,6 @@
 package subway.line;
 
-public class LineRequest {
+public class LineCreateRequest {
     private String name;
     private String color;
     private Long upStationId;
@@ -27,10 +27,10 @@ public class LineRequest {
         return distance;
     }
 
-    public LineRequest() {
+    public LineCreateRequest() {
     }
 
-    public LineRequest(String name, String color, Long upStationId, Long downStationId, Long distance) {
+    public LineCreateRequest(String name, String color, Long upStationId, Long downStationId, Long distance) {
         this.name = name;
         this.color = color;
         this.upStationId = upStationId;

@@ -60,11 +60,8 @@ public class Line {
         return distance;
     }
 
-    public void changeLineInfo(String name, String color, Station upStation, Station downStation, Long distance) {
+    public void changeNameAndColor(String name, String color) {
         this.name = name;
         this.color = color;
-        this.upStation = upStation;
-        this.downStation = downStation;
-        this.distance = distance;
     }
 }
