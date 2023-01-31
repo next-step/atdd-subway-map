@@ -91,7 +91,8 @@ public class LineService {
         }
 
         if (!line.hasLastStation(station)) {
-            throw new CannotRemoveNonLastSectionException();
+            Station lastStation = line.getLastStation();
+            throw new CannotRemoveNonLastSectionException(lastStation.getName(), station.getName());
         }
 
         line.removeSection();
