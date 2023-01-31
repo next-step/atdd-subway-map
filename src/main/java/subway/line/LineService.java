@@ -52,4 +52,10 @@ public class LineService {
         Line lineEntity = findLineEntity(id);
         return dtoConverter.of(lineEntity);
     }
+
+    @Transactional
+    public void updateLine(Long lineId, LineUpdateRequest lineUpdateRequest) {
+        Line lineEntity = findLineEntity(lineId);
+        lineEntity.update(lineUpdateRequest.getName(), lineUpdateRequest.getColor());
+    }
 }

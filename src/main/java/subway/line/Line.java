@@ -61,4 +61,8 @@ public class Line {
         return this.stationLineGroupList.stream().map(StationLineGroup::getStation).collect(Collectors.toList());
     }
 
+    public void update(String name, String color) {
+        this.name = name;
+        this.color = color;
+    }
 }
