@@ -6,6 +6,7 @@ import subway.station.Station;
 import subway.station.StationService;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -29,6 +30,9 @@ public class LineService {
     }
 
     public List<LineResponse> findAllLines() {
-        return null;
+        List<Line> lines = lineRepository.findAll();
+        return lines.stream()
+                .map(LineResponse::of)
+                .collect(Collectors.toList());
     }
 }
