@@ -6,10 +6,13 @@ import io.restassured.response.Response;
 import org.springframework.http.HttpStatus;
 import subway.MockStation;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static subway.StationApi.STATION_NAME_KEY;
 
 public class ValidationUtils {
 
@@ -18,16 +21,23 @@ public class ValidationUtils {
     }
 
     public static void checkStationExistence(ExtractableResponse<Response> response, MockStation... stations) {
-        JsonPath jsonPath = response.jsonPath();
-        for (MockStation station : stations) {
-            assertTrue(jsonPath.getList(STATION_NAME_KEY).contains(station.name()));
-        }
+        List<String> stationNamesOfResponse = ExtractionUtils.getStationNames(response);
+        List<String> stationNames = takeStationNames(stations);
+
+        assertTrue(stationNamesOfResponse.containsAll(stationNames));
     }
+
     public static void checkStationNotExistence(ExtractableResponse<Response> response, MockStation... stations) {
-        JsonPath jsonPath = response.jsonPath();
-        for (MockStation station : stations) {
-            assertFalse(jsonPath.getList(STATION_NAME_KEY).contains(station.name()));
-        }
+        List<String> stationNamesOfResponse = ExtractionUtils.getStationNames(response);
+        List<String> stationNames = takeStationNames(stations);
+        
+        assertFalse(stationNamesOfResponse.containsAll(stationNames));
+    }
+
+    private static List<String> takeStationNames(MockStation[] stations) {
+        return Arrays.stream(stations)
+                .map(station -> station.name())
+                .collect(Collectors.toList());
     }
 
     public static void checkStationCount(ExtractableResponse<Response> response, int expected) {
