@@ -16,6 +16,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ValidationUtils {
 
+    private ValidationUtils() {}
+
     public static void checkStationCreated(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
@@ -30,7 +32,7 @@ public class ValidationUtils {
     public static void checkStationNotExistence(ExtractableResponse<Response> response, MockStation... stations) {
         List<String> stationNamesOfResponse = ExtractionUtils.getStationNames(response);
         List<String> stationNames = takeStationNames(stations);
-        
+
         assertFalse(stationNamesOfResponse.containsAll(stationNames));
     }
 

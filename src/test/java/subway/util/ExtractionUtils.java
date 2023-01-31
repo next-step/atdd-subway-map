@@ -10,6 +10,8 @@ import static subway.StationApi.STATION_NAME_KEY;
 
 public class ExtractionUtils {
 
+    private ExtractionUtils() {}
+
     public static Long getStationId(ExtractableResponse<Response> response) {
         String[] locationTokens = response.header("Location").split("/");
         String id = locationTokens[2];
