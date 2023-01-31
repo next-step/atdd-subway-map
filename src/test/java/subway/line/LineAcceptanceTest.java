@@ -1,9 +1,15 @@
 package subway.line;
 
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import setting.RandomPortSetting;
+import subway.line.util.ValidationUtils;
 
+import static subway.line.MockLine.신분당선;
+
+@DisplayName("노선 관련 기능")
 public class LineAcceptanceTest extends RandomPortSetting {
 
     /**
@@ -13,6 +19,12 @@ public class LineAcceptanceTest extends RandomPortSetting {
     @Test
     @DisplayName("지하철노선 생성")
     void createLine() {
+        // When
+        LineApi.createLine(신분당선);
+
+        // Then
+        ExtractableResponse<Response> responseOfShowLines = LineApi.showLines();
+        ValidationUtils.checkLineExistence(responseOfShowLines, 신분당선);
     }
 
     /**
