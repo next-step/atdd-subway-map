@@ -125,15 +125,47 @@ public class LineAcceptanceTest {
         putParams(params, lineSixName, lineSixColor);
         Long id = getSaveLineResponse(params).getId();
 
+        //when
         String lineChangeColor = "흑색";
         params.put("color", lineChangeColor);
 
         ExtractableResponse<Response> updateResponse = getUpdateResponse(params, id);
 
+        //then
         String color = updateResponse.body().jsonPath().get("color");
 
         Assertions.assertThat(color).isEqualTo(lineChangeColor);
+    }
 
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 삭제하면
+     * Then 해당 지하철 노선 정보는 삭제된다
+     */
+    @Test
+    void 지하철_노선을_생성하고_삭제하면_노선_정보는_삭제_된다() {
+        //given
+        String lineSevenName = "7호선";
+        String lineSevenColor = "금색";
+
+        Map<String, String> params = new HashMap<>();
+        putParams(params, lineSevenName, lineSevenColor);
+        Long id = getSaveLineResponse(params).getId();
+
+        //when
+        ExtractableResponse<Response> deleteResponse = getDeleteResponse(id);
+
+        // then
+        Assertions.assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    private ExtractableResponse<Response> getDeleteResponse(Long id) {
+        return RestAssured
+                .given()
+                .when()
+                .delete("/lines/" + id)
+                .then()
+                .extract();
     }
 
     private ExtractableResponse<Response> getUpdateResponse(Map<String, String> params, Long id) {
