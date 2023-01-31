@@ -22,6 +22,12 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
+    void 구간_등록_시_상행역과_하행역이_같다면_예외를_던진다() {
+        // When 상행역과 하행역을 같은 역으로 등록하면
+        // Then 예외를 던진다.
+    }
+
+    @Test
     void 구간_등록_시_새로운_구간의_상행역이_해당_노선의_하행_종점역이_아니면_예외를_던진다() {
         // Given 구간 등록 시
         // When 상행역이 해당 노선의 하행 종점역이 아니면
