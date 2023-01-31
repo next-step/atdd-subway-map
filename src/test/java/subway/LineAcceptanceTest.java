@@ -36,6 +36,10 @@ public class LineAcceptanceTest {
         params.put("color", lineColor);
 
         //then
+        getSaveLineResponse(params);
+    }
+
+    private void getSaveLineResponse(Map<String, String> params) {
         ExtractableResponse<Response> saveResponse = RestAssured
                 .given()
                 .body(params)
