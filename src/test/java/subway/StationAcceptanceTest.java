@@ -20,14 +20,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class StationAcceptanceTest {
+public class StationAcceptanceTest extends AcceptanceTest{
     @Autowired
     private StationRepository stationRepository;
 
-    @BeforeEach
-    public void setup() {
-        stationRepository.deleteAll();
-    }
 
     /**
      * When 지하철역을 생성하면
