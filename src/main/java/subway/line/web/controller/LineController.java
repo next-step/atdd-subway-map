@@ -15,8 +15,6 @@ import subway.line.business.service.LineService;
 import subway.line.web.dto.LineRequest;
 import subway.line.web.dto.LineResponse;
 import subway.line.web.dto.LineUpdateRequest;
-import subway.station.StationResponse;
-import subway.station.StationService;
 
 import java.net.URI;
 import java.util.List;
@@ -28,24 +26,23 @@ import java.util.stream.Collectors;
 public class LineController {
 
     private final LineService lineService;
-    private final StationService stationService;
 
     @PostMapping("")
     public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest request) {
-        Line newLine = lineService.create(request.toLine());
-        return ResponseEntity.created(URI.create("/lines/"+newLine.getId())).body(createResponse(newLine));
+        Line newLine = lineService.create(request.toLine(), request.getUpStationId(), request.getDownStationId());
+        return ResponseEntity.created(URI.create("/lines/"+newLine.getId())).body(new LineResponse(newLine));
     }
 
     @GetMapping("")
     public ResponseEntity<List<LineResponse>> getAllLines() {
-        List<LineResponse> response = lineService.getAllLines().stream().map(this::createResponse).collect(Collectors.toList());
+        List<LineResponse> response = lineService.getAllLines().stream().map(LineResponse::new).collect(Collectors.toList());
         return ResponseEntity.ok().body(response);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<LineResponse> getLine(@PathVariable Long id) {
         Line line = lineService.getLine(id);
-        return ResponseEntity.ok().body(createResponse(line));
+        return ResponseEntity.ok().body(new LineResponse(line));
     }
 
     @PutMapping("/{id}")
@@ -60,11 +57,5 @@ public class LineController {
         return ResponseEntity.noContent().build();
     }
 
-    private LineResponse createResponse(Line line) {
-        StationResponse upStation = stationService.findStation(line.getUpStationId());
-        StationResponse downStation = stationService.findStation(line.getDownStationId());
-
-        return new LineResponse(line, List.of(upStation, downStation));
-    }
 
 }

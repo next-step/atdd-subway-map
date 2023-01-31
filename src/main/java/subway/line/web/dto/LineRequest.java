@@ -22,8 +22,6 @@ public class LineRequest {
         return Line.builder()
                 .name(name)
                 .color(color)
-                .upStationId(upStationId)
-                .downStationId(downStationId)
                 .distance(distance)
                 .build();
     }

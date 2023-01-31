@@ -2,12 +2,14 @@ package subway.line.repository.entity;
 
 import lombok.NoArgsConstructor;
 import subway.line.business.model.Line;
+import subway.station.repository.entity.StationEntity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -22,10 +24,10 @@ public class LineEntity {
     private String name;
     @Column(length = 20, nullable = false)
     private String color;
-    @Column(nullable = false)
-    private Long upStationId;
-    @Column(nullable = false)
-    private Long downStationId;
+    @ManyToOne
+    private StationEntity upStation;
+    @ManyToOne
+    private StationEntity downStation;
     @Column(nullable = false)
     private Integer distance;
 
@@ -33,8 +35,6 @@ public class LineEntity {
         this.id = line.getId();
         this.name = line.getName();
         this.color = line.getColor();
-        this.upStationId = line.getUpStationId();
-        this.downStationId = line.getDownStationId();
         this.distance = line.getDistance();
     }
 
@@ -43,8 +43,8 @@ public class LineEntity {
                 .id(id)
                 .name(name)
                 .color(color)
-                .upStationId(upStationId)
-                .downStationId(downStationId)
+                .upStation(upStation.toStation())
+                .downStation(downStation.toStation())
                 .distance(distance)
                 .build();
     }
@@ -54,6 +54,11 @@ public class LineEntity {
         this.color = color;
 
         return this;
+    }
+
+    public void setStations(StationEntity upStation, StationEntity downStation) {
+        this.upStation = upStation;
+        this.downStation = downStation;
     }
 
 }
