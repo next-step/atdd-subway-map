@@ -47,16 +47,16 @@ public class StationAcceptanceTest {
      */
     @DisplayName("지하철역 생성 후 목록을 조회한다.")
     @Test
-    void createAndReadStations() {
+    void readStations() {
         // given
         생성_지하철역(StationFixture.연신내);
         생성_지하철역(StationFixture.충무로);
 
         // when
-        List<Map> 등록된_지하철역_목록 = 조회_지하철역_목록().jsonPath().get();
+        List<String> 등록된_지하철역_아이디_목록 = 조회_지하철역_목록().jsonPath().getList("id");
 
         // then
-        assertThat(등록된_지하철역_목록).hasSize(2);
+        assertThat(등록된_지하철역_아이디_목록).hasSize(2);
     }
 
     /**
@@ -64,22 +64,21 @@ public class StationAcceptanceTest {
      * When 그 지하철역을 삭제하면
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
-    // TODO: 지하철역 제거 인수 테스트 메서드 생성
     @DisplayName("지하철역 생성 후 삭제한다.")
     @Test
-    void createAndDeleteStation() {
+    void deleteStation() {
         // given
         ExtractableResponse<Response> response = 생성_지하철역(StationFixture.교대);
-        Long stationId = response.body().jsonPath().getLong("id");
+        Long 지하철역_아이디 = response.body().jsonPath().getLong("id");
 
         // when
-        삭제_지하철역(stationId);
+        삭제_지하철역(지하철역_아이디);
 
         // then
         List<Long> 등록된_지하철역_고유번호_목록 =
                 조회_지하철역_목록().jsonPath().getList("id", Long.class);
 
-        assertThat(등록된_지하철역_고유번호_목록).doesNotContain(stationId);
+        assertThat(등록된_지하철역_고유번호_목록).doesNotContain(지하철역_아이디);
     }
 
     private ExtractableResponse<Response> 생성_지하철역(StationFixture station) {
@@ -98,7 +97,7 @@ public class StationAcceptanceTest {
                 .extract();
     }
 
-    private static ExtractableResponse<Response> 조회_지하철역_목록() {
+    private ExtractableResponse<Response> 조회_지하철역_목록() {
         return RestAssured.given().log().all()
                 .when().get("/stations")
                 .then().log().all()
