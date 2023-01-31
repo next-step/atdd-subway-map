@@ -58,7 +58,7 @@ class LineAcceptanceTest {
 
     @DisplayName("지하철 노선을 생성한다.")
     @Test
-    void createLine()  {
+    void createLine() {
         // given
         // 지하철 노선을 생성하면
         LineResponse createdLine = 지하철노선_생성(신분당선);
@@ -198,9 +198,9 @@ class LineAcceptanceTest {
     @Comment("지하철 노선을 조회하는 메서드")
     private LineResponse 지하철노선_단건조회(Long id) {
         return RestAssured.given().log().all()
-                .when().get("/lines/{id}",id)
+                .when().get("/lines/{id}", id)
                 .then().log().all()
-                .extract().jsonPath().getObject("",LineResponse.class);
+                .extract().jsonPath().getObject("", LineResponse.class);
     }
 
     @Comment("지하철 노선을 삭제하는 메서드")
