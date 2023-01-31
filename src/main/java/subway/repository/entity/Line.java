@@ -1,6 +1,6 @@
 package subway.repository.entity;
 
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,9 +14,7 @@ import javax.persistence.Id;
 
 @Entity
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Line {
 
     @Id
@@ -27,19 +25,31 @@ public class Line {
     @Column(length = 20)
     private String name;
 
-    @Comment("노선 색")
+    @Comment("노선 색상")
     @Column(length = 20)
     private String color;
 
-    @Comment("노선 시작역")
-    @Column(length = 20)
+    @Comment("상행 종점역")
     private Long upStationId;
 
-    @Comment("노선 종료역")
+    @Comment("하행 종점역")
     private Long downStationId;
 
-    @Comment("노선 거리")
-    private int distance;
+    @Comment("노선 간 거리")
+    private Integer distance;
+
+    @Builder
+    private Line(String name,
+                 String color,
+                 Long upStationId,
+                 Long downStationId,
+                 Integer distance) {
+        this.name = name;
+        this.color = color;
+        this.upStationId = upStationId;
+        this.downStationId = downStationId;
+        this.distance = distance;
+    }
 
     public void update(final String name, final String color) {
         this.name = name;
