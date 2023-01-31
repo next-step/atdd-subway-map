@@ -27,8 +27,9 @@ public class StationService {
                 .collect(Collectors.toList());
     }
 
-    public Station findOneStation(Long stationId) {
-        return stationRepository.getReferenceById(stationId);
+    public Station findOne(Long id) {
+        return stationRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("없는 역 입니다"));
     }
 
     @Transactional

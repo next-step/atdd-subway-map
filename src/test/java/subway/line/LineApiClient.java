@@ -7,8 +7,9 @@ import org.springframework.http.MediaType;
 
 public class LineApiClient {
     private static final String ENDPOINT_LINES = "/lines";
+    private static final String ENDPOINT_SECTIONS = "/sections";
 
-    static ExtractableResponse<Response> requestCreateLine(String name,
+    public static ExtractableResponse<Response> requestCreateLine(String name,
                                                            String color,
                                                            Long upStationId,
                                                            Long downStationId,
@@ -36,7 +37,7 @@ public class LineApiClient {
                 .extract();
     }
 
-    static ExtractableResponse<Response> requestShowLine(Long id) {
+    public static ExtractableResponse<Response> requestShowLine(Long id) {
         final String ENDPOINT = ENDPOINT_LINES + "/" + id.toString();
 
         return RestAssured.given().log().all()
@@ -66,6 +67,19 @@ public class LineApiClient {
 
         return RestAssured.given().log().all()
                 .when().delete(ENDPOINT)
+                .then().log().all()
+                .extract();
+    }
+
+    static ExtractableResponse<Response> requestAppendSection(Long lineId, Long upStationId, Long downStationId, Integer distance) {
+        final String ENDPOINT = ENDPOINT_LINES + "/" + lineId.toString() + ENDPOINT_SECTIONS;
+
+        SectionRequest sectionRequest = new SectionRequest(upStationId, downStationId, distance);
+
+        return RestAssured.given().log().all()
+                .body(sectionRequest)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post(ENDPOINT)
                 .then().log().all()
                 .extract();
     }

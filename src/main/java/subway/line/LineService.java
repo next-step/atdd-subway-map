@@ -13,21 +13,21 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class LineService {
     private final StationService stationService;
+    private final SectionService sectionService;
     private final LineRepository lineRepository;
 
-    public LineService(StationService stationService, LineRepository lineRepository) {
+    public LineService(StationService stationService, SectionService sectionService, LineRepository lineRepository) {
         this.stationService = stationService;
+        this.sectionService = sectionService;
         this.lineRepository = lineRepository;
     }
 
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
+        Station upStation = stationService.findOne(lineRequest.getUpStationId());
+        Station downStation = stationService.findOne(lineRequest.getDownStationId());
 
-        Station upStation = stationService.findOneStation(lineRequest.getUpStationId());
-        Station downStation = stationService.findOneStation(lineRequest.getDownStationId());
-
-        Line line = new Line(lineRequest.getName(), lineRequest.getColor(), upStation, downStation);
-
+        Line line = new Line(lineRequest.getName(), lineRequest.getColor(), upStation, downStation, lineRequest.getDistance());
         Line savedLine = lineRepository.save(line);
 
         return createLineResponse(savedLine);
@@ -47,7 +47,6 @@ public class LineService {
     @Transactional
     public void updateLine(Long id, LineRequest lineRequest) {
         Line line = findOne(id);
-
         line.update(lineRequest.getName(), lineRequest.getColor());
 
         lineRepository.save(line);
@@ -61,6 +60,21 @@ public class LineService {
     private Line findOne(Long id) {
         return lineRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("없는 노선 입니다"));
+    }
+
+    @Transactional
+    public void appendSection(Long id, SectionRequest sectionRequest) {
+        Line line = findOne(id);
+
+        if(!sectionService.isAppendable(line, sectionRequest)) {
+            // TODO: throw an error
+        }
+
+        Station newStation = this.stationService.findOne(sectionRequest.getDownStationId());
+
+        line.appendSection(newStation, sectionRequest.getDistance());
+
+        this.lineRepository.save(line);
     }
 
     private LineResponse createLineResponse(Line line) {
