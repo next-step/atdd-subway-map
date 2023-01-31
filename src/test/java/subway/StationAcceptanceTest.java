@@ -22,7 +22,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@Sql("/truncate.sql")
 public class StationAcceptanceTest {
     private static final String STATION_URL = "/stations";
     private static final String STATION_ID_URL = "/stations/{id}";
@@ -34,6 +33,14 @@ public class StationAcceptanceTest {
     public static final String YANGJAE = "양재역";
     public static final String HAGYE = "하계역";
     public static final String JUNGGYE = "중계역";
+
+    @Autowired
+    private DataBaseCleanUp dataBaseCleanUp;
+
+    @BeforeEach
+    void setUp() {
+        dataBaseCleanUp.execute();
+    }
 
     /**
      * When 지하철역을 생성하면
