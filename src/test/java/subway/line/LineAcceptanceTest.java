@@ -6,13 +6,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.jdbc.Sql;
 import setting.RandomPortSetting;
+import subway.common.util.CommonApi;
 import subway.common.util.CommonValidationUtils;
 import subway.line.util.ValidationUtils;
 
 import static subway.line.MockLine.분당선;
 import static subway.line.MockLine.신분당선;
-import static subway.station.MockStation.강남역;
-import static subway.station.MockStation.서초역;
 
 @DisplayName("노선 관련 기능")
 @Sql("/stations.sql")
@@ -30,7 +29,7 @@ public class LineAcceptanceTest extends RandomPortSetting {
 
         // Then
         ExtractableResponse<Response> responseOfShowLines = LineApi.showLines();
-        ValidationUtils.checkLineExistence(responseOfShowLines, 신분당선);
+        ValidationUtils.checkLineExistenceInList(responseOfShowLines, 신분당선);
     }
 
     /**
@@ -50,7 +49,7 @@ public class LineAcceptanceTest extends RandomPortSetting {
 
         // Then
         CommonValidationUtils.checkResponseCount(responseOfShowLines, 2);
-        ValidationUtils.checkLineExistence(responseOfShowLines, 신분당선, 분당선);
+        ValidationUtils.checkLinesExistenceInList(responseOfShowLines, 신분당선, 분당선);
     }
 
     /**
@@ -61,6 +60,15 @@ public class LineAcceptanceTest extends RandomPortSetting {
     @Test
     @DisplayName("지하철노선 조회")
     void showLine() {
+        // Given
+        ExtractableResponse<Response> responseOfCreateLine = LineApi.createLine(신분당선);
+        CommonValidationUtils.checkRequestCreated(responseOfCreateLine);
+
+        // When
+        ExtractableResponse<Response> responseOfShowLine = CommonApi.showResource(responseOfCreateLine);
+
+        // Then
+        ValidationUtils.checkLineExistence(responseOfShowLine, 신분당선);
     }
 
     /**

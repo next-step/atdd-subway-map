@@ -22,8 +22,8 @@ public class LineService {
 
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
-        Station upStation = stationService.findStationById(lineRequest.getUpStationId());
-        Station downStation = stationService.findStationById(lineRequest.getDownStationId());
+        Station upStation = stationService.getStationById(lineRequest.getUpStationId());
+        Station downStation = stationService.getStationById(lineRequest.getDownStationId());
         Line line = Line.of(lineRequest, upStation, downStation);
         Line savedLine = lineRepository.save(line);
         return LineResponse.of(savedLine);
@@ -34,5 +34,27 @@ public class LineService {
         return lines.stream()
                 .map(LineResponse::of)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * LineResponse를 반환하는 메서드
+     *
+     * @param lineId
+     * @return LineResponse
+     */
+    public LineResponse findLineById(long lineId) {
+        return LineResponse.of(getLineById(lineId));
+    }
+
+    /**
+     * Line 엔티티를 반환하는 메서드
+     *
+     * @param lineId
+     * @return Line 엔티티
+     * @throws LineNotFoundException 존재하지 않는 id 조회시
+     */
+    public Line getLineById(long lineId) {
+        return lineRepository.findById(lineId)
+                .orElseThrow(LineNotFoundException::new);
     }
 }

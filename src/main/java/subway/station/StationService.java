@@ -32,7 +32,14 @@ public class StationService {
         stationRepository.deleteById(id);
     }
 
-    public Station findStationById(Long stationId) {
+    /**
+     * Station 엔티티를 반환하는 메서드
+     *
+     * @param stationId
+     * @return Station
+     * @throws StationNotFoundException 존재하지 않는 id로 조회시
+     */
+    public Station getStationById(Long stationId) {
         return stationRepository.findById(stationId)
                 .orElseThrow(StationNotFoundException::new);
     }
