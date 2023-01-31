@@ -3,7 +3,6 @@ package subway.line;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,7 +19,6 @@ public class LineService {
     private final LineRepository lineRepository;
     private final StationRepository stationRepository;
 
-
     @Transactional
     public LineResponse saveLine(CreateLineRequest request) {
         Line line = request.toEntity();
@@ -30,19 +28,17 @@ public class LineService {
         Optional<Station> downStation = stationRepository.findById(request.getDownStationId());
         Optional<Station> upStation = stationRepository.findById(request.getUpStationId());
 
-        if(downStation.isPresent()){
+        if (downStation.isPresent()) {
             line.addStation(downStation.get());
-        }else{
+        } else {
             line.updateDownStationId(0L);
         }
 
-        if(upStation.isPresent()){
+        if (upStation.isPresent()) {
             line.addStation(upStation.get());
-        }else{
+        } else {
             line.updateUpStationId(0L);
         }
-
-
 
         return LineResponse.entityToResponse(line);
     }

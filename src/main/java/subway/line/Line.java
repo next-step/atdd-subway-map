@@ -3,9 +3,7 @@ package subway.line;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.*;
-
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import subway.station.Station;
@@ -37,7 +35,7 @@ public class Line {
     @Column(name = "DISTANCE")
     private Integer distance;
 
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "LINE_ID", referencedColumnName = "LINE_ID")
     private List<Station> stationList;
 
@@ -60,15 +58,15 @@ public class Line {
         return stationList;
     }
 
-    public void updateDownStationId(Long id){
+    public void updateDownStationId(Long id) {
         this.downStationId = id;
     }
 
-    public void updateUpStationId(Long id){
+    public void updateUpStationId(Long id) {
         this.upStationId = id;
     }
 
-    public void addStation(Station station){
+    public void addStation(Station station) {
         if (stationList == null) {
             stationList = new ArrayList<>();
         }
