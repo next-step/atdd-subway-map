@@ -100,12 +100,7 @@ public class LineAcceptanceTest {
         getSaveLineResponse(params);
 
         //when
-        ExtractableResponse<Response> findResponse = RestAssured
-                .given()
-                .when()
-                .get("/lines/" + id)
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> findResponse = getFindResponse(id);
 
         //then
         String lineName = findResponse.body().jsonPath().get("name");
@@ -113,6 +108,15 @@ public class LineAcceptanceTest {
 
         Assertions.assertThat(lineName).isEqualTo(lineFourName);
         Assertions.assertThat(lineColor).isEqualTo(lineFourColor);
+    }
+
+    private ExtractableResponse<Response> getFindResponse(Long id) {
+        return RestAssured
+                .given()
+                .when()
+                .get("/lines/" + id)
+                .then().log().all()
+                .extract();
     }
 
     private ExtractableResponse<Response> getReadResponses() {
