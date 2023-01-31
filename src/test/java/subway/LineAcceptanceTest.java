@@ -22,7 +22,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class LineAcceptanceTest extends BaseAcceptanceTest {
 
-
     @Test
     @DisplayName("지하철 노선 생성")
     void createLine() {
@@ -37,7 +36,6 @@ class LineAcceptanceTest extends BaseAcceptanceTest {
                 , () -> assertThat(response.jsonPath().getList("stations", Station.class)).hasSize(2));
 
     }
-
 
     @Test
     @DisplayName("지하철 노선 목록 조회")
@@ -104,7 +102,6 @@ class LineAcceptanceTest extends BaseAcceptanceTest {
 
     }
 
-
     @Test
     @DisplayName("지하철 노선 삭제")
     void deleteLine() {
@@ -118,7 +115,6 @@ class LineAcceptanceTest extends BaseAcceptanceTest {
 
         //then 해당 지하철 노선 정보는 삭제된다
         assertThat(deleteLineResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-
     }
 
     @Test
@@ -132,7 +128,39 @@ class LineAcceptanceTest extends BaseAcceptanceTest {
         //then 구간을 추가한다.
         ExtractableResponse<Response> response = addSection(신분당선Id, 정자역Id, 판교역Id);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+    }
 
+    @Test
+    @DisplayName("지하철 구간 생성 - 새로운 구간의 상행역은 노선의 하행역이어야 함")
+    void createSectionEqualEndStation() {
+        //when 지하철 노선을 생성하고
+        Long 정자역Id = createStation("정자역");
+        Long 판교역Id = createStation("판교역");
+        Long 신분당선Id = createLine("신분당선", "red", 정자역Id, 판교역Id).jsonPath().getLong("id");
+        addSection(신분당선Id, 정자역Id, 판교역Id);
+
+        //then 구간을 추가한다.
+        Long 청계산입구역Id = createStation("청계산입구역");
+        Long 양재역Id = createStation("양재역");
+        ExtractableResponse<Response> response = addSection(신분당선Id, 청계산입구역Id, 양재역Id);
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @Test
+    @DisplayName("지하철 구간 생성 - 새로운 구간의 하행역은 등록된 역일 수 없다.")
+    void createSectionWhenDuplicate() {
+        //when 지하철 노선을 생성하고
+        Long 정자역Id = createStation("정자역");
+        Long 판교역Id = createStation("판교역");
+        Long 신분당선Id = createLine("신분당선", "red", 정자역Id, 판교역Id).jsonPath().getLong("id");
+        addSection(신분당선Id, 정자역Id, 판교역Id);
+
+        //then 구간을 추가한다.
+        Long 양재역Id = createStation("양재역");
+        ExtractableResponse<Response> response = addSection(신분당선Id, 양재역Id, 판교역Id);
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     @Test
@@ -141,17 +169,15 @@ class LineAcceptanceTest extends BaseAcceptanceTest {
         //given 지하철 역과 노선을 생성한다. 구간 2개를 추가한다.
         Long 정자역Id = createStation("정자역");
         Long 판교역Id = createStation("판교역");
-        Long 청계산입구역Id = createStation("청계산입구역");
-
         Long 신분당선Id = createLine("신분당선", "red", 정자역Id, 판교역Id).jsonPath().getLong("id");
 
+        Long 청계산입구역Id = createStation("청계산입구역");
 
         Long section1 = addSection(신분당선Id, 정자역Id, 판교역Id).jsonPath().getLong("id");
         Long section2 = addSection(신분당선Id, 판교역Id, 청계산입구역Id).jsonPath().getLong("id");
 
         //when 구간 1개를 삭제한다.
-        ExtractableResponse<Response> response
-                = AcceptanceExecutor.delete("/lines/" + 신분당선Id + "/sections?sectionId=" + section2);
+        ExtractableResponse<Response> response  = deleteSection(신분당선Id, section2);
 
         //then 노선 조회 시 구간이 1개만 조회된다.
         LineResponse lineResponse = AcceptanceExecutor.get("/lines/" + 신분당선Id, LineResponse.class);
@@ -161,9 +187,48 @@ class LineAcceptanceTest extends BaseAcceptanceTest {
                 () -> assertThat(lineResponse.getSections()).hasSize(1),
                 () -> assertThat(lineResponse.getSections().get(0).getId()).isEqualTo(section1)
         );
-
-
     }
+
+    @Test
+    @DisplayName("지하철 구간 삭제 실패 - 마지막 구간이 아닌 경우")
+    void deleteSectionWhenNotLast() {
+        //given 지하철 역과 노선을 생성한다. 구간 2개를 추가한다.
+        Long 정자역Id = createStation("정자역");
+        Long 판교역Id = createStation("판교역");
+        Long 청계산입구역Id = createStation("청계산입구역");
+
+        Long 신분당선Id = createLine("신분당선", "red", 정자역Id, 판교역Id).jsonPath().getLong("id");
+
+        Long section1 = addSection(신분당선Id, 정자역Id, 판교역Id).jsonPath().getLong("id");
+        Long section2 = addSection(신분당선Id, 판교역Id, 청계산입구역Id).jsonPath().getLong("id");
+        //when 첫번째 구간을 삭제한다.
+        ExtractableResponse<Response> response = deleteSection(신분당선Id, section1);
+
+        //then 400 반환
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @Test
+    @DisplayName("지하철 구간 삭제 실패 - 구간이 하나만 있는 경우")
+    void deleteSectionWhenOnlyOne() {
+        //given 지하철 역과 노선을 생성한다. 구간 2개를 추가한다.
+        Long 정자역Id = createStation("정자역");
+        Long 판교역Id = createStation("판교역");
+
+        Long 신분당선Id = createLine("신분당선", "red", 정자역Id, 판교역Id).jsonPath().getLong("id");
+        Long section1 = addSection(신분당선Id, 정자역Id, 판교역Id).jsonPath().getLong("id");
+
+        //when 첫번째 구간을 삭제한다.
+        ExtractableResponse<Response> response = deleteSection(신분당선Id, section1);
+
+        //then 400 반환
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    private static ExtractableResponse<Response> deleteSection(Long 신분당선Id, Long sectionId) {
+        return AcceptanceExecutor.delete("/lines/" + 신분당선Id + "/sections?sectionId=" + sectionId);
+    }
+
 
     private static ExtractableResponse<Response> addSection(Long lineId, Long upStationId, Long downStationId) {
         SectionRequest sectionRequest = new SectionRequest();
@@ -184,7 +249,6 @@ class LineAcceptanceTest extends BaseAcceptanceTest {
 
         return AcceptanceExecutor.post("/lines", lineRequest);
     }
-
 
     private static Long createStation(String name) {
         return AcceptanceExecutor.post("/stations", new StationRequest(name)).jsonPath().getLong("id");
