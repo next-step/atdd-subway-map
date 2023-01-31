@@ -25,6 +25,10 @@ public class LineAcceptanceTest {
         RestAssured.port = port;
     }
 
+    /**
+     * When 지하철 노선을 생성하면
+     * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다 => 지하철 노선 목록의 이름 중에 1호선이 있다.
+     */
     @Test
     void createLine() {
         //when
@@ -34,8 +38,25 @@ public class LineAcceptanceTest {
         final Map<String, String> params = new HashMap<>();
         putParams(params, lineName, lineColor);
 
-        //then
         getSaveLineResponse(params);
+
+        //then
+        ExtractableResponse<Response> readResponses = getReadResponses();
+
+        Assertions.assertThat(readResponses.body().jsonPath().getList("name")).contains(lineName);
+    }
+
+    private ExtractableResponse<Response> getReadResponses() {
+        ExtractableResponse<Response> readResponse = RestAssured
+                .given()
+                .when().get("/lines")
+                .then().log().all()
+                .extract();
+
+        Assertions.assertThat(readResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        return readResponse;
+
     }
 
     private void putParams(Map<String, String> params, String lineName, String lineColor) {
