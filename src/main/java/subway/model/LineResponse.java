@@ -1,4 +1,7 @@
-package subway;
+package subway.model;
+
+import subway.entity.Line;
+import subway.entity.Station;
 
 import java.util.List;
 import java.util.stream.Collectors;

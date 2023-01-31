@@ -1,4 +1,6 @@
-package subway;
+package subway.model;
+
+import subway.entity.Station;
 
 public class StationResponse {
     private Long id;

@@ -1,6 +1,7 @@
-package subway;
+package subway.entity;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 public class Line {
@@ -15,24 +16,22 @@ public class Line {
     @Column(length = 50, nullable = false)
     private String color;
 
-    @Column
-    private Long upStationId;
-
-    @Column
-    private Long downStationId;
-
-    @Column
-    private Integer distance;
+    @OneToMany(mappedBy = "line", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Section> sections;
 
     protected Line() {
     }
 
-    public Line(String name, String color, Long upStationId, Long downStationId, Integer distance) {
+    public Line(String name, String color, List<Section> sections) {
         this.name = name;
         this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
-        this.distance = distance;
+        this.sections = sections;
+    }
+
+    public static Line create(String name, String color, Section section) {
+        Line line = new Line(name, color, List.of(section));
+        section.initLine(line);
+        return line;
     }
 
     public Long getId() {
@@ -47,20 +46,17 @@ public class Line {
         return color;
     }
 
-    public Long getUpStationId() {
-        return upStationId;
-    }
-
-    public Long getDownStationId() {
-        return downStationId;
-    }
-
-    public Integer getDistance() {
-        return distance;
+    public List<Section> getSections() {
+        return sections;
     }
 
     public void updateNameAndColor(String name, String color) {
         this.name = name;
         this.color = color;
+    }
+
+    public void addSection(Section section) {
+        this.sections.add(section);
+        section.initLine(this);
     }
 }

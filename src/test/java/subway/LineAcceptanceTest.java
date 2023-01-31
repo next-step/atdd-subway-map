@@ -30,11 +30,10 @@ public class LineAcceptanceTest {
      * When 지하철 노선을 생성하면
      * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
      */
-    @Test
     @DisplayName("지하철 노선을 생성한다")
-    void createLine() {
+    static void createLine(Map<String, Object> body) {
         // when
-        ExtractableResponse<Response> response = createRequest(createBody("신분당선"));
+        ExtractableResponse<Response> response = createRequest(body);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -42,9 +41,9 @@ public class LineAcceptanceTest {
         // then
         ExtractableResponse<Response> linesResponse = getAllLinesRequest();
         Assertions.assertAll(
-            withNames(linesResponse, "신분당선"),
-            withColors(linesResponse, "bg-red-600"),
-            withStationIds(linesResponse, 1L, 2L)
+            withNames(linesResponse, (String) body.get("name")),
+            withColors(linesResponse, (String) body.get("color")),
+            withStationIds(linesResponse, (Long) body.get("upStationId"), (Long) body.get("downStationId"))
         );
     }
 
@@ -152,7 +151,7 @@ public class LineAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
-    private ExtractableResponse<Response> createRequest(Map<String, Object> body) {
+    static private ExtractableResponse<Response> createRequest(Map<String, Object> body) {
         return RestAssured.given().log().all()
             .body(body)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -161,7 +160,7 @@ public class LineAcceptanceTest {
             .extract();
     }
 
-    private ExtractableResponse<Response> getAllLinesRequest() {
+    static private ExtractableResponse<Response> getAllLinesRequest() {
         return RestAssured.given().log().all()
             .when().get("/lines")
             .then().log().all()
@@ -195,15 +194,15 @@ public class LineAcceptanceTest {
         return lines.getOrDefault(name, lines.get("신분당선"));
     }
 
-    private Executable withNames(ExtractableResponse<Response> response, String...names) {
+    static private Executable withNames(ExtractableResponse<Response> response, String...names) {
         return () -> assertThat(response.jsonPath().getList("name", String.class)).containsAnyOf(names);
     }
 
-    private Executable withColors(ExtractableResponse<Response> response, String...colors) {
+    static private Executable withColors(ExtractableResponse<Response> response, String...colors) {
         return () -> assertThat(response.jsonPath().getList("color", String.class)).containsAnyOf(colors);
     }
 
-    private Executable withStationIds(ExtractableResponse<Response> response, Long...ids) {
+    static private Executable withStationIds(ExtractableResponse<Response> response, Long...ids) {
         return () -> assertThat(response.jsonPath().getList("stations.id.flatten()", Long.class)).containsExactlyInAnyOrder(ids);
     }
 
