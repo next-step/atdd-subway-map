@@ -1,6 +1,6 @@
 package subway;
 
-import static org.assertj.core.api.Assertions.*;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -37,9 +37,10 @@ public class SectionAcceptanceTest {
 
         // then
         ExtractableResponse<Response> response = client.findLineById(lineId);
+        List<Long> stationIds = response.jsonPath().getList("stations.id", Long.class);
 
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.jsonPath().getList("stations.id", Long.class)).containsExactly(1L, 2L, 3L);
+        RestAssuredValidationUtils.validateStatusCode(response, HttpStatus.OK);
+        RestAssuredValidationUtils.validateFieldContainsExactly(stationIds, 1L, 2L, 3L);
     }
 
     @Test
@@ -49,7 +50,7 @@ public class SectionAcceptanceTest {
         client.createStation("지하철역4");
         ExtractableResponse<Response> response = client.createSection(lineId, new SectionRequest(3L, 4L, 10L));
 
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        RestAssuredValidationUtils.validateStatusCode(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Test
@@ -59,7 +60,7 @@ public class SectionAcceptanceTest {
         ExtractableResponse<Response> response = client.createSection(lineId, new SectionRequest(2L, 3L, 10L));
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        RestAssuredValidationUtils.validateStatusCode(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Test
@@ -73,9 +74,9 @@ public class SectionAcceptanceTest {
 
         // then
         ExtractableResponse<Response> response = client.findLineById(1L);
-
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.jsonPath().getList("stations.id", Long.class)).hasSize(2);
+        List<Long> stationIds = response.jsonPath().getList("stations.id", Long.class);
+        RestAssuredValidationUtils.validateStatusCode(response, HttpStatus.OK);
+        RestAssuredValidationUtils.validateFieldBodyHasSize(stationIds, 2);
     }
 
     @Test
@@ -85,7 +86,7 @@ public class SectionAcceptanceTest {
         ExtractableResponse<Response> response = client.deleteSection(1L, 3L);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        RestAssuredValidationUtils.validateStatusCode(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Test
@@ -95,6 +96,6 @@ public class SectionAcceptanceTest {
         ExtractableResponse<Response> response = client.deleteSection(1L, 2L);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        RestAssuredValidationUtils.validateStatusCode(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
