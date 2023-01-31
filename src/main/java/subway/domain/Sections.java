@@ -22,12 +22,12 @@ public class Sections {
     }
 
     public boolean hasLastStation(Station upStation) {
-        List<Station> stations = getStations();
-        return stations.get(stations.size() - 1).equals(upStation);
+        return getLastStation().equals(upStation);
     }
 
-    public boolean hasStation(Station station) {
-        return getStations().contains(station);
+    public Station getLastStation() {
+        List<Station> stations = getStations();
+        return stations.get(stations.size() - 1);
     }
 
     public List<Station> getStations() {
@@ -38,9 +38,8 @@ public class Sections {
         return stations;
     }
 
-    public Station getLastStation() {
-        List<Station> stations = getStations();
-        return stations.get(stations.size() - 1);
+    public boolean hasStation(Station station) {
+        return getStations().contains(station);
     }
 
     public boolean hasSingleSection() {
