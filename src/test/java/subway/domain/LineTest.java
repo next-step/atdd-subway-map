@@ -12,7 +12,7 @@ class LineTest {
     @DisplayName("노선의 이름과 색을 수정한다.")
     @Test
     void updateTest() {
-        Line line = new Line("A", "red", null, null, 0);
+        Line line = new Line("A", "red");
 
         line.update("B", "blue");
 

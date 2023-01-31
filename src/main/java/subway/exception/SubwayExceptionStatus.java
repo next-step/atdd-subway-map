@@ -4,7 +4,8 @@ import org.springframework.http.HttpStatus;
 
 public enum SubwayExceptionStatus {
     STATION_NOT_FOUND(HttpStatus.NOT_FOUND, "지하철역을 찾을 수 없습니다."),
-    LINE_NOT_FOUND(HttpStatus.NOT_FOUND, "노선을 찾을 수 없습니다.");
+    LINE_NOT_FOUND(HttpStatus.NOT_FOUND, "노선을 찾을 수 없습니다."),
+    ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "에러 발생");
 
     private final HttpStatus status;
     private final String message;

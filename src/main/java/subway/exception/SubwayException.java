@@ -6,6 +6,10 @@ public class SubwayException extends RuntimeException {
 
     private final SubwayExceptionStatus status;
 
+    public SubwayException(String message) {
+        this(message, SubwayExceptionStatus.ERROR);
+    }
+
     public SubwayException(SubwayExceptionStatus status) {
         this(status.getMessage(), status);
     }

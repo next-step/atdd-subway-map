@@ -5,7 +5,6 @@ import subway.dto.station.StationResponse;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class LineResponse {
     private Long id;
@@ -26,11 +25,13 @@ public class LineResponse {
         return new LineResponse(line.getId(),
                 line.getName(),
                 line.getColor(),
-                Stream.of(line.getUpStation(), line.getDownStation())
+                line.getSections()
+                        .stations()
+                        .stream()
                         .map(StationResponse::from)
                         .collect(Collectors.toUnmodifiableList()),
                 line.getDistance()
-            );
+        );
     }
 
     public Long getId() {
