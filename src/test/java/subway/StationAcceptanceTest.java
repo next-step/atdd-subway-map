@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -67,19 +66,15 @@ public class StationAcceptanceTest {
                 .jsonPath()
                 .getList("name", String.class);
 
-        Assertions.assertAll(
-                () -> assertThat(stationNames.size()).isEqualTo(expectedStationNames.length),
-                () -> assertThat(stationNames).contains(expectedStationNames)
-        );
+        assertThat(stationNames).hasSize(expectedStationNames.length).contains(expectedStationNames);
     }
 
     @DisplayName("지하철역을 제거한다.")
     @Test
     void deleteStation() {
         // given
-        Long deleteStationId = 1L;
-
-        createStationResponsesBy("강남역", "양재역");
+        long deleteStationId = createStationResponseBy("강남역").jsonPath().getLong("id");
+        createStationResponseBy("양재역").jsonPath().getLong("id");
 
         // when
         deleteStationResponseBy(deleteStationId);
