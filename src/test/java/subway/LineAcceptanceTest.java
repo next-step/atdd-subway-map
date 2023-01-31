@@ -12,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.jdbc.Sql;
 import subway.exception.LineNotFoundException;
 import subway.line.LineCreateRequest;
@@ -25,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관리 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-//@Sql("/truncate.sql")
+@TestExecutionListeners(value = {AcceptanceTestTruncateListener.class}, mergeMode = TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS)
 public class LineAcceptanceTest {
     private static final String ID = "id";
     private static final String NAME = "name";
@@ -42,15 +43,11 @@ public class LineAcceptanceTest {
 
     private static final Long DISTANCE_VALUE = 10L;
 
-    @Autowired
-    private DataBaseCleanUp dataBaseCleanUp;
-
     private Long upStationId;
     private Long downStationId;
 
     @BeforeEach
     void setUp() {
-        dataBaseCleanUp.execute();
         upStationId = 지하철역생성후_식별번호_반환(StationAcceptanceTest.GANGNAM);
         downStationId = 지하철역생성후_식별번호_반환(StationAcceptanceTest.YANGJAE);
     }
