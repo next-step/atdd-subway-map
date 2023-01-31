@@ -1,4 +1,4 @@
-package subway.line;
+package subway.section;
 
 import lombok.Getter;
 

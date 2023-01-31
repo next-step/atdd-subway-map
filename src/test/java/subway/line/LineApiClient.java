@@ -4,6 +4,7 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.MediaType;
+import subway.section.SectionRequest;
 
 public class LineApiClient {
     private static final String ENDPOINT_LINES = "/lines";
@@ -71,7 +72,7 @@ public class LineApiClient {
                 .extract();
     }
 
-    static ExtractableResponse<Response> requestAppendSection(Long lineId, Long upStationId, Long downStationId, Integer distance) {
+    public static ExtractableResponse<Response> requestAppendSection(Long lineId, Long upStationId, Long downStationId, Integer distance) {
         final String ENDPOINT = ENDPOINT_LINES + "/" + lineId.toString() + ENDPOINT_SECTIONS;
 
         SectionRequest sectionRequest = new SectionRequest(upStationId, downStationId, distance);

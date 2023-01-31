@@ -1,4 +1,4 @@
-package subway.line;
+package subway.section;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -9,10 +9,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.jdbc.Sql;
+import subway.line.LineApiClient;
+import subway.line.LineResponse;
 import subway.station.StationResponse;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.line.LineApiClient.*;
+import static subway.line.LineApiClient.requestAppendSection;
 import static subway.station.StationApiClient.requestCreateStation;
 
 @DisplayName("자하철 구간 관리 기능")
@@ -41,14 +43,14 @@ public class SectionAcceptanceTest {
     @Test
     void createSectionSuccess() {
         // given
-        LineResponse lineOne = requestCreateLine("1호선", "#0052A4", stationA.getId(), stationC.getId(), 7)
+        LineResponse lineOne = LineApiClient.requestCreateLine("1호선", "#0052A4", stationA.getId(), stationC.getId(), 7)
                 .body().as(LineResponse.class);
 
         // when
         requestAppendSection(lineOne.getId(), stationC.getId(), stationB.getId(), 10);
 
         // then
-        ExtractableResponse<Response> showLineResponse = requestShowLine(lineOne.getId());
+        ExtractableResponse<Response> showLineResponse = LineApiClient.requestShowLine(lineOne.getId());
         LineResponse updatedLineOne = showLineResponse.body().as(LineResponse.class);
 
         assertThat(showLineResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -65,7 +67,7 @@ public class SectionAcceptanceTest {
     @Test
     void createSectionFail() {
         // given
-        LineResponse lineOne = requestCreateLine("1호선", "#0052A4", stationA.getId(), stationC.getId(), 7)
+        LineResponse lineOne = LineApiClient.requestCreateLine("1호선", "#0052A4", stationA.getId(), stationC.getId(), 7)
                 .body().as(LineResponse.class);
 
         // when
@@ -74,7 +76,7 @@ public class SectionAcceptanceTest {
         assertThat(appendSectionResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
 
         // then
-        ExtractableResponse<Response> showLineResponse = requestShowLine(lineOne.getId());
+        ExtractableResponse<Response> showLineResponse = LineApiClient.requestShowLine(lineOne.getId());
         LineResponse updatedLineOne = showLineResponse.body().as(LineResponse.class);
 
         assertThat(showLineResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -92,7 +94,7 @@ public class SectionAcceptanceTest {
     @Test
     void deleteSectionSuccess() {
         // given
-        LineResponse lineOne = requestCreateLine("1호선", "#0052A4", stationA.getId(), stationC.getId(), 7)
+        LineResponse lineOne = LineApiClient.requestCreateLine("1호선", "#0052A4", stationA.getId(), stationC.getId(), 7)
                 .body().as(LineResponse.class);
 
         requestAppendSection(lineOne.getId(), stationC.getId(), stationB.getId(), 10);

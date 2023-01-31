@@ -1,9 +1,12 @@
 package subway.line;
 
 import lombok.Getter;
+import subway.section.Section;
 import subway.station.Station;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Table(name = "lines")
@@ -27,18 +30,19 @@ public class Line {
     @JoinColumn(name = "down_station_id")
     private Station downStation;
 
-//    @ManyToMany
-//    @JoinTable(name = "line_stations")
-//    private List<Station> stations = new ArrayList<>();
+    @OneToMany(cascade = CascadeType.PERSIST)
+    @JoinTable(name = "line_sections", joinColumns = @JoinColumn(name = "line_id"), inverseJoinColumns = @JoinColumn(name = "section_id"))
+    private final List<Section> sections = new ArrayList<>();
 
     public Line() {
     }
 
-    public Line(String name, String color, Station upStation, Station downStation) {
-        this.name = name;
-        this.color = color;
+    public Line(LineRequest lineRequest, Station upStation, Station downStation) {
+        this.name = lineRequest.getName();
+        this.color = lineRequest.getColor();
         this.upStation = upStation;
         this.downStation = downStation;
+        this.sections.add(new Section(lineRequest.getDistance(), upStation, downStation));
     }
 
     public void update(String name, String color) {

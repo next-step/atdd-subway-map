@@ -2,6 +2,8 @@ package subway.line;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.section.SectionRequest;
+import subway.section.SectionService;
 import subway.station.Station;
 import subway.station.StationResponse;
 import subway.station.StationService;
@@ -28,7 +30,7 @@ public class LineService {
         Station upStation = stationService.findOne(lineRequest.getUpStationId());
         Station downStation = stationService.findOne(lineRequest.getDownStationId());
 
-        Line line = new Line(lineRequest.getName(), lineRequest.getColor(), upStation, downStation);
+        Line line = new Line(lineRequest, upStation, downStation);
         Line savedLine = lineRepository.save(line);
 
         return createLineResponse(savedLine);
