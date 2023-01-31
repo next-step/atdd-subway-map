@@ -1,7 +1,7 @@
 package subway.exception;
 
 public class SectionCannotAddException extends RuntimeException {
-    public SectionCannotAddException() {
-        super();
+    public SectionCannotAddException(String message) {
+        super(message);
     }
 }

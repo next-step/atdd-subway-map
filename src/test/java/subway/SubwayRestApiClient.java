@@ -74,7 +74,9 @@ public class SubwayRestApiClient {
 
     public ExtractableResponse<Response> deleteSection(Long lineId, Long stationId) {
         return RestAssured.given().log().all()
-            .when().delete("/lines/{lineId}/sections?=stationId={stationId}", lineId, stationId)
+            .pathParam("lineId", lineId)
+            .queryParam("stationId", stationId)
+            .when().delete("/lines/{lineId}/sections")
             .then().log().all()
             .extract();
     }

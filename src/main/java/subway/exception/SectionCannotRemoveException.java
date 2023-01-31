@@ -1,7 +1,7 @@
 package subway.exception;
 
 public class SectionCannotRemoveException extends RuntimeException {
-    public SectionCannotRemoveException() {
-        super();
+    public SectionCannotRemoveException(String message) {
+        super(message);
     }
 }
