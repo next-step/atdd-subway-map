@@ -1,11 +1,7 @@
 package subway.ui.dto;
 
 import subway.domain.Line;
-import subway.domain.Section;
-import subway.domain.Sections;
 import subway.domain.Station;
-
-import java.util.List;
 
 public class LineRequest {
 
@@ -45,15 +41,7 @@ public class LineRequest {
         return downStationId;
     }
 
-    public Integer getDistance() {
-        return distance;
-    }
-
-    public Line toEntity(final List<Section> sections) {
-        return new Line(this.name, this.color, Sections.from(sections));
-    }
-
-    public Section toSectionEntity(final Station upStation, final Station downStation) {
-        return new Section(upStation, downStation, this.distance);
+    public Line toEntity(final Station upStation, final Station downStation) {
+        return new Line(this.name, this.color, upStation, downStation, this.distance);
     }
 }
