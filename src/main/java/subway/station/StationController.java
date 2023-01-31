@@ -1,4 +1,4 @@
-package subway;
+package subway.station;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +23,11 @@ public class StationController {
     @GetMapping(value = "/stations")
     public ResponseEntity<List<StationResponse>> showStations() {
         return ResponseEntity.ok().body(stationService.findAllStations());
+    }
+
+    @GetMapping(value = "/stations/{id}")
+    public ResponseEntity<StationResponse> showStation(@PathVariable Long id) {
+        return ResponseEntity.ok().body(stationService.findById(id));
     }
 
     @DeleteMapping("/stations/{id}")

@@ -1,24 +1,29 @@
 package subway;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
+import subway.Mocks.MockStation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static subway.StationTestUtils.인수테스트_Given_준비;
+import static subway.StationTestUtils.지하철역_삭제;
+import static subway.StationTestUtils.지하철역_생성;
+import static subway.StationTestUtils.지하철역_조회;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 public class StationAcceptanceTest {
     /**
      * When 지하철역을 생성하면
@@ -30,9 +35,9 @@ public class StationAcceptanceTest {
     void createStation() {
         // when
         Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
+        params.put("name", MockStation.강남역);
 
-        ExtractableResponse<Response> response = prepareRestAssuredGiven(params)
+        ExtractableResponse<Response> response = 인수테스트_Given_준비(params)
             .when().post("/stations")
             .then().log().all()
             .extract();
@@ -41,11 +46,8 @@ public class StationAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames = prepareRestAssuredGiven()
-            .when().get("/stations")
-            .then().log().all()
-            .extract().jsonPath().getList("name", String.class);
-        assertThat(stationNames).containsAnyOf("강남역");
+        List<String> stationNames = 지하철역_조회();
+        assertThat(stationNames).containsAnyOf(MockStation.강남역);
     }
 
     /**
@@ -57,21 +59,17 @@ public class StationAcceptanceTest {
     @DisplayName("등록된 지하철역 목록을 조회한다.")
     void showStations() {
         // given
-        String stationOne = "서울대입구역";
-        String stationTwo = "봉천역";
-        createStation(stationOne);
-        createStation(stationTwo);
+        지하철역_생성(List.of(MockStation.서울대입구역, MockStation.봉천역));
 
         // when
-        List<String> stationNames = prepareRestAssuredGiven()
-            .when().get("/stations")
-            .then().log().all()
-            .extract().jsonPath().getList("name", String.class);
+        List<String> stationNames = 지하철역_조회();
 
         // then
         assertAll(
             () -> assertThat(stationNames.size()).isEqualTo(2),
-            () -> assertThat(stationNames).containsAll(List.of(stationOne, stationTwo))
+            () -> assertThat(stationNames).containsAll(
+                List.of(MockStation.서울대입구역, MockStation.봉천역)
+            )
         );
     }
 
@@ -85,37 +83,12 @@ public class StationAcceptanceTest {
     void deleteStation() {
         // given
         String stationName = "강남역";
-        Long id = createStation(stationName);
+        Long id = 지하철역_생성(stationName);
 
         // when
-        RestAssured
-            .given().log().all().contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().delete("/stations/" + id);
+        지하철역_삭제(id);
 
         // then
-        List<String> stationNames = prepareRestAssuredGiven()
-            .when().get("/stations")
-            .then().log().all()
-            .extract().jsonPath().getList("name", String.class);
-
-        assertThat(stationNames).doesNotContain(stationName);
-    }
-
-    private static Long createStation(String name) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-
-        return prepareRestAssuredGiven(params)
-            .when()
-                .post("/stations")
-            .then().extract().jsonPath().getLong("id");
-    }
-
-    private static RequestSpecification prepareRestAssuredGiven(Map<String, String> body) {
-        return prepareRestAssuredGiven().body(body);
-    }
-
-    private static RequestSpecification prepareRestAssuredGiven() {
-        return RestAssured.given().log().all().contentType(MediaType.APPLICATION_JSON_VALUE);
+        assertThat(지하철역_조회()).doesNotContain(stationName);
     }
 }
