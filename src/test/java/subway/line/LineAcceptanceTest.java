@@ -62,7 +62,6 @@ public class LineAcceptanceTest {
      * When 지하철 노선 목록을 조회하면
      * Then 2개의 지하철 노선을 응답 받는다
      */
-
     @DisplayName("지하철노선 목록을 조회한다.")
     @Test
     void getAllLines() {

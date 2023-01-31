@@ -2,15 +2,13 @@ package subway.presentation.line.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import subway.application.line.LineFacade;
 import subway.presentation.line.dto.request.LineRequest;
 import subway.presentation.line.dto.response.LineResponse;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/lines")
@@ -24,4 +22,10 @@ public class LineController {
         LineResponse line = lineFacade.createLine(request);
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
+
+    @GetMapping("")
+    public ResponseEntity<List<LineResponse>> getAllLines() {
+        return ResponseEntity.ok(lineFacade.getAllLines());
+    }
+
 }
