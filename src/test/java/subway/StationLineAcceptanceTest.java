@@ -43,11 +43,7 @@ public class StationLineAcceptanceTest {
      */
     @Test
     void createStationLine() {
-        ExtractableResponse<Response> response =
-                RestAssured
-                        .given().spec(getRequestSpecification()).body(SIN_BUN_DANG_STATION_LINE).log().all()
-                        .when().post("/lines")
-                        .then().log().all().extract();
+        ExtractableResponse<Response> response = StationUtils.createStationLine(SIN_BUN_DANG_STATION_LINE);
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response.header("Location")).isEqualTo("/lines/1");
