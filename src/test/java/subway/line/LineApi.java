@@ -11,6 +11,7 @@ import static io.restassured.RestAssured.given;
 
 public class LineApi {
 
+    public static final String LINE_ID_KEY = "id";
     public static final String LINE_NAME_KEY = "name";
     public static final String LINE_COLOR_KEY = "color";
     public static final String LINE_UP_STATION_ID_KEY = "upStationId";
@@ -42,6 +43,23 @@ public class LineApi {
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                     .get("/lines")
+                .then()
+                    .log().all()
+                    .extract();
+    }
+
+    public static ExtractableResponse<Response> updateLine(Long lineId, String name, String color) {
+        Map<String, Object> params = new HashMap<>();
+        params.put(LINE_NAME_KEY, name);
+        params.put(LINE_COLOR_KEY, color);
+
+        return given()
+                    .log().all()
+                    .pathParam(LINE_ID_KEY, lineId)
+                    .body(params)
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                    .put("/lines/{id}")
                 .then()
                     .log().all()
                     .extract();

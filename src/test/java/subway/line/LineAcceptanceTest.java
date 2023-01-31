@@ -8,6 +8,7 @@ import org.springframework.test.context.jdbc.Sql;
 import setting.RandomPortSetting;
 import subway.common.util.CommonApi;
 import subway.common.util.CommonValidationUtils;
+import subway.line.util.ExtractionUtils;
 
 import static subway.line.LineApi.LINE_NAME_KEY;
 import static subway.line.MockLine.분당선;
@@ -79,6 +80,16 @@ public class LineAcceptanceTest extends RandomPortSetting {
     @Test
     @DisplayName("지하철노선 수정")
     void updateLine() {
+        // Given
+        ExtractableResponse<Response> responseOfCreateLine = LineApi.createLine(신분당선);
+        Long lineId = ExtractionUtils.getLineId(responseOfCreateLine);
+
+        // When
+        LineApi.updateLine(lineId, 분당선.getName(), 분당선.getColor());
+
+        // Then
+        ExtractableResponse<Response> responseOfShowResource = CommonApi.showResource(responseOfCreateLine);
+        CommonValidationUtils.checkExistence(responseOfShowResource, LINE_NAME_KEY, 분당선);
     }
 
     /**

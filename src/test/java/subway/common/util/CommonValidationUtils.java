@@ -14,6 +14,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class CommonValidationUtils {
 
+    private CommonValidationUtils() {}
+
     public static void checkRequestCreated(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }

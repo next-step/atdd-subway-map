@@ -8,8 +8,14 @@ import static io.restassured.RestAssured.given;
 
 public class CommonApi {
 
+    private CommonApi() {}
+
     public static final String LOCATION = "Location";
 
+    /**
+     * @param response 조회할 Resource의 location 정보가 기입된 response를 입력해야한다.
+     * @return
+     */
     public static ExtractableResponse<Response> showResource(ExtractableResponse<Response> response) {
         String location = response.header(LOCATION);
         return given()
