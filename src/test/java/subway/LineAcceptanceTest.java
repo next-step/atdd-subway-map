@@ -7,6 +7,7 @@ import org.hibernate.annotations.SQLDelete;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -24,7 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관리 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@Sql("/truncate.sql")
+//@Sql("/truncate.sql")
 public class LineAcceptanceTest {
     private static final String ID = "id";
     private static final String NAME = "name";
@@ -41,11 +42,15 @@ public class LineAcceptanceTest {
 
     private static final Long DISTANCE_VALUE = 10L;
 
+    @Autowired
+    private DataBaseCleanUp dataBaseCleanUp;
+
     private Long upStationId;
     private Long downStationId;
 
     @BeforeEach
     void setUp() {
+        dataBaseCleanUp.execute();
         upStationId = 지하철역생성후_식별번호_반환(StationAcceptanceTest.GANGNAM);
         downStationId = 지하철역생성후_식별번호_반환(StationAcceptanceTest.YANGJAE);
     }
