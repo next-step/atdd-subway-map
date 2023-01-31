@@ -1,12 +1,9 @@
 package subway.station;
 
-import io.restassured.RestAssured;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
+import subway.utils.RestAssuredClient;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -26,18 +23,17 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        var station = createStation(Map.ofEntries(entry("name", "강남역")));
-
-        // then
+        var station = RestAssuredClient.createStation(Map.ofEntries(entry("name", "강남역")));
         assertThat(station.jsonPath().getLong("id")).isEqualTo(1);
         assertThat(station.jsonPath().getString("name")).isEqualTo("강남역");
 
-        // then
-        var stations = getStations();
+        // when
+        var stations = RestAssuredClient.getStations();
 
         // then
         assertThat(stations.jsonPath().getList("$")).hasSize(1);
-        assertThat(stations.jsonPath().getList("id", Long.class).get(0)).isEqualTo(1L); // 더 깔끔하게 첫번째 원소의 id 접근하는 방법 없을까?
+        // TODO 더 깔끔하게 첫번째 원소의 id 접근하는 방법 없을까?
+        assertThat(stations.jsonPath().getList("id", Long.class).get(0)).isEqualTo(1L);
         assertThat(stations.jsonPath().getList("name", String.class).get(0)).isEqualTo("강남역");
     }
 
@@ -49,12 +45,12 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역 목록을 조회한다")
     @Test
     void listStation() {
-        // when
-        createStation(Map.ofEntries(entry("name", "강남역")));
-        createStation(Map.ofEntries(entry("name", "신논현역")));
+        // given
+        RestAssuredClient.createStation(Map.ofEntries(entry("name", "강남역")));
+        RestAssuredClient.createStation(Map.ofEntries(entry("name", "신논현역")));
 
-        // then
-        var stations = getStations();
+        // when
+        var stations = RestAssuredClient.getStations();
 
         // then
         assertThat(stations.jsonPath().getList("$")).hasSize(2);
@@ -70,39 +66,15 @@ public class StationAcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        createStation(Map.ofEntries(entry("name", "강남역")));
-
-        var stationsBefore = getStations();
+        RestAssuredClient.createStation(Map.ofEntries(entry("name", "강남역")));
+        var stationsBefore = RestAssuredClient.getStations();
         assertThat(stationsBefore.jsonPath().getList("$")).hasSize(1);
 
         // when
-        deleteStation(1L);
+        RestAssuredClient.deleteStation(1L);
 
         // then
-        var stationsAfter = getStations();
+        var stationsAfter = RestAssuredClient.getStations();
         assertThat(stationsAfter.jsonPath().getList("$")).isEmpty();
-    }
-
-    private static ExtractableResponse<Response> createStation(Map<String, String> requestParam) {
-        return RestAssured.given().log().all()
-                .body(requestParam)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
-    }
-
-    private static void deleteStation(Long id) {
-        RestAssured.given().log().all()
-                .when().delete("/stations/{id}", id)
-                .then().log().all()
-                .extract();
-    }
-
-    private static ExtractableResponse<Response> getStations() {
-        return RestAssured.given().log().all()
-                .when().get("/stations")
-                .then().log().all()
-                .extract();
     }
 }
