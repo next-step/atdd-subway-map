@@ -37,6 +37,14 @@ public class LineService {
                 .collect(Collectors.toList());
     }
 
+    public Line findLine(Long id) {
+        return lineRepository.findById(id)
+                .orElseThrow(NullPointerException::new);
+    }
+
+    public LineResponse getLine(Long id) {
+        return LineResponse.of(findLine(id));
+    }
 
     private Line toLineEntity(LineRequest lineRequest) {
         Station upStation = stationService.findStation(lineRequest.getUpStationId());

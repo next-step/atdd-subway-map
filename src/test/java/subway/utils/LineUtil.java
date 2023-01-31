@@ -47,4 +47,16 @@ public class LineUtil {
 
         return response.body().jsonPath();
     }
+
+    public static JsonPath showLineResultResponse(Long id) {
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all().contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().get("/lines/{id}", id)
+                .then().log().all()
+                .extract();
+
+        assertSuccessOk(response);
+
+        return response.body().jsonPath();
+    }
 }
