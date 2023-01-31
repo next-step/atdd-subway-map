@@ -26,19 +26,17 @@ class LineTest {
     @DisplayName("노선을 생성한다.")
     @Test
     void createLine() {
-
         final Section 첫번째_구간 = new Section(강남역, 양재역, 10);
-        final Line 노선_신분당선 = new Line(1L, 신분당선, 빨간색, Sections.from(List.of(첫번째_구간)));
+        final Line 노선_신분당선 = new Line(1L, 신분당선, 빨간색, new Sections(List.of(첫번째_구간)));
 
-        assertThat(노선_신분당선).isEqualTo(new Line(1L, 신분당선, 빨간색, Sections.from(List.of(첫번째_구간))));
+        assertThat(노선_신분당선).isEqualTo(new Line(1L, 신분당선, 빨간색, new Sections(List.of(첫번째_구간))));
     }
 
     @DisplayName("노선 정보를 수정한다.")
     @Test
     void updateLine() {
-
         final Section 첫번째_구간 = new Section(강남역, 양재역, 10);
-        final Line 노선_신분당선 = new Line(1L, 신분당선, 빨간색, Sections.from(List.of(첫번째_구간)));
+        final Line 노선_신분당선 = new Line(1L, 신분당선, 빨간색, new Sections(List.of(첫번째_구간)));
         노선_신분당선.updateLine(이호선, 녹색);
 
         assertAll(
@@ -51,12 +49,11 @@ class LineTest {
     @DisplayName("노선의 구간을 추가한다.")
     @Test
     void addSection() {
-
         final Section 첫번째_구간 = new Section(1L, 강남역, 양재역, 10);
         final Line 노선_신분당선 = new Line(1L, 신분당선, 빨간색, 구간_신규_등록(첫번째_구간));
         노선_신분당선.addSection(양재역, 몽촌토성역, 10);
 
-        final List<Station> 노선_구간_목록 = convertToStation(노선_신분당선.getSections().getSections());
+        final List<Station> 노선_구간_목록 = convertToStation(노선_신분당선.getSectionsList());
         assertAll(
                 () -> assertThat(노선_구간_목록).hasSize(3),
                 () -> assertThat(노선_구간_목록).contains(강남역, 양재역, 몽촌토성역)
@@ -66,7 +63,6 @@ class LineTest {
     @DisplayName("노선 구간을 삭제한다.")
     @Test
     void removeSection() {
-
         final Section 첫번째_구간 = new Section(1L, 강남역, 양재역, 10);
         final Section 두번째_구간 = new Section(2L, 양재역, 몽촌토성역, 10);
         final Line 이호선 = new Line(1L, "2호선", "bg-red-600", 구간_복수_등록(첫번째_구간, 두번째_구간));
@@ -74,8 +70,8 @@ class LineTest {
         이호선.removeSection(몽촌토성역);
 
         assertAll(
-                () -> assertThat(이호선.getSections().getSections()).hasSize(1),
-                () -> assertThat(이호선.getSections().getSections().get(0)).isEqualTo(첫번째_구간)
+                () -> assertThat(이호선.getSectionsList()).hasSize(1),
+                () -> assertThat(이호선.getSectionsList().get(0)).isEqualTo(첫번째_구간)
         );
     }
 

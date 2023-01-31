@@ -42,24 +42,16 @@ public class TestFixtureSection {
 
     public static Sections 구간_신규_등록(final Section section) {
         final List<Section> sections = new ArrayList<>(List.of(section));
-        return Sections.from(sections);
+        return new Sections(sections);
     }
 
     public static Sections 구간_복수_등록(final Section...section) {
         final List<Section> sections = new ArrayList<>(Arrays.asList(section));
-        return Sections.from(sections);
+        return new Sections(sections);
     }
 
     public static void 지하철_노선_추가됨(final ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-    }
-
-    public static ExtractableResponse<Response> 지하철_노선_구간_목록_조회_요청(final Long lineId) {
-        return RestAssured
-                .given().log().all()
-                .when().get("/lines/" + lineId + "/sections")
-                .then().log().all()
-                .extract();
     }
 
     public static void 지하철_노선_구간_추가_실패됨(final ExtractableResponse<Response> response, final HttpStatus httpStatus, final String message) {
