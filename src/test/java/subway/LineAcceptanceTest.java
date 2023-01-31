@@ -17,6 +17,7 @@ import subway.subway.Station;
 import subway.subway.StationResponse;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -81,12 +82,12 @@ public class LineAcceptanceTest {
         createLine(secondLineRequest);
 
         // Then
-        var response = getLineResponseList();
-        List<String> name = response.jsonPath().getList("name", String.class);
+        var lineResponseList = getLineResponseList();
+        List<String> nameList = lineResponseList.stream().map(LineResponse::getName).collect(Collectors.toList());
 
-        assertThat(name).hasSize(2);
-        assertThat(name).containsAnyOf("신분당선");
-        assertThat(name).containsAnyOf("분당선");
+        assertThat(lineResponseList).hasSize(2);
+        assertThat(nameList).containsAnyOf("신분당선");
+        assertThat(nameList).containsAnyOf("분당선");
     }
 
     /**
@@ -142,7 +143,7 @@ public class LineAcceptanceTest {
      */
 
     @DisplayName("지하철 노선도를 조회할 수 있다.")
-    private ExtractableResponse<Response> getLineResponseList() {
+    private List<LineResponse> getLineResponseList() {
         var response = RestAssured.given().log().all()
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .when().get("/lines")
@@ -152,7 +153,7 @@ public class LineAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.contentType()).isEqualTo(MediaType.APPLICATION_JSON_VALUE);
 
-        return response;
+        return response.jsonPath().getList(".", LineResponse.class);
     }
 
     @DisplayName("지하철 노선을 등록할 수 있다.")
