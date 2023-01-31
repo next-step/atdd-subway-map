@@ -38,6 +38,11 @@ public class Sections {
         return stations;
     }
 
+    public Station getLastStation() {
+        List<Station> stations = getStations();
+        return stations.get(stations.size() - 1);
+    }
+
     public void remove() {
         sections.remove(sections.size() - 1);
     }

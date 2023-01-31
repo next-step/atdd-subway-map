@@ -55,6 +55,10 @@ public class Line {
         return sections.getStations();
     }
 
+    public Station getLastStation() {
+        return sections.getLastStation();
+    }
+
     public void removeSection() {
         sections.remove();
     }

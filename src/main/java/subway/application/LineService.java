@@ -9,6 +9,8 @@ import subway.domain.Station;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 import subway.dto.SectionRequest;
+import subway.exception.InvalidSectionDownStationException;
+import subway.exception.InvalidSectionUpStationException;
 import subway.exception.LineNotFoundException;
 
 import java.util.List;
@@ -69,11 +71,13 @@ public class LineService {
         Station downStation = stationService.findById(sectionRequest.getDownStationId());
 
         if (!line.hasLastStation(upStation)) {
-            throw new IllegalArgumentException("새로운 구간의 상행역은 해당 노선의 하행 종점역이어야 합니다.");
+            String lastStationName = line.getLastStation().getName();
+            String upStationName = upStation.getName();
+            throw new InvalidSectionUpStationException(lastStationName, upStationName);
         }
 
         if (line.hasStation(downStation)) {
-            throw new IllegalArgumentException("새로운 구간의 하행역은 해당 노선에 등록되어 있는 역이 아니어야 합니다.");
+            throw new InvalidSectionDownStationException(downStation.getName());
         }
 
         line.addSection(new Section(line, upStation, downStation, sectionRequest.getDistance()));
