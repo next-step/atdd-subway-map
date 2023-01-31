@@ -17,8 +17,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD;
-import static subway.line.LineNameConstraints.Line2;
-import static subway.line.LineNameConstraints.Line9;
+import static subway.line.LineNameConstraints.*;
 import static subway.station.StationNameConstraints.*;
 
 @DisplayName("지하철 노선 관련 기능")
@@ -100,7 +99,7 @@ public class LineAcceptanceTest {
         // given
         ExtractableResponse<Response> line = LineAcceptanceFactory.createFixtureLine();
         Long lineId = getId(line);
-        // when
+        // when가
         ExtractableResponse<Response> response = LineAcceptanceFactory.getLine(lineId);
         // then
         LineResponse lineResponse = getLineResponse(response);
@@ -112,4 +111,26 @@ public class LineAcceptanceTest {
     private static Long getId(ExtractableResponse<Response> response) {
         return response.jsonPath().getLong("id");
     }
+
+    /**
+     * Given 1개의 지하철 노선을 생성하고
+     * When 지하철 노선을 수정했을 때
+     * Then 200 응답을 받느다.
+     */
+    @DisplayName("지하철노선을 수정한다.")
+    @Test
+    void updateLine() {
+        // given
+        ExtractableResponse<Response> line = LineAcceptanceFactory.createFixtureLine();
+        Long lineId = getId(line);
+        // when
+        ExtractableResponse<Response> response = LineAcceptanceFactory.updateLine(
+                lineId,
+                Line1,
+                "bg-blue-600"
+        );
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
 }

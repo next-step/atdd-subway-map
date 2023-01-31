@@ -78,4 +78,18 @@ public class LineAcceptanceFactory {
                 .then().log().all()
                 .extract();
     }
+
+    public static ExtractableResponse<Response> updateLine(Long lineId, String name, String color) {
+        HashMap<String, String> params = new HashMap<>();
+        params.put("name", name);
+        params.put("color", color);
+
+        return RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(params)
+                .when().put(LINE_BASE_URL + "/{lineId}", lineId)
+                .then().log().all()
+                .extract();
+    }
 }
