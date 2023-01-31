@@ -7,7 +7,7 @@ import subway.line.LineResponse;
 import subway.subway.Station;
 import subway.subway.StationResponse;
 
-import java.util.ArrayList;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -15,8 +15,7 @@ import java.util.stream.Collectors;
 public class DtoConverter {
 
     public Line of(LineRequest lineRequest, Station upStation, Station downStation) {
-        List<Station> stationList = new ArrayList<>(List.of(upStation, downStation));
-        return new Line(lineRequest.getName(), lineRequest.getColor(), stationList, lineRequest.getDistance());
+        return new Line(lineRequest.getName(), lineRequest.getColor(), upStation, downStation, lineRequest.getDistance());
     }
 
     public LineResponse of(Line line) {

@@ -2,6 +2,7 @@ package subway.line;
 
 import subway.subway.Station;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -10,6 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 public class Line {
@@ -20,25 +22,19 @@ public class Line {
     private String name;
     private String color;
 
-    @OneToMany
-    private List<Station> stationList = new ArrayList<>();
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "line")
+    private List<StationLineGroup> stationLineGroupList = new ArrayList<>();
     private Long distance;
 
-    public Line(Long id, String name, String color, List<Station> stationList, Long distance) {
-        this.id = id;
+    public Line(String name, String color, Station upStation, Station downStation, Long distance) {
         this.name = name;
         this.color = color;
-        this.stationList = stationList;
         this.distance = distance;
-    }
-    public Line (String name, String color, List<Station> stationList, Long distance) {
-        this.name = name;
-        this.color = color;
-        this.stationList = stationList;
-        this.distance = distance;
+        addStation(upStation);
+        addStation(downStation);
     }
 
-    public Line() {
+    protected Line() {
     }
 
     public Long getId() {
@@ -53,11 +49,16 @@ public class Line {
         return color;
     }
 
-    public List<Station> getStationList() {
-        return stationList;
+    public void addStation(Station station) {
+        stationLineGroupList.add(new StationLineGroup(station, this));
     }
 
     public Long getDistance() {
         return distance;
     }
+
+    public List<Station> getStationList() {
+        return this.stationLineGroupList.stream().map(StationLineGroup::getStation).collect(Collectors.toList());
+    }
+
 }
