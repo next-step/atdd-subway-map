@@ -12,6 +12,9 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import subway.common.DatabaseCleaner;
 import subway.common.Endpoints;
+import subway.line.presentation.LineRequest;
+import subway.line.presentation.LineResponse;
+import subway.line.presentation.UpdateLineRequest;
 import subway.utils.RestAssuredClient;
 
 import java.util.List;

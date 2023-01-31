@@ -3,8 +3,8 @@ package subway.common;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.HttpStatus;
-import subway.line.LineResponse;
-import subway.station.StationResponse;
+import subway.line.presentation.LineResponse;
+import subway.station.presentation.StationResponse;
 import subway.utils.RestAssuredClient;
 
 import static org.assertj.core.api.Assertions.assertThat;

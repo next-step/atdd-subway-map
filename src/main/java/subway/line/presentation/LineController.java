@@ -1,4 +1,4 @@
-package subway.line;
+package subway.line.presentation;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import subway.line.application.LineDto;
+import subway.line.application.LineService;
+import subway.line.application.UpdateLineDto;
 
 import java.net.URI;
 import java.util.List;

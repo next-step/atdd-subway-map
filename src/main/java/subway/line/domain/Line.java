@@ -1,6 +1,6 @@
-package subway.line;
+package subway.line.domain;
 
-import subway.station.Station;
+import subway.station.domain.Station;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

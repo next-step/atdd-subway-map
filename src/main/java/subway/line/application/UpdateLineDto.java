@@ -1,4 +1,6 @@
-package subway.line;
+package subway.line.application;
+
+import subway.line.presentation.UpdateLineRequest;
 
 public class UpdateLineDto {
     private String name;

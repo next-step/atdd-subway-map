@@ -1,7 +1,9 @@
-package subway.station;
+package subway.station.application;
 
 import org.springframework.stereotype.Component;
 import subway.exception.StationNotFoundException;
+import subway.station.domain.StationRepository;
+import subway.station.domain.Station;
 
 import java.util.List;
 

@@ -1,7 +1,9 @@
-package subway.line;
+package subway.line.application;
 
 import org.springframework.stereotype.Component;
 import subway.exception.LineNotFoundException;
+import subway.line.domain.LineRepository;
+import subway.line.domain.Line;
 
 import java.util.List;
 
