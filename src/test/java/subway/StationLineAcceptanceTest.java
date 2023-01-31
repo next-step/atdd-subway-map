@@ -150,10 +150,7 @@ public class StationLineAcceptanceTest {
                         .then().log().all().extract();
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-
-        assertThatThrownBy(() -> {
-            stationLineRepository.findById(1L).orElseThrow();
-        }).isInstanceOf(NoSuchElementException.class);
+        assertThat(StationUtils.selectStationLine(1).statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
 }
