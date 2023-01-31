@@ -6,45 +6,31 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
+import subway.dto.line.LineRequest;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
 public class LineAcceptanceTest extends AbstractAcceptanceTest {
-    private static final Map<String, String> 신분당선_요청 = new HashMap<>();
-    private static final Map<String, String> 분당선_요청 = new HashMap<>();
-    private static final Map<String, String> 잘못된_노선_요청 = new HashMap<>();
-    private static final Map<String, String> 수정_요청 = new HashMap<>();
     private static final String 신분당선 = "신분당선";
     private static final String 분당선 = "분당선";
-    private static final String 미존재_노선_위치 = "/lines/100";
+    private static final Long 신사역_ID = 1L;
+    private static final Long 신논현역_ID = 2L;
+    private static final Long 강남역_ID = 3L;
+    private static final Long 존재하지_않는_ID = 1000L;
+    private static final LineRequest 신분당선_요청;
+    private static final LineRequest 분당선_요청;
+    private static final LineRequest 잘못된_노선_요청;
+    private static final LineRequest 수정_요청;
 
     static {
-        신분당선_요청.put("name", "신분당선");
-        신분당선_요청.put("color", "bg-red-600");
-        신분당선_요청.put("upStationId", "1");
-        신분당선_요청.put("downStationId", "2");
-        신분당선_요청.put("distance", "10");
-
-        분당선_요청.put("name", "분당선");
-        분당선_요청.put("color", "bg-green-600");
-        분당선_요청.put("upStationId", "1");
-        분당선_요청.put("downStationId", "3");
-        분당선_요청.put("distance", "10");
-
-        잘못된_노선_요청.put("name", "분당선");
-        잘못된_노선_요청.put("color", "bg-green-600");
-        잘못된_노선_요청.put("upStationId", "1");
-        잘못된_노선_요청.put("downStationId", "100");
-        잘못된_노선_요청.put("distance", "10");
-
-        수정_요청.put("name", "다른 분당선");
-        수정_요청.put("color", "bg-red-600");
+        신분당선_요청 = new LineRequest(신분당선, "bg-red-600", 신사역_ID, 신논현역_ID, 10);
+        분당선_요청 = new LineRequest(분당선, "bg-green-600", 신사역_ID, 강남역_ID, 10);
+        잘못된_노선_요청 = new LineRequest(분당선, "bg-green-600", 신사역_ID, 존재하지_않는_ID, 10);
+        수정_요청 = new LineRequest("다른 분당선", "bg-red-600", null, null, 0);
     }
 
     /**
@@ -111,9 +97,10 @@ public class LineAcceptanceTest extends AbstractAcceptanceTest {
     @DisplayName("존재하지 않는 노선을 조회한다.")
     @Test
     void showLineException() {
-        given().log().all().
+        given().log().all()
+                .pathParam("id", 존재하지_않는_ID).
         when()
-                .get(미존재_노선_위치).
+                .get("/lines/{id}").
         then().log().all()
                 .statusCode(HttpStatus.NOT_FOUND.value());
     }
@@ -154,9 +141,10 @@ public class LineAcceptanceTest extends AbstractAcceptanceTest {
     void updateLineException() {
         given().log().all()
             .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .pathParam("id", 존재하지_않는_ID)
             .body(수정_요청).
         when()
-            .put(미존재_노선_위치).
+            .put("/lines/{id}").
         then().log().all()
             .statusCode(HttpStatus.NOT_FOUND.value());
     }
@@ -188,17 +176,18 @@ public class LineAcceptanceTest extends AbstractAcceptanceTest {
     @DisplayName("존재하지 않는 노선을 삭제한다.")
     @Test
     void deleteLineException() {
-        given().log().all().
+        given().log().all()
+                .pathParam("id", 존재하지_않는_ID).
         when()
-                .delete(미존재_노선_위치).
+                .delete("/lines/{id}").
         then().log().all()
                 .statusCode(HttpStatus.NOT_FOUND.value());
     }
 
-    private ValidatableResponse 노선_생성(Map<String, String> params) {
+    private ValidatableResponse 노선_생성(LineRequest request) {
         return given().log().all()
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
-                    .body(params).
+                    .body(request).
                 when()
                     .post("/lines").
                 then().log().all();

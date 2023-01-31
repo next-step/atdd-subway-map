@@ -6,42 +6,32 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
+import subway.dto.line.LineRequest;
+import subway.dto.section.SectionRequest;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 구간 관련 기능")
 public class LineSectionAcceptanceTest extends AbstractAcceptanceTest {
-    private static final Map<String, String> 신분당선_요청 = new HashMap<>();
-    private static final HashMap<String, String> 신논현_양재_구간 = new HashMap<>();
-    private static final HashMap<String, String> 강남역_판교_구간 = new HashMap<>();
-    private static final HashMap<String, String> 신논현역_신사역_구간 = new HashMap<>();
+    private static final String 신분당선 = "신분당선";
+    private static final LineRequest 신분당선_요청;
+    private static final SectionRequest 신논현_양재_구간;
+    private static final SectionRequest 강남역_판교_구간;
+    private static final SectionRequest 신논현역_신사역_구간;
     private static final Long 신사역_ID = 1L;
     private static final Long 신논현역_ID = 2L;
+    private static final Long 강남역_ID = 3L;
     private static final Long 양재역_ID = 4L;
+    private static final Long 판교역_ID = 5L;
 
     static {
-        신분당선_요청.put("name", "신분당선");
-        신분당선_요청.put("color", "bg-red-600");
-        신분당선_요청.put("upStationId", String.valueOf(신사역_ID));
-        신분당선_요청.put("downStationId", String.valueOf(신논현역_ID));
-        신분당선_요청.put("distance", "10");
-
-        신논현_양재_구간.put("upStationId", "2");
-        신논현_양재_구간.put("downStationId", "4");
-        신논현_양재_구간.put("distance", "10");
-
-        강남역_판교_구간.put("upStationId", "3");
-        강남역_판교_구간.put("downStationId", "5");
-        강남역_판교_구간.put("distance", "10");
-
-        신논현역_신사역_구간.put("upStationId", String.valueOf(신논현역_ID));
-        신논현역_신사역_구간.put("downStationId", String.valueOf(신사역_ID));
-        신논현역_신사역_구간.put("distance", "10");
+        신분당선_요청 = new LineRequest(신분당선, "bg-red-600", 신사역_ID, 신논현역_ID, 10);
+        신논현_양재_구간 = new SectionRequest(신논현역_ID, 양재역_ID, 10);
+        강남역_판교_구간 = new SectionRequest(강남역_ID, 판교역_ID, 10);
+        신논현역_신사역_구간 = new SectionRequest(신논현역_ID, 신사역_ID, 10);
     }
 
     /**
@@ -139,10 +129,10 @@ public class LineSectionAcceptanceTest extends AbstractAcceptanceTest {
         구간_삭제(location, 신논현역_ID).statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
-    private ValidatableResponse 노선_생성(Map<String, String> params) {
+    private ValidatableResponse 노선_생성(LineRequest request) {
         return given().log().all()
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
-                    .body(params).
+                    .body(request).
                 when()
                     .post("/lines").
                 then().log().all();
@@ -155,10 +145,10 @@ public class LineSectionAcceptanceTest extends AbstractAcceptanceTest {
                 then().log().all();
     }
 
-    private ValidatableResponse 구간_등록(String location, HashMap<String, String> params) {
+    private ValidatableResponse 구간_등록(String location, SectionRequest request) {
         return given().log().all()
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
-                    .body(params).
+                    .body(request).
                 when()
                     .post(location + "/sections").
                 then().log().all();
