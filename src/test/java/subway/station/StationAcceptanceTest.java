@@ -47,8 +47,8 @@ public class StationAcceptanceTest {
         final String firstStationName = "강남역";
         final String secondStationName = "양재역";
 
-        지하철역_등록_요청(firstStationName);
-        지하철역_등록_요청(secondStationName);
+        지하철역_등록_성공_응답(firstStationName);
+        지하철역_등록_성공_응답(secondStationName);
 
         // when
         var response = 지하철역_조회_요청();
@@ -68,13 +68,19 @@ public class StationAcceptanceTest {
     void deleteStation() {
         // given
         final String stationName = "강남역";
-        long stationId = 지하철역_등록_요청(stationName).body().jsonPath().getLong("id");
+        long stationId = 지하철역_등록_성공_응답(stationName).body().jsonPath().getLong("id");
 
         // when
         지하철역_삭제_요청(stationId);
 
         // then
         assertThat(지하철역_조회_요청().jsonPath().getList("name")).doesNotContain(stationName);
+    }
+
+    private ExtractableResponse<Response> 지하철역_등록_성공_응답(String stationName) {
+        ExtractableResponse<Response> response = 지하철역_등록_요청(stationName);
+        지하철역_등록_성공(response);
+        return response;
     }
 
     private ExtractableResponse<Response> 지하철역_등록_요청(String stationName) {
@@ -85,6 +91,10 @@ public class StationAcceptanceTest {
                 .then().statusCode(HttpStatus.CREATED.value())
                 .log().all()
                 .extract();
+    }
+
+    private void 지하철역_등록_성공(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
     private ExtractableResponse<Response> 지하철역_조회_요청() {
