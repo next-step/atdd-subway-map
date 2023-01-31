@@ -1,29 +1,38 @@
-package line;
+package subway.line;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import subway.line.LineRequest;
 
-import javax.sound.sampled.Line;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static subway.station.StationAcceptanceTest.createStationByName;
 
 @DisplayName("노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {
 
     private final static LineRequest 신분당선 = LineRequest.of(
-            "신분당선", "bg-red-600", "1", "2", "10");
+            "신분당선", "bg-red-600", 1L, 2L, 10L);
     private final static LineRequest 분당선 = LineRequest.of(
-            "분당선", "bg-green-600", "1", "3", "15");
+            "분당선", "bg-green-600", 1L, 3L, 15L);
+
+    @BeforeEach
+    void setUp() {
+        createStationByName("지하철역");
+        createStationByName("새로운지하철역");
+        createStationByName("또다른지하철역");
+
+    }
 
     /**
      * when 지하철 노선을 생성한다.
@@ -121,7 +130,7 @@ public class LineAcceptanceTest {
 
         //Then
         List<String> names = response.jsonPath().getList("name", String.class);
-        assertThat(names).doesNotContain("신분당선")
+        assertThat(names).doesNotContain("신분당선");
 
     }
 
@@ -134,7 +143,7 @@ public class LineAcceptanceTest {
 
     private static ExtractableResponse<Response> createLine(LineRequest request) {
 
-        Map<String, String> params = makeRequestBody(request);
+        Map<String, Object> params = makeRequestBody(request);
 
         return RestAssured.given().log().all()
                 .body(params)
@@ -144,8 +153,8 @@ public class LineAcceptanceTest {
                 .extract();
     }
 
-    private static Map<String, String> makeRequestBody(LineRequest request) {
-        Map<String, String> params = new HashMap<>();
+    private static Map<String, Object> makeRequestBody(LineRequest request) {
+        Map<String, Object> params = new HashMap<>();
 
         params.put("name", request.getName());
         params.put("color", request.getColor());

@@ -1,4 +1,4 @@
-package subway;
+package subway.station;
 
 import com.jayway.jsonpath.JsonPath;
 import io.restassured.RestAssured;
@@ -87,7 +87,7 @@ public class StationAcceptanceTest {
 
     }
 
-    private static ExtractableResponse<Response> createStationByName(String stationName) {
+    public static ExtractableResponse<Response> createStationByName(String stationName) {
         Map<String, String> params = new HashMap<>();
         params.put("name", stationName);
 
