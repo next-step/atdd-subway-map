@@ -43,4 +43,9 @@ public class LineFacade {
         lineService.updateLine(lineId,request);
     }
 
+    @Transactional
+    public void deleteLine(Long lineId) {
+        lineService.deleteLine(lineId);
+    }
+
 }

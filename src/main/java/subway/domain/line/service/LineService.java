@@ -52,4 +52,11 @@ public class LineService {
                 .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_LINE));
         line.update(request.getName(), request.getColor());
     }
+
+    @Transactional
+    public void deleteLine(Long lineId) {
+        Line line = lineRepository.findByIdWithStations(lineId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_LINE));
+        lineRepository.delete(line);
+    }
 }

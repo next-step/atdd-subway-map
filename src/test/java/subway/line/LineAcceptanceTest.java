@@ -99,7 +99,7 @@ public class LineAcceptanceTest {
         // given
         ExtractableResponse<Response> line = LineAcceptanceFactory.createFixtureLine();
         Long lineId = getId(line);
-        // when가
+        // when
         ExtractableResponse<Response> response = LineAcceptanceFactory.getLine(lineId);
         // then
         LineResponse lineResponse = getLineResponse(response);
