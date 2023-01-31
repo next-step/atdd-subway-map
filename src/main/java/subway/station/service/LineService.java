@@ -8,7 +8,6 @@ import subway.station.web.dto.LineRequest;
 import subway.station.web.dto.LineResponse;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,6 +42,11 @@ public class LineService {
         Line line = lineRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("검색된 노선이 없습니다. id를 바꿔주세요."));
         line.changeColor(color);
         return createLineResponse(line);
+    }
+
+    @Transactional
+    public void deleteById(Long id) {
+        lineRepository.deleteById(id);
     }
 
     private LineResponse createLineResponse(Line line) {
