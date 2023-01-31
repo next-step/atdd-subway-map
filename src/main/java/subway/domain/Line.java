@@ -59,6 +59,10 @@ public class Line {
         return sections.getLastStation();
     }
 
+    public boolean hasSingleSection() {
+        return sections.hasSingleSection();
+    }
+
     public void removeSection() {
         sections.remove();
     }

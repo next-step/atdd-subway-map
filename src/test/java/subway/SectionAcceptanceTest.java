@@ -103,6 +103,20 @@ class SectionAcceptanceTest extends AcceptanceTest {
         assertThat(response.jsonPath().getList("stations.id", Long.class)).containsExactly(id_송파역, id_가락시장역);
     }
 
+    /**
+     * When 지하철 노선의 구간 제거 요청 시, 현재 노선에 등록된 구간이 하나라면
+     * Then 지하철 구간이 제거되지 않는다.
+     */
+    @DisplayName("현재 지하철 노선에 등록된 구간이 하나라면 지하철 구간을 제거할 수 없다.")
+    @Test
+    void singleSection() {
+        // when
+        ExtractableResponse<Response> response = 지하철_노선에_구간_제거(id_8호선, id_가락시장역);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    }
+
     private static ExtractableResponse<Response> 지하철_노선에_구간_추가(Long lineId, Long upStationId, Long downStationId, long distance) {
         Map<String, Object> sectionParam = new HashMap<>();
         sectionParam.put("upStationId", upStationId);
