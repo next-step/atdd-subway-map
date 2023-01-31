@@ -12,14 +12,16 @@ import io.restassured.response.Response;
 import java.nio.charset.StandardCharsets;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.HttpStatus;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
 public class RestAssuredTest {
     @BeforeAll
     static void beforeAll() {
@@ -30,6 +32,7 @@ public class RestAssuredTest {
 
     @DisplayName("구글 페이지 접근 테스트")
     @Test
+    @Disabled
     void accessGoogle() {
         ExtractableResponse<Response> response =
             given()
@@ -50,6 +53,7 @@ public class RestAssuredTest {
     @DisplayName("구글 검색 테스트")
     @ParameterizedTest
     @ValueSource(strings = {"atdd"})
+    @Disabled
     void searchByGoogle(String searchQuery) {
         ExtractableResponse<Response> response =
             given()

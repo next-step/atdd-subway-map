@@ -58,7 +58,7 @@
 # 3단계 - 지하철 구간 관리
 ## 기능 요구사항
 - [ ] 요구사항 설명에서 제공되는 요구사항을 기반으로 지하철 구간 관리 기능을 구현하세요.
-- [ ] 요구사항을 정의한 인수 조건을 도출하세요.
+- [x] 요구사항을 정의한 인수 조건을 도출하세요.
 - [ ] 인수 조건을 검증하는 인수 테스트를 작성하세요.
 - [ ] 예외 케이스에 대한 검증도 포함하세요.
 
@@ -68,12 +68,12 @@
 
 ## 프로그래밍 요구사항
 - [ ] 인수 테스트 주도 개발 프로세스에 맞춰서 기능을 구현하세요.
-  - [ ] 요구사항 설명을 참고하여 인수 조건을 정의
-  - [ ] 인수 조건을 검증하는 인수 테스트 작성
+  - [x] 요구사항 설명을 참고하여 인수 조건을 정의
+  - [x] 인수 조건을 검증하는 인수 테스트 작성
   - [ ] 인수 테스트를 충족하는 기능 구현
-- [ ] 인수 조건은 인수 테스트 메서드 상단에 주석으로 작성하세요.
-  - [ ] 뼈대 코드의 인수 테스트를 참고
-- [ ] 인수 테스트의 결과가 다른 인수 테스트에 영향을 끼치지 않도록 인수 테스트를 서로 격리 시키세요.
+- [x] 인수 조건은 인수 테스트 메서드 상단에 주석으로 작성하세요.
+  - [x] 뼈대 코드의 인수 테스트를 참고
+- [x] 인수 테스트의 결과가 다른 인수 테스트에 영향을 끼치지 않도록 인수 테스트를 서로 격리 시키세요.
 - [ ] 인수 테스트의 재사용성과 가독성, 그리고 빠른 테스트 의도 파악을 위해 인수 테스트를 리팩터링 하세요.
 
 ## 요구사항 설명
@@ -108,6 +108,59 @@ public class StationAcceptanceTest {
             .setContentType(ContentType.JSON)
             .setAccept(ContentType.JSON)
             .build();
+    }
+}
+```
+
+# AcceptanceTest
+```java
+@Service
+@Profile(value = "acceptanceTest")
+public class DatabaseCleanup implements InitializingBean {
+
+    @PersistenceContext
+    private EntityManager em;
+
+    private List<String> tableNames;
+
+    @Override
+    public void afterPropertiesSet() {
+        em.unwrap(Session.class)
+            .doWork(this::extractTableNames);
+    }
+
+    @Transactional
+    public void execute() {
+        em.unwrap(Session.class)
+            .doWork(this::truncate);
+    }
+
+    private void truncate(Connection connection) throws SQLException {
+        Statement statement = connection.createStatement();
+        statement.executeUpdate("SET REFERENTIAL_INTEGRITY FALSE");
+
+        for (String tableName : tableNames) {
+            statement.executeUpdate("TRUNCATE TABLE " + tableName);
+            statement.executeUpdate("ALTER TABLE " + tableName + " ALTER COLUMN ID RESTART WITH 1");
+        }
+    }
+
+    private void extractTableNames(Connection conn) {
+        tableNames = em.getMetamodel()
+            .getEntities().stream()
+            .filter(e -> e.getJavaType().getAnnotation(Entity.class) != null)
+            .map(e -> CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, e.getName()))
+            .collect(Collectors.toList());
+        
+//        List<String> tableNames = new ArrayList<>();
+//
+//        ResultSet resultSet = conn.getMetaData()
+//            .getTables(conn.getCatalog(), null, "%", new String[]{"TABLE"});
+//
+//        while (resultSet.next()) {
+//            tableNames.add(resultSet.getString("table_name"));
+//        }
+//        this.tableNames = tableNames;
     }
 }
 ```

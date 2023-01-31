@@ -46,7 +46,7 @@ public class LineService {
         line.modify(lineModifyRequest);
     }
 
-    @Transactional()
+    @Transactional
     @Modifying(clearAutomatically = true)
     public void deleteLine(Long id) {
         Line findLine = lineRepository.findById(id).orElseThrow(NotFoundLineException::new);

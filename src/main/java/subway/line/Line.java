@@ -13,6 +13,7 @@ import javax.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import subway.section.Section;
 import subway.station.Station;
 
 @Entity
@@ -31,6 +32,9 @@ public class Line {
     private String color;
 
     private int distance;
+
+    @OneToMany(mappedBy = "line")
+    private List<Section> sections = new ArrayList<>();
 
     @OneToMany(mappedBy = "line")
     private List<Station> stations = new ArrayList<>();
