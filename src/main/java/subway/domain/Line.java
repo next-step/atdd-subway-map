@@ -38,7 +38,7 @@ public class Line extends BaseEntity {
     protected Line() {
     }
 
-    public Line(String name, String color,Long distance) {
+    public Line(String name, String color, Long distance) {
         this.name = name;
         this.color = color;
         this.distance = distance;
@@ -74,7 +74,7 @@ public class Line extends BaseEntity {
         this.color = color;
     }
 
-    public void addSection(Section section){
+    public void addSection(Section section) {
         this.sections.add(section);
     }
 
@@ -94,14 +94,28 @@ public class Line extends BaseEntity {
         this.downStation = downStation;
     }
 
-    public boolean canAddSection(Station station){
+    public boolean canAddSection(Station station) {
 
-        if(sections.isEmpty()){
+        if (sections.isEmpty()) {
             return this.upStation.equals(station);
         }
 
-        Section lastSection  = sections.get(getSections().size() - 1);
+        Section lastSection = sections.get(getSections().size() - 1);
         return lastSection.isDownStation(station);
     }
 
+    public boolean canDeleteSection(Section section) {
+        if (this.sections.size() <= 1) {
+            return false;
+        }
+        Section lastSection = this.sections.get(getSections().size() - 1);
+        if (lastSection.equals(section)) {
+            return true;
+        }
+        return false;
+    }
+
+    public void deleteSection(Section section) {
+        this.sections.remove(section);
+    }
 }

@@ -1,6 +1,9 @@
 package subway.domain;
 
+import org.hibernate.Hibernate;
+
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 public class Section {
@@ -45,5 +48,18 @@ public class Section {
 
     public Long getDistance() {
         return distance;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        Section section = (Section) o;
+        return id != null && Objects.equals(id, section.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
     }
 }

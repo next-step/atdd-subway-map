@@ -6,10 +6,8 @@ import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.SectionRepository;
 import subway.domain.Station;
-import subway.exception.CanNotAddSectionException;
-import subway.exception.LineNotFoundException;
+import subway.exception.*;
 import subway.domain.LineRepository;
-import subway.exception.StationNotFoundException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -66,8 +64,8 @@ public class LineService {
     }
 
     @Transactional
-    public Section addSection(Long id, Long upStationId, Long downStationId, Long distance) {
-        Line line = lineRepository.findById(id).orElseThrow(LineNotFoundException::new);
+    public Section addSection(Long lineId, Long upStationId, Long downStationId, Long distance) {
+        Line line = lineRepository.findById(lineId).orElseThrow(LineNotFoundException::new);
         Station upStation = stationService.findStation(upStationId);
         Station downStation = stationService.findStation(downStationId);
 
@@ -78,6 +76,17 @@ public class LineService {
             line.addSection(saveSection);
             return saveSection;
         }
-        throw new CanNotAddSectionException();
+        throw new CannotAddSectionException();
+    }
+
+    @Transactional
+    public void deleteSection(Long lineId, Long sectionId){
+        Line line = lineRepository.findById(lineId).orElseThrow(LineNotFoundException::new);
+        Section section = sectionRepository.findById(sectionId).orElseThrow(SectionNotFoundException::new);
+        if(line.canDeleteSection(section)){
+            line.deleteSection(section);
+            return;
+        }
+        throw new CannotDeleteSectionException();
     }
 }
