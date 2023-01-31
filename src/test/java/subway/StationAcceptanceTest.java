@@ -98,12 +98,14 @@ public class StationAcceptanceTest {
                 .then().log().all()
                 .extract();
     }
+
     private static ExtractableResponse<Response> getStationNames() {
         return RestAssured.given().log().all()
                 .when().get("/stations")
                 .then().log().all()
                 .extract();
     }
+
     private static ExtractableResponse<Response> deleteStationById(Long id) {
         return RestAssured.given().log().all()
                 .when().delete("/stations/{id}", id)
