@@ -19,6 +19,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
+import static subway.common.error.LineSectionError.*;
 import static subway.fixture.TestFixtureSection.구간_복수_등록;
 import static subway.fixture.TestFixtureSection.구간_신규_등록;
 
@@ -77,7 +78,7 @@ class LineSectionServiceTest {
         final LineSectionRequest 구간_요청 = new LineSectionRequest(3L, 4L, 10);
         assertThatThrownBy(() -> lineSectionService.addSection(노선_요청_ID, 구간_요청))
                 .isInstanceOf(NoRegisterStationException.class)
-                .hasMessage("요청한 상행종점역은 해당 노선에 등록되어 있지 않아서 추가 불가능합니다.");
+                .hasMessage(NO_REGISTER_UP_STATION.getMessage());
     }
 
     @DisplayName("노선 구간 추가 등록 시 하행종점역은 노선에 등록되어 있어서 구간 등록이 불가능하다.")
@@ -97,7 +98,7 @@ class LineSectionServiceTest {
         final LineSectionRequest 구간_요청 = new LineSectionRequest(1L, 2L, 10);
         assertThatThrownBy(() -> lineSectionService.addSection(노선_요청_ID, 구간_요청))
                 .isInstanceOf(AlreadyExistException.class)
-                .hasMessage("요청한 하행종점역은 이미 노선에 등록되어 있어서 추가가 불가능합니다.");
+                .hasMessage(NO_REGISTER_DOWN_STATION.getMessage());
     }
 
     @DisplayName("노선 구간을 제거한다.")
@@ -139,7 +140,7 @@ class LineSectionServiceTest {
         final Long 역_요청_하행종점_ID = 하행종점_잠실역.getId();
         assertThatThrownBy(() -> lineSectionService.removeSection(노선_요청_ID, 역_요청_하행종점_ID))
                 .isInstanceOf(NoDeleteOneSectionException.class)
-                .hasMessage("노선의 구간 목록수가 1개인 경우 삭제할 수 없습니다.");
+                .hasMessage(NO_DELETE_ONE_SECTION.getMessage());
     }
 
     @DisplayName("노선 구간을 제거 시 등록된 하행 종점역이 아니어서 구간 삭제가 불가능하다.")
@@ -160,6 +161,6 @@ class LineSectionServiceTest {
         final Long 역_요청_상행종점_ID = 상행종점_강남역.getId();
         assertThatThrownBy(() -> lineSectionService.removeSection(노선_요청_ID, 역_요청_상행종점_ID))
                 .isInstanceOf(NoRegisterStationException.class)
-                .hasMessage("요청한 역으로 등록된 마지막 구간이 존재하지 않습니다.");
+                .hasMessage(NO_REGISTER_LAST_LINE_STATION.getMessage());
     }
 }

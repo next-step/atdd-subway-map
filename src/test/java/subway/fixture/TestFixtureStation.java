@@ -87,7 +87,6 @@ public class TestFixtureStation {
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
                 () -> assertThat(지하철역_응답_경로.getList("")).isEmpty()
-
         );
     }
 }

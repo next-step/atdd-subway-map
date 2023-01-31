@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import subway.AcceptanceTest;
 
+import static subway.common.error.LineSectionError.*;
 import static subway.fixture.TestFixtureLine.*;
 import static subway.fixture.TestFixtureSection.*;
 import static subway.fixture.TestFixtureStation.지하철역_생성_요청;
@@ -51,7 +52,7 @@ class LineSectionAcceptanceTest extends AcceptanceTest {
 
         final ExtractableResponse<Response> 이호선_응답 = 지하철_노선_구간_추가_요청(이호선, 검암역 ,몽총토성역, 10);
 
-        지하철_노선_구간_추가_실패됨(이호선_응답, HttpStatus.NOT_FOUND, "요청한 상행종점역은 해당 노선에 등록되어 있지 않아서 추가 불가능합니다.");
+        지하철_노선_구간_추가_실패됨(이호선_응답, HttpStatus.NOT_FOUND, NO_REGISTER_UP_STATION.getMessage());
     }
 
     @DisplayName("노선 구간 추가 시 요청값인 하행종점역은 노선에 등록되어 있어서 구간 등록이 불가능하다.")
@@ -60,7 +61,7 @@ class LineSectionAcceptanceTest extends AcceptanceTest {
 
         final ExtractableResponse<Response> 이호선_응답 = 지하철_노선_구간_추가_요청(이호선, 잠실역 ,강남역, 10);
 
-        지하철_노선_구간_추가_실패됨(이호선_응답, HttpStatus.BAD_REQUEST, "요청한 하행종점역은 이미 노선에 등록되어 있어서 추가가 불가능합니다.");
+        지하철_노선_구간_추가_실패됨(이호선_응답, HttpStatus.BAD_REQUEST, NO_REGISTER_DOWN_STATION.getMessage());
     }
 
     @DisplayName("노선 구간을 제거한다.")
@@ -86,7 +87,7 @@ class LineSectionAcceptanceTest extends AcceptanceTest {
 
         final ExtractableResponse<Response> 이호선_응답 = 지하철_노선_구간_삭제_요청(이호선, 잠실역);
 
-        지하철_노선_구간_삭제_실패됨(이호선_응답, HttpStatus.BAD_REQUEST, "노선의 구간 목록수가 1개인 경우 삭제할 수 없습니다.");
+        지하철_노선_구간_삭제_실패됨(이호선_응답, HttpStatus.BAD_REQUEST, NO_DELETE_ONE_SECTION.getMessage());
     }
 
     @DisplayName("노선 구간을 제거 시 등록된 하행 종점역이 아니어서 구간 삭제가 불가능하다.")
@@ -99,6 +100,6 @@ class LineSectionAcceptanceTest extends AcceptanceTest {
 
         final ExtractableResponse<Response> 이호선_구간_삭제_응답 = 지하철_노선_구간_삭제_요청(이호선, 강남역);
 
-        지하철_노선_구간_삭제_실패됨(이호선_구간_삭제_응답, HttpStatus.NOT_FOUND, "요청한 역으로 등록된 마지막 구간이 존재하지 않습니다.");
+        지하철_노선_구간_삭제_실패됨(이호선_구간_삭제_응답, HttpStatus.NOT_FOUND, NO_REGISTER_LAST_LINE_STATION.getMessage());
     }
 }
