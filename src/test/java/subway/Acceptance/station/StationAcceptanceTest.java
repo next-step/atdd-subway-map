@@ -1,4 +1,4 @@
-package subway;
+package subway.Acceptance.station;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -7,6 +7,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import subway.Acceptance.AcceptanceTest;
 
 import java.util.HashMap;
 import java.util.List;

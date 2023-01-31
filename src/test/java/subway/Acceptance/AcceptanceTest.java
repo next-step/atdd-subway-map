@@ -1,4 +1,4 @@
-package subway;
+package subway.Acceptance;
 
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;

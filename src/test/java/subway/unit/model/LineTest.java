@@ -1,10 +1,11 @@
-package subway.model;
+package subway.unit.model;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import subway.model.Line;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.UnitTestConstant.*;
+import static subway.unit.UnitTestFixture.*;
 
 class LineTest {
 

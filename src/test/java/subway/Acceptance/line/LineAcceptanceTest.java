@@ -1,4 +1,4 @@
-package subway;
+package subway.Acceptance.line;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -7,11 +7,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import subway.Acceptance.AcceptanceTest;
 import subway.dto.LineRequest;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static subway.Acceptance.AcceptanceTestFixture.BUN_DANG_LINE_REQUEST;
+import static subway.Acceptance.AcceptanceTestFixture.SHIN_BUN_DANG_LINE_REQUEST;
 
 @DisplayName("노선 관련 기능")
 public class LineAcceptanceTest extends AcceptanceTest {
@@ -24,7 +27,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine() {
         // when
-        ExtractableResponse<Response> response = createLineResponse(new LineRequest("신분당선", "bg-red-600", 1L, 2L, 5));
+        ExtractableResponse<Response> response = createLineResponse(SHIN_BUN_DANG_LINE_REQUEST);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -56,8 +59,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void showLines() {
         // given
-        ExtractableResponse<Response> shinBunDang = createLineResponse(new LineRequest("신분당선", "bg-red-600", 1L, 2L, 5));
-        ExtractableResponse<Response> bunDang = createLineResponse(new LineRequest("분당선", "bg-red-700", 1L, 2L, 5));
+        ExtractableResponse<Response> shinBunDang = createLineResponse(SHIN_BUN_DANG_LINE_REQUEST);
+        ExtractableResponse<Response> bunDang = createLineResponse(BUN_DANG_LINE_REQUEST);
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -85,7 +88,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void showLine() {
         // given
-        ExtractableResponse<Response> shinBunDang = createLineResponse(new LineRequest("신분당선", "bg-red-600", 1L, 2L, 5));
+        ExtractableResponse<Response> shinBunDang = createLineResponse(SHIN_BUN_DANG_LINE_REQUEST);
 
         // when
         long id = shinBunDang.jsonPath().getLong("id");
@@ -113,7 +116,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void modifyLine() {
         // given
-        ExtractableResponse<Response> shinBunDang = createLineResponse(new LineRequest("신분당선", "bg-red-600", 2L, 3L, 5));
+        ExtractableResponse<Response> shinBunDang = createLineResponse(SHIN_BUN_DANG_LINE_REQUEST);
 
         // when
         long id = shinBunDang.jsonPath().getLong("id");
@@ -145,7 +148,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        ExtractableResponse<Response> shinBunDang = createLineResponse(new LineRequest("신분당선", "bg-red-600", 1L, 2L, 5));
+        ExtractableResponse<Response> shinBunDang = createLineResponse(SHIN_BUN_DANG_LINE_REQUEST);
 
         // when
         long id = shinBunDang.jsonPath().getLong("id");

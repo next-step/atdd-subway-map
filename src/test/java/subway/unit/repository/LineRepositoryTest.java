@@ -1,4 +1,4 @@
-package subway.repository;
+package subway.unit.repository;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -7,12 +7,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import subway.exception.LineNotFoundException;
 import subway.model.Line;
+import subway.repository.LineRepository;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.UnitTestConstant.BUN_DANG_LINE;
-import static subway.UnitTestConstant.SHIN_BUN_DANG_LINE;
+import static subway.unit.UnitTestFixture.BUN_DANG_LINE;
+import static subway.unit.UnitTestFixture.SHIN_BUN_DANG_LINE;
 
 @DataJpaTest
 class LineRepositoryTest {
