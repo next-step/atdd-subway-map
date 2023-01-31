@@ -1,7 +1,13 @@
 package subway.domain.station;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.*;
 
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class Station {
     @Id
@@ -10,18 +16,7 @@ public class Station {
     @Column(length = 20, nullable = false)
     private String name;
 
-    public Station() {
-    }
-
     public Station(String name) {
         this.name = name;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 }
