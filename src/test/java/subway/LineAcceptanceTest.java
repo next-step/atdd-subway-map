@@ -66,8 +66,6 @@ public class LineAcceptanceTest {
         assertThat(nameList).containsExactly(lineRequest.getName());
     }
 
-
-
     /**
      * Given 2개의 지하철 노선을 생성하고
      * When 지하철 노선 목록을 조회하면
@@ -105,32 +103,6 @@ public class LineAcceptanceTest {
         checkLine(lineRequest, lineId, line, firstStationId, secondStationId);
     }
 
-    @DisplayName("입력한 지하철 노선도 정보와 조회한 지하철 노선도 정보를 비교할 수 있다.")
-    private void checkLine(LineRequest lineRequest, Long lineId, LineResponse lineResponse, Long stationId1, Long stationId2) {
-        var stationIdList = lineResponse.getStationResponseList().stream().mapToLong(StationResponse::getId);
-
-        assertAll(
-                () -> assertThat(lineResponse.getId()).isEqualTo(lineId),
-                () -> assertThat(lineResponse.getName()).isEqualTo(lineRequest.getName()),
-                () -> assertThat(stationIdList).containsAnyOf(stationId1, stationId2)
-        );
-    }
-
-    @DisplayName("지하철 노선 아이디를 통해 해당 지하철 노선을 조회할 수 있다.")
-    private LineResponse getLine(Long lineId) {
-        var response = RestAssured.given().log().all()
-                .accept(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/lines/" + lineId)
-                .then().log().all()
-                .extract();
-
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.contentType()).isEqualTo(MediaType.APPLICATION_JSON_VALUE);
-
-        return response.as(LineResponse.class);
-    }
-
-
     /**
      * Given 지하철 노선을 생성하고
      * When 생성한 지하철 노선을 수정하면
@@ -149,7 +121,7 @@ public class LineAcceptanceTest {
     }
 
     @DisplayName("지하철 노선도를 수정할 수 있다.")
-    private LineResponse updateLine(Long id, LineUpdateRequest lineUpdateRequest) {
+    private void updateLine(Long id, LineUpdateRequest lineUpdateRequest) {
         var response = RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(lineUpdateRequest)
@@ -157,10 +129,7 @@ public class LineAcceptanceTest {
                 .then().log().all()
                 .extract();
 
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.contentType()).isEqualTo(MediaType.APPLICATION_JSON_VALUE);
-
-        return response.as(LineResponse.class);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
     /**
@@ -198,5 +167,31 @@ public class LineAcceptanceTest {
 
         return response.jsonPath().getLong("id");
     }
+
+    @DisplayName("입력한 지하철 노선도 정보와 조회한 지하철 노선도 정보를 비교할 수 있다.")
+    private void checkLine(LineRequest lineRequest, Long lineId, LineResponse lineResponse, Long stationId1, Long stationId2) {
+        var stationIdList = lineResponse.getStationResponseList().stream().mapToLong(StationResponse::getId);
+
+        assertAll(
+                () -> assertThat(lineResponse.getId()).isEqualTo(lineId),
+                () -> assertThat(lineResponse.getName()).isEqualTo(lineRequest.getName()),
+                () -> assertThat(stationIdList).containsAnyOf(stationId1, stationId2)
+        );
+    }
+
+    @DisplayName("지하철 노선 아이디를 통해 해당 지하철 노선을 조회할 수 있다.")
+    private LineResponse getLine(Long lineId) {
+        var response = RestAssured.given().log().all()
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .when().get("/lines/" + lineId)
+                .then().log().all()
+                .extract();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.contentType()).isEqualTo(MediaType.APPLICATION_JSON_VALUE);
+
+        return response.as(LineResponse.class);
+    }
+
 
 }
