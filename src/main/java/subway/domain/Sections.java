@@ -36,11 +36,12 @@ public class Sections {
         }
     }
 
-    public Set<Station> stations() {
+    public List<Station> stations() {
         return sections.stream()
                 .map(section -> List.of(section.getUpStation(), section.getDownStation()))
                 .flatMap(Collection::stream)
-                .collect(Collectors.toCollection(LinkedHashSet::new));
+                .distinct()
+                .collect(Collectors.toUnmodifiableList());
     }
 
     public void delete(long stationId) {
