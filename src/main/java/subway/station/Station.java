@@ -1,7 +1,11 @@
-package subway;
+package subway.station;
+
+import subway.line.Line;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
+@NoArgsConstructor
 @Entity
 public class Station {
     @Id
@@ -10,8 +14,9 @@ public class Station {
     @Column(length = 20, nullable = false)
     private String name;
 
-    public Station() {
-    }
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "line_id")
+    private Line line;
 
     public Station(String name) {
         this.name = name;
