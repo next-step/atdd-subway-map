@@ -88,4 +88,28 @@ public class LineAcceptanceTest {
     private static List<LineResponse> getLineResponses(ExtractableResponse<Response> response) {
         return response.jsonPath().getList("$", LineResponse.class);
     }
+
+    /**
+     * Given 1개의 지하철 노선을 생성하고
+     * When 지하철 노선을 조회하면
+     * Then 1개의 지하철 노선과 그 노선에 포함된 역들을 응답받는다
+     */
+    @DisplayName("지하철노선을 조회한다.")
+    @Test
+    void getLine() {
+        // given
+        ExtractableResponse<Response> line = LineAcceptanceFactory.createFixtureLine();
+        Long lineId = getId(line);
+        // when
+        ExtractableResponse<Response> response = LineAcceptanceFactory.getLine(lineId);
+        // then
+        LineResponse lineResponse = getLineResponse(response);
+        assertThat(lineResponse).extracting("name").isEqualTo(Line2);
+        assertThat(lineResponse.getStations()).extracting("name")
+                .containsExactlyInAnyOrder(DANG_SAN, HONG_DAE);
+    }
+
+    private static Long getId(ExtractableResponse<Response> response) {
+        return response.jsonPath().getLong("id");
+    }
 }

@@ -70,4 +70,12 @@ public class LineAcceptanceFactory {
                 .then().log().all()
                 .extract();
     }
+
+    public static ExtractableResponse<Response> getLine(Long lineId) {
+        return RestAssured
+                .given().log().all()
+                .when().get(LINE_BASE_URL + "/{lineId}", lineId)
+                .then().log().all()
+                .extract();
+    }
 }
