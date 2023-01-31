@@ -75,4 +75,21 @@ public class SubwayLineResponse {
 				.collect(Collectors.toUnmodifiableList());
 		}
 	}
+
+	@Getter
+	@NoArgsConstructor(access = AccessLevel.PRIVATE)
+	public static class UpdateInfo {
+
+		private Long id;
+
+		private String name;
+
+		private String color;
+
+		public UpdateInfo(SubwayLine subwayLine) {
+			this.id = subwayLine.getId();
+			this.name = subwayLine.getName();
+			this.color = subwayLine.getColor();
+		}
+	}
 }

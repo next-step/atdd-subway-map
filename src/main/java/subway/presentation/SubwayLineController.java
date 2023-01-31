@@ -45,12 +45,12 @@ public class SubwayLineController {
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<Void> updateSubwayLine(
+	public ResponseEntity<SubwayLineResponse.UpdateInfo> updateSubwayLine(
 		@PathVariable Long id,
 		@RequestBody SubwayLineRequest.Update updateRequest) {
-		subwayLineService.update(id, updateRequest);
+		SubwayLineResponse.UpdateInfo updateInfo = subwayLineService.update(id, updateRequest);
 
-		return ResponseEntity.ok().build();
+		return ResponseEntity.ok(updateInfo);
 	}
 
 	@DeleteMapping("/{id}")

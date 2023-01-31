@@ -51,7 +51,7 @@ public class SubwayLineService {
 	}
 
 	@Transactional
-	public void update(Long id, SubwayLineRequest.Update updateRequest) {
+	public SubwayLineResponse.UpdateInfo update(Long id, SubwayLineRequest.Update updateRequest) {
 		SubwayLine subwayLine = subwayLineRepository.findById(id)
 			.orElseThrow(() -> new NotFoundSubwayLineException(SubwayLineErrorCode.NOT_FOUND_SUBWAY_LINE));
 
@@ -59,6 +59,8 @@ public class SubwayLineService {
 			updateRequest.getName(),
 			updateRequest.getColor()
 		);
+
+		return new SubwayLineResponse.UpdateInfo(subwayLine);
 	}
 
 	@Transactional

@@ -118,8 +118,15 @@ public class SubwayLineAcceptanceTest extends AcceptanceTest {
 		// when
 		ExtractableResponse<Response> response = 지하철노선_수정(id, updateRequest);
 
+		SubwayLineResponse.UpdateInfo updateInfo = response.as(new TypeRef<SubwayLineResponse.UpdateInfo>() {
+		});
+
 		// then
-		assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+		assertAll(
+			() -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
+			() -> assertThat(updateInfo.getName()).isEqualTo(SUBWAY_LINE_NAME_2),
+			() -> assertThat(updateInfo.getColor()).isEqualTo(SUBWAY_LINE_COLOR_2)
+		);
 	}
 
 	// Given 지하철 노선을 생성하고
