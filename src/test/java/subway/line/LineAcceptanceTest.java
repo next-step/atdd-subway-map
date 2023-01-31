@@ -17,6 +17,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD;
+import static subway.JsonPathUtil.*;
 import static subway.line.LineNameConstraints.*;
 import static subway.station.StationNameConstraints.*;
 
@@ -52,10 +53,6 @@ public class LineAcceptanceTest {
 
     }
 
-    private static LineResponse getLineResponse(ExtractableResponse<Response> response) {
-        return response.jsonPath().getObject("$", LineResponse.class);
-    }
-
     /**
      * Given 2개의 지하철 노선을 생성하고
      * When 지하철 노선 목록을 조회하면
@@ -84,9 +81,7 @@ public class LineAcceptanceTest {
                 .containsExactlyInAnyOrder(Line2, Line9);
     }
 
-    private static List<LineResponse> getLineResponses(ExtractableResponse<Response> response) {
-        return response.jsonPath().getList("$", LineResponse.class);
-    }
+
 
     /**
      * Given 1개의 지하철 노선을 생성하고
@@ -106,10 +101,6 @@ public class LineAcceptanceTest {
         assertThat(lineResponse).extracting("name").isEqualTo(Line2);
         assertThat(lineResponse.getStations()).extracting("name")
                 .containsExactlyInAnyOrder(DANG_SAN, HONG_DAE);
-    }
-
-    private static Long getId(ExtractableResponse<Response> response) {
-        return response.jsonPath().getLong("id");
     }
 
     /**
