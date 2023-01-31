@@ -21,10 +21,6 @@ public class LineResponse {
             List.of(StationResponse.of(line.getDownStation()),
                 StationResponse.of(line.getUpStation()));
 
-        //     // List.of(line.getStations().get(0), line.getStations().get(0));
-        //     List.of(StationResponse.of(line.getStations().get(0)),
-        //         StationResponse.of(line.getStations().get(0)));
-
         return LineResponse.builder()
             .id(line.getId())
             .name(line.getName())

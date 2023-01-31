@@ -17,9 +17,10 @@ import subway.station.Station;
 @Getter
 @Builder
 @Entity
-@NoArgsConstructor
 @AllArgsConstructor
 public class Line {
+    protected Line() {
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,21 +40,8 @@ public class Line {
 
     private int distance;
 
-    public static Line of(LineRequest dto, Station downStation, Station upStation) {
-        return Line.builder()
-            .name(dto.getName())
-            .color(dto.getColor())
-            .downStation(downStation)
-            .upStation(upStation)
-            .distance(dto.getDistance())
-            .build();
-    }
-
-    public void modify(LineRequest request, Station downStation, Station upStation) {
-        this.name = request.getName();
-        this.distance = request.getDistance();
-        this.color = request.getColor();
-        this.downStation = downStation;
-        this.upStation = upStation;
+    public void modify(String name, String color) {
+        this.name = name;
+        this.color = color;
     }
 }

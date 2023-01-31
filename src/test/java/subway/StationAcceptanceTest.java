@@ -64,8 +64,7 @@ public class StationAcceptanceTest {
 
         // given
         List<String> stations = List.of("강남역", "역삼역");
-        Map<String, String> params = new HashMap<>();
-        stations.forEach(station -> createOneStation(params, station));
+        stations.forEach(StationAcceptanceTest::createOneStation);
 
         // when
         List<String> stationNames = getStationNames();
@@ -90,7 +89,7 @@ public class StationAcceptanceTest {
         // given
         String stations = "강남역";
         Map<String, String> params = new HashMap<>();
-        ExtractableResponse<Response> oneStation = createOneStation(params, stations);
+        ExtractableResponse<Response> oneStation = createOneStation(stations);
         Long stationId = oneStation.body().jsonPath().getLong("id");
 
         // when
@@ -104,7 +103,8 @@ public class StationAcceptanceTest {
         );
     }
 
-    private ExtractableResponse<Response> createOneStation(Map<String, String> params, String station) {
+    public static ExtractableResponse<Response> createOneStation(String station) {
+        Map<String, String> params = new HashMap<>();
         params.put("name", station);
         return RestAssured.given().log().all()
             .body(params)

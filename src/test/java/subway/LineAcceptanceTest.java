@@ -1,17 +1,13 @@
 package subway;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
@@ -34,9 +30,9 @@ class LineAcceptanceTest {
 
     @BeforeEach
     void setUp() {
-        setUpStation(한라산역);
-        setUpStation(백두산역);
-        setUpStation(서귀포역);
+        StationAcceptanceTest.createOneStation(한라산역);
+        StationAcceptanceTest.createOneStation(백두산역);
+        StationAcceptanceTest.createOneStation(서귀포역);
     }
 
     /**
@@ -49,7 +45,7 @@ class LineAcceptanceTest {
     void 노선_삭제_테스트() {
 
         // given
-        LineRequest lineRequests = LineRequest.of(제주선, "green", 1, 3, 10);
+        LineRequest lineRequests = 제주선_생성();
         long lineId = LineAcceptanceTest.노선_생성(lineRequests).jsonPath().getLong("id");
 
         // when
@@ -67,13 +63,13 @@ class LineAcceptanceTest {
      */
     @Test
     void 노선_수정_테스트() {
+
         // given
-        LineRequest lineRequests =
-            LineRequest.of(제주선, "green", 1, 3, 10);
+        LineRequest lineRequests = 제주선_생성();
         long lineId = LineAcceptanceTest.노선_생성(lineRequests).jsonPath().getLong("id");
 
         // when
-        LineRequest modifyLine = LineRequest.of(반도선, "red", 1, 2, 10);
+        LineRequest modifyLine = 반도선_생성();
         ExtractableResponse<Response> response = 노선_수정(lineId, modifyLine);
 
         // then
@@ -90,8 +86,7 @@ class LineAcceptanceTest {
     @Test
     void 노선_조회_테스트() {
         // given
-        LineRequest lineRequests =
-            LineRequest.of(제주선, "green", 1, 3, 10);
+        LineRequest lineRequests = 제주선_생성();
         long lineId = LineAcceptanceTest.노선_생성(lineRequests).jsonPath().getLong("id");
 
         // when
@@ -111,11 +106,7 @@ class LineAcceptanceTest {
     @Test
     void 노선_목록_조회_테스트() {
         // given
-        List<LineRequest> lineRequests =
-            List.of(
-                LineRequest.of(반도선, "red", 1, 2, 10),
-                LineRequest.of(제주선, "green", 1, 3, 10)
-            );
+        List<LineRequest> lineRequests = List.of(반도선_생성(), 제주선_생성());
         lineRequests.forEach(LineAcceptanceTest::노선_생성);
 
         // when
@@ -133,7 +124,7 @@ class LineAcceptanceTest {
     @Test
     void 노선_생성_테스트() {
 
-        LineRequest request = LineRequest.of(반도선, "red", 1, 2, 10);
+        LineRequest request = 반도선_생성();
 
         // when
         ExtractableResponse<Response> response = 노선_생성(request);
@@ -164,19 +155,6 @@ class LineAcceptanceTest {
             .extract().jsonPath().getList("name", String.class);
     }
 
-    private static void setUpStation(String name) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-
-        ExtractableResponse<Response> response =
-            RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
-    }
-
     private ExtractableResponse<Response> 노선_삭제(long id) {
         return RestAssured.given().log().all()
             .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -203,5 +181,13 @@ class LineAcceptanceTest {
             .get("/lines/{id}", id)
             .then().log().all()
             .extract();
+    }
+
+    private static LineRequest 제주선_생성() {
+        return LineRequest.of(제주선, "green", 1, 3, 10);
+    }
+
+    private static LineRequest 반도선_생성() {
+        return LineRequest.of(반도선, "red", 1, 2, 10);
     }
 }
