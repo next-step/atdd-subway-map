@@ -33,6 +33,16 @@ public class Line {
         this.distance = distance;
     }
 
+    public static Line fromLineRequest(LineRequest request) {
+        Line newLine = new Line();
+        newLine.setName(request.getName());
+        newLine.setColor(request.getColor());
+        newLine.setUpStationId(request.getUpStationId());
+        newLine.setDownStationId(request.getDownStationId());
+        newLine.setDistance(request.getDistance());
+        return newLine;
+    }
+
     public Long getId() {
         return id;
     }
@@ -56,4 +66,29 @@ public class Line {
     public Long getDistance() {
         return distance;
     }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+
+    public void setUpStationId(Long upStationId) {
+        this.upStationId = upStationId;
+    }
+
+    public void setDownStationId(Long downStationId) {
+        this.downStationId = downStationId;
+    }
+
+    public void setDistance(Long distance) {
+        this.distance = distance;
+    }
+
 }

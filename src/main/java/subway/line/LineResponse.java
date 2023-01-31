@@ -3,6 +3,7 @@ package subway.line;
 import subway.station.Station;
 import subway.station.StationResponse;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class LineResponse {
@@ -12,7 +13,7 @@ public class LineResponse {
 
     private String color;
 
-    private List<StationAttr> stations;
+    private List<StationResponse> stations = new ArrayList<>();
 
 
     public Long getId() {
@@ -27,7 +28,7 @@ public class LineResponse {
         return color;
     }
 
-    public List<StationAttr> getStations() {
+    public List<StationResponse> getStations() {
         return stations;
     }
 
@@ -43,42 +44,19 @@ public class LineResponse {
         this.color = color;
     }
 
-    public static LineResponse toLineResponse(Line line, Station upStation, Station downStation){
+    public static LineResponse fromLine(Line line, Station upStation, Station downStation){
         LineResponse res = new LineResponse();
 
         res.setId(line.getId());
         res.setName(line.getName());
         res.setColor(line.getColor());
 
-        StationAttr upStationAttr = StationAttr.toStationAttr(upStation);
-        StationAttr downStationAttr = StationAttr.toStationAttr(downStation);
+        StationResponse upStationAttr = new StationResponse(upStation.getId(), upStation.getName());
+        StationResponse downStationAttr = new StationResponse(downStation.getId(), downStation.getName());
 
         res.stations.add(upStationAttr);
         res.stations.add(downStationAttr);
 
         return res;
-    }
-
-
-    static class StationAttr{
-        private Long id;
-        private String name;
-
-        public StationAttr(Long id, String name) {
-            this.id = id;
-            this.name = name;
-        }
-
-        public Long getId() {
-            return id;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public static StationAttr toStationAttr(Station station){
-            return new StationAttr(station.getId(), station.getName());
-        }
     }
 }

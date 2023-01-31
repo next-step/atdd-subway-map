@@ -1,5 +1,8 @@
 insert into station (id, name)
-values (default, '강남역');
+values (default, '지하철역');
 
 insert into station (id, name)
-values (default, '역삼역');
+values (default, '새로운지하철역');
+
+insert into station (id, name)
+values (default, '또다른지하철역');
