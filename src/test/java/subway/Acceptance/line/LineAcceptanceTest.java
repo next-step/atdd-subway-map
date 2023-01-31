@@ -59,8 +59,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void showLines() {
         // given
-        ExtractableResponse<Response> shinBunDang = createLineResponse(SHIN_BUN_DANG_LINE_REQUEST);
-        ExtractableResponse<Response> bunDang = createLineResponse(BUN_DANG_LINE_REQUEST);
+        createLineResponse(SHIN_BUN_DANG_LINE_REQUEST);
+        createLineResponse(BUN_DANG_LINE_REQUEST);
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -74,9 +74,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         List<String> lineNames = response.jsonPath().getList("name", String.class);
-        String shinBunDangLine = shinBunDang.jsonPath().getString("name");
-        String bunDangLine = bunDang.jsonPath().getString("name");
-        assertThat(lineNames).containsAnyOf(shinBunDangLine, bunDangLine);
+        assertThat(lineNames).containsAnyOf(SHIN_BUN_DANG_LINE_REQUEST.getName(), BUN_DANG_LINE_REQUEST.getName());
     }
 
     /**
@@ -103,8 +101,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         String lineName = response.jsonPath().getString("name");
-        String shinBunDangName = shinBunDang.jsonPath().getString("name");
-        assertThat(lineName).isEqualTo(shinBunDangName);
+        assertThat(lineName).isEqualTo(SHIN_BUN_DANG_LINE_REQUEST.getName());
     }
 
     /**
@@ -169,8 +166,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 .extract().jsonPath().getList("name", String.class);
 
         // then
-        String shinBunDangLine = shinBunDang.jsonPath().getString("name");
-        assertThat(lineNames).doesNotContain(shinBunDangLine);
+        assertThat(lineNames).doesNotContain(SHIN_BUN_DANG_LINE_REQUEST.getName());
     }
 
 }
