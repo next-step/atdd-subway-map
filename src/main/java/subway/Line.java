@@ -43,4 +43,10 @@ public class Line {
     public Long getDownStationId() {
         return downStationId;
     }
+
+    public void patch(LineRequest lineRequest) {
+        this.name = lineRequest.getName();
+        this.upStationId = lineRequest.getUpStationId();
+        this.downStationId = lineRequest.getDownStationId();
+    }
 }

@@ -38,7 +38,7 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         String stationsName = "강남역";
-        지하철_노선에_지하철역_등록_요청(stationsName);
+        지하철역_등록_요청(stationsName);
 
         // then
         List<String> stationNames =
@@ -60,8 +60,8 @@ public class StationAcceptanceTest {
     void getStations() {
         String gangNamStation = "강남역";
         String songPaStation = "송파역";
-        지하철_노선에_지하철역_등록_요청(gangNamStation);
-        지하철_노선에_지하철역_등록_요청(songPaStation);
+        지하철역_등록_요청(gangNamStation);
+        지하철역_등록_요청(songPaStation);
 
         JsonPath stationJsonPath = 전체_지하철역_조회();
 
@@ -81,7 +81,7 @@ public class StationAcceptanceTest {
     @Test
     void deleteStation() {
         String stationName = "강남역";
-        지하철_노선에_지하철역_등록_요청(stationName);
+        지하철역_등록_요청(stationName);
 
         ExtractableResponse<Response> response =
                 RestAssured.given().log().all()
@@ -96,7 +96,7 @@ public class StationAcceptanceTest {
         assertThat(stationNames).isNotIn(stationName);
     }
 
-    private void 지하철_노선에_지하철역_등록_요청(String stationName) {
+    private void 지하철역_등록_요청(String stationName) {
         // when
         Map<String, String> params = new HashMap<>();
         params.put("name", stationName);
