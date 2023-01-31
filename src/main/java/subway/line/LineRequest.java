@@ -1,8 +1,6 @@
 package subway.line;
 
-import subway.common.Request;
-
-public class LineRequest implements Request {
+public class LineRequest {
     private String name;
     private String color;
     private Long upStationId;

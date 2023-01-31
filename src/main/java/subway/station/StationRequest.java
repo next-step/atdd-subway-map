@@ -1,8 +1,6 @@
 package subway.station;
 
-import subway.common.Request;
-
-public class StationRequest implements Request {
+public class StationRequest {
     private String name;
 
     public StationRequest() {

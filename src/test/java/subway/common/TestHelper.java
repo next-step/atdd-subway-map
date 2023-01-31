@@ -31,7 +31,7 @@ public class TestHelper {
                 expectedUpStationId, expectedDownStationId);
     }
 
-    public static ExtractableResponse<Response> 노선을_생성한다(Request request) {
+    public static ExtractableResponse<Response> 노선을_생성한다(Object request) {
         var response = RestAssuredClient.post(
                 Endpoints.LINES,
                 request

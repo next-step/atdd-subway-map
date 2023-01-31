@@ -10,7 +10,6 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import subway.common.DatabaseCleaner;
 import subway.common.Endpoints;
-import subway.common.Request;
 import subway.utils.RestAssuredClient;
 
 import java.util.List;
@@ -86,7 +85,7 @@ public class StationAcceptanceTest {
         assertThat(stationIds).doesNotContain(강남역_아이디);
     }
 
-    public static long 지하철역_생성(Request stationRequest) {
+    public static long 지하철역_생성(Object stationRequest) {
         return RestAssuredClient.post(Endpoints.STATIONS, stationRequest)
                 .jsonPath().getLong("id");
     }

@@ -4,12 +4,11 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.MediaType;
-import subway.common.Request;
 
 public class RestAssuredClient {
     public static ExtractableResponse<Response> post(
             String path,
-            Request request
+            Object request
     ) {
         return RestAssured.given().log().all()
                 .body(request)
@@ -42,7 +41,7 @@ public class RestAssuredClient {
 
     public static ExtractableResponse<Response> put(
             String path,
-            Request request
+            Object request
     ) {
         return RestAssured.given().log().all()
                 .body(request)
