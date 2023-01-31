@@ -27,7 +27,7 @@ public class LineService {
     public LineResponse createLine(LineRequest lineRequest) {
         Station upStation = stationService.showStation(lineRequest.getUpStationId());
         Station downStation = stationService.showStation(lineRequest.getDownStationId());
-        Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor(), upStation, downStation));
+        Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor(), upStation.getId(), downStation.getId()));
         return createLineResponse(line);
     }
 
@@ -62,7 +62,8 @@ public class LineService {
                 line.getId(),
                 line.getName(),
                 line.getColor(),
-                List.of(stationService.createStationResponse(line.getUpStation()), stationService.createStationResponse(line.getDownStation()))
+                List.of(stationService.createStationResponse(stationService.showStation(line.getUpStationId()))
+                        , stationService.createStationResponse(stationService.showStation(line.getDownStationId())))
         );
     }
 }

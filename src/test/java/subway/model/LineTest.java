@@ -12,7 +12,7 @@ class LineTest {
     @Test
     void createLine() {
         // when
-        Line line = new Line("신분당선", "bg-red-600", GANG_NAM_STATION, YEOK_SAM_STATION);
+        Line line = new Line("신분당선", "bg-red-600", GANG_NAM_STATION.getId(), YEOK_SAM_STATION.getId());
 
         // then
         assertThat(line.getName()).isEqualTo("신분당선");
@@ -24,7 +24,7 @@ class LineTest {
     @Test
     void modifyLine() {
         // given
-        Line line = new Line("신분당선", "bg-red-600", GANG_NAM_STATION, YEOK_SAM_STATION);
+        Line line = new Line("신분당선", "bg-red-600", GANG_NAM_STATION.getId(), YEOK_SAM_STATION.getId());
 
         // when
         line.modifyLine("당당선", "bg-red-700");

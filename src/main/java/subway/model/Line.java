@@ -1,6 +1,9 @@
 package subway.model;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import java.util.Objects;
 
 @Entity
@@ -14,20 +17,18 @@ public class Line {
 
     private String color;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private Station upStation;
+    private Long upStationId;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private Station downStation;
+    private Long downStationId;
 
     protected Line() {
     }
 
-    public Line(String name, String color, Station upStation, Station downStation) {
+    public Line(String name, String color, Long upStationId, Long downStationId) {
         this.name = name;
         this.color = color;
-        this.upStation = upStation;
-        this.downStation = downStation;
+        this.upStationId = upStationId;
+        this.downStationId = downStationId;
     }
 
     public Long getId() {
@@ -42,12 +43,12 @@ public class Line {
         return color;
     }
 
-    public Station getUpStation() {
-        return upStation;
+    public Long getUpStationId() {
+        return upStationId;
     }
 
-    public Station getDownStation() {
-        return downStation;
+    public Long getDownStationId() {
+        return downStationId;
     }
 
     public void modifyLine(String name, String color) {
@@ -60,11 +61,11 @@ public class Line {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Line line = (Line) o;
-        return Objects.equals(id, line.id) && Objects.equals(name, line.name) && Objects.equals(color, line.color) && Objects.equals(upStation, line.upStation) && Objects.equals(downStation, line.downStation);
+        return Objects.equals(id, line.id) && Objects.equals(name, line.name) && Objects.equals(color, line.color) && Objects.equals(upStationId, line.upStationId) && Objects.equals(downStationId, line.downStationId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, color, upStation, downStation);
+        return Objects.hash(id, name, color, upStationId, downStationId);
     }
 }
