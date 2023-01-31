@@ -3,6 +3,7 @@ package subway;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -38,6 +39,15 @@ public class LineAcceptanceTest {
 
     private static final Long DISTANCE_VALUE = 10L;
 
+    private Long upStationId;
+    private Long downStationId;
+
+    @BeforeEach
+    void setUp() {
+        upStationId = 지하철역생성후_식별번호_반환(StationAcceptanceTest.GANGNAM);
+        downStationId = 지하철역생성후_식별번호_반환(StationAcceptanceTest.YANGJAE);
+    }
+
     /**
      * When 지하철 노선을 생성하면
      * Then 지하철 노선목록 조회 시 생성한 노선을 찾을 수 있다.
@@ -46,8 +56,6 @@ public class LineAcceptanceTest {
     @Test
     void createLineTest() {
         // when
-        Long upStationId = 지하철역생성후_식별번호_반환(StationAcceptanceTest.GANGNAM);
-        Long downStationId = 지하철역생성후_식별번호_반환(StationAcceptanceTest.YANGJAE);
         ExtractableResponse<Response> response = createLineWithLineRequest(NAME_VALUE1, COLOR_VALUE1, upStationId, downStationId);
 
         // then
@@ -71,8 +79,6 @@ public class LineAcceptanceTest {
     @Test
     void getLines() {
         //given
-        Long upStationId = 지하철역생성후_식별번호_반환(StationAcceptanceTest.GANGNAM);
-        Long downStationId = 지하철역생성후_식별번호_반환(StationAcceptanceTest.YANGJAE);
         Long upStationId2 = 지하철역생성후_식별번호_반환(StationAcceptanceTest.HAGYE);
         Long downStationId2 = 지하철역생성후_식별번호_반환(StationAcceptanceTest.JUNGGYE);
 
@@ -110,8 +116,6 @@ public class LineAcceptanceTest {
     @Test
     void getLineTest() {
         //given
-        Long upStationId = 지하철역생성후_식별번호_반환(StationAcceptanceTest.GANGNAM);
-        Long downStationId = 지하철역생성후_식별번호_반환(StationAcceptanceTest.YANGJAE);
         ExtractableResponse<Response> createLineResponse = createLineWithLineRequest(NAME_VALUE1, COLOR_VALUE1, upStationId, downStationId);
         long id = createLineResponse.jsonPath().getLong(ID);
 
@@ -132,8 +136,6 @@ public class LineAcceptanceTest {
     @Test
     void updateLineTest() {
         // given
-        Long upStationId = 지하철역생성후_식별번호_반환(StationAcceptanceTest.GANGNAM);
-        Long downStationId = 지하철역생성후_식별번호_반환(StationAcceptanceTest.YANGJAE);
         ExtractableResponse<Response> createLineResponse = createLineWithLineRequest(NAME_VALUE1, COLOR_VALUE1, upStationId, downStationId);
         long id = createLineResponse.jsonPath().getLong(ID);
 
@@ -155,8 +157,6 @@ public class LineAcceptanceTest {
     @Test
     void deleteLineTest() {
         // given
-        Long upStationId = 지하철역생성후_식별번호_반환(StationAcceptanceTest.GANGNAM);
-        Long downStationId = 지하철역생성후_식별번호_반환(StationAcceptanceTest.YANGJAE);
         ExtractableResponse<Response> createLineResponse = createLineWithLineRequest(NAME_VALUE1, COLOR_VALUE1, upStationId, downStationId);
         long id = createLineResponse.jsonPath().getLong(ID);
 
@@ -240,12 +240,12 @@ public class LineAcceptanceTest {
         return allLines.jsonPath().getList("", LineResponse.class);
     }
 
-    private static void 노선응답값검증(ExtractableResponse<Response> response, long id, String nameValue1, String colorValue1, String... stations) {
+    private static void 노선응답값검증(ExtractableResponse<Response> response, long id, String name, String color, String... stationNames) {
         LineResponse lineResponse = response.body().as(LineResponse.class);
         assertThat(lineResponse.getId()).isEqualTo(id);
-        assertThat(lineResponse.getName()).isEqualTo(nameValue1);
-        assertThat(lineResponse.getColor()).isEqualTo(colorValue1);
+        assertThat(lineResponse.getName()).isEqualTo(name);
+        assertThat(lineResponse.getColor()).isEqualTo(color);
         assertThat(lineResponse.getStations())
-                .extracting(NAME).contains(stations);
+                .extracting(NAME, String.class).contains(stationNames);
     }
 }
