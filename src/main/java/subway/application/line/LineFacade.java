@@ -32,4 +32,9 @@ public class LineFacade {
         return lineService.getAllLines();
     }
 
+    @Transactional(readOnly = true)
+    public LineResponse getLine(Long lineId) {
+        return lineService.getLine(lineId);
+    }
+
 }

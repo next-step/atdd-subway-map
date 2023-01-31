@@ -28,4 +28,9 @@ public class LineController {
         return ResponseEntity.ok(lineFacade.getAllLines());
     }
 
+
+    @GetMapping("/{lineId}")
+    public ResponseEntity<LineResponse> getLine(@PathVariable Long lineId) {
+        return ResponseEntity.ok(lineFacade.getLine(lineId));
+    }
 }

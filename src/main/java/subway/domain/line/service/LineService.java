@@ -37,4 +37,11 @@ public class LineService {
                 .map(LineResponse::of)
                 .collect(Collectors.toList());
     }
+
+    @Transactional(readOnly = true)
+    public LineResponse getLine(Long lineId) {
+        Line line = lineRepository.findByIdWithStations(lineId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_LINE));
+        return LineResponse.of(line);
+    }
 }
