@@ -1,5 +1,6 @@
 package subway.line;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.exception.LineNotFoundException;
@@ -55,7 +56,11 @@ public class LineService {
 
     @Transactional
     public void deleteLine(Long id) {
-        lineRepository.deleteById(id);
+        try {
+            lineRepository.deleteById(id);
+        } catch (EmptyResultDataAccessException e) {
+            throw new LineNotFoundException();
+        }
     }
 
     private static List<StationResponse> makeStationResponses(Station line, Station line1) {
