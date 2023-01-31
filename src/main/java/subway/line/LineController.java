@@ -1,6 +1,7 @@
 package subway.line;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -42,9 +43,9 @@ public class LineController {
         lineService.updateLine(lineId, lineUpdateRequest);
         return ResponseEntity.noContent().build();
     }
-//    @DeleteMapping("/stations/{id}")
-//    public ResponseEntity<Void> deleteStation(@PathVariable Long id) {
-//        stationService.deleteStationById(id);
-//        return ResponseEntity.noContent().build();
-//    }
+    @DeleteMapping("/{lineId}")
+    public ResponseEntity<Void> deleteLine(@PathVariable Long lineId) {
+        lineService.deleteLine(lineId);
+        return ResponseEntity.noContent().build();
+    }
 }
