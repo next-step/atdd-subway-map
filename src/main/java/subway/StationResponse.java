@@ -16,4 +16,11 @@ public class StationResponse {
     public String getName() {
         return name;
     }
+
+    static public StationResponse from(Station station) {
+        return new StationResponse(
+                station.getId(),
+                station.getName()
+        );
+    }
 }
