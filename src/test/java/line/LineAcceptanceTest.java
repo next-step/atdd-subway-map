@@ -4,6 +4,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @DisplayName("노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {
@@ -14,7 +17,9 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선 생성")
     @Test
     void createLine() {
-
+        //when
+        Map<String, String> params = new HashMap<>();
+        //then
     }
 
     /**
