@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 import subway.line.LineRepository;
 import subway.line.LineRequest;
 import subway.line.LineResponse;
+import subway.subway.Station;
 
 import java.util.List;
 
@@ -90,7 +91,31 @@ public class LineAcceptanceTest {
      * When 생성한 지하철 노선을 조회하면
      * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
      */
+    @DisplayName("지하철 노선을 생성하고 해당 지하철 노선을 조회하면 지하철 노선 정보를 조회할 수 있다.")
+    @Test
+    public void getLineTest() {
+        Long lineId = createLine(lineRequest);
+        var line = getLine(lineId);
+        var retriveStationIdList = line.jsonPath().getList("station.id", Long.class);
 
+        assertThat(line.jsonPath().getLong("id")).isEqualTo(lineId);
+        assertThat(retriveStationIdList).containsAnyOf(firstStationId);
+        assertThat(retriveStationIdList).containsAnyOf(secondStationId);
+    }
+
+    @DisplayName("지하철 노선 아이디를 통해 해당 지하철 노선을 조회할 수 있다.")
+    private ExtractableResponse<Response> getLine(Long lineId) {
+        var response = RestAssured.given().log().all()
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .when().get("/lines/" + lineId)
+                .then().log().all()
+                .extract();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.contentType()).isEqualTo(MediaType.APPLICATION_JSON_VALUE);
+
+        return response;
+    }
 
 
     /**
