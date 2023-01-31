@@ -1,8 +1,12 @@
 package subway.dto;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import subway.domain.Line;
+import subway.domain.Section;
+import subway.domain.Station;
 
 public class LineResponse {
     private final Long id;
@@ -12,8 +16,18 @@ public class LineResponse {
     private final List<StationResponse> stations;
 
     public static LineResponse createLineResponse(Line line) {
-        return new LineResponse(line.getId(), line.getName(), line.getColor(), line.getDistance(),
-            List.of(StationResponse.createStationResponse(line.getUpStation()), StationResponse.createStationResponse(line.getDownStation())));
+        List<Station> stations = new ArrayList<>();
+        if (!line.getSections().isEmpty()) {
+            stations.add(line.getSections().get(0).getUpStation());
+        }
+
+        stations.addAll(line.getSections().stream()
+            .map(Section::getDownStation)
+            .collect(Collectors.toList()));
+
+        return new LineResponse(line.getId(), line.getName(), line.getColor(), line.getDistance(), stations.stream()
+            .map(StationResponse::createStationResponse)
+            .collect(Collectors.toList()));
     }
 
     protected LineResponse(Long id, String name, String color, Long distance, List<StationResponse> stations) {
