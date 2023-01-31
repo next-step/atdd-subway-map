@@ -27,20 +27,29 @@ public class LineService {
 
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
-        Station upStation = findStation(lineRequest.getUpStationId());
-        Station downStation = findStation(lineRequest.getDownStationId());
+        Station upStation = findStationEntity(lineRequest.getUpStationId());
+        Station downStation = findStationEntity(lineRequest.getDownStationId());
         Line line = dtoConverter.of(lineRequest, upStation, downStation);
         Line saveLine = lineRepository.save(line);
 
         return dtoConverter.of(saveLine);
     }
 
-    public Station findStation(Long id) {
+    private Station findStationEntity(Long id) {
         return stationRepository.findById(id).orElseThrow(() -> new RuntimeException("없는 Station Id입니다."));
     }
 
     public List<LineResponse> findAllLines() {
         List<Line> lineList = lineRepository.findAll();
         return lineList.stream().map(dtoConverter::of).collect(Collectors.toList());
+    }
+
+    private Line findLineEntity(Long id) {
+        return lineRepository.findById(id).orElseThrow(() -> new RuntimeException("없는 Line Id입니다"));
+    }
+
+    public LineResponse findLine(Long id) {
+        Line lineEntity = findLineEntity(id);
+        return dtoConverter.of(lineEntity);
     }
 }
