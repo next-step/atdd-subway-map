@@ -8,8 +8,8 @@ import org.springframework.test.context.jdbc.Sql;
 import setting.RandomPortSetting;
 import subway.common.util.CommonApi;
 import subway.common.util.CommonValidationUtils;
-import subway.line.util.ValidationUtils;
 
+import static subway.line.LineApi.LINE_NAME_KEY;
 import static subway.line.MockLine.분당선;
 import static subway.line.MockLine.신분당선;
 
@@ -29,7 +29,7 @@ public class LineAcceptanceTest extends RandomPortSetting {
 
         // Then
         ExtractableResponse<Response> responseOfShowLines = LineApi.showLines();
-        ValidationUtils.checkLineExistenceInList(responseOfShowLines, 신분당선);
+        CommonValidationUtils.checkExistenceInList(responseOfShowLines, LINE_NAME_KEY, 신분당선);
     }
 
     /**
@@ -49,7 +49,7 @@ public class LineAcceptanceTest extends RandomPortSetting {
 
         // Then
         CommonValidationUtils.checkResponseCount(responseOfShowLines, 2);
-        ValidationUtils.checkLinesExistenceInList(responseOfShowLines, 신분당선, 분당선);
+        CommonValidationUtils.checkExistencesInList(responseOfShowLines, LINE_NAME_KEY, 신분당선, 분당선);
     }
 
     /**
@@ -68,7 +68,7 @@ public class LineAcceptanceTest extends RandomPortSetting {
         ExtractableResponse<Response> responseOfShowLine = CommonApi.showResource(responseOfCreateLine);
 
         // Then
-        ValidationUtils.checkLineExistence(responseOfShowLine, 신분당선);
+        CommonValidationUtils.checkExistence(responseOfShowLine, LINE_NAME_KEY, 신분당선);
     }
 
     /**

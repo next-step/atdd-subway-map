@@ -1,6 +1,8 @@
 package subway.line;
 
-public enum MockLine {
+import subway.common.Mock;
+
+public enum MockLine implements Mock {
     신분당선("신분당선", "bg-red-600", 1L, 2L, 10),
     분당선("분당선", "bg-green-600", 2L, 3L, 5),
     ;
