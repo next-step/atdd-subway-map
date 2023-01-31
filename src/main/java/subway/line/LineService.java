@@ -33,13 +33,13 @@ public class LineService {
         if(downStation.isPresent()){
             line.addStation(downStation.get());
         }else{
-            line.setDownStationId(0L);
+            line.updateDownStationId(0L);
         }
 
         if(upStation.isPresent()){
             line.addStation(upStation.get());
         }else{
-            line.setUpStationId(0L);
+            line.updateUpStationId(0L);
         }
 
 

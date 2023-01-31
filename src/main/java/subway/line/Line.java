@@ -13,7 +13,6 @@ import subway.station.Station;
 @Getter
 @Entity
 @AllArgsConstructor
-@Data
 @NoArgsConstructor
 @Table(name = "LINE")
 public class Line {
@@ -59,6 +58,14 @@ public class Line {
         if (stationList == null) return new ArrayList<>();
 
         return stationList;
+    }
+
+    public void updateDownStationId(Long id){
+        this.downStationId = id;
+    }
+
+    public void updateUpStationId(Long id){
+        this.upStationId = id;
     }
 
     public void addStation(Station station){
