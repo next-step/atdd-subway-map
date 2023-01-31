@@ -57,7 +57,7 @@ public class LineSectionAcceptanceTest extends AbstractAcceptanceTest {
     /**
      * Given 노선을 생성하고
      * When 해당 노선에 상행역과 하행역이 같은 구간을 등록하면
-     * Then 500 에러가 발생한다.
+     * Then 400 에러가 발생한다.
      */
     @DisplayName("상행역과 하행역이 같은 구간은 등록할 수 없다.")
     @Sql("/sql/setup-station.sql")
@@ -65,13 +65,13 @@ public class LineSectionAcceptanceTest extends AbstractAcceptanceTest {
     void addSectionException() {
         String location = 노선_생성(신분당선_요청).extract().header("location");
 
-        구간_등록(location, 양재_양재_구간).statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        구간_등록(location, 양재_양재_구간).statusCode(HttpStatus.BAD_REQUEST.value());
     }
 
     /**
      * Given 구간이 포함되어있는 지하철 노선을 생성하고
      * When 해당 노선에 잘못된 구간을 등록하면
-     * Then 500 에러가 발생한다.
+     * Then 400 에러가 발생한다.
      */
     @DisplayName("새로운 구간의 상행역이 해당 노선에 등록되어있는 하행 종점역과 일치하지 않은 경우 구간을 등록할 수 없다.")
     @Sql("/sql/setup-station.sql")
@@ -79,13 +79,13 @@ public class LineSectionAcceptanceTest extends AbstractAcceptanceTest {
     void addSectionException1() {
         String location = 노선_생성(신분당선_요청).extract().header("location");
 
-        구간_등록(location, 강남역_판교_구간).statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        구간_등록(location, 강남역_판교_구간).statusCode(HttpStatus.BAD_REQUEST.value());
     }
 
     /**
      * Given 구간이 포함되어있는 지하철 노선을 생성하고
      * When 해당 노선에 잘못된 구간을 등록하면
-     * Then 500 에러가 발생한다.
+     * Then 400 에러가 발생한다.
      */
     @DisplayName("새로운 구간의 하행역이 해당 노선에 등록되어있는 경우 구간을 등록할 수 없다.")
     @Sql("/sql/setup-station.sql")
@@ -93,7 +93,7 @@ public class LineSectionAcceptanceTest extends AbstractAcceptanceTest {
     void addSectionException2() {
         String location = 노선_생성(신분당선_요청).extract().header("location");
 
-        구간_등록(location, 신논현역_신사역_구간).statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        구간_등록(location, 신논현역_신사역_구간).statusCode(HttpStatus.BAD_REQUEST.value());
     }
 
     /**
@@ -119,7 +119,7 @@ public class LineSectionAcceptanceTest extends AbstractAcceptanceTest {
     /**
      * Given 구간이 1개 포함되어있는 지하철 노선을 생성하고
      * When 해당 노선에서 마지막 구간(하행 종점역)을 제거하면
-     * Then 500 에러가 발생한다.
+     * Then 400 에러가 발생한다.
      */
     @DisplayName("구간이 1개인 경우 제거할 수 없다.")
     @Sql("/sql/setup-station.sql")
@@ -127,13 +127,13 @@ public class LineSectionAcceptanceTest extends AbstractAcceptanceTest {
     void deleteSectionException1() {
         String location = 노선_생성(신분당선_요청).extract().header("location");
 
-        구간_삭제(location, 신논현역_ID).statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        구간_삭제(location, 신논현역_ID).statusCode(HttpStatus.BAD_REQUEST.value());
     }
 
     /**
      * Given 구간이 2개인 노선을 생성하고
      * When 해당 노선에서 마지막 구간(하행 종점역)이 아닌 다른 역을 제거하면
-     * Then 500 에러가 발생한다.
+     * Then 400 에러가 발생한다.
      */
     @DisplayName("마지막 구간의 하행 종점역이 아닌 경우 구간을 제거할 수 없다.")
     @Sql("/sql/setup-station.sql")
@@ -142,7 +142,7 @@ public class LineSectionAcceptanceTest extends AbstractAcceptanceTest {
         String location = 노선_생성(신분당선_요청).extract().header("location");
         구간_등록(location, 신논현_양재_구간);
 
-        구간_삭제(location, 신논현역_ID).statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        구간_삭제(location, 신논현역_ID).statusCode(HttpStatus.BAD_REQUEST.value());
     }
 
     private ValidatableResponse 노선_생성(LineRequest request) {

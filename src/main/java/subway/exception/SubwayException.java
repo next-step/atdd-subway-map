@@ -7,7 +7,7 @@ public class SubwayException extends RuntimeException {
     private final SubwayExceptionStatus status;
 
     public SubwayException(String message) {
-        this(message, SubwayExceptionStatus.ERROR);
+        this(message, SubwayExceptionStatus.BAD_REQUEST);
     }
 
     public SubwayException(SubwayExceptionStatus status) {
