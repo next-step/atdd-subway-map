@@ -12,11 +12,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class LineAcceptanceTest {
 
+    private static final int LENGTH_TWO = 2;
     @LocalServerPort
     int port;
 
@@ -44,6 +46,37 @@ public class LineAcceptanceTest {
         ExtractableResponse<Response> readResponses = getReadResponses();
 
         Assertions.assertThat(readResponses.body().jsonPath().getList("name")).contains(lineName);
+    }
+
+    /**
+     * Given 2개의 지하철 노선을 생성하고
+     * When 지하철 노선 목록을 조회하면
+     * Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다. => 지하철 노선 목록 조회시 응답받은 List<Response>의 길이가 2이다.
+     */
+    @Test
+    void readLines() {
+        //given
+        String lineTwoName = "2호선";
+        String lineTwoColor = "초록색";
+
+        Map<String, String> params = new HashMap<>();
+        putParams(params, lineTwoName, lineTwoColor);
+        getSaveLineResponse(params);
+
+        String lineThreeName = "3호선";
+        String lineThreeColor = "주황색";
+
+        putParams(params, lineThreeName, lineThreeColor);
+        getSaveLineResponse(params);
+
+        //when
+        ExtractableResponse<Response> readResponse = getReadResponses();
+
+        //then
+
+        List list = readResponse.body().jsonPath().get();
+
+        Assertions.assertThat(list.size()).isEqualTo(LENGTH_TWO);
     }
 
     private ExtractableResponse<Response> getReadResponses() {
