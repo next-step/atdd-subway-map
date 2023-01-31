@@ -5,6 +5,7 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import setting.RandomPortSetting;
+import subway.common.util.CommonValidationUtils;
 import subway.station.util.ExtractionUtils;
 import subway.station.util.ValidationUtils;
 
@@ -27,7 +28,7 @@ public class StationAcceptanceTest extends RandomPortSetting {
         ExtractableResponse<Response> responseOfCreateStation = StationApi.createStation(강남역);
 
         // then
-        ValidationUtils.checkStationCreated(responseOfCreateStation);
+        CommonValidationUtils.checkRequestCreated(responseOfCreateStation);
 
         // then
         ExtractableResponse<Response> responseOfShowStations = StationApi.showStations();
@@ -50,7 +51,7 @@ public class StationAcceptanceTest extends RandomPortSetting {
         ExtractableResponse<Response> responseOfShowStations = StationApi.showStations();
 
         // Then
-        ValidationUtils.checkStationCount(responseOfShowStations, 2);
+        CommonValidationUtils.checkResponseCount(responseOfShowStations, 2);
         ValidationUtils.checkStationExistence(responseOfShowStations, 강남역, 서초역);
     }
 
@@ -73,7 +74,7 @@ public class StationAcceptanceTest extends RandomPortSetting {
 
         // Then
         ExtractableResponse<Response> responseOfShowStations = StationApi.showStations();
-        ValidationUtils.checkStationCount(responseOfShowStations, 2);
+        CommonValidationUtils.checkResponseCount(responseOfShowStations, 2);
         ValidationUtils.checkStationNotExistence(responseOfShowStations, 서초역);
         ValidationUtils.checkStationExistence(responseOfShowStations, 강남역, 신촌역);
     }
