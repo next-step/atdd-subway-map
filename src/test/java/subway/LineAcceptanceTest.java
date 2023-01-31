@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import subway.station.web.dto.LineResponse;
 
 import java.util.HashMap;
 import java.util.List;
@@ -32,7 +33,7 @@ public class LineAcceptanceTest {
      * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다 => 지하철 노선 목록의 이름 중에 1호선이 있다.
      */
     @Test
-    void createLine() {
+    void 지하철_노선_생성_후_목록_조회시_찾을_수_있다() {
         //when
         String lineName = "1호선";
         String lineColor = "파란색";
@@ -54,7 +55,7 @@ public class LineAcceptanceTest {
      * Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다. => 지하철 노선 목록 조회시 응답받은 List<Response>의 길이가 2이다.
      */
     @Test
-    void readLines() {
+    void 두_개의_지하철_노선_생성_후_목록_조회시_응답_받은_Response의_길이는_2이다() {
         //given
         String lineTwoName = "2호선";
         String lineTwoColor = "초록색";
@@ -73,10 +74,45 @@ public class LineAcceptanceTest {
         ExtractableResponse<Response> readResponse = getReadResponses();
 
         //then
-
         List list = readResponse.body().jsonPath().get();
 
         Assertions.assertThat(list.size()).isEqualTo(LENGTH_TWO);
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 조회하면
+     * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
+     */
+    @Test
+    void 지하철_노선_생성_후_생성된_노선으로_조회시_노선의_정보를_알_수_있다() {
+        //given
+        String lineFourName = "4호선";
+        String lineFourColor = "하늘색";
+
+        Map<String, String> params = new HashMap<>();
+        putParams(params, lineFourName, lineFourColor);
+        Long id = getSaveLineResponse(params).getId();
+
+        String lineFiveName = "5호선";
+        String lineFiveColor = "보라색";
+        putParams(params, lineFiveName, lineFiveColor);
+        getSaveLineResponse(params);
+
+        //when
+        ExtractableResponse<Response> findResponse = RestAssured
+                .given()
+                .when()
+                .get("/lines/" + id)
+                .then().log().all()
+                .extract();
+
+        //then
+        String lineName = findResponse.body().jsonPath().get("name");
+        String lineColor = findResponse.body().jsonPath().get("color");
+
+        Assertions.assertThat(lineName).isEqualTo(lineFourName);
+        Assertions.assertThat(lineColor).isEqualTo(lineFourColor);
     }
 
     private ExtractableResponse<Response> getReadResponses() {
@@ -97,7 +133,7 @@ public class LineAcceptanceTest {
         params.put("color", lineColor);
     }
 
-    private void getSaveLineResponse(Map<String, String> params) {
+    private LineResponse getSaveLineResponse(Map<String, String> params) {
         ExtractableResponse<Response> saveResponse = RestAssured
                 .given()
                 .body(params)
@@ -107,5 +143,7 @@ public class LineAcceptanceTest {
                 .extract();
 
         Assertions.assertThat(saveResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        return saveResponse.jsonPath().getObject("", LineResponse.class);
     }
 }
