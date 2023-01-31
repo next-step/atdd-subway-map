@@ -9,8 +9,8 @@ import setting.RandomPortSetting;
 import subway.common.util.CommonApi;
 import subway.common.util.CommonValidationUtils;
 import subway.line.util.ExtractionUtils;
+import subway.line.util.ValidationUtils;
 
-import static subway.line.LineApi.LINE_NAME_KEY;
 import static subway.line.MockLine.분당선;
 import static subway.line.MockLine.신분당선;
 
@@ -30,7 +30,7 @@ public class LineAcceptanceTest extends RandomPortSetting {
 
         // Then
         ExtractableResponse<Response> responseOfShowLines = LineApi.showLines();
-        CommonValidationUtils.checkExistenceInList(responseOfShowLines, LINE_NAME_KEY, 신분당선);
+        CommonValidationUtils.checkNameExistenceInList(responseOfShowLines, 신분당선);
     }
 
     /**
@@ -50,7 +50,7 @@ public class LineAcceptanceTest extends RandomPortSetting {
 
         // Then
         CommonValidationUtils.checkResponseCount(responseOfShowLines, 2);
-        CommonValidationUtils.checkExistencesInList(responseOfShowLines, LINE_NAME_KEY, 신분당선, 분당선);
+        CommonValidationUtils.checkNamesExistenceInList(responseOfShowLines, 신분당선, 분당선);
     }
 
     /**
@@ -69,7 +69,7 @@ public class LineAcceptanceTest extends RandomPortSetting {
         ExtractableResponse<Response> responseOfShowLine = CommonApi.showResource(responseOfCreateLine);
 
         // Then
-        CommonValidationUtils.checkExistence(responseOfShowLine, LINE_NAME_KEY, 신분당선);
+        CommonValidationUtils.checkNameExistence(responseOfShowLine, 신분당선);
     }
 
     /**
@@ -89,7 +89,8 @@ public class LineAcceptanceTest extends RandomPortSetting {
 
         // Then
         ExtractableResponse<Response> responseOfShowResource = CommonApi.showResource(responseOfCreateLine);
-        CommonValidationUtils.checkExistence(responseOfShowResource, LINE_NAME_KEY, 분당선);
+        CommonValidationUtils.checkNameExistence(responseOfShowResource, 분당선);
+        ValidationUtils.checkColorExistenceInList(responseOfShowResource, 분당선);
     }
 
     /**
@@ -111,6 +112,6 @@ public class LineAcceptanceTest extends RandomPortSetting {
         // Then
         ExtractableResponse<Response> responseOfShowLines = LineApi.showLines();
         CommonValidationUtils.checkResponseCount(responseOfShowLines, 0);
-        CommonValidationUtils.checkNotExistencesInList(responseOfShowLines, LINE_NAME_KEY, 신분당선);
+        CommonValidationUtils.checkNamesNotExistenceInList(responseOfShowLines, 신분당선);
     }
 }

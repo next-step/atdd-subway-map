@@ -11,7 +11,6 @@ import subway.station.util.ExtractionUtils;
 import static subway.station.MockStation.강남역;
 import static subway.station.MockStation.서초역;
 import static subway.station.MockStation.신촌역;
-import static subway.station.StationApi.STATION_NAME_KEY;
 
 @DisplayName("지하철역 관련 기능")
 public class StationAcceptanceTest extends RandomPortSetting {
@@ -32,7 +31,7 @@ public class StationAcceptanceTest extends RandomPortSetting {
 
         // then
         ExtractableResponse<Response> responseOfShowStations = StationApi.showStations();
-        CommonValidationUtils.checkExistenceInList(responseOfShowStations, STATION_NAME_KEY, 강남역);
+        CommonValidationUtils.checkNameExistenceInList(responseOfShowStations, 강남역);
     }
 
     /**
@@ -52,7 +51,7 @@ public class StationAcceptanceTest extends RandomPortSetting {
 
         // Then
         CommonValidationUtils.checkResponseCount(responseOfShowStations, 2);
-        CommonValidationUtils.checkExistencesInList(responseOfShowStations, STATION_NAME_KEY, 강남역, 서초역);
+        CommonValidationUtils.checkNamesExistenceInList(responseOfShowStations, 강남역, 서초역);
     }
 
     /**
@@ -75,7 +74,7 @@ public class StationAcceptanceTest extends RandomPortSetting {
         // Then
         ExtractableResponse<Response> responseOfShowStations = StationApi.showStations();
         CommonValidationUtils.checkResponseCount(responseOfShowStations, 2);
-        CommonValidationUtils.checkNotExistencesInList(responseOfShowStations, STATION_NAME_KEY, 서초역);
-        CommonValidationUtils.checkExistencesInList(responseOfShowStations, STATION_NAME_KEY, 강남역, 신촌역);
+        CommonValidationUtils.checkNamesNotExistenceInList(responseOfShowStations, 서초역);
+        CommonValidationUtils.checkNamesExistenceInList(responseOfShowStations, 강남역, 신촌역);
     }
 }

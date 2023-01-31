@@ -14,6 +14,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class CommonValidationUtils {
 
+    public static final String MOCK_NAME_KEY = "name";
+
     private CommonValidationUtils() {}
 
     public static void checkCreatedResponse(ExtractableResponse<Response> response) {
@@ -36,29 +38,29 @@ public class CommonValidationUtils {
         assertThat(jsonPath.getList("")).hasSize(expected);
     }
 
-    public static void checkExistence(ExtractableResponse<Response> response, String key, Mock mock) {
-        String nameOfResponse = CommonExtractionUtils.getNameOfKey(response, key);
+    public static void checkNameExistence(ExtractableResponse<Response> response, Mock mock) {
+        String nameOfResponse = CommonExtractionUtils.getValueOfKey(response, MOCK_NAME_KEY);
         String name = mock.getName();
 
         assertThat(nameOfResponse).isEqualTo(name);
     }
 
-    public static void checkExistenceInList(ExtractableResponse<Response> response, String key, Mock mock) {
-        List<String> namesOfResponse = CommonExtractionUtils.getNamesOfKey(response, key);
+    public static void checkNameExistenceInList(ExtractableResponse<Response> response, Mock mock) {
+        List<String> namesOfResponse = CommonExtractionUtils.getValuesOfKey(response, MOCK_NAME_KEY);
         String name = mock.getName();
 
         assertTrue(namesOfResponse.contains(name));
     }
 
-    public static void checkNotExistencesInList(ExtractableResponse<Response> response, String key, Mock mock) {
-        List<String> namesOfResponse = CommonExtractionUtils.getNamesOfKey(response, key);
+    public static void checkNamesNotExistenceInList(ExtractableResponse<Response> response, Mock mock) {
+        List<String> namesOfResponse = CommonExtractionUtils.getValuesOfKey(response, MOCK_NAME_KEY);
         String name = mock.getName();
 
         assertFalse(namesOfResponse.contains(name));
     }
 
-    public static void checkExistencesInList(ExtractableResponse<Response> response, String key, Mock mock1, Mock mock2) {
-        List<String> namesOfResponse = CommonExtractionUtils.getNamesOfKey(response, key);
+    public static void checkNamesExistenceInList(ExtractableResponse<Response> response, Mock mock1, Mock mock2) {
+        List<String> namesOfResponse = CommonExtractionUtils.getValuesOfKey(response, MOCK_NAME_KEY);
         List<String> names = List.of(mock1.getName(), mock2.getName());
 
         assertTrue(namesOfResponse.containsAll(names));

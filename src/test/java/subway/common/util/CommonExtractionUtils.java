@@ -14,9 +14,9 @@ public class CommonExtractionUtils {
      * JSON에 대해 key를 통해 추출한다
      *
      * @param response
-     * @return target Name
+     * @return target value
      */
-    public static String getNameOfKey(ExtractableResponse<Response> response, String key) {
+    public static String getValueOfKey(ExtractableResponse<Response> response, String key) {
         JsonPath jsonPath = response.jsonPath();
         return jsonPath.get(key);
     }
@@ -25,9 +25,9 @@ public class CommonExtractionUtils {
      * List에 대해 key를 통해 추출한다
      *
      * @param response
-     * @return target Names
+     * @return target values
      */
-    public static List<String> getNamesOfKey(ExtractableResponse<Response> response, String key) {
+    public static List<String> getValuesOfKey(ExtractableResponse<Response> response, String key) {
         JsonPath jsonPath = response.jsonPath();
         return jsonPath.getList(key, String.class);
     }
