@@ -26,28 +26,20 @@ public class StationAcceptanceTest {
      */
     @DisplayName("지하철역을 생성한다.")
     @Test
-    void createStation() {
+    void 지하철을_생성하면_목록_조회_시_생성한_역을_찾을_수_있다() {
         // when
         Map<String, String> params = new HashMap<>();
         params.put("name", "강남역");
 
-        ExtractableResponse<Response> response =
-            RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = createStation(params);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames =
-            RestAssured.given().log().all()
-                .when().get("/stations")
-                .then().log().all()
-                .extract().jsonPath().getList("name", String.class);
+        ExtractableResponse<Response> retrieveResponse = retrieveStations();
+
+        List<String> stationNames = retrieveResponse.jsonPath().getList("name", String.class);
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
@@ -56,8 +48,9 @@ public class StationAcceptanceTest {
      * When 지하철역 목록을 조회하면
      * Then 2개의 지하철역을 응답 받는다
      */
+    @DisplayName("지하철역을 2개를 조회한다.")
     @Test
-    void retrieveStations() {
+    void 지하철역을_2개_생성하고_목록을_조회하면_2개가_조회된다() {
         // Given
         Map<String, String> firstParams = new HashMap<>();
         firstParams.put("name", "강남역");
@@ -68,11 +61,7 @@ public class StationAcceptanceTest {
         createStation(secondParams);
 
         // When
-        ExtractableResponse<Response> response =
-            RestAssured.given().log().all()
-                .when().get("/stations")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = retrieveStations();
 
         // Then
         List<String> stations = response.jsonPath()
@@ -85,29 +74,23 @@ public class StationAcceptanceTest {
      * When 그 지하철역을 삭제하면
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
+    @DisplayName("지하철역을 삭제한다.")
     @Test
-    void deleteStation() {
+    void 지하철역을_생성하고_삭제하면_목록_조회_시_찾을_수_없다() {
         // Given
         Map<String, String> params = new HashMap<>();
         params.put("name", "강남역");
 
         Long stationId = createStation(params).jsonPath().getLong("id");
-        System.out.println(stationId);
 
         // When
-        RestAssured.given().log().all()
-            .when().delete("/stations/{id}", stationId)
-            .then().log().all();
+        deleteStation(stationId);
 
         // Then
-        ExtractableResponse<Response> retrieveResponse =
-            RestAssured.given().log().all()
-                .when().get("/stations")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> retrieveResponse = retrieveStations();
 
-        List<String> result = retrieveResponse.jsonPath().getList("$");
-        assertThat(result).isEmpty();
+        List<Long> ids = retrieveResponse.jsonPath().getList("id", Long.class);
+        assertThat(ids).doesNotContain(stationId);
     }
 
     ExtractableResponse<Response> createStation(Map<String, String> params) {
@@ -117,5 +100,18 @@ public class StationAcceptanceTest {
             .when().post("/stations")
             .then().log().all()
             .extract();
+    }
+
+    ExtractableResponse<Response> retrieveStations() {
+        return RestAssured.given().log().all()
+            .when().get("/stations")
+            .then().log().all()
+            .extract();
+    }
+
+    void deleteStation(Long id) {
+        RestAssured.given().log().all()
+            .when().delete("/stations/{id}", id)
+            .then().log().all();
     }
 }
