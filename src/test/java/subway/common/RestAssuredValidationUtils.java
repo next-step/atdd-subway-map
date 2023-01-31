@@ -1,4 +1,4 @@
-package subway;
+package subway.common;
 
 import static org.assertj.core.api.Assertions.*;
 

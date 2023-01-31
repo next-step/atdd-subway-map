@@ -1,19 +1,15 @@
-package subway;
+package subway.station;
 
 import static org.assertj.core.api.Assertions.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 
@@ -21,9 +17,10 @@ import io.restassured.response.Response;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class StationAcceptanceTest {
-    private static final String STATIONS_URL = "/stations";
     private static final String TEST_STATION1_NAME = "지하철역1";
     private static final String TEST_STATION2_NAME = "지하철역2";
+
+    private final StationApiClient stationApiClient = new StationApiClient();
 
     /**
      * When 지하철역을 생성하면
@@ -34,13 +31,13 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        ExtractableResponse<Response> response = createStation(TEST_STATION1_NAME);
+        ExtractableResponse<Response> response = stationApiClient.createStation(TEST_STATION1_NAME);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames = getStations()
+        List<String> stationNames = stationApiClient.getStations()
             .jsonPath().getList("name", String.class);
         assertThat(stationNames).containsAnyOf(TEST_STATION1_NAME);
     }
@@ -54,11 +51,11 @@ public class StationAcceptanceTest {
     @Test
     void createTwoStations() {
         // given
-        createStation(TEST_STATION1_NAME);
-        createStation(TEST_STATION2_NAME);
+        stationApiClient.createStation(TEST_STATION1_NAME);
+        stationApiClient.createStation(TEST_STATION2_NAME);
 
         // when
-        ExtractableResponse<Response> response = getStations();
+        ExtractableResponse<Response> response = stationApiClient.getStations();
 
         // then
         List<String> stationNames = response.jsonPath().getList("name", String.class);
@@ -75,39 +72,13 @@ public class StationAcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        long stationId = createStation(TEST_STATION1_NAME).jsonPath().getLong("id");
+        long stationId = stationApiClient.createStation(TEST_STATION1_NAME).jsonPath().getLong("id");
 
         // when
-        deleteStation(stationId);
+        stationApiClient.deleteStation(stationId);
 
         // then
-        List<String> stationNames = getStations().jsonPath().getList("name", String.class);
+        List<String> stationNames = stationApiClient.getStations().jsonPath().getList("name", String.class);
         assertThat(stationNames).isEmpty();
-    }
-
-    private ExtractableResponse<Response> createStation(String stationName) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", stationName);
-
-        return RestAssured.given().log().all()
-            .body(params)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().post(STATIONS_URL)
-            .then().log().all()
-            .extract();
-    }
-
-    private ExtractableResponse<Response> getStations() {
-        return RestAssured.given().log().all()
-            .when().get(STATIONS_URL)
-            .then().log().all()
-            .extract();
-    }
-
-    private ExtractableResponse<Response> deleteStation(long stationId) {
-        return RestAssured.given().log().all()
-            .when().delete(STATIONS_URL + "/" + stationId)
-            .then().log().all()
-            .extract();
     }
 }

@@ -1,4 +1,4 @@
-package subway;
+package subway.line;
 
 import java.util.List;
 
@@ -11,19 +11,21 @@ import org.springframework.test.context.jdbc.Sql;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import subway.common.RestAssuredValidationUtils;
+import subway.common.TestFixture;
 
 @DisplayName("지하철 노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @Sql("/init.sql")
 public class LineAcceptanceTest {
-    private final SubwayRestApiClient client = new SubwayRestApiClient();
+    private final LineApiClient lineApiClient = new LineApiClient();
 
     @DisplayName("지하철 노선을 생성한다.")
     @Test
     void createLine() {
         // when
-        ExtractableResponse<Response> response = client.createLine(TestFixture.SinBunDangLine);
+        ExtractableResponse<Response> response = lineApiClient.createLine(TestFixture.SinBunDangLine);
 
         // then
         RestAssuredValidationUtils.validateStatusCode(response, HttpStatus.CREATED);
@@ -34,11 +36,11 @@ public class LineAcceptanceTest {
     @Test
     void findLines() {
         // given
-        client.createLine(TestFixture.SinBunDangLine);
-        client.createLine(TestFixture.BunDangLine);
+        lineApiClient.createLine(TestFixture.SinBunDangLine);
+        lineApiClient.createLine(TestFixture.BunDangLine);
 
         // when
-        ExtractableResponse<Response> response = client.findAllLines();
+        ExtractableResponse<Response> response = lineApiClient.findAllLines();
         List<String> lineNames = response.jsonPath().getList("name", String.class);
 
         // then
@@ -51,11 +53,11 @@ public class LineAcceptanceTest {
     @Test
     void findLineById() {
         // given
-        var line = client.createLine(TestFixture.SinBunDangLine);
+        var line = lineApiClient.createLine(TestFixture.SinBunDangLine);
         long lineId = line.jsonPath().getLong("id");
 
         // when
-        ExtractableResponse<Response> response = client.findLineById(lineId);
+        ExtractableResponse<Response> response = lineApiClient.findLineById(lineId);
 
         // then
         RestAssuredValidationUtils.validateStatusCode(response, HttpStatus.OK);
@@ -66,11 +68,11 @@ public class LineAcceptanceTest {
     @Test
     void updateLine() {
         // given
-        var line = client.createLine(TestFixture.SinBunDangLine);
+        var line = lineApiClient.createLine(TestFixture.SinBunDangLine);
         long lineId = line.jsonPath().getLong("id");
 
         // when
-        ExtractableResponse<Response> response = client.updateLine(lineId, TestFixture.BunDangLine);
+        ExtractableResponse<Response> response = lineApiClient.updateLine(lineId, TestFixture.BunDangLine);
 
         // then
         RestAssuredValidationUtils.validateStatusCode(response, HttpStatus.OK);
@@ -82,12 +84,12 @@ public class LineAcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        var line = client.createLine(TestFixture.SinBunDangLine);
+        var line = lineApiClient.createLine(TestFixture.SinBunDangLine);
         long lineId = line.jsonPath().getLong("id");
 
         // when
-        ExtractableResponse<Response> deleteResponse = client.deleteLine(lineId);
-        ExtractableResponse<Response> findResponse = client.findLineById(lineId);
+        ExtractableResponse<Response> deleteResponse = lineApiClient.deleteLine(lineId);
+        ExtractableResponse<Response> findResponse = lineApiClient.findLineById(lineId);
 
         // then
         RestAssuredValidationUtils.validateStatusCode(deleteResponse, HttpStatus.NO_CONTENT);
