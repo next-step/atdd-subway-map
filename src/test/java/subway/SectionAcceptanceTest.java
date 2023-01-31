@@ -117,6 +117,24 @@ class SectionAcceptanceTest extends AcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
+    /**
+     * Given 지하철 노선에 새로운 구간을 추가하고
+     * When 지하철 노선의 구간 제거 요청 시, 전달된 지하철역이 하행 종점역이 아닌 경우
+     * Then 지하철 구간이 제거되지 않는다.
+     */
+    @DisplayName("지하철 노선에 등록된 마지막 구간만 제거할 수 있다.")
+    @Test
+    void invalidLastStation() {
+        // given
+        지하철_노선에_구간_추가(id_8호선, id_가락시장역, id_문정역, 10);
+
+        // when
+        ExtractableResponse<Response> response = 지하철_노선에_구간_제거(id_8호선, id_송파역);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    }
+
     private static ExtractableResponse<Response> 지하철_노선에_구간_추가(Long lineId, Long upStationId, Long downStationId, long distance) {
         Map<String, Object> sectionParam = new HashMap<>();
         sectionParam.put("upStationId", upStationId);

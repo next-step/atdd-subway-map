@@ -86,9 +86,14 @@ public class LineService {
     @Transactional
     public void deleteSection(Long lineId, Long stationId) {
         Line line = findLineById(lineId);
+        Station station = stationService.findById(stationId);
 
         if (line.hasSingleSection()) {
             throw new IllegalArgumentException("현재 지하철 노선에 등록된 구간이 하나이므로, 지하철 구간을 제거할 수 없습니다.");
+        }
+
+        if (!line.hasLastStation(station)) {
+            throw new IllegalArgumentException("지하철 노선에 등록된 마지막 구간만 제거할 수 있습니다.");
         }
 
         line.removeSection();
