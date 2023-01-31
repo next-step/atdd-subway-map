@@ -1,19 +1,19 @@
 package subway;
 
-import static org.assertj.core.api.Assertions.*;
-import static subway.LineAcceptanceTest.*;
+import io.restassured.RestAssured;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.http.MediaType;
-
-import io.restassured.RestAssured;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
+import static org.assertj.core.api.Assertions.assertThat;
+import static subway.LineAcceptanceTest.*;
 
 @DisplayName("지하철 구간 관련 기능")
 class SectionAcceptanceTest extends AcceptanceTest {
@@ -53,6 +53,34 @@ class SectionAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 지하철_노선_조회(id_8호선);
 
         assertThat(response.jsonPath().getList("stations.id", Long.class)).containsExactly(id_송파역, id_가락시장역, id_문정역);
+    }
+
+    /**
+     * When 지하철 노선에 새로운 구간 추가 시, 하행 종점역이 아닌 역을 상행역으로 전달하면
+     * Then 새로운 구간이 등록되지 않는다
+     */
+    @DisplayName("새로운 지하철 구간 추가 시, 구간의 상행역은 하행 종점역이어야 한다.")
+    @Test
+    void invalidUpStation() {        
+        // when
+        ExtractableResponse<Response> response = 지하철_노선에_구간_추가(id_8호선, id_송파역, id_문정역, 10);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    }
+
+    /**
+     * When 지하철 노선에 새로운 구간 추가 시, 이미 노선에 등록된 역을 하행역으로 전달하면
+     * Then 새로운 구간이 등록되지 않는다
+     */
+    @DisplayName("새로운 지하철 구간 추가 시, 구간의 하행역은 노선에 등록되지 않은 역이어야 한다.")
+    @Test
+    void invalidDownStation() {
+        // when
+        ExtractableResponse<Response> response = 지하철_노선에_구간_추가(id_8호선, id_가락시장역, id_송파역, 10);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
     /**

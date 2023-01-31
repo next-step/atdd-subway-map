@@ -36,6 +36,14 @@ public class Line {
         this.color = color;
     }
 
+    public boolean hasLastStation(Station station) {
+        return sections.hasLastStation(station);
+    }
+
+    public boolean hasStation(Station station) {
+        return sections.hasStation(station);
+    }
+
     public void addSection(Section section) {
         this.sections.add(section);
     }

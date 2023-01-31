@@ -1,12 +1,11 @@
 package subway.domain;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Embeddable
 public class Sections {
@@ -20,6 +19,15 @@ public class Sections {
 
     public boolean isEmpty() {
         return sections.isEmpty();
+    }
+
+    public boolean hasLastStation(Station upStation) {
+        List<Station> stations = getStations();
+        return stations.get(stations.size() - 1).equals(upStation);
+    }
+
+    public boolean hasStation(Station station) {
+        return getStations().contains(station);
     }
 
     public List<Station> getStations() {

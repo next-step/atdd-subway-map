@@ -1,11 +1,7 @@
 package subway.application;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import subway.domain.Line;
 import subway.domain.LineRepository;
 import subway.domain.Section;
@@ -14,6 +10,9 @@ import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 import subway.dto.SectionRequest;
 import subway.exception.LineNotFoundException;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Transactional(readOnly = true)
 @Service
@@ -30,14 +29,10 @@ public class LineService {
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
         Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor()));
-        addSection(line, lineRequest.getUpStationId(), lineRequest.getDownStationId(), lineRequest.getDistance());
+        Station upStation = stationService.findById(lineRequest.getUpStationId());
+        Station downStation = stationService.findById(lineRequest.getDownStationId());
+        line.addSection(new Section(line, upStation, downStation, lineRequest.getDistance()));
         return new LineResponse(line);
-    }
-
-    private void addSection(Line line, Long upStationId, Long downStationId, long distance) {
-        Station upStation = stationService.findById(upStationId);
-        Station downStation = stationService.findById(downStationId);
-        line.addSection(new Section(line, upStation, downStation, distance));
     }
 
     public LineResponse findLine(Long id) {
@@ -70,7 +65,18 @@ public class LineService {
     @Transactional
     public void addSection(Long id, SectionRequest sectionRequest) {
         Line line = findLineById(id);
-        addSection(line, sectionRequest.getUpStationId(), sectionRequest.getDownStationId(), sectionRequest.getDistance());
+        Station upStation = stationService.findById(sectionRequest.getUpStationId());
+        Station downStation = stationService.findById(sectionRequest.getDownStationId());
+
+        if (!line.hasLastStation(upStation)) {
+            throw new IllegalArgumentException("새로운 구간의 상행역은 해당 노선의 하행 종점역이어야 합니다.");
+        }
+
+        if (line.hasStation(downStation)) {
+            throw new IllegalArgumentException("새로운 구간의 하행역은 해당 노선에 등록되어 있는 역이 아니어야 합니다.");
+        }
+
+        line.addSection(new Section(line, upStation, downStation, sectionRequest.getDistance()));
     }
 
     @Transactional
