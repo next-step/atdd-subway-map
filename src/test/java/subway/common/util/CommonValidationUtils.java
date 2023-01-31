@@ -16,8 +16,12 @@ public class CommonValidationUtils {
 
     private CommonValidationUtils() {}
 
-    public static void checkRequestCreated(ExtractableResponse<Response> response) {
+    public static void checkCreatedResponse(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+    }
+
+    public static void checkDeletedResponse(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
     /**

@@ -63,7 +63,7 @@ public class LineAcceptanceTest extends RandomPortSetting {
     void showLine() {
         // Given
         ExtractableResponse<Response> responseOfCreateLine = LineApi.createLine(신분당선);
-        CommonValidationUtils.checkRequestCreated(responseOfCreateLine);
+        CommonValidationUtils.checkCreatedResponse(responseOfCreateLine);
 
         // When
         ExtractableResponse<Response> responseOfShowLine = CommonApi.showResource(responseOfCreateLine);
@@ -100,5 +100,17 @@ public class LineAcceptanceTest extends RandomPortSetting {
     @Test
     @DisplayName("지하철노선 삭제")
     void deleteLine() {
+        // Given
+        ExtractableResponse<Response> responseOfCreateLine = LineApi.createLine(신분당선);
+
+        // When
+        Long lineId = ExtractionUtils.getLineId(responseOfCreateLine);
+        ExtractableResponse<Response> responseOfDelete = LineApi.deleteLine(lineId);
+        CommonValidationUtils.checkDeletedResponse(responseOfDelete);
+
+        // Then
+        ExtractableResponse<Response> responseOfShowLines = LineApi.showLines();
+        CommonValidationUtils.checkResponseCount(responseOfShowLines, 0);
+        CommonValidationUtils.checkNotExistencesInList(responseOfShowLines, LINE_NAME_KEY, 신분당선);
     }
 }

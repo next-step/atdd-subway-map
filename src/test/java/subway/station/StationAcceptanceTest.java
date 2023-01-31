@@ -28,7 +28,7 @@ public class StationAcceptanceTest extends RandomPortSetting {
         ExtractableResponse<Response> responseOfCreateStation = StationApi.createStation(강남역);
 
         // then
-        CommonValidationUtils.checkRequestCreated(responseOfCreateStation);
+        CommonValidationUtils.checkCreatedResponse(responseOfCreateStation);
 
         // then
         ExtractableResponse<Response> responseOfShowStations = StationApi.showStations();

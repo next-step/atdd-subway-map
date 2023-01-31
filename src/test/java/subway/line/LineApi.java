@@ -64,4 +64,15 @@ public class LineApi {
                     .log().all()
                     .extract();
     }
+
+    public static ExtractableResponse<Response> deleteLine(Long lineId) {
+        return given()
+                    .log().all()
+                    .pathParam(LINE_ID_KEY, lineId)
+                .when()
+                    .delete("/lines/{id}")
+                .then()
+                    .log().all()
+                    .extract();
+    }
 }
