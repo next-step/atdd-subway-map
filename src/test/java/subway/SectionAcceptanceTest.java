@@ -97,8 +97,10 @@ class SectionAcceptanceTest extends AcceptanceTest {
         return RestAssured
             .given()
                 .log().all()
+                .pathParam("id", lineId)
+                .queryParam("stationId", stationId)
             .when()
-                .delete(URL_SECTION + "?stationId={stationId}", lineId, stationId)
+                .delete(URL_SECTION)
             .then()
                 .log().all()
             .extract();
