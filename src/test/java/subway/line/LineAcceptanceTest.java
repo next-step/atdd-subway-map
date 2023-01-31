@@ -129,17 +129,17 @@ public class LineAcceptanceTest {
         createLine(분당선);
 
         //When
-        ExtractableResponse<Response> response = deleteLine(deleteId);
+        deleteLine(deleteId);
+        List<String> lineNames = getLineNames()
+                .jsonPath().getList("name", String.class);
 
         //Then
-        List<String> names = response.jsonPath().getList("name", String.class);
-        assertThat(names).doesNotContain("신분당선");
-
+        assertThat(lineNames).doesNotContain("신분당선");
     }
 
     private static ExtractableResponse<Response> deleteLine(Long id) {
         return RestAssured.given().log().all()
-                .when().delete("Line/{id}", id)
+                .when().delete("lines/{id}", id)
                 .then().log().all()
                 .extract();
     }
