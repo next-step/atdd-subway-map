@@ -1,13 +1,11 @@
 package subway.station;
 
-import io.restassured.RestAssured;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
+import subway.common.AcceptanceTest;
 import subway.common.DatabaseCleaner;
 import subway.common.Endpoints;
 import subway.utils.RestAssuredClient;
@@ -20,17 +18,12 @@ import static subway.station.StationFixtures.강남역_생성_요청;
 import static subway.station.StationFixtures.서울대입구역_생성_요청;
 
 @DisplayName("지하철역 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class StationAcceptanceTest {
-    @LocalServerPort
-    int port;
-
+public class StationAcceptanceTest extends AcceptanceTest {
     @Autowired
     private DatabaseCleaner databaseCleaner;
 
     @BeforeEach
     void setUp() {
-        RestAssured.port = port;
         databaseCleaner.execute();
     }
 
