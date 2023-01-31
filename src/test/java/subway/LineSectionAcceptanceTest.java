@@ -19,6 +19,7 @@ public class LineSectionAcceptanceTest extends AbstractAcceptanceTest {
     private static final String 신분당선 = "신분당선";
     private static final LineRequest 신분당선_요청;
     private static final SectionRequest 신논현_양재_구간;
+    private static final SectionRequest 양재_양재_구간;
     private static final SectionRequest 강남역_판교_구간;
     private static final SectionRequest 신논현역_신사역_구간;
     private static final Long 신사역_ID = 1L;
@@ -30,6 +31,7 @@ public class LineSectionAcceptanceTest extends AbstractAcceptanceTest {
     static {
         신분당선_요청 = new LineRequest(신분당선, "bg-red-600", 신사역_ID, 신논현역_ID, 10);
         신논현_양재_구간 = new SectionRequest(신논현역_ID, 양재역_ID, 10);
+        양재_양재_구간 = new SectionRequest(양재역_ID, 양재역_ID, 10);
         강남역_판교_구간 = new SectionRequest(강남역_ID, 판교역_ID, 10);
         신논현역_신사역_구간 = new SectionRequest(신논현역_ID, 신사역_ID, 10);
     }
@@ -50,6 +52,20 @@ public class LineSectionAcceptanceTest extends AbstractAcceptanceTest {
                 .jsonPath()
                 .getList("stations.id", Long.class);
         assertThat(신분당선_지하철_ID_목록).containsExactly(신사역_ID, 신논현역_ID, 양재역_ID);
+    }
+
+    /**
+     * Given 노선을 생성하고
+     * When 해당 노선에 상행역과 하행역이 같은 구간을 등록하면
+     * Then 500 에러가 발생한다.
+     */
+    @DisplayName("상행역과 하행역이 같은 구간은 등록할 수 없다.")
+    @Sql("/sql/setup-station.sql")
+    @Test
+    void addSectionException() {
+        String location = 노선_생성(신분당선_요청).extract().header("location");
+
+        구간_등록(location, 양재_양재_구간).statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
     /**
