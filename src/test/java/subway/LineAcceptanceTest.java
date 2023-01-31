@@ -1,8 +1,6 @@
 package subway;
 
 import io.restassured.RestAssured;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,10 +9,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import subway.line.LineRepository;
-import subway.line.LineRequest;
+import subway.line.LineCreateRequest;
 import subway.line.LineResponse;
 import subway.line.LineUpdateRequest;
-import subway.subway.Station;
 import subway.subway.StationResponse;
 
 import java.util.List;
@@ -37,14 +34,14 @@ public class LineAcceptanceTest {
     Long secondStationId;
     Long thirdStationId;
 
-    LineRequest lineRequest;
+    LineCreateRequest lineCreateRequest;
 
     @BeforeEach
     public void setup() {
         firstStationId = stationAcceptanceTest.createStation("지하철역1");
         secondStationId = stationAcceptanceTest.createStation("지하철역2");
         thirdStationId = stationAcceptanceTest.createStation("지하철역3");
-        lineRequest = new LineRequest("신분당선", "bg-red-600", firstStationId, secondStationId, 10L);
+        lineCreateRequest = new LineCreateRequest("신분당선", "bg-red-600", firstStationId, secondStationId, 10L);
     }
 
     /**
@@ -56,14 +53,14 @@ public class LineAcceptanceTest {
     public void createLineTest() {
 
         // When
-        createLine(lineRequest);
+        createLine(lineCreateRequest);
 
         // Then
         var lineResponseList = getLineResponseList();
         List<String> nameList = lineResponseList.stream().map(LineResponse::getName).collect(Collectors.toList());
 
         assertThat(lineResponseList).hasSize(1);
-        assertThat(nameList).containsExactly(lineRequest.getName());
+        assertThat(nameList).containsExactly(lineCreateRequest.getName());
     }
 
     /**
@@ -76,17 +73,17 @@ public class LineAcceptanceTest {
     void getLineList() {
 
         // When
-        LineRequest secondLineRequest = new LineRequest("분당선", "bg-red-600", firstStationId, thirdStationId, 10L);
-        createLine(lineRequest);
-        createLine(secondLineRequest);
+        LineCreateRequest secondLineCreateRequest = new LineCreateRequest("분당선", "bg-red-600", firstStationId, thirdStationId, 10L);
+        createLine(lineCreateRequest);
+        createLine(secondLineCreateRequest);
 
         // Then
         var lineResponseList = getLineResponseList();
         List<String> nameList = lineResponseList.stream().map(LineResponse::getName).collect(Collectors.toList());
 
         assertThat(lineResponseList).hasSize(2);
-        assertThat(nameList).containsAnyOf(lineRequest.getName());
-        assertThat(nameList).containsAnyOf(secondLineRequest.getName());
+        assertThat(nameList).containsAnyOf(lineCreateRequest.getName());
+        assertThat(nameList).containsAnyOf(secondLineCreateRequest.getName());
     }
 
     /**
@@ -97,10 +94,10 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선을 생성하고 해당 지하철 노선을 조회하면 지하철 노선 정보를 조회할 수 있다.")
     @Test
     public void getLineTest() {
-        Long lineId = createLine(lineRequest);
+        Long lineId = createLine(lineCreateRequest);
         var line = getLine(lineId);
 
-        checkLine(lineRequest, lineId, line, firstStationId, secondStationId);
+        checkLine(lineCreateRequest, lineId, line, firstStationId, secondStationId);
     }
 
     /**
@@ -111,7 +108,7 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선을 생성하고 해당 지하철 노선을 수정하면 수정된다.")
     @Test
     public void updateLineTest() {
-        Long id = createLine(lineRequest);
+        Long id = createLine(lineCreateRequest);
         LineUpdateRequest lineUpdateRequest = new LineUpdateRequest("다른 분당선", "bg-red-600");
         updateLine(id, lineUpdateRequest);
         LineResponse line = getLine(id);
@@ -137,6 +134,11 @@ public class LineAcceptanceTest {
      * When 생성한 지하철 노선을 삭제하면
      * Then 해당 지하철 노선 정보는 삭제된다
      */
+    @DisplayName("지하철 노선을 생성하고 해당 노선을 삭제하면 지하철 노선은 삭제된다.")
+    @Test
+    public void deleteLineTest() {
+        
+    }
 
     @DisplayName("지하철 노선도를 조회할 수 있다.")
     private List<LineResponse> getLineResponseList() {
@@ -153,9 +155,9 @@ public class LineAcceptanceTest {
     }
 
     @DisplayName("지하철 노선을 등록할 수 있다.")
-    private Long createLine(LineRequest lineRequest) {
+    private Long createLine(LineCreateRequest lineCreateRequest) {
         var response = RestAssured.given().log().all()
-                .body(lineRequest)
+                .body(lineCreateRequest)
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/lines")
@@ -169,12 +171,12 @@ public class LineAcceptanceTest {
     }
 
     @DisplayName("입력한 지하철 노선도 정보와 조회한 지하철 노선도 정보를 비교할 수 있다.")
-    private void checkLine(LineRequest lineRequest, Long lineId, LineResponse lineResponse, Long stationId1, Long stationId2) {
+    private void checkLine(LineCreateRequest lineCreateRequest, Long lineId, LineResponse lineResponse, Long stationId1, Long stationId2) {
         var stationIdList = lineResponse.getStationResponseList().stream().mapToLong(StationResponse::getId);
 
         assertAll(
                 () -> assertThat(lineResponse.getId()).isEqualTo(lineId),
-                () -> assertThat(lineResponse.getName()).isEqualTo(lineRequest.getName()),
+                () -> assertThat(lineResponse.getName()).isEqualTo(lineCreateRequest.getName()),
                 () -> assertThat(stationIdList).containsAnyOf(stationId1, stationId2)
         );
     }

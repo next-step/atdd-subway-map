@@ -26,10 +26,10 @@ public class LineService {
     }
 
     @Transactional
-    public LineResponse saveLine(LineRequest lineRequest) {
-        Station upStation = findStationEntity(lineRequest.getUpStationId());
-        Station downStation = findStationEntity(lineRequest.getDownStationId());
-        Line line = dtoConverter.of(lineRequest, upStation, downStation);
+    public LineResponse saveLine(LineCreateRequest lineCreateRequest) {
+        Station upStation = findStationEntity(lineCreateRequest.getUpStationId());
+        Station downStation = findStationEntity(lineCreateRequest.getDownStationId());
+        Line line = dtoConverter.of(lineCreateRequest, upStation, downStation);
         Line saveLine = lineRepository.save(line);
 
         return dtoConverter.of(saveLine);

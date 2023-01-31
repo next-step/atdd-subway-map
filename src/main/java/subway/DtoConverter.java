@@ -2,7 +2,7 @@ package subway;
 
 import org.springframework.stereotype.Component;
 import subway.line.Line;
-import subway.line.LineRequest;
+import subway.line.LineCreateRequest;
 import subway.line.LineResponse;
 import subway.subway.Station;
 import subway.subway.StationResponse;
@@ -14,8 +14,8 @@ import java.util.stream.Collectors;
 @Component
 public class DtoConverter {
 
-    public Line of(LineRequest lineRequest, Station upStation, Station downStation) {
-        return new Line(lineRequest.getName(), lineRequest.getColor(), upStation, downStation, lineRequest.getDistance());
+    public Line of(LineCreateRequest lineCreateRequest, Station upStation, Station downStation) {
+        return new Line(lineCreateRequest.getName(), lineCreateRequest.getColor(), upStation, downStation, lineCreateRequest.getDistance());
     }
 
     public LineResponse of(Line line) {
