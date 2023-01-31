@@ -8,7 +8,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import subway.line.LineRequest;
 
 import java.util.HashMap;
 import java.util.List;
@@ -104,13 +103,17 @@ public class LineAcceptanceTest {
         long updateId = getCreatedLineId(신분당선);
 
         //When
-        ExtractableResponse<Response> response = updateLine(updateId, "다른분당선", "bg-red-600");
+        updateLine(updateId, "다른분당선", "bg-red-600");
+        List<String> lineNames = getLineNames()
+                .jsonPath().getList("name", String.class);
+        List<String> lineColors = getLineNames()
+                .jsonPath().getList("color", String.class);
 
         //Then
-        String name = response.jsonPath().get("name");
-        String color = response.jsonPath().get("color");
-        assertThat(name).isEqualTo("다른분당선");
-        assertThat(color).isEqualTo("bg-red-600");
+        assertThat(lineNames).contains("다른분당선");
+        assertThat(lineColors).contains("bg-red-600");
+        assertThat(lineNames).hasSize(1);
+        assertThat(lineColors).hasSize(1);
     }
 
     /**

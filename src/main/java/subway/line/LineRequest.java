@@ -1,7 +1,5 @@
 package subway.line;
 
-import lombok.AllArgsConstructor;
-
 public class LineRequest {
 
     private String name;
