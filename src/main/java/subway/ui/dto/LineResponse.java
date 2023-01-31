@@ -2,12 +2,10 @@ package subway.ui.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import subway.domain.Line;
-import subway.domain.Section;
 import subway.domain.Station;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class LineResponse {
     private Long id;
@@ -26,21 +24,13 @@ public class LineResponse {
     }
 
     public static LineResponse createResponse(final Line saveLine) {
-        List<StationResponse> stationResponses = convertToStationResponse(saveLine.getSections().getSections());
+        final List<StationResponse> stationResponses = convertToStationResponse(saveLine.convertToStation());
         return new LineResponse(saveLine.getId(), saveLine.getName(), saveLine.getColor(), stationResponses);
     }
 
-    private static List<StationResponse> convertToStationResponse(final List<Section> sections) {
-        final List<Station> stations = convertToStation(sections);
+    private static List<StationResponse> convertToStationResponse(final List<Station> stations) {
         return stations.stream()
                 .map(StationResponse::from)
-                .collect(Collectors.toList());
-    }
-
-    private static List<Station> convertToStation(final List<Section> sections) {
-        return sections.stream()
-                .flatMap(section -> Stream.of(section.getUpStation(), section.getDownStation()))
-                .distinct()
                 .collect(Collectors.toList());
     }
 

@@ -25,8 +25,7 @@ public class LineService {
     public LineResponse createLine(final LineRequest lineRequest) {
         final Station upStation = stationService.findById(lineRequest.getUpStationId());
         final Station downStation = stationService.findById(lineRequest.getDownStationId());
-        final Section section = lineRequest.toSectionEntity(upStation, downStation);
-        final Line saveLine = save(lineRequest.toEntity(List.of(section)));
+        final Line saveLine = save(lineRequest.toEntity(upStation, downStation));
 
         return LineResponse.createResponse(saveLine);
     }
@@ -58,10 +57,8 @@ public class LineService {
     }
 
     private Line save(final Line line) {
-        final List<Section> sections = line.getSections().getSections();
-        for (Section section : sections) {
-            section.addLine(line);
-        }
+        final Sections sections = line.getSections();
+        sections.addLine(line);
         return lineRepository.save(line);
     }
 

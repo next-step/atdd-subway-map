@@ -29,7 +29,7 @@ public class Section {
 
     protected Section() {}
 
-    public Section(final Long id, final Line line, final Station upStation, final Station downStation, final Integer distance) {
+    Section(final Long id, final Line line, final Station upStation, final Station downStation, final Integer distance) {
         this.id = id;
         this.line = line;
         this.upStation = upStation;
@@ -37,48 +37,36 @@ public class Section {
         this.distance = distance;
     }
 
-    public Section(final Long id, final Station upStation, final Station downStation, final Integer distance) {
+    Section(final Long id, final Station upStation, final Station downStation, final Integer distance) {
         this(id, null, upStation, downStation, distance);
     }
 
-    public Section(final Line line, final Station upStation, final Station downStation, final Integer distance) {
+    Section(final Line line, final Station upStation, final Station downStation, final Integer distance) {
         this(null, line, upStation, downStation, distance);
     }
 
-    public Section(final Station upStation, final Station downStation, final Integer distance) {
+    Section(final Station upStation, final Station downStation, final Integer distance) {
         this(null, null, upStation, downStation, distance);
     }
 
-    public boolean matchUpStation(final Station station) {
+    boolean matchUpStation(final Station station) {
         return this.upStation.equals(station);
     }
 
-    public boolean matchDownStation(final Station station) {
+    boolean matchDownStation(final Station station) {
         return this.downStation.equals(station);
     }
 
-    public void addLine(final Line line) {
+    void addLine(final Line line) {
         this.line = line;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public Line getLine() {
-        return line;
-    }
-
-    public Station getUpStation() {
+    Station getUpStation() {
         return upStation;
     }
 
-    public Station getDownStation() {
+    Station getDownStation() {
         return downStation;
-    }
-
-    public Integer getDistance() {
-        return distance;
     }
 
     @Override
@@ -86,7 +74,7 @@ public class Section {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Section section = (Section) o;
-        return id.equals(section.id);
+        return Objects.equals(id, section.id);
     }
 
     @Override

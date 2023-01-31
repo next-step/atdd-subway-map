@@ -1,5 +1,6 @@
 package subway.domain;
 
+import org.springframework.util.CollectionUtils;
 import subway.common.exception.AlreadyExistException;
 import subway.common.exception.NoDeleteOneSectionException;
 import subway.common.exception.NoLastSectionException;
@@ -9,7 +10,6 @@ import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 import static subway.common.error.LineSectionError.*;
@@ -24,16 +24,13 @@ public class Sections {
 
     protected Sections() {}
 
-    private Sections(final List<Section> sections) {
-        this.sections = sections;
+    public Sections(final List<Section> sections) {
+        this.sections = new ArrayList<>(sections);
     }
 
-    public static Sections from(final List<Section> sections) {
-        return new Sections(sections);
-    }
-
-    public void addSection(final Line line, final Section section) {
-        final Section findSection = findLastSectionByStation();
+    public void addSection(final Line line, final Station upStation, final Station downStation, final Integer distance) {
+        final Section section = new Section(line, upStation, downStation, distance);
+        final Section findSection = findLastSection();
         validateAddStation(findSection, section);
         section.addLine(line);
         this.sections.add(section);
@@ -41,13 +38,15 @@ public class Sections {
 
     public void removeSection(final Station station) {
         validateOnlyOneSection();
-        final Section lastSection = findLastSectionByStation();
+        final Section lastSection = findLastSection();
         validateMatchLastStation(lastSection, station);
         this.sections.remove(lastSection);
     }
 
-    public List<Section> getSections() {
-        return sections;
+    public void addLine(final Line line) {
+        for (Section section : this.sections) {
+            section.addLine(line);
+        }
     }
 
     private void validateAddStation(final Section findSection, final Section section) {
@@ -56,21 +55,20 @@ public class Sections {
     }
 
     private void validateOnlyOneSection() {
-
         if (this.sections.size() == ONE_SECTION) {
             throw new NoDeleteOneSectionException(NO_DELETE_ONE_SECTION.getMessage());
         }
     }
 
     private void validateMatchDownStation(final Section findSection, final Station upStation) {
-        extracted(findSection, upStation, NO_REGISTER_UP_STATION.getMessage());
+        validateMatchStation(findSection, upStation, NO_REGISTER_UP_STATION.getMessage());
     }
 
     private void validateMatchLastStation(final Section findSection, final Station upStation) {
-        extracted(findSection, upStation, NO_REGISTER_LAST_LINE_STATION.getMessage());
+        validateMatchStation(findSection, upStation, NO_REGISTER_LAST_LINE_STATION.getMessage());
     }
 
-    private void extracted(final Section findSection, final Station upStation, final String message) {
+    private void validateMatchStation(final Section findSection, final Station upStation, final String message) {
         if (canNotMatchDownStation(findSection, upStation)) {
             throw new NoRegisterStationException(message);
         }
@@ -91,10 +89,14 @@ public class Sections {
         return !findSection.matchDownStation(station);
     }
 
-    private Section findLastSectionByStation() {
-        return this.sections.stream()
-                .sorted(Comparator.comparing(Section::getId).reversed())
-                .findFirst()
-                .orElseThrow(() -> new NoLastSectionException(NO_LAST_SECTION.getMessage()));
+    private Section findLastSection() {
+        if (CollectionUtils.isEmpty(this.sections)) {
+            throw new NoLastSectionException(NO_LAST_SECTION.getMessage());
+        }
+        return this.sections.get(this.sections.size() -1);
+    }
+
+    public List<Section> getSections() {
+        return sections;
     }
 }

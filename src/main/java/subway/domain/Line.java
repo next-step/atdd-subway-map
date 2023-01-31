@@ -1,7 +1,10 @@
 package subway.domain;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Entity
 public class Line {
@@ -28,6 +31,14 @@ public class Line {
         this.sections = sections;
     }
 
+    public Line(final Long id, final String name, final String color, final Station upStation, final Station downStation, final Integer distance) {
+        this(id, name, color, new Sections(List.of(new Section(upStation, downStation, distance))));
+    }
+
+    public Line(final String name, final String color, final Station upStation, final Station downStation, final Integer distance) {
+        this(null, name, color, new Sections(List.of(new Section(upStation, downStation, distance))));
+    }
+
     public Line(final String name, final String color, final Sections sections) {
         this(null, name, color, sections);
     }
@@ -38,11 +49,18 @@ public class Line {
     }
 
     public void addSection(final Station upStation, final Station downStation, final Integer distance) {
-        this.sections.addSection(this, new Section(this, upStation, downStation, distance));
+        this.sections.addSection(this, upStation, downStation, distance);
     }
 
     public void removeSection(final Station station) {
         this.sections.removeSection(station);
+    }
+
+    public List<Station> convertToStation() {
+        return this.sections.getSections().stream()
+                .flatMap(section -> Stream.of(section.getUpStation(), section.getDownStation()))
+                .distinct()
+                .collect(Collectors.toList());
     }
 
     public Long getId() {
@@ -58,7 +76,11 @@ public class Line {
     }
 
     public Sections getSections() {
-        return sections;
+        return this.sections;
+    }
+
+    public List<Section> getSectionsList() {
+        return this.sections.getSections();
     }
 
     @Override
