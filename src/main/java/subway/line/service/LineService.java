@@ -9,6 +9,9 @@ import subway.line.repository.LineRepository;
 import subway.station.repository.Station;
 import subway.station.service.StationService;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @Transactional(readOnly = true)
 public class LineService {
@@ -27,6 +30,13 @@ public class LineService {
 
         return LineResponse.of(line);
     }
+
+    public List<LineResponse> findAllLines() {
+        return lineRepository.findAll().stream()
+                .map(LineResponse::of)
+                .collect(Collectors.toList());
+    }
+
 
     private Line toLineEntity(LineRequest lineRequest) {
         Station upStation = stationService.findStation(lineRequest.getUpStationId());
