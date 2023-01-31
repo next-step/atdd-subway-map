@@ -20,13 +20,9 @@ public class LineAcceptanceTest extends AbstractAcceptanceTest {
     private static final Map<String, String> 분당선_요청 = new HashMap<>();
     private static final Map<String, String> 잘못된_노선_요청 = new HashMap<>();
     private static final Map<String, String> 수정_요청 = new HashMap<>();
-    private static final HashMap<String, String> 신논현_양재_구간 = new HashMap<>();
     private static final String 신분당선 = "신분당선";
     private static final String 분당선 = "분당선";
     private static final String 미존재_노선_위치 = "/lines/100";
-    private static final Long 신사역_ID = 1L;
-    private static final Long 신논현역_ID = 2L;
-    private static final Long 양재역_ID = 4L;
 
     static {
         신분당선_요청.put("name", "신분당선");
@@ -49,10 +45,6 @@ public class LineAcceptanceTest extends AbstractAcceptanceTest {
 
         수정_요청.put("name", "다른 분당선");
         수정_요청.put("color", "bg-red-600");
-
-        신논현_양재_구간.put("upStationId", "2");
-        신논현_양재_구간.put("downStationId", "4");
-        신논현_양재_구간.put("distance", "10");
     }
 
     /**
@@ -203,48 +195,6 @@ public class LineAcceptanceTest extends AbstractAcceptanceTest {
                 .statusCode(HttpStatus.NOT_FOUND.value());
     }
 
-    /**
-     * Given 지하철 노선을 생성하고
-     * When 해당 노선에 구간을 등록하면
-     * Then 해당 노선 조회 시 추가된 구간이 포함되어 있다.
-     */
-    @DisplayName("구간을 등록한다.")
-    @Sql("/sql/setup-station.sql")
-    @Test
-    void addSection() {
-        String location = 노선_생성(신분당선_요청).extract().header("location");
-        구간_등록(location, 신논현_양재_구간);
-
-        List<Long> 지하철역_ID_목록 = get(location).extract()
-                .jsonPath()
-                .getList("stations.id", Long.class);
-        assertThat(지하철역_ID_목록).containsExactly(신사역_ID, 신논현역_ID, 양재역_ID);
-    }
-
-    /**
-     * Given 지하철 노선 생성 후 해당 노선에 구간을 등록하고
-     * When 해당 노선에서 마지막 구간(하행 종점역)을 제거하면
-     * Then 해당 노선 조회 시 삭제된 구간을 찾을 수 없다.
-     */
-    @DisplayName("구간을 제거한다.")
-    @Sql("/sql/setup-station.sql")
-    @Test
-    void deleteSection() {
-        String location = 노선_생성(신분당선_요청).extract().header("location");
-        구간_등록(location, 신논현_양재_구간);
-
-        given().log().all()
-                .param("stationId", 양재역_ID).
-        when()
-                .delete(location + "/sections").
-        then().log().all();
-
-        List<Long> 지하철_ID_목록 = get(location).extract()
-                .jsonPath()
-                .getList("stations.id", Long.class);
-        assertThat(지하철_ID_목록).containsExactly(신사역_ID, 신논현역_ID);
-    }
-
     private ValidatableResponse 노선_생성(Map<String, String> params) {
         return given().log().all()
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -265,14 +215,5 @@ public class LineAcceptanceTest extends AbstractAcceptanceTest {
                 when()
                     .get(path).
                 then().log().all();
-    }
-
-    private void 구간_등록(String location, HashMap<String, String> params) {
-        given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(params).
-        when()
-                .post(location + "/sections").
-        then().log().all();
     }
 }
