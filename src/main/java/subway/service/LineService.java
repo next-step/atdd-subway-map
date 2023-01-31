@@ -2,12 +2,8 @@ package subway.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import subway.domain.Line;
-import subway.domain.Section;
-import subway.domain.SectionRepository;
-import subway.domain.Station;
+import subway.domain.*;
 import subway.exception.*;
-import subway.domain.LineRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -69,21 +65,21 @@ public class LineService {
         Station upStation = stationService.findStation(upStationId);
         Station downStation = stationService.findStation(downStationId);
 
-        Section saveSection = new Section(upStation, downStation, distance);
-
-        if (line.canAddSection(upStation)) {
-            saveSection = sectionRepository.save(saveSection);
-            line.addSection(saveSection);
-            return saveSection;
+        if (!line.canAddSection(upStation)) {
+            throw new CannotAddSectionException();
         }
-        throw new CannotAddSectionException();
+
+        Section saveSection = new Section(line, upStation, downStation, distance);
+        line.addSection(saveSection);
+        return saveSection;
+
     }
 
     @Transactional
-    public void deleteSection(Long lineId, Long sectionId){
+    public void deleteSection(Long lineId, Long sectionId) {
         Line line = lineRepository.findById(lineId).orElseThrow(LineNotFoundException::new);
         Section section = sectionRepository.findById(sectionId).orElseThrow(SectionNotFoundException::new);
-        if(line.canDeleteSection(section)){
+        if (line.canDeleteSection(section)) {
             line.deleteSection(section);
             return;
         }

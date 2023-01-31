@@ -21,10 +21,15 @@ public class Section {
 
     private Long distance;
 
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "line_id")
+    private Line line;
+
     protected Section() {
     }
 
-    public Section(Station upStation, Station downStation, Long distance) {
+    public Section(Line line,Station upStation, Station downStation, Long distance) {
+        this.line = line;
         this.upStation = upStation;
         this.downStation = downStation;
         this.distance = distance;
@@ -48,6 +53,10 @@ public class Section {
 
     public Long getDistance() {
         return distance;
+    }
+
+    public Line getLine() {
+        return line;
     }
 
     @Override

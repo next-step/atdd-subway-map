@@ -3,8 +3,6 @@ package subway.domain;
 import subway.common.BaseEntity;
 
 import javax.persistence.*;
-import java.util.LinkedList;
-import java.util.List;
 
 @Entity
 public class Line extends BaseEntity {
@@ -28,8 +26,8 @@ public class Line extends BaseEntity {
     private Station downStation;
 
 
-    @OneToMany(targetEntity = Section.class, fetch = FetchType.LAZY)
-    private List<Section> sections;
+    @Embedded
+    private Sections sections = new Sections();
 
 
     @Column(nullable = false)
@@ -42,7 +40,6 @@ public class Line extends BaseEntity {
         this.name = name;
         this.color = color;
         this.distance = distance;
-        this.sections = new LinkedList<>();
     }
 
     public Long getId() {
@@ -61,7 +58,7 @@ public class Line extends BaseEntity {
         return distance;
     }
 
-    public List<Section> getSections() {
+    public Sections getSections() {
         return sections;
     }
 
@@ -99,20 +96,16 @@ public class Line extends BaseEntity {
         if (sections.isEmpty()) {
             return this.upStation.equals(station);
         }
-
-        Section lastSection = sections.get(getSections().size() - 1);
-        return lastSection.isDownStation(station);
+        Section lastSection = sections.getLast();
+        return lastSection.isDownStation(station) && sections.hasStation(station);
     }
 
     public boolean canDeleteSection(Section section) {
-        if (this.sections.size() <= 1) {
+        if (sections.lessThanTwo()) {
             return false;
         }
-        Section lastSection = this.sections.get(getSections().size() - 1);
-        if (lastSection.equals(section)) {
-            return true;
-        }
-        return false;
+        Section lastSection = sections.getLast();
+        return lastSection.equals(section);
     }
 
     public void deleteSection(Section section) {

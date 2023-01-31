@@ -8,6 +8,8 @@ import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 import subway.dto.SectionRequest;
 import subway.dto.SectionResponse;
+import subway.exception.CannotAddSectionException;
+import subway.exception.CannotDeleteSectionException;
 import subway.service.LineService;
 
 import java.net.URI;
@@ -59,13 +61,24 @@ public class LineController {
 
     @PostMapping(value = "/{id}/sections")
     public ResponseEntity<SectionResponse> createSection(@PathVariable Long id, @RequestBody SectionRequest sectionRequest) {
-        Section section = lineService.addSection(id, sectionRequest.getUpStationId(), sectionRequest.getDownStationId(), sectionRequest.getDistance());
-        return ResponseEntity.created(URI.create("/lines/" + section.getId())).body(SectionResponse.of(section));
+        try{
+            Section section = lineService.addSection(id, sectionRequest.getUpStationId(), sectionRequest.getDownStationId(), sectionRequest.getDistance());
+            return ResponseEntity.created(URI.create("/lines/" + section.getId())).body(SectionResponse.of(section));
+        }catch (CannotAddSectionException e){
+            return ResponseEntity.badRequest().build();
+        }
+
     }
 
     @DeleteMapping(value = "/{id}/sections")
     public ResponseEntity<Void> deleteSection(@PathVariable Long id, @RequestParam Long sectionId) {
-        lineService.deleteSection(id, sectionId);
+
+        try{
+            lineService.deleteSection(id, sectionId);
+        }catch (CannotDeleteSectionException e){
+            return ResponseEntity.badRequest().build();
+        }
+
         return ResponseEntity.noContent().build();
     }
 

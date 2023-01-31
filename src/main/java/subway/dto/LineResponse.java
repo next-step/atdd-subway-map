@@ -26,7 +26,7 @@ public class LineResponse {
                 , line.getName()
                 , line.getColor()
                 , StationResponse.asList(line.getUpStation(), line.getDownStation())
-                , SectionResponse.asList(line.getSections())
+                , SectionResponse.asList(line.getSections().getSections())
         );
     }
 
