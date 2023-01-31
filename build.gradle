@@ -6,6 +6,8 @@ plugins {
 
 group = 'nextstep'
 version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
 
 repositories {
     mavenCentral()
@@ -19,7 +21,7 @@ dependencies {
     // log
     implementation 'net.rakugakibox.spring.boot:logback-access-spring-boot-starter:2.7.1'
     implementation 'org.projectlombok:lombok:1.18.22'
-    implementation 'org.projectlombok:lombok:1.18.22'
+    annotationProcessor 'org.projectlombok:lombok'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'io.rest-assured:rest-assured:4.5.1'
