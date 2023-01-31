@@ -36,7 +36,7 @@ public class StationAcceptanceFactory {
         return RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().delete(STATION_BASE_URL + "/" + stationId)
+                .when().delete(STATION_BASE_URL + "/{stationId}", stationId)
                 .then().log().all()
                 .extract();
     }

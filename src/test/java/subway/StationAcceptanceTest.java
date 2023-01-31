@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static subway.StationNameConstraints.*;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -19,7 +20,7 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        ExtractableResponse<Response> response = StationAcceptanceFactory.createStation("강남역");
+        ExtractableResponse<Response> response = StationAcceptanceFactory.createStation(GANG_NAM);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -27,15 +28,20 @@ public class StationAcceptanceTest {
         // then
         List<String> stationNames = StationAcceptanceFactory.getAllStations()
                 .jsonPath().getList("name", String.class);
-        assertThat(stationNames).containsAnyOf("강남역");
+        assertThat(stationNames).containsAnyOf(GANG_NAM);
     }
 
+    /**
+     * Given 2개의 지하철역을 생성하고
+     * When 지하철역 목록을 조회하면
+     * Then 2개의 지하철역을 응답 받는다
+     */
     @DisplayName("지하철 목록을 조회한다")
     @Test
     void getStations() {
         // given
-        StationAcceptanceFactory.createStation("염창역");
-        StationAcceptanceFactory.createStation("등촌역");
+        StationAcceptanceFactory.createStation(YEOM_CHANG);
+        StationAcceptanceFactory.createStation(DEUNG_CHON);
         // when
         ExtractableResponse<Response> response = StationAcceptanceFactory.getAllStations();
 
@@ -44,15 +50,20 @@ public class StationAcceptanceTest {
 
         // then
         List<String> stationNames = response.jsonPath().getList("name", String.class);
-        assertThat(stationNames).hasSize(2);
-        assertThat(stationNames).containsExactlyInAnyOrder("염창역", "등촌역");
+        assertThat(stationNames).containsExactlyInAnyOrder(YEOM_CHANG, DEUNG_CHON)
+                .hasSize(2);
     }
 
+    /**
+     * Given 지하철역을 생성하고
+     * When 그 지하철역을 삭제하면
+     * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
+     */
     @DisplayName("지하철역을 삭제한다.")
     @Test
     void deleteStation() {
         // given
-        ExtractableResponse<Response> station = StationAcceptanceFactory.createStation("당산역");
+        ExtractableResponse<Response> station = StationAcceptanceFactory.createStation(DANG_SAN);
         long stationId = station.jsonPath().getLong("id");
 
         // when
@@ -64,7 +75,7 @@ public class StationAcceptanceTest {
         // then
         List<String> stationNames = StationAcceptanceFactory.getAllStations()
                 .jsonPath().getList("name", String.class);
-        assertThat(stationNames).doesNotContain("당산역");
+        assertThat(stationNames).doesNotContain(DANG_SAN);
     }
 
 
