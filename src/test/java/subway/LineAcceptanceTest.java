@@ -6,6 +6,7 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.opentest4j.AssertionFailedError;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
@@ -133,16 +134,17 @@ public class LineAcceptanceTest {
         Long lineId = createLine(lineCreateRequest);
         deleteLine(lineId);
 
-        assertThrows(RuntimeException.class, (() -> getLine(lineId)));
+        assertThrows(AssertionFailedError.class, (() -> getLine(lineId)));
     }
 
+    @DisplayName("지하철 노선을 삭제할 수 있다.")
     private void deleteLine(Long lineId) {
         var response = RestAssured.given().log().all()
                 .when().delete("/lines/" + lineId)
                 .then().log().all()
                 .extract();
 
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
     @DisplayName("지하철 노선도를 조회할 수 있다.")
