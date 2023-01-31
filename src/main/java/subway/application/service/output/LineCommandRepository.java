@@ -1,13 +1,14 @@
 package subway.application.service.output;
 
+import subway.domain.Line;
 import subway.domain.LineCreateDto;
 import subway.domain.LineUpdateDto;
 
 public interface LineCommandRepository {
 
-    Long createLine(LineCreateDto lineCreateDto);
+    Long createLine(Line line);
 
-    void updateLine(LineUpdateDto toDomain);
+    void updateLine(Line line);
 
     void deleteLine(Long lineId);
 

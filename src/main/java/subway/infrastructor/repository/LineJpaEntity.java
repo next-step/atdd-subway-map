@@ -1,7 +1,5 @@
 package subway.infrastructor.repository;
 
-import subway.domain.LineUpdateDto;
-
 import javax.persistence.*;
 
 @Entity
@@ -29,10 +27,11 @@ class LineJpaEntity {
     @Column
     private Long distance;
 
-    public LineJpaEntity() {
+    protected LineJpaEntity() {
     }
 
-    public LineJpaEntity(String name, String color, StationPk upStationId, StationPk downStationId, Long distance) {
+    protected LineJpaEntity(Long id, String name, String color, StationPk upStationId, StationPk downStationId, Long distance) {
+        this.id = id;
         this.name = name;
         this.color = color;
         this.upStationId = upStationId;
@@ -60,9 +59,8 @@ class LineJpaEntity {
         return downStationId;
     }
 
-    public void updateLine(LineUpdateDto lineUpdateDto) {
-        this.name = lineUpdateDto.getName();
-        this.color = lineUpdateDto.getColor();
+    public Long getDistance() {
+        return distance;
     }
 
 }

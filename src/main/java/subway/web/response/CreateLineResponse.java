@@ -1,9 +1,9 @@
 package subway.web.response;
 
 import subway.domain.Line;
+import subway.domain.Station;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class CreateLineResponse {
 
@@ -20,7 +20,10 @@ public class CreateLineResponse {
     }
 
     public static CreateLineResponse from(Line loadLine) {
-        List<StationResponse> stations = loadLine.getStations().stream().map(stationDomain -> new StationResponse(stationDomain.getId(), stationDomain.getName())).collect(Collectors.toList());
+        Station upStation = loadLine.getUpStation();
+        Station downStation = loadLine.getDownStation();
+
+        List<StationResponse> stations = List.of(new StationResponse(upStation.getId(), upStation.getName()), new StationResponse(downStation.getId(), downStation.getName()));
         return new CreateLineResponse(loadLine.getId(), loadLine.getName(), loadLine.getColor(), stations);
     }
 
