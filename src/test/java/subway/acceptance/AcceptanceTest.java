@@ -39,4 +39,20 @@ class AcceptanceTest {
                 .then().log().all()
                 .extract();
     }
+
+    public static ExtractableResponse<Response> 지하철_노선_생성_요청(Map<String, String> responseBody) {
+        return given().log().all()
+                .body(responseBody)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post(LINE_BASE_URL)
+                .then().log().all()
+                .extract();
+    }
+
+    public static ExtractableResponse<Response> 지하철_노선_목록_조회_요청() {
+        return given().log().all()
+                .when().get(LINE_BASE_URL)
+                .then().log().all()
+                .extract();
+    }
 }
