@@ -20,10 +20,10 @@ public class LineService {
   }
 
   @Transactional
-  public LineResponse saveLine(String name, String inboundName, String outboundName) {
-    Station inbound = stationRepository.findByName(inboundName);
-    Station outbound = stationRepository.findByName(outboundName);
-    Line created = lineRepository.save(new Line(name, inbound, outbound));
+  public LineResponse saveLine(String name, String color, Long upStationId, Long downStationId, Long distance) {
+    Optional<Station> inbound = stationRepository.findById(upStationId);
+    Optional<Station> outbound = stationRepository.findById(downStationId);
+    Line created = lineRepository.save(new Line(name, color, inbound.get(), outbound.get(), distance));
     return createServiceResponse(created);
   }
 
@@ -43,17 +43,15 @@ public class LineService {
     lineRepository.deleteById(id);
   }
 
-  public Optional<LineResponse> updateLine(Long id, String name, String inboundName, String outboundName) {
-    Station inbound = stationRepository.findByName(inboundName);
-    Station outbound = stationRepository.findByName(outboundName);
+  public Optional<LineResponse> updateLine(Long id, String name, String color) {
     Optional<Line> optionalLine = lineRepository.findById(id);
 
-    return optionalLine.map(line -> line.updateLine(name, inbound, outbound))
+    return optionalLine.map(line -> line.updateLine(name, color))
         .map(lineRepository::save)
         .map(this::createServiceResponse);
   }
 
   private LineResponse createServiceResponse(Line line) {
-    return new LineResponse(line.getId(), line.getName(), line.getInboundStation(), line.getOutboundStation());
+    return new LineResponse(line.getId(), line.getName(), line.getColor(), line.getUpStation(), line.getDownStation(), line.getDistance());
   }
 }

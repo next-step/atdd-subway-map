@@ -45,6 +45,13 @@ public class StationTestUtils {
         .extract().jsonPath().getList("name", String.class);
   }
 
+  public static String 지하철역_조회(Long id) {
+    return 인수테스트_Given_준비()
+        .when().get("/stations" + id)
+        .then().log().all()
+        .extract().jsonPath().getString("name");
+  }
+
   public static void 지하철역_삭제(Long id) {
     RestAssured
         .given().log().all().contentType(MediaType.APPLICATION_JSON_VALUE)

@@ -17,18 +17,25 @@ public class Line {
 
   private String name;
 
-  @ManyToOne(cascade = CascadeType.ALL)
-  private Station inboundStation; // 상행역
+  private String color;
 
   @ManyToOne(cascade = CascadeType.ALL)
-  private Station outboundStation; // 하행역
+  private Station upStation; // 상행역
+
+  @ManyToOne(cascade = CascadeType.ALL)
+  private Station downStation; // 하행역
+
+  private Long distance;
 
   public Line() {}
 
-  public Line(String name, Station inboundStation, Station outboundStation) {
+  public Line(String name, String color, Station upStation, Station downStation,
+      Long distance) {
     this.name = name;
-    this.inboundStation = inboundStation;
-    this.outboundStation = outboundStation;
+    this.color = color;
+    this.upStation = upStation;
+    this.downStation = downStation;
+    this.distance = distance;
   }
 
   public Long getId() {
@@ -39,18 +46,25 @@ public class Line {
     return name;
   }
 
-  public Station getInboundStation() {
-    return inboundStation;
+  public Station getUpStation() {
+    return upStation;
   }
 
-  public Station getOutboundStation() {
-    return outboundStation;
+  public Station getDownStation() {
+    return downStation;
   }
 
-  public Line updateLine(String name, Station inboundStation, Station outboundStation) {
+  public String getColor() {
+    return color;
+  }
+
+  public Long getDistance() {
+    return distance;
+  }
+
+  public Line updateLine(String name, String color) {
     this.name = name;
-    this.inboundStation = inboundStation;
-    this.outboundStation = outboundStation;
+    this.color = color;
     return this;
   }
 }

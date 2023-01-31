@@ -9,6 +9,11 @@ public class Mocks {
     public static String 신사역 = "신사역";
   }
 
+  public static class Color {
+    public static String 초록 = "초록";
+    public static String 노랑 = "노랑";
+  }
+
   public static class MockLine {
     public static String 서울2호선 = "서울2호선";
     public static String 신분당선 = "신분당선";

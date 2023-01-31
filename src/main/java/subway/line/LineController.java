@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import subway.station.Station;
 
 @RestController
 public class LineController {
@@ -23,13 +22,18 @@ public class LineController {
 
   /**
    * 새로운 지하철 노선을 추가한다.
-   * @param request LineRequest
+   * @param request LineCreateRequest
    * @return 노선 생성의 결과를 반환한다.
    */
   @PostMapping("/lines")
-  public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest request) {
+  public ResponseEntity<LineResponse> createLine(@RequestBody LineCreateRequest request) {
     return ResponseEntity.ok().body(lineService.saveLine(
-        request.getName(), request.getInbound(), request.getOutbound())
+        request.getName(),
+        request.getColor(),
+        request.getUpStationId(),
+        request.getDownStationId(),
+        request.getDistance()
+        )
     );
   }
 
@@ -63,8 +67,8 @@ public class LineController {
    * @return 변환된 지하철 정보를 반환한다. 존재하지 않는 지하철 노선에 대한 변경은 noContent()를 반환한다.
    */
   @PatchMapping("/lines/{id}")
-  public ResponseEntity<LineResponse> patchLine(@PathVariable Long id, @RequestBody LineRequest request) {
-    Optional<LineResponse> response = lineService.updateLine(id,request.getName(), request.getInbound(), request.getOutbound());
+  public ResponseEntity<LineResponse> patchLine(@PathVariable Long id, @RequestBody LinePatchRequest request) {
+    Optional<LineResponse> response = lineService.updateLine(id,request.getName(), request.getColor());
     if (response.isEmpty()) {
       return ResponseEntity.notFound().build();
     }
