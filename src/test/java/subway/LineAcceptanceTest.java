@@ -31,12 +31,16 @@ public class LineAcceptanceTest {
         String lineName = "1호선";
         String lineColor = "파란색";
 
-        Map<String, String> params = new HashMap<>();
-        params.put("name", lineName);
-        params.put("color", lineColor);
+        final Map<String, String> params = new HashMap<>();
+        putParams(params, lineName, lineColor);
 
         //then
         getSaveLineResponse(params);
+    }
+
+    private void putParams(Map<String, String> params, String lineName, String lineColor) {
+        params.put("name", lineName);
+        params.put("color", lineColor);
     }
 
     private void getSaveLineResponse(Map<String, String> params) {
