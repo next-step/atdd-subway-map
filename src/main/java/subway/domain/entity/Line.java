@@ -1,6 +1,10 @@
 package subway.domain.entity;
 
+import subway.api.dto.LineRequest;
+import static java.util.Optional.ofNullable;
+
 import javax.persistence.*;
+import java.util.Optional;
 
 @Entity
 public class Line {
@@ -24,6 +28,13 @@ public class Line {
 		this.upStationId = upStationId;
 		this.downStationId = downStationId;
 		this.distance = distance;
+	}
+	public void updateLineIfPresent(LineRequest lineRequest) {
+		ofNullable(lineRequest.getName()).ifPresent(nameToUpdate -> name = nameToUpdate);
+		ofNullable(lineRequest.getColor()).ifPresent(colorToUpdate -> color = colorToUpdate);
+		ofNullable(lineRequest.getUpStationId()).ifPresent(upStationIdToUpdate -> upStationId = upStationIdToUpdate);
+		ofNullable(lineRequest.getDownStationId()).ifPresent(downStationIdToUpdate -> downStationId = downStationIdToUpdate);
+		ofNullable(lineRequest.getDistance()).ifPresent(distanceToUpdate -> distance = distanceToUpdate);
 	}
 
 	public String getName() {
