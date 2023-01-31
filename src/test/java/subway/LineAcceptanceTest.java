@@ -113,7 +113,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void modifyLine() {
         // given
-        ExtractableResponse<Response> shinBunDang = createLineResponse(new LineRequest("신분당선", "bg-red-600", 1L, 2L, 5));
+        ExtractableResponse<Response> shinBunDang = createLineResponse(new LineRequest("신분당선", "bg-red-600", 2L, 3L, 5));
 
         // when
         long id = shinBunDang.jsonPath().getLong("id");
