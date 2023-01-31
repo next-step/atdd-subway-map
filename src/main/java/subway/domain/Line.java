@@ -1,8 +1,4 @@
-package subway.line;
-
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import subway.station.Station;
+package subway.domain;
 
 import javax.persistence.*;
 

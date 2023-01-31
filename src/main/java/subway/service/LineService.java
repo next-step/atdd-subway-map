@@ -1,9 +1,14 @@
-package subway.line;
+package subway.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import subway.station.Station;
-import subway.station.StationRepository;
+import subway.domain.Line;
+import subway.domain.Station;
+import subway.repository.LineRepository;
+import subway.dto.LineRequest;
+import subway.dto.LineResponse;
+import subway.dto.LineUpdateRequest;
+import subway.repository.StationRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;

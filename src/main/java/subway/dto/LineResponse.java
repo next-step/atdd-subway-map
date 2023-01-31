@@ -1,7 +1,8 @@
-package subway.line;
+package subway.dto;
 
 import lombok.AllArgsConstructor;
-import subway.station.Station;
+import subway.domain.Line;
+import subway.domain.Station;
 
 import java.util.List;
 
