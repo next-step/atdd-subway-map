@@ -2,11 +2,8 @@ package subway.line;
 
 import lombok.Getter;
 import subway.station.Station;
-import subway.station.StationRequest;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @Table(name = "lines")
@@ -22,22 +19,26 @@ public class Line {
     @Column(length = 20, nullable = false)
     private String color;
 
-    @Column(nullable = false)
-    private Integer distance;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "up_station_id")
+    private Station upStation;
 
-    @ManyToMany
-    @JoinTable(name = "line_stations")
-    private List<Station> stations = new ArrayList<>();
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "down_station_id")
+    private Station downStation;
+
+//    @ManyToMany
+//    @JoinTable(name = "line_stations")
+//    private List<Station> stations = new ArrayList<>();
 
     public Line() {
     }
 
-    public Line(String name, String color, Station upStation, Station downStation, Integer distance) {
+    public Line(String name, String color, Station upStation, Station downStation) {
         this.name = name;
         this.color = color;
-        this.stations.add(upStation);
-        this.stations.add(downStation);
-        this.distance = distance;
+        this.upStation = upStation;
+        this.downStation = downStation;
     }
 
     public void update(String name, String color) {
@@ -45,8 +46,7 @@ public class Line {
         this.color = color;
     }
 
-    public void appendSection(Station newStation, Integer distance) {
-        this.stations.add(newStation);
-        this.distance = distance;
-    }
+//    public void appendSection(Station newStation) {
+//        this.stations.add(newStation);
+//    }
 }

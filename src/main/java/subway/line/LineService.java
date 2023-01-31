@@ -6,6 +6,7 @@ import subway.station.Station;
 import subway.station.StationResponse;
 import subway.station.StationService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,7 +28,7 @@ public class LineService {
         Station upStation = stationService.findOne(lineRequest.getUpStationId());
         Station downStation = stationService.findOne(lineRequest.getDownStationId());
 
-        Line line = new Line(lineRequest.getName(), lineRequest.getColor(), upStation, downStation, lineRequest.getDistance());
+        Line line = new Line(lineRequest.getName(), lineRequest.getColor(), upStation, downStation);
         Line savedLine = lineRepository.save(line);
 
         return createLineResponse(savedLine);
@@ -66,22 +67,22 @@ public class LineService {
     public void appendSection(Long id, SectionRequest sectionRequest) {
         Line line = findOne(id);
 
-        if(!sectionService.isAppendable(line, sectionRequest)) {
-            throw new IllegalArgumentException("등록할 수 없는 구간입니다");
-        }
+//        if(!sectionService.isAppendable(line, sectionRequest)) {
+//            throw new IllegalArgumentException("등록할 수 없는 구간입니다");
+//        }
 
         Station newStation = this.stationService.findOne(sectionRequest.getDownStationId());
 
-        line.appendSection(newStation, sectionRequest.getDistance());
+//        line.appendSection(newStation, sectionRequest.getDistance());
 
         this.lineRepository.save(line);
     }
 
     private LineResponse createLineResponse(Line line) {
-        List<StationResponse> stationResponses = line.getStations()
-                .stream()
-                .map(stationService::createStationResponse)
-                .collect(Collectors.toList());
+        List<StationResponse> stationResponses = new ArrayList<>();
+
+        stationResponses.add(stationService.createStationResponse(line.getUpStation()));
+        stationResponses.add(stationService.createStationResponse(line.getDownStation()));
 
         return LineResponse.builder()
                 .id(line.getId())

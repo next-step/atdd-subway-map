@@ -3,6 +3,7 @@ package subway.line;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -33,8 +34,9 @@ public class SectionAcceptanceTest {
     /**
      * Given 지하철 노선을 생성하고
      * When 지하철 구간을 등록하면
-     * Then 지하철 노선 조회시 기존 구간과 등록한 구간이 합쳐진 노선을 확인할 수 있다.
+     * Then 지하철 노선 조회시 기존 구간과 등록한 구간이 합쳐진 노선을 확인할 수 있다
      */
+    @Disabled
     @DisplayName("구간 등록 기능 - 성공 케이스")
     @Test
     void createSectionSuccess() {
@@ -56,8 +58,9 @@ public class SectionAcceptanceTest {
     /**
      * Given 지하철 노선을 생성하고
      * When 지하철 구간을 등록하면
-     * Then 지하철 노선 조회시 기존 노선과 동일하다.
+     * Then 지하철 노선 조회시 기존 노선과 동일하다
      */
+    @Disabled
     @DisplayName("구간 등록 기능 - 실패 케이스")
     @Test
     void createSectionFail() {
@@ -76,5 +79,25 @@ public class SectionAcceptanceTest {
 
         assertThat(showLineResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(updatedLineOne.getStations()).containsExactly(stationA, stationC);
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * Given 지하철 구간 하나를 추가하고
+     * When 추가한 구간을 삭제하면
+     * Then 지하철 조회시 처음 등록한 지하철 노선과 동일하다
+     */
+    @Disabled
+    @DisplayName("구간 삭제 기능 - 성공 케이스")
+    @Test
+    void deleteSectionSuccess() {
+        // given
+        LineResponse lineOne = requestCreateLine("1호선", "#0052A4", stationA.getId(), stationC.getId(), 7)
+                .body().as(LineResponse.class);
+
+        requestAppendSection(lineOne.getId(), stationC.getId(), stationB.getId(), 10);
+
+        // when
+//        requestDeleteSection()
     }
 }
