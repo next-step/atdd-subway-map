@@ -1,10 +1,16 @@
 package subway.station;
 
 import javax.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
+@AllArgsConstructor
+@Data
+@NoArgsConstructor
 @Table(name = "STATION")
 public class Station {
     @Id
@@ -18,10 +24,13 @@ public class Station {
     @Column(name = "STATION_NAME", length = 20, nullable = false)
     private String name;
 
-    public Station() {}
 
     public Station(Long lineId, String name) {
         this.lineId = lineId;
         this.name = name;
+    }
+
+    public void changeLine(Long lineId){
+        this.lineId = lineId;
     }
 }

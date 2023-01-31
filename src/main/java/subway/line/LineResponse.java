@@ -3,9 +3,11 @@ package subway.line;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import subway.station.StationResponse;
 
 @AllArgsConstructor
+@Getter
 public class LineResponse {
 
     private Long id;

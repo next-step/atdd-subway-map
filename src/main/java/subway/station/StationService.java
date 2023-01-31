@@ -34,6 +34,6 @@ public class StationService {
     }
 
     private StationResponse createStationResponse(Station station) {
-        return new StationResponse(station.getId(), station.getName());
+        return new StationResponse(station.getId(), station.getLineId(), station.getName());
     }
 }

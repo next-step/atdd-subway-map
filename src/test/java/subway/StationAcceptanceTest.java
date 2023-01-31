@@ -32,6 +32,19 @@ public class StationAcceptanceTest {
     @Test
     void createStationTest() {
         // when
+        List<String> stationList =
+                RestAssured.given()
+                        .log()
+                        .all()
+                        .when()
+                        .get("/lines")
+                        .then()
+                        .log()
+                        .all()
+                        .extract()
+                        .jsonPath()
+                        .getList("name", String.class);
+
         createStation(2, 강남역);
 
         // then

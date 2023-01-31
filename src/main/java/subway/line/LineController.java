@@ -1,13 +1,9 @@
 package subway.line;
 
 import java.util.List;
-
-import org.hibernate.sql.Update;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import subway.common.ErrorResponse;
 
 @RestController
 public class LineController {
@@ -40,7 +36,8 @@ public class LineController {
     }
 
     @PutMapping("/lines/{id}")
-    public ResponseEntity<Void> updateLine(@PathVariable(name = "id") Long id, @RequestBody UpdateLineRequest request) {
+    public ResponseEntity<Void> updateLine(
+            @PathVariable(name = "id") Long id, @RequestBody UpdateLineRequest request) {
         lineService.updateLineById(id, request);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
