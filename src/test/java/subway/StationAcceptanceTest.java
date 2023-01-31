@@ -1,13 +1,9 @@
 package subway;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import subway.util.ExtractionUtils;
 import subway.util.ValidationUtils;
 
@@ -16,16 +12,7 @@ import static subway.MockStation.서초역;
 import static subway.MockStation.신촌역;
 
 @DisplayName("지하철역 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class StationAcceptanceTest {
-    
-    @LocalServerPort
-    int port;
-
-    @BeforeEach
-    public void setUp() {
-        RestAssured.port = port;
-    }
+public class StationAcceptanceTest extends RandomPortSetting {
 
     /**
      * When 지하철역을 생성하면
