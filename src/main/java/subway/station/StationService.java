@@ -1,4 +1,4 @@
-package subway;
+package subway.station;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,9 +10,11 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class StationService {
     private StationRepository stationRepository;
+    private StationQuery stationQuery;
 
-    public StationService(StationRepository stationRepository) {
+    public StationService(StationRepository stationRepository, StationQuery stationQuery) {
         this.stationRepository = stationRepository;
+        this.stationQuery = stationQuery;
     }
 
     @Transactional
@@ -22,7 +24,7 @@ public class StationService {
     }
 
     public List<StationResponse> findAllStations() {
-        return stationRepository.findAll().stream()
+        return stationQuery.findAll().stream()
                 .map(this::createStationResponse)
                 .collect(Collectors.toList());
     }
@@ -33,9 +35,6 @@ public class StationService {
     }
 
     private StationResponse createStationResponse(Station station) {
-        return new StationResponse(
-                station.getId(),
-                station.getName()
-        );
+        return StationResponse.from(station);
     }
 }
