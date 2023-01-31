@@ -20,7 +20,7 @@ public class Line {
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Station downStation;
 
-    public Line() {
+    protected Line() {
     }
 
     public Line(String name, String color, Station upStation, Station downStation) {
