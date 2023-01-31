@@ -27,7 +27,7 @@ public class LineService {
         Station upStation = stationService.findStation(lineRequest.getUpStationId());
         Station downStation = stationService.findStation(lineRequest.getDownStationId());
 
-        Line line = new Line(lineRequest.getName(), lineRequest.getColor(), upStation, downStation, lineRequest.getDistance());
+        Line line = new Line(lineRequest.getName(), lineRequest.getColor(), lineRequest.getDistance(), upStation, downStation);
         Line newLine = lineRepository.save(line);
         return new LineResponse(newLine.getId(), newLine.getName(), newLine.getColor(),
                 makeStationResponses(upStation, downStation));
@@ -56,11 +56,10 @@ public class LineService {
 
     @Transactional
     public void deleteLine(Long id) {
-        try {
-            lineRepository.deleteById(id);
-        } catch (EmptyResultDataAccessException e) {
-            throw new LineNotFoundException();
-        }
+        Line line = lineRepository.findById(id)
+                .orElseThrow(LineNotFoundException::new);
+        line.breakAllStationRelation();
+        lineRepository.deleteById(id);
     }
 
     private static List<StationResponse> makeStationResponses(Station line, Station line1) {
