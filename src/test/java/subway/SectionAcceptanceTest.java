@@ -12,7 +12,6 @@ import org.springframework.test.context.jdbc.Sql;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import subway.dto.LineRequest;
 import subway.dto.SectionRequest;
 
 @DisplayName("지하철 구간 관련 기능")
@@ -25,8 +24,7 @@ public class SectionAcceptanceTest {
 
     @BeforeEach
     void setup() {
-        lineId = client.createLine(new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10L))
-            .jsonPath().getLong("id");
+        lineId = client.createLine(TestFixture.SinBunDangLine).jsonPath().getLong("id");
     }
 
     @Test

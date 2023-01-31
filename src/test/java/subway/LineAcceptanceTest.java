@@ -11,7 +11,6 @@ import org.springframework.test.context.jdbc.Sql;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import subway.dto.LineRequest;
 
 @DisplayName("지하철 노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -24,7 +23,7 @@ public class LineAcceptanceTest {
     @Test
     void createLine() {
         // when
-        ExtractableResponse<Response> response = client.createLine(new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10L));
+        ExtractableResponse<Response> response = client.createLine(TestFixture.SinBunDangLine);
 
         // then
         RestAssuredValidationUtils.validateStatusCode(response, HttpStatus.CREATED);
@@ -35,8 +34,8 @@ public class LineAcceptanceTest {
     @Test
     void findLines() {
         // given
-        client.createLine(new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10L));
-        client.createLine(new LineRequest("분당선", "bg-red-600", 2L, 3L, 10L));
+        client.createLine(TestFixture.SinBunDangLine);
+        client.createLine(TestFixture.BunDangLine);
 
         // when
         ExtractableResponse<Response> response = client.findAllLines();
@@ -52,7 +51,7 @@ public class LineAcceptanceTest {
     @Test
     void findLineById() {
         // given
-        var line = client.createLine(new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10L));
+        var line = client.createLine(TestFixture.SinBunDangLine);
         long lineId = line.jsonPath().getLong("id");
 
         // when
@@ -67,11 +66,11 @@ public class LineAcceptanceTest {
     @Test
     void updateLine() {
         // given
-        var line = client.createLine(new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10L));
+        var line = client.createLine(TestFixture.SinBunDangLine);
         long lineId = line.jsonPath().getLong("id");
 
         // when
-        ExtractableResponse<Response> response = client.updateLine(lineId, new LineRequest("분당선", "bg-yellow-600", 2L, 3L, 100L));
+        ExtractableResponse<Response> response = client.updateLine(lineId, TestFixture.BunDangLine);
 
         // then
         RestAssuredValidationUtils.validateStatusCode(response, HttpStatus.OK);
@@ -83,7 +82,7 @@ public class LineAcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        var line = client.createLine(new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10L));
+        var line = client.createLine(TestFixture.SinBunDangLine);
         long lineId = line.jsonPath().getLong("id");
 
         // when
