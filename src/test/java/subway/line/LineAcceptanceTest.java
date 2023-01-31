@@ -20,6 +20,13 @@ import static subway.station.StationAcceptanceTest.createStationByName;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {
 
+    private final String 신분당선_이름 = "신분당선";
+    private final String 신분당선_색 = "bg-red-600";
+    private final String 분당선_이름 = "분당선";
+    private final String 다른분당선_이름 = "다른분당선";
+    private final String 다른분당선_색 = "bg-red-600";
+
+
     private final static LineRequest 신분당선 = LineRequest.of(
             "신분당선", "bg-red-600", 1L, 2L, 10L);
     private final static LineRequest 분당선 = LineRequest.of(
@@ -30,7 +37,6 @@ public class LineAcceptanceTest {
         createStationByName("지하철역");
         createStationByName("새로운지하철역");
         createStationByName("또다른지하철역");
-
     }
 
     /**
@@ -46,7 +52,7 @@ public class LineAcceptanceTest {
                 .jsonPath().getList("name", String.class);
 
         //Then
-        assertThat(lineNames).containsAnyOf("신분당선");
+        assertThat(lineNames).containsAnyOf(신분당선_이름);
     }
 
     /**
@@ -66,7 +72,7 @@ public class LineAcceptanceTest {
                 .jsonPath().getList("name", String.class);
 
         //Then
-        assertThat(lineNames).containsAll(List.of("신분당선", "분당선"));
+        assertThat(lineNames).containsAll(List.of(신분당선_이름, 분당선_이름));
         assertThat(lineNames).hasSize(2);
     }
 
@@ -87,8 +93,8 @@ public class LineAcceptanceTest {
         //Then
         String name = response.jsonPath().get("name");
         String color = response.jsonPath().get("color");
-        assertThat(name).isEqualTo("신분당선");
-        assertThat(color).isEqualTo("bg-red-600");
+        assertThat(name).isEqualTo(신분당선_이름);
+        assertThat(color).isEqualTo(신분당선_색);
     }
 
     /**
@@ -103,15 +109,15 @@ public class LineAcceptanceTest {
         long updateId = getCreatedLineId(신분당선);
 
         //When
-        updateLine(updateId, "다른분당선", "bg-red-600");
+        updateLine(updateId, 다른분당선_이름, 다른분당선_색);
         List<String> lineNames = getLineNames()
                 .jsonPath().getList("name", String.class);
         List<String> lineColors = getLineNames()
                 .jsonPath().getList("color", String.class);
 
         //Then
-        assertThat(lineNames).contains("다른분당선");
-        assertThat(lineColors).contains("bg-red-600");
+        assertThat(lineNames).contains(다른분당선_이름);
+        assertThat(lineColors).contains(다른분당선_색);
         assertThat(lineNames).hasSize(1);
         assertThat(lineColors).hasSize(1);
     }
@@ -134,7 +140,7 @@ public class LineAcceptanceTest {
                 .jsonPath().getList("name", String.class);
 
         //Then
-        assertThat(lineNames).doesNotContain("신분당선");
+        assertThat(lineNames).doesNotContain(신분당선_이름);
     }
 
     private static ExtractableResponse<Response> deleteLine(Long id) {
