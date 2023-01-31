@@ -7,6 +7,7 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
+@RequestMapping("/lines")
 public class LineController {
 
     private final LineService lineService;
@@ -15,32 +16,32 @@ public class LineController {
         this.lineService = lineService;
     }
 
-    @PostMapping("/lines")
+    @PostMapping
     public ResponseEntity<LineResponse> createLine(@RequestBody LineCreateRequest lineRequest) {
         LineResponse lineResponse = lineService.saveLine(lineRequest);
         return ResponseEntity.created(URI.create("/lines/" + lineResponse.getId())).body(lineResponse);
     }
 
-    @GetMapping("/lines")
+    @GetMapping
     public ResponseEntity<List<LineResponse>> showLines() {
         List<LineResponse> lineResponses = lineService.findAllLines();
         return ResponseEntity.ok(lineResponses);
     }
 
-    @GetMapping("/lines/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<LineResponse> getLine(
             @PathVariable(name = "id") Long id) {
         return ResponseEntity.ok(lineService.findLine(id));
     }
 
-    @PutMapping("/lines/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<Void> updateLine(
             @PathVariable(name = "id") Long id, @RequestBody LineCreateRequest lineRequest) {
         lineService.updateLine(id, lineRequest);
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/lines/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteLine(
             @PathVariable(name = "id") Long id) {
         lineService.deleteLine(id);
