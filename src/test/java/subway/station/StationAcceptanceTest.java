@@ -1,15 +1,16 @@
-package subway;
+package subway.station;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import subway.util.ExtractionUtils;
-import subway.util.ValidationUtils;
+import setting.RandomPortSetting;
+import subway.station.util.ExtractionUtils;
+import subway.station.util.ValidationUtils;
 
-import static subway.MockStation.강남역;
-import static subway.MockStation.서초역;
-import static subway.MockStation.신촌역;
+import static subway.station.MockStation.강남역;
+import static subway.station.MockStation.서초역;
+import static subway.station.MockStation.신촌역;
 
 @DisplayName("지하철역 관련 기능")
 public class StationAcceptanceTest extends RandomPortSetting {

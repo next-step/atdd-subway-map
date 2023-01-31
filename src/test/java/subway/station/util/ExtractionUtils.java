@@ -1,4 +1,4 @@
-package subway.util;
+package subway.station.util;
 
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
@@ -6,7 +6,7 @@ import io.restassured.response.Response;
 
 import java.util.List;
 
-import static subway.StationApi.STATION_NAME_KEY;
+import static subway.station.StationApi.STATION_NAME_KEY;
 
 public class ExtractionUtils {
 

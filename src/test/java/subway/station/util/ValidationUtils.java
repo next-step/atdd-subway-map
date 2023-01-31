@@ -1,10 +1,10 @@
-package subway.util;
+package subway.station.util;
 
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.HttpStatus;
-import subway.MockStation;
+import subway.station.MockStation;
 
 import java.util.Arrays;
 import java.util.List;

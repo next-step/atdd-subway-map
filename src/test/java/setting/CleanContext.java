@@ -1,4 +1,4 @@
-package subway;
+package setting;
 
 import org.springframework.test.annotation.DirtiesContext;
 

@@ -1,4 +1,4 @@
-package subway;
+package subway.station;
 
 public enum MockStation {
     강남역,

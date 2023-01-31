@@ -1,7 +1,8 @@
-package subway;
+package subway.line;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import setting.RandomPortSetting;
 
 public class LineAcceptanceTest extends RandomPortSetting {
 
