@@ -1,42 +1,19 @@
 package subway.common;
 
-import static io.restassured.RestAssured.*;
+import org.junit.jupiter.api.AfterEach;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Import;
+import org.springframework.transaction.annotation.Transactional;
 
-import org.springframework.boot.test.context.SpringBootTest;
+@Import(JpaDataBaseCleaner.class)
+@Transactional
+public abstract class AcceptanceTest extends RestAssuredTest {
 
-import io.restassured.http.Method;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
-import io.restassured.specification.RequestSpecification;
+	@Autowired
+	private JpaDataBaseCleaner jpaDataBaseCleaner;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public abstract class AcceptanceTest {
-
-	protected ExtractableResponse<Response> requestApi(
-		Method method,
-		String url, Object... pathVariables) {
-		//@formatter:off
-			return given()
-					.log().all()
-				.when()
-					.request(method, url, pathVariables)
-				.then()
-					.log().all()
-				.extract();
-		}
-
-
-	protected ExtractableResponse<Response> requestApi(
-		RequestSpecification requestSpec,
-		Method method,
-		String url, Object... pathVariables) {
-		//@formatter:off
-		return given(requestSpec)
-				.log().all()
-			.when()
-				.request(method, url, pathVariables)
-			.then()
-				.log().all()
-			.extract();
+	@AfterEach
+	void cleanTable() {
+		jpaDataBaseCleaner.execute();
 	}
 }
