@@ -13,9 +13,12 @@ import org.springframework.test.annotation.DirtiesContext;
 import subway.presentation.line.dto.response.LineResponse;
 import subway.station.StationAcceptanceFactory;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD;
 import static subway.line.LineNameConstraints.Line2;
+import static subway.line.LineNameConstraints.Line9;
 import static subway.station.StationNameConstraints.*;
 
 @DisplayName("지하철 노선 관련 기능")
@@ -52,5 +55,38 @@ public class LineAcceptanceTest {
 
     private static LineResponse getLineResponse(ExtractableResponse<Response> response) {
         return response.jsonPath().getObject("$", LineResponse.class);
+    }
+
+    /**
+     * Given 2개의 지하철 노선을 생성하고
+     * When 지하철 노선 목록을 조회하면
+     * Then 2개의 지하철 노선을 응답 받는다
+     */
+
+    @DisplayName("지하철노선 목록을 조회한다.")
+    @Test
+    void getAllLines() {
+        // given
+        LineAcceptanceFactory.createFixtureLine();
+        LineAcceptanceFactory.createLine(
+                Line9,
+                "bg-brown-600",
+                1,
+                4,
+                20
+
+        );
+        // when
+        ExtractableResponse<Response> response = LineAcceptanceFactory.getAllLine();
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        //then
+        List<LineResponse> lineResponses = getLineResponses(response);
+        assertThat(lineResponses).extracting("name")
+                .containsExactlyInAnyOrder(Line2, Line9);
+    }
+
+    private static List<LineResponse> getLineResponses(ExtractableResponse<Response> response) {
+        return response.jsonPath().getList("$", LineResponse.class);
     }
 }

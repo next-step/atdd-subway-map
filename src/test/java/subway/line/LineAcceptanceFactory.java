@@ -62,4 +62,12 @@ public class LineAcceptanceFactory {
         params.put("distance", distance);
         return params;
     }
+
+    public static ExtractableResponse<Response> getAllLine() {
+        return RestAssured
+                .given().log().all()
+                .when().get(LINE_BASE_URL)
+                .then().log().all()
+                .extract();
+    }
 }
