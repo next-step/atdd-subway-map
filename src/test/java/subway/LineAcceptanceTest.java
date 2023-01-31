@@ -3,7 +3,6 @@ package subway;
 import io.restassured.response.ValidatableResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
@@ -16,16 +15,18 @@ import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
-@Sql("/sql/setup-station.sql")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class LineAcceptanceTest {
+public class LineAcceptanceTest extends AbstractAcceptanceTest {
     private static final Map<String, String> 신분당선_요청 = new HashMap<>();
     private static final Map<String, String> 분당선_요청 = new HashMap<>();
     private static final Map<String, String> 잘못된_노선_요청 = new HashMap<>();
     private static final Map<String, String> 수정_요청 = new HashMap<>();
+    private static final HashMap<String, String> 신논현_양재_구간 = new HashMap<>();
     private static final String 신분당선 = "신분당선";
     private static final String 분당선 = "분당선";
     private static final String 미존재_노선_위치 = "/lines/100";
+    private static final Long 신사역_ID = 1L;
+    private static final Long 신논현역_ID = 2L;
+    private static final Long 양재역_ID = 4L;
 
     static {
         신분당선_요청.put("name", "신분당선");
@@ -48,6 +49,10 @@ public class LineAcceptanceTest {
 
         수정_요청.put("name", "다른 분당선");
         수정_요청.put("color", "bg-red-600");
+
+        신논현_양재_구간.put("upStationId", "2");
+        신논현_양재_구간.put("downStationId", "4");
+        신논현_양재_구간.put("distance", "10");
     }
 
     /**
@@ -55,6 +60,7 @@ public class LineAcceptanceTest {
      * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다.
      */
     @DisplayName("지하철 노선을 생성한다.")
+    @Sql("/sql/setup-station.sql")
     @Test
     void createLine() {
         노선_생성(신분당선_요청).statusCode(HttpStatus.CREATED.value());
@@ -78,6 +84,7 @@ public class LineAcceptanceTest {
      * Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
      */
     @DisplayName("지하철 노선 목록을 조회한다.")
+    @Sql("/sql/setup-station.sql")
     @Test
     void showLines() {
         노선_생성(신분당선_요청);
@@ -94,6 +101,7 @@ public class LineAcceptanceTest {
      * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
      */
     @DisplayName("지하철 노선을 조회한다.")
+    @Sql("/sql/setup-station.sql")
     @Test
     void showLine() {
         var createResponse = 노선_생성(신분당선_요청).extract();
@@ -124,6 +132,7 @@ public class LineAcceptanceTest {
      * Then 해당 지하철 노선 정보는 수정된다
      */
     @DisplayName("지하철 노선을 수정한다.")
+    @Sql("/sql/setup-station.sql")
     @Test
     void updateLine() {
         var location = 노선_생성(신분당선_요청).extract().header("location");
@@ -166,6 +175,7 @@ public class LineAcceptanceTest {
      * Then 해당 지하철 노선 정보는 삭제된다.
      */
     @DisplayName("지하철 노선을 삭제한다.")
+    @Sql("/sql/setup-station.sql")
     @Test
     void deleteLine() {
         var location = 노선_생성(신분당선_요청).extract().header("location");
@@ -193,6 +203,48 @@ public class LineAcceptanceTest {
                 .statusCode(HttpStatus.NOT_FOUND.value());
     }
 
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 해당 노선에 구간을 등록하면
+     * Then 해당 노선 조회 시 추가된 구간이 포함되어 있다.
+     */
+    @DisplayName("구간을 등록한다.")
+    @Sql("/sql/setup-station.sql")
+    @Test
+    void addSection() {
+        String location = 노선_생성(신분당선_요청).extract().header("location");
+        구간_등록(location, 신논현_양재_구간);
+
+        List<Long> 지하철역_ID_목록 = get(location).extract()
+                .jsonPath()
+                .getList("stations.id", Long.class);
+        assertThat(지하철역_ID_목록).containsExactly(신사역_ID, 신논현역_ID, 양재역_ID);
+    }
+
+    /**
+     * Given 지하철 노선 생성 후 해당 노선에 구간을 등록하고
+     * When 해당 노선에서 마지막 구간(하행 종점역)을 제거하면
+     * Then 해당 노선 조회 시 삭제된 구간을 찾을 수 없다.
+     */
+    @DisplayName("구간을 제거한다.")
+    @Sql("/sql/setup-station.sql")
+    @Test
+    void deleteSection() {
+        String location = 노선_생성(신분당선_요청).extract().header("location");
+        구간_등록(location, 신논현_양재_구간);
+
+        given().log().all()
+                .param("stationId", 양재역_ID).
+        when()
+                .delete(location + "/sections").
+        then().log().all();
+
+        List<Long> 지하철_ID_목록 = get(location).extract()
+                .jsonPath()
+                .getList("stations.id", Long.class);
+        assertThat(지하철_ID_목록).containsExactly(신사역_ID, 신논현역_ID);
+    }
+
     private ValidatableResponse 노선_생성(Map<String, String> params) {
         return given().log().all()
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -213,5 +265,14 @@ public class LineAcceptanceTest {
                 when()
                     .get(path).
                 then().log().all();
+    }
+
+    private void 구간_등록(String location, HashMap<String, String> params) {
+        given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(params).
+        when()
+                .post(location + "/sections").
+        then().log().all();
     }
 }

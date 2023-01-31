@@ -3,10 +3,8 @@ package subway;
 import io.restassured.response.ValidatableResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.jdbc.Sql;
 
 import java.util.HashMap;
 import java.util.List;
@@ -16,9 +14,11 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
 
 @DisplayName("지하철역 관련 기능")
-@Sql("/sql/truncate-tables.sql")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class StationAcceptanceTest {
+public class StationAcceptanceTest extends AbstractAcceptanceTest {
+
+    private static final String 강남역 = "강남역";
+    private static final String 교대역 = "교대역";
+
     /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다
@@ -27,13 +27,13 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 생성한다.")
     @Test
     void createStation() {
-        역_생성("강남역").statusCode(HttpStatus.CREATED.value());
+        역_생성(강남역).statusCode(HttpStatus.CREATED.value());
 
         given().log().all().
         when()
                 .get("/stations").
         then().log().all()
-                .body("name", hasItems("강남역"));
+                .body("name", hasItems(강남역));
     }
 
     /**
@@ -44,7 +44,7 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역 2개를 생성하고 목록을 조회한다.")
     @Test
     void createStations() {
-        List.of("강남역", "교대역")
+        List.of(강남역, 교대역)
                 .forEach(this::역_생성);
 
         given().log().all().
@@ -52,7 +52,7 @@ public class StationAcceptanceTest {
                 .get("/stations").
         then().log().all()
                 .body("size()", equalTo(2))
-                .body("name", contains("강남역", "교대역"));
+                .body("name", contains(강남역, 교대역));
     }
 
     /**
@@ -64,7 +64,7 @@ public class StationAcceptanceTest {
     @Test
     void deleteStation() {
         역_생성("교대역");
-        var createResponse = 역_생성("강남역").extract();
+        var createResponse = 역_생성(강남역).extract();
 
         given().log().all().
         when()
@@ -77,7 +77,7 @@ public class StationAcceptanceTest {
                 .get("/stations").
         then().log().all()
                 .body("size()", equalTo(1))
-                .body("name", not(contains("강남역")));
+                .body("name", not(contains(강남역)));
     }
 
     private ValidatableResponse 역_생성(String stationName) {
