@@ -4,12 +4,14 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.context.jdbc.Sql;
 import setting.RandomPortSetting;
 import subway.line.util.ValidationUtils;
 
 import static subway.line.MockLine.신분당선;
 
 @DisplayName("노선 관련 기능")
+@Sql("/stations.sql")
 public class LineAcceptanceTest extends RandomPortSetting {
 
     /**

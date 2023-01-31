@@ -23,6 +23,18 @@ public class LineResponse {
         this.stationResponses = stations;
     }
 
+    public static LineResponse of(Line line) {
+        return new LineResponse(
+                line.getId(),
+                line.getName(),
+                line.getColor(),
+                List.of(
+                        StationResponse.of(line.getUpStation()),
+                        StationResponse.of(line.getDownStation())
+                )
+        );
+    }
+
     public long getId() {
         return id;
     }
