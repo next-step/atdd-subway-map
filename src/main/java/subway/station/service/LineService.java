@@ -2,8 +2,8 @@ package subway.station.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import subway.station.domain.line.LineRepository;
 import subway.station.domain.line.Line;
+import subway.station.domain.line.LineRepository;
 import subway.station.web.dto.LineRequest;
 import subway.station.web.dto.LineResponse;
 
@@ -30,6 +30,11 @@ public class LineService {
         return lineRepository.findAll().stream()
                 .map(this::createLineResponse)
                 .collect(Collectors.toList());
+    }
+
+    public LineResponse findLineById(Long id) {
+        Line line = lineRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("검색된 노선이 없습니다. id를 바꿔주세요."));
+        return createLineResponse(line);
     }
 
     private LineResponse createLineResponse(Line line) {
