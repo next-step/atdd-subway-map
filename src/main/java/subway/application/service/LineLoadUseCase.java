@@ -1,13 +1,13 @@
 package subway.application.service;
 
-import subway.domain.LineDomain;
+import subway.domain.Line;
 
 import java.util.List;
 
 public interface LineLoadUseCase {
 
-    LineDomain loadLine(Long createdLineId);
+    Line loadLine(Long createdLineId);
 
-    List<LineDomain> loadLines();
+    List<Line> loadLines();
 
 }

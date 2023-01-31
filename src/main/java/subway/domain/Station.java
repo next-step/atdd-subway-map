@@ -2,12 +2,12 @@ package subway.domain;
 
 import java.util.Objects;
 
-public class StationDomain {
+public class Station {
 
     private Long id;
     private String name;
 
-    public StationDomain(Long id, String name) {
+    public Station(Long id, String name) {
         this.id = id;
         this.name = name;
     }
@@ -24,7 +24,7 @@ public class StationDomain {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        StationDomain that = (StationDomain) o;
+        Station that = (Station) o;
         return Objects.equals(id, that.id);
     }
 

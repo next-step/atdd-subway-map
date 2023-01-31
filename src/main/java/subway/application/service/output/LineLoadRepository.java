@@ -1,14 +1,14 @@
 package subway.application.service.output;
 
-import subway.domain.LineDomain;
+import subway.domain.Line;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface LineLoadRepository {
 
-    Optional<LineDomain> loadLine(Long createdLineId);
+    Optional<Line> loadLine(Long createdLineId);
 
-    List<LineDomain> loadLines();
+    List<Line> loadLines();
 
 }

@@ -1,6 +1,6 @@
 package subway.web.request;
 
-import subway.domain.LineCreateDomain;
+import subway.domain.LineCreateDto;
 
 public class LineCreateRequest {
 
@@ -38,8 +38,8 @@ public class LineCreateRequest {
         return distance;
     }
 
-    public LineCreateDomain toDomain() {
-        return new LineCreateDomain(name, color, upStationId, downStationId, distance);
+    public LineCreateDto toDomain() {
+        return new LineCreateDto(name, color, upStationId, downStationId, distance);
     }
 
 }

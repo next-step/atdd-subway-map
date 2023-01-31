@@ -1,6 +1,6 @@
 package subway.web.request;
 
-import subway.domain.LineUpdateDomain;
+import subway.domain.LineUpdateDto;
 
 public class LineUpdateRequest {
 
@@ -20,8 +20,8 @@ public class LineUpdateRequest {
         return color;
     }
 
-    public LineUpdateDomain toDomain(Long lineId) {
-        return new LineUpdateDomain(lineId, this.name, this.color);
+    public LineUpdateDto toDomain(Long lineId) {
+        return new LineUpdateDto(lineId, this.name, this.color);
     }
 
 }

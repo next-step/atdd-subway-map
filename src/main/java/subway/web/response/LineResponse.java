@@ -1,6 +1,6 @@
 package subway.web.response;
 
-import subway.domain.LineDomain;
+import subway.domain.Line;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,7 +22,7 @@ public class LineResponse {
         this.stations = stations;
     }
 
-    public static LineResponse from(LineDomain loadLine) {
+    public static LineResponse from(Line loadLine) {
         List<StationResponse> stations = loadLine.getStations().stream().map(stationDomain -> new StationResponse(stationDomain.getId(), stationDomain.getName())).collect(Collectors.toList());
         return new LineResponse(loadLine.getId(), loadLine.getName(), loadLine.getColor(), stations);
     }

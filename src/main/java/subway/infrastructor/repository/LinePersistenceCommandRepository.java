@@ -23,13 +23,13 @@ class LinePersistenceCommandRepository implements LineCommandRepository, LineLoa
     }
 
     @Override
-    public Long createLine(LineCreateDomain lineCreateDomain) {
-        LineJpaEntity lineJpaEntity = lineMapper.domainToEntity(lineCreateDomain);
+    public Long createLine(LineCreateDto lineCreateDto) {
+        LineJpaEntity lineJpaEntity = lineMapper.domainToEntity(lineCreateDto);
         return lineRepository.save(lineJpaEntity).getId();
     }
 
     @Override
-    public Optional<LineDomain> loadLine(Long createdLineId) {
+    public Optional<Line> loadLine(Long createdLineId) {
         return lineRepository.findById(createdLineId).map(lineJpaEntity -> {
             Station upStation = stationRepository.findById(lineJpaEntity.getUpStationId().getId())
                 .orElseThrow(() -> new NotFoundStationException(String.format("해당하는 Line 에 상행 Station 을 찾을 수 없습니다. Requested LineId: %d StationId: %d", lineJpaEntity.getId(), lineJpaEntity.getUpStationId().getId())));
@@ -42,7 +42,7 @@ class LinePersistenceCommandRepository implements LineCommandRepository, LineLoa
     }
 
     @Override
-    public List<LineDomain> loadLines() {
+    public List<Line> loadLines() {
         return lineRepository.findAll().stream().map(lineJpaEntity -> {
             Station upStation = stationRepository.findById(lineJpaEntity.getUpStationId().getId())
                 .orElseThrow(() -> new NotFoundStationException(String.format("해당하는 Line 에 상행 Station 을 찾을 수 없습니다. Requested LineId: %d StationId: %d", lineJpaEntity.getId(), lineJpaEntity.getUpStationId().getId())));
@@ -55,7 +55,7 @@ class LinePersistenceCommandRepository implements LineCommandRepository, LineLoa
     }
 
     @Override
-    public void updateLine(LineUpdateDomain toDomain) {
+    public void updateLine(LineUpdateDto toDomain) {
         LineJpaEntity lineJpaEntity = lineRepository.findById(toDomain.getLineId()).orElseThrow(() -> new NotFoundLineException("수정 하려는 라인을 찾지 못했습니다."));
         lineJpaEntity.updateLine(toDomain);
     }

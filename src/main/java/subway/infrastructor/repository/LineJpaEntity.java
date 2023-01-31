@@ -1,6 +1,6 @@
 package subway.infrastructor.repository;
 
-import subway.domain.LineUpdateDomain;
+import subway.domain.LineUpdateDto;
 
 import javax.persistence.*;
 
@@ -60,9 +60,9 @@ class LineJpaEntity {
         return downStationId;
     }
 
-    public void updateLine(LineUpdateDomain lineUpdateDomain) {
-        this.name = lineUpdateDomain.getName();
-        this.color = lineUpdateDomain.getColor();
+    public void updateLine(LineUpdateDto lineUpdateDto) {
+        this.name = lineUpdateDto.getName();
+        this.color = lineUpdateDto.getColor();
     }
 
 }

@@ -1,6 +1,6 @@
 package subway.domain;
 
-public class LineCreateDomain {
+public class LineCreateDto {
 
     private String name;
     private String color;
@@ -8,7 +8,7 @@ public class LineCreateDomain {
     private Long downStationId;
     private Long distance;
 
-    public LineCreateDomain(String name, String color, Long upStationId, Long downStationId, Long distance) {
+    public LineCreateDto(String name, String color, Long upStationId, Long downStationId, Long distance) {
         this.name = name;
         this.color = color;
         this.upStationId = upStationId;

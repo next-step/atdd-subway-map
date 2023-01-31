@@ -1,31 +1,31 @@
 package subway.infrastructor.repository;
 
 import org.springframework.stereotype.Component;
-import subway.domain.LineCreateDomain;
-import subway.domain.LineDomain;
-import subway.domain.StationDomain;
+import subway.domain.LineCreateDto;
+import subway.domain.Line;
+import subway.domain.Station;
 
 import java.util.List;
 
 @Component
 class LineMapper {
 
-    LineJpaEntity domainToEntity(LineCreateDomain lineCreateDomain) {
-        return new LineJpaEntity(lineCreateDomain.getName(),
-            lineCreateDomain.getColor(),
-            new StationPk(lineCreateDomain.getUpStationId()),
-            new StationPk(lineCreateDomain.getDownStationId()),
-            lineCreateDomain.getDistance());
+    LineJpaEntity domainToEntity(LineCreateDto lineCreate) {
+        return new LineJpaEntity(lineCreate.getName(),
+            lineCreate.getColor(),
+            new StationPk(lineCreate.getUpStationId()),
+            new StationPk(lineCreate.getDownStationId()),
+            lineCreate.getDistance());
     }
 
-    LineDomain entityToDomain(LineJpaEntity lineJpaEntity, Station upStationJpaEntity, Station downStationJapEntity) {
-        List<StationDomain> stationDomains =
-            List.of(new StationDomain(upStationJpaEntity.getId(), upStationJpaEntity.getName()), new StationDomain(downStationJapEntity.getId(), downStationJapEntity.getName()));
+    Line entityToDomain(LineJpaEntity lineJpaEntity, subway.infrastructor.repository.Station upStationJpaEntity, subway.infrastructor.repository.Station downStationJapEntity) {
+        List<Station> stations =
+            List.of(new Station(upStationJpaEntity.getId(), upStationJpaEntity.getName()), new Station(downStationJapEntity.getId(), downStationJapEntity.getName()));
 
-        return new LineDomain(lineJpaEntity.getId(),
+        return new Line(lineJpaEntity.getId(),
             lineJpaEntity.getName(),
             lineJpaEntity.getColor(),
-            stationDomains);
+            stations);
     }
 
 }
