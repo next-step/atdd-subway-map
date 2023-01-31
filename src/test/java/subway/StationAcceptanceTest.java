@@ -4,8 +4,10 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.Arrays;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -13,6 +15,7 @@ import org.springframework.http.MediaType;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import subway.common.DatabaseCleanup;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -20,8 +23,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationAcceptanceTest {
 
+    @Autowired
+    private DatabaseCleanup databaseCleanup;
+
     private final String 강남역 = "강남역";
     private final String 방배역 = "방배역";
+
+    @BeforeEach
+    void setUp() {
+        databaseCleanup.execute();
+    }
 
     /**
      * When 지하철역을 생성하면
