@@ -9,9 +9,7 @@ import subway.domain.Station;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 import subway.dto.SectionRequest;
-import subway.exception.InvalidSectionDownStationException;
-import subway.exception.InvalidSectionUpStationException;
-import subway.exception.LineNotFoundException;
+import subway.exception.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -89,11 +87,11 @@ public class LineService {
         Station station = stationService.findById(stationId);
 
         if (line.hasSingleSection()) {
-            throw new IllegalArgumentException("현재 지하철 노선에 등록된 구간이 하나이므로, 지하철 구간을 제거할 수 없습니다.");
+            throw new CannotRemoveUniqueSectionException();
         }
 
         if (!line.hasLastStation(station)) {
-            throw new IllegalArgumentException("지하철 노선에 등록된 마지막 구간만 제거할 수 있습니다.");
+            throw new CannotRemoveNonLastSectionException();
         }
 
         line.removeSection();
