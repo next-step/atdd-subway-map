@@ -46,8 +46,8 @@ public class LineAcceptanceTest {
     @Test
     void createLineTest() {
         // when
-        Long upStationId = 지하철역생성후ID반환(StationAcceptanceTest.GANGNAM);
-        Long downStationId = 지하철역생성후ID반환(StationAcceptanceTest.YANGJAE);
+        Long upStationId = 지하철역생성후_식별번호_반환(StationAcceptanceTest.GANGNAM);
+        Long downStationId = 지하철역생성후_식별번호_반환(StationAcceptanceTest.YANGJAE);
         ExtractableResponse<Response> response = createLineWithLineRequest(NAME_VALUE1, COLOR_VALUE1, upStationId, downStationId);
 
         // then
@@ -71,10 +71,10 @@ public class LineAcceptanceTest {
     @Test
     void getLines() {
         //given
-        Long upStationId = 지하철역생성후ID반환(StationAcceptanceTest.GANGNAM);
-        Long downStationId = 지하철역생성후ID반환(StationAcceptanceTest.YANGJAE);
-        Long upStationId2 = 지하철역생성후ID반환(StationAcceptanceTest.HAGYE);
-        Long downStationId2 = 지하철역생성후ID반환(StationAcceptanceTest.JUNGGYE);
+        Long upStationId = 지하철역생성후_식별번호_반환(StationAcceptanceTest.GANGNAM);
+        Long downStationId = 지하철역생성후_식별번호_반환(StationAcceptanceTest.YANGJAE);
+        Long upStationId2 = 지하철역생성후_식별번호_반환(StationAcceptanceTest.HAGYE);
+        Long downStationId2 = 지하철역생성후_식별번호_반환(StationAcceptanceTest.JUNGGYE);
 
         // when
         LineCreateRequest lineRequest = new LineCreateRequest(NAME_VALUE1, COLOR_VALUE1, upStationId, downStationId, DISTANCE_VALUE);
@@ -110,8 +110,8 @@ public class LineAcceptanceTest {
     @Test
     void getLineTest() {
         //given
-        Long upStationId = 지하철역생성후ID반환(StationAcceptanceTest.GANGNAM);
-        Long downStationId = 지하철역생성후ID반환(StationAcceptanceTest.YANGJAE);
+        Long upStationId = 지하철역생성후_식별번호_반환(StationAcceptanceTest.GANGNAM);
+        Long downStationId = 지하철역생성후_식별번호_반환(StationAcceptanceTest.YANGJAE);
         ExtractableResponse<Response> createLineResponse = createLineWithLineRequest(NAME_VALUE1, COLOR_VALUE1, upStationId, downStationId);
         long id = createLineResponse.jsonPath().getLong(ID);
 
@@ -132,8 +132,8 @@ public class LineAcceptanceTest {
     @Test
     void updateLineTest() {
         // given
-        Long upStationId = 지하철역생성후ID반환(StationAcceptanceTest.GANGNAM);
-        Long downStationId = 지하철역생성후ID반환(StationAcceptanceTest.YANGJAE);
+        Long upStationId = 지하철역생성후_식별번호_반환(StationAcceptanceTest.GANGNAM);
+        Long downStationId = 지하철역생성후_식별번호_반환(StationAcceptanceTest.YANGJAE);
         ExtractableResponse<Response> createLineResponse = createLineWithLineRequest(NAME_VALUE1, COLOR_VALUE1, upStationId, downStationId);
         long id = createLineResponse.jsonPath().getLong(ID);
 
@@ -155,8 +155,8 @@ public class LineAcceptanceTest {
     @Test
     void deleteLineTest() {
         // given
-        Long upStationId = 지하철역생성후ID반환(StationAcceptanceTest.GANGNAM);
-        Long downStationId = 지하철역생성후ID반환(StationAcceptanceTest.YANGJAE);
+        Long upStationId = 지하철역생성후_식별번호_반환(StationAcceptanceTest.GANGNAM);
+        Long downStationId = 지하철역생성후_식별번호_반환(StationAcceptanceTest.YANGJAE);
         ExtractableResponse<Response> createLineResponse = createLineWithLineRequest(NAME_VALUE1, COLOR_VALUE1, upStationId, downStationId);
         long id = createLineResponse.jsonPath().getLong(ID);
 
@@ -225,7 +225,7 @@ public class LineAcceptanceTest {
         return response;
     }
 
-    private static Long 지하철역생성후ID반환(String stationName) {
+    private static Long 지하철역생성후_식별번호_반환(String stationName) {
         ExtractableResponse<Response> 강남역 = StationAcceptanceTest.createSubwayStation(stationName);
         Long upStationId = StationAcceptanceTest.extractStationId(강남역);
         return upStationId;
