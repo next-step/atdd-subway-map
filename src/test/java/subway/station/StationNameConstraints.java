@@ -1,4 +1,4 @@
-package subway;
+package subway.station;
 
 public interface StationNameConstraints {
     String GANG_NAM = "강남역";
