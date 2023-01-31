@@ -26,8 +26,8 @@ public class LineController {
     }
 
     @PostMapping
-    public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
-        LineResponse lineResponse = lineService.createLine(LineDto.from(lineRequest));
+    public ResponseEntity<LineResponse> createLine(@RequestBody CreateLineRequest createLineRequest) {
+        LineResponse lineResponse = lineService.createLine(LineDto.from(createLineRequest));
         return ResponseEntity.created(URI.create("/lines/" + lineResponse.getId())).body(lineResponse);
     }
 
