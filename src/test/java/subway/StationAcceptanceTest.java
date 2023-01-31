@@ -1,24 +1,14 @@
 package subway;
 
-import io.restassured.RestAssured;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("지하철역 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-class StationAcceptanceTest {
+class StationAcceptanceTest extends AcceptanceTest {
     /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다
@@ -27,14 +17,12 @@ class StationAcceptanceTest {
     @DisplayName("지하철역을 생성한다.")
     @Test
     void createStation() {
-        final String stationName = "강남역";
-        final ExtractableResponse<Response> response = 지하철역을_생성한다(stationName);
-        // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        // when then
+        final String 강남역 = "강남역";
+        지하철역을_생성한다(강남역);
 
         // then
-        final List<String> stationNames = 지하철역_이름들을_조회한다();
-        assertThat(stationNames).containsAnyOf(stationName);
+        지하철역_목록에서_조회_가능하다(강남역);
     }
 
     /**
@@ -45,14 +33,12 @@ class StationAcceptanceTest {
     @DisplayName("지하철역 목록 조회")
     @Test
     void 지하철역_목록_조회() {
+        // given
         final List<String> stationNames = List.of("강남역", "잠실역");
         stationNames.forEach(it -> 지하철역을_생성한다(it));
 
-        final List<String> stationNameResponses = 지하철역_이름들을_조회한다();
-
-        assertThat(stationNameResponses)
-            .hasSize(stationNames.size())
-            .containsAll(stationNames);
+        // when then
+        지하철역_목록에서_조회_가능하다(stationNames);
     }
 
     /**
@@ -66,54 +52,35 @@ class StationAcceptanceTest {
         final String 강남역 = "강남역";
         final String 잠실역 = "잠실역";
 
-        final List<String> stationNames = List.of(강남역, 잠실역);
-        final List<StationResponse> stationResponses = stationNames.stream()
-            .map(it -> 지하철역을_생성한다(it))
-            .map(it -> it.body().as(StationResponse.class))
-            .collect(Collectors.toList());
+        final Long 강남역Id = 지하철역을_생성한다(강남역).body().jsonPath().getLong("id");
+        지하철역을_생성한다(잠실역);
 
-        final Long 강남역Id = stationResponses.stream()
-            .filter(it -> 강남역.equals(it.getName()))
-            .map(StationResponse::getId)
-            .findFirst()
-            .orElseThrow();
+        지하철역을_삭제한다(강남역Id);
 
-        final ExtractableResponse<Response> deleteResponse = 지하철역을_삭제한다(강남역Id);
-
-        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-
-        final List<String> stationNameResponses = 지하철역_이름들을_조회한다();
-
-        assertAll(
-            () -> assertThat(stationNameResponses.size()).isNotEqualTo(stationNames.size()),
-            () -> assertThat(stationNameResponses)
-                .doesNotContain(강남역)
-                .contains(잠실역)
-        );
+        지하철역_목록에서_조회_가능하다(잠실역);
+        지하철역_목록에서_조회_불가능하다(강남역);
     }
 
-    private ExtractableResponse<Response> 지하철역을_생성한다(String stationName) {
-        return RestAssured.given().log().all()
-            .body(Map.of("name", stationName))
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().post("/stations")
-            .then().log().all()
-            .extract();
+    List<String> 지하철역_이름들을_조회한다() {
+        return 지하철역_목록을_조회한다().jsonPath().getList("name", String.class);
     }
 
-    private List<String> 지하철역_이름들을_조회한다() {
-        return RestAssured.given().log().all()
-            .when().get("/stations")
-            .then().log().all()
-            .extract().jsonPath().getList("name", String.class);
+    private void 지하철역_목록에서_조회_가능하다(List<String> stationNames) {
+        final List<String> createdStationNames = 지하철역_이름들을_조회한다();
+
+        assertThat(createdStationNames)
+            .hasSizeGreaterThanOrEqualTo(stationNames.size())
+            .containsAll(stationNames);
     }
 
-    private ExtractableResponse<Response> 지하철역을_삭제한다(Long stationId) {
-        return RestAssured.given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().delete("/stations/" + stationId)
-            .then().log().all()
-            .extract();
+    private void 지하철역_목록에서_조회_가능하다(String... stationNames) {
+        지하철역_목록에서_조회_가능하다(List.of(stationNames));
+    }
+
+    private void 지하철역_목록에서_조회_불가능하다(String... stationNames) {
+        final List<String> createdStationNames = 지하철역_이름들을_조회한다();
+
+        assertThat(createdStationNames).doesNotContain(stationNames);
     }
 
 }

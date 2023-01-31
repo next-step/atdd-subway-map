@@ -1,7 +1,11 @@
-package subway;
+package subway.station.application;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.station.application.dto.StationRequest;
+import subway.station.application.dto.StationResponse;
+import subway.station.domain.Station;
+import subway.station.domain.StationRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -9,7 +13,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional(readOnly = true)
 public class StationService {
-    private StationRepository stationRepository;
+    private final StationRepository stationRepository;
 
     public StationService(StationRepository stationRepository) {
         this.stationRepository = stationRepository;
@@ -23,8 +27,8 @@ public class StationService {
 
     public List<StationResponse> findAllStations() {
         return stationRepository.findAll().stream()
-                .map(this::createStationResponse)
-                .collect(Collectors.toList());
+            .map(this::createStationResponse)
+            .collect(Collectors.toList());
     }
 
     @Transactional
@@ -34,8 +38,14 @@ public class StationService {
 
     private StationResponse createStationResponse(Station station) {
         return new StationResponse(
-                station.getId(),
-                station.getName()
+            station.getId(),
+            station.getName()
         );
+    }
+
+    public List<StationResponse> findStationsByIds(List<Long> ids) {
+        return stationRepository.findAllByIdIn(ids).stream()
+            .map(this::createStationResponse)
+            .collect(Collectors.toList());
     }
 }
