@@ -6,6 +6,7 @@ public interface StationNameConstraints {
     String YEOM_CHANG = "염창역";
     String DEUNG_CHON = "등촌역";
     String HONG_DAE = "홍대입구역";
+    String HAP_JEONG = "합정역";
 
 
 

@@ -10,17 +10,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.jdbc.Sql;
-import subway.station.StationNameConstraints;
+import subway.presentation.line.dto.response.LineResponse;
+import subway.station.StationAcceptanceFactory;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD;
-import static subway.line.LineNameConstraints.*;
+import static subway.line.LineNameConstraints.Line2;
 import static subway.station.StationNameConstraints.*;
 
 @DisplayName("지하철 노선 관련 기능")
 @DirtiesContext(classMode = BEFORE_EACH_TEST_METHOD)
-@Sql("/sql/stations.sql")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class LineAcceptanceTest {
 
@@ -30,6 +29,10 @@ public class LineAcceptanceTest {
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
+        StationAcceptanceFactory.createStation(DANG_SAN);
+        StationAcceptanceFactory.createStation(HAP_JEONG);
+        StationAcceptanceFactory.createStation(HONG_DAE);
+        StationAcceptanceFactory.createStation(YEOM_CHANG);
     }
 
     @DisplayName("지하철 노선을 생성한다.")
@@ -44,6 +47,7 @@ public class LineAcceptanceTest {
         assertThat(lineResponse).extracting("name").isEqualTo(Line2);
         assertThat(lineResponse.getStations()).extracting("name")
                 .containsExactlyInAnyOrder(DANG_SAN, HONG_DAE);
+
     }
 
     private static LineResponse getLineResponse(ExtractableResponse<Response> response) {
