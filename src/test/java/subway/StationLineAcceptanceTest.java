@@ -43,7 +43,6 @@ public class StationLineAcceptanceTest {
      */
     @Test
     void createStationLine() {
-        System.out.println(SIN_BUN_DANG_STATION_LINE);
         ExtractableResponse<Response> response =
                 RestAssured
                         .given().spec(getRequestSpecification()).body(SIN_BUN_DANG_STATION_LINE).log().all()
