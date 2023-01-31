@@ -92,4 +92,12 @@ public class LineAcceptanceFactory {
                 .then().log().all()
                 .extract();
     }
+
+    public static ExtractableResponse<Response> deleteLine(Long lineId) {
+        return RestAssured
+                .given().log().all()
+                .when().delete(LINE_BASE_URL + "/{lineId}", lineId)
+                .then().log().all()
+                .extract();
+    }
 }

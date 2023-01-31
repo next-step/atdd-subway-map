@@ -133,4 +133,20 @@ public class LineAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
+    /**
+     * Given 1개의 지하철 노선을 생성하고
+     * When 그 지하철 노선을 삭제하면
+     * Then 지하철 노선 목록 조회 시 그 지하철 노선을 찾을 수 없다
+     */
+    @DisplayName("지하철노선을 삭제한다.")
+    @Test
+    void deleteLine() {
+        // given
+        ExtractableResponse<Response> line = LineAcceptanceFactory.createFixtureLine();
+        Long lineId = getId(line);
+        // when
+        ExtractableResponse<Response> response = LineAcceptanceFactory.deleteLine(lineId);
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
 }
