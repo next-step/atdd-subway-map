@@ -14,10 +14,13 @@ import subway.line.LineRepository;
 import subway.line.LineRequest;
 import subway.line.LineResponse;
 import subway.subway.Station;
+import subway.subway.StationResponse;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DisplayName("지하철 노선 관리 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -96,15 +99,23 @@ public class LineAcceptanceTest {
     public void getLineTest() {
         Long lineId = createLine(lineRequest);
         var line = getLine(lineId);
-        var retriveStationIdList = line.jsonPath().getList("station.id", Long.class);
 
-        assertThat(line.jsonPath().getLong("id")).isEqualTo(lineId);
-        assertThat(retriveStationIdList).containsAnyOf(firstStationId);
-        assertThat(retriveStationIdList).containsAnyOf(secondStationId);
+        checkLine(lineRequest, lineId, line, firstStationId, secondStationId);
+    }
+
+    @DisplayName("입력한 지하철 노선도 정보와 조회한 지하철 노선도 정보를 비교할 수 있다.")
+    private void checkLine(LineRequest lineRequest, Long lineId, LineResponse lineResponse, Long stationId1, Long stationId2) {
+        var stationIdList = lineResponse.getStationResponseList().stream().mapToLong(StationResponse::getId);
+
+        assertAll(
+                () -> assertThat(lineResponse.getId()).isEqualTo(lineId),
+                () -> assertThat(lineResponse.getName()).isEqualTo(lineRequest.getName()),
+                () -> assertThat(stationIdList).containsAnyOf(stationId1, stationId2)
+        );
     }
 
     @DisplayName("지하철 노선 아이디를 통해 해당 지하철 노선을 조회할 수 있다.")
-    private ExtractableResponse<Response> getLine(Long lineId) {
+    private LineResponse getLine(Long lineId) {
         var response = RestAssured.given().log().all()
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .when().get("/lines/" + lineId)
@@ -114,7 +125,7 @@ public class LineAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.contentType()).isEqualTo(MediaType.APPLICATION_JSON_VALUE);
 
-        return response;
+        return response.as(LineResponse.class);
     }
 
 
