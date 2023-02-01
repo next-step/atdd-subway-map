@@ -78,6 +78,20 @@ public class SubwayLine {
 		this.subwayLineStationGroups.add(createSubwayLineStationGroup(downStation));
 	}
 
+	public boolean isPossibleRemove(Section section) {
+		return section.equalDownStationId(this.downStationId) && !section.equalUpStationId(this.upStationId);
+	}
+
+	public void removeSection(Section section, Station newDownStation) {
+		this.downStationId = newDownStation.getId();
+
+		subwayLineStationGroups.removeIf(
+			subwayLineStationGroup -> subwayLineStationGroup.equalStationId(section.getDownStationId())
+		);
+
+		subwayLineStationGroups.add(createSubwayLineStationGroup(newDownStation));
+	}
+
 	private void validateNewSectionUpStationEqualDownStation(Section section) {
 		if (!section.equalUpStationId(this.downStationId)) {
 			throw new SectionRegisterException(SectionErrorCode.INVALID_SECTION_UP_STATION);

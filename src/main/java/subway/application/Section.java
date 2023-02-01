@@ -41,4 +41,8 @@ public class Section {
 	public boolean equalUpStationId(Long target) {
 		return this.upStationId.equals(target);
 	}
+
+	public boolean equalDownStationId(Long target) {
+		return this.downStationId.equals(target);
+	}
 }

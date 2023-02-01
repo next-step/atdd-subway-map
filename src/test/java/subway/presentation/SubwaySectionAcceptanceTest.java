@@ -34,10 +34,10 @@ public class SubwaySectionAcceptanceTest extends SubwayAcceptanceTest {
 
 	// Given 노선 1개를 생성하고
 	// When 구간등록을 요청하면
-	// Then 지하철 노선 목록 조회 시 하행 종점역이 변경됨을 확인할 수 있다
-	@DisplayName("구간등록 요청시 지하철 노선을 조회하면 종점역 변경을 확인할 수 있다")
+	// Then 지하철 노선 조회 시 하행 종점역이 변경됨을 확인할 수 있다
+	@DisplayName("구간등록 요청시 지하철 노선을 조회하면 하행역 변경을 확인할 수 있다")
 	@Test
-	void 구간등록_요청시_지하철_노선목록을_조회하면_종점역_변경을_확인할_수_있다() {
+	void 구간등록_요청시_지하철_노선을_조회하면_하행역_변경을_확인할_수_있다() {
 		long subwayLineId = 지하철노선_생성(SubwayLineFixtures.getSubwayLineRequest1())
 			.jsonPath().getLong("id");
 
@@ -49,12 +49,43 @@ public class SubwaySectionAcceptanceTest extends SubwayAcceptanceTest {
 
 		ExtractableResponse<Response> response = 구간등록_요청(subwayLineId, createRequest);
 
-		SubwayLineResponse.LineInfo subwayLineInfo = 지하철노선_조회(subwayLineId).as(new TypeRef<>() {});
+		SubwayLineResponse.LineInfo subwayLineInfo = 지하철노선_조회(subwayLineId).as(new TypeRef<>() {
+		});
 
 		assertAll(
 			() -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
 			() -> assertThat(subwayLineInfo.getStations()).extracting("id")
 				.contains(EXISTING_SUBWAY_LINE_UP_STATION_ID, STATION_ID_3)
+		);
+	}
+
+	// Given 노선 1개를 생성하고
+	// Given 구간등록을 요청하고
+	// When 구간제거를 요청하면
+	// Then 지하철 노선 조회 시 하행역이 변경됨을 확인할 수 있다
+	@DisplayName("구간등록을 한 후 구간제거를 요청하면 지하철 노선 조회하면 하행역이 변경됨을 확인할 수 있다")
+	@Test
+	void 구간등록을_한_후_구간제거를_요청하면_지하철_노선_조회하면_하행역이_변경됨을_확인할_수_있다() {
+		long subwayLineId = 지하철노선_생성(SubwayLineFixtures.getSubwayLineRequest1())
+			.jsonPath().getLong("id");
+
+		SectionRequest.Create createRequest = SectionRequest.Create.builder()
+			.upStationId(STATION_ID_2)
+			.downStationId(STATION_ID_3)
+			.distance(10)
+			.build();
+
+		구간등록_요청(subwayLineId, createRequest);
+
+		ExtractableResponse<Response> deleteResponse = 구간제거_요청(subwayLineId, STATION_ID_3);
+
+		SubwayLineResponse.LineInfo subwayLineInfo = 지하철노선_조회(subwayLineId).as(new TypeRef<>() {
+		});
+
+		assertAll(
+			() -> assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.OK.value()),
+			() -> assertThat(subwayLineInfo.getStations()).extracting("id")
+				.contains(EXISTING_SUBWAY_LINE_UP_STATION_ID, STATION_ID_2)
 		);
 	}
 
@@ -64,6 +95,19 @@ public class SubwaySectionAcceptanceTest extends SubwayAcceptanceTest {
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
 				.body(createRequest),
 			Method.POST,
+			ROOT_PATH,
+			subwayLineId
+		);
+	}
+
+	private ExtractableResponse<Response> 구간제거_요청(
+		Long subwayLineId,
+		Long stationId) {
+		return requestApi(
+			with()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.param("stationId", stationId),
+			Method.DELETE,
 			ROOT_PATH,
 			subwayLineId
 		);

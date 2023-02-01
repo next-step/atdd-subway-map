@@ -9,12 +9,12 @@ import subway.domain.Station;
 import subway.domain.StationRepository;
 import subway.domain.SubwayLine;
 import subway.domain.SubwayLineRepository;
+import subway.exception.NotFoundSectionException;
 import subway.exception.NotFoundStationException;
 import subway.exception.NotFoundSubwayLineException;
 import subway.exception.SectionErrorCode;
 import subway.exception.SubwayLineErrorCode;
 import subway.presentation.request.SectionRequest;
-import subway.presentation.request.SubwayLineRequest;
 
 @Service
 @RequiredArgsConstructor
@@ -39,5 +39,20 @@ public class SectionService {
 		subwayLine.exchangeDownStation(section, station);
 
 		return section.getId();
+	}
+
+	@Transactional
+	public void deleteSection(Long subwayLineId, Long stationId) {
+		Section section = sectionRepository.findSectionByDownStationId(stationId)
+			.orElseThrow(() -> new NotFoundSectionException(SectionErrorCode.NOT_FOUND_SECTION));
+
+		SubwayLine subwayLine = subwayLineRepository.findSubwayLineById(subwayLineId)
+			.orElseThrow(() -> new NotFoundSubwayLineException(SubwayLineErrorCode.NOT_FOUND_SUBWAY_LINE));
+
+		if (subwayLine.isPossibleRemove(section)) {
+			Station newDownStation = stationRepository.findById(section.getUpStationId())
+				.orElseThrow(() -> new NotFoundStationException(SectionErrorCode.NOT_FOUND_STATION));
+			subwayLine.removeSection(section, newDownStation);
+		}
 	}
 }
