@@ -9,7 +9,6 @@ import javax.persistence.Table;
 import java.util.Objects;
 
 @Entity
-@Table(name = "station")
 public class Station {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

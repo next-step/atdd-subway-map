@@ -16,7 +16,6 @@ import static javax.persistence.CascadeType.PERSIST;
 import static javax.persistence.FetchType.LAZY;
 
 @Entity
-@Table(name = "line")
 public class Line {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
