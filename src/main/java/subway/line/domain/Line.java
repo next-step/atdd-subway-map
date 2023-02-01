@@ -1,7 +1,7 @@
 package subway.line.domain;
 
 import lombok.*;
-import subway.line.controller.dto.LineModifyRequest;
+import subway.line.dto.LineModifyRequest;
 import subway.station.domain.Station;
 
 import javax.persistence.*;

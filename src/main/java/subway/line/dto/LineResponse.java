@@ -1,10 +1,10 @@
-package subway.line.controller.dto;
+package subway.line.dto;
 
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import subway.line.domain.Line;
-import subway.station.controller.dto.StationResponse;
+import subway.station.dto.StationResponse;
 import subway.station.domain.Station;
 
 import java.util.List;

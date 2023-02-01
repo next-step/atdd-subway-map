@@ -1,4 +1,4 @@
-package subway.station.controller.dto;
+package subway.station.dto;
 
 import lombok.Builder;
 import lombok.Getter;

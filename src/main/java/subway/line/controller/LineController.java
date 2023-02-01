@@ -3,9 +3,9 @@ package subway.line.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import subway.line.controller.dto.LineModifyRequest;
-import subway.line.controller.dto.LineSaveRequest;
-import subway.line.controller.dto.LineResponse;
+import subway.line.dto.LineModifyRequest;
+import subway.line.dto.LineSaveRequest;
+import subway.line.dto.LineResponse;
 import subway.line.service.LineService;
 
 import java.net.URI;
