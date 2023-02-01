@@ -3,6 +3,7 @@ package subway.service;
 import org.springframework.stereotype.Service;
 import subway.entity.Line;
 import subway.entity.Section;
+import subway.entity.Station;
 import subway.model.CreateSectionRequest;
 import subway.model.SectionResponse;
 import subway.repository.LineRepository;
@@ -26,19 +27,26 @@ public class SectionService {
     }
 
     public SectionResponse createSection(Long lineId, CreateSectionRequest req) {
-        Section section = Section.of(stationRepository.findByIdInOrderById(
-            List.of(
-                req.getUpStationId(),
-                req.getDownStationId()
-            )), req.getDistance()
-        );
-
         Line line = lineRepository.findById(lineId).orElseThrow(NoSuchElementException::new);
-        line.addSection(section);
+        Section newSection = Section.create(
+            getStationsInSection(req.getUpStationId(), req.getDownStationId()),
+            req.getDistance(),
+            line.getDownEndStation(),
+            line
+        );
+        line.addSection(newSection);
 
-        sectionRepository.save(section);
+        sectionRepository.save(newSection);
         lineRepository.save(line);
 
-        return SectionResponse.from(section);
+        return SectionResponse.from(newSection);
+    }
+
+    private List<Station> getStationsInSection(Long upStationId, Long downStationId) {
+        return stationRepository.findByIdInOrderById(
+            List.of(
+                upStationId,
+                downStationId
+            ));
     }
 }

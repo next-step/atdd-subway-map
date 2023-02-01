@@ -40,8 +40,8 @@ public class SectionResponse {
     static public SectionResponse from(Section section) {
         return new SectionResponse(
             section.getId(),
-            section.getUpStation().getId(),
-            section.getDownStation().getId(),
+            section.getUpStationId(),
+            section.getDownStationId(),
             section.getDistance()
         );
     }

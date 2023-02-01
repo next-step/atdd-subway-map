@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.entity.Line;
 import subway.entity.Section;
+import subway.entity.Station;
 import subway.model.CreateLineRequest;
 import subway.model.LineResponse;
 import subway.model.UpdateLineRequest;
@@ -11,7 +12,6 @@ import subway.repository.LineRepository;
 import subway.repository.SectionRepository;
 import subway.repository.StationRepository;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,16 +30,17 @@ public class LineService {
 
     @Transactional
     public LineResponse saveLine(CreateLineRequest req) {
-        Section section = Section.of(stationRepository.findByIdInOrderById(
-            List.of(
-                req.getUpStationId(),
-                req.getDownStationId()
-            )), req.getDistance()
+        Line newLine = Line.create(req.getName(), req.getColor());
+        Section newSection = Section.createForNewLine(
+            getStationsInSection(req.getUpStationId(), req.getDownStationId()),
+            req.getDistance(),
+            newLine
         );
-        Line line = lineRepository.save(Line.create(req.getName(), req.getColor(), section));
+        newLine.addSection(newSection);
+        lineRepository.save(newLine);
 
-        sectionRepository.save(section);
-        return createLineResponse(line);
+        sectionRepository.save(newSection);
+        return createLineResponse(newLine);
     }
 
     public List<LineResponse> findAllLines() {
@@ -53,13 +54,7 @@ public class LineService {
     }
 
     private LineResponse createLineResponse(Line line) {
-        return new LineResponse(line,
-            line.getSections().stream()
-                .map(s -> List.of(s.getUpStation(), s.getDownStation()))
-                .flatMap(Collection::stream)
-                .distinct()
-                .collect(Collectors.toList())
-        );
+        return new LineResponse(line);
     }
     @Transactional
     public void updateLine(Long id, UpdateLineRequest request) {
@@ -69,5 +64,13 @@ public class LineService {
 
     public void deleteLineById(Long id) {
         lineRepository.deleteById(id);
+    }
+
+    private List<Station> getStationsInSection(Long upStationId, Long downStationId) {
+        return stationRepository.findByIdInOrderById(
+            List.of(
+                upStationId,
+                downStationId
+            ));
     }
 }
