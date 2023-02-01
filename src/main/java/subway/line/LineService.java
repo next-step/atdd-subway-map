@@ -79,6 +79,18 @@ public class LineService {
         this.lineRepository.save(line);
     }
 
+    @Transactional
+    public void deleteSection(Long lineId, Long stationID) {
+        Line line = findOne(lineId);
+
+        if(!this.sectionService.isDeletable(line, stationID)) {
+            throw new IllegalArgumentException("제거할 수 없는 구간입니다");
+        }
+
+        line.removeSection();
+        this.lineRepository.save(line);
+    }
+
     private LineResponse createLineResponse(Line line) {
         List<StationResponse> stationResponses = line.getSections().stream()
                 .map((s) -> stationService.createStationResponse(s.getUpStation()))

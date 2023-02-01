@@ -15,6 +15,7 @@ import subway.station.StationResponse;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static subway.line.LineApiClient.requestAppendSection;
+import static subway.line.LineApiClient.requestDeleteSection;
 import static subway.station.StationApiClient.requestCreateStation;
 
 @DisplayName("자하철 구간 관리 기능")
@@ -46,7 +47,7 @@ public class SectionAcceptanceTest {
                 .body().as(LineResponse.class);
 
         // when
-        requestAppendSection(lineOne.getId(), stationC.getId(), stationB.getId(), 10);
+        requestAppendSection(lineOne.getId(), stationC.getId(), stationB.getId(), 3);
 
         // then
         ExtractableResponse<Response> showLineResponse = LineApiClient.requestShowLine(lineOne.getId());
@@ -69,7 +70,7 @@ public class SectionAcceptanceTest {
                 .body().as(LineResponse.class);
 
         // when
-        ExtractableResponse<Response> appendSectionResponse = requestAppendSection(lineOne.getId(), stationA.getId(), stationA.getId(), 10);
+        ExtractableResponse<Response> appendSectionResponse = requestAppendSection(lineOne.getId(), stationA.getId(), stationA.getId(), 3);
 
         assertThat(appendSectionResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
 
@@ -85,9 +86,8 @@ public class SectionAcceptanceTest {
      * Given 지하철 노선을 생성하고
      * Given 지하철 구간 하나를 추가하고
      * When 추가한 구간을 삭제하면
-     * Then 지하철 조회시 처음 등록한 지하철 노선과 동일하다
+     * Then 지하철 노선 조회시 처음 등록한 지하철 노선과 동일하다
      */
-    @Disabled
     @DisplayName("구간 삭제 기능 - 성공 케이스")
     @Test
     void deleteSectionSuccess() {
@@ -95,9 +95,18 @@ public class SectionAcceptanceTest {
         LineResponse lineOne = LineApiClient.requestCreateLine("1호선", "#0052A4", stationA.getId(), stationC.getId(), 7)
                 .body().as(LineResponse.class);
 
-        requestAppendSection(lineOne.getId(), stationC.getId(), stationB.getId(), 10);
+        requestAppendSection(lineOne.getId(), stationC.getId(), stationB.getId(), 3);
 
         // when
-//        requestDeleteSection()
+        ExtractableResponse<Response> deleteSectionResponse = requestDeleteSection(lineOne.getId(), stationB.getId());
+
+        assertThat(deleteSectionResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        // then
+        ExtractableResponse<Response> showLineResponse = LineApiClient.requestShowLine(lineOne.getId());
+        LineResponse updatedLineOne = showLineResponse.body().as(LineResponse.class);
+
+        assertThat(showLineResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(updatedLineOne.getStations()).containsExactly(stationA, stationC);
     }
 }

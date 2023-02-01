@@ -54,4 +54,11 @@ public class Line {
         this.sections.add(section);
         this.downStation = section.getDownStation();
     }
+
+    public void removeSection() {
+        this.sections.remove(this.sections.size() - 1);
+
+        Section lastSection = this.sections.get(this.sections.size() - 1);
+        this.downStation = lastSection.getDownStation();
+    }
 }

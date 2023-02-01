@@ -41,9 +41,28 @@ public class SectionService {
         return Boolean.TRUE;
     }
 
+    public Boolean isDeletable(Line line, Long stationId) {
+        if(!hasDeletableDownStation(line, stationId))
+            return Boolean.FALSE;
+
+        if(hasSingleSection(line))
+            return Boolean.FALSE;
+
+        return Boolean.TRUE;
+    }
+
     private Boolean hasAppended(List<Section> sections, Long downStationId) {
         return sections.stream()
                 .anyMatch((s) -> s.getUpStation().getId().equals(downStationId) ||
                         s.getDownStation().getId().equals(downStationId));
+    }
+
+    private Boolean hasDeletableDownStation(Line line, Long downStationId) {
+        return downStationId.equals(line.getDownStation().getId());
+    }
+
+    private Boolean hasSingleSection(Line line) {
+        final int CANNOT_DELETE_SECTION_SIZE = 1;
+        return line.getSections().size() == CANNOT_DELETE_SECTION_SIZE;
     }
 }

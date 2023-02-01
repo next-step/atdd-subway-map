@@ -84,4 +84,15 @@ public class LineApiClient {
                 .then().log().all()
                 .extract();
     }
+
+    public static ExtractableResponse<Response> requestDeleteSection(Long lineId, Long stationId)
+    {
+        final String ENDPOINT = ENDPOINT_LINES + "/" + lineId.toString() + ENDPOINT_SECTIONS + "?stationId=" + stationId.toString();
+
+        return RestAssured.given().log().all()
+                .when()
+                .delete(ENDPOINT)
+                .then().log().all()
+                .extract();
+    }
 }
