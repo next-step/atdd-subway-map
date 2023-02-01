@@ -87,14 +87,14 @@ public class StationAcceptanceTest {
         assertThat(getResponse.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 
-    private ExtractableResponse<Response> getStationList() {
+    private static ExtractableResponse<Response> getStationList() {
         return RestAssured.given().log().all()
                 .when().get("/stations")
                 .then().log().all()
                 .extract();
     }
 
-    private ExtractableResponse<Response> createStation(String stationName) {
+    public static ExtractableResponse<Response> createStation(String stationName) {
         Map<String, String> params = new HashMap<>();
         params.put("name", stationName);
 

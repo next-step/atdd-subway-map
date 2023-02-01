@@ -14,10 +14,13 @@ import org.springframework.test.annotation.DirtiesContext;
 import subway.line.StationLine;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static subway.StationAcceptanceTest.createStation;
 
 /**
  * StationLineAcceptanceTest
@@ -94,7 +97,7 @@ public class StationLineAcceptanceTest {
     }
 
     /**
-     * Given 2개의 지하철 노선을 생성하고
+     * Given 2개의 지하철 역, 노선을 생성하고
      * When 지하철 노선 목록을 조회하면
      * Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
      */
@@ -110,6 +113,8 @@ public class StationLineAcceptanceTest {
                 shinbundangLine.getDistance()
         );
 
+        ExtractableResponse<Response> gangnamStation = createStation("강남역");
+
         ExtractableResponse<Response> line4 = createStationLine(
                 fourLine.getName(),
                 fourLine.getColor(),
@@ -118,6 +123,8 @@ public class StationLineAcceptanceTest {
                 fourLine.getDistance()
         );
 
+        ExtractableResponse<Response> sadangStation = createStation("사당역");
+
         // when
         ExtractableResponse<Response> getResponses = getStationLines();
 
@@ -125,6 +132,7 @@ public class StationLineAcceptanceTest {
         assertThat(getResponses.body().jsonPath().getList("id").size()).isEqualTo(2);
         assertThat(getResponses.body().jsonPath().getList("name").size()).isEqualTo(2);
         assertThat(getResponses.body().jsonPath().getList("color").size()).isEqualTo(2);
+        assertThat(getResponses.body().jsonPath().getList("stations").size()).isEqualTo(2);
     }
 
     /**
