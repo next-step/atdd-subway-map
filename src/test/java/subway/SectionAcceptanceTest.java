@@ -1,8 +1,11 @@
 package subway;
 
-import io.restassured.RestAssured;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
+import static org.assertj.core.api.Assertions.*;
+import static subway.LineAcceptanceTest.*;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,11 +14,9 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static subway.LineAcceptanceTest.*;
+import io.restassured.RestAssured;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
 
 @DisplayName("지하철 구간 관련 기능")
 class SectionAcceptanceTest extends AcceptanceTest {
@@ -54,7 +55,7 @@ class SectionAcceptanceTest extends AcceptanceTest {
         // then
         ExtractableResponse<Response> response = 지하철_노선_조회(id_8호선);
 
-        assertThat(response.jsonPath().getList("stations.id", Long.class)).containsExactly(id_송파역, id_가락시장역, id_문정역);
+        지하철_노선에_등록된_역_목록_검증(response, id_송파역, id_가락시장역, id_문정역);
     }
 
     /**
@@ -63,12 +64,12 @@ class SectionAcceptanceTest extends AcceptanceTest {
      */
     @DisplayName("새로운 지하철 구간 추가 시, 구간의 상행역은 하행 종점역이어야 한다.")
     @Test
-    void invalidUpStation() {        
+    void invalidUpStation() {
         // when
         ExtractableResponse<Response> response = 지하철_노선에_구간_추가(id_8호선, id_송파역, id_문정역, 10);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        요청에_대한_응답이_500_에러인지_검증(response);
     }
 
     /**
@@ -82,7 +83,7 @@ class SectionAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 지하철_노선에_구간_추가(id_8호선, id_가락시장역, id_송파역, 10);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        요청에_대한_응답이_500_에러인지_검증(response);
     }
 
     /**
@@ -102,7 +103,7 @@ class SectionAcceptanceTest extends AcceptanceTest {
         // then
         ExtractableResponse<Response> response = 지하철_노선_조회(id_8호선);
 
-        assertThat(response.jsonPath().getList("stations.id", Long.class)).containsExactly(id_송파역, id_가락시장역);
+        지하철_노선에_등록된_역_목록_검증(response, id_송파역, id_가락시장역);
     }
 
     /**
@@ -116,7 +117,7 @@ class SectionAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 지하철_노선에_구간_제거(id_8호선, id_가락시장역);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        요청에_대한_응답이_500_에러인지_검증(response);
     }
 
     /**
@@ -134,7 +135,7 @@ class SectionAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 지하철_노선에_구간_제거(id_8호선, id_송파역);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        요청에_대한_응답이_500_에러인지_검증(response);
     }
 
     @DisplayName("지하철 구간의 길이는 1 이상이어야 한다.")
@@ -145,7 +146,7 @@ class SectionAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 지하철_노선에_구간_추가(id_8호선, id_가락시장역, id_문정역, distance);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        요청에_대한_응답이_500_에러인지_검증(response);
     }
 
     private static ExtractableResponse<Response> 지하철_노선에_구간_추가(Long lineId, Long upStationId, Long downStationId, long distance) {
@@ -177,5 +178,13 @@ class SectionAcceptanceTest extends AcceptanceTest {
             .then()
                 .log().all()
             .extract();
+    }
+
+    private void 지하철_노선에_등록된_역_목록_검증(ExtractableResponse<Response> response, Long... stationIds) {
+        assertThat(response.jsonPath().getList("stations.id", Long.class)).containsExactly(stationIds);
+    }
+
+    private void 요청에_대한_응답이_500_에러인지_검증(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 }
