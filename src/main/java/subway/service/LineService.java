@@ -48,6 +48,12 @@ public class LineService {
         return id;
     }
 
+    @Transactional
+    public Long deleteById(Long id) {
+        lineRepository.deleteById(id);
+        return id;
+    }
+
     private LineResponse createLineResponse(Line line) {
         return new LineResponse(line);
     }

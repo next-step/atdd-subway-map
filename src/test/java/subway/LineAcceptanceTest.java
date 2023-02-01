@@ -93,6 +93,19 @@ public class LineAcceptanceTest {
         assertThat(lineName).isEqualTo("구분당선");
     }
 
+    @DisplayName("지하철 노선 정보를 삭제한다.")
+    @Test
+    void deleteStationById() {
+        ExtractableResponse<Response> createResponse = 지하철_신분당선_생성();
+        Long line_id = createResponse.jsonPath().getLong("id");
+
+        ExtractableResponse<Response> deleteResponse = 지하철_노선_삭제(line_id);
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        List<String> lineNames = 지하철_노선_목록_조회();
+        assertThat(lineNames).doesNotContain(신분당선_line);
+    }
+
     private ExtractableResponse<Response> 지하철_신분당선_생성() {
         return 지하철_노선_생성(신분당선_line, "bg-red-600", 강남역_id, 광교역_id, 10);
     }
@@ -143,6 +156,14 @@ public class LineAcceptanceTest {
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().put("/lines/{id}", id)
+                .then().log().all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> 지하철_노선_삭제(Long id) {
+        return given()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().delete("/lines/{id}", id)
                 .then().log().all()
                 .extract();
     }
