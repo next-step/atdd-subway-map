@@ -23,7 +23,7 @@ public class LineService {
         this.lineRepository = lineRepository;
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public SaveLineResponse saveLine(SaveLineRequest saveLineRequest) {
         Line line = lineRepository.save(new Line(
                 saveLineRequest.getName(),
@@ -31,9 +31,10 @@ public class LineService {
                 saveLineRequest.getUpStationId(),
                 saveLineRequest.getDownStationId(),
                 saveLineRequest.getDistance(),
-                List.of(stationRepository.findById(saveLineRequest.getUpStationId()).orElseThrow(() -> new IllegalArgumentException("검색된 지하철이 없습니다. id를 바꿔주세요.")),
-                        stationRepository.findById(saveLineRequest.getDownStationId()).orElseThrow(() -> new IllegalArgumentException("검색된 지하철이 없습니다. id를 바꿔주세요.")))
-                ));
+                List.of(
+                        stationRepository.findById(saveLineRequest.getUpStationId()).orElseThrow(() -> new IllegalArgumentException("검색된 지하철이 없습니다. id를 바꿔주세요.")),
+                        stationRepository.findById(saveLineRequest.getDownStationId()).orElseThrow(() -> new IllegalArgumentException("검색된 지하철이 없습니다. id를 바꿔주세요."))
+                )));
         return createLineResponse(line);
     }
 
@@ -65,9 +66,7 @@ public class LineService {
                 line.getId(),
                 line.getName(),
                 line.getColor(),
-                List.of(
-                        stationRepository.findById(line.getUpStationId()).orElseThrow(() -> new IllegalArgumentException("검색된 지하철이 없습니다. id를 바꿔주세요.")),
-                        stationRepository.findById(line.getDownStationId()).orElseThrow(() -> new IllegalArgumentException("검색된 지하철이 없습니다. id를 바꿔주세요."))
-                ));
+                line.getStations()
+        );
     }
 }
