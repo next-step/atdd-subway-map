@@ -51,7 +51,7 @@ public class Line {
             throw new InvalidSectionDownStationException(downStation.getName());
         }
 
-        this.sections.add(new Section(this, upStation, downStation, distance));
+        sections.add(new Section(this, upStation, downStation, distance));
     }
 
     public List<Station> getAllStations() {

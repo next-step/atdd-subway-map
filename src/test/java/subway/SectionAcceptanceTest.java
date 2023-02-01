@@ -6,6 +6,8 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
@@ -36,7 +38,7 @@ class SectionAcceptanceTest extends AcceptanceTest {
         id_가락시장역 = 지하철_역_생성(가락시장역);
         id_문정역 = 지하철_역_생성(문정역);
 
-        id_8호선 = 지하철_노선_생성("8호선", "pink", id_송파역, id_가락시장역).jsonPath().getLong("id");
+        id_8호선 = 지하철_노선_생성("8호선", "pink", id_송파역, id_가락시장역, 10).jsonPath().getLong("id");
     }
 
     /**
@@ -130,6 +132,17 @@ class SectionAcceptanceTest extends AcceptanceTest {
 
         // when
         ExtractableResponse<Response> response = 지하철_노선에_구간_제거(id_8호선, id_송파역);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    }
+
+    @DisplayName("지하철 구간의 길이는 1 이상이어야 한다.")
+    @ValueSource(ints = {-1, 0})
+    @ParameterizedTest
+    void invalidDistance(long distance) {
+        // when
+        ExtractableResponse<Response> response = 지하철_노선에_구간_추가(id_8호선, id_가락시장역, id_문정역, distance);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());

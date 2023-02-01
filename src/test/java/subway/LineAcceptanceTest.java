@@ -158,19 +158,20 @@ class LineAcceptanceTest extends AcceptanceTest {
     }
 
     private ExtractableResponse<Response> 지하철_분당선_생성() {
-        return 지하철_노선_생성(LINE_분당선, "yellow", 수서역_id, 복정역_id);
+        return 지하철_노선_생성(LINE_분당선, "yellow", 수서역_id, 복정역_id, 5);
     }
 
     private ExtractableResponse<Response> 지하철_3호선_생성() {
-        return 지하철_노선_생성(LINE_3호선, "brown", 수서역_id, 오금역_id);
+        return 지하철_노선_생성(LINE_3호선, "brown", 수서역_id, 오금역_id, 7);
     }
 
-    static ExtractableResponse<Response> 지하철_노선_생성(String name, String color, Long upStationId, Long downStationId) {
+    static ExtractableResponse<Response> 지하철_노선_생성(String name, String color, Long upStationId, Long downStationId, long distance) {
         Map<String, Object> param = new HashMap<>();
         param.put("name", name);
         param.put("color", color);
         param.put("upStationId", upStationId);
         param.put("downStationId", downStationId);
+        param.put("distance", distance);
 
         return RestAssured
             .given()

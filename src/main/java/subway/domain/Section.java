@@ -1,13 +1,6 @@
 package subway.domain;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 
 @Entity
 public class Section {
@@ -28,7 +21,8 @@ public class Section {
     @JoinColumn(name = "down_station_id")
     private Station downStation;
 
-    private long distance;
+    @Embedded
+    private Distance distance;
 
     protected Section() {
     }
@@ -37,15 +31,11 @@ public class Section {
         this.line = line;
         this.upStation = upStation;
         this.downStation = downStation;
-        this.distance = distance;
+        this.distance = new Distance(distance);
     }
 
     public Long getId() {
         return id;
-    }
-
-    public Line getLine() {
-        return line;
     }
 
     public Station getUpStation() {
@@ -54,9 +44,5 @@ public class Section {
 
     public Station getDownStation() {
         return downStation;
-    }
-
-    public long getDistance() {
-        return distance;
     }
 }
