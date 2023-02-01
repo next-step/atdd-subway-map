@@ -110,6 +110,7 @@ public class LineAcceptanceTest {
 
         String location = createLineResponse.header("Location");
 
+        // when, then
         lineAssert.assertShowLine(name, color, upStationId, downStationId, distance, location);
     }
 
