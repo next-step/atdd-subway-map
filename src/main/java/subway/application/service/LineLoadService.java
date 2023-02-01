@@ -5,7 +5,6 @@ import org.springframework.transaction.annotation.Transactional;
 import subway.application.service.output.LineLoadRepository;
 import subway.domain.Line;
 import subway.domain.NotFoundLineException;
-import subway.infrastructor.repository.StationRepository;
 
 import java.util.List;
 
