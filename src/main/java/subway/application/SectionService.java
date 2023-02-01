@@ -33,10 +33,10 @@ public class SectionService {
 
 		Section section = sectionRepository.save(createRequest.toEntity());
 
-		Station station = stationRepository.findById(section.getDownStationId())
+		Station newDownStation = stationRepository.findById(section.getDownStationId())
 			.orElseThrow(() -> new NotFoundStationException(SectionErrorCode.NOT_FOUND_STATION));
 
-		subwayLine.exchangeDownStation(section, station);
+		subwayLine.exchangeDownStation(section, newDownStation);
 
 		return section.getId();
 	}

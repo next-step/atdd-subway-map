@@ -66,16 +66,16 @@ public class SubwayLine {
 		return new Section(this.upStationId, this.downStationId, distance);
 	}
 
-	public void exchangeDownStation(Section section, Station downStation) {
+	public void exchangeDownStation(Section section, Station newDownStation) {
 		validateNewSectionUpStationEqualDownStation(section);
-		validateDownStationRegistration(downStation);
+		validateDownStationRegistration(newDownStation);
 
 		subwayLineStationGroups.removeIf(
 			subwayLineStationGroup -> subwayLineStationGroup.equalStationId(this.downStationId)
 		);
 
-		this.downStationId= downStation.getId();
-		this.subwayLineStationGroups.add(createSubwayLineStationGroup(downStation));
+		this.downStationId= newDownStation.getId();
+		this.subwayLineStationGroups.add(createSubwayLineStationGroup(newDownStation));
 	}
 
 	public boolean isPossibleRemove(Section section) {
