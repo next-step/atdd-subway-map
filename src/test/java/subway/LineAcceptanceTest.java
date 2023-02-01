@@ -42,9 +42,8 @@ public class LineAcceptanceTest {
 		ExtractableResponse<Response> response = getLinesResponse();
 		List<String> lineNames = response.jsonPath().getList("name", String.class);
 
-		assertAll(
-				() -> assertThat(lineNames).containsAnyOf("신분당선")
-		);
+		assertThat(lineNames).containsAnyOf("신분당선");
+
 	}
 
 
@@ -120,7 +119,9 @@ public class LineAcceptanceTest {
 		Map<String, String> updateInfoParam = new HashMap<>();
 		updateInfoParam.put("name", "다른분당선");
 		updateInfoParam.put("color", "bg-red-600");
-		updateStationResponse(updateInfoParam, id);
+		ExtractableResponse<Response> updatedResponse = updateStationResponse(updateInfoParam, id);
+
+		assertThat(updatedResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
 		ExtractableResponse<Response> response = getLineResponse(id);
 		String lineName = response.jsonPath().getString("name");
