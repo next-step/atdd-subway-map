@@ -5,7 +5,6 @@ import org.springframework.transaction.annotation.Transactional;
 import subway.Station;
 import subway.StationRepository;
 import subway.StationResponse;
-import subway.exception.BadRequestException;
 import subway.exception.NotFoundException;
 
 import java.util.ArrayList;
@@ -33,10 +32,6 @@ public class StationLineService {
 
     @Transactional
     public StationLineResponse createStationLines(StationLineRequest stationLineRequest) {
-        if (stationLineRequest.getUpStationId() >= stationLineRequest.getDownStationId()) {
-            throw new BadRequestException();
-        }
-
         StationLine stationLine = stationLineRepository.save(stationLineRequest.toEntity());
         return getStationsInLine(stationLine);
     }
