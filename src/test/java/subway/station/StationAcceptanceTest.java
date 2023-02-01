@@ -1,4 +1,4 @@
-package subway;
+package subway.station;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import subway.RestTestUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -37,7 +38,7 @@ public class StationAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames = getAllStations().jsonPath().getList("name", String.class);
+        List<String> stationNames = RestTestUtils.getListFromResponse(getAllStations(), "name", String.class);
         assertThat(stationNames).containsAnyOf(station);
     }
 
@@ -57,7 +58,7 @@ public class StationAcceptanceTest {
         }
 
         // when
-        List<String> stationNames = getAllStations().jsonPath().getList("name", String.class);
+        List<String> stationNames = RestTestUtils.getListFromResponse(getAllStations(), "name", String.class);
 
         // then
         assertThat(stationNames).containsAll(stations);
@@ -79,12 +80,12 @@ public class StationAcceptanceTest {
         }
 
         // when
-        List<Long> stationIds = getAllStations().jsonPath().getList("id", Long.class);
+        List<Long> stationIds = RestTestUtils.getListFromResponse(getAllStations(), "id", Long.class);
         Long deleteId = stationIds.get(0);
         delete(deleteId);
 
         // then
-        List<Long> result = getAllStations().jsonPath().getList("id", Long.class);
+        List<Long> result = RestTestUtils.getListFromResponse(getAllStations(), "id", Long.class);
         assertThat(result).doesNotContain(deleteId);
     }
 
