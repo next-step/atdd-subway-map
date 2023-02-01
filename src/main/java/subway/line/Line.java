@@ -50,7 +50,8 @@ public class Line {
         this.color = color;
     }
 
-//    public void appendSection(Station newStation) {
-//        this.stations.add(newStation);
-//    }
+    public void appendSection(Section section) {
+        this.sections.add(section);
+        this.downStation = section.getDownStation();
+    }
 }

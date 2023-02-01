@@ -2,13 +2,13 @@ package subway.line;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.section.Section;
 import subway.section.SectionRequest;
 import subway.section.SectionService;
 import subway.station.Station;
 import subway.station.StationResponse;
 import subway.station.StationService;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -69,21 +69,21 @@ public class LineService {
     public void appendSection(Long id, SectionRequest sectionRequest) {
         Line line = findOne(id);
 
-//        if(!sectionService.isAppendable(line, sectionRequest)) {
-//            throw new IllegalArgumentException("등록할 수 없는 구간입니다");
-//        }
+        if (!sectionService.isAppendable(line, sectionRequest)) {
+            throw new IllegalArgumentException("등록할 수 없는 구간입니다");
+        }
 
-        Station newStation = this.stationService.findOne(sectionRequest.getDownStationId());
+        Section section = this.sectionService.createSection(sectionRequest);
 
-//        line.appendSection(newStation, sectionRequest.getDistance());
-
+        line.appendSection(section);
         this.lineRepository.save(line);
     }
 
     private LineResponse createLineResponse(Line line) {
-        List<StationResponse> stationResponses = new ArrayList<>();
+        List<StationResponse> stationResponses = line.getSections().stream()
+                .map((s) -> stationService.createStationResponse(s.getUpStation()))
+                .collect(Collectors.toList());
 
-        stationResponses.add(stationService.createStationResponse(line.getUpStation()));
         stationResponses.add(stationService.createStationResponse(line.getDownStation()));
 
         return LineResponse.builder()

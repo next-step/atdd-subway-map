@@ -38,7 +38,6 @@ public class SectionAcceptanceTest {
      * When 지하철 구간을 등록하면
      * Then 지하철 노선 조회시 기존 구간과 등록한 구간이 합쳐진 노선을 확인할 수 있다
      */
-    @Disabled
     @DisplayName("구간 등록 기능 - 성공 케이스")
     @Test
     void createSectionSuccess() {
@@ -62,7 +61,6 @@ public class SectionAcceptanceTest {
      * When 지하철 구간을 등록하면
      * Then 지하철 노선 조회시 기존 노선과 동일하다
      */
-    @Disabled
     @DisplayName("구간 등록 기능 - 실패 케이스")
     @Test
     void createSectionFail() {

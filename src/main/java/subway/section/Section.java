@@ -17,19 +17,19 @@ public class Section {
     private Integer distance;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "begin_station_id")
-    private Station beginStation;
+    @JoinColumn(name = "up_station_id")
+    private Station upStation;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "end_station_id")
-    private Station endStation;
+    @JoinColumn(name = "down_station_id")
+    private Station downStation;
 
     public Section() {
     }
 
-    public Section(Integer distance, Station beginStation, Station endStation) {
+    public Section(Integer distance, Station upStation, Station downStation) {
         this.distance = distance;
-        this.beginStation = beginStation;
-        this.endStation = endStation;
+        this.upStation = upStation;
+        this.downStation = downStation;
     }
 }
