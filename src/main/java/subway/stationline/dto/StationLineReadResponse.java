@@ -11,6 +11,8 @@ public class StationLineReadResponse {
     private String name;
     private String color;
     private List<StationLineStationReadResponse> stations = new ArrayList<>();
+    private Long upStationId;
+    private Long downStationId;
 
     public StationLineReadResponse() {
     }
@@ -23,6 +25,9 @@ public class StationLineReadResponse {
         for (Station station : stations) {
             this.stations.add(new StationLineStationReadResponse(station.getId(), station.getName()));
         }
+
+        this.upStationId = stationLine.getUpStationId();
+        this.downStationId = stationLine.getDownStationId();
     }
 
     public Long getId() {
@@ -39,5 +44,13 @@ public class StationLineReadResponse {
 
     public List<StationLineStationReadResponse> getStations() {
         return stations;
+    }
+
+    public Long getUpStationId() {
+        return upStationId;
+    }
+
+    public Long getDownStationId() {
+        return downStationId;
     }
 }
