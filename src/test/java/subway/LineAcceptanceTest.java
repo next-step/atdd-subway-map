@@ -35,28 +35,18 @@ public class LineAcceptanceTest {
     @Test
     void 지하철_노선_생성_후_목록_조회시_찾을_수_있다() {
         //when
-        String lineName = "신분당선";
-        String lineColor = "bg-red-600";
-        Long upStationId = 1L;
-        Long downStationId = 2L;
-        Long distance = 10L;
-
-        final Map<String, String> stationParams = new HashMap<>();
-        stationParams.put("name", "지하철역");
-        getStationResponse(stationParams);
-
-        stationParams.put("name", "새로운지하철역");
-        getStationResponse(stationParams);
+        saveStations();
 
         final Map<String, String> lineParams = new HashMap<>();
-        putParams(lineParams, lineName, lineColor, upStationId, downStationId, distance);
+        LineTestDto lineTestDto = new LineTestDto();
+        putParams(lineParams, lineTestDto);
 
         getSaveLineResponse(lineParams);
 
         //then
         ExtractableResponse<Response> readResponses = getReadResponses();
 
-        Assertions.assertThat(readResponses.body().jsonPath().getList("name")).contains(lineName);
+        Assertions.assertThat(readResponses.body().jsonPath().getList("name")).contains(lineTestDto.getLineName());
     }
 
     /**
@@ -169,6 +159,15 @@ public class LineAcceptanceTest {
         Assertions.assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
+    private void saveStations() {
+        final Map<String, String> stationParams = new HashMap<>();
+        stationParams.put("name", "지하철역");
+        getStationResponse(stationParams);
+
+        stationParams.put("name", "새로운지하철역");
+        getStationResponse(stationParams);
+    }
+
     private void getStationResponse(Map<String, String> stationParams) {
         ExtractableResponse<Response> createResponse = RestAssured
                 .given()
@@ -226,12 +225,12 @@ public class LineAcceptanceTest {
 
     }
 
-    private void putParams(Map<String, String> params, String lineName, String lineColor, Long upStationId, Long downStationId, Long distance) {
-        params.put("name", lineName);
-        params.put("color", lineColor);
-        params.put("upStationId", String.valueOf(upStationId));
-        params.put("downStationId", String.valueOf(downStationId));
-        params.put("distance", String.valueOf(distance));
+    private void putParams(Map<String, String> params, LineTestDto lineTestDto) {
+        params.put("name", lineTestDto.getLineName());
+        params.put("color", lineTestDto.getLineColor());
+        params.put("upStationId", String.valueOf(lineTestDto.getUpStationId()));
+        params.put("downStationId", String.valueOf(lineTestDto.getDownStationId()));
+        params.put("distance", String.valueOf(lineTestDto.getDistance()));
     }
 
     private SaveLineResponse getSaveLineResponse(Map<String, String> params) {
