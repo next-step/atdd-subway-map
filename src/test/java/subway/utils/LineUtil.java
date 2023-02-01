@@ -59,4 +59,22 @@ public class LineUtil {
 
         return response.body().jsonPath();
     }
+
+    public static void updateLineResult(Long id, String lineName, String color) {
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all().body(getUpdateParam(lineName, color)).contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().put("/lines/{id}", id)
+                .then().log().all()
+                .extract();
+
+        assertSuccessOk(response);
+    }
+
+    private static Map<String, String> getUpdateParam(String lineName, String color) {
+        Map<String, String> param = new HashMap<>();
+        param.put("name", lineName);
+        param.put("color", color);
+
+        return param;
+    }
 }
