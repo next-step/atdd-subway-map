@@ -82,17 +82,12 @@ public class LineAcceptanceTest {
     @Test
     void 지하철_노선_생성_후_생성된_노선으로_조회시_노선의_정보를_알_수_있다() {
         //given
-        String lineFourName = "4호선";
-        String lineFourColor = "하늘색";
+        saveStation("지하철역");
+        saveStation("새로운지하철역");
 
-        Map<String, String> params = new HashMap<>();
-//        putParams(params, lineFourName, lineFourColor);
-        Long id = getSaveLineResponse(params).getId();
-
-        String lineFiveName = "5호선";
-        String lineFiveColor = "보라색";
-//        putParams(params, lineFiveName, lineFiveColor);
-        getSaveLineResponse(params);
+        final Map<String, String> lineParams = new HashMap<>();
+        LineTestDto shinBunDangLine = new LineTestDto("신분당선", "bg-red-600", 1L, 2L, 10L);
+        Long id = saveLine(lineParams, shinBunDangLine).getId();
 
         //when
         ExtractableResponse<Response> findResponse = getFindResponse(id);
@@ -101,8 +96,8 @@ public class LineAcceptanceTest {
         String lineName = findResponse.body().jsonPath().get("name");
         String lineColor = findResponse.body().jsonPath().get("color");
 
-        Assertions.assertThat(lineName).isEqualTo(lineFourName);
-        Assertions.assertThat(lineColor).isEqualTo(lineFourColor);
+        Assertions.assertThat(lineName).isEqualTo(shinBunDangLine.getLineName());
+        Assertions.assertThat(lineColor).isEqualTo(shinBunDangLine.getLineColor());
     }
 
     /**
@@ -154,9 +149,9 @@ public class LineAcceptanceTest {
         Assertions.assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
-    private void saveLine(Map<String, String> lineParams, LineTestDto lineName) {
+    private SaveLineResponse saveLine(Map<String, String> lineParams, LineTestDto lineName) {
         putParams(lineParams, lineName);
-        getSaveLineResponse(lineParams);
+        return getSaveLineResponse(lineParams);
     }
 
     private void saveStation(String stationName) {
@@ -231,7 +226,6 @@ public class LineAcceptanceTest {
     }
 
     private SaveLineResponse getSaveLineResponse(Map<String, String> params) {
-
         ExtractableResponse<Response> saveResponse = RestAssured
                 .given()
                 .body(params)

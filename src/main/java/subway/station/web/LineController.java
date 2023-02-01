@@ -3,6 +3,7 @@ package subway.station.web;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import subway.station.service.LineService;
+import subway.station.web.dto.FindLineResponse;
 import subway.station.web.dto.SaveLineRequest;
 import subway.station.web.dto.SaveLineResponse;
 import subway.station.web.dto.ViewLineResponse;
@@ -31,8 +32,8 @@ public class LineController {
     }
 
     @GetMapping("/lines/{id}")
-    public ResponseEntity<SaveLineResponse> findLineById(@PathVariable Long id) {
-        SaveLineResponse line = lineService.findLineById(id);
+    public ResponseEntity<FindLineResponse> findLineById(@PathVariable Long id) {
+        FindLineResponse line = lineService.findLineById(id);
         return ResponseEntity.ok().body(line);
     }
 
