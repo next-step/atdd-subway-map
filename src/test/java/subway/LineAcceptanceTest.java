@@ -5,7 +5,6 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -139,12 +138,12 @@ public class LineAcceptanceTest {
     @Test
     void 지하철_노선을_생성하고_삭제하면_노선_정보는_삭제_된다() {
         //given
-        String lineSevenName = "7호선";
-        String lineSevenColor = "금색";
+        saveStation("지하철역");
+        saveStation("새로운지하철역");
 
-        Map<String, String> params = new HashMap<>();
-//        putParams(params, lineSevenName, lineSevenColor);
-        Long id = getSaveLineResponse(params).getId();
+        final Map<String, String> lineParams = new HashMap<>();
+        LineTestDto shinBunDangLine = new LineTestDto("신분당선", "bg-red-600", 1L, 2L, 10L);
+        Long id = saveLine(lineParams, shinBunDangLine).getId();
 
         //when
         ExtractableResponse<Response> deleteResponse = getDeleteResponse(id);
