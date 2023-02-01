@@ -59,4 +59,20 @@ public class Line {
     public List<Long> getStationIds() {
         return List.of(upStationId, downStationId);
     }
+
+    public Long getUpStationId() {
+        return upStationId;
+    }
+
+    public Long getDownStationId() {
+        return downStationId;
+    }
+
+    public int getDistance() {
+        return distance;
+    }
+
+    public void updateDownStation(Long downStationId) {
+        this.downStationId = downStationId;
+    }
 }

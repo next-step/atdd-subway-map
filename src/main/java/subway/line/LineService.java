@@ -47,7 +47,7 @@ public class LineService {
                 .collect(Collectors.toList());
     }
 
-    private Line findLineById(Long id) {
+    public Line findLineById(Long id) {
         return lineRepository.findById(id)
                 .orElseThrow(LineException::new);
     }

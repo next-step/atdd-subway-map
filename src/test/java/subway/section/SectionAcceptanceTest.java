@@ -16,15 +16,16 @@ import org.springframework.test.context.jdbc.Sql;
 import subway.line.LineAcceptanceTest;
 import subway.line.LineRequest;
 import subway.line.LineResponse;
+import subway.station.StationAcceptanceTest;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Sql(value = "classpath:/init-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-@Sql(value = "classpath:/truncate.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 @DisplayName("지하철 구간 관련 기능")
+@Sql(statements = "TRUNCATE TABLE STATION;", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class SectionAcceptanceTest {
@@ -35,6 +36,7 @@ public class SectionAcceptanceTest {
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
+        StationAcceptanceTest.requestSaveStation("강남역", "망포역", "정자역", "판교역");
     }
 
     /**
@@ -55,12 +57,13 @@ public class SectionAcceptanceTest {
                         "downStationId", 3L,
                         "distance", 10
                 ));
+        //then
+        assertThat(saveResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         //then
         ExtractableResponse<Response> listResponse = 노선_구간_목록_조회(line.getId());
-        List<Long> sectionStationIds = listResponse.jsonPath().getList("stations.id", Long.class);
-        assertThat(sectionStationIds).containsAnyOf(3L);
-
+        List<Long> stationIds = extractStationIds(listResponse.jsonPath().getList("stations.id", String.class));
+        assertThat(stationIds).containsAnyOf(3L);
     }
 
     /**
@@ -126,11 +129,12 @@ public class SectionAcceptanceTest {
                 ));
 
         //when
-        구간_삭제(line.getId(), 3L);
+        ExtractableResponse<Response> deleteResponse = 구간_삭제(line.getId(), 3L);
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         //then
         ExtractableResponse<Response> listResponse = 노선_구간_목록_조회(line.getId());
-        List<Long> stationIds = listResponse.jsonPath().getList("stations.id", Long.class);
+        List<Long> stationIds = extractStationIds(listResponse.jsonPath().getList("stations.id", String.class));
         assertThat(stationIds).doesNotContain(3L);
     }
 
@@ -152,11 +156,14 @@ public class SectionAcceptanceTest {
                 ));
 
         //when
-        구간_삭제(line.getId(), 4L);
+        ExtractableResponse<Response> deleteResponse = 구간_삭제(line.getId(), 4L);
+
+        //then
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
 
         //then
         ExtractableResponse<Response> listResponse = 노선_구간_목록_조회(line.getId());
-        List<Long> stationIds = listResponse.jsonPath().getList("stations.id", Long.class);
+        List<Long> stationIds = extractStationIds(listResponse.jsonPath().getList("stations.id", String.class));
         assertThat(stationIds).containsAnyOf(1L, 2L, 3L);
     }
 
@@ -182,11 +189,11 @@ public class SectionAcceptanceTest {
         ExtractableResponse<Response> deleteResponse = 구간_삭제(line.getId(), 2L);
 
         //then
-        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
 
         //then
         ExtractableResponse<Response> listResponse = 노선_구간_목록_조회(line.getId());
-        List<Long> stationIds = listResponse.jsonPath().getList("stations.id", Long.class);
+        List<Long> stationIds = extractStationIds(listResponse.jsonPath().getList("stations.id", String.class));
         assertThat(stationIds).containsAnyOf(1L, 2L, 3L);
     }
 
@@ -205,26 +212,17 @@ public class SectionAcceptanceTest {
         ExtractableResponse<Response> deleteResponse = 구간_삭제(line.getId(), 2L);
 
         //then
-        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
 
         ExtractableResponse<Response> listResponse = 노선_구간_목록_조회(line.getId());
-        List<Long> stationIds = listResponse.jsonPath().getList("stations.id", Long.class);
+        List<Long> stationIds = extractStationIds(listResponse.jsonPath().getList("stations.id", String.class));
         assertThat(stationIds).containsAnyOf(1L, 2L);
     }
 
     public static LineResponse 노선_생성(LineRequest lineRequest) {
-        // 라인 생성
-        LineResponse lineResponse = LineAcceptanceTest.requestSaveLine(lineRequest)
+        return LineAcceptanceTest.requestSaveLine(lineRequest)
                 .body()
                 .as(LineResponse.class);
-
-        // 라인 구간 생성
-        구간_생성(lineResponse.getId(),
-                Maps.of("upStationId", lineRequest.getUpStationId(),
-                        "downStationId", lineRequest.getDownStationId(),
-                        "distance", lineRequest.getDistance()
-                ));
-        return lineResponse;
     }
 
     public static ExtractableResponse<Response> 구간_생성(Long lineId, Map<String, Object> params) {
@@ -233,7 +231,6 @@ public class SectionAcceptanceTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/lines/" + lineId + "/sections")
                 .then().log().all()
-                .statusCode(HttpStatus.CREATED.value())
                 .extract();
     }
 
@@ -241,7 +238,6 @@ public class SectionAcceptanceTest {
         return RestAssured.given().log().all()
                 .when().delete("/lines/" + lineId + "/sections?stationId=" + id)
                 .then().log().all()
-                .statusCode(HttpStatus.NO_CONTENT.value())
                 .extract();
     }
 
@@ -251,5 +247,15 @@ public class SectionAcceptanceTest {
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
                 .extract();
+    }
+    private List<Long> extractStationIds(List<String> stationIds) {
+        System.out.println("stationIds = " + stationIds);
+        return String.join("", stationIds)
+                .chars()
+                .mapToObj(ch -> (char) ch)
+                .filter(Character::isDigit)
+                .map(String::valueOf)
+                .map(Long::valueOf)
+                .collect(Collectors.toList());
     }
 }

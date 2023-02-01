@@ -13,37 +13,37 @@ import static subway.line.LineController.LINE_URI_PATH;
 public class LineController {
     public static final String LINE_URI_PATH = "/lines";
 
-    private final LineService lineService;
+    private final LineSectionService lineSectionService;
 
-    public LineController(LineService lineService) {
-        this.lineService = lineService;
+    public LineController(LineSectionService lineSectionService) {
+        this.lineSectionService = lineSectionService;
     }
 
     @PostMapping
     public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
-        LineResponse line = lineService.saveLine(lineRequest);
+        LineResponse line = lineSectionService.saveLineSection(lineRequest);
         return ResponseEntity.created(URI.create(LINE_URI_PATH + "/" + line.getId())).body(line);
     }
 
     @GetMapping
     public ResponseEntity<List<LineResponse>> showLines() {
-        return ResponseEntity.ok().body(lineService.findAllLines());
+        return ResponseEntity.ok().body(lineSectionService.findAllLines());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<LineResponse> showLine(@PathVariable Long id) {
-        return ResponseEntity.ok().body(lineService.getLineResponseById(id));
+        return ResponseEntity.ok().body(lineSectionService.getLineResponseById(id));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<LineResponse> updateLine(@PathVariable Long id,
                                                    @RequestBody LineRequest lineRequest) {
-        return ResponseEntity.ok().body(lineService.updateLine(id, lineRequest));
+        return ResponseEntity.ok().body(lineSectionService.updateLine(id, lineRequest));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteLine(@PathVariable Long id) {
-        lineService.deleteLineById(id);
+        lineSectionService.deleteLineById(id);
         return ResponseEntity.noContent().build();
     }
 }

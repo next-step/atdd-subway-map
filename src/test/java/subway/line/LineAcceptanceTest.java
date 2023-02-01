@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
+import subway.station.StationAcceptanceTest;
 
 import java.util.Arrays;
 import java.util.List;
@@ -19,9 +20,8 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static subway.line.LineController.LINE_URI_PATH;
 
-@Sql(value = "classpath:/init-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-@Sql(value = "classpath:/truncate.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 @DisplayName("지하철 노선 관련 기능")
+@Sql(statements = "TRUNCATE TABLE STATION;", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class LineAcceptanceTest {
@@ -32,6 +32,7 @@ public class LineAcceptanceTest {
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
+        StationAcceptanceTest.requestSaveStation("강남역", "망포역", "정자역", "판교역");
     }
 
     /**
