@@ -78,4 +78,8 @@ public class Line {
         this.distance = new Distance(distance);
         return this;
     }
+
+    public void detachStations() {
+        stations.detach();
+    }
 }

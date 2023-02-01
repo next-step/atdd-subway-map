@@ -158,7 +158,7 @@ public class LineAcceptanceTest {
                         "distance", distance
                 ))
                 .when()
-                .patch(location)
+                .put(location)
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
                 .extract();
@@ -180,6 +180,31 @@ public class LineAcceptanceTest {
                         .containsExactly(upStationId, downStationId),
                 () -> assertThat(jsonPath.getInt("distance")).isEqualTo(distance)
         );
+    }
+
+    @DisplayName("지하철 노선을 삭제한다.")
+    @Test
+    void deleteLine() {
+        // given
+        ExtractableResponse<Response> createLineResponse
+                = createLine("신분당선", "bg-red-600", upStationId, downStationId, 10);
+
+        String location = createLineResponse.header("Location");
+
+        // when
+        RestAssured.given().log().all()
+                .when()
+                .delete(location)
+                .then().log().all()
+                .statusCode(HttpStatus.NO_CONTENT.value())
+                .extract();
+
+        // then
+        RestAssured.given().log().all()
+                .when()
+                .get(location)
+                .then().log().all()
+                .statusCode(HttpStatus.NOT_FOUND.value());
     }
 
     private static ExtractableResponse<Response> showLinesResponse() {

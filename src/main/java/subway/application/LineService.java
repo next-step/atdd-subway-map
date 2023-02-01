@@ -2,6 +2,7 @@ package subway.application;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.application.converter.LineConverter;
@@ -60,8 +61,15 @@ public class LineService {
                 .editDistance(lineEditRequest.getDistance());
     }
 
+    @Transactional
+    public void delete(final Long lineId) {
+        Line line = findLineBy(lineId);
+        line.detachStations();
+        lineRepository.delete(line);
+    }
+
     private Line findLineBy(final Long lineId) {
         return lineRepository.findById(lineId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 노선입니다."));
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 노선입니다."));
     }
 }

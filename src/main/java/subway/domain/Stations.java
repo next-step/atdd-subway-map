@@ -25,4 +25,9 @@ public class Stations {
     public List<Station> getStations() {
         return stations;
     }
+
+    public void detach() {
+        stations.stream()
+                .forEach(station -> station.setLine(null));
+    }
 }
