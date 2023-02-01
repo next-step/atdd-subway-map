@@ -5,8 +5,8 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import setting.RandomPortSetting;
-import subway.common.util.CommonValidationUtils;
-import subway.station.util.ExtractionUtils;
+import subway.common.util.validation.ExistenceValidation;
+import subway.station.util.Extraction;
 
 import static subway.station.MockStation.강남역;
 import static subway.station.MockStation.서초역;
@@ -27,11 +27,11 @@ public class StationAcceptanceTest extends RandomPortSetting {
         ExtractableResponse<Response> responseOfCreateStation = StationApi.createStation(강남역);
 
         // then
-        CommonValidationUtils.checkCreatedResponse(responseOfCreateStation);
+        ExistenceValidation.checkCreatedResponse(responseOfCreateStation);
 
         // then
         ExtractableResponse<Response> responseOfShowStations = StationApi.showStations();
-        CommonValidationUtils.checkNameExistenceInList(responseOfShowStations, 강남역);
+        ExistenceValidation.checkNameExistenceInList(responseOfShowStations, 강남역);
     }
 
     /**
@@ -50,8 +50,8 @@ public class StationAcceptanceTest extends RandomPortSetting {
         ExtractableResponse<Response> responseOfShowStations = StationApi.showStations();
 
         // Then
-        CommonValidationUtils.checkResponseCount(responseOfShowStations, 2);
-        CommonValidationUtils.checkNamesExistenceInList(responseOfShowStations, 강남역, 서초역);
+        ExistenceValidation.checkCountInList(responseOfShowStations, 2);
+        ExistenceValidation.checkNamesExistenceInList(responseOfShowStations, 강남역, 서초역);
     }
 
     /**
@@ -68,13 +68,13 @@ public class StationAcceptanceTest extends RandomPortSetting {
         StationApi.createStation(신촌역);
 
         // When
-        Long stationId = ExtractionUtils.getStationId(responseOfCreateStation);
+        Long stationId = Extraction.getStationId(responseOfCreateStation);
         StationApi.deleteStation(stationId);
 
         // Then
         ExtractableResponse<Response> responseOfShowStations = StationApi.showStations();
-        CommonValidationUtils.checkResponseCount(responseOfShowStations, 2);
-        CommonValidationUtils.checkNamesNotExistenceInList(responseOfShowStations, 서초역);
-        CommonValidationUtils.checkNamesExistenceInList(responseOfShowStations, 강남역, 신촌역);
+        ExistenceValidation.checkCountInList(responseOfShowStations, 2);
+        ExistenceValidation.checkNamesNotExistenceInList(responseOfShowStations, 서초역);
+        ExistenceValidation.checkNamesExistenceInList(responseOfShowStations, 강남역, 신촌역);
     }
 }

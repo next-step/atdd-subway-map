@@ -6,9 +6,9 @@ import io.restassured.response.Response;
 
 import java.util.List;
 
-public class CommonExtractionUtils {
+public class Extraction {
 
-    private CommonExtractionUtils() {}
+    private Extraction() {}
 
     /**
      * JSON에 대해 key를 통해 추출한다

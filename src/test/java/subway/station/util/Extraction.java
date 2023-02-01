@@ -3,9 +3,9 @@ package subway.station.util;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 
-public class ExtractionUtils {
+public class Extraction {
 
-    private ExtractionUtils() {}
+    private Extraction() {}
 
     public static Long getStationId(ExtractableResponse<Response> response) {
         String[] locationTokens = response.header("Location").split("/");

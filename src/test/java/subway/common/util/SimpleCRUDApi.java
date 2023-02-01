@@ -6,9 +6,9 @@ import org.springframework.http.MediaType;
 
 import static io.restassured.RestAssured.given;
 
-public class CommonApi {
+public class SimpleCRUDApi {
 
-    private CommonApi() {}
+    private SimpleCRUDApi() {}
 
     public static final String LOCATION = "Location";
 

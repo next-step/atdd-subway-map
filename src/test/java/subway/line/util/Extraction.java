@@ -3,11 +3,11 @@ package subway.line.util;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 
-public class ExtractionUtils {
+public class Extraction {
 
     public static final String LOCATION = "Location";
 
-    private ExtractionUtils() {}
+    private Extraction() {}
 
     public static Long getLineId(ExtractableResponse<Response> response) {
         String[] locationTokens = response.header(LOCATION).split("/");

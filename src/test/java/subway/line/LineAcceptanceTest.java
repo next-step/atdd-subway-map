@@ -6,10 +6,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.jdbc.Sql;
 import setting.RandomPortSetting;
-import subway.common.util.CommonApi;
-import subway.common.util.CommonValidationUtils;
-import subway.line.util.ExtractionUtils;
-import subway.line.util.ValidationUtils;
+import subway.common.util.SimpleCRUDApi;
+import subway.common.util.validation.ExistenceValidation;
+import subway.common.util.validation.ResponseStatusValidation;
+import subway.line.util.Extraction;
+import subway.line.util.Validation;
 
 import static subway.line.MockLine.분당선;
 import static subway.line.MockLine.신분당선;
@@ -30,7 +31,7 @@ public class LineAcceptanceTest extends RandomPortSetting {
 
         // Then
         ExtractableResponse<Response> responseOfShowLines = LineApi.showLines();
-        CommonValidationUtils.checkNameExistenceInList(responseOfShowLines, 신분당선);
+        ExistenceValidation.checkNameExistenceInList(responseOfShowLines, 신분당선);
     }
 
     /**
@@ -49,8 +50,8 @@ public class LineAcceptanceTest extends RandomPortSetting {
         ExtractableResponse<Response> responseOfShowLines = LineApi.showLines();
 
         // Then
-        CommonValidationUtils.checkResponseCount(responseOfShowLines, 2);
-        CommonValidationUtils.checkNamesExistenceInList(responseOfShowLines, 신분당선, 분당선);
+        ExistenceValidation.checkCountInList(responseOfShowLines, 2);
+        ExistenceValidation.checkNamesExistenceInList(responseOfShowLines, 신분당선, 분당선);
     }
 
     /**
@@ -63,13 +64,13 @@ public class LineAcceptanceTest extends RandomPortSetting {
     void showLine() {
         // Given
         ExtractableResponse<Response> responseOfCreateLine = LineApi.createLine(신분당선);
-        CommonValidationUtils.checkCreatedResponse(responseOfCreateLine);
+        ResponseStatusValidation.checkCreatedResponse(responseOfCreateLine);
 
         // When
-        ExtractableResponse<Response> responseOfShowLine = CommonApi.showResource(responseOfCreateLine);
+        ExtractableResponse<Response> responseOfShowLine = SimpleCRUDApi.showResource(responseOfCreateLine);
 
         // Then
-        CommonValidationUtils.checkNameExistence(responseOfShowLine, 신분당선);
+        ExistenceValidation.checkNameExistence(responseOfShowLine, 신분당선);
     }
 
     /**
@@ -82,15 +83,15 @@ public class LineAcceptanceTest extends RandomPortSetting {
     void updateLine() {
         // Given
         ExtractableResponse<Response> responseOfCreateLine = LineApi.createLine(신분당선);
-        Long lineId = ExtractionUtils.getLineId(responseOfCreateLine);
+        Long lineId = Extraction.getLineId(responseOfCreateLine);
 
         // When
         LineApi.updateLine(lineId, 분당선.getName(), 분당선.getColor());
 
         // Then
-        ExtractableResponse<Response> responseOfShowResource = CommonApi.showResource(responseOfCreateLine);
-        CommonValidationUtils.checkNameExistence(responseOfShowResource, 분당선);
-        ValidationUtils.checkColorExistenceInList(responseOfShowResource, 분당선);
+        ExtractableResponse<Response> responseOfShowResource = SimpleCRUDApi.showResource(responseOfCreateLine);
+        ExistenceValidation.checkNameExistence(responseOfShowResource, 분당선);
+        Validation.checkColorExistenceInList(responseOfShowResource, 분당선);
     }
 
     /**
@@ -105,13 +106,13 @@ public class LineAcceptanceTest extends RandomPortSetting {
         ExtractableResponse<Response> responseOfCreateLine = LineApi.createLine(신분당선);
 
         // When
-        Long lineId = ExtractionUtils.getLineId(responseOfCreateLine);
+        Long lineId = Extraction.getLineId(responseOfCreateLine);
         ExtractableResponse<Response> responseOfDelete = LineApi.deleteLine(lineId);
-        CommonValidationUtils.checkDeletedResponse(responseOfDelete);
+        ResponseStatusValidation.checkDeletedResponse(responseOfDelete);
 
         // Then
         ExtractableResponse<Response> responseOfShowLines = LineApi.showLines();
-        CommonValidationUtils.checkResponseCount(responseOfShowLines, 0);
-        CommonValidationUtils.checkNamesNotExistenceInList(responseOfShowLines, 신분당선);
+        ExistenceValidation.checkCountInList(responseOfShowLines, 0);
+        ExistenceValidation.checkNamesNotExistenceInList(responseOfShowLines, 신분당선);
     }
 }
