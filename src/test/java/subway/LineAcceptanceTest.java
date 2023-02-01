@@ -35,18 +35,17 @@ public class LineAcceptanceTest {
     @Test
     void 지하철_노선_생성_후_목록_조회시_찾을_수_있다() {
         //when
-        saveStations();
+        saveStations("지하철역");
+        saveStations("새로운지하철역");
 
         final Map<String, String> lineParams = new HashMap<>();
-        LineTestDto lineTestDto = new LineTestDto();
-        putParams(lineParams, lineTestDto);
-
-        getSaveLineResponse(lineParams);
+        LineTestDto shinBunDangLine = new LineTestDto("신분당선", "bg-red-600", 1L, 2L, 10L);
+        saveLine(lineParams, shinBunDangLine);
 
         //then
         ExtractableResponse<Response> readResponses = getReadResponses();
 
-        Assertions.assertThat(readResponses.body().jsonPath().getList("name")).contains(lineTestDto.getLineName());
+        Assertions.assertThat(readResponses.body().jsonPath().getList("name")).contains(shinBunDangLine.getLineName());
     }
 
     /**
@@ -57,18 +56,13 @@ public class LineAcceptanceTest {
     @Test
     void 두_개의_지하철_노선_생성_후_목록_조회시_응답_받은_Response의_길이는_2이다() {
         //given
-        String lineTwoName = "2호선";
-        String lineTwoColor = "초록색";
+        saveStations("지하철역");
+        saveStations("새로운지하철역");
+        saveStations("또다른지하철역");
 
-        Map<String, String> params = new HashMap<>();
-//        putParams(params, lineTwoName, lineTwoColor);
-        getSaveLineResponse(params);
-
-        String lineThreeName = "3호선";
-        String lineThreeColor = "주황색";
-
-//        putParams(params, lineThreeName, lineThreeColor);
-        getSaveLineResponse(params);
+        final Map<String, String> lineParams = new HashMap<>();
+        saveLine(lineParams, new LineTestDto("신분당선", "bg-red-600", 1L, 2L, 10L));
+        saveLine(lineParams, new LineTestDto("분당선", "bg-green-600", 1L, 3L, 15L));
 
         //when
         ExtractableResponse<Response> readResponse = getReadResponses();
@@ -77,6 +71,11 @@ public class LineAcceptanceTest {
         List list = readResponse.body().jsonPath().get();
 
         Assertions.assertThat(list.size()).isEqualTo(LENGTH_TWO);
+    }
+
+    private void saveLine(Map<String, String> lineParams, LineTestDto lineName) {
+        putParams(lineParams, lineName);
+        getSaveLineResponse(lineParams);
     }
 
     /**
@@ -159,12 +158,9 @@ public class LineAcceptanceTest {
         Assertions.assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
-    private void saveStations() {
+    private void saveStations(String stationName) {
         final Map<String, String> stationParams = new HashMap<>();
-        stationParams.put("name", "지하철역");
-        getStationResponse(stationParams);
-
-        stationParams.put("name", "새로운지하철역");
+        stationParams.put("name", stationName);
         getStationResponse(stationParams);
     }
 
@@ -234,8 +230,9 @@ public class LineAcceptanceTest {
     }
 
     private SaveLineResponse getSaveLineResponse(Map<String, String> params) {
+
         ExtractableResponse<Response> saveResponse = RestAssured
-                .given().log().all()
+                .given()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/lines")
