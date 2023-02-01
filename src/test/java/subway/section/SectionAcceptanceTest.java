@@ -25,7 +25,7 @@ public class SectionAcceptanceTest {
      */
     @DisplayName("지하철 구간 등록 - 예외 케이스 : 새로운 구간의 상행역이 해당 노선에 등록되어있는 하행 종점역이 아닌 경우")
     @Test
-    public void createStation_InvalidCase1() {
+    public void createSection_InvalidCase1() {
 
     }
 
@@ -39,7 +39,7 @@ public class SectionAcceptanceTest {
      */
     @DisplayName("지하철 구간 등록 - 예외 케이스 : 새로운 구간의 하행역이 해당 노선에 등록되어있는 역인 경우")
     @Test
-    public void createStation_InvalidCase2() {
+    public void createSection_InvalidCase2() {
 
     }
 
@@ -50,7 +50,7 @@ public class SectionAcceptanceTest {
      */
     @DisplayName("지하철 구간 제거 - 정상 케이스")
     @Test
-    public void deleteStation() {
+    public void deleteSection() {
     }
 
     /**
@@ -60,7 +60,7 @@ public class SectionAcceptanceTest {
      */
     @DisplayName("지하철 구간 제거 - 예외 케이스 : 구간이 한 개인 노선의 하행 종점역을 제거하려는 경우")
     @Test
-    public void deleteStation_InvalidCase1() {
+    public void deleteSection_InvalidCase1() {
     }
 
     /**
@@ -70,7 +70,7 @@ public class SectionAcceptanceTest {
      */
     @DisplayName("지하철 구간 제거 - 예외 케이스 : 하행 종점역이 아닌 역을 제거하려는 경우")
     @Test
-    public void deleteStation_InvalidCase2() {
+    public void deleteSection_InvalidCase2() {
     }
 
 
