@@ -2,6 +2,7 @@ package subway.models;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -24,7 +25,7 @@ public class Line {
     private String name;
     @Column(length = 20, nullable = false)
     private String color;
-    @OneToMany(mappedBy = "line")
+    @OneToMany(mappedBy = "line", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Section> sections = new ArrayList<>();
 
     @Builder
@@ -37,5 +38,10 @@ public class Line {
     public void addSection(Section section) {
         section.setLine(this);
         sections.add(section);
+    }
+
+    public void update(String name, String color) {
+        this.name = name;
+        this.color = color;
     }
 }

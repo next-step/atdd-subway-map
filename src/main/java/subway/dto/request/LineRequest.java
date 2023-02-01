@@ -32,4 +32,14 @@ public class LineRequest {
                 .build();
         }
     }
+
+    @Getter
+    public static class Update {
+        private String name;
+        private String color;
+
+        public void apply(Line line) {
+            line.update(name, color);
+        }
+    }
 }

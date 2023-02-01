@@ -1,6 +1,7 @@
 package subway;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static subway.StationAcceptanceTest.지하철역_생성;
 import static subway.fixtures.LineFixtures.분당선_파라미터_생성;
 import static subway.fixtures.LineFixtures.신분당선_수정_파라미터_생성;
@@ -18,6 +19,7 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.opentest4j.AssertionFailedError;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
@@ -145,8 +147,7 @@ public class LineAcceptanceTest {
         지하철_노선_삭제(lineId);
 
         // then
-        ExtractableResponse<Response> response = 지하철_노선_조회(lineId);
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+        assertThrows(AssertionFailedError.class, () -> 지하철_노선_조회(lineId));
     }
 
     private ExtractableResponse<Response> 지하철_노선_생성(Map<String, String> params) {
@@ -188,7 +189,7 @@ public class LineAcceptanceTest {
         ExtractableResponse<Response> response = RestAssured.given().log().all()
             .body(params)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().post("/lines/{id}", id)
+            .when().put("/lines/{id}", id)
             .then().log().all()
             .extract();
 

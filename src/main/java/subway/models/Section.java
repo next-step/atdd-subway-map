@@ -2,6 +2,7 @@ package subway.models;
 
 import java.util.Arrays;
 import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -28,7 +29,6 @@ public class Section {
     private Integer sequence;
     @Setter
     @ManyToOne
-    @JoinColumn(name = "line_id")
     private Line line;
     @ManyToOne
     private Station upStation;

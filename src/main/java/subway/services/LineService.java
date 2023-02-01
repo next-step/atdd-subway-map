@@ -37,9 +37,24 @@ public class LineService {
     }
 
     public List<LineResponse> findAllLines() {
-        List<Line> lines = lineRepository.findAll();
-        return lines.stream()
+        return lineRepository.findAll().stream()
             .map(LineResponse::of)
             .collect(Collectors.toList());
+    }
+
+    public LineResponse findById(Long id) {
+        return LineResponse.of(lineRepository.findById(id).orElseThrow(EntityNotFoundException::new));
+    }
+
+    @Transactional
+    public void update(Long id, LineRequest.Update lineRequest) {
+        Line line = lineRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+        lineRequest.apply(line);
+        lineRepository.save(line);
+    }
+
+    @Transactional
+    public void deleteById(Long id) {
+        lineRepository.deleteById(id);
     }
 }
