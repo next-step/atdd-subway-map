@@ -1,17 +1,20 @@
 package subway.application;
 
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import subway.domain.Line;
 import subway.domain.LineRepository;
 import subway.domain.Station;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 import subway.dto.SectionRequest;
+import subway.exception.CannotCreateLineException;
 import subway.exception.LineNotFoundException;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Transactional(readOnly = true)
 @Service
@@ -27,9 +30,16 @@ public class LineService {
 
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
+        Long upStationId = lineRequest.getUpStationId();
+        Long downStationId = lineRequest.getDownStationId();
+
+        if (Objects.equals(upStationId, downStationId)) {
+            throw new CannotCreateLineException();
+        }
+
         Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor()));
-        Station upStation = stationService.findById(lineRequest.getUpStationId());
-        Station downStation = stationService.findById(lineRequest.getDownStationId());
+        Station upStation = stationService.findById(upStationId);
+        Station downStation = stationService.findById(downStationId);
         line.addSection(upStation, downStation, lineRequest.getDistance());
         return new LineResponse(line);
     }

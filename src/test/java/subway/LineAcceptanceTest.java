@@ -139,6 +139,20 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertThat(getResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
+    /**
+     * When 지하철 노선 생성 요청 시, 상행역과 하행역이 동일하면
+     * Then 지하철 노선이 생성되지 않는다.
+     */
+    @DisplayName("상행역과 하행역이 동일하면 지하철 노선이 생성되지 않는다.")
+    @Test
+    void identicalStations() {
+        // when
+        ExtractableResponse<Response> createResponse = 지하철_노선_생성(LINE_3호선, "brown", 수서역_id, 수서역_id, 1);
+
+        // then
+        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    }
+
     static Long 지하철_역_생성(String name) {
         Map<String, String> param = new HashMap<>();
         param.put("name", name);
