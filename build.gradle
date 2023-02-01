@@ -28,6 +28,9 @@ dependencies {
     // Lombok
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
+
+    // Guava
+    implementation 'com.google.guava:guava:31.1-jre'
 }
 
 test {
