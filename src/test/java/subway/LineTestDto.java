@@ -1,13 +1,18 @@
 package subway;
 
 public class LineTestDto {
-    private final String lineName = "신분당선";
-    private final String lineColor = "bg-red-600";
-    private final Long upStationId = 1L;
-    private final Long downStationId = 2L;
-    private final Long distance = 10L;
+    private final String lineName;
+    private final String lineColor;
+    private final Long upStationId;
+    private final Long downStationId;
+    private final Long distance;
 
-    public LineTestDto() {
+    public LineTestDto(String lineName, String lineColor, Long upStationId, Long downStationId, Long distance) {
+        this.lineName = lineName;
+        this.lineColor = lineColor;
+        this.upStationId = upStationId;
+        this.downStationId = downStationId;
+        this.distance = distance;
     }
 
     public String getLineName() {
