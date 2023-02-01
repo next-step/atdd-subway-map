@@ -1,6 +1,6 @@
 package subway.line;
 
-import subway.subway.Station;
+import subway.station.Station;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;

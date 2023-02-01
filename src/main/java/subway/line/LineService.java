@@ -3,8 +3,8 @@ package subway.line;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.DtoConverter;
-import subway.subway.Station;
-import subway.subway.StationRepository;
+import subway.station.Station;
+import subway.station.StationRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;

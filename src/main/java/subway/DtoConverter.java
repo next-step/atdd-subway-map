@@ -4,8 +4,8 @@ import org.springframework.stereotype.Component;
 import subway.line.Line;
 import subway.line.LineCreateRequest;
 import subway.line.LineResponse;
-import subway.subway.Station;
-import subway.subway.StationResponse;
+import subway.station.Station;
+import subway.station.StationResponse;
 
 
 import java.util.List;

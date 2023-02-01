@@ -1,8 +1,6 @@
 package subway;
 
 import io.restassured.RestAssured;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,7 +13,7 @@ import subway.line.LineRepository;
 import subway.line.LineCreateRequest;
 import subway.line.LineResponse;
 import subway.line.LineUpdateRequest;
-import subway.subway.StationResponse;
+import subway.station.StationResponse;
 
 import java.util.List;
 import java.util.stream.Collectors;
