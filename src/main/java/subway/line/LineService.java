@@ -60,10 +60,8 @@ public class LineService {
 
     @Transactional
     public void updateLine(long lineId, LineRequest lineRequest) {
-        System.out.println("lineId = " + lineId);
         Line line = getLineById(lineId);
 
-        System.out.println("line = " + line.getName());
         line.update(lineRequest.getName(), lineRequest.getColor());
     }
 
