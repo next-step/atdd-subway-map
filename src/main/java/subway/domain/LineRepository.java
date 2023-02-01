@@ -17,6 +17,6 @@ public interface LineRepository extends JpaRepository<Line, Long> {
     void deleteAllAndRestartId();
 
     @Override
-    @Query("select l from Line l join fetch l.stations.stations")
+    @Query("select distinct l from Line l join fetch l.stations.stations")
     List<Line> findAll();
 }

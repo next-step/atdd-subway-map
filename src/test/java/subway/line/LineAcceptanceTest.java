@@ -89,7 +89,9 @@ public class LineAcceptanceTest {
     void showLines() {
         // given
         LineRestAssured.createLine("신분당선", "bg-red-600", upStationId, downStationId, 10);
-        LineRestAssured.createLine("2호선", "bg-green-600", upStationId, downStationId, 20);
+        long upStationId2 = createStationResponseBy("신림역").jsonPath().getLong("id");
+        long downStationId2 = createStationResponseBy("노량진역").jsonPath().getLong("id");
+        LineRestAssured.createLine("2호선", "bg-green-600", upStationId2, downStationId2, 20);
 
         // when
         ExtractableResponse<Response> response = lineRestAssured.showLinesResponse();
