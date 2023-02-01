@@ -29,12 +29,12 @@ public class Line {
 		this.downStationId = downStationId;
 		this.distance = distance;
 	}
-	public void updateLineIfPresent(LineRequest lineRequest) {
-		ofNullable(lineRequest.getName()).ifPresent(nameToUpdate -> name = nameToUpdate);
-		ofNullable(lineRequest.getColor()).ifPresent(colorToUpdate -> color = colorToUpdate);
-		ofNullable(lineRequest.getUpStationId()).ifPresent(upStationIdToUpdate -> upStationId = upStationIdToUpdate);
-		ofNullable(lineRequest.getDownStationId()).ifPresent(downStationIdToUpdate -> downStationId = downStationIdToUpdate);
-		ofNullable(lineRequest.getDistance()).ifPresent(distanceToUpdate -> distance = distanceToUpdate);
+	public void updateLineIfPresent(Line line) {
+		ofNullable(line.getName()).ifPresent(nameToUpdate -> name = nameToUpdate);
+		ofNullable(line.getColor()).ifPresent(colorToUpdate -> color = colorToUpdate);
+		ofNullable(line.getUpStationId()).ifPresent(upStationIdToUpdate -> upStationId = upStationIdToUpdate);
+		ofNullable(line.getDownStationId()).ifPresent(downStationIdToUpdate -> downStationId = downStationIdToUpdate);
+		ofNullable(line.getDistance()).ifPresent(distanceToUpdate -> distance = distanceToUpdate);
 	}
 
 	public String getName() {

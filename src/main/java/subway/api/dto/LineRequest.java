@@ -1,5 +1,7 @@
 package subway.api.dto;
 
+import subway.domain.entity.Line;
+
 public class LineRequest {
 	private String name;
 	private String color;
@@ -13,6 +15,10 @@ public class LineRequest {
 		this.upStationId = upStationId;
 		this.downStationId = downStationId;
 		this.distance = distance;
+	}
+
+	public Line toLineEntity(LineRequest lineRequest) {
+		return new Line(lineRequest.getName(), lineRequest.getColor(), lineRequest.getUpStationId(), lineRequest.getDownStationId(), lineRequest.getDistance());
 	}
 
 	public String getName() {

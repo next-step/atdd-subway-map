@@ -62,7 +62,7 @@ public class LineService {
     @Transactional
     public void updateLine(Long id, LineRequest lineRequest) {
         Line findedLine = lineRepository.findById(id).orElseThrow(EntityNotFoundException::new);
-        findedLine.updateLineIfPresent(lineRequest);
+        findedLine.updateLineIfPresent(lineRequest.toLineEntity(lineRequest));
         lineRepository.save(findedLine);
     }
 
