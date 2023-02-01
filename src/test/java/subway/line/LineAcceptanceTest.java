@@ -101,4 +101,26 @@ public class LineAcceptanceTest {
         JsonPath line = showLineResultResponse(lineId);
         assertEqualToLine(line, "다른분당선", "bg-red-600", "지하철역", "새로운지하철역");
     }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 삭제하면
+     * Then 해당 지하철 노선 정보는 삭제된다.
+     */
+    @Test
+    @DisplayName("지하철노선 삭제")
+    void deleteLine() {
+        // given
+        createStationResultResponse("지하철역");
+        createStationResultResponse("새로운지하철역");
+
+        Long lineId = createLineResultResponse("신분당선", "bg-red-600", 1L, 2L, 10).getLong("id");
+
+        // when
+        deleteLineResult(lineId);
+
+        // then
+        List<String> lineNames = showLinesResultResponse().getList("name", String.class);
+        assertEqualToNames(lineNames);
+    }
 }

@@ -77,4 +77,14 @@ public class LineUtil {
 
         return param;
     }
+
+    public static void deleteLineResult(Long id) {
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all().contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().delete("/lines/{id}", id)
+                .then().log().all()
+                .extract();
+
+        assertSuccessNoContent(response);
+    }
 }

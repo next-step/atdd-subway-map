@@ -63,4 +63,9 @@ public class LineService {
                 downStation,
                 lineRequest.getDistance());
     }
+
+    @Transactional
+    public void deleteLine(Long id) {
+        lineRepository.deleteById(id);
+    }
 }
