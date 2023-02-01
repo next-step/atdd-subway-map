@@ -5,6 +5,7 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static subway.common.fixture.FieldFixture.노선_내_역_이름_목록;
@@ -113,5 +114,27 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .isEqualTo(사호선.노선_이름());
         assertThat(지하철_노선_단건_조회_결과.jsonPath().getString(노선_색깔.필드명()))
                 .isEqualTo(사호선.노선_색깔());
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 삭제하면
+     * Then 해당 지하철 노선 정보는 삭제된다
+     */
+    @DisplayName("지하철 노선을 삭제한다.")
+    @Test
+    void deleteLine() {
+        // given
+        String 생성된_지하철_노선_id = 지하철_노선_생성_요청(이호선.생성_요청_데이터_생성(강남역_id, 서울대입구역_id))
+                .jsonPath().getString(식별자_아이디.필드명());
+
+        // when
+        ExtractableResponse<Response> 지하철_노선_삭제_결과 = 지하철_노선_삭제_요청(생성된_지하철_노선_id);
+
+        // then
+        assertThat(지하철_노선_삭제_결과.statusCode())
+                .isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertThat(지하철_노선_단건_조회_요청(생성된_지하철_노선_id).statusCode())
+                .isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 }

@@ -18,6 +18,7 @@ class AcceptanceTest {
     public static final String LINE_BASE_URL = "/lines";
     public static final String LINE_SELECT_URL = LINE_BASE_URL + "/{lineId}";
     public static final String LINE_UPDATE_URL = LINE_BASE_URL + "/{lineId}";
+    public static final String LINE_DELETE_URL = LINE_BASE_URL + "/{lineId}";
 
     public static ExtractableResponse<Response> 지하철역_생성_요청(Map<String, String> requestBody) {
         return given().log().all()
@@ -70,6 +71,13 @@ class AcceptanceTest {
                 .body(requestBody)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().put(LINE_UPDATE_URL, lineId)
+                .then().log().all()
+                .extract();
+    }
+
+    public static ExtractableResponse<Response> 지하철_노선_삭제_요청(String lineId) {
+        return given().log().all()
+                .when().delete(LINE_DELETE_URL, lineId)
                 .then().log().all()
                 .extract();
     }
