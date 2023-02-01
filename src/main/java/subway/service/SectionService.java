@@ -1,6 +1,7 @@
 package subway.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import subway.entity.Line;
 import subway.entity.Section;
 import subway.entity.Station;
@@ -40,6 +41,13 @@ public class SectionService {
         lineRepository.save(line);
 
         return SectionResponse.from(newSection);
+    }
+
+    @Transactional
+    public void deleteLastSection(Long lineId, Long stationId) {
+        Line line = lineRepository.findById(lineId).orElseThrow(NoSuchElementException::new);
+        Station downEndStation = stationRepository.findById(stationId).orElseThrow(NoSuchElementException::new);
+        line.deleteSection(downEndStation);
     }
 
     private List<Station> getStationsInSection(Long upStationId, Long downStationId) {

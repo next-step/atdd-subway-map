@@ -4,6 +4,7 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Entity
@@ -70,5 +71,23 @@ public class Line {
             .flatMap(Collection::stream)
             .distinct()
             .collect(Collectors.toList());
+    }
+
+    public void deleteSection(Station downStation) {
+        checkIsLastSection(downStation);
+        checkIsUniqueSection();
+        Section section = sections.stream()
+            .filter(s -> s.getDownStation().equals(downStation))
+            .findAny()
+            .orElseThrow(() -> new NoSuchElementException("해당 구간이 존재하지 않습니다."));
+        this.sections.remove(section);
+    }
+
+    private void checkIsUniqueSection() {
+        if (sections.size() <= 1) throw new IllegalStateException("구간이 1개 남은 경우 제거할 수 없습니다.");
+    }
+
+    private void checkIsLastSection(Station downStation) {
+        if (!getDownEndStation().equals(downStation)) throw new IllegalStateException("마지막이 아닌 구간은 제거할 수 없습니다.");
     }
 }
