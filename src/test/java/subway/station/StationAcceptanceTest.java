@@ -64,7 +64,7 @@ public class StationAcceptanceTest {
     void showStations() {
         // given
         List<String> stations = List.of("미금역", "구의역");
-        stations.forEach(this::createStation);
+        stations.forEach(StationAcceptanceTest::createStation);
 
         // when
         ExtractableResponse<Response> response =
@@ -83,7 +83,7 @@ public class StationAcceptanceTest {
         );
     }
 
-    private void createStation(String name) {
+    public static void createStation(String name) {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
 
