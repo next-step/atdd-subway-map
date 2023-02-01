@@ -42,9 +42,12 @@ public class LineAcceptanceTest {
 
         List<String> lineNames = 전체_지하철_노선_조회().jsonPath().getList("name", String.class);
 
-        assertThat(lineNames).containsAnyOf(lineName);
+        전체_지하철_노선_화인(lineName, lineNames);
     }
 
+    private void 전체_지하철_노선_화인(String lineName, List<String> lineNames) {
+        assertThat(lineNames).containsAnyOf(lineName);
+    }
 
 
     /**
