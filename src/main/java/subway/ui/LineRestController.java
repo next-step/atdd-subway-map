@@ -22,6 +22,11 @@ public class LineRestController {
         return ResponseEntity.ok().body(lineService.findAll());
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<LineResponse> findById(@PathVariable Long id) {
+        return ResponseEntity.ok().body(lineService.findById(id));
+    }
+
     @PostMapping
     public ResponseEntity<LineResponse> save(@RequestBody LineRequest lineRequest) {
         LineResponse line = lineService.save(lineRequest);

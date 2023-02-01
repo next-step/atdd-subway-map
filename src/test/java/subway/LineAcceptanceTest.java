@@ -23,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {
 
-    private String 신분당선_line = "신본당선";
+    private String 신분당선_line = "신분당선";
     private String 수인분당선_line = "수인분당선";
     private Long 강남역_id;
     private Long 광교역_id;
@@ -70,6 +70,16 @@ public class LineAcceptanceTest {
         assertThat(lineNames).containsExactly(신분당선_line, 수인분당선_line);
     }
 
+    @DisplayName("지하철 노선을 조회한다.")
+    @Test
+    void findStation() {
+        ExtractableResponse<Response> createResponse = 지하철_신분당선_생성();
+        Long line_id = createResponse.jsonPath().getLong("id");
+
+        String lineName = 지하철_노선_조회(line_id);
+        assertThat(lineName).isEqualTo(신분당선_line);
+    }
+
     private ExtractableResponse<Response> 지하철_신분당선_생성() {
         return 지하철_노선_생성(신분당선_line, "bg-red-600", 강남역_id, 광교역_id, 10);
     }
@@ -101,6 +111,14 @@ public class LineAcceptanceTest {
                 .when().get("/lines")
                 .then().log().all()
                 .extract().jsonPath().getList("name", String.class);
+    }
+
+    private String 지하철_노선_조회(Long id) {
+        return given()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().get("/lines/{id}", id)
+                .then().log().all()
+                .extract().jsonPath().getString("name");
     }
 
     private Long 지하철역_생성(String stationName) {
