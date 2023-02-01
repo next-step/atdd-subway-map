@@ -8,7 +8,7 @@ import org.springframework.test.annotation.DirtiesContext;
 @DisplayName("지하철 역 노선 구간 관련 기능")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class StationLineSectionAcceptanceTest {
+public class StationSectionAcceptanceTest {
 
 
     /**
