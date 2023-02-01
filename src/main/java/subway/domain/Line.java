@@ -1,6 +1,7 @@
 package subway.domain;
 
 import subway.common.BaseEntity;
+import subway.exception.CannotAddSectionException;
 
 import javax.persistence.*;
 
@@ -72,6 +73,9 @@ public class Line extends BaseEntity {
     }
 
     public void addSection(Section section) {
+        if (!canAddSection(upStation)) {
+            throw new CannotAddSectionException();
+        }
         this.sections.add(section);
     }
 
@@ -88,7 +92,7 @@ public class Line extends BaseEntity {
         this.downStation = downStation;
     }
 
-    public boolean canAddSection(Station station) {
+    private boolean canAddSection(Station station) {
 
         if (sections.isEmpty()) {
             return this.upStation.equals(station);

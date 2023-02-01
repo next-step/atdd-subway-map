@@ -63,10 +63,6 @@ public class LineService {
         Station upStation = stationService.findStation(upStationId);
         Station downStation = stationService.findStation(downStationId);
 
-        if (!line.canAddSection(upStation)) {
-            throw new CannotAddSectionException();
-        }
-
         Section saveSection = new Section(line, upStation, downStation, distance);
         line.addSection(saveSection);
         return saveSection;
