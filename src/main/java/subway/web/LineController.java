@@ -7,7 +7,6 @@ import subway.application.service.LineLoadUseCase;
 import subway.application.service.input.LineCommandUseCase;
 import subway.web.request.LineCreateRequest;
 import subway.web.request.LineUpdateRequest;
-import subway.web.response.CreateLineResponse;
 import subway.web.response.LineResponse;
 
 import java.util.List;
@@ -25,9 +24,9 @@ public class LineController {
     }
 
     @PostMapping("/lines")
-    public ResponseEntity<CreateLineResponse> createLine(@RequestBody LineCreateRequest stationRequest) {
+    public ResponseEntity<LineResponse> createLine(@RequestBody LineCreateRequest stationRequest) {
         Long createdLineId = lineCommandUseCase.createLine(stationRequest.toDomain());
-        CreateLineResponse response = CreateLineResponse.from(lineLoadUseCase.loadLine(createdLineId));
+        LineResponse response = LineResponse.from(lineLoadUseCase.loadLine(createdLineId));
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 

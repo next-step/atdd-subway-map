@@ -4,6 +4,7 @@ import subway.domain.Line;
 import subway.domain.Station;
 
 import java.util.List;
+import java.util.Objects;
 
 public class LineResponse {
 
@@ -41,6 +42,19 @@ public class LineResponse {
 
     public List<StationResponse> getStations() {
         return stations;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        LineResponse that = (LineResponse) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
 }
