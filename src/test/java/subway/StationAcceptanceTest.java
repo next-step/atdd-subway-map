@@ -18,6 +18,8 @@ import java.util.Map;
 import subway.common.DatabaseCleanup;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static subway.fixtures.StationFixtures.강남역;
+import static subway.fixtures.StationFixtures.방배역;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -25,9 +27,6 @@ public class StationAcceptanceTest {
 
     @Autowired
     private DatabaseCleanup databaseCleanup;
-
-    private final String 강남역 = "강남역";
-    private final String 방배역 = "방배역";
 
     @BeforeEach
     void setUp() {
@@ -58,10 +57,10 @@ public class StationAcceptanceTest {
      */
     @DisplayName("지하철역 2개의 목록을 조회한다.")
     @Test
-    void getStationList() {
+    void showStations() {
         // given
         String[] stations = {강남역, 방배역};
-        Arrays.stream(stations).forEach(this::지하철역_생성);
+        Arrays.stream(stations).forEach(StationAcceptanceTest::지하철역_생성);
 
         // when
         ExtractableResponse<Response> response = 지하철역_목록_조회();
@@ -96,7 +95,7 @@ public class StationAcceptanceTest {
         assertThat(stationNames).doesNotContain(강남역);
     }
 
-    private ExtractableResponse<Response> 지하철역_생성(String name) {
+    public static ExtractableResponse<Response> 지하철역_생성(String name) {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
 
