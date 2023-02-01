@@ -30,16 +30,6 @@ public class LineService {
         this.stationQuery = stationQuery;
     }
 
-    @Transactional
-    public LineCreateResponse saveLine(final LineRequest lineRequest) {
-        Station upStation = stationQuery.findById(lineRequest.getUpStationId());
-        Station downStation = stationQuery.findById(lineRequest.getDownStationId());
-
-        Line line = lineRepository.save(lineRequest.toEntity(upStation, downStation));
-
-        return LineCreateResponse.from(line);
-    }
-
     public List<LineResponse> findAllLines() {
         return lineQuery.findAll().stream()
                 .map(LineResponse::from)
@@ -53,9 +43,24 @@ public class LineService {
     }
 
     @Transactional
+    public LineCreateResponse saveLine(final LineRequest lineRequest) {
+        Station upStation = stationQuery.findById(lineRequest.getUpStationId());
+        Station downStation = stationQuery.findById(lineRequest.getDownStationId());
+
+        Line line = lineRepository.save(lineRequest.toEntity(upStation, downStation));
+
+        return LineCreateResponse.from(line);
+    }
+
+    @Transactional
     public void updateLine(final Long lineId, final LineUpdateRequest lineUpdateRequest) {
         Line line = lineQuery.findById(lineId);
 
         line.updateLine(lineUpdateRequest.toEntity());
+    }
+
+    @Transactional
+    public void deleteLine(final Long lineId) {
+        lineRepository.deleteById(lineId);
     }
 }

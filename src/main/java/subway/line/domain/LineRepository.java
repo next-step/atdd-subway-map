@@ -8,5 +8,7 @@ public interface LineRepository {
 
     List<Line> findAll();
 
-    Optional<Line> findById(final Long lineId);
+    Optional<Line> findById(Long lineId);
+
+    void deleteById(Long lineId);
 }

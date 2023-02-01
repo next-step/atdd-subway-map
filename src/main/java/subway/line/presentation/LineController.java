@@ -1,6 +1,7 @@
 package subway.line.presentation;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -47,5 +48,11 @@ class LineController {
     void updateLine(@PathVariable final Long lineId,
                     @RequestBody final LineUpdateRequest lineUpdateRequest) {
         lineService.updateLine(lineId, lineUpdateRequest);
+    }
+
+    @DeleteMapping("/{lineId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void deleteLine(@PathVariable final Long lineId) {
+        lineService.deleteLine(lineId);
     }
 }
