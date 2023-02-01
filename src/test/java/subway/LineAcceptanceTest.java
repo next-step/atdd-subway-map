@@ -1,35 +1,24 @@
 package subway;
 
-import io.restassured.RestAssured;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.opentest4j.AssertionFailedError;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import subway.line.LineRepository;
 import subway.line.LineCreateRequest;
 import subway.line.LineResponse;
 import subway.line.LineUpdateRequest;
-import subway.station.StationResponse;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("지하철 노선 관리 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest extends AcceptanceTest{
+    StationRestAssuredTest stationRestAssuredTest = new StationRestAssuredTest();
 
-    @Autowired
-    private LineRepository lineRepository;
-
-    StationAcceptanceTest stationAcceptanceTest = new StationAcceptanceTest();
+    LineRestAssuredTest lineRestAssuredTest = new LineRestAssuredTest();
 
     Long firstStationId;
     Long secondStationId;
@@ -39,9 +28,9 @@ public class LineAcceptanceTest extends AcceptanceTest{
 
     @BeforeEach
     public void setup() {
-        firstStationId = stationAcceptanceTest.createStation("지하철역1");
-        secondStationId = stationAcceptanceTest.createStation("지하철역2");
-        thirdStationId = stationAcceptanceTest.createStation("지하철역3");
+        firstStationId = stationRestAssuredTest.createStation("지하철역1");
+        secondStationId = stationRestAssuredTest.createStation("지하철역2");
+        thirdStationId = stationRestAssuredTest.createStation("지하철역3");
         lineCreateRequest = new LineCreateRequest("신분당선", "bg-red-600", firstStationId, secondStationId, 10L);
     }
 
@@ -54,10 +43,10 @@ public class LineAcceptanceTest extends AcceptanceTest{
     public void createLineTest() {
 
         // When
-        createLine(lineCreateRequest);
+        lineRestAssuredTest.createLine(lineCreateRequest);
 
         // Then
-        var lineResponseList = getLineResponseList();
+        var lineResponseList = lineRestAssuredTest.getLineResponseList();
         List<String> nameList = lineResponseList.stream().map(LineResponse::getName).collect(Collectors.toList());
 
         assertThat(lineResponseList).hasSize(1);
@@ -75,11 +64,11 @@ public class LineAcceptanceTest extends AcceptanceTest{
 
         // When
         LineCreateRequest secondLineCreateRequest = new LineCreateRequest("분당선", "bg-red-600", firstStationId, thirdStationId, 10L);
-        createLine(lineCreateRequest);
-        createLine(secondLineCreateRequest);
+        lineRestAssuredTest.createLine(lineCreateRequest);
+        lineRestAssuredTest.createLine(secondLineCreateRequest);
 
         // Then
-        var lineResponseList = getLineResponseList();
+        var lineResponseList = lineRestAssuredTest.getLineResponseList();
         List<String> nameList = lineResponseList.stream().map(LineResponse::getName).collect(Collectors.toList());
 
         assertThat(lineResponseList).hasSize(2);
@@ -95,10 +84,10 @@ public class LineAcceptanceTest extends AcceptanceTest{
     @DisplayName("지하철 노선을 생성하고 해당 지하철 노선을 조회하면 지하철 노선 정보를 조회할 수 있다.")
     @Test
     public void getLineTest() {
-        Long lineId = createLine(lineCreateRequest);
-        var line = getLine(lineId);
+        Long lineId = lineRestAssuredTest.createLine(lineCreateRequest);
+        var line = lineRestAssuredTest.getLine(lineId);
 
-        checkLine(lineCreateRequest, lineId, line, firstStationId, secondStationId);
+        lineRestAssuredTest.checkLine(lineCreateRequest, lineId, line, firstStationId, secondStationId);
     }
 
     /**
@@ -109,15 +98,14 @@ public class LineAcceptanceTest extends AcceptanceTest{
     @DisplayName("지하철 노선을 생성하고 해당 지하철 노선을 수정하면 수정된다.")
     @Test
     public void updateLineTest() {
-        Long id = createLine(lineCreateRequest);
+        Long id = lineRestAssuredTest.createLine(lineCreateRequest);
         LineUpdateRequest lineUpdateRequest = new LineUpdateRequest("다른 분당선", "bg-red-600");
-        updateLine(id, lineUpdateRequest);
-        LineResponse line = getLine(id);
+        lineRestAssuredTest.updateLine(id, lineUpdateRequest);
+        LineResponse line = lineRestAssuredTest.getLine(id);
 
         assertThat(line.getId()).isEqualTo(id);
         assertThat(line.getName()).isEqualTo(lineUpdateRequest.getName());
     }
-
 
 
     /**
@@ -128,88 +116,12 @@ public class LineAcceptanceTest extends AcceptanceTest{
     @DisplayName("지하철 노선을 생성하고 해당 노선을 삭제하면 지하철 노선은 삭제된다.")
     @Test
     public void deleteLineTest() {
-        Long lineId = createLine(lineCreateRequest);
-        deleteLine(lineId);
+        Long lineId = lineRestAssuredTest.createLine(lineCreateRequest);
+        lineRestAssuredTest.deleteLine(lineId);
 
-        assertThrows(AssertionFailedError.class, (() -> getLine(lineId)));
+        assertThrows(AssertionFailedError.class, (() -> lineRestAssuredTest.getLine(lineId)));
     }
 
-    @DisplayName("지하철 노선을 삭제할 수 있다.")
-    private void deleteLine(Long lineId) {
-        var response = RestAssured.given().log().all()
-                .when().delete("/lines/" + lineId)
-                .then().log().all()
-                .extract();
-
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-    }
-
-    @DisplayName("지하철 노선도를 조회할 수 있다.")
-    private List<LineResponse> getLineResponseList() {
-        var response = RestAssured.given().log().all()
-                .accept(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/lines")
-                .then().log().all()
-                .extract();
-
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.contentType()).isEqualTo(MediaType.APPLICATION_JSON_VALUE);
-
-        return response.jsonPath().getList(".", LineResponse.class);
-    }
-
-    @DisplayName("지하철 노선을 등록할 수 있다.")
-    private Long createLine(LineCreateRequest lineCreateRequest) {
-        var response = RestAssured.given().log().all()
-                .body(lineCreateRequest)
-                .accept(MediaType.APPLICATION_JSON_VALUE)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().log().all()
-                .extract();
-
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(response.contentType()).isEqualTo(MediaType.APPLICATION_JSON_VALUE);
-
-        return response.jsonPath().getLong("id");
-    }
-
-    @DisplayName("입력한 지하철 노선도 정보와 조회한 지하철 노선도 정보를 비교할 수 있다.")
-    private void checkLine(LineCreateRequest lineCreateRequest, Long lineId, LineResponse lineResponse, Long stationId1, Long stationId2) {
-        var stationIdList = lineResponse.getStationResponseList().stream().mapToLong(StationResponse::getId);
-
-        assertAll(
-                () -> assertThat(lineResponse.getId()).isEqualTo(lineId),
-                () -> assertThat(lineResponse.getName()).isEqualTo(lineCreateRequest.getName()),
-                () -> assertThat(stationIdList).containsAnyOf(stationId1, stationId2)
-        );
-    }
-
-    @DisplayName("지하철 노선 아이디를 통해 해당 지하철 노선을 조회할 수 있다.")
-    private LineResponse getLine(Long lineId) {
-        var response = RestAssured.given().log().all()
-                .accept(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/lines/" + lineId)
-                .then().log().all()
-                .extract();
-
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.contentType()).isEqualTo(MediaType.APPLICATION_JSON_VALUE);
-
-        return response.as(LineResponse.class);
-    }
-
-    @DisplayName("지하철 노선도를 수정할 수 있다.")
-    private void updateLine(Long id, LineUpdateRequest lineUpdateRequest) {
-        var response = RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(lineUpdateRequest)
-                .when().put("/lines/" + id)
-                .then().log().all()
-                .extract();
-
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-    }
 
 
 }
