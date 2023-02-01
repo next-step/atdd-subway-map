@@ -29,22 +29,11 @@ public class LineAcceptanceTest {
 	@Test
 	void createLine() {
 		//when
-		Map<String, String> station1 = new HashMap<>();
-		station1.put("name", "지하철역");
-		createStationResponse(station1);
+		createStation("지하철역");
+		createStation("새로운 지하철역");
+		Map<String, Object> line1 = createLine("신분당선","bg-red-600",1,2,10);
 
-		Map<String, String> station2 = new HashMap<>();
-		station2.put("name", "새로운 지하철역");
-		createStationResponse(station2);
-
-		Map<String, Object> lineParams = new HashMap<>();
-		lineParams.put("name", "신분당선");
-		lineParams.put("color", "bg-red-600");
-		lineParams.put("upStationId", 1);
-		lineParams.put("downStationId", 2);
-		lineParams.put("distance", 10);
-
-		ExtractableResponse<Response> createResponse = createLineResponse(lineParams);
+		ExtractableResponse<Response> createResponse = createLineResponse(line1);
 
 		// then
 		assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -68,32 +57,12 @@ public class LineAcceptanceTest {
 	@Test
 	void showLines() {
 		//given
-		Map<String, String> station1 = new HashMap<>();
-		station1.put("name", "지하철역");
-		createStationResponse(station1);
-
-		Map<String, String> station2 = new HashMap<>();
-		station2.put("name", "새로운 지하철역");
-		createStationResponse(station2);
-
-		Map<String, String> station3 = new HashMap<>();
-		station3.put("name", "또다른 지하철역");
-		createStationResponse(station3);
-
-		Map<String, Object> line1 = new HashMap<>();
-		line1.put("name", "신분당선");
-		line1.put("color", "bg-red-600");
-		line1.put("upStationId", 1);
-		line1.put("downStationId", 2);
-		line1.put("distance", 10);
+		createStation("지하철역");
+		createStation("새로운 지하철역");
+		createStation("또 다른 지하철역");
+		Map<String, Object> line1 = createLine("신분당선","bg-red-600",1,2,10);
 		createLineResponse(line1);
-
-		Map<String, Object> line2 = new HashMap<>();
-		line2.put("name", "분당선");
-		line2.put("color", "bg-green-600");
-		line2.put("upStationId", 1);
-		line2.put("downStationId", 3);
-		line2.put("distance", 10);
+		Map<String, Object> line2 = createLine("분당선","bg-red-600",1,3,10);
 		createLineResponse(line2);
 
 		//when
@@ -116,20 +85,9 @@ public class LineAcceptanceTest {
 	@Test
 	void showLine() {
 		//given
-		Map<String, String> station1 = new HashMap<>();
-		station1.put("name", "지하철역");
-		createStationResponse(station1);
-
-		Map<String, String> station2 = new HashMap<>();
-		station2.put("name", "새로운 지하철역");
-		createStationResponse(station2);
-
-		Map<String, Object> line1 = new HashMap<>();
-		line1.put("name", "신분당선");
-		line1.put("color", "bg-red-600");
-		line1.put("upStationId", 1);
-		line1.put("downStationId", 2);
-		line1.put("distance", 10);
+		createStation("지하철역");
+		createStation("새로운 지하철역");
+		Map<String, Object> line1 = createLine("신분당선","bg-red-600",1,2,10);
 		ExtractableResponse<Response> lineResponse = createLineResponse(line1);
 		long id = lineResponse.response().jsonPath().getLong("id");
 
@@ -152,20 +110,9 @@ public class LineAcceptanceTest {
 	@Test
 	void updateLine() {
 		//given
-		Map<String, String> station1 = new HashMap<>();
-		station1.put("name", "지하철역");
-		createStationResponse(station1);
-
-		Map<String, String> station2 = new HashMap<>();
-		station2.put("name", "새로운 지하철역");
-		createStationResponse(station2);
-
-		Map<String, Object> line1 = new HashMap<>();
-		line1.put("name", "신분당선");
-		line1.put("color", "bg-red-600");
-		line1.put("upStationId", 1);
-		line1.put("downStationId", 2);
-		line1.put("distance", 10);
+		createStation("지하철역");
+		createStation("새로운 지하철역");
+		Map<String, Object> line1 = createLine("신분당선","bg-red-600",1,2,10);
 		ExtractableResponse<Response> lineResponse = createLineResponse(line1);
 		long id = lineResponse.response().jsonPath().getLong("id");
 
@@ -198,20 +145,10 @@ public class LineAcceptanceTest {
 	@Test
 	void deleteLine() {
 		//given
-		Map<String, String> station1 = new HashMap<>();
-		station1.put("name", "지하철역");
-		createStationResponse(station1);
+		createStation("지하철역");
+		createStation("새로운 지하철역");
+		Map<String, Object> line1 = createLine("신분당선","bg-red-600",1,2,10);
 
-		Map<String, String> station2 = new HashMap<>();
-		station2.put("name", "새로운 지하철역");
-		createStationResponse(station2);
-
-		Map<String, Object> line1 = new HashMap<>();
-		line1.put("name", "신분당선");
-		line1.put("color", "bg-red-600");
-		line1.put("upStationId", 1);
-		line1.put("downStationId", 2);
-		line1.put("distance", 10);
 		ExtractableResponse<Response> lineResponse = createLineResponse(line1);
 		long id = lineResponse.response().jsonPath().getLong("id");
 
@@ -265,5 +202,21 @@ public class LineAcceptanceTest {
 				.given().pathParam("id", id)
 				.when().put("/lines/{id}")
 				.then().log().all().extract();
+	}
+
+	private Map<String, Object> createLine(String lineName, String color, int upStationId, int downStationid, int distance) {
+		Map<String, Object> lineParams = new HashMap<>();
+		lineParams.put("name", lineName);
+		lineParams.put("color", color);
+		lineParams.put("upStationId", upStationId);
+		lineParams.put("downStationId", downStationid);
+		lineParams.put("distance", distance);
+		return lineParams;
+	}
+
+	private void createStation(String stationName) {
+		Map<String, String> station = new HashMap<>();
+		station.put("name", stationName);
+		createStationResponse(station);
 	}
 }
