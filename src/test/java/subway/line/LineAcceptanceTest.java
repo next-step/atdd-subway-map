@@ -149,10 +149,10 @@ public class LineAcceptanceTest {
     }
 
     private void requestSaveLines(LineRequest... lineRequests) {
-        Arrays.stream(lineRequests).forEach(this::requestSaveLine);
+        Arrays.stream(lineRequests).forEach(LineAcceptanceTest::requestSaveLine);
     }
 
-    private ExtractableResponse<Response> requestSaveLine(LineRequest lineRequest) {
+    public static ExtractableResponse<Response> requestSaveLine(LineRequest lineRequest) {
         return RestAssured.given().log().all()
                 .body(lineRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -166,21 +166,21 @@ public class LineAcceptanceTest {
         return findAllLine().jsonPath().getList("name", String.class);
     }
 
-    private ExtractableResponse<Response> findAllLine() {
+    public static ExtractableResponse<Response> findAllLine() {
         return RestAssured.given().log().all()
                 .when().get(LINE_URI_PATH)
                 .then().log().all()
                 .extract();
     }
 
-    private ExtractableResponse<Response> findLineById(Long id) {
+    public static ExtractableResponse<Response> findLineById(Long id) {
         return RestAssured.given().log().all()
                 .when().get(LINE_URI_PATH + "/" + id)
                 .then().log().all()
                 .extract();
     }
 
-    private ExtractableResponse<Response> updateLine(Long id, LineRequest lineRequest) {
+    public static ExtractableResponse<Response> updateLine(Long id, LineRequest lineRequest) {
         return RestAssured.given().log().all()
                 .body(lineRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -190,7 +190,7 @@ public class LineAcceptanceTest {
                 .extract();
     }
 
-    private void deleteLineById(Long id) {
+    public static void deleteLineById(Long id) {
         RestAssured.given().log().all()
                 .when().delete(LINE_URI_PATH + "/" + id)
                 .then().log().all()
