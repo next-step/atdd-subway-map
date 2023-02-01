@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import subway.station.domain.station.Station;
 import subway.station.web.dto.SaveLineResponse;
 
 import java.util.HashMap;
@@ -35,17 +36,17 @@ public class LineAcceptanceTest {
     @Test
     void 지하철_노선_생성_후_목록_조회시_찾을_수_있다() {
         //when
-        saveStations("지하철역");
-        saveStations("새로운지하철역");
+        saveStation("지하철역");
+        saveStation("새로운지하철역");
 
         final Map<String, String> lineParams = new HashMap<>();
         LineTestDto shinBunDangLine = new LineTestDto("신분당선", "bg-red-600", 1L, 2L, 10L);
         saveLine(lineParams, shinBunDangLine);
 
         //then
-        ExtractableResponse<Response> readResponses = getReadResponses();
+        ExtractableResponse<Response> viewResponses = getViewResponses();
 
-        Assertions.assertThat(readResponses.body().jsonPath().getList("name")).contains(shinBunDangLine.getLineName());
+        Assertions.assertThat(viewResponses.body().jsonPath().getList("name")).contains(shinBunDangLine.getLineName());
     }
 
     /**
@@ -56,26 +57,21 @@ public class LineAcceptanceTest {
     @Test
     void 두_개의_지하철_노선_생성_후_목록_조회시_응답_받은_Response의_길이는_2이다() {
         //given
-        saveStations("지하철역");
-        saveStations("새로운지하철역");
-        saveStations("또다른지하철역");
+        saveStation("지하철역");
+        saveStation("새로운지하철역");
+        saveStation("또다른지하철역");
 
         final Map<String, String> lineParams = new HashMap<>();
         saveLine(lineParams, new LineTestDto("신분당선", "bg-red-600", 1L, 2L, 10L));
         saveLine(lineParams, new LineTestDto("분당선", "bg-green-600", 1L, 3L, 15L));
 
         //when
-        ExtractableResponse<Response> readResponse = getReadResponses();
+        ExtractableResponse<Response> viewResponse = getViewResponses();
 
         //then
-        List list = readResponse.body().jsonPath().get();
+        List<Station> stations = viewResponse.body().jsonPath().get();
 
-        Assertions.assertThat(list.size()).isEqualTo(LENGTH_TWO);
-    }
-
-    private void saveLine(Map<String, String> lineParams, LineTestDto lineName) {
-        putParams(lineParams, lineName);
-        getSaveLineResponse(lineParams);
+        Assertions.assertThat(stations.size()).isEqualTo(LENGTH_TWO);
     }
 
     /**
@@ -158,7 +154,12 @@ public class LineAcceptanceTest {
         Assertions.assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
-    private void saveStations(String stationName) {
+    private void saveLine(Map<String, String> lineParams, LineTestDto lineName) {
+        putParams(lineParams, lineName);
+        getSaveLineResponse(lineParams);
+    }
+
+    private void saveStation(String stationName) {
         final Map<String, String> stationParams = new HashMap<>();
         stationParams.put("name", stationName);
         getStationResponse(stationParams);
@@ -208,16 +209,16 @@ public class LineAcceptanceTest {
                 .extract();
     }
 
-    private ExtractableResponse<Response> getReadResponses() {
-        ExtractableResponse<Response> readResponse = RestAssured
-                .given().log().all()
+    private ExtractableResponse<Response> getViewResponses() {
+        ExtractableResponse<Response> viewResponse = RestAssured
+                .given()
                 .when().get("/lines")
                 .then().log().all()
                 .extract();
 
-        Assertions.assertThat(readResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+        Assertions.assertThat(viewResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
-        return readResponse;
+        return viewResponse;
 
     }
 

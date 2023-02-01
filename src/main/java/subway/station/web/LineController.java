@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import subway.station.service.LineService;
 import subway.station.web.dto.SaveLineRequest;
 import subway.station.web.dto.SaveLineResponse;
+import subway.station.web.dto.ViewLineResponse;
 
 import java.net.URI;
 import java.util.List;
@@ -25,7 +26,7 @@ public class LineController {
     }
 
     @GetMapping("/lines")
-    public ResponseEntity<List<SaveLineResponse>> viewLines() {
+    public ResponseEntity<List<ViewLineResponse>> viewLines() {
         return ResponseEntity.ok().body(lineService.findAll());
     }
 

@@ -7,6 +7,7 @@ import subway.station.domain.line.LineRepository;
 import subway.station.domain.station.StationRepository;
 import subway.station.web.dto.SaveLineRequest;
 import subway.station.web.dto.SaveLineResponse;
+import subway.station.web.dto.ViewLineResponse;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,9 +39,9 @@ public class LineService {
         return createLineResponse(line);
     }
 
-    public List<SaveLineResponse> findAll() {
+    public List<ViewLineResponse> findAll() {
         return lineRepository.findAll().stream()
-                .map(this::createLineResponse)
+                .map(this::createViewLineResponse)
                 .collect(Collectors.toList());
     }
 
@@ -63,6 +64,15 @@ public class LineService {
 
     private SaveLineResponse createLineResponse(Line line) {
         return new SaveLineResponse(
+                line.getId(),
+                line.getName(),
+                line.getColor(),
+                line.getStations()
+        );
+    }
+
+    private ViewLineResponse createViewLineResponse(Line line) {
+        return new ViewLineResponse(
                 line.getId(),
                 line.getName(),
                 line.getColor(),
