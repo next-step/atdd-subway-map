@@ -35,7 +35,7 @@ class StationAcceptanceTest extends BaseAcceptance {
 
         // then
         List<String> stationNames =
-            RestAssured.given().log().all()
+            RestAssured.given().spec(REQUEST_SPEC).log().all()
                 .when().get("/stations")
                 .then().log().all()
                 .extract().jsonPath().getList("name", String.class);
@@ -80,7 +80,7 @@ class StationAcceptanceTest extends BaseAcceptance {
         Integer givenStationId = givenResponse.body().jsonPath().get("id");
 
         // When
-        ExtractableResponse<Response> deleteResponse = RestAssured.given().log().all()
+        ExtractableResponse<Response> deleteResponse = RestAssured.given().spec(REQUEST_SPEC).log().all()
             .pathParam("stationId", givenStationId)
             .when().delete("/stations/{stationId}")
             .then().log().all()
@@ -89,7 +89,7 @@ class StationAcceptanceTest extends BaseAcceptance {
         // then
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
+        ExtractableResponse<Response> response = RestAssured.given().spec(REQUEST_SPEC).log().all()
             .when().get("/stations")
             .then().log().all()
             .extract();
