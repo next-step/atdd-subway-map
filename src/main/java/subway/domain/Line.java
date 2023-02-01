@@ -83,11 +83,8 @@ public class Line extends BaseEntity {
         return downStation;
     }
 
-    public void setUpStation(Station upStation) {
+    public void changeFirstAndLastStation(Station upStation, Station downStation) {
         this.upStation = upStation;
-    }
-
-    public void setDownStation(Station downStation) {
         this.downStation = downStation;
     }
 

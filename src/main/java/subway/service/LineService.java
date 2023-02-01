@@ -12,8 +12,8 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class LineService {
 
-    private LineRepository lineRepository;
-    private StationService stationService;
+    private final LineRepository lineRepository;
+    private final StationService stationService;
     private final SectionRepository sectionRepository;
 
     public LineService(LineRepository lineRepository, StationService stationService,
@@ -29,8 +29,7 @@ public class LineService {
         Station upStation = stationService.findStation(upStationId);
         Station downStation = stationService.findStation(downStationId);
 
-        line.setUpStation(upStation);
-        line.setDownStation(downStation);
+        line.changeFirstAndLastStation(upStation, downStation);
 
         return lineRepository.save(line);
 
