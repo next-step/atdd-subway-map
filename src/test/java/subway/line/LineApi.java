@@ -11,6 +11,8 @@ import static io.restassured.RestAssured.given;
 
 public class LineApi {
 
+    private LineApi() {}
+
     public static final String LINE_ID_KEY = "id";
     public static final String LINE_NAME_KEY = "name";
     public static final String LINE_COLOR_KEY = "color";

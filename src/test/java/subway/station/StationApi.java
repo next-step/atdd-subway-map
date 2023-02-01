@@ -10,6 +10,8 @@ import java.util.Map;
 import static io.restassured.RestAssured.given;
 
 public class StationApi {
+
+    private StationApi() {}
     public static final String STATION_NAME_KEY = "name";
     public static final String STATION_ID_KEY = "id";
 
