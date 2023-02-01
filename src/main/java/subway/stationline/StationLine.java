@@ -23,17 +23,17 @@ public class StationLine {
     public StationLine() {
     }
 
-    public StationLine(StationLineInterface stationLine) {
-        this.name = stationLine.name();
-        this.color = stationLine.color();
-        this.upStationId = stationLine.upStationId();
-        this.downStationId = stationLine.downStationId();
-        this.distance = stationLine.distance();
-    }
-
-    public void updateNameAndColor(String name, String color) {
+    public StationLine(String name, String color, Long upStationId, Long downStationId, Long distance) {
         this.name = name;
         this.color = color;
+        this.upStationId = upStationId;
+        this.downStationId = downStationId;
+        this.distance = distance;
+    }
+
+    public void updateNameAndColor(StationLine other) {
+        this.name = other.getName();
+        this.color = other.getColor();
     }
 
     public Long getId() {

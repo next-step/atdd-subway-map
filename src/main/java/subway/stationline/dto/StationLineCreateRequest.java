@@ -1,6 +1,8 @@
 package subway.stationline.dto;
 
-public class StationLineCreateRequest implements StationLineInterface {
+import subway.stationline.StationLine;
+
+public class StationLineCreateRequest {
     private String name;
     private String color;
     private Long upStationId;
@@ -15,28 +17,9 @@ public class StationLineCreateRequest implements StationLineInterface {
         this.distance = distance;
     }
 
-    @Override
-    public String name() {
-        return name;
+    public StationLine convertToEntity() {
+        return new StationLine(name, color, upStationId, downStationId, distance);
     }
 
-    @Override
-    public String color() {
-        return color;
-    }
 
-    @Override
-    public Long upStationId() {
-        return upStationId;
-    }
-
-    @Override
-    public Long downStationId() {
-        return downStationId;
-    }
-
-    @Override
-    public Long distance() {
-        return distance;
-    }
 }

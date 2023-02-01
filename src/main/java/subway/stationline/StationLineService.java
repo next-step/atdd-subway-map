@@ -22,7 +22,7 @@ public class StationLineService {
 
     @Transactional
     public StationLineCreateResponse createStationLine(StationLineCreateRequest request) {
-        StationLine stationLine = stationLineRepository.save(new StationLine(request));
+        StationLine stationLine = stationLineRepository.save(request.convertToEntity());
         Station upStation = stationRepository.findById(stationLine.getUpStationId()).orElseThrow();
         Station downStation = stationRepository.findById(stationLine.getDownStationId()).orElseThrow();
         return new StationLineCreateResponse(stationLine, List.of(upStation, downStation));
@@ -49,7 +49,7 @@ public class StationLineService {
     @Transactional
     public void updateStationLine(Long stationLineId, StationLineUpdateRequest request) {
         StationLine stationLine = stationLineRepository.findById(stationLineId).orElseThrow();
-        stationLine.updateNameAndColor(request.getName(), request.getColor());
+        stationLine.updateNameAndColor(request.convertToEntity());
     }
 
     @Transactional
