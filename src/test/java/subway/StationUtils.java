@@ -73,4 +73,18 @@ public class StationUtils {
                 .then().extract();
     }
 
+    public static ExtractableResponse<Response> createStationSection(Map<String, Object> body) {
+        return RestAssured
+                .given().spec(getRequestSpecification()).body(body).log().all()
+                .when().post("/lines/1/sections")
+                .then().log().all().extract();
+    }
+
+    public static ExtractableResponse<Response> deleteStationSection(long stationId) {
+        return RestAssured
+                .given().spec(getRequestSpecification()).log().all()
+                .when().delete("/lines/1/sections?stationId=" + stationId)
+                .then().log().all().extract();
+    }
+
 }
