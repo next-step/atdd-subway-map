@@ -1,15 +1,9 @@
 package subway.common;
-
-import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
-import org.springframework.http.HttpStatus;
-
 import java.util.HashMap;
 import java.util.Map;
 
-import static subway.common.DomainApiTest.지하철노선을_생성한다;
+import static subway.domain.line.LineUnitTest.지하철노선을_생성한다;
+
 
 public class SetupTest {
     public static void 분당선_노선을_생성한다() {
