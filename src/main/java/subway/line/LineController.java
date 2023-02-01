@@ -13,13 +13,13 @@ import java.util.List;
 public class LineController {
     private final LineService lineService;
 
-    @PostMapping("/")
+    @PostMapping
     public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest request) {
         LineResponse lineResponse = lineService.saveLine(request);
         return ResponseEntity.created(URI.create("/lines/" + lineResponse.getId())).body(lineResponse);
     }
 
-    @GetMapping("/")
+    @GetMapping
     public ResponseEntity<List<LineResponse>> showLines() {
         return ResponseEntity.ok().body(lineService.findAllLines());
     }
