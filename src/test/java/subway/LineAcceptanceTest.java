@@ -23,8 +23,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {
 
-    private String 신분당선_line = "신분당선";
-    private String 수인분당선_line = "수인분당선";
+    private static final String 신분당선_line = "신분당선";
+    private static final String 수인분당선_line = "수인분당선";
     private Long 강남역_id;
     private Long 광교역_id;
     private Long 성수역_id;

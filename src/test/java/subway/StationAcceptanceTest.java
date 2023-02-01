@@ -18,40 +18,46 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationAcceptanceTest {
+
+    private static final String 강남_station = "강남역";
+    private static final String 양재_station = "양재역";
+    private static final String 교대_station = "교대역";
+    private static final String 잠실_station = "잠실역";
+
     @DisplayName("지하철역을 생성한다.")
     @Test
     void createStation() {
-        ExtractableResponse<Response> createResponse = 지하철역_생성("강남역");
+        ExtractableResponse<Response> createResponse = 지하철역_생성(강남_station);
 
         assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         List<String> stationNames = 지하철역_목록_조회();
-        assertThat(stationNames).containsAnyOf("강남역");
+        assertThat(stationNames).containsAnyOf(강남_station);
     }
 
     @DisplayName("지하철역 목록을 조회한다.")
     @Test
     void findAllStations() {
-        지하철역_생성("양재역");
-        지하철역_생성("교대역");
+        지하철역_생성(양재_station);
+        지하철역_생성(교대_station);
 
         List<String> stationNames = 지하철역_목록_조회();
 
         assertThat(stationNames).hasSize(2);
-        assertThat(stationNames).containsExactly("양재역", "교대역");
+        assertThat(stationNames).containsExactly(양재_station, 교대_station);
     }
 
     @DisplayName("지하철역을 삭제한다.")
     @Test
     void deleteStation() {
-        ExtractableResponse<Response> createResponse = 지하철역_생성("잠실역");
+        ExtractableResponse<Response> createResponse = 지하철역_생성(잠실_station);
 
         Long id = createResponse.jsonPath().getLong("id");
         ExtractableResponse<Response> deleteResponse = 지하철역_삭제(id);
-        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         List<String> stationNames = 지하철역_목록_조회();
-        assertThat(stationNames).doesNotContain("잠실역");
+        assertThat(stationNames).doesNotContain(잠실_station);
     }
 
 
