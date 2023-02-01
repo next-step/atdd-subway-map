@@ -6,6 +6,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import setting.RandomPortSetting;
 import subway.common.util.validation.ExistenceValidation;
+import subway.common.util.validation.ResponseStatusValidation;
 import subway.station.util.Extraction;
 
 import static subway.station.MockStation.강남역;
@@ -27,7 +28,7 @@ public class StationAcceptanceTest extends RandomPortSetting {
         ExtractableResponse<Response> responseOfCreateStation = StationApi.createStation(강남역);
 
         // then
-        ExistenceValidation.checkCreatedResponse(responseOfCreateStation);
+        ResponseStatusValidation.checkCreatedResponse(responseOfCreateStation);
 
         // then
         ExtractableResponse<Response> responseOfShowStations = StationApi.showStations();
