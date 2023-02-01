@@ -1,24 +1,23 @@
 package subway;
 
-import io.restassured.RestAssured;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+import static org.assertj.core.api.Assertions.*;
 
 import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+
+import io.restassured.RestAssured;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
 
 @DisplayName("지하철역 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-class StationAcceptanceTest {
+class StationAcceptanceTest extends AcceptanceTest {
 
     private static final String GANGNAM_STATION = "강남역";
     private static final String JAMSIL_STATION = "잠실역";
@@ -50,14 +49,32 @@ class StationAcceptanceTest {
 
         return RestAssured
             .given()
-                .log().all()
-                .body(param)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .log().all()
+            .body(param)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
             .when()
-                .post(URI.create("/stations"))
+            .post(URI.create("/stations"))
             .then()
-                .log().all()
+            .log().all()
             .extract();
+    }
+
+    /**
+     * Given 지하철역을 생성하고
+     * When 동일한 이름의 지하철역을 생성하려고 하면
+     * Then 지하철역이 생성되지 않는다.
+     */
+    @DisplayName("지하철역 이름은 중복되지 않아야 한다.")
+    @Test
+    void duplicateStationName() {
+        // given
+        createStation(GANGNAM_STATION);
+
+        // then
+        ExtractableResponse<Response> response = createStation(GANGNAM_STATION);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
     private List<String> getAllStationNames() {

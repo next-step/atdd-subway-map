@@ -1,11 +1,13 @@
 package subway.domain;
 
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import subway.exception.CannotRemoveNonLastSectionException;
+import subway.exception.CannotRemoveUniqueSectionException;
+import subway.exception.InvalidSectionDownStationException;
+import subway.exception.InvalidSectionUpStationException;
+
+import javax.persistence.*;
+import java.util.Collections;
+import java.util.List;
 
 @Entity
 public class Line {
@@ -18,28 +20,58 @@ public class Line {
 
     private String color;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Station upStation;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Station downStation;
-
-    private Long distance;
+    @Embedded
+    private Sections sections = new Sections();
 
     public Line() {
     }
 
-    public Line(String name, String color, Station upStation, Station downStation, Long distance) {
+    public Line(String name, String color) {
         this.name = name;
         this.color = color;
-        this.upStation = upStation;
-        this.downStation = downStation;
-        this.distance = distance;
     }
 
     public void update(String name, String color) {
         this.name = name;
         this.color = color;
+    }
+
+    public void addSection(Station upStation, Station downStation, long distance) {
+        if (sections.isEmpty()) {
+            sections.add(new Section(this, upStation, downStation, distance));
+            return;
+        }
+
+        if (!sections.isLastStation(upStation)) {
+            Station lastStation = sections.getLastStation();
+            throw new InvalidSectionUpStationException(lastStation.getName(), upStation.getName());
+        }
+
+        if (sections.hasStation(downStation)) {
+            throw new InvalidSectionDownStationException(downStation.getName());
+        }
+
+        sections.add(new Section(this, upStation, downStation, distance));
+    }
+
+    public List<Station> getAllStations() {
+        if (sections.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return sections.getStations();
+    }
+
+    public void removeSection(Station station) {
+        if (sections.hasSingleSection()) {
+            throw new CannotRemoveUniqueSectionException();
+        }
+
+        if (!sections.isLastStation(station)) {
+            Station lastStation = sections.getLastStation();
+            throw new CannotRemoveNonLastSectionException(lastStation.getName(), station.getName());
+        }
+
+        sections.remove();
     }
 
     public Long getId() {
@@ -52,17 +84,5 @@ public class Line {
 
     public String getColor() {
         return color;
-    }
-
-    public Station getUpStation() {
-        return upStation;
-    }
-
-    public Station getDownStation() {
-        return downStation;
-    }
-
-    public Long getDistance() {
-        return distance;
     }
 }

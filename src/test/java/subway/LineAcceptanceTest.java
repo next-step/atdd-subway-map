@@ -10,20 +10,17 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 
 @DisplayName("지하철 노선 관련 기능")
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-class LineAcceptanceTest {
+class LineAcceptanceTest extends AcceptanceTest {
 
+    private static final String URL_LINES = "/lines";
     private static final String LINE_분당선 = "분당선";
     private static final String LINE_3호선 = "3호선";
     private static final String STATION_수서역 = "수서역";
@@ -36,6 +33,8 @@ class LineAcceptanceTest {
 
     @BeforeEach
     void setup() {
+        super.setup();
+
         수서역_id = 지하철_역_생성(STATION_수서역);
         복정역_id = 지하철_역_생성(STATION_복정역);
         오금역_id = 지하철_역_생성(STATION_오금역);
@@ -50,11 +49,12 @@ class LineAcceptanceTest {
     void createLine() {
         // when
         ExtractableResponse<Response> createResponse = 지하철_분당선_생성();
-        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
         List<String> lineNames = 지하철_노선_목록_이름_조회();
+
         assertThat(lineNames).contains(LINE_분당선);
+        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
 
     /**
@@ -74,6 +74,7 @@ class LineAcceptanceTest {
 
         // then
         List<String> lineNames = getResponse.jsonPath().getList("name", String.class);
+
         assertThat(lineNames).hasSize(2).contains(LINE_분당선, LINE_3호선);
     }
 
@@ -108,10 +109,11 @@ class LineAcceptanceTest {
 
         // when
         ExtractableResponse<Response> putResponse = 지하철_노선_수정(lineId, "새로운 분당선", "lightyellow");
-        assertThat(putResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         // then
         ExtractableResponse<Response> getResponse = 지하철_노선_조회(lineId);
+
+        assertThat(putResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(getResponse.jsonPath().getString("name")).isEqualTo("새로운 분당선");
         assertThat(getResponse.jsonPath().getString("color")).isEqualTo("lightyellow");
     }
@@ -129,14 +131,29 @@ class LineAcceptanceTest {
 
         // when
         ExtractableResponse<Response> deleteResponse = 지하철_노선_삭제(lineId);
-        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         // then
-        List<String> lineNames = 지하철_노선_목록_이름_조회();
-        assertThat(lineNames).doesNotContain(LINE_분당선);
+        ExtractableResponse<Response> getResponse = 지하철_노선_조회(lineId);
+
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertThat(getResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
-    private Long 지하철_역_생성(String name) {
+    /**
+     * When 지하철 노선 생성 요청 시, 상행역과 하행역이 동일하면
+     * Then 지하철 노선이 생성되지 않는다.
+     */
+    @DisplayName("상행역과 하행역이 동일하면 지하철 노선이 생성되지 않는다.")
+    @Test
+    void identicalStations() {
+        // when
+        ExtractableResponse<Response> createResponse = 지하철_노선_생성(LINE_3호선, "brown", 수서역_id, 수서역_id, 1);
+
+        // then
+        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    }
+
+    static Long 지하철_역_생성(String name) {
         Map<String, String> param = new HashMap<>();
         param.put("name", name);
 
@@ -154,7 +171,15 @@ class LineAcceptanceTest {
             .getLong("id");
     }
 
-    private ExtractableResponse<Response> 지하철_노선_생성(String name, String color, Long upStationId, Long downStationId, Long distance) {
+    private ExtractableResponse<Response> 지하철_분당선_생성() {
+        return 지하철_노선_생성(LINE_분당선, "yellow", 수서역_id, 복정역_id, 5);
+    }
+
+    private ExtractableResponse<Response> 지하철_3호선_생성() {
+        return 지하철_노선_생성(LINE_3호선, "brown", 수서역_id, 오금역_id, 7);
+    }
+
+    static ExtractableResponse<Response> 지하철_노선_생성(String name, String color, Long upStationId, Long downStationId, long distance) {
         Map<String, Object> param = new HashMap<>();
         param.put("name", name);
         param.put("color", color);
@@ -168,47 +193,39 @@ class LineAcceptanceTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(param)
             .when()
-                .post(URI.create("/lines"))
+                .post(URI.create(URL_LINES))
             .then()
                 .log().all()
             .extract();
     }
 
-    private ExtractableResponse<Response> 지하철_분당선_생성() {
-        return 지하철_노선_생성(LINE_분당선, "yellow", 수서역_id, 복정역_id, 10L);
-    }
-
-    private ExtractableResponse<Response> 지하철_3호선_생성() {
-        return 지하철_노선_생성(LINE_3호선, "brown", 수서역_id, 오금역_id, 20L);
-    }
-
-    private ExtractableResponse<Response> 지하철_노선_목록_조회() {
+    static ExtractableResponse<Response> 지하철_노선_목록_조회() {
         return RestAssured
             .given()
                 .log().all()
             .when()
-                .get("/lines")
+                .get(URL_LINES)
             .then()
                 .log().all()
             .extract();
     }
 
-    private List<String> 지하철_노선_목록_이름_조회() {
+    static List<String> 지하철_노선_목록_이름_조회() {
         return 지하철_노선_목록_조회().jsonPath().getList("name", String.class);
     }
 
-    private ExtractableResponse<Response> 지하철_노선_조회(Long id) {
+    static ExtractableResponse<Response> 지하철_노선_조회(Long id) {
         return RestAssured
             .given()
                 .log().all()
             .when()
-                .get("/lines/{id}", id)
+                .get(URL_LINES + "/{id}", id)
             .then()
                 .log().all()
             .extract();
     }
 
-    private ExtractableResponse<Response> 지하철_노선_수정(Long id, String name, String color) {
+    static ExtractableResponse<Response> 지하철_노선_수정(Long id, String name, String color) {
         Map<String, String> updateParam = new HashMap<>();
         updateParam.put("name", name);
         updateParam.put("color", color);
@@ -219,18 +236,18 @@ class LineAcceptanceTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(updateParam)
             .when()
-                .put("/lines/{id}", id)
+                .put(URL_LINES + "/{id}", id)
             .then()
                 .log().all()
             .extract();
     }
 
-    private ExtractableResponse<Response> 지하철_노선_삭제(Long id) {
+    static ExtractableResponse<Response> 지하철_노선_삭제(Long id) {
         return RestAssured
             .given()
                 .log().all()
             .when()
-                .delete("/lines/{id}", id)
+                .delete(URL_LINES + "/{id}", id)
             .then()
                 .log().all()
             .extract();
