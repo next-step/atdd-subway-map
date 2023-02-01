@@ -49,7 +49,7 @@ public class LineAcceptanceTest {
     void 노선_생성() {
         //when
         createLine(신분당선);
-        List<String> lineNames = getLineNames()
+        List<String> lineNames = getLines()
                 .jsonPath().getList("name", String.class);
 
         //Then
@@ -69,12 +69,11 @@ public class LineAcceptanceTest {
         createLine(분당선);
 
         //When
-        List<String> lineNames = getLineNames()
+        List<String> lineNames = getLines()
                 .jsonPath().getList("name", String.class);
 
         //Then
-        assertThat(lineNames).containsAll(List.of(신분당선_이름, 분당선_이름));
-        assertThat(lineNames).hasSize(2);
+        assertThat(lineNames).containsAll(List.of(신분당선_이름, 분당선_이름)).hasSize(2);
     }
 
     /**
@@ -111,16 +110,14 @@ public class LineAcceptanceTest {
 
         //When
         updateLine(updateId, 다른분당선_이름, 다른분당선_색);
-        List<String> lineNames = getLineNames()
-                .jsonPath().getList("name", String.class);
-        List<String> lineColors = getLineNames()
-                .jsonPath().getList("color", String.class);
+        String lineName = readLine(updateId)
+                .jsonPath().get("name");
+        String lineColor = readLine(updateId)
+                .jsonPath().get("color");
 
         //Then
-        assertThat(lineNames).contains(다른분당선_이름);
-        assertThat(lineColors).contains(다른분당선_색);
-        assertThat(lineNames).hasSize(1);
-        assertThat(lineColors).hasSize(1);
+        assertThat(lineName).isEqualTo(다른분당선_이름);
+        assertThat(lineColor).isEqualTo(다른분당선_색);
     }
 
     /**
@@ -137,7 +134,7 @@ public class LineAcceptanceTest {
 
         //When
         deleteLine(deleteId);
-        List<String> lineNames = getLineNames()
+        List<String> lineNames = getLines()
                 .jsonPath().getList("name", String.class);
 
         //Then
@@ -153,35 +150,20 @@ public class LineAcceptanceTest {
 
     private static ExtractableResponse<Response> createLine(LineRequest request) {
 
-        Map<String, Object> params = makeRequestBody(request);
-
         return RestAssured.given().log().all()
-                .body(params)
+                .body(request)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/lines")
                 .then().log().all()
                 .extract();
     }
 
-    private static Map<String, Object> makeRequestBody(LineRequest request) {
-        Map<String, Object> params = new HashMap<>();
-
-        params.put("name", request.getName());
-        params.put("color", request.getColor());
-        params.put("upStationId", request.getUpStationId());
-        params.put("downStationId", request.getDownStationId());
-        params.put("distance", request.getDistance());
-
-        return params;
-    }
-
     private static long getCreatedLineId(LineRequest request) {
-        ExtractableResponse<Response> createResponse = createLine(request);
-        long updateId = createResponse.jsonPath().getLong("id");
-        return updateId;
+        return createLine(request)
+                .jsonPath().getLong("id");
     }
 
-    private static ExtractableResponse<Response> getLineNames() {
+    private static ExtractableResponse<Response> getLines() {
         return RestAssured.given().log().all()
                 .when().get("/lines")
                 .then().log().all()
