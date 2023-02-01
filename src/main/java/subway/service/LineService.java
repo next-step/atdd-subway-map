@@ -31,19 +31,11 @@ public class LineService {
 
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
-
-        Long upStationId = lineRequest.getUpStationId();
-        Long downStationId = lineRequest.getDownStationId();
-
-        if (upStationId == null || downStationId == null) {
-            throw new StationNotFoundException();
-        }
-
         Line line = lineRepository.save(new Line(
                 lineRequest.getName(),
                 lineRequest.getColor(),
-                upStationId,
-                downStationId,
+                lineRequest.getUpStationId(),
+                lineRequest.getDownStationId(),
                 lineRequest.getDistance()));
 
         return createLineResponse(line);

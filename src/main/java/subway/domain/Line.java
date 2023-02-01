@@ -1,5 +1,7 @@
 package subway.domain;
 
+import subway.exception.StationNotFoundException;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -50,11 +52,19 @@ public class Line {
     }
 
     public Line(String name, String color, Long upStationId, Long downStationId, Long distance) {
+        validateStations(upStationId, downStationId);
+
         this.name = name;
         this.color = color;
         this.upStationId = upStationId;
         this.downStationId = downStationId;
         this.distance = distance;
+    }
+
+    private void validateStations(Long upStationId, Long downStationId) {
+        if (upStationId == null || downStationId == null) {
+            throw new StationNotFoundException();
+        }
     }
 
     public void update(String name, String color) {
