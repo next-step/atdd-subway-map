@@ -33,10 +33,7 @@ public class LineService {
 
     private LineResponse createLineResponse(Line line) {
         List<Station> stations = new ArrayList<>();
-        Station upStation = stationRepository.findById(line.getUpStationId()).orElseThrow(EntityNotFoundException::new);
-        Station downStation = stationRepository.findById(line.getDownStationId()).orElseThrow(EntityNotFoundException::new);
-        stations.add(upStation);
-        stations.add(downStation);
+        createStations(line, stations);
 
         return new LineResponse(
                 line.getId(),
@@ -63,10 +60,17 @@ public class LineService {
     public void updateLine(Long id, LineRequest lineRequest) {
         Line findedLine = lineRepository.findById(id).orElseThrow(EntityNotFoundException::new);
         findedLine.updateLineIfPresent(lineRequest.toLineEntity(lineRequest));
-        lineRepository.save(findedLine);
     }
 
+    @Transactional
     public void deleteLine(Long id) {
         lineRepository.deleteById(id);
+    }
+
+    private void createStations(Line line, List<Station> stations) {
+        Station upStation = stationRepository.findById(line.getUpStationId()).orElseThrow(EntityNotFoundException::new);
+        Station downStation = stationRepository.findById(line.getDownStationId()).orElseThrow(EntityNotFoundException::new);
+        stations.add(upStation);
+        stations.add(downStation);
     }
 }
