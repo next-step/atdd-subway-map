@@ -1,6 +1,5 @@
 package subway.line;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -19,10 +18,10 @@ public class Line {
 
   private String color;
 
-  @ManyToOne(cascade = CascadeType.ALL)
+  @ManyToOne
   private Station upStation; // 상행역
 
-  @ManyToOne(cascade = CascadeType.ALL)
+  @ManyToOne
   private Station downStation; // 하행역
 
   private Long distance;

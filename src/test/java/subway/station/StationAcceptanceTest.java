@@ -1,4 +1,4 @@
-package subway;
+package subway.station;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -16,10 +16,10 @@ import subway.Mocks.MockStation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static subway.StationTestUtils.인수테스트_Given_준비;
-import static subway.StationTestUtils.지하철역_삭제;
-import static subway.StationTestUtils.지하철역_생성;
-import static subway.StationTestUtils.지하철역_조회;
+import static subway.station.StationTestUtils.인수테스트_Given_준비;
+import static subway.station.StationTestUtils.지하철역_삭제;
+import static subway.station.StationTestUtils.지하철역_생성;
+import static subway.station.StationTestUtils.지하철역_조회;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)

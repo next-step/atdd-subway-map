@@ -22,24 +22,17 @@ public class LineController {
 
   /**
    * 새로운 지하철 노선을 추가한다.
-   * @param request LineCreateRequest
+   * @param request
    * @return 노선 생성의 결과를 반환한다.
    */
   @PostMapping("/lines")
   public ResponseEntity<LineResponse> createLine(@RequestBody LineCreateRequest request) {
-    return ResponseEntity.ok().body(lineService.saveLine(
-        request.getName(),
-        request.getColor(),
-        request.getUpStationId(),
-        request.getDownStationId(),
-        request.getDistance()
-        )
-    );
+    return ResponseEntity.ok().body(lineService.saveLine(request));
   }
 
   /**
    * 지하철의 노선을 조회한다
-   * @param id Long. 조회하려는 노선의 ID
+   * @param id 조회하려는 노선의 ID
    * @return 지하철 노선의 조회 결과 값을 반환한다.
    */
   @GetMapping("/lines/{id}")
@@ -53,7 +46,7 @@ public class LineController {
 
   /**
    * 모든 지하철의 노선을 조회한다.
-   * @return 모든 지하철 모든의 정보를 반환한다.
+   * @return 모든 지하철 노선 정보를 반환한다.
    */
   @GetMapping("/lines")
   public ResponseEntity<List<LineResponse>> showAllLines() {
@@ -62,7 +55,7 @@ public class LineController {
 
   /**
    * 특정 지하철 노선의 정보를 변경한다.
-   * @param id Long. 변경하려는 지하철 노선의 ID
+   * @param id 변경하려는 지하철 노선의 ID
    * @param request
    * @return 변환된 지하철 정보를 반환한다. 존재하지 않는 지하철 노선에 대한 변경은 noContent()를 반환한다.
    */
@@ -77,7 +70,7 @@ public class LineController {
 
   /**
    * id에 해당하는 노선 정보를 삭제한다.
-   * @param id Long. 삭제하려는 노선의 ID
+   * @param id 삭제하려는 노선의 ID
    * @return noContent() 결과값
    */
   @DeleteMapping("/lines/{id}")

@@ -6,36 +6,37 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.station.Station;
-import subway.station.StationRepository;
+import subway.station.StationService;
 
 @Service
 public class LineService {
 
   private final LineRepository lineRepository;
-  private final StationRepository stationRepository;
+  private final StationService stationService;
 
-  public LineService(LineRepository repository, StationRepository stationRepository) {
+  public LineService(LineRepository repository, StationService stationService) {
     this.lineRepository = repository;
-    this.stationRepository = stationRepository;
+    this.stationService = stationService;
   }
 
   @Transactional
-  public LineResponse saveLine(String name, String color, Long upStationId, Long downStationId, Long distance) {
-    Optional<Station> inbound = stationRepository.findById(upStationId);
-    Optional<Station> outbound = stationRepository.findById(downStationId);
-    Line created = lineRepository.save(new Line(name, color, inbound.get(), outbound.get(), distance));
-    return createServiceResponse(created);
+  public LineResponse saveLine(LineCreateRequest request) {
+    Station upStation = stationService.findById(request.getUpStationId()).toEntity();
+    Station downStation = stationService.findById(request.getDownStationId()).toEntity();
+    Line created = lineRepository.save(
+        new Line(request.getName(), request.getColor(), upStation, downStation, request.getDistance())
+    );
+
+    return LineResponse.of(created);
   }
 
   public Optional<LineResponse> showLine(Long id) {
-    Optional<Line> optionalLine = lineRepository.findById(id);
-
-    return optionalLine.map(this::createServiceResponse);
+    return lineRepository.findById(id).map(LineResponse::of);
   }
 
   public List<LineResponse> showLines() {
     return lineRepository.findAll().stream()
-        .map(this::createServiceResponse)
+        .map(LineResponse::of)
         .collect(Collectors.toList());
   }
 
@@ -47,11 +48,6 @@ public class LineService {
     Optional<Line> optionalLine = lineRepository.findById(id);
 
     return optionalLine.map(line -> line.updateLine(name, color))
-        .map(lineRepository::save)
-        .map(this::createServiceResponse);
-  }
-
-  private LineResponse createServiceResponse(Line line) {
-    return new LineResponse(line.getId(), line.getName(), line.getColor(), line.getUpStation(), line.getDownStation(), line.getDistance());
+        .map(line -> LineResponse.of(lineRepository.save(line)));
   }
 }

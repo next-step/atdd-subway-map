@@ -20,6 +20,17 @@ public class LineResponse {
     this.distance = distance;
   }
 
+  public static LineResponse of(Line line) {
+    return new LineResponse(
+        line.getId(),
+        line.getName(),
+        line.getColor(),
+        line.getUpStation(),
+        line.getDownStation(),
+        line.getDistance()
+    );
+  }
+
   public Long getId() {
     return id;
   }

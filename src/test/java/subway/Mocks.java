@@ -18,4 +18,8 @@ public class Mocks {
     public static String 서울2호선 = "서울2호선";
     public static String 신분당선 = "신분당선";
   }
+
+  public static class LineCreateRequestDTO {
+
+  }
 }
