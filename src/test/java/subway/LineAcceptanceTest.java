@@ -116,8 +116,6 @@ public class LineAcceptanceTest {
 
         String location = createLineResponse.header("Location");
 
-        System.out.println(location);
-
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .when()
@@ -127,6 +125,52 @@ public class LineAcceptanceTest {
                 .extract();
 
         // then
+        JsonPath jsonPath = response.jsonPath();
+
+        Assertions.assertAll(
+                () -> assertThat(jsonPath.getString("name")).isEqualTo(name),
+                () -> assertThat(jsonPath.getString("color")).isEqualTo(color),
+                () -> assertThat(jsonPath.getList("stations.id", Long.class))
+                        .containsExactly(upStationId, downStationId),
+                () -> assertThat(jsonPath.getInt("distance")).isEqualTo(distance)
+        );
+    }
+
+    @DisplayName("지하철 노선을 수정한다.")
+    @Test
+    void editLine() {
+        // given
+        ExtractableResponse<Response> createLineResponse
+                = createLine("신분당선", "bg-red-600", upStationId, downStationId, 10);
+
+        String location = createLineResponse.header("Location");
+
+        String name = "수정한 지하철 노선 이름";
+        String color = "수정한 지하철 색상";
+        int distance = 5;
+
+        // when
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .body(Map.of(
+                        "name", name,
+                        "color", color,
+                        "distance", distance
+                ))
+                .when()
+                .patch(location)
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract();
+
+        // then
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .when()
+                .get(location)
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract();
+
         JsonPath jsonPath = response.jsonPath();
 
         Assertions.assertAll(

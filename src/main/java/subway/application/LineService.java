@@ -9,6 +9,7 @@ import subway.domain.Line;
 import subway.domain.LineRepository;
 import subway.domain.Station;
 import subway.domain.StationRepository;
+import subway.dto.LineEditRequest;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 
@@ -45,9 +46,22 @@ public class LineService {
     }
 
     public LineResponse get(final Long lineId) {
-        Line line = lineRepository.findById(lineId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 노선입니다."));
+        Line line = findLineBy(lineId);
 
         return LineResponse.by(line);
+    }
+
+    @Transactional
+    public void edit(final Long lineId, final LineEditRequest lineEditRequest) {
+        Line line = findLineBy(lineId);
+
+        line.editName(lineEditRequest.getName())
+                .editColor(lineEditRequest.getColor())
+                .editDistance(lineEditRequest.getDistance());
+    }
+
+    private Line findLineBy(final Long lineId) {
+        return lineRepository.findById(lineId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 노선입니다."));
     }
 }

@@ -5,11 +5,13 @@ import java.util.List;
 import javax.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import subway.application.LineService;
+import subway.dto.LineEditRequest;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 
@@ -38,5 +40,15 @@ public class LineController {
     public ResponseEntity<LineResponse> showLine(@PathVariable Long lineId) {
         return ResponseEntity.ok()
                 .body(lineService.get(lineId));
+    }
+
+    @PatchMapping("/lines/{lineId}")
+    public ResponseEntity editLine(
+            @PathVariable Long lineId,
+            @RequestBody LineEditRequest lineEditRequest
+    ) {
+        lineService.edit(lineId, lineEditRequest);
+
+        return ResponseEntity.ok().build();
     }
 }

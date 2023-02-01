@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import org.springframework.util.StringUtils;
 
 @Entity
 public class Line {
@@ -48,12 +49,33 @@ public class Line {
     public String getColor() {
         return color;
     }
-    
+
     public List<Station> getStations() {
         return stations.getStations();
     }
 
     public int getDistance() {
         return distance.getValue();
+    }
+
+    public Line editName(final String name) {
+        if (!StringUtils.hasText(name)) {
+            throw new IllegalArgumentException("이름은 공백일 수 없습니다.");
+        }
+        this.name = name;
+        return this;
+    }
+
+    public Line editColor(final String color) {
+        if (!StringUtils.hasText(color)) {
+            throw new IllegalArgumentException("색상은 공백일 수 없습니다.");
+        }
+        this.color = color;
+        return this;
+    }
+
+    public Line editDistance(final int distance) {
+        this.distance = new Distance(distance);
+        return this;
     }
 }
