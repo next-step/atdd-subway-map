@@ -72,12 +72,25 @@ public class LineAcceptanceTest {
 
     @DisplayName("지하철 노선을 조회한다.")
     @Test
-    void findStation() {
+    void findStationById() {
         ExtractableResponse<Response> createResponse = 지하철_신분당선_생성();
         Long line_id = createResponse.jsonPath().getLong("id");
 
         String lineName = 지하철_노선_조회(line_id);
         assertThat(lineName).isEqualTo(신분당선_line);
+    }
+
+    @DisplayName("지하철 노선 정보를 수정한다.")
+    @Test
+    void updateStation() {
+        ExtractableResponse<Response> createResponse = 지하철_신분당선_생성();
+        Long line_id = createResponse.jsonPath().getLong("id");
+
+        ExtractableResponse<Response> updateResponse = 지하철_노선_수정(line_id, "구분당선", "be-red-200");
+        assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        String lineName = 지하철_노선_조회(line_id);
+        assertThat(lineName).isEqualTo("구분당선");
     }
 
     private ExtractableResponse<Response> 지하철_신분당선_생성() {
@@ -119,6 +132,19 @@ public class LineAcceptanceTest {
                 .when().get("/lines/{id}", id)
                 .then().log().all()
                 .extract().jsonPath().getString("name");
+    }
+
+    private ExtractableResponse<Response> 지하철_노선_수정(Long id, String name, String color) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("name", name);
+        params.put("color", color);
+
+        return given()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().put("/lines/{id}", id)
+                .then().log().all()
+                .extract();
     }
 
     private Long 지하철역_생성(String stationName) {

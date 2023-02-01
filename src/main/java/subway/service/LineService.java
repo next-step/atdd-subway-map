@@ -38,6 +38,16 @@ public class LineService {
         return createLineResponse(line);
     }
 
+    @Transactional
+    public Long update(Long id, LineRequest lineRequest) {
+        Line line = lineRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("지하철 노선이 존재하지 않습니다."));
+
+        line.update(lineRequest.getName(), lineRequest.getColor());
+
+        return id;
+    }
+
     private LineResponse createLineResponse(Line line) {
         return new LineResponse(line);
     }
