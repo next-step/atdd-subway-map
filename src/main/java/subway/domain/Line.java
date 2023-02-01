@@ -1,6 +1,9 @@
 package subway.domain;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
 @Entity
 public class Line {
@@ -17,6 +20,10 @@ public class Line {
     private Long downStationId;
 
     private Long distance;
+
+    protected Line() {
+
+    }
 
     public Long getId() {
         return id;
@@ -40,10 +47,6 @@ public class Line {
 
     public Long getDistance() {
         return distance;
-    }
-
-    public Line() {
-
     }
 
     public Line(String name, String color, Long upStationId, Long downStationId, Long distance) {

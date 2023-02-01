@@ -12,7 +12,7 @@ public class LineResponse {
     private Long id;
     private String name;
     private String color;
-    private List<Station> stations;
+    private List<StationResponse> stations;
 
     public Long getId() {
         return id;
@@ -26,11 +26,11 @@ public class LineResponse {
         return color;
     }
 
-    public List<Station> getStations() {
+    public List<StationResponse> getStations() {
         return stations;
     }
 
-    public LineResponse(Line line, List<Station> stations) {
+    public LineResponse(Line line, List<StationResponse> stations) {
         id = line.getId();
         name = line.getName();
         color = line.getColor();

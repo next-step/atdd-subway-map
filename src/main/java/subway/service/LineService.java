@@ -4,6 +4,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.domain.Line;
 import subway.domain.Station;
+import subway.dto.StationResponse;
+import subway.exception.StationNotFoundException;
 import subway.repository.LineRepository;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
@@ -12,6 +14,8 @@ import subway.repository.StationRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static subway.service.StationService.createStationResponse;
 
 @Service
 @Transactional(readOnly = true)
@@ -27,11 +31,19 @@ public class LineService {
 
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
+
+        Long upStationId = lineRequest.getUpStationId();
+        Long downStationId = lineRequest.getDownStationId();
+
+        if (upStationId == null || downStationId == null) {
+            throw new StationNotFoundException();
+        }
+
         Line line = lineRepository.save(new Line(
                 lineRequest.getName(),
                 lineRequest.getColor(),
-                lineRequest.getUpStationId(),
-                lineRequest.getDownStationId(),
+                upStationId,
+                downStationId,
                 lineRequest.getDistance()));
 
         return createLineResponse(line);
@@ -62,9 +74,12 @@ public class LineService {
 
     private LineResponse createLineResponse(Line line) {
 
-        Station upStation = stationRepository.findById(line.getUpStationId()).orElseThrow(IllegalArgumentException::new);
-        Station downStation = stationRepository.findById(line.getDownStationId()).orElseThrow(IllegalArgumentException::new);
+        Station upStation = stationRepository.findById(line.getUpStationId()).orElseThrow(StationNotFoundException::new);
+        Station downStation = stationRepository.findById(line.getDownStationId()).orElseThrow(StationNotFoundException::new);
 
-        return new LineResponse(line, List.of(upStation, downStation));
+        StationResponse upStationResponse = createStationResponse(upStation);
+        StationResponse downStationResponse = createStationResponse(downStation);
+
+        return new LineResponse(line, List.of(upStationResponse, downStationResponse));
     }
 }
