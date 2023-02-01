@@ -49,10 +49,10 @@ public class SectionService {
 		SubwayLine subwayLine = subwayLineRepository.findSubwayLineById(subwayLineId)
 			.orElseThrow(() -> new NotFoundSubwayLineException(SubwayLineErrorCode.NOT_FOUND_SUBWAY_LINE));
 
-		if (subwayLine.isPossibleRemove(section)) {
-			Station newDownStation = stationRepository.findById(section.getUpStationId())
-				.orElseThrow(() -> new NotFoundStationException(SectionErrorCode.NOT_FOUND_STATION));
-			subwayLine.removeSection(section, newDownStation);
-		}
+		subwayLine.validatePossibleRemove(section);
+
+		Station newDownStation = stationRepository.findById(section.getUpStationId())
+			.orElseThrow(() -> new NotFoundStationException(SectionErrorCode.NOT_FOUND_STATION));
+		subwayLine.removeSection(section, newDownStation);
 	}
 }

@@ -16,6 +16,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import subway.application.Section;
 import subway.exception.AlreadyRegisteredStationException;
+import subway.exception.InvalidSectionRemoveRequestException;
 import subway.exception.SectionErrorCode;
 import subway.exception.SectionRegisterException;
 
@@ -78,10 +79,6 @@ public class SubwayLine {
 		this.subwayLineStationGroups.add(createSubwayLineStationGroup(newDownStation));
 	}
 
-	public boolean isPossibleRemove(Section section) {
-		return section.equalDownStationId(this.downStationId) && !section.equalUpStationId(this.upStationId);
-	}
-
 	public void removeSection(Section section, Station newDownStation) {
 		this.downStationId = newDownStation.getId();
 
@@ -90,6 +87,20 @@ public class SubwayLine {
 		);
 
 		subwayLineStationGroups.add(createSubwayLineStationGroup(newDownStation));
+	}
+
+	public void validatePossibleRemove(Section section) {
+		if (!section.equalDownStationId(this.downStationId)) {
+			throw new InvalidSectionRemoveRequestException(
+				SectionErrorCode.INVALID_SECTION_REMOVE_BECAUSE_DOWN_STATION
+			);
+		}
+
+		if (section.equalDownStationId(this.downStationId) && section.equalDownStationId(this.upStationId)) {
+			throw new InvalidSectionRemoveRequestException(
+				SectionErrorCode.INVALID_SECTION_REMOVE_BECAUSE_ONLY_ONE_SECTION
+			);
+		}
 	}
 
 	private void validateNewSectionUpStationEqualDownStation(Section section) {
