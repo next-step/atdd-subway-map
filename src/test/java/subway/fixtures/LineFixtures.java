@@ -24,4 +24,12 @@ public class LineFixtures {
         params.put("distance", "10");
         return params;
     }
+
+    public static Map<String, String> 신분당선_수정_파라미터_생성() {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "신분당선_수정");
+        params.put("color", "bg-yellow-600");
+        return params;
+    }
+
 }
