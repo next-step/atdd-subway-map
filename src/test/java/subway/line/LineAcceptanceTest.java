@@ -1,10 +1,12 @@
 package subway.line;
 
 import io.restassured.path.json.JsonPath;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
+import subway.utils.DatabaseCleanup;
 
 import java.util.List;
 
@@ -15,8 +17,15 @@ import static subway.utils.StationUtil.createStationResultResponse;
 
 @DisplayName("지하철 노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class LineAcceptanceTest {
+
+    @Autowired
+    DatabaseCleanup databaseCleanup;
+
+    @BeforeEach
+    void setup() {
+        databaseCleanup.execute();
+    }
 
     /**
      * When 지하철 노선을 생성하면

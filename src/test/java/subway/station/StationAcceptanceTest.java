@@ -1,10 +1,13 @@
 package subway.station;
 
 import io.restassured.path.json.JsonPath;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
+import subway.utils.DatabaseCleanup;
 
 import java.util.List;
 
@@ -13,8 +16,17 @@ import static subway.utils.StationUtil.*;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@ActiveProfiles("acceptance")
 public class StationAcceptanceTest {
+
+    @Autowired
+    DatabaseCleanup databaseCleanup;
+
+    @BeforeEach
+    void setup() {
+        databaseCleanup.execute();
+    }
+
     /**
      * When 지하철역을 생성하면
      * Then 지하철역 목록 조회 시 생성한 역을 찾을 수 있다
