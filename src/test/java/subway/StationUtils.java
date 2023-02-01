@@ -18,29 +18,18 @@ public class StationUtils {
     public static String GANG_NAM_STATION = "강남역";
     public static String SIN_SA_STATION = "신사역";
     public static String PAN_GYEO_STATION = "판교역";
+    public static String SIN_NONE_HYEON_STATION = "신논현역";
 
-    public static Map<String, Object> SIN_BUN_DANG_STATION_LINE = new HashMap<>();
-    public static Map<String, Object> BUN_DANG_STATION_LINE = new HashMap<>();
+    public static String GURO_STATION = "구로역";
+    public static String SINDORIM_STATION = "신도림역";
+    public static String GASAN_STATION = "가산역";
+    public static String SEOUL_STATION = "서울역";
 
-    public static String SIN_BUN_DANG_NAME = "신분당선";
-    public static String BUN_DANG_NAME = "분당선";
+    public static String SIN_BUN_DANG_LINE_NAME = "신분당선";
+    public static String ONE_LINE_NAME = "분당선";
+
     public static String LINE_RED = "bg-red-600";
-    public static String LINE_GREEN = "bg-green-600";
-
-
-    static {
-        SIN_BUN_DANG_STATION_LINE.put("name", SIN_BUN_DANG_NAME);
-        SIN_BUN_DANG_STATION_LINE.put("color", LINE_RED);
-        SIN_BUN_DANG_STATION_LINE.put("upStationId", 1);
-        SIN_BUN_DANG_STATION_LINE.put("downStationId", 2);
-        SIN_BUN_DANG_STATION_LINE.put("distance", 10);
-
-        BUN_DANG_STATION_LINE.put("name", BUN_DANG_NAME);
-        BUN_DANG_STATION_LINE.put("color", LINE_GREEN);
-        BUN_DANG_STATION_LINE.put("upStationId", 1);
-        BUN_DANG_STATION_LINE.put("downStationId", 3);
-        BUN_DANG_STATION_LINE.put("distance", 20);
-    }
+    public static String LINE_BLUE = "bg-blue-600";
 
 
     public static RequestSpecification getRequestSpecification() {

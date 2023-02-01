@@ -22,12 +22,28 @@ import static subway.StationUtils.*;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationLineAcceptanceTest {
+    Map<String, Object> SIN_BUN_DANG_STATION_LINE = new HashMap<>();
+    Map<String, Object> ONE_STATION_LINE = new HashMap<>();
 
     @BeforeEach
     void setup() {
         StationUtils.createStation(GANG_NAM_STATION);
         StationUtils.createStation(SIN_SA_STATION);
-        StationUtils.createStation(PAN_GYEO_STATION);
+
+        SIN_BUN_DANG_STATION_LINE.put("name", SIN_BUN_DANG_LINE_NAME);
+        SIN_BUN_DANG_STATION_LINE.put("color", LINE_RED);
+        SIN_BUN_DANG_STATION_LINE.put("upStationId", 1);
+        SIN_BUN_DANG_STATION_LINE.put("downStationId", 2);
+        SIN_BUN_DANG_STATION_LINE.put("distance", 10);
+
+        StationUtils.createStation(GURO_STATION);
+        StationUtils.createStation(SINDORIM_STATION);
+
+        ONE_STATION_LINE.put("name", ONE_LINE_NAME);
+        ONE_STATION_LINE.put("color", LINE_BLUE);
+        ONE_STATION_LINE.put("upStationId", 3);
+        ONE_STATION_LINE.put("downStationId", 4);
+        ONE_STATION_LINE.put("distance", 20);
     }
 
     /**
@@ -45,7 +61,7 @@ public class StationLineAcceptanceTest {
         JsonPath jsonPath = response.jsonPath();
 
         assertThat(jsonPath.getLong("id")).isEqualTo(1L);
-        assertThat(jsonPath.getString("name")).isEqualTo(SIN_BUN_DANG_NAME);
+        assertThat(jsonPath.getString("name")).isEqualTo(SIN_BUN_DANG_LINE_NAME);
         assertThat(jsonPath.getString("color")).isEqualTo(LINE_RED);
     }
 
@@ -58,7 +74,7 @@ public class StationLineAcceptanceTest {
     @Test
     void selectStationLineList() {
         StationUtils.createStationLine(SIN_BUN_DANG_STATION_LINE);
-        StationUtils.createStationLine(BUN_DANG_STATION_LINE);
+        StationUtils.createStationLine(ONE_STATION_LINE);
 
         ExtractableResponse<Response> response =
                 RestAssured
@@ -72,8 +88,8 @@ public class StationLineAcceptanceTest {
         JsonPath jsonPath = response.jsonPath();
 
         assertThat(jsonPath.getList("id", Integer.class)).containsExactly(1, 2);
-        assertThat(jsonPath.getList("name", String.class)).containsExactly(SIN_BUN_DANG_NAME, BUN_DANG_NAME);
-        assertThat(jsonPath.getList("color", String.class)).containsExactly(LINE_RED, LINE_GREEN);
+        assertThat(jsonPath.getList("name", String.class)).containsExactly(SIN_BUN_DANG_LINE_NAME, ONE_LINE_NAME);
+        assertThat(jsonPath.getList("color", String.class)).containsExactly(LINE_RED, LINE_BLUE);
     }
 
     /**
@@ -97,7 +113,7 @@ public class StationLineAcceptanceTest {
         JsonPath jsonPath = response.jsonPath();
 
         assertThat(jsonPath.getLong("id")).isEqualTo(1L);
-        assertThat(jsonPath.getString("name")).isEqualTo(SIN_BUN_DANG_NAME);
+        assertThat(jsonPath.getString("name")).isEqualTo(SIN_BUN_DANG_LINE_NAME);
         assertThat(jsonPath.getString("color")).isEqualTo(LINE_RED);
     }
 
@@ -111,8 +127,9 @@ public class StationLineAcceptanceTest {
         StationUtils.createStationLine(SIN_BUN_DANG_STATION_LINE);
 
         Map<String, Object> body = new HashMap<>();
-        body.put("name", BUN_DANG_NAME);
-        body.put("color", LINE_GREEN);
+        body.put("name", ONE_LINE_NAME);
+        body.put("color", LINE_BLUE);
+
         ExtractableResponse<Response> response =
                 RestAssured
                         .given().spec(getRequestSpecification()).body(body).log().all()
@@ -123,8 +140,8 @@ public class StationLineAcceptanceTest {
 
         JsonPath jsonPath = StationUtils.selectStationLine(1L).jsonPath();
 
-        assertThat(jsonPath.getString("name")).isEqualTo(BUN_DANG_NAME);
-        assertThat(jsonPath.getString("color")).isEqualTo(LINE_GREEN);
+        assertThat(jsonPath.getString("name")).isEqualTo(ONE_LINE_NAME);
+        assertThat(jsonPath.getString("color")).isEqualTo(LINE_BLUE);
     }
 
     /**
