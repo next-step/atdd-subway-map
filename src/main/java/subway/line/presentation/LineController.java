@@ -2,6 +2,7 @@ package subway.line.presentation;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,5 +34,10 @@ class LineController {
     @GetMapping
     List<LineResponse> showLines() {
         return lineService.findAllLines();
+    }
+
+    @GetMapping("/{lineId}")
+    LineResponse showLine(@PathVariable final Long lineId) {
+        return lineService.findLineById(lineId);
     }
 }

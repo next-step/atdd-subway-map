@@ -44,4 +44,10 @@ public class LineService {
                 .map(LineResponse::from)
                 .collect(Collectors.toList());
     }
+
+    public LineResponse findLineById(final Long lineId) {
+        Line line = lineQuery.findById(lineId);
+
+        return LineResponse.from(line);
+    }
 }
