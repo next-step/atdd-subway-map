@@ -2,15 +2,12 @@ package subway.domain;
 
 import subway.exception.CannotRemoveNonLastSectionException;
 import subway.exception.CannotRemoveUniqueSectionException;
+import subway.exception.InvalidSectionDownStationException;
+import subway.exception.InvalidSectionUpStationException;
 
+import javax.persistence.*;
 import java.util.Collections;
 import java.util.List;
-
-import javax.persistence.Embedded;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 
 @Entity
 public class Line {
@@ -39,16 +36,22 @@ public class Line {
         this.color = color;
     }
 
-    public boolean isLastStation(Station station) {
-        return sections.isLastStation(station);
-    }
+    public void addSection(Station upStation, Station downStation, long distance) {
+        if (sections.isEmpty()) {
+            sections.add(new Section(this, upStation, downStation, distance));
+            return;
+        }
 
-    public boolean hasStation(Station station) {
-        return sections.hasStation(station);
-    }
+        if (!sections.isLastStation(upStation)) {
+            Station lastStation = sections.getLastStation();
+            throw new InvalidSectionUpStationException(lastStation.getName(), upStation.getName());
+        }
 
-    public void addSection(Section section) {
-        this.sections.add(section);
+        if (sections.hasStation(downStation)) {
+            throw new InvalidSectionDownStationException(downStation.getName());
+        }
+
+        this.sections.add(new Section(this, upStation, downStation, distance));
     }
 
     public List<Station> getAllStations() {
@@ -58,16 +61,12 @@ public class Line {
         return sections.getStations();
     }
 
-    public Station getLastStation() {
-        return sections.getLastStation();
-    }
-
     public void removeSection(Station station) {
         if (sections.hasSingleSection()) {
             throw new CannotRemoveUniqueSectionException();
         }
 
-        if (!isLastStation(station)) {
+        if (!sections.isLastStation(station)) {
             Station lastStation = sections.getLastStation();
             throw new CannotRemoveNonLastSectionException(lastStation.getName(), station.getName());
         }

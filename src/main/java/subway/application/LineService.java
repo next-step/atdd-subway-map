@@ -4,12 +4,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.domain.Line;
 import subway.domain.LineRepository;
-import subway.domain.Section;
 import subway.domain.Station;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 import subway.dto.SectionRequest;
-import subway.exception.*;
+import subway.exception.LineNotFoundException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,7 +30,7 @@ public class LineService {
         Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor()));
         Station upStation = stationService.findById(lineRequest.getUpStationId());
         Station downStation = stationService.findById(lineRequest.getDownStationId());
-        line.addSection(new Section(line, upStation, downStation, lineRequest.getDistance()));
+        line.addSection(upStation, downStation, lineRequest.getDistance());
         return new LineResponse(line);
     }
 
@@ -67,18 +66,7 @@ public class LineService {
         Line line = findLineById(id);
         Station upStation = stationService.findById(sectionRequest.getUpStationId());
         Station downStation = stationService.findById(sectionRequest.getDownStationId());
-
-        if (!line.isLastStation(upStation)) {
-            String lastStationName = line.getLastStation().getName();
-            String upStationName = upStation.getName();
-            throw new InvalidSectionUpStationException(lastStationName, upStationName);
-        }
-
-        if (line.hasStation(downStation)) {
-            throw new InvalidSectionDownStationException(downStation.getName());
-        }
-
-        line.addSection(new Section(line, upStation, downStation, sectionRequest.getDistance()));
+        line.addSection(upStation, downStation, sectionRequest.getDistance());
     }
 
     @Transactional
