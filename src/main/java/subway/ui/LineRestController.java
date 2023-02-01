@@ -1,0 +1,30 @@
+package subway.ui;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import subway.service.LineService;
+import subway.ui.dto.LineRequest;
+import subway.ui.dto.LineResponse;
+
+import java.net.URI;
+import java.util.List;
+
+@RequiredArgsConstructor
+@RequestMapping("/lines")
+@RestController
+public class LineRestController {
+
+    private final LineService lineService;
+
+    @GetMapping
+    public ResponseEntity<List<LineResponse>> findAll() {
+        return ResponseEntity.ok().body(lineService.findAll());
+    }
+
+    @PostMapping
+    public ResponseEntity<LineResponse> save(@RequestBody LineRequest lineRequest) {
+        LineResponse line = lineService.save(lineRequest);
+        return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
+    }
+}
