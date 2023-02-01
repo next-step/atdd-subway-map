@@ -20,7 +20,7 @@ public class CustomSubwayLineRepositoryImpl implements CustomSubwayLineRepositor
 	private final JPAQueryFactory queryFactory;
 
 	@Override
-	public List<SubwayLineResponse.LineInfo> findSubwayLineAll() {
+	public List<SubwayLineResponse.LineInfo> findSubwayLineProjectionAll() {
 		List<SubwayLine> subwayLines = findSubwayLineQuery().distinct()
 			.fetch();
 
@@ -30,11 +30,19 @@ public class CustomSubwayLineRepositoryImpl implements CustomSubwayLineRepositor
 	}
 
 	@Override
-	public Optional<SubwayLineResponse.LineInfo> findSubwayLineById(Long id) {
+	public Optional<SubwayLineResponse.LineInfo> findSubwayLineProjectionById(Long id) {
 		SubwayLine findSubwayLine = findSubwayLineQuery().where(subwayLine.id.eq(id))
 			.fetchOne();
 
 		return findSubwayLine == null ? Optional.empty() : Optional.of(new SubwayLineResponse.LineInfo(findSubwayLine));
+	}
+
+	@Override
+	public Optional<SubwayLine> findSubwayLineById(Long id) {
+		SubwayLine findSubwayLine = findSubwayLineQuery().where(subwayLine.id.eq(id))
+			.fetchOne();
+
+		return findSubwayLine == null ? Optional.empty() : Optional.of(findSubwayLine);
 	}
 
 	private JPAQuery<SubwayLine> findSubwayLineQuery() {

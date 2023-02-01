@@ -48,12 +48,12 @@ public class SubwayLineService {
 
 	@Transactional(readOnly = true)
 	public List<SubwayLineResponse.LineInfo> findSubwayLines() {
-		return subwayLineRepository.findSubwayLineAll();
+		return subwayLineRepository.findSubwayLineProjectionAll();
 	}
 
 	@Transactional(readOnly = true)
 	public SubwayLineResponse.LineInfo findSubwayLineById(Long id) {
-		return subwayLineRepository.findSubwayLineById(id)
+		return subwayLineRepository.findSubwayLineProjectionById(id)
 			.orElseThrow(() -> new NotFoundSubwayLineException(SubwayLineErrorCode.NOT_FOUND_SUBWAY_LINE));
 	}
 

@@ -1,5 +1,7 @@
 package subway.domain;
 
+import java.util.Objects;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -23,5 +25,9 @@ public class Station {
 
 	public Station(String name) {
 		this.name = name;
+	}
+
+	public boolean equalId(Long target) {
+		return this.id.equals(target);
 	}
 }

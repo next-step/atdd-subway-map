@@ -15,9 +15,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import subway.application.Section;
-import subway.exception.ErrorCode;
-import subway.exception.InvalidSectionDistanceException;
-import subway.exception.SectionErrorCode;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -40,7 +37,7 @@ public class SubwayLine {
 	@Column(nullable = false)
 	private Long downStationId;
 
-	@OneToMany(mappedBy = "subwayLine", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+	@OneToMany(mappedBy = "subwayLine", cascade = {CascadeType.PERSIST, CascadeType.DETACH}, orphanRemoval = true)
 	private List<SubwayLineStationGroup> subwayLineStationGroups = new ArrayList<>();
 
 	public SubwayLine(
@@ -57,13 +54,6 @@ public class SubwayLine {
 		createSubwayLineStationGroups(stations);
 	}
 
-	private void createSubwayLineStationGroups(List<Station> stations) {
-		for (Station station : stations) {
-			SubwayLineStationGroup subwayLineStationGroup = new SubwayLineStationGroup(station, this);
-			this.subwayLineStationGroups.add(subwayLineStationGroup);
-		}
-	}
-
 	public void updateInfo(String name, String color) {
 		this.name = name;
 		this.color = color;
@@ -71,5 +61,26 @@ public class SubwayLine {
 
 	public Section createSection(int distance) {
 		return new Section(this.upStationId, this.downStationId, distance);
+	}
+
+	public void exchangeDownStation(Section section, Station downStation) {
+		//TODO: validation 작성 해주어야함
+		boolean isRemoveStationGroup = subwayLineStationGroups.removeIf(
+			subwayLineStationGroup -> subwayLineStationGroup.equalStationId(this.downStationId)
+		);
+
+		this.downStationId= downStation.getId();
+		this.subwayLineStationGroups.add(createSubwayLineStationGroup(downStation));
+	}
+
+	private SubwayLineStationGroup createSubwayLineStationGroup(Station station) {
+		return new SubwayLineStationGroup(station, this);
+	}
+
+	private void createSubwayLineStationGroups(List<Station> stations) {
+		for (Station station : stations) {
+			SubwayLineStationGroup subwayLineStationGroup = new SubwayLineStationGroup(station, this);
+			this.subwayLineStationGroups.add(subwayLineStationGroup);
+		}
 	}
 }

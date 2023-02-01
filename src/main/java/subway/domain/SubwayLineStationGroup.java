@@ -33,4 +33,8 @@ public class SubwayLineStationGroup {
 		this.station = station;
 		this.subwayLine = subwayLine;
 	}
+
+	public boolean equalStationId(Long target) {
+		return this.station.equalId(target);
+	}
 }

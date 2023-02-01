@@ -3,6 +3,9 @@ package subway.fixture;
 import subway.presentation.request.SubwayLineRequest;
 
 public class SubwayLineFixtures {
+
+	public static final String SUBWAY_LINE_ROOT_PATH = "/lines";
+
 	/**
 	 * SUB WAY LINE NAME
 	 */
@@ -21,6 +24,8 @@ public class SubwayLineFixtures {
 	public static final Long UP_STATION_ID_1 = 1L;
 	public static final Long DOWN_STATION_ID_1 = 2L;
 	public static final Long DOWN_STATION_ID_2 = 3L;
+
+	public static final Long EXISTING_SUBWAY_LINE_UP_STATION_ID = 1L;
 
 	/**
 	 * SUB WAY LINE DISTANCE

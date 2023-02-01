@@ -7,7 +7,9 @@ import subway.presentation.response.SubwayLineResponse;
 
 public interface CustomSubwayLineRepository {
 
-	List<SubwayLineResponse.LineInfo> findSubwayLineAll();
+	List<SubwayLineResponse.LineInfo> findSubwayLineProjectionAll();
 
-	Optional<SubwayLineResponse.LineInfo> findSubwayLineById(Long id);
+	Optional<SubwayLineResponse.LineInfo> findSubwayLineProjectionById(Long id);
+
+	Optional<SubwayLine> findSubwayLineById(Long id);
 }
