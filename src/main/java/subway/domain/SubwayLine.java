@@ -14,6 +14,10 @@ import javax.persistence.OneToMany;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import subway.application.Section;
+import subway.exception.ErrorCode;
+import subway.exception.InvalidSectionDistanceException;
+import subway.exception.SectionErrorCode;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -63,5 +67,9 @@ public class SubwayLine {
 	public void updateInfo(String name, String color) {
 		this.name = name;
 		this.color = color;
+	}
+
+	public Section createSection(int distance) {
+		return new Section(this.upStationId, this.downStationId, distance);
 	}
 }

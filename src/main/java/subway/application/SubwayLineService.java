@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import subway.domain.SectionRepository;
 import subway.domain.Station;
 import subway.domain.StationRepository;
 import subway.domain.SubwayLine;
@@ -24,6 +25,8 @@ public class SubwayLineService {
 
 	private final StationRepository stationRepository;
 
+	private final SectionRepository sectionRepository;
+
 	@Transactional
 	public SubwayLineResponse.CreateInfo createSubwayLine(SubwayLineRequest.Create createRequest) {
 		List<Station> stations = stationRepository.findByIdIn(createRequest.getUpAndDownStationIds());
@@ -32,9 +35,13 @@ public class SubwayLineService {
 			throw new NotFoundStationException(SubwayLineErrorCode.NOT_FOUND_STATION);
 		}
 
+		SubwayLine subwayLine = createRequest.toEntity(stations);
+
+		sectionRepository.save(subwayLine.createSection(createRequest.getDistance()));
+
 		return new SubwayLineResponse.CreateInfo(
 			subwayLineRepository.save(
-				createRequest.toEntity(stations)
+				subwayLine
 			)
 		);
 	}
