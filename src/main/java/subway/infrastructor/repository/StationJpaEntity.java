@@ -3,6 +3,7 @@ package subway.infrastructor.repository;
 import javax.persistence.*;
 
 @Entity
+@Table(name = "station")
 public class StationJpaEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
