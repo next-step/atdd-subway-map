@@ -169,7 +169,7 @@ public class LineAcceptanceTest {
 
         // then
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-        assertThat(getLine(id).statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        assertThat(getLine(id).statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 
     /**
@@ -183,7 +183,7 @@ public class LineAcceptanceTest {
         ExtractableResponse<Response> deleteResponse = deleteLine(1L);
 
         // then
-        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
         assertThat(deleteResponse.jsonPath().getString("message")).isEqualTo(LineNotFoundException.EXCEPTION_MESSAGE);
     }
 

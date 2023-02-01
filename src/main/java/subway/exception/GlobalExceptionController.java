@@ -10,7 +10,7 @@ public class GlobalExceptionController {
 
     @ExceptionHandler(SubwayException.class)
     public ResponseEntity<ErrorDTO> handleRuntimeException(SubwayException exception) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new ErrorDTO(exception.getMessage()));
     }
 }
