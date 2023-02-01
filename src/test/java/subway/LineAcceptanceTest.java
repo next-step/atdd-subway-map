@@ -5,6 +5,7 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -108,23 +109,26 @@ public class LineAcceptanceTest {
     @Test
     void 지하철_노선을_생성하고_수정하면_노선_정보는_수정된다() {
         //given
-        String lineSixName = "6호선";
-        String lineSixColor = "갈색";
+        saveStation("지하철역");
+        saveStation("새로운지하철역");
 
-        Map<String, String> params = new HashMap<>();
-//        putParams(params, lineSixName, lineSixColor);
-        Long id = getSaveLineResponse(params).getId();
+        final Map<String, String> lineParams = new HashMap<>();
+        LineTestDto shinBunDangLine = new LineTestDto("신분당선", "bg-red-600", 1L, 2L, 10L);
+        Long id = saveLine(lineParams, shinBunDangLine).getId();
 
         //when
-        String lineChangeColor = "흑색";
-        params.put("color", lineChangeColor);
-
-        ExtractableResponse<Response> updateResponse = getUpdateResponse(params, id);
+        String lineChangeName = "다른분당선";
+        String lineChangeColor = "bg-red-600";
+        ExtractableResponse<Response> updateResponse = getUpdateResponse(lineParams, id, lineChangeName, lineChangeColor);
 
         //then
-        String color = updateResponse.body().jsonPath().get("color");
+        String updatedName = updateResponse.body().jsonPath().get("name");
+        String updatedColor = updateResponse.body().jsonPath().get("color");
 
-        Assertions.assertThat(color).isEqualTo(lineChangeColor);
+        Assertions.assertThat(updatedName).isEqualTo(lineChangeName);
+        Assertions.assertThat(updatedColor).isEqualTo(lineChangeColor);
+
+        getViewResponses();
     }
 
     /**
@@ -147,6 +151,13 @@ public class LineAcceptanceTest {
 
         // then
         Assertions.assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    private ExtractableResponse<Response> getUpdateResponse(Map<String, String> lineParams, Long id, String lineChangeName, String lineChangeColor) {
+        lineParams.put("name", lineChangeName);
+        lineParams.put("color", lineChangeColor);
+        ExtractableResponse<Response> updateResponse = getUpdateResponse(lineParams, id);
+        return updateResponse;
     }
 
     private SaveLineResponse saveLine(Map<String, String> lineParams, LineTestDto lineName) {

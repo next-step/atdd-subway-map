@@ -5,10 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 import subway.station.domain.line.Line;
 import subway.station.domain.line.LineRepository;
 import subway.station.domain.station.StationRepository;
-import subway.station.web.dto.FindLineResponse;
-import subway.station.web.dto.SaveLineRequest;
-import subway.station.web.dto.SaveLineResponse;
-import subway.station.web.dto.ViewLineResponse;
+import subway.station.web.dto.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -52,10 +49,11 @@ public class LineService {
     }
 
     @Transactional
-    public SaveLineResponse update(Long id, String color) {
+    public UpdateLineResponse update(Long id, String name, String color) {
         Line line = lineRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("검색된 노선이 없습니다. id를 바꿔주세요."));
+        line.changeName(name);
         line.changeColor(color);
-        return createLineResponse(line);
+        return createUpdateLineResponse(line);
     }
 
     @Transactional
@@ -87,6 +85,13 @@ public class LineService {
                 line.getName(),
                 line.getColor(),
                 line.getStations()
+        );
+    }
+
+    private UpdateLineResponse createUpdateLineResponse(Line line) {
+        return new UpdateLineResponse(
+                line.getName(),
+                line.getColor()
         );
     }
 }

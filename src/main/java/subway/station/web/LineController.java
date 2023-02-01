@@ -3,10 +3,7 @@ package subway.station.web;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import subway.station.service.LineService;
-import subway.station.web.dto.FindLineResponse;
-import subway.station.web.dto.SaveLineRequest;
-import subway.station.web.dto.SaveLineResponse;
-import subway.station.web.dto.ViewLineResponse;
+import subway.station.web.dto.*;
 
 import java.net.URI;
 import java.util.List;
@@ -38,9 +35,9 @@ public class LineController {
     }
 
     @PutMapping("/lines/{id}")
-    public ResponseEntity<SaveLineResponse> updateLine(@PathVariable Long id, @RequestBody SaveLineRequest saveLineRequest) {
-        SaveLineResponse updateResponse = lineService.update(id, saveLineRequest.getColor());
-        return ResponseEntity.ok().body(updateResponse);
+    public ResponseEntity<UpdateLineResponse> updateLine(@PathVariable Long id, @RequestBody UpdateLineResponse updateLineRequest) {
+        UpdateLineResponse line = lineService.update(id, updateLineRequest.getName(), updateLineRequest.getColor());
+        return ResponseEntity.ok().body(line);
     }
 
     @DeleteMapping("/lines/{id}")
