@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.HashMap;
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class LineAcceptanceTest {
 
@@ -103,6 +105,7 @@ class LineAcceptanceTest {
                         .color("bg-green-600")
                         .upStationId(1L)
                         .downStationId(3L)
+                        .distance(10L)
                         .build()
         );
         lines.forEach(this::createLine);
@@ -115,11 +118,14 @@ class LineAcceptanceTest {
                 .extract();
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.statusCode())
+                .isEqualTo(HttpStatus.OK.value());
         assertThat(response.jsonPath()
                 .getList("name", String.class))
                 .hasSameSizeAs(lines)
-                .containsAll(lines.stream().map(LineRequest::getName).collect(Collectors.toList()));
+                .containsAll(lines.stream()
+                        .map(LineRequest::getName)
+                        .collect(Collectors.toList()));
     }
 
     private void createLine(LineRequest request) {
@@ -164,7 +170,7 @@ class LineAcceptanceTest {
                 .isEqualTo(request.getName());
         assertThat(response.jsonPath().getString("color"))
                 .isEqualTo(request.getColor());
-        assertThat(response.jsonPath().getList("stations", Long.class))
+        assertThat(response.jsonPath().getList("stations.id", Long.class))
                 .contains(request.getUpStationId(), request.getDownStationId());
     }
 
@@ -182,6 +188,7 @@ class LineAcceptanceTest {
                 .color("bg-green-600")
                 .upStationId(1L)
                 .downStationId(3L)
+                .distance(10L)
                 .build();
 
         createLine(request);
@@ -212,8 +219,6 @@ class LineAcceptanceTest {
                 .isEqualTo(params.get("name"));
         assertThat(line.jsonPath().getString("color"))
                 .isEqualTo(params.get("color"));
-
-
     }
 
     /**
@@ -224,13 +229,13 @@ class LineAcceptanceTest {
     @DisplayName("지하철 노선을 삭제한다.")
     @Test
     void deleteLine() {
-
         // given
         LineRequest request = LineRequest.builder()
                 .name("분당선")
                 .color("bg-green-600")
                 .upStationId(1L)
                 .downStationId(3L)
+                .distance(10L)
                 .build();
 
         createLine(request);
