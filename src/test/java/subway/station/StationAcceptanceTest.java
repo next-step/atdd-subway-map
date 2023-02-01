@@ -1,5 +1,6 @@
 package subway.station;
 
+import subway.station.fixture.StationFixture;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -8,16 +9,16 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import subway.station.fixture.StationFixture;
 
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationAcceptanceTest {
+
+    private final static String urlPath = "/stations";
 
     /**
      * When 지하철역을 생성하면
@@ -85,21 +86,21 @@ public class StationAcceptanceTest {
         return RestAssured.given().log().all()
                 .body(station.toMap())
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
+                .when().post(urlPath)
                 .then().log().all()
                 .extract();
     }
 
     private ExtractableResponse<Response> 삭제_지하철역(Long stationId) {
         return RestAssured.given().log().all()
-                .when().delete("/stations/" + stationId)
+                .when().delete(urlPath + "/{id}", stationId)
                 .then().log().all()
                 .extract();
     }
 
     private ExtractableResponse<Response> 조회_지하철역_목록() {
         return RestAssured.given().log().all()
-                .when().get("/stations")
+                .when().get(urlPath)
                 .then().log().all()
                 .extract();
     }
