@@ -71,4 +71,8 @@ public class Section {
     public int hashCode() {
         return getClass().hashCode();
     }
+
+    public boolean hasStation(Station station) {
+        return this.downStation.equals(station) || this.upStation.equals(station);
+    }
 }

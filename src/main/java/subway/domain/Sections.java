@@ -40,6 +40,6 @@ public class Sections {
 
     public boolean hasStation(Station station){
         return sections.stream()
-                .anyMatch(section -> section.getDownStation().equals(station) || section.getUpStation().equals(station));
+                .anyMatch(section -> hasStation(station));
     }
 }
