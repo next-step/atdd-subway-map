@@ -7,13 +7,13 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static subway.AssertionUtils.*;
 
 @DisplayName("지하철 노선 관련 기능")
 @AcceptanceTest
@@ -43,7 +43,7 @@ public class LineAcceptanceTest {
         Assertions.assertAll(
             withNames(linesResponse, (String) body.get("name")),
             withColors(linesResponse, (String) body.get("color")),
-            withStationIds(linesResponse, (Long) body.get("upStationId"), (Long) body.get("downStationId"))
+            withStationIdsInAnyOrder(linesResponse, (Long) body.get("upStationId"), (Long) body.get("downStationId"))
         );
     }
 
@@ -69,7 +69,7 @@ public class LineAcceptanceTest {
         Assertions.assertAll(
             withNames(response, "신분당선", "분당선"),
             withColors(response, "bg-red-600", "bg-green-600"),
-            withStationIds(response, 1L, 2L, 1L, 3L)
+            withStationIdsInAnyOrder(response, 1L, 2L, 1L, 3L)
         );
     }
 
@@ -91,7 +91,7 @@ public class LineAcceptanceTest {
         Assertions.assertAll(
             withName(response, "신분당선"),
             withColor(response, "bg-red-600"),
-            withStationIds(response, 1L, 2L)
+            withStationIdsInAnyOrder(response, 1L, 2L)
         );
     }
 
@@ -151,7 +151,7 @@ public class LineAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
-    static private ExtractableResponse<Response> createRequest(Map<String, Object> body) {
+    private static ExtractableResponse<Response> createRequest(Map<String, Object> body) {
         return RestAssured.given().log().all()
             .body(body)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -160,14 +160,14 @@ public class LineAcceptanceTest {
             .extract();
     }
 
-    static private ExtractableResponse<Response> getAllLinesRequest() {
+    private static ExtractableResponse<Response> getAllLinesRequest() {
         return RestAssured.given().log().all()
             .when().get("/lines")
             .then().log().all()
             .extract();
     }
 
-    private ExtractableResponse<Response> getLineRequest(Long id) {
+    public static ExtractableResponse<Response> getLineRequest(Long id) {
         return RestAssured.given().log().all().pathParam("id", id)
             .when().get("/lines/{id}")
             .then().log().all()
@@ -192,25 +192,5 @@ public class LineAcceptanceTest {
             )
         );
         return lines.getOrDefault(name, lines.get("신분당선"));
-    }
-
-    static private Executable withNames(ExtractableResponse<Response> response, String...names) {
-        return () -> assertThat(response.jsonPath().getList("name", String.class)).containsAnyOf(names);
-    }
-
-    static private Executable withColors(ExtractableResponse<Response> response, String...colors) {
-        return () -> assertThat(response.jsonPath().getList("color", String.class)).containsAnyOf(colors);
-    }
-
-    static private Executable withStationIds(ExtractableResponse<Response> response, Long...ids) {
-        return () -> assertThat(response.jsonPath().getList("stations.id.flatten()", Long.class)).containsExactlyInAnyOrder(ids);
-    }
-
-    private Executable withName(ExtractableResponse<Response> response, String name) {
-        return () -> assertThat((String) response.jsonPath().get("name")).isEqualTo(name);
-    }
-
-    private Executable withColor(ExtractableResponse<Response> response, String color) {
-        return () -> assertThat((String) response.jsonPath().get("color")).isEqualTo(color);
     }
 }

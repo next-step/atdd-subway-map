@@ -27,6 +27,7 @@ public class SectionService {
         this.sectionRepository = sectionRepository;
     }
 
+    @Transactional
     public SectionResponse createSection(Long lineId, CreateSectionRequest req) {
         Line line = lineRepository.findById(lineId).orElseThrow(NoSuchElementException::new);
         Section newSection = Section.create(
