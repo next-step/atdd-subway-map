@@ -1,7 +1,8 @@
-package subway;
+package subway.station;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.exception.StationNotFoundException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -9,7 +10,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional(readOnly = true)
 public class StationService {
-    private StationRepository stationRepository;
+    private final StationRepository stationRepository;
 
     public StationService(StationRepository stationRepository) {
         this.stationRepository = stationRepository;
@@ -26,6 +27,12 @@ public class StationService {
                 .map(this::createStationResponse)
                 .collect(Collectors.toList());
     }
+
+    public Station findStation(Long id) {
+        return stationRepository.findById(id)
+                .orElseThrow(StationNotFoundException::new);
+    }
+
 
     @Transactional
     public void deleteStationById(Long id) {
