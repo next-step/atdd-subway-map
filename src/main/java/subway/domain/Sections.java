@@ -21,13 +21,12 @@ public class Sections {
         return sections.isEmpty();
     }
 
-    public boolean hasLastStation(Station upStation) {
-        return getLastStation().equals(upStation);
+    public boolean isLastStation(Station station) {
+        return getLastStation().equals(station);
     }
 
     public Station getLastStation() {
-        List<Station> stations = getStations();
-        return stations.get(stations.size() - 1);
+        return sections.get(sections.size() - 1).getDownStation();
     }
 
     public List<Station> getStations() {

@@ -1,5 +1,8 @@
 package subway.domain;
 
+import subway.exception.CannotRemoveNonLastSectionException;
+import subway.exception.CannotRemoveUniqueSectionException;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -36,8 +39,8 @@ public class Line {
         this.color = color;
     }
 
-    public boolean hasLastStation(Station station) {
-        return sections.hasLastStation(station);
+    public boolean isLastStation(Station station) {
+        return sections.isLastStation(station);
     }
 
     public boolean hasStation(Station station) {
@@ -59,11 +62,16 @@ public class Line {
         return sections.getLastStation();
     }
 
-    public boolean hasSingleSection() {
-        return sections.hasSingleSection();
-    }
+    public void removeSection(Station station) {
+        if (sections.hasSingleSection()) {
+            throw new CannotRemoveUniqueSectionException();
+        }
 
-    public void removeSection() {
+        if (!isLastStation(station)) {
+            Station lastStation = sections.getLastStation();
+            throw new CannotRemoveNonLastSectionException(lastStation.getName(), station.getName());
+        }
+
         sections.remove();
     }
 

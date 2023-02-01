@@ -68,7 +68,7 @@ public class LineService {
         Station upStation = stationService.findById(sectionRequest.getUpStationId());
         Station downStation = stationService.findById(sectionRequest.getDownStationId());
 
-        if (!line.hasLastStation(upStation)) {
+        if (!line.isLastStation(upStation)) {
             String lastStationName = line.getLastStation().getName();
             String upStationName = upStation.getName();
             throw new InvalidSectionUpStationException(lastStationName, upStationName);
@@ -85,16 +85,6 @@ public class LineService {
     public void deleteSection(Long lineId, Long stationId) {
         Line line = findLineById(lineId);
         Station station = stationService.findById(stationId);
-
-        if (line.hasSingleSection()) {
-            throw new CannotRemoveUniqueSectionException();
-        }
-
-        if (!line.hasLastStation(station)) {
-            Station lastStation = line.getLastStation();
-            throw new CannotRemoveNonLastSectionException(lastStation.getName(), station.getName());
-        }
-
-        line.removeSection();
+        line.removeSection(station);
     }
 }
