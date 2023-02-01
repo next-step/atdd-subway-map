@@ -7,8 +7,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import subway.AcceptanceTest;
 
-import static subway.acceptance.TestFixtureLine.*;
-import static subway.acceptance.TestFixtureStation.지하철역_생성_요청;
+import static subway.fixture.TestFixtureLine.*;
+import static subway.fixture.TestFixtureStation.지하철역_생성_요청;
 
 @DisplayName("지하철 노선 기능 인수 테스트")
 class LineAcceptanceTest extends AcceptanceTest {
@@ -26,10 +26,6 @@ class LineAcceptanceTest extends AcceptanceTest {
         검암역 = 지하철역_생성_요청("검암역");
     }
 
-    /**
-     * When 지하철 노선을 생성하면
-     * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
-     */
     @DisplayName("지하철 노선을 생성한다.")
     @Test
     void createLine() {
@@ -42,11 +38,6 @@ class LineAcceptanceTest extends AcceptanceTest {
         지하철_노선_목록_중_생성한_노선_조회됨(지하철_노선_목록_조회_응답, 이호선);
     }
 
-    /**
-     * Given 2개의 지하철 노선을 생성하고
-     * When 지하철 노선 목록을 조회하면
-     * Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다
-     */
     @DisplayName("지하철 노선 목록을 조회한다.")
     @Test
     void showLines() {
@@ -58,11 +49,6 @@ class LineAcceptanceTest extends AcceptanceTest {
         지하철_노선_목록_조회됨(지하철_노선_목록_응답, 2);
     }
 
-    /**
-     * Given 지하철 노선을 생성하고
-     * When 생성한 지하철 노선을 조회하면
-     * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
-     */
     @DisplayName("지하철 노선을 조회한다.")
     @Test
     void findLine() {
@@ -75,11 +61,6 @@ class LineAcceptanceTest extends AcceptanceTest {
         지하철_노선_조회됨(지하철_노선_조회_응답, "2호선", "bg-red-600", 2);
     }
 
-    /**
-     * Given 지하철 노선을 생성하고
-     * When 생성한 지하철 노선을 수정하면
-     * Then 해당 지하철 노선 정보가 수정된다.
-     */
     @DisplayName("지하철 노선 정보를 수정한다.")
     @Test
     void updateLine() {
@@ -96,11 +77,6 @@ class LineAcceptanceTest extends AcceptanceTest {
         지하철_노선_조회됨(지하철_노선_조회_응답, "3호선", "bg-yellow-600", 2);
     }
 
-    /**
-     * Given 지하철 노선을 생성하고
-     * When 생성한 지하철 노선을 삭제하면
-     * Then 해당 지하철 노선 정보는 삭제된다.
-     */
     @DisplayName("지하철 노선을 삭제한다.")
     @Test
     void deleteLine() {

@@ -6,10 +6,9 @@ import subway.domain.Station;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class LineResponse {
-    private long id;
+    private Long id;
     private String name;
     private String color;
     @JsonProperty("stations")
@@ -17,7 +16,7 @@ public class LineResponse {
 
     private LineResponse() {}
 
-    public LineResponse(final long id, final String name, final String color, final List<StationResponse> stationResponses) {
+    public LineResponse(final Long id, final String name, final String color, final List<StationResponse> stationResponses) {
         this.id = id;
         this.name = name;
         this.color = color;
@@ -25,16 +24,17 @@ public class LineResponse {
     }
 
     public static LineResponse createResponse(final Line saveLine) {
-        return new LineResponse(saveLine.getId(), saveLine.getName(), saveLine.getColor(), convertToStationResponse(saveLine.getUpStation(), saveLine.getDownStation()));
+        final List<StationResponse> stationResponses = convertToStationResponse(saveLine.convertToStation());
+        return new LineResponse(saveLine.getId(), saveLine.getName(), saveLine.getColor(), stationResponses);
     }
 
-    private static List<StationResponse> convertToStationResponse(final Station upStation, final Station downStation) {
-        return Stream.of(upStation, downStation)
-                .map(StationResponse::of)
+    private static List<StationResponse> convertToStationResponse(final List<Station> stations) {
+        return stations.stream()
+                .map(StationResponse::from)
                 .collect(Collectors.toList());
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 

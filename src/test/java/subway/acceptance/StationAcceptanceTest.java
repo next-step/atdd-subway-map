@@ -7,7 +7,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import subway.AcceptanceTest;
 
-import static subway.acceptance.TestFixtureStation.*;
+import static subway.fixture.TestFixtureStation.*;
 
 @DisplayName("지하철 역 기능 인수 테스트")
 class StationAcceptanceTest extends AcceptanceTest {
@@ -17,12 +17,6 @@ class StationAcceptanceTest extends AcceptanceTest {
         super.setUp();
     }
 
-    /**
-     * When 지하철역을 생성하면
-     * Then 지하철역이 생성된다
-     * When 지하철역 조회하면
-     * Then 생성한 역을 찾을 수 있다
-     */
     @DisplayName("지하철역을 생성한다.")
     @Test
     void createStation() {
@@ -35,11 +29,6 @@ class StationAcceptanceTest extends AcceptanceTest {
         지하철역_조회됨(지하철역_목록, "강남역");
     }
 
-    /**
-     * Given 2개의 지하철역을 생성하고
-     * When 지하철역 목록을 조회하면
-     * Then 2개의 지하철역을 응답 받는다
-     */
     @DisplayName("지하철역 목록을 조회한다.")
     @Test
     void showStations() {
@@ -51,12 +40,6 @@ class StationAcceptanceTest extends AcceptanceTest {
         지하철역_목록_조회됨(지하철역_목록_응답, "잠실역", "검암역");
     }
 
-    /**
-     * Given 지하철역을 생성하고
-     * When 그 지하철역을 삭제하고
-     * When 지하철역 목록 조회를 하면
-     * Then 생성한 역을 찾을 수 없다
-     */
     @DisplayName("지하철역을 제거한다.")
     @Test
     void deleteStation() {

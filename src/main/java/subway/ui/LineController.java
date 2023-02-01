@@ -33,20 +33,20 @@ public class LineController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<LineResponse> findLine(@PathVariable final long id) {
+    public ResponseEntity<LineResponse> findLine(@PathVariable final Long id) {
 
         return ResponseEntity.ok().body(lineService.findLine(id));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateLine(@PathVariable final long id, @RequestBody final LineRequest lineRequest) {
+    public ResponseEntity<Void> updateLine(@PathVariable final Long id, @RequestBody final LineRequest lineRequest) {
 
         lineService.updateLine(id, lineRequest);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteLine(@PathVariable final long id) {
+    public ResponseEntity<Void> deleteLine(@PathVariable final Long id) {
 
         lineService.deleteLine(id);
         return ResponseEntity.noContent().build();

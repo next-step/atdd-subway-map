@@ -2,9 +2,7 @@ package subway.application;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import subway.domain.Line;
-import subway.domain.LineRepository;
-import subway.domain.Station;
+import subway.domain.*;
 import subway.ui.dto.LineRequest;
 import subway.ui.dto.LineResponse;
 
@@ -25,16 +23,14 @@ public class LineService {
 
     @Transactional
     public LineResponse createLine(final LineRequest lineRequest) {
-
         final Station upStation = stationService.findById(lineRequest.getUpStationId());
         final Station downStation = stationService.findById(lineRequest.getDownStationId());
-        final Line saveLine = lineRepository.save(lineRequest.toEntity(upStation, downStation));
+        final Line saveLine = save(lineRequest.toEntity(upStation, downStation));
 
         return LineResponse.createResponse(saveLine);
     }
 
     public List<LineResponse> showLines() {
-
         final List<Line> lines = lineRepository.findAll();
 
         return lines.stream()
@@ -42,30 +38,32 @@ public class LineService {
                 .collect(Collectors.toList());
     }
 
-    public LineResponse findLine(final long lineId) {
-
+    public LineResponse findLine(final Long lineId) {
         final Line findLine = findById(lineId);
 
         return LineResponse.createResponse(findLine);
     }
 
     @Transactional
-    public void updateLine(final long lineId, final LineRequest lineRequest) {
-
+    public void updateLine(final Long lineId, final LineRequest lineRequest) {
         final Line findLine = findById(lineId);
 
         findLine.updateLine(lineRequest.getName(), lineRequest.getColor());
     }
 
     @Transactional
-    public void deleteLine(final long lineId) {
-
+    public void deleteLine(final Long lineId) {
         lineRepository.deleteById(lineId);
     }
 
-    private Line findById(long lineId) {
+    private Line save(final Line line) {
+        final Sections sections = line.getSections();
+        sections.addLine(line);
+        return lineRepository.save(line);
+    }
 
+    public Line findById(final Long lineId) {
         return lineRepository.findById(lineId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 호선입니다."));
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 노선입니다."));
     }
 }

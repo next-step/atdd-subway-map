@@ -1,7 +1,10 @@
 package subway.domain;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Entity
 public class Line {
@@ -15,30 +18,49 @@ public class Line {
     @Column(length = 20, nullable = false)
     private String color;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn
-    private Station upStation;
-
-    @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn
-    private Station downStation;
-
-    private Integer distance;
+    @Embedded
+    private Sections sections;
 
     protected Line() {
     }
 
-    public Line(final Long id, final String name, final String color, final Station upStation, final Station downStation, final Integer distance) {
+    public Line(final Long id, final String name, final String color, final Sections sections) {
         this.id = id;
         this.name = name;
         this.color = color;
-        this.upStation = upStation;
-        this.downStation = downStation;
-        this.distance = distance;
+        this.sections = sections;
+    }
+
+    public Line(final Long id, final String name, final String color, final Station upStation, final Station downStation, final Integer distance) {
+        this(id, name, color, new Sections(List.of(new Section(upStation, downStation, distance))));
     }
 
     public Line(final String name, final String color, final Station upStation, final Station downStation, final Integer distance) {
-        this(null, name, color, upStation, downStation, distance);
+        this(null, name, color, new Sections(List.of(new Section(upStation, downStation, distance))));
+    }
+
+    public Line(final String name, final String color, final Sections sections) {
+        this(null, name, color, sections);
+    }
+
+    public void updateLine(final String changeName, final String changeColor) {
+        this.name = changeName;
+        this.color = changeColor;
+    }
+
+    public void addSection(final Station upStation, final Station downStation, final Integer distance) {
+        this.sections.addSection(this, upStation, downStation, distance);
+    }
+
+    public void removeSection(final Station station) {
+        this.sections.removeSection(station);
+    }
+
+    public List<Station> convertToStation() {
+        return this.sections.getSections().stream()
+                .flatMap(section -> Stream.of(section.getUpStation(), section.getDownStation()))
+                .distinct()
+                .collect(Collectors.toList());
     }
 
     public Long getId() {
@@ -53,17 +75,12 @@ public class Line {
         return color;
     }
 
-    public Station getUpStation() {
-        return upStation;
+    public Sections getSections() {
+        return this.sections;
     }
 
-    public Station getDownStation() {
-        return downStation;
-    }
-
-    public void updateLine(final String changeName, final String changeColor) {
-        this.name = changeName;
-        this.color = changeColor;
+    public List<Section> getSectionsList() {
+        return this.sections.getSections();
     }
 
     @Override
