@@ -24,14 +24,12 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 생성한다.")
     @Test
     void createStation() {
-        // given
-        final String stationName = "강남역";
-
         // when
+        final String stationName = "강남역";
         var response = 지하철역_등록_요청(stationName);
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(지하철역_조회_요청().jsonPath().getList("name")).containsAnyOf(stationName);
     }
 
@@ -47,8 +45,8 @@ public class StationAcceptanceTest {
         final String firstStationName = "강남역";
         final String secondStationName = "양재역";
 
-        지하철역_등록_성공_응답(firstStationName);
-        지하철역_등록_성공_응답(secondStationName);
+        지하철역_등록됨(firstStationName);
+        지하철역_등록됨(secondStationName);
 
         // when
         var response = 지하철역_조회_요청();
@@ -68,7 +66,7 @@ public class StationAcceptanceTest {
     void deleteStation() {
         // given
         final String stationName = "강남역";
-        long stationId = 지하철역_등록_성공_응답(stationName).body().jsonPath().getLong("id");
+        long stationId = 지하철역_등록됨(stationName).body().jsonPath().getLong("id");
 
         // when
         지하철역_삭제_요청(stationId);
@@ -77,13 +75,13 @@ public class StationAcceptanceTest {
         assertThat(지하철역_조회_요청().jsonPath().getList("name")).doesNotContain(stationName);
     }
 
-    private ExtractableResponse<Response> 지하철역_등록_성공_응답(String stationName) {
+    public static ExtractableResponse<Response> 지하철역_등록됨(String stationName) {
         ExtractableResponse<Response> response = 지하철역_등록_요청(stationName);
         지하철역_등록_성공(response);
         return response;
     }
 
-    private ExtractableResponse<Response> 지하철역_등록_요청(String stationName) {
+    public static ExtractableResponse<Response> 지하철역_등록_요청(String stationName) {
         return RestAssured.given().log().all()
                 .body(Map.of("name", stationName))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -93,8 +91,8 @@ public class StationAcceptanceTest {
                 .extract();
     }
 
-    private void 지하철역_등록_성공(ExtractableResponse<Response> response) {
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+    public static void 지하철역_등록_성공(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
 
     private ExtractableResponse<Response> 지하철역_조회_요청() {
