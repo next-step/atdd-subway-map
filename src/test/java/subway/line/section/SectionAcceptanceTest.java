@@ -1,9 +1,10 @@
-package subway.section;
+package subway.line.section;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import common.AbstractAcceptanceTest;
 import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.List;
@@ -51,6 +52,9 @@ public class SectionAcceptanceTest extends AbstractAcceptanceTest {
 
         // Then
         List<SectionResponse> sections = findSections(lineId);
+
+        sections.forEach(System.out::println);
+
         assertThat(sections)
             .contains(createdSection);
     }
@@ -129,6 +133,7 @@ public class SectionAcceptanceTest extends AbstractAcceptanceTest {
     public static SectionResponse createSection(Long lineId, Long downStationId, Long upStationId, int distance) {
         return RestAssured
             .given()
+                .contentType(ContentType.JSON)
                 .body(
                     SectionRequest.builder()
                         .downStationId(downStationId)
@@ -155,11 +160,11 @@ public class SectionAcceptanceTest extends AbstractAcceptanceTest {
     public static ExtractableResponse<Response> findSectionById(Long lineId, Long sectionId) {
         return RestAssured
             .given()
-            .param("sectionId", sectionId)
+                .param("sectionId", sectionId)
             .when()
-            .get("/lines/{lineId}/sections", lineId)
+                .get("/lines/{lineId}/sections", lineId)
             .then()
-            .extract();
+                .extract();
     }
     public static SectionResponse findSection(Long lineId, Long sectionId) {
         return findSectionById(lineId, sectionId)
@@ -172,6 +177,6 @@ public class SectionAcceptanceTest extends AbstractAcceptanceTest {
             .when()
                 .get("/lines/{lineId}/sections", lineId)
             .then()
-            .extract().jsonPath().getList("$", SectionResponse.class);
+                .extract().jsonPath().getList("$", SectionResponse.class);
     }
 }

@@ -1,7 +1,9 @@
 package subway.line;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,7 +15,7 @@ import javax.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import subway.section.Section;
+import subway.line.section.Section;
 import subway.station.Station;
 
 @Entity
@@ -42,6 +44,7 @@ public class Line {
     public Line(String name, String color, int distance) {
         this(name, color, distance, new ArrayList<>());
     }
+
     public Line(String name, String color, int distance, List<Station> stations) {
         this.name = name;
         this.color = color;
@@ -77,5 +80,34 @@ public class Line {
         if (StringUtils.isNotBlank(modifiedColor)) {
             this.color = modifiedColor;
         }
+    }
+
+    public void registerSection(Section section) {
+        if (isAbleToRegister(section)) {
+            section.setNumber(nextSectionNumber());
+            section.setLine(this);
+            sections.add(section);
+        }
+    }
+
+    private int nextSectionNumber() {
+        return sections.stream()
+            .mapToInt(Section::getNumber)
+            .max().orElse(0) + 1;
+    }
+
+    private boolean isAbleToRegister(Section section) {
+        return !sections.contains(section) && isConnected(section);
+    }
+
+    private boolean isConnected(Section section) {
+        return getLastSection()
+            .map(lastSection -> lastSection.isConnected(section))
+            .orElse(true);
+    }
+
+    private Optional<Section> getLastSection() {
+        return sections.stream()
+            .max(Comparator.comparing(Section::getNumber));
     }
 }
