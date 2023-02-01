@@ -8,15 +8,18 @@ import javax.validation.constraints.NotNull;
 public class LineRequest {
 
     @NotBlank
-    private final String name;
+    private String name;
     @NotBlank
-    private final String color;
+    private String color;
     @NotNull
-    private final Long upStationId;
+    private Long upStationId;
     @NotNull
-    private final Long downStationId;
+    private Long downStationId;
     @Min(value = 0)
-    private final int distance;
+    private int distance;
+
+    public LineRequest() {
+    }
 
     public LineRequest(
             final String name,
@@ -38,6 +41,14 @@ public class LineRequest {
 
     public String getColor() {
         return color;
+    }
+
+    public Long getUpStationId() {
+        return upStationId;
+    }
+
+    public Long getDownStationId() {
+        return downStationId;
     }
 
     public List<Long> getStationIds() {

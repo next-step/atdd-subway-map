@@ -2,9 +2,12 @@ package subway.dto;
 
 public class LineEditRequest {
 
-    private final String name;
-    private final String color;
-    private final int distance;
+    private String name;
+    private String color;
+    private int distance;
+
+    public LineEditRequest() {
+    }
 
     public LineEditRequest(final String name, final String color, final int distance) {
         this.name = name;
