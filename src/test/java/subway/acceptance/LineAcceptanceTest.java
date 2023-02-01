@@ -38,7 +38,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine() {
         // when
-        지하철_노선_생성_요청(이호선.요청_데이터_생성(강남역_id, 서울대입구역_id));
+        지하철_노선_생성_요청(이호선.생성_요청_데이터_생성(강남역_id, 서울대입구역_id));
 
         // then
         assertThat(지하철_노선_목록_조회_요청().jsonPath().getList(노선_이름.필드명()))
@@ -54,8 +54,8 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void selectLines() {
         // given
-        지하철_노선_생성_요청(이호선.요청_데이터_생성(강남역_id, 서울대입구역_id));
-        지하철_노선_생성_요청(사호선.요청_데이터_생성(강남역_id, 서울대입구역_id));
+        지하철_노선_생성_요청(이호선.생성_요청_데이터_생성(강남역_id, 서울대입구역_id));
+        지하철_노선_생성_요청(사호선.생성_요청_데이터_생성(강남역_id, 서울대입구역_id));
 
         // when
         ExtractableResponse<Response> 지하철_노선_목록_조회_결과 = 지하철_노선_목록_조회_요청();
@@ -75,7 +75,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void selectLine() {
         // given
-        String 생성된_지하철_노선_id = 지하철_노선_생성_요청(이호선.요청_데이터_생성(강남역_id, 서울대입구역_id))
+        String 생성된_지하철_노선_id = 지하철_노선_생성_요청(이호선.생성_요청_데이터_생성(강남역_id, 서울대입구역_id))
                 .jsonPath().getString(식별자_아이디.필드명());
 
         // when
@@ -89,5 +89,29 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertThat(지하철_노선_조회_결과.jsonPath().getList(노선_내_역_이름_목록.필드명()))
                 .hasSize(2)
                 .contains(강남역.역_이름(), 서울대입구역.역_이름());
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 수정하면
+     * Then 해당 지하철 노선 정보는 수정된다
+     */
+    @DisplayName("지하철 노선을 수정한다.")
+    @Test
+    void updateLine() {
+        // given
+        String 생성된_지하철_노선_id = 지하철_노선_생성_요청(이호선.생성_요청_데이터_생성(강남역_id, 서울대입구역_id))
+                .jsonPath().getString(식별자_아이디.필드명());
+
+        // when
+        지하철_노선_수정_요청(생성된_지하철_노선_id, 사호선.수정_요청_데이터_생성());
+
+        // then
+        ExtractableResponse<Response> 지하철_노선_단건_조회_결과 = 지하철_노선_단건_조회_요청(생성된_지하철_노선_id);
+
+        assertThat(지하철_노선_단건_조회_결과.jsonPath().getString(노선_이름.필드명()))
+                .isEqualTo(사호선.노선_이름());
+        assertThat(지하철_노선_단건_조회_결과.jsonPath().getString(노선_색깔.필드명()))
+                .isEqualTo(사호선.노선_색깔());
     }
 }

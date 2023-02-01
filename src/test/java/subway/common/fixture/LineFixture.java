@@ -48,13 +48,20 @@ public enum LineFixture {
         return downStationId;
     }
 
-    public Map<String, String> 요청_데이터_생성(String 상행종점역_id, String 하행종점역_id) {
+    public Map<String, String> 생성_요청_데이터_생성(String 상행종점역_id, String 하행종점역_id) {
         Map<String, String> params = new HashMap<>();
         params.put(노선_이름.필드명(), 노선_이름());
         params.put(노선_색깔.필드명(), 노선_색깔());
         params.put(노선_간_거리.필드명(), 노선_간_거리());
         params.put(노선_상행_종점역_ID.필드명(), 상행종점역_id);
         params.put(노선_하행_종점역_ID.필드명(), 하행종점역_id);
+        return params;
+    }
+
+    public Map<String, String> 수정_요청_데이터_생성() {
+        Map<String, String> params = new HashMap<>();
+        params.put(노선_이름.필드명(), 노선_이름());
+        params.put(노선_색깔.필드명(), 노선_색깔());
         return params;
     }
 }
