@@ -11,7 +11,6 @@ import static subway.fixtures.StationFixtures.역삼역;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -54,8 +53,8 @@ public class LineAcceptanceTest {
         ExtractableResponse<Response> response = 지하철_노선_목록_조회();
         assertThat(response.jsonPath().getList("name").get(0)).isEqualTo(신분당선_파라미터.get("name"));
         assertThat(response.jsonPath().getList("color").get(0)).isEqualTo(신분당선_파라미터.get("color"));
-        assertThat(response.jsonPath().getList("stations.[0].id").get(0)).isEqualTo(신분당선_파라미터.get("upStationId"));
-        assertThat(response.jsonPath().getList("stations.[1].id").get(0)).isEqualTo(신분당선_파라미터.get("downStationId"));
+        assertThat(response.jsonPath().getString("stations[0].id[0]")).isEqualTo(신분당선_파라미터.get("upStationId"));
+        assertThat(response.jsonPath().getString("stations[0].id[1]")).isEqualTo(신분당선_파라미터.get("downStationId"));
 
     }
 
