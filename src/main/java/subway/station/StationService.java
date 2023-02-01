@@ -38,4 +38,10 @@ public class StationService {
                 station.getName()
         );
     }
+
+    public List<StationResponse> findStationsByIds(List<Long> stationIds) {
+        return stationRepository.findAllById(stationIds).stream()
+                .map(this::createStationResponse)
+                .collect(Collectors.toList());
+    }
 }

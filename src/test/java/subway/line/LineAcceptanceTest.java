@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.jdbc.Sql;
 
 import java.util.Map;
 
@@ -17,8 +17,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static subway.station.StationAcceptanceTest.지하철역_등록됨;
 
 @DisplayName("지하철노선 관련 기능")
+@Sql(value = "/truncate_table.sql")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class LineAcceptanceTest {
 
     private long firstStationId;
@@ -55,7 +55,7 @@ public class LineAcceptanceTest {
      */
     @DisplayName("지하철 노선 목록을 조회한다.")
     @Test
-    void createLines() {
+    void getLines() {
         // given
         지하철_노선을_생성한다("1호선", "blue darken-4", firstStationId, secondStationId, 20L);
         지하철_노선을_생성한다("2호선", "green darken-2", firstStationId, secondStationId, 10L);

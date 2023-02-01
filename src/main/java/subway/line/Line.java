@@ -18,18 +18,22 @@ public class Line {
 
     private Long downStationId;
 
-    private int distance;
+    private Long distance;
 
     public Line() {
     }
 
-    public Line(Long id, String name, String color, Long upStationId, Long downStationId, int distance) {
-        this.id = id;
+    public Line(String name, String color, Long upStationId, Long downStationId, Long distance) {
         this.name = name;
         this.color = color;
         this.upStationId = upStationId;
         this.downStationId = downStationId;
         this.distance = distance;
+    }
+
+    public void update(String name, String color) {
+        this.name = name;
+        this.color = color;
     }
 
     public Long getId() {
@@ -52,7 +56,7 @@ public class Line {
         return downStationId;
     }
 
-    public int getDistance() {
+    public Long getDistance() {
         return distance;
     }
 }
