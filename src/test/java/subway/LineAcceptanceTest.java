@@ -104,6 +104,40 @@ public class LineAcceptanceTest {
         assertThat(response.jsonPath().getList("id")).hasSize(2).contains(1, 2);
     }
 
+    @DisplayName("지하철 노선을 조회한다.")
+    @Test
+    void showLine() {
+        // given
+        String name = "신분당선";
+        String color = "bg-red-600";
+        int distance = 10;
+        ExtractableResponse<Response> createLineResponse
+                = createLine(name, color, upStationId, downStationId, distance);
+
+        String location = createLineResponse.header("Location");
+
+        System.out.println(location);
+
+        // when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .when()
+                .get(location)
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract();
+
+        // then
+        JsonPath jsonPath = response.jsonPath();
+
+        Assertions.assertAll(
+                () -> assertThat(jsonPath.getString("name")).isEqualTo(name),
+                () -> assertThat(jsonPath.getString("color")).isEqualTo(color),
+                () -> assertThat(jsonPath.getList("stations.id", Long.class))
+                        .containsExactly(upStationId, downStationId),
+                () -> assertThat(jsonPath.getInt("distance")).isEqualTo(distance)
+        );
+    }
+
     private static ExtractableResponse<Response> showLinesResponse() {
         return RestAssured
                 .given().log().all()
@@ -114,7 +148,7 @@ public class LineAcceptanceTest {
                 .extract();
     }
 
-    private static void createLine(
+    private static ExtractableResponse<Response> createLine(
             final String name,
             final String color,
             final Long upStationId,
@@ -129,7 +163,7 @@ public class LineAcceptanceTest {
                 "distance", distance
         );
 
-        RestAssured
+        return RestAssured
                 .given().log().all()
                 .contentType(ContentType.JSON)
                 .body(body)

@@ -43,4 +43,11 @@ public class LineService {
                 .map(LineResponse::by)
                 .collect(Collectors.toUnmodifiableList());
     }
+
+    public LineResponse get(final Long lineId) {
+        Line line = lineRepository.findById(lineId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 노선입니다."));
+
+        return LineResponse.by(line);
+    }
 }
