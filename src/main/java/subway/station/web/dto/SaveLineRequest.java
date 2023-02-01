@@ -1,6 +1,6 @@
 package subway.station.web.dto;
 
-public class LineRequest {
+public class SaveLineRequest {
 
     private String name;
     private String color;

@@ -10,7 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import subway.station.web.dto.LineResponse;
+import subway.station.web.dto.SaveLineResponse;
 
 import java.util.HashMap;
 import java.util.List;
@@ -234,7 +234,7 @@ public class LineAcceptanceTest {
         params.put("distance", String.valueOf(distance));
     }
 
-    private LineResponse getSaveLineResponse(Map<String, String> params) {
+    private SaveLineResponse getSaveLineResponse(Map<String, String> params) {
         ExtractableResponse<Response> saveResponse = RestAssured
                 .given().log().all()
                 .body(params)
@@ -245,6 +245,6 @@ public class LineAcceptanceTest {
 
         Assertions.assertThat(saveResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
-        return saveResponse.jsonPath().getObject("", LineResponse.class);
+        return saveResponse.jsonPath().getObject("", SaveLineResponse.class);
     }
 }

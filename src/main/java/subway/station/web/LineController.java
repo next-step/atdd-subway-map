@@ -3,8 +3,8 @@ package subway.station.web;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import subway.station.service.LineService;
-import subway.station.web.dto.LineRequest;
-import subway.station.web.dto.LineResponse;
+import subway.station.web.dto.SaveLineRequest;
+import subway.station.web.dto.SaveLineResponse;
 
 import java.net.URI;
 import java.util.List;
@@ -19,25 +19,25 @@ public class LineController {
     }
 
     @PostMapping("/lines")
-    public ResponseEntity<LineResponse> saveLine(@RequestBody LineRequest lineRequest) {
-        LineResponse line = lineService.saveLine(lineRequest);
+    public ResponseEntity<SaveLineResponse> saveLine(@RequestBody SaveLineRequest saveLineRequest) {
+        SaveLineResponse line = lineService.saveLine(saveLineRequest);
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
 
     @GetMapping("/lines")
-    public ResponseEntity<List<LineResponse>> viewLines() {
+    public ResponseEntity<List<SaveLineResponse>> viewLines() {
         return ResponseEntity.ok().body(lineService.findAll());
     }
 
     @GetMapping("/lines/{id}")
-    public ResponseEntity<LineResponse> findLineById(@PathVariable Long id) {
-        LineResponse line = lineService.findLineById(id);
+    public ResponseEntity<SaveLineResponse> findLineById(@PathVariable Long id) {
+        SaveLineResponse line = lineService.findLineById(id);
         return ResponseEntity.ok().body(line);
     }
 
     @PutMapping("/lines/{id}")
-    public ResponseEntity<LineResponse> updateLine(@PathVariable Long id, @RequestBody LineRequest lineRequest) {
-        LineResponse updateResponse = lineService.update(id, lineRequest.getColor());
+    public ResponseEntity<SaveLineResponse> updateLine(@PathVariable Long id, @RequestBody SaveLineRequest saveLineRequest) {
+        SaveLineResponse updateResponse = lineService.update(id, saveLineRequest.getColor());
         return ResponseEntity.ok().body(updateResponse);
     }
 

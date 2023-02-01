@@ -4,14 +4,14 @@ import subway.station.domain.station.Station;
 
 import java.util.List;
 
-public class LineResponse {
+public class SaveLineResponse {
 
     private Long id;
     private String name;
     private String color;
     private List<Station> stations;
 
-    public LineResponse(Long id, String name, String color, List<Station> stations) {
+    public SaveLineResponse(Long id, String name, String color, List<Station> stations) {
         this.id = id;
         this.name = name;
         this.color = color;

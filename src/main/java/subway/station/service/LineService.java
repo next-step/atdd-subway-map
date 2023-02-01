@@ -5,8 +5,8 @@ import org.springframework.transaction.annotation.Transactional;
 import subway.station.domain.line.Line;
 import subway.station.domain.line.LineRepository;
 import subway.station.domain.station.StationRepository;
-import subway.station.web.dto.LineRequest;
-import subway.station.web.dto.LineResponse;
+import subway.station.web.dto.SaveLineRequest;
+import subway.station.web.dto.SaveLineResponse;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,32 +24,32 @@ public class LineService {
     }
 
     @Transactional
-    public LineResponse saveLine(LineRequest lineRequest) {
+    public SaveLineResponse saveLine(SaveLineRequest saveLineRequest) {
         Line line = lineRepository.save(new Line(
-                lineRequest.getName(),
-                lineRequest.getColor(),
-                lineRequest.getUpStationId(),
-                lineRequest.getDownStationId(),
-                lineRequest.getDistance(),
-                List.of(stationRepository.findById(lineRequest.getUpStationId()).orElseThrow(() -> new IllegalArgumentException("검색된 지하철이 없습니다. id를 바꿔주세요.")),
-                        stationRepository.findById(lineRequest.getDownStationId()).orElseThrow(() -> new IllegalArgumentException("검색된 지하철이 없습니다. id를 바꿔주세요.")))
+                saveLineRequest.getName(),
+                saveLineRequest.getColor(),
+                saveLineRequest.getUpStationId(),
+                saveLineRequest.getDownStationId(),
+                saveLineRequest.getDistance(),
+                List.of(stationRepository.findById(saveLineRequest.getUpStationId()).orElseThrow(() -> new IllegalArgumentException("검색된 지하철이 없습니다. id를 바꿔주세요.")),
+                        stationRepository.findById(saveLineRequest.getDownStationId()).orElseThrow(() -> new IllegalArgumentException("검색된 지하철이 없습니다. id를 바꿔주세요.")))
                 ));
         return createLineResponse(line);
     }
 
-    public List<LineResponse> findAll() {
+    public List<SaveLineResponse> findAll() {
         return lineRepository.findAll().stream()
                 .map(this::createLineResponse)
                 .collect(Collectors.toList());
     }
 
-    public LineResponse findLineById(Long id) {
+    public SaveLineResponse findLineById(Long id) {
         Line line = lineRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("검색된 노선이 없습니다. id를 바꿔주세요."));
         return createLineResponse(line);
     }
 
     @Transactional
-    public LineResponse update(Long id, String color) {
+    public SaveLineResponse update(Long id, String color) {
         Line line = lineRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("검색된 노선이 없습니다. id를 바꿔주세요."));
         line.changeColor(color);
         return createLineResponse(line);
@@ -60,8 +60,8 @@ public class LineService {
         lineRepository.deleteById(id);
     }
 
-    private LineResponse createLineResponse(Line line) {
-        return new LineResponse(
+    private SaveLineResponse createLineResponse(Line line) {
+        return new SaveLineResponse(
                 line.getId(),
                 line.getName(),
                 line.getColor(),
