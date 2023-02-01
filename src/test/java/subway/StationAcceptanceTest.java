@@ -37,12 +37,9 @@ class StationAcceptanceTest extends RestMethods {
      * Then 지하철역이 생성된다
      * Then 지하철역 목록 조회 시 생성한 역을 찾을 수 있다
      */
-    @DisplayName("입력받은 지하철역을 생성한다.")
+    @DisplayName("지하철역을 생성한다.")
     @Test
-    void createStationTest() {
-        // given
-        createStation("강남역");
-
+    void createStation() {
         // when
         final ExtractableResponse<Response> response = get(STATION_PATH);
         final List<String> stationNames = response.jsonPath()
