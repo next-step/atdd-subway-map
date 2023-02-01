@@ -1,7 +1,8 @@
 package subway.domain;
 
 import subway.common.BaseEntity;
-import subway.exception.CannotAddSectionException;
+import subway.exception.SubwayException;
+import subway.exception.statusmessage.SubwayExceptionStatus;
 
 import javax.persistence.*;
 
@@ -73,13 +74,12 @@ public class Line extends BaseEntity {
     }
 
     public void addSection(Section section) {
-        if (sections.isEmpty() && section.isUpStation(this.upStation)) {
-            this.sections.add(section); return;
+        if (sections.isEmpty() && !section.isUpStation(this.upStation)) {
+            throw new SubwayException(
+                    SubwayExceptionStatus.SECTION_NOT_ADD,
+                    "노선의 상행선과 구간의 상행선이 같아야 합니다.");
         }
-        if (sections.canAddSection(section)){
-            this.sections.add(section); return;
-        }
-        throw new CannotAddSectionException();
+        this.sections.add(section);
     }
 
     public Station getUpStation() {

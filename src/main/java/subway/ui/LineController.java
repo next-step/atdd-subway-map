@@ -8,8 +8,6 @@ import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 import subway.dto.SectionRequest;
 import subway.dto.SectionResponse;
-import subway.exception.CannotAddSectionException;
-import subway.exception.CannotDeleteSectionException;
 import subway.service.LineService;
 
 import java.net.URI;

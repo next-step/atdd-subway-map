@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.domain.*;
 import subway.exception.*;
+import subway.exception.statusmessage.SubwayExceptionStatus;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -77,14 +78,18 @@ public class LineService {
             line.deleteSection(section);
             return;
         }
-        throw new CannotDeleteSectionException();
+        throw new SubwayException(SubwayExceptionStatus.SECTION_NOT_DELETE);
     }
 
     private Section findSectionById(Long sectionId) {
-        return sectionRepository.findById(sectionId).orElseThrow(SectionNotFoundException::new);
+        return sectionRepository.findById(sectionId).orElseThrow(
+                () -> new SubwayException(SubwayExceptionStatus.SECTION_NOT_FOUND)
+        );
     }
 
     private Line findLineById(Long lineId) {
-        return lineRepository.findById(lineId).orElseThrow(LineNotFoundException::new);
+        return lineRepository.findById(lineId).orElseThrow(
+                () -> new SubwayException(SubwayExceptionStatus.LINE_NOT_FOUND)
+        );
     }
 }

@@ -4,8 +4,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.domain.Station;
 import subway.dto.StationRequest;
-import subway.exception.StationNotFoundException;
 import subway.domain.StationRepository;
+import subway.exception.SubwayException;
+import subway.exception.statusmessage.SubwayExceptionStatus;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,7 +32,9 @@ public class StationService {
 
     public Station findStation(Long id) {
         return stationRepository.findById(id)
-                .orElseThrow(StationNotFoundException::new);
+                .orElseThrow(
+                        () -> new SubwayException(SubwayExceptionStatus.STATION_NOT_FOUND)
+                );
     }
 
     @Transactional

@@ -1,5 +1,8 @@
 package subway.domain;
 
+import subway.exception.SubwayException;
+import subway.exception.statusmessage.SubwayExceptionStatus;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
@@ -14,8 +17,22 @@ public class Sections {
     private List<Section> sections = new ArrayList<>();
 
 
-    public void add(Section section) {
-        this.sections.add(section);
+    public void add(Section addSection) {
+
+        if (!sections.isEmpty() && !this.getLast().isEqualDownStation(addSection)) {
+            throw new SubwayException(
+                    SubwayExceptionStatus.SECTION_NOT_ADD
+                    , "마지막 구간의 하행선과 추가하려는 구간의 상행선이 같아야 합니다.");
+        }
+
+        if (!sections.isEmpty()
+                && sections.stream().anyMatch(section -> section.hasStation(addSection.getDownStation()))) {
+            throw new SubwayException(
+                    SubwayExceptionStatus.SECTION_NOT_ADD,
+                    "추가하려는 구간의 하행선이 기존 노선에 이미 있습니다.");
+        }
+
+        this.sections.add(addSection);
     }
 
     public boolean isEmpty() {
@@ -38,10 +55,4 @@ public class Sections {
         return Collections.unmodifiableList(sections);
     }
 
-    public boolean canAddSection(Section addSection) {
-
-        return this.getLast().isEqualDownStation(addSection)
-                && !sections.stream()
-                .anyMatch(section -> section.hasStation(addSection.getDownStation()));
-    }
 }
