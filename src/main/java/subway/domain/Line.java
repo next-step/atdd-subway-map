@@ -73,10 +73,13 @@ public class Line extends BaseEntity {
     }
 
     public void addSection(Section section) {
-        if (!canAddSection(upStation)) {
-            throw new CannotAddSectionException();
+        if (sections.isEmpty() && section.isUpStation(this.upStation)) {
+            this.sections.add(section); return;
         }
-        this.sections.add(section);
+        if (sections.canAddSection(section)){
+            this.sections.add(section); return;
+        }
+        throw new CannotAddSectionException();
     }
 
     public Station getUpStation() {
@@ -90,15 +93,6 @@ public class Line extends BaseEntity {
     public void changeFirstAndLastStation(Station upStation, Station downStation) {
         this.upStation = upStation;
         this.downStation = downStation;
-    }
-
-    private boolean canAddSection(Station station) {
-
-        if (sections.isEmpty()) {
-            return this.upStation.equals(station);
-        }
-        Section lastSection = sections.getLast();
-        return lastSection.isDownStation(station) && sections.hasStation(station);
     }
 
     public boolean canDeleteSection(Section section) {

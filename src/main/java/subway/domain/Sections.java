@@ -18,19 +18,19 @@ public class Sections {
         this.sections.add(section);
     }
 
-    public boolean isEmpty(){
+    public boolean isEmpty() {
         return sections.isEmpty();
     }
 
-    public Section getLast(){
+    public Section getLast() {
         return sections.get(sections.size() - 1);
     }
 
-    public boolean lessThanTwo(){
+    public boolean lessThanTwo() {
         return sections.size() < 2;
     }
 
-    public void remove(Section section){
+    public void remove(Section section) {
         sections.remove(section);
     }
 
@@ -38,8 +38,10 @@ public class Sections {
         return Collections.unmodifiableList(sections);
     }
 
-    public boolean hasStation(Station station){
-        return sections.stream()
-                .anyMatch(section -> hasStation(station));
+    public boolean canAddSection(Section addSection) {
+
+        return this.getLast().isEqualDownStation(addSection)
+                && !sections.stream()
+                .anyMatch(section -> section.hasStation(addSection.getDownStation()));
     }
 }

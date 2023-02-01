@@ -144,7 +144,7 @@ class LineAcceptanceTest extends BaseAcceptanceTest {
         Long 양재역Id = createStation("양재역");
         ExtractableResponse<Response> response = addSection(신분당선Id, 청계산입구역Id, 양재역Id);
 
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
     @Test
@@ -160,7 +160,7 @@ class LineAcceptanceTest extends BaseAcceptanceTest {
         Long 양재역Id = createStation("양재역");
         ExtractableResponse<Response> response = addSection(신분당선Id, 양재역Id, 판교역Id);
 
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
     @Test
@@ -205,7 +205,7 @@ class LineAcceptanceTest extends BaseAcceptanceTest {
         ExtractableResponse<Response> response = deleteSection(신분당선Id, section1);
 
         //then 400 반환
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
     @Test
@@ -222,7 +222,7 @@ class LineAcceptanceTest extends BaseAcceptanceTest {
         ExtractableResponse<Response> response = deleteSection(신분당선Id, section1);
 
         //then 400 반환
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
     private static ExtractableResponse<Response> deleteSection(Long 신분당선Id, Long sectionId) {
