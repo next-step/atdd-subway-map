@@ -49,14 +49,32 @@ class StationAcceptanceTest extends AcceptanceTest {
 
         return RestAssured
             .given()
-                .log().all()
-                .body(param)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .log().all()
+            .body(param)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
             .when()
-                .post(URI.create("/stations"))
+            .post(URI.create("/stations"))
             .then()
-                .log().all()
+            .log().all()
             .extract();
+    }
+
+    /**
+     * Given 지하철역을 생성하고
+     * When 동일한 이름의 지하철역을 생성하려고 하면
+     * Then 지하철역이 생성되지 않는다.
+     */
+    @DisplayName("지하철역 이름은 중복되지 않아야 한다.")
+    @Test
+    void duplicateStationName() {
+        // given
+        createStation(GANGNAM_STATION);
+
+        // then
+        ExtractableResponse<Response> response = createStation(GANGNAM_STATION);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
     private List<String> getAllStationNames() {

@@ -10,6 +10,7 @@ import subway.domain.Station;
 import subway.domain.StationRepository;
 import subway.dto.StationRequest;
 import subway.dto.StationResponse;
+import subway.exception.DuplicateStationNameException;
 import subway.exception.StationNotFoundException;
 
 @Service
@@ -23,8 +24,20 @@ public class StationService {
 
     @Transactional
     public StationResponse saveStation(StationRequest stationRequest) {
-        Station station = stationRepository.save(new Station(stationRequest.getName()));
+        String stationName = stationRequest.getName();
+
+        if (isSameStationExists(stationName)) {
+            throw new DuplicateStationNameException(stationName);
+        }
+
+        Station station = stationRepository.save(new Station(stationName));
         return new StationResponse(station);
+    }
+
+    private boolean isSameStationExists(String name) {
+        return stationRepository.findAll()
+            .stream()
+            .anyMatch(station -> station.hasName(name));
     }
 
     public List<StationResponse> findAllStations() {
