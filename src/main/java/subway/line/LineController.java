@@ -2,6 +2,7 @@ package subway.line;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -55,5 +56,10 @@ public class LineController {
         lineService.deleteLineById(lineId);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @ExceptionHandler({LineNotFoundException.class})
+    public ResponseEntity<Void> catchLineNotFoundException(LineNotFoundException e) {
+        return ResponseEntity.notFound().build();
     }
 }
