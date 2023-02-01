@@ -15,6 +15,9 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import subway.application.Section;
+import subway.exception.AlreadyRegisteredStationException;
+import subway.exception.SectionErrorCode;
+import subway.exception.SectionRegisterException;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -64,13 +67,30 @@ public class SubwayLine {
 	}
 
 	public void exchangeDownStation(Section section, Station downStation) {
-		//TODO: validation 작성 해주어야함
-		boolean isRemoveStationGroup = subwayLineStationGroups.removeIf(
+		validateNewSectionUpStationEqualDownStation(section);
+		validateDownStationRegistration(downStation);
+
+		subwayLineStationGroups.removeIf(
 			subwayLineStationGroup -> subwayLineStationGroup.equalStationId(this.downStationId)
 		);
 
 		this.downStationId= downStation.getId();
 		this.subwayLineStationGroups.add(createSubwayLineStationGroup(downStation));
+	}
+
+	private void validateNewSectionUpStationEqualDownStation(Section section) {
+		if (!section.equalUpStationId(this.downStationId)) {
+			throw new SectionRegisterException(SectionErrorCode.INVALID_SECTION_UP_STATION);
+		}
+	}
+
+	private void validateDownStationRegistration(Station downStation) {
+		boolean hasDownStation = subwayLineStationGroups.stream()
+			.anyMatch(subwayLineStationGroup -> subwayLineStationGroup.equalStationId(downStation.getId()));
+
+		if (hasDownStation) {
+			throw new AlreadyRegisteredStationException(SectionErrorCode.ALREADY_STATION_REGISTERED);
+		}
 	}
 
 	private SubwayLineStationGroup createSubwayLineStationGroup(Station station) {

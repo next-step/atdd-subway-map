@@ -42,7 +42,7 @@ public class SubwaySectionAcceptanceTest extends SubwayAcceptanceTest {
 			.jsonPath().getLong("id");
 
 		SectionRequest.Create createRequest = SectionRequest.Create.builder()
-			.upStationId(EXISTING_SUBWAY_LINE_UP_STATION_ID)
+			.upStationId(STATION_ID_2)
 			.downStationId(STATION_ID_3)
 			.distance(10)
 			.build();

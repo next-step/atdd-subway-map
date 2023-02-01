@@ -37,4 +37,8 @@ public class Section {
 		this.downStationId = downStationId;
 		this.distance = distance;
 	}
+
+	public boolean equalUpStationId(Long target) {
+		return this.upStationId.equals(target);
+	}
 }
