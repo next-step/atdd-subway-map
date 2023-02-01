@@ -144,7 +144,7 @@ public class LineAcceptanceTest {
         long id = createLineResponse.jsonPath().getLong(ID);
 
         // when
-        ExtractableResponse<Response> updateResponse = updateLine(id, NAME_VALUE2, COLOR_VALUE2, DISTANCE_VALUE + DISTANCE_VALUE);
+        ExtractableResponse<Response> updateResponse = updateLine(id, NAME_VALUE2, COLOR_VALUE2);
 
         // then
         assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -195,8 +195,8 @@ public class LineAcceptanceTest {
                 .extract();
     }
 
-    private ExtractableResponse<Response> updateLine(long id, String name, String color, Long distance) {
-        LineUpdateRequest lineRequest = new LineUpdateRequest(name, color, distance);
+    private ExtractableResponse<Response> updateLine(long id, String name, String color) {
+        LineUpdateRequest lineRequest = new LineUpdateRequest(name, color);
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(lineRequest)

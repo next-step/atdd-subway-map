@@ -48,7 +48,7 @@ public class LineService {
     }
 
     @Transactional
-    public void updateLine(Long id, LineCreateRequest lineRequest) {
+    public void updateLine(Long id, LineUpdateRequest lineRequest) {
         Line line = lineRepository.findById(id)
                 .orElseThrow(LineNotFoundException::new);
         line.changeNameAndColor(lineRequest.getName(), lineRequest.getColor());
