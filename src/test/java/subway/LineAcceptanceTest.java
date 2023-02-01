@@ -5,13 +5,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.jdbc.Sql;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -21,17 +20,9 @@ import subway.line.LineRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관리 기능")
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@Sql(scripts = {"classpath:sql/truncate.sql", "classpath:sql/setup.sql"})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class SubwayLineTest {
-
-	@BeforeEach
-	void createStations() {
-		createStation("신분당선");
-		createStation("새로운지하철역");
-		createStation("또다른지하철역");
-	}
-
+public class LineAcceptanceTest {
 	/**
 	 * When 지하철 노선을 생성하면
 	 * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
@@ -44,7 +35,8 @@ public class SubwayLineTest {
 		createLine(lineRequest);
 
 		// then
-		List<String> lineNames = showLines().jsonPath().getList("name", String.class);
+		ExtractableResponse<Response> showResponse = showLines();
+		List<String> lineNames = showResponse.jsonPath().getList("name", String.class);
 		assertThat(lineNames).containsAnyOf("신분당선");
 	}
 
@@ -64,8 +56,10 @@ public class SubwayLineTest {
 		createLine(lineRequest2);
 
 		// when
+		ExtractableResponse<Response> showResponse = showLines();
+
 		// then
-		List<String> lineNames = showLines().jsonPath().getList("name", String.class);
+		List<String> lineNames = showResponse.jsonPath().getList("name", String.class);
 		assertThat(lineNames.size()).isEqualTo(2);
 		assertThat(lineNames).containsAnyOf("신분당선", "분당선");
 	}
@@ -84,11 +78,13 @@ public class SubwayLineTest {
 		long id = createLine(lineRequest).jsonPath().getLong("id");
 
 		// when
+		ExtractableResponse<Response> showResponse = showLineById(id);
+
 		// then
 		Assertions.assertAll(
-			() -> assertThat(showLineById(id).jsonPath().getLong("id")).isEqualTo(id),
-			() -> assertThat(showLineById(id).jsonPath().getString("name")).isEqualTo("신분당선"),
-			() -> assertThat(showLineById(id).jsonPath().getString("color")).isEqualTo("bg-red-600")
+			() -> assertThat(showResponse.jsonPath().getLong("id")).isEqualTo(id),
+			() -> assertThat(showResponse.jsonPath().getString("name")).isEqualTo("신분당선"),
+			() -> assertThat(showResponse.jsonPath().getString("color")).isEqualTo("bg-red-600")
 		);
 	}
 
@@ -109,10 +105,11 @@ public class SubwayLineTest {
 		updateLine(id, "다른분당선", "bg-red-600");
 
 		// then
+		ExtractableResponse<Response> showResponse = showLineById(id);
 		Assertions.assertAll(
-			() -> assertThat(showLineById(id).jsonPath().getLong("id")).isEqualTo(id),
-			() -> assertThat(showLineById(id).jsonPath().getString("name")).isEqualTo("다른분당선"),
-			() -> assertThat(showLineById(id).jsonPath().getString("color")).isEqualTo("bg-red-600")
+			() -> assertThat(showResponse.jsonPath().getLong("id")).isEqualTo(id),
+			() -> assertThat(showResponse.jsonPath().getString("name")).isEqualTo("다른분당선"),
+			() -> assertThat(showResponse.jsonPath().getString("color")).isEqualTo("bg-red-600")
 		);
 	}
 
@@ -130,10 +127,10 @@ public class SubwayLineTest {
 		long id = createLine(lineRequest).jsonPath().getLong("id");
 
 		// when
-		deleteLine(id);
+		ExtractableResponse<Response> deleteResponse = deleteLine(id);
 
 		// then
-		assertThat(showLineById(id).jsonPath().getLong("id")).isNotEqualTo(id);
+		assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
 	}
 
 	private ExtractableResponse<Response> createLine(LineRequest lineRequest) {
@@ -196,7 +193,14 @@ public class SubwayLineTest {
 			.extract();
 
 		assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-		return response;
+
+		ExtractableResponse<Response> afterDeleteResponse = RestAssured
+			.given().log().all()
+			.when().delete("/lines/{id}", id)
+			.then().log().all()
+			.extract();
+
+		return afterDeleteResponse;
 	}
 
 	private ExtractableResponse<Response> createStation(String stationName) {

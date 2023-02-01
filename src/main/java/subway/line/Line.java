@@ -1,12 +1,13 @@
 package subway.line;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 import subway.Station;
@@ -25,12 +26,10 @@ public class Line {
 	@Column(length = 30, nullable = false)
 	private String color;
 
-	@ManyToOne()
-	@JoinColumn(foreignKey = @ForeignKey(name = "fk_up_station_id"))
+	@ManyToOne
 	private Station upStationId;
 
-	@ManyToOne()
-	@JoinColumn(foreignKey = @ForeignKey(name = "fk_down_station_id"))
+	@ManyToOne
 	private Station downStationId;
 
 	@Column(length = 20, nullable = false)
@@ -47,6 +46,11 @@ public class Line {
 		this.distance = distance;
 	}
 
+	public void updateLine(String name, String color) {
+		this.name = name;
+		this.color = color;
+	}
+
 	public Long getId() {
 		return id;
 	}
@@ -59,23 +63,14 @@ public class Line {
 		return color;
 	}
 
-	public Station getUpStationId() {
-		return upStationId;
-	}
-
-	public Station getDownStationId() {
-		return downStationId;
+	public List<Station> getStations() {
+		List<Station> stations = new ArrayList<>();
+		stations.add(upStationId);
+		stations.add(downStationId);
+		return stations;
 	}
 
 	public int getDistance() {
 		return distance;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public void setColor(String color) {
-		this.color = color;
 	}
 }

@@ -1,16 +1,13 @@
 package subway.line;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.transaction.Transactional;
-
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import subway.Station;
 import subway.StationRepository;
-import subway.StationResponse;
 
 @Service
 public class LineService {
@@ -24,8 +21,8 @@ public class LineService {
 
 	@Transactional
 	public LineResponse saveLine(LineRequest lineRequest) {
-		Station upStation = stationRepository.findById(lineRequest.getUpStationsId()).orElse(null);
-		Station downStation = stationRepository.findById(lineRequest.getDownStationsId()).orElse(null);
+		Station upStation = stationRepository.findById(lineRequest.getUpStationsId()).orElseThrow(() -> new NullPointerException("Station doesn't exist"));
+		Station downStation = stationRepository.findById(lineRequest.getDownStationsId()).orElseThrow(() -> new NullPointerException("Station doesn't exist"));
 
 		Line saveLine = lineRepository.save(new Line(
 			lineRequest.getName(), lineRequest.getColor(),
@@ -34,12 +31,14 @@ public class LineService {
 		return createLineResponse(saveLine);
 	}
 
+	@Transactional(readOnly = true)
 	public List<LineResponse> findAllLines() {
 		return lineRepository.findAll().stream()
 			.map(this::createLineResponse)
 			.collect(Collectors.toList());
 	}
 
+	@Transactional(readOnly = true)
 	public LineResponse findLineById(Long id) {
 		return createLineResponse(lineRepository.findById(id).orElse(null));
 	}
@@ -47,8 +46,7 @@ public class LineService {
 	@Transactional
 	public void updateLineById(Long id, LineUpdateRequest lineUpdateRequest) {
 		Line line = lineRepository.findById(id).orElse(null);
-		line.setName(lineUpdateRequest.getName());
-		line.setColor(lineUpdateRequest.getColor());
+		line.updateLine(lineUpdateRequest.getName(), lineUpdateRequest.getColor());
 	}
 
 	@Transactional
@@ -58,18 +56,9 @@ public class LineService {
 
 	private LineResponse createLineResponse(Line line) {
 		try {
-			StationResponse upStationResponse =
-				new StationResponse(line.getUpStationId().getId(), line.getUpStationId().getName());
-			StationResponse downStationResponse =
-				new StationResponse(line.getDownStationId().getId(), line.getDownStationId().getName());
-
-			List<StationResponse> stations = new ArrayList<>();
-			stations.add(upStationResponse);
-			stations.add(downStationResponse);
-
-			return new LineResponse(line.getId(), line.getName(), line.getColor(), stations);
+			return new LineResponse(line);
 		} catch (NullPointerException npe) {
-			return new LineResponse(-1L, "", "", null);
+			throw new NullPointerException("Line doesn't exist");
 		}
 	}
 }
