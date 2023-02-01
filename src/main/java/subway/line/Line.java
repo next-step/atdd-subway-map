@@ -20,10 +20,14 @@ public class Line {
     private Long id;
     @Column(length = 20, nullable = false)
     private String name;
+
+    @Column(length = 20, nullable = false)
     private String color;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "line")
-    private List<StationLineGroup> stationLineGroupList = new ArrayList<>();
+    private List<StationLineGroup> stationLineGroups = new ArrayList<>();
+
+    @Column(nullable = false)
     private Long distance;
 
     public Line(String name, String color, Station upStation, Station downStation, Long distance) {
@@ -50,7 +54,7 @@ public class Line {
     }
 
     public void addStation(Station station) {
-        stationLineGroupList.add(new StationLineGroup(station, this));
+        stationLineGroups.add(new StationLineGroup(station, this));
     }
 
     public Long getDistance() {
@@ -58,7 +62,7 @@ public class Line {
     }
 
     public List<Station> getStationList() {
-        return this.stationLineGroupList.stream().map(StationLineGroup::getStation).collect(Collectors.toList());
+        return this.stationLineGroups.stream().map(StationLineGroup::getStation).collect(Collectors.toList());
     }
 
     public void update(String name, String color) {
