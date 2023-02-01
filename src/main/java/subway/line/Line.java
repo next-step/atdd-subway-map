@@ -51,16 +51,6 @@ public class Line {
         this.distance = distance;
     }
 
-    public static Line of(LineRequest lineRequest, Station upStation, Station downStation) {
-        return new Line(
-                lineRequest.getName(),
-                lineRequest.getColor(),
-                upStation,
-                downStation,
-                lineRequest.getDistance()
-        );
-    }
-
     public void update(String name, String color) {
         this.name = name;
         this.color = color;

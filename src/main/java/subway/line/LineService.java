@@ -24,13 +24,16 @@ public class LineService {
     public LineResponse saveLine(LineRequest lineRequest) {
         Station upStation = stationService.getStationById(lineRequest.getUpStationId());
         Station downStation = stationService.getStationById(lineRequest.getDownStationId());
-        Line line = Line.of(lineRequest, upStation, downStation);
+
+        Line line = lineRequest.toEntity(upStation, downStation);
         Line savedLine = lineRepository.save(line);
+
         return LineResponse.of(savedLine);
     }
 
     public List<LineResponse> findAllLines() {
         List<Line> lines = lineRepository.findAll();
+
         return lines.stream()
                 .map(LineResponse::of)
                 .collect(Collectors.toList());
@@ -43,7 +46,9 @@ public class LineService {
      * @return LineResponse
      */
     public LineResponse findLineById(long lineId) {
-        return LineResponse.of(getLineById(lineId));
+        Line line = getLineById(lineId);
+
+        return LineResponse.of(line);
     }
 
     /**
