@@ -19,6 +19,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationAcceptanceTest {
+
+    private static final String gangnamStation = "강남역";
+    private static final String kyodaeStation = "교대역";
     /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다
@@ -61,32 +64,14 @@ public class StationAcceptanceTest {
     void selectStation() {
 
         // given
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-
-        RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all();
-
-        params.put("name", "교대역");
-
-        RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all();
+        createStation(gangnamStation);
+        createStation(kyodaeStation);
 
         // when
-        List<String> stationNames =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
+        List<String> stationNames = getStationNames();
 
         // then
-        assertThat(stationNames).contains("강남역", "교대역");
+        assertThat(stationNames).contains(gangnamStation, kyodaeStation);
     }
 
     /**
@@ -99,33 +84,44 @@ public class StationAcceptanceTest {
     void deleteStation() {
         // given
         Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
+        params.put("name", gangnamStation);
 
-        int createdStationId = RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract().jsonPath().get("id");
+        int createdStationId = createStation(gangnamStation).jsonPath().get("id");
 
         // when
-        ExtractableResponse<Response> deleteResponse =
-                RestAssured.given().log().all()
-                        .when().delete("/stations/" + createdStationId)
-                        .then().log().all()
-                        .extract();
+        ExtractableResponse<Response> deleteResponse = deleteStation(createdStationId);
 
         // then
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         // then
-        List<String> stationNames =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
+        List<String> stationNames = getStationNames();
+        assertThat(stationNames).doesNotContain(gangnamStation);
+    }
 
-        assertThat(stationNames).doesNotContain("강남역");
+    ExtractableResponse<Response> createStation(String stationName) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", stationName);
+
+        return RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all().extract();
+    }
+
+    List<String> getStationNames() {
+        return RestAssured.given().log().all()
+                    .when().get("/stations")
+                    .then().log().all()
+                    .extract().jsonPath().getList("name", String.class);
+    }
+
+    ExtractableResponse<Response> deleteStation(int stationId) {
+        return RestAssured.given().log().all()
+                        .when().delete("/stations/" + stationId)
+                        .then().log().all()
+                        .extract();
     }
 
 }
