@@ -62,7 +62,7 @@ public class LineService {
         lineRepository.deleteById(id);
     }
 
-    private static List<StationResponse> makeStationResponses(Station line, Station line1) {
-        return List.of(StationResponse.of(line), StationResponse.of(line1));
+    private static List<StationResponse> makeStationResponses(Station upStation, Station downStation) {
+        return List.of(StationResponse.of(upStation), StationResponse.of(downStation));
     }
 }
