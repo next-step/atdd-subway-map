@@ -155,6 +155,7 @@ public class LineAcceptanceTest extends AbstractAcceptanceTest {
             .when()
                 .get("/lines")
             .then()
+                .log().all()
                 .statusCode(HttpStatus.OK.value())
                 .extract().jsonPath().getList("$", LineResponse.class);
     }
@@ -170,6 +171,7 @@ public class LineAcceptanceTest extends AbstractAcceptanceTest {
             .when()
                 .get("/lines/{id}", lineId)
             .then()
+                .log().all()
                 .extract();
     }
 
@@ -189,6 +191,7 @@ public class LineAcceptanceTest extends AbstractAcceptanceTest {
             .when()
                 .post("/lines")
             .then()
+                .log().all()
                 .statusCode(HttpStatus.CREATED.value())
                 .extract().jsonPath().getObject("$", LineResponse.class);
     }

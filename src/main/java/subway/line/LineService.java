@@ -8,7 +8,11 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.exception.NotFoundLineException;
-import subway.station.Station;
+import subway.line.section.LineSectionRepository;
+import subway.line.section.LineSectionService;
+import subway.section.SectionRepository;
+import subway.line.station.LineStationRepository;
+import subway.line.station.LineStationService;
 import subway.station.StationRepository;
 
 @Service
@@ -18,24 +22,41 @@ public class LineService {
 
     private final StationRepository stationRepository;
 
+    private final LineStationRepository lineStationRepository;
+
+    private final SectionRepository sectionRepository;
+
+    private final LineSectionRepository lineSectionRepository;
+
+    private final LineSectionService lineSectionService;
+
+    private final LineStationService lineStationService;
+
     @Transactional
-    public LineResponse saveLine(LineRequest request) {
-        Line line = createLine(request);
+    public LineResponse saveLine(LineRequest lineRequest) {
+        Line line = createAndSaveLine(lineRequest);
 
-        Line savedLine = lineRepository.save(line);
+        lineStationService.registerLineStations(line.getId(), lineRequest.getStationIds());
 
-        return LineResponse.of(savedLine);
+        lineSectionService.registerLineSection(
+            line.getId(),
+            lineRequest.getUpStationId(),
+            lineRequest.getDownStationId(),
+            lineRequest.getDistance()
+        );
+
+        return LineResponse.of(line);
     }
 
     @Transactional(readOnly = true)
     public List<LineResponse> findAllLines() {
-        return lineRepository.findAllWithStation().stream()
+        return lineRepository.findAllWithLineStations().stream()
             .map(LineResponse::of)
             .collect(Collectors.toList());
     }
     @Transactional(readOnly = true)
     public Optional<LineResponse> findById(Long id) {
-        return lineRepository.findById(id)
+        return lineRepository.findByIdWithLineStations(id)
             .map(LineResponse::of);
     }
 
@@ -51,16 +72,41 @@ public class LineService {
     public void deleteLine(Long id) {
         Line findLine = lineRepository.findById(id).orElseThrow(NotFoundLineException::new);
 
-        List<Long> stationIds = findLine.getStationIds();
-
-        stationRepository.updateLineByIds(stationIds, null);
-
         lineRepository.delete(findLine);
     }
 
-    private Line createLine(LineRequest request) {
-        List<Station> stations = stationRepository.findByIdIn(request.getStationIds());
+    private Line createAndSaveLine(LineRequest lineRequest) {
+        Line line = new Line(lineRequest.getName(), lineRequest.getColor(), lineRequest.getDistance());
 
-        return new Line(request.getName(), request.getColor(), request.getDistance(), stations);
+        return lineRepository.save(line);
     }
+
+//    private List<LineStation> createAndSaveLineStations(Line line, LineRequest lineRequest) {
+//        List<Station> stations = stationRepository.findByIdIn(lineRequest.getStationIds());
+//
+//        List<LineStation> lineStations = stations.stream()
+//            .map(station -> new LineStation(line, station))
+//            .collect(Collectors.toList());
+//
+//        List<LineStation> savedLineStations = lineStationRepository.saveAll(lineStations);
+//
+//        savedLineStations.forEach(line::addLineStation);
+//
+//        return savedLineStations;
+//    }
+
+//    private LineSection createAndSaveLineSection(Line line, LineRequest lineRequest) {
+//        Section section = sectionRepository.findSectionByUpStationIdAndDownStationId(
+//            lineRequest.getUpStationId(),
+//            lineRequest.getDownStationId()
+//        ).orElseThrow(NotFoundSectionException::new);
+//
+//        LineSection lineSection = new LineSection(line, section);
+//
+//        LineSection savedLineSection = lineSectionRepository.save(lineSection);
+//
+//        line.addLineSection(savedLineSection);
+//
+//        return savedLineSection;
+//    }
 }

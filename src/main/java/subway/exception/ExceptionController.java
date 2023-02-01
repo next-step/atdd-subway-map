@@ -8,7 +8,12 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 @Slf4j
 public class ExceptionController {
-    @ExceptionHandler(value = {NotFoundLineException.class})
+    @ExceptionHandler(value = {
+        NotFoundLineException.class,
+        NotFoundStationException.class,
+        NotFoundLineSectionException.class,
+        NotFoundSectionException.class
+    })
     public ResponseEntity<?> notFoundException(Exception e) {
         log.info("Not Found Exception: {}", e.getMessage(), e);
 

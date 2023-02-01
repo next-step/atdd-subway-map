@@ -1,4 +1,4 @@
-package subway.line.section;
+package subway.section;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

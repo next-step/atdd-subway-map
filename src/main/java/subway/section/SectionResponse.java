@@ -1,4 +1,4 @@
-package subway.line.section;
+package subway.section;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import subway.line.section.LineSection;
 
 @Getter
 @Setter(AccessLevel.PROTECTED)
@@ -18,21 +19,27 @@ public class SectionResponse {
 
     private Long id;
 
-    private Long downStationId;
-
     private Long upStationId;
+
+    private Long downStationId;
 
     private int distance;
 
-    private int number;
+    public static SectionResponse of(LineSection lineSection) {
+        return new SectionResponse(
+            lineSection.getId(),
+            lineSection.getUpStationId(),
+            lineSection.getDownStationId(),
+            lineSection.getDistance()
+        );
+    }
 
     public static SectionResponse of(Section section) {
         return new SectionResponse(
             section.getId(),
-            section.getDownStationId(),
             section.getUpStationId(),
-            section.getDistance(),
-            section.getNumber()
+            section.getDownStationId(),
+            section.getDistance()
         );
     }
 }

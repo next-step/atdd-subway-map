@@ -1,4 +1,4 @@
-package subway.line.section;
+package subway.section;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -6,26 +6,29 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import subway.line.Line;
 import subway.station.Station;
 
 @Entity
-@Table(name = "SECTION")
+@Table(
+    name = "SECTION",
+    uniqueConstraints = {
+        @UniqueConstraint(
+            name = "UNIQUE_DOWN_UP_STATION_ID",
+            columnNames = {"DOWN_STATION_ID", "UP_STATION_ID"}
+        )
+    }
+)
 @NoArgsConstructor
 @Getter
 public class Section {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "LINE_ID")
-    private Line line;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "DOWN_STATION_ID")
@@ -37,8 +40,6 @@ public class Section {
 
     private int distance;
 
-    private int number;
-
     public void setUpStation(Station upStation) {
         this.upStation = upStation;
     }
@@ -47,8 +48,7 @@ public class Section {
         this.downStation = downStation;
     }
 
-    public Section(Line line, Station downStation, Station upStation, int distance) {
-        this.line = line;
+    public Section(Station upStation, Station downStation, int distance) {
         this.downStation = downStation;
         this.upStation = upStation;
         this.distance = distance;
@@ -62,15 +62,4 @@ public class Section {
         return upStation.getId();
     }
 
-    public void setNumber(int number) {
-        this.number = number;
-    }
-
-    public void setLine(Line line) {
-        this.line = line;
-    }
-
-    public boolean isConnected(Section other) {
-        return this.downStation == other.upStation;
-    }
 }

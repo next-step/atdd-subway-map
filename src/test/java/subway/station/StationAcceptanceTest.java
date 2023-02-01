@@ -99,6 +99,7 @@ public class StationAcceptanceTest extends AbstractAcceptanceTest {
             .when()
                 .post("/stations")
             .then()
+                .log().all()
                 .statusCode(HttpStatus.CREATED.value())
                 .extract();
 
@@ -116,6 +117,7 @@ public class StationAcceptanceTest extends AbstractAcceptanceTest {
             .when()
                 .get("/stations")
             .then()
+                .log().all()
                 .statusCode(HttpStatus.OK.value())
                 .extract();
     }
@@ -126,6 +128,7 @@ public class StationAcceptanceTest extends AbstractAcceptanceTest {
             .when()
                 .delete("/stations/{id}", stationId)
             .then()
+                .log().all()
                 .statusCode(HttpStatus.NO_CONTENT.value())
                 .extract();
     }

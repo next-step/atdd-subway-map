@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional(readOnly = true)
 public class StationService {
     private final StationRepository stationRepository;
 
@@ -16,11 +15,11 @@ public class StationService {
     }
 
     @Transactional
-    public StationResponse saveStation(StationRequest stationRequest) {
-        Station station = stationRepository.save(new Station(stationRequest.getName()));
-        return StationResponse.of(station);
+    public Station saveStation(String stationName) {
+        return stationRepository.save(new Station(stationName));
     }
 
+    @Transactional(readOnly = true)
     public List<StationResponse> findAllStations() {
         return stationRepository.findAll().stream()
                 .map(StationResponse::of)

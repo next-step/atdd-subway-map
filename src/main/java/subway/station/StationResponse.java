@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import subway.line.station.LineStation;
 
 @Getter
 @Setter(AccessLevel.PROTECTED)
@@ -22,6 +23,10 @@ public class StationResponse {
 
     public String getName() {
         return name;
+    }
+
+    public static StationResponse of(LineStation lineStation) {
+        return of(lineStation.getStation());
     }
 
     public static StationResponse of(Station station) {

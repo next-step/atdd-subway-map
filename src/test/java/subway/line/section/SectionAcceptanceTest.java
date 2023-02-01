@@ -13,14 +13,18 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import subway.line.LineAcceptanceTest;
+import subway.section.SectionRequest;
+import subway.section.SectionResponse;
 import subway.station.StationAcceptanceTest;
 
 @DisplayName("지하철역 구간 관련 기능")
 public class SectionAcceptanceTest extends AbstractAcceptanceTest {
 
-    private Long downStationId;
+    private Long aStationId;
 
-    private Long upStationId;
+    private Long bStationId;
+
+    private Long cStationId;
 
     private Long lineId;
 
@@ -28,14 +32,15 @@ public class SectionAcceptanceTest extends AbstractAcceptanceTest {
     protected void beforeEach() {
         super.beforeEach();
 
-        upStationId = StationAcceptanceTest.createStation("upStation");
-        downStationId = StationAcceptanceTest.createStation("downStation");
+        aStationId = StationAcceptanceTest.createStation("aStation");
+        bStationId = StationAcceptanceTest.createStation("bStation");
+        cStationId = StationAcceptanceTest.createStation("cStation");
 
         lineId = LineAcceptanceTest.createLine(
             LineAcceptanceTest.LINE_1,
             LineAcceptanceTest.RED_COLOR,
-            upStationId,
-            downStationId,
+            aStationId,
+            bStationId,
             10
         ).getId();
     }
@@ -48,12 +53,10 @@ public class SectionAcceptanceTest extends AbstractAcceptanceTest {
     @DisplayName("지하철 구간 생성")
     void createSection() {
         // When
-        SectionResponse createdSection = createSection(lineId, downStationId, upStationId, 10);
+        SectionResponse createdSection = createSection(lineId, bStationId, cStationId, 20);
 
         // Then
         List<SectionResponse> sections = findSections(lineId);
-
-        sections.forEach(System.out::println);
 
         assertThat(sections)
             .contains(createdSection);
@@ -70,10 +73,10 @@ public class SectionAcceptanceTest extends AbstractAcceptanceTest {
     @DisplayName("지하철 구간 삭제")
     void deleteSection() {
         // Given
-        SectionResponse givenSection = createSection(lineId, downStationId, upStationId, 10);
+        SectionResponse givenSection = createSection(lineId, bStationId, cStationId, 20);
 
         // When
-        ExtractableResponse<Response> response = deleteSection(lineId, givenSection.getId());
+        ExtractableResponse<Response> response = deleteSection(lineId, givenSection.getDownStationId());
 
         // Then
         assertThat(response.statusCode())
@@ -98,7 +101,7 @@ public class SectionAcceptanceTest extends AbstractAcceptanceTest {
         Long downStationId2 = StationAcceptanceTest.createStation("downStation");
         Long upStationId2 = StationAcceptanceTest.createStation("upStation");
 
-        SectionResponse givenSection1 = createSection(lineId, downStationId, upStationId, 10);
+        SectionResponse givenSection1 = createSection(lineId, bStationId, aStationId, 10);
         SectionResponse givenSection2 = createSection(lineId, downStationId2, upStationId2, 20);
 
         // When
@@ -119,7 +122,7 @@ public class SectionAcceptanceTest extends AbstractAcceptanceTest {
     @DisplayName("지하철 구간 조회")
     void searchSection() {
         // Given
-        SectionResponse givenSection = createSection(lineId, downStationId, upStationId, 10);
+        SectionResponse givenSection = createSection(lineId, bStationId, aStationId, 10);
 
         // When
         SectionResponse findSection = findSection(lineId, givenSection.getId());
@@ -130,7 +133,7 @@ public class SectionAcceptanceTest extends AbstractAcceptanceTest {
             .isEqualTo(givenSection);
     }
 
-    public static SectionResponse createSection(Long lineId, Long downStationId, Long upStationId, int distance) {
+    public static SectionResponse createSection(Long lineId, Long upStationId ,Long downStationId, int distance) {
         return RestAssured
             .given()
                 .contentType(ContentType.JSON)
@@ -144,26 +147,28 @@ public class SectionAcceptanceTest extends AbstractAcceptanceTest {
             .when()
                 .post("/lines/{lineId}/sections", lineId)
             .then()
+                .log().all()
                 .extract().jsonPath().getObject("$", SectionResponse.class);
     }
 
-    public static ExtractableResponse<Response> deleteSection(Long lineId, Long sectionId) {
+    public static ExtractableResponse<Response> deleteSection(Long lineId, Long stationId) {
         return RestAssured
             .given()
-                .param("sectionId", sectionId)
+                .param("stationId", stationId)
             .when()
                 .delete("/lines/{lineId}/sections", lineId)
             .then()
+                .log().all()
                 .extract();
     }
 
     public static ExtractableResponse<Response> findSectionById(Long lineId, Long sectionId) {
         return RestAssured
             .given()
-                .param("sectionId", sectionId)
             .when()
-                .get("/lines/{lineId}/sections", lineId)
+                .get("/lines/{lineId}/sections/{sectionId}", lineId, sectionId)
             .then()
+                .log().all()
                 .extract();
     }
     public static SectionResponse findSection(Long lineId, Long sectionId) {
@@ -177,6 +182,7 @@ public class SectionAcceptanceTest extends AbstractAcceptanceTest {
             .when()
                 .get("/lines/{lineId}/sections", lineId)
             .then()
+                .log().all()
                 .extract().jsonPath().getList("$", SectionResponse.class);
     }
 }
