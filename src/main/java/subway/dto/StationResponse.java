@@ -1,10 +1,21 @@
 package subway.dto;
 
-public class StationResponse {
-    private Long id;
-    private String name;
+import java.util.List;
+import java.util.stream.Collectors;
+import subway.domain.Station;
 
-    public StationResponse(Long id, String name) {
+public class StationResponse {
+
+    private final Long id;
+    private final String name;
+
+    public static List<StationResponse> by(final List<Station> stations) {
+        return stations.stream()
+                .map(station -> new StationResponse(station.getId(), station.getName()))
+                .collect(Collectors.toUnmodifiableList());
+    }
+
+    public StationResponse(final Long id, final String name) {
         this.id = id;
         this.name = name;
     }

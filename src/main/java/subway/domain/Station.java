@@ -10,10 +10,14 @@ public class Station {
     @Column(length = 20, nullable = false)
     private String name;
 
+    @ManyToOne
+    @JoinColumn(name = "LINE_ID")
+    private Line line;
+
     public Station() {
     }
 
-    public Station(String name) {
+    public Station(final String name) {
         this.name = name;
     }
 
@@ -23,5 +27,9 @@ public class Station {
 
     public String getName() {
         return name;
+    }
+
+    public void setLine(final Line line) {
+        this.line = line;
     }
 }
