@@ -4,6 +4,7 @@ import javax.persistence.*;
 
 @Entity
 public class Station {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -14,7 +15,7 @@ public class Station {
     @JoinColumn(name = "LINE_ID")
     private Line line;
 
-    public Station() {
+    protected Station() {
     }
 
     public Station(final String name) {

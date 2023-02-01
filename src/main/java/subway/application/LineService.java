@@ -11,7 +11,7 @@ import subway.domain.LineRepository;
 import subway.domain.Station;
 import subway.domain.StationRepository;
 import subway.dto.LineEditRequest;
-import subway.dto.LineRequest;
+import subway.dto.LineCreateRequest;
 import subway.dto.LineResponse;
 
 @Transactional(readOnly = true)
@@ -32,12 +32,9 @@ public class LineService {
         this.stationRepository = stationRepository;
     }
 
-    @Transactional
-    public Long save(final LineRequest lineRequest) {
-        List<Station> stations = stationRepository.findAllById(lineRequest.getStationIds());
-        Line requestSaveLine = lineConverter.lineBy(lineRequest, stations);
-        Line line = lineRepository.save(requestSaveLine);
-        return line.getId();
+    public LineResponse getBy(final Long lineId) {
+        Line line = findLineBy(lineId);
+        return LineResponse.by(line);
     }
 
     public List<LineResponse> getList() {
@@ -46,16 +43,18 @@ public class LineService {
                 .collect(Collectors.toUnmodifiableList());
     }
 
-    public LineResponse get(final Long lineId) {
-        Line line = findLineBy(lineId);
-
-        return LineResponse.by(line);
+    @Transactional
+    public Long save(final LineCreateRequest lineCreateRequest) {
+        List<Station> stations = stationRepository
+                .findAllById(List.of(lineCreateRequest.getUpStationId(), lineCreateRequest.getDownStationId()));
+        Line line = lineConverter.lineBy(lineCreateRequest, stations);
+        lineRepository.save(line);
+        return line.getId();
     }
 
     @Transactional
     public void edit(final Long lineId, final LineEditRequest lineEditRequest) {
         Line line = findLineBy(lineId);
-
         line.editName(lineEditRequest.getName())
                 .editColor(lineEditRequest.getColor())
                 .editDistance(lineEditRequest.getDistance());

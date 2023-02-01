@@ -1,5 +1,6 @@
 package subway.domain;
 
+import java.util.Collections;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
@@ -12,8 +13,8 @@ import org.springframework.util.StringUtils;
 @Entity
 public class Line {
 
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
@@ -28,7 +29,7 @@ public class Line {
     @Embedded
     private Distance distance;
 
-    public Line() {
+    protected Line() {
     }
 
     public Line(final String name, final String color, final List<Station> stations, final int distance) {
@@ -51,7 +52,7 @@ public class Line {
     }
 
     public List<Station> getStations() {
-        return stations.getStations();
+        return Collections.unmodifiableList(stations.getStations());
     }
 
     public int getDistance() {

@@ -12,12 +12,12 @@ public class Stations {
     @OneToMany(mappedBy = "line")
     private List<Station> stations;
 
-    public Stations() {
+    protected Stations() {
     }
 
     public Stations(final List<Station> stations) {
         if (stations.size() < STATIONS_MIN) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("노선에는 최소 2개 이상의 역이 존재해야 합니다.");
         }
         this.stations = stations;
     }
@@ -27,7 +27,6 @@ public class Stations {
     }
 
     public void detach() {
-        stations.stream()
-                .forEach(station -> station.setLine(null));
+        stations.forEach(station -> station.setLine(null));
     }
 }

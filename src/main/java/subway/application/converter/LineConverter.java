@@ -4,21 +4,19 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 import subway.domain.Line;
 import subway.domain.Station;
-import subway.dto.LineRequest;
+import subway.dto.LineCreateRequest;
 
 @Component
 public class LineConverter {
 
-    public Line lineBy(final LineRequest lineRequest, final List<Station> stations) {
+    public Line lineBy(final LineCreateRequest lineCreateRequest, final List<Station> stations) {
         Line line = new Line(
-                lineRequest.getName(),
-                lineRequest.getColor(),
+                lineCreateRequest.getName(),
+                lineCreateRequest.getColor(),
                 stations,
-                lineRequest.getDistance()
+                lineCreateRequest.getDistance()
         );
-
         stations.forEach(station -> station.setLine(line));
-
         return line;
     }
 }
