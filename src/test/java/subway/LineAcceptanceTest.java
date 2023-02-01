@@ -35,13 +35,23 @@ public class LineAcceptanceTest {
     @Test
     void 지하철_노선_생성_후_목록_조회시_찾을_수_있다() {
         //when
-        String lineName = "1호선";
-        String lineColor = "파란색";
+        String lineName = "신분당선";
+        String lineColor = "bg-red-600";
+        Long upStationId = 1L;
+        Long downStationId = 2L;
+        Long distance = 10L;
 
-        final Map<String, String> params = new HashMap<>();
-        putParams(params, lineName, lineColor);
+        final Map<String, String> stationParams = new HashMap<>();
+        stationParams.put("name", "지하철역");
+        getStationResponse(stationParams);
 
-        getSaveLineResponse(params);
+        stationParams.put("name", "새로운지하철역");
+        getStationResponse(stationParams);
+
+        final Map<String, String> lineParams = new HashMap<>();
+        putParams(lineParams, lineName, lineColor, upStationId, downStationId, distance);
+
+        getSaveLineResponse(lineParams);
 
         //then
         ExtractableResponse<Response> readResponses = getReadResponses();
@@ -61,13 +71,13 @@ public class LineAcceptanceTest {
         String lineTwoColor = "초록색";
 
         Map<String, String> params = new HashMap<>();
-        putParams(params, lineTwoName, lineTwoColor);
+//        putParams(params, lineTwoName, lineTwoColor);
         getSaveLineResponse(params);
 
         String lineThreeName = "3호선";
         String lineThreeColor = "주황색";
 
-        putParams(params, lineThreeName, lineThreeColor);
+//        putParams(params, lineThreeName, lineThreeColor);
         getSaveLineResponse(params);
 
         //when
@@ -91,12 +101,12 @@ public class LineAcceptanceTest {
         String lineFourColor = "하늘색";
 
         Map<String, String> params = new HashMap<>();
-        putParams(params, lineFourName, lineFourColor);
+//        putParams(params, lineFourName, lineFourColor);
         Long id = getSaveLineResponse(params).getId();
 
         String lineFiveName = "5호선";
         String lineFiveColor = "보라색";
-        putParams(params, lineFiveName, lineFiveColor);
+//        putParams(params, lineFiveName, lineFiveColor);
         getSaveLineResponse(params);
 
         //when
@@ -122,7 +132,7 @@ public class LineAcceptanceTest {
         String lineSixColor = "갈색";
 
         Map<String, String> params = new HashMap<>();
-        putParams(params, lineSixName, lineSixColor);
+//        putParams(params, lineSixName, lineSixColor);
         Long id = getSaveLineResponse(params).getId();
 
         //when
@@ -149,7 +159,7 @@ public class LineAcceptanceTest {
         String lineSevenColor = "금색";
 
         Map<String, String> params = new HashMap<>();
-        putParams(params, lineSevenName, lineSevenColor);
+//        putParams(params, lineSevenName, lineSevenColor);
         Long id = getSaveLineResponse(params).getId();
 
         //when
@@ -157,6 +167,18 @@ public class LineAcceptanceTest {
 
         // then
         Assertions.assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    private void getStationResponse(Map<String, String> stationParams) {
+        ExtractableResponse<Response> createResponse = RestAssured
+                .given()
+                .body(stationParams)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then()
+                .extract();
+
+        Assertions.assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
 
     private ExtractableResponse<Response> getDeleteResponse(Long id) {
@@ -193,7 +215,7 @@ public class LineAcceptanceTest {
 
     private ExtractableResponse<Response> getReadResponses() {
         ExtractableResponse<Response> readResponse = RestAssured
-                .given()
+                .given().log().all()
                 .when().get("/lines")
                 .then().log().all()
                 .extract();
@@ -204,14 +226,17 @@ public class LineAcceptanceTest {
 
     }
 
-    private void putParams(Map<String, String> params, String lineName, String lineColor) {
+    private void putParams(Map<String, String> params, String lineName, String lineColor, Long upStationId, Long downStationId, Long distance) {
         params.put("name", lineName);
         params.put("color", lineColor);
+        params.put("upStationId", String.valueOf(upStationId));
+        params.put("downStationId", String.valueOf(downStationId));
+        params.put("distance", String.valueOf(distance));
     }
 
     private LineResponse getSaveLineResponse(Map<String, String> params) {
         ExtractableResponse<Response> saveResponse = RestAssured
-                .given()
+                .given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/lines")
