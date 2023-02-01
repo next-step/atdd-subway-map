@@ -3,6 +3,7 @@ package subway.line.application;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.line.application.dto.request.LineRequest;
+import subway.line.application.dto.request.LineUpdateRequest;
 import subway.line.application.dto.response.LineCreateResponse;
 import subway.line.application.dto.response.LineResponse;
 import subway.line.domain.Line;
@@ -49,5 +50,12 @@ public class LineService {
         Line line = lineQuery.findById(lineId);
 
         return LineResponse.from(line);
+    }
+
+    @Transactional
+    public void updateLine(final Long lineId, final LineUpdateRequest lineUpdateRequest) {
+        Line line = lineQuery.findById(lineId);
+
+        line.updateLine(lineUpdateRequest.toEntity());
     }
 }

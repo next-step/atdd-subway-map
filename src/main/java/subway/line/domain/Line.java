@@ -52,4 +52,9 @@ public class Line {
         this.downStation = downStation;
         this.distance = distance;
     }
+
+    public void updateLine(final Line line) {
+        this.name = line.getName();
+        this.color = line.getColor();
+    }
 }
