@@ -42,13 +42,12 @@ public class LineService {
     }
 
     public Line findLine(Long id) {
-        return lineRepository.findById(id)
-                .orElseThrow(LineNotFoundException::new);
+        return findLineById(id);
     }
 
     @Transactional
     public void updateLine(Long id, String color, String name) {
-        Line line = lineRepository.findById(id).orElseThrow(StationNotFoundException::new);
+        Line line = findLineById(id);
         line.changeName(name);
         line.changeColor(color);
     }
@@ -60,7 +59,7 @@ public class LineService {
 
     @Transactional
     public Section addSection(Long lineId, Long upStationId, Long downStationId, Long distance) {
-        Line line = lineRepository.findById(lineId).orElseThrow(LineNotFoundException::new);
+        Line line = findLineById(lineId);
         Station upStation = stationService.findStation(upStationId);
         Station downStation = stationService.findStation(downStationId);
 
@@ -76,12 +75,20 @@ public class LineService {
 
     @Transactional
     public void deleteSection(Long lineId, Long sectionId) {
-        Line line = lineRepository.findById(lineId).orElseThrow(LineNotFoundException::new);
-        Section section = sectionRepository.findById(sectionId).orElseThrow(SectionNotFoundException::new);
+        Line line = findLineById(lineId);
+        Section section = findSectionById(sectionId);
         if (line.canDeleteSection(section)) {
             line.deleteSection(section);
             return;
         }
         throw new CannotDeleteSectionException();
+    }
+
+    private Section findSectionById(Long sectionId) {
+        return sectionRepository.findById(sectionId).orElseThrow(SectionNotFoundException::new);
+    }
+
+    private Line findLineById(Long lineId) {
+        return lineRepository.findById(lineId).orElseThrow(LineNotFoundException::new);
     }
 }
