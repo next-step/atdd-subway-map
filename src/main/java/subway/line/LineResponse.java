@@ -29,13 +29,4 @@ public class LineResponse {
             .build();
     }
 
-    public static LineResponse of(Line line, List<StationResponse> stations) {
-        return LineResponse.builder()
-            .id(line.getId())
-            .name(line.getName())
-            .color(line.getColor())
-            .stations(stations)
-            .build();
-    }
-
 }

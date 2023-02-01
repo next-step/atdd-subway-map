@@ -22,12 +22,12 @@ public class LineService {
     public LineResponse createLine(LineRequest request) {
 
         Line line = lineBuilder(request);
-        Line entity = lineRepository.save(line);
+        lineRepository.save(line);
 
-        return LineResponse.of(entity);
+        return LineResponse.of(line);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<LineResponse> getLines() {
         return lineRepository.findAll()
             .stream()
@@ -63,7 +63,7 @@ public class LineService {
         Station downStation = getStationById(request.getDownStationId());
         Station upStation = getStationById(request.getUpStationId());
 
-        return Line.builder()
+        return Line.GenerateLine()
             .name(request.getName())
             .color(request.getColor())
             .distance(request.getDistance())
