@@ -24,23 +24,12 @@ public class Line {
     public Line() {
     }
 
-    public Line(Long id, String name, String color, Long upStationId, Long downStationId, Long distance) {
-        this.id = id;
+    public Line(String name, String color, Long upStationId, Long downStationId, Long distance) {
         this.name = name;
         this.color = color;
         this.upStationId = upStationId;
         this.downStationId = downStationId;
         this.distance = distance;
-    }
-
-    public static Line fromLineRequest(LineRequest request) {
-        Line newLine = new Line();
-        newLine.setName(request.getName());
-        newLine.setColor(request.getColor());
-        newLine.setUpStationId(request.getUpStationId());
-        newLine.setDownStationId(request.getDownStationId());
-        newLine.setDistance(request.getDistance());
-        return newLine;
     }
 
     public Long getId() {
@@ -67,28 +56,14 @@ public class Line {
         return distance;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setName(String name) {
+    public void updateLine(String name, String color){
         this.name = name;
-    }
-
-    public void setColor(String color) {
         this.color = color;
     }
 
-    public void setUpStationId(Long upStationId) {
-        this.upStationId = upStationId;
-    }
-
-    public void setDownStationId(Long downStationId) {
-        this.downStationId = downStationId;
-    }
-
-    public void setDistance(Long distance) {
-        this.distance = distance;
+    public static Line createLine(String name, String color, Long upStationId, Long downStationId, Long distance){
+        Line newLine = new Line(name, color, upStationId, downStationId, distance);
+        return newLine;
     }
 
 }

@@ -22,33 +22,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철 노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-@Sql(value = {"/insert_test_station.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@Sql(value = {"/LineAcceptance.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 public class LineAcceptanceTest {
 
-    private static String GANGNAM = "강남역";
-    private static String YEOKSAM = "역삼역";
-
-    void assertThatLineReqAndLineRes(LineRequest req, LineResponse res) {
-        assertThat(req.getName()).isEqualTo(res.getName());
-        assertThat(req.getColor()).isEqualTo(res.getColor());
-        assertThat(req.getUpStationId()).isEqualTo(res.getStations().get(0).getId());
-        assertThat(req.getDownStationId()).isEqualTo(res.getStations().get(1).getId());
-    }
-
-    @DisplayName("지하철 노선 생성")
+    @DisplayName("지하철 생성 요청을 보낸 후, 생성한 노선을 찾을 수 있음.")
     @Test
     void createLine() {
-
         //when 지하철 노선을 생성하면.
         LineRequest lineRequest = new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10L);
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .body(lineRequest)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().log().all()
-                .extract();
-
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        requestCreateLine(lineRequest);
 
         //지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있음.
         LineResponse lineResponse = RestAssured.given().log().all()
@@ -57,31 +39,17 @@ public class LineAcceptanceTest {
                 .then().log().all()
                 .extract().jsonPath().getList("$", LineResponse.class).get(0);
 
-        assertThatLineReqAndLineRes(lineRequest, lineResponse);
+        checkCreatedLineData(lineRequest, lineResponse);
     }
 
-    @DisplayName("지하철 노선들 조회")
+    @DisplayName("현재 DB에 있는 모든 지하철의 조회가 가능함.")
     @Test
     void showLines() {
 //       Given 2개의 지하철 노선을 생성하고
         LineRequest lineRequest1 = new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10L);
-        ExtractableResponse<Response> response1 = RestAssured.given()
-                .body(lineRequest1)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().extract();
-
-        assertThat(response1.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
+        requestCreateLine(lineRequest1);
         LineRequest lineRequest2 = new LineRequest("분당선", "bg-red-600", 1L, 3L, 15L);
-        ExtractableResponse<Response> response2 = RestAssured.given()
-                .body(lineRequest2)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().extract();
-
-        assertThat(response2.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
+        requestCreateLine(lineRequest2);
 
 //      When 지하철 노선 목록을 조회하면
         List<LineResponse> lineResponses = RestAssured.given().log().all()
@@ -92,23 +60,16 @@ public class LineAcceptanceTest {
 
 //      Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
         assertThat(lineResponses.size()).isEqualTo(2);
-        assertThatLineReqAndLineRes(lineRequest1 ,lineResponses.get(0));
-        assertThatLineReqAndLineRes(lineRequest2 ,lineResponses.get(1));
+        checkCreatedLineData(lineRequest1, lineResponses.get(0));
+        checkCreatedLineData(lineRequest2, lineResponses.get(1));
     }
 
-    @DisplayName("지하철 특정 노선 조회")
+    @DisplayName("DB에 노선 데이터가 있으면, 해당 지하철 노선은 조회가 가능함.")
     @Test
-    void showLine(){
+    void showLine() {
 //       Given 지하철 노선을 생성하고
         LineRequest createReq = new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10L);
-        ExtractableResponse<Response> response = RestAssured.given()
-                .body(createReq)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().extract();
-
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        LineResponse createRes = response.jsonPath().getObject("$", LineResponse.class);
+        LineResponse createRes = parseCreateLineResponse(requestCreateLine(createReq));
 
 //      When 지하철 노선 목록을 조회하면
         LineResponse lineResponse = RestAssured.given().log().all()
@@ -118,23 +79,16 @@ public class LineAcceptanceTest {
                 .extract().jsonPath().getObject("$", LineResponse.class);
 
 //      Then 지하철 노선 조회 시 노선을 조회할 수 있다.
-        assertThatLineReqAndLineRes(createReq ,lineResponse);
+        checkCreatedLineData(createReq, lineResponse);
     }
 
-    @DisplayName("지하철 특정 노선 수정")
+    @DisplayName("DB에 있는 노선 데이터의 이름과 색깔을 수정할 수 있음.")
     @Test
-    void updateLine(){
+    void updateLine() {
 
         //Given 지하철 노선을 생성하고
         LineRequest createReq = new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10L);
-        ExtractableResponse<Response> response = RestAssured.given()
-                .body(createReq)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().extract();
-
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        LineResponse createRes = response.jsonPath().getObject("$", LineResponse.class);
+        LineResponse createRes = parseCreateLineResponse(requestCreateLine(createReq));
 
 //      When 생성한 지하철 노선을 수정하면
         LineUpdateRequest updateRequest = new LineUpdateRequest("다른 분당선", "bg-blue-600");
@@ -144,7 +98,6 @@ public class LineAcceptanceTest {
                 .when().put("/line/" + createRes.getId())
                 .then()
                 .extract();
-
         assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
 //      Then 해당 지하철 노선 정보는 수정된다
@@ -158,27 +111,21 @@ public class LineAcceptanceTest {
 
     }
 
-    @DisplayName("지하철 특정 노선 삭제")
+    @DisplayName("DB에 지하철 노선 데이터가 있으면, 삭제가 가능함.")
     @Test
-    void deleteLine(){
-//        Given 지하철 노선을 생성하고
+    void deleteLine() {
+//      Given 지하철 노선을 생성하고
         LineRequest createReq = new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10L);
-        ExtractableResponse<Response> response = RestAssured.given()
-                .body(createReq)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().extract();
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        LineResponse createdLineRes = response.jsonPath().getObject("$", LineResponse.class);
+        LineResponse createdLineRes = parseCreateLineResponse(requestCreateLine(createReq));
 
-//        When 생성한 지하철 노선을 삭제하면
+//      When 생성한 지하철 노선을 삭제하면
         ExtractableResponse<Response> deleteResponse = RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().delete("/line/" + createdLineRes.getId())
                 .then().log().all().extract();
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
-//        Then 해당 지하철 노선 정보는 삭제된다
+//      Then 해당 지하철 노선 정보는 삭제된다
         List<LineResponse> deleteCheckRes = RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().get("/lines")
@@ -188,4 +135,29 @@ public class LineAcceptanceTest {
         assertThat(deleteCheckRes.size()).isEqualTo(0);
     }
 
+    private void checkCreatedLineData(LineRequest req, LineResponse res) {
+        assertThat(req.getName()).isEqualTo(res.getName());
+        assertThat(req.getColor()).isEqualTo(res.getColor());
+
+        var stations = res.getStations();
+        var upStation = stations.get(0);
+        var downStation = stations.get(1);
+        assertThat(req.getUpStationId()).isEqualTo(upStation.getId());
+        assertThat(req.getDownStationId()).isEqualTo(downStation.getId());
+    }
+
+    private ExtractableResponse<Response> requestCreateLine(LineRequest req) {
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .body(req)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines")
+                .then().log().all()
+                .extract();
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        return response;
+    }
+
+    private LineResponse parseCreateLineResponse(ExtractableResponse<Response> res) {
+        return res.jsonPath().getObject("$", LineResponse.class);
+    }
 }

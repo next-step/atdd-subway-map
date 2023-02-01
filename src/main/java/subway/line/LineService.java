@@ -1,11 +1,13 @@
 package subway.line;
 
 import org.springframework.stereotype.Service;
+import subway.error.ErrorMessage;
 import subway.station.Station;
 import subway.station.StationRepository;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -20,11 +22,16 @@ public class LineService {
         this.stationRepository = stationRepository;
     }
 
-
     public LineResponse saveLine(LineRequest lineRequest) {
-        Station upStation = stationRepository.findById(lineRequest.getUpStationId()).orElseThrow();
-        Station downStation = stationRepository.findById(lineRequest.getDownStationId()).orElseThrow();
-        Line saveLine = lineRepository.save(Line.fromLineRequest(lineRequest));
+        Station upStation = stationRepository.findById(lineRequest.getUpStationId()).orElseThrow(
+                () -> new NoSuchElementException(ErrorMessage.NO_DATA_STATION.message)
+        );
+        Station downStation = stationRepository.findById(lineRequest.getDownStationId()).orElseThrow(
+                () -> new NoSuchElementException(ErrorMessage.NO_DATA_STATION.message)
+        );
+        Line newLine = Line.createLine(lineRequest.getName(), lineRequest.getColor(), lineRequest.getUpStationId(),
+                lineRequest.getDownStationId(), lineRequest.getDistance());
+        Line saveLine = lineRepository.save(newLine);
         return LineResponse.fromLine(saveLine, upStation, downStation);
     }
 
@@ -33,28 +40,34 @@ public class LineService {
         return lineRepository.findAll().stream().map(this::createLineResponse).collect(Collectors.toList());
     }
 
-    public LineResponse findById(Long id){
+    public LineResponse findById(Long id) {
         Optional<Line> resLine = lineRepository.findById(id);
-        return createLineResponse(resLine.orElseThrow());
+        return createLineResponse(resLine.orElseThrow(
+                () -> new NoSuchElementException(ErrorMessage.NO_DATA_LINE.message))
+        );
     }
 
     @Transactional
-    public LineResponse updateLine(Long id, LineUpdateRequest lineUpdateRequest){
+    public LineResponse updateLine(Long id, LineUpdateRequest lineUpdateRequest) {
         Line line = lineRepository.findById(id).orElseThrow();
-        line.setColor(lineUpdateRequest.getColor());
-        line.setName(lineUpdateRequest.getName());
+        line.updateLine(lineUpdateRequest.getName(), lineUpdateRequest.getColor());
         return createLineResponse(line);
     }
 
     @Transactional
-    public void deleteLine(Long id){
+    public void deleteLine(Long id) {
         Optional<Line> resLine = lineRepository.findById(id);
         lineRepository.delete(resLine.orElseThrow());
     }
 
     private LineResponse createLineResponse(Line line) {
-        Station upStation = stationRepository.findById(line.getUpStationId()).orElseThrow();
-        Station downStation = stationRepository.findById(line.getDownStationId()).orElseThrow();
+        Station upStation = stationRepository.findById(line.getUpStationId()).orElseThrow(
+                () -> new NoSuchElementException(ErrorMessage.NO_DATA_STATION.message)
+        );
+        Station downStation = stationRepository.findById(line.getDownStationId()).orElseThrow(
+                () -> new NoSuchElementException(ErrorMessage.NO_DATA_STATION.message)
+        );
         return LineResponse.fromLine(line, upStation, downStation);
     }
+
 }

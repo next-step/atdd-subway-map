@@ -32,31 +32,21 @@ public class LineResponse {
         return stations;
     }
 
-    public void setId(Long id) {
+    public LineResponse(Long id, String name, String color) {
         this.id = id;
-    }
-
-    public void setName(String name) {
         this.name = name;
-    }
-
-    public void setColor(String color) {
         this.color = color;
     }
 
-    public static LineResponse fromLine(Line line, Station upStation, Station downStation){
-        LineResponse res = new LineResponse();
-
-        res.setId(line.getId());
-        res.setName(line.getName());
-        res.setColor(line.getColor());
+    public static LineResponse fromLine(Line line, Station upStation, Station downStation) {
+        LineResponse res = new LineResponse(line.getId(), line.getName(), line.getColor());
 
         StationResponse upStationAttr = new StationResponse(upStation.getId(), upStation.getName());
         StationResponse downStationAttr = new StationResponse(downStation.getId(), downStation.getName());
 
-        res.stations.add(upStationAttr);
-        res.stations.add(downStationAttr);
-
+        List<StationResponse> lineStations = res.getStations();
+        lineStations.add(upStationAttr);
+        lineStations.add(downStationAttr);
         return res;
     }
 }
