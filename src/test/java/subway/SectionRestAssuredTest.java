@@ -23,4 +23,12 @@ public class SectionRestAssuredTest {
 
         return response.jsonPath().getLong("id");
     }
+    public static void deleteSection(Long lineId, Long stationId) {
+        var response = RestAssured.given().log().all()
+                .when().delete("/lines/" + lineId + "/sections?stationId=" + stationId)
+                .then().log().all()
+                .extract();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
 }

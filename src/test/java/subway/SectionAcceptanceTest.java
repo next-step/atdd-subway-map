@@ -1,13 +1,8 @@
 package subway;
 
-import io.restassured.RestAssured;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import subway.line.LineCreateRequest;
 import subway.line.LineResponse;
 import subway.section.SectionCreateRequest;
@@ -47,6 +42,20 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         LineResponse line = LineRestAssuredTest.getLine(lineId);
         List<Long> ids = line.getStationResponseList().stream().map(StationResponse::getId).collect(Collectors.toList());
         assertThat(ids).containsAnyOf(thirdStationId);
+    }
+
+    /**
+     * When 지하철 노선에 구간을 제거하면
+     * Then 지하철 노선에 구간이 제거된다.
+     * Then 제거된 노선을 조회시 에러가 발생한다.
+     */
+    @DisplayName("지하철 노선에 구간을 제거하고 그 구간을 조회 시 삭제한 구간을 발견할 수 없다.")
+    public void sectionDeleteTest() {
+        SectionRestAssuredTest.deleteSection(lineId, thirdStationId);
+
+        LineResponse line = LineRestAssuredTest.getLine(lineId);
+        List<Long> ids = line.getStationResponseList().stream().map(StationResponse::getId).collect(Collectors.toList());
+        assertThat(ids).doesNotContain(thirdStationId);
     }
 
 
