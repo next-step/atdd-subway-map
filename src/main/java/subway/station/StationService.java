@@ -2,7 +2,6 @@ package subway.station;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import subway.station.domain.Station;
 import subway.station.dto.StationRequest;
 import subway.station.dto.StationResponse;
 
@@ -36,9 +35,6 @@ public class StationService {
     }
 
     private StationResponse createStationResponse(Station station) {
-        return new StationResponse(
-                station.getId(),
-                station.getName()
-        );
+        return StationResponse.from(station);
     }
 }
