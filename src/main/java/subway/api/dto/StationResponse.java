@@ -1,4 +1,4 @@
-package subway;
+package subway.api.dto;
 
 public class StationResponse {
     private Long id;
