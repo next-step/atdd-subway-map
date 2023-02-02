@@ -10,7 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
 @Entity
-public class StationLineGroup {
+public class Section {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -21,12 +21,12 @@ public class StationLineGroup {
     @ManyToOne(fetch = FetchType.LAZY)
     private Line line;
 
-    public StationLineGroup(Station station, Line line) {
+    public Section(Station station, Line line) {
         this.station = station;
         this.line = line;
     }
 
-    protected StationLineGroup() {
+    protected Section() {
 
     }
 
