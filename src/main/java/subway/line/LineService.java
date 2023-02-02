@@ -52,7 +52,6 @@ public class LineService {
         lineRepository.deleteById(id);
     }
 
-
     @Transactional
     public void addSection(final Long id, final SectionRequest sectionRequest) {
         final Line line = getLine(id);
@@ -62,6 +61,12 @@ public class LineService {
         line.addSection(upStation, downStation, sectionRequest.getDistance());
     }
 
+    @Transactional
+    public void deleteSection(final Long id, final Long stationId) {
+        final Line line = getLine(id);
+        final Station station = stationService.findOneById(stationId);
+        line.removeSection(station);
+    }
 
     private Line getLine(final long lineId) {
         return lineRepository.findById(lineId)

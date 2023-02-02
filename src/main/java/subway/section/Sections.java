@@ -46,6 +46,10 @@ public class Sections {
         return getStations().contains(station);
     }
 
+    public boolean isSingleSection() {
+        return sections.size() == 1;
+    }
+
     private int getLastStationIndex() {
         return sections.size() - 1;
     }

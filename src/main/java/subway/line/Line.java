@@ -67,6 +67,16 @@ public class Line {
         sections.addSection(new Section(this, upStation, downStation, distance));
     }
 
+    public void removeSection(Station station) {
+        if (!sections.isLastStation(station)) {
+            throw new SubwayRestApiException(ErrorResponseCode.NOT_THE_LAST_STATION);
+        }
+        if (sections.isSingleSection()) {
+            throw new SubwayRestApiException(ErrorResponseCode.SINGLE_SECTION_ERROR);
+        }
+        sections.remove();
+    }
+
     public List<Station> getStations() {
         return sections.getStations();
     }
