@@ -23,6 +23,9 @@ import subway.util.DatabaseCleanup;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class StationAcceptanceTest {
 
+    private static final String STATION_NAME1 = "강남역";
+    private static final String STATION_NAME2 = "양재역";
+
     @LocalServerPort
     private int port;
 
@@ -47,23 +50,21 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        String stationName = "강남역";
-
-        stationRestAssured.createStation(stationName);
+        stationRestAssured.createStation(STATION_NAME1);
 
         // then
         List<String> stationNames = stationRestAssured.findStations()
                 .jsonPath()
                 .getList("name", String.class);
 
-        assertThat(stationNames).containsAnyOf(stationName);
+        assertThat(stationNames).containsAnyOf(STATION_NAME1);
     }
 
     @DisplayName("지하철역 목록을 조회한다.")
     @Test
     void findStations() {
         // given
-        String[] expectedStationNames = {"강남역", "양재역"};
+        String[] expectedStationNames = {STATION_NAME1, STATION_NAME2};
 
         stationRestAssured.createStation(expectedStationNames);
 
@@ -82,8 +83,8 @@ public class StationAcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        long deleteStationId = stationRestAssured.createStation("강남역").jsonPath().getLong("id");
-        stationRestAssured.createStation("양재역").jsonPath().getLong("id");
+        long deleteStationId = stationRestAssured.createStation(STATION_NAME1).jsonPath().getLong("id");
+        stationRestAssured.createStation(STATION_NAME2).jsonPath().getLong("id");
 
         // when
         stationRestAssured.deleteStation(deleteStationId);
