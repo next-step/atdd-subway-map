@@ -10,6 +10,7 @@ import java.util.Map;
 
 public class RestAssuredClient {
 
+    // Subway Station
     public static ExtractableResponse<Response> createStation(Map<String, Object> requestParam) {
         return RestAssuredClient.post(ApiPath.STATION_CREATE_PATH, requestParam);
     }
@@ -18,18 +19,17 @@ public class RestAssuredClient {
         RestAssuredClient.delete(String.format(ApiPath.STATION_DELETE_PATH, id));
     }
 
-    public static ExtractableResponse<Response> getStations() {
+    public static ExtractableResponse<Response> listStation() {
         return RestAssuredClient.get(ApiPath.STATION_LIST_PATH);
     }
 
-    private static ExtractableResponse<Response> post(String path, Map<String, Object> requestParam) {
-        return RestAssured
-                .given().log().all()
-                .body(requestParam)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post(path)
-                .then().log().all()
-                .extract();
+    // Subway Line
+    public static ExtractableResponse<Response> createLine(Map<String, Object> requestParam) {
+        return RestAssuredClient.post(ApiPath.LINE_CREATE_PATH, requestParam);
+    }
+
+    public static ExtractableResponse<Response> listLine() {
+        return RestAssuredClient.get(ApiPath.LINE_LIST_PATH);
     }
 
     private static void delete(String path) {
@@ -44,6 +44,16 @@ public class RestAssuredClient {
         return RestAssured
                 .given().log().all()
                 .when().get(path)
+                .then().log().all()
+                .extract();
+    }
+
+    private static ExtractableResponse<Response> post(String path, Map<String, Object> requestParam) {
+        return RestAssured
+                .given().log().all()
+                .body(requestParam)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post(path)
                 .then().log().all()
                 .extract();
     }
