@@ -1,7 +1,11 @@
-package subway;
+package subway.application.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.infrastructor.repository.StationJpaEntity;
+import subway.infrastructor.repository.StationRepository;
+import subway.web.request.StationRequest;
+import subway.web.response.StationResponse;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -9,7 +13,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional(readOnly = true)
 public class StationService {
-    private StationRepository stationRepository;
+    private final StationRepository stationRepository;
 
     public StationService(StationRepository stationRepository) {
         this.stationRepository = stationRepository;
@@ -17,14 +21,14 @@ public class StationService {
 
     @Transactional
     public StationResponse saveStation(StationRequest stationRequest) {
-        Station station = stationRepository.save(new Station(stationRequest.getName()));
-        return createStationResponse(station);
+        StationJpaEntity stationJpaEntity = stationRepository.save(new StationJpaEntity(stationRequest.getName()));
+        return createStationResponse(stationJpaEntity);
     }
 
     public List<StationResponse> findAllStations() {
         return stationRepository.findAll().stream()
-                .map(this::createStationResponse)
-                .collect(Collectors.toList());
+            .map(this::createStationResponse)
+            .collect(Collectors.toList());
     }
 
     @Transactional
@@ -32,10 +36,10 @@ public class StationService {
         stationRepository.deleteById(id);
     }
 
-    private StationResponse createStationResponse(Station station) {
+    private StationResponse createStationResponse(StationJpaEntity stationJpaEntity) {
         return new StationResponse(
-                station.getId(),
-                station.getName()
+            stationJpaEntity.getId(),
+            stationJpaEntity.getName()
         );
     }
 }

@@ -1,19 +1,20 @@
-package subway;
+package subway.infrastructor.repository;
 
 import javax.persistence.*;
 
 @Entity
-public class Station {
+@Table(name = "station")
+public class StationJpaEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(length = 20, nullable = false)
     private String name;
 
-    public Station() {
+    public StationJpaEntity() {
     }
 
-    public Station(String name) {
+    public StationJpaEntity(String name) {
         this.name = name;
     }
 

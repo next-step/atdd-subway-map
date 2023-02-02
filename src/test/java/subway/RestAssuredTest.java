@@ -21,9 +21,9 @@ public class RestAssuredTest {
         // TODO: 구글 페이지 요청 구현
         ExtractableResponse<Response> response = RestAssured.
             when()
-                .get(URI.create("https://www.google.com"))
+            .get(URI.create("https://www.google.com"))
             .then()
-                .statusCode(HttpStatus.OK.value())
+            .statusCode(HttpStatus.OK.value())
             .extract();
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
