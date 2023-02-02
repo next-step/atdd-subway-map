@@ -82,10 +82,17 @@ class LineAcceptanceTest {
     }
 
     private List<String> getStationNames() {
-        return given()
+        return findAllLines()
+                .jsonPath()
+                .getList("name", String.class);
+    }
+
+    private ExtractableResponse<Response> findAllLines() {
+        return RestAssured
+                .given().log().all()
                 .when().get("/lines")
-                .then()
-                .extract().jsonPath().getList("name", String.class);
+                .then().log().all()
+                .extract();
     }
 
     /**
@@ -114,14 +121,6 @@ class LineAcceptanceTest {
                 .containsAll(lines.stream()
                         .map(LineRequest::getName)
                         .collect(Collectors.toList()));
-    }
-
-    private ExtractableResponse<Response> findAllLines() {
-        return RestAssured
-                .given().log().all()
-                .when().get("/lines")
-                .then().log().all()
-                .extract();
     }
 
     /**
