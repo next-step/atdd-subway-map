@@ -3,7 +3,6 @@ package subway.line;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 
+import javax.annotation.PostConstruct;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -23,14 +23,12 @@ public class LineAcceptanceTest {
 
     private long firstStationId;
     private long secondStationId;
-    private long thirdStationId;
 
-    @BeforeEach
+    @PostConstruct
     void setup() {
         // given
         firstStationId = 지하철역_등록됨("강남역").body().jsonPath().getLong("id");
         secondStationId = 지하철역_등록됨("역삼역").body().jsonPath().getLong("id");
-        thirdStationId = 지하철역_등록됨("선릉역").body().jsonPath().getLong("id");
     }
 
     /**
@@ -42,10 +40,11 @@ public class LineAcceptanceTest {
     void createLine() {
         // when
         final String line = "2호선";
-        지하철_노선을_생성한다(line, "green darken-2", firstStationId, secondStationId, 10L);
+        var response = 지하철_노선을_생성됨(line, "green darken-2", firstStationId, secondStationId, 10L);
 
         // then
-        assertThat(지하철_노선_조회_요청().jsonPath().getList("name")).contains(line);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(지하철_노선_조회().jsonPath().getList("name")).contains(line);
     }
 
     /**
@@ -57,14 +56,15 @@ public class LineAcceptanceTest {
     @Test
     void getLines() {
         // given
-        지하철_노선을_생성한다("1호선", "blue darken-4", firstStationId, secondStationId, 20L);
-        지하철_노선을_생성한다("2호선", "green darken-2", firstStationId, secondStationId, 10L);
+        지하철_노선을_생성됨("1호선", "blue darken-4", firstStationId, secondStationId, 20L);
+        지하철_노선을_생성됨("2호선", "green darken-2", firstStationId, secondStationId, 10L);
 
         // when
-        var response = 지하철_노선_조회_요청().jsonPath().getList("name");
+        var response = 지하철_노선_조회();
 
         // then
-        assertThat(response).hasSize(2);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.jsonPath().getList("name")).hasSize(2);
     }
 
     /**
@@ -76,14 +76,15 @@ public class LineAcceptanceTest {
     @Test
     void getLine() {
         // given
-        long lineId = 지하철_노선을_생성한다("2호선", "green darken-2", firstStationId, secondStationId, 10L).jsonPath().getLong("id");
+        long lineId = 지하철_노선을_생성됨("2호선", "green darken-2", firstStationId, secondStationId, 10L).jsonPath().getLong("id");
 
         // when
-        var response = 지하철_노선_조회_요청(lineId).jsonPath();
+        var response = 지하철_노선_Id로_조회됨(lineId);
 
         // then
-        assertThat(response.getString("name")).isEqualTo("2호선");
-        assertThat(response.getString("color")).isEqualTo("green darken-2");
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.jsonPath().getString("name")).isEqualTo("2호선");
+        assertThat(response.jsonPath().getString("color")).isEqualTo("green darken-2");
     }
 
     /**
@@ -95,15 +96,17 @@ public class LineAcceptanceTest {
     @Test
     void setLine() {
         // given
-        long lineId = 지하철_노선을_생성한다("2호선", "green darken-2", firstStationId, secondStationId, 10L).jsonPath().getLong("id");
+        long lineId = 지하철_노선을_생성됨("2호선", "green darken-2", firstStationId, secondStationId, 10L).jsonPath().getLong("id");
 
         // when
-        지하철_노선_수정됨(lineId, "12호선", "blue darken-4");
+        var response = 지하철_노선_수정됨(lineId, "12호선", "blue darken-4");
 
         // then
-        var response = 지하철_노선_조회_요청(lineId).jsonPath();
-        assertThat(response.getString("name")).isEqualTo("12호선");
-        assertThat(response.getString("color")).isEqualTo("blue darken-4");
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        response = 지하철_노선_Id로_조회됨(lineId);
+        assertThat(response.jsonPath().getString("name")).isEqualTo("12호선");
+        assertThat(response.jsonPath().getString("color")).isEqualTo("blue darken-4");
     }
 
     /**
@@ -115,34 +118,20 @@ public class LineAcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        long lineId = 지하철_노선을_생성한다("2호선", "green darken-2", firstStationId, secondStationId, 10L).jsonPath().getLong("id");
+        long lineId = 지하철_노선을_생성됨("2호선", "green darken-2", firstStationId, secondStationId, 10L).jsonPath().getLong("id");
 
         // when
-        지하철_노선_삭제됨(lineId);
+        var response = 지하철_노선_삭제됨(lineId);
 
         // then
-        var response = 지하철_노선_조회_요청().jsonPath().getList("name");
-        assertThat(response).doesNotContain("2호선");
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        response = 지하철_노선_조회();
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.jsonPath().getList("name")).doesNotContain("2호선");
     }
 
-    private ExtractableResponse<Response> 지하철_노선을_생성한다(String name, String color, Long upStationId, Long downStationId, long distance) {
-        final Map<String, Object> params = Map.of(
-                "name", name,
-                "color", color,
-                "upStationId", upStationId,
-                "downStationId", downStationId,
-                "distance", distance);
-
-        return RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().statusCode(HttpStatus.CREATED.value())
-                .log().all()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> 지하철_노선_조회_요청() {
+    private ExtractableResponse<Response> 지하철_노선_조회() {
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().get("/lines")
@@ -151,7 +140,7 @@ public class LineAcceptanceTest {
                 .extract();
     }
 
-    private ExtractableResponse<Response> 지하철_노선_조회_요청(long lineId) {
+    private ExtractableResponse<Response> 지하철_노선_Id로_조회됨(long lineId) {
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().get("/lines/{id}", lineId)
@@ -181,5 +170,32 @@ public class LineAcceptanceTest {
                 .then().statusCode(HttpStatus.NO_CONTENT.value())
                 .log().all()
                 .extract();
+    }
+
+    public static ExtractableResponse<Response> 지하철_노선을_생성됨(String name, String color, Long upStationId, Long downStationId, long distance) {
+        final Map<String, Object> params = Map.of(
+                "name", name,
+                "color", color,
+                "upStationId", upStationId,
+                "downStationId", downStationId,
+                "distance", distance);
+
+        var response = 지하철_노선_등록_요청(params);
+        요청_성공(response);
+        return response;
+    }
+
+    public static ExtractableResponse<Response> 지하철_노선_등록_요청(Map<String, Object> params) {
+        return RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines")
+                .then().statusCode(HttpStatus.CREATED.value())
+                .log().all()
+                .extract();
+    }
+
+    public static void 요청_성공(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
 }
