@@ -16,7 +16,7 @@ public class AssertUtil {
     }
 
     public static void 상태코드_NOT_FOUND(ExtractableResponse<Response> response) {
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 
     public static void 상태코드_NO_CONTENT(ExtractableResponse<Response> response) {

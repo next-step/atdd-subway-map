@@ -11,11 +11,15 @@ public class AcceptanceTestTruncateListener extends AbstractTestExecutionListene
     @Override
     public void afterTestMethod(TestContext testContext) throws Exception {
         JdbcTemplate jdbcTemplate = testContext.getApplicationContext().getBean(JdbcTemplate.class);
-        List<String> truncateQueries = jdbcTemplate.queryForList("SELECT Concat('TRUNCATE TABLE ', TABLE_NAME, ';') " +
-                "AS q FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'PUBLIC'", String.class);
+        List<String> truncateQueries = jdbcTemplate.queryForList("SELECT TABLE_NAME " +
+                "AS t FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'PUBLIC'", String.class);
 
         jdbcTemplate.execute("SET REFERENTIAL_INTEGRITY FALSE");
-        truncateQueries.forEach(query -> jdbcTemplate.execute(query));
+        truncateQueries.forEach(tableName -> {
+            jdbcTemplate.execute("truncate table " + tableName + ";");
+            jdbcTemplate.execute("ALTER TABLE " + tableName + " ALTER COLUMN " + "ID RESTART WITH 1");
+        });
         jdbcTemplate.execute("SET REFERENTIAL_INTEGRITY TRUE");
+
     }
 }

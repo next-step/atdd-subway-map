@@ -6,6 +6,7 @@ import io.restassured.response.Response;
 import org.springframework.http.MediaType;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static subway.station.StationConstant.*;
@@ -49,5 +50,18 @@ public class StationStep {
                 .then().log().all()
                 .extract();
         return response;
+    }
+
+
+    public static List<String> extractStationNames(ExtractableResponse<Response> stationsResponse) {
+        return stationsResponse.jsonPath().getList(NAME_FILED, String.class);
+    }
+
+    public static String extractStationName(ExtractableResponse<Response> stationsResponse) {
+        return stationsResponse.jsonPath().getString(NAME_FILED);
+    }
+
+    public static Long extractStationId(ExtractableResponse<Response> stationsResponse) {
+        return stationsResponse.jsonPath().getLong(ID_FILED);
     }
 }
