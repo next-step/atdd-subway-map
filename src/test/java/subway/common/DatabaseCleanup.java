@@ -1,6 +1,5 @@
-package subway.utils;
+package subway.common;
 
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,6 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
+@Profile("acceptance")
 public class DatabaseCleanup {
 
     @PersistenceContext

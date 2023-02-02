@@ -4,7 +4,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import subway.line.dto.LineRequest;
 import subway.line.dto.LineResponse;
-import subway.line.dto.LineUpdate;
+import subway.line.dto.LineUpdateRequest;
 import subway.line.service.LineService;
 
 import java.net.URI;
@@ -36,8 +36,8 @@ public class LineController {
     }
 
     @PutMapping("/lines/{id}")
-    public void updateLine(@PathVariable Long id, @RequestBody LineUpdate lineUpdate) {
-        lineService.updateLine(id, lineUpdate);
+    public void updateLine(@PathVariable Long id, @RequestBody LineUpdateRequest lineUpdateRequest) {
+        lineService.updateLine(id, lineUpdateRequest);
     }
 
     @DeleteMapping("/lines/{id}")
