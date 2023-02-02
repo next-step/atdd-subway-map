@@ -90,7 +90,7 @@ public class LineAssert {
         );
     }
 
-    public static void assertDeleteLine(final String location) {
+    public void assertDeleteLine(final String location) {
         RestAssured.given().log().all()
                 .when()
                 .get(location)
