@@ -8,10 +8,9 @@ import org.springframework.transaction.annotation.Transactional;
 import subway.application.converter.LineConverter;
 import subway.domain.Line;
 import subway.domain.LineRepository;
-import subway.domain.Station;
 import subway.domain.StationRepository;
-import subway.dto.LineEditRequest;
 import subway.dto.LineCreateRequest;
+import subway.dto.LineEditRequest;
 import subway.dto.LineResponse;
 
 @Transactional(readOnly = true)
@@ -45,9 +44,7 @@ public class LineService {
 
     @Transactional
     public Long save(final LineCreateRequest lineCreateRequest) {
-        List<Station> stations = stationRepository
-                .findAllById(List.of(lineCreateRequest.getUpStationId(), lineCreateRequest.getDownStationId()));
-        Line line = lineConverter.lineBy(lineCreateRequest, stations);
+        Line line = lineConverter.lineBy(lineCreateRequest);
         lineRepository.save(line);
         return line.getId();
     }
@@ -63,7 +60,6 @@ public class LineService {
     @Transactional
     public void delete(final Long lineId) {
         Line line = findLineBy(lineId);
-        line.detachStations();
         lineRepository.delete(line);
     }
 

@@ -32,8 +32,6 @@ public class LineAssert {
                 () -> assertThat(jsonPath.getLong("id[0]")).isEqualTo(1),
                 () -> assertThat(jsonPath.getList("name")).contains(name),
                 () -> assertThat(jsonPath.getList("color")).contains(color),
-                () -> assertThat(jsonPath.getList("stations.id[0]")).contains(upStationId.intValue(),
-                        downStationId.intValue()),
                 () -> assertThat(jsonPath.getList("distance")).contains(distance)
         );
     }
@@ -58,8 +56,6 @@ public class LineAssert {
         Assertions.assertAll(
                 () -> assertThat(jsonPath.getString("name")).isEqualTo(name),
                 () -> assertThat(jsonPath.getString("color")).isEqualTo(color),
-                () -> assertThat(jsonPath.getList("stations.id", Long.class))
-                        .containsExactly(upStationId, downStationId),
                 () -> assertThat(jsonPath.getInt("distance")).isEqualTo(distance)
         );
     }
@@ -84,8 +80,6 @@ public class LineAssert {
         Assertions.assertAll(
                 () -> assertThat(jsonPath.getString("name")).isEqualTo(name),
                 () -> assertThat(jsonPath.getString("color")).isEqualTo(color),
-                () -> assertThat(jsonPath.getList("stations.id", Long.class))
-                        .containsExactly(upStationId, downStationId),
                 () -> assertThat(jsonPath.getInt("distance")).isEqualTo(distance)
         );
     }

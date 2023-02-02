@@ -1,7 +1,5 @@
 package subway.domain;
 
-import java.util.Collections;
-import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -24,18 +22,14 @@ public class Line {
     private String color;
 
     @Embedded
-    private Stations stations;
-
-    @Embedded
     private Distance distance;
 
     protected Line() {
     }
 
-    public Line(final String name, final String color, final List<Station> stations, final int distance) {
+    public Line(final String name, final String color, final int distance) {
         this.name = name;
         this.color = color;
-        this.stations = new Stations(stations);
         this.distance = new Distance(distance);
     }
 
@@ -49,10 +43,6 @@ public class Line {
 
     public String getColor() {
         return color;
-    }
-
-    public List<Station> getStations() {
-        return Collections.unmodifiableList(stations.getStations());
     }
 
     public int getDistance() {
@@ -78,9 +68,5 @@ public class Line {
     public Line editDistance(final int distance) {
         this.distance = new Distance(distance);
         return this;
-    }
-
-    public void detachStations() {
-        stations.detach();
     }
 }
