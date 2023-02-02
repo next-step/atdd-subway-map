@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
-import subway.response.StationResponse;
+import subway.response.StationAcceptanceTestUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -34,13 +34,13 @@ public class StationAcceptanceTest {
         Map<String, String> params = new HashMap<>();
         params.put("name", "강남역");
 
-        ExtractableResponse<Response> response = StationResponse.createStationResponse(params);
+        ExtractableResponse<Response> response = StationAcceptanceTestUtils.createStationResponse(params);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        ExtractableResponse<Response> showResponse = StationResponse.showStationResponse();
+        ExtractableResponse<Response> showResponse = StationAcceptanceTestUtils.showStationResponse();
         List<String> stationNames = showResponse.jsonPath().getList("name", String.class);
         assertThat(stationNames).containsAnyOf("강남역");
     }
@@ -58,13 +58,13 @@ public class StationAcceptanceTest {
         station1.put("name", "강남역");
         Map<String, String> station2 = new HashMap<>();
         station2.put("name", "역삼역");
-        StationResponse.createStationResponse(station1);
-        StationResponse.createStationResponse(station2);
+        StationAcceptanceTestUtils.createStationResponse(station1);
+        StationAcceptanceTestUtils.createStationResponse(station2);
 
         List<String> stations = List.of("강남역", "역삼역");
 
         //when
-        ExtractableResponse<Response> response = StationResponse.showStationResponse();
+        ExtractableResponse<Response> response = StationAcceptanceTestUtils.showStationResponse();
         List<String> stationNames = response.jsonPath().getList("name", String.class);
 
         //then
@@ -87,7 +87,7 @@ public class StationAcceptanceTest {
         //given
         Map<String, String> station = new HashMap<>();
         station.put("name", "강남역");
-        ExtractableResponse<Response> request = StationResponse.createStationResponse(station);
+        ExtractableResponse<Response> request = StationAcceptanceTestUtils.createStationResponse(station);
         Long id = request.jsonPath().getLong("id");
 
         // when

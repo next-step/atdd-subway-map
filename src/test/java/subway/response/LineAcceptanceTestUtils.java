@@ -7,7 +7,7 @@ import org.springframework.http.MediaType;
 
 import java.util.Map;
 
-public class LineResponse {
+public class LineAcceptanceTestUtils {
     public static ExtractableResponse<Response> deleteLineResponse(long id) {
         return RestAssured.given().log().all()
                 .given().pathParam("id", id)

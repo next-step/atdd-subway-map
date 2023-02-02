@@ -7,7 +7,7 @@ import org.springframework.http.MediaType;
 
 import java.util.Map;
 
-public class StationResponse {
+public class StationAcceptanceTestUtils {
 
     public static ExtractableResponse<Response> createStationResponse(Map<String, String> param) {
         return RestAssured.given().log().all()
