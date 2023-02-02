@@ -13,19 +13,14 @@ import org.springframework.test.annotation.DirtiesContext;
 import subway.line.dto.LineRequest;
 import subway.line.dto.LineResponse;
 import subway.line.dto.SectionRequest;
-import subway.line.exception.CustomException;
 import subway.station.dto.StationResponse;
 import subway.util.assertUtils;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static subway.line.LineAcceptanceTest.지하철노선이_생성됨;
 import static subway.line.LineAcceptanceTest.지하철노선이_조회됨;
-import static subway.line.exception.CustomException.ALREADY_CREATED_SECTION_MSG;
 import static subway.station.StationAcceptanceTest.지하철역이_생성됨;
 
 @DisplayName("지하철 구간 관련 기능")

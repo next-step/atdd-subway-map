@@ -3,7 +3,9 @@ package subway.line.domain;
 import subway.line.exception.CustomException;
 import subway.station.domain.Station;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Embeddable;
+import javax.persistence.OneToMany;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,21 +37,13 @@ public class Sections {
         return getStations().stream().map(Station::getId).collect(Collectors.toList());
     }
 
-    public List<Long> getUpStationIds() {
-        return sections.stream().map(section -> section.getUpStation().getId()).collect(Collectors.toList());
-    }
-
-    public List<Long> getDownStationIds() {
-        return sections.stream().map(section -> section.getDownStation().getId()).collect(Collectors.toList());
-    }
-
     public void addSection(Section section) {
         if(sections.isEmpty()) {
             sections.add(section);
             return;
         }
 
-        if(isLastStation(section.getDownStation())) {
+        if(!isLastStation(section.getUpStation())) {
             throw new CustomException(CustomException.CAN_CREATE_ONLY_LAST_SECTION_MSG);
         }
 
@@ -58,20 +52,6 @@ public class Sections {
         }
 
         sections.add(section);
-    }
-
-    private boolean isLastStation(Station station) {
-        return getLastDownStation().getId() == station.getId();
-    }
-
-    private Station getLastDownStation() {
-        return sections.get(sections.size() - 1).getDownStation();
-    }
-
-    private boolean isStationExist(Station station) {
-        return getStations().stream()
-                .map(Station::getId)
-                .anyMatch(stationId -> stationId.equals(station.getId()));
     }
 
     public void deleteSection(Station station) {
@@ -88,5 +68,19 @@ public class Sections {
         }
 
         sections.remove(sections.size() - 1);
+    }
+
+    private Station getLastDownStation() {
+        return sections.get(sections.size() - 1).getDownStation();
+    }
+
+    private boolean isLastStation(Station station) {
+        return getLastDownStation().getId() == station.getId();
+    }
+
+    private boolean isStationExist(Station station) {
+        return getStations().stream()
+                .map(Station::getId)
+                .anyMatch(stationId -> stationId.equals(station.getId()));
     }
 }

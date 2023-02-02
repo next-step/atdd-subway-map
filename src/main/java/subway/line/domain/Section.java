@@ -1,12 +1,10 @@
 package subway.line.domain;
 
-import subway.line.dto.SectionRequest;
 import subway.line.exception.CustomException;
 import subway.station.domain.Station;
 
 import javax.persistence.*;
 
-//@Embeddable
 @Entity
 public class Section {
     @Id

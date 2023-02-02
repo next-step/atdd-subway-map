@@ -1,13 +1,11 @@
 package subway.line.controller;
 
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import subway.line.dto.LineRequest;
 import subway.line.dto.LineResponse;
 import subway.line.dto.SectionRequest;
 import subway.line.dto.SectionResponse;
-import subway.line.exception.CustomException;
 import subway.line.service.LineService;
 
 import java.net.URI;
