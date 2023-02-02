@@ -8,16 +8,20 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.exception.NotFoundLineException;
+import subway.exception.NotFoundStationException;
+import subway.line.section.LineSection;
 import subway.line.section.LineSectionRepository;
 import subway.line.section.LineSectionService;
 import subway.section.SectionRepository;
 import subway.line.station.LineStationRepository;
 import subway.line.station.LineStationService;
+import subway.station.Station;
 import subway.station.StationRepository;
 
 @Service
 @RequiredArgsConstructor
 public class LineService {
+
     private final LineRepository lineRepository;
 
     private final StationRepository stationRepository;
@@ -33,27 +37,29 @@ public class LineService {
     private final LineStationService lineStationService;
 
     @Transactional
-    public LineResponse saveLine(LineRequest lineRequest) {
-        Line line = createAndSaveLine(lineRequest);
+    public Line saveLine(LineRequest lineRequest) {
+        Line savedLine = createAndSaveLine(lineRequest);
 
-        lineStationService.registerLineStations(line.getId(), lineRequest.getStationIds());
+        lineStationService.registerLineStations(savedLine.getId(),
+            lineRequest.getStationIds());
 
-        lineSectionService.registerLineSection(
-            line.getId(),
+        LineSection lineSection = lineSectionService.registerLineSection(
+            savedLine.getId(),
             lineRequest.getUpStationId(),
             lineRequest.getDownStationId(),
             lineRequest.getDistance()
         );
 
-        return LineResponse.of(line);
+        return savedLine;
     }
 
     @Transactional(readOnly = true)
     public List<LineResponse> findAllLines() {
-        return lineRepository.findAllWithLineStations().stream()
+        return lineRepository.findAllWithDefault().stream()
             .map(LineResponse::of)
             .collect(Collectors.toList());
     }
+
     @Transactional(readOnly = true)
     public Optional<LineResponse> findById(Long id) {
         return lineRepository.findByIdWithLineStations(id)
@@ -76,7 +82,18 @@ public class LineService {
     }
 
     private Line createAndSaveLine(LineRequest lineRequest) {
-        Line line = new Line(lineRequest.getName(), lineRequest.getColor(), lineRequest.getDistance());
+        Line line = new Line(lineRequest.getName(), lineRequest.getColor(),
+            lineRequest.getDistance());
+
+        Station upStation = stationRepository.findById(lineRequest.getUpStationId())
+            .orElseThrow(NotFoundStationException::new);
+
+        Station downStation = stationRepository.findById(lineRequest.getDownStationId())
+            .orElseThrow(NotFoundStationException::new);
+
+        line.setUpStation(upStation);
+
+        line.setDownStation(downStation);
 
         return lineRepository.save(line);
     }

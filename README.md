@@ -164,3 +164,20 @@ public class DatabaseCleanup implements InitializingBean {
     }
 }
 ```
+
+# TRUNCATE
+> 아까 TRUNCATE 관련 이슈 전 처음에 브라운 강사님 코드대로 TRUNCATE 했다가 ID 컬럼명이 달라서 오류가 나서 아래같이 해결했어요!
+
+1. ALTER TABLE ... ID RESTART WITH 1 문 제거
+
+2. dialect를 H2 database 사용 시 pk 초기화를 하려면 TRUNCATE 명령문에 RESTART IDENTITY를 추가하는 방법]
+entityManager.createNativeQuery("TRUNCATE TABLE " + tableName + " RESTART IDENTITY").executeUpdate();
+
+3. dialect를 MySQL 사용 시 TRUNCATE 진행 시 별다른 명령문이 없어도 AUTO_INCREMENT가 재설정 됨(5.7, 8.0 동일)
+entityManager.createNativeQuery("TRUNCATE TABLE " + tableName).executeUpdate();
+
+
+- H2 reference
+  - https://www.h2database.com/html/commands.html?highlight=truncate&search=truncate#truncate_table
+- mySQL reference
+  - https://dev.mysql.com/doc/refman/5.7/en/truncate-table.html, https://dev.mysql.com/doc/refman/8.0/en/truncate-table.html

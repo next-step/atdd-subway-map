@@ -1,17 +1,17 @@
 package subway.line;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import subway.exception.CannotRemoveLineSectionException;
 import subway.line.section.LineSection;
 import subway.line.station.LineStation;
+import subway.station.Station;
 
 @Entity
 @Table(name = "LINE")
@@ -43,27 +44,41 @@ public class Line {
     @OneToMany(mappedBy = "line")
     private List<LineStation> lineStations = new ArrayList<>();
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "downLineStationId")
+    private Station downStation;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "upLineStationId")
+    private Station upStation;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "lastLineSectionId")
+    private LineSection lastLineSection;
+
     public Line(String name, String color, int distance) {
         this.name = name;
         this.color = color;
         this.distance = distance;
     }
 
-    public List<Long> getStationIds() {
-        return lineStations.stream().map(subway.line.station.LineStation::getStationId)
-            .collect(Collectors.toList());
+    public LineSection getLastLineSection() {
+        return lastLineSection;
     }
 
+    public void setDownStation(Station downStation) {
+        this.downStation = downStation;
+    }
+
+    public void setUpStation(Station upStation) {
+        this.upStation = upStation;
+    }
 
     public void addLineStation(LineStation lineStation) {
         if (!lineStations.contains(lineStation)) {
             lineStations.add(lineStation);
             lineStation.changeLine(this);
         }
-    }
-
-    public void addLineStations(List<LineStation> lineStations) {
-        lineStations.forEach(this::addLineStation);
     }
 
     public void removeLineStation(LineStation lineStation) {
@@ -77,16 +92,10 @@ public class Line {
         if (isAbleToRegister(lineSection)) {
             lineSection.setNumber(nextSectionNumber());
             lineSection.setLine(this);
+            downStation = lineSection.getDownStation();
+            lastLineSection = lineSection;
             lineSections.add(lineSection);
         }
-    }
-
-    public void removeLineSection(Long downStationId) {
-        if (isNotAbleToRemove(downStationId)) {
-            throw new CannotRemoveLineSectionException();
-        }
-
-        removeLastLineSection();
     }
 
     public void removeLineSection(LineSection lineSection) {
@@ -116,46 +125,26 @@ public class Line {
             .max().orElse(0) + 1;
     }
 
-    private boolean isAbleToRegister(LineSection section) {
-        return !lineSections.contains(section) && isConnected(section);
+    private boolean isAbleToRegister(LineSection lineSection) {
+        LineSection lastLineSection = getLastLineSection();
+        return Objects.isNull(lastLineSection) || isConnected(lineSection);
     }
 
     private boolean isNotAbleToRemove(LineSection lineSection) {
         return !isAbleToRemove(lineSection);
     }
 
-    private boolean isNotAbleToRemove(Long downStationId) {
-        return !isAbleToRemove(downStationId);
-    }
-
     private boolean isAbleToRemove(LineSection lineSection) {
-        Optional<LineSection> optionalLastLineSection = getLastLineSection();
+        LineSection lastLineSection = getLastLineSection();
 
-        return lineSections.contains(lineSection)
-            && optionalLastLineSection.isPresent()
-            && optionalLastLineSection.get() == lineSection;
-    }
-
-    private boolean isAbleToRemove(Long downStationId) {
-        Optional<LineSection> optionalLastLineSection = getLastLineSection();
-
-        return optionalLastLineSection.isPresent()
-            && Objects.equals(optionalLastLineSection.get().getDownStationId(), downStationId);
+        return Objects.isNull(lastLineSection)
+            || lastLineSection == lineSection;
     }
 
     private boolean isConnected(LineSection lineSection) {
-        return getLastLineSection()
-            .map(lastSection -> lastSection.isConnected(lineSection))
-            .orElse(true);
-    }
+        LineSection lastLineSection = getLastLineSection();
 
-    public Optional<LineSection> getLastLineSection() {
-        return lineSections.stream()
-            .max(Comparator.comparing(LineSection::getNumber));
-    }
-
-    private void removeLastLineSection() {
-        getLastLineSection()
-            .ifPresent(this::removeLineSection);
+        return Objects.nonNull(lastLineSection)
+            && lastLineSection.isConnected(lineSection);
     }
 }

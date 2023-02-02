@@ -1,5 +1,6 @@
 package subway.section;
 
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,9 +23,11 @@ public class SectionService {
         Station downStation = stationRepository.findById(downStationId)
             .orElseThrow(NotFoundStationException::new);
 
-        return sectionRepository.findSectionByUpStationIdAndDownStationId(upStationId, downStationId)
-            .orElse(
-                sectionRepository.save(new Section(upStation, downStation, distance))
-            );
+        return sectionRepository.save(new Section(upStation, downStation, distance));
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<Section> searchSection(Long upStationId, Long downStationId) {
+        return sectionRepository.findSectionByUpStationIdAndDownStationId(upStationId, downStationId);
     }
 }

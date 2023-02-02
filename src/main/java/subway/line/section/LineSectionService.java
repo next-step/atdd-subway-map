@@ -27,7 +27,9 @@ public class LineSectionService {
         Line line = lineRepository.findByIdWithLineSections(lineId)
             .orElseThrow(NotFoundLineException::new);
 
-        Section savedSection = sectionService.registerSection(upStationId, downStationId, distance);
+        Section savedSection = sectionService.searchSection(upStationId, downStationId).orElse(
+            sectionService.registerSection(upStationId, downStationId, distance)
+        );
 
         return createAndSaveLineSection(line, savedSection);
     }
@@ -38,24 +40,23 @@ public class LineSectionService {
     }
 
     @Transactional
-    public void removeLineSection(Long lineId, Long stationId) {
-        Line line = lineRepository.findByIdWithLineSections(lineId).orElseThrow(NotFoundLineException::new);
+    public void removeLineSection(Long lineId, Long downStationId) {
+        Line line = lineRepository.findByIdWithLineSections(lineId)
+            .orElseThrow(NotFoundLineException::new);
 
-        LineSection lineSection = line.getLastLineSection()
-            .orElseThrow(CannotRemoveLineSectionException::new);
+        LineSection lineSection = line.getLastLineSection();
 
-        if (!Objects.equals(lineSection.getDownStationId(), stationId)) {
+        if (!Objects.equals(lineSection.getDownStationId(), downStationId)) {
             throw new CannotRemoveLineSectionException();
         }
 
-        lineSectionRepository.deleteById(lineSection.getId());
+        lineSectionRepository.delete(lineSection);
     }
 
     private LineSection createAndSaveLineSection(Line line, Section section) {
         LineSection lineSection = new LineSection(line, section);
 
         LineSection savedLineSection = lineSectionRepository.save(lineSection);
-
 
         line.addLineSection(savedLineSection);
 

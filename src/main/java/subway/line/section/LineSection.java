@@ -44,7 +44,6 @@ public class LineSection {
             return;
         }
 
-        // TODO: check
         if (this.line != null) {
             this.line.removeLineSection(this);
         }

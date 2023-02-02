@@ -2,6 +2,7 @@ package subway.line;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -25,7 +26,7 @@ public class LineResponse {
     private List<StationResponse> stations;
 
     public static LineResponse of(Line line) {
-        List<StationResponse> stationResponses = line.getLineStations().stream()
+        List<StationResponse> stationResponses = Stream.of(line.getUpStation(), line.getDownStation())
             .map(StationResponse::of)
             .collect(Collectors.toList());
 
