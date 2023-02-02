@@ -38,37 +38,59 @@ public class LineAcceptanceTest {
     @Test
     void createLineTest() {
         // when
-        createLine("2호선", "#92932", 1L, 2L, 100);
+        var response = createLine("2호선", "#92932", 1L, 2L, 100);
 
         // then
+        assertEquals(response.statusCode(), HttpStatus.CREATED.value());
         checkCanFindCreatedLineInLineList("2호선");
     }
 
     @DisplayName("지하철노선 목록을 조회한다.")
     @Test
     void getLineListTest() {
+        // given - SQL로 대체
+
+        // when
+        List<String> lineList = findAllLine();
+
         // then
-        checkCanFindExpectedLineList("2호선", "3호선");
+        checkCanFindLineInLineList(lineList, "2호선", "3호선");
     }
 
     @DisplayName("지하철노선을 조회한다.")
     @Test
     void getLineTest() {
+        // given - SQL로 대체
+
+        // when
+        String lineName = findLine(1L).jsonPath().getString("name");
+
         // then
-        checkCanFindLine(1L, "2호선");
+        assertEquals(lineName, "2호선");
     }
 
     @DisplayName("지하철노선을 수정한다.")
     @Test
     void updateLineTest() {
+        // given - SQL로 대체
+
+        // when
+        var response = updateLineNameAndColor(1L, "#29834", "8호선");
+
         // then
-        checkCanUpdateLineNameAndColor(1L, "#29834", "8호선");
+        assertEquals(response.statusCode(), HttpStatus.NO_CONTENT.value());
     }
 
     @DisplayName("지하철노선을 삭제한다.")
     @Test
     void deleteLineTest() {
-        checkCanDeleteLine(1L);
+        // given - SQL로 대체
+
+        // when
+        var response = deleteLine(1L);
+
+        // then
+        assertEquals(response.statusCode(), HttpStatus.NO_CONTENT.value());
     }
 
     private ExtractableResponse<Response> createLine(
@@ -94,8 +116,6 @@ public class LineAcceptanceTest {
                         .all()
                         .extract();
 
-        assertEquals(HttpStatus.CREATED.value(), response.statusCode());
-
         return response;
     }
 
@@ -117,7 +137,7 @@ public class LineAcceptanceTest {
         assertThat(stationList).containsAll(List.of(createdLineName));
     }
 
-    private void checkCanFindExpectedLineList(String... createdLineName) {
+    private List<String> findAllLine() {
 
         List<String> stationList =
                 RestAssured.given()
@@ -132,12 +152,10 @@ public class LineAcceptanceTest {
                         .jsonPath()
                         .getList("name", String.class);
 
-        assertAll(
-                () -> assertThat(stationList).containsAll(List.of(createdLineName)),
-                () -> assertEquals(stationList.size(), createdLineName.length));
+        return stationList;
     }
 
-    private void checkCanFindLine(Long lineId, String lineName) {
+    private ExtractableResponse<Response> findLine(Long lineId) {
         ExtractableResponse<Response> response =
                 RestAssured.given()
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -149,11 +167,19 @@ public class LineAcceptanceTest {
                         .log()
                         .all()
                         .extract();
-        assertEquals(response.jsonPath().getString("name"), lineName);
+
+        return response;
     }
 
-    private void checkCanUpdateLineNameAndColor(Long lineId, String lineName, String lineColor) {
+    private void checkCanFindLineInLineList(List<String> lineList, String... lineName) {
 
+        assertAll(
+                () -> assertThat(lineList).containsAll(List.of(lineName)),
+                () -> assertEquals(lineList.size(), lineName.length));
+    }
+
+    private ExtractableResponse<Response> updateLineNameAndColor(
+            Long lineId, String lineName, String lineColor) {
         Map<String, Object> params = new HashMap<>();
         params.put("name", lineName);
         params.put("color", lineColor);
@@ -171,10 +197,10 @@ public class LineAcceptanceTest {
                         .all()
                         .extract();
 
-        assertEquals(response.statusCode(), HttpStatus.NO_CONTENT.value());
+        return response;
     }
 
-    private void checkCanDeleteLine(Long lineId) {
+    private ExtractableResponse<Response> deleteLine(Long lineId) {
 
         ExtractableResponse<Response> response =
                 RestAssured.given()
@@ -188,6 +214,6 @@ public class LineAcceptanceTest {
                         .all()
                         .extract();
 
-        assertEquals(response.statusCode(), HttpStatus.NO_CONTENT.value());
+        return response;
     }
 }
