@@ -1,5 +1,6 @@
 package subway.line;
 
+import subway.section.Sections;
 import subway.station.Station;
 
 import javax.persistence.*;
@@ -28,6 +29,9 @@ public class Line {
 
         protected Line() {
     }
+
+    @Embedded
+    private Sections sections = new Sections();
 
     public Line(String name, String color, Station upStation, Station downStation, int distance) {
         this.name = name;
@@ -65,5 +69,9 @@ public class Line {
 
     public Station getDownStation() {
         return downStation;
+    }
+
+    public Sections getSections() {
+        return sections;
     }
 }
