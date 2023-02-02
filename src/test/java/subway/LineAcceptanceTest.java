@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DisplayName("지하철 노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@DirtiesContext
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class LineAcceptanceTest {
     /**
      * When 지하철 노선을 생성하면
@@ -127,6 +127,7 @@ public class LineAcceptanceTest {
 
         //then
         assertAll(
+                () -> assertThat(id).isEqualTo(1),
                 () -> assertThat(lineName).isEqualTo("다른분당선"),
                 () -> assertThat(lineColor).isEqualTo("bg-red-600")
         );
