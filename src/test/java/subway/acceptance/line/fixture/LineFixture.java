@@ -1,4 +1,4 @@
-package subway.line.fixture;
+package subway.acceptance.line.fixture;
 
 import java.util.HashMap;
 import java.util.Map;

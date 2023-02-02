@@ -1,5 +1,6 @@
 package subway.station.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.station.repository.StationCommandRepository;
@@ -13,15 +14,11 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class StationService {
 
     private final StationCommandRepository stationCommand;
     private final StationQueryRepository stationQuery;
-
-    public StationService(final StationCommandRepository stationCommand, final StationQueryRepository stationQuery) {
-        this.stationCommand = stationCommand;
-        this.stationQuery = stationQuery;
-    }
 
     @Transactional
     public StationResponse saveStation(StationRequest stationRequest) {
