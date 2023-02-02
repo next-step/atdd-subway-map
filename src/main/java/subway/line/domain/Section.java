@@ -1,6 +1,7 @@
 package subway.line.domain;
 
 import subway.line.dto.SectionRequest;
+import subway.line.exception.CustomException;
 import subway.station.domain.Station;
 
 import javax.persistence.*;
@@ -43,13 +44,10 @@ public class Section {
     }
 
     public Section(Station upStation, Station downStation, Long distance) {
-        this.upStation = upStation;
-        this.downStation = downStation;
-        this.distance = distance;
-    }
+        if(distance <= 0) {
+            throw new CustomException(CustomException.INVALID_DISTANCE_MSG);
+        }
 
-    public Section(Line line, Station upStation, Station downStation, Long distance) {
-        this.line = line;
         this.upStation = upStation;
         this.downStation = downStation;
         this.distance = distance;

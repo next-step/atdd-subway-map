@@ -132,7 +132,6 @@ public class LineAcceptanceTest {
         LineResponse 이호선_생성_응답 = 지하철노선이_생성됨(이호선_request);
         LineResponse 이호선 = 노선목록에서_특정_지하철역을_조회(이호선_생성_응답.getId());
 
-
         //when
         var 이호선_update_request = new LineRequest(이호선_request.getName(), "green", 강남역.getId(), 역삼역.getId(), 이호선_request.getDistance());
         ExtractableResponse<Response> lineResponse = 지하철노선을_수정한다(이호선.getId(), 이호선_update_request);
@@ -149,7 +148,6 @@ public class LineAcceptanceTest {
             assertThat(이호선_update.getStationIds()).containsExactlyInAnyOrderElementsOf(List.of(강남역.getId(), 역삼역.getId()));
         });
     }
-
 
     /**
      * 지하철노선 삭제

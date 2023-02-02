@@ -1,5 +1,6 @@
 package subway.line.domain;
 
+import subway.line.exception.CustomException;
 import subway.station.domain.Station;
 
 import javax.persistence.*;
@@ -34,43 +35,56 @@ public class Sections {
         return getStations().stream().map(Station::getId).collect(Collectors.toList());
     }
 
+    public List<Long> getUpStationIds() {
+        return sections.stream().map(section -> section.getUpStation().getId()).collect(Collectors.toList());
+    }
+
+    public List<Long> getDownStationIds() {
+        return sections.stream().map(section -> section.getDownStation().getId()).collect(Collectors.toList());
+    }
+
     public void addSection(Section section) {
         if(sections.isEmpty()) {
             sections.add(section);
             return;
         }
 
-        //중복 체크
-        isDuplication(section.getUpStation().getId(), section.getDownStation().getId());
-
-        //하행 종점역인지 valid
-        if(getLastDownStation().getId() != section.getUpStation().getId()) {
-            throw new RuntimeException();
+        if(isLastStation(section.getDownStation())) {
+            throw new CustomException(CustomException.CAN_CREATE_ONLY_LAST_SECTION_MSG);
         }
 
-        //add
+        if(isStationExist(section.getDownStation())) {
+            throw new CustomException(CustomException.ALREADY_CREATED_SECTION_MSG);
+        }
+
         sections.add(section);
+    }
+
+    private boolean isLastStation(Station station) {
+        return getLastDownStation().getId() == station.getId();
     }
 
     private Station getLastDownStation() {
         return sections.get(sections.size() - 1).getDownStation();
     }
 
-    private void isDuplication(Long upStationId, Long downStationId) {
-        boolean isDuplication = getStations().stream().map(Station::getId).noneMatch(stationId -> stationId.equals(upStationId) || stationId.equals(downStationId));
-
-        if(isDuplication) {
-            throw new RuntimeException();
-        }
+    private boolean isStationExist(Station station) {
+        return getStations().stream()
+                .map(Station::getId)
+                .anyMatch(stationId -> stationId.equals(station.getId()));
     }
 
     public void deleteSection(Station station) {
         if(sections.isEmpty()) {
-            throw new RuntimeException();
+            throw new CustomException(CustomException.EMPTY_SECTIONS_IN_LINE);
         }
 
-        if(getLastDownStation().getId() != station.getId()) {
-            throw new RuntimeException();
+        if(!isStationExist(station)) {
+            throw new CustomException(CustomException.EMPTY_SECTIONS_IN_LINE);
+        }
+
+        if(!isLastStation(station)) {
+            throw new CustomException(CustomException.CAN_DELETE_ONLY_LAST_SECTION_MSG);
         }
 
         sections.remove(sections.size() - 1);
