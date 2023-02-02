@@ -42,7 +42,7 @@ public class LineService {
     @Transactional
     public LineResponse updateById(Long id, LineRequest lineRequest) {
         Line line = lineRepository.findById(id).orElseThrow();
-        return LineResponse.of(lineRepository.save(line.updateLine(lineRequest)));
+        return LineResponse.of(line.updateLine(lineRequest.getName(), lineRequest.getColor()));
     }
 
     @Transactional

@@ -37,9 +37,9 @@ public class Line {
         this.distance = distance;
     }
 
-    public Line updateLine(LineRequest lineRequest) {
-        this.name = lineRequest.getName();
-        this.color = lineRequest.getColor();
+    public Line updateLine(String name, String color) {
+        this.name = name;
+        this.color = color;
         return this;
     }
 
