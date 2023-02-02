@@ -28,7 +28,7 @@ public class StationAcceptanceTest {
         assertThat(station.jsonPath().getString("name")).isEqualTo("강남역");
 
         // when
-        var stations = RestAssuredClient.getStations();
+        var stations = RestAssuredClient.listStation();
 
         // then
         assertThat(stations.jsonPath().getList("$")).hasSize(1);
@@ -50,7 +50,7 @@ public class StationAcceptanceTest {
         RestAssuredClient.createStation(Map.ofEntries(entry("name", "신논현역")));
 
         // when
-        var stations = RestAssuredClient.getStations();
+        var stations = RestAssuredClient.listStation();
 
         // then
         assertThat(stations.jsonPath().getList("$")).hasSize(2);
@@ -67,14 +67,14 @@ public class StationAcceptanceTest {
     void deleteStation() {
         // given
         RestAssuredClient.createStation(Map.ofEntries(entry("name", "강남역")));
-        var stationsBefore = RestAssuredClient.getStations();
+        var stationsBefore = RestAssuredClient.listStation();
         assertThat(stationsBefore.jsonPath().getList("$")).hasSize(1);
 
         // when
         RestAssuredClient.deleteStation(1L);
 
         // then
-        var stationsAfter = RestAssuredClient.getStations();
+        var stationsAfter = RestAssuredClient.listStation();
         assertThat(stationsAfter.jsonPath().getList("$")).isEmpty();
     }
 }
