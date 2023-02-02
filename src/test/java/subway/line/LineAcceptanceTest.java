@@ -5,8 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.util.HashMap;
-import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,12 +12,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.TestConstructor;
 import org.springframework.test.context.TestConstructor.AutowireMode;
 import subway.domain.LineRepository;
 import subway.domain.StationRepository;
+import subway.station.StationRestAssured;
 
 @DisplayName("지하철 노선 관련 기능")
 @TestConstructor(autowireMode = AutowireMode.ALL)
@@ -37,6 +34,7 @@ public class LineAcceptanceTest {
 
     private final LineRestAssured lineRestAssured;
     private final LineAssert lineAssert;
+    private final StationRestAssured stationRestAssured;
 
     private final StationRepository stationRepository;
     private final LineRepository lineRepository;
@@ -47,6 +45,7 @@ public class LineAcceptanceTest {
     ) {
         this.lineRestAssured = new LineRestAssured();
         this.lineAssert = new LineAssert();
+        this.stationRestAssured = new StationRestAssured();
         this.stationRepository = stationRepository;
         this.lineRepository = lineRepository;
     }
@@ -56,23 +55,8 @@ public class LineAcceptanceTest {
         RestAssured.port = port;
         stationRepository.truncateTableStation();
         lineRepository.deleteAllAndRestartId();
-        this.upStationId = createStationResponseBy("강남역").jsonPath().getLong("id");
-        this.downStationId = createStationResponseBy("양재역").jsonPath().getLong("id");
-    }
-
-    private ExtractableResponse<Response> createStationResponseBy(final String stationName) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", stationName);
-
-        return RestAssured
-                .given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/stations")
-                .then().log().all()
-                .statusCode(HttpStatus.CREATED.value())
-                .extract();
+        this.upStationId = stationRestAssured.createStation("강남역").jsonPath().getLong("id");
+        this.downStationId = stationRestAssured.createStation("양재역").jsonPath().getLong("id");
     }
 
     @DisplayName("지하철 노선 생성한다.")
@@ -90,8 +74,8 @@ public class LineAcceptanceTest {
     void showLines() {
         // given
         lineRestAssured.createLine(LINE_NAME, COLOR, upStationId, downStationId, DISTANCE);
-        long upStationId2 = createStationResponseBy("신림역").jsonPath().getLong("id");
-        long downStationId2 = createStationResponseBy("노량진역").jsonPath().getLong("id");
+        long upStationId2 = stationRestAssured.createStation("신림역").jsonPath().getLong("id");
+        long downStationId2 = stationRestAssured.createStation("노량진역").jsonPath().getLong("id");
         lineRestAssured.createLine("2호선", "bg-green-600", upStationId2, downStationId2, 20);
 
         // when
