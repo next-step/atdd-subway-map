@@ -53,7 +53,6 @@ public class Sections {
     }
 
     private Station getLastDownStation() {
-        System.out.println(sections.size());
         return sections.get(sections.size() - 1).getDownStation();
     }
 
@@ -63,5 +62,17 @@ public class Sections {
         if(isDuplication) {
             throw new RuntimeException();
         }
+    }
+
+    public void deleteSection(Station station) {
+        if(sections.isEmpty()) {
+            throw new RuntimeException();
+        }
+
+        if(getLastDownStation().getId() != station.getId()) {
+            throw new RuntimeException();
+        }
+
+        sections.remove(sections.size() - 1);
     }
 }

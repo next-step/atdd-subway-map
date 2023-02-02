@@ -67,4 +67,11 @@ public class LineService {
 
         line.addSection(section);
     }
+
+    @Transactional
+    public void deleteSection(Long lineId, Long stationId) {
+        Line line = lineRepository.findById(lineId).orElseThrow(RuntimeException::new);
+        Station station = stationService.findById(stationId);
+        line.deleteSection(station);
+    }
 }

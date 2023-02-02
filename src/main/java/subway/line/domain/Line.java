@@ -111,4 +111,8 @@ public class Line {
     public List<Long> getStationIds() {
         return sections.getStationIds();
     }
+
+    public void deleteSection(Station station) {
+        sections.deleteSection(station);
+    }
 }
