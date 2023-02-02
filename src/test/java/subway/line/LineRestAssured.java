@@ -75,4 +75,13 @@ public class LineRestAssured {
                 .statusCode(HttpStatus.NO_CONTENT.value())
                 .extract();
     }
+
+    public ExtractableResponse<Response> requestGet(final String location) {
+        return RestAssured.given().log().all()
+                .when()
+                .get(location)
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract();
+    }
 }

@@ -11,6 +11,12 @@ import org.springframework.http.HttpStatus;
 
 public class LineAssert {
 
+    private LineRestAssured lineRestAssured;
+
+    public LineAssert() {
+        this.lineRestAssured = new LineRestAssured();
+    }
+
     public void assertCreateLine(
             final String name,
             final String color,
@@ -18,13 +24,7 @@ public class LineAssert {
             final Long downStationId,
             final int distance
     ) {
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .when()
-                .get("/lines")
-                .then().log().all()
-                .statusCode(HttpStatus.OK.value())
-                .extract();
+        ExtractableResponse<Response> response = lineRestAssured.showLines();
 
         JsonPath jsonPath = response.jsonPath();
 
@@ -44,12 +44,7 @@ public class LineAssert {
             final int distance,
             final String location
     ) {
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when()
-                .get(location)
-                .then().log().all()
-                .statusCode(HttpStatus.OK.value())
-                .extract();
+        ExtractableResponse<Response> response = lineRestAssured.requestGet(location);
 
         JsonPath jsonPath = response.jsonPath();
 
@@ -68,12 +63,7 @@ public class LineAssert {
             final String color,
             final int distance
     ) {
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when()
-                .get(location)
-                .then().log().all()
-                .statusCode(HttpStatus.OK.value())
-                .extract();
+        ExtractableResponse<Response> response = lineRestAssured.requestGet(location);
 
         JsonPath jsonPath = response.jsonPath();
 
