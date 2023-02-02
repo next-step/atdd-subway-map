@@ -11,6 +11,8 @@ public class LineConverter {
         return new Line(
                 lineCreateRequest.getName(),
                 lineCreateRequest.getColor(),
+                lineCreateRequest.getUpStationId(),
+                lineCreateRequest.getDownStationId(),
                 lineCreateRequest.getDistance()
         );
     }

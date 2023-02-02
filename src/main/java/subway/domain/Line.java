@@ -1,5 +1,6 @@
 package subway.domain;
 
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -11,6 +12,8 @@ import org.springframework.util.StringUtils;
 @Entity
 public class Line {
 
+    private static final int STATION_SIZE = 2;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -21,15 +24,29 @@ public class Line {
     @Column(nullable = false)
     private String color;
 
+    @Column(nullable = false)
+    private Long upStationId;
+
+    @Column(nullable = false)
+    private Long downStationId;
+
     @Embedded
     private Distance distance;
 
     protected Line() {
     }
 
-    public Line(final String name, final String color, final int distance) {
+    public Line(
+            final String name,
+            final String color,
+            final Long upStationId,
+            final Long downStationId,
+            final int distance
+    ) {
         this.name = name;
         this.color = color;
+        this.upStationId = upStationId;
+        this.downStationId = downStationId;
         this.distance = new Distance(distance);
     }
 
@@ -41,12 +58,24 @@ public class Line {
         return name;
     }
 
+    public Long getUpStationId() {
+        return upStationId;
+    }
+
+    public Long getDownStationId() {
+        return downStationId;
+    }
+
     public String getColor() {
         return color;
     }
 
     public int getDistance() {
         return distance.getValue();
+    }
+
+    public List<Long> getStationIds() {
+        return List.of(upStationId, downStationId);
     }
 
     public void modify(final String name, final String color, final int distance) {
@@ -71,5 +100,11 @@ public class Line {
 
     private void editDistance(final int distance) {
         this.distance = new Distance(distance);
+    }
+
+    public void validateStationSize(final int size) {
+        if (size < STATION_SIZE) {
+            throw new IllegalArgumentException("노선의 지하철 개수가 일치하지 않습니다.");
+        }
     }
 }

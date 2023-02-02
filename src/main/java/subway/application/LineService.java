@@ -1,17 +1,19 @@
 package subway.application;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import javax.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.application.converter.LineConverter;
 import subway.domain.Line;
 import subway.domain.LineRepository;
+import subway.domain.Station;
 import subway.domain.StationRepository;
 import subway.dto.LineCreateRequest;
 import subway.dto.LineEditRequest;
 import subway.dto.LineResponse;
+import subway.dto.StationResponse;
 
 @Transactional(readOnly = true)
 @Service
@@ -33,18 +35,29 @@ public class LineService {
 
     public LineResponse getBy(final Long lineId) {
         Line line = findLineBy(lineId);
-        return LineResponse.by(line);
+        List<Station> stations = stationRepository.findAllById(line.getStationIds());
+        line.validateStationSize(stations.size());
+        return LineResponse.by(line, StationResponse.by(stations));
     }
 
     public List<LineResponse> getList() {
-        return lineRepository.findAll().stream()
-                .map(LineResponse::by)
-                .collect(Collectors.toUnmodifiableList());
+        List<Line> lines = lineRepository.findAll();
+        List<LineResponse> result = new ArrayList<>();
+        for (Line line : lines) {
+            List<Station> stations = stationRepository.findAllById(line.getStationIds());
+            line.validateStationSize(stations.size());
+            result.add(LineResponse.by(line, StationResponse.by(stations)));
+        }
+        return result;
     }
 
     @Transactional
     public Long save(final LineCreateRequest lineCreateRequest) {
+        List<Station> stations = stationRepository.findAllById(
+                List.of(lineCreateRequest.getUpStationId(), lineCreateRequest.getDownStationId())
+        );
         Line line = lineConverter.lineBy(lineCreateRequest);
+        line.validateStationSize(stations.size());
         lineRepository.save(line);
         return line.getId();
     }
