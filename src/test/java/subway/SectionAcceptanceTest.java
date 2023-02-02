@@ -25,6 +25,7 @@ class SectionAcceptanceTest {
             LineRequest.of("신분당선", "bg-red-600", 1L, 2L, 10);
     private static final SectionRequest 구간 = SectionRequest.of(2L, 3L, 3);
     private static final SectionRequest 노선의하행역과일치하지않은구간 = SectionRequest.of(3L, 3L, 3);
+    private static final SectionRequest 하행역이이미포함된구간 = SectionRequest.of(2L, 1L, 3);
 
     /**
      * Given 처음 지하철 노선이 생성되면 구간도 함꼐 생성된다.
@@ -64,5 +65,25 @@ class SectionAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(response.jsonPath().getString("message"))
                 .isEqualTo("새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 합니다.");
+    }
+
+    /**
+     * Given 지하철 노선에 새로운 구간을 추가한다.
+     * When 지하철 노선에 추가하려는 구간의 상행역이 노선의 하행역과 일치하지 않은 구간을 추가한다.
+     * Then 에러가 발생한다.
+     */
+    @DisplayName("새로운 구간의 하행역은 해당 노선에 등록되어 있으면 에러 체크한다.")
+    @Test
+    void containsLastStationTest() {
+        //given
+        post("/lines", 신분당선);
+
+        //when
+        ExtractableResponse<Response> response = post("/lines/{id}/sections", 1, 하행역이이미포함된구간);
+
+        //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.jsonPath().getString("message"))
+                .isEqualTo("새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없습니다.");
     }
 }
