@@ -16,9 +16,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("지하철 노선 관리 기능")
 public class LineAcceptanceTest extends AcceptanceTest{
-    StationRestAssuredTest stationRestAssuredTest = new StationRestAssuredTest();
-
-    LineRestAssuredTest lineRestAssuredTest = new LineRestAssuredTest();
 
     Long firstStationId;
     Long secondStationId;
@@ -28,9 +25,9 @@ public class LineAcceptanceTest extends AcceptanceTest{
 
     @BeforeEach
     public void setup() {
-        firstStationId = stationRestAssuredTest.createStation("지하철역1");
-        secondStationId = stationRestAssuredTest.createStation("지하철역2");
-        thirdStationId = stationRestAssuredTest.createStation("지하철역3");
+        firstStationId = StationRestAssuredTest.createStation("지하철역1");
+        secondStationId = StationRestAssuredTest.createStation("지하철역2");
+        thirdStationId = StationRestAssuredTest.createStation("지하철역3");
         lineCreateRequest = new LineCreateRequest("신분당선", "bg-red-600", firstStationId, secondStationId, 10L);
     }
 
@@ -43,10 +40,10 @@ public class LineAcceptanceTest extends AcceptanceTest{
     public void createLineTest() {
 
         // When
-        lineRestAssuredTest.createLine(lineCreateRequest);
+        LineRestAssuredTest.createLine(lineCreateRequest);
 
         // Then
-        var lineResponseList = lineRestAssuredTest.getLineResponseList();
+        var lineResponseList = LineRestAssuredTest.getLineResponseList();
         List<String> nameList = lineResponseList.stream().map(LineResponse::getName).collect(Collectors.toList());
 
         assertThat(lineResponseList).hasSize(1);
@@ -64,11 +61,11 @@ public class LineAcceptanceTest extends AcceptanceTest{
 
         // When
         LineCreateRequest secondLineCreateRequest = new LineCreateRequest("분당선", "bg-red-600", firstStationId, thirdStationId, 10L);
-        lineRestAssuredTest.createLine(lineCreateRequest);
-        lineRestAssuredTest.createLine(secondLineCreateRequest);
+        LineRestAssuredTest.createLine(lineCreateRequest);
+        LineRestAssuredTest.createLine(secondLineCreateRequest);
 
         // Then
-        var lineResponseList = lineRestAssuredTest.getLineResponseList();
+        var lineResponseList = LineRestAssuredTest.getLineResponseList();
         List<String> nameList = lineResponseList.stream().map(LineResponse::getName).collect(Collectors.toList());
 
         assertThat(lineResponseList).hasSize(2);
@@ -84,10 +81,10 @@ public class LineAcceptanceTest extends AcceptanceTest{
     @DisplayName("지하철 노선을 생성하고 해당 지하철 노선을 조회하면 지하철 노선 정보를 조회할 수 있다.")
     @Test
     public void getLineTest() {
-        Long lineId = lineRestAssuredTest.createLine(lineCreateRequest);
-        var line = lineRestAssuredTest.getLine(lineId);
+        Long lineId = LineRestAssuredTest.createLine(lineCreateRequest);
+        var line = LineRestAssuredTest.getLine(lineId);
 
-        lineRestAssuredTest.checkLine(lineCreateRequest, lineId, line, firstStationId, secondStationId);
+        LineRestAssuredTest.checkLine(lineCreateRequest, lineId, line, firstStationId, secondStationId);
     }
 
     /**
@@ -98,10 +95,10 @@ public class LineAcceptanceTest extends AcceptanceTest{
     @DisplayName("지하철 노선을 생성하고 해당 지하철 노선을 수정하면 수정된다.")
     @Test
     public void updateLineTest() {
-        Long id = lineRestAssuredTest.createLine(lineCreateRequest);
+        Long id = LineRestAssuredTest.createLine(lineCreateRequest);
         LineUpdateRequest lineUpdateRequest = new LineUpdateRequest("다른 분당선", "bg-red-600");
-        lineRestAssuredTest.updateLine(id, lineUpdateRequest);
-        LineResponse line = lineRestAssuredTest.getLine(id);
+        LineRestAssuredTest.updateLine(id, lineUpdateRequest);
+        LineResponse line = LineRestAssuredTest.getLine(id);
 
         assertThat(line.getId()).isEqualTo(id);
         assertThat(line.getName()).isEqualTo(lineUpdateRequest.getName());
@@ -116,10 +113,10 @@ public class LineAcceptanceTest extends AcceptanceTest{
     @DisplayName("지하철 노선을 생성하고 해당 노선을 삭제하면 지하철 노선은 삭제된다.")
     @Test
     public void deleteLineTest() {
-        Long lineId = lineRestAssuredTest.createLine(lineCreateRequest);
-        lineRestAssuredTest.deleteLine(lineId);
+        Long lineId = LineRestAssuredTest.createLine(lineCreateRequest);
+        LineRestAssuredTest.deleteLine(lineId);
 
-        assertThrows(AssertionFailedError.class, (() -> lineRestAssuredTest.getLine(lineId)));
+        assertThrows(AssertionFailedError.class, (() -> LineRestAssuredTest.getLine(lineId)));
     }
 
 
