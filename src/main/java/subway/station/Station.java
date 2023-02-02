@@ -1,4 +1,4 @@
-package subway;
+package subway.station;
 
 import javax.persistence.*;
 
@@ -6,9 +6,9 @@ import javax.persistence.*;
 public class Station {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    protected Long id;
     @Column(length = 20, nullable = false)
-    private String name;
+    protected String name;
 
     public Station() {
     }
