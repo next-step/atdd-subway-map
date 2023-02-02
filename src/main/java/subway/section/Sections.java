@@ -1,5 +1,7 @@
 package subway.section;
 
+import subway.station.Station;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
