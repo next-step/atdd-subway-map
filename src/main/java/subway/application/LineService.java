@@ -53,9 +53,8 @@ public class LineService {
 
     @Transactional
     public Long save(final LineCreateRequest lineCreateRequest) {
-        List<Station> stations = stationRepository.findAllById(
-                List.of(lineCreateRequest.getUpStationId(), lineCreateRequest.getDownStationId())
-        );
+        List<Station> stations = stationRepository
+                .findAllById(List.of(lineCreateRequest.getUpStationId(), lineCreateRequest.getDownStationId()));
         Line line = lineConverter.lineBy(lineCreateRequest);
         line.validateStationSize(stations.size());
         lineRepository.save(line);
