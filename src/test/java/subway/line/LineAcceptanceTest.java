@@ -12,15 +12,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpHeaders;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestConstructor;
 import org.springframework.test.context.TestConstructor.AutowireMode;
-import subway.domain.LineRepository;
-import subway.domain.StationRepository;
 import subway.station.StationRestAssured;
+import subway.util.DatabaseCleanup;
 
+@ActiveProfiles("acceptance")
 @DisplayName("지하철 노선 관련 기능")
 @TestConstructor(autowireMode = AutowireMode.ALL)
-@SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class LineAcceptanceTest {
 
     private static final String LINE_NAME = "신분당선";
@@ -32,29 +33,23 @@ public class LineAcceptanceTest {
     private Long upStationId;
     private Long downStationId;
 
+    private final DatabaseCleanup databaseCleanup;
     private final LineRestAssured lineRestAssured;
     private final LineAssert lineAssert;
     private final StationRestAssured stationRestAssured;
 
-    private final StationRepository stationRepository;
-    private final LineRepository lineRepository;
 
-    public LineAcceptanceTest(
-            final StationRepository stationRepository,
-            final LineRepository lineRepository
-    ) {
+    public LineAcceptanceTest(final DatabaseCleanup databaseCleanup) {
+        this.databaseCleanup = databaseCleanup;
         this.lineRestAssured = new LineRestAssured();
         this.lineAssert = new LineAssert();
         this.stationRestAssured = new StationRestAssured();
-        this.stationRepository = stationRepository;
-        this.lineRepository = lineRepository;
     }
 
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
-        stationRepository.truncateTableStation();
-        lineRepository.deleteAllAndRestartId();
+        this.databaseCleanup.truncateTable();
         this.upStationId = stationRestAssured.createStation("강남역").jsonPath().getLong("id");
         this.downStationId = stationRestAssured.createStation("양재역").jsonPath().getLong("id");
     }

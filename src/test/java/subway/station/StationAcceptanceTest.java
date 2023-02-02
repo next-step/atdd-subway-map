@@ -2,6 +2,7 @@ package subway.station;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.List;
@@ -9,27 +10,34 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestConstructor;
 import org.springframework.test.context.TestConstructor.AutowireMode;
-import subway.domain.StationRepository;
+import subway.util.DatabaseCleanup;
 
+@ActiveProfiles("acceptance")
 @DisplayName("지하철역 관련 기능")
 @TestConstructor(autowireMode = AutowireMode.ALL)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class StationAcceptanceTest {
 
-    private final StationRepository stationRepository;
+    @LocalServerPort
+    private int port;
 
+    private final DatabaseCleanup databaseCleanup;
     private final StationRestAssured stationRestAssured;
 
-    public StationAcceptanceTest(final StationRepository stationRepository) {
-        this.stationRepository = stationRepository;
+    public StationAcceptanceTest(final DatabaseCleanup databaseCleanup) {
+        this.databaseCleanup = databaseCleanup;
         this.stationRestAssured = new StationRestAssured();
     }
 
     @BeforeEach
     void setUp() {
-        this.stationRepository.truncateTableStation();
+        RestAssured.port = this.port;
+        this.databaseCleanup.truncateTable();
     }
 
     /**
