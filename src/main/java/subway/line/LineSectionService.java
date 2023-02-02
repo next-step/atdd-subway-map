@@ -21,8 +21,7 @@ public class LineSectionService {
     @Transactional
     public LineResponse saveLineSection(LineRequest lineRequest) {
         LineResponse lineResponse = lineService.saveLine(lineRequest);
-        Line line = lineService.findLineById(lineResponse.getId());
-        return sectionService.saveSection(line.getId(), SectionRequest.toRequest(line)).getLine();
+        return sectionService.saveSection(lineResponse.getId(), SectionRequest.toRequest(lineRequest)).getLine();
     }
 
     @Transactional
@@ -43,9 +42,5 @@ public class LineSectionService {
 
     public List<LineResponse> findAllLines() {
         return lineService.findAllLines();
-    }
-
-    public Line findLineById(Long id) {
-        return lineService.findLineById(id);
     }
 }

@@ -249,7 +249,6 @@ public class SectionAcceptanceTest {
                 .extract();
     }
     private List<Long> extractStationIds(List<String> stationIds) {
-        System.out.println("stationIds = " + stationIds);
         return String.join("", stationIds)
                 .chars()
                 .mapToObj(ch -> (char) ch)

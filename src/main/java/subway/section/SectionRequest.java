@@ -21,8 +21,8 @@ public class SectionRequest {
         return new Section(line, upStationId, downStationId, distance);
     }
 
-    public static SectionRequest toRequest(Line line) {
-        return new SectionRequest(line.getUpStationId(), line.getDownStationId(), line.getDistance());
+    public static SectionRequest toRequest(LineRequest lineRequest) {
+        return new SectionRequest(lineRequest.getUpStationId(), lineRequest.getDownStationId(), lineRequest.getDistance());
     }
 
     public Long getUpStationId() {
