@@ -27,8 +27,6 @@ class SectionAcceptanceTest extends BaseAcceptanceTest {
     private Long 정자역;
     private Long 판교역;
     private Long 신분당선;
-    @Autowired
-    private LineRepository lineRepository;
 
     @BeforeEach
     void setUp() {
