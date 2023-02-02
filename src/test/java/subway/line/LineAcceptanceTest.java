@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.TestConstructor;
@@ -24,6 +25,10 @@ import subway.domain.StationRepository;
 @TestConstructor(autowireMode = AutowireMode.ALL)
 @SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {
+
+    private static final String LINE_NAME = "신분당선";
+    private static final String COLOR = "bg-red-600";
+    private static final int DISTANCE = 10;
 
     @LocalServerPort
     private int port;
@@ -74,21 +79,17 @@ public class LineAcceptanceTest {
     @Test
     void createLine() {
         // when
-        String name = "신분당선";
-        String color = "bg-red-600";
-        int distance = 10;
-
-        lineRestAssured.createLine(name, color, upStationId, downStationId, distance);
+        lineRestAssured.createLine(LINE_NAME, COLOR, upStationId, downStationId, DISTANCE);
 
         // then
-        lineAssert.assertCreateLine(name, color, upStationId, downStationId, distance);
+        lineAssert.assertCreateLine(LINE_NAME, COLOR, upStationId, downStationId, DISTANCE);
     }
 
     @DisplayName("지하철 노선 목록을 조회한다.")
     @Test
     void showLines() {
         // given
-        lineRestAssured.createLine("신분당선", "bg-red-600", upStationId, downStationId, 10);
+        lineRestAssured.createLine(LINE_NAME, COLOR, upStationId, downStationId, DISTANCE);
         long upStationId2 = createStationResponseBy("신림역").jsonPath().getLong("id");
         long downStationId2 = createStationResponseBy("노량진역").jsonPath().getLong("id");
         lineRestAssured.createLine("2호선", "bg-green-600", upStationId2, downStationId2, 20);
@@ -104,16 +105,13 @@ public class LineAcceptanceTest {
     @Test
     void showLine() {
         // given
-        String name = "신분당선";
-        String color = "bg-red-600";
-        int distance = 10;
         ExtractableResponse<Response> createLineResponse
-                = lineRestAssured.createLine(name, color, upStationId, downStationId, distance);
+                = lineRestAssured.createLine(LINE_NAME, COLOR, upStationId, downStationId, DISTANCE);
 
-        String location = createLineResponse.header("Location");
+        String location = createLineResponse.header(HttpHeaders.LOCATION);
 
         // when, then
-        lineAssert.assertShowLine(name, color, upStationId, downStationId, distance, location);
+        lineAssert.assertShowLine(LINE_NAME, COLOR, upStationId, downStationId, DISTANCE, location);
     }
 
     @DisplayName("지하철 노선을 수정한다.")
@@ -121,9 +119,9 @@ public class LineAcceptanceTest {
     void editLine() {
         // given
         ExtractableResponse<Response> createLineResponse
-                = lineRestAssured.createLine("신분당선", "bg-red-600", upStationId, downStationId, 10);
+                = lineRestAssured.createLine(LINE_NAME, COLOR, upStationId, downStationId, DISTANCE);
 
-        String location = createLineResponse.header("Location");
+        String location = createLineResponse.header(HttpHeaders.LOCATION);
 
         String name = "수정한 지하철 노선 이름";
         String color = "수정한 지하철 색상";
@@ -141,9 +139,9 @@ public class LineAcceptanceTest {
     void deleteLine() {
         // given
         ExtractableResponse<Response> createLineResponse
-                = lineRestAssured.createLine("신분당선", "bg-red-600", upStationId, downStationId, 10);
+                = lineRestAssured.createLine(LINE_NAME, COLOR, upStationId, downStationId, DISTANCE);
 
-        String location = createLineResponse.header("Location");
+        String location = createLineResponse.header(HttpHeaders.LOCATION);
 
         // when
         lineRestAssured.deleteLine(location);
