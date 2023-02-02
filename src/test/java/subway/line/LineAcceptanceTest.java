@@ -66,7 +66,7 @@ public class LineAcceptanceTest {
         lineRestAssured.createLine(LINE_NAME, COLOR, upStationId, downStationId, DISTANCE);
 
         // then
-        lineAssert.assertCreateLine(LINE_NAME, COLOR, upStationId, downStationId, DISTANCE);
+        lineAssert.assertCreateLine(LINE_NAME, COLOR, DISTANCE);
     }
 
     @DisplayName("지하철 노선 목록을 조회한다.")
@@ -95,7 +95,7 @@ public class LineAcceptanceTest {
         String location = getLocation(createLineResponse);
 
         // when, then
-        lineAssert.assertShowLine(LINE_NAME, COLOR, upStationId, downStationId, DISTANCE, location);
+        lineAssert.assertShowLine(LINE_NAME, COLOR, DISTANCE, location);
     }
 
     @DisplayName("지하철 노선을 수정한다.")

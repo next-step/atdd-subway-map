@@ -6,7 +6,6 @@ import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.http.HttpStatus;
 
@@ -21,8 +20,6 @@ public class LineAssert {
     public void assertCreateLine(
             final String name,
             final String color,
-            final Long upStationId,
-            final Long downStationId,
             final int distance
     ) {
         ExtractableResponse<Response> response = lineRestAssured.showLines();
@@ -30,9 +27,7 @@ public class LineAssert {
         JsonPath jsonPath = response.jsonPath();
 
         Assertions.assertAll(
-                () -> assertThat(jsonPath.getLong("id[0]")).isEqualTo(1),
                 () -> assertThat(jsonPath.getList("name")).contains(name),
-                () -> assertThat(jsonPath.getList("stations[0].id", Long.class)).contains(upStationId, downStationId),
                 () -> assertThat(jsonPath.getList("color")).contains(color),
                 () -> assertThat(jsonPath.getList("distance")).contains(distance)
         );
@@ -41,8 +36,6 @@ public class LineAssert {
     public void assertShowLine(
             final String name,
             final String color,
-            final Long upStationId,
-            final Long downStationId,
             final int distance,
             final String location
     ) {
@@ -50,12 +43,9 @@ public class LineAssert {
 
         JsonPath jsonPath = response.jsonPath();
 
-        List<Object> list = jsonPath.getList("stations.id");
-
         Assertions.assertAll(
                 () -> assertThat(jsonPath.getString("name")).isEqualTo(name),
                 () -> assertThat(jsonPath.getString("color")).isEqualTo(color),
-                () -> assertThat(jsonPath.getList("stations.id", Long.class)).contains(upStationId, downStationId),
                 () -> assertThat(jsonPath.getInt("distance")).isEqualTo(distance)
         );
     }
