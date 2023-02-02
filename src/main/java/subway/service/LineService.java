@@ -15,13 +15,13 @@ public class LineService {
 
     private final LineRepository lineRepository;
     private final StationService stationService;
-    private final SectionRepository sectionRepository;
+    private final SectionService sectionService;
 
     public LineService(LineRepository lineRepository, StationService stationService,
-                       SectionRepository sectionRepository) {
+                       SectionService sectionService) {
         this.lineRepository = lineRepository;
         this.stationService = stationService;
-        this.sectionRepository = sectionRepository;
+        this.sectionService = sectionService;
     }
 
     @Transactional
@@ -73,18 +73,12 @@ public class LineService {
     @Transactional
     public void deleteSection(Long lineId, Long sectionId) {
         Line line = findLineById(lineId);
-        Section section = findSectionById(sectionId);
+        Section section = sectionService.findSection(sectionId);
         if (line.canDeleteSection(section)) {
             line.deleteSection(section);
             return;
         }
         throw new SubwayException(SubwayExceptionStatus.SECTION_NOT_DELETE);
-    }
-
-    private Section findSectionById(Long sectionId) {
-        return sectionRepository.findById(sectionId).orElseThrow(
-                () -> new SubwayException(SubwayExceptionStatus.SECTION_NOT_FOUND)
-        );
     }
 
     private Line findLineById(Long lineId) {
