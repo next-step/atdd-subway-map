@@ -36,11 +36,10 @@ class SectionAcceptanceTest extends BaseAcceptanceTest {
                 () -> assertThat(lineResponse.getSections().stream()
                         .anyMatch(
                                 section -> section.getUpStation().getName().equals("정자역")
-                                && section.getDownStation().getName().equals("판교역"))).isTrue()
+                                        && section.getDownStation().getName().equals("판교역"))).isTrue()
         );
 
     }
-
 
     @Test
     @DisplayName("지하철 구간 생성 - 새로운 구간의 상행역은 노선의 하행역이어야 함")
