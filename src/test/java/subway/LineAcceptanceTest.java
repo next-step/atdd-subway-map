@@ -18,13 +18,23 @@ import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
 
-@DirtiesContext
 @DisplayName("지하철노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@Sql(
+        scripts = {
+            "/sql/truncate-table.sql",
+            "/sql/insert-station-data.sql",
+            "/sql/insert-line-data.sql"
+        },
+        executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@DirtiesContext
 public class LineAcceptanceTest {
 
     @DisplayName("지하철노선을 생성한다.")
-    @Sql({"/sql/truncate-table.sql", "/sql/insert-station-data.sql"})
+    @Sql({
+        "/sql/truncate-table.sql",
+        "/sql/insert-station-data.sql",
+    })
     @Test
     void createLineTest() {
         // when
@@ -35,7 +45,6 @@ public class LineAcceptanceTest {
     }
 
     @DisplayName("지하철노선 목록을 조회한다.")
-    @Sql({"/sql/truncate-table.sql", "/sql/insert-station-data.sql", "/sql/insert-line-data.sql"})
     @Test
     void getLineListTest() {
         // then
@@ -43,7 +52,6 @@ public class LineAcceptanceTest {
     }
 
     @DisplayName("지하철노선을 조회한다.")
-    @Sql({"/sql/truncate-table.sql", "/sql/insert-station-data.sql", "/sql/insert-line-data.sql"})
     @Test
     void getLineTest() {
         // then
@@ -51,7 +59,6 @@ public class LineAcceptanceTest {
     }
 
     @DisplayName("지하철노선을 수정한다.")
-    @Sql({"/sql/truncate-table.sql", "/sql/insert-station-data.sql", "/sql/insert-line-data.sql"})
     @Test
     void updateLineTest() {
         // then
@@ -59,7 +66,6 @@ public class LineAcceptanceTest {
     }
 
     @DisplayName("지하철노선을 삭제한다.")
-    @Sql({"/sql/truncate-table.sql", "/sql/insert-station-data.sql", "/sql/insert-line-data.sql"})
     @Test
     void deleteLineTest() {
         checkCanDeleteLine(1L);
