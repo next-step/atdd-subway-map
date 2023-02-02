@@ -58,6 +58,10 @@ public class Line {
         return this.stations.get(this.stations.size() - 1);
     }
 
+    public List<Station> getStations() {
+        return this.stations;
+    }
+
     public Long getDistance() {
         return distance;
     }
@@ -69,5 +73,14 @@ public class Line {
 
     public void breakAllStationRelation() {
         stations.forEach(station -> station.changeLine(null));
+    }
+
+    public void addStation(Station station) {
+        station.changeLine(this);
+        this.stations.add(station);
+    }
+
+    public void plusDistance(long distance) {
+        this.distance += distance;
     }
 }

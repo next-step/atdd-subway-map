@@ -33,7 +33,6 @@ public class SectionAcceptanceTest {
 
     long upStationId;
     long downStationId;
-    long sectionUpStationId;
     long sectionDownStationId;
     long lineId;
 
@@ -42,7 +41,6 @@ public class SectionAcceptanceTest {
         upStationId = StationStep.extractStationId(StationStep.createSubwayStation(StationConstant.GANGNAM));
         downStationId = StationStep.extractStationId(StationStep.createSubwayStation(StationConstant.YANGJAE));
 
-        sectionUpStationId = StationStep.extractStationId(StationStep.createSubwayStation(StationConstant.HAGYE));
         sectionDownStationId = StationStep.extractStationId(StationStep.createSubwayStation(StationConstant.JUNGGYE));
 
         ExtractableResponse<Response> lineResponse =
@@ -64,7 +62,7 @@ public class SectionAcceptanceTest {
         // when
         HashMap<Object, Object> paramMap = new HashMap<>();
         paramMap.put("downStationId", sectionDownStationId);
-        paramMap.put("upStationId", sectionUpStationId);
+        paramMap.put("upStationId", downStationId);
         paramMap.put("distance", 10);
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .body(paramMap)
@@ -78,17 +76,16 @@ public class SectionAcceptanceTest {
 
         ExtractableResponse<Response> line = LineStep.getLine(lineId);
 
-        StationResponse upStationResponse = new StationResponse(sectionUpStationId, StationConstant.HAGYE);
-        StationResponse downStationResponse = new StationResponse(sectionDownStationId, StationConstant.HAGYE);
-        추가한_구간이_하행역에_존재_하는지_검증(List.of(upStationResponse, downStationResponse), line);
+        StationResponse downStationResponse = new StationResponse(sectionDownStationId, StationConstant.JUNGGYE);
+        추가한_구간이_하행역에_존재_하는지_검증(downStationResponse, line);
     }
 
-    private void 추가한_구간이_하행역에_존재_하는지_검증(List<StationResponse> stationResponses, ExtractableResponse<Response> line) {
+    private void 추가한_구간이_하행역에_존재_하는지_검증(StationResponse stationResponse, ExtractableResponse<Response> line) {
         List<StationResponse> lineStations = line.jsonPath().getList("stations", StationResponse.class);
         if (lineStations.size() < 2) {
             fail("노선에 역이 두 개 미만으로 존재할 수 없습니다.");
         }
-        List<StationResponse> subStations = lineStations.subList(lineStations.size() - 2, lineStations.size() - 1);
-        assertThat(subStations).containsExactly(stationResponses.toArray(new StationResponse[0]));
+        StationResponse lastStation = lineStations.get(lineStations.size() - 1);
+        assertThat(lastStation).isEqualTo(stationResponse);
     }
 }

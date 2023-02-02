@@ -30,21 +30,26 @@ public class LineService {
         Line line = new Line(lineRequest.getName(), lineRequest.getColor(), lineRequest.getDistance(), upStation, downStation);
         Line newLine = lineRepository.save(line);
         return new LineResponse(newLine.getId(), newLine.getName(), newLine.getColor(),
-                makeStationResponses(upStation, downStation));
+                makeStationResponses(line.getStations()));
     }
 
     public List<LineResponse> findAllLines() {
         List<Line> lines = lineRepository.findAll();
         return lines.stream().map(line -> {
             return new LineResponse(line.getId(), line.getName(), line.getColor(),
-                    makeStationResponses(line.getUpStation(), line.getDownStation()));
+                    makeStationResponses(line.getStations()));
         }).collect(Collectors.toList());
     }
 
     public LineResponse findLine(Long id) {
         Line line = lineRepository.findById(id)
                 .orElseThrow(LineNotFoundException::new);
-        return new LineResponse(line.getId(), line.getName(), line.getColor(), makeStationResponses(line.getUpStation(), line.getDownStation()));
+        return new LineResponse(line.getId(), line.getName(), line.getColor(), makeStationResponses(line.getStations()));
+    }
+
+    public Line findOneById(Long id) {
+        return lineRepository.findById(id)
+                .orElseThrow(LineNotFoundException::new);
     }
 
     @Transactional
@@ -62,7 +67,9 @@ public class LineService {
         lineRepository.deleteById(id);
     }
 
-    private static List<StationResponse> makeStationResponses(Station upStation, Station downStation) {
-        return List.of(StationResponse.of(upStation), StationResponse.of(downStation));
+    private static List<StationResponse> makeStationResponses(List<Station> stations) {
+        return stations.stream()
+                .map(StationResponse::of)
+                .collect(Collectors.toList());
     }
 }
