@@ -17,7 +17,10 @@ public class ErrorResponse {
         this.message = message;
     }
 
-    public static <T extends Exception> ErrorResponse from(final T exception) {
+    /**
+     * Subway 비즈니스 로직의 논리적 예외 응답 body 형식을 설정합니다.
+     */
+    public static <T extends SubwayException> ErrorResponse from(final T exception) {
         return ErrorResponse.builder()
                 .message(exception.getMessage())
                 .build();
