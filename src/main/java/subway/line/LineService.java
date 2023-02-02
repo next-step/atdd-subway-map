@@ -31,12 +31,14 @@ public class LineService {
         return createLineResponse(line);
     }
 
+    @Transactional(readOnly = true)
     public LineResponse findLineById(Long id) {
         final var line = findById(id);
 
         return createLineResponse(line);
     }
 
+    @Transactional(readOnly = true)
     public List<LineResponse> findAllLines() {
         return lineRepository.findAll().stream()
                 .map(this::createLineResponse)

@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static subway.station.StationAcceptanceTest.지하철역_등록됨;
 
 @DisplayName("지하철노선 관련 기능")
-@Sql(value = "/truncate_table.sql")
+@Sql(value = "/LineAcceptance.sql")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {
 
