@@ -4,12 +4,12 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.HashMap;
 import java.util.List;
@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class StationAcceptanceTest {
     /**
      * When 지하철역을 생성하면
@@ -64,8 +65,7 @@ public class StationAcceptanceTest {
 
         // given
         List<String> stations = List.of("강남역", "역삼역");
-        Map<String, String> params = new HashMap<>();
-        stations.forEach(station -> createOneStation(params, station));
+        stations.forEach(StationAcceptanceTest::createOneStation);
 
         // when
         List<String> stationNames = getStationNames();
@@ -90,7 +90,7 @@ public class StationAcceptanceTest {
         // given
         String stations = "강남역";
         Map<String, String> params = new HashMap<>();
-        ExtractableResponse<Response> oneStation = createOneStation(params, stations);
+        ExtractableResponse<Response> oneStation = createOneStation(stations);
         Long stationId = oneStation.body().jsonPath().getLong("id");
 
         // when
@@ -104,7 +104,8 @@ public class StationAcceptanceTest {
         );
     }
 
-    private ExtractableResponse<Response> createOneStation(Map<String, String> params, String station) {
+    public static ExtractableResponse<Response> createOneStation(String station) {
+        Map<String, String> params = new HashMap<>();
         params.put("name", station);
         return RestAssured.given().log().all()
             .body(params)
