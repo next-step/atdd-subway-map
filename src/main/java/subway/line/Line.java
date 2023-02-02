@@ -26,7 +26,7 @@ public class Line {
     @JoinColumn(name = "down_station_id")
     private Station downStation;
 
-    public Line() {
+        protected Line() {
     }
 
     public Line(String name, String color, Station upStation, Station downStation, int distance) {
