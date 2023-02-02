@@ -88,13 +88,13 @@ public class LineAcceptanceTest {
     @Test
     void showLines() {
         // given
-        LineRestAssured.createLine("신분당선", "bg-red-600", upStationId, downStationId, 10);
+        lineRestAssured.createLine("신분당선", "bg-red-600", upStationId, downStationId, 10);
         long upStationId2 = createStationResponseBy("신림역").jsonPath().getLong("id");
         long downStationId2 = createStationResponseBy("노량진역").jsonPath().getLong("id");
-        LineRestAssured.createLine("2호선", "bg-green-600", upStationId2, downStationId2, 20);
+        lineRestAssured.createLine("2호선", "bg-green-600", upStationId2, downStationId2, 20);
 
         // when
-        ExtractableResponse<Response> response = lineRestAssured.showLinesResponse();
+        ExtractableResponse<Response> response = lineRestAssured.showLines();
 
         // then
         assertThat(response.jsonPath().getList("id")).hasSize(2).contains(1, 2);
@@ -130,7 +130,7 @@ public class LineAcceptanceTest {
         int distance = 5;
 
         // when
-        lineRestAssured.editLineResponse(location, name, color, distance);
+        lineRestAssured.editLine(location, name, color, distance);
 
         // then
         lineAssert.assertEditLine(location, name, upStationId, downStationId, color, distance);
@@ -146,7 +146,7 @@ public class LineAcceptanceTest {
         String location = createLineResponse.header("Location");
 
         // when
-        lineRestAssured.deleteLineResponse(location);
+        lineRestAssured.deleteLine(location);
 
         // then
         lineAssert.assertDeleteLine(location);
