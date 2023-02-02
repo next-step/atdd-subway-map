@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.HashMap;
 import java.util.List;
@@ -17,7 +18,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class StationAcceptanceTest {
+
+    private static String GANGNAM = "강남역";
+    private static String YEOKSAM = "역삼역";
+
     /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다
@@ -28,7 +34,7 @@ public class StationAcceptanceTest {
     void createStation() {
         // when
         Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
+        params.put("name", GANGNAM);
 
         ExtractableResponse<Response> response =
                 RestAssured.given().log().all()
@@ -47,7 +53,7 @@ public class StationAcceptanceTest {
                         .when().get("/stations")
                         .then().log().all()
                         .extract().jsonPath().getList("name", String.class);
-        assertThat(stationNames).containsAnyOf("강남역");
+        assertThat(stationNames).containsAnyOf(GANGNAM);
     }
 
     /**
@@ -60,14 +66,14 @@ public class StationAcceptanceTest {
     void findStation() {
         //given
         Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
+        params.put("name", GANGNAM);
 
         RestAssured.given()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/stations");
 
-        params.put("name", "역삼역");
+        params.put("name", YEOKSAM);
         RestAssured.given()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -83,8 +89,7 @@ public class StationAcceptanceTest {
 
         //then
         assertThat(stationNames.size()).isEqualTo(2);
-        assertThat(stationNames).containsAnyOf("강남역");
-        assertThat(stationNames).containsAnyOf("역삼역");
+        assertThat(stationNames).containsAnyOf(GANGNAM, YEOKSAM);
     }
 
     /**
@@ -97,7 +102,7 @@ public class StationAcceptanceTest {
     void deleteStation() {
         //given
         Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
+        params.put("name", GANGNAM);
 
         ExtractableResponse<Response> createResponse = RestAssured.given()
                 .body(params)
@@ -125,7 +130,8 @@ public class StationAcceptanceTest {
                         .then().log().all()
                         .extract().jsonPath().getList("name", String.class);
 
-        assertThat(stationNames).doesNotContain("강남역");
+        assertThat(stationNames).doesNotContain(GANGNAM);
     }
+
 
 }
