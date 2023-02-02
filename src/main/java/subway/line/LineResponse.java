@@ -4,7 +4,6 @@ import subway.station.StationResponse;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class LineResponse {
     private final Long id;
@@ -22,8 +21,12 @@ public class LineResponse {
     }
 
     public static LineResponse of(Line line) {
-        return new LineResponse(line.getId(), line.getName(), line.getColor(), line.getDistance(),
-                Stream.of(line.getUpStation(), line.getDownStation())
+        return new LineResponse(
+                line.getId(),
+                line.getName(),
+                line.getColor(),
+                line.getDistance(),
+                line.getStations().stream()
                         .map(station -> new StationResponse(station.getId(), station.getName()))
                         .collect(Collectors.toUnmodifiableList()));
     }
@@ -34,5 +37,17 @@ public class LineResponse {
 
     public String getName() {
         return name;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public int getDistance() {
+        return distance;
+    }
+
+    public List<StationResponse> getStations() {
+        return stations;
     }
 }

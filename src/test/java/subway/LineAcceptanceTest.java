@@ -96,43 +96,4 @@ class LineAcceptanceTest {
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
-
-    private static ExtractableResponse<Response> get(String url) {
-        return given().log().all()
-                .when().get(url)
-                .then().log().all()
-                .extract();
-    }
-
-    private static ExtractableResponse<Response> get(String url, Long pathParams) {
-        return given().log().all()
-                .when().get(url, pathParams)
-                .then().log().all()
-                .extract();
-    }
-
-    private static ExtractableResponse<Response> post(String url, Object request) {
-        return given().log().all()
-                .body(request)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post(url)
-                .then().log().all()
-                .extract();
-    }
-
-    private static ExtractableResponse<Response> put(String url, Long pathParams, Object request) {
-        return given().log().all()
-                .body(request)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().put(url, pathParams)
-                .then().log().all()
-                .extract();
-    }
-
-    private static ExtractableResponse<Response> delete(String url, Long pathParams) {
-        return given().log().all()
-                .when().delete(url, pathParams)
-                .then().log().all()
-                .extract();
-    }
 }

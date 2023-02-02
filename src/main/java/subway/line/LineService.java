@@ -2,6 +2,7 @@ package subway.line;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.section.SectionRequest;
 import subway.station.Station;
 import subway.station.StationService;
 
@@ -23,6 +24,7 @@ public class LineService {
         Station upStation = stationService.findOneById(request.getUpStationId());
         Station downStation = stationService.findOneById(request.getDownStationId());
         Line line = lineRepository.save(new Line(request.getName(), request.getColor(), upStation, downStation, request.getDistance()));
+        line.addSection(upStation, downStation, request.getDistance());
         return LineResponse.of(line);
     }
     @Transactional(readOnly = true)
@@ -48,5 +50,21 @@ public class LineService {
     @Transactional
     public void deleteById(Long id) {
         lineRepository.deleteById(id);
+    }
+
+
+    @Transactional
+    public void addSection(final Long id, final SectionRequest sectionRequest) {
+        final Line line = getLine(id);
+        final Station upStation = stationService.findOneById(sectionRequest.getUpStationId());
+        final Station downStation = stationService.findOneById(sectionRequest.getDownStationId());
+
+        line.addSection(upStation, downStation, sectionRequest.getDistance());
+    }
+
+
+    private Line getLine(final long lineId) {
+        return lineRepository.findById(lineId)
+                .orElseThrow(IllegalArgumentException::new);
     }
 }
