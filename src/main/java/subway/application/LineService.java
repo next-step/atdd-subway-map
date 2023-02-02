@@ -52,9 +52,7 @@ public class LineService {
     @Transactional
     public void edit(final Long lineId, final LineEditRequest lineEditRequest) {
         Line line = findLineBy(lineId);
-        line.editName(lineEditRequest.getName())
-                .editColor(lineEditRequest.getColor())
-                .editDistance(lineEditRequest.getDistance());
+        line.modify(lineEditRequest.getName(), lineEditRequest.getColor(), lineEditRequest.getDistance());
     }
 
     @Transactional

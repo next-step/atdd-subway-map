@@ -49,24 +49,27 @@ public class Line {
         return distance.getValue();
     }
 
-    public Line editName(final String name) {
+    public void modify(final String name, final String color, final int distance) {
+        editName(name);
+        editColor(color);
+        editDistance(distance);
+    }
+
+    private void editName(final String name) {
         if (!StringUtils.hasText(name)) {
             throw new IllegalArgumentException("이름은 공백일 수 없습니다.");
         }
         this.name = name;
-        return this;
     }
 
-    public Line editColor(final String color) {
+    private void editColor(final String color) {
         if (!StringUtils.hasText(color)) {
             throw new IllegalArgumentException("색상은 공백일 수 없습니다.");
         }
         this.color = color;
-        return this;
     }
 
-    public Line editDistance(final int distance) {
+    private void editDistance(final int distance) {
         this.distance = new Distance(distance);
-        return this;
     }
 }
