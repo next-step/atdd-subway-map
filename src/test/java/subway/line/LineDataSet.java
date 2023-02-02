@@ -1,7 +1,7 @@
 package subway.line;
 
 public class LineDataSet {
-    public static Line testData() {
-        return new Line("line01", "bg-red-009", 100);
+    public static Line testData(String name, String color, int distance) {
+        return new Line(name, color, distance);
     }
 }

@@ -5,12 +5,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-@DisplayName("LineRepository 단위 테스트")
+@DisplayName("지하철 노선 관련 LineRepository 단위 테스트")
 class LineRepositoryTest extends JpaRepositoryTest<Line, Long> {
 
     @Autowired
     private LineRepository lineRepository;
-
 
     @Override
     protected JpaRepository<Line, Long> repository() {
@@ -19,6 +18,6 @@ class LineRepositoryTest extends JpaRepositoryTest<Line, Long> {
 
     @Override
     protected Line createTestInstance() {
-        return LineDataSet.testData();
+        return LineDataSet.testData("lineName", "color", 10);
     }
 }

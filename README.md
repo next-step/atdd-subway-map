@@ -181,3 +181,7 @@ entityManager.createNativeQuery("TRUNCATE TABLE " + tableName).executeUpdate();
   - https://www.h2database.com/html/commands.html?highlight=truncate&search=truncate#truncate_table
 - mySQL reference
   - https://dev.mysql.com/doc/refman/5.7/en/truncate-table.html, https://dev.mysql.com/doc/refman/8.0/en/truncate-table.html
+
+# Stub, Fake, Mock
+- Mocking은 협력객체의 어떠한 행위를 했냐 안했냐를 판단할 떄 사용하고
+- Stubbing은 협력객체의 값이 필요할 때 사용하는 건가요?

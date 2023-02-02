@@ -12,7 +12,7 @@ import subway.line.LineRepository;
 import subway.station.Station;
 import subway.station.StationRepository;
 
-@DisplayName("LineStationRepository 단위 테스트")
+@DisplayName("지하철 노선과 역 관계 관련 LineStationRepository 단위 테스트")
 class LineStationRepositoryTest extends JpaRepositoryTest<LineStation, Long> {
 
     @Autowired
@@ -36,8 +36,10 @@ class LineStationRepositoryTest extends JpaRepositoryTest<LineStation, Long> {
 
     @Override
     protected LineStation createTestInstance() {
-        Line line = lineRepository.save(LineDataSet.testData());
-        Station station = stationRepository.save(StationDataSet.testData());
+        Line line = lineRepository.save(LineDataSet.testData("lineName", "color", 15));
+
+        Station station = stationRepository.save(StationDataSet.testData("stationName"));
+
         return LineStationDataSet.testData(line, station);
     }
 }

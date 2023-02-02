@@ -11,14 +11,6 @@ public interface LineRepository extends JpaRepository<Line, Long> {
     @Query(value = "select distinct l from Line l left join fetch l.upStation left join fetch l.downStation left join fetch l.lastLineSection")
     List<Line> findAllWithDefault();
 
-    @Query(value = "select distinct l from Line l left join fetch l.upStation left join fetch l.downStation left join fetch l.lastLineSection where l.id = :id")
-    List<Line> findByIdWithDefault(@Param("id") Long id);
-    @Query(value = "select distinct l from Line l left join fetch l.upStation left join fetch l.downStation left join fetch l.lastLineSection left join fetch l.lineSections ls left join fetch ls.section")
-    List<Line> findAllWithLineSections();
-
-    @Query(value = "select distinct l from Line l left join fetch l.upStation left join fetch l.downStation left join fetch l.lastLineSection left join fetch l.lineStations ls left join fetch ls.station")
-    List<Line> findAllWithLineStations();
-
     @Query(value = "select distinct l from Line l left join fetch l.upStation left join fetch l.downStation left join fetch l.lastLineSection left join fetch l.lineSections ls left join fetch ls.section s where l.id = :id")
     Optional<Line> findByIdWithLineSections(@Param("id") Long id);
 

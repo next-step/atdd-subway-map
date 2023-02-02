@@ -4,7 +4,7 @@ import subway.station.Station;
 
 public class StationDataSet {
 
-    public static Station testData() {
-        return new Station("station");
+    public static Station testData(String name) {
+        return new Station(name);
     }
 }
