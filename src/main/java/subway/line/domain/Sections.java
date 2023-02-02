@@ -27,7 +27,7 @@ public class Sections {
     }
 
     public List<Station> getStations() {
-        var stations = sections.stream().map(section -> section.getUpStation()).collect(Collectors.toList());
+        var stations = sections.stream().map(Section::getUpStation).collect(Collectors.toList());
         stations.add(getLastDownStation());
 
         return stations;
@@ -75,7 +75,7 @@ public class Sections {
     }
 
     private boolean isLastStation(Station station) {
-        return getLastDownStation().getId() == station.getId();
+        return getLastDownStation().getId().equals(station.getId());
     }
 
     private boolean isStationExist(Station station) {

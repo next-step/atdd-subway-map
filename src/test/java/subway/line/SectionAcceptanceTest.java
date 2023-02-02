@@ -26,7 +26,7 @@ import static subway.station.StationAcceptanceTest.지하철역이_생성됨;
 @DisplayName("지하철 구간 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-public class SectionAcceptanceTest {
+class SectionAcceptanceTest {
 
     private LineResponse 이호선;
     private StationResponse 강남역;
@@ -131,7 +131,7 @@ public class SectionAcceptanceTest {
         // then
 
         LineResponse 이호선_조회 = 지하철노선이_조회됨(이호선.getId());
-        assertThat(이호선_조회.getStationIds()).doesNotContain(선릉역.getId());
+        assertThat(이호선_조회.getStationIds()).containsExactlyElementsOf(List.of(강남역.getId(), 역삼역.getId()));
     }
 
     /**
