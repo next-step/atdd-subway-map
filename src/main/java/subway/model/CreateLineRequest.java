@@ -1,4 +1,4 @@
-package subway;
+package subway.model;
 
 public class CreateLineRequest {
 
@@ -26,15 +26,5 @@ public class CreateLineRequest {
 
     public Integer getDistance() {
         return distance;
-    }
-
-    public Line toEntity() {
-        return new Line(
-                this.name,
-                this.color,
-                this.upStationId,
-                this.downStationId,
-                this.distance
-        );
     }
 }
