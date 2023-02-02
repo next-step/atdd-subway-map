@@ -15,6 +15,10 @@ public class StationResponse {
                 .collect(Collectors.toUnmodifiableList());
     }
 
+    public static StationResponse by(final Station station) {
+        return new StationResponse(station.getId(), station.getName());
+    }
+
     public StationResponse(final Long id, final String name) {
         this.id = id;
         this.name = name;
