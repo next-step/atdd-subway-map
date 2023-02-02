@@ -230,7 +230,7 @@ public class LineAcceptanceTest {
     }
 
     private static Long 지하철역생성후_식별번호_반환(String stationName) {
-        ExtractableResponse<Response> 강남역 = StationAcceptanceTest.createSubwayStation(stationName);
+        ExtractableResponse<Response> 강남역 = StationStep.createSubwayStation(stationName);
         Long upStationId = StationAcceptanceTest.extractStationId(강남역);
         return upStationId;
     }

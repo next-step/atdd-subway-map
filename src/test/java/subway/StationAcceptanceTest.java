@@ -1,6 +1,5 @@
 package subway;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,14 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.jdbc.Sql;
-import subway.station.StationRepository;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -51,16 +44,15 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        ExtractableResponse<Response> response = createSubwayStation(GANGNAM);
+        ExtractableResponse<Response> response = StationStep.createSubwayStation(GANGNAM);
 
         // then
+        AssertUtil.상태코드_CREATED(response);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        ExtractableResponse<Response> stationsResponse = getAllStationsResponse();
-        List<String> stationNames = stationResponseToStationNames(stationsResponse);
-
-        assertThat(stationNames).containsAnyOf(GANGNAM);
+        ExtractableResponse<Response> stationsResponse = StationStep.getAllStationsResponse();
+        지하철역_목록_이름_검증(stationsResponse, List.of(GANGNAM));
     }
 
     /**
@@ -72,18 +64,15 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역 목록을 조회한다.")
     void getStations() {
         //given
-        createSubwayStation(GANGNAM);
-        createSubwayStation(YANGJAE);
+        StationStep.createSubwayStation(GANGNAM);
+        StationStep.createSubwayStation(YANGJAE);
 
         //when
-        ExtractableResponse<Response> response = getAllStationsResponse();
+        ExtractableResponse<Response> response = StationStep.getAllStationsResponse();
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-
-        //then
-        List<String> names = stationResponseToStationNames(response);
-        assertThat(names).containsExactly(GANGNAM, YANGJAE);
+        AssertUtil.상태코드_OK(response);
+        지하철역_목록_이름_검증(response, List.of(GANGNAM, YANGJAE));
     }
 
     /**
@@ -95,71 +84,33 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 삭제한다.")
     void deleteStation() {
         // given
-        ExtractableResponse<Response> gangnamStation = createSubwayStation(GANGNAM);
-        ExtractableResponse<Response> yangjaeStation = createSubwayStation(YANGJAE);
-        String notDeletedStationName = yangjaeStation.jsonPath().get(NAME_FILED);
+        ExtractableResponse<Response> gangnamStation = StationStep.createSubwayStation(GANGNAM);
+        ExtractableResponse<Response> yangjaeStation = StationStep.createSubwayStation(YANGJAE);
+        Long gangnamId = extractStationId(gangnamStation);
+        String notDeletedStationName = extractStationName(yangjaeStation);
 
         // when
-        ExtractableResponse<Response> response = deleteStationResponse(gangnamStation);
+        ExtractableResponse<Response> response = StationStep.deleteStationResponse(gangnamId);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-
-        // then
-        ExtractableResponse<Response> stationsResponse = getAllStationsResponse();
-
-        List<String> names = stationResponseToStationNames(stationsResponse);
-        assertThat(names).containsOnly(notDeletedStationName);
+        AssertUtil.상태코드_NO_CONTENT(response);
+        ExtractableResponse<Response> stationsResponse = StationStep.getAllStationsResponse();
+        지하철역_목록_이름_검증(stationsResponse, List.of(notDeletedStationName));
     }
 
-
-    /**
-     * 지하철역 생성 메서드
-     *
-     * @param stationName
-     * @return
-     */
-    static ExtractableResponse<Response> createSubwayStation(String stationName) {
-        Map<String, String> params = new HashMap<>();
-        params.put(NAME_FILED, stationName);
-
-        return RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post(STATION_URL)
-                .then().log().all()
-                .extract();
+    private static void 지하철역_목록_이름_검증(ExtractableResponse<Response> stationsResponse, List<String> stationNames) {
+        List<String> names = extractStationNames(stationsResponse);
+        assertThat(names).containsExactly(stationNames.toArray(new String[0]));
     }
 
-    /**
-     * 전체 지하철역 조회 메서드
-     *
-     * @return
-     */
-    private static ExtractableResponse<Response> getAllStationsResponse() {
-        return RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().get(STATION_URL)
-                .then().log().all()
-                .extract();
-    }
-
-    private static ExtractableResponse<Response> deleteStationResponse(ExtractableResponse<Response> subwayStation1) {
-        Object deletedId = subwayStation1.jsonPath().get(ID_FILED);
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .pathParam(ID_FILED, deletedId)
-                .delete(STATION_ID_URL)
-                .then().log().all()
-                .extract();
-        return response;
-    }
-
-    static List<String> stationResponseToStationNames(ExtractableResponse<Response> stationsResponse) {
+    static List<String> extractStationNames(ExtractableResponse<Response> stationsResponse) {
         return stationsResponse.jsonPath().getList(NAME_FILED, String.class);
     }
 
+    static String extractStationName(ExtractableResponse<Response> stationsResponse) {
+        return stationsResponse.jsonPath().getString(NAME_FILED);
+    }
+    
     static Long extractStationId(ExtractableResponse<Response> stationsResponse) {
         return stationsResponse.jsonPath().getLong(ID_FILED);
     }
