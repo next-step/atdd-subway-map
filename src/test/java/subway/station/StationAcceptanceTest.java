@@ -1,4 +1,4 @@
-package subway;
+package subway.station;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
+import subway.common.AssertUtil;
+import subway.common.DataBaseCleanUp;
 
 import java.util.List;
 
@@ -103,15 +105,15 @@ public class StationAcceptanceTest {
         assertThat(names).containsExactly(stationNames.toArray(new String[0]));
     }
 
-    static List<String> extractStationNames(ExtractableResponse<Response> stationsResponse) {
+    public static List<String> extractStationNames(ExtractableResponse<Response> stationsResponse) {
         return stationsResponse.jsonPath().getList(NAME_FILED, String.class);
     }
 
-    static String extractStationName(ExtractableResponse<Response> stationsResponse) {
+    public static String extractStationName(ExtractableResponse<Response> stationsResponse) {
         return stationsResponse.jsonPath().getString(NAME_FILED);
     }
-    
-    static Long extractStationId(ExtractableResponse<Response> stationsResponse) {
+
+    public static Long extractStationId(ExtractableResponse<Response> stationsResponse) {
         return stationsResponse.jsonPath().getLong(ID_FILED);
     }
 }

@@ -1,4 +1,4 @@
-package subway;
+package subway.station;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -8,13 +8,13 @@ import org.springframework.http.MediaType;
 import java.util.HashMap;
 import java.util.Map;
 
-import static subway.StationConstant.*;
+import static subway.station.StationConstant.*;
 
 public class StationStep {
     /*
         지하철역 생성
      */
-    static ExtractableResponse<Response> createSubwayStation(String stationName) {
+    public static ExtractableResponse<Response> createSubwayStation(String stationName) {
         Map<String, String> params = new HashMap<>();
         params.put(NAME_FILED, stationName);
 

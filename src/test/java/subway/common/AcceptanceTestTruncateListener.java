@@ -1,4 +1,4 @@
-package subway;
+package subway.common;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.TestContext;

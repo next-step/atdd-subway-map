@@ -1,23 +1,19 @@
-package subway;
+package subway.line;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.hibernate.annotations.SQLDelete;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.jdbc.Sql;
+import subway.common.AcceptanceTestTruncateListener;
 import subway.exception.LineNotFoundException;
-import subway.line.LineCreateRequest;
-import subway.line.LineResponse;
-import subway.line.LineUpdateRequest;
+import subway.station.StationAcceptanceTest;
+import subway.station.StationStep;
 
 import java.util.List;
 import java.util.Map;

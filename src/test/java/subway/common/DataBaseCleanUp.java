@@ -1,4 +1,4 @@
-package subway;
+package subway.common;
 
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.test.context.TestComponent;

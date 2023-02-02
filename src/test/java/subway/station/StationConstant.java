@@ -1,4 +1,4 @@
-package subway;
+package subway.station;
 
 public class StationConstant {
     public static final String STATION_URL = "/stations";
