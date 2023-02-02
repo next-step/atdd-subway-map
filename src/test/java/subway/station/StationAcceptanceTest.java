@@ -83,20 +83,18 @@ public class StationAcceptanceTest {
         );
     }
 
-    public static void createStation(String name) {
+    public static StationResponse createStation(String name) {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
 
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
+        return RestAssured.given().log().all()
                         .body(params)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .when().post("/stations")
                         .then().log().all()
-                        .extract();
-
-        assertThat(response.statusCode())
-                .isEqualTo(HttpStatus.CREATED.value());
+                        .statusCode(HttpStatus.CREATED.value())
+                        .extract()
+                        .jsonPath().getObject("$", StationResponse.class);
     }
 
     /**

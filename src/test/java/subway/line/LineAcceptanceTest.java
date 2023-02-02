@@ -1,6 +1,5 @@
 package subway.line;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,9 +24,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class LineAcceptanceTest {
 
-    public static final String SHINBUNDANG_LINE = "신분당선";
+    public static final String 신분당선 = "신분당선";
+    public static final String 분당선 = "분당선";
     public static final String RED = "be-red-600";
-    public static final String BUNDANG_LINE = "분당선";
     public static final String GREEN = "bg-green-600";
 
     @BeforeEach
@@ -37,9 +36,9 @@ class LineAcceptanceTest {
         StationAcceptanceTest.createStation("구의역");
     }
 
-    private LineRequest givenLineRequest1() {
+    private LineRequest 신분당선_생성_요청() {
         return LineRequest.builder()
-                .name(SHINBUNDANG_LINE)
+                .name(신분당선)
                 .color(RED)
                 .upStationId(1L)
                 .downStationId(2L)
@@ -47,9 +46,9 @@ class LineAcceptanceTest {
                 .build();
     }
 
-    private LineRequest givenLineRequest2() {
+    private LineRequest 분당선_생성_요청() {
         return LineRequest.builder()
-                .name(BUNDANG_LINE)
+                .name(분당선)
                 .color(GREEN)
                 .upStationId(1L)
                 .downStationId(3L)
@@ -65,20 +64,18 @@ class LineAcceptanceTest {
     @Test
     void createLine() {
         // when
-        ExtractableResponse<Response> response = createLine(givenLineRequest1());
+        createLine(신분당선_생성_요청());
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(getStationNames()).containsAnyOf("신분당선");
+        assertThat(getStationNames()).containsAnyOf(신분당선);
     }
 
-    private ExtractableResponse<Response> createLine(LineRequest request) {
-        return given().log().all()
+    private void createLine(LineRequest request) {
+        given().log().all()
                 .body(request)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/lines")
-                .then().statusCode(HttpStatus.CREATED.value())
-                .extract();
+                .then().statusCode(HttpStatus.CREATED.value());
     }
 
     private List<String> getStationNames() {
@@ -88,8 +85,7 @@ class LineAcceptanceTest {
     }
 
     private ExtractableResponse<Response> findAllLines() {
-        return RestAssured
-                .given().log().all()
+        return given().log().all()
                 .when().get("/lines")
                 .then().log().all()
                 .extract();
@@ -104,10 +100,7 @@ class LineAcceptanceTest {
     @Test
     void showLines() {
         // given
-        List<LineRequest> lines = List.of(
-                givenLineRequest1(),
-                givenLineRequest2()
-        );
+        List<LineRequest> lines = List.of(신분당선_생성_요청(), 분당선_생성_요청());
         lines.forEach(this::createLine);
 
         // when
@@ -132,7 +125,7 @@ class LineAcceptanceTest {
     @Test
     void showLine() {
         // given
-        LineRequest request = givenLineRequest1();
+        LineRequest request = 신분당선_생성_요청();
         createLine(request);
 
         // when
@@ -165,19 +158,20 @@ class LineAcceptanceTest {
     @Test
     void updateLine() {
         // given
-        createLine(givenLineRequest2());
+        createLine(분당선_생성_요청());
 
         // when
         Map<String, String> params = new HashMap<>();
         params.put("name", "다른분당선");
         params.put("color", "bg-red-600");
 
-        ExtractableResponse<Response> response = given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().put("/lines/1")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response =
+                given().log().all()
+                        .body(params)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .when().put("/lines/1")
+                        .then().log().all()
+                        .extract();
 
         // then
         LineResponse line = getLineById(1L);
@@ -203,11 +197,11 @@ class LineAcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        createLine(givenLineRequest1());
+        createLine(신분당선_생성_요청());
 
         // when
         ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
+                given().log().all()
                         .when().delete("/lines/1")
                         .then().log().all()
                         .extract();

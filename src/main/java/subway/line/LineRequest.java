@@ -2,6 +2,7 @@ package subway.line;
 
 import lombok.Builder;
 import lombok.Getter;
+import subway.station.Station;
 
 @Getter
 @Builder
@@ -12,7 +13,7 @@ public class LineRequest {
     private Long downStationId;
     private Long distance;
 
-    public Line toEntity() {
-        return new Line(this.name, this.color, this.upStationId, this.downStationId, this.distance);
+    public Line toEntity(Station upStation, Station downStation) {
+        return new Line(this.name, this.color, upStation, downStation, this.distance);
     }
 }

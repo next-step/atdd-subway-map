@@ -1,11 +1,12 @@
 package subway.station;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Getter
 public class Station {
@@ -16,6 +17,11 @@ public class Station {
     private String name;
 
     public Station(String name) {
+        this.name = name;
+    }
+
+    public Station(Long id, String name) {
+        this.id = id;
         this.name = name;
     }
 }
