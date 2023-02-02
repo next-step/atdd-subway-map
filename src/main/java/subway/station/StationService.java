@@ -29,7 +29,7 @@ public class StationService {
 
     public Station findOneById(Long id) {
         return stationRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("해당하는 id의 지하철 역이 존재하지 않습니다."));
+                .orElseThrow(() -> new SubwayRestApiException(ErrorResponseCode.NOT_FOUND_STATION));
     }
 
     @Transactional

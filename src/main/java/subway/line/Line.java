@@ -1,5 +1,8 @@
 package subway.line;
 
+import subway.exception.ErrorResponseCode;
+import subway.exception.SubwayRestApiException;
+import subway.section.Section;
 import subway.section.Sections;
 import subway.station.Station;
 
@@ -55,11 +58,11 @@ public class Line {
         }
 
         if (!sections.isLastStation(upStation)) {
-            throw new RuntimeException("새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 합니다.");
+            throw new SubwayRestApiException(ErrorResponseCode.DUPLICATED_DOWN_STATION);
         }
 
         if (sections.containsStation(downStation)) {
-            throw new RuntimeException("새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없습니다.");
+            throw new SubwayRestApiException(ErrorResponseCode.NOT_EQUAL_LAST_STATION);
         }
         sections.addSection(new Section(this, upStation, downStation, distance));
     }
