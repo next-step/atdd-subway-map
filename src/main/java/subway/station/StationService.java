@@ -1,4 +1,4 @@
-package subway;
+package subway.station;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,12 +18,12 @@ public class StationService {
     @Transactional
     public StationResponse saveStation(StationRequest stationRequest) {
         Station station = stationRepository.save(new Station(stationRequest.getName()));
-        return createStationResponse(station);
+        return StationResponse.of(station);
     }
 
     public List<StationResponse> findAllStations() {
         return stationRepository.findAll().stream()
-                .map(this::createStationResponse)
+                .map(StationResponse::of)
                 .collect(Collectors.toList());
     }
 
@@ -32,10 +32,15 @@ public class StationService {
         stationRepository.deleteById(id);
     }
 
-    private StationResponse createStationResponse(Station station) {
-        return new StationResponse(
-                station.getId(),
-                station.getName()
-        );
+    /**
+     * Station 엔티티를 반환하는 메서드
+     *
+     * @param stationId
+     * @return Station
+     * @throws StationNotFoundException 존재하지 않는 id로 조회시
+     */
+    public Station getStationById(Long stationId) {
+        return stationRepository.findById(stationId)
+                .orElseThrow(StationNotFoundException::new);
     }
 }
