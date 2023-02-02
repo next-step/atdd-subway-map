@@ -108,7 +108,7 @@ public class LineAcceptanceTest {
         ExtractableResponse<Response> createLineResponse
                 = lineRestAssured.createLine(LINE_NAME, COLOR, upStationId, downStationId, DISTANCE);
 
-        String location = createLineResponse.header(HttpHeaders.LOCATION);
+        String location = getLocation(createLineResponse);
 
         // when, then
         lineAssert.assertShowLine(LINE_NAME, COLOR, upStationId, downStationId, DISTANCE, location);
@@ -121,7 +121,7 @@ public class LineAcceptanceTest {
         ExtractableResponse<Response> createLineResponse
                 = lineRestAssured.createLine(LINE_NAME, COLOR, upStationId, downStationId, DISTANCE);
 
-        String location = createLineResponse.header(HttpHeaders.LOCATION);
+        String location = getLocation(createLineResponse);
 
         String name = "수정한 지하철 노선 이름";
         String color = "수정한 지하철 색상";
@@ -141,12 +141,16 @@ public class LineAcceptanceTest {
         ExtractableResponse<Response> createLineResponse
                 = lineRestAssured.createLine(LINE_NAME, COLOR, upStationId, downStationId, DISTANCE);
 
-        String location = createLineResponse.header(HttpHeaders.LOCATION);
+        String location = getLocation(createLineResponse);
 
         // when
         lineRestAssured.deleteLine(location);
 
         // then
         lineAssert.assertDeleteLine(location);
+    }
+
+    private static String getLocation(final ExtractableResponse<Response> createLineResponse) {
+        return createLineResponse.header(HttpHeaders.LOCATION);
     }
 }
