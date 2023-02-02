@@ -6,16 +6,16 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
-import java.util.List;
-import java.util.Map;
-
 import static org.assertj.core.api.Assertions.assertThat;
+import static subway.common.fixture.FieldFixture.식별자_아이디;
 import static subway.common.fixture.FieldFixture.역_이름;
 import static subway.common.fixture.StationFixture.강남역;
 import static subway.common.fixture.StationFixture.서울대입구역;
+import static subway.common.util.JsonPathUtil.리스트로_데이터_추출;
+import static subway.common.util.JsonPathUtil.문자열로_데이터_추출;
 
 @DisplayName("지하철역 관련 기능")
-public class StationAcceptanceTest extends AcceptanceTest {
+class StationAcceptanceTest extends AcceptanceTest {
 
     /**
      * When 지하철역을 생성하면
@@ -26,17 +26,13 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void createStation() {
         // when
-        Map<String, String> 강남역_데이터 = 강남역.요청_데이터_생성();
-        ExtractableResponse<Response> response = 지하철역_생성_요청(강남역_데이터);
+        ExtractableResponse<Response> 지하철역_생성_결과 = 지하철역_생성_요청(강남역.요청_데이터_생성());
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(지하철역_생성_결과.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> 등록된_지하철역_이름_목록 = 지하철역_목록_조회_요청()
-                .jsonPath().getList(역_이름.필드명(), String.class);
-
-        assertThat(등록된_지하철역_이름_목록).containsAnyOf(강남역.역_이름());
+        assertThat(리스트로_데이터_추출(지하철역_목록_조회_요청(), 역_이름)).containsAnyOf(강남역.역_이름());
     }
 
     /**
@@ -48,18 +44,14 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void selectStations() {
         // given
-        Map<String, String> 강남역_데이터 = 강남역.요청_데이터_생성();
-        지하철역_생성_요청(강남역_데이터);
-
-        Map<String, String> 서울대입구역_데이터 = 서울대입구역.요청_데이터_생성();
-        지하철역_생성_요청(서울대입구역_데이터);
+        지하철역_생성_요청(강남역.요청_데이터_생성());
+        지하철역_생성_요청(서울대입구역.요청_데이터_생성());
 
         // when
-        List<String> 등록된_지하철역_이름_목록 = 지하철역_목록_조회_요청()
-                .jsonPath().getList(역_이름.필드명(), String.class);
+        ExtractableResponse<Response> 지하철역_목록_조회_결과 = 지하철역_목록_조회_요청();
 
         // then
-        assertThat(등록된_지하철역_이름_목록).contains(강남역.역_이름(), 서울대입구역.역_이름());
+        assertThat(리스트로_데이터_추출(지하철역_목록_조회_결과, 역_이름)).contains(강남역.역_이름(), 서울대입구역.역_이름());
     }
 
     /**
@@ -71,17 +63,12 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        Map<String, String> 강남역_데이터 = 강남역.요청_데이터_생성();
-        Long 생성된_지하철역_id = 지하철역_생성_요청(강남역_데이터)
-                .jsonPath().getLong("id");
+        String 생성된_지하철역_id = 문자열로_데이터_추출(지하철역_생성_요청(강남역.요청_데이터_생성()), 식별자_아이디);
 
         // when
         지하철역_삭제_요청(생성된_지하철역_id);
 
         // then
-        List<String> 등록된_지하철역_이름_목록 = 지하철역_목록_조회_요청()
-                .jsonPath().getList(역_이름.필드명(), String.class);
-
-        assertThat(등록된_지하철역_이름_목록).doesNotContain(강남역.역_이름());
+        assertThat(리스트로_데이터_추출(지하철역_목록_조회_요청(), 역_이름)).doesNotContain(강남역.역_이름());
     }
 }

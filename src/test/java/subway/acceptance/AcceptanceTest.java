@@ -23,12 +23,10 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 class AcceptanceTest {
 
     public static final String STATION_BASE_URL = "/stations";
-    public static final String STATION_DELETE_URL = STATION_BASE_URL + "/{stationId}";
+    public static final String STATION_COMMAND_URL = STATION_BASE_URL + "/{stationId}";
 
     public static final String LINE_BASE_URL = "/lines";
-    public static final String LINE_SELECT_URL = LINE_BASE_URL + "/{lineId}";
-    public static final String LINE_UPDATE_URL = LINE_BASE_URL + "/{lineId}";
-    public static final String LINE_DELETE_URL = LINE_BASE_URL + "/{lineId}";
+    public static final String LINE_COMMAND_URL = LINE_BASE_URL + "/{lineId}";
 
     @LocalServerPort
     private int port;
@@ -65,9 +63,9 @@ class AcceptanceTest {
                 .extract();
     }
 
-    public static void 지하철역_삭제_요청(Long stationId) {
+    public static void 지하철역_삭제_요청(String stationId) {
         given().log().all()
-                .when().delete(STATION_DELETE_URL, stationId)
+                .when().delete(STATION_COMMAND_URL, stationId)
                 .then().log().all()
                 .extract();
     }
@@ -90,7 +88,7 @@ class AcceptanceTest {
 
     public static ExtractableResponse<Response> 지하철_노선_단건_조회_요청(String lineId) {
         return given().log().all()
-                .when().get(LINE_SELECT_URL, lineId)
+                .when().get(LINE_COMMAND_URL, lineId)
                 .then().log().all()
                 .extract();
     }
@@ -99,14 +97,14 @@ class AcceptanceTest {
         return given().log().all()
                 .body(requestBody)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().put(LINE_UPDATE_URL, lineId)
+                .when().put(LINE_COMMAND_URL, lineId)
                 .then().log().all()
                 .extract();
     }
 
     public static ExtractableResponse<Response> 지하철_노선_삭제_요청(String lineId) {
         return given().log().all()
-                .when().delete(LINE_DELETE_URL, lineId)
+                .when().delete(LINE_COMMAND_URL, lineId)
                 .then().log().all()
                 .extract();
     }
