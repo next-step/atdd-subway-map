@@ -62,6 +62,28 @@ public class SectionAcceptanceTest {
         assertThat(이호선_조회.getStationIds()).containsExactlyElementsOf(List.of(강남역.getId(), 역삼역.getId(), 선릉역.getId()));
     }
 
+    /**
+     * 지하철노선 삭제
+     *  - Given 지하철 구간을 생성하고
+     *  - When 생성한 지하철 구간을 삭제하면
+     *  - Then 해당 지하철 구간은 삭제된다
+     */
+    @DisplayName("지하철 구간을 삭제한다.")
+    @Test
+    void Should_지하철구간을_삭제하면_Then_지하철구간이_삭제된다() {
+        //given ==> 강남역 - 역삼역 - 선릉역
+        지하철구간을_생성한다(이호선.getId(), new SectionRequest(역삼역.getId(), 선릉역.getId(), 10L));
+
+        // when
+        ExtractableResponse<Response> response = 지하철구간을_삭제한다(이호선.getId(), 선릉역.getId());
+
+        // then
+        assertUtils.assertHttpStatus(response.statusCode(), HttpStatus.NO_CONTENT.value());
+        LineResponse 이호선_조회 = 지하철노선이_조회됨(이호선.getId());
+        assertThat(이호선_조회.getStationIds()).doesNotContain(선릉역.getId());
+    }
+
+
     private static ExtractableResponse<Response> 지하철구간을_생성한다(Long lineId, SectionRequest request) {
         return RestAssured.given().log().all()
                 .body(request)
@@ -73,5 +95,13 @@ public class SectionAcceptanceTest {
 
     private static void 지하철구간이_정상적으로_생성(ExtractableResponse<Response> response) {
         assertUtils.assertHttpStatus(response.statusCode(), HttpStatus.CREATED.value());
+    }
+
+    private static ExtractableResponse<Response> 지하철구간을_삭제한다(Long lineId, Long stationId) {
+        return RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().delete(String.format("/lines/%d/sections?stationId=%d", lineId, stationId))
+                .then().log().all()
+                .extract();
     }
 }
