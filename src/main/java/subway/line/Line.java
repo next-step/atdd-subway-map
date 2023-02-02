@@ -58,11 +58,11 @@ public class Line {
         }
 
         if (!sections.isLastStation(upStation)) {
-            throw new SubwayRestApiException(ErrorResponseCode.DUPLICATED_DOWN_STATION);
+            throw new SubwayRestApiException(ErrorResponseCode.NOT_EQUAL_LAST_STATION);
         }
 
         if (sections.containsStation(downStation)) {
-            throw new SubwayRestApiException(ErrorResponseCode.NOT_EQUAL_LAST_STATION);
+            throw new SubwayRestApiException(ErrorResponseCode.DUPLICATED_DOWN_STATION);
         }
         sections.addSection(new Section(this, upStation, downStation, distance));
     }
