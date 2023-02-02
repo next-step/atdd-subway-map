@@ -111,4 +111,47 @@ class SectionAcceptanceTest {
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
         assertThat(stations).hasSize(2);
     }
+
+    /**
+     * Given 지하철 노선에 새로운 구간을 추가한다.
+     * When 그 구간은 마지막 노선이 아닌 곳을 제거한다.
+     * Then StatusCode는 BadRequest이고, 에러 발생한다.
+     */
+    @DisplayName("지하철 노선에 등록된 하행 종점역(마지막 구간의 하행 종점역)이 아니면 에러 발생한다.")
+    @Test
+    void isLastStationInLastSectionErrorTest() {
+        //given
+        post("/lines", 신분당선);
+        post("/lines/{id}/sections", 1, 구간);
+
+        //when
+        ExtractableResponse<Response> response =
+                delete("/lines/{id}/sections", 1, "stationId", 2L);
+
+        //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.jsonPath().getString("message"))
+                .isEqualTo("지하철 노선에 등록된 하행 종점역만 제거할 수 있습니다.");
+    }
+
+    /**
+     * Given 구간이 하나인 노선을 생성한다.
+     * When 그 노선을 지운다.
+     * Then StatusCode는 BadRequest이고, 에러 발생한다.
+     */
+    @DisplayName("지하철 노선에 상행 종점역과 하행 종점역만 있는 경우(구간이 1개인 경우) 에러 발생.")
+    @Test
+    void singleSectionErrorTest() {
+        //given
+        post("/lines", 신분당선);
+
+        //when
+        ExtractableResponse<Response> response =
+                delete("/lines/{id}/sections", 1, "stationId", 2L);
+
+        //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.jsonPath().getString("message"))
+                .isEqualTo("지하철 노선에 구간이 1개인 경우에는 역을 삭제할 수 없습니다.");
+    }
 }
