@@ -35,7 +35,7 @@ public class Section {
         this.distance = distance;
     }
 
-    public boolean isEqualDownStation(Section section){
+    public boolean equalsDownStation(Section section){
         return this.downStation.equals(section.getUpStation());
     }
 
