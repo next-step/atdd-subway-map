@@ -12,7 +12,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
+import java.util.Objects;
 
+import static javax.persistence.FetchType.LAZY;
 import static lombok.AccessLevel.PROTECTED;
 
 @Entity
@@ -31,11 +33,11 @@ public class Line {
     @Column(length = 100, nullable = false)
     private String color;
 
-    @OneToOne
+    @OneToOne(fetch = LAZY)
     @JoinColumn(name = "up_station_id")
     private Station upStation;
 
-    @OneToOne
+    @OneToOne(fetch = LAZY)
     @JoinColumn(name = "down_station_id")
     private Station downStation;
 
@@ -56,5 +58,22 @@ public class Line {
     public void updateLine(final Line line) {
         this.name = line.getName();
         this.color = line.getColor();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Line)) {
+            return false;
+        }
+        Line line = (Line) o;
+        return Objects.equals(id, line.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
     }
 }

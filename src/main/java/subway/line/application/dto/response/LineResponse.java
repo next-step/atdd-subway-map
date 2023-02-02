@@ -3,7 +3,7 @@ package subway.line.application.dto.response;
 import lombok.Builder;
 import lombok.Getter;
 import subway.line.domain.Line;
-import subway.station.domain.Station;
+import subway.station.application.dto.response.StationResponse;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -14,11 +14,11 @@ public class LineResponse {
     private String name;
     private String color;
 
-    private List<Station> stations;
+    private List<StationResponse> stations;
 
     @Builder
     private LineResponse(final Long id, final String name,
-                         final String color, final List<Station> stations) {
+                         final String color, final List<StationResponse> stations) {
         this.id = id;
         this.name = name;
         this.color = color;
@@ -31,8 +31,15 @@ public class LineResponse {
                 .name(line.getName())
                 .color(line.getColor())
                 .stations(List.of(
-                        line.getUpStation(),
-                        line.getDownStation()))
+                        StationResponse.builder()
+                                .id(line.getUpStation().getId())
+                                .name(line.getUpStation().getName())
+                                .build(),
+                        StationResponse.builder()
+                                .id(line.getDownStation().getId())
+                                .name(line.getDownStation().getName())
+                                .build()
+                ))
                 .build();
     }
 
