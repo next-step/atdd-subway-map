@@ -106,8 +106,8 @@ public class LineAcceptanceTest {
         LineResponse 이호선_생성_응답 = 지하철노선이_생성됨(new LineRequest("2호선", "blue", 강남역.getId(), 역삼역.getId(), 10L));
         LineResponse 이호선 = 노선목록에서_특정_지하철역을_조회(이호선_생성_응답.getId());
 
-        //when
-        ExtractableResponse<Response> lineResponse = 특정_지하철노선을_조회한다(이호선.getId());
+        // when
+        ExtractableResponse<Response> lineResponse = 특정_지하철노선을_조회한다(이호선_생성_응답.getId());
 
         // then
         var 이호선_단일_조회 = 지하철노선이_정상적으로_조회(lineResponse);
@@ -133,7 +133,7 @@ public class LineAcceptanceTest {
 
 
         //when
-        var 이호선_update_request = new LineRequest(이호선_request.getName(), "green", 신논현역.getId(), 이호선_request.getDownStationId(), 이호선_request.getDistance());
+        var 이호선_update_request = new LineRequest(이호선_request.getName(), "green", 강남역.getId(), 역삼역.getId(), 이호선_request.getDistance());
         ExtractableResponse<Response> lineResponse = 지하철노선을_수정한다(이호선.getId(), 이호선_update_request);
 
         // then
@@ -145,7 +145,7 @@ public class LineAcceptanceTest {
         assertAll(() -> {
             assertThat(이호선_update.getName()).isEqualTo("2호선");
             assertThat(이호선_update.getColor()).isEqualTo("green");
-            assertThat(이호선_update.getStationIds()).containsExactlyInAnyOrderElementsOf(List.of(신논현역.getId(), 역삼역.getId()));
+            assertThat(이호선_update.getStationIds()).containsExactlyInAnyOrderElementsOf(List.of(강남역.getId(), 역삼역.getId()));
         });
     }
 
