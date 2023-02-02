@@ -14,11 +14,9 @@ import org.springframework.test.annotation.DirtiesContext;
 import subway.line.StationLine;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static subway.StationAcceptanceTest.createStation;
 
@@ -104,6 +102,10 @@ public class StationLineAcceptanceTest {
     @DisplayName("생성한 지하철 노선 2개를 조회할 수 있다.")
     @Test
     void twoCreateLineAndGetLines() {
+        final String gangnamStationName = "강남역";
+        final String pangyoStationName = "판교역";
+        final String sadangStationName = "사당역";
+
         // given
         ExtractableResponse<Response> lineShinbundang = createStationLine(
                 shinbundangLine.getName(),
@@ -113,7 +115,8 @@ public class StationLineAcceptanceTest {
                 shinbundangLine.getDistance()
         );
 
-        ExtractableResponse<Response> gangnamStation = createStation("강남역");
+        ExtractableResponse<Response> gangnamStation = createStation(gangnamStationName);
+        ExtractableResponse<Response> pangyoStation = createStation(pangyoStationName);
 
         ExtractableResponse<Response> line4 = createStationLine(
                 fourLine.getName(),
@@ -123,7 +126,7 @@ public class StationLineAcceptanceTest {
                 fourLine.getDistance()
         );
 
-        ExtractableResponse<Response> sadangStation = createStation("사당역");
+        ExtractableResponse<Response> sadangStation = createStation(sadangStationName);
 
         // when
         ExtractableResponse<Response> getResponses = getStationLines();
@@ -133,6 +136,9 @@ public class StationLineAcceptanceTest {
         assertThat(getResponses.body().jsonPath().getList("name").size()).isEqualTo(2);
         assertThat(getResponses.body().jsonPath().getList("color").size()).isEqualTo(2);
         assertThat(getResponses.body().jsonPath().getList("stations").size()).isEqualTo(2);
+        assertThat(getResponses.body().jsonPath().getList("stations.name[0]").get(0)).isEqualTo(gangnamStationName);
+        assertThat(getResponses.body().jsonPath().getList("stations.name[0]").get(1)).isEqualTo(pangyoStationName);
+        assertThat(getResponses.body().jsonPath().getList("stations.name[1]").get(0)).isEqualTo(sadangStationName);
     }
 
     /**
@@ -195,7 +201,7 @@ public class StationLineAcceptanceTest {
                 "신분당선",
                 "bg-red-600",
                 1L,
-                10L,
+                2L,
                 10
         );
     }
@@ -204,8 +210,8 @@ public class StationLineAcceptanceTest {
         return StationLineTestFixtures.fixture(
                 "4호선",
                 "bg-blue-600",
-                1L,
-                20L,
+                3L,
+                4L,
                 30
         );
     }
