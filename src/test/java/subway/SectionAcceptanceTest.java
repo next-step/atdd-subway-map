@@ -10,11 +10,13 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
 import subway.line.LineRequest;
 import subway.section.SectionRequest;
+import subway.station.StationResponse;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD;
-import static subway.AcceptanceTestHelper.get;
-import static subway.AcceptanceTestHelper.post;
+import static subway.AcceptanceTestHelper.*;
 
 @DisplayName("지하철 구간 관련 기능")
 @DirtiesContext(classMode = BEFORE_EACH_TEST_METHOD)
@@ -69,7 +71,7 @@ class SectionAcceptanceTest {
 
     /**
      * Given 지하철 노선에 새로운 구간을 추가한다.
-     * When 지하철 노선에 추가하려는 구간의 상행역이 노선의 하행역과 일치하지 않은 구간을 추가한다.
+     * When 지하철 노선에 추가하려는 새로운 구간의 하행역에 이 노선에 포함된 역을 추가한다.
      * Then 에러가 발생한다.
      */
     @DisplayName("새로운 구간의 하행역은 해당 노선에 등록되어 있으면 에러 체크한다.")
@@ -85,5 +87,28 @@ class SectionAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(response.jsonPath().getString("message"))
                 .isEqualTo("새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없습니다.");
+    }
+
+    /**
+     * Given 지하철 노선에 새로운 구간을 추가한다.
+     * When 지하철 노선의 마지막 구간을 제거한다.
+     * Then 지하철 노선에서 해당 구간이 제거되고, 제거된 역은 제외한 해당 노선의 모든 지하철 역을 조회한다.
+     */
+    @DisplayName("지하철 노선에 지하철 구간을 제거한다.")
+    @Test
+    void deleteSection() {
+        //given
+        post("/lines", 신분당선);
+        post("/lines/{id}/sections", 1, 구간);
+
+        //when
+        ExtractableResponse<Response> deleteResponse =
+                delete("/lines/{id}/sections", 1, "stationId", 3L);
+        ExtractableResponse<Response> getListResponse = get("/lines/{id}", 1);
+        List<StationResponse> stations = getListResponse.jsonPath().getList("stations");
+
+        //then
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertThat(stations).hasSize(2);
     }
 }
