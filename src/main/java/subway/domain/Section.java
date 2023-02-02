@@ -1,31 +1,26 @@
 package subway.domain;
 
-import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.validation.constraints.NotBlank;
+import javax.persistence.*;
 
 @Getter
 @Entity
 public class Section {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "section_id")
     private Long id;
-    @NotBlank(message = "upStationId is not blank")
-    private String upStationId;
-    @NotBlank(message = "downStationId is not blank")
-    private String downStationId;
+    private Long upStationId;
+    private Long downStationId;
     private int distance;
+    @ManyToOne
+    @JoinColumn(name = "line_id")
+    private Line line;
 
     public Section() {
     }
 
-    public Section(String upStationId, String downStationId, int distance) {
+    public Section(Long upStationId, Long downStationId, int distance) {
         this.upStationId = upStationId;
         this.downStationId = downStationId;
         this.distance = distance;

@@ -1,12 +1,16 @@
 package subway.service;
 
+import org.springframework.expression.ExpressionException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.domain.Line;
-import subway.domain.Station;
+import subway.domain.Section;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
+import subway.dto.SectionRequest;
 import subway.repository.LineRepository;
+import subway.repository.SectionRepository;
+import subway.repository.StationRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,16 +20,24 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class LineService {
     LineRepository lineRepository;
-    StationService stationService;
+    SectionRepository sectionRepository;
+    StationRepository stationRepository;
 
-    public LineService(LineRepository lineRepository, StationService stationService) {
+
+    public LineService(LineRepository lineRepository, StationRepository stationRepository, SectionRepository sectionRepository) {
         this.lineRepository = lineRepository;
-        this.stationService = stationService;
+        this.stationRepository = stationRepository;
+        this.sectionRepository = sectionRepository;
     }
 
     @Transactional
-    public LineResponse saveLine(LineRequest lineRequest) {
-        Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor(), lineRequest.getUpStationId(), lineRequest.getDownStationId(), lineRequest.getDistance()));
+    public LineResponse saveLine(LineRequest lineRequest) throws Exception{
+        Section section = sectionRepository.save(new Section(lineRequest.getUpStationId(), lineRequest.getDownStationId(), lineRequest.getDistance()));
+
+        List<Section> sections = new ArrayList<>();
+        sections.add(section);
+
+        Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor(), sections));
         return createLineResponse(line);
     }
 
@@ -37,11 +49,7 @@ public class LineService {
 
     private LineResponse createLineResponse(Line line) {
         try {
-            List<Station> stationList = new ArrayList<>();
-            stationList.add(stationService.findById(line.getUpStationId()));
-            stationList.add(stationService.findById(line.getDownStationId()));
-
-            return new LineResponse(line.getId(), line.getName(), line.getColor(), stationList);
+            return new LineResponse(line.getId(), line.getName(), line.getColor(), line.getSections());
         } catch (Exception e) {
             System.out.println(e.getMessage());
 
@@ -65,5 +73,25 @@ public class LineService {
         line.change(lineRequest.getName(), lineRequest.getColor());
 
         lineRepository.save(line);
+    }
+
+    public LineResponse addSection(String id, SectionRequest sectionRequest) throws Exception {
+        Line line = lineRepository.findById(Long.valueOf(id)).orElseThrow(() -> new ExpressionException("[SYS_ERROR] do not found station by id ("+id+")"));
+
+        if (line.isUpStationNotEqualDownStation(sectionRequest.getUpStationId())) {
+            throw new Exception("[SYS_ERROR] upStation's not correct");
+        }
+
+        if (line.alreadyExistsDownStation(sectionRequest.getDownStationId())) {
+            throw new Exception("[SYS_ERROR] downStation's already exists");
+        }
+
+        Section section = sectionRepository.save(new Section(sectionRequest.getUpStationId(), sectionRequest.getDownStationId(), sectionRequest.getDistance()));
+        line.addSection(section);
+
+        line = lineRepository.save(line);
+
+        return createLineResponse(line);
+
     }
 }
