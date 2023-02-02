@@ -1,32 +1,23 @@
 package subway;
 
-import io.restassured.RestAssured;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+import subway.station.StationRepository;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class StationAcceptanceTest {
+public class StationAcceptanceTest extends AcceptanceTest{
     @Autowired
     private StationRepository stationRepository;
 
-    @BeforeEach
-    public void setup() {
-        stationRepository.deleteAll();
-    }
+    private final StationRestAssuredTest stationRestAssuredTest = new StationRestAssuredTest();
+
 
     /**
      * When 지하철역을 생성하면
@@ -37,10 +28,10 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        createStation("강남역");
+        stationRestAssuredTest.createStation("강남역");
 
         // then
-        List<String> stationNameList = getStationNameList();
+        List<String> stationNameList = stationRestAssuredTest.getStationNameList();
         assertThat(stationNameList).containsAnyOf("강남역");
     }
 
@@ -57,11 +48,11 @@ public class StationAcceptanceTest {
     void getStationList() {
 
         //Given
-        createStation("강남역");
-        createStation("역삼역");
+        stationRestAssuredTest.createStation("강남역");
+        stationRestAssuredTest.createStation("역삼역");
 
         //Then
-        List<String> stationNameList = getStationNameList();
+        List<String> stationNameList = stationRestAssuredTest.getStationNameList();
 
         assertThat(stationNameList).containsAnyOf("강남역", "역삼역");
         assertThat(stationNameList).hasSize(2);
@@ -76,20 +67,15 @@ public class StationAcceptanceTest {
     @Test
     public void deleteStation() {
         // Given
-        Long id = createStation("강남역");
-        createStation("역삼역");
+        Long id = stationRestAssuredTest.createStation("강남역");
+        stationRestAssuredTest.createStation("역삼역");
 
         // When
-        var deleteResponse = RestAssured.given().log().all()
-                .when().delete("/stations/" + id)
-                .then().log().all()
-                .extract();
-
-        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        stationRestAssuredTest.deleteStation(id);
 
         // Then
 
-        var stationNameList = getStationNameList();
+        var stationNameList = stationRestAssuredTest.getStationNameList();
 
         assertThat(stationNameList).hasSize(1);
         assertThat(stationNameList).containsExactly("역삼역");
@@ -97,34 +83,4 @@ public class StationAcceptanceTest {
     }
 
 
-    @DisplayName("주어진 이름의 지하철역을 생성한다.")
-    private Long createStation(String station) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", station);
-
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .body(params)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/stations")
-                        .then().log().all()
-                        .extract();
-        // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        return response.body().jsonPath().getLong("id");
-    }
-
-    @DisplayName("지하철역 목록을 조회한다.")
-    private List<String> getStationNameList() {
-        var response = RestAssured.given().log().all()
-                .when().get("/stations")
-                .then().log().all()
-                .extract();
-
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.contentType()).isEqualTo(MediaType.APPLICATION_JSON_VALUE);
-
-        return response.jsonPath().getList("name", String.class);
-
-    }
 }
