@@ -6,15 +6,18 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import subway.station.application.StationService;
 import subway.station.application.dto.request.StationRequest;
 import subway.station.application.dto.response.StationResponse;
+import subway.station.domain.Station;
 
 import java.net.URI;
 import java.util.List;
 
 @RestController
+@RequestMapping("/stations")
 public class StationController {
     private final StationService stationService;
 
@@ -22,20 +25,27 @@ public class StationController {
         this.stationService = stationService;
     }
 
-    @PostMapping("/stations")
+    @PostMapping
     public ResponseEntity<StationResponse> createStation(@RequestBody final StationRequest stationRequest) {
-        StationResponse station = stationService.saveStation(stationRequest);
-        return ResponseEntity.created(URI.create("/stations/" + station.getId())).body(station);
+        Long stationId = stationService.saveStation(stationRequest);
+        Station findStation = stationService.findStationById(stationId);
+
+        return ResponseEntity.created(URI.create("/stations/" + stationId))
+                .body(StationResponse.from(findStation));
     }
 
-    @GetMapping("/stations")
+    @GetMapping
     public ResponseEntity<List<StationResponse>> showStations() {
-        return ResponseEntity.ok().body(stationService.findAllStations());
+        List<Station> findStations = stationService.findAllStations();
+
+        return ResponseEntity.ok()
+                .body(StationResponse.fromList(findStations));
     }
 
-    @DeleteMapping("/stations/{id}")
-    public ResponseEntity<Void> deleteStation(@PathVariable final Long id) {
-        stationService.deleteStationById(id);
+    @DeleteMapping("/{stationId}")
+    public ResponseEntity<Void> deleteStation(@PathVariable final Long stationId) {
+        stationService.deleteStationById(stationId);
+
         return ResponseEntity.noContent().build();
     }
 }

@@ -3,43 +3,43 @@ package subway.station.application;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.station.application.dto.request.StationRequest;
-import subway.station.application.dto.response.StationResponse;
 import subway.station.domain.Station;
-import subway.station.domain.StationRepository;
+import subway.station.domain.StationCommandRepository;
+import subway.station.domain.StationQueryRepository;
+import subway.station.exception.StationNotFoundException;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
 public class StationService {
-    private final StationRepository stationRepository;
 
-    public StationService(final StationRepository stationRepository) {
-        this.stationRepository = stationRepository;
+    private final StationQueryRepository stationQueryRepository;
+    private final StationCommandRepository stationCommandRepository;
+
+    public StationService(final StationQueryRepository stationQueryRepository,
+                          final StationCommandRepository stationCommandRepository) {
+        this.stationQueryRepository = stationQueryRepository;
+        this.stationCommandRepository = stationCommandRepository;
+    }
+
+    public List<Station> findAllStations() {
+        return stationQueryRepository.findAll();
+    }
+
+    public Station findStationById(final Long stationId) {
+        return stationQueryRepository.findById(stationId)
+                .orElseThrow(StationNotFoundException::new);
     }
 
     @Transactional
-    public StationResponse saveStation(final StationRequest stationRequest) {
-        Station station = stationRepository.save(new Station(stationRequest.getName()));
-        return createStationResponse(station);
-    }
-
-    public List<StationResponse> findAllStations() {
-        return stationRepository.findAll().stream()
-                .map(this::createStationResponse)
-                .collect(Collectors.toList());
+    public Long saveStation(final StationRequest stationRequest) {
+        Station station = stationCommandRepository.save(new Station(stationRequest.getName()));
+        return station.getId();
     }
 
     @Transactional
-    public void deleteStationById(final Long id) {
-        stationRepository.deleteById(id);
-    }
-
-    private StationResponse createStationResponse(final Station station) {
-        return new StationResponse(
-                station.getId(),
-                station.getName()
-        );
+    public void deleteStationById(final Long stationId) {
+        stationCommandRepository.deleteById(stationId);
     }
 }

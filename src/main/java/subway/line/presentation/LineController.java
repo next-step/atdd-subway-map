@@ -1,6 +1,6 @@
 package subway.line.presentation;
 
-import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -8,14 +8,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import subway.line.application.LineService;
-import subway.line.application.dto.request.LineRequest;
+import subway.line.application.dto.request.LineCreateRequest;
 import subway.line.application.dto.request.LineUpdateRequest;
-import subway.line.application.dto.response.LineCreateResponse;
 import subway.line.application.dto.response.LineResponse;
+import subway.line.domain.Line;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -29,30 +29,42 @@ class LineController {
     }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    LineCreateResponse createLine(@RequestBody final LineRequest lineRequest) {
-        return lineService.saveLine(lineRequest);
+    ResponseEntity<LineResponse> createLine(@RequestBody final LineCreateRequest lineCreateRequest) {
+        Long lineId = lineService.saveLine(lineCreateRequest);
+        Line findLine = lineService.findLineById(lineId);
+
+        return ResponseEntity.created(URI.create("/lines/" + lineId))
+                .body(LineResponse.from(findLine));
     }
 
     @GetMapping
-    List<LineResponse> showLines() {
-        return lineService.findAllLines();
+    ResponseEntity<List<LineResponse>> showLines() {
+        List<Line> findLines = lineService.findAllLines();
+
+        return ResponseEntity.ok()
+                .body(LineResponse.fromList(findLines));
     }
 
     @GetMapping("/{lineId}")
-    LineResponse showLine(@PathVariable final Long lineId) {
-        return lineService.findLineById(lineId);
+    ResponseEntity<LineResponse> showLine(@PathVariable final Long lineId) {
+        Line findLine = lineService.findLineById(lineId);
+
+        return ResponseEntity.ok()
+                .body(LineResponse.from(findLine));
     }
 
     @PutMapping("/{lineId}")
-    void updateLine(@PathVariable final Long lineId,
-                    @RequestBody final LineUpdateRequest lineUpdateRequest) {
+    ResponseEntity<Void> updateLine(@PathVariable final Long lineId,
+                                    @RequestBody final LineUpdateRequest lineUpdateRequest) {
         lineService.updateLine(lineId, lineUpdateRequest);
+
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{lineId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    void deleteLine(@PathVariable final Long lineId) {
+    ResponseEntity<Void> deleteLine(@PathVariable final Long lineId) {
         lineService.deleteLine(lineId);
+
+        return ResponseEntity.noContent().build();
     }
 }

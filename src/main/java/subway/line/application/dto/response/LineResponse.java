@@ -6,6 +6,7 @@ import subway.line.domain.Line;
 import subway.station.domain.Station;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 public class LineResponse {
@@ -33,5 +34,11 @@ public class LineResponse {
                         line.getUpStation(),
                         line.getDownStation()))
                 .build();
+    }
+
+    public static List<LineResponse> fromList(final List<Line> lines) {
+        return lines.stream()
+                .map(LineResponse::from)
+                .collect(Collectors.toList());
     }
 }

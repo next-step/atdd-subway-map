@@ -2,65 +2,62 @@ package subway.line.application;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import subway.line.application.dto.request.LineRequest;
+import subway.line.application.dto.request.LineCreateRequest;
 import subway.line.application.dto.request.LineUpdateRequest;
-import subway.line.application.dto.response.LineCreateResponse;
-import subway.line.application.dto.response.LineResponse;
 import subway.line.domain.Line;
-import subway.line.domain.LineQuery;
-import subway.line.domain.LineRepository;
+import subway.line.domain.LineCommandRepository;
+import subway.line.domain.LineQueryRepository;
+import subway.line.exception.LineNotFoundException;
+import subway.station.application.StationService;
 import subway.station.domain.Station;
-import subway.station.domain.StationQuery;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
 public class LineService {
 
-    private final LineRepository lineRepository;
-    private final LineQuery lineQuery;
-    private final StationQuery stationQuery;
+    private final LineQueryRepository lineQueryRepository;
+    private final LineCommandRepository lineCommandRepository;
+    private final StationService stationService;
 
-    public LineService(final LineRepository lineRepository, final LineQuery lineQuery,
-                       final StationQuery stationQuery) {
-        this.lineRepository = lineRepository;
-        this.lineQuery = lineQuery;
-        this.stationQuery = stationQuery;
+    public LineService(final LineQueryRepository lineQueryRepository,
+                       final LineCommandRepository lineCommandRepository,
+                       final StationService stationService) {
+        this.lineQueryRepository = lineQueryRepository;
+        this.lineCommandRepository = lineCommandRepository;
+        this.stationService = stationService;
     }
 
-    public List<LineResponse> findAllLines() {
-        return lineQuery.findAll().stream()
-                .map(LineResponse::from)
-                .collect(Collectors.toList());
+
+    public List<Line> findAllLines() {
+        return lineQueryRepository.findAll();
     }
 
-    public LineResponse findLineById(final Long lineId) {
-        Line line = lineQuery.findById(lineId);
-
-        return LineResponse.from(line);
+    public Line findLineById(final Long lineId) {
+        return lineQueryRepository.findById(lineId)
+                .orElseThrow(LineNotFoundException::new);
     }
 
     @Transactional
-    public LineCreateResponse saveLine(final LineRequest lineRequest) {
-        Station upStation = stationQuery.findById(lineRequest.getUpStationId());
-        Station downStation = stationQuery.findById(lineRequest.getDownStationId());
+    public Long saveLine(final LineCreateRequest lineCreateRequest) {
+        Station upStation = stationService.findStationById(lineCreateRequest.getUpStationId());
+        Station downStation = stationService.findStationById(lineCreateRequest.getDownStationId());
 
-        Line line = lineRepository.save(lineRequest.toEntity(upStation, downStation));
+        Line line = lineCommandRepository.save(lineCreateRequest.toEntity(upStation, downStation));
 
-        return LineCreateResponse.from(line);
+        return line.getId();
     }
 
     @Transactional
     public void updateLine(final Long lineId, final LineUpdateRequest lineUpdateRequest) {
-        Line line = lineQuery.findById(lineId);
+        Line line = findLineById(lineId);
 
         line.updateLine(lineUpdateRequest.toEntity());
     }
 
     @Transactional
     public void deleteLine(final Long lineId) {
-        lineRepository.deleteById(lineId);
+        lineCommandRepository.deleteById(lineId);
     }
 }
