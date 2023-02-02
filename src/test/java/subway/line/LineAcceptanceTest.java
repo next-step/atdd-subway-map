@@ -13,6 +13,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import subway.line.dto.LineRequest;
 import subway.line.dto.LineResponse;
 import subway.station.dto.StationResponse;
+import subway.util.assertUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -137,7 +138,7 @@ public class LineAcceptanceTest {
         ExtractableResponse<Response> lineResponse = 지하철노선을_수정한다(이호선.getId(), 이호선_update_request);
 
         // then
-        assertHttpStatus(lineResponse.statusCode(), HttpStatus.OK.value());
+        assertUtils.assertHttpStatus(lineResponse.statusCode(), HttpStatus.OK.value());
 
         // then
         ExtractableResponse<Response> updateLineResponse = 특정_지하철노선을_조회한다(이호선.getId());
@@ -167,7 +168,7 @@ public class LineAcceptanceTest {
         ExtractableResponse<Response> lineResponse = 지하철노선을_삭제한다(이호선.getId());
 
         // then
-        assertHttpStatus(lineResponse.statusCode(), HttpStatus.NO_CONTENT.value());
+        assertUtils.assertHttpStatus(lineResponse.statusCode(), HttpStatus.NO_CONTENT.value());
 
         // then
         var linesResponseLastest = 지하철노선을_조회한다();
@@ -184,7 +185,7 @@ public class LineAcceptanceTest {
                 .get();
     }
 
-    private ExtractableResponse<Response> 지하철노선을_생성한다(LineRequest request) {
+    private static ExtractableResponse<Response> 지하철노선을_생성한다(LineRequest request) {
         return RestAssured.given().log().all()
                 .body(request)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -201,7 +202,7 @@ public class LineAcceptanceTest {
                 .extract();
     }
 
-    private ExtractableResponse<Response> 특정_지하철노선을_조회한다(Long id) {
+    private static ExtractableResponse<Response> 특정_지하철노선을_조회한다(Long id) {
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().get(String.format("/lines/%d", id))
@@ -226,27 +227,28 @@ public class LineAcceptanceTest {
                 .extract();
     }
 
-    private LineResponse 지하철노선이_생성됨(LineRequest request) {
+    public static LineResponse 지하철노선이_생성됨(LineRequest request) {
         ExtractableResponse<Response> response = 지하철노선을_생성한다(request);
         지하철노선이_정상적으로_생성(response);
         return response.as(LineResponse.class);
     }
 
-    private void 지하철노선이_정상적으로_생성(ExtractableResponse<Response> response) {
-        assertHttpStatus(response.statusCode(), HttpStatus.CREATED.value());
+    private static void 지하철노선이_정상적으로_생성(ExtractableResponse<Response> response) {
+        assertUtils.assertHttpStatus(response.statusCode(), HttpStatus.CREATED.value());
     }
 
     private List<LineResponse> 지하철노선_목록이_정상적으로_조회(ExtractableResponse<Response> response) {
-        assertHttpStatus(response.statusCode(), HttpStatus.OK.value());
+        assertUtils.assertHttpStatus(response.statusCode(), HttpStatus.OK.value());
         return response.jsonPath().getList(".", LineResponse.class);
     }
 
-    private LineResponse 지하철노선이_정상적으로_조회(ExtractableResponse<Response> response) {
-        assertHttpStatus(response.statusCode(), HttpStatus.OK.value());
+    private static LineResponse 지하철노선이_정상적으로_조회(ExtractableResponse<Response> response) {
+        assertUtils.assertHttpStatus(response.statusCode(), HttpStatus.OK.value());
         return response.as(LineResponse.class);
     }
 
-    private void assertHttpStatus(int actualHttpStatus, int expectHttpStatus) {
-        assertThat(actualHttpStatus).isEqualTo(expectHttpStatus);
+    public static LineResponse 지하철노선이_조회됨(Long id) {
+        ExtractableResponse<Response> lineResponse = 특정_지하철노선을_조회한다(id);
+        return 지하철노선이_정상적으로_조회(lineResponse);
     }
 }

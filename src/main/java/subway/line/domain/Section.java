@@ -55,8 +55,8 @@ public class Section {
         this.distance = distance;
     }
 
-    public static Section of (Line line, Station upStation, Station downStation, Long distance) {
-        return new Section(line, upStation, downStation, distance);
+    public static Section of (Station upStation, Station downStation, Long distance) {
+        return new Section(upStation, downStation, distance);
     }
 
     public void addLine(Line line) {

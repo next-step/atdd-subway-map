@@ -63,8 +63,8 @@ public class LineService {
         Line line = lineRepository.findById(id).orElseThrow(RuntimeException::new);
         Station upStation = stationService.findById(sectionRequest.getUpStationId());
         Station downStation = stationService.findById(sectionRequest.getDownStationId());
+        Section section = Section.of(upStation, downStation, sectionRequest.getDistance());
 
-        Section section = Section.of(line, upStation, downStation, sectionRequest.getDistance());
         line.addSection(section);
     }
 }
