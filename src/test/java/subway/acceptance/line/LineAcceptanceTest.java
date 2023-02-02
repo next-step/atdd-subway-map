@@ -1,9 +1,12 @@
 package subway.acceptance.line;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
+import subway.acceptance.util.DatabaseCleanup;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static subway.acceptance.common.handler.HttpStatusValidationHandler.*;
@@ -14,9 +17,18 @@ import static subway.acceptance.common.handler.BodyJsonPathHandler.*;
 
 
 @DisplayName("지하철 노선 관련 기능")
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@ActiveProfiles("acceptance")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {
+
+    @Autowired
+    private DatabaseCleanup databaseCleanup;
+
+    @AfterEach
+    void cleanUp() {
+        databaseCleanup.afterPropertiesSet();
+        databaseCleanup.execute();
+    }
 
     /**
      * When 지하철 노선을 생성하면
