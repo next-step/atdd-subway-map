@@ -28,17 +28,12 @@ public class LineService {
         Optional<Station> downStation = stationRepository.findById(request.getDownStationId());
         Optional<Station> upStation = stationRepository.findById(request.getUpStationId());
 
-        if (downStation.isPresent()) {
-            line.addStation(downStation.get());
-        } else {
-            line.updateDownStationId(0L);
+        if (downStation.isEmpty() || upStation.isEmpty()) {
+            throw new DomainException(DomainExceptionType.NO_STATION);
         }
 
-        if (upStation.isPresent()) {
-            line.addStation(upStation.get());
-        } else {
-            line.updateUpStationId(0L);
-        }
+        line.addStation(downStation.get());
+        line.addStation(upStation.get());
 
         return LineResponse.entityToResponse(line);
     }
