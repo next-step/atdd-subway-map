@@ -30,8 +30,8 @@ class LineAcceptanceTest {
         Map<String, String> secondParam = new HashMap<>();
         secondParam.put("name", "덕소역");
 
-        StationAcceptanceTest.createStation(firstParam);
-        StationAcceptanceTest.createStation(secondParam);
+        StationAcceptanceTest.지하철역_생성(firstParam);
+        StationAcceptanceTest.지하철역_생성(secondParam);
     }
 
     /**
