@@ -1,13 +1,13 @@
-package subway.stationline.dto;
+package subway.line.dto;
 
-public class StationLineStationReadListResponse {
+public class LineStationReadResponse {
     private Long id;
     private String name;
 
-    public StationLineStationReadListResponse() {
+    public LineStationReadResponse() {
     }
 
-    public StationLineStationReadListResponse(Long id, String name) {
+    public LineStationReadResponse(Long id, String name) {
         this.id = id;
         this.name = name;
     }

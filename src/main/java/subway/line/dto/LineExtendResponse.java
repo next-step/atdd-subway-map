@@ -1,6 +1,6 @@
-package subway.stationline.dto;
+package subway.line.dto;
 
-public class StationLineExtendResponse {
+public class LineExtendResponse {
     private Long id;
     private String name;
     private String color;
@@ -8,10 +8,10 @@ public class StationLineExtendResponse {
     private Long downStationId;
     private Long distance;
 
-    public StationLineExtendResponse() {
+    public LineExtendResponse() {
     }
 
-    public StationLineExtendResponse(Long id, String name, String color, Long upStationId, Long downStationId, Long distance) {
+    public LineExtendResponse(Long id, String name, String color, Long upStationId, Long downStationId, Long distance) {
         this.id = id;
         this.name = name;
         this.color = color;

@@ -21,7 +21,7 @@ import static subway.StationUtils.*;
 @DisplayName("지하철 역 노선 관련 기능")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class StationLineAcceptanceTest {
+public class LineAcceptanceTest {
     Map<String, Object> SIN_BUN_DANG_STATION_LINE = new HashMap<>();
     Map<String, Object> ONE_STATION_LINE = new HashMap<>();
 

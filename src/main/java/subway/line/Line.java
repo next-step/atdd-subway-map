@@ -1,11 +1,9 @@
-package subway.stationline;
-
-import subway.stationline.dto.StationLineInterface;
+package subway.line;
 
 import javax.persistence.*;
 
 @Entity
-public class StationLine {
+public class Line {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -20,10 +18,10 @@ public class StationLine {
     @Column(nullable = false)
     private Long distance;
 
-    public StationLine() {
+    public Line() {
     }
 
-    public StationLine(String name, String color, Long upStationId, Long downStationId, Long distance) {
+    public Line(String name, String color, Long upStationId, Long downStationId, Long distance) {
         this.name = name;
         this.color = color;
         this.upStationId = upStationId;
@@ -31,7 +29,7 @@ public class StationLine {
         this.distance = distance;
     }
 
-    public void updateNameAndColor(StationLine other) {
+    public void updateNameAndColor(Line other) {
         this.name = other.getName();
         this.color = other.getColor();
     }

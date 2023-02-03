@@ -1,14 +1,14 @@
-package subway.stationline.dto;
+package subway.line.dto;
 
-public class StationLineExtendRequest {
+public class LineExtendRequest {
     private Long upStationId;
     private Long downStationId;
     private Long distance;
 
-    public StationLineExtendRequest() {
+    public LineExtendRequest() {
     }
 
-    public StationLineExtendRequest(Long upStationId, Long downStationId, Long distance) {
+    public LineExtendRequest(Long upStationId, Long downStationId, Long distance) {
         this.upStationId = upStationId;
         this.downStationId = downStationId;
         this.distance = distance;
