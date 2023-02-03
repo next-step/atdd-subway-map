@@ -1,14 +1,19 @@
 package subway.Acceptance;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.jdbc.Sql;
-
-import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD;
+import org.springframework.test.context.ActiveProfiles;
+import subway.utils.DatabaseCleanup;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@DirtiesContext(classMode = BEFORE_EACH_TEST_METHOD)
-@Sql("/stations.sql")
+@ActiveProfiles("acceptance")
 public class AcceptanceTest {
+    @Autowired
+    private DatabaseCleanup databaseCleanup;
 
+    @BeforeEach
+    void setDatabaseCleanup() {
+        databaseCleanup.execute();
+    }
 }
