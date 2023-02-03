@@ -18,6 +18,8 @@ import javax.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import subway.exception.SectionErrorCode;
+import subway.exception.SectionRegisterException;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -86,6 +88,14 @@ public class SubwayLine {
 	}
 
 	public void updateSection(Section section) {
+		if (!section.isEqualUpStation(this.downStation)) {
+			throw new SectionRegisterException(SectionErrorCode.INVALID_SECTION_UP_STATION);
+		}
+
+		if (sections.hasStation(section.getDownStation())) {
+			throw new SectionRegisterException(SectionErrorCode.ALREADY_STATION_REGISTERED);
+		}
+
 		this.downStation = section.getDownStation();
 
 		section.connectSubwayLine(this);

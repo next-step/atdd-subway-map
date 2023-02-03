@@ -67,6 +67,10 @@ public class Section {
 		return this.upStation.equals(station);
 	}
 
+	public boolean hasStation(Station target) {
+		return this.upStation.equals(target) || this.downStation.equals(target);
+	}
+
 	public void connectSubwayLine(SubwayLine subwayLine) {
 		this.subwayLine = subwayLine;
 	}

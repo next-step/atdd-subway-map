@@ -20,4 +20,6 @@ public class StationFixtures {
 	public static final Long STATION_ID_2 = 2L;
 	public static final Long STATION_ID_3 = 3L;
 
+	public static final Long STATION_ID_4 = 4L;
+
 }
