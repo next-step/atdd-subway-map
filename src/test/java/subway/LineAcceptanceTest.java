@@ -95,4 +95,39 @@ class LineAcceptanceTest {
             .getList("$");
         assertThat(lines).hasSize(2);
     }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 조회하면
+     * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
+     */
+    @DisplayName("지하철 노선을 조회한다.")
+    @Test
+    void 지하철_노선을_생성하고_생성한_노선을_조회하면_생성한_노선_정보를_응답받는다() {
+        // Given
+        Map<String, Object> params = new HashMap<>();
+        params.put("name", "신분당선");
+        params.put("color", "bg-red-600");
+        params.put("upStationId", 1);
+        params.put("downStationId", 2);
+        params.put("distance", 10);
+
+        Long lineId = RestAssured.given().log().all()
+            .body(params)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().post("/lines")
+            .then().log().all()
+            .extract().jsonPath().getLong("id");
+
+        // When
+        ExtractableResponse<Response> response =
+            RestAssured.given().pathParam("id", lineId).log().all()
+                .when().get("/lines")
+                .then().log().all()
+                .extract();
+
+        // Then
+        String lineName = response.jsonPath().getString("name");
+        assertThat(lineName).isEqualTo("신분당선");
+    }
 }
