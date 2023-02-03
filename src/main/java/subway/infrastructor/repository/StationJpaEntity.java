@@ -11,7 +11,7 @@ public class StationJpaEntity {
     @Column(length = 20, nullable = false)
     private String name;
 
-    public StationJpaEntity() {
+    protected StationJpaEntity() {
     }
 
     public StationJpaEntity(String name) {
