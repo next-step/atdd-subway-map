@@ -8,7 +8,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import subway.domain.Station;
 import subway.domain.SubwayLine;
-import subway.domain.SubwayLineStationGroup;
 
 public class SubwayLineResponse {
 
@@ -28,12 +27,12 @@ public class SubwayLineResponse {
 			this.id = subwayLine.getId();
 			this.name = subwayLine.getName();
 			this.color = subwayLine.getColor();
-			this.stations = toStationInfos(subwayLine.getSubwayLineStationGroups());
+			this.stations = toStationInfo(subwayLine.getUpAndDownStations());
 		}
 
-		private static List<StationInfo> toStationInfos(List<SubwayLineStationGroup> subwayLineStationGroups) {
-			return subwayLineStationGroups.stream()
-				.map(subwayLineStationGroup -> new StationInfo(subwayLineStationGroup.getStation()))
+		private List<StationInfo> toStationInfo(List<Station> stations) {
+			return stations.stream()
+				.map(StationInfo::new)
 				.collect(Collectors.toUnmodifiableList());
 		}
 	}
@@ -66,14 +65,17 @@ public class SubwayLineResponse {
 			this.id = subwayLine.getId();
 			this.name = subwayLine.getName();
 			this.color = subwayLine.getColor();
-			this.stations = toStationInfos(subwayLine.getSubwayLineStationGroups());
+
+			this.stations = toStationInfos(subwayLine);
 		}
 
-		private static List<StationInfo> toStationInfos(List<SubwayLineStationGroup> subwayLineStationGroups) {
-			return subwayLineStationGroups.stream()
-				.map(subwayLineStationGroup -> new StationInfo(subwayLineStationGroup.getStation()))
+		private List<StationInfo> toStationInfos(SubwayLine subwayLine) {
+			return subwayLine.getUpAndDownStations()
+				.stream()
+				.map(StationInfo::new)
 				.collect(Collectors.toUnmodifiableList());
 		}
+
 	}
 
 	@Getter

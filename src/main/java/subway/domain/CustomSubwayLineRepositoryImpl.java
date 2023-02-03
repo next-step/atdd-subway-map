@@ -1,13 +1,12 @@
 package subway.domain;
 
-import static subway.domain.QStation.*;
+import static subway.domain.QSection.*;
 import static subway.domain.QSubwayLine.*;
-import static subway.domain.QSubwayLineStationGroup.*;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
@@ -21,12 +20,14 @@ public class CustomSubwayLineRepositoryImpl implements CustomSubwayLineRepositor
 
 	@Override
 	public List<SubwayLineResponse.LineInfo> findSubwayLineProjectionAll() {
-		List<SubwayLine> subwayLines = findSubwayLineQuery().distinct()
+		return queryFactory
+			.select(
+				Projections.constructor(
+					SubwayLineResponse.LineInfo.class,
+					subwayLine
+				)
+			).from(subwayLine)
 			.fetch();
-
-		return subwayLines.stream()
-			.map(SubwayLineResponse.LineInfo::new)
-			.collect(Collectors.toUnmodifiableList());
 	}
 
 	@Override
@@ -39,16 +40,16 @@ public class CustomSubwayLineRepositoryImpl implements CustomSubwayLineRepositor
 
 	@Override
 	public Optional<SubwayLine> findSubwayLineById(Long id) {
-		SubwayLine findSubwayLine = findSubwayLineQuery().where(subwayLine.id.eq(id))
+		SubwayLine findSubwayLine = findSubwayLineQuery()
+			.innerJoin(subwayLine.sections.sections, section)
+			.fetchJoin()
+			.where(subwayLine.id.eq(id))
 			.fetchOne();
 
 		return findSubwayLine == null ? Optional.empty() : Optional.of(findSubwayLine);
 	}
 
 	private JPAQuery<SubwayLine> findSubwayLineQuery() {
-		return queryFactory.selectFrom(subwayLine)
-			.innerJoin(subwayLine.subwayLineStationGroups, subwayLineStationGroup)
-			.fetchJoin()
-			.innerJoin(subwayLineStationGroup.station, station);
+		return queryFactory.selectFrom(subwayLine);
 	}
 }

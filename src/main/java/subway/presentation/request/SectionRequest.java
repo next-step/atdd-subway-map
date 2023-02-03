@@ -1,10 +1,15 @@
 package subway.presentation.request;
 
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import subway.application.Section;
+import subway.domain.Section;
+import subway.domain.Station;
 
 public class SectionRequest {
 
@@ -12,9 +17,9 @@ public class SectionRequest {
 	@NoArgsConstructor(access = AccessLevel.PRIVATE)
 	public static class Create {
 
-		private Long downStationId;
-
 		private Long upStationId;
+
+		private Long downStationId;
 
 		private int distance;
 
@@ -25,8 +30,13 @@ public class SectionRequest {
 			this.distance = distance;
 		}
 
-		public Section toEntity() {
-			return new Section(upStationId, downStationId, distance);
+		@JsonIgnore
+		public List<Long> getUpAndDownStationIds() {
+			return List.of(upStationId, downStationId);
+		}
+
+		public Section toEntity(List<Station> stations) {
+			return new Section(upStationId, downStationId, distance, stations);
 		}
 	}
 }

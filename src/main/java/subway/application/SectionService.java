@@ -1,16 +1,18 @@
 package subway.application;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import subway.domain.Section;
 import subway.domain.SectionRepository;
 import subway.domain.Station;
 import subway.domain.StationRepository;
 import subway.domain.SubwayLine;
 import subway.domain.SubwayLineRepository;
 import subway.exception.NotFoundSectionException;
-import subway.exception.NotFoundStationException;
 import subway.exception.NotFoundSubwayLineException;
 import subway.exception.SectionErrorCode;
 import subway.exception.SubwayLineErrorCode;
@@ -31,13 +33,11 @@ public class SectionService {
 		SubwayLine subwayLine = subwayLineRepository.findSubwayLineById(subwayLineId)
 			.orElseThrow(() -> new NotFoundSubwayLineException(SubwayLineErrorCode.NOT_FOUND_SUBWAY_LINE));
 
-		Section section = sectionRepository.save(createRequest.toEntity());
+		List<Station> upAndDownStations = stationRepository.findByIdIn(createRequest.getUpAndDownStationIds());
 
-		Station newDownStation = stationRepository.findById(section.getDownStationId())
-			.orElseThrow(() -> new NotFoundStationException(SectionErrorCode.NOT_FOUND_STATION));
+		Section section = sectionRepository.save(createRequest.toEntity(upAndDownStations));
 
-		subwayLine.exchangeDownStation(section, newDownStation);
-
+		subwayLine.updateSection(section);
 		return section.getId();
 	}
 
@@ -49,10 +49,11 @@ public class SectionService {
 		SubwayLine subwayLine = subwayLineRepository.findSubwayLineById(subwayLineId)
 			.orElseThrow(() -> new NotFoundSubwayLineException(SubwayLineErrorCode.NOT_FOUND_SUBWAY_LINE));
 
-		subwayLine.validatePossibleRemove(section);
-
-		Station newDownStation = stationRepository.findById(section.getUpStationId())
-			.orElseThrow(() -> new NotFoundStationException(SectionErrorCode.NOT_FOUND_STATION));
-		subwayLine.removeSection(section, newDownStation);
+		// subwayLine.removeSection(section);
+		// subwayLine.validatePossibleRemove(section);
+		//
+		// Station newDownStation = stationRepository.findById(section.getUpStationId())
+		// 	.orElseThrow(() -> new NotFoundStationException(SectionErrorCode.NOT_FOUND_STATION));
+		// subwayLine.removeSection(section, newDownStation);
 	}
 }
