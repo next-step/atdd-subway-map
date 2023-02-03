@@ -4,6 +4,7 @@ import subway.line.dto.LineRequest;
 import subway.station.domain.Station;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 public class Line {
@@ -17,34 +18,25 @@ public class Line {
     @Column
     private String color;
 
-    @Column
-    private Long distance;
-
-    @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "up_station_id")
-    private Station upStation;
-
-    @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "down_station_id")
-    private Station downStation;
+    @Embedded
+    private Sections sections = new Sections();
 
     protected Line() {
     }
 
-    public Line(String name, String color, Long distance, Station upStation, Station downStation) {
+    public Line(String name, String color) {
         this.name = name;
         this.color = color;
-        this.distance = distance;
-        this.upStation = upStation;
-        this.downStation = downStation;
     }
 
-    public static Line of(LineRequest request, Station upStation, Station downStation) {
-        return new Line(request.getName(),
-                        request.getColor(),
-                        request.getDistance(),
-                        upStation,
-                        downStation);
+    public Line(String name, String color, List<Section> sections) {
+        this.name = name;
+        this.color = color;
+        this.sections = new Sections(sections);
+    }
+
+    public static Line of(LineRequest request) {
+        return new Line(request.getName(), request.getColor());
     }
 
     public Long getId() {
@@ -59,19 +51,15 @@ public class Line {
         return color;
     }
 
-    public Long getDistance() {
-        return distance;
+    public List<Section> getSections() {
+        return sections.getSections();
     }
 
-    public Station getUpStation() {
-        return upStation;
+    public List<Long> getStationIds() {
+        return sections.getStationIds();
     }
 
-    public Station getDownStation() {
-        return downStation;
-    }
-
-    public void update(LineRequest request, Station upStation, Station downStation) {
+    public void update(LineRequest request) {
         if(!name.equals(request.getName())) {
             this.name = request.getName();
         }
@@ -79,17 +67,14 @@ public class Line {
         if(!color.equals(request.getColor())) {
             this.color = request.getColor();
         }
+    }
 
-        if(!distance.equals(request.getDistance())) {
-            this.distance = request.getDistance();
-        }
+    public void addSection(Section section) {
+        section.addLine(this);
+        sections.addSection(section);
+    }
 
-        if(!this.upStation.getId().equals(upStation.getId())) {
-            this.upStation = upStation;
-        }
-
-        if(!this.downStation.getId().equals(downStation.getId())) {
-            this.downStation = downStation;
-        }
+    public void deleteSection(Station station) {
+        sections.deleteSection(station);
     }
 }
