@@ -11,6 +11,7 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
+import subway.dto.LineTestDto;
 import subway.station.domain.station.Station;
 import subway.station.web.dto.SaveLineResponse;
 

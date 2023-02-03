@@ -1,5 +1,9 @@
-package subway;
+package subway.dto;
 
+import lombok.Builder;
+import lombok.Getter;
+
+@Getter
 public class LineTestDto {
     private final String lineName;
     private final String lineColor;
@@ -7,31 +11,12 @@ public class LineTestDto {
     private final Long downStationId;
     private final Long distance;
 
+    @Builder
     public LineTestDto(String lineName, String lineColor, Long upStationId, Long downStationId, Long distance) {
         this.lineName = lineName;
         this.lineColor = lineColor;
         this.upStationId = upStationId;
         this.downStationId = downStationId;
         this.distance = distance;
-    }
-
-    public String getLineName() {
-        return lineName;
-    }
-
-    public String getLineColor() {
-        return lineColor;
-    }
-
-    public Long getUpStationId() {
-        return upStationId;
-    }
-
-    public Long getDownStationId() {
-        return downStationId;
-    }
-
-    public Long getDistance() {
-        return distance;
     }
 }
