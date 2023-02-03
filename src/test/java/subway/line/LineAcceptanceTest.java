@@ -194,7 +194,7 @@ public class LineAcceptanceTest {
         assertThat(lines).hasSize(1);
         assertThat(lines).extracting(ID).containsExactly(id);
         assertThat(lines).extracting(COLOR).containsExactly(COLOR_VALUE1);
-        assertThat(lines).flatExtracting(STATIONS).extracting(NAME)
+        assertThat(lines).flatExtracting(STATIONS).extracting(NAME, String.class)
                 .contains(stationNames.toArray(new String[0]));
     }
 }
