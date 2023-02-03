@@ -1,4 +1,4 @@
-package subway.line.dto;
+package subway.dto.line;
 
 public class LineExtendRequest {
     private Long upStationId;

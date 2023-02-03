@@ -1,6 +1,6 @@
-package subway.line.dto;
+package subway.dto.line;
 
-import subway.line.Line;
+import subway.domain.Line;
 
 public class LineUpdateRequest {
     private String name;
