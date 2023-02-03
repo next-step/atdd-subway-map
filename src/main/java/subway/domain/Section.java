@@ -13,6 +13,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import subway.exception.InvalidSectionDistanceException;
@@ -20,6 +21,7 @@ import subway.exception.SectionErrorCode;
 
 @Getter
 @Entity
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Section {
 
@@ -27,6 +29,7 @@ public class Section {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@EqualsAndHashCode.Include
 	private Long id;
 
 	@ManyToOne
@@ -65,6 +68,10 @@ public class Section {
 
 	public boolean isEqualUpStation(Station station) {
 		return this.upStation.equals(station);
+	}
+
+	public boolean isEqualDownStation(Station station) {
+		return this.downStation.equals(station);
 	}
 
 	public boolean hasStation(Station target) {

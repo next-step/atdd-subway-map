@@ -20,6 +20,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import subway.exception.SectionErrorCode;
 import subway.exception.SectionRegisterException;
+import subway.exception.SectionRemoveException;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -88,17 +89,34 @@ public class SubwayLine {
 	}
 
 	public void updateSection(Section section) {
-		if (!section.isEqualUpStation(this.downStation)) {
-			throw new SectionRegisterException(SectionErrorCode.INVALID_SECTION_UP_STATION);
+		if (this.sections.hasStation(section.getDownStation())) {
+			throw new SectionRegisterException(SectionErrorCode.ALREADY_STATION_REGISTERED);
 		}
 
-		if (sections.hasStation(section.getDownStation())) {
-			throw new SectionRegisterException(SectionErrorCode.ALREADY_STATION_REGISTERED);
+		if (!section.isEqualUpStation(this.downStation)) {
+			throw new SectionRegisterException(SectionErrorCode.INVALID_SECTION_UP_STATION);
 		}
 
 		this.downStation = section.getDownStation();
 
 		section.connectSubwayLine(this);
-		sections.add(section);
+		this.sections.add(section);
+	}
+
+	public void removeSection(Station station) {
+		if (this.sections.haveOnlyUpAndDownFinalStation()) {
+			throw new SectionRemoveException(SectionErrorCode.INVALID_SECTION_REMOVE_BECAUSE_ONLY_ONE_SECTION);
+		}
+
+		if (isNotEqualsDownStation(station)) {
+			throw new SectionRemoveException(SectionErrorCode.INVALID_SECTION_REMOVE_BECAUSE_DOWN_STATION);
+		}
+
+		Section removedSection = this.sections.remove(station);
+		this.downStation = removedSection.getUpStation();
+	}
+
+	private boolean isNotEqualsDownStation(Station station) {
+		return !this.downStation.equals(station);
 	}
 }

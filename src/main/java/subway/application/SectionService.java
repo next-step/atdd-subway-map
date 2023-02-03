@@ -13,6 +13,7 @@ import subway.domain.StationRepository;
 import subway.domain.SubwayLine;
 import subway.domain.SubwayLineRepository;
 import subway.exception.NotFoundSectionException;
+import subway.exception.NotFoundStationException;
 import subway.exception.NotFoundSubwayLineException;
 import subway.exception.SectionErrorCode;
 import subway.exception.SubwayLineErrorCode;
@@ -43,17 +44,12 @@ public class SectionService {
 
 	@Transactional
 	public void deleteSection(Long subwayLineId, Long stationId) {
-		Section section = sectionRepository.findSectionByDownStationId(stationId)
-			.orElseThrow(() -> new NotFoundSectionException(SectionErrorCode.NOT_FOUND_SECTION));
+		Station station = stationRepository.findById(stationId)
+			.orElseThrow(() -> new NotFoundStationException(SubwayLineErrorCode.NOT_FOUND_STATION));
 
 		SubwayLine subwayLine = subwayLineRepository.findSubwayLineById(subwayLineId)
 			.orElseThrow(() -> new NotFoundSubwayLineException(SubwayLineErrorCode.NOT_FOUND_SUBWAY_LINE));
 
-		// subwayLine.removeSection(section);
-		// subwayLine.validatePossibleRemove(section);
-		//
-		// Station newDownStation = stationRepository.findById(section.getUpStationId())
-		// 	.orElseThrow(() -> new NotFoundStationException(SectionErrorCode.NOT_FOUND_STATION));
-		// subwayLine.removeSection(section, newDownStation);
+		subwayLine.removeSection(station);
 	}
 }

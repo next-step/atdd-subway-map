@@ -39,6 +39,6 @@ public class SectionController {
 
 		sectionService.deleteSection(lineId, stationId);
 
-		return ResponseEntity.ok().build();
+		return ResponseEntity.noContent().build();
 	}
 }
