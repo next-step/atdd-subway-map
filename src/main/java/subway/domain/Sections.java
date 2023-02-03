@@ -27,11 +27,11 @@ public class Sections {
             return;
         }
 
-        if (!newSection.getUpStation().equals(lastSection().getDownStation())) {
+        if (!newSection.addable(lastSection())) {
             throw new SubwayException("새로운 구간의 상행역은 해당 노선의 하행 종점역이어야 합니다.");
         }
 
-        if (stations().contains(newSection.getDownStation())) {
+        if (!newSection.addable(stations())) {
             throw new SubwayException("새로운 구간의 하행역이 해당 노선에 등록되어있습니다.");
         }
     }

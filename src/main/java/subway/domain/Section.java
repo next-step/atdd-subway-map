@@ -3,6 +3,7 @@ package subway.domain;
 import subway.exception.SubwayException;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 public class Section {
@@ -67,5 +68,13 @@ public class Section {
 
     public boolean isDownStationId(long stationId) {
         return downStation.getId() == stationId;
+    }
+
+    public boolean addable(Section lastSection) {
+        return upStation.equals(lastSection.downStation);
+    }
+
+    public boolean addable(List<Station> stations) {
+        return !stations.contains(this.downStation);
     }
 }

@@ -1,5 +1,6 @@
 package subway.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import subway.dto.line.LineRequest;
@@ -49,7 +50,7 @@ public class LineController {
     @PostMapping("/lines/{id}/sections")
     public ResponseEntity<Void> addSection(@PathVariable Long id, @RequestBody SectionRequest sectionRequest) {
         lineService.addSection(id, sectionRequest);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @DeleteMapping("/lines/{id}/sections")
