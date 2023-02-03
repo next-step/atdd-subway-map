@@ -3,7 +3,7 @@ package subway.web;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import subway.application.service.LineLoadUseCase;
+import subway.application.service.input.LineLoadUseCase;
 import subway.application.service.input.LineCommandUseCase;
 import subway.web.request.LineCreateRequest;
 import subway.web.request.LineUpdateRequest;

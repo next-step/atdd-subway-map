@@ -3,6 +3,7 @@ package subway.application.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.application.service.output.LineLoadRepository;
+import subway.application.service.input.LineLoadUseCase;
 import subway.domain.Line;
 import subway.domain.NotFoundLineException;
 

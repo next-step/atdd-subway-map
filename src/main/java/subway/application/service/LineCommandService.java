@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.application.service.input.LineCommandUseCase;
 import subway.application.service.output.LineCommandRepository;
+import subway.application.service.input.LineLoadUseCase;
 import subway.domain.*;
 import subway.infrastructor.repository.StationRepository;
 
