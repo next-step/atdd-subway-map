@@ -1,23 +1,27 @@
 package subway.Acceptance.line;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import subway.Acceptance.AcceptanceTest;
-import subway.dto.LineRequest;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static subway.Acceptance.AcceptanceTestFixture.BUN_DANG_LINE_REQUEST;
-import static subway.Acceptance.AcceptanceTestFixture.SHIN_BUN_DANG_LINE_REQUEST;
+import static subway.Acceptance.line.LineAcceptanceFixture.분당선_생성_요청;
+import static subway.Acceptance.line.LineAcceptanceFixture.신분당선_생성_요청;
+import static subway.Acceptance.line.LineAcceptanceStep.*;
+import static subway.Acceptance.station.StationAcceptanceStep.지하철역_생성_요청;
 
 @DisplayName("노선 관련 기능")
 public class LineAcceptanceTest extends AcceptanceTest {
+
+    @BeforeEach
+    void setStations() {
+        지하철역_생성_요청("강남역");
+        지하철역_생성_요청("역삼역");
+    }
 
     /**
      * When 지하철 노선을 생성하면
@@ -27,27 +31,14 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine() {
         // when
-        ExtractableResponse<Response> response = createLineResponse(SHIN_BUN_DANG_LINE_REQUEST);
+        ExtractableResponse<Response> createResponse = 노선_생성_요청(신분당선_생성_요청);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        노선_생성됨(createResponse);
 
         // then
-        List<String> lineNames =
-                RestAssured.given().log().all()
-                        .when().get("/lines")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
-        assertThat(lineNames).containsAnyOf("신분당선");
-    }
-
-    private ExtractableResponse<Response> createLineResponse(LineRequest lineRequest) {
-        return RestAssured.given().log().all()
-                .body(lineRequest)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = 노선_목록_조회_요청();
+        노선_목록_포함됨(response, List.of(createResponse));
     }
 
     /**
@@ -59,22 +50,14 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void showLines() {
         // given
-        createLineResponse(SHIN_BUN_DANG_LINE_REQUEST);
-        createLineResponse(BUN_DANG_LINE_REQUEST);
+        ExtractableResponse<Response> createResponse1 = 노선_생성_요청(신분당선_생성_요청);
+        ExtractableResponse<Response> createResponse2 = 노선_생성_요청(분당선_생성_요청);
 
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/lines")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = 노선_목록_조회_요청();
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-
-        // then
-        List<String> lineNames = response.jsonPath().getList("name", String.class);
-        assertThat(lineNames).containsAnyOf(SHIN_BUN_DANG_LINE_REQUEST.getName(), BUN_DANG_LINE_REQUEST.getName());
+        노선_목록_포함됨(response, List.of(createResponse1, createResponse2));
     }
 
     /**
@@ -86,24 +69,13 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void showLine() {
         // given
-        ExtractableResponse<Response> shinBunDang = createLineResponse(SHIN_BUN_DANG_LINE_REQUEST);
+        ExtractableResponse<Response> createResponse = 노선_생성_요청(신분당선_생성_요청);
 
         // when
-        long id = shinBunDang.jsonPath().getLong("id");
-        ExtractableResponse<Response> response = RestAssured.given()
-                .pathParam("id", id)
-                .log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/lines/{id}")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = 노선_조회_요청(createResponse);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-
-        // then
-        String lineName = response.jsonPath().getString("name");
-        assertThat(lineName).isEqualTo(SHIN_BUN_DANG_LINE_REQUEST.getName());
+        노선_조회됨(response);
     }
 
     /**
@@ -115,31 +87,13 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void modifyLine() {
         // given
-        ExtractableResponse<Response> shinBunDang = createLineResponse(SHIN_BUN_DANG_LINE_REQUEST);
+        ExtractableResponse<Response> createResponse = 노선_생성_요청(신분당선_생성_요청);
 
         // when
-        long id = shinBunDang.jsonPath().getLong("id");
-        ExtractableResponse<Response> response = RestAssured.given()
-                .pathParam("id", id)
-                .log().all()
-                .body(new LineRequest("당당선", "bg-red-500"))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().put("/lines/{id}")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = 노선_수정_요청(createResponse);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-
-        // then
-        String lineName = RestAssured.given()
-                .pathParam("id", id)
-                .log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/lines/{id}")
-                .then().log().all()
-                .extract().jsonPath().getString("name");
-        assertThat(lineName).isEqualTo("당당선");
+        노선_수정됨(response);
     }
 
     /**
@@ -151,30 +105,13 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        ExtractableResponse<Response> shinBunDang = createLineResponse(SHIN_BUN_DANG_LINE_REQUEST);
+        ExtractableResponse<Response> createResponse = 노선_생성_요청(신분당선_생성_요청);
 
         // when
-        long id = shinBunDang.jsonPath().getLong("id");
-        ExtractableResponse<Response> response = RestAssured.given()
-                .pathParam("id", id)
-                .log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().delete("/lines/{id}")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = 노선_삭제_요청(createResponse);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-
-        // then
-        List<String> lineNames = RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/lines")
-                .then().log().all()
-                .extract().jsonPath().getList("name", String.class);
-
-        // then
-        assertThat(lineNames).doesNotContain(SHIN_BUN_DANG_LINE_REQUEST.getName());
+        노선_삭제됨(response);
     }
 
 }
