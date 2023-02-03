@@ -20,7 +20,7 @@ public class LineService {
 	}
 
 	@Transactional
-	public LineResponse saveLine(LineRequest lineRequest) {
+	public LineResponse saveLine(LineCreateRequest lineRequest) {
 		Station upStation = stationRepository.findById(lineRequest.getUpStationsId()).orElseThrow(() -> new NullPointerException("Station doesn't exist"));
 		Station downStation = stationRepository.findById(lineRequest.getDownStationsId()).orElseThrow(() -> new NullPointerException("Station doesn't exist"));
 
@@ -40,12 +40,12 @@ public class LineService {
 
 	@Transactional(readOnly = true)
 	public LineResponse findLineById(Long id) {
-		return createLineResponse(lineRepository.findById(id).orElse(null));
+		return createLineResponse(lineRepository.findById(id).orElseThrow(() -> new NullPointerException("Line doesn't exist")));
 	}
 
 	@Transactional
 	public void updateLineById(Long id, LineUpdateRequest lineUpdateRequest) {
-		Line line = lineRepository.findById(id).orElse(null);
+		Line line = lineRepository.findById(id).orElseThrow(() -> new NullPointerException("Line doesn't exist"));
 		line.updateLine(lineUpdateRequest.getName(), lineUpdateRequest.getColor());
 	}
 
@@ -55,10 +55,6 @@ public class LineService {
 	}
 
 	private LineResponse createLineResponse(Line line) {
-		try {
-			return new LineResponse(line);
-		} catch (NullPointerException npe) {
-			throw new NullPointerException("Line doesn't exist");
-		}
+		return new LineResponse(line);
 	}
 }

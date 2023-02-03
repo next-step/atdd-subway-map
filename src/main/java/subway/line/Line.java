@@ -27,10 +27,10 @@ public class Line {
 	private String color;
 
 	@ManyToOne
-	private Station upStationId;
+	private Station upStation;
 
 	@ManyToOne
-	private Station downStationId;
+	private Station downStation;
 
 	@Column(length = 20, nullable = false)
 	private int distance;
@@ -41,8 +41,8 @@ public class Line {
 	public Line(String name, String color, Station upStationId, Station downStationId, int distance) {
 		this.name = name;
 		this.color = color;
-		this.upStationId = upStationId;
-		this.downStationId = downStationId;
+		this.upStation = upStationId;
+		this.downStation = downStationId;
 		this.distance = distance;
 	}
 
@@ -64,10 +64,7 @@ public class Line {
 	}
 
 	public List<Station> getStations() {
-		List<Station> stations = new ArrayList<>();
-		stations.add(upStationId);
-		stations.add(downStationId);
-		return stations;
+		return List.of(upStation, downStation);
 	}
 
 	public int getDistance() {

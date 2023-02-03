@@ -15,7 +15,7 @@ import org.springframework.test.context.jdbc.Sql;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import subway.line.LineRequest;
+import subway.line.LineCreateRequest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -31,13 +31,13 @@ public class LineAcceptanceTest {
 	@Test
 	void createLine() {
 		// when
-		LineRequest lineRequest = new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10);
-		createLine(lineRequest);
+		LineCreateRequest lineRequest = new LineCreateRequest("신분당선", "bg-red-600", 1L, 2L, 10);
+
+		long id = createLine(lineRequest).jsonPath().getLong("id");
 
 		// then
-		ExtractableResponse<Response> showResponse = showLines();
-		List<String> lineNames = showResponse.jsonPath().getList("name", String.class);
-		assertThat(lineNames).containsAnyOf("신분당선");
+		ExtractableResponse<Response> showResponse = showLineById(id);
+		assertThat(showResponse.jsonPath().getString("name")).isEqualTo("신분당선");
 	}
 
 	/**
@@ -49,8 +49,8 @@ public class LineAcceptanceTest {
 	@Test
 	void showLineList() {
 		// given
-		LineRequest lineRequest1 = new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10);
-		LineRequest lineRequest2 = new LineRequest("분당선", "bg-green-600", 1L, 3L, 10);
+		LineCreateRequest lineRequest1 = new LineCreateRequest("신분당선", "bg-red-600", 1L, 2L, 10);
+		LineCreateRequest lineRequest2 = new LineCreateRequest("분당선", "bg-green-600", 1L, 3L, 10);
 
 		createLine(lineRequest1);
 		createLine(lineRequest2);
@@ -73,7 +73,7 @@ public class LineAcceptanceTest {
 	@Test
 	void showLine() {
 		// given
-		LineRequest lineRequest = new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10);
+		LineCreateRequest lineRequest = new LineCreateRequest("신분당선", "bg-red-600", 1L, 2L, 10);
 
 		long id = createLine(lineRequest).jsonPath().getLong("id");
 
@@ -97,7 +97,7 @@ public class LineAcceptanceTest {
 	@Test
 	void updateLine() {
 		// given
-		LineRequest lineRequest = new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10);
+		LineCreateRequest lineRequest = new LineCreateRequest("신분당선", "bg-red-600", 1L, 2L, 10);
 
 		long id = createLine(lineRequest).jsonPath().getLong("id");
 
@@ -122,7 +122,7 @@ public class LineAcceptanceTest {
 	@Test
 	void deleteLine() {
 		// given
-		LineRequest lineRequest = new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10);
+		LineCreateRequest lineRequest = new LineCreateRequest("신분당선", "bg-red-600", 1L, 2L, 10);
 
 		long id = createLine(lineRequest).jsonPath().getLong("id");
 
@@ -133,7 +133,7 @@ public class LineAcceptanceTest {
 		assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
 	}
 
-	private ExtractableResponse<Response> createLine(LineRequest lineRequest) {
+	private ExtractableResponse<Response> createLine(LineCreateRequest lineRequest) {
 		ExtractableResponse<Response> response = RestAssured
 			.given().log().all()
 			.body(lineRequest)
@@ -201,21 +201,5 @@ public class LineAcceptanceTest {
 			.extract();
 
 		return afterDeleteResponse;
-	}
-
-	private ExtractableResponse<Response> createStation(String stationName) {
-		Map<String, String> params = new HashMap<>();
-		params.put("name", stationName);
-
-		ExtractableResponse<Response> response = RestAssured
-			.given().log().all()
-			.body(params)
-			.contentType(MediaType.APPLICATION_JSON_VALUE)
-			.when().post("/stations")
-			.then().log().all()
-			.extract();
-
-		assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-		return response;
 	}
 }
