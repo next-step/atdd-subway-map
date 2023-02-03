@@ -1,6 +1,6 @@
 package subway.domain;
 
-import subway.exception.SubwayException;
+import subway.exception.SectionException;
 
 import javax.persistence.*;
 import java.util.List;
@@ -38,7 +38,7 @@ public class Section {
 
     private void validate(Station upStation, Station downStation) {
         if (upStation.equals(downStation)) {
-            throw new SubwayException("상행역과 하행역은 같을 수 없습니다.");
+            throw new SectionException("상행역과 하행역이 같은 구간은 생성할 수 없습니다.");
         }
     }
 

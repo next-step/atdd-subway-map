@@ -8,13 +8,11 @@ import subway.domain.Station;
 import subway.dto.line.LineRequest;
 import subway.dto.line.LineResponse;
 import subway.dto.section.SectionRequest;
-import subway.exception.SubwayException;
+import subway.exception.NotFoundException;
 import subway.repository.LineRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static subway.exception.SubwayExceptionStatus.LINE_NOT_FOUND;
 
 @Service
 @Transactional(readOnly = true)
@@ -79,6 +77,6 @@ public class LineService {
 
     private Line findLine(Long id) {
         return lineRepository.findById(id)
-                .orElseThrow(() -> new SubwayException(LINE_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(id + " 노선을 찾을 수 없습니다."));
     }
 }
