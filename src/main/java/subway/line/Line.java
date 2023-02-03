@@ -108,4 +108,13 @@ public class Line {
     public List<Section> getSections() {
         return sections;
     }
+
+    public boolean isLastStationId(long upStationId) {
+        return getDownStation().getId() == upStationId;
+    }
+
+    public boolean hasStation(Station downStation) {
+        return getStations().stream()
+                .anyMatch(station -> station.equals(downStation));
+    }
 }

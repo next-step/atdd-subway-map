@@ -1,5 +1,7 @@
 package subway.section;
 
+import subway.exception.SectionAlreadyCreateStationException;
+import subway.exception.SectionUpStationNotMatchException;
 import subway.line.Line;
 import subway.sectionstation.SectionStation;
 import subway.station.Station;
@@ -32,6 +34,21 @@ public class Section {
         this.sectionStations.addAll(List.of(new SectionStation(this, upStation), new SectionStation(this, downStation)));
         this.distance = distance;
         this.line = line;
+    }
+
+    public Section(long upStationId, Station downStation, long distance, Line line) {
+        if (!line.isLastStationId(upStationId)) {
+            throw new SectionUpStationNotMatchException();
+        }
+        if (line.hasStation(downStation)) {
+            throw new SectionAlreadyCreateStationException();
+        }
+        Station sectionUpStation = line.getDownStation();
+        this.sectionStations.addAll(List.of(new SectionStation(this, sectionUpStation), new SectionStation(this, downStation)));
+        this.distance = distance;
+        this.line = line;
+        line.addSection(this);
+        line.plusDistance(distance);
     }
 
     public Long getId() {
