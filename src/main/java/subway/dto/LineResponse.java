@@ -1,12 +1,8 @@
 package subway.dto;
 
-import lombok.AllArgsConstructor;
 import subway.domain.Line;
-import subway.domain.Station;
-
 import java.util.List;
 
-@AllArgsConstructor
 public class LineResponse {
 
     private Long id;

@@ -112,14 +112,11 @@ public class LineAcceptanceTest {
 
         //When
         updateLine(updateId, 다른분당선_이름, 다른분당선_색);
-        String lineName = readLine(updateId)
-                .jsonPath().get("name");
-        String lineColor = readLine(updateId)
-                .jsonPath().get("color");
+        ExtractableResponse<Response> response = readLine(updateId);
 
         //Then
-        assertThat(lineName).isEqualTo(다른분당선_이름);
-        assertThat(lineColor).isEqualTo(다른분당선_색);
+        assertThat(response.jsonPath().getString("name")).isEqualTo(다른분당선_이름);
+        assertThat(response.jsonPath().getString("color")).isEqualTo(다른분당선_색);
     }
 
     /**
