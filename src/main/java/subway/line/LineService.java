@@ -1,12 +1,9 @@
 package subway.line;
 
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.exception.LineNotFoundException;
-import subway.section.Section;
 import subway.section.SectionRepository;
-import subway.section.SectionService;
 import subway.station.Station;
 import subway.station.StationResponse;
 import subway.station.StationService;

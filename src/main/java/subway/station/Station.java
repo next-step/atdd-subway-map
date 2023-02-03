@@ -1,6 +1,5 @@
 package subway.station;
 
-import subway.line.Line;
 import subway.section.Section;
 import subway.sectionstation.SectionStation;
 

@@ -8,7 +8,6 @@ import org.springframework.http.MediaType;
 import java.util.Map;
 
 import static subway.line.LineConstant.*;
-import static subway.line.LineConstant.BASE_URL;
 
 public class LineStep {
     public static ExtractableResponse<Response> deleteLine(long id) {

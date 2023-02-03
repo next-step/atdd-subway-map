@@ -7,14 +7,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
 import subway.common.AssertUtil;
 import subway.common.DataBaseCleanUp;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.station.StationConstant.*;
+import static subway.station.StationConstant.GANGNAM;
+import static subway.station.StationConstant.YANGJAE;
 import static subway.station.StationStep.*;
 
 @DisplayName("지하철역 관련 기능")

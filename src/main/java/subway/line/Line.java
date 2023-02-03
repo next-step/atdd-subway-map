@@ -5,7 +5,9 @@ import subway.section.Section;
 import subway.station.Station;
 
 import javax.persistence.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Entity

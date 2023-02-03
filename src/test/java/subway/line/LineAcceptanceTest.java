@@ -13,12 +13,9 @@ import org.springframework.test.context.TestExecutionListeners;
 import subway.common.AcceptanceTestTruncateListener;
 import subway.common.AssertUtil;
 import subway.exception.LineNotFoundException;
-import subway.station.StationAcceptanceTest;
-import subway.station.StationConstant;
 import subway.station.StationStep;
 
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static subway.line.LineConstant.*;
