@@ -19,9 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DisplayName("지하철 노선 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class LineAcceptanceTest {
+public class LineAcceptanceTest extends AcceptanceTest{
 	/**
 	 * When 지하철 노선을 생성하면
 	 * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다

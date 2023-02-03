@@ -19,9 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DisplayName("지하철역 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class StationAcceptanceTest {
+public class StationAcceptanceTest extends AcceptanceTest{
     /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다
