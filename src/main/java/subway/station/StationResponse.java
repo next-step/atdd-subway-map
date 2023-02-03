@@ -1,7 +1,6 @@
-package subway;
+package subway.station;
 
-public class
-StationResponse {
+public class StationResponse {
     private Long id;
     private String name;
 
