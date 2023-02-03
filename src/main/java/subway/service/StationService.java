@@ -3,6 +3,7 @@ package subway.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.domain.Station;
+import subway.exception.StationNotFoundException;
 import subway.repository.StationRepository;
 import subway.dto.StationRequest;
 import subway.dto.StationResponse;

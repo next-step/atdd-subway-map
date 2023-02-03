@@ -5,6 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 import subway.domain.Line;
 import subway.domain.Station;
 import subway.dto.StationResponse;
+import subway.exception.LineNotFoundException;
 import subway.exception.StationNotFoundException;
 import subway.repository.LineRepository;
 import subway.dto.LineRequest;
@@ -31,6 +32,8 @@ public class LineService {
 
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
+        validateStationsExist(lineRequest);
+
         Line line = lineRepository.save(new Line(
                 lineRequest.getName(),
                 lineRequest.getColor(),
@@ -41,6 +44,19 @@ public class LineService {
         return createLineResponse(line);
     }
 
+    private void validateStationsExist(LineRequest lineRequest) {
+        Long downStationId = lineRequest.getDownStationId();
+        Long upStationId = lineRequest.getUpStationId();
+
+        if (stationsNotExist(downStationId, upStationId)) {
+            throw new StationNotFoundException();
+        }
+    }
+
+    private boolean stationsNotExist(Long downStationId, Long upStationId) {
+        return (!stationRepository.existsById(downStationId)||!stationRepository.existsById(upStationId));
+    }
+
     public List<LineResponse> findAllLines() {
         return lineRepository.findAll().stream()
                 .map(this::createLineResponse)
@@ -48,7 +64,7 @@ public class LineService {
     }
 
     public LineResponse findById(Long id) {
-        Line line = lineRepository.findById(id).orElseThrow(IllegalArgumentException::new);
+        Line line = lineRepository.findById(id).orElseThrow(LineNotFoundException::new);
         return createLineResponse(line);
     }
 
