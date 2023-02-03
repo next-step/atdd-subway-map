@@ -1,9 +1,13 @@
 package subway.section;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import subway.line.Line;
+import subway.sectionstation.SectionStation;
+import subway.station.Station;
+
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 public class Section {
@@ -12,34 +16,48 @@ public class Section {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long upStationId;
+    @OneToMany(mappedBy = "section", cascade = CascadeType.ALL)
+    private List<SectionStation> sectionStations = new ArrayList<>();
 
-    private Long downStationId;
+    @ManyToOne
+    @JoinColumn
+    private Line line;
 
     private Long distance;
 
     public Section() {
     }
 
-    public Section(long upStationId, long downStationId, long distance) {
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
+    public Section(Station upStation, Station downStation, long distance, Line line) {
+        this.sectionStations.addAll(List.of(new SectionStation(this, upStation), new SectionStation(this, downStation)));
         this.distance = distance;
+        this.line = line;
     }
 
     public Long getId() {
         return id;
     }
 
-    public long getUpStationId() {
-        return upStationId;
+    public Station getUpStation() {
+        return sectionStations.get(0).getStation();
     }
 
-    public long getDownStationId() {
-        return downStationId;
+    public Station getDownStation() {
+        return sectionStations.get(sectionStations.size() - 1).getStation();
     }
 
     public long getDistance() {
         return distance;
+    }
+
+    public void changeLine(Line line) {
+        this.line = line;
+    }
+
+    public List<Station> getStations() {
+        return this.sectionStations.stream()
+                .map(SectionStation::getStation)
+                .distinct()
+                .collect(Collectors.toList());
     }
 }

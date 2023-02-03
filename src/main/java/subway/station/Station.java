@@ -1,8 +1,12 @@
 package subway.station;
 
 import subway.line.Line;
+import subway.section.Section;
+import subway.sectionstation.SectionStation;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Station {
@@ -14,9 +18,8 @@ public class Station {
     @Column(length = 20, nullable = false)
     private String name;
 
-    @ManyToOne
-    @JoinColumn(name = "line_id")
-    private Line line;
+    @OneToMany(mappedBy = "station")
+    private List<SectionStation> sectionStation = new ArrayList<>();
 
     public Station() {
     }
@@ -33,7 +36,7 @@ public class Station {
         return name;
     }
 
-    public void changeLine(Line line) {
-        this.line = line;
+    public void addSection(Section section) {
+        this.sectionStation.add(new SectionStation(section, this));
     }
 }

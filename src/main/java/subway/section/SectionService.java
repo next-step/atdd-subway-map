@@ -13,8 +13,8 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class SectionService {
     private final LineService lineService;
-    private final SectionRepository sectionRepository;
     private final StationService stationService;
+    private final SectionRepository sectionRepository;
 
     public SectionService(LineService lineService, SectionRepository sectionRepository, StationService stationService) {
         this.lineService = lineService;
@@ -34,13 +34,25 @@ public class SectionService {
                 request.getDownStationId() == station.getId())) {
             throw new IllegalArgumentException();
         }
-
         Station downStation = stationService.findStation(request.getDownStationId());
-        line.addStation(downStation);
+        Section section = new Section(lastStation, downStation, line.getDistance(), line);
+
+        line.addSection(section);
         line.plusDistance(request.getDistance());
 
-        Section section = new Section(request.getUpStationId(), request.getDownStationId(), line.getDistance());
         section = sectionRepository.save(section);
-        return new SectionResponse(section.getId(), section.getUpStationId(), section.getDownStationId(), section.getDistance());
+        return new SectionResponse(section.getId(), section.getUpStation().getId(), section.getDownStation().getId(), section.getDistance());
+    }
+
+    @Transactional
+    public void deleteSection(long lineId, long stationId) {
+        Line line = lineService.findOneById(lineId);
+        Station requestStation = stationService.findStation(stationId);
+        Station lineDownStation = line.getDownStation();
+        if (requestStation != lineDownStation || line.hasMinimumStations()) {
+            throw new IllegalArgumentException();
+        }
+        Section section = line.removeLastSection();
+        sectionRepository.delete(section);
     }
 }

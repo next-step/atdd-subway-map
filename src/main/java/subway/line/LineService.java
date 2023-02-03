@@ -4,6 +4,9 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.exception.LineNotFoundException;
+import subway.section.Section;
+import subway.section.SectionRepository;
+import subway.section.SectionService;
 import subway.station.Station;
 import subway.station.StationResponse;
 import subway.station.StationService;
@@ -16,10 +19,12 @@ import java.util.stream.Collectors;
 public class LineService {
     private final LineRepository lineRepository;
     private final StationService stationService;
+    private final SectionRepository sectionRepository;
 
-    public LineService(LineRepository lineRepository, StationService stationService) {
+    public LineService(LineRepository lineRepository, StationService stationService, SectionRepository sectionRepository) {
         this.lineRepository = lineRepository;
         this.stationService = stationService;
+        this.sectionRepository = sectionRepository;
     }
 
     @Transactional
@@ -30,9 +35,10 @@ public class LineService {
         Line line = new Line(lineRequest.getName(), lineRequest.getColor(), lineRequest.getDistance(), upStation, downStation);
         Line newLine = lineRepository.save(line);
         return new LineResponse(newLine.getId(), newLine.getName(), newLine.getColor(),
-                makeStationResponses(line.getStations()));
+                makeStationResponses(newLine.getStations()));
     }
 
+    @Transactional
     public List<LineResponse> findAllLines() {
         List<Line> lines = lineRepository.findAll();
         return lines.stream().map(line -> {

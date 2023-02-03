@@ -1,5 +1,6 @@
 package subway.section;
 
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,6 +21,12 @@ public class SectionController {
             @RequestBody SectionCreateRequest request) {
         SectionResponse sectionResponse = sectionService.createSection(lineId, request);
         return ResponseEntity.created(URI.create("/lines/" + lineId + "/sections/" + sectionResponse.getId())).body(sectionResponse);
+    }
+
+    @DeleteMapping("/{lineId}/sections")
+    public ResponseEntity<SectionResponse> createSection(@PathVariable("lineId") Long lineId, @Param("stationId") Long stationId) {
+        sectionService.deleteSection(lineId, stationId);
+        return ResponseEntity.noContent().build();
     }
 
 }
