@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
+import subway.station.StationAcceptanceTest;
 
 import java.util.Arrays;
 import java.util.List;
@@ -19,9 +20,8 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static subway.line.LineController.LINE_URI_PATH;
 
-@Sql(value = "classpath:/init-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-@Sql(value = "classpath:/truncate.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 @DisplayName("지하철 노선 관련 기능")
+@Sql(statements = "TRUNCATE TABLE STATION;", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class LineAcceptanceTest {
@@ -32,6 +32,7 @@ public class LineAcceptanceTest {
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
+        StationAcceptanceTest.requestSaveStation("강남역", "망포역", "정자역", "판교역");
     }
 
     /**
@@ -149,10 +150,10 @@ public class LineAcceptanceTest {
     }
 
     private void requestSaveLines(LineRequest... lineRequests) {
-        Arrays.stream(lineRequests).forEach(this::requestSaveLine);
+        Arrays.stream(lineRequests).forEach(LineAcceptanceTest::requestSaveLine);
     }
 
-    private ExtractableResponse<Response> requestSaveLine(LineRequest lineRequest) {
+    public static ExtractableResponse<Response> requestSaveLine(LineRequest lineRequest) {
         return RestAssured.given().log().all()
                 .body(lineRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -166,21 +167,21 @@ public class LineAcceptanceTest {
         return findAllLine().jsonPath().getList("name", String.class);
     }
 
-    private ExtractableResponse<Response> findAllLine() {
+    public static ExtractableResponse<Response> findAllLine() {
         return RestAssured.given().log().all()
                 .when().get(LINE_URI_PATH)
                 .then().log().all()
                 .extract();
     }
 
-    private ExtractableResponse<Response> findLineById(Long id) {
+    public static ExtractableResponse<Response> findLineById(Long id) {
         return RestAssured.given().log().all()
                 .when().get(LINE_URI_PATH + "/" + id)
                 .then().log().all()
                 .extract();
     }
 
-    private ExtractableResponse<Response> updateLine(Long id, LineRequest lineRequest) {
+    public static ExtractableResponse<Response> updateLine(Long id, LineRequest lineRequest) {
         return RestAssured.given().log().all()
                 .body(lineRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -190,7 +191,7 @@ public class LineAcceptanceTest {
                 .extract();
     }
 
-    private void deleteLineById(Long id) {
+    public static void deleteLineById(Long id) {
         RestAssured.given().log().all()
                 .when().delete(LINE_URI_PATH + "/" + id)
                 .then().log().all()
