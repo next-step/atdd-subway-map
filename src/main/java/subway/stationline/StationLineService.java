@@ -57,5 +57,8 @@ public class StationLineService {
         stationLineRepository.deleteById(stationLineId);
     }
 
-
+    @Transactional
+    public StationLineExtendResponse extendStationLine(StationLineExtendRequest request) {
+        return null;
+    }
 }
