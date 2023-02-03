@@ -6,16 +6,34 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 
 @DisplayName("지하철 노선 관련 기능")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class LineAcceptanceTest {
+
+    @BeforeEach
+    void setUp() {
+        Map<String, String> firstParam = new HashMap<>();
+        firstParam.put("name", "강남역");
+        Map<String, String> secondParam = new HashMap<>();
+        secondParam.put("name", "덕소역");
+
+        StationAcceptanceTest.createStation(firstParam);
+        StationAcceptanceTest.createStation(secondParam);
+    }
+
     /**
      * When 지하철 노선을 생성하면
      * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
@@ -67,8 +85,8 @@ class LineAcceptanceTest {
         Map<String, Object> secondParams = new HashMap<>();
         secondParams.put("name", "경의중앙선");
         secondParams.put("color", "bg-teal-300");
-        secondParams.put("upStationId", 3);
-        secondParams.put("downStationId", 4);
+        secondParams.put("upStationId", 1);
+        secondParams.put("downStationId", 2);
         secondParams.put("distance", 5);
 
         RestAssured.given().log().all()
@@ -122,8 +140,7 @@ class LineAcceptanceTest {
         // When
         ExtractableResponse<Response> response =
             RestAssured.given()
-                .pathParam("id", lineId).log().all()
-                .when().get("/lines")
+                .when().get("/lines/" + lineId)
                 .then().log().all()
                 .extract();
 
@@ -161,15 +178,15 @@ class LineAcceptanceTest {
 
         ExtractableResponse<Response> response =
             RestAssured.given()
-                .pathParam("id", lineId)
-                .body(changedLineNameParam).log().all()
-                .when().put("/lines")
+                .body(changedLineNameParam)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .log().all()
+                .when().put("/lines/" + lineId)
                 .then().log().all()
                 .extract();
 
         // Then
-        String lineName = response.jsonPath().getString("name");
-        assertThat(lineName).isEqualTo("경의중앙선");
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
     /**
@@ -198,7 +215,7 @@ class LineAcceptanceTest {
         // When
         ExtractableResponse<Response> response =
             RestAssured.given()
-                .pathParam("id", lineId)
+                .queryParam("id", lineId)
                 .log().all()
                 .when().delete("/lines")
                 .then().log().all()

@@ -19,6 +19,15 @@ import io.restassured.response.Response;
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationAcceptanceTest {
+    static ExtractableResponse<Response> createStation(Map<String, String> params) {
+        return RestAssured.given().log().all()
+            .body(params)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().post("/stations")
+            .then().log().all()
+            .extract();
+    }
+
     /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다
@@ -91,15 +100,6 @@ public class StationAcceptanceTest {
 
         List<Long> ids = retrieveResponse.jsonPath().getList("id", Long.class);
         assertThat(ids).doesNotContain(stationId);
-    }
-
-    ExtractableResponse<Response> createStation(Map<String, String> params) {
-        return RestAssured.given().log().all()
-            .body(params)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().post("/stations")
-            .then().log().all()
-            .extract();
     }
 
     ExtractableResponse<Response> retrieveStations() {
