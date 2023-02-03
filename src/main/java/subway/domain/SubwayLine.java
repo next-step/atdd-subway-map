@@ -61,7 +61,7 @@ public class SubwayLine {
 
 		this.upStation = stationMap.get(upStationId);
 		this.downStation = stationMap.get(downStationId);
-		this.sections.add(createInitialSection(stationMap, distance));
+		this.sections.add(createInitialSection(distance));
 	}
 
 	public void updateInfo(String name, String color) {
@@ -78,10 +78,10 @@ public class SubwayLine {
 			.collect(Collectors.toMap(Station::getId, Function.identity()));
 	}
 
-	private Section createInitialSection(Map<Long, Station> stationMap, int distance) {
+	private Section createInitialSection(int distance) {
 		return new Section(
-			stationMap.get(this.upStation.getId()),
-			stationMap.get(this.downStation.getId()),
+			this.upStation,
+			this.downStation,
 			distance,
 			this
 		);
