@@ -19,21 +19,26 @@ public class StationLineController {
     @PostMapping("")
     public ResponseEntity<StationLineCreateResponse> craeteStation(@RequestBody StationLineCreateRequest request) {
         StationLineCreateResponse response = stationLineService.createStationLine(request);
-        return ResponseEntity.created(URI.create("/lines/" + response.getId())).body(response);
+        return ResponseEntity
+                .created(URI.create("/lines/" + response.getId()))
+                .body(response);
     }
 
     @GetMapping("")
     public ResponseEntity<List<StationLineReadListResponse>> readStationLineList() {
-        return ResponseEntity.ok(stationLineService.readStationLineList());
+        return ResponseEntity
+                .ok(stationLineService.readStationLineList());
     }
 
     @GetMapping("/{stationLineId}")
     public ResponseEntity<StationLineReadResponse> readStationLine(@PathVariable Long stationLineId) {
-        return ResponseEntity.ok(stationLineService.readStationLine(stationLineId));
+        return ResponseEntity
+                .ok(stationLineService.readStationLine(stationLineId));
     }
 
     @PutMapping("/{stationLineId}")
-    public ResponseEntity<Void> readStationLine(@PathVariable Long stationLineId, @RequestBody StationLineUpdateRequest request) {
+    public ResponseEntity<Void> readStationLine(@PathVariable Long stationLineId,
+                                                @RequestBody StationLineUpdateRequest request) {
         stationLineService.updateStationLine(stationLineId, request);
         return ResponseEntity.ok().build();
     }
@@ -41,7 +46,18 @@ public class StationLineController {
     @DeleteMapping("/{stationLineId}")
     public ResponseEntity<Void> deleteStationLine(@PathVariable Long stationLineId) {
         stationLineService.deleteStationLine(stationLineId);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity
+                .noContent()
+                .build();
+    }
+
+    @PostMapping("/{stationLineId}/sections")
+    public ResponseEntity<Void> extendStationLine(@PathVariable String stationLineId,
+                                                  @RequestBody StationLineExtendRequest request) {
+        StationLineExtendResponse response = stationLineService.extendStationLine(request);
+        return ResponseEntity
+                .created(URI.create("/lines/" + response.getId()))
+                .build();
     }
 
 }
