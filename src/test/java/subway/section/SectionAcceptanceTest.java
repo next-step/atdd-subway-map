@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.TestExecutionListeners;
 import subway.common.AcceptanceTestTruncateListener;
 import subway.common.AssertUtil;
+import subway.exception.SectionUpStationNotMatchException;
 import subway.line.LineConstant;
 import subway.line.LineCreateRequest;
 import subway.line.LineStep;
@@ -93,6 +94,26 @@ public class SectionAcceptanceTest {
         ExtractableResponse<Response> line = LineStep.getLine(lineId);
         StationResponse 구간상행역 = new StationResponse(downStationId, StationConstant.YANGJAE);
         노선의_하행역에_특정역이_존재하는지_검증(구간상행역, line);
+    }
+
+
+    /**
+     * Given 노선이 주어졌을 때
+     * When  노선의 하행역과 구간의 상행역이 다를 때 구간을 생성하면
+     * Then  예외가 발생한다.
+     */
+    @DisplayName("지하철 구간을 생성 시 새로운 구간의 상행역이 노선의 하행역이 아니라면 예외가 발생한다.")
+    @Test
+    void createSectionAnotherSectionUpStationTest() {
+        //given
+        long anotherStationId = StationStep.extractStationId(StationStep.createSubwayStation(StationConstant.JUNGGYE));
+
+        // when
+        ExtractableResponse<Response> response = 지하철_구간_생성(lineId, anotherStationId, sectionDownStationId);
+
+        // then
+        AssertUtil.상태코드_BAD_REQUEST(response);
+        assertThat(response.jsonPath().getString("message")).isEqualTo(SectionUpStationNotMatchException.MESSAGE);
     }
 
     private ExtractableResponse<Response> 지하철_구간_생성(long lineId, long upStationId, long downStationId) {

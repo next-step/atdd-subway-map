@@ -2,6 +2,7 @@ package subway.section;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.exception.SectionUpStationNotMatchException;
 import subway.line.Line;
 import subway.line.LineService;
 import subway.station.Station;
@@ -28,7 +29,7 @@ public class SectionService {
         List<Station> stations = line.getStations();
         Station lastStation = stations.get(stations.size() - 1);
         if (request.getUpStationId() != lastStation.getId()) {
-            throw new IllegalArgumentException();
+            throw new SectionUpStationNotMatchException();
         }
         if (stations.stream().anyMatch(station ->
                 request.getDownStationId() == station.getId())) {
