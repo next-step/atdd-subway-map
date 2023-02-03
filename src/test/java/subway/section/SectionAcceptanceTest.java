@@ -55,14 +55,50 @@ public class SectionAcceptanceTest {
      */
     @DisplayName("지하철 구간을 생성합니다.")
     @Test
-    void createLineTest() {
+    void createSectionTest() {
         //given
         //setUp
 
         // when
+        ExtractableResponse<Response> response = 지하철_구간_생성(lineId, downStationId, sectionDownStationId);
+
+        // then
+        AssertUtil.상태코드_CREATED(response);
+
+        ExtractableResponse<Response> line = LineStep.getLine(lineId);
+
+        StationResponse 구간하행역 = new StationResponse(sectionDownStationId, StationConstant.JUNGGYE);
+        노선의_하행역에_특정역이_존재하는지_검증(구간하행역, line);
+    }
+
+
+
+    /**
+     * Given 지하철 구간이 주어졌을 때
+     * When  지하철 구간을 제거하고
+     * Then  노선을 조회하면 구간의 상행역이 노선의 하행역으로 조회된다.
+     */
+    @DisplayName("지하철 구간을 제거합니다.")
+    @Test
+    void deleteSectionTest() {
+        // given
+        지하철_구간_생성(lineId, downStationId, sectionDownStationId);
+
+        // when
+        ExtractableResponse<Response> response = 지하철_구간_삭제(lineId, sectionDownStationId);
+
+        // then
+        AssertUtil.상태코드_NO_CONTENT(response);
+
+        ExtractableResponse<Response> line = LineStep.getLine(lineId);
+        StationResponse 구간상행역 = new StationResponse(downStationId, StationConstant.YANGJAE);
+        노선의_하행역에_특정역이_존재하는지_검증(구간상행역, line);
+    }
+
+    private ExtractableResponse<Response> 지하철_구간_생성(long lineId, long upStationId, long downStationId) {
         HashMap<Object, Object> paramMap = new HashMap<>();
-        paramMap.put("downStationId", sectionDownStationId);
-        paramMap.put("upStationId", downStationId);
+        paramMap.put("upStationId", upStationId);
+        paramMap.put("downStationId", downStationId);
         paramMap.put("distance", 10);
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .body(paramMap)
@@ -70,17 +106,20 @@ public class SectionAcceptanceTest {
                 .when().post(LineConstant.BASE_URL + "/" + lineId + BASE_URL)
                 .then().log().all()
                 .extract();
-
-        // then
-        AssertUtil.상태코드_CREATED(response);
-
-        ExtractableResponse<Response> line = LineStep.getLine(lineId);
-
-        StationResponse downStationResponse = new StationResponse(sectionDownStationId, StationConstant.JUNGGYE);
-        추가한_구간이_하행역에_존재_하는지_검증(downStationResponse, line);
+        return response;
     }
 
-    private void 추가한_구간이_하행역에_존재_하는지_검증(StationResponse stationResponse, ExtractableResponse<Response> line) {
+    private ExtractableResponse<Response> 지하철_구간_삭제(long lineId, long stationId) {
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .queryParam("stationId", stationId)
+                .when().delete(LineConstant.BASE_URL + "/" + lineId + BASE_URL)
+                .then().log().all()
+                .extract();
+        return response;
+    }
+
+    private void 노선의_하행역에_특정역이_존재하는지_검증(StationResponse stationResponse, ExtractableResponse<Response> line) {
         List<StationResponse> lineStations = line.jsonPath().getList("stations", StationResponse.class);
         if (lineStations.size() < 2) {
             fail("노선에 역이 두 개 미만으로 존재할 수 없습니다.");
