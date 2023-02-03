@@ -3,29 +3,28 @@ package subway.line;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.jdbc.Sql;
+import subway.testsupport.AcceptanceTest;
 
-import javax.annotation.PostConstruct;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static subway.station.StationAcceptanceTest.지하철역_등록됨;
 
 @DisplayName("지하철노선 관련 기능")
-@Sql(value = "/LineAcceptance.sql")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class LineAcceptanceTest {
+public class LineAcceptanceTest extends AcceptanceTest {
 
     private long firstStationId;
     private long secondStationId;
 
-    @PostConstruct
+    @BeforeEach
     void setup() {
+        super.setUp();
+        
         // given
         firstStationId = 지하철역_등록됨("강남역").body().jsonPath().getLong("id");
         secondStationId = 지하철역_등록됨("역삼역").body().jsonPath().getLong("id");
