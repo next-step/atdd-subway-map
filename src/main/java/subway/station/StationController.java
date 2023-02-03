@@ -1,21 +1,21 @@
-package subway;
-
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+package subway.station;
 
 import java.net.URI;
 import java.util.List;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class StationController {
-    private StationService stationService;
+    private final StationService stationService;
 
     public StationController(StationService stationService) {
         this.stationService = stationService;
     }
 
     @PostMapping("/stations")
-    public ResponseEntity<StationResponse> createStation(@RequestBody StationRequest stationRequest) {
+    public ResponseEntity<StationResponse> createStation(
+            @RequestBody StationRequest stationRequest) {
         StationResponse station = stationService.saveStation(stationRequest);
         return ResponseEntity.created(URI.create("/stations/" + station.getId())).body(station);
     }

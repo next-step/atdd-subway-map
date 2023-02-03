@@ -1,10 +1,9 @@
-package subway;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+package subway.station;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
@@ -17,7 +16,9 @@ public class StationService {
 
     @Transactional
     public StationResponse saveStation(StationRequest stationRequest) {
-        Station station = stationRepository.save(new Station(stationRequest.getName()));
+        Station station =
+                stationRepository.save(
+                        new Station(stationRequest.getLineId(), stationRequest.getName()));
         return createStationResponse(station);
     }
 
@@ -33,9 +34,6 @@ public class StationService {
     }
 
     private StationResponse createStationResponse(Station station) {
-        return new StationResponse(
-                station.getId(),
-                station.getName()
-        );
+        return new StationResponse(station.getId(), station.getLineId(), station.getName());
     }
 }
