@@ -37,9 +37,9 @@ public class StationService {
     }
 
     private StationResponse createStationResponse(Station station) {
-        return new StationResponse(
-                station.getId(),
-                station.getName()
-        );
+        return StationResponse.builder()
+                .id(station.getId())
+                .name(station.getName())
+                .build();
     }
 }
