@@ -1,11 +1,14 @@
 package subway.station.domain.line;
 
+import lombok.Builder;
+import lombok.Getter;
 import subway.station.domain.station.Station;
 
 import javax.persistence.*;
 import java.util.List;
 
 @Entity
+@Getter
 public class Line {
 
     @Id
@@ -34,6 +37,7 @@ public class Line {
     public Line() {
     }
 
+    @Builder
     public Line(String name, String color, Long upStationId, Long downStationId, Long distance, List<Station> stations) {
         this.name = name;
         this.color = color;
@@ -41,34 +45,6 @@ public class Line {
         this.downStationId = downStationId;
         this.distance = distance;
         this.stations = stations;
-    }
-
-    public Long getUpStationId() {
-        return upStationId;
-    }
-
-    public Long getDownStationId() {
-        return downStationId;
-    }
-
-    public List<Station> getStations() {
-        return stations;
-    }
-
-    public Long getDistance() {
-        return distance;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getColor() {
-        return color;
     }
 
     public void changeName(String name) {
