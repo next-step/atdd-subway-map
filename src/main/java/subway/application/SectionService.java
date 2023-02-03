@@ -12,10 +12,8 @@ import subway.domain.Station;
 import subway.domain.StationRepository;
 import subway.domain.SubwayLine;
 import subway.domain.SubwayLineRepository;
-import subway.exception.NotFoundSectionException;
 import subway.exception.NotFoundStationException;
 import subway.exception.NotFoundSubwayLineException;
-import subway.exception.SectionErrorCode;
 import subway.exception.SubwayLineErrorCode;
 import subway.presentation.request.SectionRequest;
 
@@ -31,8 +29,7 @@ public class SectionService {
 
 	@Transactional
 	public Long createSection(Long subwayLineId, SectionRequest.Create createRequest) {
-		SubwayLine subwayLine = subwayLineRepository.findSubwayLineById(subwayLineId)
-			.orElseThrow(() -> new NotFoundSubwayLineException(SubwayLineErrorCode.NOT_FOUND_SUBWAY_LINE));
+		SubwayLine subwayLine = findSubwayLineBy(subwayLineId);
 
 		List<Station> upAndDownStations = stationRepository.findByIdIn(createRequest.getUpAndDownStationIds());
 
@@ -47,9 +44,13 @@ public class SectionService {
 		Station station = stationRepository.findById(stationId)
 			.orElseThrow(() -> new NotFoundStationException(SubwayLineErrorCode.NOT_FOUND_STATION));
 
-		SubwayLine subwayLine = subwayLineRepository.findSubwayLineById(subwayLineId)
-			.orElseThrow(() -> new NotFoundSubwayLineException(SubwayLineErrorCode.NOT_FOUND_SUBWAY_LINE));
+		SubwayLine subwayLine = findSubwayLineBy(subwayLineId);
 
 		subwayLine.removeSection(station);
+	}
+
+	private SubwayLine findSubwayLineBy(Long subwayLineId) {
+		return subwayLineRepository.findSubwayLineById(subwayLineId)
+			.orElseThrow(() -> new NotFoundSubwayLineException(SubwayLineErrorCode.NOT_FOUND_SUBWAY_LINE));
 	}
 }
