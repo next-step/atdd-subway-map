@@ -16,6 +16,7 @@ import subway.repository.StationRepository;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static subway.domain.Line.validateStations;
 import static subway.service.StationService.createStationResponse;
 
 @Service
@@ -47,6 +48,7 @@ public class LineService {
     private void validateStationsExist(LineRequest lineRequest) {
         Long downStationId = lineRequest.getDownStationId();
         Long upStationId = lineRequest.getUpStationId();
+        validateStations(downStationId, upStationId);
 
         if (stationsNotExist(downStationId, upStationId)) {
             throw new StationNotFoundException();

@@ -52,8 +52,6 @@ public class Line {
     }
 
     public Line(String name, String color, Long upStationId, Long downStationId, Long distance) {
-        validateStations(upStationId, downStationId);
-
         this.name = name;
         this.color = color;
         this.upStationId = upStationId;
@@ -61,7 +59,7 @@ public class Line {
         this.distance = distance;
     }
 
-    private void validateStations(Long upStationId, Long downStationId) {
+    public static void validateStations(Long upStationId, Long downStationId) {
         if (upStationId == null || downStationId == null) {
             throw new StationNotFoundException();
         }
