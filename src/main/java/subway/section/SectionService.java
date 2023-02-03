@@ -2,6 +2,8 @@ package subway.section;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.exception.SectionAlreadyCreateStationException;
+import subway.exception.SectionBadRequestException;
 import subway.exception.SectionUpStationNotMatchException;
 import subway.line.Line;
 import subway.line.LineService;
@@ -33,7 +35,7 @@ public class SectionService {
         }
         if (stations.stream().anyMatch(station ->
                 request.getDownStationId() == station.getId())) {
-            throw new IllegalArgumentException();
+            throw new SectionAlreadyCreateStationException();
         }
         Station downStation = stationService.findStation(request.getDownStationId());
         Section section = new Section(lastStation, downStation, line.getDistance(), line);
@@ -51,7 +53,7 @@ public class SectionService {
         Station requestStation = stationService.findStation(stationId);
         Station lineDownStation = line.getDownStation();
         if (requestStation != lineDownStation || line.hasMinimumStations()) {
-            throw new IllegalArgumentException();
+            throw new SectionBadRequestException();
         }
         Section section = line.removeLastSection();
         sectionRepository.delete(section);

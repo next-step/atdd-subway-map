@@ -11,6 +11,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.TestExecutionListeners;
 import subway.common.AcceptanceTestTruncateListener;
 import subway.common.AssertUtil;
+import subway.exception.SectionAlreadyCreateStationException;
+import subway.exception.SectionBadRequestException;
 import subway.exception.SectionUpStationNotMatchException;
 import subway.line.LineConstant;
 import subway.line.LineCreateRequest;
@@ -114,6 +116,61 @@ public class SectionAcceptanceTest {
         // then
         AssertUtil.상태코드_BAD_REQUEST(response);
         assertThat(response.jsonPath().getString("message")).isEqualTo(SectionUpStationNotMatchException.MESSAGE);
+    }
+
+    /**
+     * Given 노선이 주어졌을 때
+     * When  노선의 하행역이 구간에 등록되어 있다면
+     * Then  예외가 발생한다.
+     */
+    @DisplayName("지하철 구간을 생성 시 노선의 하행역이 구간에 이미 등록되어 있다면 예외가 발생한다.")
+    @Test
+    void createSectionAlreadyUseStationException() {
+        //given
+
+        // when
+        ExtractableResponse<Response> response = 지하철_구간_생성(lineId, downStationId, upStationId);
+
+        // then
+        AssertUtil.상태코드_BAD_REQUEST(response);
+        assertThat(response.jsonPath().getString("message")).isEqualTo(SectionAlreadyCreateStationException.MESSAGE);
+    }
+
+    /**
+     * Given 지하철 구간이 주어졌을 때
+     * When  노선의 하행종점역이 아닌 지하철역을 제거할 때
+     * Then  예외가 발생한다.
+     */
+    @DisplayName("노선의 하행종점역이 아닌 지하철역을 제거할 때 예외가 발생한다.")
+    @Test
+    void deleteSectionExceptionTest() {
+        // given
+        지하철_구간_생성(lineId, downStationId, sectionDownStationId);
+
+        // when
+        ExtractableResponse<Response> response = 지하철_구간_삭제(lineId, downStationId);
+
+        // then
+        AssertUtil.상태코드_BAD_REQUEST(response);
+        assertThat(response.jsonPath().getString("message")).isEqualTo(SectionBadRequestException.MESSAGE);
+    }
+
+    /**
+     * given 노선이 상행 종점역과 하행종점역 둘만 있는 노선이 주어진다.
+     * When  노선에 등록된 지하철역을 삭제한다.
+     * Then  예외가 발생한다.
+     */
+    @DisplayName("노선에 상행,하행역 둘만 있을 때 노선에 등록된 지하철역을 삭제하면 예외가 발생한다.")
+    @Test
+    void deleteSectionExceptionTest2() {
+        // given
+
+        // when
+        ExtractableResponse<Response> response = 지하철_구간_삭제(lineId, downStationId);
+
+        // then
+        AssertUtil.상태코드_BAD_REQUEST(response);
+        assertThat(response.jsonPath().getString("message")).isEqualTo(SectionBadRequestException.MESSAGE);
     }
 
     private ExtractableResponse<Response> 지하철_구간_생성(long lineId, long upStationId, long downStationId) {
