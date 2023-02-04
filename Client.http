@@ -60,6 +60,32 @@ Content-Type: application/json
   "distance": 10
 }
 
-
 ### 신분당선 조회
 GET localhost:8080/lines/{{lineId}}
+
+### 양재역 삭제 in [강남역 - 양재역 - 양재시민의숲역]
+DELETE localhost:8080/lines/{{lineId}}/sections?stationId={{stationId2}}
+
+> {%
+    client.test("422", function() {
+        client.assert(response.status == 422, "");
+    });
+%}
+
+### 양재시민의숲역 삭제 in [강남역 - 양재역 - 양재시민의숲역]
+DELETE localhost:8080/lines/{{lineId}}/sections?stationId={{stationId3}}
+
+> {% 
+client.test("204", function() {
+  client.assert(response.status == 204, "");
+});
+%}
+
+### 양재역 삭제 in [강남역 - 양재역]
+DELETE localhost:8080/lines/{{lineId}}/sections?stationId={{stationId2}}
+
+> {% 
+client.test("422", function() {
+  client.assert(response.status == 422, "");
+});
+%}
