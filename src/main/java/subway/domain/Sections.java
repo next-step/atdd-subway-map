@@ -1,7 +1,9 @@
 package subway.domain;
 
-import subway.exception.CannotAppendableDownStationException;
-import subway.exception.CannotAppendableUpStationException;
+import subway.exception.AlreadyExistStationException;
+import subway.exception.MinimumLineException;
+import subway.exception.NonContinuousStationException;
+import subway.exception.OnlyCanRemoveTailStationException;
 
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
@@ -54,14 +56,31 @@ public class Sections {
         Station upStation = section.getUpStation();
 
         if (!tailStation.equals(upStation)) {
-            throw new CannotAppendableUpStationException(upStation.getId());
+            throw new NonContinuousStationException(upStation.getId());
         }
 
         Station downStation = section.getDownStation();
         if (stations.contains(downStation)) {
-            throw new CannotAppendableDownStationException(downStation.getId());
+            throw new AlreadyExistStationException(downStation.getId());
         }
 
         sections.add(section);
+    }
+
+    public void remove(Station station) {
+        if (isRemainedOneSection()) {
+            throw new MinimumLineException(station.getId());
+        }
+
+        Station tailStation = getTailStation();
+        if (!tailStation.equals(station)) {
+            throw new OnlyCanRemoveTailStationException(station.getId());
+        }
+
+        sections.remove(sections.size() - 1);
+    }
+
+    private boolean isRemainedOneSection() {
+        return sections.size() == 1;
     }
 }
