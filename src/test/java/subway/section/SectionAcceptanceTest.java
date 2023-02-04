@@ -96,6 +96,19 @@ class SectionAcceptanceTest extends AcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
+    /**
+     * When 지하철 노선에 새로운 구간 등록 시, 이미 해당 노선에 등록된 역을 하행역으로 요청하면
+     * Then 새로운 구간이 등록되지 않는다. (에러 처리)
+     */
+    @DisplayName("새로운 지하철 구간 등록 시, 구간의 하행역은 해당 노선에 등록되지 않은 역이어야 한다.")
+    @Test
+    void invalidDownStation() {
+        // When
+        ExtractableResponse<Response> responseOfAddSection = LineApi.addSection(신분당선_ID, 서초역_ID, 강남역_ID, 10);
+
+        // Then
+        checkBadRequest(responseOfAddSection);
+    }
 
     /**
      * Given 지하철 노선에 새로운 구간을 등록 요청하고
