@@ -67,12 +67,39 @@ public class SectionAcceptanceTest extends AcceptanceTest {
      * Then 제거된 노선을 조회시 에러가 발생한다.
      */
     @DisplayName("지하철 노선에 구간을 제거하고 그 구간을 조회 시 삭제한 구간을 발견할 수 없다.")
+    @Test
     public void sectionDeleteTest() {
+        var param = new SectionCreateRequest(secondStationId, thirdStationId, 10L);
+        SectionRestAssuredTest.createSection(lineId, param);
         SectionRestAssuredTest.deleteSection(lineId, thirdStationId);
 
         LineResponse line = LineRestAssuredTest.getLine(lineId);
         List<Long> ids = line.getStationResponseList().stream().map(StationResponse::getId).collect(Collectors.toList());
         assertThat(ids).doesNotContain(thirdStationId);
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 하행종점역이 아닌 지하철역을 삭제하면
+     * Then 에러가 발생한다.
+     */
+    @DisplayName("하행종점역이 아닌 노선을 삭제하면 에러가 발생한다.")
+    @Test
+    public void deleteLineFailTest_1() {
+        var param = new SectionCreateRequest(secondStationId, thirdStationId, 10L);
+        SectionRestAssuredTest.createSection(lineId, param);
+
+        SectionRestAssuredTest.deleteSectionFail(lineId, secondStationId);
+    }
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 한개 남은 지하철 역을 삭제하면
+     * Then 에러가 발생한다.
+     */
+    @DisplayName("한개 남은 노선을 삭제하면 에러가 발생한다.")
+    @Test
+    public void deleteLineFailTest_2() {
+        SectionRestAssuredTest.deleteSectionFail(lineId, secondStationId);
     }
 
 

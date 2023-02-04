@@ -122,28 +122,6 @@ public class LineAcceptanceTest extends AcceptanceTest{
         assertThrows(AssertionFailedError.class, (() -> LineRestAssuredTest.getLine(lineId)));
     }
 
-    /**
-     * Given 지하철 노선을 생성하고
-     * When 하행종점역이 아닌 지하철역을 삭제하면
-     * Then 에러가 발생한다.
-     */
-    @DisplayName("하행종점역이 아닌 노선을 삭제하면 에러가 발생한다.")
-    @Test
-    public void deleteLineFailTest_1() {
-        Long lineId = LineRestAssuredTest.createLine(lineCreateRequest);
-        LineRestAssuredTest.deleteLineFail(lineId + 1);
-    }
-    /**
-     * Given 지하철 노선을 생성하고
-     * When 한개 남은 지하철 역을 삭제하면
-     * Then 에러가 발생한다.
-     */
-    @DisplayName("한개 남은 노선을 삭제하면 에러가 발생한다.")
-    @Test
-    public void deleteLineFailTest_2() {
 
-        Long lineId = LineRestAssuredTest.createLine(lineCreateRequest);
-        LineRestAssuredTest.deleteLineFail(lineId);
-    }
 
 }

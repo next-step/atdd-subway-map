@@ -45,4 +45,13 @@ public class SectionRestAssuredTest {
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
+    @DisplayName("지하철 노선 구간을 삭제할 수 없다.")
+    public static void deleteSectionFail(Long lineId, Long stationId) {
+        var response = RestAssured.given().log().all()
+                .when().delete("/lines/" + lineId + "/sections?stationId=" + stationId)
+                .then().log().all()
+                .extract();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
 }
