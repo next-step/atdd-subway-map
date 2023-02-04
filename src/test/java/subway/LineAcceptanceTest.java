@@ -1,15 +1,10 @@
 package subway;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.annotation.DirtiesContext;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static subway.extracts.LineExtracts.*;
@@ -19,17 +14,7 @@ import static subway.requests.LineRequests.*;
 import static subway.requests.StationRequests.지하철역_생성_요청하기;
 
 @DisplayName("지하철노선 관련 기능")
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class LineAcceptanceTest {
-
-    @LocalServerPort
-    private int port;
-
-    @BeforeEach
-    void setUp() {
-        RestAssured.port = port;
-    }
+public class LineAcceptanceTest extends AcceptanceTest {
 
     /**
      * When 지하철 노선을 생성하면
