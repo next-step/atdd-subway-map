@@ -3,11 +3,8 @@ package subway.application;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.application.dto.*;
-import subway.domain.Line;
-import subway.domain.Section;
-import subway.domain.Station;
-import subway.domain.LineRepository;
-import subway.domain.StationRepository;
+import subway.domain.*;
+import subway.domain.exceptions.EntityNotFoundException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,10 +24,13 @@ public class LineService {
 
     @Transactional
     public LineDto saveLine(LineCreateDto lineCreateDto) {
-        Station upStation = stationRepository.findById(lineCreateDto.getUpStationId()).get();
-        Station downStation = stationRepository.findById(lineCreateDto.getDownStationId()).get();
-        int distance = lineCreateDto.getDistance();
+        Station upStation = stationRepository.findById(lineCreateDto.getUpStationId())
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 역입니다."));
 
+        Station downStation = stationRepository.findById(lineCreateDto.getDownStationId())
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 역입니다."));
+
+        int distance = lineCreateDto.getDistance();
 
         Line line = lineRepository.save(Line.create(
                 lineCreateDto.getName(),
@@ -51,7 +51,7 @@ public class LineService {
 
     public LineDto readLine(Long lineId) {
         Line line = lineRepository.findById(lineId)
-                .orElseThrow(() -> new RuntimeException("존재하지 않는 노선입니다."));
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 노선입니다."));
 
         return createLineResponse(line);
     }
@@ -82,7 +82,7 @@ public class LineService {
         String newColor = lineModifyDto.getColor();
 
         Line line = lineRepository.findById(lineId)
-                .orElseThrow(() -> new RuntimeException("존재하지 않는 노선입니다."));
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 노선입니다."));
 
         line.modify(newName, newColor);
     }
@@ -90,7 +90,7 @@ public class LineService {
     @Transactional
     public void deleteLine(Long lineId) {
         lineRepository.findById(lineId)
-                .orElseThrow(() -> new RuntimeException("존재하지 않는 노선입니다."));
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 노선입니다."));
 
         lineRepository.deleteById(lineId);
     }
@@ -104,13 +104,13 @@ public class LineService {
         int distance = sectionAddDto.getDistance();
 
         Line line = lineRepository.findById(lineId)
-                .orElseThrow(() -> new RuntimeException("존재하지 않는 노선입니다."));
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 노선입니다."));
 
         Station upStation = stationRepository.findById(upStationId)
-                .orElseThrow(() -> new RuntimeException("존재하지 않는 역입니다."));
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 역입니다."));
 
         Station downStation = stationRepository.findById(downStationId)
-                .orElseThrow(() -> new RuntimeException("존재하지 않는 역입니다."));
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 역입니다."));
 
         Section newSection = new Section(upStation, downStation, distance);
 
@@ -123,10 +123,10 @@ public class LineService {
         Long stationId = sectionDeleteDto.getStationId();
 
         Line line = lineRepository.findById(lineId)
-                .orElseThrow(() -> new RuntimeException("존재하지 않는 노선입니다."));
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 노선입니다."));
 
         Station station = stationRepository.findById(stationId)
-                .orElseThrow(() -> new RuntimeException("존재하지 않는 역입니다."));
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 역입니다."));
 
         line.deleteSection(station);
     }
