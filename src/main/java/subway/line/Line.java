@@ -57,11 +57,11 @@ public class Line {
     }
 
     public void addStation(Station downStation, Station upStation, long distance) {
-        checkStation(downStation, upStation);
+        checkAddStation(downStation, upStation);
         sections.add(new Section(downStation, this, distance));
     }
 
-    private void checkStation(Station downStation, Station upStation) {
+    private void checkAddStation(Station downStation, Station upStation) {
         if (!checkUpStation(upStation.getId())) {
             throw new RuntimeException("하행 종점역과 이어진 지하철 역만 추가할 수 있습니다.");
         }
@@ -106,9 +106,16 @@ public class Line {
     }
 
     public void deleteStation(Long stationId) {
+        checkDeleteStation(stationId);
+        sections.remove(sections.size() - 1);
+    }
+
+    private void checkDeleteStation(Long stationId) {
+        if (sections.size() == 2) {
+            throw new RuntimeException("구간이 1개인 경우 삭제할 수 없습니다.");
+        }
         if (Objects.equals(stationId, getLastStationId())) {
             throw new RuntimeException("하행 종점역이 아닌 지하철 역은 삭제할 수 없다.");
         }
-        sections.remove(sections.size() - 1);
     }
 }
