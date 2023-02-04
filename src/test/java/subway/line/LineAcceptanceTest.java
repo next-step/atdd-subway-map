@@ -1,6 +1,15 @@
 package subway.line;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static subway.line.LineAssert.노선_목록_조회_검증;
+import static subway.line.LineAssert.노선_삭제_검증;
+import static subway.line.LineAssert.노선_생성_검증;
+import static subway.line.LineAssert.노선_수정_검증;
+import static subway.line.LineAssert.노선_조회_검증;
+import static subway.line.LineRestAssured.노선_목록_조회;
+import static subway.line.LineRestAssured.노선_삭제;
+import static subway.line.LineRestAssured.노선_생성;
+import static subway.line.LineRestAssured.노선_수정;
+import static subway.station.StationRestAssured.역_생성;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -15,7 +24,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestConstructor;
 import org.springframework.test.context.TestConstructor.AutowireMode;
-import subway.station.StationRestAssured;
 import subway.util.DatabaseCleanup;
 
 @ActiveProfiles("acceptance")
@@ -30,75 +38,67 @@ public class LineAcceptanceTest {
 
     @LocalServerPort
     private int port;
+
     private Long upStationId;
     private Long downStationId;
 
     private final DatabaseCleanup databaseCleanup;
-    private final LineRestAssured lineRestAssured;
-    private final LineAssert lineAssert;
-    private final StationRestAssured stationRestAssured;
-
 
     public LineAcceptanceTest(final DatabaseCleanup databaseCleanup) {
         this.databaseCleanup = databaseCleanup;
-        this.lineRestAssured = new LineRestAssured();
-        this.lineAssert = new LineAssert();
-        this.stationRestAssured = new StationRestAssured();
     }
 
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
         this.databaseCleanup.truncateTable();
-        this.upStationId = stationRestAssured.createStation("강남역").jsonPath().getLong("id");
-        this.downStationId = stationRestAssured.createStation("양재역").jsonPath().getLong("id");
+        this.upStationId = 역_생성("강남역").jsonPath().getLong("id");
+        this.downStationId = 역_생성("양재역").jsonPath().getLong("id");
     }
 
     @DisplayName("지하철 노선 생성한다.")
     @Test
     void createLine() {
         // when
-        lineRestAssured.createLine(LINE_NAME, COLOR, upStationId, downStationId, DISTANCE);
+        노선_생성(LINE_NAME, COLOR, upStationId, downStationId, DISTANCE);
 
         // then
-        lineAssert.assertCreateLine(LINE_NAME, COLOR, DISTANCE);
+        노선_생성_검증(1L, LINE_NAME, COLOR, upStationId, downStationId, DISTANCE);
     }
 
     @DisplayName("지하철 노선 목록을 조회한다.")
     @Test
     void showLines() {
         // given
-        lineRestAssured.createLine(LINE_NAME, COLOR, upStationId, downStationId, DISTANCE);
-        long upStationId2 = stationRestAssured.createStation("신림역").jsonPath().getLong("id");
-        long downStationId2 = stationRestAssured.createStation("노량진역").jsonPath().getLong("id");
-        lineRestAssured.createLine("2호선", "bg-green-600", upStationId2, downStationId2, 20);
+        노선_생성(LINE_NAME, COLOR, upStationId, downStationId, DISTANCE);
+        long upStationId2 = 역_생성("신림역").jsonPath().getLong("id");
+        long downStationId2 = 역_생성("노량진역").jsonPath().getLong("id");
+        노선_생성("2호선", "bg-green-600", upStationId2, downStationId2, 20);
 
         // when
-        ExtractableResponse<Response> response = lineRestAssured.showLines();
+        var response = 노선_목록_조회();
 
         // then
-        assertThat(response.jsonPath().getList("id")).hasSize(2).contains(1, 2);
+        노선_목록_조회_검증(response, 2);
     }
 
     @DisplayName("지하철 노선을 조회한다.")
     @Test
     void showLine() {
         // given
-        ExtractableResponse<Response> createLineResponse
-                = lineRestAssured.createLine(LINE_NAME, COLOR, upStationId, downStationId, DISTANCE);
+        var createLineResponse = 노선_생성(LINE_NAME, COLOR, upStationId, downStationId, DISTANCE);
 
         String location = getLocation(createLineResponse);
 
         // when, then
-        lineAssert.assertShowLine(LINE_NAME, COLOR, DISTANCE, location);
+        노선_조회_검증(LINE_NAME, COLOR, DISTANCE, location);
     }
 
     @DisplayName("지하철 노선을 수정한다.")
     @Test
     void editLine() {
         // given
-        ExtractableResponse<Response> createLineResponse
-                = lineRestAssured.createLine(LINE_NAME, COLOR, upStationId, downStationId, DISTANCE);
+        var createLineResponse = 노선_생성(LINE_NAME, COLOR, upStationId, downStationId, DISTANCE);
 
         String location = getLocation(createLineResponse);
 
@@ -107,26 +107,25 @@ public class LineAcceptanceTest {
         int distance = 5;
 
         // when
-        lineRestAssured.editLine(location, name, color, distance);
+        노선_수정(location, name, color, distance);
 
         // then
-        lineAssert.assertEditLine(location, name, upStationId, downStationId, color, distance);
+        노선_수정_검증(location, name, upStationId, downStationId, color, distance);
     }
 
     @DisplayName("지하철 노선을 삭제한다.")
     @Test
     void deleteLine() {
         // given
-        ExtractableResponse<Response> createLineResponse
-                = lineRestAssured.createLine(LINE_NAME, COLOR, upStationId, downStationId, DISTANCE);
+        var createLineResponse = 노선_생성(LINE_NAME, COLOR, upStationId, downStationId, DISTANCE);
 
         String location = getLocation(createLineResponse);
 
         // when
-        lineRestAssured.deleteLine(location);
+        노선_삭제(location);
 
         // then
-        lineAssert.assertDeleteLine(location);
+        노선_삭제_검증(location);
     }
 
     private static String getLocation(final ExtractableResponse<Response> createLineResponse) {

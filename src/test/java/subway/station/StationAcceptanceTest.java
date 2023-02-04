@@ -1,10 +1,13 @@
 package subway.station;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static subway.station.StationAssert.역_목록_조회_검증;
+import static subway.station.StationAssert.역_삭제_검증;
+import static subway.station.StationAssert.역_생성_검증;
+import static subway.station.StationRestAssured.역_목록_조회;
+import static subway.station.StationRestAssured.역_삭제;
+import static subway.station.StationRestAssured.역_생성;
 
 import io.restassured.RestAssured;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -30,11 +33,9 @@ public class StationAcceptanceTest {
     private int port;
 
     private final DatabaseCleanup databaseCleanup;
-    private final StationRestAssured stationRestAssured;
 
     public StationAcceptanceTest(final DatabaseCleanup databaseCleanup) {
         this.databaseCleanup = databaseCleanup;
-        this.stationRestAssured = new StationRestAssured();
     }
 
     @BeforeEach
@@ -50,14 +51,16 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        stationRestAssured.createStation(STATION_NAME1);
+        역_생성(STATION_NAME1);
 
         // then
-        List<String> stationNames = stationRestAssured.findStations()
+        var response = 역_목록_조회();
+
+        List<String> stationNames = response
                 .jsonPath()
                 .getList("name", String.class);
 
-        assertThat(stationNames).containsAnyOf(STATION_NAME1);
+        역_생성_검증(stationNames, STATION_NAME1);
     }
 
     @DisplayName("지하철역 목록을 조회한다.")
@@ -66,34 +69,36 @@ public class StationAcceptanceTest {
         // given
         String[] expectedStationNames = {STATION_NAME1, STATION_NAME2};
 
-        stationRestAssured.createStation(expectedStationNames);
+        역_생성(expectedStationNames);
 
         // when
-        ExtractableResponse<Response> response = stationRestAssured.findStations();
+        var response = 역_목록_조회();
 
         // Then
         List<String> stationNames = response
                 .jsonPath()
                 .getList("name", String.class);
 
-        assertThat(stationNames).hasSize(expectedStationNames.length).contains(expectedStationNames);
+        역_목록_조회_검증(expectedStationNames, stationNames);
     }
 
     @DisplayName("지하철역을 제거한다.")
     @Test
     void deleteStation() {
         // given
-        long deleteStationId = stationRestAssured.createStation(STATION_NAME1).jsonPath().getLong("id");
-        stationRestAssured.createStation(STATION_NAME2).jsonPath().getLong("id");
+        long deleteStationId = 역_생성(STATION_NAME1).jsonPath().getLong("id");
+        역_생성(STATION_NAME2).jsonPath().getLong("id");
 
         // when
-        stationRestAssured.deleteStation(deleteStationId);
+        역_삭제(deleteStationId);
 
         // Then
-        List<Long> stationIds = stationRestAssured.findStations()
+        var response = 역_목록_조회();
+
+        List<Long> stationIds = response
                 .jsonPath()
                 .getList("id", Long.class);
 
-        assertThat(stationIds).doesNotContain(deleteStationId);
+        역_삭제_검증(deleteStationId, stationIds);
     }
 }

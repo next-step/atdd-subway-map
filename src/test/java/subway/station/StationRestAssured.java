@@ -14,13 +14,13 @@ import org.springframework.http.MediaType;
 
 public class StationRestAssured {
 
-    public List<ExtractableResponse<Response>> createStation(final String... stationNames) {
+    public static List<ExtractableResponse<Response>> 역_생성(final String... stationNames) {
         return Arrays.stream(stationNames)
-                .map(this::createStation)
+                .map(StationRestAssured::역_생성)
                 .collect(Collectors.toUnmodifiableList());
     }
 
-    public ExtractableResponse<Response> createStation(final String stationName) {
+    public static ExtractableResponse<Response> 역_생성(final String stationName) {
         Map<String, String> params = new HashMap<>();
         params.put("name", stationName);
 
@@ -35,7 +35,7 @@ public class StationRestAssured {
                 .extract();
     }
 
-    public ExtractableResponse<Response> deleteStation(final Long id) {
+    public static ExtractableResponse<Response> 역_삭제(final Long id) {
         return givenLog()
                 .when()
                 .delete("/stations/{id}", id)
@@ -44,7 +44,7 @@ public class StationRestAssured {
                 .extract();
     }
 
-    public ExtractableResponse<Response> findStations() {
+    public static ExtractableResponse<Response> 역_목록_조회() {
         return givenLog()
                 .when()
                 .get("/stations")
@@ -53,7 +53,7 @@ public class StationRestAssured {
                 .extract();
     }
 
-    private RequestSpecification givenLog() {
+    private static RequestSpecification givenLog() {
         return RestAssured
                 .given().log().all();
     }

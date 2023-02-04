@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus;
 
 public class LineRestAssured {
 
-    public ExtractableResponse<Response> createLine(
+    public static ExtractableResponse<Response> 노선_생성(
             final String name,
             final String color,
             final Long upStationId,
@@ -35,7 +35,7 @@ public class LineRestAssured {
                 .extract();
     }
 
-    public ExtractableResponse<Response> showLines() {
+    public static ExtractableResponse<Response> 노선_목록_조회() {
         return RestAssured
                 .given().log().all()
                 .when()
@@ -45,7 +45,7 @@ public class LineRestAssured {
                 .extract();
     }
 
-    public ExtractableResponse<Response> editLine(
+    public static ExtractableResponse<Response> 노선_수정(
             final String location,
             final String name,
             final String color,
@@ -67,7 +67,7 @@ public class LineRestAssured {
                 .extract();
     }
 
-    public ExtractableResponse<Response> deleteLine(final String location) {
+    public static ExtractableResponse<Response> 노선_삭제(final String location) {
         return RestAssured.given().log().all()
                 .when()
                 .delete(location)
@@ -76,7 +76,7 @@ public class LineRestAssured {
                 .extract();
     }
 
-    public ExtractableResponse<Response> requestGet(final String location) {
+    public static ExtractableResponse<Response> Location_조회(final String location) {
         return RestAssured.given().log().all()
                 .when()
                 .get(location)
