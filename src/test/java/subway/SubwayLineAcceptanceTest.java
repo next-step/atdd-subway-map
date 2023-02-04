@@ -88,5 +88,52 @@ public class SubwayLineAcceptanceTest {
             LINE_TWO_REQUEST.getName());
     }
 
+    private ExtractableResponse<Response> getSubwayLine(Long id) {
+        return given()
+            .accept(MediaType.APPLICATION_JSON_VALUE)
+            .pathParam("id", id)
+            .when().get("/line/{id}")
+            .then()
+            .statusCode(HttpStatus.OK.value())
+            .extract();
+    }
+
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 조회하면
+     * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
+     */
+
+    @DisplayName("지하철노선 조회")
+    @Test
+    void 지하철노선_조회() {
+        //given
+        ExtractableResponse<Response> createResponse = createSubwayLine(LINE_SHIN_BUN_DANG_REQUEST);
+
+        //when
+        Long id = createResponse.jsonPath().getLong("id");
+        ExtractableResponse<Response> getResponse = getSubwayLine(id);
+
+        //then
+        assertThat(getResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+        String name = getResponse.jsonPath().getString("name");
+        assertThat(name).isEqualTo(LINE_SHIN_BUN_DANG_REQUEST.getName());
+
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 수정하면
+     * Then 해당 지하철 노선 정보는 수정된다
+     */
+    @DisplayName("지하철노선 수정")
+    @Test
+    void 지하철노선_수정() {
+        //given
+        //when
+        //then
+    }
+
 
 }

@@ -3,9 +3,9 @@ package subway;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import subway.exception.ResourceNotFoundException;
 
 @Service
@@ -18,9 +18,9 @@ public class SubwayLineService {
 
     public SubwayLineResponse saveLine(SubwayLineRequest request) {
         Station upStation = stationRepository.findById(request.getUpStationId()).orElseThrow(
-            () -> new ResourceNotFoundException("리소스를 찾을 수 없읍니다."));
+            ResourceNotFoundException::new);
         Station downStation = stationRepository.findById(request.getDownStationId()).orElseThrow(
-            () -> new ResourceNotFoundException("리소스를 찾을 수 없읍니다."));
+            ResourceNotFoundException::new);
         SubwayLine subwayLine = subwayLineRepository.save(
             new SubwayLine(request.getName(), request.getColor(), upStation, downStation,
                 request.getDistance()));
@@ -28,9 +28,18 @@ public class SubwayLineService {
         return SubwayLineResponse.createSubwayLineResponse(subwayLine);
     }
 
-    public List<SubwayLineResponse> getLineList() {
+    @Transactional(readOnly = true)
+    public List<SubwayLineResponse> getSubwayLineList() {
         List<SubwayLine> lines = subwayLineRepository.findAll();
         return lines.stream().map(SubwayLineResponse::createSubwayLineResponse)
             .collect(Collectors.toList());
     }
+
+    @Transactional(readOnly = true)
+    public SubwayLineResponse getSubwayLine(Long id) {
+        SubwayLine subwayLine = subwayLineRepository.findById(id)
+            .orElseThrow(ResourceNotFoundException::new);
+        return SubwayLineResponse.createSubwayLineResponse(subwayLine);
+    }
+
 }

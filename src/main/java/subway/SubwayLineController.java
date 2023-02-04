@@ -5,6 +5,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,8 +25,13 @@ public class SubwayLineController {
     }
 
     @GetMapping("/lines")
-    public ResponseEntity<List<SubwayLineResponse>> getLineList() {
-        return ResponseEntity.ok().body(subwayLineService.getLineList());
+    public ResponseEntity<List<SubwayLineResponse>> getSubwayLineList() {
+        return ResponseEntity.ok().body(subwayLineService.getSubwayLineList());
+    }
+
+    @GetMapping("/line/{id}")
+    public ResponseEntity<SubwayLineResponse> getSubwayLine(@PathVariable Long id) {
+        return ResponseEntity.ok().body(subwayLineService.getSubwayLine(id));
     }
 
 
