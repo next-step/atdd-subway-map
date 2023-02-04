@@ -57,17 +57,28 @@ public class Line {
     }
 
     public void addStation(Station downStation, Station upStation, long distance) {
-        if (!isAddStation(upStation.getId())) {
-            throw new RuntimeException("추가할 수 없는 지하철 역입니다.");
-        }
+        checkStation(downStation, upStation);
         sections.add(new Section(downStation, this, distance));
+    }
+
+    private void checkStation(Station downStation, Station upStation) {
+        if (!checkUpStation(upStation.getId())) {
+            throw new RuntimeException("하행 종점역과 이어진 지하철 역만 추가할 수 있습니다.");
+        }
+        if (!checkDownStation(downStation.getId())) {
+            throw new RuntimeException("이미 존재하는 지하철역은 추가할 수 없습니다.");
+        }
+    }
+
+    private boolean checkDownStation(Long downStationId) {
+        return getStations().stream().map(Station::getId).allMatch(id -> id.equals(downStationId));
     }
 
     public void addStation(Station station, long distance) {
         sections.add(new Section(station, this, distance));
     }
 
-    private boolean isAddStation(Long upStationId) {
+    private boolean checkUpStation(Long upStationId) {
         long lastStationId = getLastStationId();
         return Objects.equals(lastStationId, upStationId) || lastStationId == -1 ;
     }
