@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
-public class StationAcceptanceTestTest extends AcceptanceTest {
+public class StationAcceptanceTest extends AcceptanceTest {
     private static final String URI_DELIMITER = "/";
     private static final int STATION_ID_INDEX = 2;
     private static final String STATION_NAME = "name";
