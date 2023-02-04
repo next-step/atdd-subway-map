@@ -25,6 +25,16 @@ public class LineRestAssuredTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
+    @DisplayName("지하철 노선을 삭제할 수 없다")
+    public static void deleteLineFail(Long lineId) {
+        var response = RestAssured.given().log().all()
+                .when().delete("/lines/" + lineId)
+                .then().log().all()
+                .extract();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
     @DisplayName("지하철 노선도를 조회할 수 있다.")
     public static List<LineResponse> getLineResponseList() {
         var response = RestAssured.given().log().all()
