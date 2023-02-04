@@ -11,13 +11,13 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
-class LinePersistenceCommandRepository implements LineCommandRepository, LineLoadRepository {
+class LinePersistenceRepository implements LineCommandRepository, LineLoadRepository {
 
     private final LineRepository lineRepository;
     private final StationRepository stationRepository;
     private final LineMapper lineMapper;
 
-    public LinePersistenceCommandRepository(LineRepository lineRepository, StationRepository stationRepository, LineMapper lineMapper) {
+    public LinePersistenceRepository(LineRepository lineRepository, StationRepository stationRepository, LineMapper lineMapper) {
         this.lineRepository = lineRepository;
         this.stationRepository = stationRepository;
         this.lineMapper = lineMapper;
