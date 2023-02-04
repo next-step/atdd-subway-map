@@ -4,13 +4,10 @@ import io.restassured.response.ValidatableResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+import subway.dto.station.StationRequest;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
 
 @DisplayName("지하철역 관련 기능")
@@ -21,36 +18,30 @@ public class StationAcceptanceTest extends AbstractAcceptanceTest {
 
     /**
      * When 지하철역을 생성하면
-     * Then 지하철역이 생성된다
-     * Then 지하철역 목록 조회 시 생성한 역을 찾을 수 있다
+     * Then 지하철역이 생성된다.
+     * Then 지하철역 목록 조회 시 생성한 역을 찾을 수 있다.
      */
     @DisplayName("지하철역을 생성한다.")
     @Test
     void createStation() {
         역_생성(강남역).statusCode(HttpStatus.CREATED.value());
-
-        given().log().all().
-        when()
-                .get("/stations").
-        then().log().all()
+        역_목록_조회()
                 .body("name", hasItems(강남역));
     }
 
     /**
      * Given 2개의 지하철역을 생성하고
      * When 지하철역 목록을 조회하면
-     * Then 2개의 지하철역을 응답 받는다
+     * Then 2개의 지하철역을 응답 받는다.
      */
     @DisplayName("지하철역 2개를 생성하고 목록을 조회한다.")
     @Test
     void createStations() {
-        List.of(강남역, 교대역)
-                .forEach(this::역_생성);
+        for (String station : List.of(강남역, 교대역)) {
+            역_생성(station);
+        }
 
-        given().log().all().
-        when()
-                .get("/stations").
-        then().log().all()
+        역_목록_조회()
                 .body("size()", equalTo(2))
                 .body("name", contains(강남역, 교대역));
     }
@@ -58,37 +49,31 @@ public class StationAcceptanceTest extends AbstractAcceptanceTest {
     /**
      * Given 지하철역을 생성하고
      * When 그 지하철역을 삭제하면
-     * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
+     * Then 지하철역 목록 조회 시 앞서 생성한 역을 찾을 수 없다.
      */
     @DisplayName("지하철역 2개를 생성하고 그중 1개를 삭제한다.")
     @Test
     void deleteStation() {
-        역_생성("교대역");
-        var createResponse = 역_생성(강남역).extract();
+        역_생성(교대역);
+        var createResponse = 역_생성(강남역);
 
-        given().log().all().
+        given().
         when()
-                .delete(createResponse.header("location")).
+                .delete(리소스_경로_추출(createResponse)).
         then().log().all()
                 .statusCode(HttpStatus.NO_CONTENT.value());
 
-        given().log().all().
-        when()
-                .get("/stations").
-        then().log().all()
+        역_목록_조회()
                 .body("size()", equalTo(1))
                 .body("name", not(contains(강남역)));
     }
 
-    private ValidatableResponse 역_생성(String stationName) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", stationName);
+    public static ValidatableResponse 역_생성(String stationName) {
+        StationRequest request = new StationRequest(stationName);
+        return post("/stations", request);
+    }
 
-        return given().log().all()
-                    .body(params)
-                    .contentType(MediaType.APPLICATION_JSON_VALUE).
-                when()
-                    .post("/stations").
-                then().log().all();
+    private ValidatableResponse 역_목록_조회() {
+        return get("/stations");
     }
 }
