@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import subway.web.request.LineCreateRequest;
 import subway.web.request.SectionCreateRequest;
 import subway.web.response.LineResponse;
+import subway.web.response.SectionResponse;
 import subway.web.response.StationResponse;
 
 import java.util.HashMap;
@@ -43,7 +44,32 @@ class SectionAcceptanceTest extends BaseAcceptance {
     @Test
     void createSection() {
         // Given && When
-        SectionCreateRequest sectionCreateRequest = new SectionCreateRequest("2", "3", 10L);
+        SectionResponse givenSection = 지하철_구간_생성();
+
+        // Then
+        ExtractableResponse<Response> actualSection = 지하철_구간_목록_요청(givenSection);
+
+        지하철_구간을_조회_할_수_있다(givenSection, actualSection);
+    }
+
+    private static void 지하철_구간을_조회_할_수_있다(SectionResponse givenSection, ExtractableResponse<Response> actualSection) {
+        assertThat(actualSection.as(SectionResponse.class)).isEqualTo(givenSection);
+    }
+
+    private static ExtractableResponse<Response> 지하철_구간_목록_요청(SectionResponse givenSection) {
+        ExtractableResponse<Response> sectionResponse = RestAssured.given().spec(REQUEST_SPEC).log().all()
+            .param("sectionId", givenSection.getId())
+            .when().get("/lines/1/sections/{sectionId}")
+            .then().log().all()
+            .extract();
+
+        assertThat(sectionResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        return sectionResponse;
+    }
+
+    private static SectionResponse 지하철_구간_생성() {
+        SectionCreateRequest sectionCreateRequest = new SectionCreateRequest("1", "2", 10L);
 
         ExtractableResponse<Response> createResponse = RestAssured.given().spec(REQUEST_SPEC).log().all()
             .body(sectionCreateRequest)
@@ -51,8 +77,9 @@ class SectionAcceptanceTest extends BaseAcceptance {
             .then().log().all()
             .extract();
 
-        // Then
         assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        return createResponse.as(SectionResponse.class);
     }
 
     private LineResponse 지하철_노선_생성(String lineName, StationResponse upStation, StationResponse downStation) {
