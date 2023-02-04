@@ -7,19 +7,12 @@ import org.springframework.http.MediaType;
 
 public class AcceptanceExecutor {
 
-    public static <T> ExtractableResponse<Response> post(final String url, final T requestBody) {
+    public static <T> ExtractableResponse<Response> post(final String path, final T requestBody) {
+
         return RestAssured
                 .given().body(requestBody)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post(url)
-                .then().log().all()
-                .extract();
-    }
-
-    public static <R> ExtractableResponse<Response> get(final String url) {
-
-        return RestAssured
-                .when().get(url)
+                .when().post(path)
                 .then().log().all()
                 .extract();
     }
@@ -33,21 +26,17 @@ public class AcceptanceExecutor {
                 .as(responseType);
     }
 
-    public static <T, R> R get(final String url, final Class<T> requestBody, final Class<R> responseType) {
+    public static ExtractableResponse<Response> get(final String path) {
 
         return RestAssured
-                .given()
-                .body(requestBody)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().get(url)
+                .when().get(path)
                 .then().log().all()
-                .extract()
-                .as(responseType);
+                .extract();
     }
 
-    public static <T> ExtractableResponse<Response> put(final String path, final T requestBody) {
+    public static <T> void put(final String path, final T requestBody) {
 
-        return RestAssured.given().log().all()
+        RestAssured.given().log().all()
                 .body(requestBody)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().put(path)
@@ -55,10 +44,10 @@ public class AcceptanceExecutor {
                 .extract();
     }
 
-    public static <T> ExtractableResponse<Response> delete(final String url) {
+    public static <T> ExtractableResponse<Response> delete(final String path) {
 
         return RestAssured
-                .when().delete(url)
+                .when().delete(path)
                 .then().log().all()
                 .extract();
     }

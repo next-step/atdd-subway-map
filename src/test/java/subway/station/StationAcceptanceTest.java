@@ -11,15 +11,16 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import subway.util.BaseAcceptanceTest;
+import subway.util.AcceptanceTestHelper;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class StationAcceptanceTest extends BaseAcceptanceTest {
+class StationAcceptanceTest extends AcceptanceTestHelper {
 
     @LocalServerPort
     int port;
@@ -77,9 +78,7 @@ class StationAcceptanceTest extends BaseAcceptanceTest {
     @ValueSource(strings = {"강남역", "역삼역"})
     void createAndDeleteAfterFindNoContentsStation(String stationName) {
         // given
-        final Integer id = 지하철역_생성(stationName)
-                .jsonPath()
-                .get("id");
+        final Long id = 지하철역_생성(stationName);
 
         // when
         final String deletePath = String.format(STATION_PATH + "/%s", id);
@@ -91,4 +90,9 @@ class StationAcceptanceTest extends BaseAcceptanceTest {
                 .isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
+    public long 지하철역_생성(String name) {
+
+        return post(STATION_PATH, Map.of("name", name))
+                .jsonPath().getLong("id");
+    }
 }

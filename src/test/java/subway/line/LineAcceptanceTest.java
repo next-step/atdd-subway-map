@@ -2,51 +2,37 @@ package subway.line;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
-import subway.util.BaseAcceptanceTest;
+import subway.controller.request.LineRequest;
 import subway.controller.response.LineResponse;
+import subway.util.AcceptanceTestHelper;
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD;
+import static subway.fixture.LineFixture.분당선_요청;
+import static subway.fixture.LineFixture.신분당선_요청;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @DirtiesContext(classMode = AFTER_EACH_TEST_METHOD)
 @Sql("/insert-station.sql")
-class LineAcceptanceTest extends BaseAcceptanceTest {
-
-    @BeforeEach
-    void setup() {
-        신분당선 = new HashMap<>();
-        신분당선.put("name", SHIN_BUN_DANG);
-        신분당선.put("color", "bg-red-600");
-        신분당선.put("upStationId", 1);
-        신분당선.put("downStationId", 2);
-        신분당선.put("distance", 10);
-
-        이호선 = new HashMap<>();
-        이호선.put("name", LEE_HO_SEON);
-        이호선.put("color", "bg-green-600");
-        이호선.put("upStationId", 3);
-        이호선.put("downStationId", 4);
-        이호선.put("distance", 10);
-    }
+class LineAcceptanceTest extends AcceptanceTestHelper {
 
     @DisplayName("지하철 노선을 생성한다.")
     @Test
     void createLine() {
         // when
         // 지하철 노선을 생성하면
-        ExtractableResponse<Response> response = 지하철노선_생성(신분당선);
+        ExtractableResponse<Response> response = 지하철노선_생성(신분당선_요청);
         long id = response.jsonPath().getLong("id");
 
         // 지하철 노선 목록 조회 시
@@ -68,8 +54,8 @@ class LineAcceptanceTest extends BaseAcceptanceTest {
     void findAllLine() {
         // given
         // 2개의 지하철 노선을 생성하고
-        지하철노선_생성(신분당선);
-        지하철노선_생성(이호선);
+        지하철노선_생성(신분당선_요청);
+        지하철노선_생성(분당선_요청);
 
         // when
         // 지하철 노선 목록을 조회하면
@@ -86,7 +72,7 @@ class LineAcceptanceTest extends BaseAcceptanceTest {
     void getLineTest() {
         // given
         // 지하철 노선을 생성하고
-        ExtractableResponse<Response> response = 지하철노선_생성(신분당선);
+        ExtractableResponse<Response> response = 지하철노선_생성(신분당선_요청);
         long id = response.jsonPath().getLong("id");
 
         // when
@@ -103,16 +89,18 @@ class LineAcceptanceTest extends BaseAcceptanceTest {
     void updateLine() {
         // given
         // 지하철 노선을 생성하고
-        ExtractableResponse<Response> response = 지하철노선_생성(신분당선);
+        ExtractableResponse<Response> response = 지하철노선_생성(신분당선_요청);
 
         long id = response.jsonPath().getLong("id");
 
         String updateName = "개명된 신분당선";
         String updateColor = "bg-red-500";
 
+        final Map<String, String> param = Map.of("name", updateName, "color", updateColor);
+
         // when
         // 생성한 노선을 수정하면
-        지하철_노선을_수정한다(id, updateName, updateColor);
+        지하철_노선을_수정한다(id, param);
 
         // then
         // 생성한 노선 정보가 수정되어있다
@@ -126,7 +114,7 @@ class LineAcceptanceTest extends BaseAcceptanceTest {
     void deleteLine() {
         // given
         // 지하철 노선을 생성하고
-        ExtractableResponse<Response> createdResponse = 지하철노선_생성(신분당선);
+        ExtractableResponse<Response> createdResponse = 지하철노선_생성(신분당선_요청);
         long id = createdResponse.jsonPath().getLong("id");
 
         // when
@@ -147,4 +135,36 @@ class LineAcceptanceTest extends BaseAcceptanceTest {
         assertThat(maybeLine).isEmpty();
     }
 
+    public ExtractableResponse<Response> 지하철노선_생성(final LineRequest req) {
+        return post(LINE_PATH, req);
+    }
+
+    public List<String> 지하철노선목록의_이름_조회() {
+
+        return 지하철노선_목록조회().stream()
+                .map(LineResponse::getName)
+                .collect(Collectors.toList());
+    }
+
+    public List<LineResponse> 지하철노선_목록조회() {
+
+        return get(LINE_PATH)
+                .jsonPath()
+                .getList("$", LineResponse.class);
+    }
+
+    public void 지하철_노선을_수정한다(final Long id, Map<String, String> param) {
+
+        put(LINE_PATH + "/" + id, param);
+    }
+
+    public LineResponse 지하철노선_단건조회(Long id) {
+
+        return get(LINE_PATH + "/" + id, LineResponse.class);
+    }
+
+    public ExtractableResponse<Response> 지하철_노선을_삭제한다(Long id) {
+
+        return delete(LINE_PATH + "/" + id);
+    }
 }

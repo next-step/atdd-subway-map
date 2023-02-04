@@ -1,5 +1,6 @@
 package subway.controller.request;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import subway.common.Comment;
 
@@ -7,6 +8,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Getter
+@AllArgsConstructor
 public class LineRequest {
 
     @Comment("노선 이름")
