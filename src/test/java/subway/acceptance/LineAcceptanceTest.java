@@ -32,10 +32,10 @@ public class LineAcceptanceTest extends AbstractAcceptanceTest {
     @DisplayName("지하철 노선을 생성한다.")
     @Test
     void createLine() {
-        노선_생성(신분당선_요청)
-                .statusCode(HttpStatus.CREATED.value());
+        노선_생성(신분당선_요청).statusCode(HttpStatus.CREATED.value());
 
-        assertThat(노선_이름_목록_조회()).contains(신분당선);
+        List<String> 노선_이름_목록 = 노선_이름_목록_조회();
+        assertThat(노선_이름_목록).contains(신분당선);
     }
 
     /**
@@ -45,8 +45,9 @@ public class LineAcceptanceTest extends AbstractAcceptanceTest {
     @DisplayName("존재하지 않는 역을 포함시켜 지하철 노선을 생성하면 생성되지 않는다.")
     @Test
     void createLineException() {
-        노선_생성(잘못된_노선_요청)
-                .statusCode(HttpStatus.NOT_FOUND.value());
+        var response = 노선_생성(잘못된_노선_요청);
+
+        assertThat(상태_코드_추출(response)).isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 
     /**
@@ -60,7 +61,9 @@ public class LineAcceptanceTest extends AbstractAcceptanceTest {
         노선_생성(신분당선_요청);
         노선_생성(분당선_요청);
 
-        assertThat(노선_이름_목록_조회())
+        List<String> 노선_이름_목록 = 노선_이름_목록_조회();
+
+        assertThat(노선_이름_목록)
                 .hasSize(2)
                 .contains(신분당선, 분당선);
     }
@@ -76,7 +79,9 @@ public class LineAcceptanceTest extends AbstractAcceptanceTest {
         var createResponse = 노선_생성(신분당선_요청);
         String location = 리소스_경로_추출(createResponse);
 
-        assertThat(노선_이름_조회(location)).isEqualTo(신분당선);
+        String 노선_이름 = 노선_이름_조회(location);
+
+        assertThat(노선_이름).isEqualTo(신분당선);
     }
 
     /**
@@ -86,12 +91,13 @@ public class LineAcceptanceTest extends AbstractAcceptanceTest {
     @DisplayName("존재하지 않는 노선을 조회한다.")
     @Test
     void showLineException() {
-        given()
-                .pathParam("id", 존재하지_않는_노선_ID).
-        when()
-                .get("/lines/{id}").
-        then().log().all()
-                .statusCode(HttpStatus.NOT_FOUND.value());
+        ValidatableResponse response = given()
+                    .pathParam("id", 존재하지_않는_노선_ID).
+                when()
+                    .get("/lines/{id}").
+                then().log().all();
+
+        assertThat(상태_코드_추출(response)).isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 
     /**
@@ -123,14 +129,15 @@ public class LineAcceptanceTest extends AbstractAcceptanceTest {
     @DisplayName("존재하지 않는 노선을 수정하는 경우 수정되지 않는다.")
     @Test
     void updateLineException() {
-        given()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .pathParam("id", 존재하지_않는_노선_ID)
-            .body(지하철노선_수정_요청).
-        when()
-            .put("/lines/{id}").
-        then().log().all()
-            .statusCode(HttpStatus.NOT_FOUND.value());
+        var response = given()
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .pathParam("id", 존재하지_않는_노선_ID)
+                        .body(지하철노선_수정_요청).
+                    when()
+                         .put("/lines/{id}").
+                    then().log().all();
+
+        assertThat(상태_코드_추출(response)).isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 
     /**
@@ -160,12 +167,13 @@ public class LineAcceptanceTest extends AbstractAcceptanceTest {
     @DisplayName("존재하지 않는 노선을 삭제한다.")
     @Test
     void deleteLineException() {
-        given()
-                .pathParam("id", 존재하지_않는_노선_ID).
-        when()
-                .delete("/lines/{id}").
-        then().log().all()
-                .statusCode(HttpStatus.NOT_FOUND.value());
+        ValidatableResponse response = given()
+                                        .pathParam("id", 존재하지_않는_노선_ID).
+                                    when()
+                                        .delete("/lines/{id}").
+                                    then().log().all();
+
+        assertThat(상태_코드_추출(response)).isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 
     public static ValidatableResponse 노선_생성(LineRequest request) {

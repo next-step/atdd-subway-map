@@ -54,7 +54,9 @@ public class LineSectionAcceptanceTest extends AbstractAcceptanceTest {
         var createResponse = 노선_생성(신분당선_요청);
         String location = 리소스_경로_추출(createResponse);
 
-        구간_등록(location, 양재역_양재역_구간_요청).statusCode(HttpStatus.BAD_REQUEST.value());
+        ValidatableResponse response = 구간_등록(location, 양재역_양재역_구간_요청);
+
+        assertThat(상태_코드_추출(response)).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     /**
@@ -113,7 +115,9 @@ public class LineSectionAcceptanceTest extends AbstractAcceptanceTest {
         var createResponse = 노선_생성(신분당선_요청);
         String location = 리소스_경로_추출(createResponse);
 
-        구간_삭제(location, 역삼역_ID).statusCode(HttpStatus.BAD_REQUEST.value());
+        ValidatableResponse response = 구간_삭제(location, 역삼역_ID);
+
+        assertThat(상태_코드_추출(response)).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     /**
@@ -128,7 +132,9 @@ public class LineSectionAcceptanceTest extends AbstractAcceptanceTest {
         String location = 리소스_경로_추출(createResponse);
         구간_등록(location, 역삼역_교대역_구간_요청);
 
-        구간_삭제(location, 역삼역_ID).statusCode(HttpStatus.BAD_REQUEST.value());
+        ValidatableResponse response = 구간_삭제(location, 역삼역_ID);
+
+        assertThat(상태_코드_추출(response)).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     private ValidatableResponse 구간_등록(String location, SectionRequest request) {

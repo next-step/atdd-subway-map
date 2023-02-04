@@ -24,7 +24,8 @@ public class StationAcceptanceTest extends AbstractAcceptanceTest {
     @DisplayName("지하철역을 생성한다.")
     @Test
     void createStation() {
-        역_생성(강남역).statusCode(HttpStatus.CREATED.value());
+        역_생성(강남역)
+                .statusCode(HttpStatus.CREATED.value());
         역_목록_조회()
                 .body("name", hasItems(강남역));
     }

@@ -26,11 +26,15 @@ public abstract class AbstractAcceptanceTest {
                 then().log().all();
     }
 
+    public static RequestSpecification given() {
+        return RestAssured.given().log().all();
+    }
+
     public String 리소스_경로_추출(ValidatableResponse response) {
         return response.extract().header("location");
     }
 
-    public static RequestSpecification given() {
-        return RestAssured.given().log().all();
+    public int 상태_코드_추출(ValidatableResponse response) {
+        return response.extract().statusCode();
     }
 }
