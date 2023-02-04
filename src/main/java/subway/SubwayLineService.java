@@ -47,4 +47,8 @@ public class SubwayLineService {
             .orElseThrow(ResourceNotFoundException::new);
         subwayLine.update(id, subwayLineRequest);
     }
+
+    public void deleteSubwayLine(Long id) {
+        subwayLineRepository.deleteById(id);
+    }
 }

@@ -109,10 +109,11 @@ public class SubwayLineAcceptanceTest {
     @Test
     void 지하철노선_조회() {
         //given
-        ExtractableResponse<Response> createResponse = createSubwayLine(LINE_SHIN_BUN_DANG_REQUEST);
+        ExtractableResponse<Response> createdResponse = createSubwayLine(
+            LINE_SHIN_BUN_DANG_REQUEST);
 
         //when
-        Long id = createResponse.jsonPath().getLong("id");
+        Long id = createdResponse.jsonPath().getLong("id");
         ExtractableResponse<Response> getResponse = getSubwayLine(id);
 
         //then
@@ -144,15 +145,28 @@ public class SubwayLineAcceptanceTest {
     @Test
     void 지하철노선_수정() {
         //given
-        ExtractableResponse<Response> createResponse = createSubwayLine(LINE_SHIN_BUN_DANG_REQUEST);
+        ExtractableResponse<Response> createdResponse = createSubwayLine(
+            LINE_SHIN_BUN_DANG_REQUEST);
         //when
-        Long id = createResponse.jsonPath().getLong("id");
+        Long id = createdResponse.jsonPath().getLong("id");
         ExtractableResponse<Response> response = updateSubwayLine(id);
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         String lineName = getSubwayLine(id).jsonPath().getString("name");
         assertThat(lineName).isEqualTo("새로운 신분당선");
+    }
+
+    private void deleteSubwayLine(Long id) {
+        given()
+            .pathParam("id", id)
+            .log().all()
+            .when()
+            .delete("/lines/{id}")
+            .then()
+            .statusCode(HttpStatus.NO_CONTENT.value())
+            .log().all()
+            .extract();
     }
 
     /**
@@ -163,7 +177,15 @@ public class SubwayLineAcceptanceTest {
     @DisplayName("지하철노선 삭제")
     @Test
     void 지하철노선_삭제() {
-
+        //given
+        ExtractableResponse<Response> createdResponse = createSubwayLine(
+            LINE_SHIN_BUN_DANG_REQUEST);
+        //when
+        Long id = createdResponse.jsonPath().getLong("id");
+        deleteSubwayLine(id);
+        //then
+        List<String> subwayNameList = getSubwayLines().jsonPath().getList("name", String.class);
+        assertThat(subwayNameList).doesNotContain(LINE_SHIN_BUN_DANG_REQUEST.getName());
     }
 
 
