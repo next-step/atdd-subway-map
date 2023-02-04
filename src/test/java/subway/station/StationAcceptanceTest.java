@@ -1,4 +1,4 @@
-package subway;
+package subway.station;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -11,16 +11,15 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
+import subway.util.BaseAcceptanceTest;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class StationAcceptanceTest extends RestMethods {
+class StationAcceptanceTest extends BaseAcceptanceTest {
 
     @LocalServerPort
     int port;
@@ -29,8 +28,6 @@ class StationAcceptanceTest extends RestMethods {
     void setUp() {
         RestAssured.port = port;
     }
-
-    private static final String STATION_PATH = "/stations";
 
     /**
      * When 지하철역을 생성하면
@@ -58,8 +55,8 @@ class StationAcceptanceTest extends RestMethods {
     @Test
     void requestAndResponseForSubwayStationTest() {
         // given
-        createStation("강남역");
-        createStation("역삼역");
+        지하철역_생성("강남역");
+        지하철역_생성("역삼역");
 
         // when
         ExtractableResponse<Response> response = get(STATION_PATH);
@@ -80,7 +77,7 @@ class StationAcceptanceTest extends RestMethods {
     @ValueSource(strings = {"강남역", "역삼역"})
     void createAndDeleteAfterFindNoContentsStation(String stationName) {
         // given
-        final Integer id = createStation(stationName)
+        final Integer id = 지하철역_생성(stationName)
                 .jsonPath()
                 .get("id");
 
@@ -92,18 +89,6 @@ class StationAcceptanceTest extends RestMethods {
         // then
         assertThat(response.statusCode())
                 .isEqualTo(HttpStatus.NO_CONTENT.value());
-    }
-
-    /**
-     * 지하철을 입력받아 /station 에 post 요청하는 편의 메서드
-     * @param name
-     * @return response
-     */
-    ExtractableResponse<Response> createStation(String name) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-
-        return post(STATION_PATH, params);
     }
 
 }
