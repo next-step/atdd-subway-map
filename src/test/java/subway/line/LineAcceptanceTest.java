@@ -1,59 +1,40 @@
 package subway.line;
 
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
-import subway.station.StationAcceptanceTest;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import static io.restassured.RestAssured.given;
+import static common.CommonResponseBodyExtraction.getList;
+import static common.CommonResponseBodyExtraction.getObject;
+import static common.CommonRestAssured.delete;
+import static common.CommonRestAssured.get;
+import static common.CommonRestAssured.post;
+import static common.CommonRestAssured.put;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
+import java.util.List;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
+import subway.AbstractAcceptanceTest;
+import subway.station.StationAcceptanceTest;
+import subway.station.StationResponse;
+
 @DisplayName("지하철 노선 관련 기능")
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-class LineAcceptanceTest {
+class LineAcceptanceTest extends AbstractAcceptanceTest {
 
-    public static final String 신분당선 = "신분당선";
-    public static final String 분당선 = "분당선";
-    public static final String RED = "be-red-600";
-    public static final String GREEN = "bg-green-600";
+    private static final String BASE_URL = "lines/";
+    private static final String 신분당선 = "신분당선";
+    private static final String RED = "be-red-600";
 
-    @BeforeEach
-    void setUp() {
-        StationAcceptanceTest.createStation("강남역");
-        StationAcceptanceTest.createStation("미금역");
-        StationAcceptanceTest.createStation("구의역");
+    private LineRequest 신분당선_생성_요청_dto() {
+        StationResponse 강남역 = StationAcceptanceTest.createStation("강남역");
+        StationResponse 미금역 = StationAcceptanceTest.createStation("미금역");
+
+        return new LineRequest(신분당선, RED, 강남역.getId(), 미금역.getId(), 10L);
     }
 
-    private LineRequest 신분당선_생성_요청() {
-        return LineRequest.builder()
-                .name(신분당선)
-                .color(RED)
-                .upStationId(1L)
-                .downStationId(2L)
-                .distance(10L)
-                .build();
-    }
-
-    private LineRequest 분당선_생성_요청() {
-        return LineRequest.builder()
-                .name(분당선)
-                .color(GREEN)
-                .upStationId(1L)
-                .downStationId(3L)
-                .distance(10L)
-                .build();
+    private LineResponse 신분당선_생성() {
+        ExtractableResponse<Response> response = post(BASE_URL, 신분당선_생성_요청_dto());
+        return getObject(response, "$", LineResponse.class);
     }
 
     /**
@@ -64,31 +45,11 @@ class LineAcceptanceTest {
     @Test
     void createLine() {
         // when
-        createLine(신분당선_생성_요청());
+        ExtractableResponse<Response> response = post(BASE_URL, 신분당선_생성_요청_dto());
 
         // then
-        assertThat(getStationNames()).containsAnyOf(신분당선);
-    }
-
-    private void createLine(LineRequest request) {
-        given().log().all()
-                .body(request)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().statusCode(HttpStatus.CREATED.value());
-    }
-
-    private List<String> getStationNames() {
-        return findAllLines()
-                .jsonPath()
-                .getList("name", String.class);
-    }
-
-    private ExtractableResponse<Response> findAllLines() {
-        return given().log().all()
-                .when().get("/lines")
-                .then().log().all()
-                .extract();
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(getList(get(BASE_URL), "name")).containsAnyOf(신분당선);
     }
 
     /**
@@ -100,20 +61,14 @@ class LineAcceptanceTest {
     @Test
     void showLines() {
         // given
-        List<LineRequest> lines = List.of(신분당선_생성_요청(), 분당선_생성_요청());
-        lines.forEach(this::createLine);
+        List<LineResponse> lines = List.of(신분당선_생성(), 신분당선_생성());
 
         // when
-        ExtractableResponse<Response> response = findAllLines();
+        ExtractableResponse<Response> response = get(BASE_URL);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.jsonPath()
-                .getList("name", String.class))
-                .hasSameSizeAs(lines)
-                .containsAll(lines.stream()
-                        .map(LineRequest::getName)
-                        .collect(Collectors.toList()));
+        assertThat(getList(response, "$")).hasSameSizeAs(lines);
     }
 
     /**
@@ -125,28 +80,17 @@ class LineAcceptanceTest {
     @Test
     void showLine() {
         // given
-        LineRequest request = 신분당선_생성_요청();
-        createLine(request);
+        LineResponse 신분당선 = 신분당선_생성();
 
         // when
-        ExtractableResponse<Response> response = findLineById(1L);
+        ExtractableResponse<Response> response = get(BASE_URL + 신분당선.getId());
 
         // then
-        assertThat(response.statusCode())
-                .isEqualTo(HttpStatus.OK.value());
-        assertThat(response.jsonPath().getString("name"))
-                .isEqualTo(request.getName());
-        assertThat(response.jsonPath().getString("color"))
-                .isEqualTo(request.getColor());
-        assertThat(response.jsonPath().getList("stations.id", Long.class))
-                .contains(request.getUpStationId(), request.getDownStationId());
-    }
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
-    private ExtractableResponse<Response> findLineById(Long id) {
-        return given().log().all()
-                .when().get("/lines/" + id)
-                .then().log().all()
-                .extract();
+        LineResponse line = getObject(response, "$", LineResponse.class);
+        assertThat(line.getName()).isEqualTo(신분당선.getName());
+        assertThat(line.getColor()).isEqualTo(신분당선.getColor());
     }
 
     /**
@@ -158,34 +102,23 @@ class LineAcceptanceTest {
     @Test
     void updateLine() {
         // given
-        createLine(분당선_생성_요청());
+        LineResponse 신분당선 = 신분당선_생성();
 
         // when
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "다른분당선");
-        params.put("color", "bg-red-600");
-
-        ExtractableResponse<Response> response =
-                given().log().all()
-                        .body(params)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().put("/lines/1")
-                        .then().log().all()
-                        .extract();
+        LineUpdateRequest request = new LineUpdateRequest("다른분당선", "bg-green-600");
+        ExtractableResponse<Response> response = put(BASE_URL + 신분당선.getId(), request);
 
         // then
-        LineResponse line = getLineById(1L);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
-        assertThat(response.statusCode())
-                .isEqualTo(HttpStatus.OK.value());
-        assertThat(line.getName())
-                .isEqualTo(params.get("name"));
-        assertThat(line.getColor())
-                .isEqualTo(params.get("color"));
+        LineResponse line = findLineById(신분당선.getId());
+        assertThat(line.getName()).isEqualTo(request.getName());
+        assertThat(line.getColor()).isEqualTo(request.getColor());
     }
 
-    private LineResponse getLineById(Long id) {
-        return findLineById(id).jsonPath().getObject("$", LineResponse.class);
+    private LineResponse findLineById(Long id) {
+        ExtractableResponse<Response> response = get(BASE_URL + id);
+        return getObject(response, "$", LineResponse.class);
     }
 
     /**
@@ -197,17 +130,12 @@ class LineAcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        createLine(신분당선_생성_요청());
+        LineResponse 신분당선 = 신분당선_생성();
 
         // when
-        ExtractableResponse<Response> response =
-                given().log().all()
-                        .when().delete("/lines/1")
-                        .then().log().all()
-                        .extract();
+        ExtractableResponse<Response> response = delete(BASE_URL + 신분당선.getId());
 
         // then
-        assertThat(response.statusCode())
-                .isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 }

@@ -1,11 +1,11 @@
 package subway.line;
 
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import subway.station.Station;
 
 @Getter
-@Builder
+@AllArgsConstructor
 public class LineRequest {
     private String name;
     private String color;
