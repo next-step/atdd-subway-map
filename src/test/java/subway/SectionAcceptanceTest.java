@@ -59,7 +59,7 @@ class SectionAcceptanceTest extends BaseAcceptance {
      * When 기존 노선에 새로운 구간 생성 시
      * Then 상행역은 해당 노선에 등록되어있는 하행 종점역이 아닐 시 throw Exception
      */
-    @DisplayName("새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 한다")
+    @DisplayName("새로운 구간 생성 시 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 한다")
     @Test
     void 지하철_구간_생성_시_상행역은_해당_노선에_등록되어있는_하행_종점역이_아닐_시_Exception() {
         // Given
@@ -70,6 +70,24 @@ class SectionAcceptanceTest extends BaseAcceptance {
 
         // Then
         지하철_구간_등록하려는_상행역이_기존_하행역이_아니다(actualResponse);
+    }
+
+    /**
+     * When 기존 노선에 새로운 구간 생성 시
+     * Then 하행역이 해당 노선에 등록되어있는 역이 경우 Exception.
+     */
+    @DisplayName("새로운 구간 생성 시 하행역은 해당 노선에 등록되어있는 역일 수 없다")
+    @Test
+    void 지하철_구간_생성_시_하행역이_해당_노선에_등록되어있는_역이_경우_Exception() {
+        // Given && When
+        ExtractableResponse<Response> actualResponse = 지하철_구간_생성(신분당선, 강남역, 논현역,  10L);
+
+        // Then
+        지하철_구간_등록하려는_하행역은_해당_노선에_등록되어있는_역일_수_없다(actualResponse);
+    }
+
+    private void 지하철_구간_등록하려는_하행역은_해당_노선에_등록되어있는_역일_수_없다(ExtractableResponse<Response> actualResponse) {
+        assertThat(actualResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
     private void 지하철_구간_등록하려는_상행역이_기존_하행역이_아니다(ExtractableResponse<Response> actualSection) {
