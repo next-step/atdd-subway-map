@@ -54,6 +54,13 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         var param = new SectionCreateRequest(firstStationId, thirdStationId, 10L);
         SectionRestAssuredTest.createSectionFail(lineId, param);
     }
+
+    @DisplayName("지하철 노선에 추가 구간의 하행역이 해당 노선에 등록되어 있는 역일 수 없다.")
+    @Test
+    public void sectionCreateFail_2() {
+        var param = new SectionCreateRequest(secondStationId, firstStationId, 10L);
+        SectionRestAssuredTest.createSectionFail(lineId, param);
+    }
     /**
      * When 지하철 노선에 구간을 제거하면
      * Then 지하철 노선에 구간이 제거된다.
