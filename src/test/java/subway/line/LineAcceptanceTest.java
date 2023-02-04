@@ -2,22 +2,34 @@ package subway.line;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.context.jdbc.Sql;
 import setting.RandomPortSetting;
 import subway.common.util.SimpleCRUDApi;
 import subway.common.util.validation.ExistenceValidation;
 import subway.common.util.validation.ResponseStatusValidation;
 import subway.line.util.Extraction;
 import subway.line.util.Validation;
+import subway.station.StationApi;
 
 import static subway.line.MockLine.분당선;
 import static subway.line.MockLine.신분당선;
+import static subway.station.MockStation.강남역;
+import static subway.station.MockStation.서초역;
+import static subway.station.MockStation.신촌역;
 
 @DisplayName("노선 관련 기능")
-@Sql("/stations.sql")
-public class LineAcceptanceTest extends RandomPortSetting {
+class LineAcceptanceTest extends RandomPortSetting {
+
+    @BeforeEach
+    public void setUp() {
+        super.setUp();
+
+        StationApi.createStation(강남역);
+        StationApi.createStation(서초역);
+        StationApi.createStation(신촌역);
+    }
 
     /**
      * When 지하철 노선을 생성하면
