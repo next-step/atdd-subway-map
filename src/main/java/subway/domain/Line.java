@@ -20,16 +20,15 @@ public class Line {
     private String name;
     @NotBlank(message = "color is not blank")
     private String color;
-    @OneToMany(fetch = FetchType.EAGER)
-    private List<Section> sections = new ArrayList<>();
+    @OneToMany(mappedBy = "line", cascade = CascadeType.ALL)
+    private List<Section> sections = new ArrayList<Section>();
 
     public Line() {
     }
 
-    public Line(String name, String color, List<Section> sections) {
+    public Line(String name, String color) {
         this.name = name;
         this.color = color;
-        this.sections = sections;
     }
 
     public void change(String name, String color){
@@ -37,16 +36,28 @@ public class Line {
         this.color = color;
     }
 
-    public void addSection(Section section){
+    public void addSection(Section section) {
         this.sections.add(section);
+
+        if (section.getLine() != this) {
+            section.setLine(this);
+        }
     }
 
-    public boolean isUpStationNotEqualDownStation(Long upStationId) {
-        if (this.getSections().get(this.getSections().size() -1 ).getDownStationId().equals(upStationId)) {
-            return false;
+    public void deleteSection(Section section) {
+        this.sections.remove(section);
+
+        if (section.getLine() == this) {
+            section.setLine(null);
+        }
+    }
+
+    public boolean isUpStationEqualDownStation(Long upStationId) {
+        if (this.getSections().size() < 1 || this.getSections().get(this.getSections().size() -1 ).getDownStationId().equals(upStationId)) {
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     public boolean alreadyExistsDownStation(Long downStationId) {
@@ -54,6 +65,22 @@ public class Line {
             if (downStationId.equals(section.getUpStationId()) || downStationId.equals(section.getDownStationId())) {
                 return true;
             }
+        }
+
+        return false;
+    }
+
+    public boolean isNotLastSection(Section section) {
+        if (!this.sections.get(this.sections.size()-1).equals(section)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean isNotValidSectionCount() {
+        if (this.sections.size() <= 1) {
+            return true;
         }
 
         return false;

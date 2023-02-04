@@ -8,13 +8,15 @@ import subway.domain.Station;
 import subway.dto.SectionRequest;
 import subway.dto.SectionResponse;
 import subway.repository.SectionRepository;
+import subway.repository.StationRepository;
 
 @AllArgsConstructor
 @Service
 @Transactional(readOnly = true)
 public class SectionService {
     SectionRepository sectionRepository;
-    StationService stationService;
+    StationRepository stationRepository;
+    public static String ERROR_NO_FOUND_SECTION = "[SYS_ERROR] do not found section by id";
 
     @Transactional
     public SectionResponse saveSection(SectionRequest sectionRequest) throws Exception {
@@ -24,9 +26,13 @@ public class SectionService {
     }
 
     private SectionResponse createSectionResponse(Section section) throws Exception{
-        Station upStation = stationService.findById(Long.valueOf(section.getUpStationId()));
-        Station downStation = stationService.findById(Long.valueOf(section.getDownStationId()));
+        Station upStation = stationRepository.findById(Long.valueOf(section.getUpStationId())).orElseThrow(() -> new Exception(ERROR_NO_FOUND_SECTION));
+        Station downStation = stationRepository.findById(Long.valueOf(section.getDownStationId())).orElseThrow(() -> new Exception(ERROR_NO_FOUND_SECTION));
 
         return new SectionResponse(section.getId(), upStation, downStation, section.getDistance());
+    }
+
+    public void deleteSection(Long id) {
+        sectionRepository.deleteById(id);
     }
 }

@@ -1,5 +1,6 @@
 package subway.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import javax.persistence.*;
 
@@ -15,6 +16,7 @@ public class Section {
     private int distance;
     @ManyToOne
     @JoinColumn(name = "line_id")
+    @JsonIgnore
     private Line line;
 
     public Section() {
@@ -24,5 +26,9 @@ public class Section {
         this.upStationId = upStationId;
         this.downStationId = downStationId;
         this.distance = distance;
+    }
+
+    public void setLine(Line line) {
+        this.line = line;
     }
 }

@@ -1,4 +1,4 @@
-package subway.domain.station;
+package subway.common;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus;
 import java.util.HashMap;
 import java.util.Map;
 
-public class StationUnitTest {
+public class StationApiTest {
     public static ExtractableResponse<Response> 지하철역을_조회한다() {
         return RestAssured.given().log().all()
                 .contentType(ContentType.JSON)

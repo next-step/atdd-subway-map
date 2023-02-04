@@ -3,6 +3,7 @@ package subway.dto;
 import lombok.Getter;
 import subway.domain.Section;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter

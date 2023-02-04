@@ -25,10 +25,16 @@ public class LineController {
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
 
-    @PostMapping("/{id}/section")
+    @PostMapping("/{id}/sections")
     public ResponseEntity<LineResponse> addSection(@PathVariable String id, @RequestBody SectionRequest sectionRequest) throws Exception {
         LineResponse line = lineService.addSection(id, sectionRequest);
-        return ResponseEntity.created(URI.create("/lines/" + line.getId()+"section")).body(line);
+        return ResponseEntity.ok().body(line);
+    }
+
+    @DeleteMapping ("/{id}/sections")
+    public ResponseEntity<LineResponse> deleteSection(@PathVariable String id, @RequestParam(name = "sectionId") String sectionId) throws Exception {
+        LineResponse line = lineService.deleteSection(id, sectionId);
+        return ResponseEntity.ok().body(line);
     }
 
     @GetMapping()

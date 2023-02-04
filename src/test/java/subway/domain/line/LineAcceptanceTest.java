@@ -16,7 +16,7 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD;
 import static subway.common.SetupTest.*;
-import static subway.domain.line.LineUnitTest.*;
+import static subway.common.LineApiTest.*;
 
 @DisplayName("지하철 노선을 관리한다.")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
