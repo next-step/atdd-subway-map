@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import subway.exception.LineNotFoundException;
 import subway.exception.SectionException;
@@ -69,6 +70,13 @@ public class LineController {
         LineResponse lineResponse = lineService.addSection(lineId, sectionRequest);
 
         return ResponseEntity.created(URI.create("/lines/" + lineResponse.getId() + "/sections")).body(lineResponse);
+    }
+
+    @DeleteMapping("/{id}/sections")
+    public ResponseEntity<Void> deleteSection(@PathVariable(name = "id") Long lineId, @RequestParam Long stationId) {
+        lineService.deleteSection(lineId, stationId);
+
+        return ResponseEntity.noContent().build();
     }
 
     @ExceptionHandler({LineNotFoundException.class})

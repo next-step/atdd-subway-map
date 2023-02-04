@@ -9,6 +9,9 @@ import java.util.Map;
 
 import static io.restassured.RestAssured.given;
 
+/**
+ *
+ */
 public class LineApi {
 
     private LineApi() {}
@@ -106,6 +109,22 @@ public class LineApi {
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                     .post("/lines/{"+LINE_ID_KEY+"}/sections")
+                .then()
+                    .log().all()
+                    .extract();
+    }
+
+    /**
+     * http://localhost:50840/lines/%7Bid%7D/sections?stationId=3
+     */
+    public static ExtractableResponse<Response> deleteSection(long lineId, long stationId) {
+        return given()
+                .log().all()
+                    .pathParam(LINE_ID_KEY, lineId)
+                    .queryParam("stationId", stationId)
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                    .delete("/lines/{"+LINE_ID_KEY+"}/sections")
                 .then()
                     .log().all()
                     .extract();

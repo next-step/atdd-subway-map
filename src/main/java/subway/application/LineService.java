@@ -100,4 +100,9 @@ public class LineService {
 
         return LineResponse.of(line);
     }
+
+    @Transactional
+    public void deleteSection(Long lineId, Long stationId) {
+
+    }
 }

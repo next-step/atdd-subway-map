@@ -118,5 +118,17 @@ class SectionAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선의 구간을 제거한다")
     @Test
     void removeSection() {
+        // Given
+        ExtractableResponse<Response> responseOfCreate신촌역 = StationApi.createStation(신촌역);
+        long 신촌역_ID = StationExtraction.getStationId(responseOfCreate신촌역);
+
+        LineApi.addSection(신분당선_ID, 서초역_ID, 신촌역_ID, 10);
+
+        // When
+        LineApi.deleteSection(신분당선_ID, 신촌역_ID);
+
+        // Then
+        ExtractableResponse<Response> responseOfShowLine = LineApi.showLine(신분당선_ID);
+        checkIdNotExistence(responseOfShowLine, 신촌역_ID);
     }
 }
