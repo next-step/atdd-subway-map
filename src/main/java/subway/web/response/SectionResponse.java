@@ -7,41 +7,41 @@ import java.util.Objects;
 public class SectionResponse {
 
     private Long id;
-    private Long downStationId;
-    private Long upStationId;
+    private StationResponse downStation;
+    private StationResponse upStation;
     private Long distance;
-    private Long lineId;
+    private LineResponse lineResponse;
 
-    public SectionResponse(Long id, Long downStationId, Long upStationId, Long distance, Long lineId) {
+    public SectionResponse(Long id, StationResponse downStation, StationResponse upStation, Long distance, LineResponse lineResponse) {
         this.id = id;
-        this.downStationId = downStationId;
-        this.upStationId = upStationId;
+        this.downStation = downStation;
+        this.upStation = upStation;
         this.distance = distance;
-        this.lineId = lineId;
+        this.lineResponse = lineResponse;
     }
 
     public static SectionResponse from(Section section) {
-        return new SectionResponse(section.getId(), section.getDownStationId(), section.getUpStationId(), section.getDistance(), section.getLineId());
+        return new SectionResponse(section.getId(), StationResponse.from(section.getDownStation()), StationResponse.from(section.getUpStation()), section.getDistance(), LineResponse.from(section.getLine()));
     }
 
     public Long getId() {
         return id;
     }
 
-    public Long getDownStationId() {
-        return downStationId;
+    public StationResponse getDownStation() {
+        return downStation;
     }
 
-    public Long getUpStationId() {
-        return upStationId;
+    public StationResponse getUpStation() {
+        return upStation;
     }
 
     public Long getDistance() {
         return distance;
     }
 
-    public Long getLineId() {
-        return lineId;
+    public LineResponse getLineResponse() {
+        return lineResponse;
     }
 
     @Override

@@ -30,7 +30,7 @@ public class SectionCommandService implements SectionCommandUseCase {
         Station upStation = stationService.findStation(sectionCreateDto.getUpStationId());
         Station downStation = stationService.findStation(sectionCreateDto.getDownStationId());
 
-        Section section = Section.withNoId(sectionCreateDto.getDownStationId(), upStation.getId(), downStation.getId(), line.getId());
+        Section section = Section.withNoId(downStation, upStation, sectionCreateDto.getDistance(), line);
         return sectionCommandRepository.createSection(section);
     }
 

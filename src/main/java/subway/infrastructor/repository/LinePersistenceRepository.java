@@ -4,10 +4,10 @@ import org.springframework.stereotype.Component;
 import subway.application.service.output.LineCommandRepository;
 import subway.application.service.output.LineLoadRepository;
 import subway.domain.Line;
+import subway.domain.NotFoundLineException;
 import subway.domain.NotFoundStationException;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
@@ -30,8 +30,8 @@ class LinePersistenceRepository implements LineCommandRepository, LineLoadReposi
     }
 
     @Override
-    public Optional<Line> loadLine(Long createdLineId) {
-        return lineRepository.findById(createdLineId).map(this::buildLine);
+    public Line loadLine(Long createdLineId) {
+        return lineRepository.findById(createdLineId).map(this::buildLine).orElseThrow(NotFoundLineException::new);
     }
 
     @Override

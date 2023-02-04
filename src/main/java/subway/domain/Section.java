@@ -3,45 +3,45 @@ package subway.domain;
 public class Section {
 
     private Long id;
-    private Long downStationId;
-    private Long upStationId;
+    private Station downStation;
+    private Station upStation;
     private Long distance;
-    private Long lineId;
+    private Line line;
 
-    private Section(Long id, Long downStationId, Long upStationId, Long distance, Long lineId) {
+    public Section(Long id, Station downStation, Station upStation, Long distance, Line line) {
         this.id = id;
-        this.downStationId = downStationId;
-        this.upStationId = upStationId;
+        this.downStation = downStation;
+        this.upStation = upStation;
         this.distance = distance;
-        this.lineId = lineId;
+        this.line = line;
     }
 
-    public static Section withNoId(Long downStationId, Long upStationId, Long distance, Long lineId) {
-        return new Section(null, downStationId, upStationId, distance, lineId);
+    public static Section withNoId(Station downStation, Station upStation, Long distance, Line line) {
+        return new Section(null, downStation, upStation, distance, line);
     }
 
-    public static Section withId(Long id, Long downStationId, Long upStationId, Long distance, Long lineId) {
-        return new Section(id, downStationId, upStationId, distance, lineId);
+    public static Section withId(Long id, Station downStation, Station upStation, Long distance, Line line) {
+        return new Section(id, downStation, upStation, distance, line);
     }
 
     public Long getId() {
         return id;
     }
 
-    public Long getDownStationId() {
-        return downStationId;
+    public Station getDownStation() {
+        return downStation;
     }
 
-    public Long getUpStationId() {
-        return upStationId;
+    public Station getUpStation() {
+        return upStation;
     }
 
     public Long getDistance() {
         return distance;
     }
 
-    public Long getLineId() {
-        return lineId;
+    public Line getLine() {
+        return line;
     }
 
 }
