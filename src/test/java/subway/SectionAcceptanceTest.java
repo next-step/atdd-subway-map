@@ -45,6 +45,16 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     }
 
     /**
+     * When 지하철 노선에 새로운 구간의 상행역이 해당 노선에 하행 종점역이 아닌 구간을 등록하면
+     * Then 지하철 노선을 등록할 수 없다.
+     */
+    @DisplayName("지하철 노선에 추가 구간의 상행역이 해당 노선의 하행 종점역이 아니면 추가할 수 없다")
+    @Test
+    public void sectionCreateFail_1() {
+        var param = new SectionCreateRequest(firstStationId, thirdStationId, 10L);
+        SectionRestAssuredTest.createSectionFail(lineId, param);
+    }
+    /**
      * When 지하철 노선에 구간을 제거하면
      * Then 지하철 노선에 구간이 제거된다.
      * Then 제거된 노선을 조회시 에러가 발생한다.
