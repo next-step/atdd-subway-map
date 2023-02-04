@@ -131,4 +131,24 @@ class SectionAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> responseOfShowLine = LineApi.showLine(신분당선_ID);
         checkIdNotExistence(responseOfShowLine, 신촌역_ID);
     }
+
+    /**
+     * When 지하철 노선에 새로운 구간 제거 시, 이미 해당 노선에 등록된 역을 하행 종점역이 아닌 역을 요청하면
+     * Then 새로운 구간이 제거되지 않는다. (에러 처리)
+     */
+    @DisplayName("지하철 노선에 등록된 역(하행 종점역)만 제거할 수 있다. 즉, 마지막 구간만 제거할 수 있다.")
+    @Test
+    void removeNotTailSection() {
+        // Given
+        ExtractableResponse<Response> responseOfCreate신촌역 = StationApi.createStation(신촌역);
+        long 신촌역_ID = StationExtraction.getStationId(responseOfCreate신촌역);
+
+        LineApi.addSection(신분당선_ID, 서초역_ID, 신촌역_ID, 10);
+
+        // When
+        ExtractableResponse<Response> responseOfDeleteSection = LineApi.deleteSection(신분당선_ID, 서초역_ID);
+
+        // Then
+        checkBadRequest(responseOfDeleteSection);
+    }
 }
