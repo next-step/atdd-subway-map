@@ -4,9 +4,9 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import setting.RandomPortSetting;
 import subway.common.util.validation.ExistenceValidation;
 import subway.common.util.validation.ResponseStatusValidation;
+import subway.setting.AcceptanceTest;
 import subway.station.util.StationExtraction;
 
 import static subway.station.MockStation.강남역;
@@ -14,7 +14,7 @@ import static subway.station.MockStation.서초역;
 import static subway.station.MockStation.신촌역;
 
 @DisplayName("지하철역 관련 기능")
-public class StationAcceptanceTest extends RandomPortSetting {
+public class StationAcceptanceTest extends AcceptanceTest {
 
     /**
      * When 지하철역을 생성하면

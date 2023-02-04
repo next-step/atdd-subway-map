@@ -5,11 +5,11 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import setting.RandomPortSetting;
 import subway.common.util.validation.ExistenceValidation;
 import subway.common.util.validation.ResponseStatusValidation;
 import subway.line.util.LineExtraction;
 import subway.line.util.Validation;
+import subway.setting.AcceptanceTest;
 import subway.station.StationApi;
 import subway.station.util.StationExtraction;
 
@@ -20,7 +20,7 @@ import static subway.station.MockStation.서초역;
 import static subway.station.MockStation.신촌역;
 
 @DisplayName("노선 관련 기능")
-class LineAcceptanceTest extends RandomPortSetting {
+class LineAcceptanceTest extends AcceptanceTest {
     long 강남역_ID;
     long 서초역_ID;
     long 신촌역_ID;
