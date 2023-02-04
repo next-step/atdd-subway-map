@@ -151,4 +151,18 @@ class SectionAcceptanceTest extends AcceptanceTest {
         // Then
         checkBadRequest(responseOfDeleteSection);
     }
+
+    /**
+     * When 지하철 노선에 새로운 구간 제거 시, 해당 노선에 구간이 1개인 경우에는
+     * Then 새로운 구간이 제거되지 않는다. (에러 처리)
+     */
+    @DisplayName("지하철 노선에 상행 종점역과 하행 종점역만 있는 경우(구간이 1개인 경우) 역을 삭제할 수 없다.")
+    @Test
+    void removeSectionInOneSection() {
+        // When
+        ExtractableResponse<Response> responseOfDeleteSection = LineApi.deleteSection(신분당선_ID, 서초역_ID);
+
+        // Then
+        checkBadRequest(responseOfDeleteSection);
+    }
 }
