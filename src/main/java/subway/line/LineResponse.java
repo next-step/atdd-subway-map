@@ -25,8 +25,8 @@ public class LineResponse {
                 line.getId(),
                 line.getName(),
                 line.getColor(),
-                line.getDistance(),
-                line.getStations().stream()
+                line.getSumDistance(),
+                line.getAllStations().stream()
                         .map(station -> new StationResponse(station.getId(), station.getName()))
                         .collect(Collectors.toUnmodifiableList()));
     }

@@ -16,7 +16,7 @@ public class AcceptanceTestHelper {
                 .extract();
     }
 
-    static <T> ExtractableResponse<Response> post(String url, T pathParams, T request) {
+    static <T> ExtractableResponse<Response> post(String url, Long pathParams, T request) {
         return given().log().all()
                 .body(request)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -32,7 +32,7 @@ public class AcceptanceTestHelper {
                 .extract();
     }
 
-    static <T> ExtractableResponse<Response> get(String url, T pathParams) {
+    static ExtractableResponse<Response> get(String url, Long pathParams) {
         return given().log().all()
                 .when().get(url, pathParams)
                 .then().log().all()
@@ -40,7 +40,7 @@ public class AcceptanceTestHelper {
     }
 
 
-    static <T> ExtractableResponse<Response> put(String url, T pathParams, T request) {
+    static <T> ExtractableResponse<Response> put(String url, Long pathParams, T request) {
         return given().log().all()
                 .body(request)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -49,7 +49,7 @@ public class AcceptanceTestHelper {
                 .extract();
     }
 
-    static <T> ExtractableResponse<Response> delete(String url, T pathParams) {
+    static ExtractableResponse<Response> delete(String url, Long pathParams) {
         return given().log().all()
                 .when().delete(url, pathParams)
                 .then().log().all()

@@ -53,4 +53,8 @@ public class Sections {
     private int getLastStationIndex() {
         return sections.size() - 1;
     }
+
+    public int calcDistance() {
+        return sections.stream().mapToInt(Section::getDistance).sum();
+    }
 }

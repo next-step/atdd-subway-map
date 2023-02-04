@@ -23,12 +23,6 @@ import static subway.AcceptanceTestHelper.*;
 @Sql("/stations.sql")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class SectionAcceptanceTest {
-    private static final LineRequest 신분당선 =
-            LineRequest.of("신분당선", "bg-red-600", 1L, 2L, 10);
-    private static final SectionRequest 구간 = SectionRequest.of(2L, 3L, 3);
-    private static final SectionRequest 노선의하행역과일치하지않은구간 = SectionRequest.of(3L, 3L, 3);
-    private static final SectionRequest 하행역이이미포함된구간 = SectionRequest.of(2L, 1L, 3);
-
     /**
      * Given 처음 지하철 노선이 생성되면 구간도 함꼐 생성된다.
      * When 지하철 노선에 새로운 구간을 추가한다.
@@ -38,11 +32,13 @@ class SectionAcceptanceTest {
     @Test
     void createSection() {
         //given
+        LineRequest 신분당선 = LineRequest.of("신분당선", "bg-red-600", 1L, 2L, 10);
+        SectionRequest 구간 = SectionRequest.of(2L, 3L, 3);
         post("/lines", 신분당선);
 
         //when
-        ExtractableResponse<Response> postResponse = post("/lines/{id}/sections", 1, 구간);
-        ExtractableResponse<Response> listResponse = get("/lines/{id}", 1);
+        ExtractableResponse<Response> postResponse = post("/lines/{id}/sections", 1L, 구간);
+        ExtractableResponse<Response> listResponse = get("/lines/{id}", 1L);
 
         //then
         assertThat(postResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -58,10 +54,12 @@ class SectionAcceptanceTest {
     @Test
     void lastStationToAddSectionTest() {
         //given
+        LineRequest 신분당선 = LineRequest.of("신분당선", "bg-red-600", 1L, 2L, 10);
+        SectionRequest 노선의하행역과일치하지않은구간 = SectionRequest.of(3L, 3L, 3);
         post("/lines", 신분당선);
 
         //when
-        ExtractableResponse<Response> response = post("/lines/{id}/sections", 1, 노선의하행역과일치하지않은구간);
+        ExtractableResponse<Response> response = post("/lines/{id}/sections", 1L, 노선의하행역과일치하지않은구간);
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -78,10 +76,12 @@ class SectionAcceptanceTest {
     @Test
     void containsLastStationTest() {
         //given
+        LineRequest 신분당선 = LineRequest.of("신분당선", "bg-red-600", 1L, 2L, 10);
+        SectionRequest 하행역이이미포함된구간 = SectionRequest.of(2L, 1L, 3);
         post("/lines", 신분당선);
 
         //when
-        ExtractableResponse<Response> response = post("/lines/{id}/sections", 1, 하행역이이미포함된구간);
+        ExtractableResponse<Response> response = post("/lines/{id}/sections", 1L, 하행역이이미포함된구간);
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -98,13 +98,15 @@ class SectionAcceptanceTest {
     @Test
     void deleteSection() {
         //given
+        LineRequest 신분당선 = LineRequest.of("신분당선", "bg-red-600", 1L, 2L, 10);
+        SectionRequest 구간 = SectionRequest.of(2L, 3L, 3);
         post("/lines", 신분당선);
-        post("/lines/{id}/sections", 1, 구간);
+        post("/lines/{id}/sections", 1L, 구간);
 
         //when
         ExtractableResponse<Response> deleteResponse =
                 delete("/lines/{id}/sections", 1, "stationId", 3L);
-        ExtractableResponse<Response> getListResponse = get("/lines/{id}", 1);
+        ExtractableResponse<Response> getListResponse = get("/lines/{id}", 1L);
         List<StationResponse> stations = getListResponse.jsonPath().getList("stations");
 
         //then
@@ -121,12 +123,14 @@ class SectionAcceptanceTest {
     @Test
     void isLastStationInLastSectionErrorTest() {
         //given
+        LineRequest 신분당선 = LineRequest.of("신분당선", "bg-red-600", 1L, 2L, 10);
+        SectionRequest 구간 = SectionRequest.of(2L, 3L, 3);
         post("/lines", 신분당선);
-        post("/lines/{id}/sections", 1, 구간);
+        post("/lines/{id}/sections", 1L, 구간);
 
         //when
         ExtractableResponse<Response> response =
-                delete("/lines/{id}/sections", 1, "stationId", 2L);
+                delete("/lines/{id}/sections", 1L, "stationId", 2L);
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -143,6 +147,7 @@ class SectionAcceptanceTest {
     @Test
     void singleSectionErrorTest() {
         //given
+        LineRequest 신분당선 = LineRequest.of("신분당선", "bg-red-600", 1L, 2L, 10);
         post("/lines", 신분당선);
 
         //when
