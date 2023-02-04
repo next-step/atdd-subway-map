@@ -37,7 +37,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     public void sectionCreateTest() {
         var param = new SectionCreateRequest(secondStationId, thirdStationId, 10L);
-        SectionRestAssuredTest.createSection(param);
+        SectionRestAssuredTest.createSection(lineId, param);
 
         LineResponse line = LineRestAssuredTest.getLine(lineId);
         List<Long> ids = line.getStationResponseList().stream().map(StationResponse::getId).collect(Collectors.toList());

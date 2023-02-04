@@ -11,17 +11,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class SectionRestAssuredTest {
 
-    public static Long createSection(SectionCreateRequest param) {
+    public static void createSection(Long lineId, SectionCreateRequest param) {
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(param)
-                .when().post()
+                .when().post("/lines/" + lineId + "/sections")
                 .then().log().all()
                 .extract();
 
-        assertThat(response.contentType()).isEqualTo(HttpStatus.CREATED.value());
-
-        return response.jsonPath().getLong("id");
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
     public static void deleteSection(Long lineId, Long stationId) {
         var response = RestAssured.given().log().all()

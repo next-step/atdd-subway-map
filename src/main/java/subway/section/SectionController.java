@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.net.URI;
+
 @RestController
 @RequestMapping("/lines/{lineId}/sections")
 public class SectionController {
@@ -22,10 +24,9 @@ public class SectionController {
     }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Void> createSection(@PathVariable Long lineId, @RequestBody SectionCreateRequest sectionCreateRequest) {
         sectionService.createSection(lineId, sectionCreateRequest);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.created(URI.create("/lines/" + lineId)).build();
     }
 
     @DeleteMapping
