@@ -4,11 +4,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.api.dto.LineRequest;
 import subway.api.dto.LineResponse;
+import subway.api.dto.SectionRequest;
 import subway.domain.entity.Line;
-import subway.domain.entity.Station;
 import subway.domain.entity.Section;
+import subway.domain.entity.Station;
 import subway.domain.repository.LineRepository;
-import subway.domain.repository.StationRepository;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.Collections;
@@ -79,5 +79,14 @@ public class LineService {
         return stations.stream()
                 .map(it -> stationService.createStationResponse(it))
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void addSection(Long lineId, SectionRequest sectionRequest) {
+        Station upStation = stationService.findById(sectionRequest.getUpStationId());
+        Station downStation = stationService.findById(sectionRequest.getDownStationId());
+        Line line = lineRepository.findById(lineId).orElseThrow(IllegalArgumentException::new);
+
+        line.getSections().add(new Section(line, upStation, downStation, sectionRequest.getDistance()));
     }
 }

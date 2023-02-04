@@ -3,7 +3,6 @@ package subway;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,7 +13,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static subway.response.LineAcceptanceTestUtils.*;
 import static subway.response.StationAcceptanceTestUtils.createStation;
 
@@ -35,6 +33,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         station2Id = createStation("양재역").jsonPath().getLong("id");
         Map<String, Object> line1 = createLine("신분당선", "bg-red-600", station1Id, station2Id, 10);
         line1Id = createLineResponse(line1).jsonPath().getLong("id");
+        createSectionResponse(line1Id, createSectionCreateParams(station1Id, station2Id));
     }
 
     /**
@@ -49,8 +48,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         Long station3Id = createStation("청계산입구역").jsonPath().getLong("id");
 
         //when
-        ExtractableResponse<Response> sectionResponse = createSectionResponse(line1Id, createSectionCreateParams(station2Id, station3Id));
-        assertThat(sectionResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        createSectionResponse(line1Id, createSectionCreateParams(station2Id, station3Id));
 
         //then
         ExtractableResponse<Response> response = getLineResponse(line1Id);
@@ -61,9 +59,10 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 
     private ExtractableResponse<Response> createSectionResponse(Long lineId, Map<String, String> params) {
         return RestAssured.given().log().all()
+                .given().pathParam("id", lineId)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(params)
-                .when().post("/line/{}/sections", lineId)
+                .when().post("/lines/{id}/sections")
                 .then().log().all().extract();
     }
 
