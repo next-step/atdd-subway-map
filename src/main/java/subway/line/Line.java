@@ -31,7 +31,7 @@ public class Line {
     @JoinColumn(name = "down_station_id")
     private Station downStation;
 
-        protected Line() {
+    protected Line() {
     }
 
     @Embedded
