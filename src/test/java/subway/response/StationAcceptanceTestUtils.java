@@ -5,6 +5,7 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.MediaType;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class StationAcceptanceTestUtils {
@@ -21,5 +22,11 @@ public class StationAcceptanceTestUtils {
         return RestAssured.given().log().all()
                 .when().get("/stations")
                 .then().log().all().extract();
+    }
+
+    public static ExtractableResponse<Response> createStation(String stationName) {
+        Map<String, String> station = new HashMap<>();
+        station.put("name", stationName);
+        return StationAcceptanceTestUtils.createStationResponse(station);
     }
 }

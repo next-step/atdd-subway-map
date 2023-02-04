@@ -5,6 +5,7 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.MediaType;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class LineAcceptanceTestUtils {
@@ -42,5 +43,15 @@ public class LineAcceptanceTestUtils {
                 .given().pathParam("id", id)
                 .when().put("/lines/{id}")
                 .then().log().all().extract();
+    }
+
+    public static Map<String, Object> createLine(String lineName, String color, long upStationId, long downStationid, int distance) {
+        Map<String, Object> lineParams = new HashMap<>();
+        lineParams.put("name", lineName);
+        lineParams.put("color", color);
+        lineParams.put("upStationId", upStationId);
+        lineParams.put("downStationId", downStationid);
+        lineParams.put("distance", distance);
+        return lineParams;
     }
 }
