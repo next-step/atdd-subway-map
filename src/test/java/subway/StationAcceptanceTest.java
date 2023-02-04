@@ -42,7 +42,7 @@ public class StationAcceptanceTest extends AcceptanceTest {
         assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames = 지하철역_조회_요청().jsonPath().getList(STATION_NAME, String.class);
+        List<String> stationNames = 지하철역_목록_조회_요청().jsonPath().getList(STATION_NAME, String.class);
         assertThat(stationNames).containsAnyOf(강남역);
     }
 
@@ -51,16 +51,16 @@ public class StationAcceptanceTest extends AcceptanceTest {
      * When 지하철역 목록을 조회하면
      * Then 2개의 지하철역을 응답 받는다
      */
-    @DisplayName("지하철역을 조회한다.")
+    @DisplayName("지하철역 목록을 조회한다.")
     @Test
     void getStations() {
         // given
-        ExtractableResponse<Response> createResponse1 = 지하철역_생성_요청(강남역);
-        ExtractableResponse<Response> createResponse2 = 지하철역_생성_요청(역삼역);
-        List<Long> expectedStationIds = getCreateStationIds(Arrays.asList(createResponse1, createResponse2));
+        ExtractableResponse<Response> createStationResponse1 = 지하철역_생성_요청(강남역);
+        ExtractableResponse<Response> createStationResponse2 = 지하철역_생성_요청(역삼역);
+        List<Long> expectedStationIds = getCreateStationIds(Arrays.asList(createStationResponse1, createStationResponse2));
 
         // when
-        ExtractableResponse<Response> getResponse = 지하철역_조회_요청();
+        ExtractableResponse<Response> getResponse = 지하철역_목록_조회_요청();
         List<Long> stationIds = getResponse.jsonPath().getList(STATION_ID, Long.class);
 
         // then
@@ -77,20 +77,26 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        ExtractableResponse<Response> createResponse = 지하철역_생성_요청(강남역);
+        ExtractableResponse<Response> createStationResponse = 지하철역_생성_요청(강남역);
 
         // when
-        ExtractableResponse<Response> deleteResponse = 지하철역_삭제_요청(createResponse);
+        ExtractableResponse<Response> deleteStationResponse = 지하철역_삭제_요청(createStationResponse);
 
         // then
-        List<String> stationNames = 지하철역_조회_요청().jsonPath().getList(STATION_NAME, String.class);
-        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        List<String> stationNames = 지하철역_목록_조회_요청().jsonPath().getList(STATION_NAME, String.class);
+        assertThat(deleteStationResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
         assertThat(stationNames).doesNotContain(강남역).isEmpty();
     }
 
-    private ExtractableResponse<Response> 지하철역_생성_요청(String name) {
+    private List<Long> getCreateStationIds(List<ExtractableResponse<Response>> createStationResponses) {
+        return createStationResponses.stream()
+                .map(response -> Long.parseLong(response.header(LOCATION).split(URI_DELIMITER)[STATION_ID_INDEX]))
+                .collect(Collectors.toList());
+    }
+
+    public static ExtractableResponse<Response> 지하철역_생성_요청(String stationName) {
         Map<String, String> params = new HashMap<>();
-        params.put(STATION_NAME, name);
+        params.put(STATION_NAME, stationName);
 
         return RestAssured.given().log().all()
                 .body(params)
@@ -100,21 +106,15 @@ public class StationAcceptanceTest extends AcceptanceTest {
                 .extract();
     }
 
-    private List<Long> getCreateStationIds(List<ExtractableResponse<Response>> createResponses) {
-        return createResponses.stream()
-                .map(response -> Long.parseLong(response.header(LOCATION).split(URI_DELIMITER)[STATION_ID_INDEX]))
-                .collect(Collectors.toList());
-    }
-
-    private ExtractableResponse<Response> 지하철역_조회_요청() {
+    private static ExtractableResponse<Response> 지하철역_목록_조회_요청() {
         return RestAssured.given().log().all()
                 .when().get(STATION_PATH)
                 .then().log().all()
                 .extract();
     }
 
-    private ExtractableResponse<Response> 지하철역_삭제_요청(ExtractableResponse<Response> response) {
-        String uri = response.header(LOCATION);
+    private static ExtractableResponse<Response> 지하철역_삭제_요청(ExtractableResponse<Response> createStationResponse) {
+        String uri = createStationResponse.header(LOCATION);
         return RestAssured.given().log().all()
                 .when().delete(uri)
                 .then().log().all()
