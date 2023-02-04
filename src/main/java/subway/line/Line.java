@@ -106,9 +106,9 @@ public class Line {
     }
 
     public void deleteStation(Long stationId) {
-        long lastStationId = getLastStationId();
-        if (Objects.equals(stationId, lastStationId)) {
-            sections.remove(sections.size() - 1);
+        if (Objects.equals(stationId, getLastStationId())) {
+            throw new RuntimeException("하행 종점역이 아닌 지하철 역은 삭제할 수 없다.");
         }
+        sections.remove(sections.size() - 1);
     }
 }
