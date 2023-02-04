@@ -13,6 +13,8 @@ public class LineApi {
 
     private LineApi() {}
 
+    public static final String LOCATION = "Location";
+
     public static final String LINE_ID_KEY = "id";
     public static final String LINE_NAME_KEY = "name";
     public static final String LINE_COLOR_KEY = "color";
@@ -34,6 +36,18 @@ public class LineApi {
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                     .post("/lines")
+                .then()
+                    .log().all()
+                    .extract();
+    }
+
+    public static ExtractableResponse<Response> showLine(Long lineId) {
+        return given()
+                    .log().all()
+                    .pathParam(LINE_ID_KEY, lineId)
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                    .get("/lines/{"+LINE_ID_KEY+"}")
                 .then()
                     .log().all()
                     .extract();
@@ -61,7 +75,7 @@ public class LineApi {
                     .body(params)
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
-                    .put("/lines/{id}")
+                    .put("/lines/{"+LINE_ID_KEY+"}")
                 .then()
                     .log().all()
                     .extract();
@@ -72,7 +86,7 @@ public class LineApi {
                     .log().all()
                     .pathParam(LINE_ID_KEY, lineId)
                 .when()
-                    .delete("/lines/{id}")
+                    .delete("/lines/{"+LINE_ID_KEY+"}")
                 .then()
                     .log().all()
                     .extract();

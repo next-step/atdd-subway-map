@@ -6,7 +6,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import setting.RandomPortSetting;
-import subway.common.util.SimpleCRUDApi;
 import subway.common.util.validation.ExistenceValidation;
 import subway.common.util.validation.ResponseStatusValidation;
 import subway.line.util.LineExtraction;
@@ -84,9 +83,10 @@ class LineAcceptanceTest extends RandomPortSetting {
         // Given
         ExtractableResponse<Response> responseOfCreate신분당선 = LineApi.createLine(신분당선, 강남역_ID, 서초역_ID, 10);
         ResponseStatusValidation.checkCreatedResponse(responseOfCreate신분당선);
+        Long 신분당선_ID = LineExtraction.getLineId(responseOfCreate신분당선);
 
         // When
-        ExtractableResponse<Response> responseOfShowLine = SimpleCRUDApi.showResource(responseOfCreate신분당선);
+        ExtractableResponse<Response> responseOfShowLine = LineApi.showLine(신분당선_ID);
 
         // Then
         ExistenceValidation.checkNameExistence(responseOfShowLine, 신분당선);
@@ -102,15 +102,15 @@ class LineAcceptanceTest extends RandomPortSetting {
     void updateLine() {
         // Given
         ExtractableResponse<Response> responseOfCreate신분당선 = LineApi.createLine(신분당선, 강남역_ID, 서초역_ID, 10);
-        Long lineId = LineExtraction.getLineId(responseOfCreate신분당선);
+        Long 신분당선_ID = LineExtraction.getLineId(responseOfCreate신분당선);
 
         // When
-        LineApi.updateLine(lineId, 분당선.getName(), 분당선.getColor());
+        LineApi.updateLine(신분당선_ID, 분당선.getName(), 분당선.getColor());
 
         // Then
-        ExtractableResponse<Response> responseOfShowResource = SimpleCRUDApi.showResource(responseOfCreate신분당선);
-        ExistenceValidation.checkNameExistence(responseOfShowResource, 분당선);
-        Validation.checkColorExistenceInList(responseOfShowResource, 분당선);
+        ExtractableResponse<Response> responseOfShowLine = LineApi.showLine(신분당선_ID);
+        ExistenceValidation.checkNameExistence(responseOfShowLine, 분당선);
+        Validation.checkColorExistenceInList(responseOfShowLine, 분당선);
     }
 
     /**
