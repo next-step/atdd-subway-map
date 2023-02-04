@@ -57,9 +57,10 @@ public class Line {
     }
 
     public void addStation(Station downStation, Station upStation, long distance) {
-        if (isAddStation(upStation.getId())) {
-            sections.add(new Section(downStation, this, distance));
+        if (!isAddStation(upStation.getId())) {
+            throw new RuntimeException("추가할 수 없는 지하철 역입니다.");
         }
+        sections.add(new Section(downStation, this, distance));
     }
 
     public void addStation(Station station, long distance) {
