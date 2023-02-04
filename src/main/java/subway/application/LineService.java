@@ -116,4 +116,18 @@ public class LineService {
 
         line.addSection(newSection);
     }
+
+    @Transactional
+    public void deleteSection(SectionDeleteDto sectionDeleteDto) {
+        Long lineId = sectionDeleteDto.getLineId();
+        Long stationId = sectionDeleteDto.getStationId();
+
+        Line line = lineRepository.findById(lineId)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 노선입니다."));
+
+        Station station = stationRepository.findById(stationId)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 역입니다."));
+
+        line.deleteSection(station);
+    }
 }

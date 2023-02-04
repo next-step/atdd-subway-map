@@ -58,6 +58,10 @@ public class Line {
         this.sections.addSection(section);
     }
 
+    public void deleteSection(Station station) {
+        this.sections.delete(station);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

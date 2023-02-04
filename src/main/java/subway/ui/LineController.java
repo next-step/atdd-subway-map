@@ -3,10 +3,7 @@ package subway.ui;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import subway.application.LineService;
-import subway.application.dto.LineModifyDto;
-import subway.application.dto.LineCreateDto;
-import subway.application.dto.LineDto;
-import subway.application.dto.SectionAddDto;
+import subway.application.dto.*;
 
 import java.net.URI;
 import java.util.List;
@@ -53,6 +50,13 @@ public class LineController {
     public ResponseEntity<LineDto> addSection(@PathVariable Long lineId, @RequestBody SectionCreateRequest sectionCreateRequest) {
         var createDto = new SectionAddDto(lineId, sectionCreateRequest.getUpStationId(), sectionCreateRequest.getDownStationId(), sectionCreateRequest.getDistance());
         lineService.addSection(createDto);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/lines/{lineId}/sections")
+    public ResponseEntity<LineDto> deleteSection(@PathVariable Long lineId, @RequestParam Long stationId) {
+        var deleteDto = new SectionDeleteDto(lineId, stationId);
+        lineService.deleteSection(deleteDto);
         return ResponseEntity.noContent().build();
     }
 }
