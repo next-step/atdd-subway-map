@@ -5,8 +5,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
+@Transactional(readOnly = true)
 public class LineService {
 
     private LineRepository lineRepository;
@@ -21,14 +23,14 @@ public class LineService {
     public LineResponse saveLine(LineRequest lineRequest) {
         Station upStation = stationRepository.findById(lineRequest.getUpStationId()).get();
         Station downStation = stationRepository.findById(lineRequest.getDownStationId()).get();
+        int distance = lineRequest.getDistance();
 
-        Line line = lineRepository.save(new Line(
-                null,
+
+        Line line = lineRepository.save(Line.create(
                 lineRequest.getName(),
                 lineRequest.getColor(),
-                upStation,
-                downStation,
-                lineRequest.getDistance()));
+                new Section(upStation, downStation, distance)
+        ));
 
         return createLineResponse(line);
     }
@@ -53,10 +55,11 @@ public class LineService {
                 line.getId(),
                 line.getName(),
                 line.getColor(),
-                List.of(
-                        createStationResponse(line.getUpStation()),
-                        createStationResponse(line.getDownStation())
-                )
+                line.getSections().getSections().stream()
+                        .flatMap(it -> Stream.of(it.getUpStation(), it.getDownStation()))
+                        .distinct()
+                        .map(this::createStationResponse)
+                        .collect(Collectors.toList())
         );
     }
 
@@ -84,5 +87,27 @@ public class LineService {
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 노선입니다."));
 
         lineRepository.deleteById(lineId);
+    }
+
+
+    @Transactional
+    public void addSection(SectionAddDto sectionAddDto) {
+        Long lineId = sectionAddDto.getLineId();
+        Long upStationId = sectionAddDto.getUpStationId();
+        Long downStationId = sectionAddDto.getDownStationId();
+        int distance = sectionAddDto.getDistance();
+
+        Line line = lineRepository.findById(lineId)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 노선입니다."));
+
+        Station upStation = stationRepository.findById(upStationId)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 역입니다."));
+
+        Station downStation = stationRepository.findById(downStationId)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 역입니다."));
+
+        Section newSection = new Section(upStation, downStation, distance);
+
+        line.addSection(newSection);
     }
 }
