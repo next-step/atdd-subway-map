@@ -22,4 +22,15 @@ public class SectionRequests {
                 .then().log().all()
                 .extract();
     }
+
+    public static ExtractableResponse<Response> 지하철구간_삭제_요청하기(String lineId, String stationId) {
+        Map<String, String> params = new HashMap<>();
+        params.put("stationId", stationId);
+
+        return RestAssured.given().log().all()
+                .params(params)
+                .when().delete("/lines/" + lineId + "/sections")
+                .then().log().all()
+                .extract();
+    }
 }
