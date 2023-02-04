@@ -4,6 +4,8 @@ import org.springframework.stereotype.Component;
 import subway.line.Line;
 import subway.line.LineCreateRequest;
 import subway.line.LineResponse;
+import subway.section.Section;
+import subway.section.SectionCreateRequest;
 import subway.station.Station;
 import subway.station.StationResponse;
 
@@ -19,7 +21,7 @@ public class DtoConverter {
     }
 
     public LineResponse of(Line line) {
-        List<StationResponse> stationResponseList = line.getStationList().stream().map(this::createStationResponse).collect(Collectors.toList());
+        List<StationResponse> stationResponseList = line.getStations().stream().map(this::createStationResponse).collect(Collectors.toList());
         return new LineResponse(line.getId(), line.getName(), stationResponseList);
     }
 
@@ -29,4 +31,5 @@ public class DtoConverter {
                 station.getName()
         );
     }
+
 }

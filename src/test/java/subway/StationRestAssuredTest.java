@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class StationRestAssuredTest {
     @DisplayName("주어진 아이디의 지하철역을 삭제한다.")
-    public void deleteStation(Long id) {
+    public static void deleteStation(Long id) {
         var deleteResponse = RestAssured.given().log().all()
                 .when().delete("/stations/" + id)
                 .then().log().all()
@@ -26,7 +26,7 @@ public class StationRestAssuredTest {
 
 
     @DisplayName("주어진 이름의 지하철역을 생성한다.")
-    public Long createStation(String station) {
+    public static Long createStation(String station) {
         Map<String, String> params = new HashMap<>();
         params.put("name", station);
 
@@ -43,7 +43,7 @@ public class StationRestAssuredTest {
     }
 
     @DisplayName("지하철역 목록을 조회한다.")
-    public List<String> getStationNameList() {
+    public static List<String> getStationNameList() {
         var response = RestAssured.given().log().all()
                 .when().get("/stations")
                 .then().log().all()

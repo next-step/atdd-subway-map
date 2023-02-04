@@ -1,7 +1,9 @@
-package subway.line;
+package subway.section;
 
+import subway.line.Line;
 import subway.station.Station;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -10,7 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
 @Entity
-public class StationLineGroup {
+public class Section {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -21,12 +23,25 @@ public class StationLineGroup {
     @ManyToOne(fetch = FetchType.LAZY)
     private Line line;
 
-    public StationLineGroup(Station station, Line line) {
+    @Column(nullable = false)
+    private Long distance;
+
+    public Section(Station station, Line line, Long distance) {
         this.station = station;
         this.line = line;
+        this.distance = distance;
     }
 
-    protected StationLineGroup() {
+    public void delete() {
+        this.station = null;
+        this.line = null;
+    }
+
+    public Long getDistance() {
+        return distance;
+    }
+
+    protected Section() {
 
     }
 

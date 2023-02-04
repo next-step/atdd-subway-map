@@ -16,9 +16,6 @@ public class StationAcceptanceTest extends AcceptanceTest{
     @Autowired
     private StationRepository stationRepository;
 
-    private final StationRestAssuredTest stationRestAssuredTest = new StationRestAssuredTest();
-
-
     /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다
@@ -28,10 +25,10 @@ public class StationAcceptanceTest extends AcceptanceTest{
     @Test
     void createStation() {
         // when
-        stationRestAssuredTest.createStation("강남역");
+        StationRestAssuredTest.createStation("강남역");
 
         // then
-        List<String> stationNameList = stationRestAssuredTest.getStationNameList();
+        List<String> stationNameList = StationRestAssuredTest.getStationNameList();
         assertThat(stationNameList).containsAnyOf("강남역");
     }
 
@@ -48,11 +45,11 @@ public class StationAcceptanceTest extends AcceptanceTest{
     void getStationList() {
 
         //Given
-        stationRestAssuredTest.createStation("강남역");
-        stationRestAssuredTest.createStation("역삼역");
+        StationRestAssuredTest.createStation("강남역");
+        StationRestAssuredTest.createStation("역삼역");
 
         //Then
-        List<String> stationNameList = stationRestAssuredTest.getStationNameList();
+        List<String> stationNameList = StationRestAssuredTest.getStationNameList();
 
         assertThat(stationNameList).containsAnyOf("강남역", "역삼역");
         assertThat(stationNameList).hasSize(2);
@@ -67,15 +64,15 @@ public class StationAcceptanceTest extends AcceptanceTest{
     @Test
     public void deleteStation() {
         // Given
-        Long id = stationRestAssuredTest.createStation("강남역");
-        stationRestAssuredTest.createStation("역삼역");
+        Long id = StationRestAssuredTest.createStation("강남역");
+        StationRestAssuredTest.createStation("역삼역");
 
         // When
-        stationRestAssuredTest.deleteStation(id);
+        StationRestAssuredTest.deleteStation(id);
 
         // Then
 
-        var stationNameList = stationRestAssuredTest.getStationNameList();
+        var stationNameList = StationRestAssuredTest.getStationNameList();
 
         assertThat(stationNameList).hasSize(1);
         assertThat(stationNameList).containsExactly("역삼역");
