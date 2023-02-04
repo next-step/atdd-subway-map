@@ -5,6 +5,7 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 import subway.line.LineApi;
 import subway.line.util.LineExtraction;
 import subway.setting.AcceptanceTest;
@@ -65,6 +66,36 @@ class SectionAcceptanceTest extends AcceptanceTest {
         List<Long> idsOfResponse = response.jsonPath().getList("stations.id", Long.class);
         assertThat(idsOfResponse).contains(stationIds);
     }
+
+    /**
+     * When 지하철 노선에 새로운 구간 등록 시, 하행 종점역이 아닌 역을 상행역으로 요청하면
+     * Then 새로운 구간이 등록되지 않는다. (에러 처리)
+     */
+    @DisplayName("새로운 지하철 구간 등록 시, 구간의 상행역은 해당 노선의 하행 종점역이어야 한다.")
+    @Test
+    void invalidUpStation() {
+        // Given
+        ExtractableResponse<Response> responseOfCreate신촌역 = StationApi.createStation(신촌역);
+        long 신촌역_ID = StationExtraction.getStationId(responseOfCreate신촌역);
+
+        // When
+        ExtractableResponse<Response> responseOfAddSection = LineApi.addSection(신분당선_ID, 신촌역_ID, 서초역_ID, 10);
+        ExtractableResponse<Response> responseOfShowLine = LineApi.showLine(신분당선_ID);
+
+        // Then
+        checkBadRequest(responseOfAddSection);
+        checkIdNotExistence(responseOfShowLine, 신촌역_ID);
+    }
+
+    private static void checkIdNotExistence(ExtractableResponse<Response> response, long stationId) {
+        List<Long> idsOfResponse = response.jsonPath().getList("stations.id", Long.class);
+        assertThat(idsOfResponse).doesNotContain(stationId);
+    }
+
+    private void checkBadRequest(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
 
     /**
      * Given 지하철 노선에 새로운 구간을 등록 요청하고

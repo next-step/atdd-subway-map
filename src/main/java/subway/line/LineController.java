@@ -69,4 +69,9 @@ public class LineController {
     public ResponseEntity<Void> catchLineNotFoundException(LineNotFoundException e) {
         return ResponseEntity.notFound().build();
     }
+
+    @ExceptionHandler({SectionException.class})
+    public ResponseEntity<Void> catchSectionException(SectionException e) {
+        return ResponseEntity.badRequest().build();
+    }
 }
