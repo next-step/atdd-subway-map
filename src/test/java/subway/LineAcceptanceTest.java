@@ -1,4 +1,4 @@
-package subway.line;
+package subway;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -7,6 +7,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import subway.common.util.validation.ExistenceValidation;
 import subway.common.util.validation.ResponseStatusValidation;
+import subway.line.LineApi;
 import subway.line.util.LineExtraction;
 import subway.line.util.Validation;
 import subway.setting.AcceptanceTest;

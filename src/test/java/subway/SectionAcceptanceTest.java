@@ -1,4 +1,4 @@
-package subway.section;
+package subway;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;

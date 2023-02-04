@@ -1,4 +1,4 @@
-package subway.station;
+package subway;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import subway.common.util.validation.ExistenceValidation;
 import subway.common.util.validation.ResponseStatusValidation;
 import subway.setting.AcceptanceTest;
+import subway.station.StationApi;
 import subway.station.util.StationExtraction;
 
 import static subway.station.MockStation.강남역;
