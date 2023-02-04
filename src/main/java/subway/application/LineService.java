@@ -26,22 +26,22 @@ public class LineService {
     }
 
     @Transactional
-    public LineResponse saveLine(LineRequest lineRequest) {
-        Station upStation = stationRepository.findById(lineRequest.getUpStationId()).get();
-        Station downStation = stationRepository.findById(lineRequest.getDownStationId()).get();
-        int distance = lineRequest.getDistance();
+    public LineDto saveLine(LineCreateDto lineCreateDto) {
+        Station upStation = stationRepository.findById(lineCreateDto.getUpStationId()).get();
+        Station downStation = stationRepository.findById(lineCreateDto.getDownStationId()).get();
+        int distance = lineCreateDto.getDistance();
 
 
         Line line = lineRepository.save(Line.create(
-                lineRequest.getName(),
-                lineRequest.getColor(),
+                lineCreateDto.getName(),
+                lineCreateDto.getColor(),
                 new Section(upStation, downStation, distance)
         ));
 
         return createLineResponse(line);
     }
 
-    public List<LineResponse> readLines() {
+    public List<LineDto> readLines() {
         return lineRepository
                 .findAll()
                 .stream()
@@ -49,15 +49,15 @@ public class LineService {
                 .collect(Collectors.toList());
     }
 
-    public LineResponse readLine(Long lineId) {
+    public LineDto readLine(Long lineId) {
         Line line = lineRepository.findById(lineId)
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 노선입니다."));
 
         return createLineResponse(line);
     }
 
-    private LineResponse createLineResponse(Line line) {
-        return new LineResponse(
+    private LineDto createLineResponse(Line line) {
+        return new LineDto(
                 line.getId(),
                 line.getName(),
                 line.getColor(),
@@ -69,17 +69,17 @@ public class LineService {
         );
     }
 
-    private StationResponse createStationResponse(Station station) {
-        return new StationResponse(
+    private StationDto createStationResponse(Station station) {
+        return new StationDto(
                 station.getId(),
                 station.getName()
         );
     }
 
     @Transactional
-    public void modifyLine(Long lineId, LineModifyRequest lineModifyRequest) {
-        String newName = lineModifyRequest.getName();
-        String newColor = lineModifyRequest.getColor();
+    public void modifyLine(Long lineId, LineModifyDto lineModifyDto) {
+        String newName = lineModifyDto.getName();
+        String newColor = lineModifyDto.getColor();
 
         Line line = lineRepository.findById(lineId)
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 노선입니다."));

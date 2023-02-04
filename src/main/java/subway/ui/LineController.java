@@ -3,9 +3,9 @@ package subway.ui;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import subway.application.LineService;
-import subway.application.dto.LineModifyRequest;
-import subway.application.dto.LineRequest;
-import subway.application.dto.LineResponse;
+import subway.application.dto.LineModifyDto;
+import subway.application.dto.LineCreateDto;
+import subway.application.dto.LineDto;
 import subway.application.dto.SectionAddDto;
 
 import java.net.URI;
@@ -20,26 +20,26 @@ public class LineController {
     }
 
     @PostMapping("/lines")
-    public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
-        LineResponse line = lineService.saveLine(lineRequest);
+    public ResponseEntity<LineDto> createLine(@RequestBody LineCreateDto lineCreateDto) {
+        LineDto line = lineService.saveLine(lineCreateDto);
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
 
     @GetMapping("/lines")
-    public ResponseEntity<List<LineResponse>> readLines() {
-        List<LineResponse> line = lineService.readLines();
+    public ResponseEntity<List<LineDto>> readLines() {
+        List<LineDto> line = lineService.readLines();
         return ResponseEntity.ok().body(line);
     }
 
     @GetMapping("/lines/{id}")
-    public ResponseEntity<LineResponse> readLine(@PathVariable Long id) {
-        LineResponse line = lineService.readLine(id);
+    public ResponseEntity<LineDto> readLine(@PathVariable Long id) {
+        LineDto line = lineService.readLine(id);
         return ResponseEntity.ok(line);
     }
 
     @PutMapping("/lines/{id}")
-    public ResponseEntity<Void> modifyLine(@PathVariable Long id, @RequestBody LineModifyRequest lineModifyRequest) {
-        lineService.modifyLine(id, lineModifyRequest);
+    public ResponseEntity<Void> modifyLine(@PathVariable Long id, @RequestBody LineModifyDto lineModifyDto) {
+        lineService.modifyLine(id, lineModifyDto);
         return ResponseEntity.noContent().build();
     }
 
@@ -50,7 +50,7 @@ public class LineController {
     }
 
     @PostMapping("/lines/{lineId}/sections")
-    public ResponseEntity<LineResponse> addSection(@PathVariable Long lineId, @RequestBody SectionCreateRequest sectionCreateRequest) {
+    public ResponseEntity<LineDto> addSection(@PathVariable Long lineId, @RequestBody SectionCreateRequest sectionCreateRequest) {
         var createDto = new SectionAddDto(lineId, sectionCreateRequest.getUpStationId(), sectionCreateRequest.getDownStationId(), sectionCreateRequest.getDistance());
         lineService.addSection(createDto);
         return ResponseEntity.noContent().build();

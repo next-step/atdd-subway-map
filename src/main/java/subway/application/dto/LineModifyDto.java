@@ -1,6 +1,6 @@
 package subway.application.dto;
 
-public class LineModifyRequest {
+public class LineModifyDto {
     private String name;
     private String color;
 
