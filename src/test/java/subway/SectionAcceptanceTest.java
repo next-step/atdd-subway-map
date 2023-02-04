@@ -50,35 +50,23 @@ class SectionAcceptanceTest extends BaseAcceptance {
         ExtractableResponse<Response> actualSection = 지하철_구간_목록_요청(sectionResponse);
 
         지하철_구간을_조회_할_수_있다(sectionResponse, actualSection);
-        지하철_노선을_확인_할_수_있다(sectionResponse);
+        지하철_노선을_확인_할_수_있다(actualSection);
     }
-
-    private void 지하철_노선을_확인_할_수_있다(SectionResponse givenSection) {
-        ExtractableResponse<Response> actualResponse = 지하철_노선_조회(givenSection.getLineResponse().getId());
-
-        LineLoadDtoResponse lineLoadDtoResponse = actualResponse.as(LineLoadDtoResponse.class);
-
-        assertThat(lineLoadDtoResponse.getStations()).containsExactlyInAnyOrderElementsOf(List.of(강남역, 논현역, givenSection.getDownStation()));
-
-    }
-
-    /**
-     * 지하철 노선에 구간을 등록하는 기능을 구현
-     * 새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 한다.
-     * 새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없다.
-     * 새로운 구간 등록시 위 조건에 부합하지 않는 경우 에러 처리한다.
-     */
 
 
     /**
-     * When 지하철 구간을 생성시 상행역은 해당 노선에 등록되어있는 하행 종점역이 아닐 시
-     * Then throw Exception
+     * Given 새로운 역을 생성 후
+     * When 기존 노선에 새로운 구간 생성 시
+     * Then 상행역은 해당 노선에 등록되어있는 하행 종점역이 아닐 시 throw Exception
      */
-    @DisplayName("지하철 구간 생성 시 상행역은 해당 노선에 등록되어있는 하행 종점역이 아닐 시 Exception")
+    @DisplayName("새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 한다")
     @Test
-    void 지하철_구간_생성_시_사행역은_해당_노선에_등록되어있는_하행_종점역이_아닐_시_Exception() {
-        // Given && When
-        ExtractableResponse<Response> actualResponse = 지하철_구간_생성(신분당선, 강남역, 논현역, 10L);
+    void 지하철_구간_생성_시_상행역은_해당_노선에_등록되어있는_하행_종점역이_아닐_시_Exception() {
+        // Given
+        StationResponse 신논현역 = 지하철역_생성("신논현역").as(StationResponse.class);
+
+        // && When
+        ExtractableResponse<Response> actualResponse = 지하철_구간_생성(신분당선, 강남역, 신논현역, 10L);
 
         // Then
         지하철_구간_등록하려는_상행역이_기존_하행역이_아니다(actualResponse);
@@ -124,8 +112,6 @@ class SectionAcceptanceTest extends BaseAcceptance {
             .then().log().all()
             .extract();
 
-        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
         return createResponse;
     }
 
@@ -149,6 +135,14 @@ class SectionAcceptanceTest extends BaseAcceptance {
         assertThat(stations).containsExactlyInAnyOrder(upStation, downStation);
 
         return createResponse.as(LineLoadDtoResponse.class);
+    }
+
+    private void 지하철_노선을_확인_할_수_있다(ExtractableResponse<Response> givenSection) {
+        SectionResponse section = givenSection.as(SectionResponse.class);
+        ExtractableResponse<Response> lineResponse = 지하철_노선_조회(section.getLineResponse().getId());
+        LineLoadDtoResponse lineLoadDtoResponse = lineResponse.as(LineLoadDtoResponse.class);
+
+        assertThat(lineLoadDtoResponse.getStations()).containsExactlyInAnyOrderElementsOf(List.of(강남역, section.getUpStation(), section.getDownStation()));
     }
 
     private ExtractableResponse<Response> 지하철_노선_조회(Long lineId) {
