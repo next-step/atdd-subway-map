@@ -1,19 +1,9 @@
-package subway;
+package subway.ui;
 
-public class LineRequest {
-    private String name;
-    private String color;
+public class SectionCreateRequest {
     private Long upStationId;
     private Long downStationId;
     private int distance;
-
-    public String getName() {
-        return name;
-    }
-
-    public String getColor() {
-        return color;
-    }
 
     public Long getUpStationId() {
         return upStationId;

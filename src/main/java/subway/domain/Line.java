@@ -1,4 +1,4 @@
-package subway;
+package subway.domain;
 
 import javax.persistence.*;
 import java.util.Objects;
@@ -16,25 +16,21 @@ public class Line {
     @Column(nullable = false)
     private String color;
 
-    @ManyToOne
-    private Station upStation;
+    @Embedded
+    private Sections sections = new Sections();
 
-    @ManyToOne
-    private Station downStation;
-
-    @Column(nullable = false)
-    private int distance;
+    public static Line create(String name, String color, Section section) {
+        return new Line(null, name, color, Sections.create(section));
+    }
 
     public Line() {
     }
 
-    public Line(Long id, String name, String color, Station upStation, Station downStation, int distance) {
+    public Line(Long id, String name, String color, Sections sections) {
         this.id = id;
         this.name = name;
         this.color = color;
-        this.upStation = upStation;
-        this.downStation = downStation;
-        this.distance = distance;
+        this.sections = sections;
     }
 
     public Long getId() {
@@ -49,21 +45,21 @@ public class Line {
         return color;
     }
 
-    public Station getUpStation() {
-        return upStation;
-    }
-
-    public Station getDownStation() {
-        return downStation;
-    }
-
-    public int getDistance() {
-        return distance;
+    public Sections getSections() {
+        return sections;
     }
 
     public void modify(String name, String color) {
         this.name = name;
         this.color = color;
+    }
+
+    public void addSection(Section section) {
+        this.sections.addSection(section);
+    }
+
+    public void deleteSection(Station station) {
+        this.sections.delete(station);
     }
 
     @Override

@@ -1,10 +1,10 @@
-package subway;
+package subway.application.dto;
 
-public class StationResponse {
+public class StationDto {
     private Long id;
     private String name;
 
-    public StationResponse(Long id, String name) {
+    public StationDto(Long id, String name) {
         this.id = id;
         this.name = name;
     }

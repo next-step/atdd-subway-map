@@ -1,0 +1,91 @@
+### 강남역 추가
+POST localhost:8080/stations
+Content-Type: application/json
+
+{
+  "name": "강남역"
+}
+
+> {%
+    client.global.set("stationId1", response.body.id);
+%}
+
+### 양재역 추가
+POST localhost:8080/stations
+Content-Type: application/json
+
+{
+  "name": "양재역"
+}
+> {%
+    client.global.set("stationId2", response.body.id);
+%}
+
+### 양재시민의숲역 추가
+POST localhost:8080/stations
+Content-Type: application/json
+
+{
+  "name": "양재시민의숲역"
+}
+> {%
+    client.global.set("stationId3", response.body.id);
+%}
+
+### 역 목록 조회
+GET localhost:8080/stations
+
+### 신분당선 생성 (강남역 + 양재역)
+POST localhost:8080/lines
+Content-Type: application/json
+
+{
+  "name": "신분당선",
+  "color": "bg-red-600",
+  "upStationId": {{stationId1}},
+  "downStationId": {{stationId2}},
+  "distance": 10
+}
+> {%
+    client.global.set("lineId", response.body.id);
+%}
+
+### 구간 추가
+POST localhost:8080/lines/{{lineId}}/sections
+Content-Type: application/json
+
+{
+  "upStationId": {{stationId2}},
+  "downStationId": {{stationId3}},
+  "distance": 10
+}
+
+### 신분당선 조회
+GET localhost:8080/lines/{{lineId}}
+
+### 양재역 삭제 in [강남역 - 양재역 - 양재시민의숲역]
+DELETE localhost:8080/lines/{{lineId}}/sections?stationId={{stationId2}}
+
+> {%
+    client.test("422", function() {
+        client.assert(response.status == 422, "");
+    });
+%}
+
+### 양재시민의숲역 삭제 in [강남역 - 양재역 - 양재시민의숲역]
+DELETE localhost:8080/lines/{{lineId}}/sections?stationId={{stationId3}}
+
+> {% 
+client.test("204", function() {
+  client.assert(response.status == 204, "");
+});
+%}
+
+### 양재역 삭제 in [강남역 - 양재역]
+DELETE localhost:8080/lines/{{lineId}}/sections?stationId={{stationId2}}
+
+> {% 
+client.test("422", function() {
+  client.assert(response.status == 422, "");
+});
+%}

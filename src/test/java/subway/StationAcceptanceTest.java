@@ -1,15 +1,10 @@
 package subway;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.List;
 
@@ -20,17 +15,7 @@ import static subway.extracts.StationExtracts.지하철역_생성_응답_ID_추�
 import static subway.requests.StationRequests.*;
 
 @DisplayName("지하철역 관련 기능")
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class StationAcceptanceTest {
-
-    @LocalServerPort
-    private int port;
-
-    @BeforeEach
-    void setUp() {
-        RestAssured.port = port;
-    }
+public class StationAcceptanceTest extends AcceptanceTest {
 
     /**
      * When 지하철역을 생성하면
@@ -83,7 +68,7 @@ public class StationAcceptanceTest {
     void deleteStation() {
         // given
         String 지하철역_이름 = "강남역";
-        String 지하철역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기(지하철역_이름));
+        Long 지하철역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기(지하철역_이름));
 
         // when
         ExtractableResponse<Response> 지하철역_삭제_응답 = 지하철역_삭제_요청하기(지하철역_ID);

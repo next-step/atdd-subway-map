@@ -1,15 +1,10 @@
 package subway;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.annotation.DirtiesContext;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static subway.extracts.LineExtracts.*;
@@ -19,17 +14,7 @@ import static subway.requests.LineRequests.*;
 import static subway.requests.StationRequests.지하철역_생성_요청하기;
 
 @DisplayName("지하철노선 관련 기능")
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class LineAcceptanceTest {
-
-    @LocalServerPort
-    private int port;
-
-    @BeforeEach
-    void setUp() {
-        RestAssured.port = port;
-    }
+public class LineAcceptanceTest extends AcceptanceTest {
 
     /**
      * When 지하철 노선을 생성하면
@@ -38,8 +23,8 @@ public class LineAcceptanceTest {
     @DisplayName("지하철노선을 생성한다.")
     @Test
     void createLine() {
-        String 강남역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("강남역"));
-        String 양재역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("양재역"));
+        Long 강남역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("강남역"));
+        Long 양재역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("양재역"));
         String lineName = "신분당선";
 
         // when
@@ -59,9 +44,9 @@ public class LineAcceptanceTest {
     @Test
     void readLines() {
         // given
-        String 강남역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("강남역"));
-        String 신논현역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("신논현역"));
-        String 논현역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("논현역"));
+        Long 강남역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("강남역"));
+        Long 신논현역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("신논현역"));
+        Long 논현역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("논현역"));
 
         지하철노선_생성_요청하기("신분당선", 강남역_ID, 신논현역_ID);
         지하철노선_생성_요청하기("신분당선", 신논현역_ID, 논현역_ID);
@@ -83,10 +68,10 @@ public class LineAcceptanceTest {
     void readLine() {
         // given
         String 노선_이름 = "신분당선";
-        String 강남역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("강남역"));
-        String 신논현역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("신논현역"));
+        Long 강남역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("강남역"));
+        Long 신논현역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("신논현역"));
 
-        String lineId = 지하철노선_생성_응답_ID_추출(지하철노선_생성_요청하기(노선_이름, 강남역_ID, 신논현역_ID));
+        Long lineId = 지하철노선_생성_응답_ID_추출(지하철노선_생성_요청하기(노선_이름, 강남역_ID, 신논현역_ID));
 
         // when
         ExtractableResponse<Response> 지하철노선_조회_응답 = 지하철노선_조회_요청하기(lineId);
@@ -105,10 +90,10 @@ public class LineAcceptanceTest {
     @Test
     void modifyLine() {
         // given
-        String 강남역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("강남역"));
-        String 신논현역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("신논현역"));
+        Long 강남역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("강남역"));
+        Long 신논현역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("신논현역"));
 
-        String 노선_ID = 지하철노선_생성_응답_ID_추출(지하철노선_생성_요청하기("신분당선", 강남역_ID, 신논현역_ID));
+        Long 노선_ID = 지하철노선_생성_응답_ID_추출(지하철노선_생성_요청하기("신분당선", 강남역_ID, 신논현역_ID));
 
         String 새로운_노선_이름 = "다른분당선";
 
@@ -130,10 +115,10 @@ public class LineAcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        String 강남역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("강남역"));
-        String 신논현역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("신논현역"));
+        Long 강남역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("강남역"));
+        Long 신논현역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("신논현역"));
 
-        String 노선_ID = 지하철노선_생성_응답_ID_추출(지하철노선_생성_요청하기("신분당선", 강남역_ID, 신논현역_ID));
+        Long 노선_ID = 지하철노선_생성_응답_ID_추출(지하철노선_생성_요청하기("신분당선", 강남역_ID, 신논현역_ID));
 
         // when
         ExtractableResponse<Response> 지하철역_삭제_응답 = 지하철노선_삭제_요청하기(노선_ID);
