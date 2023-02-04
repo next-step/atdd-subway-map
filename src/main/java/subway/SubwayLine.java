@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@NoArgsConstructor()
+@NoArgsConstructor
 public class SubwayLine {
 
     @Id
