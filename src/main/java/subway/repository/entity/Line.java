@@ -5,12 +5,15 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import subway.common.Comment;
+import subway.controller.request.LineRequest;
 
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import java.util.List;
 
 @Entity
 @Getter
@@ -29,30 +32,28 @@ public class Line {
     @Column(length = 20)
     private String color;
 
-    @Comment("상행 종점역")
-    private Long upStationId;
-
-    @Comment("하행 종점역")
-    private Long downStationId;
-
-    @Comment("노선 간 거리")
-    private Integer distance;
+    @Embedded
+    private final Sections sections = new Sections();
 
     @Builder
-    private Line(String name,
-                 String color,
-                 Long upStationId,
-                 Long downStationId,
-                 Integer distance) {
+    private Line(String name, String color, Section section) {
         this.name = name;
         this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
-        this.distance = distance;
+        sections.addSection(section);
+        section.addLine(this);
     }
 
     public void update(final String name, final String color) {
         this.name = name;
         this.color = color;
+    }
+
+    public void addSection(Section section) {
+        section.addLine(this);
+        sections.addSection(section);
+    }
+
+    public List<Long> getStationIds() {
+        return sections.getStationIds();
     }
 }

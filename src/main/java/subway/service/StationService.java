@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.controller.request.StationRequest;
 import subway.controller.response.StationResponse;
+import subway.exception.SubwayRuntimeException;
+import subway.exception.message.SubwayErrorCode;
 import subway.repository.StationRepository;
 import subway.repository.entity.Station;
 
@@ -30,6 +32,11 @@ public class StationService {
                 .collect(Collectors.toList());
     }
 
+    public Station find(Long id) {
+        return stationRepository.findById(id)
+                .orElseThrow(() -> new SubwayRuntimeException(SubwayErrorCode.NOT_FOUND_STATION));
+    }
+
     @Transactional
     public void deleteStationById(Long id) {
         stationRepository.deleteById(id);
@@ -37,5 +44,9 @@ public class StationService {
 
     private StationResponse createStationResponse(Station station) {
         return StationResponse.from(station);
+    }
+
+    public List<Station> findByIdIn(final List<Long> id) {
+        return stationRepository.findByIdIn(id);
     }
 }

@@ -1,6 +1,5 @@
-package subway;
+package subway.line;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,34 +9,20 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
-import subway.common.Comment;
-import subway.controller.request.LineRequest;
+import subway.util.BaseAcceptanceTest;
 import subway.controller.response.LineResponse;
-import subway.util.MapHelper;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
-import static io.restassured.http.ContentType.JSON;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @DirtiesContext(classMode = AFTER_EACH_TEST_METHOD)
 @Sql("/insert-station.sql")
-class LineAcceptanceTest {
-
-    private static final String LINE_PATH = "/lines";
-
-    private static final String SHIN_BUN_DANG = "신분당선";
-    private static final String LEE_HO_SEON = "이호선";
-
-    private Map<String, Object> 신분당선;
-    private Map<String, Object> 이호선;
+class LineAcceptanceTest extends BaseAcceptanceTest {
 
     @BeforeEach
     void setup() {
@@ -160,66 +145,6 @@ class LineAcceptanceTest {
                 .isEqualTo(HttpStatus.NO_CONTENT.value());
 
         assertThat(maybeLine).isEmpty();
-    }
-
-    @Comment("지하철 노선을 생성하는 메서드")
-    private ExtractableResponse<Response> 지하철노선_생성(final Map<String, Object> line) {
-        final LineRequest param = MapHelper.readValue(line, LineRequest.class);
-
-        return RestAssured.given().log().all()
-                .contentType(JSON)
-                .body(param)
-                .when().post(LINE_PATH)
-                .then().log().all()
-                .extract();
-    }
-
-
-    @Comment("지하철 노선 목록의 이름을 반환하는 함수")
-    private List<String> 지하철노선목록의_이름_조회() {
-        return 지하철노선_목록조회().stream()
-                .map(LineResponse::getName)
-                .collect(Collectors.toList());
-    }
-
-    @Comment("지하철 노선 목록을 반환하는 함수")
-    private List<LineResponse> 지하철노선_목록조회() {
-        return RestAssured
-                .given().accept(APPLICATION_JSON_VALUE)
-                .when().get(LINE_PATH)
-                .then().statusCode(HttpStatus.OK.value())
-                .extract().jsonPath()
-                .getList("$", LineResponse.class);
-    }
-
-    @Comment("지하철 노선을 수정하는 메서드")
-    private void 지하철_노선을_수정한다(final Long id, String newLineName, String newLinColor) {
-        RestAssured
-                .given()
-                .contentType(APPLICATION_JSON_VALUE)
-                .body(Map.of("name", newLineName, "color", newLinColor))
-                .when()
-                .put(LINE_PATH + "/{id}", id)
-                .then()
-                .statusCode(HttpStatus.OK.value());
-    }
-
-    @Comment("지하철 노선을 조회하는 메서드")
-    private LineResponse 지하철노선_단건조회(Long id) {
-        return RestAssured.given().log().all()
-                .when().get(LINE_PATH + "/{id}", id)
-                .then().log().all()
-                .extract().jsonPath().getObject("", LineResponse.class);
-    }
-
-    @Comment("지하철 노선을 삭제하는 메서드")
-    private ExtractableResponse<Response> 지하철_노선을_삭제한다(Long id) {
-        return RestAssured
-                .given()
-                .when()
-                .delete(LINE_PATH + "/{id}", id)
-                .then()
-                .extract();
     }
 
 }
