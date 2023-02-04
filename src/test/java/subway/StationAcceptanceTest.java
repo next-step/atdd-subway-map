@@ -82,7 +82,6 @@ class StationAcceptanceTest {
 
         //then
         assertThat(stationList).containsExactly("강남역", "양재역");
-
     }
 
     public List<String> getStations(String path) {
@@ -93,7 +92,7 @@ class StationAcceptanceTest {
     }
 
 
-    private void createStation(String stationName) {
+    public static void createStation(String stationName) {
         Map<String, String> param = new HashMap<>();
         param.put("name", stationName);
         RestAssured.given().log().all()
