@@ -32,6 +32,11 @@ public class Section {
         this.distance = distance;
     }
 
+    public void delete() {
+        this.station = null;
+        this.line = null;
+    }
+
     public Long getDistance() {
         return distance;
     }

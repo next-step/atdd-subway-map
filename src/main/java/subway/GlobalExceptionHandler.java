@@ -11,6 +11,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RuntimeException.class)
     protected ResponseEntity<?> handleRuntimeException(RuntimeException e) {
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
 }

@@ -71,7 +71,7 @@ public class Line {
     }
 
     private boolean checkDownStation(Long downStationId) {
-        return getStations().stream().map(Station::getId).allMatch(id -> id.equals(downStationId));
+        return !getStations().stream().map(Station::getId).anyMatch(id -> id.equals(downStationId));
     }
 
     public void addStation(Station station, long distance) {
@@ -107,6 +107,8 @@ public class Line {
 
     public void deleteStation(Long stationId) {
         checkDeleteStation(stationId);
+        Section section = sections.stream().filter(o -> o.getStation().getId().equals(stationId)).findFirst().orElseThrow();
+        section.delete();
         sections.remove(sections.size() - 1);
     }
 
@@ -114,7 +116,7 @@ public class Line {
         if (sections.size() == 2) {
             throw new RuntimeException("구간이 1개인 경우 삭제할 수 없습니다.");
         }
-        if (Objects.equals(stationId, getLastStationId())) {
+        if (!Objects.equals(stationId, getLastStationId())) {
             throw new RuntimeException("하행 종점역이 아닌 지하철 역은 삭제할 수 없다.");
         }
     }
