@@ -1,4 +1,4 @@
-package subway.application.service;
+package subway.domain;
 
 public class NotEqualUpStationAndDownStationException extends RuntimeException {
 

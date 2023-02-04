@@ -6,10 +6,7 @@ import subway.application.service.input.LineLoadUseCase;
 import subway.application.service.input.SectionCommandUseCase;
 import subway.application.service.output.SectionCommandRepository;
 import subway.application.service.output.SectionLoadRepository;
-import subway.domain.Line;
-import subway.domain.Section;
-import subway.domain.SectionCreateDto;
-import subway.domain.Station;
+import subway.domain.*;
 
 import java.util.List;
 
@@ -32,29 +29,14 @@ public class SectionCommandService implements SectionCommandUseCase {
     @Override
     public Long createSection(SectionCreateDto sectionCreateDto) {
         Line line = lineLoadUseCase.loadLine(sectionCreateDto.getLineId());
-
         Station upStation = stationService.findStation(sectionCreateDto.getUpStationId());
         Station newDownStation = stationService.findStation(sectionCreateDto.getDownStationId());
+        Long distance = sectionCreateDto.getDistance();
 
         List<Section> lineSections = sectionLoadRepository.loadLineSection(line.getId());
-
-        if (lineSections.isEmpty()) {
-            return createSection(sectionCreateDto, line, upStation, newDownStation);
-        }
-
-        Section lineDownSection = lineSections.get(lineSections.size() - 1);
-        Station lineDownStation = lineDownSection.getDownStation();
-
-        if (!lineDownStation.equals(upStation)) {
-            throw new NotEqualUpStationAndDownStationException();
-        }
-
-        return createSection(sectionCreateDto, line, upStation, newDownStation);
-    }
-
-    private Long createSection(SectionCreateDto sectionCreateDto, Line line, Station upStation, Station downStation) {
-        Section section = Section.withNoId(downStation, upStation, sectionCreateDto.getDistance(), line);
+        Section section = Section.from(line, upStation, newDownStation, distance, lineSections);
         return sectionCommandRepository.createSection(section);
+
     }
 
 }
