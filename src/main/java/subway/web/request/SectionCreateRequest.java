@@ -4,21 +4,21 @@ import subway.domain.SectionCreateDto;
 
 public class SectionCreateRequest {
 
-    private final String downStationId;
-    private final String upStationId;
+    private final Long downStationId;
+    private final Long upStationId;
     private final Long distance;
 
-    public SectionCreateRequest(String downStationId, String upStationId, Long distance) {
+    public SectionCreateRequest(Long downStationId, Long upStationId, Long distance) {
         this.downStationId = downStationId;
         this.upStationId = upStationId;
         this.distance = distance;
     }
 
-    public String getDownStationId() {
+    public Long getDownStationId() {
         return downStationId;
     }
 
-    public String getUpStationId() {
+    public Long getUpStationId() {
         return upStationId;
     }
 
@@ -27,7 +27,7 @@ public class SectionCreateRequest {
     }
 
     public SectionCreateDto toDto(Long lineId) {
-        return new SectionCreateDto(lineId, Long.parseLong(this.getUpStationId()), Long.parseLong(this.getDownStationId()), getDistance());
+        return new SectionCreateDto(lineId, this.getUpStationId(), this.getDownStationId(), getDistance());
     }
 
 }
