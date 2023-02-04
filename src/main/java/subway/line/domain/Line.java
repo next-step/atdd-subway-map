@@ -3,7 +3,10 @@ package subway.line.domain;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import subway.section.domain.Section;
 import subway.section.domain.Sections;
+import subway.section.exception.DownStationAlreadyRegisteredException;
+import subway.section.exception.DownStationNotFoundException;
 import subway.station.domain.Station;
 
 import javax.persistence.Column;
@@ -56,6 +59,30 @@ public class Line {
         this.downStation = downStation;
     }
 
+    // == 생성 메서드 ==
+    public static Line createLine(final String name, final String color,
+                                  final Long distance, final Station upStation, final Station downStation) {
+        Line line = Line.builder()
+                .name(name)
+                .color(color)
+                .upStation(upStation)
+                .downStation(downStation)
+                .build();
+
+        createSections(distance, line, upStation, downStation);
+
+        return line;
+    }
+
+    // == 연관관계 편의 메서드 ==
+    private static void createSections(final Long distance, final Line line,
+                                       final Station upStation, final Station downStation) {
+        Section section = Section.createSection(line, upStation, downStation, distance);
+        line.getSections().addSection(section);
+    }
+
+
+    // == 비즈니스 로직 ==
     public void updateLine(final Line line) {
         this.name = line.getName();
         this.color = line.getColor();
@@ -67,6 +94,16 @@ public class Line {
         }
 
         this.downStation = station;
+    }
+
+    public void validateSectionRegistered(final Station upStation, final Station downStation) {
+        if (sections.isNotExistDownStation(upStation)) {
+            throw new DownStationNotFoundException();
+        }
+
+        if (sections.isAlreadyRegisteredStation(downStation)) {
+            throw new DownStationAlreadyRegisteredException();
+        }
     }
 
     @Override

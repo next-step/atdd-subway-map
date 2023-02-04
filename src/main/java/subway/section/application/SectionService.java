@@ -28,6 +28,8 @@ public class SectionService {
         Station downStation = stationService.findStationById(sectionCreateRequest.getDownStationId());
         Section section = Section.createSection(line, upStation, downStation, sectionCreateRequest.getDistance());
 
+        line.validateSectionRegistered(upStation, downStation);
+
         sectionCommandRepository.save(section);
         line.changeDownStation(downStation);
 

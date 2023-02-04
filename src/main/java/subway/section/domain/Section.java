@@ -50,21 +50,15 @@ public class Section {
         this.downStation = downStation;
         this.distance = distance;
         this.line = line;
-
-        line.getSections().addSection(this);
     }
 
     public static Section createSection(final Line line, final Station upStation,
                                         final Station downStation, final Long distance) {
-        Section section = Section.builder()
+        return Section.builder()
                 .distance(distance)
                 .line(line)
                 .upStation(upStation)
                 .downStation(downStation)
                 .build();
-
-        line.getSections().addSection(section);
-
-        return section;
     }
 }
