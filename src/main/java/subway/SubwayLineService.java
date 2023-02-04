@@ -1,12 +1,12 @@
 package subway;
 
 
+import java.util.List;
+import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import subway.exception.ResourceNotFoundException;
-
-import javax.transaction.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +25,12 @@ public class SubwayLineService {
             new SubwayLine(request.getName(), request.getColor(), upStation, downStation,
                 request.getDistance()));
 
-        return SubwayLineResponse.createLineResponse(subwayLine);
+        return SubwayLineResponse.createSubwayLineResponse(subwayLine);
+    }
+
+    public List<SubwayLineResponse> getLineList() {
+        List<SubwayLine> lines = subwayLineRepository.findAll();
+        return lines.stream().map(SubwayLineResponse::createSubwayLineResponse)
+            .collect(Collectors.toList());
     }
 }

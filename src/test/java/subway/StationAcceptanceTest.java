@@ -85,16 +85,16 @@ public class StationAcceptanceTest {
 
     }
 
-    private ExtractableResponse<Response> createSubwayStation(String stationName) {
+    public static ExtractableResponse<Response> createSubwayStation(String stationName) {
         Map<String, String> params = new HashMap<>();
         params.put("name", stationName);
 
         return RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
+            .body(params)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().post("/stations")
+            .then().log().all()
+            .extract();
     }
 
     private List<String> getStationNames() {

@@ -25,7 +25,7 @@ public class SubwayLineResponse {
         this.stations = stations;
     }
 
-    public static SubwayLineResponse createLineResponse(SubwayLine subwayLine) {
+    public static SubwayLineResponse createSubwayLineResponse(SubwayLine subwayLine) {
 
         return new SubwayLineResponse(subwayLine.getId(), subwayLine.getName(),
             subwayLine.getColor(), subwayLine.getDistance(),

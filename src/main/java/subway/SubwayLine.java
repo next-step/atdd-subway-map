@@ -27,7 +27,6 @@ public class SubwayLine {
     @OneToOne
     private Station upStation;
     @JoinColumn(name = "down_station_id", nullable = false)
-
     @OneToOne
     private Station downStation;
     @Column(nullable = false)
