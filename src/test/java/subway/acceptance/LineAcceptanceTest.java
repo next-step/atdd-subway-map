@@ -1,4 +1,4 @@
-package subway;
+package subway.acceptance;
 
 import io.restassured.response.ValidatableResponse;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,7 +11,7 @@ import subway.dto.line.LineRequest;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.StationAcceptanceTest.역_생성;
+import static subway.acceptance.StationAcceptanceTest.역_생성;
 import static subway.fixture.LineFixture.*;
 
 @DisplayName("지하철 노선 관련 기능")

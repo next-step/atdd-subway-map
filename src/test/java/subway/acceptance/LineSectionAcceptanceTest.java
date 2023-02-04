@@ -1,4 +1,4 @@
-package subway;
+package subway.acceptance;
 
 import io.restassured.response.ValidatableResponse;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,8 +10,8 @@ import subway.dto.section.SectionRequest;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.LineAcceptanceTest.노선_생성;
-import static subway.StationAcceptanceTest.역_생성;
+import static subway.acceptance.LineAcceptanceTest.노선_생성;
+import static subway.acceptance.StationAcceptanceTest.역_생성;
 import static subway.fixture.LineFixture.신분당선_요청;
 import static subway.fixture.SectionFixture.*;
 import static subway.fixture.StationFixture.*;

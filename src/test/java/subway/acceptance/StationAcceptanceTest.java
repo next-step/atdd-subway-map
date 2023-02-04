@@ -1,4 +1,4 @@
-package subway;
+package subway.acceptance;
 
 import io.restassured.response.ValidatableResponse;
 import org.junit.jupiter.api.DisplayName;
