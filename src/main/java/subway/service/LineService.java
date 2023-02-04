@@ -77,6 +77,6 @@ public class LineService {
 
     private Line findLine(Long id) {
         return lineRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(id + " 노선을 찾을 수 없습니다."));
+                .orElseThrow(() -> new NotFoundException(id + "번 노선을 찾을 수 없습니다."));
     }
 }

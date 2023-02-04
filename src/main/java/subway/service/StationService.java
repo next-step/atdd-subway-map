@@ -34,7 +34,7 @@ public class StationService {
 
     public Station findStation(Long stationId) {
         return stationRepository.findById(stationId)
-                .orElseThrow(() -> new NotFoundException(stationId + " 역을 찾을 수 없습니다."));
+                .orElseThrow(() -> new NotFoundException(stationId + "번 역을 찾을 수 없습니다."));
     }
 
     @Transactional
