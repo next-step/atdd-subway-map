@@ -28,7 +28,7 @@ public class StationRequests {
                 .extract();
     }
     
-    public static ExtractableResponse<Response> 지하철역_삭제_요청하기(String stationId) {
+    public static ExtractableResponse<Response> 지하철역_삭제_요청하기(Long stationId) {
         return RestAssured.given().log().all()
                 .when().delete("/stations/" + stationId)
                 .then().log().all()

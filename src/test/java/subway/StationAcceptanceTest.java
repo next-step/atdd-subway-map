@@ -83,7 +83,7 @@ public class StationAcceptanceTest {
     void deleteStation() {
         // given
         String 지하철역_이름 = "강남역";
-        String 지하철역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기(지하철역_이름));
+        Long 지하철역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기(지하철역_이름));
 
         // when
         ExtractableResponse<Response> 지하철역_삭제_응답 = 지하철역_삭제_요청하기(지하철역_ID);

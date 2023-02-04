@@ -44,12 +44,12 @@ public class SectionAcceptanceTest {
     @Test
     void addSection() {
         // given
-        String 강남역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("강남역"));
-        String 양재역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("양재역"));
-        String 양재시민의숲역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("양재시민의숲역"));
+        Long 강남역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("강남역"));
+        Long 양재역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("양재역"));
+        Long 양재시민의숲역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("양재시민의숲역"));
         String lineName = "신분당선";
 
-        String 신분당선_ID = 지하철노선_생성_응답_ID_추출(지하철노선_생성_요청하기(lineName, 강남역_ID, 양재역_ID));
+        Long 신분당선_ID = 지하철노선_생성_응답_ID_추출(지하철노선_생성_요청하기(lineName, 강남역_ID, 양재역_ID));
 
         // when
         ExtractableResponse<Response> 지하철구간_추가_응답 = 지하철구간_추가_요청하기(신분당선_ID, 양재역_ID, 양재시민의숲역_ID, 10);
@@ -68,12 +68,12 @@ public class SectionAcceptanceTest {
     @Test
     void addSectionMismatchStation() {
         // given
-        String 강남역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("강남역"));
-        String 양재역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("양재역"));
-        String 양재시민의숲역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("양재시민의숲역"));
+        Long 강남역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("강남역"));
+        Long 양재역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("양재역"));
+        Long 양재시민의숲역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("양재시민의숲역"));
         String lineName = "신분당선";
 
-        String 신분당선_ID = 지하철노선_생성_응답_ID_추출(지하철노선_생성_요청하기(lineName, 강남역_ID, 양재역_ID));
+        Long 신분당선_ID = 지하철노선_생성_응답_ID_추출(지하철노선_생성_요청하기(lineName, 강남역_ID, 양재역_ID));
 
         // when
         ExtractableResponse<Response> 지하철구간_추가_응답 = 지하철구간_추가_요청하기(신분당선_ID, 강남역_ID, 양재시민의숲역_ID, 10);
@@ -91,11 +91,11 @@ public class SectionAcceptanceTest {
     @Test
     void addSectionAlreadyExistsStation() {
         // given
-        String 강남역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("강남역"));
-        String 양재역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("양재역"));
+        Long 강남역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("강남역"));
+        Long 양재역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("양재역"));
         String lineName = "신분당선";
 
-        String 신분당선_ID = 지하철노선_생성_응답_ID_추출(지하철노선_생성_요청하기(lineName, 강남역_ID, 양재역_ID));
+        Long 신분당선_ID = 지하철노선_생성_응답_ID_추출(지하철노선_생성_요청하기(lineName, 강남역_ID, 양재역_ID));
 
         // when
         ExtractableResponse<Response> 지하철구간_추가_응답 = 지하철구간_추가_요청하기(신분당선_ID, 양재역_ID, 강남역_ID, 10);
@@ -114,12 +114,12 @@ public class SectionAcceptanceTest {
     @Test
     void deleteSection() {
         // given
-        String 강남역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("강남역"));
-        String 양재역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("양재역"));
-        String 양재시민의숲역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("양재시민의숲역"));
+        Long 강남역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("강남역"));
+        Long 양재역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("양재역"));
+        Long 양재시민의숲역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("양재시민의숲역"));
         String lineName = "신분당선";
 
-        String 신분당선_ID = 지하철노선_생성_응답_ID_추출(지하철노선_생성_요청하기(lineName, 강남역_ID, 양재역_ID));
+        Long 신분당선_ID = 지하철노선_생성_응답_ID_추출(지하철노선_생성_요청하기(lineName, 강남역_ID, 양재역_ID));
         지하철구간_추가_요청하기(신분당선_ID, 양재역_ID, 양재시민의숲역_ID, 10);
 
         // when
@@ -142,12 +142,12 @@ public class SectionAcceptanceTest {
     @Test
     void deleteSectionNotLastStation() {
         // given
-        String 강남역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("강남역"));
-        String 양재역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("양재역"));
-        String 양재시민의숲역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("양재시민의숲역"));
+        Long 강남역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("강남역"));
+        Long 양재역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("양재역"));
+        Long 양재시민의숲역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("양재시민의숲역"));
         String lineName = "신분당선";
 
-        String 신분당선_ID = 지하철노선_생성_응답_ID_추출(지하철노선_생성_요청하기(lineName, 강남역_ID, 양재역_ID));
+        Long 신분당선_ID = 지하철노선_생성_응답_ID_추출(지하철노선_생성_요청하기(lineName, 강남역_ID, 양재역_ID));
         지하철구간_추가_요청하기(신분당선_ID, 양재역_ID, 양재시민의숲역_ID, 10);
 
         // when
@@ -166,11 +166,11 @@ public class SectionAcceptanceTest {
     @Test
     void deleteSectionOnlyOneSection() {
         // given
-        String 강남역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("강남역"));
-        String 양재역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("양재역"));
+        Long 강남역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("강남역"));
+        Long 양재역_ID = 지하철역_생성_응답_ID_추출(지하철역_생성_요청하기("양재역"));
         String lineName = "신분당선";
 
-        String 신분당선_ID = 지하철노선_생성_응답_ID_추출(지하철노선_생성_요청하기(lineName, 강남역_ID, 양재역_ID));
+        Long 신분당선_ID = 지하철노선_생성_응답_ID_추출(지하철노선_생성_요청하기(lineName, 강남역_ID, 양재역_ID));
 
         // when
         ExtractableResponse<Response> 지하철구간_삭제_응답 = 지하철구간_삭제_요청하기(신분당선_ID, 양재역_ID);

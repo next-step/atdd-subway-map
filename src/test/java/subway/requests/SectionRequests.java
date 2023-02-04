@@ -9,10 +9,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SectionRequests {
-    public static ExtractableResponse<Response> 지하철구간_추가_요청하기(String lineId, String upStationId, String downStationId, int distance) {
+    public static ExtractableResponse<Response> 지하철구간_추가_요청하기(Long lineId, Long upStationId, Long downStationId, int distance) {
         Map<String, String> params = new HashMap<>();
-        params.put("upStationId", upStationId);
-        params.put("downStationId", downStationId);
+        params.put("upStationId", String.valueOf(upStationId));
+        params.put("downStationId", String.valueOf(downStationId));
         params.put("distance", String.valueOf(distance));
 
         return RestAssured.given().log().all()
@@ -23,9 +23,9 @@ public class SectionRequests {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 지하철구간_삭제_요청하기(String lineId, String stationId) {
+    public static ExtractableResponse<Response> 지하철구간_삭제_요청하기(Long lineId, Long stationId) {
         Map<String, String> params = new HashMap<>();
-        params.put("stationId", stationId);
+        params.put("stationId", String.valueOf(stationId));
 
         return RestAssured.given().log().all()
                 .params(params)
