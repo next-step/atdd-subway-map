@@ -1,4 +1,6 @@
-package subway;
+package subway.domain;
+
+import subway.domain.exceptions.CanNotAddSectionException;
 
 import javax.persistence.CollectionTable;
 import javax.persistence.ElementCollection;
