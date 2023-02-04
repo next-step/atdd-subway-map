@@ -5,7 +5,6 @@ import subway.application.service.output.LineCommandRepository;
 import subway.application.service.output.LineLoadRepository;
 import subway.domain.Line;
 import subway.domain.NotFoundLineException;
-import subway.domain.NotFoundStationException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -14,12 +13,10 @@ import java.util.stream.Collectors;
 class LinePersistenceRepository implements LineCommandRepository, LineLoadRepository {
 
     private final LineRepository lineRepository;
-    private final StationRepository stationRepository;
     private final LineMapper lineMapper;
 
-    public LinePersistenceRepository(LineRepository lineRepository, StationRepository stationRepository, LineMapper lineMapper) {
+    public LinePersistenceRepository(LineRepository lineRepository, LineMapper lineMapper) {
         this.lineRepository = lineRepository;
-        this.stationRepository = stationRepository;
         this.lineMapper = lineMapper;
     }
 
@@ -31,13 +28,13 @@ class LinePersistenceRepository implements LineCommandRepository, LineLoadReposi
 
     @Override
     public Line loadLine(Long createdLineId) {
-        return lineRepository.findById(createdLineId).map(this::buildLine).orElseThrow(NotFoundLineException::new);
+        return lineRepository.findById(createdLineId).map(lineMapper::entityToDomain).orElseThrow(NotFoundLineException::new);
     }
 
     @Override
     public List<Line> loadLines() {
         return lineRepository.findAll().stream()
-            .map(this::buildLine)
+            .map(lineMapper::entityToDomain)
             .collect(Collectors.toList());
     }
 
@@ -49,16 +46,6 @@ class LinePersistenceRepository implements LineCommandRepository, LineLoadReposi
     @Override
     public void deleteLine(Long lineId) {
         lineRepository.deleteById(lineId);
-    }
-
-    private Line buildLine(LineJpaEntity lineJpaEntity) {
-        StationJpaEntity upStationJpaEntity = stationRepository.findById(lineJpaEntity.getUpStationId().getId())
-            .orElseThrow(() -> new NotFoundStationException(String.format("해당하는 Line 에 상행 Station 을 찾을 수 없습니다. Requested LineId: %d StationId: %d", lineJpaEntity.getId(), lineJpaEntity.getUpStationId().getId())));
-
-        StationJpaEntity downStationJpaEntity = stationRepository.findById(lineJpaEntity.getDownStationId().getId())
-            .orElseThrow(() -> new NotFoundStationException(String.format("해당하는 Line 에 하행 Station 을 찾을 수 없습니다. Requested LineId: %d StationId: %d", lineJpaEntity.getId(), lineJpaEntity.getDownStationId().getId())));
-
-        return lineMapper.entityToDomain(lineJpaEntity, upStationJpaEntity, downStationJpaEntity);
     }
 
 }

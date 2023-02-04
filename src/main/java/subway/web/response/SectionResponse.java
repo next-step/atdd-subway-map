@@ -21,7 +21,11 @@ public class SectionResponse {
     }
 
     public static SectionResponse from(Section section) {
-        return new SectionResponse(section.getId(), StationResponse.from(section.getDownStation()), StationResponse.from(section.getUpStation()), section.getDistance(), LineResponse.from(section.getLine()));
+        return new SectionResponse(section.getId(),
+            StationResponse.from(section.getDownStation()),
+            StationResponse.from(section.getUpStation()),
+            section.getDistance(),
+            LineResponse.from(section.getLine()));
     }
 
     public Long getId() {

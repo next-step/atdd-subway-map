@@ -7,7 +7,7 @@ import subway.application.service.input.LineLoadUseCase;
 import subway.application.service.input.LineCommandUseCase;
 import subway.web.request.LineCreateRequest;
 import subway.web.request.LineUpdateRequest;
-import subway.web.response.LineResponse;
+import subway.web.response.LineLoadDtoResponse;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,25 +24,25 @@ public class LineController {
     }
 
     @PostMapping("/lines")
-    public ResponseEntity<LineResponse> createLine(@RequestBody LineCreateRequest stationRequest) {
+    public ResponseEntity<LineLoadDtoResponse> createLine(@RequestBody LineCreateRequest stationRequest) {
         Long createdLineId = lineCommandUseCase.createLine(stationRequest.toDomain());
-        LineResponse response = LineResponse.from(lineLoadUseCase.loadLine(createdLineId));
+        LineLoadDtoResponse response = LineLoadDtoResponse.from(lineLoadUseCase.loadLineDto(createdLineId));
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/lines/{lineId}")
-    public ResponseEntity<LineResponse> lines(@PathVariable Long lineId) {
-        LineResponse line = LineResponse.from(lineLoadUseCase.loadLine(lineId));
+    public ResponseEntity<LineLoadDtoResponse> lines(@PathVariable Long lineId) {
+        LineLoadDtoResponse line = LineLoadDtoResponse.from(lineLoadUseCase.loadLineDto(lineId));
         return ResponseEntity.status(HttpStatus.OK).body(line);
     }
 
     @GetMapping("/lines")
-    public ResponseEntity<List<LineResponse>> lines() {
-        List<LineResponse> lineResponses = lineLoadUseCase.loadLines().stream()
-            .map(LineResponse::from)
+    public ResponseEntity<List<LineLoadDtoResponse>> lines() {
+        List<LineLoadDtoResponse> lineLoadDtoResponse = lineLoadUseCase.loadLineDtos().stream()
+            .map(LineLoadDtoResponse::from)
             .collect(Collectors.toList());
 
-        return ResponseEntity.status(HttpStatus.OK).body(lineResponses);
+        return ResponseEntity.status(HttpStatus.OK).body(lineLoadDtoResponse);
     }
 
     @PutMapping("/lines/{lineId}")

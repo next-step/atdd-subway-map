@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import subway.web.request.LineCreateRequest;
 import subway.web.request.LineUpdateRequest;
-import subway.web.response.LineResponse;
+import subway.web.response.LineLoadDtoResponse;
 import subway.web.response.StationResponse;
 
 import java.util.HashMap;
@@ -38,7 +38,7 @@ class LineAcceptanceTest extends BaseAcceptance {
     @Test
     void loadLine() {
         // Given && When
-        LineResponse 신분당선 = 지하철_노선_생성("신분당선", 강남역, 논현역);
+        LineLoadDtoResponse 신분당선 = 지하철_노선_생성("신분당선", 강남역, 논현역);
 
         // when
         ExtractableResponse<Response> actualLines = 지하철_노선_목록_조회();
@@ -57,8 +57,8 @@ class LineAcceptanceTest extends BaseAcceptance {
     @Test
     void loadStations() {
         // Given
-        LineResponse 신분당선 = 지하철_노선_생성("신분당선", 강남역, 논현역);
-        LineResponse 분당선 = 지하철_노선_생성("분당선", 강남역, 논현역);
+        LineLoadDtoResponse 신분당선 = 지하철_노선_생성("신분당선", 강남역, 논현역);
+        LineLoadDtoResponse 분당선 = 지하철_노선_생성("분당선", 강남역, 논현역);
 
         // When
         ExtractableResponse<Response> actualLines = 지하철_노선_목록_조회();
@@ -76,7 +76,7 @@ class LineAcceptanceTest extends BaseAcceptance {
     @Test
     void loadStation() {
         // Given
-        LineResponse 신분당선 = 지하철_노선_생성("신분당선", 강남역, 논현역);
+        LineLoadDtoResponse 신분당선 = 지하철_노선_생성("신분당선", 강남역, 논현역);
 
         // When
         ExtractableResponse<Response> actualLine = 지하철_노선_목록_조회(신분당선);
@@ -94,7 +94,7 @@ class LineAcceptanceTest extends BaseAcceptance {
     @Test
     void updateStation() {
         // Given
-        LineResponse 신분당선 = 지하철_노선_생성("신분당선", 강남역, 논현역);
+        LineLoadDtoResponse 신분당선 = 지하철_노선_생성("신분당선", 강남역, 논현역);
 
         // When
         지하철_노선_수정_요청(신분당선, "다른분당선", "bg-red-600");
@@ -112,7 +112,7 @@ class LineAcceptanceTest extends BaseAcceptance {
     @Test
     void deleteStation() {
         // Given
-        LineResponse 신분당선 = 지하철_노선_생성("신분당선", 강남역, 논현역);
+        LineLoadDtoResponse 신분당선 = 지하철_노선_생성("신분당선", 강남역, 논현역);
 
         // When
         지하철_노선_삭제_요청(신분당선);
@@ -121,12 +121,12 @@ class LineAcceptanceTest extends BaseAcceptance {
         해당_지하철_노선은_삭제_된다(신분당선);
     }
 
-    private void 해당_지하철_노선은_삭제_된다(LineResponse line) {
+    private void 해당_지하철_노선은_삭제_된다(LineLoadDtoResponse line) {
         ExtractableResponse<Response> actualResponse = 지하철_노선_목록_조회(line);
         assertThat(actualResponse.statusCode()).as("노선을 찾지 못할 시 500에러 발생").isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
-    private void 지하철_노선_삭제_요청(LineResponse line) {
+    private void 지하철_노선_삭제_요청(LineLoadDtoResponse line) {
         ExtractableResponse<Response> actualResponse = RestAssured.given().spec(REQUEST_SPEC).log().all()
             .pathParam("lineId", line.getId())
             .when().delete("/lines/{lineId}")
@@ -137,14 +137,14 @@ class LineAcceptanceTest extends BaseAcceptance {
     }
 
 
-    private void 해당_지하철_노선_정보는_수정된다(LineResponse line, String name, String color) {
+    private void 해당_지하철_노선_정보는_수정된다(LineLoadDtoResponse line, String name, String color) {
         ExtractableResponse<Response> actual = 지하철_노선_목록_조회(line);
         assertThat(actual.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(actual.jsonPath().getString("name")).isEqualTo(name);
         assertThat(actual.jsonPath().getString("color")).isEqualTo(color);
     }
 
-    private void 지하철_노선_수정_요청(LineResponse 신분당선, String name, String color) {
+    private void 지하철_노선_수정_요청(LineLoadDtoResponse 신분당선, String name, String color) {
         LineUpdateRequest lineUpdateRequest = new LineUpdateRequest(name, color);
 
         RestAssured.given().spec(REQUEST_SPEC).log().all()
@@ -156,15 +156,15 @@ class LineAcceptanceTest extends BaseAcceptance {
     }
 
 
-    private static void 지하철_노선_목록을_조회_할_수_있다(LineResponse line, LineResponse otherLine, ExtractableResponse<Response> actualLines) {
+    private static void 지하철_노선_목록을_조회_할_수_있다(LineLoadDtoResponse line, LineLoadDtoResponse otherLine, ExtractableResponse<Response> actualLines) {
         assertThat(actualLines.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(actualLines.jsonPath().getObject("[0]", LineResponse.class)).isEqualTo(line);
-        assertThat(actualLines.jsonPath().getObject("[1]", LineResponse.class)).isEqualTo(otherLine);
+        assertThat(actualLines.jsonPath().getObject("[0]", LineLoadDtoResponse.class)).isEqualTo(line);
+        assertThat(actualLines.jsonPath().getObject("[1]", LineLoadDtoResponse.class)).isEqualTo(otherLine);
     }
 
-    private static void 지하철_노선_목록을_조회_할_수_있다(LineResponse line, ExtractableResponse<Response> actualLines) {
+    private static void 지하철_노선_목록을_조회_할_수_있다(LineLoadDtoResponse line, ExtractableResponse<Response> actualLines) {
         assertThat(actualLines.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(actualLines.jsonPath().getObject("[0]", LineResponse.class)).isEqualTo(line);
+        assertThat(actualLines.jsonPath().getObject("[0]", LineLoadDtoResponse.class)).isEqualTo(line);
     }
 
     private static ExtractableResponse<Response> 지하철_노선_목록_조회() {
@@ -174,13 +174,13 @@ class LineAcceptanceTest extends BaseAcceptance {
             .extract();
     }
 
-    private void 지하철_노선을_조회_할_수_있다(LineResponse line, ExtractableResponse<Response> actualLine) {
+    private void 지하철_노선을_조회_할_수_있다(LineLoadDtoResponse line, ExtractableResponse<Response> actualLine) {
         assertThat(actualLine.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(actualLine.jsonPath().getObject("", LineResponse.class)).isEqualTo(line);
+        assertThat(actualLine.jsonPath().getObject("", LineLoadDtoResponse.class)).isEqualTo(line);
 
     }
 
-    private ExtractableResponse<Response> 지하철_노선_목록_조회(LineResponse line) {
+    private ExtractableResponse<Response> 지하철_노선_목록_조회(LineLoadDtoResponse line) {
         return RestAssured.given().spec(REQUEST_SPEC).log().all()
             .pathParam("lineId", line.getId())
             .when().get("/lines/{lineId}")
@@ -188,7 +188,7 @@ class LineAcceptanceTest extends BaseAcceptance {
             .extract();
     }
 
-    private LineResponse 지하철_노선_생성(String lineName, StationResponse 강남역, StationResponse 논현역) {
+    private LineLoadDtoResponse 지하철_노선_생성(String lineName, StationResponse 강남역, StationResponse 논현역) {
         LineCreateRequest givenRequest = new LineCreateRequest(lineName, "bg-red-600", 강남역.getId(), 논현역.getId(), 10L);
 
         ExtractableResponse<Response> createResponse = RestAssured.given().spec(REQUEST_SPEC).log().all()
@@ -203,7 +203,7 @@ class LineAcceptanceTest extends BaseAcceptance {
         List<StationResponse> stations = createResponse.jsonPath().getList("stations", StationResponse.class);
         assertThat(stations).containsExactlyInAnyOrder(강남역, 논현역);
 
-        return createResponse.as(LineResponse.class);
+        return createResponse.as(LineLoadDtoResponse.class);
     }
 
     private static ExtractableResponse<Response> createStation(String stationName) {
