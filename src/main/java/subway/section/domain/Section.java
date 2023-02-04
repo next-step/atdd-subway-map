@@ -26,8 +26,10 @@ public class Section {
 
     private Long distance;
 
-    public Section() {}
-    public Section( Long lineId, Station upStation, Station downStation, Long distance) {
+    public Section() {
+    }
+
+    public Section(Long lineId, Station upStation, Station downStation, Long distance) {
         this.lineId = lineId;
         this.upStation = upStation;
         this.downStation = downStation;

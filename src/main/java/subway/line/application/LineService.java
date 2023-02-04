@@ -6,6 +6,7 @@ import subway.line.domain.Line;
 import subway.line.domain.LineRepository;
 import subway.line.presentation.LineResponse;
 import subway.station.application.StationQuery;
+import subway.station.domain.Station;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -61,5 +62,18 @@ public class LineService {
     @Transactional
     public void deleteLineById(long lineId) {
         lineRepository.deleteById(lineId);
+    }
+
+    @Transactional
+    public LineResponse addSection(long lineId, SectionDto sectionDto) {
+        Station upStation = stationQuery.findById(sectionDto.getUpStationId());
+        Station downStation = stationQuery.findById(sectionDto.getDownStationId());
+
+        Line line = lineQuery.findById(lineId);
+        return LineResponse.from(lineRepository.save(line.addSection(
+                upStation,
+                downStation,
+                sectionDto.getDistance()
+        )));
     }
 }

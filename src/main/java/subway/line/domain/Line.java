@@ -1,8 +1,12 @@
 package subway.line.domain;
 
+import subway.line.application.LineValidator;
+import subway.section.domain.Section;
+import subway.section.domain.Sections;
 import subway.station.domain.Station;
 
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -30,6 +34,9 @@ public class Line {
     @OneToOne
     private Station downStation;
 
+    @Embedded
+    private Sections sections = new Sections();
+
     public Line() {
     }
 
@@ -39,6 +46,24 @@ public class Line {
         this.distance = distance;
         this.upStation = upStation;
         this.downStation = downStation;
+    }
+
+    public Line update(String name, String color) {
+        this.name = name;
+        this.color = color;
+        return this;
+    }
+
+    public Line addSection(
+            Station upStation,
+            Station downStation,
+            long distance
+    ) {
+        Section section = new Section(id, upStation, downStation, distance);
+        if (LineValidator.isValidate(this, section)) {
+            sections.addSection(section);
+        }
+        return this;
     }
 
     public Long getId() {
@@ -65,9 +90,7 @@ public class Line {
         return downStation;
     }
 
-    public Line update(String name, String color) {
-        this.name = name;
-        this.color = color;
-        return this;
+    public Sections getSections() {
+        return sections;
     }
 }

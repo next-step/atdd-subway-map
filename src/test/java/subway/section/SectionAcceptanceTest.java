@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import subway.common.AcceptanceTest;
 import subway.common.Endpoints;
 import subway.line.LineFixtures;
+import subway.line.presentation.AddSectionRequest;
 import subway.line.presentation.CreateLineRequest;
 import subway.line.presentation.LineResponse;
 import subway.utils.RestAssuredClient;
@@ -66,7 +67,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 
         var response = RestAssuredClient.post(
                 Endpoints.sections(신분당선_아이디),
-                new CreateSectionRequest(
+                new AddSectionRequest(
                         downStationId,
                         upStationId,
                         distance
