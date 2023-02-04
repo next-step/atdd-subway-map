@@ -52,6 +52,7 @@ public class SubwayLineRequest {
 				this.color,
 				this.upStationId,
 				this.downStationId,
+				this.distance,
 				stations
 			);
 		}

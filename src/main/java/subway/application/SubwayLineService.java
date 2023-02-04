@@ -1,6 +1,7 @@
 package subway.application;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,6 +11,7 @@ import subway.domain.Station;
 import subway.domain.StationRepository;
 import subway.domain.SubwayLine;
 import subway.domain.SubwayLineRepository;
+import subway.domain.SubwayLines;
 import subway.exception.NotFoundStationException;
 import subway.exception.NotFoundSubwayLineException;
 import subway.exception.SubwayLineErrorCode;
@@ -32,21 +34,23 @@ public class SubwayLineService {
 			throw new NotFoundStationException(SubwayLineErrorCode.NOT_FOUND_STATION);
 		}
 
+		SubwayLine subwayLine = createRequest.toEntity(stations);
+
 		return new SubwayLineResponse.CreateInfo(
 			subwayLineRepository.save(
-				createRequest.toEntity(stations)
+				subwayLine
 			)
 		);
 	}
 
 	@Transactional(readOnly = true)
 	public List<SubwayLineResponse.LineInfo> findSubwayLines() {
-		return subwayLineRepository.findSubwayLineAll();
+		return subwayLineRepository.findSubwayLineProjectionAll();
 	}
 
 	@Transactional(readOnly = true)
 	public SubwayLineResponse.LineInfo findSubwayLineById(Long id) {
-		return subwayLineRepository.findSubwayLineById(id)
+		return subwayLineRepository.findSubwayLineProjectionById(id)
 			.orElseThrow(() -> new NotFoundSubwayLineException(SubwayLineErrorCode.NOT_FOUND_SUBWAY_LINE));
 	}
 

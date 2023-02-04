@@ -3,6 +3,9 @@ package subway.fixture;
 import subway.presentation.request.SubwayLineRequest;
 
 public class SubwayLineFixtures {
+
+	public static final String SUBWAY_LINE_ROOT_PATH = "/lines";
+
 	/**
 	 * SUB WAY LINE NAME
 	 */
@@ -31,7 +34,7 @@ public class SubwayLineFixtures {
 	 * SUB WAY LINE CREATE REQUEST
 	 * @return SubwayLineRequest.Create
 	 */
-	public static SubwayLineRequest.Create getSubwayLineRequest1() {
+	public static SubwayLineRequest.Create 혜화_to_동대문() {
 		return SubwayLineRequest.Create.builder()
 			.name(SUBWAY_LINE_NAME_1)
 			.color(SUBWAY_LINE_COLOR_1)

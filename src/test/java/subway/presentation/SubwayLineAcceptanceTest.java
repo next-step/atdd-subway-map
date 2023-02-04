@@ -40,7 +40,7 @@ public class SubwayLineAcceptanceTest extends AcceptanceTest {
 	@Test
 	void 지하철노선을_생성하면_목록_조회_시_생성한_노선을_찾을_수_있다() {
 		// given
-		ExtractableResponse<Response> createResponse = 지하철노선_생성(getSubwayLineRequest1());
+		ExtractableResponse<Response> createResponse = 지하철노선_생성(혜화_to_동대문());
 
 
 		// when
@@ -61,7 +61,7 @@ public class SubwayLineAcceptanceTest extends AcceptanceTest {
 	@Test
 	void 지하철노선_2개를_생성하고_목록조회_시_2개의_노선을_조회할_수_있다() {
 		// given
-		지하철노선_생성(getSubwayLineRequest1());
+		지하철노선_생성(혜화_to_동대문());
 		지하철노선_생성(getSubwayLineRequest2());
 
 		// when
@@ -79,7 +79,7 @@ public class SubwayLineAcceptanceTest extends AcceptanceTest {
 	@Test
 	void 지하철노선을_생성하고_노선을_조회하면_노선의_정보를_응답받을_수_있다() {
 		// given
-		Long id = 지하철노선_생성(getSubwayLineRequest1())
+		Long id = 지하철노선_생성(혜화_to_동대문())
 			.as(new TypeRef<SubwayLineResponse.CreateInfo>() {
 			})
 			.getId();
@@ -105,7 +105,7 @@ public class SubwayLineAcceptanceTest extends AcceptanceTest {
 	@Test
 	void 지하철노선을_생성하고_노선을_생성한_노선을_수정하면_수정된다() {
 		// given
-		Long id = 지하철노선_생성(getSubwayLineRequest1())
+		Long id = 지하철노선_생성(혜화_to_동대문())
 			.as(new TypeRef<SubwayLineResponse.CreateInfo>() {
 			})
 			.getId();
@@ -136,7 +136,7 @@ public class SubwayLineAcceptanceTest extends AcceptanceTest {
 	@Test
 	void 지하철노선을_생성하고_노선을_생성한_노선을_삭제하면_삭제된다() {
 		// given
-		Long id = 지하철노선_생성(getSubwayLineRequest1())
+		Long id = 지하철노선_생성(혜화_to_동대문())
 			.as(new TypeRef<SubwayLineResponse.CreateInfo>() {
 			})
 			.getId();
