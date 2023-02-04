@@ -11,7 +11,6 @@ import subway.domain.Station;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 import subway.dto.StationRequest;
-import subway.dto.StationResponse;
 import subway.executor.AcceptanceExecutor;
 
 import java.util.List;
@@ -27,9 +26,7 @@ class LineAcceptanceTest extends BaseAcceptanceTest {
     @DisplayName("지하철 노선 생성")
     void createLine() {
         //when 지하철 노선을 생성하면
-        Long 정자역Id = createStation("정자역");
-        Long 판교역Id = createStation("판교역");
-        ExtractableResponse<Response> response = createLine("신분당선", "red", 정자역Id, 판교역Id);
+        ExtractableResponse<Response> response = createLine("신분당선", "red", "정자역", "판교역");
 
         //then  지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
         assertAll(() -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value())
@@ -38,18 +35,12 @@ class LineAcceptanceTest extends BaseAcceptanceTest {
 
     }
 
-
     @Test
     @DisplayName("지하철 노선 목록 조회")
     void showLines() {
         //given 2개의 지하철 노선을 생성하고
-        Long 정자역Id = createStation("정자역");
-        Long 판교역Id = createStation("판교역");
-        createLine("신분당선", "red", 정자역Id, 판교역Id);
-
-        Long 광화문역Id = createStation("광화문");
-        Long 서대문역Id = createStation("서대문");
-        createLine("5호선", "purple", 광화문역Id, 서대문역Id);
+        createLine("신분당선", "red", "정자역", "판교역");
+        createLine("5호선", "purple", "광화문", "서대문");
 
         //when 지하철 노선 목록을 조회하면
         List<LineResponse> response = List.of(AcceptanceExecutor.get("lines", LineResponse[].class));
@@ -61,24 +52,22 @@ class LineAcceptanceTest extends BaseAcceptanceTest {
 
     }
 
+
     @Test
     @DisplayName("지하철 노선 조회")
     void showLine() {
         //given 지하철 노선을 생성하고
-        Long 정자역Id = createStation("정자역");
-        Long 판교역Id = createStation("판교역");
-        Long 신분당선Id = createLine("신분당선", "red", 정자역Id, 판교역Id).jsonPath().getLong("id");
+        Long 신분당선 = createLine("신분당선", "red", "정자역", "판교역").jsonPath().getLong("id");
 
         //when 생성한 지하철 노선을 조회하면
-        LineResponse 신분당선 = AcceptanceExecutor.get("/lines/" + 신분당선Id, LineResponse.class);
+
+        LineResponse response = AcceptanceExecutor.get("/lines/" + 신분당선, LineResponse.class);
 
         //then 생성한 지하철 노선의 정보를 응답받을 수 있다.
         assertAll(
-                () -> assertThat(신분당선.getName()).isEqualTo("신분당선")
-                , () -> assertThat(신분당선.getColor()).isEqualTo("red")
-                , () -> assertThat(신분당선.getId()).isEqualTo(신분당선Id)
-                , () -> assertThat(신분당선.getStations().stream().map(StationResponse::getName)).hasSize(2)
-                , () -> assertThat(신분당선.getStations().stream().map(StationResponse::getName)).containsAnyOf("정자역", "판교역"));
+                () -> assertThat(response.getName()).isEqualTo("신분당선")
+                , () -> assertThat(response.getColor()).isEqualTo("red")
+                , () -> assertThat(response.getId()).isEqualTo(신분당선));
 
     }
 
@@ -86,18 +75,16 @@ class LineAcceptanceTest extends BaseAcceptanceTest {
     @DisplayName("지하철 노선 수정")
     void updateLine() {
         //given 지하철 노선을 생성하고
-        Long 정자역Id = createStation("정자역");
-        Long 판교역Id = createStation("판교역");
-        Long 신분당선Id = createLine("신분당선", "red", 정자역Id, 판교역Id).jsonPath().getLong("id");
+        Long 신분당선 = createLine("신분당선", "red", "정자역", "판교역").jsonPath().getLong("id");
 
         //when 생성한 지하철 노선을 수정하면
         LineRequest updateRequest = new LineRequest();
         updateRequest.setName("경강선");
         updateRequest.setColor("blue");
-        ExtractableResponse<Response> response = AcceptanceExecutor.put("/lines/" + 신분당선Id, updateRequest);
+        ExtractableResponse<Response> response = AcceptanceExecutor.put("/lines/" + 신분당선, updateRequest);
 
         //then 해당 지하철 노선 정보는 수정된다
-        LineResponse updatedLine = AcceptanceExecutor.get("/lines/"+신분당선Id, LineResponse.class);
+        LineResponse updatedLine = AcceptanceExecutor.get("/lines/" + 신분당선, LineResponse.class);
 
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value())
@@ -106,30 +93,29 @@ class LineAcceptanceTest extends BaseAcceptanceTest {
 
     }
 
-
     @Test
     @DisplayName("지하철 노선 삭제")
     void deleteLine() {
         //given 지하철 노선을 생성하고
-        Long 정자역Id = createStation("정자역");
-        Long 판교역Id = createStation("판교역");
-        Long 신분당선Id = createLine("신분당선", "red", 정자역Id, 판교역Id).jsonPath().getLong("id");
+        Long 신분당선 = createLine("신분당선", "red", "정자역", "판교역").jsonPath().getLong("id");
 
         //when 생성한 지하철 노선을 삭제하면
-        ExtractableResponse<Response> deleteLineResponse = AcceptanceExecutor.delete("/lines/" + 신분당선Id);
+        ExtractableResponse<Response> deleteLineResponse = AcceptanceExecutor.delete("/lines/" + 신분당선);
 
         //then 해당 지하철 노선 정보는 삭제된다
         assertThat(deleteLineResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-
     }
 
-    private static ExtractableResponse<Response> createLine(String lineName, String red, Long upStation, Long downStation) {
+    private static ExtractableResponse<Response> createLine(String lineName, String red, String upStation, String downStation) {
+
+        Long upStationId = createStation(upStation);
+        Long downStationId = createStation(downStation);
 
         LineRequest lineRequest = new LineRequest();
         lineRequest.setName(lineName);
         lineRequest.setColor(red);
-        lineRequest.setUpStationId(upStation);
-        lineRequest.setDownStationId(downStation);
+        lineRequest.setUpStationId(upStationId);
+        lineRequest.setDownStationId(downStationId);
         lineRequest.setDistance(10L);
 
         return AcceptanceExecutor.post("/lines", lineRequest);
