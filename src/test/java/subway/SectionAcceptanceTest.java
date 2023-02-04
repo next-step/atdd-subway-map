@@ -21,13 +21,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("구간 관련 기능")
 class SectionAcceptanceTest extends BaseAcceptance {
 
-    private static LineResponse 신분당선;
-
     @BeforeEach
     void setUpStation() {
-        StationResponse 강남역 = createStation("강남역").as(StationResponse.class);
-        StationResponse 논현역 = createStation("논현역").as(StationResponse.class);
-        신분당선 = 지하철_노선_생성("신분당선", 강남역, 논현역);
+        StationResponse 강남역 = 지하철역_생성("강남역").as(StationResponse.class);
+        StationResponse 논현역 = 지하철역_생성("논현역").as(StationResponse.class);
+        LineResponse 신분당선 = 지하철_노선_생성("신분당선", 강남역, 논현역);
     }
 
     /**
@@ -83,7 +81,7 @@ class SectionAcceptanceTest extends BaseAcceptance {
             .extract();
     }
 
-    private static ExtractableResponse<Response> createStation(String stationName) {
+    private static ExtractableResponse<Response> 지하철역_생성(String stationName) {
         Map<String, String> params = new HashMap<>();
         params.put("name", stationName);
 
