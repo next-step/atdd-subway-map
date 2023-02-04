@@ -1,17 +1,41 @@
 package subway.section;
 
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import setting.RandomPortSetting;
+import subway.line.LineApi;
+import subway.line.util.LineExtraction;
+import subway.station.StationApi;
+import subway.station.util.StationExtraction;
+
+import static subway.line.MockLine.신분당선;
+import static subway.station.MockStation.강남역;
+import static subway.station.MockStation.서초역;
 
 @DisplayName("지하철 구간 관리 기능")
-class SectionAcceptanceTest {
+class SectionAcceptanceTest extends RandomPortSetting {
+    long 신분당선_ID;
+
+    long 강남역_ID;
+    long 서초역_ID;
 
     /**
      * Given 지하철역, 지하철 노선을 생성요청하고
      */
     @BeforeEach
-    void setUp() {
+    public void setUp() {
+        super.setUp();
+
+        ExtractableResponse<Response> responseOfCreate강남역 = StationApi.createStation(강남역);
+        ExtractableResponse<Response> responseOfCreate서초역 = StationApi.createStation(서초역);
+        강남역_ID = StationExtraction.getStationId(responseOfCreate강남역);
+        서초역_ID = StationExtraction.getStationId(responseOfCreate서초역);
+
+        ExtractableResponse<Response> responseOfCreate신분당선 = LineApi.createLine(신분당선, 강남역_ID, 서초역_ID, 10);
+        신분당선_ID = LineExtraction.getLineId(responseOfCreate신분당선);
     }
 
     /**

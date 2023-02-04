@@ -9,9 +9,10 @@ import setting.RandomPortSetting;
 import subway.common.util.SimpleCRUDApi;
 import subway.common.util.validation.ExistenceValidation;
 import subway.common.util.validation.ResponseStatusValidation;
-import subway.line.util.Extraction;
+import subway.line.util.LineExtraction;
 import subway.line.util.Validation;
 import subway.station.StationApi;
+import subway.station.util.StationExtraction;
 
 import static subway.line.MockLine.분당선;
 import static subway.line.MockLine.신분당선;
@@ -21,14 +22,20 @@ import static subway.station.MockStation.신촌역;
 
 @DisplayName("노선 관련 기능")
 class LineAcceptanceTest extends RandomPortSetting {
+    long 강남역_ID;
+    long 서초역_ID;
+    long 신촌역_ID;
 
     @BeforeEach
     public void setUp() {
         super.setUp();
 
-        StationApi.createStation(강남역);
-        StationApi.createStation(서초역);
-        StationApi.createStation(신촌역);
+        ExtractableResponse<Response> responseOfCreate강남역 = StationApi.createStation(강남역);
+        ExtractableResponse<Response> responseOfCreate서초역 = StationApi.createStation(서초역);
+        ExtractableResponse<Response> responseOfCreate신촌역 = StationApi.createStation(신촌역);
+        강남역_ID = StationExtraction.getStationId(responseOfCreate강남역);
+        서초역_ID = StationExtraction.getStationId(responseOfCreate서초역);
+        신촌역_ID = StationExtraction.getStationId(responseOfCreate신촌역);
     }
 
     /**
@@ -39,7 +46,7 @@ class LineAcceptanceTest extends RandomPortSetting {
     @DisplayName("지하철노선 생성")
     void createLine() {
         // When
-        LineApi.createLine(신분당선);
+        LineApi.createLine(신분당선, 강남역_ID, 서초역_ID, 10);
 
         // Then
         ExtractableResponse<Response> responseOfShowLines = LineApi.showLines();
@@ -55,8 +62,8 @@ class LineAcceptanceTest extends RandomPortSetting {
     @DisplayName("지하철노선 목록 조회")
     void showLines() {
         // Given
-        LineApi.createLine(신분당선);
-        LineApi.createLine(분당선);
+        LineApi.createLine(신분당선, 강남역_ID, 서초역_ID, 10);
+        LineApi.createLine(분당선, 서초역_ID, 신촌역_ID, 6);
 
         // When
         ExtractableResponse<Response> responseOfShowLines = LineApi.showLines();
@@ -75,11 +82,11 @@ class LineAcceptanceTest extends RandomPortSetting {
     @DisplayName("지하철노선 조회")
     void showLine() {
         // Given
-        ExtractableResponse<Response> responseOfCreateLine = LineApi.createLine(신분당선);
-        ResponseStatusValidation.checkCreatedResponse(responseOfCreateLine);
+        ExtractableResponse<Response> responseOfCreate신분당선 = LineApi.createLine(신분당선, 강남역_ID, 서초역_ID, 10);
+        ResponseStatusValidation.checkCreatedResponse(responseOfCreate신분당선);
 
         // When
-        ExtractableResponse<Response> responseOfShowLine = SimpleCRUDApi.showResource(responseOfCreateLine);
+        ExtractableResponse<Response> responseOfShowLine = SimpleCRUDApi.showResource(responseOfCreate신분당선);
 
         // Then
         ExistenceValidation.checkNameExistence(responseOfShowLine, 신분당선);
@@ -94,14 +101,14 @@ class LineAcceptanceTest extends RandomPortSetting {
     @DisplayName("지하철노선 수정")
     void updateLine() {
         // Given
-        ExtractableResponse<Response> responseOfCreateLine = LineApi.createLine(신분당선);
-        Long lineId = Extraction.getLineId(responseOfCreateLine);
+        ExtractableResponse<Response> responseOfCreate신분당선 = LineApi.createLine(신분당선, 강남역_ID, 서초역_ID, 10);
+        Long lineId = LineExtraction.getLineId(responseOfCreate신분당선);
 
         // When
         LineApi.updateLine(lineId, 분당선.getName(), 분당선.getColor());
 
         // Then
-        ExtractableResponse<Response> responseOfShowResource = SimpleCRUDApi.showResource(responseOfCreateLine);
+        ExtractableResponse<Response> responseOfShowResource = SimpleCRUDApi.showResource(responseOfCreate신분당선);
         ExistenceValidation.checkNameExistence(responseOfShowResource, 분당선);
         Validation.checkColorExistenceInList(responseOfShowResource, 분당선);
     }
@@ -115,10 +122,10 @@ class LineAcceptanceTest extends RandomPortSetting {
     @DisplayName("지하철노선 삭제")
     void deleteLine() {
         // Given
-        ExtractableResponse<Response> responseOfCreateLine = LineApi.createLine(신분당선);
+        ExtractableResponse<Response> responseOfCreate신분당선 = LineApi.createLine(신분당선, 강남역_ID, 서초역_ID, 10);
 
         // When
-        Long lineId = Extraction.getLineId(responseOfCreateLine);
+        Long lineId = LineExtraction.getLineId(responseOfCreate신분당선);
         ExtractableResponse<Response> responseOfDelete = LineApi.deleteLine(lineId);
         ResponseStatusValidation.checkDeletedResponse(responseOfDelete);
 
