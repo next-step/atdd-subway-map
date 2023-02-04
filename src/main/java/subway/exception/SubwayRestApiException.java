@@ -1,6 +1,6 @@
 package subway.exception;
 
-public class SubwayRestApiException extends RuntimeException{
+public class SubwayRestApiException extends RuntimeException {
     private final ErrorResponseCode errorResponse;
 
     public SubwayRestApiException(ErrorResponseCode errorResponse) {
