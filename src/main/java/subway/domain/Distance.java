@@ -1,4 +1,6 @@
-package subway.line;
+package subway.domain;
+
+import subway.exception.InvalidDistanceException;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;

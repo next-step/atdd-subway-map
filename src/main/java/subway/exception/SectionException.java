@@ -1,4 +1,4 @@
-package subway.line;
+package subway.exception;
 
 public abstract class SectionException extends RuntimeException {
     public SectionException() {

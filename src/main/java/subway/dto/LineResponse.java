@@ -1,8 +1,8 @@
-package subway.line;
+package subway.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import subway.station.Station;
-import subway.station.StationResponse;
+import subway.domain.Line;
+import subway.domain.Station;
 
 import java.util.List;
 import java.util.stream.Collectors;

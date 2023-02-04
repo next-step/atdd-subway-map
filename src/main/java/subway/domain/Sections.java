@@ -1,6 +1,7 @@
-package subway.line;
+package subway.domain;
 
-import subway.station.Station;
+import subway.exception.CannotAppendableDownStationException;
+import subway.exception.CannotAppendableUpStationException;
 
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;

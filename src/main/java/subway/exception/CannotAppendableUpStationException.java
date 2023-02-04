@@ -1,4 +1,4 @@
-package subway.line;
+package subway.exception;
 
 public class CannotAppendableUpStationException extends SectionException {
 
