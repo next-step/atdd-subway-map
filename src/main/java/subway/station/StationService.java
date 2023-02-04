@@ -6,6 +6,9 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import subway.station.dto.StationRequest;
+import subway.station.dto.StationResponse;
+
 @Service
 @Transactional(readOnly = true)
 public class StationService {

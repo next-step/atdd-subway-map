@@ -2,7 +2,7 @@ package subway.line.dto;
 
 import java.util.List;
 
-import subway.station.StationResponse;
+import subway.station.dto.StationResponse;
 
 public class StationsDto {
     private List<StationResponse> stations;

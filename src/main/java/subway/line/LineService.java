@@ -14,7 +14,7 @@ import subway.line.dto.LineResponse;
 import subway.line.dto.StationsDto;
 import subway.station.Station;
 import subway.station.StationRepository;
-import subway.station.StationResponse;
+import subway.station.dto.StationResponse;
 
 @Service
 public class LineService {
