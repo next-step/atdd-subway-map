@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.controller.request.LineRequest;
 import subway.controller.response.LineResponse;
-import subway.exception.SubwayException;
+import subway.exception.SubwayRuntimeException;
 import subway.exception.message.SubwayErrorCode;
 import subway.repository.LineRepository;
 import subway.repository.StationRepository;
@@ -66,7 +66,7 @@ public class LineService {
      * 노선 단건 조회 편의 메서드
      */
     public Line findLine(Long id) {
-        return lineRepository.findById(id).orElseThrow(() -> new SubwayException(SubwayErrorCode.NOT_FOUND_STATION));
+        return lineRepository.findById(id).orElseThrow(() -> new SubwayRuntimeException(SubwayErrorCode.NOT_FOUND_STATION));
     }
 
     /**
