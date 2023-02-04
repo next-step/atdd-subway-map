@@ -34,7 +34,7 @@ public class SectionCommandService implements SectionCommandUseCase {
         Long distance = sectionCreateDto.getDistance();
 
         List<Section> lineSections = sectionLoadRepository.loadLineSection(line.getId());
-        Section section = Section.from(line, upStation, newDownStation, distance, lineSections);
+        Section section = Section.make(line, upStation, newDownStation, distance, lineSections);
         return sectionCommandRepository.createSection(section);
 
     }

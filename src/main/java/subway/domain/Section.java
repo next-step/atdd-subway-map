@@ -26,13 +26,16 @@ public class Section {
         return new Section(id, downStation, upStation, distance, line);
     }
 
-    public static Section from(Line line, Station upStation, Station downStation, Long distance, List<Section> lineSections) {
-        if (lineSections.isEmpty()) {
-            return Section.withNoId(downStation, upStation, distance, line);
+    public static Section make(Line line, Station upStation, Station downStation, Long distance, List<Section> lineSections) {
+        if (!lineSections.isEmpty()) {
+            validateSection(upStation, downStation, lineSections);
         }
 
-        Section lineDownSection = lineSections.get(lineSections.size() - 1);
+        return Section.withNoId(downStation, upStation, distance, line);
+    }
 
+    private static void validateSection(Station upStation, Station downStation, List<Section> lineSections) {
+        Section lineDownSection = lineSections.get(lineSections.size() - 1);
         Station lineDownStation = lineDownSection.getDownStation();
 
         if (!lineDownStation.equals(upStation)) {
@@ -42,10 +45,7 @@ public class Section {
         if (lineSections.stream().anyMatch(section -> section.hasStation(downStation))) {
             throw new AlreadyRegisteredDownStation();
         }
-
-        return Section.withNoId(downStation, upStation, distance, line);
     }
-
 
     public Long getId() {
         return id;
