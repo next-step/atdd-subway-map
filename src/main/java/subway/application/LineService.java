@@ -30,12 +30,13 @@ public class LineService {
     }
 
     public LineResponse getBy(final Long lineId) {
-        Line line = findLineBy(lineId);
+        Line line = lineRepository.findByIdWithStation(lineId)
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 노선입니다."));
         return LineResponse.by(line, StationResponse.by(line.getStations()));
     }
 
     public List<LineResponse> getList() {
-        return lineRepository.findAll().stream()
+        return lineRepository.findAllWithStation().stream()
                 .map(line -> LineResponse.by(line, StationResponse.by(line.getStations())))
                 .collect(Collectors.toUnmodifiableList());
     }
