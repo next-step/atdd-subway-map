@@ -34,7 +34,8 @@ public class StationService {
 
     @Transactional
     public Long saveStation(final StationRequest stationRequest) {
-        Station station = stationCommandRepository.save(new Station(stationRequest.getName()));
+        Station station = stationCommandRepository.save(stationRequest.toEntity());
+
         return station.getId();
     }
 

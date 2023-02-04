@@ -8,6 +8,7 @@ import subway.line.domain.Line;
 import subway.line.domain.LineCommandRepository;
 import subway.line.domain.LineQueryRepository;
 import subway.line.exception.LineNotFoundException;
+import subway.section.application.SectionService;
 import subway.station.application.StationService;
 import subway.station.domain.Station;
 
@@ -20,13 +21,16 @@ public class LineService {
     private final LineQueryRepository lineQueryRepository;
     private final LineCommandRepository lineCommandRepository;
     private final StationService stationService;
+    private final SectionService sectionService;
 
     public LineService(final LineQueryRepository lineQueryRepository,
                        final LineCommandRepository lineCommandRepository,
-                       final StationService stationService) {
+                       final StationService stationService,
+                       final SectionService sectionService) {
         this.lineQueryRepository = lineQueryRepository;
         this.lineCommandRepository = lineCommandRepository;
         this.stationService = stationService;
+        this.sectionService = sectionService;
     }
 
 
@@ -45,6 +49,7 @@ public class LineService {
         Station downStation = stationService.findStationById(lineCreateRequest.getDownStationId());
 
         Line line = lineCommandRepository.save(lineCreateRequest.toEntity(upStation, downStation));
+        sectionService.saveSection(line, lineCreateRequest.toSectionCreateRequest());
 
         return line.getId();
     }

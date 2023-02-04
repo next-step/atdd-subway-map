@@ -24,6 +24,8 @@ class AcceptanceTest {
     public static final String LINE_BASE_URL = "/lines";
     public static final String LINE_COMMAND_URL = LINE_BASE_URL + "/{lineId}";
 
+    public static final String SECTION_BASE_URL = "/lines/{lineId}/sections";
+
     @Autowired
     private DatabaseCleaner databaseCleaner;
 

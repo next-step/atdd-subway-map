@@ -2,6 +2,7 @@ package subway.line.application.dto.request;
 
 import lombok.Getter;
 import subway.line.domain.Line;
+import subway.section.application.dto.request.SectionCreateRequest;
 import subway.station.domain.Station;
 
 @Getter
@@ -27,6 +28,13 @@ public class LineCreateRequest {
                 .color(getColor())
                 .upStation(upStation)
                 .downStation(downStation)
+                .build();
+    }
+
+    public SectionCreateRequest toSectionCreateRequest() {
+        return SectionCreateRequest.builder()
+                .upStationId(getUpStationId())
+                .downStationId(getDownStationId())
                 .distance(getDistance())
                 .build();
     }

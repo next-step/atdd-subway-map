@@ -14,6 +14,8 @@ import subway.line.application.dto.request.LineCreateRequest;
 import subway.line.application.dto.request.LineUpdateRequest;
 import subway.line.application.dto.response.LineResponse;
 import subway.line.domain.Line;
+import subway.section.application.SectionService;
+import subway.section.application.dto.request.SectionCreateRequest;
 
 import java.net.URI;
 import java.util.List;
@@ -23,9 +25,11 @@ import java.util.List;
 class LineController {
 
     private final LineService lineService;
+    private final SectionService sectionService;
 
-    LineController(final LineService lineService) {
+    LineController(final LineService lineService, final SectionService sectionService) {
         this.lineService = lineService;
+        this.sectionService = sectionService;
     }
 
     @PostMapping
@@ -66,5 +70,14 @@ class LineController {
         lineService.deleteLine(lineId);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{lineId}/sections")
+    ResponseEntity<Void> createSection(@PathVariable final Long lineId,
+                                       @RequestBody final SectionCreateRequest sectionCreateRequest) {
+        Line findLine = lineService.findLineById(lineId);
+        sectionService.saveSection(findLine, sectionCreateRequest);
+
+        return ResponseEntity.created(URI.create("/lines/" + lineId)).build();
     }
 }

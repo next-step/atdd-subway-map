@@ -10,11 +10,11 @@ import java.util.stream.Collectors;
 
 @Getter
 public class LineResponse {
-    private Long id;
-    private String name;
-    private String color;
 
-    private List<StationResponse> stations;
+    private final Long id;
+    private final String name;
+    private final String color;
+    private final List<StationResponse> stations;
 
     @Builder
     private LineResponse(final Long id, final String name,
@@ -30,16 +30,7 @@ public class LineResponse {
                 .id(line.getId())
                 .name(line.getName())
                 .color(line.getColor())
-                .stations(List.of(
-                        StationResponse.builder()
-                                .id(line.getUpStation().getId())
-                                .name(line.getUpStation().getName())
-                                .build(),
-                        StationResponse.builder()
-                                .id(line.getDownStation().getId())
-                                .name(line.getDownStation().getName())
-                                .build()
-                ))
+                .stations(StationResponse.fromList(line.getSections().getStations()))
                 .build();
     }
 
