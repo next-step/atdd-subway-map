@@ -5,13 +5,11 @@ import org.springframework.transaction.annotation.Transactional;
 import subway.domain.Station;
 import subway.dto.station.StationRequest;
 import subway.dto.station.StationResponse;
-import subway.exception.SubwayException;
+import subway.exception.NotFoundException;
 import subway.repository.StationRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static subway.exception.SubwayExceptionStatus.STATION_NOT_FOUND;
 
 @Service
 @Transactional(readOnly = true)
@@ -36,7 +34,7 @@ public class StationService {
 
     public Station findStation(Long stationId) {
         return stationRepository.findById(stationId)
-                .orElseThrow(() -> new SubwayException(STATION_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(stationId + "번 역을 찾을 수 없습니다."));
     }
 
     @Transactional
