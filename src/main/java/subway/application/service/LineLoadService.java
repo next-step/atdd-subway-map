@@ -2,10 +2,9 @@ package subway.application.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import subway.application.service.output.LineLoadRepository;
 import subway.application.service.input.LineLoadUseCase;
+import subway.application.service.output.LineLoadRepository;
 import subway.domain.Line;
-import subway.domain.NotFoundLineException;
 
 import java.util.List;
 
@@ -21,8 +20,7 @@ class LineLoadService implements LineLoadUseCase {
 
     @Override
     public Line loadLine(Long loadLineId) {
-        return lineLoadRepository.loadLine(loadLineId)
-            .orElseThrow(() -> new NotFoundLineException(String.format("요청한 Line 을 찾지 못했습니다 requested lineId: %d", loadLineId)));
+        return lineLoadRepository.loadLine(loadLineId);
     }
 
     @Override
