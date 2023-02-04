@@ -8,7 +8,7 @@ public class Section {
     private Long distance;
     private Long lineId;
 
-    public Section(Long id, Long downStationId, Long upStationId, Long distance, Long lineId) {
+    private Section(Long id, Long downStationId, Long upStationId, Long distance, Long lineId) {
         this.id = id;
         this.downStationId = downStationId;
         this.upStationId = upStationId;
@@ -18,6 +18,10 @@ public class Section {
 
     public static Section withNoId(Long downStationId, Long upStationId, Long distance, Long lineId) {
         return new Section(null, downStationId, upStationId, distance, lineId);
+    }
+
+    public static Section withId(Long id, Long downStationId, Long upStationId, Long distance, Long lineId) {
+        return new Section(id, downStationId, upStationId, distance, lineId);
     }
 
     public Long getId() {

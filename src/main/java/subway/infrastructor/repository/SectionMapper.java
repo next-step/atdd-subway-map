@@ -14,4 +14,10 @@ public class SectionMapper {
             new LinePk(section.getLineId()));
     }
 
+    Section entityToDomain(SectionJpaEntity sectionJpaEntity) {
+        return Section.withId(
+            sectionJpaEntity.getId(), sectionJpaEntity.getDownStationId().getId(), sectionJpaEntity.getUpStationId().getId(), sectionJpaEntity.getDistance(), sectionJpaEntity.getLineId().getId()
+        );
+    }
+
 }

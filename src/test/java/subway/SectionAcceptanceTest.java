@@ -52,20 +52,30 @@ class SectionAcceptanceTest extends BaseAcceptance {
         지하철_구간을_조회_할_수_있다(givenSection, actualSection);
     }
 
-    private static void 지하철_구간을_조회_할_수_있다(SectionResponse givenSection, ExtractableResponse<Response> actualSection) {
-        assertThat(actualSection.as(SectionResponse.class)).isEqualTo(givenSection);
-    }
-
     private static ExtractableResponse<Response> 지하철_구간_목록_요청(SectionResponse givenSection) {
         ExtractableResponse<Response> sectionResponse = RestAssured.given().spec(REQUEST_SPEC).log().all()
-            .param("sectionId", givenSection.getId())
-            .when().get("/lines/1/sections/{sectionId}")
+            .pathParam("sectionId", givenSection.getId())
+            .when().get("/sections/{sectionId}")
             .then().log().all()
             .extract();
 
         assertThat(sectionResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         return sectionResponse;
+    }
+
+    private static ExtractableResponse<Response> 지하철역_생성(String stationName) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", stationName);
+
+        ExtractableResponse<Response> response = RestAssured.given().spec(REQUEST_SPEC).log().all()
+            .body(params)
+            .when().post("/stations")
+            .then().log().all()
+            .extract();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        return response;
     }
 
     private static SectionResponse 지하철_구간_생성() {
@@ -80,6 +90,10 @@ class SectionAcceptanceTest extends BaseAcceptance {
         assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         return createResponse.as(SectionResponse.class);
+    }
+
+    private static void 지하철_구간을_조회_할_수_있다(SectionResponse givenSection, ExtractableResponse<Response> actualSection) {
+        assertThat(actualSection.as(SectionResponse.class)).isEqualTo(givenSection);
     }
 
     private LineResponse 지하철_노선_생성(String lineName, StationResponse upStation, StationResponse downStation) {
@@ -106,20 +120,6 @@ class SectionAcceptanceTest extends BaseAcceptance {
             .when().get("/lines/{lineId}")
             .then().log().all()
             .extract();
-    }
-
-    private static ExtractableResponse<Response> 지하철역_생성(String stationName) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", stationName);
-
-        ExtractableResponse<Response> response = RestAssured.given().spec(REQUEST_SPEC).log().all()
-            .body(params)
-            .when().post("/stations")
-            .then().log().all()
-            .extract();
-
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        return response;
     }
 
 }

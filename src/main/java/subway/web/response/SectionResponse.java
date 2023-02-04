@@ -2,6 +2,8 @@ package subway.web.response;
 
 import subway.domain.Section;
 
+import java.util.Objects;
+
 public class SectionResponse {
 
     private Long id;
@@ -40,6 +42,19 @@ public class SectionResponse {
 
     public Long getLineId() {
         return lineId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SectionResponse that = (SectionResponse) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
 }
