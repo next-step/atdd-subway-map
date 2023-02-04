@@ -1,8 +1,10 @@
 package subway.model;
 
+import lombok.Getter;
 import javax.persistence.*;
 
 @Entity
+@Getter
 public class Station {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,11 +19,8 @@ public class Station {
         this.name = name;
     }
 
-    public Long getId() {
-        return id;
-    }
+    @ManyToOne
+    @JoinColumn(name = "LINE_ID")
+    private Line line;
 
-    public String getName() {
-        return name;
-    }
 }
