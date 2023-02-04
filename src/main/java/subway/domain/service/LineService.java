@@ -6,11 +6,12 @@ import subway.api.dto.LineRequest;
 import subway.api.dto.LineResponse;
 import subway.domain.entity.Line;
 import subway.domain.entity.Station;
+import subway.domain.entity.Section;
 import subway.domain.repository.LineRepository;
 import subway.domain.repository.StationRepository;
 
 import javax.persistence.EntityNotFoundException;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,28 +19,25 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class LineService {
     private LineRepository lineRepository;
-    private StationRepository stationRepository;
+    private StationService stationService;
 
-    public LineService(LineRepository lineRepository, StationRepository stationRepository) {
+    public LineService(LineRepository lineRepository, StationService stationService) {
         this.lineRepository = lineRepository;
-        this.stationRepository = stationRepository;
+        this.stationService = stationService;
     }
 
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
-        Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor(), lineRequest.getUpStationId(), lineRequest.getDownStationId(), lineRequest.getDistance()));
+        Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor()));
         return createLineResponse(line);
     }
 
     private LineResponse createLineResponse(Line line) {
-        List<Station> stations = new ArrayList<>();
-        createStations(line, stations);
-
         return new LineResponse(
                 line.getId(),
                 line.getName(),
                 line.getColor(),
-                stations
+                createStations(line)
         );
     }
 
@@ -67,10 +65,19 @@ public class LineService {
         lineRepository.deleteById(id);
     }
 
-    private void createStations(Line line, List<Station> stations) {
-        Station upStation = stationRepository.findById(line.getUpStationId()).orElseThrow(EntityNotFoundException::new);
-        Station downStation = stationRepository.findById(line.getDownStationId()).orElseThrow(EntityNotFoundException::new);
-        stations.add(upStation);
-        stations.add(downStation);
+    private List createStations(Line line) {
+        if (line.getSections().isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<Station> stations = line.getSections().stream()
+                .map(Section::getDownStation)
+                .collect(Collectors.toList());
+
+        stations.add(0, line.getSections().get(0).getUpStation());
+
+        return stations.stream()
+                .map(it -> stationService.createStationResponse(it))
+                .collect(Collectors.toList());
     }
 }

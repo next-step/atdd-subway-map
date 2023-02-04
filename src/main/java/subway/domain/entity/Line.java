@@ -2,6 +2,9 @@ package subway.domain.entity;
 
 import javax.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static java.util.Optional.ofNullable;
 
 @Entity
@@ -12,27 +15,20 @@ public class Line {
 	@Column(length = 20, nullable = false)
 	private String name;
 	private String color;
-	private Long upStationId;
-	private Long downStationId;
-	private Long distance;
+	@OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
+	private List<Section> sections = new ArrayList<>();
 
 	protected Line() {
 
 	}
 
-	public Line(String name, String color, Long upStationId, Long downStationId, Long distance) {
+	public Line(String name, String color) {
 		this.name = name;
 		this.color = color;
-		this.upStationId = upStationId;
-		this.downStationId = downStationId;
-		this.distance = distance;
 	}
 	public void updateLineIfPresent(Line line) {
 		ofNullable(line.getName()).ifPresent(nameToUpdate -> name = nameToUpdate);
 		ofNullable(line.getColor()).ifPresent(colorToUpdate -> color = colorToUpdate);
-		ofNullable(line.getUpStationId()).ifPresent(upStationIdToUpdate -> upStationId = upStationIdToUpdate);
-		ofNullable(line.getDownStationId()).ifPresent(downStationIdToUpdate -> downStationId = downStationIdToUpdate);
-		ofNullable(line.getDistance()).ifPresent(distanceToUpdate -> distance = distanceToUpdate);
 	}
 
 	public String getName() {
@@ -43,19 +39,11 @@ public class Line {
 		return color;
 	}
 
-	public Long getUpStationId() {
-		return upStationId;
-	}
-
-	public Long getDownStationId() {
-		return downStationId;
-	}
-
-	public Long getDistance() {
-		return distance;
-	}
-
 	public Long getId() {
 		return id;
+	}
+
+	public List<Section> getSections() {
+		return sections;
 	}
 }
