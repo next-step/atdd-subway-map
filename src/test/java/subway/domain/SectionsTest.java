@@ -9,8 +9,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static subway.fixture.SectionFixture.*;
-import static subway.fixture.StationFixture.강남역;
-import static subway.fixture.StationFixture.교대역;
+import static subway.fixture.StationFixture.*;
 
 @DisplayName("구간 일급 컬렉션 도메인")
 class SectionsTest {

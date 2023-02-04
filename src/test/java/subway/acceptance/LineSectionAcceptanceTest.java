@@ -21,10 +21,10 @@ public class LineSectionAcceptanceTest extends AbstractAcceptanceTest {
 
     @BeforeEach
     void setUp() {
-        역_생성("강남역");
-        역_생성("역삼역");
-        역_생성("교대역");
-        역_생성("양재역");
+        List<String> 역_목록 = List.of(강남역_이름, 역삼역_이름, 교대역_이름, 양재역_이름);
+        for (String stationName : 역_목록) {
+            역_생성(stationName);
+        }
     }
 
     /**

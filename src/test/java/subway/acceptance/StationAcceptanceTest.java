@@ -9,12 +9,10 @@ import subway.dto.station.StationRequest;
 import java.util.List;
 
 import static org.hamcrest.Matchers.*;
+import static subway.fixture.StationFixture.*;
 
 @DisplayName("지하철역 관련 기능")
 public class StationAcceptanceTest extends AbstractAcceptanceTest {
-
-    private static final String 강남역 = "강남역";
-    private static final String 교대역 = "교대역";
 
     /**
      * When 지하철역을 생성하면
@@ -24,10 +22,10 @@ public class StationAcceptanceTest extends AbstractAcceptanceTest {
     @DisplayName("지하철역을 생성한다.")
     @Test
     void createStation() {
-        역_생성(강남역)
+        역_생성(강남역_이름)
                 .statusCode(HttpStatus.CREATED.value());
         역_목록_조회()
-                .body("name", hasItems(강남역));
+                .body("name", hasItems(강남역_이름));
     }
 
     /**
@@ -38,13 +36,13 @@ public class StationAcceptanceTest extends AbstractAcceptanceTest {
     @DisplayName("지하철역 2개를 생성하고 목록을 조회한다.")
     @Test
     void createStations() {
-        for (String station : List.of(강남역, 교대역)) {
+        for (String station : List.of(강남역_이름, 교대역_이름)) {
             역_생성(station);
         }
 
         역_목록_조회()
                 .body("size()", equalTo(2))
-                .body("name", contains(강남역, 교대역));
+                .body("name", contains(강남역_이름, 교대역_이름));
     }
 
     /**
@@ -55,8 +53,8 @@ public class StationAcceptanceTest extends AbstractAcceptanceTest {
     @DisplayName("지하철역 2개를 생성하고 그중 1개를 삭제한다.")
     @Test
     void deleteStation() {
-        역_생성(교대역);
-        var createResponse = 역_생성(강남역);
+        역_생성(교대역_이름);
+        var createResponse = 역_생성(강남역_이름);
 
         given().
         when()
@@ -66,7 +64,7 @@ public class StationAcceptanceTest extends AbstractAcceptanceTest {
 
         역_목록_조회()
                 .body("size()", equalTo(1))
-                .body("name", not(contains(강남역)));
+                .body("name", not(contains(강남역_이름)));
     }
 
     public static ValidatableResponse 역_생성(String stationName) {

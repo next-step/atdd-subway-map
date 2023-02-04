@@ -13,16 +13,18 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static subway.acceptance.StationAcceptanceTest.역_생성;
 import static subway.fixture.LineFixture.*;
+import static subway.fixture.StationFixture.*;
+import static subway.fixture.StationFixture.양재역_이름;
 
 @DisplayName("지하철 노선 관련 기능")
 public class LineAcceptanceTest extends AbstractAcceptanceTest {
 
     @BeforeEach
     void setUp() {
-        역_생성("강남역");
-        역_생성("역삼역");
-        역_생성("교대역");
-        역_생성("양재역");
+        List<String> 역_목록 = List.of(강남역_이름, 역삼역_이름, 교대역_이름, 양재역_이름);
+        for (String stationName : 역_목록) {
+            역_생성(stationName);
+        }
     }
 
     /**
