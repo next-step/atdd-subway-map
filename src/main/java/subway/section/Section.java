@@ -3,6 +3,7 @@ package subway.section;
 import subway.line.Line;
 import subway.station.Station;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -22,9 +23,17 @@ public class Section {
     @ManyToOne(fetch = FetchType.LAZY)
     private Line line;
 
-    public Section(Station station, Line line) {
+    @Column(nullable = false)
+    private Long distance;
+
+    public Section(Station station, Line line, Long distance) {
         this.station = station;
         this.line = line;
+        this.distance = distance;
+    }
+
+    public Long getDistance() {
+        return distance;
     }
 
     protected Section() {

@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Entity
@@ -28,15 +29,16 @@ public class Line {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "line")
     private List<Section> sections = new ArrayList<>();
 
-    @Column(nullable = false)
-    private Long distance;
 
     public Line(String name, String color, Station upStation, Station downStation, Long distance) {
         this.name = name;
         this.color = color;
-        this.distance = distance;
-        addStation(upStation);
-        addStation(downStation);
+        addStation(upStation, 0);
+        addStation(downStation, distance);
+    }
+
+    public Line(Long id) {
+        this.id = id;
     }
 
     protected Line() {
@@ -54,20 +56,47 @@ public class Line {
         return color;
     }
 
-    public void addStation(Station station) {
-        sections.add(new Section(station, this));
+    public void addStation(Station downStation, Station upStation, long distance) {
+        if (isAddStation(upStation.getId())) {
+            sections.add(new Section(downStation, this, distance));
+        }
+    }
+
+    public void addStation(Station station, long distance) {
+        sections.add(new Section(station, this, distance));
+    }
+
+    private boolean isAddStation(Long upStationId) {
+        long lastStationId = getLastStationId();
+        return Objects.equals(lastStationId, upStationId) || lastStationId == -1 ;
     }
 
     public Long getDistance() {
-        return distance;
+        return sections.stream().mapToLong(Section::getDistance).sum();
     }
 
-    public List<Station> getStationList() {
+    private long getLastStationId() {
+        int lastIndex = sections.size() - 1;
+
+        if (lastIndex == -1) {
+            return -1;
+        }
+        return sections.get(lastIndex).getStation().getId();
+    }
+
+    public List<Station> getStations() {
         return this.sections.stream().map(Section::getStation).collect(Collectors.toList());
     }
 
     public void update(String name, String color) {
         this.name = name;
         this.color = color;
+    }
+
+    public void deleteStation(Long stationId) {
+        long lastStationId = getLastStationId();
+        if (Objects.equals(stationId, lastStationId)) {
+            sections.remove(sections.size() - 1);
+        }
     }
 }
