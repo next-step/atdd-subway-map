@@ -5,20 +5,22 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import setting.RandomPortSetting;
-import subway.common.util.validation.ExistenceValidation;
 import subway.line.LineApi;
 import subway.line.util.LineExtraction;
+import subway.setting.AcceptanceTest;
 import subway.station.StationApi;
 import subway.station.util.StationExtraction;
 
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import static subway.line.MockLine.신분당선;
 import static subway.station.MockStation.강남역;
 import static subway.station.MockStation.서초역;
 import static subway.station.MockStation.신촌역;
 
 @DisplayName("지하철 구간 관리 기능")
-class SectionAcceptanceTest extends RandomPortSetting {
+class SectionAcceptanceTest extends AcceptanceTest {
     long 신분당선_ID;
 
     long 강남역_ID;
@@ -52,11 +54,16 @@ class SectionAcceptanceTest extends RandomPortSetting {
         long 신촌역_ID = StationExtraction.getStationId(responseOfCreate신촌역);
 
         // When
-        LineApi.addSection(신분당선_ID, 서초역_ID, 신촌역_ID, 10)
+        LineApi.addSection(신분당선_ID, 서초역_ID, 신촌역_ID, 10);
 
         // Then
         ExtractableResponse<Response> responseOfShowLine = LineApi.showLine(신분당선_ID);
-        ExistenceValidation.checkNamesExistenceInList(responseOfShowLine, 서초역, 신촌역);
+        checkIdsExistence(responseOfShowLine, 강남역_ID, 서초역_ID, 신촌역_ID);
+    }
+
+    private void checkIdsExistence(ExtractableResponse<Response> response, Long... stationIds) {
+        List<Long> idsOfResponse = response.jsonPath().getList("stations.id", Long.class);
+        assertThat(idsOfResponse).contains(stationIds);
     }
 
     /**

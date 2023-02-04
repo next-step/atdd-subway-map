@@ -58,6 +58,13 @@ public class LineController {
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/{id}/sections")
+    public ResponseEntity<LineResponse> addSection(@PathVariable(name = "id") Long lineId, @RequestBody SectionRequest sectionRequest) {
+        LineResponse lineResponse = lineService.addSection(lineId, sectionRequest);
+
+        return ResponseEntity.created(URI.create("/lines/" + lineResponse.getId() + "/sections")).body(lineResponse);
+    }
+
     @ExceptionHandler({LineNotFoundException.class})
     public ResponseEntity<Void> catchLineNotFoundException(LineNotFoundException e) {
         return ResponseEntity.notFound().build();

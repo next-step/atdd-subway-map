@@ -25,10 +25,18 @@ public class LineService {
         Station upStation = stationService.getStationById(lineRequest.getUpStationId());
         Station downStation = stationService.getStationById(lineRequest.getDownStationId());
 
-        Line line = lineRequest.toEntity(upStation, downStation);
-        Line savedLine = lineRepository.save(line);
+        Line line = lineRequest.toEntity();
 
-        return LineResponse.of(savedLine);
+        lineRepository.save(line);
+
+        Section section = new Section(line, upStation, downStation, lineRequest.getDistance());
+
+        line.addSection(section);
+
+        List<Station> stations = line.getStations();
+        System.out.println("stations = " + stations);
+
+        return LineResponse.of(line);
     }
 
     public List<LineResponse> findAllLines() {
@@ -73,5 +81,17 @@ public class LineService {
     @Transactional
     public void deleteLineById(long lineId) {
         lineRepository.deleteById(lineId);
+    }
+
+    @Transactional
+    public LineResponse addSection(Long lineId, SectionRequest sectionRequest) {
+        Station upStation = stationService.getStationById(sectionRequest.getUpStationId());
+        Station downStation = stationService.getStationById(sectionRequest.getDownStationId());
+        Line line = getLineById(lineId);
+
+        Section section = new Section(line, upStation, downStation, sectionRequest.getDistance());
+        line.addSection(section);
+
+        return LineResponse.of(line);
     }
 }
