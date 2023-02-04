@@ -41,4 +41,10 @@ public class SubwayLine {
         this.downStation = downStationId;
         this.distance = distance;
     }
+
+    public void update(Long id, SubwayLineRequest subwayLineRequest) {
+        this.id = id;
+        this.name = subwayLineRequest.getName();
+        this.color = subwayLineRequest.getColor();
+    }
 }

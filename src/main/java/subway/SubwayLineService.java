@@ -42,4 +42,9 @@ public class SubwayLineService {
         return SubwayLineResponse.createSubwayLineResponse(subwayLine);
     }
 
+    public void updateSubwayLine(Long id, SubwayLineRequest subwayLineRequest) {
+        SubwayLine subwayLine = subwayLineRepository.findById(id)
+            .orElseThrow(ResourceNotFoundException::new);
+        subwayLine.update(id, subwayLineRequest);
+    }
 }

@@ -7,6 +7,7 @@ import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFOR
 import static subway.SubwayFixture.LINE_SHIN_BUN_DANG_REQUEST;
 import static subway.SubwayFixture.LINE_TWO_REQUEST;
 
+import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.List;
@@ -34,8 +35,7 @@ public class SubwayLineAcceptanceTest {
     void 지하철_노선_생성() {
 
         //when
-        ExtractableResponse<Response> response = createSubwayLine(
-            new SubwayLineRequest("신분당선", "bg-red-600", 1L, 2L, 10));
+        ExtractableResponse<Response> response = createSubwayLine(LINE_SHIN_BUN_DANG_REQUEST);
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -92,7 +92,7 @@ public class SubwayLineAcceptanceTest {
         return given()
             .accept(MediaType.APPLICATION_JSON_VALUE)
             .pathParam("id", id)
-            .when().get("/line/{id}")
+            .when().get("/lines/{id}")
             .then()
             .statusCode(HttpStatus.OK.value())
             .extract();
@@ -122,6 +122,19 @@ public class SubwayLineAcceptanceTest {
 
     }
 
+    private ExtractableResponse<Response> updateSubwayLine(Long id) {
+        return RestAssured.given()
+            .pathParam("id", id)
+            .log().all()
+            .body(SubwayLineRequest.of(SubwayFixture.LINE_NEW_SHIN_BUN_DANG_REQUEST.getId(),
+                SubwayFixture.LINE_NEW_SHIN_BUN_DANG_REQUEST.getName(),
+                SubwayFixture.LINE_NEW_SHIN_BUN_DANG_REQUEST.getColor()))
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().put("/lines/{id}")
+            .then().log().all()
+            .extract();
+    }
+
     /**
      * Given 지하철 노선을 생성하고
      * When 생성한 지하철 노선을 수정하면
@@ -131,8 +144,26 @@ public class SubwayLineAcceptanceTest {
     @Test
     void 지하철노선_수정() {
         //given
+        ExtractableResponse<Response> createResponse = createSubwayLine(LINE_SHIN_BUN_DANG_REQUEST);
         //when
+        Long id = createResponse.jsonPath().getLong("id");
+        ExtractableResponse<Response> response = updateSubwayLine(id);
+
         //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        String lineName = getSubwayLine(id).jsonPath().getString("name");
+        assertThat(lineName).isEqualTo("새로운 신분당선");
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 삭제하면
+     * Then 해당 지하철 노선 정보는 삭제된다
+     */
+    @DisplayName("지하철노선 삭제")
+    @Test
+    void 지하철노선_삭제() {
+
     }
 
 

@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,9 +30,15 @@ public class SubwayLineController {
         return ResponseEntity.ok().body(subwayLineService.getSubwayLineList());
     }
 
-    @GetMapping("/line/{id}")
+    @GetMapping("/lines/{id}")
     public ResponseEntity<SubwayLineResponse> getSubwayLine(@PathVariable Long id) {
         return ResponseEntity.ok().body(subwayLineService.getSubwayLine(id));
+    }
+
+    @PutMapping("/lines/{id}")
+    public void modifySubwayLine(@PathVariable Long id,
+        @RequestBody SubwayLineRequest subwayLineRequest) {
+        subwayLineService.updateSubwayLine(id, subwayLineRequest);
     }
 
 
