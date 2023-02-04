@@ -7,12 +7,12 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import org.springframework.util.StringUtils;
 
 @Entity
 public class Line {
-
-    private static final int STATION_SIZE = 2;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,11 +24,13 @@ public class Line {
     @Column(nullable = false)
     private String color;
 
-    @Column(nullable = false)
-    private Long upStationId;
+    @OneToOne
+    @JoinColumn(name = "up_station_id")
+    private Station upStation;
 
-    @Column(nullable = false)
-    private Long downStationId;
+    @OneToOne
+    @JoinColumn(name = "down_station_id")
+    private Station downStation;
 
     @Embedded
     private Distance distance;
@@ -39,14 +41,14 @@ public class Line {
     public Line(
             final String name,
             final String color,
-            final Long upStationId,
-            final Long downStationId,
+            final Station upStation,
+            final Station downStation,
             final int distance
     ) {
         this.name = name;
         this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
+        this.upStation = upStation;
+        this.downStation = downStation;
         this.distance = new Distance(distance);
     }
 
@@ -58,12 +60,16 @@ public class Line {
         return name;
     }
 
-    public Long getUpStationId() {
-        return upStationId;
+    public Station getUpStation() {
+        return upStation;
     }
 
-    public Long getDownStationId() {
-        return downStationId;
+    public Station getDownStation() {
+        return downStation;
+    }
+
+    public List<Station> getStations() {
+        return List.of(upStation, downStation);
     }
 
     public String getColor() {
@@ -72,10 +78,6 @@ public class Line {
 
     public int getDistance() {
         return distance.getValue();
-    }
-
-    public List<Long> getStationIds() {
-        return List.of(upStationId, downStationId);
     }
 
     public void modify(final String name, final String color, final int distance) {
@@ -100,11 +102,5 @@ public class Line {
 
     private void editDistance(final int distance) {
         this.distance = new Distance(distance);
-    }
-
-    public void validateStationSize(final int size) {
-        if (size < STATION_SIZE) {
-            throw new IllegalArgumentException("노선의 지하철 개수가 일치하지 않습니다.");
-        }
     }
 }
