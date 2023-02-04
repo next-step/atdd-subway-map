@@ -14,10 +14,6 @@ public class LineExtracts {
         return response.body().jsonPath().getList("name");
     }
 
-    public static String 지하철노선_조회_응답_ID_추출(ExtractableResponse<Response> response) {
-        return response.body().jsonPath().getString("id");
-    }
-
     public static String 지하철노선_조회_응답_노선_이름_추출(ExtractableResponse<Response> response) {
         return response.body().jsonPath().getString("name");
     }
