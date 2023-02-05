@@ -80,11 +80,44 @@ class SectionAcceptanceTest extends BaseAcceptance {
     @Test
     void 지하철_구간_생성_시_하행역이_해당_노선에_등록되어있는_역이_경우_Exception() {
         // Given && When
-        ExtractableResponse<Response> actualResponse = 지하철_구간_생성(신분당선, 강남역, 논현역,  10L);
+        ExtractableResponse<Response> actualResponse = 지하철_구간_생성(신분당선, 강남역, 논현역, 10L);
 
         // Then
         지하철_구간_등록하려는_하행역은_해당_노선에_등록되어있는_역일_수_없다(actualResponse);
     }
+
+    /**
+     * When 지하철 노서넹 구간을 제거 시
+     * Then 노선에 구간을 확인 할 수 없다
+     */
+    @DisplayName("지하철 노선에 구간을 제거 할 수 있다")
+    @Test
+    void 지하철_노선에_구간을_제거_할_수_있다() {
+        // Given && When
+        지하철_구간_제거_요청(신분당선);
+
+        // Then
+        노선에_구간이_제거_된_걸_확인_할_수_있다(신분당선);
+    }
+
+    private void 노선에_구간이_제거_된_걸_확인_할_수_있다(LineLoadDtoResponse lineDto) {
+        ExtractableResponse<Response> actualLineResponse = 지하철_노선_조회(lineDto.getId());
+        assertThat(actualLineResponse.jsonPath().getList("stations")).isEmpty();
+    }
+
+    private ExtractableResponse<Response> 지하철_구간_제거_요청(LineLoadDtoResponse lineDto) {
+        ExtractableResponse<Response> response = RestAssured.given().spec(REQUEST_SPEC).log().all()
+            .pathParam("lineId", lineDto.getId())
+            .param("sectionId", 1)
+            .when().delete("/lines/{lineId}/sections")
+            .then().log().all()
+            .extract();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        return response;
+    }
+
 
     private void 지하철_구간_등록하려는_하행역은_해당_노선에_등록되어있는_역일_수_없다(ExtractableResponse<Response> actualResponse) {
         assertThat(actualResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());

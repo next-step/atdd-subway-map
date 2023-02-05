@@ -27,6 +27,8 @@ public class SectionController {
         return ResponseEntity.status(HttpStatus.CREATED).body(SectionResponse.from(section));
     }
 
+
+
     @GetMapping(value = "/sections/{sectionId}")
     public ResponseEntity<SectionResponse> loadSection(@PathVariable Long sectionId) {
         Section section = sectionLoadUseCase.loadSection(sectionId);
