@@ -51,15 +51,15 @@ public class Sections {
 
         Optional<UpAndDownStationsDto> upAndDownStation =
                 upAndDownStations.stream()
-                .filter(dto -> dto.getDownStation().equals(upStation))
-                .findFirst();
+                        .filter(dto -> dto.getDownStation().equals(upStation))
+                        .findFirst();
         while (upAndDownStation.isPresent()) {
             Station upperStation = upAndDownStation.get().getUpStation();
             upperStations.add(upperStation);
             upAndDownStation =
                     upAndDownStations.stream()
-                    .filter(dto -> dto.getDownStation().equals(upperStation))
-                    .findFirst();
+                            .filter(dto -> dto.getDownStation().equals(upperStation))
+                            .findFirst();
         }
 
         Collections.reverse(upperStations);

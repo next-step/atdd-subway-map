@@ -14,7 +14,7 @@ public class ReadLineResponse {
     private Long id;
     private String name;
     private String color;
-    private List<ReadLineStationResponse> stations = new ArrayList<>();
+    private final List<ReadLineStationResponse> stations = new ArrayList<>();
 
     public ReadLineResponse(Line line) {
         this.id = line.getId();

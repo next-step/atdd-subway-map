@@ -80,7 +80,7 @@ public class LineService {
         Station upStation = stationRepository.findById(request.getUpStationId()).orElseThrow();
         Station downStation = stationRepository.findById(request.getDownStationId()).orElseThrow();
         Line line = lineRepository.findById(request.getLineId()).orElseThrow();
-        
+
         line.checkLineExtendValid(upStation, downStation);
 
         Section section = sectionRepository.save(new Section(request.getDistance(), line));

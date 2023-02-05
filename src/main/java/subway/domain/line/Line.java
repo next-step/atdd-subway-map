@@ -2,7 +2,6 @@ package subway.domain.line;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import subway.domain.section.Section;
 import subway.domain.station.Station;
 
 import javax.persistence.*;

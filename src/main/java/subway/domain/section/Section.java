@@ -2,8 +2,8 @@ package subway.domain.section;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import subway.dto.domain.UpAndDownStationsDto;
 import subway.domain.line.Line;
+import subway.dto.domain.UpAndDownStationsDto;
 
 import javax.persistence.*;
 import java.util.Objects;

@@ -1,8 +1,6 @@
 package subway.dto.line;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
 import subway.domain.line.Line;
 
 @AllArgsConstructor

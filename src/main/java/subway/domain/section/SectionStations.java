@@ -2,10 +2,10 @@ package subway.domain.section;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import subway.dto.domain.UpAndDownStationsDto;
 import subway.domain.sectionstation.Direction;
 import subway.domain.sectionstation.SectionStation;
 import subway.domain.station.Station;
+import subway.dto.domain.UpAndDownStationsDto;
 
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;

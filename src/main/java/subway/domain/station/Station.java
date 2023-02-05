@@ -21,7 +21,7 @@ public class Station {
     private Name name;
 
     @OneToMany(mappedBy = "station")
-    private List<SectionStation> sectionStations = new ArrayList<>();
+    private final List<SectionStation> sectionStations = new ArrayList<>();
 
     public Station(String name) {
         this.name = new Name(name);
