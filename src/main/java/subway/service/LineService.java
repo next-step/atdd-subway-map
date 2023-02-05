@@ -14,7 +14,7 @@ import subway.repository.StationRepository;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static subway.common.ErrorResponse.*;
+import static subway.exception.ErrorResponseEnum.*;
 
 @Service
 @Transactional(readOnly = true)

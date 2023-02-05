@@ -8,7 +8,7 @@ import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
 
-import static subway.common.ErrorResponse.*;
+import static subway.exception.ErrorResponseEnum.*;
 
 @Embeddable
 public class Sections {

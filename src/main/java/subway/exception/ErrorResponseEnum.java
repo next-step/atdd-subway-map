@@ -1,8 +1,8 @@
-package subway.common;
+package subway.exception;
 
 import org.springframework.http.HttpStatus;
 
-public enum ErrorResponse {
+public enum ErrorResponseEnum {
     ERROR_NO_FOUND_LINE (HttpStatus.INTERNAL_SERVER_ERROR,"do not found line by id"),
     ERROR_UPSTATION_INVAILD_LINE (HttpStatus.INTERNAL_SERVER_ERROR, "upStation's not equal (last down station)"),
     ERROR_DOWNSTATION_INVAILD_LINE (HttpStatus.INTERNAL_SERVER_ERROR, "downStation's already exists"),
@@ -13,7 +13,7 @@ public enum ErrorResponse {
     HttpStatus httpStatus;
     String message;
 
-    ErrorResponse(HttpStatus httpStatus, String message) {
+    ErrorResponseEnum(HttpStatus httpStatus, String message) {
         this.httpStatus = httpStatus;
         this.message = message;
     }

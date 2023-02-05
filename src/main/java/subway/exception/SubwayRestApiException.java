@@ -1,15 +1,13 @@
 package subway.exception;
 
-import subway.common.ErrorResponse;
-
 public class SubwayRestApiException extends RuntimeException {
-    private final ErrorResponse errorResponse;
+    private final ErrorResponseEnum errorResponseEnum;
 
-    public SubwayRestApiException(ErrorResponse errorResponse) {
-        this.errorResponse = errorResponse;
+    public SubwayRestApiException(ErrorResponseEnum errorResponseEnum) {
+        this.errorResponseEnum = errorResponseEnum;
     }
 
-    public ErrorResponse getErrorResponse() {
-        return errorResponse;
+    public ErrorResponseEnum getErrorResponse() {
+        return errorResponseEnum;
     }
 }
