@@ -1,6 +1,9 @@
 package subway.section.domain;
 
 import lombok.Getter;
+import subway.section.exception.NotLastSectionException;
+import subway.section.exception.SectionNotFoundException;
+import subway.section.exception.SingleSectionException;
 import subway.station.domain.Station;
 
 import javax.persistence.Embeddable;
@@ -19,18 +22,6 @@ public class Sections {
     @OneToMany(mappedBy = "line", cascade = ALL, orphanRemoval = true)
     private final List<Section> sectionList = new ArrayList<>();
 
-    public void addSection(final Section section) {
-        sectionList.add(section);
-    }
-
-    public void remove(Station station) {
-        Section lastSection = sectionList.get(sectionList.size() - 1);
-
-        if (lastSection.getDownStation().equals(station)) {
-            sectionList.remove(lastSection);
-        }
-    }
-
     public Set<Station> getStations() {
         Set<Station> stations = new HashSet<>();
 
@@ -40,6 +31,32 @@ public class Sections {
         });
 
         return stations;
+    }
+
+    public void addSection(final Section section) {
+        sectionList.add(section);
+    }
+
+    public void remove(final Station station) {
+        Section lastSection = getLastSection();
+
+        if (!lastSection.getDownStation().equals(station)) {
+            throw new NotLastSectionException();
+        }
+
+        sectionList.remove(lastSection);
+    }
+
+    private Section getLastSection() {
+        if (sectionList.isEmpty()) {
+            throw new SectionNotFoundException();
+        }
+
+        if (sectionList.size() < 2) {
+            throw new SingleSectionException();
+        }
+
+        return sectionList.get(sectionList.size() - 1);
     }
 
     public boolean isNotExistDownStation(Station station) {
