@@ -47,6 +47,13 @@ public class LineFixtures {
                 .containsExactly(stationNames.toArray(new String[stationNames.size()]));
     }
 
+    public static void 노선이_해당_역을_포함하지_않는다(
+            LineResponse lineResponse,
+            long stationId
+    ) {
+       assertThat(lineResponse.getStations().stream().map(StationResponse::getId))
+               .doesNotContain(stationId);
+    }
     public static ExtractableResponse<Response> 노선을_생성한다(Object request) {
         var response = RestAssuredClient.post(
                 Endpoints.LINES,

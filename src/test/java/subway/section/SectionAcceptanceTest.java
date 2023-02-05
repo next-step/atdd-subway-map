@@ -18,6 +18,7 @@ import static subway.common.TestHelper.응답_코드가_일치한다;
 import static subway.line.LineFixtures.노선을_생성하고_노선_아이디를_반환한다;
 import static subway.line.LineFixtures.노선의_정보가_일치한다;
 import static subway.line.LineFixtures.노선이_해당_역을_정확히_포함한다;
+import static subway.line.LineFixtures.노선이_해당_역을_포함하지_않는다;
 import static subway.station.StationFixtures.강남역_생성_요청;
 import static subway.station.StationFixtures.낙성대역_생성_요청;
 import static subway.station.StationFixtures.서울대입구역_생성_요청;
@@ -177,17 +178,38 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void 노선에_등록된_구간을_제거한다() {
         // Given 노선에 등록된 구간을 제거하면
+        var 노선_아이디 = 하행역이_강남역인_노선을_생성한다();
+        노선에_신논현역이_하행역인_구간을_등록한다(노선_아이디);
+
+        var response = RestAssuredClient.delete(
+                Endpoints.sections(노선_아이디),
+                신논현역_아이디
+        );
+        응답_코드가_일치한다(response.statusCode(), HttpStatus.NO_CONTENT);
 
         // When 노선 조회 시
+        var 노선_조회_응답 = RestAssuredClient.get(
+                Endpoints.endpointWithParam(Endpoints.LINES, 노선_아이디)
+        );
 
         // Then 삭제한 구간이 조회되지 않는다.
+        노선이_해당_역을_포함하지_않는다(노선_조회_응답.as(LineResponse.class), 신논현역_아이디);
     }
 
     @Test
-    void 마지막_구간이_아닌_역을_제거하면_예외를_던진다() {
+    void 하행_종점역이_아닌_역을_제거하면_예외를_던진다() {
         // Given 구간 삭제 시
         // When 마지막 구간이 아닌 역을 제거하면
         // Then 예외를 던진다.
+
+        var 노선_아이디 = 하행역이_강남역인_노선을_생성한다();
+        노선에_신논현역이_하행역인_구간을_등록한다(노선_아이디);
+
+        var response = RestAssuredClient.delete(
+                Endpoints.sections(노선_아이디),
+              강남역_아이디
+        );
+        응답_코드가_일치한다(response.statusCode(), HttpStatus.BAD_REQUEST);
     }
 
     @Test
@@ -195,5 +217,29 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         // Given 구간 삭제 시
         // When 노선에 구간이 1개인 경우
         // Then 예외를 던진다.
+
+        var 노선_아이디 = 하행역이_강남역인_노선을_생성한다();
+
+        var response = RestAssuredClient.delete(
+                Endpoints.sections(노선_아이디),
+                강남역_아이디
+        );
+        응답_코드가_일치한다(response.statusCode(), HttpStatus.BAD_REQUEST);
+    }
+
+    private void 노선에_신논현역이_하행역인_구간을_등록한다(long lineId) {
+        var upStationId = 강남역_아이디;
+        var downStationId = 신논현역_아이디;
+        var distance = 10L;
+
+        var response = RestAssuredClient.post(
+                Endpoints.sections(lineId),
+                new AddSectionRequest(
+                        downStationId,
+                        upStationId,
+                        distance
+                )
+        );
+        응답_코드가_일치한다(response.statusCode(), HttpStatus.CREATED);
     }
 }
