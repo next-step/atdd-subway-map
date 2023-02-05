@@ -12,7 +12,7 @@ public class CreateLineResponse {
     private final Long id;
     private final String name;
     private final String color;
-    private final List<LineStationCreateResponse> stations = new ArrayList<>();
+    private final List<CreateLineStationResponse> stations = new ArrayList<>();
 
     public CreateLineResponse(Line line, List<Station> stations) {
         this.id = line.getId();
@@ -20,7 +20,7 @@ public class CreateLineResponse {
         this.color = line.getColor().getName();
 
         for (Station station : stations) {
-            this.stations.add(new LineStationCreateResponse(station.getId(), station.getName().getName()));
+            this.stations.add(new CreateLineStationResponse(station.getId(), station.getName().getName()));
         }
     }
 
