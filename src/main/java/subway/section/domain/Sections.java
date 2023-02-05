@@ -1,6 +1,7 @@
 package subway.section.domain;
 
-import lombok.Getter;
+import subway.section.exception.DownStationAlreadyRegisteredException;
+import subway.section.exception.NotSameAsRegisteredDownStation;
 import subway.section.exception.NotLastSectionException;
 import subway.section.exception.SectionNotFoundException;
 import subway.section.exception.SingleSectionException;
@@ -16,7 +17,6 @@ import java.util.Set;
 import static javax.persistence.CascadeType.ALL;
 
 @Embeddable
-@Getter
 public class Sections {
 
     @OneToMany(mappedBy = "line", cascade = ALL, orphanRemoval = true)
@@ -33,8 +33,21 @@ public class Sections {
         return stations;
     }
 
-    public void addSection(final Section section) {
+    public void createSection(final Section section) {
         sectionList.add(section);
+    }
+
+    public void addSection(final Section section) {
+        if (isNotExistDownStation(section.getUpStation())) {
+            throw new NotSameAsRegisteredDownStation();
+        }
+
+        if (isAlreadyRegisteredStation(section.getDownStation())) {
+            throw new DownStationAlreadyRegisteredException();
+        }
+
+        sectionList.add(section);
+        section.getLine().changeDownStation(section.getDownStation());
     }
 
     public void remove(final Station station) {
@@ -59,13 +72,13 @@ public class Sections {
         return sectionList.get(sectionList.size() - 1);
     }
 
-    public boolean isNotExistDownStation(Station station) {
+    private boolean isNotExistDownStation(Station station) {
         return sectionList.stream()
                 .map(Section::getDownStation)
                 .noneMatch(downStation -> downStation.equals(station));
     }
 
-    public boolean isAlreadyRegisteredStation(final Station station) {
+    private boolean isAlreadyRegisteredStation(final Station station) {
         return sectionList.stream()
                 .anyMatch(section -> section.getUpStation().equals(station)
                         || section.getDownStation().equals(station));

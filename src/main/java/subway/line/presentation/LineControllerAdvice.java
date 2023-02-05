@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import subway.common.exception.ErrorResponse;
 import subway.line.exception.LineNotFoundException;
 import subway.section.exception.DownStationAlreadyRegisteredException;
-import subway.section.exception.DownStationNotFoundException;
+import subway.section.exception.NotSameAsRegisteredDownStation;
 import subway.section.exception.NotLastSectionException;
 import subway.section.exception.SectionNotFoundException;
 import subway.section.exception.SingleSectionException;
@@ -26,8 +26,8 @@ public class LineControllerAdvice {
     }
 
     @ResponseStatus(HttpStatus.CONFLICT)
-    @ExceptionHandler(DownStationNotFoundException.class)
-    ErrorResponse handleDownStationNotFound(final DownStationNotFoundException exception) {
+    @ExceptionHandler(NotSameAsRegisteredDownStation.class)
+    ErrorResponse handleDownStationNotFound(final NotSameAsRegisteredDownStation exception) {
         return ErrorResponse.from(exception);
     }
 

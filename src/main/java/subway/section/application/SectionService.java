@@ -6,7 +6,6 @@ import subway.line.application.LineService;
 import subway.line.domain.Line;
 import subway.section.application.dto.request.SectionCreateRequest;
 import subway.section.domain.Section;
-import subway.section.domain.SectionCommandRepository;
 import subway.station.application.StationService;
 import subway.station.domain.Station;
 
@@ -14,14 +13,11 @@ import subway.station.domain.Station;
 @Transactional(readOnly = true)
 public class SectionService {
 
-    private final SectionCommandRepository sectionCommandRepository;
     private final StationService stationService;
     private final LineService lineService;
 
-    public SectionService(final SectionCommandRepository sectionCommandRepository,
-                          final StationService stationService,
+    public SectionService(final StationService stationService,
                           final LineService lineService) {
-        this.sectionCommandRepository = sectionCommandRepository;
         this.stationService = stationService;
         this.lineService = lineService;
     }
@@ -33,10 +29,7 @@ public class SectionService {
         Station downStation = stationService.findStationById(sectionCreateRequest.getDownStationId());
         Section section = Section.createSection(findLine, upStation, downStation, sectionCreateRequest.getDistance());
 
-        findLine.validateSectionRegistered(upStation, downStation);
-
-        sectionCommandRepository.save(section);
-        findLine.changeDownStation(downStation);
+        findLine.getSections().addSection(section);
 
         return section.getId();
     }

@@ -5,8 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import subway.section.domain.Section;
 import subway.section.domain.Sections;
-import subway.section.exception.DownStationAlreadyRegisteredException;
-import subway.section.exception.DownStationNotFoundException;
 import subway.station.domain.Station;
 
 import javax.persistence.Column;
@@ -78,7 +76,7 @@ public class Line {
     private static void createSections(final Long distance, final Line line,
                                        final Station upStation, final Station downStation) {
         Section section = Section.createSection(line, upStation, downStation, distance);
-        line.getSections().addSection(section);
+        line.getSections().createSection(section);
     }
 
 
@@ -94,16 +92,6 @@ public class Line {
         }
 
         this.downStation = station;
-    }
-
-    public void validateSectionRegistered(final Station upStation, final Station downStation) {
-        if (sections.isNotExistDownStation(upStation)) {
-            throw new DownStationNotFoundException();
-        }
-
-        if (sections.isAlreadyRegisteredStation(downStation)) {
-            throw new DownStationAlreadyRegisteredException();
-        }
     }
 
     @Override
