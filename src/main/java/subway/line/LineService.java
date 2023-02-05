@@ -56,6 +56,10 @@ public class LineService {
         return LineResponse.from(lineRepository.save(updatedLine));
     }
 
+    public void deleteLine(Long lineId) {
+        lineRepository.deleteById(lineId);
+    }
+
     private List<Station> queryStations(LineDto lineDto) {
         return stationQuery.findByIds(
                 List.of(lineDto.getUpStationId(), lineDto.getDownStationId())
