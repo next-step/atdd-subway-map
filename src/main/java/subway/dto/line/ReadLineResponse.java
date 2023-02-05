@@ -1,0 +1,28 @@
+package subway.dto.line;
+
+import lombok.Getter;
+import subway.domain.line.Line;
+import subway.domain.station.Station;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Getter
+public class ReadLineResponse {
+    private final Long id;
+    private final String name;
+    private final String color;
+    private final List<ReadLineStationResponse> stations = new ArrayList<>();
+
+    public ReadLineResponse(Line line) {
+        this.id = line.getId();
+        this.name = line.getName().getName();
+        this.color = line.getColor().getName();
+
+        List<Station> stations = line.getStationsByAscendingOrder();
+        for (Station station : stations) {
+            this.stations.add(new ReadLineStationResponse(station.getId(), station.getName().getName()));
+        }
+    }
+
+}

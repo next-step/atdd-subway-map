@@ -1,4 +1,4 @@
-package subway;
+package subway.controller;
 
 
 import io.restassured.path.json.JsonPath;
@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.StationUtils.*;
+import static subway.controller.StationUtils.*;
 
 @DisplayName("지하철 역 노선 구간 관련 기능")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)

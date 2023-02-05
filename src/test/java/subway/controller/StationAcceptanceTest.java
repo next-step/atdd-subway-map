@@ -1,4 +1,4 @@
-package subway;
+package subway.controller;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -11,8 +11,7 @@ import org.springframework.http.HttpStatus;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.StationUtils.GANG_NAM_STATION;
-import static subway.StationUtils.PAN_GYEO_STATION;
+import static subway.controller.StationUtils.*;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -26,13 +25,11 @@ public class StationAcceptanceTest {
     @DisplayName("지하철 역을 생성한다.")
     @Test
     void createStation() {
-        // when
         StationUtils.createStation(GANG_NAM_STATION);
 
-        // then
         List<String> stationNames =
                 RestAssured
-                        .given().spec(StationUtils.getRequestSpecification())
+                        .given().spec(getRequestSpecification())
                         .when().get("/stations")
                         .then().extract().jsonPath().getList("name", String.class);
         assertThat(stationNames).containsAnyOf(GANG_NAM_STATION);
@@ -46,15 +43,13 @@ public class StationAcceptanceTest {
     @DisplayName("지하철 역을 조회한다.")
     @Test
     void selectStation() {
-        // given
         StationUtils.createStation(GANG_NAM_STATION);
         StationUtils.createStation(PAN_GYEO_STATION);
 
-        // when
-        List<String> list = StationUtils.selectStations().jsonPath()
+        List<String> list = StationUtils.selectStations()
+                .jsonPath()
                 .getList("name", String.class);
 
-        // then
         assertThat(list).containsExactly(GANG_NAM_STATION, PAN_GYEO_STATION);
     }
 
@@ -72,7 +67,7 @@ public class StationAcceptanceTest {
         // when
         ExtractableResponse<Response> response =
                 RestAssured
-                        .given().spec(StationUtils.getRequestSpecification()).log().all()
+                        .given().spec(getRequestSpecification()).log().all()
                         .when().delete("/stations/1")
                         .then().log().all()
                         .extract();
@@ -80,7 +75,8 @@ public class StationAcceptanceTest {
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
-        List<String> list = StationUtils.selectStations().jsonPath()
+        List<String> list = StationUtils.selectStations()
+                .jsonPath()
                 .getList("name", String.class);
         assertThat(list).isEmpty();
     }

@@ -1,66 +1,80 @@
 package subway.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.domain.line.Line;
+import subway.domain.section.Section;
+import subway.domain.section.SectionStations;
+import subway.domain.sectionstation.Direction;
+import subway.domain.sectionstation.SectionStation;
+import subway.domain.station.Station;
 import subway.dto.line.*;
-import subway.domain.Line;
 import subway.repository.LineRepository;
-import subway.domain.Station;
+import subway.repository.SectionRepository;
+import subway.repository.SectionStationRepository;
 import subway.repository.StationRepository;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
-@Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class LineService {
     private final LineRepository lineRepository;
     private final StationRepository stationRepository;
-
-    public LineService(LineRepository lineRepository, StationRepository stationRepository) {
-        this.lineRepository = lineRepository;
-        this.stationRepository = stationRepository;
-    }
+    private final SectionRepository sectionRepository;
+    private final SectionStationRepository sectionStationRepository;
 
     @Transactional
-    public LineCreateResponse createStationLine(LineCreateRequest request) {
-        Line line = lineRepository.save(request.convertToEntity());
-        Station upStation = stationRepository.findById(line.getUpStationId()).orElseThrow();
-        Station downStation = stationRepository.findById(line.getDownStationId()).orElseThrow();
-        return new LineCreateResponse(line, List.of(upStation, downStation));
+    public CreateLineResponse createLine(CreateLineRequest request) {
+        Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
+        Section section = sectionRepository.save(new Section(request.getDistance(), line));
+
+        Station upStation = stationRepository.findById(request.getUpStationId()).orElseThrow();
+        Station downStation = stationRepository.findById(request.getDownStationId()).orElseThrow();
+        sectionStationRepository.save(new SectionStation(section, upStation, Direction.UP));
+        sectionStationRepository.save(new SectionStation(section, downStation, Direction.DOWN));
+
+        return new CreateLineResponse(line, List.of(upStation, downStation));
     }
 
-    public List<LineReadListResponse> readStationLineList() {
+    @Transactional(readOnly = true)
+    public List<ReadLinesResponse> readLines() {
+        List<ReadLinesResponse> response = new ArrayList<>();
+
         List<Line> lines = lineRepository.findAll();
-        List<LineReadListResponse> response = new ArrayList<>();
         for (Line line : lines) {
-            Station upStation = stationRepository.findById(line.getUpStationId()).orElseThrow();
-            Station downStation = stationRepository.findById(line.getDownStationId()).orElseThrow();
-            response.add(new LineReadListResponse(line, List.of(upStation, downStation)));
+            response.add(new ReadLinesResponse(line));
         }
         return response;
     }
 
-    public LineReadResponse readStationLine(Long stationLineId) {
+    @Transactional(readOnly = true)
+    public ReadLineResponse readLine(Long stationLineId) {
         Line line = lineRepository.findById(stationLineId).orElseThrow();
-        Station upStation = stationRepository.findById(line.getUpStationId()).orElseThrow();
-        Station downStation = stationRepository.findById(line.getDownStationId()).orElseThrow();
-        return new LineReadResponse(line, List.of(upStation, downStation));
+        return new ReadLineResponse(line);
     }
 
     @Transactional
-    public void updateStationLine(Long stationLineId, LineUpdateRequest request) {
+    public void updateLine(Long stationLineId, UpdateLineRequest request) {
         Line line = lineRepository.findById(stationLineId).orElseThrow();
         line.updateNameAndColor(request.convertToEntity());
     }
 
     @Transactional
-    public void deleteStationLine(Long stationLineId) {
-        lineRepository.deleteById(stationLineId);
+    public void deleteLine(Long stationLineId) {
+        Line line = lineRepository.findById(stationLineId).orElseThrow();
+        List<Section> sections = line.getSections().getSections();
+        List<SectionStation> sectionStations = new ArrayList<>();
+        for (Section section : sections) {
+            sectionStations.addAll(section.getSectionStations().getSectionStations());
+        }
+
+        sectionStationRepository.deleteAll(sectionStations);
+        sectionRepository.deleteAll(sections);
+        lineRepository.delete(line);
     }
 
-    @Transactional
-    public LineExtendResponse extendStationLine(LineExtendRequest request) {
-        return null;
-    }
+
 }
