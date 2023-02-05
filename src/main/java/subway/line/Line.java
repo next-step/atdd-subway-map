@@ -2,11 +2,9 @@ package subway.line;
 
 import static javax.persistence.FetchType.LAZY;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -117,7 +115,6 @@ public class Line {
 
     sections.add(add);
     downStation = add.getDownStation();
-
     return this;
   }
 
@@ -125,15 +122,11 @@ public class Line {
     if (sections.size() <= 1) {
       throw new ZeroSectionException();
     }
-
     if (!sections.get(sections.size() - 1).getId().equals(remove.getId())) {
       throw new MiddleSectionRemoveFailException();
     }
 
-    System.out.println("remove here");
-
     sections.remove(sections.size() - 1);
-    System.out.println(sections.get(sections.size() - 1).getDownStation());
     this.downStation = sections.get(sections.size() - 1).getDownStation();
   }
 

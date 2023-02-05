@@ -6,13 +6,13 @@ import subway.station.Station;
 
 public class LineResponse {
 
-  private Long id;
-  private String name;
-  private String color;
-  private Station upStation;
-  private Station downStation;
-  private List<Section> sections;
-  private Long distance;
+  private final Long id;
+  private final String name;
+  private final String color;
+  private final Station upStation;
+  private final Station downStation;
+  private final List<Section> sections;
+  private final Long distance;
 
   public LineResponse(Long id, String name, String color, Station upStation, Station downStation, List<Section> sections, Long distance) {
     this.id = id;

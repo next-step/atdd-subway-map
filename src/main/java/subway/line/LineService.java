@@ -37,8 +37,8 @@ public class LineService {
     return LineResponse.of(created);
   }
 
-  public Line save(Line line) {
-    return lineRepository.save(line);
+  public void save(Line line) {
+    lineRepository.save(line);
   }
 
   public Optional<LineResponse> showLine(Long id) {

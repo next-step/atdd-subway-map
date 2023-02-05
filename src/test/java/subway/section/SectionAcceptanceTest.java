@@ -56,9 +56,9 @@ public class SectionAcceptanceTest {
   @DisplayName("하행선이 아닌 역에 구간 추가시 에러를 반환한다.")
   void 하행선이_아닌_구간_생성_테스트() {
     // given
-    Long 신규역아이디 = StationTestUtils.지하철역_생성(MockStation.신림역);
     Line line = LineTestUtils.역_과_노선_생성(LineCreateRequestDTO.서울2호선_노선_생성요청);
     Long 기존_노선_상행역_ID = line.getUpStation().getId();
+    Long 신규역아이디 = StationTestUtils.지하철역_생성(MockStation.신림역);
 
     //when
     SectionCreateRequest request = new SectionCreateRequest(
@@ -105,9 +105,9 @@ public class SectionAcceptanceTest {
     Line line = LineTestUtils.역_과_노선_생성(LineCreateRequestDTO.서울2호선_노선_생성요청);
     Long 기존_노선_하행역_ID = line.getDownStation().getId();
     Long 신규역아이디 = StationTestUtils.지하철역_생성(MockStation.신림역);
-    SectionCreateRequest 서울2호선_하행선_구간_추가_요청 = new SectionCreateRequest(기존_노선_하행역_ID, 신규역아이디, 서울2호선_거리);
+    SectionCreateRequest request = new SectionCreateRequest(기존_노선_하행역_ID, 신규역아이디, 서울2호선_거리);
 
-    Long 신규_섹션_ID = SectionTestUtils.노선에_구간_추가(line, 서울2호선_하행선_구간_추가_요청).jsonPath().getLong("id");
+    Long 신규_섹션_ID = SectionTestUtils.노선에_구간_추가(line, request).jsonPath().getLong("id");
 
     // When
     ExtractableResponse<Response> response = SectionTestUtils.노선에_구간_제거(line, 신규_섹션_ID);
@@ -124,12 +124,16 @@ public class SectionAcceptanceTest {
   @Test
   @DisplayName("하행역이 포함된 구간이 아닌 경우 지울 수 없다.")
   void 하행역이_포함안된_구간_삭제_실패_테스트() {
+    // Given
     Line line = LineTestUtils.역_과_노선_생성(LineCreateRequestDTO.서울2호선_노선_생성요청);
     Long 기존_노선_하행역_ID = line.getDownStation().getId();
     Long 신규역아이디 = StationTestUtils.지하철역_생성(MockStation.신림역);
+
+    // When
     SectionCreateRequest 서울2호선_하행선_구간_추가_요청 = new SectionCreateRequest(기존_노선_하행역_ID, 신규역아이디, 서울2호선_거리);
     SectionTestUtils.노선에_구간_추가(line, 서울2호선_하행선_구간_추가_요청);
 
+    // Then
     assertThrows(RuntimeException.class, () -> SectionTestUtils.노선에_구간_제거(line, line.getSections().get(0).getId()));
   }
 
