@@ -4,12 +4,9 @@ import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
 import org.springframework.util.StringUtils;
 
 @Entity
@@ -25,13 +22,8 @@ public class Line {
     @Column(nullable = false)
     private String color;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "up_station_id")
-    private Station upStation;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "down_station_id")
-    private Station downStation;
+    @Embedded
+    private Stations stations;
 
     @Embedded
     private Distance distance;
@@ -42,14 +34,14 @@ public class Line {
     public Line(
             final String name,
             final String color,
-            final Station upStation,
-            final Station downStation,
+            final List<Station> stations,
+            final Long upStationId,
+            final Long downStationId,
             final int distance
     ) {
         this.name = name;
         this.color = color;
-        this.upStation = upStation;
-        this.downStation = downStation;
+        this.stations = new Stations(stations, upStationId, downStationId);
         this.distance = new Distance(distance);
     }
 
@@ -61,16 +53,8 @@ public class Line {
         return name;
     }
 
-    public Station getUpStation() {
-        return upStation;
-    }
-
-    public Station getDownStation() {
-        return downStation;
-    }
-
     public List<Station> getStations() {
-        return List.of(upStation, downStation);
+        return List.of(stations.getUpStation(), stations.getDownStation());
     }
 
     public String getColor() {

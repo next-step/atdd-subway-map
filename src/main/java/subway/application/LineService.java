@@ -48,21 +48,19 @@ public class LineService {
         return line.getId();
     }
 
-    private Line convertToLineBy(final LineCreateRequest lineCreateRequest) {
-        Station upStation = getStationBy(lineCreateRequest.getUpStationId());
-        Station downStation = getStationBy(lineCreateRequest.getDownStationId());
+    private Line convertToLineBy(
+            final LineCreateRequest lineCreateRequest
+    ) {
+        List<Station> stations = stationRepository
+                .findAllById(List.of(lineCreateRequest.getUpStationId(), lineCreateRequest.getDownStationId()));
         return new Line(
                 lineCreateRequest.getName(),
                 lineCreateRequest.getColor(),
-                upStation,
-                downStation,
+                stations,
+                lineCreateRequest.getUpStationId(),
+                lineCreateRequest.getDownStationId(),
                 lineCreateRequest.getDistance()
         );
-    }
-
-    private Station getStationBy(final Long stationId) {
-        return stationRepository.findById(stationId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 지하철 역 입니다."));
     }
 
     @Transactional

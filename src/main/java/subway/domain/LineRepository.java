@@ -8,9 +8,9 @@ import org.springframework.data.repository.query.Param;
 
 public interface LineRepository extends JpaRepository<Line, Long> {
 
-    @Query(value = "SELECT l FROM Line l join fetch l.upStation join fetch l.downStation WHERE l.id = :id")
+    @Query(value = "SELECT l FROM Line l join fetch l.stations.upStation join fetch l.stations.downStation WHERE l.id = :id")
     Optional<Line> findByIdWithStation(@Param("id") Long id);
 
-    @Query(value = "SELECT l FROM Line l join fetch l.upStation join fetch l.downStation")
+    @Query(value = "SELECT l FROM Line l join fetch l.stations.upStation join fetch l.stations.downStation")
     List<Line> findAllWithStation();
 }
