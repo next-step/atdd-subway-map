@@ -6,8 +6,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
-import subway.line.dto.LineRequest;
-
 @Entity
 public class Line {
     @Id
@@ -63,22 +61,8 @@ public class Line {
         return distance;
     }
 
-    public Line changeByLineRequest(LineRequest lineRequest) {
-        if (lineRequest.getName() != null) {
-            this.name = lineRequest.getName();
-        }
-        if (lineRequest.getColor() != null) {
-            this.color = lineRequest.getColor();
-        }
-        if (lineRequest.getUpStationId() != null) {
-            this.upStationId = lineRequest.getUpStationId();
-        }
-        if (lineRequest.getDownStationId() != null) {
-            this.downStationId = lineRequest.getDownStationId();
-        }
-        if (lineRequest.getDistance() != null) {
-            this.distance = lineRequest.getDistance();
-        }
-        return this;
+    public void changeLine(String name, String color) {
+        this.name = name;
+        this.color = color;
     }
 }
