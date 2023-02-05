@@ -21,7 +21,7 @@ public class Line {
     @Column(length = 20, nullable = false)
     private String color;
 
-    @OneToMany(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+    @OneToMany(cascade = { CascadeType.PERSIST, CascadeType.REMOVE }, mappedBy = "line", orphanRemoval = true)
     private final List<Section> sections = new ArrayList<>();
 
     public Line() {
