@@ -45,11 +45,11 @@ public class SectionCommandService implements SectionCommandUseCase {
         List<Section> sections = sectionLoadRepository.loadLineSection(lineId);
         Section lastSection = sections.get(sections.size() - 1);
 
-        if (lastSection.getDownStation().equals(section.getUpStation())) {
-            sectionCommandRepository.deleteSection(section.getId());
+        if (!lastSection.equals(section)) {
+            throw new NotDownStationWhenDeleteSectionException();
         }
 
-        throw new NotDownStationWhenDeleteSectionException();
+        sectionCommandRepository.deleteSection(section.getId());
     }
 
 }
