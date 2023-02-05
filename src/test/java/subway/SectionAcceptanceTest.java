@@ -87,17 +87,34 @@ class SectionAcceptanceTest extends BaseAcceptance {
     }
 
     /**
-     * When 지하철 노서넹 구간을 제거 시
+     * Given 지하철 노선에 구간들을 조회 후
+     * When 구간 제거 시
      * Then 노선에 구간을 확인 할 수 없다
      */
     @DisplayName("지하철 노선에 구간을 제거 할 수 있다")
     @Test
     void 지하철_노선에_구간을_제거_할_수_있다() {
-        // Given && When
-        지하철_구간_제거_요청(신분당선);
+        // Given
+        List<SectionResponse> 노선의_구간들 = 지하철_노선의_구간들_조회_요청(신분당선);
+        SectionResponse 노선의_첫번_째_구간 = 노선의_구간들.get(0);
+
+        // When
+        지하철_구간_제거_요청(신분당선, 노선의_첫번_째_구간);
 
         // Then
         노선에_구간이_제거_된_걸_확인_할_수_있다(신분당선);
+    }
+
+    private List<SectionResponse> 지하철_노선의_구간들_조회_요청(LineLoadDtoResponse lineLoadDtoResponse) {
+        ExtractableResponse<Response> response = RestAssured.given().spec(REQUEST_SPEC).log().all()
+            .pathParam("lineId", lineLoadDtoResponse.getId())
+            .when().get("/lines/{lineId}/sections")
+            .then().log().all()
+            .extract();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        return response.jsonPath().getList(".", SectionResponse.class);
     }
 
     private void 노선에_구간이_제거_된_걸_확인_할_수_있다(LineLoadDtoResponse lineDto) {
@@ -105,10 +122,10 @@ class SectionAcceptanceTest extends BaseAcceptance {
         assertThat(actualLineResponse.jsonPath().getList("stations")).isEmpty();
     }
 
-    private ExtractableResponse<Response> 지하철_구간_제거_요청(LineLoadDtoResponse lineDto) {
+    private ExtractableResponse<Response> 지하철_구간_제거_요청(LineLoadDtoResponse lineDto, SectionResponse sectionResponse) {
         ExtractableResponse<Response> response = RestAssured.given().spec(REQUEST_SPEC).log().all()
             .pathParam("lineId", lineDto.getId())
-            .param("sectionId", 1)
+            .param("sectionId", sectionResponse.getId())
             .when().delete("/lines/{lineId}/sections")
             .then().log().all()
             .extract();
@@ -162,6 +179,8 @@ class SectionAcceptanceTest extends BaseAcceptance {
             .when().post("/lines/{lineId}/sections")
             .then().log().all()
             .extract();
+
+        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         return createResponse;
     }
