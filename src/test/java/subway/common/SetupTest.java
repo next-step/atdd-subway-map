@@ -12,9 +12,6 @@ public class SetupTest {
 
         param.put("name", "분당선");
         param.put("color", "bg-green-600");
-        param.put("upStationId", 2);
-        param.put("downStationId", 3);
-        param.put("distance", 5);
 
         지하철노선을_생성한다(param);
     }
@@ -23,9 +20,6 @@ public class SetupTest {
         Map<String, Object> param = new HashMap<>();
         param.put("name", "신분당선");
         param.put("color", "bg-red-600");
-        param.put("upStationId", 1);
-        param.put("downStationId", 2);
-        param.put("distance", 10);
 
         지하철노선을_생성한다(param);
     }
@@ -34,17 +28,18 @@ public class SetupTest {
         Map<String, Object> param = new HashMap<>();
         param.put("name", "신분당선");
         param.put("color", "bg-red-600");
-        param.put("upStationId", 1);
-        param.put("downStationId", 2);
-        param.put("distance", 10);
 
         지하철노선을_생성한다(param);
 
         Map<String, Object> subParam = new HashMap<>();
+        subParam.put("upStationId", 1);
+        subParam.put("downStationId", 2);
+        subParam.put("distance", 10);
+        지하철노선에_구간을_추가한다(1, subParam);
+
         subParam.put("upStationId", 2);
         subParam.put("downStationId", 3);
         subParam.put("distance", 5);
-
         지하철노선에_구간을_추가한다(1, subParam);
     }
 }

@@ -9,15 +9,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
 import subway.domain.Section;
-import subway.dto.LineResponse;
-
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD;
-import static subway.common.LineApiTest.지하철노선을_조회한다;
+import static subway.common.LineApiTest.지하철노선의_마지막_구간을_조회한다;
 import static subway.common.SetupTest.*;
 
 @DisplayName("지하철구간 관련 기능")
@@ -38,8 +35,8 @@ public class SectionAcceptanceTest {
 
         //when
         Map<String, Object> param = new HashMap<>();
-        param.put("upStationId", 2);
-        param.put("downStationId", 3);
+        param.put("upStationId", 1);
+        param.put("downStationId", 2);
         param.put("distance", 5);
 
         var response = RestAssured.given().log().all()
@@ -49,8 +46,8 @@ public class SectionAcceptanceTest {
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.jsonPath().getInt("sections[1].upStationId")).isEqualTo(2);
-        assertThat(response.jsonPath().getInt("sections[1].downStationId")).isEqualTo(3);
+        assertThat(response.jsonPath().getInt("sections[0].upStationId")).isEqualTo(1);
+        assertThat(response.jsonPath().getInt("sections[0].downStationId")).isEqualTo(2);
     }
 
     /**
@@ -61,12 +58,12 @@ public class SectionAcceptanceTest {
     @DisplayName("새로운 지하철 구간을 등록할때 상행역이 기존 구간의 하행 종점역이 아닌 경우 예외가 발생한다.")
     @Test
     void 새로운_지하철구간_추가_중_예외가_발생한다_1() {
-        신분당선_노선을_생성한다();
+        신분당선_노선을_생성한뒤_새로운_구간을_추가한다();
 
         //when
         Map<String, Object> param = new HashMap<>();
-        param.put("upStationId", 3);
-        param.put("downStationId", 4);
+        param.put("upStationId", 4);
+        param.put("downStationId", 5);
         param.put("distance", 5);
 
         var response = RestAssured.given().log().all()
@@ -88,11 +85,11 @@ public class SectionAcceptanceTest {
     @Test
     void 새로운_지하철구간_등록_중_예외가_발생한다_2() {
         //given
-        신분당선_노선을_생성한다();
+        신분당선_노선을_생성한뒤_새로운_구간을_추가한다();
 
         //when
         Map<String, Object> param = new HashMap<>();
-        param.put("upStationId", 2);
+        param.put("upStationId", 3);
         param.put("downStationId", 1);
         param.put("distance", 4);
 
@@ -115,8 +112,7 @@ public class SectionAcceptanceTest {
     void 기존_노선의_마지막_구간을_삭제한다() {
         //given
         신분당선_노선을_생성한뒤_새로운_구간을_추가한다();
-
-        Section section = 노선의_마지막_구간을_조회한다(1);
+        Section section = 지하철노선의_마지막_구간을_조회한다(1);
 
         //when
         var response = RestAssured.given().log().all()
@@ -144,7 +140,7 @@ public class SectionAcceptanceTest {
         //when
         var response = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
-                .param("sectionId", 2)
+                .param("sectionId", 1)
                 .when().delete("/lines/{id}/sections", 1)
                 .then().log().all()
                 .extract();
@@ -172,12 +168,5 @@ public class SectionAcceptanceTest {
                 .extract();
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
-    }
-
-    private Section 노선의_마지막_구간을_조회한다(int lineId) {
-        var tempResponse = 지하철노선을_조회한다(lineId);
-        List<Section> sections = tempResponse.body().as(LineResponse.class).getSections();
-        Section section = sections.get(sections.size()-1);
-        return section;
     }
 }

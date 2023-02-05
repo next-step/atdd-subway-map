@@ -8,6 +8,9 @@ import javax.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.List;
 
+import static subway.common.errorMsgEnum.ERROR_DOWNSTATION_INVAILD_LINE;
+import static subway.common.errorMsgEnum.ERROR_UPSTATION_INVAILD_LINE;
+
 @Entity
 @Getter
 @ToString
@@ -16,9 +19,7 @@ public class Line {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "line_id")
     private Long id;
-    @NotBlank(message = "name is not blank")
     private String name;
-    @NotBlank(message = "color is not blank")
     private String color;
     @OneToMany(mappedBy = "line", cascade = CascadeType.ALL)
     private List<Section> sections = new ArrayList<Section>();
@@ -36,11 +37,23 @@ public class Line {
         this.color = color;
     }
 
-    public void addSection(Section section) {
+    public void addSection(Section section) throws Exception{
+        this.validationSection(section);
+
         this.sections.add(section);
 
         if (section.getLine() != this) {
             section.setLine(this);
+        }
+    }
+
+    private void validationSection(Section section) throws Exception{
+        if (! this.isUpStationEqualDownStation(section.getUpStationId())) {
+            throw new Exception("["+ERROR_UPSTATION_INVAILD_LINE.getCode()+"]"+ERROR_UPSTATION_INVAILD_LINE.getMsg());
+        }
+
+        if (this.alreadyExistsDownStation(section.getDownStationId())) {
+            throw new Exception("["+ERROR_DOWNSTATION_INVAILD_LINE.getCode()+"]"+ERROR_DOWNSTATION_INVAILD_LINE.getMsg());
         }
     }
 

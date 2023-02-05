@@ -13,17 +13,11 @@ import subway.repository.StationRepository;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static subway.service.SectionService.ERROR_NO_FOUND_SECTION;
+import static subway.common.errorMsgEnum.*;
 
 @Service
 @Transactional(readOnly = true)
 public class LineService {
-    private static String ERROR_NO_FOUND_LINE = "[SYS_ERROR] do not found line by id";
-    private static String ERROR_UPSTATION_INVAILD = "[SYS_ERROR] upStation's not equal (last down station)";
-    private static String ERROR_DOWNSTATION_INVAILD = "[SYS_ERROR] downStation's already exists";
-    private static String ERROR_LINE_DELETE_SECTION_COUNT = "[SYS_ERROR] line have only one section";
-    private static String ERROR_LINE_DELETE_SECTION_NO_LAST_SECTION = "[SYS_ERROR] section's not last section";
-
     LineRepository lineRepository;
     SectionRepository sectionRepository;
     StationRepository stationRepository;
@@ -37,12 +31,7 @@ public class LineService {
 
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) throws Exception{
-        Section section = new Section(lineRequest.getUpStationId(), lineRequest.getDownStationId(), lineRequest.getDistance());
         Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor()));
-
-        line.addSection(section);
-        sectionRepository.save(section);
-
         return createLineResponse(line);
     }
 
@@ -82,34 +71,28 @@ public class LineService {
 
     @Transactional
     public LineResponse addSection(String id, SectionRequest sectionRequest) throws Exception {
-        Line line = lineRepository.findById(Long.valueOf(id)).orElseThrow(() -> new Exception(ERROR_NO_FOUND_LINE));
+        Line line = lineRepository.findById(Long.valueOf(id)).orElseThrow(() -> new Exception("["+ERROR_NO_FOUND_LINE.getCode()+"]"+ERROR_NO_FOUND_LINE.getMsg()));
 
-        if (! line.isUpStationEqualDownStation(sectionRequest.getUpStationId())) {
-            throw new Exception(ERROR_UPSTATION_INVAILD);
-        }
-
-        if (line.alreadyExistsDownStation(sectionRequest.getDownStationId())) {
-            throw new Exception(ERROR_DOWNSTATION_INVAILD);
-        }
-
-        Section section = sectionRepository.save(new Section(sectionRequest.getUpStationId(), sectionRequest.getDownStationId(), sectionRequest.getDistance()));
+        Section section = new Section(sectionRequest.getUpStationId(), sectionRequest.getDownStationId(), sectionRequest.getDistance());
         line.addSection(section);
 
         line = lineRepository.save(line);
+        sectionRepository.save(section);
+
         return createLineResponse(line);
     }
 
     @Transactional
     public LineResponse deleteSection(String id, String sectionId) throws Exception{
-        Line line = lineRepository.findById(Long.valueOf(id)).orElseThrow(() -> new Exception(ERROR_NO_FOUND_LINE));
-        Section section = sectionRepository.findById(Long.valueOf(sectionId)).orElseThrow(() -> new Exception(ERROR_NO_FOUND_SECTION));
+        Line line = lineRepository.findById(Long.valueOf(id)).orElseThrow(() -> new Exception("["+ERROR_NO_FOUND_LINE.getCode()+"]"+ERROR_NO_FOUND_LINE.getMsg()));
+        Section section = sectionRepository.findById(Long.valueOf(sectionId)).orElseThrow(() -> new Exception("["+ERROR_NO_FOUND_SECTION.getCode()+"]"+ERROR_NO_FOUND_SECTION.getMsg()));
 
         if (line.isNotValidSectionCount()) {
-            throw new Exception(ERROR_LINE_DELETE_SECTION_COUNT);
+            throw new Exception("["+ERROR_DELETE_SECTION_COUNT_LINE.getCode()+"]"+ERROR_DELETE_SECTION_COUNT_LINE.getMsg());
         }
 
         if (line.isNotLastSection(section)) {
-            throw new Exception(ERROR_LINE_DELETE_SECTION_NO_LAST_SECTION);
+            throw new Exception("["+ERROR_DELETE_SECTION_NO_LAST_SECTION_LINE.getCode()+"]"+ERROR_DELETE_SECTION_NO_LAST_SECTION_LINE.getMsg());
         }
 
         sectionRepository.deleteById(section.getId());
