@@ -41,12 +41,14 @@ public class Line {
         this.color = line.getColor();
     }
 
-
+    public void checkLineExtendValid(Station upStation, Station downStation) {
+        sections.checkSectionExtendValid(upStation, downStation);
+    }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof Line)) return false;
         Line line = (Line) o;
         return Objects.equals(getId(), line.getId());
     }
@@ -55,4 +57,5 @@ public class Line {
     public int hashCode() {
         return Objects.hash(getId());
     }
+
 }

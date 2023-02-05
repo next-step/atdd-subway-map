@@ -29,6 +29,7 @@ public class Section {
     public Section(Long distance, Line line) {
         this.distance = new Distance(distance);
         this.line = line;
+        this.sectionStations = new SectionStations();
     }
 
     public UpAndDownStationsDto getUpAndDownStations() {
@@ -38,7 +39,7 @@ public class Section {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof Section)) return false;
         Section section = (Section) o;
         return Objects.equals(getId(), section.getId());
     }
