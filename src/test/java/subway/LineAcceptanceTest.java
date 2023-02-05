@@ -12,6 +12,7 @@ import org.springframework.http.MediaType;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -60,10 +61,10 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // then
         List<String> lineNames = 지하철_노선_목록_조회_요청().jsonPath().getList("name", String.class);
         List<List<String>> lineStationNames = 지하철_노선_목록_조회_요청().jsonPath().getList("stations.name");
-        Set<String> stationNames = lineStationNames.stream().flatMap(Collection::stream).collect(Collectors.toSet());
+        Set<String> stationNames = lineStationNames.stream().flatMap(Collection::stream).collect(Collectors.toCollection(LinkedHashSet::new));
 
         assertThat(lineNames).containsAnyOf("신분당선");
-        assertThat(stationNames).containsAll(List.of("강남역", "판교역"));
+        assertThat(stationNames).containsExactly("강남역", "판교역");
     }
 
     /**
