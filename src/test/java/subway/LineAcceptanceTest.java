@@ -11,9 +11,11 @@ import org.springframework.http.MediaType;
 import subway.station.StationResponse;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -58,7 +60,9 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         List<String> lineNames = 지하철_노선_목록_조회_요청().jsonPath().getList("name", String.class);
-        List<String> stationNames = 지하철_노선_목록_조회_요청().jsonPath().getList("stations.name", String.class);
+        List<List<String>> lineStationNames = 지하철_노선_목록_조회_요청().jsonPath().getList("stations.name");
+        Set<String> stationNames = lineStationNames.stream().flatMap(Collection::stream).collect(Collectors.toSet());
+
         assertThat(lineNames).containsAnyOf("신분당선");
         assertThat(stationNames).containsAll(List.of("강남역", "판교역"));
     }
