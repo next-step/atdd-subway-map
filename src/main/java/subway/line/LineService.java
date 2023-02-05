@@ -3,7 +3,6 @@ package subway.line;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.exception.ErrorResponseCode;
-import subway.exception.SubwayIllegalArgumentException;
 import subway.exception.SubwayRestApiException;
 import subway.section.SectionRequest;
 import subway.station.Station;
@@ -27,11 +26,7 @@ public class LineService {
         Station upStation = stationService.findOneById(request.getUpStationId());
         Station downStation = stationService.findOneById(request.getDownStationId());
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
-        try {
-            line.addSection(upStation, downStation, request.getDistance());
-        } catch (SubwayIllegalArgumentException e) {
-            throw new SubwayRestApiException(e.getErrorResponseCode());
-        }
+        line.addSection(upStation, downStation, request.getDistance());
         return LineResponse.of(line);
     }
 
@@ -65,18 +60,14 @@ public class LineService {
         final Line line = getLine(id);
         final Station upStation = stationService.findOneById(sectionRequest.getUpStationId());
         final Station downStation = stationService.findOneById(sectionRequest.getDownStationId());
-            line.addSection(upStation, downStation, sectionRequest.getDistance());
+        line.addSection(upStation, downStation, sectionRequest.getDistance());
     }
 
     @Transactional
     public void deleteSection(final Long id, final Long stationId) {
         final Line line = getLine(id);
         final Station station = stationService.findOneById(stationId);
-        try {
-            line.removeSection(station);
-        } catch (SubwayIllegalArgumentException e) {
-            throw new SubwayRestApiException(e.getErrorResponseCode());
-        }
+        line.removeSection(station);
     }
 
     private Line getLine(final long lineId) {
