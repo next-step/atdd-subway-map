@@ -15,7 +15,7 @@ import subway.line.dto.response.StationResponse;
 import static org.assertj.core.api.Assertions.assertThat;
 import static subway.line.api.LineApiClient.requestAppendSection;
 import static subway.line.api.LineApiClient.requestDeleteSection;
-import static subway.line.acceptance.StationApiClient.requestCreateStation;
+import static subway.line.api.StationApiClient.requestCreateStation;
 
 @DisplayName("자하철 구간 관리 기능")
 @Sql("classpath:sql/delete-records.sql")

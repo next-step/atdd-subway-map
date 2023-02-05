@@ -49,8 +49,6 @@ public class LineApiClient {
     }
 
     public static ExtractableResponse<Response> requestUpdateLine(Long id, String name, String color) {
-        final String ENDPOINT = ENDPOINT_LINES + "/" + id.toString();
-
         LineRequest lineRequest = LineRequest.builder()
                 .name(name)
                 .color(color)
@@ -59,40 +57,34 @@ public class LineApiClient {
         return RestAssured.given().log().all()
                 .body(lineRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().put(ENDPOINT)
+                .when().put(ENDPOINT_LINES + "/{lineId}", id.toString())
                 .then().log().all()
                 .extract();
     }
 
     public static ExtractableResponse<Response> requestDeleteLine(Long id) {
-        final String ENDPOINT = ENDPOINT_LINES + "/" + id.toString();
-
         return RestAssured.given().log().all()
-                .when().delete(ENDPOINT)
+                .when().delete(ENDPOINT_LINES + "/{lineId}", id.toString())
                 .then().log().all()
                 .extract();
     }
 
     public static ExtractableResponse<Response> requestAppendSection(Long lineId, Long upStationId, Long downStationId, Integer distance) {
-        final String ENDPOINT = ENDPOINT_LINES + "/" + lineId.toString() + ENDPOINT_SECTIONS;
-
         SectionRequest sectionRequest = new SectionRequest(upStationId, downStationId, distance);
 
         return RestAssured.given().log().all()
                 .body(sectionRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post(ENDPOINT)
+                .when().post(ENDPOINT_LINES + "/{lineId}" + ENDPOINT_SECTIONS, lineId.toString())
                 .then().log().all()
                 .extract();
     }
 
-    public static ExtractableResponse<Response> requestDeleteSection(Long lineId, Long stationId)
-    {
-        final String ENDPOINT = ENDPOINT_LINES + "/" + lineId.toString() + ENDPOINT_SECTIONS + "?stationId=" + stationId.toString();
-
+    public static ExtractableResponse<Response> requestDeleteSection(Long lineId, Long stationId) {
         return RestAssured.given().log().all()
                 .when()
-                .delete(ENDPOINT)
+                .delete(ENDPOINT_LINES + "/{lineId}" + ENDPOINT_SECTIONS + "?=stationId={stationId}",
+                        lineId.toString(), stationId.toString())
                 .then().log().all()
                 .extract();
     }

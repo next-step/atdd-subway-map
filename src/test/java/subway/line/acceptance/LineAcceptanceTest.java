@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.jdbc.Sql;
+import subway.line.api.StationApiClient;
 import subway.line.dto.response.LineResponse;
 import subway.line.entity.Station;
 
