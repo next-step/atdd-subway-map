@@ -15,6 +15,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static subway.api.validator.sectionValidator.addSectionValidator;
+import static subway.api.validator.sectionValidator.deleteSectionValidator;
+
 @Service
 @Transactional(readOnly = true)
 public class LineService {
@@ -86,13 +89,15 @@ public class LineService {
         Station upStation = stationService.findById(sectionRequest.getUpStationId());
         Station downStation = stationService.findById(sectionRequest.getDownStationId());
         Line line = lineRepository.findById(lineId).orElseThrow(IllegalArgumentException::new);
-
+        addSectionValidator(line,upStation,downStation);
         line.getSections().add(new Section(line, upStation, downStation, sectionRequest.getDistance()));
     }
 
     @Transactional
     public void deleteSection(Long lineId, Long stationId) {
         Line line = lineRepository.findById(lineId).orElseThrow(EntityNotFoundException::new);
+        Station station = stationService.findById(stationId);
+        deleteSectionValidator(line, station);
         line.getSections().remove(line.getSections().size() - 1);
     }
 }
