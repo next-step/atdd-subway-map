@@ -59,4 +59,12 @@ public class LineController {
                 .build();
     }
 
+    @DeleteMapping("/{id}/sections")
+    public ResponseEntity<Void> reduceLine(@PathVariable Long id, @RequestParam Long stationId) {
+        lineService.reduceLine(new ReduceLineRequest(id, stationId));
+        return ResponseEntity
+                .noContent()
+                .build();
+    }
+
 }

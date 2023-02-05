@@ -88,4 +88,24 @@ public class LineService {
         sectionStationRepository.save(new SectionStation(section, downStation, Direction.DOWN));
     }
 
+    @Transactional
+    public void reduceLine(ReduceLineRequest request) {
+        Line line = lineRepository.findById(request.getLineId()).orElseThrow();
+        Station lastStation = stationRepository.findById(request.getStationId()).orElseThrow();
+
+        line.checkLineReduceValid(lastStation);
+
+        List<Station> stations = line.getStationsByAscendingOrder();
+        Station pairStation = stations.get(stations.size() - 2);
+
+        SectionStation upSectionStation = sectionStationRepository.findByStationAndDirection(pairStation, Direction.UP).orElseThrow();
+        SectionStation downSectionStation = sectionStationRepository.findByStationAndDirection(lastStation, Direction.DOWN).orElseThrow();
+        Section lastSection = upSectionStation.getSection();
+
+        sectionStationRepository.delete(upSectionStation);
+        sectionStationRepository.delete(downSectionStation);
+        stationRepository.delete(lastStation);
+        sectionRepository.delete(lastSection);
+    }
+
 }

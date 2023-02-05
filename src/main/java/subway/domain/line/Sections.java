@@ -5,7 +5,9 @@ import lombok.NoArgsConstructor;
 import subway.domain.section.Section;
 import subway.domain.station.Station;
 import subway.dto.domain.UpAndDownStationsDto;
+import subway.exception.CannotDeleteStationFromALineWithOnlyTwoStationsException;
 import subway.exception.DownStationOfNewSectionMustNotExistingLineStationException;
+import subway.exception.ToBeDeletedStationMustBeLastException;
 import subway.exception.UpStationOfNewSectionMustBeDownStationOfExistingLineException;
 
 import javax.persistence.Embeddable;
@@ -94,4 +96,16 @@ public class Sections {
         }
     }
 
+    public void checkSectionReduceValid(Station station) {
+        List<Station> stations = getStationsByAscendingOrder();
+        if (stations.isEmpty()) {
+            throw new IllegalArgumentException("해당 노선이 비어있습니다.");
+        }
+        if (!stations.get(stations.size() - 1).equals(station)) {
+            throw new ToBeDeletedStationMustBeLastException();
+        }
+        if (stations.size() == 2) {
+            throw new CannotDeleteStationFromALineWithOnlyTwoStationsException();
+        }
+    }
 }

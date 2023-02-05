@@ -2,6 +2,7 @@ package subway.domain.line;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import subway.domain.section.Section;
 import subway.domain.station.Station;
 
 import javax.persistence.*;
@@ -43,6 +44,10 @@ public class Line {
 
     public void checkLineExtendValid(Station upStation, Station downStation) {
         sections.checkSectionExtendValid(upStation, downStation);
+    }
+
+    public void checkLineReduceValid(Station station) {
+        sections.checkSectionReduceValid(station);
     }
 
     @Override
