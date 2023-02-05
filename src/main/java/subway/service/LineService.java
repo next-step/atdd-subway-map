@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.domain.line.Line;
 import subway.domain.section.Section;
-import subway.domain.section.SectionStations;
 import subway.domain.sectionstation.Direction;
 import subway.domain.sectionstation.SectionStation;
 import subway.domain.station.Station;
@@ -76,5 +75,17 @@ public class LineService {
         lineRepository.delete(line);
     }
 
+    @Transactional
+    public void extendLine(ExtendLineRequest request) {
+        Station upStation = stationRepository.findById(request.getUpStationId()).orElseThrow();
+        Station downStation = stationRepository.findById(request.getDownStationId()).orElseThrow();
+        Line line = lineRepository.findById(request.getLineId()).orElseThrow();
+        
+        line.checkLineExtendValid(upStation, downStation);
+
+        Section section = sectionRepository.save(new Section(request.getDistance(), line));
+        sectionStationRepository.save(new SectionStation(section, upStation, Direction.UP));
+        sectionStationRepository.save(new SectionStation(section, downStation, Direction.DOWN));
+    }
 
 }

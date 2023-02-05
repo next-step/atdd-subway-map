@@ -50,6 +50,13 @@ public class LineController {
                 .build();
     }
 
-
+    @PostMapping("/{id}/sections")
+    public ResponseEntity<Void> extendLine(@PathVariable Long id,
+                                           @RequestBody ExtendLineRequest request) {
+        lineService.extendLine(request.setLineId(id));
+        return ResponseEntity
+                .ok()
+                .build();
+    }
 
 }

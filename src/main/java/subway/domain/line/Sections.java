@@ -5,6 +5,8 @@ import lombok.NoArgsConstructor;
 import subway.domain.section.Section;
 import subway.domain.station.Station;
 import subway.dto.domain.UpAndDownStationsDto;
+import subway.exception.DownStationOfNewSectionMustNotExistingLineStationException;
+import subway.exception.UpStationOfNewSectionMustBeDownStationOfExistingLineException;
 
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
@@ -75,11 +77,21 @@ public class Sections {
             downerStations.add(downerStation);
             upAndDownStation =
                     upAndDownStations.stream()
-                            .filter(dto -> dto.getDownStation().equals(downerStation))
+                            .filter(dto -> dto.getUpStation().equals(downerStation))
                             .findFirst();
         }
 
         return downerStations;
+    }
+
+    public void checkSectionExtendValid(Station upStation, Station downStation) {
+        List<Station> stations = getStationsByAscendingOrder();
+        if (!upStation.equals(stations.get(stations.size() - 1))) {
+            throw new UpStationOfNewSectionMustBeDownStationOfExistingLineException();
+        }
+        if (stations.stream().anyMatch(station -> station.equals(downStation))) {
+            throw new DownStationOfNewSectionMustNotExistingLineStationException();
+        }
     }
 
 }
