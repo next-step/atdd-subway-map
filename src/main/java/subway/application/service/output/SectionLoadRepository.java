@@ -8,6 +8,8 @@ public interface SectionLoadRepository {
 
     Section loadSection(Long sectionId);
 
+    Section loadLineSectionWithLineId(Long lineId, Long sectionId);
+
     List<Section> loadLineSection(Long loadLineId);
 
 }

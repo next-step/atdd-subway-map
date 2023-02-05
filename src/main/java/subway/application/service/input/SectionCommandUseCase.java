@@ -6,4 +6,6 @@ public interface SectionCommandUseCase {
 
     Long createSection(SectionCreateDto lineCreateDto);
 
+    void deleteLineSection(Long lineId, Long sectionId);
+
 }

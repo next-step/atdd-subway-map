@@ -29,6 +29,7 @@ public class SectionController {
 
     @DeleteMapping(value = "/lines/{lineId}/sections")
     public ResponseEntity<Void> deleteStation(@PathVariable Long lineId, @RequestParam Long sectionId) {
+        sectionCommandUseCase.deleteLineSection(lineId, sectionId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 

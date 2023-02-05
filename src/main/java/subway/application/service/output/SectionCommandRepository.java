@@ -6,4 +6,6 @@ public interface SectionCommandRepository {
 
     Long createSection(Section section);
 
+    void deleteSection(Long id);
+    
 }
