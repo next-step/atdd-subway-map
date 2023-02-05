@@ -44,4 +44,13 @@ public class Section {
     this.downStation = downStation;
     this.distance = distance;
   }
+
+  @Override
+  public String toString() {
+    return String.format("[Section id : %d, upStationId : %d, downStationId: %d]",
+        id,
+        upStation.getId(),
+        downStation.getId()
+    );
+  }
 }

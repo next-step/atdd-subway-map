@@ -29,16 +29,22 @@ public class SectionService {
 
     Section created = sectionRepository.save(new Section(upStation, downStation, request.getDistance()));
 
-    line.addSection(created);
-
-    System.out.println("sectionService addSection");
-    System.out.println(line.getSections().size());
+    lineService.save(line.addSection(created));
 
     return SectionResponse.of(created);
   }
 
-  public SectionResponse removeSection() {
-    return null;
-//    return SectionResponse.of(sectionRepository.delete());
+  public void removeSection(Long lineId, Long sectionId) {
+    Line line = lineService.showLine(lineId).get().toEntity();
+    Section section = sectionRepository.findById(sectionId).get();
+
+    System.out.println("remove!!");
+    System.out.println(line);
+    System.out.println(section);
+    line.removeSection(section);
+
+    System.out.println("delete by id");
+    sectionRepository.deleteById(sectionId);
+    System.out.println("succeed remove");
   }
 }

@@ -34,10 +34,11 @@ public class LineService {
 
     sectionService.createSection(created.getId(), new SectionCreateRequest(upStation.getId(), downStation.getId(), request.getDistance()));
 
-    System.out.println("Line service");
-    System.out.println(created.getSections().size());
-
     return LineResponse.of(created);
+  }
+
+  public Line save(Line line) {
+    return lineRepository.save(line);
   }
 
   public Optional<LineResponse> showLine(Long id) {

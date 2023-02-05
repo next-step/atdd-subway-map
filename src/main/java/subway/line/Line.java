@@ -3,8 +3,10 @@ package subway.line;
 import static javax.persistence.FetchType.LAZY;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -46,7 +48,7 @@ public class Line {
     this.color = color;
     this.upStation = upStation;
     this.downStation = downStation;
-    this.sections = new ArrayList<>();
+    this.sections = new LinkedList<>();
     this.distance = distance;
   }
 
@@ -56,7 +58,7 @@ public class Line {
     this.color = color;
     this.upStation = upStation;
     this.downStation = downStation;
-    this.sections = new ArrayList<>();
+    this.sections = new LinkedList<>();
     this.distance = distance;
   }
 
@@ -105,26 +107,34 @@ public class Line {
     return this;
   }
 
-  public void addSection(Section add) {
-    System.out.println("line domain add Section");
+  public Line addSection(Section add) {
     if (sections.size() != 0 && !Objects.equals(downStation.getId(), add.getUpStation().getId())) {
-      System.out.println("error1");
       throw new InvalidUpstationAppendInSection();
     }
-
-    System.out.println(sections.size());
-    if (sections.size() != 0) {
-      System.out.println(sections.get(0).getUpStation());
-      System.out.println(sections.get(0).getDownStation());
-      System.out.println(add.getUpStation());
-    }
     if (sections.stream().anyMatch(s -> Objects.equals(add.getDownStation().getId(), s.getUpStation().getId()))) {
-      System.out.println("error2");
       throw new DuplicatedStationAddToSectionFailException();
     };
 
     sections.add(add);
     downStation = add.getDownStation();
+
+    return this;
+  }
+
+  public void removeSection(Section remove) {
+    if (sections.size() <= 1) {
+      throw new ZeroSectionException();
+    }
+
+    if (!sections.get(sections.size() - 1).getId().equals(remove.getId())) {
+      throw new MiddleSectionRemoveFailException();
+    }
+
+    System.out.println("remove here");
+
+    sections.remove(sections.size() - 1);
+    System.out.println(sections.get(sections.size() - 1).getDownStation());
+    this.downStation = sections.get(sections.size() - 1).getDownStation();
   }
 
   @ResponseStatus(value = HttpStatus.BAD_REQUEST)
@@ -138,6 +148,20 @@ public class Line {
   static class InvalidUpstationAppendInSection extends RuntimeException {
     public InvalidUpstationAppendInSection() {
       super("하행역에만 새로운 구간 추가가 가능합니다.");
+    }
+  }
+
+  @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+  static class ZeroSectionException extends RuntimeException {
+    public ZeroSectionException() {
+      super("노선의 구간은 한 개 이상 남아야 합니다.");
+    }
+  }
+
+  @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+  static class MiddleSectionRemoveFailException extends RuntimeException {
+    public MiddleSectionRemoveFailException() {
+      super("노선의 중간 구간들은 지울 수 없습니다.");
     }
   }
 }

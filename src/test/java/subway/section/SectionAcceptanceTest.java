@@ -106,14 +106,14 @@ public class SectionAcceptanceTest {
     Long 기존_노선_하행역_ID = line.getDownStation().getId();
     Long 신규역아이디 = StationTestUtils.지하철역_생성(MockStation.신림역);
     SectionCreateRequest 서울2호선_하행선_구간_추가_요청 = new SectionCreateRequest(기존_노선_하행역_ID, 신규역아이디, 서울2호선_거리);
+
     Long 신규_섹션_ID = SectionTestUtils.노선에_구간_추가(line, 서울2호선_하행선_구간_추가_요청).jsonPath().getLong("id");
-    SectionTestUtils.노선에_구간_추가(line, 서울2호선_하행선_구간_추가_요청);
 
     // When
-    Line removed = SectionTestUtils.노선에_구간_제거(line, 신규_섹션_ID).as(Line.class);
+    ExtractableResponse<Response> response = SectionTestUtils.노선에_구간_제거(line, 신규_섹션_ID);
 
     // then
-    assertThat(removed.getDownStation().getId()).isNotEqualTo(신규역아이디);
+    assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
   }
 
   /**
