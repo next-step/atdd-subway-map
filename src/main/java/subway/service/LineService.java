@@ -37,6 +37,9 @@ public class LineService {
         return createLineResponse(line);
     }
 
+    public Line findLineById(Long id) {
+        return lineRepository.findById(id).orElseThrow(IllegalAccessError::new);
+    }
 
     public LineResponse createLineResponse(Line line) {
         List<StationResponse> list = new ArrayList<>();
