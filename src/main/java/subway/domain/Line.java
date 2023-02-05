@@ -1,6 +1,7 @@
 package subway.domain;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 public class Line {
@@ -10,13 +11,8 @@ public class Line {
     private Long id;
     private String name;
     private String color;
-    @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(foreignKey = @ForeignKey(name = "fk_up_station"))
-    private Station upStation;
-    @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(foreignKey = @ForeignKey(name = "fk_down_station"))
-    private Station downStation;
-    private Long distance;
+    @Embedded
+    private final Sections sections = new Sections();
 
     public Line() {
     }
@@ -24,14 +20,25 @@ public class Line {
     public Line(String name, String color, Station upStation, Station downStation, Long distance) {
         this.name = name;
         this.color = color;
-        this.upStation = upStation;
-        this.downStation = downStation;
-        this.distance = distance;
+        this.sections.init(Section.of(this, upStation, downStation, distance));
     }
 
-    public void updateNameAndColor(String name, String color){
+
+    public void updateNameAndColor(String name, String color) {
         this.name = name;
         this.color = color;
+    }
+
+    public void deleteSection(Station station) {
+        this.sections.delete(station);
+    }
+
+    public List<Station> getStations() {
+        return sections.getStations();
+    }
+
+    public void addSection(Station upStation, Station downStation, Long distance) {
+        this.sections.addSection(Section.of(this, upStation, downStation, distance));
     }
 
     public Long getId() {
@@ -44,13 +51,5 @@ public class Line {
 
     public String getColor() {
         return color;
-    }
-
-    public Station getUpStation() {
-        return upStation;
-    }
-
-    public Station getDownStation() {
-        return downStation;
     }
 }
