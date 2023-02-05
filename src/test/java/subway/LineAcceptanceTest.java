@@ -208,6 +208,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         String uri = createLineResponse.header(LOCATION);
         return RestAssured.given().log().all()
                 .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().put(uri)
                 .then().log().all()
                 .extract();

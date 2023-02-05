@@ -19,10 +19,11 @@ public class LineService {
         this.stationService = stationService;
     }
 
-    public LineResponse saveLine(LineRequest lineRequest) {
-        Station upStation = stationService.findById(lineRequest.getUpStationId());
-        Station downStation = stationService.findById(lineRequest.getDownStationId());
-        Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor(), upStation, downStation, lineRequest.getDistance()));
+    @Transactional
+    public LineResponse saveLine(LineRequest lineCreateRequest) {
+        Station upStation = stationService.findById(lineCreateRequest.getUpStationId());
+        Station downStation = stationService.findById(lineCreateRequest.getDownStationId());
+        Line line = lineRepository.save(new Line(lineCreateRequest.getName(), lineCreateRequest.getColor(), upStation, downStation, lineCreateRequest.getDistance()));
         return LineResponse.of(line);
     }
 
@@ -38,5 +39,11 @@ public class LineService {
 
     private Line findLineById(Long id) {
         return lineRepository.findById(id).orElseThrow(RuntimeException::new);
+    }
+
+    @Transactional
+    public void updateLine(Long id, LineRequest lineUpdateRequest) {
+        Line line = findLineById(id);
+        line.update(new Line(lineUpdateRequest.getName(), lineUpdateRequest.getColor()));
     }
 }
