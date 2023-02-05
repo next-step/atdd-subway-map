@@ -21,7 +21,7 @@ public class Sections {
         int lastSectionIndex = sections.size();
 
         if (lastSectionIndex <= 0) {
-            return false;
+            return true;
         }
 
         Section lastSection = sections.get(lastSectionIndex - 1);

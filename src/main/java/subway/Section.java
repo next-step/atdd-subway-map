@@ -19,6 +19,10 @@ public class Section {
     @Column(name = "distance")
     private int distance;
 
+    public Section() {
+
+    }
+
     public Section(Long downStationId, Long upStationId, int distance) {
         this.downStationId = downStationId;
         this.upStationId = upStationId;
