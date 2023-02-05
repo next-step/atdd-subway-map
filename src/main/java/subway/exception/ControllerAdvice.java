@@ -12,4 +12,10 @@ public class ControllerAdvice {
         return ResponseEntity.status(e.getErrorResponse().getHttpStatus())
                 .body(new ErrorResponse(e.getErrorResponse().getMessage()));
     }
+
+    @ExceptionHandler(SubwayIllegalArgumentException.class)
+    public ResponseEntity<?> handlerException(SubwayIllegalArgumentException e) {
+        return ResponseEntity.status(e.getErrorResponseCode().getHttpStatus())
+                .body(new ErrorResponse(e.getErrorResponseCode().getMessage()));
+    }
 }

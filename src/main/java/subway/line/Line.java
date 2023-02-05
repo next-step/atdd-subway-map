@@ -21,11 +21,11 @@ public class Line {
     @Column(length = 20, nullable = false)
     private String color;
 
-    protected Line() {
-    }
-
     @Embedded
     private Sections sections = new Sections();
+
+    protected Line() {
+    }
 
     public Line(String name, String color) {
         this.name = name;

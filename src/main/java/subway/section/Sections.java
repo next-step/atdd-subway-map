@@ -55,6 +55,8 @@ public class Sections {
     }
 
     public int calcDistance() {
-        return sections.stream().mapToInt(Section::getDistance).sum();
+        return sections.stream()
+                .mapToInt(Section::getDistance)
+                .sum();
     }
 }

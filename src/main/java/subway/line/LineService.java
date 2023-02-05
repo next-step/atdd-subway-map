@@ -65,11 +65,7 @@ public class LineService {
         final Line line = getLine(id);
         final Station upStation = stationService.findOneById(sectionRequest.getUpStationId());
         final Station downStation = stationService.findOneById(sectionRequest.getDownStationId());
-        try {
             line.addSection(upStation, downStation, sectionRequest.getDistance());
-        } catch (SubwayIllegalArgumentException e) {
-            throw new SubwayRestApiException(e.getErrorResponseCode());
-        }
     }
 
     @Transactional
