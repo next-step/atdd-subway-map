@@ -1,15 +1,15 @@
 package subway.section;
 
-import java.util.NoSuchElementException;
+import java.util.List;
 
 import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
 
-import subway.station.Station;
-import subway.station.StationRepository;
-import subway.line.Line;
 import subway.line.LineRepository;
+import subway.station.Station;
+import subway.line.Line;
+import subway.station.StationRepository;
 
 @Service
 public class SectionService {
@@ -17,8 +17,10 @@ public class SectionService {
 	private SectionRepository sectionRepository;
 	private StationRepository stationRepository;
 
-	public SectionService(LineRepository lineRepository, SectionRepository sectionRepository,
-		StationRepository stationRepository) {
+	private final int UP = 0;
+	private final int DOWN = 1;
+
+	public SectionService(LineRepository lineRepository, SectionRepository sectionRepository, StationRepository stationRepository) {
 		this.lineRepository = lineRepository;
 		this.sectionRepository = sectionRepository;
 		this.stationRepository = stationRepository;
@@ -28,12 +30,8 @@ public class SectionService {
 	public SectionResponse addSection(Long lineId, SectionCreateRequest sectionRequest) {
 		Line line = lineRepository.findById(lineId).orElseThrow(() -> new NullPointerException("Line doesn't exist"));
 
-		if (line.getLastSection().getDownStation().getId() != sectionRequest.getUpStationId()) {
-			throw new NoSuchElementException("등록하려는 새로운 구간의 상행역이 노선의 하행 종점역과 일치하지 않습니다.");
-		}
-		if (line.getAllStation().contains(stationRepository.findById(sectionRequest.getDownStationId()).orElseThrow(() -> new NullPointerException("Station doesn't exist")))) {
-			throw new IllegalArgumentException("등록하려는 새로운 구간의 하행 종점역이 이미 노선에 등록되어 있습니다.");
-		}
+		List<Station> stations = findStation(sectionRequest);
+		line.validAddSection(stations.get(UP), stations.get(DOWN));
 
 		Section newSection = saveSection(sectionRequest);
 		line.addSection(newSection);
@@ -42,26 +40,26 @@ public class SectionService {
 
 	@Transactional
 	public Section saveSection(SectionCreateRequest sectionRequest) {
-		Station upStation = stationRepository.findById(sectionRequest.getUpStationId()).orElseThrow(() -> new NullPointerException("Station doesn't exist"));
-		Station downStation = stationRepository.findById(sectionRequest.getDownStationId()).orElseThrow(() -> new NullPointerException("Station doesn't exist"));
-
-		Section newSection = sectionRepository.save(new Section(upStation, downStation, sectionRequest.getDistance()));
+		List<Station> stations = findStation(sectionRequest);
+		Section newSection = sectionRepository.save(new Section(stations.get(UP), stations.get(DOWN), sectionRequest.getDistance()));
 		return newSection;
 	}
 
 	@Transactional
 	public void deleteSectionById(Long lineId, Long downStationId) {
 		Line line = lineRepository.findById(lineId).orElseThrow(() -> new NullPointerException("Line doesn't exist"));
-		if (line.getLastSection().getDownStation().getId() != downStationId) {
-			throw new NoSuchElementException("삭제하려는 구간의 하행역이 노선의 하행 종점역과 일치하지 않습니다.");
-		}
-		if (line.isLastSection()) {
-			throw new IllegalArgumentException("삭제하려는 구간이 노선의 마지막 구간입니다.");
-		}
-		line.removeLastSection();
+		Section findSection = sectionRepository.findByDownStation_Id(downStationId);
+		line.removeSection(findSection);
 	}
 
-	public SectionResponse createSectionResponse(Section section) {
+	private SectionResponse createSectionResponse(Section section) {
 		return new SectionResponse(section);
+	}
+
+	private List<Station> findStation(SectionCreateRequest sectionRequest) {
+		Station upStation = stationRepository.findById(sectionRequest.getUpStationId()).orElseThrow(() -> new NullPointerException("Station doesn't exist"));
+		Station downStation = stationRepository.findById(sectionRequest.getDownStationId()).orElseThrow(() -> new NullPointerException("Station doesn't exist"));
+
+		return List.of(upStation, downStation);
 	}
 }

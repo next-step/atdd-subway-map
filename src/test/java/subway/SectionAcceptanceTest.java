@@ -2,27 +2,42 @@ package subway;
 
 import java.util.List;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.jdbc.Sql;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import subway.api.LineTestApi;
-import subway.api.SectionTestApi;
+import subway.common.DatabaseTruncate;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static subway.api.LineTestApi.*;
+import static subway.api.SectionTestApi.*;
+import static subway.api.StationTestApi.*;
 
 @DisplayName("지하철 구간 관리")
-@Sql(scripts = {"classpath:sql/truncate.sql", "classpath:sql/setupSectionTest.sql"})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class SectionAcceptanceTest {
 
-	LineTestApi lineApi = new LineTestApi();
-	SectionTestApi sectionApi = new SectionTestApi();
+	@Autowired
+	private DatabaseTruncate databaseTruncate;
+
+	@BeforeEach
+	void truncate() {
+		databaseTruncate.execute();
+		fixedId = createStation("신분당선").jsonPath().getLong("id");
+		registeredUpStationId = createStation("새로운지하철역").jsonPath().getLong("id");
+		anotherId = createStation("또다른지하철역").jsonPath().getLong("id");
+		newDownStationId = createStation("새로운구간등록역").jsonPath().getLong("id");
+	}
+
+	long fixedId;
+	long registeredUpStationId;
+	long anotherId;
+	long newDownStationId;
 
 	/** 구간 등록 기능 **/
 	/**
@@ -31,17 +46,12 @@ public class SectionAcceptanceTest {
 	 * */
 	@DisplayName("지하철 노선에 구간을 등록")
 	@Test
-	void createSection() {
+	void createSectionTest() {
 		// when
-		long registeredUpStationId = 2L;
-		long newDownStationId = 4L;
-		long lineId = lineApi.createLine("신분당선", "bg-red-600", 1L, registeredUpStationId, 10).jsonPath().getLong("id");
-
-		sectionApi.createSection(lineId, newDownStationId, registeredUpStationId, 10);
+		long lineId = successCreateSection();
 
 		// then
-		ExtractableResponse<Response> showLineResponse = lineApi.showLineById(lineId);
-		List<Long> stationIds = showLineResponse.jsonPath().getList("stations.id", Long.class);
+		List<Long> stationIds = showLineById(lineId).jsonPath().getList("stations.id", Long.class);
 		assertThat(stationIds).contains(registeredUpStationId, newDownStationId);
 	}
 
@@ -50,22 +60,18 @@ public class SectionAcceptanceTest {
 	 * Then 400에러 발생
 	 * Then 지하철 노선 조회 시 등록한 구간을 찾을 수 없다.
 	 * */
-	@DisplayName("노선에 하행 종점역으로 등록되어 있지 않는 새로운 구간 등록 시 에러 발생")
+	@DisplayName("구간 등록 시, 구간의 상행역은 노선의 하행 종점역이여 한다.")
 	@Test
-	void newUpStationNotRegisteredAsLastDownStation() {
+	void UpStationNotRegistered() {
 		// when
-		long registeredUpStationId = 2L;
-		long newDownStationId = 4L;
-		long lineId = lineApi.createLine("신분당선", "bg-red-600", 1L, 3L, 10).jsonPath().getLong("id");
-
-		ExtractableResponse<Response> createResponse = sectionApi.createSection(lineId, newDownStationId, registeredUpStationId, 10);
+		long lineId = createLine("신분당선", "bg-red-600", fixedId, anotherId, 10).jsonPath().getLong("id");
+		ExtractableResponse<Response> createResponse = createSection(lineId, newDownStationId, registeredUpStationId, 10);
 
 		// then
 		assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
 
 		// then
-		ExtractableResponse<Response> showLineResponse = lineApi.showLineById(lineId);
-		List<Long> stationIds = showLineResponse.jsonPath().getList("stations.id", Long.class);
+		List<Long> stationIds = showLineById(lineId).jsonPath().getList("stations.id", Long.class);
 		assertThat(stationIds).doesNotContain(newDownStationId);
 	}
 
@@ -74,25 +80,19 @@ public class SectionAcceptanceTest {
 	 * Then 400에러 발생
 	 * Then 지하철 노선 조회 시 등록하려던 역을 찾을 수 있다.
 	 * */
-	@DisplayName("노선에 등록되어 있는 역을 새로운 구간으로 등록 시 에러 발생")
+	@DisplayName("구간 등록 시, 노선에 등록하려는 역이 있으면 안 된다.")
 	@Test
 	void newDownStationAlreadyRegistered() {
 		// when
-		long registeredUpStationId = 2L;
-		long newDownStationId = 4L;
-		long lineId = lineApi.createLine("신분당선", "bg-red-600", 1L, registeredUpStationId, 10).jsonPath().getLong("id");
-
-		ExtractableResponse<Response> addSectionResponse = sectionApi.createSection(lineId, newDownStationId, registeredUpStationId, 10);
-		assertThat(addSectionResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+		long lineId = successCreateSection();
 
 		// then
-		ExtractableResponse<Response> alreadyRegisteredResponse = sectionApi.createSection(lineId, registeredUpStationId, newDownStationId, 10);
+		ExtractableResponse<Response> alreadyRegisteredResponse = createSection(lineId, registeredUpStationId, newDownStationId, 10);
 		assertThat(alreadyRegisteredResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
 
 		// then
-		ExtractableResponse<Response> showLineResponse = lineApi.showLineById(lineId);
-		List<Long> stationIds = showLineResponse.jsonPath().getList("stations.id", Long.class);
-		assertThat(stationIds).contains(1L, registeredUpStationId, newDownStationId);
+		List<Long> stationIds = showLineById(lineId).jsonPath().getList("stations.id", Long.class);
+		assertThat(stationIds).contains(fixedId, registeredUpStationId, newDownStationId);
 	}
 
 	/** 구간 제거 기능 **/
@@ -103,20 +103,16 @@ public class SectionAcceptanceTest {
 	 **/
 	@DisplayName("등록한 구간을 삭제")
 	@Test
-	void deleteSection() {
+	void deleteSectionTest() {
 		// given
-		long newDownStationId = 4L;
-		long lineId = lineApi.createLine("신분당선", "bg-red-600", 1L,  2L, 10).jsonPath().getLong("id");
-		ExtractableResponse<Response> addSectionResponse = sectionApi.createSection(lineId, newDownStationId, 2L, 10);
-		assertThat(addSectionResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+		long lineId = successCreateSection();
 
 		// when
-		ExtractableResponse<Response> deleteResponse = sectionApi.deleteSection(lineId, newDownStationId);
+		ExtractableResponse<Response> deleteResponse = deleteSection(lineId, newDownStationId);
 		assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
 		// then
-		ExtractableResponse<Response> showLineResponse = lineApi.showLineById(lineId);
-		List<Long> stationIds = showLineResponse.jsonPath().getList("stations.id", Long.class);
+		List<Long> stationIds = showLineById(lineId).jsonPath().getList("stations.id", Long.class);
 		assertThat(stationIds).doesNotContain(newDownStationId);
 	}
 
@@ -126,27 +122,21 @@ public class SectionAcceptanceTest {
 	 * Then 400 에러 발생
 	 * Then 지하철 노선 조회 시 등록한 구간이 그대로인 것을 확인할 수 있다
 	 * */
-	@DisplayName("구간 삭제 시 마지막 구간이 아니면 에러 발생")
+	@DisplayName("구간 삭제 시, 마지막 구간이 아니면 에러 발생")
 	@Test
 	void deleteLastSection() {
 		// given
-		long newDownStationId = 4L;
-		long lineId = lineApi.createLine("신분당선", "bg-red-600", 1L,  2L, 10).jsonPath().getLong("id");
-		ExtractableResponse<Response> addSectionResponse = sectionApi.createSection(lineId, newDownStationId, 2L, 10);
-		ExtractableResponse<Response> addSectionResponse2 = sectionApi.createSection(lineId, 3L, newDownStationId, 10);
-		assertAll(
-			() -> assertThat(addSectionResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
-			() -> assertThat(addSectionResponse2.statusCode()).isEqualTo(HttpStatus.CREATED.value())
-		);
+		long lineId = successCreateSection();
+		ExtractableResponse<Response> addSectionResponse = createSection(lineId, anotherId, newDownStationId, 10);
+		assertThat(addSectionResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
 		// when
-		ExtractableResponse<Response> deleteResponse = sectionApi.deleteSection(lineId, newDownStationId);
+		ExtractableResponse<Response> deleteResponse = deleteSection(lineId, newDownStationId);
 		assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
 
 		// then
-		ExtractableResponse<Response> showLineResponse = lineApi.showLineById(lineId);
-		List<Long> stationIds = showLineResponse.jsonPath().getList("stations.id", Long.class);
-		assertThat(stationIds).contains(1L, 2L, newDownStationId, 3L);
+		List<Long> stationIds = showLineById(lineId).jsonPath().getList("stations.id", Long.class);
+		assertThat(stationIds).contains(fixedId, registeredUpStationId, newDownStationId, anotherId);
 	}
 
 	/**
@@ -155,21 +145,26 @@ public class SectionAcceptanceTest {
 	 * Then 400 에러 발생
 	 * Then 지하철 노선 조회 시 등록한 구간 1개가 그대로인 것을 확인할 수 있다
 	 * */
-	@DisplayName("구간 삭제 시 구간이 1개인 경우 에러 발생")
+	@DisplayName("구간 삭제 시, 구간이 1개인 경우 에러 발생")
 	@Test
 	void deleteExistOneSection() {
 		// given
-		long newDownStationId = 4L;
-		long lineId = lineApi.createLine("신분당선", "bg-red-600", 1L,  newDownStationId, 10).jsonPath().getLong("id");
+		long lineId = successCreateSection();
 
 		// when
-		ExtractableResponse<Response> deleteResponse = sectionApi.deleteSection(lineId, newDownStationId);
+		ExtractableResponse<Response> deleteResponse = deleteSection(lineId, registeredUpStationId);
 		assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
 
 		// then
-		ExtractableResponse<Response> showLineResponse = lineApi.showLineById(lineId);
-		List<Long> stationIds = showLineResponse.jsonPath().getList("stations.id", Long.class);
-		assertThat(stationIds).contains(1L, newDownStationId);
+		List<Long> stationIds = showLineById(lineId).jsonPath().getList("stations.id", Long.class);
+		assertThat(stationIds).contains(fixedId, registeredUpStationId);
 	}
 
+	private Long successCreateSection() {
+		long lineId = createLine("신분당선", "bg-red-600", fixedId, registeredUpStationId, 10).jsonPath().getLong("id");
+		ExtractableResponse<Response> addSectionResponse = createSection(lineId, newDownStationId, registeredUpStationId, 10);
+		assertThat(addSectionResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+		return lineId;
+	}
 }

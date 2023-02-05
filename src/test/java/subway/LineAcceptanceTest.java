@@ -11,16 +11,14 @@ import org.springframework.test.context.jdbc.Sql;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import subway.api.LineTestApi;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static subway.api.LineTestApi.*;
 
 @DisplayName("지하철 노선 관리 기능")
 @Sql(scripts = {"classpath:sql/truncate.sql", "classpath:sql/setupLineTest.sql"})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {
-
-	LineTestApi lineApi = new LineTestApi();
 
 	/**
 	 * When 지하철 노선을 생성하면
@@ -28,13 +26,13 @@ public class LineAcceptanceTest {
 	 */
 	@DisplayName("지하철 노선 생성")
 	@Test
-	void createLine() {
+	void createLineTest() {
 		// when
-		long id = lineApi.createLine("신분당선", "bg-red-600", 1L, 2L, 10).jsonPath().getLong("id");
+		long id = createLine("신분당선", "bg-red-600", 1L, 2L, 10).jsonPath().getLong("id");
 
 		// then
-		ExtractableResponse<Response> showResponse = lineApi.showLineById(id);
-		assertThat(showResponse.jsonPath().getString("name")).isEqualTo("신분당선");
+		String lineName = showLineById(id).jsonPath().getString("name");
+		assertThat(lineName).isEqualTo("신분당선");
 	}
 
 	/**
@@ -46,11 +44,11 @@ public class LineAcceptanceTest {
 	@Test
 	void showLineList() {
 		// given
-		lineApi.createLine("신분당선", "bg-red-600", 1L, 2L, 10);
-		lineApi.createLine("분당선", "bg-green-600", 1L, 3L, 10);
+		createLine("신분당선", "bg-red-600", 1L, 2L, 10);
+		createLine("분당선", "bg-green-600", 1L, 3L, 10);
 
 		// when
-		ExtractableResponse<Response> showResponse = lineApi.showLines();
+		ExtractableResponse<Response> showResponse = showLines();
 
 		// then
 		List<String> lineNames = showResponse.jsonPath().getList("name", String.class);
@@ -67,10 +65,10 @@ public class LineAcceptanceTest {
 	@Test
 	void showLine() {
 		// given
-		long id = lineApi.createLine("신분당선", "bg-red-600", 1L, 2L, 10).jsonPath().getLong("id");
+		long id = createLine("신분당선", "bg-red-600", 1L, 2L, 10).jsonPath().getLong("id");
 
 		// when
-		ExtractableResponse<Response> showResponse = lineApi.showLineById(id);
+		ExtractableResponse<Response> showResponse = showLineById(id);
 
 		// then
 		Assertions.assertAll(
@@ -87,15 +85,15 @@ public class LineAcceptanceTest {
 	 * */
 	@DisplayName("지하철 노선 수정")
 	@Test
-	void updateLine() {
+	void updateLineTest() {
 		// given
-		long id = lineApi.createLine("신분당선", "bg-red-600", 1L, 2L, 10).jsonPath().getLong("id");
+		long id = createLine("신분당선", "bg-red-600", 1L, 2L, 10).jsonPath().getLong("id");
 
 		// when
-		lineApi.updateLine(id, "다른분당선", "bg-red-600");
+		updateLine(id, "다른분당선", "bg-red-600");
 
 		// then
-		ExtractableResponse<Response> showResponse = lineApi.showLineById(id);
+		ExtractableResponse<Response> showResponse = showLineById(id);
 		Assertions.assertAll(
 			() -> assertThat(showResponse.jsonPath().getLong("id")).isEqualTo(id),
 			() -> assertThat(showResponse.jsonPath().getString("name")).isEqualTo("다른분당선"),
@@ -110,12 +108,12 @@ public class LineAcceptanceTest {
 	 * */
 	@DisplayName("지하철 노선 삭제")
 	@Test
-	void deleteLine() {
+	void deleteLineTest() {
 		// given
-		long id = lineApi.createLine("신분당선", "bg-red-600", 1L, 2L, 10).jsonPath().getLong("id");
+		long id = createLine("신분당선", "bg-red-600", 1L, 2L, 10).jsonPath().getLong("id");
 
 		// when
-		ExtractableResponse<Response> deleteResponse = lineApi.deleteLine(id);
+		ExtractableResponse<Response> deleteResponse = deleteLine(id);
 
 		// then
 		assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());

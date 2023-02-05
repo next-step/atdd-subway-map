@@ -9,7 +9,7 @@ import subway.section.SectionCreateRequest;
 
 public class SectionTestApi {
 
-	public ExtractableResponse<Response> createSection(Long lineId, Long newDownStationId, Long registeredUpStationId, int distance) {
+	public static ExtractableResponse<Response> createSection(Long lineId, Long newDownStationId, Long registeredUpStationId, int distance) {
 		SectionCreateRequest sectionRequest = new SectionCreateRequest(newDownStationId, registeredUpStationId, distance);
 
 		ExtractableResponse<Response> response = RestAssured
@@ -23,7 +23,7 @@ public class SectionTestApi {
 		return response;
 	}
 
-	public ExtractableResponse<Response> deleteSection(Long lineId, Long stationId) {
+	public static ExtractableResponse<Response> deleteSection(Long lineId, Long stationId) {
 		ExtractableResponse<Response> response = RestAssured
 			.given().log().all()
 			.param("stationId", stationId)

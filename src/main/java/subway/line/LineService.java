@@ -28,7 +28,8 @@ public class LineService {
 		Section newSection = sectionService.saveSection(new SectionCreateRequest(lineRequest.getDownStationsId(), lineRequest.getUpStationsId(), lineRequest.getDistance()));
 		saveLine.addSection(newSection);
 
-		return createLineResponse(saveLine);
+		LineResponse lineResponse = createLineResponse(saveLine);
+		return lineResponse;
 	}
 
 	@Transactional(readOnly = true)

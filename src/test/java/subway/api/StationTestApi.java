@@ -14,7 +14,7 @@ import io.restassured.response.Response;
 
 public class StationTestApi {
 
-	public ExtractableResponse<Response> createStation(String stationName) {
+	public static ExtractableResponse<Response> createStation(String stationName) {
 		Map<String, String> params = new HashMap<>();
 		params.put("name", stationName);
 
@@ -30,7 +30,7 @@ public class StationTestApi {
 		return response;
 	}
 
-	public ExtractableResponse<Response> showStation() {
+	public static ExtractableResponse<Response> showStation() {
 		ExtractableResponse<Response> response = RestAssured
 			.given().log().all()
 			.when().get("/stations")
@@ -41,7 +41,7 @@ public class StationTestApi {
 		return response;
 	}
 
-	public ExtractableResponse<Response> deleteStationById(Long id) {
+	public static ExtractableResponse<Response> deleteStationById(Long id) {
 		ExtractableResponse<Response> response = RestAssured
 			.given().log().all()
 			.when().delete("/stations/{id}", id)

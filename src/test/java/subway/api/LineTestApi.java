@@ -15,7 +15,7 @@ import subway.line.LineCreateRequest;
 
 public class LineTestApi {
 
-	public ExtractableResponse<Response> createLine(String name, String color, Long upStationId, Long downStationId, int distance) {
+	public static ExtractableResponse<Response> createLine(String name, String color, Long upStationId, Long downStationId, int distance) {
 		LineCreateRequest lineRequest = new LineCreateRequest(name, color, upStationId, downStationId, distance);
 
 		ExtractableResponse<Response> response = RestAssured
@@ -30,7 +30,7 @@ public class LineTestApi {
 		return response;
 	}
 
-	public ExtractableResponse<Response> showLines() {
+	public static ExtractableResponse<Response> showLines() {
 		ExtractableResponse<Response> response = RestAssured
 			.given().log().all()
 			.when().get("/lines")
@@ -41,7 +41,7 @@ public class LineTestApi {
 		return response;
 	}
 
-	public ExtractableResponse<Response> showLineById(Long id) {
+	public static ExtractableResponse<Response> showLineById(Long id) {
 		ExtractableResponse<Response> response = RestAssured
 			.given().log().all()
 			.when().get("/lines/{id}", id)
@@ -52,7 +52,7 @@ public class LineTestApi {
 		return response;
 	}
 
-	public ExtractableResponse<Response> updateLine(Long id, String name, String color) {
+	public static ExtractableResponse<Response> updateLine(Long id, String name, String color) {
 		Map<String, String> params = new HashMap<>();
 		params.put("name", name);
 		params.put("color", color);
@@ -69,7 +69,7 @@ public class LineTestApi {
 		return response;
 	}
 
-	public ExtractableResponse<Response> deleteLine(Long id) {
+	public static ExtractableResponse<Response> deleteLine(Long id) {
 		ExtractableResponse<Response> response = RestAssured
 			.given().log().all()
 			.when().delete("/lines/{id}", id)
