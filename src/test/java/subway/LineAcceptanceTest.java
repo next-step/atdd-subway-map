@@ -106,7 +106,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         // when
         ExtractableResponse<Response> getLineResponse = 지하철_노선_조회_요청(createLineResponse);
-        Long lineId = getLineResponse.jsonPath().get(LINE_ID);
+        Long lineId = getLineResponse.jsonPath().getLong(LINE_ID);
 
         // then
         assertThat(getLineResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
