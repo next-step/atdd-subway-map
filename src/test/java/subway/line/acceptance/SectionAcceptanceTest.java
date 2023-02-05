@@ -26,11 +26,15 @@ public class SectionAcceptanceTest {
     private StationResponse stationB;
     private StationResponse stationC;
 
+    private LineResponse lineOne;
+
     @BeforeEach
     void beforeEach() {
         stationA = requestCreateStation("A역").body().as(StationResponse.class);
         stationB = requestCreateStation("B역").body().as(StationResponse.class);
         stationC = requestCreateStation("C역").body().as(StationResponse.class);
+        lineOne = LineApiClient.requestCreateLine("1호선", "#0052A4", stationA.getId(), stationC.getId(), 7)
+                .body().as(LineResponse.class);
     }
 
     /**
@@ -41,10 +45,6 @@ public class SectionAcceptanceTest {
     @DisplayName("구간 등록 기능 - 성공 케이스")
     @Test
     void createSectionSuccess() {
-        // given
-        LineResponse lineOne = LineApiClient.requestCreateLine("1호선", "#0052A4", stationA.getId(), stationC.getId(), 7)
-                .body().as(LineResponse.class);
-
         // when
         requestAppendSection(lineOne.getId(), stationC.getId(), stationB.getId(), 3);
 
@@ -64,10 +64,6 @@ public class SectionAcceptanceTest {
     @DisplayName("구간 등록 기능 - 새로운 구간의 상행역이 노선에 등록된 하행 종점이 아닌 경우 실패")
     @Test
     void createSectionFail() {
-        // given
-        LineResponse lineOne = LineApiClient.requestCreateLine("1호선", "#0052A4", stationA.getId(), stationC.getId(), 7)
-                .body().as(LineResponse.class);
-
         // when
         ExtractableResponse<Response> appendSectionResponse = requestAppendSection(lineOne.getId(), stationC.getId(), stationC.getId(), 3);
 
@@ -89,10 +85,6 @@ public class SectionAcceptanceTest {
     @DisplayName("구간 등록 기능 - 새로운 구간의 하행역이 노선에 등록된 역인 경우 실패")
     @Test
     void createSectionFail2() {
-        // given
-        LineResponse lineOne = LineApiClient.requestCreateLine("1호선", "#0052A4", stationA.getId(), stationC.getId(), 7)
-                .body().as(LineResponse.class);
-
         // when
         ExtractableResponse<Response> appendSectionResponse = requestAppendSection(lineOne.getId(), stationA.getId(), stationA.getId(), 3);
 
@@ -116,9 +108,6 @@ public class SectionAcceptanceTest {
     @Test
     void deleteSectionSuccess() {
         // given
-        LineResponse lineOne = LineApiClient.requestCreateLine("1호선", "#0052A4", stationA.getId(), stationC.getId(), 7)
-                .body().as(LineResponse.class);
-
         requestAppendSection(lineOne.getId(), stationC.getId(), stationB.getId(), 3);
 
         // when
@@ -143,9 +132,6 @@ public class SectionAcceptanceTest {
     @Test
     void deleteSectionFail() {
         // given
-        LineResponse lineOne = LineApiClient.requestCreateLine("1호선", "#0052A4", stationA.getId(), stationC.getId(), 7)
-                .body().as(LineResponse.class);
-
         requestAppendSection(lineOne.getId(), stationC.getId(), stationB.getId(), 3);
 
         // when
@@ -168,10 +154,6 @@ public class SectionAcceptanceTest {
     @DisplayName("구간 삭제 기능 - 노선의 구간이 한개일때 삭제하면 실패")
     @Test
     void deleteSectionFail2() {
-        // given
-        LineResponse lineOne = LineApiClient.requestCreateLine("1호선", "#0052A4", stationA.getId(), stationC.getId(), 7)
-                .body().as(LineResponse.class);
-
         // when
         ExtractableResponse<Response> deleteSectionResponse = requestDeleteSection(lineOne.getId(), stationC.getId());
         assertThat(deleteSectionResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
