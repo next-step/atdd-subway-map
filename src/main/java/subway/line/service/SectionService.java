@@ -34,21 +34,25 @@ public class SectionService {
         Long requestUpStationId = sectionRequest.getUpStationId();
         Long requestDownStationId = sectionRequest.getDownStationId();
 
-        if(!downStationId.equals(requestUpStationId))
+        if(!downStationId.equals(requestUpStationId)) {
             return Boolean.FALSE;
+        }
 
-        if(hasAppended(sections, requestDownStationId))
+        if(hasAppended(sections, requestDownStationId)) {
             return Boolean.FALSE;
+        }
 
         return Boolean.TRUE;
     }
 
     public Boolean isDeletable(Line line, Long stationId) {
-        if(!hasDeletableDownStation(line, stationId))
+        if(!hasDeletableDownStation(line, stationId)) {
             return Boolean.FALSE;
+        }
 
-        if(hasSingleSection(line))
+        if(hasSingleSection(line)) {
             return Boolean.FALSE;
+        }
 
         return Boolean.TRUE;
     }
