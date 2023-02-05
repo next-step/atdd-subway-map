@@ -3,8 +3,10 @@ package subway.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.domain.Line;
+import subway.domain.Station;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
+import subway.dto.SectionRequest;
 import subway.repository.LineRepository;
 
 import java.util.List;
@@ -20,6 +22,7 @@ public class LineService {
         this.lineRepository = lineRepository;
         this.stationService = stationService;
     }
+
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
         Line line = lineRepository.save(
@@ -38,10 +41,7 @@ public class LineService {
     }
 
     private LineResponse createLineResponse(Line line) {
-        return new LineResponse(line.getId()
-                , line.getName()
-                , line.getColor()
-                , List.of(line.getUpStation(), line.getDownStation()));
+        return LineResponse.from(line);
     }
 
     public LineResponse findLineById(Long id) {
@@ -52,7 +52,7 @@ public class LineService {
     public void updateLine(Long id, LineRequest lineRequest) {
         Line line = findById(id);
         line.updateNameAndColor(lineRequest.getName(), lineRequest.getColor());
-
+        lineRepository.save(line);
     }
 
     @Transactional
@@ -61,11 +61,24 @@ public class LineService {
         lineRepository.deleteById(line.getId());
     }
 
+    @Transactional
+    public void addSection(Long id, SectionRequest sectionRequest) {
+        Line line = findById(id);
+        Station upStation = stationService.findById(sectionRequest.getUpStationId());
+        Station downStation = stationService.findById(sectionRequest.getDownStationId());
+        line.addSection(upStation, downStation, sectionRequest.getDistance());
+    }
+
+    @Transactional
+    public void deleteSection(Long id, Long stationId) {
+        Line line = findById(id);
+        Station station = stationService.findById(stationId);
+        line.deleteSection(station);
+    }
+
     private Line findById(Long id) {
         return lineRepository.findById(id)
                 .orElseThrow(IllegalArgumentException::new);
     }
-
-
 }
 
