@@ -28,10 +28,10 @@ public class Line {
     public Line() {
     }
 
-    public Line(LineRequest lineRequest, Station upStation, Station downStation) {
-        this.name = lineRequest.getName();
-        this.color = lineRequest.getColor();
-        this.sections.add(new Section(lineRequest.getDistance(), upStation, downStation));
+    public Line(String name, String color, Integer distance, Station upStation, Station downStation) {
+        this.name = name;
+        this.color = color;
+        this.sections.add(new Section(distance, upStation, downStation));
     }
 
     public void update(String name, String color) {

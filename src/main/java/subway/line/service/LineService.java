@@ -29,10 +29,13 @@ public class LineService {
 
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
+        String name = lineRequest.getName();
+        String color = lineRequest.getColor();
+        Integer distance = lineRequest.getDistance();
         Station upStation = stationService.findOne(lineRequest.getUpStationId());
         Station downStation = stationService.findOne(lineRequest.getDownStationId());
 
-        Line line = new Line(lineRequest, upStation, downStation);
+        Line line = new Line(name, color, distance, upStation, downStation);
         Line savedLine = lineRepository.save(line);
 
         return createLineResponse(savedLine);
