@@ -101,7 +101,7 @@ public class StationSectionAcceptanceTest {
     @Test
     void createStationSectionError2() {
         Map<String, Object> body = new HashMap<>();
-        body.put("upStationId", 4);
+        body.put("upStationId", 3);
         body.put("downStationId", 1);
         ExtractableResponse<Response> response = StationUtils.extendLine(body);
 
