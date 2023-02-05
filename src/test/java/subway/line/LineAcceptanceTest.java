@@ -1,10 +1,13 @@
 package subway.line;
 
+import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
@@ -22,10 +25,18 @@ import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER
 import static subway.fixture.LineFixture.분당선_요청;
 import static subway.fixture.LineFixture.신분당선_요청;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = AFTER_EACH_TEST_METHOD)
 @Sql("/insert-station.sql")
 class LineAcceptanceTest extends AcceptanceTestHelper {
+
+    @LocalServerPort
+    int port;
+
+    @BeforeEach
+    void setUp() {
+        RestAssured.port = port;
+    }
 
     @DisplayName("지하철 노선을 생성한다.")
     @Test

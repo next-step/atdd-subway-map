@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import subway.common.Comment;
-import subway.controller.request.LineRequest;
 
 import javax.persistence.Column;
 import javax.persistence.Embedded;
@@ -33,7 +32,7 @@ public class Line {
     private String color;
 
     @Embedded
-    private final Sections sections = new Sections();
+    private Sections sections = new Sections();
 
     @Builder
     private Line(String name, String color, Section section) {
@@ -48,12 +47,20 @@ public class Line {
         this.color = color;
     }
 
+    public int getDistance() {
+        return sections.distance();
+    }
+
     public void addSection(Section section) {
-        section.addLine(this);
         sections.addSection(section);
+        section.addLine(this);
     }
 
     public List<Long> getStationIds() {
         return sections.getStationIds();
+    }
+
+    public void delete(final Long stationId) {
+        sections.delete(stationId);
     }
 }

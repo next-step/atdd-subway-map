@@ -30,29 +30,26 @@ public class LineService {
     /**
      * 노선 생성
      */
-
     @Transactional
     public LineResponse create(LineRequest request) {
         Station upStation = stationService.find(request.getUpStationId());
         Station downStation = stationService.find(request.getDownStationId());
 
-        Section section =  sectionBuild(request, upStation, downStation);
+        Section section = sectionBuild(request, upStation, downStation);
 
         Line line = lineBuild(request, section);
-        line.addSection(section);
-
         lineRepository.save(line);
         return getLineWithStations(line);
     }
 
-    private Line lineBuild(final LineRequest request, final Section section) {
+    private Line lineBuild(LineRequest request, Section section) {
         return Line.builder()
                 .name(request.getName())
                 .color(request.getColor())
                 .section(section).build();
     }
 
-    private Section sectionBuild(final LineRequest request, final Station upStation, final Station downStation) {
+    private Section sectionBuild(LineRequest request, Station upStation, final Station downStation) {
         return Section.builder()
                 .upStation(upStation)
                 .downStation(downStation)
@@ -127,5 +124,16 @@ public class LineService {
         Line line = findLine(id);
 
         line.addSection(section);
+    }
+
+    /**
+     * 노선에 구간 삭제
+     * @param id
+     * @param stationId
+     */
+    @Transactional
+    public void deleteSection(final Long id, Long stationId) {
+        Line line = findLine(id);
+        line.delete(stationId);
     }
 }

@@ -14,6 +14,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import java.util.List;
 
 @Entity
 @Getter
@@ -50,7 +51,7 @@ public class Section {
 
     private void validate(Station upStation, Station downStation) {
         if (upStation.equals(downStation)) {
-            throw new SubwayRuntimeException(SubwayErrorCode.NOT_POSSIBLE_TO_CREATE_STATION);
+            throw new SubwayRuntimeException(SubwayErrorCode.SECTION_SAME_STATION);
         }
     }
 
@@ -67,5 +68,17 @@ public class Section {
 
     public void addLine(Line line) {
         this.line = line;
+    }
+
+    public boolean isDownStationId(long stationId) {
+        return downStation.getId() == stationId;
+    }
+
+    public boolean addable(Section lastSection) {
+        return upStation.equals(lastSection.downStation);
+    }
+
+    public boolean addable(List<Station> stations) {
+        return !stations.contains(this.downStation);
     }
 }
