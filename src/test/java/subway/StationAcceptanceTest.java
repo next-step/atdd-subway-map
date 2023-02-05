@@ -70,19 +70,12 @@ public class StationAcceptanceTest {
         long stationId = createSubwayStation("사상역").jsonPath().getLong("id");
 
         //when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .basePath("/stations")
-            .pathParam("id", stationId)
-            .when().delete("{id}")
-            .then().log().all()
-            .extract();
-        List<String> stationNames = getStationNames();
+        ExtractableResponse<Response> response = deleteSubwayStation(stationId);
 
         //then
+        List<String> stationNames = getStationNames();
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
         assertThat(stationNames).doesNotContain("사상역");
-
     }
 
     private ExtractableResponse<Response> createSubwayStation(String stationName) {
@@ -104,6 +97,16 @@ public class StationAcceptanceTest {
             .when().get("/stations")
             .then().log().all()
             .extract().jsonPath().getList("name", String.class);
+    }
+
+    private ExtractableResponse<Response> deleteSubwayStation(Long stationId) {
+        return RestAssured.given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .basePath("/stations")
+            .pathParam("id", stationId)
+            .when().delete("{id}")
+            .then().log().all()
+            .extract();
     }
 
 }
