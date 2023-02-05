@@ -1,13 +1,22 @@
-package subway.station;
+package subway.line.entity;
 
+import javax.persistence.*;
 import java.util.Objects;
 
-public class StationResponse {
+@Table(name = "stations")
+@Entity
+public class Station {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(length = 20, nullable = false)
     private String name;
 
-    public StationResponse(Long id, String name) {
-        this.id = id;
+    public Station() {
+    }
+
+    public Station(String name) {
         this.name = name;
     }
 
@@ -23,12 +32,12 @@ public class StationResponse {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        StationResponse that = (StationResponse) o;
-        return Objects.equals(id, that.id) && Objects.equals(name, that.name);
+        Station station = (Station) o;
+        return Objects.equals(id, station.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name);
+        return Objects.hash(id);
     }
 }

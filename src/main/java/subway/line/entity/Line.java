@@ -1,8 +1,7 @@
-package subway.line;
+package subway.line.entity;
 
 import lombok.Getter;
-import subway.section.Section;
-import subway.station.Station;
+import subway.line.dto.request.LineRequest;
 
 import javax.persistence.*;
 import java.util.ArrayList;

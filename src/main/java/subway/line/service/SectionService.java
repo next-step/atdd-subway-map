@@ -1,9 +1,11 @@
-package subway.section;
+package subway.line.service;
 
 import org.springframework.stereotype.Service;
-import subway.line.Line;
-import subway.station.Station;
-import subway.station.StationService;
+import subway.line.dto.request.SectionRequest;
+import subway.line.entity.Line;
+import subway.line.entity.Section;
+import subway.line.entity.Station;
+import subway.line.repository.SectionRepository;
 
 import java.util.List;
 

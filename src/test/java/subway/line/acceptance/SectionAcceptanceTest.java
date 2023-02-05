@@ -1,4 +1,4 @@
-package subway.section;
+package subway.line.acceptance;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -8,14 +8,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.jdbc.Sql;
-import subway.line.LineApiClient;
-import subway.line.LineResponse;
-import subway.station.StationResponse;
+import subway.line.api.LineApiClient;
+import subway.line.dto.response.LineResponse;
+import subway.line.dto.response.StationResponse;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.line.LineApiClient.requestAppendSection;
-import static subway.line.LineApiClient.requestDeleteSection;
-import static subway.station.StationApiClient.requestCreateStation;
+import static subway.line.api.LineApiClient.requestAppendSection;
+import static subway.line.api.LineApiClient.requestDeleteSection;
+import static subway.line.acceptance.StationApiClient.requestCreateStation;
 
 @DisplayName("자하철 구간 관리 기능")
 @Sql("classpath:sql/delete-records.sql")

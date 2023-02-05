@@ -1,22 +1,13 @@
-package subway.station;
+package subway.line.dto.response;
 
-import javax.persistence.*;
 import java.util.Objects;
 
-@Table(name = "stations")
-@Entity
-public class Station {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class StationResponse {
     private Long id;
-
-    @Column(length = 20, nullable = false)
     private String name;
 
-    public Station() {
-    }
-
-    public Station(String name) {
+    public StationResponse(Long id, String name) {
+        this.id = id;
         this.name = name;
     }
 
@@ -32,12 +23,12 @@ public class Station {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Station station = (Station) o;
-        return Objects.equals(id, station.id);
+        StationResponse that = (StationResponse) o;
+        return Objects.equals(id, that.id) && Objects.equals(name, that.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(id, name);
     }
 }

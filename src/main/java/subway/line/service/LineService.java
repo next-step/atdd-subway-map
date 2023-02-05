@@ -1,13 +1,15 @@
-package subway.line;
+package subway.line.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import subway.section.Section;
-import subway.section.SectionRequest;
-import subway.section.SectionService;
-import subway.station.Station;
-import subway.station.StationResponse;
-import subway.station.StationService;
+import subway.line.dto.request.LineRequest;
+import subway.line.dto.response.LineResponse;
+import subway.line.entity.Line;
+import subway.line.entity.Section;
+import subway.line.repository.LineRepository;
+import subway.line.dto.request.SectionRequest;
+import subway.line.entity.Station;
+import subway.line.dto.response.StationResponse;
 
 import java.util.List;
 import java.util.stream.Collectors;

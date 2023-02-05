@@ -1,9 +1,10 @@
-package subway.station;
+package subway.line.acceptance;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.MediaType;
+import subway.line.dto.request.StationRequest;
 
 public class StationApiClient {
 

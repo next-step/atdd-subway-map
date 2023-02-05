@@ -1,10 +1,11 @@
-package subway.line;
+package subway.line.api;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.MediaType;
-import subway.section.SectionRequest;
+import subway.line.dto.request.LineRequest;
+import subway.line.dto.request.SectionRequest;
 
 public class LineApiClient {
     private static final String ENDPOINT_LINES = "/lines";
@@ -31,7 +32,7 @@ public class LineApiClient {
                 .extract();
     }
 
-    static ExtractableResponse<Response> requestShowLines() {
+    public static ExtractableResponse<Response> requestShowLines() {
         return RestAssured.given().log().all()
                 .when().get(ENDPOINT_LINES)
                 .then().log().all()
@@ -47,7 +48,7 @@ public class LineApiClient {
                 .extract();
     }
 
-    static ExtractableResponse<Response> requestUpdateLine(Long id, String name, String color) {
+    public static ExtractableResponse<Response> requestUpdateLine(Long id, String name, String color) {
         final String ENDPOINT = ENDPOINT_LINES + "/" + id.toString();
 
         LineRequest lineRequest = LineRequest.builder()
@@ -63,7 +64,7 @@ public class LineApiClient {
                 .extract();
     }
 
-    static ExtractableResponse<Response> requestDeleteLine(Long id) {
+    public static ExtractableResponse<Response> requestDeleteLine(Long id) {
         final String ENDPOINT = ENDPOINT_LINES + "/" + id.toString();
 
         return RestAssured.given().log().all()

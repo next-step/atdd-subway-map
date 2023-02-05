@@ -1,4 +1,4 @@
-package subway.station;
+package subway.line.acceptance;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -11,7 +11,7 @@ import org.springframework.test.context.jdbc.Sql;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.station.StationApiClient.*;
+import static subway.line.acceptance.StationApiClient.*;
 
 @DisplayName("지하철역 관련 기능")
 @Sql("classpath:sql/delete-records.sql")
