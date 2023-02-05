@@ -4,7 +4,6 @@ import java.util.NoSuchElementException;
 
 import javax.transaction.Transactional;
 
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import subway.station.Station;
@@ -33,7 +32,7 @@ public class SectionService {
 			throw new NoSuchElementException("등록하려는 새로운 구간의 상행역이 노선의 하행 종점역과 일치하지 않습니다.");
 		}
 		if (line.getAllStation().contains(stationRepository.findById(sectionRequest.getDownStationId()).orElseThrow(() -> new NullPointerException("Station doesn't exist")))) {
-			throw new DuplicateKeyException("등록하려는 새로운 구간의 하행 종점역이 이미 노선에 등록되어 있습니다.");
+			throw new IllegalArgumentException("등록하려는 새로운 구간의 하행 종점역이 이미 노선에 등록되어 있습니다.");
 		}
 
 		Section newSection = saveSection(sectionRequest);
@@ -50,9 +49,19 @@ public class SectionService {
 		return newSection;
 	}
 
+	@Transactional
+	public void deleteSectionById(Long lineId, Long downStationId) {
+		Line line = lineRepository.findById(lineId).orElseThrow(() -> new NullPointerException("Line doesn't exist"));
+		if (line.getLastSection().getDownStation().getId() != downStationId) {
+			throw new NoSuchElementException("삭제하려는 구간의 하행역이 노선의 하행 종점역과 일치하지 않습니다.");
+		}
+		if (line.isLastSection()) {
+			throw new IllegalArgumentException("삭제하려는 구간이 노선의 마지막 구간입니다.");
+		}
+		line.removeLastSection();
+	}
+
 	public SectionResponse createSectionResponse(Section section) {
 		return new SectionResponse(section);
 	}
-
-
 }

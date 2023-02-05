@@ -22,4 +22,15 @@ public class SectionTestApi {
 
 		return response;
 	}
+
+	public ExtractableResponse<Response> deleteSection(Long lineId, Long stationId) {
+		ExtractableResponse<Response> response = RestAssured
+			.given().log().all()
+			.param("stationId", stationId)
+			.when().delete("/lines/{id}/sections", lineId)
+			.then().log().all()
+			.extract();
+
+		return response;
+	}
 }

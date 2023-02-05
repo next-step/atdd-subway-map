@@ -73,4 +73,11 @@ public class Line {
 		return sections.get(sections.size() - 1);
 	}
 
+	public boolean isLastSection() {
+		return sections.size() == 1;
+	}
+
+	public Section removeLastSection() {
+		return sections.remove(sections.size() - 1);
+	}
 }
