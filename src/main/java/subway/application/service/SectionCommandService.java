@@ -6,10 +6,7 @@ import subway.application.service.input.LineLoadUseCase;
 import subway.application.service.input.SectionCommandUseCase;
 import subway.application.service.output.SectionCommandRepository;
 import subway.application.service.output.SectionLoadRepository;
-import subway.domain.Line;
-import subway.domain.Section;
-import subway.domain.SectionCreateDto;
-import subway.domain.Station;
+import subway.domain.*;
 
 import java.util.List;
 
@@ -45,8 +42,14 @@ public class SectionCommandService implements SectionCommandUseCase {
     @Override
     public void deleteLineSection(Long lineId, Long sectionId) {
         Section section = sectionLoadRepository.loadLineSectionWithLineId(lineId, sectionId);
-        sectionCommandRepository.deleteSection(section.getId());
+        List<Section> sections = sectionLoadRepository.loadLineSection(lineId);
+        Section lastSection = sections.get(sections.size() - 1);
 
+        if (lastSection.getDownStation().equals(section.getUpStation())) {
+            sectionCommandRepository.deleteSection(section.getId());
+        }
+
+        throw new NotDownStationWhenDeleteSectionException();
     }
 
 }
