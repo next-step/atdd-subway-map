@@ -10,8 +10,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
+import subway.dto.line.ReadLineResponse;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -40,6 +42,7 @@ public class StationSectionAcceptanceTest {
         Map<String, Object> body = new HashMap<>();
         body.put("upStationId", 2L);
         body.put("downStationId", 3L);
+        body.put("distance", 20L);
         StationUtils.extendLine(body);
     }
 
@@ -55,15 +58,19 @@ public class StationSectionAcceptanceTest {
         Map<String, Object> body = new HashMap<>();
         body.put("upStationId", 3);
         body.put("downStationId", 4);
+        body.put("distance", 30L);
         ExtractableResponse<Response> response = StationUtils.extendLine(body);
 
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         JsonPath jsonPath = StationUtils.selectLine(1L).jsonPath();
 
         assertThat(jsonPath.getLong("id")).isEqualTo(1L);
         assertThat(jsonPath.getString("name")).isEqualTo(SIN_BUN_DANG_LINE_NAME);
         assertThat(jsonPath.getString("color")).isEqualTo(LINE_RED);
+
+        List<ReadLineResponse> responses = jsonPath.getList("stations", ReadLineResponse.class);
+        assertThat(responses.get(responses.size() - 1).getId()).isEqualTo(4L);
     }
 
 
