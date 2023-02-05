@@ -43,6 +43,10 @@ public class LineService {
                 .collect(Collectors.toList());
     }
 
+    public LineResponse findLine(Long id) {
+        return LineResponse.from(lineRepository.findById(id).get()); // TODO null일경우 exception 처리
+    }
+
     private List<Station> queryStations(LineDto lineDto) {
         return stationQuery.findStationByIdIn(
                 List.of(lineDto.getUpStationId(), lineDto.getDownStationId())

@@ -18,12 +18,19 @@ public class LineController {
 
     @PostMapping
     public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
-        LineResponse line = lineService.createLine(LineDto.from(lineRequest));
-        return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
+        LineResponse lineResponse = lineService.createLine(LineDto.from(lineRequest));
+        return ResponseEntity.created(URI.create("/lines/" + lineResponse.getId())).body(lineResponse);
     }
 
     @GetMapping
     public ResponseEntity<List<LineResponse>> showLines() {
-        return ResponseEntity.ok().body(lineService.findAllLines());
+        List<LineResponse> lineResponses = lineService.findAllLines();
+        return ResponseEntity.ok().body(lineResponses);
+    }
+
+    @GetMapping("/{lineId}")
+    public ResponseEntity<LineResponse> findLine(@PathVariable Long lineId) {
+        LineResponse lineResponse = lineService.findLine(lineId);
+        return ResponseEntity.ok().body(lineResponse);
     }
 }
