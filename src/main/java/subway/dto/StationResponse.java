@@ -9,6 +9,11 @@ public class StationResponse {
     private final Long id;
     private final String name;
 
+    public StationResponse(final Long id, final String name) {
+        this.id = id;
+        this.name = name;
+    }
+
     public static List<StationResponse> by(final List<Station> stations) {
         return stations.stream()
                 .map(station -> new StationResponse(station.getId(), station.getName()))
@@ -17,11 +22,6 @@ public class StationResponse {
 
     public static StationResponse by(final Station station) {
         return new StationResponse(station.getId(), station.getName());
-    }
-
-    public StationResponse(final Long id, final String name) {
-        this.id = id;
-        this.name = name;
     }
 
     public Long getId() {
