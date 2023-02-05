@@ -1,18 +1,13 @@
 package subway;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import subway.api.StationTestApi;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -20,6 +15,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Sql(scripts = "classpath:sql/truncate.sql")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationAcceptanceTest {
+
+	StationTestApi stationApi = new StationTestApi();
 	/**
 	 * When 지하철역을 생성하면
 	 * Then 지하철역이 생성된다
@@ -30,10 +27,11 @@ public class StationAcceptanceTest {
 	void createStation() {
 		// when
 		String stationName = "강남역";
-		createStation(stationName);
+		stationApi.createStation(stationName);
 
 		// then
-		assertThat(showStation().jsonPath().getList("name", String.class)).containsAnyOf(stationName);
+		ExtractableResponse<Response> showResponse = stationApi.showStation();
+		assertThat(showResponse.jsonPath().getList("name", String.class)).containsAnyOf(stationName);
 	}
 
 	/**
@@ -49,13 +47,15 @@ public class StationAcceptanceTest {
 		String stationName1 = "강남역";
 		String stationName2 = "교대역";
 
-		createStation(stationName1);
-		createStation(stationName2);
+		stationApi.createStation(stationName1);
+		stationApi.createStation(stationName2);
 
 		// when
+		ExtractableResponse<Response> showResponse = stationApi.showStation();
+
 		// then
-		assertThat(showStation().jsonPath().getList("name", String.class).size()).isEqualTo(2);
-		assertThat(showStation().jsonPath().getList("name", String.class)).containsAnyOf(stationName1, stationName2);
+		assertThat(showResponse.jsonPath().getList("name", String.class).size()).isEqualTo(2);
+		assertThat(showResponse.jsonPath().getList("name", String.class)).containsAnyOf(stationName1, stationName2);
 	}
 
 	/**
@@ -69,50 +69,14 @@ public class StationAcceptanceTest {
 	void deleteStation() {
 		// given
 		String stationName = "강남역";
-		long id = createStation(stationName).jsonPath().getLong("id");
+		long id = stationApi.createStation(stationName).jsonPath().getLong("id");
 
 		// when
-		deleteStationById(id);
+		stationApi.deleteStationById(id);
 
 		// then
-		assertThat(showStation().jsonPath().getList("name", String.class)).doesNotContain(stationName);
+		ExtractableResponse<Response> showResponse = stationApi.showStation();
+		assertThat(showResponse.jsonPath().getList("name", String.class)).doesNotContain(stationName);
 	}
 
-	private ExtractableResponse<Response> createStation(String stationName) {
-		Map<String, String> params = new HashMap<>();
-		params.put("name", stationName);
-
-		ExtractableResponse<Response> response = RestAssured
-			.given().log().all()
-			.body(params)
-			.contentType(MediaType.APPLICATION_JSON_VALUE)
-			.when().post("/stations")
-			.then().log().all()
-			.extract();
-
-		assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-		return response;
-	}
-
-	private ExtractableResponse<Response> showStation() {
-		ExtractableResponse<Response> response = RestAssured
-			.given().log().all()
-			.when().get("/stations")
-			.then().log().all()
-			.extract();
-
-		assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-		return response;
-	}
-
-	private ExtractableResponse<Response> deleteStationById(Long id) {
-		ExtractableResponse<Response> response = RestAssured
-			.given().log().all()
-			.when().delete("/stations/{id}", id)
-			.then().log().all()
-			.extract();
-
-		assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-		return response;
-	}
 }
