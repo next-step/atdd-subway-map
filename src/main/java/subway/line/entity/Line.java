@@ -22,8 +22,7 @@ public class Line {
     @Column(length = 20, nullable = false)
     private String color;
 
-    @OneToMany(cascade = CascadeType.PERSIST)
-    @JoinTable(name = "line_sections", joinColumns = @JoinColumn(name = "line_id"), inverseJoinColumns = @JoinColumn(name = "section_id"))
+    @OneToMany(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
     private final List<Section> sections = new ArrayList<>();
 
     public Line() {
@@ -32,7 +31,7 @@ public class Line {
     public Line(String name, String color, Integer distance, Station upStation, Station downStation) {
         this.name = name;
         this.color = color;
-        this.sections.add(new Section(distance, upStation, downStation));
+        this.sections.add(new Section(distance, upStation, downStation, this));
     }
 
     public void update(String name, String color) {

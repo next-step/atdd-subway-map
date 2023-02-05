@@ -86,7 +86,7 @@ public class LineService {
         Station upStation = this.stationService.findOne(upStationId);
         Station downStation = this.stationService.findOne(downStationId);
 
-        Section section = new Section(distance, upStation, downStation);
+        Section section = new Section(distance, upStation, downStation, line);
         this.sectionRepository.save(section);
 
         line.appendSection(section);
