@@ -47,7 +47,13 @@ public class LineAcceptanceTest {
     void createLine() {
         // when
         var newLine = RestAssuredClient.createLine(
-                Fixture.line1
+                Map.ofEntries(
+                        entry("name", "신분당선"),
+                        entry("color", "bg-red-600"),
+                        entry("upStationId", 1),
+                        entry("downStationId", 2),
+                        entry("distance", 10)
+                )
         );
 
         // then
@@ -89,8 +95,20 @@ public class LineAcceptanceTest {
         // given
         Fixture.createLines(
                 List.of(
-                        Fixture.line1,
-                        Fixture.line2
+                        Map.ofEntries(
+                                entry("name", "신분당선"),
+                                entry("color", "bg-red-600"),
+                                entry("upStationId", 1),
+                                entry("downStationId", 2),
+                                entry("distance", 10)
+                        ),
+                        Map.ofEntries(
+                                entry("name", "분당선"),
+                                entry("color", "bg-green-600"),
+                                entry("upStationId", 1),
+                                entry("downStationId", 3),
+                                entry("distance", 10)
+                        )
                 )
         );
 
@@ -122,9 +140,13 @@ public class LineAcceptanceTest {
     @Test
     void getLine() {
         // given
-        Fixture.createLines(
-                List.of(
-                        Fixture.line1
+        RestAssuredClient.createLine(
+                Map.ofEntries(
+                        entry("name", "신분당선"),
+                        entry("color", "bg-red-600"),
+                        entry("upStationId", 1),
+                        entry("downStationId", 2),
+                        entry("distance", 10)
                 )
         );
 
@@ -155,22 +177,6 @@ public class LineAcceptanceTest {
      * */
 
     private static class Fixture {
-        private static final Map<String, Object> line1 = Map.ofEntries(
-                entry("name", "신분당선"),
-                entry("color", "bg-red-600"),
-                entry("upStationId", 1),
-                entry("downStationId", 2),
-                entry("distance", 10)
-        );
-
-        private static final Map<String, Object> line2 = Map.ofEntries(
-                entry("name", "분당선"),
-                entry("color", "bg-green-600"),
-                entry("upStationId", 1),
-                entry("downStationId", 3),
-                entry("distance", 10)
-        );
-
         private static final List<Map<String, Object>> stations =  List.of(
                 Map.ofEntries(entry("name", "강남역")),
                 Map.ofEntries(entry("name", "신논현역")),
