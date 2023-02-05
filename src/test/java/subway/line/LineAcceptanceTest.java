@@ -9,17 +9,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import subway.common.DatabaseCleanser;
-import subway.line.dto.LineResponse;
-import subway.station.dto.StationResponse;
-import subway.utils.RestAssuredClient;
+import subway.station.StationRestAssuredClient;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DisplayName("지하철 노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT) // RandomPort 사용하는 이유, 각 Port는 언제 사용하면 좋은지
@@ -47,7 +45,7 @@ public class LineAcceptanceTest {
     @Test
     void createLine() {
         // when
-        var newLine = RestAssuredClient.createLine(
+        var newLine = LineRestAssuredClient.createLine(
                 Map.ofEntries(
                         entry("name", "신분당선"),
                         entry("color", "bg-red-600"),
@@ -59,29 +57,27 @@ public class LineAcceptanceTest {
 
         // then
         assertAll(
-                () -> assertEquals(newLine.jsonPath().getLong("id"), 1),
-                () -> assertEquals(newLine.jsonPath().getString("name"),"신분당선"),
-                () -> assertEquals(newLine.jsonPath().getString("color"), "bg-red-600"),
-                () -> {
-                    assertThat(
-                            newLine.jsonPath()
-                                    .getList("stations", StationResponse.class)
-                                    .stream().map(StationResponse::getName)
-                                    .collect(Collectors.toList())
-                    ).containsExactly("강남역", "신논현역");
-                }
+                () -> assertNotNull(newLine.jsonPath().get()),
+                () -> assertThat(newLine.jsonPath().getLong("id")).isEqualTo(1),
+                () -> assertThat(newLine.jsonPath().getString("name")).isEqualTo("신분당선"),
+                () -> assertThat(newLine.jsonPath().getString("color")).isEqualTo("bg-red-600"),
+                () -> assertThat(newLine.jsonPath().getLong("stations[0].id")).isEqualTo(1),
+                () -> assertThat(newLine.jsonPath().getString("stations[0].name")).isEqualTo("강남역"),
+                () -> assertThat(newLine.jsonPath().getLong("stations[1].id")).isEqualTo(2),
+                () -> assertThat(newLine.jsonPath().getString("stations[1].name")).isEqualTo("신논현역")
         );
 
         // then
-        List<LineResponse> lines = RestAssuredClient.listLine().jsonPath().getList("$", LineResponse.class);
-
+        var lines = LineRestAssuredClient.listLine();
         assertAll(
-                () -> assertEquals(1, lines.size()),
-                () -> assertEquals(1, lines.get(0).getId()),
-                () -> assertEquals("신분당선", lines.get(0).getName()),
-                () -> assertEquals("bg-red-600", lines.get(0).getColor()),
-                () -> assertEquals(1L, lines.get(0).getStations().get(0).getId()),
-                () -> assertEquals(2L, lines.get(0).getStations().get(1).getId())
+                () -> assertThat(lines.jsonPath().getList("$").size()).isEqualTo(1),
+                () -> assertThat(lines.jsonPath().getLong("[0].id")).isEqualTo(1),
+                () -> assertThat(lines.jsonPath().getString("[0].name")).isEqualTo("신분당선"),
+                () -> assertThat(lines.jsonPath().getString("[0].color")).isEqualTo("bg-red-600"),
+                () -> assertThat(lines.jsonPath().getLong("[0].stations[0].id")).isEqualTo(1),
+                () -> assertThat(lines.jsonPath().getString("[0].stations[0].name")).isEqualTo("강남역"),
+                () -> assertThat(lines.jsonPath().getLong("[0].stations[1].id")).isEqualTo(2),
+                () -> assertThat(lines.jsonPath().getString("[0].stations[1].name")).isEqualTo("신논현역")
         );
     }
 
@@ -114,21 +110,33 @@ public class LineAcceptanceTest {
         );
 
         // when
-        List<LineResponse> lines = RestAssuredClient.listLine().jsonPath().getList("$", LineResponse.class);
+        var lines = LineRestAssuredClient.listLine();
 
         // then
         assertAll(
-                () -> assertEquals(2, lines.size()),
-                () -> assertEquals(1, lines.get(0).getId()),
-                () -> assertEquals("신분당선", lines.get(0).getName()),
-                () -> assertEquals("bg-red-600", lines.get(0).getColor()),
-                () -> assertEquals(1L, lines.get(0).getStations().get(0).getId()),
-                () -> assertEquals(2L, lines.get(0).getStations().get(1).getId()),
-                () -> assertEquals(2, lines.get(1).getId()),
-                () -> assertEquals("분당선", lines.get(1).getName()),
-                () -> assertEquals("bg-green-600", lines.get(1).getColor()),
-                () -> assertEquals(1L, lines.get(1).getStations().get(0).getId()),
-                () -> assertEquals(3L, lines.get(1).getStations().get(1).getId())
+                () -> assertThat(lines.jsonPath().getList("$").size()).isEqualTo(2),
+                () -> assertThat(lines.jsonPath().getLong("[0].id")).isEqualTo(1),
+                () -> assertThat(lines.jsonPath().getString("[0].name")).isEqualTo("신분당선"),
+                () -> assertThat(lines.jsonPath().getString("[0].color")).isEqualTo("bg-red-600"),
+                () -> assertThat(lines.jsonPath().getMap("[0].stations[0]")).containsExactly(
+                        entry("id", 1),
+                        entry("name", "강남역")
+                ),
+                () -> assertThat(lines.jsonPath().getMap("[0].stations[1]")).containsExactly(
+                        entry("id", 2),
+                        entry("name", "신논현역")
+                ),
+                () -> assertThat(lines.jsonPath().getLong("[1].id")).isEqualTo(2),
+                () -> assertThat(lines.jsonPath().getString("[1].name")).isEqualTo( "분당선"),
+                () -> assertThat(lines.jsonPath().getString("[1].color")).isEqualTo( "bg-green-600"),
+                () -> assertThat(lines.jsonPath().getMap("[1].stations[0]")).containsExactly(
+                        entry("id", 1),
+                        entry("name", "강남역")
+                ),
+                () -> assertThat(lines.jsonPath().getMap("[1].stations[1]")).containsExactly(
+                        entry("id", 3),
+                        entry("name", "석촌역")
+                )
         );
     }
 
@@ -139,9 +147,9 @@ public class LineAcceptanceTest {
      * */
     @DisplayName("지하철 노선 조회")
     @Test
-    void getLine() {
+    void findLine() {
         // given
-        RestAssuredClient.createLine(
+        LineRestAssuredClient.createLine(
                 Map.ofEntries(
                         entry("name", "신분당선"),
                         entry("color", "bg-red-600"),
@@ -152,16 +160,18 @@ public class LineAcceptanceTest {
         );
 
         // when
-        var line = RestAssuredClient.findLine(1L).as(LineResponse.class);
+        var line = LineRestAssuredClient.findLine(1L);
 
         // then
         assertAll(
-                () -> assertNotNull(line),
-                () -> assertEquals(1, line.getId()),
-                () -> assertEquals("신분당선", line.getName()),
-                () -> assertEquals("bg-red-600", line.getColor()),
-                () -> assertEquals(1L, line.getStations().get(0).getId()),
-                () -> assertEquals(2L, line.getStations().get(1).getId())
+                () -> assertNotNull(line.jsonPath().get()),
+                () -> assertThat(line.jsonPath().getLong("id")).isEqualTo(1),
+                () -> assertThat(line.jsonPath().getString("name")).isEqualTo("신분당선"),
+                () -> assertThat(line.jsonPath().getString("color")).isEqualTo("bg-red-600"),
+                () -> assertThat(line.jsonPath().getLong("stations[0].id")).isEqualTo(1),
+                () -> assertThat(line.jsonPath().getString("stations[0].name")).isEqualTo("강남역"),
+                () -> assertThat(line.jsonPath().getLong("stations[1].id")).isEqualTo(2),
+                () -> assertThat(line.jsonPath().getString("stations[1].name")).isEqualTo("신논현역")
         );
     }
 
@@ -174,7 +184,7 @@ public class LineAcceptanceTest {
     @Test
     void updateLine() {
         // given
-        RestAssuredClient.createLine(
+        LineRestAssuredClient.createLine(
                 Map.ofEntries(
                         entry("name", "신분당선"),
                         entry("color", "bg-red-600"),
@@ -184,16 +194,15 @@ public class LineAcceptanceTest {
                 )
         );
 
-        var line = RestAssuredClient.findLine(1L).as(LineResponse.class);
+        var line = LineRestAssuredClient.findLine(1L);
         assertAll(
-                () -> assertEquals(1, line.getId()),
-                () -> assertEquals("신분당선", line.getName()),
-                () -> assertEquals("bg-red-600", line.getColor())
+                () -> assertThat(line.jsonPath().getLong("id")).isEqualTo(1),
+                () -> assertThat(line.jsonPath().getString("name")).isEqualTo("신분당선"),
+                () -> assertThat(line.jsonPath().getString("color")).isEqualTo("bg-red-600")
         );
 
         // when
-        RestAssuredClient.updateLine(
-                1L,
+        LineRestAssuredClient.updateLine(1L,
                 Map.ofEntries(
                         entry("name", "다른분당선"),
                         entry("color", "bg-blue-600")
@@ -201,12 +210,12 @@ public class LineAcceptanceTest {
         );
 
         // then
-        var updatedLine = RestAssuredClient.findLine(1L).as(LineResponse.class);
+        var updatedLine = LineRestAssuredClient.findLine(1L);
         assertAll(
                 () -> assertNotNull(updatedLine),
-                () -> assertEquals(1, updatedLine.getId()),
-                () -> assertEquals("다른분당선", updatedLine.getName()),
-                () -> assertEquals("bg-blue-600", updatedLine.getColor())
+                () -> assertThat(updatedLine.jsonPath().getLong("id")).isEqualTo(1),
+                () -> assertThat(updatedLine.jsonPath().getString("name")).isEqualTo("다른분당선"),
+                () -> assertThat(updatedLine.jsonPath().getString("color")).isEqualTo("bg-blue-600")
         );
     }
 
@@ -219,7 +228,7 @@ public class LineAcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        RestAssuredClient.createLine(
+        LineRestAssuredClient.createLine(
                 Map.ofEntries(
                         entry("name", "신분당선"),
                         entry("color", "bg-red-600"),
@@ -230,11 +239,11 @@ public class LineAcceptanceTest {
         );
 
         // when
-        var deleted = RestAssuredClient.deleteLine(1L);
+        var deleted = LineRestAssuredClient.deleteLine(1L);
         assertEquals(HttpStatus.NO_CONTENT.value(), deleted.statusCode());
 
         // then
-        var line = RestAssuredClient.findLine(1L);
+        var line = LineRestAssuredClient.findLine(1L);
         assertEquals(HttpStatus.NOT_FOUND.value(), line.statusCode());
     }
 
@@ -248,13 +257,13 @@ public class LineAcceptanceTest {
 
         private static void createStations() {
             for (var station : stations) {
-                RestAssuredClient.createStation(station);
+                StationRestAssuredClient.createStation(station);
             }
         }
 
         private static void createLines(List<Map<String, Object>> lines) {
             for (var line: lines) {
-                RestAssuredClient.createLine(line);
+                LineRestAssuredClient.createLine(line);
             }
         }
     }

@@ -1,19 +1,37 @@
 package subway.station;
 
+import io.restassured.RestAssured;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import subway.utils.RestAssuredClient;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import subway.common.DatabaseCleanser;
 
-import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("지하철역 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class StationAcceptanceTest {
+
+    @LocalServerPort
+    int port;
+
+    @Autowired
+    private DatabaseCleanser databaseCleanser;
+
+    @BeforeEach
+    void init() {
+        RestAssured.port = port;
+        databaseCleanser.execute();
+    }
+
     /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다
@@ -23,18 +41,24 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        var station = RestAssuredClient.createStation(Map.ofEntries(entry("name", "강남역")));
-        assertThat(station.jsonPath().getLong("id")).isEqualTo(1);
-        assertThat(station.jsonPath().getString("name")).isEqualTo("강남역");
+        var newStation = StationRestAssuredClient.createStation(
+                Map.ofEntries(
+                        entry("name", "강남역")
+                )
+        );
+        assertThat(newStation.jsonPath().getLong("id")).isEqualTo(1);
+        assertThat(newStation.jsonPath().getString("name")).isEqualTo("강남역");
 
-        // when
-        var stations = RestAssuredClient.listStation();
+        // then
+        var stations = StationRestAssuredClient.listStation();
 
         // then
         assertThat(stations.jsonPath().getList("$")).hasSize(1);
-        // TODO 더 깔끔하게 첫번째 원소의 id 접근하는 방법 없을까?
-        assertThat(stations.jsonPath().getList("id", Long.class).get(0)).isEqualTo(1L);
-        assertThat(stations.jsonPath().getList("name", String.class).get(0)).isEqualTo("강남역");
+        assertAll(
+                () -> assertThat(stations.jsonPath().getList("$")).hasSize(1),
+                () -> assertThat(stations.jsonPath().getLong("[0].id")).isEqualTo(1),
+                () -> assertThat(stations.jsonPath().getString("[0].name")).isEqualTo("강남역")
+        );
     }
 
     /**
@@ -46,15 +70,28 @@ public class StationAcceptanceTest {
     @Test
     void listStation() {
         // given
-        RestAssuredClient.createStation(Map.ofEntries(entry("name", "강남역")));
-        RestAssuredClient.createStation(Map.ofEntries(entry("name", "신논현역")));
+        Fixture.createStations(
+                List.of(
+                        Map.ofEntries(
+                                entry("name", "강남역")
+                        ),
+                        Map.ofEntries(
+                                entry("name", "신논현역")
+                        )
+                )
+        );
 
         // when
-        var stations = RestAssuredClient.listStation();
+        var stations = StationRestAssuredClient.listStation();
 
         // then
-        assertThat(stations.jsonPath().getList("$")).hasSize(2);
-        assertThat(stations.jsonPath().getList("name", String.class)).containsAll(Arrays.asList("강남역", "신논현역"));
+        assertAll(
+                () -> assertThat(stations.jsonPath().getList("$")).hasSize(2),
+                () -> assertThat(stations.jsonPath().getLong("[0].id")).isEqualTo(1),
+                () -> assertThat(stations.jsonPath().getString("[0].name")).isEqualTo("강남역"),
+                () -> assertThat(stations.jsonPath().getLong("[1].id")).isEqualTo(2),
+                () -> assertThat(stations.jsonPath().getString("[1].name")).isEqualTo("신논현역")
+        );
     }
 
     /**
@@ -66,15 +103,33 @@ public class StationAcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        RestAssuredClient.createStation(Map.ofEntries(entry("name", "강남역")));
-        var stationsBefore = RestAssuredClient.listStation();
+        Fixture.createStation(
+                Map.ofEntries(
+                        entry("name", "강남역")
+                )
+        );
+
+        // then
+        var stationsBefore = StationRestAssuredClient.listStation();
         assertThat(stationsBefore.jsonPath().getList("$")).hasSize(1);
 
         // when
-        RestAssuredClient.deleteStation(1L);
+        StationRestAssuredClient.deleteStation(1L);
 
         // then
-        var stationsAfter = RestAssuredClient.listStation();
+        var stationsAfter = StationRestAssuredClient.listStation();
         assertThat(stationsAfter.jsonPath().getList("$")).isEmpty();
+    }
+
+    private static class Fixture {
+        private static void createStations(List<Map<String, Object>> stations) {
+            for (var station : stations) {
+                StationRestAssuredClient.createStation(station);
+            }
+        }
+
+        private static void createStation(Map<String, Object> station) {
+            StationRestAssuredClient.createStation(station);
+        }
     }
 }
