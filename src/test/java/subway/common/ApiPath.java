@@ -11,4 +11,5 @@ public class ApiPath {
     public static final String LINE_GET_PATH = "/lines/%d";
     public static final String LINE_UPDATE_PATH = "/lines/%d";
     public static final String LINE_LIST_PATH = "/lines";
+    public static final String LINE_DELETE_PATH = "/lines/%d";
 }

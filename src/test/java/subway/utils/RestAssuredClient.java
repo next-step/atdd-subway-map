@@ -39,9 +39,10 @@ public class RestAssuredClient {
     public static ExtractableResponse<Response> listLine() {
         return RestAssuredClient.get(ApiPath.LINE_LIST_PATH);
     }
+    public static ExtractableResponse<Response> deleteLine(Long id) { return RestAssuredClient.delete(String.format(ApiPath.LINE_DELETE_PATH, id)); }
 
-    private static void delete(String path) {
-        RestAssured.
+    private static ExtractableResponse<Response> delete(String path) {
+        return RestAssured.
                 given().log().all()
                 .when().delete(path)
                 .then().log().all()

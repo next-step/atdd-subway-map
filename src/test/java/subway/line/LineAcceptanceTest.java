@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.HttpStatus;
 import subway.common.DatabaseCleanser;
 import subway.line.dto.LineResponse;
 import subway.station.dto.StationResponse;
@@ -214,6 +215,28 @@ public class LineAcceptanceTest {
      * When 생성한 지하철 노선을 삭제하면
      * Then 해당 지하철 노선 정보는 삭제된다
      * */
+    @DisplayName("지하철 노선 삭제")
+    @Test
+    void deleteLine() {
+        // given
+        RestAssuredClient.createLine(
+                Map.ofEntries(
+                        entry("name", "신분당선"),
+                        entry("color", "bg-red-600"),
+                        entry("upStationId", 1),
+                        entry("downStationId", 2),
+                        entry("distance", 10)
+                )
+        );
+
+        // when
+        var deleted = RestAssuredClient.deleteLine(1L);
+        assertEquals(HttpStatus.NO_CONTENT.value(), deleted.statusCode());
+
+        // then
+        var line = RestAssuredClient.findLine(1L);
+        assertEquals(HttpStatus.NOT_FOUND.value(), line.statusCode());
+    }
 
     private static class Fixture {
         private static final List<Map<String, Object>> stations =  List.of(
