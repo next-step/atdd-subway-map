@@ -99,7 +99,8 @@ class SectionAcceptanceTest extends BaseAcceptance {
         SectionResponse 노선의_첫번_째_구간 = 노선의_구간들.get(0);
 
         // When
-        지하철_구간_제거_요청(신분당선, 노선의_첫번_째_구간);
+        ExtractableResponse<Response> response = 지하철_구간_제거_요청(신분당선, 노선의_첫번_째_구간);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         // Then
         노선에_구간이_제거_된_걸_확인_할_수_있다(신분당선);
@@ -153,11 +154,8 @@ class SectionAcceptanceTest extends BaseAcceptance {
             .then().log().all()
             .extract();
 
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-
         return response;
     }
-
 
     private void 지하철_구간_등록하려는_하행역은_해당_노선에_등록되어있는_역일_수_없다(ExtractableResponse<Response> actualResponse) {
         assertThat(actualResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
