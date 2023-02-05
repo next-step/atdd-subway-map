@@ -3,13 +3,14 @@ package subway.line.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.line.dto.request.LineRequest;
+import subway.line.dto.request.SectionRequest;
 import subway.line.dto.response.LineResponse;
+import subway.line.dto.response.StationResponse;
 import subway.line.entity.Line;
 import subway.line.entity.Section;
-import subway.line.repository.LineRepository;
-import subway.line.dto.request.SectionRequest;
 import subway.line.entity.Station;
-import subway.line.dto.response.StationResponse;
+import subway.line.repository.LineRepository;
+import subway.line.repository.SectionRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,13 +19,13 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class LineService {
     private final StationService stationService;
-    private final SectionService sectionService;
     private final LineRepository lineRepository;
+    private final SectionRepository sectionRepository;
 
-    public LineService(StationService stationService, SectionService sectionService, LineRepository lineRepository) {
+    public LineService(StationService stationService, LineRepository lineRepository, SectionRepository sectionRepository) {
         this.stationService = stationService;
-        this.sectionService = sectionService;
         this.lineRepository = lineRepository;
+        this.sectionRepository = sectionRepository;
     }
 
     @Transactional
@@ -72,23 +73,31 @@ public class LineService {
 
     @Transactional
     public void appendSection(Long id, SectionRequest sectionRequest) {
+        Long upStationId = sectionRequest.getUpStationId();
+        Long downStationId = sectionRequest.getDownStationId();
+        Integer distance = sectionRequest.getDistance();
+
         Line line = findOne(id);
 
-        if (!sectionService.isAppendable(line, sectionRequest)) {
+        if (!line.validateSectionCreation(upStationId, downStationId)) {
             throw new IllegalArgumentException("등록할 수 없는 구간입니다");
         }
 
-        Section section = this.sectionService.createSection(sectionRequest);
+        Station upStation = this.stationService.findOne(upStationId);
+        Station downStation = this.stationService.findOne(downStationId);
+
+        Section section = new Section(distance, upStation, downStation);
+        this.sectionRepository.save(section);
 
         line.appendSection(section);
         this.lineRepository.save(line);
     }
 
     @Transactional
-    public void deleteSection(Long lineId, Long stationID) {
+    public void deleteSection(Long lineId, Long stationId) {
         Line line = findOne(lineId);
 
-        if(!this.sectionService.isDeletable(line, stationID)) {
+        if(!line.validateSectionDeletion(stationId)) {
             throw new IllegalArgumentException("제거할 수 없는 구간입니다");
         }
 
