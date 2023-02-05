@@ -19,8 +19,16 @@ public class Sections {
     @OneToMany(mappedBy = "line", cascade = ALL, orphanRemoval = true)
     private final List<Section> sectionList = new ArrayList<>();
 
-    public void addSection(final Section sections) {
-        sectionList.add(sections);
+    public void addSection(final Section section) {
+        sectionList.add(section);
+    }
+
+    public void remove(Station station) {
+        Section lastSection = sectionList.get(sectionList.size() - 1);
+
+        if (lastSection.getDownStation().equals(station)) {
+            sectionList.remove(lastSection);
+        }
     }
 
     public Set<Station> getStations() {

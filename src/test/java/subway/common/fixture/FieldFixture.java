@@ -3,6 +3,7 @@ package subway.common.fixture;
 
 public enum FieldFixture {
     식별자_아이디("id"),
+    역_아이디("stationId"),
     역_이름("name"),
     노선_이름("name"),
     노선_색깔("color"),
