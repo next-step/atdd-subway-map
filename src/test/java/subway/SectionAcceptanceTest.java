@@ -146,7 +146,6 @@ class SectionAcceptanceTest extends BaseAcceptance {
 
         // When
         ExtractableResponse<Response> response = 지하철_구간_제거_요청(신분당선, 노선의_첫번_째_구간);
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         // Then
         노선에_구간이_하나_일_경우_제거_할_수_없다(response);
