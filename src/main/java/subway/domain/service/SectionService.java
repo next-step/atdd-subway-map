@@ -14,7 +14,12 @@ public class SectionService {
     }
 
     @Transactional
-    public void addSection(Long id, SectionRequest sectionRequest) {
-        lineService.addSection(id, sectionRequest);
+    public void addSection(Long lineId, SectionRequest sectionRequest) {
+        lineService.addSection(lineId, sectionRequest);
+    }
+
+    @Transactional
+    public void deleteSection(Long lineId, Long stationId) {
+        lineService.deleteSection(lineId, stationId);
     }
 }

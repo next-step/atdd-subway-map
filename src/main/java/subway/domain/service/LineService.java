@@ -89,4 +89,10 @@ public class LineService {
 
         line.getSections().add(new Section(line, upStation, downStation, sectionRequest.getDistance()));
     }
+
+    @Transactional
+    public void deleteSection(Long lineId, Long stationId) {
+        Line line = lineRepository.findById(lineId).orElseThrow(EntityNotFoundException::new);
+        line.getSections().remove(line.getSections().size() - 1);
+    }
 }

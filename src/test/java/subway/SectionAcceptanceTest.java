@@ -70,9 +70,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         createSectionResponse(line1Id, createSectionCreateParams(station2Id, station3Id));
 
         //when
-        Map<String, Object> map = new HashMap<>();
-        map.put("stationId",station3Id);
-        ExtractableResponse<Response> deleteSectionResponse = deleteSectionResponse(line1Id, map);
+        ExtractableResponse<Response> deleteSectionResponse = deleteSectionResponse(line1Id, station3Id);
 
         //then
         assertThat(deleteSectionResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
@@ -81,11 +79,11 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 
     }
 
-    private ExtractableResponse<Response> deleteSectionResponse(Long lineId, Map<String, Object> params) {
+    private ExtractableResponse<Response> deleteSectionResponse(Long lineId, Long stationId) {
         return RestAssured.given().log().all()
                 .given().pathParam("id", lineId)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(params)
+                .body(stationId)
                 .when().delete("/lines/{id}/sections")
                 .then().log().all().extract();
     }
