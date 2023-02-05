@@ -1,16 +1,19 @@
 package subway.line;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
-import subway.Station;
+import subway.station.Station;
+import subway.section.Section;
 
 @Entity
 public class Line {
@@ -26,29 +29,24 @@ public class Line {
 	@Column(length = 30, nullable = false)
 	private String color;
 
-	@ManyToOne
-	private Station upStation;
-
-	@ManyToOne
-	private Station downStation;
-
-	@Column(length = 20, nullable = false)
-	private int distance;
+	@OneToMany
+	private List<Section> sections = new ArrayList<>();
 
 	public Line() {
 	}
 
-	public Line(String name, String color, Station upStationId, Station downStationId, int distance) {
+	public Line(String name, String color) {
 		this.name = name;
 		this.color = color;
-		this.upStation = upStationId;
-		this.downStation = downStationId;
-		this.distance = distance;
 	}
 
 	public void updateLine(String name, String color) {
 		this.name = name;
 		this.color = color;
+	}
+
+	public void addSection(Section section) {
+		this.sections.add(section);
 	}
 
 	public Long getId() {
@@ -63,11 +61,16 @@ public class Line {
 		return color;
 	}
 
-	public List<Station> getStations() {
-		return List.of(upStation, downStation);
+	public List<Station> getAllStation() {
+		return this.sections.stream()
+			.map(section -> List.of(section.getUpStation(), section.getDownStation()))
+			.flatMap(Collection::stream)
+			.distinct()
+			.collect(Collectors.toList());
 	}
 
-	public int getDistance() {
-		return distance;
+	public Section getLastSection() {
+		return sections.get(sections.size() - 1);
 	}
+
 }

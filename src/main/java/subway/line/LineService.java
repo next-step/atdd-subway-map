@@ -6,27 +6,27 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import subway.Station;
-import subway.StationRepository;
+import subway.section.Section;
+import subway.section.SectionCreateRequest;
+import subway.section.SectionService;
 
 @Service
 public class LineService {
-	private LineRepository lineRepository;
-	private StationRepository stationRepository;
+	private SectionService sectionService;
 
-	public LineService(LineRepository lineRepository, StationRepository stationRepository) {
+	private LineRepository lineRepository;
+
+	public LineService(SectionService sectionService, LineRepository lineRepository) {
+		this.sectionService = sectionService;
 		this.lineRepository = lineRepository;
-		this.stationRepository = stationRepository;
 	}
 
 	@Transactional
 	public LineResponse saveLine(LineCreateRequest lineRequest) {
-		Station upStation = stationRepository.findById(lineRequest.getUpStationsId()).orElseThrow(() -> new NullPointerException("Station doesn't exist"));
-		Station downStation = stationRepository.findById(lineRequest.getDownStationsId()).orElseThrow(() -> new NullPointerException("Station doesn't exist"));
+		Line saveLine = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor()));
 
-		Line saveLine = lineRepository.save(new Line(
-			lineRequest.getName(), lineRequest.getColor(),
-			upStation, downStation, lineRequest.getDistance()));
+		Section newSection = sectionService.saveSection(new SectionCreateRequest(lineRequest.getDownStationsId(), lineRequest.getUpStationsId(), lineRequest.getDistance()));
+		saveLine.addSection(newSection);
 
 		return createLineResponse(saveLine);
 	}
