@@ -28,8 +28,12 @@ public class RestAssuredClient {
         return RestAssuredClient.post(ApiPath.LINE_CREATE_PATH, requestParam);
     }
 
-    public static ExtractableResponse<Response> getLine(Long id) {
+    public static ExtractableResponse<Response> findLine(Long id) {
         return RestAssuredClient.get(String.format(ApiPath.LINE_GET_PATH, id));
+    }
+
+    public static ExtractableResponse<Response> updateLine(Long id, Map<String, Object> requestParam) {
+        return RestAssuredClient.put(String.format(ApiPath.LINE_UPDATE_PATH, id), requestParam);
     }
 
     public static ExtractableResponse<Response> listLine() {
@@ -58,6 +62,16 @@ public class RestAssuredClient {
                 .body(requestParam)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post(path)
+                .then().log().all()
+                .extract();
+    }
+
+    private static ExtractableResponse<Response> put(String path, Map<String, Object> requestParam) {
+        return RestAssured
+                .given().log().all()
+                .body(requestParam)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().put(path)
                 .then().log().all()
                 .extract();
     }

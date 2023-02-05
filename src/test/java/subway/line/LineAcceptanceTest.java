@@ -151,7 +151,7 @@ public class LineAcceptanceTest {
         );
 
         // when
-        var line = RestAssuredClient.getLine(1L).as(LineResponse.class);
+        var line = RestAssuredClient.findLine(1L).as(LineResponse.class);
 
         // then
         assertAll(
@@ -169,6 +169,45 @@ public class LineAcceptanceTest {
      * When 생성한 지하철 노선을 수정하면
      * Then 해당 지하철 노선 정보는 수정된다
      * */
+    @DisplayName("지하철 노선 수정")
+    @Test
+    void updateLine() {
+        // given
+        RestAssuredClient.createLine(
+                Map.ofEntries(
+                        entry("name", "신분당선"),
+                        entry("color", "bg-red-600"),
+                        entry("upStationId", 1),
+                        entry("downStationId", 2),
+                        entry("distance", 10)
+                )
+        );
+
+        var line = RestAssuredClient.findLine(1L).as(LineResponse.class);
+        assertAll(
+                () -> assertEquals(1, line.getId()),
+                () -> assertEquals("신분당선", line.getName()),
+                () -> assertEquals("bg-red-600", line.getColor())
+        );
+
+        // when
+        RestAssuredClient.updateLine(
+                1L,
+                Map.ofEntries(
+                        entry("name", "다른분당선"),
+                        entry("color", "bg-blue-600")
+                )
+        );
+
+        // then
+        var updatedLine = RestAssuredClient.findLine(1L).as(LineResponse.class);
+        assertAll(
+                () -> assertNotNull(updatedLine),
+                () -> assertEquals(1, updatedLine.getId()),
+                () -> assertEquals("다른분당선", updatedLine.getName()),
+                () -> assertEquals("bg-blue-600", updatedLine.getColor())
+        );
+    }
 
     /*
      * Given 지하철 노선을 생성하고
