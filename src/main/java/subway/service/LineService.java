@@ -7,13 +7,14 @@ import subway.domain.Section;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 import subway.dto.SectionRequest;
+import subway.exception.SubwayRestApiException;
 import subway.repository.LineRepository;
 import subway.repository.SectionRepository;
 import subway.repository.StationRepository;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static subway.common.errorMsgEnum.*;
+import static subway.common.ErrorResponse.*;
 
 @Service
 @Transactional(readOnly = true)
@@ -71,7 +72,7 @@ public class LineService {
 
     @Transactional
     public LineResponse addSection(String id, SectionRequest sectionRequest) throws Exception {
-        Line line = lineRepository.findById(Long.valueOf(id)).orElseThrow(() -> new Exception("["+ERROR_NO_FOUND_LINE.getCode()+"]"+ERROR_NO_FOUND_LINE.getMsg()));
+        Line line = lineRepository.findById(Long.valueOf(id)).orElseThrow(() -> new SubwayRestApiException(ERROR_NO_FOUND_LINE));
 
         Section section = new Section(sectionRequest.getUpStationId(), sectionRequest.getDownStationId(), sectionRequest.getDistance());
 
@@ -83,16 +84,8 @@ public class LineService {
 
     @Transactional
     public LineResponse deleteSection(String id, String sectionId) throws Exception{
-        Line line = lineRepository.findById(Long.valueOf(id)).orElseThrow(() -> new Exception("["+ERROR_NO_FOUND_LINE.getCode()+"]"+ERROR_NO_FOUND_LINE.getMsg()));
-        Section section = sectionRepository.findById(Long.valueOf(sectionId)).orElseThrow(() -> new Exception("["+ERROR_NO_FOUND_SECTION.getCode()+"]"+ERROR_NO_FOUND_SECTION.getMsg()));
-
-        if (line.isNotValidSectionCount()) {
-            throw new Exception("["+ERROR_DELETE_SECTION_COUNT_LINE.getCode()+"]"+ERROR_DELETE_SECTION_COUNT_LINE.getMsg());
-        }
-
-        if (line.isNotLastSection(section)) {
-            throw new Exception("["+ERROR_DELETE_SECTION_NO_LAST_SECTION_LINE.getCode()+"]"+ERROR_DELETE_SECTION_NO_LAST_SECTION_LINE.getMsg());
-        }
+        Line line = lineRepository.findById(Long.valueOf(id)).orElseThrow(() -> new SubwayRestApiException(ERROR_NO_FOUND_LINE));
+        Section section = sectionRepository.findById(Long.valueOf(sectionId)).orElseThrow(() -> new SubwayRestApiException(ERROR_NO_FOUND_SECTION));
 
         line.deleteSection(section);
         Line deleteLine = lineRepository.save(line);

@@ -2,14 +2,14 @@ package subway.domain.section;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.jdbc.Sql;
 import subway.domain.Section;
+import subway.domain.Sections;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,9 +44,9 @@ public class SectionAcceptanceTest {
                 .when().post("/lines/{id}/sections", 1).then().log().all().extract();
 
         //then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.jsonPath().getInt("sections[0].upStationId")).isEqualTo(1);
-        assertThat(response.jsonPath().getInt("sections[0].downStationId")).isEqualTo(2);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(response.body().jsonPath().getObject("sections", Sections.class).getSections().get(0).getUpStationId()).isEqualTo(1);
+        assertThat(response.body().jsonPath().getObject("sections", Sections.class).getSections().get(0).getDownStationId()).isEqualTo(2);
     }
 
     /**
@@ -122,7 +122,7 @@ public class SectionAcceptanceTest {
                 .extract();
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.jsonPath().getList("sections").contains(section)).isEqualTo(false);
+        assertThat(response.body().jsonPath().getObject("sections", Sections.class).getSections().contains(section)).isEqualTo(false);
     }
 
     /**
@@ -167,35 +167,5 @@ public class SectionAcceptanceTest {
                 .extract();
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
-    }
-
-    public static class StationApiTest {
-        public static ExtractableResponse<Response> 지하철역을_조회한다() {
-            return RestAssured.given().log().all()
-                    .contentType(ContentType.JSON)
-                    .when().get("/stations")
-                    .then().log().all()
-                    .extract();
-        }
-
-        public static ExtractableResponse<Response> 지하철역을_생성한다(String name) {
-            Map<String, String> param = new HashMap<>();
-            param.put("name", name);
-
-            return RestAssured.given().log().all()
-                    .contentType(ContentType.JSON)
-                    .body(param)
-                    .when().post("/stations")
-                    .then().log().all()
-                    .extract();
-        }
-
-        public static ExtractableResponse<Response> 지하철역을_삭제한다(Map<String, String> deleteStation) {
-            return RestAssured.given().log().all()
-                    .when().delete("/stations/{id}", deleteStation.get("id"))
-                    .then().statusCode(HttpStatus.NO_CONTENT.value())
-                    .log().all()
-                    .extract();
-        }
     }
 }

@@ -28,7 +28,7 @@ public class LineController {
     @PostMapping("/{id}/sections")
     public ResponseEntity<LineResponse> addSection(@PathVariable String id, @RequestBody SectionRequest sectionRequest) throws Exception {
         LineResponse line = lineService.addSection(id, sectionRequest);
-        return ResponseEntity.ok().body(line);
+        return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
 
     @DeleteMapping ("/{id}/sections")

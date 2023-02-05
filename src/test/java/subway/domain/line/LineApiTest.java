@@ -5,6 +5,7 @@ import io.restassured.http.ContentType;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import subway.domain.Section;
+import subway.domain.Sections;
 import subway.dto.LineResponse;
 
 import java.util.List;
@@ -62,8 +63,8 @@ public class LineApiTest {
     public static Section 지하철노선의_마지막_구간을_조회한다(int lineId) {
         var tempResponse = 지하철노선을_조회한다(lineId);
 
-        List<Section> sections = tempResponse.body().as(LineResponse.class).getSections();
-        Section section = sections.get(sections.size()-1);
+        Sections sections = tempResponse.body().as(LineResponse.class).getSections();
+        Section section = sections.getSections().get(sections.getSections().size()-1);
 
         return section;
     }
