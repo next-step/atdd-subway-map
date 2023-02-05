@@ -6,6 +6,7 @@ import subway.dto.domain.UpAndDownStationsDto;
 import subway.domain.line.Line;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Getter
 @NoArgsConstructor
@@ -34,4 +35,16 @@ public class Section {
         return sectionStations.getUpAndDownStations();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Section section = (Section) o;
+        return Objects.equals(getId(), section.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
+    }
 }
