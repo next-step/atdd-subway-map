@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public class SubwayLineRequest {
+public class LineRequest {
 
     private Long id;
     private String name;
@@ -15,7 +15,7 @@ public class SubwayLineRequest {
     private Integer distance;
 
 
-    public SubwayLineRequest(String name, String color, Long upStationId,
+    public LineRequest(String name, String color, Long upStationId,
         Long downStationId, Integer distance) {
         this.name = name;
         this.color = color;
@@ -25,14 +25,14 @@ public class SubwayLineRequest {
     }
 
 
-    private SubwayLineRequest(Long id, String name, String color) {
+    private LineRequest(Long id, String name, String color) {
         this.id = id;
         this.name = name;
         this.color = color;
     }
 
-    public static SubwayLineRequest of(Long id, String name, String color) {
-        return new SubwayLineRequest(id, name, color);
+    public static LineRequest of(Long id, String name, String color) {
+        return new LineRequest(id, name, color);
     }
 
 }

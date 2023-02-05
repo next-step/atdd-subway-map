@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-public class SubwayLine {
+public class Line {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,7 +33,7 @@ public class SubwayLine {
     private Integer distance;
 
 
-    public SubwayLine(String name, String color, Station upStationId,
+    public Line(String name, String color, Station upStationId,
         Station downStationId, Integer distance) {
         this.name = name;
         this.color = color;
@@ -42,9 +42,9 @@ public class SubwayLine {
         this.distance = distance;
     }
 
-    public void update(Long id, SubwayLineRequest subwayLineRequest) {
+    public void update(Long id, LineRequest lineRequest) {
         this.id = id;
-        this.name = subwayLineRequest.getName();
-        this.color = subwayLineRequest.getColor();
+        this.name = lineRequest.getName();
+        this.color = lineRequest.getColor();
     }
 }

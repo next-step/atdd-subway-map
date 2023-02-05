@@ -14,37 +14,37 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-public class SubwayLineController {
+public class LineController {
 
-    private final SubwayLineService subwayLineService;
+    private final LineService lineService;
 
     @PostMapping("/lines")
-    public ResponseEntity<SubwayLineResponse> createLine(
-        @RequestBody SubwayLineRequest subwayLineRequest) {
-        SubwayLineResponse subwayLineResponse = subwayLineService.saveLine(subwayLineRequest);
-        return ResponseEntity.created(URI.create("/lines/" + subwayLineResponse.getId()))
-            .body(subwayLineResponse);
+    public ResponseEntity<LineResponse> createLine(
+        @RequestBody LineRequest lineRequest) {
+        LineResponse lineResponse = lineService.saveLine(lineRequest);
+        return ResponseEntity.created(URI.create("/lines/" + lineResponse.getId()))
+            .body(lineResponse);
     }
 
     @GetMapping("/lines")
-    public ResponseEntity<List<SubwayLineResponse>> getSubwayLineList() {
-        return ResponseEntity.ok().body(subwayLineService.getSubwayLineList());
+    public ResponseEntity<List<LineResponse>> getSubwayLineList() {
+        return ResponseEntity.ok().body(lineService.getSubwayLineList());
     }
 
     @GetMapping("/lines/{id}")
-    public ResponseEntity<SubwayLineResponse> getSubwayLine(@PathVariable Long id) {
-        return ResponseEntity.ok().body(subwayLineService.getSubwayLine(id));
+    public ResponseEntity<LineResponse> getSubwayLine(@PathVariable Long id) {
+        return ResponseEntity.ok().body(lineService.getSubwayLine(id));
     }
 
     @PutMapping("/lines/{id}")
     public void modifySubwayLine(@PathVariable Long id,
-        @RequestBody SubwayLineRequest subwayLineRequest) {
-        subwayLineService.updateSubwayLine(id, subwayLineRequest);
+        @RequestBody LineRequest lineRequest) {
+        lineService.updateSubwayLine(id, lineRequest);
     }
 
     @DeleteMapping("/lines/{id}")
     public ResponseEntity<Void> deleteSubwayLine(@PathVariable Long id) {
-        subwayLineService.deleteSubwayLine(id);
+        lineService.deleteSubwayLine(id);
         return ResponseEntity.noContent().build();
     }
 

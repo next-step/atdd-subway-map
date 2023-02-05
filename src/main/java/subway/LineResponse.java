@@ -7,7 +7,7 @@ import java.util.stream.Stream;
 import lombok.Getter;
 
 @Getter
-public class SubwayLineResponse {
+public class LineResponse {
 
     private final Long id;
     private final String name;
@@ -16,7 +16,7 @@ public class SubwayLineResponse {
     private final List<StationResponse> stations;
 
 
-    public SubwayLineResponse(Long id, String name, String color, Integer distance,
+    public LineResponse(Long id, String name, String color, Integer distance,
         List<StationResponse> stations) {
         this.id = id;
         this.name = name;
@@ -25,11 +25,11 @@ public class SubwayLineResponse {
         this.stations = stations;
     }
 
-    public static SubwayLineResponse createSubwayLineResponse(SubwayLine subwayLine) {
+    public static LineResponse createSubwayLineResponse(Line line) {
 
-        return new SubwayLineResponse(subwayLine.getId(), subwayLine.getName(),
-            subwayLine.getColor(), subwayLine.getDistance(),
-            Stream.of(subwayLine.getUpStation(), subwayLine.getDownStation())
+        return new LineResponse(line.getId(), line.getName(),
+            line.getColor(), line.getDistance(),
+            Stream.of(line.getUpStation(), line.getDownStation())
                 .map(station -> new StationResponse(station.getId(), station.getName()))
                 .collect(Collectors.toUnmodifiableList()));
     }

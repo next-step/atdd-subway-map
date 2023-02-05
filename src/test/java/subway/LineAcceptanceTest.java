@@ -24,7 +24,7 @@ import org.springframework.test.context.jdbc.Sql;
 @DirtiesContext(classMode = BEFORE_EACH_TEST_METHOD)
 @Sql("/stations.sql")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class SubwayLineAcceptanceTest {
+public class LineAcceptanceTest {
 
     /**
      * When 지하철 노선을 생성하면
@@ -39,13 +39,14 @@ public class SubwayLineAcceptanceTest {
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        //todo : 생성한 노선찾기
         assertThat(response.jsonPath().getString("name")).contains("신분당선");
     }
 
 
-    private ExtractableResponse<Response> createSubwayLine(SubwayLineRequest subwayLineRequest) {
+    private ExtractableResponse<Response> createSubwayLine(LineRequest lineRequest) {
         return given().log().all()
-            .body(subwayLineRequest)
+            .body(lineRequest)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .when()
             .post("/lines")
@@ -62,7 +63,6 @@ public class SubwayLineAcceptanceTest {
             .then()
             .statusCode(HttpStatus.OK.value())
             .extract();
-//            .jsonPath().getList(".", SubwayLineResponse.class);
     }
 
     /**
@@ -83,7 +83,6 @@ public class SubwayLineAcceptanceTest {
 
         // then
         List<String> lineNames = response.jsonPath().getList("name", String.class);
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(lineNames).containsAnyOf(LINE_SHIN_BUN_DANG_REQUEST.getName(),
             LINE_TWO_REQUEST.getName());
     }
@@ -117,22 +116,22 @@ public class SubwayLineAcceptanceTest {
         ExtractableResponse<Response> getResponse = getSubwayLine(id);
 
         //then
-        assertThat(getResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
         String name = getResponse.jsonPath().getString("name");
         assertThat(name).isEqualTo(LINE_SHIN_BUN_DANG_REQUEST.getName());
 
     }
 
-    private ExtractableResponse<Response> updateSubwayLine(Long id) {
-        return RestAssured.given()
+    private void updateSubwayLine(Long id) {
+        RestAssured.given()
             .pathParam("id", id)
             .log().all()
-            .body(SubwayLineRequest.of(SubwayFixture.LINE_NEW_SHIN_BUN_DANG_REQUEST.getId(),
+            .body(LineRequest.of(SubwayFixture.LINE_NEW_SHIN_BUN_DANG_REQUEST.getId(),
                 SubwayFixture.LINE_NEW_SHIN_BUN_DANG_REQUEST.getName(),
                 SubwayFixture.LINE_NEW_SHIN_BUN_DANG_REQUEST.getColor()))
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .when().put("/lines/{id}")
-            .then().log().all()
+            .then().statusCode(HttpStatus.OK.value())
+            .log().all()
             .extract();
     }
 
@@ -149,10 +148,9 @@ public class SubwayLineAcceptanceTest {
             LINE_SHIN_BUN_DANG_REQUEST);
         //when
         Long id = createdResponse.jsonPath().getLong("id");
-        ExtractableResponse<Response> response = updateSubwayLine(id);
+        updateSubwayLine(id);
 
         //then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         String lineName = getSubwayLine(id).jsonPath().getString("name");
         assertThat(lineName).isEqualTo("새로운 신분당선");
     }

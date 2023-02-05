@@ -11,41 +11,41 @@ import subway.exception.ResourceNotFoundException;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class SubwayLineService {
+public class LineService {
 
-    private final SubwayLineRepository subwayLineRepository;
+    private final LineRepository subwayLineRepository;
     private final StationRepository stationRepository;
 
-    public SubwayLineResponse saveLine(SubwayLineRequest request) {
+    public LineResponse saveLine(LineRequest request) {
         Station upStation = stationRepository.findById(request.getUpStationId()).orElseThrow(
             ResourceNotFoundException::new);
         Station downStation = stationRepository.findById(request.getDownStationId()).orElseThrow(
             ResourceNotFoundException::new);
-        SubwayLine subwayLine = subwayLineRepository.save(
-            new SubwayLine(request.getName(), request.getColor(), upStation, downStation,
+        Line line = subwayLineRepository.save(
+            new Line(request.getName(), request.getColor(), upStation, downStation,
                 request.getDistance()));
 
-        return SubwayLineResponse.createSubwayLineResponse(subwayLine);
+        return LineResponse.createSubwayLineResponse(line);
     }
 
     @Transactional(readOnly = true)
-    public List<SubwayLineResponse> getSubwayLineList() {
-        List<SubwayLine> lines = subwayLineRepository.findAll();
-        return lines.stream().map(SubwayLineResponse::createSubwayLineResponse)
+    public List<LineResponse> getSubwayLineList() {
+        List<Line> lines = subwayLineRepository.findAll();
+        return lines.stream().map(LineResponse::createSubwayLineResponse)
             .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    public SubwayLineResponse getSubwayLine(Long id) {
-        SubwayLine subwayLine = subwayLineRepository.findById(id)
+    public LineResponse getSubwayLine(Long id) {
+        Line line = subwayLineRepository.findById(id)
             .orElseThrow(ResourceNotFoundException::new);
-        return SubwayLineResponse.createSubwayLineResponse(subwayLine);
+        return LineResponse.createSubwayLineResponse(line);
     }
 
-    public void updateSubwayLine(Long id, SubwayLineRequest subwayLineRequest) {
-        SubwayLine subwayLine = subwayLineRepository.findById(id)
+    public void updateSubwayLine(Long id, LineRequest lineRequest) {
+        Line line = subwayLineRepository.findById(id)
             .orElseThrow(ResourceNotFoundException::new);
-        subwayLine.update(id, subwayLineRequest);
+        line.update(id, lineRequest);
     }
 
     public void deleteSubwayLine(Long id) {
