@@ -10,7 +10,6 @@ import java.util.List;
 @Table(name = "lines")
 @Entity
 public class Line {
-    final int CANNOT_DELETE_SECTION_SIZE = 1;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -53,48 +52,9 @@ public class Line {
         return sections.get(sections.size() - 1).getDownStation();
     }
 
-    public Boolean validateSectionCreation(Long newUpStationId, Long newDownStationId) {
-        if(!equalsDownStation(newUpStationId)) {
-            return Boolean.FALSE;
-        }
-
-        if(alreadyInLine(newDownStationId)) {
-            return Boolean.FALSE;
-        }
-
-        return Boolean.TRUE;
-    }
-
-    public Boolean validateSectionDeletion(Long stationId) {
-        if(!equalsDownStation(stationId)) {
-            return Boolean.FALSE;
-        }
-
-        if(hasSingleSection()) {
-            return Boolean.FALSE;
-        }
-
-        return Boolean.TRUE;
-    }
-
     private void mustContainSection() {
         if (sections.isEmpty()) {
             throw new EntityNotFoundException("등록된 구간이 없습니다");
         }
-    }
-
-    private Boolean equalsDownStation(Long stationId) {
-        Long downStationId = this.getDownStation().getId();
-        return downStationId.equals(stationId);
-    }
-
-    private Boolean alreadyInLine(Long downStationId) {
-        return sections.stream()
-                .anyMatch((s) -> s.getUpStation().getId().equals(downStationId) ||
-                        s.getDownStation().getId().equals(downStationId));
-    }
-
-    private Boolean hasSingleSection() {
-        return getSections().size() == CANNOT_DELETE_SECTION_SIZE;
     }
 }

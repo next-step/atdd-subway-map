@@ -79,7 +79,7 @@ public class LineService {
 
         Line line = findOne(id);
 
-        if (!line.validateSectionCreation(upStationId, downStationId)) {
+        if (!validateSectionCreation(line, upStationId, downStationId)) {
             throw new IllegalArgumentException("등록할 수 없는 구간입니다");
         }
 
@@ -97,7 +97,7 @@ public class LineService {
     public void deleteSection(Long lineId, Long stationId) {
         Line line = findOne(lineId);
 
-        if(!line.validateSectionDeletion(stationId)) {
+        if(!validateSectionDeletion(line, stationId)) {
             throw new IllegalArgumentException("제거할 수 없는 구간입니다");
         }
 
@@ -119,4 +119,45 @@ public class LineService {
                 .stations(stationResponses)
                 .build();
     }
+
+    private Boolean validateSectionCreation(Line line, Long newUpStationId, Long newDownStationId) {
+        if(!equalsDownStation(line, newUpStationId)) {
+            return Boolean.FALSE;
+        }
+
+        if(alreadyInLine(line, newDownStationId)) {
+            return Boolean.FALSE;
+        }
+
+        return Boolean.TRUE;
+    }
+
+    public Boolean validateSectionDeletion(Line line, Long stationId) {
+        if(!equalsDownStation(line, stationId)) {
+            return Boolean.FALSE;
+        }
+
+        if(hasSingleSection(line)) {
+            return Boolean.FALSE;
+        }
+
+        return Boolean.TRUE;
+    }
+
+    private Boolean hasSingleSection(Line line) {
+        int CANNOT_DELETE_SECTION_SIZE = 1;
+        return line.getSections().size() == CANNOT_DELETE_SECTION_SIZE;
+    }
+
+    private Boolean equalsDownStation(Line line, Long stationId) {
+        Long downStationId = line.getDownStation().getId();
+        return downStationId.equals(stationId);
+    }
+
+    private Boolean alreadyInLine(Line line, Long downStationId) {
+        return line.getSections().stream()
+                .anyMatch((s) -> s.getUpStation().getId().equals(downStationId) ||
+                        s.getDownStation().getId().equals(downStationId));
+    }
+
 }
