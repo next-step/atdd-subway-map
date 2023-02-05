@@ -20,10 +20,12 @@ public class Line {
     @Column(nullable = false)
     private Long distance;
 
-    @OneToOne
+    @ManyToOne
+    @JoinColumn(name = "upStationId")
     private Station upStation;
 
-    @OneToOne
+    @ManyToOne
+    @JoinColumn(name = "downStationId")
     private Station downStation;
 
     public Line() {
