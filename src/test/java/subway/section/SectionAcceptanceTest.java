@@ -128,9 +128,9 @@ public class SectionAcceptanceTest {
     Long 기존_노선_하행역_ID = line.getDownStation().getId();
     Long 신규역아이디 = StationTestUtils.지하철역_생성(MockStation.신림역);
     SectionCreateRequest 서울2호선_하행선_구간_추가_요청 = new SectionCreateRequest(기존_노선_하행역_ID, 신규역아이디, 서울2호선_거리);
-    SectionTestUtils.노선에_구간_추가(line, 서울2호선_하행선_구간_추가_요청).jsonPath().getLong("id");
+    SectionTestUtils.노선에_구간_추가(line, 서울2호선_하행선_구간_추가_요청);
 
-    assertThrows(RuntimeException.class, () -> SectionTestUtils.노선에_구간_제거(line, line.getSection().get(0).getId()));
+    assertThrows(RuntimeException.class, () -> SectionTestUtils.노선에_구간_제거(line, line.getSections().get(0).getId()));
   }
 
   /**
@@ -144,7 +144,7 @@ public class SectionAcceptanceTest {
     Line line = LineTestUtils.역_과_노선_생성(LineCreateRequestDTO.서울2호선_노선_생성요청);
 
     assertThrows(RuntimeException.class,
-        () ->SectionTestUtils.노선에_구간_제거(line, line.getSection().get(0).getId())
+        () ->SectionTestUtils.노선에_구간_제거(line, line.getSections().get(0).getId())
     );
   }
 }

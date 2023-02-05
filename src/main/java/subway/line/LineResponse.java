@@ -31,6 +31,10 @@ public class LineResponse {
     );
   }
 
+  public Line toEntity() {
+    return new Line(name, color, upStation, downStation, distance);
+  }
+
   public Long getId() {
     return id;
   }

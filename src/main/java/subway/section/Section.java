@@ -37,6 +37,8 @@ public class Section {
     return distance;
   }
 
+  public Section() {}
+
   public Section(Station upStation, Station downStation, Long distance) {
     this.upStation = upStation;
     this.downStation = downStation;
