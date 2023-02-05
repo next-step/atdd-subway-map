@@ -1,5 +1,6 @@
 package subway.station;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -9,6 +10,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional(readOnly = true)
 public class StationService {
+
     private final StationRepository stationRepository;
 
     public StationService(StationRepository stationRepository) {

@@ -33,9 +33,9 @@ public class SectionAcceptanceTest {
   @DisplayName("지하철 구간 생성 테스트")
   void 노선_구간_생성_테스트() {
     // given
-    Long 신규역아이디 = StationTestUtils.지하철역_생성(MockStation.신림역);
     Line line = LineTestUtils.역_과_노선_생성(LineCreateRequestDTO.서울2호선_노선_생성요청);
     Long 기존_노선_하행역_ID = line.getDownStation().getId();
+    Long 신규역아이디 = StationTestUtils.지하철역_생성(MockStation.신림역);
 
     //when
     SectionCreateRequest request = new SectionCreateRequest(

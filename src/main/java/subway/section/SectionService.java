@@ -1,5 +1,6 @@
 package subway.section;
 
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.line.Line;
@@ -10,11 +11,11 @@ import subway.station.StationService;
 @Service
 public class SectionService {
 
+  private final SectionRepository sectionRepository;
   private final StationService stationService;
   private final LineService lineService;
-  private final SectionRepository sectionRepository;
 
-  public SectionService(StationService stationService, LineService lineService, SectionRepository sectionRepository) {
+  public SectionService(StationService stationService, @Lazy LineService lineService, SectionRepository sectionRepository) {
     this.stationService = stationService;
     this.lineService = lineService;
     this.sectionRepository = sectionRepository;
@@ -23,11 +24,15 @@ public class SectionService {
   @Transactional
   public SectionResponse createSection(Long lineId, SectionCreateRequest request) {
     Station upStation = stationService.findById(request.getUpStationId()).toEntity();
-    Station downStation = stationService.findById(request.getUpStationId()).toEntity();
+    Station downStation = stationService.findById(request.getDownStationId()).toEntity();
     Line line = lineService.showLine(lineId).get().toEntity();
 
     Section created = sectionRepository.save(new Section(upStation, downStation, request.getDistance()));
+
     line.addSection(created);
+
+    System.out.println("sectionService addSection");
+    System.out.println(line.getSections().size());
 
     return SectionResponse.of(created);
   }
