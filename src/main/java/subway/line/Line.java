@@ -54,4 +54,10 @@ public class Line {
     public Station getUpStation() {return upStation;}
 
     public Station getDownStation() {return downStation;}
+
+    public Line update(String name, String color) {
+        this.name = name;
+        this.color = color;
+        return this;
+    }
 }

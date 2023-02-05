@@ -3,6 +3,7 @@ package subway.line;
 import org.springframework.stereotype.Service;
 import subway.line.dto.LineDto;
 import subway.line.dto.LineResponse;
+import subway.line.dto.UpdateLineDto;
 import subway.station.Station;
 import subway.station.StationQuery;
 
@@ -13,10 +14,12 @@ import java.util.stream.Collectors;
 @Service
 public class LineService {
     private LineRepository lineRepository;
+    private LineQuery lineQuery;
     private StationQuery stationQuery;
 
-    public LineService(LineRepository lineRepository, StationQuery stationQuery) {
+    public LineService(LineRepository lineRepository, LineQuery lineQuery, StationQuery stationQuery) {
         this.lineRepository = lineRepository;
+        this.lineQuery = lineQuery;
         this.stationQuery = stationQuery;
     }
 
@@ -43,8 +46,14 @@ public class LineService {
                 .collect(Collectors.toList());
     }
 
-    public LineResponse findLine(Long id) {
-        return LineResponse.from(lineRepository.findById(id).get()); // TODO null일경우 exception 처리
+    public LineResponse findLine(Long lineId) {
+        return LineResponse.from(lineQuery.findById(lineId));
+    }
+
+    public LineResponse updateLine(Long lineId, UpdateLineDto updateLineDto) {
+        var line = lineQuery.findById(lineId);
+        var updatedLine = line.update(updateLineDto.getName(), updateLineDto.getColor());
+        return LineResponse.from(lineRepository.save(updatedLine));
     }
 
     private List<Station> queryStations(LineDto lineDto) {

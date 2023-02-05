@@ -2,9 +2,7 @@ package subway.line;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import subway.line.dto.LineDto;
-import subway.line.dto.LineRequest;
-import subway.line.dto.LineResponse;
+import subway.line.dto.*;
 
 import java.net.URI;
 import java.util.List;
@@ -31,6 +29,15 @@ public class LineController {
     @GetMapping("/{lineId}")
     public ResponseEntity<LineResponse> findLine(@PathVariable Long lineId) {
         LineResponse lineResponse = lineService.findLine(lineId);
+        return ResponseEntity.ok().body(lineResponse);
+    }
+
+    @PutMapping("/{lineId}")
+    public ResponseEntity<LineResponse> updateLine(
+            @PathVariable Long lineId,
+            @RequestBody UpdateLineRequest updateLineRequest
+    ) {
+        LineResponse lineResponse = lineService.updateLine(lineId, UpdateLineDto.from(updateLineRequest));
         return ResponseEntity.ok().body(lineResponse);
     }
 }
