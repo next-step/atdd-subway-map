@@ -70,10 +70,7 @@ public class LineService {
         Station downStation = stationQuery.findById(sectionDto.getDownStationId());
 
         Line line = lineQuery.findById(lineId);
-        return LineResponse.from(lineRepository.save(line.addSection(
-                upStation,
-                downStation,
-                sectionDto.getDistance()
-        )));
+        Line updatedLine = lineRepository.save(line.addSection(upStation, downStation, sectionDto.getDistance()));
+        return LineResponse.from(updatedLine);
     }
 }

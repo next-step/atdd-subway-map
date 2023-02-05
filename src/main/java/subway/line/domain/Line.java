@@ -11,7 +11,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToOne;
+import java.util.List;
 
 @Entity
 public class Line {
@@ -28,12 +28,6 @@ public class Line {
     @Column(nullable = false)
     private Long distance;
 
-    @OneToOne
-    private Station upStation;
-
-    @OneToOne
-    private Station downStation;
-
     @Embedded
     private Sections sections = new Sections();
 
@@ -44,8 +38,7 @@ public class Line {
         this.name = name;
         this.color = color;
         this.distance = distance;
-        this.upStation = upStation;
-        this.downStation = downStation;
+        this.sections = new Sections(List.of(new Section(upStation, downStation, distance)));
     }
 
     public Line update(String name, String color) {
@@ -59,11 +52,15 @@ public class Line {
             Station downStation,
             long distance
     ) {
-        Section section = new Section(this, upStation, downStation, distance);
+        Section section = new Section(upStation, downStation, distance);
         if (LineValidator.isValidate(this, section)) {
-            sections.addSection(section);
+            this.sections.addSection(section);
         }
         return this;
+    }
+
+    public List<Station> getAllStations() {
+        return sections.getAllStations();
     }
 
     public Long getId() {
@@ -83,11 +80,11 @@ public class Line {
     }
 
     public Station getUpStation() {
-        return upStation;
+        return sections.getUpStation();
     }
 
     public Station getDownStation() {
-        return downStation;
+        return sections.getDownStation();
     }
 
     public Sections getSections() {

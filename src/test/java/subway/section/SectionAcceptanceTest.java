@@ -12,9 +12,12 @@ import subway.line.presentation.CreateLineRequest;
 import subway.line.presentation.LineResponse;
 import subway.utils.RestAssuredClient;
 
+import java.util.List;
+
 import static subway.common.TestHelper.응답_코드가_일치한다;
 import static subway.line.LineFixtures.노선을_생성하고_노선_아이디를_반환한다;
 import static subway.line.LineFixtures.노선의_정보가_일치한다;
+import static subway.line.LineFixtures.노선이_해당_역을_정확히_포함한다;
 import static subway.station.StationFixtures.강남역_생성_요청;
 import static subway.station.StationFixtures.낙성대역_생성_요청;
 import static subway.station.StationFixtures.서울대입구역_생성_요청;
@@ -37,14 +40,14 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         super.setUp();
         강남역_아이디 = 지하철역을_생성한다(강남역_생성_요청);
         서울대입구역_아이디 = 지하철역을_생성한다(서울대입구역_생성_요청);
-        신논현역_아이디 = 지하철역을_생성한다(낙성대역_생성_요청);
-        낙성대역_아이디 = 지하철역을_생성한다(신논현역_생성_요청);
+        낙성대역_아이디 = 지하철역을_생성한다(낙성대역_생성_요청);
+        신논현역_아이디 = 지하철역을_생성한다(신논현역_생성_요청);
 
         신분당선_생성_요청 = new CreateLineRequest(
                 "신분당선",
                 LineFixtures.RED,
-                강남역_아이디,
                 서울대입구역_아이디,
+                강남역_아이디,
                 10L
         );
         이호선_생성_요청 = new CreateLineRequest(
@@ -52,22 +55,22 @@ public class SectionAcceptanceTest extends AcceptanceTest {
                 LineFixtures.BLUE,
                 신논현역_아이디,
                 낙성대역_아이디,
-                10L
+                1L
         );
-
-        신분당선_아이디 = 노선을_생성하고_노선_아이디를_반환한다(신분당선_생성_요청);
         이호선_아이디 = 노선을_생성하고_노선_아이디를_반환한다(이호선_생성_요청);
     }
 
     @Test
     void 노선에_구간을_등록한다() {
         // Given 노선에 구간을 등록하면
-        var downStationId = 강남역_아이디;
-        var upStationId = 서울대입구역_아이디;
+        // 서울대입구역 - 신논현역 - 강남역
+        var 노선_아이디 = 하행역이_강남역인_노선을_생성한다();
+        var upStationId = 강남역_아이디;
+        var downStationId = 신논현역_아이디;
         var distance = 10L;
 
         var response = RestAssuredClient.post(
-                Endpoints.sections(신분당선_아이디),
+                Endpoints.sections(노선_아이디),
                 new AddSectionRequest(
                         downStationId,
                         upStationId,
@@ -78,30 +81,62 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 
         // When 노선 조회 시
         var 신분당선_조회_응답 = RestAssuredClient.get(
-                Endpoints.endpointWithParam(Endpoints.LINES, 신분당선_아이디)
+                Endpoints.endpointWithParam(Endpoints.LINES, 노선_아이디)
         );
 
         // Then 등록된 구간이 조회된다.
-        // TODO, 등록된 모든 역이 보여야함.
         노선의_정보가_일치한다(
                 신분당선_조회_응답.as(LineResponse.class),
                 신분당선_생성_요청.getName(),
-                신분당선_생성_요청.getColor(),
-                신분당선_생성_요청.getUpStationId(),
-                신분당선_생성_요청.getDownStationId()
+                신분당선_생성_요청.getColor()
         );
+        노선이_해당_역을_정확히_포함한다(신분당선_조회_응답.as(LineResponse.class), List.of(서울대입구역_생성_요청.getName(), 강남역_생성_요청.getName(), 신논현역_생성_요청.getName()));
     }
 
     @Test
     void 구간_등록_시_하행역이_해당_노선에_등록되어있다면_예외를_던진다() {
         // When 노선에 등록된 역을 구간의 하행역으로 등록하면
         // Then 예외를 던진다.
+
+        var 노선_아이디 = 하행역이_강남역인_노선을_생성한다();
+
+        var upStationId = 강남역_아이디;
+        var downStationId = 서울대입구역_아이디;
+        var distance = 5L;
+
+        var response = RestAssuredClient.post(
+                Endpoints.sections(노선_아이디),
+                new AddSectionRequest(
+                        downStationId,
+                        upStationId,
+                        distance
+                )
+        );
+
+        응답_코드가_일치한다(response.statusCode(), HttpStatus.BAD_REQUEST);
     }
 
     @Test
     void 구간_등록_시_상행역과_하행역이_같다면_예외를_던진다() {
         // When 상행역과 하행역을 같은 역으로 등록하면
         // Then 예외를 던진다.
+
+        var 노선_아이디 = 하행역이_강남역인_노선을_생성한다();
+
+        var upStationId = 신논현역_아이디;
+        var downStationId = 신논현역_아이디;
+        var distance = 5L;
+
+        var response = RestAssuredClient.post(
+                Endpoints.sections(노선_아이디),
+                new AddSectionRequest(
+                        downStationId,
+                        upStationId,
+                        distance
+                )
+        );
+
+        응답_코드가_일치한다(response.statusCode(), HttpStatus.BAD_REQUEST);
     }
 
     @Test
@@ -109,6 +144,34 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         // Given 구간 등록 시
         // When 상행역이 해당 노선의 하행 종점역이 아니면
         // Then 예외를 던진다.
+
+        var 노선_아이디 = 하행역이_강남역인_노선을_생성한다();
+
+        var upStationId = 서울대입구역_아이디;
+        var downStationId = 신논현역_아이디;
+        var distance = 5L;
+
+        var response = RestAssuredClient.post(
+                Endpoints.sections(노선_아이디),
+                new AddSectionRequest(
+                        downStationId,
+                        upStationId,
+                        distance
+                )
+        );
+
+        응답_코드가_일치한다(response.statusCode(), HttpStatus.BAD_REQUEST);
+    }
+
+    private long 하행역이_강남역인_노선을_생성한다() {
+        신분당선_생성_요청 = new CreateLineRequest(
+                "신분당선",
+                LineFixtures.RED,
+                서울대입구역_아이디,
+                강남역_아이디,
+                10L
+        );
+        return 노선을_생성하고_노선_아이디를_반환한다(신분당선_생성_요청);
     }
 
     @Test

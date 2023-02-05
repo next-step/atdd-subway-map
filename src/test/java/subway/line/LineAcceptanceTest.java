@@ -86,8 +86,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 신분당선_응답,
                 "신분당선",
                 LineFixtures.RED,
-                강남역_아이디,
-                서울대입구역_아이디
+                List.of(강남역_아이디, 서울대입구역_아이디)
         );
     }
 
@@ -121,8 +120,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 신분당선_응답,
                 신분당선_생성_요청.getName(),
                 신분당선_생성_요청.getColor(),
-                신분당선_생성_요청.getUpStationId(),
-                신분당선_생성_요청.getDownStationId()
+                List.of(신분당선_생성_요청.getUpStationId(),
+                신분당선_생성_요청.getDownStationId())
         );
     }
 
@@ -149,8 +148,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 사호선_응답,
                 updateLineName,
                 updateColor,
-                신분당선_생성_요청.getUpStationId(),
-                신분당선_생성_요청.getDownStationId()
+                List.of(신분당선_생성_요청.getUpStationId(),
+                신분당선_생성_요청.getDownStationId())
         );
     }
 

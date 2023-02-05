@@ -2,7 +2,6 @@ package subway.station.application;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import subway.station.application.StationQuery;
 import subway.station.domain.Station;
 import subway.station.domain.StationRepository;
 import subway.station.presentation.StationRequest;
@@ -36,6 +35,7 @@ public class StationService {
 
     @Transactional
     public void deleteStationById(Long id) {
+
         stationRepository.deleteById(id);
     }
 

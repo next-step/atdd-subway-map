@@ -8,6 +8,8 @@ import subway.section.domain.Section;
 import subway.section.domain.Sections;
 import subway.station.domain.Station;
 
+import java.util.Objects;
+
 public class LineValidator {
     public static boolean isValidate(
             Line line,
@@ -15,7 +17,7 @@ public class LineValidator {
     ) {
         Sections lineSections = line.getSections();
         if (lineSections.isEmpty()) return true;
-        validateSectionUpStation(line.getUpStation(), section.getUpStation());
+        validateSectionUpStation(line.getDownStation(), section.getUpStation());
         validateLineContainsSectionDownStation(lineSections, section.getDownStation());
         validateDistance(line.getDistance(), section.getDistance());
         return true;
@@ -28,9 +30,9 @@ public class LineValidator {
     }
 
     private static void validateSectionUpStation(
-            Station lineUpStation,
+            Station lineDownStation,
             Station sectionUpStation) {
-        if (lineUpStation.getId() != sectionUpStation.getId()) {
+        if (!Objects.equals(lineDownStation.getId(), sectionUpStation.getId())) {
             throw new InvalidSectionUpStationException(sectionUpStation.getId());
         }
     }
