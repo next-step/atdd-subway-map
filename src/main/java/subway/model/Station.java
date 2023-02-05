@@ -19,8 +19,4 @@ public class Station {
         this.name = name;
     }
 
-    @ManyToOne
-    @JoinColumn(name = "LINE_ID")
-    private Line line;
-
 }

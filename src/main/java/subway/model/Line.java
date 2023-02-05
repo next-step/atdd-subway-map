@@ -5,8 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter
@@ -20,12 +18,16 @@ public class Line {
     private String name;
     private String color;
 
-    @OneToMany(mappedBy = "line")
-    private List<Station> stations = new ArrayList<>();
+    @OneToOne(fetch = FetchType.LAZY)
+    private Station upStation;
 
-    public Line(String name, String color, List<Station> stations) {
+    @OneToOne(fetch = FetchType.LAZY)
+    private Station downStation;
+
+    public Line(String name, String color, Station upStation, Station downStation) {
         this.name = name;
         this.color = color;
-        this.stations = stations;
+        this.upStation = upStation;
+        this.downStation = downStation;
     }
 }

@@ -5,11 +5,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
+import subway.dto.StationResponse;
 import subway.model.Line;
 import subway.model.Station;
 import subway.repository.LineRepository;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,7 +24,8 @@ public class LineService {
     private final StationService stationService;
 
     public List<LineResponse> findALlLines() {
-        return lineRepository.findAll().stream()
+        List<Line> list = lineRepository.findAll();
+        return list.stream()
                 .map(this::createLineResponse).collect(Collectors.toList());
     }
 
@@ -31,14 +33,19 @@ public class LineService {
     public LineResponse saveLine(LineRequest lineRequest) {
         Station upStation = stationService.findStationById(lineRequest.getUpStationId());
         Station downStation = stationService.findStationById(lineRequest.getDownStationId());
-        List<Station> stations = Arrays.asList(upStation, downStation);
-        Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor(), stations));
+        Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor(), upStation, downStation));
         return createLineResponse(line);
     }
 
 
     public LineResponse createLineResponse(Line line) {
-        return new LineResponse(line.getId(),line.getName(), line.getColor(), line.getStations().stream().map(stationService::createStationResponse).collect(Collectors.toList()));
+        List<StationResponse> list = new ArrayList<>();
+        StationResponse upStationResponse = stationService.createStationResponse(line.getUpStation());
+        StationResponse downStationResponse = stationService.createStationResponse(line.getDownStation());
+        list.add(upStationResponse);
+        list.add(downStationResponse);
+        return new LineResponse(line.getId(), line.getName(), line.getColor(), list);
     }
+
 
 }
