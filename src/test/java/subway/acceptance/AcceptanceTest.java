@@ -16,7 +16,7 @@ import static subway.common.util.RestAssuredBuilder.기본_헤더값_설정;
 
 @SpringBootTest(webEnvironment = DEFINED_PORT)
 @ActiveProfiles("acceptanceTest")
-class AcceptanceTest {
+public class AcceptanceTest {
 
     public static final String STATION_BASE_URL = "/stations";
     public static final String STATION_COMMAND_URL = STATION_BASE_URL + "/{stationId}";
@@ -89,6 +89,14 @@ class AcceptanceTest {
     public static ExtractableResponse<Response> 지하철_노선_삭제_요청(String lineId) {
         return given(기본_헤더값_설정()).log().all()
                 .when().delete(LINE_COMMAND_URL, lineId)
+                .then().log().all()
+                .extract();
+    }
+
+    public static ExtractableResponse<Response> 지하철_구간_생성_요청(String lineId, Map<String, String> responseBody) {
+        return given(기본_헤더값_설정()).log().all()
+                .body(responseBody)
+                .when().post(SECTION_BASE_URL, lineId)
                 .then().log().all()
                 .extract();
     }

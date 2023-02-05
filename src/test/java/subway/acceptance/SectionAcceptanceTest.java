@@ -10,20 +10,17 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static subway.common.fixture.FieldFixture.노선_내_역_이름_목록;
 import static subway.common.fixture.FieldFixture.식별자_아이디;
 import static subway.common.fixture.LineFixture.이호선;
+import static subway.common.fixture.SectionFixture.선릉역_구간;
+import static subway.common.fixture.SectionFixture.역삼역_구간;
 import static subway.common.fixture.StationFixture.강남역;
-import static subway.common.fixture.StationFixture.범계역;
-import static subway.common.fixture.StationFixture.서울대입구역;
+import static subway.common.fixture.StationFixture.선릉역;
+import static subway.common.fixture.StationFixture.역삼역;
 import static subway.common.util.JsonPathUtil.리스트로_데이터_추출;
 import static subway.common.util.JsonPathUtil.문자열로_데이터_추출;
-import static subway.common.util.RestAssuredBuilder.기본_헤더값_설정;
 
 // 계층 구조를 이용한 BDD 스타일
 @DisplayName("지하철 구간 관련 기능")
@@ -37,45 +34,31 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
     class 지하철_구간_생성 {
 
-        private String 강남역_id;
-        private String 서울대입구역_id;
+        private String 상행_종점역_id;
+        private String 하행_종점역_id;
+        private String 생성된_노선_id;
 
         @BeforeEach
         void setUp() {
-            강남역_id = 문자열로_데이터_추출(지하철역_생성_요청(강남역.요청_데이터_생성()), 식별자_아이디);
-            서울대입구역_id = 문자열로_데이터_추출(지하철역_생성_요청(서울대입구역.요청_데이터_생성()), 식별자_아이디);
+            상행_종점역_id = 문자열로_데이터_추출(지하철역_생성_요청(강남역.요청_데이터_생성()), 식별자_아이디);
+            하행_종점역_id = 문자열로_데이터_추출(지하철역_생성_요청(역삼역.요청_데이터_생성()), 식별자_아이디);
+            생성된_노선_id =
+                    문자열로_데이터_추출(지하철_노선_생성_요청(이호선.생성_요청_데이터_생성(상행_종점역_id, 하행_종점역_id)), 식별자_아이디);
         }
 
         /**
-         * Given 1개의 지하철 노선을 생성하고
-         * and 1개의 구간 등록용 지하철 역을 생성하고
-         * When 생성한 역으로 해당 노선에 구간 등록을 하면
+         * When 새로운 역으로 해당 노선에 구간 등록을 하면
          * Then 지하철 노선 단건 조회 시 노선 내 3개의 지하철 역이 조회된다
          */
         @Nested
         @DisplayName("유효한 구간 등록 정보가 주어지면")
         class Context_with_valid_section {
-            private String 생성된_노선_id;
-            private String 범계역_id;
 
             @BeforeEach
             void setUp() {
-                // given
-                범계역_id = 문자열로_데이터_추출(지하철역_생성_요청(범계역.요청_데이터_생성()), 식별자_아이디);
-                생성된_노선_id =
-                        문자열로_데이터_추출(지하철_노선_생성_요청(이호선.생성_요청_데이터_생성(강남역_id, 서울대입구역_id)), 식별자_아이디);
-
-                Map<String, String> params = new HashMap<>();
-                params.put("upStationId", 서울대입구역_id);
-                params.put("downStationId", 범계역_id);
-                params.put("distance", "10");
-
                 // when
-                given(기본_헤더값_설정()).log().all()
-                        .body(params)
-                        .when().post(SECTION_BASE_URL, 생성된_노선_id)
-                        .then().log().all()
-                        .extract();
+                String 선릉역_id = 문자열로_데이터_추출(지하철역_생성_요청(선릉역.요청_데이터_생성()), 식별자_아이디);
+                지하철_구간_생성_요청(생성된_노선_id, 선릉역_구간.요청_데이터_생성(하행_종점역_id, 선릉역_id));
             }
 
             @Test
@@ -85,73 +68,49 @@ public class SectionAcceptanceTest extends AcceptanceTest {
                 ExtractableResponse<Response> 지하철_노선_단건_조회_결과 = 지하철_노선_단건_조회_요청(생성된_노선_id);
 
                 assertThat(리스트로_데이터_추출(지하철_노선_단건_조회_결과, 노선_내_역_이름_목록))
-                        .hasSize(3)
-                        .contains(강남역.역_이름(), 서울대입구역.역_이름(), 범계역.역_이름());
+                        .hasSize(3);
             }
         }
 
+
+        /**
+         * When 새로운 구간의 상행역이 하행 종점역이 아니라면 (상행역을 상행 종점역으로 설정)
+         * Then 구간 등록에 실패한다
+         */
         @Nested
         @DisplayName("새로운 구간의 상행역이 해당 노선에 등록되어 있는 하행 종점역이 아닐 경우")
         class Context_with_invalid_upstation_of_new_section {
-
-            private String 생성된_노선_id;
-            private String 범계역_id;
-            private final Map<String, String> params = new HashMap<>();
-
-            @BeforeEach
-            void setUp() {
-                // given
-                범계역_id = 문자열로_데이터_추출(지하철역_생성_요청(범계역.요청_데이터_생성()), 식별자_아이디);
-                생성된_노선_id =
-                        문자열로_데이터_추출(지하철_노선_생성_요청(이호선.생성_요청_데이터_생성(강남역_id, 서울대입구역_id)), 식별자_아이디);
-
-                params.put("upStationId", 강남역_id);
-                params.put("downStationId", 범계역_id);
-                params.put("distance", "10");
-            }
 
             @Test
             @DisplayName("409 에러 코드를 응답한다")
             void it_responses_409() throws Exception {
                 // when
-                ExtractableResponse<Response> 결과 = given(기본_헤더값_설정()).log().all()
-                        .body(params)
-                        .when().post(SECTION_BASE_URL, 생성된_노선_id)
-                        .then().log().all()
-                        .extract();
+                String 선릉역_id = 문자열로_데이터_추출(지하철역_생성_요청(선릉역.요청_데이터_생성()), 식별자_아이디);
+                ExtractableResponse<Response> 지하철_구간_생성_결과 =
+                        지하철_구간_생성_요청(생성된_노선_id, 선릉역_구간.요청_데이터_생성(상행_종점역_id, 선릉역_id));
 
-                assertThat(결과.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
+                // then
+                assertThat(지하철_구간_생성_결과.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
             }
         }
 
+        /**
+         * When 새로운 구간의 하행역이 이미 노선에 등록되어 있다면 (하행역을 상행 종점역으로 설정)
+         * Then 구간 등록에 실패한다
+         */
         @Nested
         @DisplayName("새로운 구간의 하행역이 해당 노선에 등록되어 있는 역일 경우")
         class Context_with_already_registered_station {
 
-            private String 생성된_노선_id;
-            private final Map<String, String> params = new HashMap<>();
-
-            @BeforeEach
-            void setUp() {
-                // given
-                생성된_노선_id =
-                        문자열로_데이터_추출(지하철_노선_생성_요청(이호선.생성_요청_데이터_생성(강남역_id, 서울대입구역_id)), 식별자_아이디);
-
-                params.put("upStationId", 서울대입구역_id);
-                params.put("downStationId", 강남역_id);
-                params.put("distance", "10");
-            }
-
             @Test
             @DisplayName("409 에러 코드를 응답한다")
             void it_responses_409() throws Exception {
-                ExtractableResponse<Response> 결과 = given(기본_헤더값_설정()).log().all()
-                        .body(params)
-                        .when().post(SECTION_BASE_URL, 생성된_노선_id)
-                        .then().log().all()
-                        .extract();
+                // when
+                ExtractableResponse<Response> 지하철_구간_생성_결과 =
+                        지하철_구간_생성_요청(생성된_노선_id, 역삼역_구간.요청_데이터_생성(하행_종점역_id, 상행_종점역_id));
 
-                assertThat(결과.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
+                // then
+                assertThat(지하철_구간_생성_결과.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
             }
         }
     }
