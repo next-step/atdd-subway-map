@@ -20,6 +20,8 @@ import java.util.Map;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DisplayName("지하철노선 관리")
 @ActiveProfiles("acceptance")
@@ -78,17 +80,24 @@ public class LineAcceptanceTest {
     @Test
     void find_Line() {
         Long 이호선 = 지하철_노선_생성("이호선", "green", 강남역, 잠실역, 5L);
-        String name = 지하철_노선_조회(이호선);
-        assertThat(name).isEqualTo("이호선");
+        ExtractableResponse<Response> getResponse = 지하철_노선_조회(이호선);
+        assertAll(
+                () -> assertEquals(getResponse.statusCode(), HttpStatus.OK.value()),
+                () -> assertEquals(getResponse.jsonPath().get("name"), "이호선")
+        );
     }
 
     @DisplayName("지하철노선 수정 성공")
     @Test
     void modify_line() {
         Long 이호선 = 지하철_노선_생성("이호선", "green", 강남역, 잠실역, 5L);
-        지하철_노선_수정(이호선, "신분당선", "blue");
-        String name = 지하철_노선_조회(이호선);
-        assertThat(name).isEqualTo("신분당선");
+        ExtractableResponse<Response> putResponse = 지하철_노선_수정(이호선, "신분당선", "blue");
+        ExtractableResponse<Response> getResponse = 지하철_노선_조회(이호선);
+        assertAll(
+                () -> assertEquals(putResponse.statusCode(), HttpStatus.OK.value()),
+                () -> assertEquals(getResponse.statusCode(), HttpStatus.OK.value()),
+                () -> assertEquals(getResponse.jsonPath().get("name"), "이호선")
+        );
     }
 
     @DisplayName("지하철노선 삭제 성공")
@@ -110,7 +119,7 @@ public class LineAcceptanceTest {
                     .extract();
     }
 
-    private ExtractableResponse<Response> 지하철_노선_수정(Long id, String name, String color) {
+    ExtractableResponse<Response> 지하철_노선_수정(Long id, String name, String color) {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
         params.put("color", color);
@@ -122,12 +131,10 @@ public class LineAcceptanceTest {
                 .when()
                     .put("/lines/{id}")
                 .then().log().all()
-                    .assertThat()
-                    .statusCode(HttpStatus.OK.value())
                     .extract();
     }
 
-    private Long 지하철_노선_생성(String name, String color, Long upStationId, Long downStationId, Long distance) {
+    Long 지하철_노선_생성(String name, String color, Long upStationId, Long downStationId, Long distance) {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
         params.put("color", color);
@@ -157,15 +164,13 @@ public class LineAcceptanceTest {
                     .extract().jsonPath().getList("name", String.class);
     }
 
-    String 지하철_노선_조회(Long id) {
+    ExtractableResponse<Response> 지하철_노선_조회(Long id) {
         return given().log().all()
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
                     .pathParam("id", id)
                 .when()
                     .get("/lines/{id}")
                 .then().log().all()
-                    .assertThat()
-                    .statusCode(HttpStatus.OK.value())
-                    .extract().jsonPath().get("name");
+                    .extract();
     }
 }
