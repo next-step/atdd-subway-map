@@ -38,9 +38,9 @@ public class LineAcceptanceTest {
         ExtractableResponse<Response> response = createSubwayLine(LINE_SHIN_BUN_DANG_REQUEST);
 
         //then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        //todo : 생성한 노선찾기
         assertThat(response.jsonPath().getString("name")).contains("신분당선");
+        List<String> lineNames = getSubwayLines().jsonPath().getList("name", String.class);
+        assertThat(lineNames).containsAnyOf(LINE_SHIN_BUN_DANG_REQUEST.getName());
     }
 
 
