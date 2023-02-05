@@ -90,4 +90,8 @@ public class Line {
     public Sections getSections() {
         return sections;
     }
+
+    public void deleteSection(Station deleteStation) {
+        sections.deleteSection(deleteStation);
+    }
 }

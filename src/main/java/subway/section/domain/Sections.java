@@ -1,5 +1,6 @@
 package subway.section.domain;
 
+import subway.exception.CannotDeleteSectionException;
 import subway.exception.SectionNotFoundException;
 import subway.station.domain.Station;
 
@@ -61,11 +62,25 @@ public class Sections {
     }
 
     public Station getDownStation() {
+        Section lastSection = getLastSection();
+        return lastSection.getDownStation();
+    }
+
+    private Section getLastSection() {
         int size = sections.size();
         if (size < 1) {
             throw new SectionNotFoundException();
         }
-        Section lastSection = sections.get(size - 1);
-        return lastSection.getDownStation();
+        return sections.get(size - 1);
+    }
+
+    public void deleteSection(Station deleteStation) {
+        if (sections.size() == 1) {
+            throw new CannotDeleteSectionException("Line has only 1 section");
+        }
+        if (!getLastSection().isDownStation(deleteStation)) {
+            throw new CannotDeleteSectionException("Station that trying to delete is not downStation of this line.");
+        }
+        sections.remove(getLastSection());
     }
 }

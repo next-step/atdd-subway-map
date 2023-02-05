@@ -1,9 +1,13 @@
 package subway.section;
 
+import io.restassured.RestAssured;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 import subway.common.AcceptanceTest;
 import subway.common.Endpoints;
 import subway.line.LineFixtures;
@@ -20,28 +24,27 @@ import static subway.line.LineFixtures.노선의_정보가_일치한다;
 import static subway.line.LineFixtures.노선이_해당_역을_정확히_포함한다;
 import static subway.line.LineFixtures.노선이_해당_역을_포함하지_않는다;
 import static subway.station.StationFixtures.강남역_생성_요청;
-import static subway.station.StationFixtures.낙성대역_생성_요청;
 import static subway.station.StationFixtures.서울대입구역_생성_요청;
 import static subway.station.StationFixtures.신논현역_생성_요청;
 import static subway.station.StationFixtures.지하철역을_생성한다;
 
 @DisplayName("지하철 구간 관련 기능")
+@DirtiesContext
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class SectionAcceptanceTest extends AcceptanceTest {
     private long 강남역_아이디;
     private long 서울대입구역_아이디;
     private long 신논현역_아이디;
-    private long 낙성대역_아이디;
     private CreateLineRequest 신분당선_생성_요청;
-    private CreateLineRequest 이호선_생성_요청;
-    private long 신분당선_아이디;
-    private long 이호선_아이디;
+
+    @LocalServerPort
+    int port;
 
     @BeforeEach
     protected void setUp() {
-        super.setUp();
+        RestAssured.port = port;
         강남역_아이디 = 지하철역을_생성한다(강남역_생성_요청);
         서울대입구역_아이디 = 지하철역을_생성한다(서울대입구역_생성_요청);
-        낙성대역_아이디 = 지하철역을_생성한다(낙성대역_생성_요청);
         신논현역_아이디 = 지하철역을_생성한다(신논현역_생성_요청);
 
         신분당선_생성_요청 = new CreateLineRequest(
@@ -51,14 +54,6 @@ public class SectionAcceptanceTest extends AcceptanceTest {
                 강남역_아이디,
                 10L
         );
-        이호선_생성_요청 = new CreateLineRequest(
-                "2호선",
-                LineFixtures.BLUE,
-                신논현역_아이디,
-                낙성대역_아이디,
-                1L
-        );
-        이호선_아이디 = 노선을_생성하고_노선_아이디를_반환한다(이호선_생성_요청);
     }
 
     @Test
@@ -207,7 +202,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 
         var response = RestAssuredClient.delete(
                 Endpoints.sections(노선_아이디),
-              강남역_아이디
+                강남역_아이디
         );
         응답_코드가_일치한다(response.statusCode(), HttpStatus.BAD_REQUEST);
     }

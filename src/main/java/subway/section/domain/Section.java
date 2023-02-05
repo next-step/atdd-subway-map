@@ -4,6 +4,7 @@ import subway.station.domain.Station;
 
 import javax.persistence.Embeddable;
 import javax.persistence.ManyToOne;
+import java.util.Objects;
 
 @Embeddable
 public class Section {
@@ -39,5 +40,22 @@ public class Section {
 
     public Long getDistance() {
         return distance;
+    }
+
+    public boolean isDownStation(Station station) {
+       return Objects.equals(this.downStation, station);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Section section = (Section) o;
+        return Objects.equals(upStation, section.upStation) && Objects.equals(downStation, section.downStation) && Objects.equals(distance, section.distance);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(upStation, downStation, distance);
     }
 }

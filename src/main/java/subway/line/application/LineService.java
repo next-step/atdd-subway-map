@@ -73,4 +73,11 @@ public class LineService {
         Line updatedLine = lineRepository.save(line.addSection(upStation, downStation, sectionDto.getDistance()));
         return LineResponse.from(updatedLine);
     }
+
+    @Transactional
+    public void deleteSection(Long lineId, long stationId) {
+        Station deleteStation = stationQuery.findById(stationId);
+        Line line = lineQuery.findById(lineId);
+        line.deleteSection(deleteStation);
+    }
 }
