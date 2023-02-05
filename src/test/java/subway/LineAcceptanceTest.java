@@ -96,7 +96,7 @@ public class LineAcceptanceTest {
         assertAll(
                 () -> assertEquals(putResponse.statusCode(), HttpStatus.OK.value()),
                 () -> assertEquals(getResponse.statusCode(), HttpStatus.OK.value()),
-                () -> assertEquals(getResponse.jsonPath().get("name"), "이호선")
+                () -> assertEquals(getResponse.jsonPath().get("name"), "신분당선")
         );
     }
 
