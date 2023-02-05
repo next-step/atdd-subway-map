@@ -1,6 +1,7 @@
 package subway.line;
 
 import org.springframework.stereotype.Service;
+import subway.exception.SubwayNotFoundException;
 
 import java.util.List;
 
@@ -17,6 +18,7 @@ public class LineQuery {
     }
 
     public Line findById(Long id) {
-        return lineRepository.findById(id).get(); // TODO NullException 추가
+        return lineRepository.findById(id)
+                .orElseThrow(() -> new SubwayNotFoundException("Line not found with id, " + id));
     }
 }
