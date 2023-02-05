@@ -34,13 +34,14 @@ class SectionPersistenceRepository implements SectionCommandRepository, SectionL
     }
 
     @Override
+    public void deleteSection(Long id) {
+        sectionRepository.deleteById(id);
+    }
+
+    @Override
     public Section loadSection(Long sectionId) {
         SectionJpaEntity sectionJpaEntity = sectionRepository.findById(sectionId).orElseThrow(NotFoundSectionException::new);
-        Line line = lineLoadRepository.loadLine(sectionJpaEntity.getLineId().getId());
-        StationJpaEntity upStation = stationRepository.findById(sectionJpaEntity.getUpStationId().getId()).orElseThrow(NotFoundStationException::new);
-        StationJpaEntity downStation = stationRepository.findById(sectionJpaEntity.getDownStationId().getId()).orElseThrow(NotFoundStationException::new);
-
-        return mapper.entityToDomain(sectionJpaEntity, upStation, downStation, line);
+        return buildSection(sectionJpaEntity);
     }
 
     @Override
@@ -48,13 +49,25 @@ class SectionPersistenceRepository implements SectionCommandRepository, SectionL
         List<Section> sections = new ArrayList<>();
 
         sectionRepository.findByLineId(new LinePk(loadLineId)).forEach(sectionJpaEntity -> {
-            Line line = lineLoadRepository.loadLine(sectionJpaEntity.getLineId().getId());
-            StationJpaEntity upStation = stationRepository.findById(sectionJpaEntity.getUpStationId().getId()).orElseThrow(NotFoundStationException::new);
-            StationJpaEntity downStation = stationRepository.findById(sectionJpaEntity.getDownStationId().getId()).orElseThrow(NotFoundStationException::new);
-            sections.add(mapper.entityToDomain(sectionJpaEntity, upStation, downStation, line));
+            Section section = buildSection(sectionJpaEntity);
+            sections.add(section);
         });
 
         return sections;
+    }
+
+    @Override
+    public Section loadLineSectionWithLineId(Long lineId, Long sectionId) {
+        SectionJpaEntity sectionJpaEntity = sectionRepository.findByIdAndLineId(sectionId, new LinePk(lineId)).orElseThrow(NotFoundSectionException::new);
+        return buildSection(sectionJpaEntity);
+    }
+
+    private Section buildSection(SectionJpaEntity sectionJpaEntity) {
+        Line line = lineLoadRepository.loadLine(sectionJpaEntity.getLineId().getId());
+        StationJpaEntity upStation = stationRepository.findById(sectionJpaEntity.getUpStationId().getId()).orElseThrow(NotFoundStationException::new);
+        StationJpaEntity downStation = stationRepository.findById(sectionJpaEntity.getDownStationId().getId()).orElseThrow(NotFoundStationException::new);
+
+        return mapper.entityToDomain(sectionJpaEntity, upStation, downStation, line);
     }
 
 }
