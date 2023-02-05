@@ -1,5 +1,8 @@
 package subway.dto;
 
+import subway.domain.Line;
+import subway.domain.Station;
+
 public class LineRequest {
 
     private String name;
@@ -39,5 +42,15 @@ public class LineRequest {
     public static LineRequest of(
             String name, String color, Long upStationId, Long downStationId, Long distance) {
         return new LineRequest(name, color, upStationId, downStationId, distance);
+    }
+
+    public Line toEntity(Station upStation, Station downStation) {
+        return new Line(
+                this.name,
+                this.color,
+                upStation,
+                downStation,
+                this.distance
+        );
     }
 }

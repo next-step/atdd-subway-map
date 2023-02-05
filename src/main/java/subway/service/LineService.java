@@ -33,30 +33,12 @@ public class LineService {
 
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
-        validateStationsExist(lineRequest);
+        Station upStation = stationRepository.findById(lineRequest.getUpStationId()).orElseThrow(StationNotFoundException::new);
+        Station downStation = stationRepository.findById(lineRequest.getDownStationId()).orElseThrow(StationNotFoundException::new);
 
-        Line line = lineRepository.save(new Line(
-                lineRequest.getName(),
-                lineRequest.getColor(),
-                lineRequest.getUpStationId(),
-                lineRequest.getDownStationId(),
-                lineRequest.getDistance()));
+        Line line = lineRepository.save(lineRequest.toEntity(upStation, downStation));
 
         return createLineResponse(line);
-    }
-
-    private void validateStationsExist(LineRequest lineRequest) {
-        Long downStationId = lineRequest.getDownStationId();
-        Long upStationId = lineRequest.getUpStationId();
-        validateStations(downStationId, upStationId);
-
-        if (stationsNotExist(downStationId, upStationId)) {
-            throw new StationNotFoundException();
-        }
-    }
-
-    private boolean stationsNotExist(Long downStationId, Long upStationId) {
-        return (!stationRepository.existsById(downStationId)||!stationRepository.existsById(upStationId));
     }
 
     public List<LineResponse> findAllLines() {

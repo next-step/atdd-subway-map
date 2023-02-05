@@ -2,10 +2,10 @@ package subway.domain;
 
 import subway.exception.StationNotFoundException;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+
+import static javax.persistence.CascadeType.PERSIST;
+import static javax.persistence.FetchType.LAZY;
 
 @Entity
 public class Line {
@@ -17,9 +17,13 @@ public class Line {
 
     private String color;
 
-    private Long upStationId;
+    @ManyToOne(fetch = LAZY, cascade = PERSIST)
+    @JoinColumn(name = "upStation_id")
+    private Station upStation;
 
-    private Long downStationId;
+    @ManyToOne(fetch = LAZY, cascade = PERSIST)
+    @JoinColumn(name = "downStation_id")
+    private Station downStation;
 
     private Long distance;
 
@@ -39,23 +43,23 @@ public class Line {
         return color;
     }
 
-    public Long getUpStationId() {
-        return upStationId;
+    public Station getUpStation() {
+        return upStation;
     }
 
-    public Long getDownStationId() {
-        return downStationId;
+    public Station getDownStation() {
+        return downStation;
     }
 
     public Long getDistance() {
         return distance;
     }
 
-    public Line(String name, String color, Long upStationId, Long downStationId, Long distance) {
+    public Line(String name, String color, Station upStation, Station downStation, Long distance) {
         this.name = name;
         this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
+        this.upStation = upStation;
+        this.downStation = downStation;
         this.distance = distance;
     }
 
@@ -68,5 +72,13 @@ public class Line {
     public void update(String name, String color) {
         this.name = name;
         this.color =color;
+    }
+
+    public Long getUpStationId() {
+        return upStation.getId();
+    }
+
+    public Long getDownStationId() {
+        return downStation.getId();
     }
 }
