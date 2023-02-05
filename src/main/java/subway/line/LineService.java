@@ -57,7 +57,7 @@ public class LineService {
     }
 
     private List<Station> queryStations(LineDto lineDto) {
-        return stationQuery.findStationByIdIn(
+        return stationQuery.findByIds(
                 List.of(lineDto.getUpStationId(), lineDto.getDownStationId())
         );
     }

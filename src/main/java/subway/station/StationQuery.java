@@ -10,7 +10,7 @@ public class StationQuery {
 
     public StationQuery(StationRepository stationRepository) { this.stationRepository = stationRepository; }
 
-    public List<Station> findStationByIdIn(List<Long> ids) {
-        return stationRepository.findAllById(ids);  // TODO CustomException 추가
+    public List<Station> findByIds(List<Long> ids) {
+        return stationRepository.findAllById(ids);
     }
 }
