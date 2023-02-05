@@ -20,14 +20,17 @@ public class SectionController {
         this.sectionLoadUseCase = sectionLoadUseCase;
     }
 
-    @RequestMapping(value = "/lines/{lineId}/sections")
+    @PostMapping(value = "/lines/{lineId}/sections")
     public ResponseEntity<SectionResponse> createSection(@PathVariable Long lineId, @RequestBody SectionCreateRequest sectionCreateRequest) {
         Long sectionId = sectionCommandUseCase.createSection(sectionCreateRequest.toDto(lineId));
         Section section = sectionLoadUseCase.loadSection(sectionId);
         return ResponseEntity.status(HttpStatus.CREATED).body(SectionResponse.from(section));
     }
 
-
+    @DeleteMapping(value = "/lines/{lineId}/sections")
+    public ResponseEntity<Void> deleteStation(@PathVariable Long lineId, @RequestParam Long sectionId) {
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
 
     @GetMapping(value = "/sections/{sectionId}")
     public ResponseEntity<SectionResponse> loadSection(@PathVariable Long sectionId) {
