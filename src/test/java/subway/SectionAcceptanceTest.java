@@ -160,44 +160,6 @@ class SectionAcceptanceTest extends BaseAcceptance {
         assertThat(actualResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
-    private List<SectionResponse> 지하철_노선의_구간들_조회_요청(LineLoadDtoResponse lineLoadDtoResponse) {
-        ExtractableResponse<Response> response = RestAssured.given().spec(REQUEST_SPEC).log().all()
-            .pathParam("lineId", lineLoadDtoResponse.getId())
-            .when().get("/lines/{lineId}/sections")
-            .then().log().all()
-            .extract();
-
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-
-        return response.jsonPath().getList(".", SectionResponse.class);
-    }
-
-    private void 노선에_구간이_제거_된_걸_확인_할_수_있다(LineLoadDtoResponse lineResponse) {
-        LineLoadDtoResponse response = 지하철_노선_조회(lineResponse.getId()).as(LineLoadDtoResponse.class);
-
-        assertThat(response.getStations().size()).isEqualTo(2L);
-        assertThat(response.getStations()).containsExactlyInAnyOrderElementsOf(List.of(강남역, 논현역));
-    }
-
-    private ExtractableResponse<Response> 지하철_구간_제거_요청(LineLoadDtoResponse lineDto, SectionResponse sectionResponse) {
-        ExtractableResponse<Response> response = RestAssured.given().spec(REQUEST_SPEC).log().all()
-            .pathParam("lineId", lineDto.getId())
-            .param("sectionId", sectionResponse.getId())
-            .when().delete("/lines/{lineId}/sections")
-            .then().log().all()
-            .extract();
-
-        return response;
-    }
-
-    private void 지하철_구간_등록하려는_하행역은_해당_노선에_등록되어있는_역일_수_없다(ExtractableResponse<Response> actualResponse) {
-        assertThat(actualResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
-    }
-
-    private void 지하철_구간_등록하려는_상행역이_기존_하행역이_아니다(ExtractableResponse<Response> actualSection) {
-        assertThat(actualSection.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
-    }
-
     private static ExtractableResponse<Response> 지하철_구간_목록_요청(SectionResponse givenSection) {
         ExtractableResponse<Response> sectionResponse = RestAssured.given().spec(REQUEST_SPEC).log().all()
             .pathParam("sectionId", givenSection.getId())
@@ -241,6 +203,43 @@ class SectionAcceptanceTest extends BaseAcceptance {
         assertThat(actualSection.as(SectionResponse.class)).isEqualTo(givenSection);
     }
 
+    private List<SectionResponse> 지하철_노선의_구간들_조회_요청(LineLoadDtoResponse lineLoadDtoResponse) {
+        ExtractableResponse<Response> response = RestAssured.given().spec(REQUEST_SPEC).log().all()
+            .pathParam("lineId", lineLoadDtoResponse.getId())
+            .when().get("/lines/{lineId}/sections")
+            .then().log().all()
+            .extract();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        return response.jsonPath().getList(".", SectionResponse.class);
+    }
+
+    private void 노선에_구간이_제거_된_걸_확인_할_수_있다(LineLoadDtoResponse lineResponse) {
+        LineLoadDtoResponse response = 지하철_노선_조회(lineResponse.getId()).as(LineLoadDtoResponse.class);
+
+        assertThat(response.getStations()).hasSize(2);
+        assertThat(response.getStations()).containsExactlyInAnyOrderElementsOf(List.of(강남역, 논현역));
+    }
+
+    private ExtractableResponse<Response> 지하철_구간_제거_요청(LineLoadDtoResponse lineDto, SectionResponse sectionResponse) {
+        ExtractableResponse<Response> response = RestAssured.given().spec(REQUEST_SPEC).log().all()
+            .pathParam("lineId", lineDto.getId())
+            .param("sectionId", sectionResponse.getId())
+            .when().delete("/lines/{lineId}/sections")
+            .then().log().all()
+            .extract();
+
+        return response;
+    }
+
+    private void 지하철_구간_등록하려는_하행역은_해당_노선에_등록되어있는_역일_수_없다(ExtractableResponse<Response> actualResponse) {
+        assertThat(actualResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    }
+
+    private void 지하철_구간_등록하려는_상행역이_기존_하행역이_아니다(ExtractableResponse<Response> actualSection) {
+        assertThat(actualSection.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    }
     private LineLoadDtoResponse 지하철_노선_생성(String lineName, StationResponse upStation, StationResponse downStation) {
         LineCreateRequest givenRequest = new LineCreateRequest(lineName, "bg-red-600", upStation.getId(), downStation.getId(), 10L);
 

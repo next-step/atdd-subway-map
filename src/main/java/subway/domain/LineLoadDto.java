@@ -31,5 +31,5 @@ public class LineLoadDto {
     public List<Station> getStations() {
         return stations;
     }
-    
+
 }

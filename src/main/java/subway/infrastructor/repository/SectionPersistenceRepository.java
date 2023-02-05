@@ -34,8 +34,8 @@ class SectionPersistenceRepository implements SectionCommandRepository, SectionL
     }
 
     @Override
-    public void deleteSection(Long id) {
-        sectionRepository.deleteById(id);
+    public void deleteSection(Section section) {
+        sectionRepository.delete(mapper.domainToEntityWithId(section));
     }
 
     @Override

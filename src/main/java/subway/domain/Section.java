@@ -1,5 +1,7 @@
 package subway.domain;
 
+import subway.application.domain.IllegalMinSizeDeleteSectionException;
+
 import java.util.List;
 import java.util.Objects;
 
@@ -45,6 +47,18 @@ public class Section {
 
         if (lineSections.stream().anyMatch(section -> section.hasStation(downStation))) {
             throw new AlreadyRegisteredDownStation();
+        }
+    }
+
+    public void delete(List<Section> sections) {
+        if (sections.size() == 1) {
+            throw new IllegalMinSizeDeleteSectionException();
+        }
+
+        Section lastSection = sections.get(sections.size() - 1);
+
+        if (!lastSection.equals(this)) {
+            throw new NotDownStationWhenDeleteSectionException();
         }
     }
 

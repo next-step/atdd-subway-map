@@ -6,7 +6,10 @@ import subway.application.service.input.LineLoadUseCase;
 import subway.application.service.input.SectionCommandUseCase;
 import subway.application.service.output.SectionCommandRepository;
 import subway.application.service.output.SectionLoadRepository;
-import subway.domain.*;
+import subway.domain.Line;
+import subway.domain.Section;
+import subway.domain.SectionCreateDto;
+import subway.domain.Station;
 
 import java.util.List;
 
@@ -31,25 +34,21 @@ public class SectionCommandService implements SectionCommandUseCase {
         Line line = lineLoadUseCase.loadLine(sectionCreateDto.getLineId());
         Station upStation = stationService.findStation(sectionCreateDto.getUpStationId());
         Station newDownStation = stationService.findStation(sectionCreateDto.getDownStationId());
-        Long distance = sectionCreateDto.getDistance();
-
         List<Section> lineSections = sectionLoadRepository.loadLineSection(line.getId());
+
+        Long distance = sectionCreateDto.getDistance();
         Section section = Section.make(line, upStation, newDownStation, distance, lineSections);
         return sectionCommandRepository.createSection(section);
-
     }
 
     @Override
     public void deleteLineSection(Long lineId, Long sectionId) {
         Section section = sectionLoadRepository.loadLineSectionWithLineId(lineId, sectionId);
         List<Section> sections = sectionLoadRepository.loadLineSection(lineId);
-        Section lastSection = sections.get(sections.size() - 1);
 
-        if (!lastSection.equals(section)) {
-            throw new NotDownStationWhenDeleteSectionException();
-        }
+        section.delete(sections);
 
-        sectionCommandRepository.deleteSection(section.getId());
+        sectionCommandRepository.deleteSection(section);
     }
 
 }

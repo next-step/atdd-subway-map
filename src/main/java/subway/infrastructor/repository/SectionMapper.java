@@ -8,6 +8,15 @@ import subway.domain.Station;
 @Component
 public class SectionMapper {
 
+    SectionJpaEntity domainToEntityWithId(Section section) {
+        return new SectionJpaEntity(
+            section.getId(),
+            new StationPk(section.getUpStation().getId()),
+            new StationPk(section.getDownStation().getId()),
+            section.getDistance(),
+            new LinePk(section.getLine().getId()));
+    }
+
     SectionJpaEntity domainToEntity(Section section) {
         return new SectionJpaEntity(
             new StationPk(section.getUpStation().getId()),

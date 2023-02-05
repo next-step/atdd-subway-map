@@ -28,6 +28,14 @@ public class SectionJpaEntity {
     protected SectionJpaEntity() {
     }
 
+    public SectionJpaEntity(Long id, StationPk upStationId, StationPk downStationId, Long distance, LinePk lineId) {
+        this.id = id;
+        this.upStationId = upStationId;
+        this.downStationId = downStationId;
+        this.distance = distance;
+        this.lineId = lineId;
+    }
+
     public SectionJpaEntity(StationPk upStationId, StationPk downStationId, Long distance, LinePk lineId) {
         this.upStationId = upStationId;
         this.downStationId = downStationId;

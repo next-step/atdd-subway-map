@@ -2,7 +2,6 @@ package subway.infrastructor.repository;
 
 import org.springframework.stereotype.Component;
 import subway.domain.Line;
-import subway.domain.Station;
 
 @Component
 class LineMapper {
