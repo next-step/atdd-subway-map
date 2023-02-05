@@ -52,7 +52,7 @@ public class LineAcceptanceTest {
      */
     @Test
     void createStationLine() {
-        ExtractableResponse<Response> response = StationUtils.createStationLine(SIN_BUN_DANG_STATION_LINE);
+        ExtractableResponse<Response> response = StationUtils.createLine(SIN_BUN_DANG_STATION_LINE);
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response.header("Location")).isEqualTo("/lines/1");
@@ -73,8 +73,8 @@ public class LineAcceptanceTest {
      */
     @Test
     void selectStationLineList() {
-        StationUtils.createStationLine(SIN_BUN_DANG_STATION_LINE);
-        StationUtils.createStationLine(ONE_STATION_LINE);
+        StationUtils.createLine(SIN_BUN_DANG_STATION_LINE);
+        StationUtils.createLine(ONE_STATION_LINE);
 
         ExtractableResponse<Response> response =
                 RestAssured
@@ -99,7 +99,7 @@ public class LineAcceptanceTest {
      */
     @Test
     void selectStationLine() {
-        StationUtils.createStationLine(SIN_BUN_DANG_STATION_LINE);
+        StationUtils.createLine(SIN_BUN_DANG_STATION_LINE);
 
         ExtractableResponse<Response> response =
                 RestAssured
@@ -124,7 +124,7 @@ public class LineAcceptanceTest {
      */
     @Test
     void updateStationLine() {
-        StationUtils.createStationLine(SIN_BUN_DANG_STATION_LINE);
+        StationUtils.createLine(SIN_BUN_DANG_STATION_LINE);
 
         Map<String, Object> body = new HashMap<>();
         body.put("name", ONE_LINE_NAME);
@@ -138,7 +138,7 @@ public class LineAcceptanceTest {
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
-        JsonPath jsonPath = StationUtils.selectStationLine(1L).jsonPath();
+        JsonPath jsonPath = StationUtils.selectLine(1L).jsonPath();
 
         assertThat(jsonPath.getString("name")).isEqualTo(ONE_LINE_NAME);
         assertThat(jsonPath.getString("color")).isEqualTo(LINE_BLUE);
@@ -151,7 +151,7 @@ public class LineAcceptanceTest {
      */
     @Test
     void deleteStationLine() {
-        StationUtils.createStationLine(SIN_BUN_DANG_STATION_LINE);
+        StationUtils.createLine(SIN_BUN_DANG_STATION_LINE);
 
         ExtractableResponse<Response> response =
                 RestAssured
@@ -160,7 +160,7 @@ public class LineAcceptanceTest {
                         .then().log().all().extract();
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-        assertThat(StationUtils.selectStationLine(1).statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertThat(StationUtils.selectLine(1).statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
 }

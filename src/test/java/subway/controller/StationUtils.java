@@ -58,28 +58,28 @@ public class StationUtils {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> createStationLine(Map<String, Object> body) {
+    public static ExtractableResponse<Response> createLine(Map<String, Object> body) {
         return RestAssured
                 .given().spec(getRequestSpecification()).body(body)
                 .when().post("/lines")
                 .then().extract();
     }
 
-    public static ExtractableResponse<Response> selectStationLine(long stationLineId) {
+    public static ExtractableResponse<Response> selectLine(long stationLineId) {
         return RestAssured
                 .given().spec(getRequestSpecification())
                 .when().get("/lines/" + stationLineId)
                 .then().extract();
     }
 
-    public static ExtractableResponse<Response> createStationSection(Map<String, Object> body) {
+    public static ExtractableResponse<Response> extendLine(Map<String, Object> body) {
         return RestAssured
                 .given().spec(getRequestSpecification()).body(body).log().all()
                 .when().post("/lines/1/sections")
                 .then().log().all().extract();
     }
 
-    public static ExtractableResponse<Response> deleteStationSection(long stationId) {
+    public static ExtractableResponse<Response> reduceLine(long stationId) {
         return RestAssured
                 .given().spec(getRequestSpecification()).log().all()
                 .when().delete("/lines/1/sections?stationId=" + stationId)

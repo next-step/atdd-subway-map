@@ -35,12 +35,12 @@ public class StationSectionAcceptanceTest {
         SIN_BUN_DANG_STATION_LINE.put("downStationId", 2L);
         SIN_BUN_DANG_STATION_LINE.put("distance", 10);
 
-        StationUtils.createStationLine(SIN_BUN_DANG_STATION_LINE);
+        StationUtils.createLine(SIN_BUN_DANG_STATION_LINE);
 
         Map<String, Object> body = new HashMap<>();
         body.put("upStationId", 2L);
         body.put("downStationId", 3L);
-        StationUtils.createStationSection(body);
+        StationUtils.extendLine(body);
     }
 
 
@@ -55,11 +55,11 @@ public class StationSectionAcceptanceTest {
         Map<String, Object> body = new HashMap<>();
         body.put("upStationId", 3);
         body.put("downStationId", 4);
-        ExtractableResponse<Response> response = StationUtils.createStationSection(body);
+        ExtractableResponse<Response> response = StationUtils.extendLine(body);
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
-        JsonPath jsonPath = StationUtils.selectStationLine(1L).jsonPath();
+        JsonPath jsonPath = StationUtils.selectLine(1L).jsonPath();
 
         assertThat(jsonPath.getLong("id")).isEqualTo(1L);
         assertThat(jsonPath.getString("name")).isEqualTo(SIN_BUN_DANG_LINE_NAME);
@@ -78,7 +78,7 @@ public class StationSectionAcceptanceTest {
         Map<String, Object> body = new HashMap<>();
         body.put("upStationId", 2);
         body.put("downStationId", 4);
-        ExtractableResponse<Response> response = StationUtils.createStationSection(body);
+        ExtractableResponse<Response> response = StationUtils.extendLine(body);
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(response.body().asString()).contains("새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 한다");
@@ -96,7 +96,7 @@ public class StationSectionAcceptanceTest {
         Map<String, Object> body = new HashMap<>();
         body.put("upStationId", 4);
         body.put("downStationId", 1);
-        ExtractableResponse<Response> response = StationUtils.createStationSection(body);
+        ExtractableResponse<Response> response = StationUtils.extendLine(body);
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(response.body().asString()).contains("새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없다");
@@ -111,10 +111,10 @@ public class StationSectionAcceptanceTest {
      */
     @Test
     void deleteStationSection() {
-        ExtractableResponse<Response> response = StationUtils.deleteStationSection(3L);
+        ExtractableResponse<Response> response = StationUtils.reduceLine(3L);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
-        JsonPath jsonPath = selectStationLine(1L).jsonPath();
+        JsonPath jsonPath = selectLine(1L).jsonPath();
         assertThat(jsonPath.getLong("downStationId")).isEqualTo(2L);
     }
 
@@ -127,11 +127,11 @@ public class StationSectionAcceptanceTest {
      */
     @Test
     void deleteStationSectionError1() {
-        ExtractableResponse<Response> response1 = StationUtils.deleteStationSection(1L);
+        ExtractableResponse<Response> response1 = StationUtils.reduceLine(1L);
         assertThat(response1.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(response1.body().asString()).contains("마지막 구간만 제거할 수 있다");
 
-        ExtractableResponse<Response> response2 = StationUtils.deleteStationSection(2L);
+        ExtractableResponse<Response> response2 = StationUtils.reduceLine(2L);
         assertThat(response2.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(response2.body().asString()).contains("마지막 구간만 제거할 수 있다");
     }
@@ -154,9 +154,9 @@ public class StationSectionAcceptanceTest {
         ONE_STATION_LINE.put("downStationId", 6L);
         ONE_STATION_LINE.put("distance", 20);
 
-        StationUtils.createStationLine(ONE_STATION_LINE);
+        StationUtils.createLine(ONE_STATION_LINE);
 
-        ExtractableResponse<Response> response = StationUtils.deleteStationSection(5L);
+        ExtractableResponse<Response> response = StationUtils.reduceLine(5L);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(response.body().asString()).contains("지하철 노선에 상행 종점역과 하행 종점역만 있는 경우");
     }
