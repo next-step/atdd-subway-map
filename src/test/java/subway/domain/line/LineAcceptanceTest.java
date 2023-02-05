@@ -6,7 +6,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.util.ArrayList;
@@ -14,14 +13,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD;
 import static subway.common.SetupTest.*;
 import static subway.common.LineApiTest.*;
 
 @DisplayName("지하철 노선을 관리한다.")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@DirtiesContext(classMode = BEFORE_EACH_TEST_METHOD)
-@Sql("/setup-station.sql")
+@Sql("/setup-data.sql")
 public class LineAcceptanceTest {
 
     /**

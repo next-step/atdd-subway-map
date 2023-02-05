@@ -6,21 +6,18 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
 import subway.domain.Section;
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD;
 import static subway.common.LineApiTest.지하철노선의_마지막_구간을_조회한다;
 import static subway.common.SetupTest.*;
 
 @DisplayName("지하철구간 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@DirtiesContext(classMode = BEFORE_EACH_TEST_METHOD)
-@Sql("/setup-station.sql")
+@Sql("/setup-data.sql")
 public class SectionAcceptanceTest {
 
     /**
