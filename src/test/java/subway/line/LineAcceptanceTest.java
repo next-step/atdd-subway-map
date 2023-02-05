@@ -18,9 +18,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import subway.Mocks.Color;
-import subway.Mocks.MockLine;
+import subway.Mocks.LineCreateRequestDTO;
 import subway.Mocks.MockStation;
-import subway.line.LineTestDTO.LineStationCreateDTO;
 
 @DisplayName("지하철 노선 관리 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -38,9 +37,7 @@ public class LineAcceptanceTest {
   @Test
   void 지하철_노선_생성_테스트() {
     // when
-    Line line = LineTestUtils.역_과_노선_생성(
-        new LineStationCreateDTO(MockLine.서울2호선, Color.초록,MockStation.서울대입구역,MockStation.봉천역, 서울2호선_거리)
-    );
+    Line line = LineTestUtils.역_과_노선_생성(LineCreateRequestDTO.서울2호선_노선_생성요청);
 
     ExtractableResponse<Response> response = 지하철_노선_조회(line.getId());
 
@@ -59,12 +56,8 @@ public class LineAcceptanceTest {
   @DisplayName("지하철노선 목록 조회 테스트")
   @Test
   void 지하철_노선_목록_조회_테스트() {
-    Line line1 = LineTestUtils.역_과_노선_생성(
-        new LineStationCreateDTO(MockLine.서울2호선, Color.초록,MockStation.서울대입구역,MockStation.봉천역, 서울2호선_거리)
-    );
-    Line line2 = LineTestUtils.역_과_노선_생성(
-        new LineStationCreateDTO(MockLine.신분당선, Color.노랑,MockStation.강남역,MockStation.신사역, 신분당선_거리)
-    );
+    Line line1 = LineTestUtils.역_과_노선_생성(LineCreateRequestDTO.서울2호선_노선_생성요청);
+    Line line2 = LineTestUtils.역_과_노선_생성(LineCreateRequestDTO.신분당선_노선_생성요청);
 
     assertThat(
         지하철_노선_목록_조회().jsonPath().getList("name", String.class)
@@ -80,9 +73,7 @@ public class LineAcceptanceTest {
   @Test
   void 지하철_노선_조회_테스트() {
     // given
-    Line created = LineTestUtils.역_과_노선_생성(
-        new LineStationCreateDTO(MockLine.서울2호선, Color.초록,MockStation.서울대입구역,MockStation.봉천역, 서울2호선_거리)
-    );
+    Line created = LineTestUtils.역_과_노선_생성(LineCreateRequestDTO.서울2호선_노선_생성요청);
 
     // when
     ExtractableResponse<Response> show = 지하철_노선_조회(created.getId());
@@ -100,9 +91,7 @@ public class LineAcceptanceTest {
   @Test
   void 지하철_노선_수정_테스트() {
     // given
-    Line created = LineTestUtils.역_과_노선_생성(
-        new LineStationCreateDTO(MockLine.서울2호선, Color.초록,MockStation.서울대입구역,MockStation.봉천역, 서울2호선_거리)
-    );
+    Line created = LineTestUtils.역_과_노선_생성(LineCreateRequestDTO.서울2호선_노선_생성요청);
 
     // when
     Line updated = 지하철_노선_수정(created.getId(), "이름이_바뀐_2호선", Color.노랑);
@@ -124,9 +113,7 @@ public class LineAcceptanceTest {
   @Test
   void 지하철_노선_삭제_테스트() {
     // given
-    Line line = LineTestUtils.역_과_노선_생성(
-        new LineStationCreateDTO(MockLine.서울2호선, Color.초록,MockStation.서울대입구역,MockStation.봉천역, 서울2호선_거리)
-    );
+    Line line = LineTestUtils.역_과_노선_생성(LineCreateRequestDTO.서울2호선_노선_생성요청);
 
     // when
     지하철_노선_삭제(line.getId());

@@ -2,21 +2,21 @@ package subway.section;
 
 public class SectionCreateRequest {
 
-  private final String downStationId;
-  private final String upStationId;
+  private final Long downStationId;
+  private final Long upStationId;
   private final Long distance;
 
-  public SectionCreateRequest(String downStationId, String upStationId, Long distance) {
-    this.downStationId = downStationId;
+  public SectionCreateRequest(Long upStationId, Long downStationId, Long distance) {
     this.upStationId = upStationId;
+    this.downStationId = downStationId;
     this.distance = distance;
   }
 
-  public String getDownStationId() {
+  public Long getDownStationId() {
     return downStationId;
   }
 
-  public String getUpStationId() {
+  public Long getUpStationId() {
     return upStationId;
   }
 
