@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 
 public class LineRestAssured {
 
+    private static final String LINE_BASE_PATH = "/lines";
+
     public static ExtractableResponse<Response> 노선_생성(
             final String name,
             final String color,
@@ -29,7 +31,7 @@ public class LineRestAssured {
                 .contentType(ContentType.JSON)
                 .body(body)
                 .when()
-                .post("/lines")
+                .post(LINE_BASE_PATH)
                 .then().log().all()
                 .statusCode(HttpStatus.CREATED.value())
                 .extract();
@@ -39,7 +41,7 @@ public class LineRestAssured {
         return RestAssured
                 .given().log().all()
                 .when()
-                .get("/lines")
+                .get(LINE_BASE_PATH)
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
                 .extract();
