@@ -10,7 +10,7 @@ import java.util.List;
 
 @Embeddable
 public class Sections {
-    @OneToMany(mappedBy = "line_id", cascade = CascadeType.PERSIST, orphanRemoval = true)
+    @OneToMany(mappedBy = "line", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private List<Section> sections = new ArrayList<>();
 
     public Sections() {

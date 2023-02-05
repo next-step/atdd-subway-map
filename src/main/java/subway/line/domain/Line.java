@@ -59,7 +59,7 @@ public class Line {
             Station downStation,
             long distance
     ) {
-        Section section = new Section(id, upStation, downStation, distance);
+        Section section = new Section(this, upStation, downStation, distance);
         if (LineValidator.isValidate(this, section)) {
             sections.addSection(section);
         }

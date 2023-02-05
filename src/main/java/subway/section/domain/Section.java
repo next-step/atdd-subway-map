@@ -1,12 +1,13 @@
 package subway.section.domain;
 
+import subway.line.domain.Line;
 import subway.station.domain.Station;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
 @Entity
@@ -15,8 +16,8 @@ public class Section {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
-    private Long lineId;
+    @ManyToOne
+    private Line line;
 
     @OneToOne
     private Station upStation;
@@ -29,8 +30,8 @@ public class Section {
     public Section() {
     }
 
-    public Section(Long lineId, Station upStation, Station downStation, Long distance) {
-        this.lineId = lineId;
+    public Section(Line line, Station upStation, Station downStation, Long distance) {
+        this.line = line;
         this.upStation = upStation;
         this.downStation = downStation;
         this.distance = distance;
@@ -40,8 +41,8 @@ public class Section {
         return id;
     }
 
-    public Long getLineId() {
-        return lineId;
+    public Line getLine() {
+        return line;
     }
 
     public Station getUpStation() {

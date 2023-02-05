@@ -37,7 +37,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
     private CreateLineRequest 이호선_생성_요청;
 
     @BeforeEach
-    void setUp() {
+    protected void setUp() {
+        super.setUp();
         강남역_아이디 = 지하철역을_생성한다(강남역_생성_요청);
         서울대입구역_아이디 = 지하철역을_생성한다(서울대입구역_생성_요청);
         신논현역_아이디 = 지하철역을_생성한다(낙성대역_생성_요청);

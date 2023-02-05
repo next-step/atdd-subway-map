@@ -15,7 +15,7 @@ public abstract class AcceptanceTest {
     private DatabaseCleaner databaseCleaner;
 
     @BeforeEach
-    void setUp() {
+    protected void setUp() {
         RestAssured.port = port;
         databaseCleaner.execute();
     }
