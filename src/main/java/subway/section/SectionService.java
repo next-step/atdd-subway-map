@@ -15,6 +15,9 @@ public class SectionService {
   private final StationService stationService;
   private final LineService lineService;
 
+  /*
+  순환 참조는 어떻게 해결하는게 좋을까요?
+   */
   public SectionService(StationService stationService, @Lazy LineService lineService, SectionRepository sectionRepository) {
     this.stationService = stationService;
     this.lineService = lineService;
