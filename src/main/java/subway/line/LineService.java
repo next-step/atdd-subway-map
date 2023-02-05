@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.common.DomainException;
 import subway.common.DomainExceptionType;
+import subway.section.Section;
+import subway.section.SectionRepository;
 import subway.station.Station;
 import subway.station.StationRepository;
 
@@ -18,22 +20,27 @@ public class LineService {
 
     private final LineRepository lineRepository;
     private final StationRepository stationRepository;
+    private final SectionRepository sectionRepository;
 
     @Transactional
     public LineResponse saveLine(CreateLineRequest request) {
-        Line line = request.toEntity();
+        Line line = lineRepository.save(request.toEntity());
 
-        line = lineRepository.save(line);
+        Optional<Section> section = sectionRepository.findByDownStationId(line.getDownStationId());
 
-        Optional<Station> downStation = stationRepository.findById(request.getDownStationId());
-        Optional<Station> upStation = stationRepository.findById(request.getUpStationId());
-
-        if (downStation.isEmpty() || upStation.isEmpty()) {
-            throw new DomainException(DomainExceptionType.NO_STATION);
+        if (section.isPresent()) {
+            return LineResponse.entityToResponse(line);
         }
 
-        line.addStation(downStation.get());
-        line.addStation(upStation.get());
+        Optional<Station> downStation = stationRepository.findById(line.getDownStationId());
+        Optional<Station> upStation = stationRepository.findById(line.getUpStationId());
+
+        if (downStation.isEmpty() || upStation.isEmpty())
+            throw new DomainException(DomainExceptionType.NO_STATION);
+
+        line.addSection(
+                new Section(
+                        line.getId(), downStation.get(), upStation.get(), line.getLineDistance()));
 
         return LineResponse.entityToResponse(line);
     }

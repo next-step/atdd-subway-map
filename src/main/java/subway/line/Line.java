@@ -1,11 +1,12 @@
 package subway.line;
 
-import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import subway.section.Section;
+import subway.section.Sections;
 import subway.station.Station;
 
 @Getter
@@ -32,19 +33,17 @@ public class Line {
     @Column(name = "UP_STATION_ID")
     private Long upStationId;
 
-    @Column(name = "DISTANCE")
-    private Integer distance;
+    @Column(name = "LINE_DISTANCE")
+    private Integer lineDistance;
 
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "LINE_ID", referencedColumnName = "LINE_ID")
-    private List<Station> stationList;
+    @Embedded private Sections sections = new Sections();
 
     public Line(String name, String color, Long downStationId, Long upStationId, Integer distance) {
         this.name = name;
         this.color = color;
         this.downStationId = downStationId;
         this.upStationId = upStationId;
-        this.distance = distance;
+        this.lineDistance = distance;
     }
 
     public void updateNameAndColor(String name, String color) {
@@ -53,26 +52,10 @@ public class Line {
     }
 
     public List<Station> getStationList() {
-        if (stationList == null) return new ArrayList<>();
-
-        return stationList;
+        return sections.getStations();
     }
 
-    public void updateDownStationId(Long id) {
-        this.downStationId = id;
-    }
-
-    public void updateUpStationId(Long id) {
-        this.upStationId = id;
-    }
-
-    public void addStation(Station station) {
-        if (stationList == null) {
-            stationList = new ArrayList<>();
-        }
-
-        station.changeLine(this.id);
-
-        stationList.add(station);
+    public void addSection(Section section) {
+        sections.addSections(section);
     }
 }

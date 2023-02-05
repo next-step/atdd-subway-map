@@ -12,54 +12,29 @@ import org.springframework.test.annotation.DirtiesContext;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class SectionAcceptanceTest {
 
-    @Autowired
-    private DataBaseCleanUp dataBaseCleanUp;
+    @Autowired private DataBaseCleanUp dataBaseCleanUp;
 
     @BeforeEach
-    void setUp(){
+    void setUp() {
         dataBaseCleanUp.excute();
     }
-    /**
-     * Given - 지하철 구간을 생성 요청을
-     * When -
-     * Then -
-     */
+    /** Given - 지하철 구간을 생성 요청을 When - Then - */
     @DisplayName("지하철 구간을 생성한다. - 성공")
     @Test
-    void createSectionTest_success() {
+    void createSectionTest_success() {}
 
-    }
-
-    /**
-     * Given -
-     * When -
-     * Then -
-     */
+    /** Given - When - Then - */
     @DisplayName("지하철 구간을 생성한다. - 실패")
     @Test
-    void createSectionTest_fail() {
+    void createSectionTest_fail() {}
 
-    }
-
-    /**
-     * Given -
-     * When -
-     * Then -
-     */
+    /** Given - When - Then - */
     @DisplayName("지하철 구간을 생성한다. - 성공")
     @Test
-    void deleteSectionTest_success() {
+    void deleteSectionTest_success() {}
 
-    }
-
-    /**
-     * Given -
-     * When -
-     * Then -
-     */
+    /** Given - When - Then - */
     @DisplayName("지하철 구간을 생성한다. - 실패")
     @Test
-    void deleteSectionTest_fail() {
-
-    }
+    void deleteSectionTest_fail() {}
 }
