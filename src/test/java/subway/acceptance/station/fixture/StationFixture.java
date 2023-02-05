@@ -7,7 +7,9 @@ public enum StationFixture {
     연신내,
     충무로,
     교대,
-    선릉;
+    선릉,
+    수서,
+    ;
 
     public Map toMap() {
         Map map = new HashMap();

@@ -3,6 +3,7 @@ package subway.station.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.line.exception.LineNotFoundException;
 import subway.station.repository.StationCommandRepository;
 import subway.station.dto.StationRequest;
 import subway.station.dto.StationResponse;
@@ -21,9 +22,9 @@ public class StationService {
     private final StationQueryRepository stationQuery;
 
     @Transactional
-    public StationResponse saveStation(StationRequest stationRequest) {
+    public Station saveStation(StationRequest stationRequest) {
         Station station = stationCommand.save(new Station(stationRequest.getName()));
-        return createStationResponse(station);
+        return station;
     }
 
     @Transactional
@@ -31,14 +32,12 @@ public class StationService {
         stationCommand.deleteById(id);
     }
 
-    public List<StationResponse> findAllStations() {
-        return stationQuery.findAll().stream()
-                .map(this::createStationResponse)
-                .collect(Collectors.toList());
+    public Station findStationById(Long id) {
+        return stationQuery.findById(id).orElseThrow(LineNotFoundException::new);
     }
 
-    private StationResponse createStationResponse(Station station) {
-        return StationResponse.fromDomain(station);
+    public List<Station> findAllStations() {
+        return stationQuery.findAll();
     }
 
 }

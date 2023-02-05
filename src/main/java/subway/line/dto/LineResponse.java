@@ -19,23 +19,26 @@ public class LineResponse {
     private List<StationResponse> stations;
 
     @Builder(access = AccessLevel.PROTECTED)
-    private LineResponse(Long id, String name, String color, List<Station> stations) {
+    private LineResponse(Long id, String name, String color, List<StationResponse> stations) {
         this.id = id;
         this.name = name;
         this.color = color;
-        this.stations = stations.stream()
-                .map(StationResponse::fromDomain)
-                .collect(Collectors.toList());
+        this.stations = stations;
     }
 
     public static LineResponse fromDomain(Line line) {
+        var stationResponses = line.getSections().getStationList()
+                .stream()
+                .map(StationResponse::fromDomain)
+                .collect(Collectors.toList());
+
         return LineResponse
-                .builder().id(line.getId())
+                .builder()
+                .id(line.getId())
                 .name(line.getName())
                 .color(line.getColor())
-                .stations(
-                        List.of(line.getUpStation(), line.getDownStation())
-                ).build();
+                .stations(stationResponses)
+                .build();
     }
 
 }
