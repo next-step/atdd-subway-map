@@ -4,26 +4,34 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import io.restassured.response.ValidatableResponse;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import subway.controller.request.LineRequest;
 import subway.controller.request.SectionRequest;
+import subway.exception.SubwayRuntimeException;
+import subway.exception.message.SubwayErrorCode;
 import subway.util.AcceptanceTestHelper;
 
 import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.fixture.LineFixture.분당선_요청;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static subway.fixture.LineFixture.삼호선_요청;
 import static subway.fixture.LineFixture.신분당선_요청;
+import static subway.fixture.LineFixture.잘못된_노선_요청;
+import static subway.fixture.SectionFixture.강남역_양재역_구간_요청;
+import static subway.fixture.SectionFixture.교대역_양재역_구간_요청;
 import static subway.fixture.SectionFixture.양재역_양재역_구간_요청;
 import static subway.fixture.SectionFixture.역삼역_교대역_구간_요청;
 import static subway.fixture.StationFixture.강남역_ID;
 import static subway.fixture.StationFixture.강남역_이름;
 import static subway.fixture.StationFixture.교대역_ID;
 import static subway.fixture.StationFixture.교대역_이름;
+import static subway.fixture.StationFixture.양재역_ID;
 import static subway.fixture.StationFixture.양재역_이름;
 import static subway.fixture.StationFixture.역삼역_ID;
 import static subway.fixture.StationFixture.역삼역_이름;
@@ -44,15 +52,18 @@ class SectionAcceptanceTest extends AcceptanceTestHelper {
      * When -> 해당 노선에 구간을 등록하면
      * Then -> 해당 노선 조회 시 추가된 구간이 포함되어 있다.
      */
-    @DisplayName("지하철 노선에 구간을 등록한다")
+    @DisplayName("지하철 노선에 구간을 등록한다.")
     @Test
     void addSection() {
+        // given
         var createResponse = 지하철노선_생성(신분당선_요청);
-        String location = 경로_추출(createResponse);
+        String path = 경로_추출(createResponse);
 
-        구간_등록(location, 역삼역_교대역_구간_요청);
+        // when
+        구간_등록(path, 역삼역_교대역_구간_요청);
 
-        assertThat(노선_지하철역_ID_목록_조회(location)).containsExactly(강남역_ID, 역삼역_ID, 교대역_ID);
+        // then
+        assertThat(노선_지하철역_ID_목록_조회(path)).containsExactly(강남역_ID, 역삼역_ID, 교대역_ID);
     }
 
     /**
@@ -63,42 +74,116 @@ class SectionAcceptanceTest extends AcceptanceTestHelper {
     @DisplayName("상행역과 하행역이 같은 구간은 등록할 수 없다.")
     @Test
     void addSectionException() {
-        final ExtractableResponse<Response> createResponse = 지하철노선_생성(신분당선_요청);
+        // given
+        var createResponse = 지하철노선_생성(신분당선_요청);
         String path = 경로_추출(createResponse);
 
+        // when
         var response = 구간_등록(path, 양재역_양재역_구간_요청);
 
+        // then
         assertThat(상태코드_추출(response)).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(에러메시지_추출(response)).isEqualTo("상행역과 하행역이 같은 구간은 생성할 수 없습니다.");
+        assertThat(에러메시지_추출(response)).isEqualTo(SubwayErrorCode.SECTION_SAME_STATION.getMessage());
     }
 
     /**
-     * Given -> 지하철 노선 생성 후 해당 노선에 구간을 등록하고
-     * When -> 해당 노선에서 마지막 구간(하행 종점역)을 제거하면
-     * Then -> 해당 노선 조회 시 삭제된 구간을 찾을 수 없다.
+     * Given -> 노선을 생성하고
+     * When -> 해당 노선에 등록되지 않은 역을 상행역으로 등록하면
+     * Then -> 400 에러가 발생한다.
+     */
+    @Test
+    void 새로운_구간의_상행역은_해당_노선에_등록되어있는_하행_종점역이어야_한다() {
+        // given
+        var createResponse = 지하철노선_생성(신분당선_요청);
+        String path = 경로_추출(createResponse);
+
+        // when
+        var response = 구간_등록(path, 교대역_양재역_구간_요청);
+
+        // then
+        assertThat(상태코드_추출(response)).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(에러메시지_추출(response)).isEqualTo(SubwayErrorCode.STATION_UPPER_SECTION.getMessage());
+    }
+
+
+    /**
+     * Given -> 노선을 생성하고
+     * When -> 해당 노선에 등록되지 않은 역을 하행역으로 등록하면
+     * Then -> 400 에러가 발생한다.
+     */
+    @Test
+    void 새로운_구간의_하행역은_해당_노선에_등록되어있는_역일_수_없다() {
+        // given
+        var createResponse = 지하철노선_생성(신분당선_요청);
+        String path = 경로_추출(createResponse);
+
+        // when
+        var response = 구간_등록(path, 교대역_양재역_구간_요청);
+
+        // then
+        assertThat(상태코드_추출(response)).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(에러메시지_추출(response)).isEqualTo(SubwayErrorCode.STATION_UPPER_SECTION.getMessage());
+    }
+
+    /**
+     * Given -> 지하철 노선 생성 후
+     * When -> 해당 노선에 구간을 등록하고
+     * Then -> 해당 노선에서 마지막 구간(하행 종점역)을 제거하면 해당 노선 조회 시 삭제된 구간을 찾을 수 없다.
      */
     @DisplayName("구간을 제거한다.")
     @Test
     void deleteSection() {
-
         // 노선을 생성하고
-        var createResponse = 지하철노선_생성(분당선_요청);
+        var createResponse = 지하철노선_생성(신분당선_요청);
         String location = 경로_추출(createResponse);
 
         // 해당 노선에 구간을 등록하고
-        var response = 구간_등록(location, 역삼역_교대역_구간_요청);
+        구간_등록(location, 역삼역_교대역_구간_요청);
 
         // 해당 노선에서 마지막 구간(하행 종점역)을 제거하면
         구간_삭제(location, 교대역_ID);
 
-        final long id = ID_추출(response);
-
         // 해당 노선 조회 시 삭제된 구간을 찾을 수 없다.
-        assertThat(노선_지하철역_ID_목록_조회(location)).doesNotContain(id);
+        assertThat(노선_지하철역_ID_목록_조회(location)).doesNotContain(교대역_ID);
     }
 
-    private long ID_추출(final ExtractableResponse<Response> response) {
-        return response.jsonPath().getLong("id");
+    /**
+     * Given -> 지하철 노선 생성 후
+     * When -> 구간을 등록하고
+     * Then -> 해당 노선에서 하행 종점역을 제거하면 해당 노선 조회 시 삭제된 구간을 찾을 수 없다.
+     */
+    @Test
+    @DisplayName("지하철 노선에 등록된 역 (하행 종점역) 만 제거할 수 있다. 즉, 마지막 구간만 제거할 수 있다")
+    void lastLineDeleteTest() {
+        // Given -> 지하철 노선 생성 후
+        var createResponse = 지하철노선_생성(삼호선_요청);
+        String location = 경로_추출(createResponse);
+
+        // When -> 구간을 등록하고
+        구간_등록(location, 교대역_양재역_구간_요청);
+
+        // Then -> 해당 노선에서 하행 종점역을 제거하면 해당 노선 조회 시 삭제된 구간을 찾을 수 없다.
+        var response = 구간_삭제(location, 양재역_ID).extract();
+        assertThat(상태코드_추출(response)).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    /**
+     * Given -> 지하철 노선 생성후
+     * When -> 해당 노선에서 하행 종점역을 제거하면
+     * Then -> 상행 종점역과 하행 종점역만 있는 경우 역을 삭제 할 수 없다
+     */
+    @Test
+    @DisplayName("지하철 노선에 상행 종점역과 하행 종점역만 있는 경우 (구간이 1개인 경우) 역을 삭제할 수 없다")
+    void lineOneDeleteExceptionTest() {
+        // Given -> 지하철 노선 생성후
+        var createResponse = 지하철노선_생성(삼호선_요청);
+        String location = 경로_추출(createResponse);
+
+        // When -> 해당 노선에서 하행 종점역을 제거하면
+        var response = 구간_삭제(location, 교대역_ID).extract();
+
+        // Then -> 상행 종점역과 하행 종점역만 있는 경우 역을 삭제 할 수 없다
+        assertThat(상태코드_추출(response)).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     private ExtractableResponse<Response> 구간_등록(String path, SectionRequest request) {
@@ -124,8 +209,8 @@ class SectionAcceptanceTest extends AcceptanceTestHelper {
     }
 
     public long 지하철역_생성(String name) {
-
         return post(STATION_PATH, Map.of("name", name))
-                .jsonPath().getLong("id");
+                .jsonPath()
+                .getLong("id");
     }
 }

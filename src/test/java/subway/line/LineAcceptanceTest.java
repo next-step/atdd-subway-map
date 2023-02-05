@@ -6,11 +6,9 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.jdbc.Sql;
 import subway.controller.request.LineRequest;
 import subway.controller.response.LineResponse;
 import subway.util.AcceptanceTestHelper;
@@ -21,13 +19,13 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD;
 import static subway.fixture.LineFixture.분당선_요청;
 import static subway.fixture.LineFixture.신분당선_요청;
+import static subway.fixture.StationFixture.강남역_이름;
+import static subway.fixture.StationFixture.교대역_이름;
+import static subway.fixture.StationFixture.양재역_이름;
+import static subway.fixture.StationFixture.역삼역_이름;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@DirtiesContext(classMode = AFTER_EACH_TEST_METHOD)
-@Sql("/insert-station.sql")
 class LineAcceptanceTest extends AcceptanceTestHelper {
 
     @LocalServerPort
@@ -36,6 +34,11 @@ class LineAcceptanceTest extends AcceptanceTestHelper {
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
+
+        지하철역_생성(강남역_이름);
+        지하철역_생성(역삼역_이름);
+        지하철역_생성(교대역_이름);
+        지하철역_생성(양재역_이름);
     }
 
     @DisplayName("지하철 노선을 생성한다.")
@@ -144,6 +147,13 @@ class LineAcceptanceTest extends AcceptanceTestHelper {
                 .isEqualTo(HttpStatus.NO_CONTENT.value());
 
         assertThat(maybeLine).isEmpty();
+    }
+
+    public long 지하철역_생성(String name) {
+
+        return post(STATION_PATH, Map.of("name", name))
+                .jsonPath()
+                .getLong("id");
     }
 
     public ExtractableResponse<Response> 지하철노선_생성(final LineRequest req) {
