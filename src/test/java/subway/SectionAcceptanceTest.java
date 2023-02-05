@@ -1,19 +1,17 @@
 package subway;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static subway.response.LineAcceptanceTestUtils.*;
+import static subway.response.SectionAcceptanceTestUtils.*;
 import static subway.response.StationAcceptanceTestUtils.createStation;
 
 @DisplayName("지하철 구간 관련 기능")
@@ -79,29 +77,4 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 
     }
 
-    private ExtractableResponse<Response> deleteSectionResponse(Long lineId, Long stationId) {
-        return RestAssured.given().log().all()
-                .given().pathParam("id", lineId)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(stationId)
-                .when().delete("/lines/{id}/sections")
-                .then().log().all().extract();
-    }
-
-    private ExtractableResponse<Response> createSectionResponse(Long lineId, Map<String, String> params) {
-        return RestAssured.given().log().all()
-                .given().pathParam("id", lineId)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(params)
-                .when().post("/lines/{id}/sections")
-                .then().log().all().extract();
-    }
-
-    private Map<String, String> createSectionCreateParams(Long upStationId, Long downStationId) {
-        Map<String, String> params = new HashMap<>();
-        params.put("upStationId", upStationId + "");
-        params.put("downStationId", downStationId + "");
-        params.put("distance", 6 + "");
-        return params;
-    }
 }
