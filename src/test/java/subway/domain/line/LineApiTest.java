@@ -1,4 +1,4 @@
-package subway.common;
+package subway.domain.line;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;

@@ -2,6 +2,8 @@ package subway.domain.section;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.common.LineApiTest.지하철노선의_마지막_구간을_조회한다;
+import static subway.domain.line.LineApiTest.지하철노선의_마지막_구간을_조회한다;
 import static subway.common.SetupTest.*;
 
 @DisplayName("지하철구간 관련 기능")
@@ -165,5 +167,35 @@ public class SectionAcceptanceTest {
                 .extract();
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    }
+
+    public static class StationApiTest {
+        public static ExtractableResponse<Response> 지하철역을_조회한다() {
+            return RestAssured.given().log().all()
+                    .contentType(ContentType.JSON)
+                    .when().get("/stations")
+                    .then().log().all()
+                    .extract();
+        }
+
+        public static ExtractableResponse<Response> 지하철역을_생성한다(String name) {
+            Map<String, String> param = new HashMap<>();
+            param.put("name", name);
+
+            return RestAssured.given().log().all()
+                    .contentType(ContentType.JSON)
+                    .body(param)
+                    .when().post("/stations")
+                    .then().log().all()
+                    .extract();
+        }
+
+        public static ExtractableResponse<Response> 지하철역을_삭제한다(Map<String, String> deleteStation) {
+            return RestAssured.given().log().all()
+                    .when().delete("/stations/{id}", deleteStation.get("id"))
+                    .then().statusCode(HttpStatus.NO_CONTENT.value())
+                    .log().all()
+                    .extract();
+        }
     }
 }

@@ -2,8 +2,8 @@ package subway.common;
 import java.util.HashMap;
 import java.util.Map;
 
-import static subway.common.LineApiTest.지하철노선에_구간을_추가한다;
-import static subway.common.LineApiTest.지하철노선을_생성한다;
+import static subway.domain.line.LineApiTest.지하철노선에_구간을_추가한다;
+import static subway.domain.line.LineApiTest.지하철노선을_생성한다;
 
 
 public class SetupTest {
