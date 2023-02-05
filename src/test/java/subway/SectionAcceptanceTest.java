@@ -87,7 +87,8 @@ class SectionAcceptanceTest extends BaseAcceptance {
     }
 
     /**
-     * Given 지하철 노선에 구간들을 조회 후
+     * Given 새로운 역을 추가 후
+     * Given 지하철 노선에 새로운 구간을 추가 후
      * When 구간 제거 시
      * Then 노선에 구간을 확인 할 수 없다
      */
@@ -95,11 +96,14 @@ class SectionAcceptanceTest extends BaseAcceptance {
     @Test
     void 지하철_노선에_구간을_제거_할_수_있다() {
         // Given
+        StationResponse 신논현역 = 지하철역_생성("신논현역").as(StationResponse.class);
+        지하철_구간_생성(신분당선, 논현역, 신논현역, 10L);
+
         List<SectionResponse> 노선의_구간들 = 지하철_노선의_구간들_조회_요청(신분당선);
-        SectionResponse 노선의_첫번_째_구간 = 노선의_구간들.get(0);
+        SectionResponse 노선의_마지막_구간 = 노선의_구간들.get(1);
 
         // When
-        ExtractableResponse<Response> response = 지하철_구간_제거_요청(신분당선, 노선의_첫번_째_구간);
+        ExtractableResponse<Response> response = 지하철_구간_제거_요청(신분당선, 노선의_마지막_구간);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         // Then
@@ -126,6 +130,33 @@ class SectionAcceptanceTest extends BaseAcceptance {
         ExtractableResponse<Response> actualResponse = 지하철_구간_제거_요청(신분당선, 노선의_첫번_째_구간);
 
         // Then
+        마지막_구간_하행_종점역만_제거_할_수_있다(actualResponse);
+    }
+
+    /**
+     * When 노선에 구간이 하나인데 제거 시
+     * Then Exception
+     */
+    @DisplayName("지하철 노선에 구간이 하나일 경우 제거 할 수 없다")
+    @Test
+    void 지하철_노선에_구간이_하나일_경우_제거_할_수_없다() {
+        // Given
+        List<SectionResponse> 노선의_구간들 = 지하철_노선의_구간들_조회_요청(신분당선);
+        SectionResponse 노선의_첫번_째_구간 = 노선의_구간들.get(0);
+
+        // When
+        ExtractableResponse<Response> response = 지하철_구간_제거_요청(신분당선, 노선의_첫번_째_구간);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        // Then
+        노선에_구간이_하나_일_경우_제거_할_수_없다(response);
+    }
+
+    private static void 노선에_구간이_하나_일_경우_제거_할_수_없다(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    }
+
+    private static void 마지막_구간_하행_종점역만_제거_할_수_있다(ExtractableResponse<Response> actualResponse) {
         assertThat(actualResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
@@ -141,9 +172,11 @@ class SectionAcceptanceTest extends BaseAcceptance {
         return response.jsonPath().getList(".", SectionResponse.class);
     }
 
-    private void 노선에_구간이_제거_된_걸_확인_할_수_있다(LineLoadDtoResponse lineDto) {
-        ExtractableResponse<Response> actualLineResponse = 지하철_노선_조회(lineDto.getId());
-        assertThat(actualLineResponse.jsonPath().getList("stations")).isEmpty();
+    private void 노선에_구간이_제거_된_걸_확인_할_수_있다(LineLoadDtoResponse lineResponse) {
+        LineLoadDtoResponse response = 지하철_노선_조회(lineResponse.getId()).as(LineLoadDtoResponse.class);
+
+        assertThat(response.getStations().size()).isEqualTo(2L);
+        assertThat(response.getStations()).containsExactlyInAnyOrderElementsOf(List.of(강남역, 논현역));
     }
 
     private ExtractableResponse<Response> 지하철_구간_제거_요청(LineLoadDtoResponse lineDto, SectionResponse sectionResponse) {
