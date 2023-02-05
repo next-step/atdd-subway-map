@@ -28,6 +28,10 @@ public class RestAssuredClient {
         return RestAssuredClient.post(ApiPath.LINE_CREATE_PATH, requestParam);
     }
 
+    public static ExtractableResponse<Response> getLine(Long id) {
+        return RestAssuredClient.get(String.format(ApiPath.LINE_GET_PATH, id));
+    }
+
     public static ExtractableResponse<Response> listLine() {
         return RestAssuredClient.get(ApiPath.LINE_LIST_PATH);
     }
