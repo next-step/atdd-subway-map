@@ -1,6 +1,7 @@
 package subway.controller;
 
 
+import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -119,10 +120,11 @@ public class StationSectionAcceptanceTest {
     @Test
     void deleteStationSection() {
         ExtractableResponse<Response> response = StationUtils.reduceLine(3L);
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         JsonPath jsonPath = selectLine(1L).jsonPath();
-        assertThat(jsonPath.getLong("downStationId")).isEqualTo(2L);
+        List<ReadLineResponse> responses = jsonPath.getList("stations", ReadLineResponse.class);
+        assertThat(responses.get(responses.size() - 1).getId()).isEqualTo(2L);
     }
 
     /**
@@ -163,7 +165,11 @@ public class StationSectionAcceptanceTest {
 
         StationUtils.createLine(ONE_STATION_LINE);
 
-        ExtractableResponse<Response> response = StationUtils.reduceLine(5L);
+        ExtractableResponse<Response> response =
+                RestAssured
+                .given().spec(getRequestSpecification()).log().all()
+                .when().delete("/lines/2/sections?stationId=6")
+                .then().log().all().extract();;
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(response.body().asString()).contains("지하철 노선에 상행 종점역과 하행 종점역만 있는 경우");
     }
