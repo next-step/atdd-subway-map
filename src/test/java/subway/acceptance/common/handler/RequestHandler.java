@@ -17,27 +17,6 @@ import java.util.Map;
  */
 public class RequestHandler {
 
-    public static ExtractableResponse<Response> 생성_지하철_노선에_구간(Long lineId, Long upStationId, Long downStationId, int distance) {
-        Map tmp = new HashMap();
-        tmp.put("upStationId", upStationId);
-        tmp.put("downStationId", downStationId);
-        tmp.put("distance", distance);
-        return RestAssured.given().log().all()
-                .body(tmp)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines/{id}/sections", lineId)
-                .then().log().all()
-                .extract();
-    }
-
-    public static ExtractableResponse<Response> 삭제_지하철_노선의_구간() {
-        return RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().delete("/lines/{id}/sections?stationId={id}", 1, 1)
-                .then().log().all()
-                .extract();
-    }
-
     /**
      * 요청을 위한 URL 경로셋
      */
@@ -136,6 +115,27 @@ public class RequestHandler {
     public static ExtractableResponse<Response> 조회_지하철_노선(Long id) {
         return RestAssured.given().log().all()
                 .when().get(UrlPath.지하철_노선_아이디_기본_경로.경로(), id)
+                .then().log().all()
+                .extract();
+    }
+
+    public static ExtractableResponse<Response> 생성_지하철_노선에_구간(Long lineId, Long upStationId, Long downStationId, int distance) {
+        Map tmp = new HashMap();
+        tmp.put("upStationId", upStationId);
+        tmp.put("downStationId", downStationId);
+        tmp.put("distance", distance);
+        return RestAssured.given().log().all()
+                .body(tmp)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post(UrlPath.지하철_구간_기본_경로.경로(), lineId)
+                .then().log().all()
+                .extract();
+    }
+
+    public static ExtractableResponse<Response> 삭제_지하철_노선의_구간(Long lineId, Long stationId) {
+        return RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().delete(UrlPath.지하철_구간_기본_경로.경로() + "?stationId={stationId}", lineId, stationId)
                 .then().log().all()
                 .extract();
     }

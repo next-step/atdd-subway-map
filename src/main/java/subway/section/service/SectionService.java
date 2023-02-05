@@ -37,6 +37,12 @@ public class SectionService {
         return line.addSection(upStation, downStation, saveRequest.getDistance());
     }
 
+    public void removeStationById(Long lineId, Long stationId) {
+        Line line = getLine(lineId);
+        Station station = getStation(stationId);
+        line.removeStation(station);
+    }
+
     private Line getLine(Long lineId) {
         return lineService.findLineById(lineId);
     }

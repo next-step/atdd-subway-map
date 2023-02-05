@@ -1,8 +1,10 @@
 package subway.section.domain;
 
 import subway.common.util.CollectionUtil;
+import subway.section.exception.DownEndStationRegisteredOnLineException;
 import subway.section.exception.DownStationAlreadyExistsException;
 import subway.section.exception.DownStationMustBeUpStationException;
+import subway.section.exception.OnlyOneSectionException;
 import subway.station.domain.Station;
 
 import javax.persistence.CascadeType;
@@ -35,6 +37,17 @@ public class Sections {
         return section;
     }
 
+    public void removeStation(Station station) {
+
+        if (isOnlyOneSection())
+            throw new OnlyOneSectionException();
+
+        if (isNotDownEndStation(station))
+            throw new DownEndStationRegisteredOnLineException();
+
+        stationList.remove(station);
+    }
+
     public List<Station> getStationList() {
         LinkedHashSet stationSet = new LinkedHashSet();
         stationList.stream().forEach((section) -> {
@@ -42,10 +55,6 @@ public class Sections {
             stationSet.add(section.getDownStation());
         });
         return new ArrayList<>(stationSet);
-    }
-
-    private boolean notEqaulsDownStation(Station station) {
-        return !containStations(station);
     }
 
     private boolean containStations(Station section) {
@@ -57,9 +66,14 @@ public class Sections {
         return !section.equals(lastStation);
     }
 
-    private boolean equalsLastStation(Station section) {
+    private boolean isNotDownEndStation(Station section) {
         Station lastStation = CollectionUtil.lastItemOfList(getStationList());
         return section.equals(lastStation);
+    }
+
+    private boolean isOnlyOneSection() {
+        return stationList.size() == 1;
+
     }
 
 }

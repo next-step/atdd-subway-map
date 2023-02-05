@@ -61,4 +61,8 @@ public class Line {
         );
     }
 
+    public void removeStation(Station station) {
+        sections.removeStation(station);
+    }
+
 }

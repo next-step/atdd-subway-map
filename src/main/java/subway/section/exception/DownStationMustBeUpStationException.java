@@ -1,6 +1,5 @@
 package subway.section.exception;
 
-import org.springframework.http.HttpStatus;
 import subway.common.exception.SubwayException;
 
 import static subway.common.exception.SubwayExceptionPurpose.CREATE;
