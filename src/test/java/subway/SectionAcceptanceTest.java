@@ -105,6 +105,29 @@ class SectionAcceptanceTest extends BaseAcceptance {
         노선에_구간이_제거_된_걸_확인_할_수_있다(신분당선);
     }
 
+    /**
+     * Given 새로운 역을 추가 후
+     * Given 지하철 노선에 새로운 구간을 추가 후
+     * When 첫 번 째 구간 제거 시
+     * Then Exception
+     */
+    @DisplayName("지하철 노선에 구간을 마지막 하행 종점역만 제거 할 수 있다")
+    @Test
+    void 지하철_노선에_구간은_마지막_하행_종점역만_제거_할_수_있다() {
+        // Given
+        StationResponse 신논현역 = 지하철역_생성("신논현역").as(StationResponse.class);
+        지하철_구간_생성(신분당선, 신논현역, 논현역, 10L);
+
+        List<SectionResponse> 노선의_구간들 = 지하철_노선의_구간들_조회_요청(신분당선);
+        SectionResponse 노선의_첫번_째_구간 = 노선의_구간들.get(0);
+
+        // When
+        ExtractableResponse<Response> actualResponse = 지하철_구간_제거_요청(신분당선, 노선의_첫번_째_구간);
+
+        // Then
+        assertThat(actualResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    }
+
     private List<SectionResponse> 지하철_노선의_구간들_조회_요청(LineLoadDtoResponse lineLoadDtoResponse) {
         ExtractableResponse<Response> response = RestAssured.given().spec(REQUEST_SPEC).log().all()
             .pathParam("lineId", lineLoadDtoResponse.getId())
