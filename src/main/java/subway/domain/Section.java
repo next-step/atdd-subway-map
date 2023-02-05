@@ -14,7 +14,7 @@ public class Section {
     private Long upStationId;
     private Long downStationId;
     private int distance;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "line_id")
     @JsonIgnore
     private Line line;

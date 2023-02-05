@@ -74,10 +74,9 @@ public class LineService {
         Line line = lineRepository.findById(Long.valueOf(id)).orElseThrow(() -> new Exception("["+ERROR_NO_FOUND_LINE.getCode()+"]"+ERROR_NO_FOUND_LINE.getMsg()));
 
         Section section = new Section(sectionRequest.getUpStationId(), sectionRequest.getDownStationId(), sectionRequest.getDistance());
-        line.addSection(section);
 
+        line.addSection(section);
         line = lineRepository.save(line);
-        sectionRepository.save(section);
 
         return createLineResponse(line);
     }
@@ -95,10 +94,9 @@ public class LineService {
             throw new Exception("["+ERROR_DELETE_SECTION_NO_LAST_SECTION_LINE.getCode()+"]"+ERROR_DELETE_SECTION_NO_LAST_SECTION_LINE.getMsg());
         }
 
-        sectionRepository.deleteById(section.getId());
         line.deleteSection(section);
-
         Line deleteLine = lineRepository.save(line);
+
         return createLineResponse(deleteLine);
     }
 }
