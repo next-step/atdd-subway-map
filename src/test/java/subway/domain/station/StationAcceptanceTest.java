@@ -2,8 +2,8 @@ package subway.domain.station;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
+import subway.common.AcceptanceTest;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -12,8 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static subway.domain.station.StationApiTest.*;
 
 @DisplayName("지하철역 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class StationAcceptanceTest {
+public class StationAcceptanceTest extends AcceptanceTest {
 
     /**
      * When 지하철역을 생성하면

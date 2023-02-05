@@ -4,6 +4,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.domain.Line;
 import subway.domain.Section;
+import subway.domain.Sections;
+import subway.domain.Station;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 import subway.dto.SectionRequest;
@@ -42,14 +44,8 @@ public class LineService {
                 .collect(Collectors.toList());
     }
 
-    private LineResponse createLineResponse(Line line) {
-        try {
-            return new LineResponse(line.getId(), line.getName(), line.getColor(), line.getSections());
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-
-            return new LineResponse();
-        }
+    private LineResponse createLineResponse(Line line){
+        return new LineResponse(line.getId(), line.getName(), line.getColor(), line.getSections());
     }
 
     public LineResponse findLineById(Long id) {
@@ -74,7 +70,10 @@ public class LineService {
     public LineResponse addSection(String id, SectionRequest sectionRequest) throws Exception {
         Line line = lineRepository.findById(Long.valueOf(id)).orElseThrow(() -> new SubwayRestApiException(ERROR_NO_FOUND_LINE));
 
-        Section section = new Section(sectionRequest.getUpStationId(), sectionRequest.getDownStationId(), sectionRequest.getDistance());
+        Station upStation = stationRepository.findById(sectionRequest.getUpStationId()).orElseThrow(() -> new SubwayRestApiException(ERROR_NO_FOUND_STATION));
+        Station downStation = stationRepository.findById(sectionRequest.getDownStationId()).orElseThrow(() -> new SubwayRestApiException(ERROR_NO_FOUND_STATION));
+
+        Section section = new Section(upStation, downStation, sectionRequest.getDistance());
 
         line.addSection(section);
         line = lineRepository.save(line);

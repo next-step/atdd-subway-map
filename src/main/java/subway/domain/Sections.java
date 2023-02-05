@@ -16,6 +16,9 @@ public class Sections {
     @OneToMany(mappedBy = "line", cascade = CascadeType.ALL)
     private List<Section> sections = new ArrayList<>();
 
+    protected Sections() {
+    }
+
     public List<Section> getSections() {
         return sections;
     }
@@ -27,26 +30,26 @@ public class Sections {
     }
 
     private void validationAdd(Section section) throws Exception{
-        if (! this.isUpStationEqualDownStation(section.getUpStationId())) {
+        if (! this.isUpStationEqualDownStation(section.getUpStation())) {
             throw new SubwayRestApiException(ERROR_DOWNSTATION_INVAILD_LINE);
         }
 
-        if (this.alreadyExistsDownStation(section.getDownStationId())) {
+        if (this.alreadyExistsDownStation(section.getDownStation())) {
             throw new SubwayRestApiException(ERROR_DOWNSTATION_INVAILD_LINE);
         }
     }
 
-    private boolean isUpStationEqualDownStation(Long upStationId) {
-        if (this.sections.size() < 1 || this.sections.get(this.sections.size() -1 ).getDownStationId().equals(upStationId)) {
+    private boolean isUpStationEqualDownStation(Station upStation) {
+        if (this.sections.size() < 1 || this.sections.get(this.sections.size() -1 ).getDownStation().equals(upStation)) {
             return true;
         }
 
         return false;
     }
 
-    private boolean alreadyExistsDownStation(Long downStationId) {
+    private boolean alreadyExistsDownStation(Station downStation) {
         for (Section section : this.sections) {
-            if (downStationId.equals(section.getUpStationId()) || downStationId.equals(section.getDownStationId())) {
+            if (downStation.equals(section.getUpStation()) || downStation.equals(section.getDownStation())) {
                 return true;
             }
         }

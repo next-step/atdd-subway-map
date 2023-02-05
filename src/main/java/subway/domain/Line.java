@@ -10,14 +10,13 @@ import javax.persistence.*;
 public class Line {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "line_id")
     private Long id;
     private String name;
     private String color;
     @Embedded
     private Sections sections;
 
-    public Line() {
+    protected Line() {
     }
 
     public Line(String name, String color) {

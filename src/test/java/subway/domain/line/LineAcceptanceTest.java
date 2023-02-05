@@ -4,9 +4,8 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.jdbc.Sql;
+import subway.common.AcceptanceTest;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,9 +16,7 @@ import static subway.common.SetupTest.*;
 import static subway.domain.line.LineApiTest.*;
 
 @DisplayName("지하철 노선을 관리한다.")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@Sql("/setup-data.sql")
-public class LineAcceptanceTest {
+public class LineAcceptanceTest extends AcceptanceTest {
 
     /**
      * When 지하철 노선을 생성하면
@@ -32,9 +29,6 @@ public class LineAcceptanceTest {
         Map<String, Object> param = new HashMap<>();
         param.put("name", "신분당선");
         param.put("color", "bg-red-600");
-        param.put("upStationId", 1);
-        param.put("downStationId", 2);
-        param.put("distance", 10);
 
         //when
         var response = RestAssured.given().log().all()

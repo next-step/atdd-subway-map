@@ -9,22 +9,25 @@ import javax.persistence.*;
 public class Section {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "section_id")
     private Long id;
-    private Long upStationId;
-    private Long downStationId;
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "up_station_id")
+    private Station upStation;
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "down_station_id")
+    private Station downStation;
     private int distance;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "line_id")
     @JsonIgnore
     private Line line;
 
-    public Section() {
+    protected Section() {
     }
 
-    public Section(Long upStationId, Long downStationId, int distance) {
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
+    public Section(Station upStation, Station downStation, int distance) {
+        this.upStation = upStation;
+        this.downStation = downStation;
         this.distance = distance;
     }
 

@@ -8,7 +8,8 @@ public enum ErrorResponseEnum {
     ERROR_DOWNSTATION_INVAILD_LINE (HttpStatus.INTERNAL_SERVER_ERROR, "downStation's already exists"),
     ERROR_DELETE_SECTION_COUNT_LINE (HttpStatus.INTERNAL_SERVER_ERROR, "line have only one section"),
     ERROR_DELETE_SECTION_NO_LAST_SECTION_LINE (HttpStatus.INTERNAL_SERVER_ERROR, "section's not last section"),
-    ERROR_NO_FOUND_SECTION (HttpStatus.INTERNAL_SERVER_ERROR, "do not found section by id");
+    ERROR_NO_FOUND_SECTION (HttpStatus.INTERNAL_SERVER_ERROR, "do not found section by id"),
+    ERROR_NO_FOUND_STATION (HttpStatus.INTERNAL_SERVER_ERROR, "do not found station by id");
 
     HttpStatus httpStatus;
     String message;

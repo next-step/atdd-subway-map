@@ -7,8 +7,6 @@ import io.restassured.response.Response;
 import subway.domain.Section;
 import subway.domain.Sections;
 import subway.dto.LineResponse;
-
-import java.util.List;
 import java.util.Map;
 
 public class LineApiTest {

@@ -2,11 +2,11 @@ package subway.domain.section;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.jdbc.Sql;
+import subway.common.AcceptanceTest;
 import subway.domain.Section;
 import subway.domain.Sections;
 
@@ -16,11 +16,19 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static subway.domain.line.LineApiTest.지하철노선의_마지막_구간을_조회한다;
 import static subway.common.SetupTest.*;
+import static subway.domain.station.StationApiTest.지하철역을_생성한다;
 
 @DisplayName("지하철구간 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@Sql("/setup-data.sql")
-public class SectionAcceptanceTest {
+public class SectionAcceptanceTest extends AcceptanceTest {
+    @BeforeEach
+    void setup() {
+        지하철역을_생성한다("강남역");
+        지하철역을_생성한다("미금역");
+        지하철역을_생성한다("오리역");
+        지하철역을_생성한다("판교역");
+        지하철역을_생성한다("정자역");
+        지하철역을_생성한다("동천역");
+    }
 
     /**
      * When 지하철 구간을 생성하면
@@ -45,8 +53,8 @@ public class SectionAcceptanceTest {
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(response.body().jsonPath().getObject("sections", Sections.class).getSections().get(0).getUpStationId()).isEqualTo(1);
-        assertThat(response.body().jsonPath().getObject("sections", Sections.class).getSections().get(0).getDownStationId()).isEqualTo(2);
+        assertThat(response.body().jsonPath().getObject("sections", Sections.class).getSections().get(0).getUpStation().getId()).isEqualTo(1);
+        assertThat(response.body().jsonPath().getObject("sections", Sections.class).getSections().get(0).getDownStation().getId()).isEqualTo(2);
     }
 
     /**
