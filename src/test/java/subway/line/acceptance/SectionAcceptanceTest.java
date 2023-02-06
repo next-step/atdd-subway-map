@@ -25,6 +25,7 @@ public class SectionAcceptanceTest {
     private StationResponse stationA;
     private StationResponse stationB;
     private StationResponse stationC;
+    private StationResponse stationD;
 
     private LineResponse lineOne;
 
@@ -33,6 +34,7 @@ public class SectionAcceptanceTest {
         stationA = requestCreateStation("A역").body().as(StationResponse.class);
         stationB = requestCreateStation("B역").body().as(StationResponse.class);
         stationC = requestCreateStation("C역").body().as(StationResponse.class);
+        stationD = requestCreateStation("D역").body().as(StationResponse.class);
         lineOne = LineApiClient.requestCreateLine("1호선", "#0052A4", stationA.getId(), stationC.getId(), 7)
                 .body().as(LineResponse.class);
     }
@@ -65,7 +67,7 @@ public class SectionAcceptanceTest {
     @Test
     void createSectionFail() {
         // when
-        ExtractableResponse<Response> appendSectionResponse = requestAppendSection(lineOne.getId(), stationC.getId(), stationC.getId(), 3);
+        ExtractableResponse<Response> appendSectionResponse = requestAppendSection(lineOne.getId(), stationD.getId(), stationC.getId(), 3);
 
         assertThat(appendSectionResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
 
@@ -86,7 +88,7 @@ public class SectionAcceptanceTest {
     @Test
     void createSectionFail2() {
         // when
-        ExtractableResponse<Response> appendSectionResponse = requestAppendSection(lineOne.getId(), stationA.getId(), stationA.getId(), 3);
+        ExtractableResponse<Response> appendSectionResponse = requestAppendSection(lineOne.getId(), stationC.getId(), stationA.getId(), 3);
 
         assertThat(appendSectionResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
 
