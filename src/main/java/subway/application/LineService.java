@@ -32,15 +32,10 @@ public class LineService {
         Station downStation = stationService.getStationById(lineRequest.getDownStationId());
 
         Line line = lineRequest.toEntity();
-
         lineRepository.save(line);
 
         Section section = new Section(line, upStation, downStation, lineRequest.getDistance());
-
         line.addSection(section);
-
-        List<Station> stations = line.getStations();
-        System.out.println("stations = " + stations);
 
         return LineResponse.of(line);
     }
