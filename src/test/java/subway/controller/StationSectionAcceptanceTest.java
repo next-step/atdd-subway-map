@@ -39,12 +39,7 @@ public class StationSectionAcceptanceTest {
         SIN_BUN_DANG_STATION_LINE.put("distance", 10);
 
         StationUtils.createLine(SIN_BUN_DANG_STATION_LINE);
-
-        Map<String, Object> body = new HashMap<>();
-        body.put("upStationId", 2L);
-        body.put("downStationId", 3L);
-        body.put("distance", 20L);
-        StationUtils.extendLine(body);
+        StationUtils.extendLine(2L, 3L, 20L);
     }
 
 
@@ -56,11 +51,7 @@ public class StationSectionAcceptanceTest {
      */
     @Test
     void createStationSection() {
-        Map<String, Object> body = new HashMap<>();
-        body.put("upStationId", 3);
-        body.put("downStationId", 4);
-        body.put("distance", 30L);
-        ExtractableResponse<Response> response = StationUtils.extendLine(body);
+        ExtractableResponse<Response> response = StationUtils.extendLine(3L, 4L, 30L);
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
@@ -83,10 +74,7 @@ public class StationSectionAcceptanceTest {
      */
     @Test
     void createStationSectionError1() {
-        Map<String, Object> body = new HashMap<>();
-        body.put("upStationId", 2);
-        body.put("downStationId", 4);
-        ExtractableResponse<Response> response = StationUtils.extendLine(body);
+        ExtractableResponse<Response> response = StationUtils.extendLine(2L, 4L, 40L);
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(response.body().asString()).contains("새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 한다");
@@ -101,10 +89,7 @@ public class StationSectionAcceptanceTest {
      */
     @Test
     void createStationSectionError2() {
-        Map<String, Object> body = new HashMap<>();
-        body.put("upStationId", 3);
-        body.put("downStationId", 1);
-        ExtractableResponse<Response> response = StationUtils.extendLine(body);
+        ExtractableResponse<Response> response = StationUtils.extendLine(3L, 1L, 40L);
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(response.body().asString()).contains("새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없다");

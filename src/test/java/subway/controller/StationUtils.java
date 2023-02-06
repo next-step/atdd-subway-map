@@ -8,6 +8,7 @@ import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import org.springframework.http.HttpStatus;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -72,7 +73,11 @@ public class StationUtils {
                 .then().extract();
     }
 
-    public static ExtractableResponse<Response> extendLine(Map<String, Object> body) {
+    public static ExtractableResponse<Response> extendLine(Long upStationId, Long downStationId, Long distance) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("upStationId", upStationId);
+        body.put("downStationId", downStationId);
+        body.put("distance", distance);
         return RestAssured
                 .given().spec(getRequestSpecification()).body(body).log().all()
                 .when().post("/lines/1/sections")
