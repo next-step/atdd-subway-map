@@ -1,11 +1,15 @@
 package subway.domain.entity;
 
+import subway.api.dto.SectionRequest;
+
 import javax.persistence.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Optional.ofNullable;
+import static subway.api.validator.SectionValidator.addSectionValidator;
+import static subway.api.validator.SectionValidator.deleteSectionValidator;
 
 @Entity
 public class Line {
@@ -29,6 +33,16 @@ public class Line {
 	public void updateLineIfPresent(Line line) {
 		ofNullable(line.getName()).ifPresent(nameToUpdate -> name = nameToUpdate);
 		ofNullable(line.getColor()).ifPresent(colorToUpdate -> color = colorToUpdate);
+	}
+
+	public void addSection(SectionRequest sectionRequest, Station upStation, Station downStation) {
+		addSectionValidator(this, upStation, downStation);
+		this.getSections().add(new Section(this, upStation, downStation, sectionRequest.getDistance()));
+	}
+
+	public void removeSection(Station station) {
+		deleteSectionValidator(this, station);
+		this.getSections().remove(this.getSections().size() - 1);
 	}
 
 	public String getName() {

@@ -15,8 +15,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static subway.api.validator.SectionValidator.addSectionValidator;
-import static subway.api.validator.SectionValidator.deleteSectionValidator;
 import static subway.global.error.exception.ErrorCode.LINE_NOT_EXISTS;
 
 @Service
@@ -55,12 +53,12 @@ public class LineService {
         return lineRepository.findById(id).stream()
                 .map(this::createLineResponse)
                 .findFirst()
-                .orElseThrow(()->new EntityNotFoundException(LINE_NOT_EXISTS));
+                .orElseThrow(() -> new EntityNotFoundException(LINE_NOT_EXISTS));
     }
 
     @Transactional
     public void updateLine(Long id, LineRequest lineRequest) {
-        Line findedLine = lineRepository.findById(id).orElseThrow(()->new EntityNotFoundException(LINE_NOT_EXISTS));
+        Line findedLine = lineRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(LINE_NOT_EXISTS));
         findedLine.updateLineIfPresent(lineRequest.toLineEntity(lineRequest));
     }
 
@@ -89,16 +87,14 @@ public class LineService {
     public void addSection(Long lineId, SectionRequest sectionRequest) {
         Station upStation = stationService.findById(sectionRequest.getUpStationId());
         Station downStation = stationService.findById(sectionRequest.getDownStationId());
-        Line line = lineRepository.findById(lineId).orElseThrow(()->new EntityNotFoundException(LINE_NOT_EXISTS));
-        addSectionValidator(line,upStation,downStation);
-        line.getSections().add(new Section(line, upStation, downStation, sectionRequest.getDistance()));
+        Line line = lineRepository.findById(lineId).orElseThrow(() -> new EntityNotFoundException(LINE_NOT_EXISTS));
+        line.addSection(sectionRequest, upStation, downStation);
     }
 
     @Transactional
     public void deleteSection(Long lineId, Long stationId) {
-        Line line = lineRepository.findById(lineId).orElseThrow(()->new EntityNotFoundException(LINE_NOT_EXISTS));
+        Line line = lineRepository.findById(lineId).orElseThrow(() -> new EntityNotFoundException(LINE_NOT_EXISTS));
         Station station = stationService.findById(stationId);
-        deleteSectionValidator(line, station);
-        line.getSections().remove(line.getSections().size() - 1);
+        line.removeSection(station);
     }
 }
