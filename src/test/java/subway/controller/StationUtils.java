@@ -66,6 +66,20 @@ public class StationUtils {
                 .then().extract();
     }
 
+    public static ExtractableResponse<Response> createLine(String name, String color, Long upStationId, Long downStationId, Long distance) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("name", name);
+        body.put("color", color);
+        body.put("upStationId", upStationId);
+        body.put("downStationId", downStationId);
+        body.put("distance", distance);
+        return RestAssured
+                .given().spec(getRequestSpecification()).body(body)
+                .when().post("/lines")
+                .then().extract();
+    }
+
+
     public static ExtractableResponse<Response> selectLine(long stationLineId) {
         return RestAssured
                 .given().spec(getRequestSpecification())
@@ -88,6 +102,13 @@ public class StationUtils {
         return RestAssured
                 .given().spec(getRequestSpecification()).log().all()
                 .when().delete("/lines/1/sections?stationId=" + stationId)
+                .then().log().all().extract();
+    }
+
+    public static ExtractableResponse<Response> reduceLine(long lineId, long stationId) {
+        return RestAssured
+                .given().spec(getRequestSpecification()).log().all()
+                .when().delete("/lines/"+ lineId +"/sections?stationId=" + stationId)
                 .then().log().all().extract();
     }
 

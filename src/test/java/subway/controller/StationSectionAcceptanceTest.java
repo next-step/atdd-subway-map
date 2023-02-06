@@ -135,21 +135,9 @@ public class StationSectionAcceptanceTest {
     void deleteStationSectionError2() {
         StationUtils.createStation(GURO_STATION);
         StationUtils.createStation(SINDORIM_STATION);
+        StationUtils.createLine(ONE_LINE_NAME, LINE_BLUE, 5L, 6L, 20L);
 
-        Map<String, Object> oneStationLine = new HashMap<>();
-        oneStationLine.put("name", ONE_LINE_NAME);
-        oneStationLine.put("color", LINE_BLUE);
-        oneStationLine.put("upStationId", 5L);
-        oneStationLine.put("downStationId", 6L);
-        oneStationLine.put("distance", 20);
-
-        StationUtils.createLine(oneStationLine);
-
-        ExtractableResponse<Response> response =
-                RestAssured
-                .given().spec(getRequestSpecification()).log().all()
-                .when().delete("/lines/2/sections?stationId=6")
-                .then().log().all().extract();;
+        ExtractableResponse<Response> response = reduceLine(2, 6);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(response.body().asString()).contains("지하철 노선에 상행 종점역과 하행 종점역만 있는 경우");
     }
