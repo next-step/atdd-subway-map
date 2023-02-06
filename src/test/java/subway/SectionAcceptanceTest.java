@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static subway.global.error.exception.ErrorCode.STATION_NOT_FINAL;
 import static subway.response.LineAcceptanceTestUtils.*;
 import static subway.response.SectionAcceptanceTestUtils.*;
 import static subway.response.StationAcceptanceTestUtils.createStation;
@@ -56,6 +57,24 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     }
 
     /**
+     * given 새로운 역을 생성하고
+     * when 해당 노선에 등록되어 있지 않은 지하철 구간을 등록하면
+     * Then STATION_NOT_FINAL 예외발생
+     */
+    @DisplayName("지하철 구간 등록 예외처리1 - 새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 한다.")
+    @Test
+    void addSection_exception1() {
+        //given
+        Long station3Id = createStation("청계산입구역").jsonPath().getLong("id");
+        Long station4Id = createStation("판교역").jsonPath().getLong("id");
+        //when
+        ExtractableResponse<Response> sectionResponse = createSectionResponse(line1Id, createSectionCreateParams(station3Id, station4Id));
+        assertThat(sectionResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(sectionResponse.jsonPath().getList("errorMessages")).contains(STATION_NOT_FINAL.getMessage());
+        //then
+    }
+
+    /**
      * given 새로운 역을 생성하고 지하철 구간을 등록하고
      * when 지하철 구간을 삭제하면
      * Then 지하철 구간을 조회 시 제거된 구간을 찾을 수 있다
@@ -76,5 +95,4 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         assertThat(response.jsonPath().getList("stations.id", Long.class)).doesNotContain(station3Id);
 
     }
-
 }
