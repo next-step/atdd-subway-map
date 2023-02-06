@@ -136,14 +136,14 @@ public class StationSectionAcceptanceTest {
         StationUtils.createStation(GURO_STATION);
         StationUtils.createStation(SINDORIM_STATION);
 
-        Map<String, Object> ONE_STATION_LINE = new HashMap<>();
-        ONE_STATION_LINE.put("name", ONE_LINE_NAME);
-        ONE_STATION_LINE.put("color", LINE_BLUE);
-        ONE_STATION_LINE.put("upStationId", 5L);
-        ONE_STATION_LINE.put("downStationId", 6L);
-        ONE_STATION_LINE.put("distance", 20);
+        Map<String, Object> oneStationLine = new HashMap<>();
+        oneStationLine.put("name", ONE_LINE_NAME);
+        oneStationLine.put("color", LINE_BLUE);
+        oneStationLine.put("upStationId", 5L);
+        oneStationLine.put("downStationId", 6L);
+        oneStationLine.put("distance", 20);
 
-        StationUtils.createLine(ONE_STATION_LINE);
+        StationUtils.createLine(oneStationLine);
 
         ExtractableResponse<Response> response =
                 RestAssured
