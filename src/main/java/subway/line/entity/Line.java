@@ -58,19 +58,21 @@ public class Line {
     public Station getDownStation() {
         mustContainSection();
 
-        return sections.get(sections.size() - 1).getDownStation();
+        int lastIndex = sections.size() - 1;
+
+        return sections.get(lastIndex).getDownStation();
     }
 
-    private Boolean validateSectionCreation(Station newUpStation, Station newDownStation) {
+    private boolean validateSectionCreation(Station newUpStation, Station newDownStation) {
         if(!equalsDownStation(newUpStation)) {
-            return Boolean.FALSE;
+            return false;
         }
 
         if(alreadyInLine(newDownStation)) {
-            return Boolean.FALSE;
+            return false;
         }
 
-        return Boolean.TRUE;
+        return true;
     }
 
     private void mustContainSection() {
@@ -79,28 +81,28 @@ public class Line {
         }
     }
 
-    private Boolean equalsDownStation(Station newUpStation) {
+    private boolean equalsDownStation(Station newUpStation) {
         return  getDownStation().equals(newUpStation);
     }
 
-    private Boolean alreadyInLine(Station newDownStation) {
+    private boolean alreadyInLine(Station newDownStation) {
         return sections.stream()
                 .anyMatch((s) -> s.getUpStation().equals(newDownStation) || s.getDownStation().equals(newDownStation));
     }
 
-    public Boolean validateSectionDeletion(Station station) {
+    public boolean validateSectionDeletion(Station station) {
         if(!equalsDownStation(station)) {
-            return Boolean.FALSE;
+            return false;
         }
 
         if(hasSingleSection()) {
-            return Boolean.FALSE;
+            return false;
         }
 
-        return Boolean.TRUE;
+        return true;
     }
 
-    private Boolean hasSingleSection() {
+    private boolean hasSingleSection() {
         return getSections().size() == CANNOT_DELETE_SECTION_SIZE;
     }
 }
