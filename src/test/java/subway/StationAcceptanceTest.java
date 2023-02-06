@@ -80,9 +80,9 @@ class StationAcceptanceTest extends BaseAcceptance {
         assertThat(stationNames).isEmpty();
     }
 
-    private static ExtractableResponse<Response> 지하철역을_삭제한다(StationResponse 강남역_응답) {
+    private static ExtractableResponse<Response> 지하철역을_삭제한다(StationResponse stationResponse) {
         return RestAssured.given().spec(REQUEST_SPEC).log().all()
-            .pathParam("stationId", 강남역_응답.getId())
+            .pathParam("stationId", stationResponse.getId())
             .when().delete("/stations/{stationId}")
             .then().log().all()
             .extract();

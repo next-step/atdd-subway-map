@@ -24,12 +24,14 @@ class SectionAcceptanceTest extends BaseAcceptance {
 
     StationResponse 강남역;
     StationResponse 논현역;
+    StationResponse 신논현역;
     LineLoadDtoResponse 신분당선;
 
     @BeforeEach
     void setUpStation() {
-        강남역 = 지하철역_생성("강남역").as(StationResponse.class);
-        논현역 = 지하철역_생성("논현역").as(StationResponse.class);
+        강남역 = 지하철역_생성("강남역");
+        논현역 = 지하철역_생성("논현역");
+        신논현역 = 지하철역_생성("신논현역");
         신분당선 = 지하철_노선_생성("신분당선", 강남역, 논현역);
     }
 
@@ -40,14 +42,11 @@ class SectionAcceptanceTest extends BaseAcceptance {
     @DisplayName("지하철 구간 생성")
     @Test
     void 지하철_구간_생성을_생성_할_수_있다() {
-        // Given
-        StationResponse 신논현역 = 지하철역_생성("신논현역").as(StationResponse.class);
-
         // When
-        SectionResponse sectionResponse = 지하철_구간_생성(신분당선, 논현역, 신논현역, 10L).as(SectionResponse.class);
+        ExtractableResponse<Response> sectionResponse = 지하철_구간_생성(신분당선, 논현역, 신논현역, 10L);
 
         // Then
-        ExtractableResponse<Response> actualSection = 지하철_구간_목록_요청(sectionResponse);
+        SectionResponse actualSection = 지하철_구간_목록_요청(sectionResponse);
 
         지하철_구간을_조회_할_수_있다(sectionResponse, actualSection);
         지하철_노선을_확인_할_수_있다(actualSection);
@@ -55,35 +54,34 @@ class SectionAcceptanceTest extends BaseAcceptance {
 
 
     /**
-     * Given 새로운 역을 생성 후
-     * When 기존 노선에 새로운 구간 생성 시
-     * Then 상행역은 해당 노선에 등록되어있는 하행 종점역이 아닐 시 throw Exception
+     * When
+     * Then 기존 노선에 새로운 구간 생성 시 상행역은 해당 노선에 등록되어있는 하행 종점역이 아닐 시 생성이 안된다
      */
     @DisplayName("새로운 구간 생성 시 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 한다")
     @Test
-    void 지하철_구간_생성_시_상행역은_해당_노선에_등록되어있는_하행_종점역이_아닐_시_Exception() {
-        // Given
-        StationResponse 신논현역 = 지하철역_생성("신논현역").as(StationResponse.class);
+    void 지하철_구간_생성_시_상행역은_해당_노선에_등록되어있는_하행_종점역이_아닐_시_생성이_안된다() {
+        // When && Then
+        ExtractableResponse<Response> actualResponse = 지하철_구간_생성_요청(신분당선, 논현역, 강남역, 10L);
 
-        // && When
-        ExtractableResponse<Response> actualResponse = 지하철_구간_생성(신분당선, 신논현역, 강남역, 10L);
-
-        // Then
-        지하철_구간_등록하려는_상행역이_기존_하행역이_아니다(actualResponse);
+        지하철_구간_생성이_안된다(actualResponse);
     }
 
     /**
-     * When 기존 노선에 새로운 구간 생성 시
-     * Then 하행역이 해당 노선에 등록되어있는 역이 경우 Exception.
+     * When 기존 노선에 새로운 구간 요청 시 만약 하행역이 해당 노선에 등록되어있는 역일 경우
+     * Then 생성이 안된다
      */
     @DisplayName("새로운 구간 생성 시 하행역은 해당 노선에 등록되어있는 역일 수 없다")
     @Test
-    void 지하철_구간_생성_시_하행역이_해당_노선에_등록되어있는_역이_경우_Exception() {
-        // Given && When
-        ExtractableResponse<Response> actualResponse = 지하철_구간_생성(신분당선, 논현역, 강남역, 10L);
+    void 지하철_구간_생성_시_하행역이_해당_노선에_등록되어있는_역이_경우_등록이_안된다() {
+        // When
+        ExtractableResponse<Response> actualResponse = 지하철_구간_생성_요청(신분당선, 논현역, 강남역, 10L);
 
         // Then
-        지하철_구간_등록하려는_하행역은_해당_노선에_등록되어있는_역일_수_없다(actualResponse);
+        지하철_구간_생성이_안된다(actualResponse);
+    }
+
+    private void 지하철_구간_생성이_안된다(ExtractableResponse<Response> actualResponse) {
+        assertThat(actualResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
     /**
@@ -96,7 +94,6 @@ class SectionAcceptanceTest extends BaseAcceptance {
     @Test
     void 지하철_노선에_구간을_제거_할_수_있다() {
         // Given
-        StationResponse 신논현역 = 지하철역_생성("신논현역").as(StationResponse.class);
         지하철_구간_생성(신분당선, 논현역, 신논현역, 10L);
 
         List<SectionResponse> 노선의_구간들 = 지하철_노선의_구간들_조회_요청(신분당선);
@@ -104,10 +101,9 @@ class SectionAcceptanceTest extends BaseAcceptance {
 
         // When
         ExtractableResponse<Response> response = 지하철_구간_제거_요청(신분당선, 노선의_마지막_구간);
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         // Then
-        노선에_구간이_제거_된_걸_확인_할_수_있다(신분당선);
+        노선에_구간이_제거_된_걸_확인_할_수_있다(신분당선, response);
     }
 
     /**
@@ -120,7 +116,6 @@ class SectionAcceptanceTest extends BaseAcceptance {
     @Test
     void 지하철_노선에_구간은_마지막_하행_종점역만_제거_할_수_있다() {
         // Given
-        StationResponse 신논현역 = 지하철역_생성("신논현역").as(StationResponse.class);
         지하철_구간_생성(신분당선, 논현역, 신논현역, 10L);
 
         List<SectionResponse> 노선의_구간들 = 지하철_노선의_구간들_조회_요청(신분당선);
@@ -151,27 +146,27 @@ class SectionAcceptanceTest extends BaseAcceptance {
         노선에_구간이_하나_일_경우_제거_할_수_없다(response);
     }
 
-    private static void 노선에_구간이_하나_일_경우_제거_할_수_없다(ExtractableResponse<Response> response) {
+    private void 노선에_구간이_하나_일_경우_제거_할_수_없다(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
-    private static void 마지막_구간_하행_종점역만_제거_할_수_있다(ExtractableResponse<Response> actualResponse) {
+    private void 마지막_구간_하행_종점역만_제거_할_수_있다(ExtractableResponse<Response> actualResponse) {
         assertThat(actualResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
-    private static ExtractableResponse<Response> 지하철_구간_목록_요청(SectionResponse givenSection) {
+    private SectionResponse 지하철_구간_목록_요청(ExtractableResponse<Response> givenSection) {
         ExtractableResponse<Response> sectionResponse = RestAssured.given().spec(REQUEST_SPEC).log().all()
-            .pathParam("sectionId", givenSection.getId())
+            .pathParam("sectionId", givenSection.jsonPath().getLong("id"))
             .when().get("/sections/{sectionId}")
             .then().log().all()
             .extract();
 
         assertThat(sectionResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
-        return sectionResponse;
+        return sectionResponse.as(SectionResponse.class);
     }
 
-    private static ExtractableResponse<Response> 지하철역_생성(String stationName) {
+    private StationResponse 지하철역_생성(String stationName) {
         Map<String, String> params = new HashMap<>();
         params.put("name", stationName);
 
@@ -182,24 +177,18 @@ class SectionAcceptanceTest extends BaseAcceptance {
             .extract();
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        return response;
+
+        return response.as(StationResponse.class);
     }
 
-    private static ExtractableResponse<Response> 지하철_구간_생성(LineLoadDtoResponse line, StationResponse upStation, StationResponse downStation, Long distance) {
-        SectionCreateRequest sectionCreateRequest = new SectionCreateRequest(downStation.getId(), upStation.getId(), distance);
-
-        ExtractableResponse<Response> createResponse = RestAssured.given().spec(REQUEST_SPEC).log().all()
-            .pathParam("lineId", line.getId())
-            .body(sectionCreateRequest)
-            .when().post("/lines/{lineId}/sections")
-            .then().log().all()
-            .extract();
+    private ExtractableResponse<Response> 지하철_구간_생성(LineLoadDtoResponse line, StationResponse upStation, StationResponse downStation, Long distance) {
+        ExtractableResponse<Response> createResponse = 지하철_구간_생성_요청(line, upStation, downStation, distance);
 
         return createResponse;
     }
 
-    private static void 지하철_구간을_조회_할_수_있다(SectionResponse givenSection, ExtractableResponse<Response> actualSection) {
-        assertThat(actualSection.as(SectionResponse.class)).isEqualTo(givenSection);
+    private void 지하철_구간을_조회_할_수_있다(ExtractableResponse<Response> givenSection, SectionResponse actualSection) {
+        assertThat(actualSection).isEqualTo(givenSection.as(SectionResponse.class));
     }
 
     private List<SectionResponse> 지하철_노선의_구간들_조회_요청(LineLoadDtoResponse lineLoadDtoResponse) {
@@ -214,8 +203,9 @@ class SectionAcceptanceTest extends BaseAcceptance {
         return response.jsonPath().getList(".", SectionResponse.class);
     }
 
-    private void 노선에_구간이_제거_된_걸_확인_할_수_있다(LineLoadDtoResponse lineResponse) {
-        LineLoadDtoResponse response = 지하철_노선_조회(lineResponse.getId()).as(LineLoadDtoResponse.class);
+    private void 노선에_구간이_제거_된_걸_확인_할_수_있다(LineLoadDtoResponse 신분당선, ExtractableResponse<Response> lineResponse) {
+        assertThat(lineResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        LineLoadDtoResponse response = 지하철_노선_조회(신분당선.getId()).as(LineLoadDtoResponse.class);
 
         assertThat(response.getStations()).hasSize(2);
         assertThat(response.getStations()).containsExactlyInAnyOrderElementsOf(List.of(강남역, 논현역));
@@ -232,13 +222,19 @@ class SectionAcceptanceTest extends BaseAcceptance {
         return response;
     }
 
-    private void 지하철_구간_등록하려는_하행역은_해당_노선에_등록되어있는_역일_수_없다(ExtractableResponse<Response> actualResponse) {
-        assertThat(actualResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    private static ExtractableResponse<Response> 지하철_구간_생성_요청(LineLoadDtoResponse line, StationResponse upStation, StationResponse downStation, Long distance) {
+        SectionCreateRequest sectionCreateRequest = new SectionCreateRequest(downStation.getId(), upStation.getId(), distance);
+
+        ExtractableResponse<Response> actualResponse = RestAssured.given().spec(REQUEST_SPEC).log().all()
+            .pathParam("lineId", line.getId())
+            .body(sectionCreateRequest)
+            .when().post("/lines/{lineId}/sections")
+            .then().log().all()
+            .extract();
+
+        return actualResponse;
     }
 
-    private void 지하철_구간_등록하려는_상행역이_기존_하행역이_아니다(ExtractableResponse<Response> actualSection) {
-        assertThat(actualSection.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
-    }
     private LineLoadDtoResponse 지하철_노선_생성(String lineName, StationResponse upStation, StationResponse downStation) {
         LineCreateRequest givenRequest = new LineCreateRequest(lineName, "bg-red-600", upStation.getId(), downStation.getId(), 10L);
 
@@ -257,12 +253,11 @@ class SectionAcceptanceTest extends BaseAcceptance {
         return createResponse.as(LineLoadDtoResponse.class);
     }
 
-    private void 지하철_노선을_확인_할_수_있다(ExtractableResponse<Response> givenSection) {
-        SectionResponse section = givenSection.as(SectionResponse.class);
-        ExtractableResponse<Response> lineResponse = 지하철_노선_조회(section.getLineResponse().getId());
+    private void 지하철_노선을_확인_할_수_있다(SectionResponse sectionResponse) {
+        ExtractableResponse<Response> lineResponse = 지하철_노선_조회(sectionResponse.getLineResponse().getId());
         LineLoadDtoResponse lineLoadDtoResponse = lineResponse.as(LineLoadDtoResponse.class);
 
-        assertThat(lineLoadDtoResponse.getStations()).containsExactlyInAnyOrderElementsOf(List.of(강남역, section.getUpStation(), section.getDownStation()));
+        assertThat(lineLoadDtoResponse.getStations()).containsExactlyInAnyOrderElementsOf(List.of(강남역, sectionResponse.getUpStation(), sectionResponse.getDownStation()));
     }
 
     private ExtractableResponse<Response> 지하철_노선_조회(Long lineId) {
