@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.station.domain.line.Line;
 import subway.station.domain.line.LineRepository;
+import subway.station.domain.station.Station;
 import subway.station.domain.station.StationRepository;
 import subway.station.web.dto.*;
 
@@ -22,38 +23,23 @@ public class LineService {
         this.lineRepository = lineRepository;
     }
 
-    @Transactional(readOnly = true)
-    public SaveLineResponse saveLine(SaveLineRequest saveLineRequest) {
-        Line line = lineRepository.save(new Line(
-                saveLineRequest.getName(),
-                saveLineRequest.getColor(),
-                saveLineRequest.getUpStationId(),
-                saveLineRequest.getDownStationId(),
-                saveLineRequest.getDistance(),
-                List.of(
-                        stationRepository.findById(saveLineRequest.getUpStationId()).orElseThrow(() -> new IllegalArgumentException("검색된 지하철이 없습니다. id를 바꿔주세요.")),
-                        stationRepository.findById(saveLineRequest.getDownStationId()).orElseThrow(() -> new IllegalArgumentException("검색된 지하철이 없습니다. id를 바꿔주세요."))
-                )));
-        return createLineResponse(line);
+    @Transactional
+    public LineSaveResponse save(LineSaveRequest lineSaveRequest) {
+        Line line = saveLine(lineSaveRequest);
+
+        return toDtoForSaveResponse(line);
     }
 
-    public List<ViewLineResponse> findAll() {
-        return lineRepository.findAll().stream()
-                .map(this::createViewLineResponse)
-                .collect(Collectors.toList());
-    }
-
-    public FindLineResponse findLineById(Long id) {
-        Line line = lineRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("검색된 노선이 없습니다. id를 바꿔주세요."));
-        return createFindLineResponse(line);
+    public List<LineFindAllResponse> findAll() {
+        List<Line> lines = lineRepository.findAll();
+        return toDtoForFindAllResponse(lines);
     }
 
     @Transactional
-    public UpdateLineResponse update(Long id, String name, String color) {
-        Line line = lineRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("검색된 노선이 없습니다. id를 바꿔주세요."));
-        line.changeName(name);
-        line.changeColor(color);
-        return createUpdateLineResponse(line);
+    public LineUpdateResponse update(Long id, String name, String color) {
+        Line line = findLineById(id);
+        update(line, name, color);
+        return toDtoForUpdateResponse(line);
     }
 
     @Transactional
@@ -61,37 +47,74 @@ public class LineService {
         lineRepository.deleteById(id);
     }
 
-    private SaveLineResponse createLineResponse(Line line) {
-        return new SaveLineResponse(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                line.getStations()
-        );
+    private List<LineFindAllResponse> toDtoForFindAllResponse(List<Line> lines) {
+        return lines.stream()
+                .map(this::toDtoFoFindAllResponse)
+                .collect(Collectors.toList());
     }
 
-    private ViewLineResponse createViewLineResponse(Line line) {
-        return new ViewLineResponse(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                line.getStations()
-        );
+    public LineFindByLineResponse findById(Long id) {
+        Line line = findLineById(id);
+        return toDtoForFindByResponse(line);
     }
 
-    private FindLineResponse createFindLineResponse(Line line) {
-        return new FindLineResponse(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                line.getStations()
-        );
+    private void update(Line line, String name, String color) {
+        line.changeName(name);
+        line.changeColor(color);
     }
 
-    private UpdateLineResponse createUpdateLineResponse(Line line) {
-        return new UpdateLineResponse(
-                line.getName(),
-                line.getColor()
-        );
+    private Line saveLine(LineSaveRequest lineSaveRequest) {
+        return lineRepository.save(Line.builder()
+                .name(lineSaveRequest.getName())
+                .color(lineSaveRequest.getColor())
+                .upStation(findStation(lineSaveRequest.getUpStationId()))
+                .downStation(findStation(lineSaveRequest.getDownStationId()))
+                .distance(lineSaveRequest.getDistance())
+                .build());
+    }
+
+    private Line findLineById(Long lineId) {
+        return lineRepository.findById(lineId).orElseThrow(() -> new IllegalArgumentException("검색된 노선이 없습니다. id를 바꿔주세요."));
+    }
+
+    private Station findStation(Long stationId) {
+        return stationRepository.findById(stationId).orElseThrow(() -> new IllegalArgumentException("검색된 지하철이 없습니다. id를 바꿔주세요."));
+    }
+
+    private LineSaveResponse toDtoForSaveResponse(Line line) {
+        return LineSaveResponse.builder()
+                .id(line.getId())
+                .name(line.getName())
+                .color(line.getColor())
+                .upStation(line.getUpStation())
+                .downStation(line.getDownStation())
+                .build();
+    }
+
+    private LineFindAllResponse toDtoFoFindAllResponse(Line line) {
+        return LineFindAllResponse.builder()
+                .id(line.getId())
+                .name(line.getName())
+                .color(line.getColor())
+                .upStation(line.getUpStation())
+                .downStation(line.getDownStation())
+                .build();
+    }
+
+    private LineFindByLineResponse toDtoForFindByResponse(Line line) {
+        return LineFindByLineResponse.builder()
+                .id(line.getId())
+                .name(line.getName())
+                .color(line.getColor())
+                .upStation(line.getUpStation())
+                .downStation(line.getDownStation())
+                .build();
+    }
+
+    private LineUpdateResponse toDtoForUpdateResponse(Line line) {
+        return LineUpdateResponse.builder()
+                .name(line.getName())
+                .color(line.getColor())
+                .build();
     }
 }

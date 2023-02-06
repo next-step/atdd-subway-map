@@ -18,25 +18,25 @@ public class LineController {
     }
 
     @PostMapping("/lines")
-    public ResponseEntity<SaveLineResponse> saveLine(@RequestBody SaveLineRequest saveLineRequest) {
-        SaveLineResponse line = lineService.saveLine(saveLineRequest);
+    public ResponseEntity<LineSaveResponse> saveLine(@RequestBody LineSaveRequest lineSaveRequest) {
+        LineSaveResponse line = lineService.save(lineSaveRequest);
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
 
     @GetMapping("/lines")
-    public ResponseEntity<List<ViewLineResponse>> viewLines() {
+    public ResponseEntity<List<LineFindAllResponse>> viewLines() {
         return ResponseEntity.ok().body(lineService.findAll());
     }
 
     @GetMapping("/lines/{id}")
-    public ResponseEntity<FindLineResponse> findLineById(@PathVariable Long id) {
-        FindLineResponse line = lineService.findLineById(id);
+    public ResponseEntity<LineFindByLineResponse> findLineById(@PathVariable Long id) {
+        LineFindByLineResponse line = lineService.findById(id);
         return ResponseEntity.ok().body(line);
     }
 
     @PutMapping("/lines/{id}")
-    public ResponseEntity<UpdateLineResponse> updateLine(@PathVariable Long id, @RequestBody UpdateLineResponse updateLineRequest) {
-        UpdateLineResponse line = lineService.update(id, updateLineRequest.getName(), updateLineRequest.getColor());
+    public ResponseEntity<LineUpdateResponse> updateLine(@PathVariable Long id, @RequestBody LineUpdateResponse updateLineRequest) {
+        LineUpdateResponse line = lineService.update(id, updateLineRequest.getName(), updateLineRequest.getColor());
         return ResponseEntity.ok().body(line);
     }
 
