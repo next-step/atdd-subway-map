@@ -31,10 +31,6 @@ public class StationService {
                 .collect(Collectors.toList());
     }
 
-    public Station findById(Long id) throws Exception {
-        return stationRepository.findById(id).orElseThrow(() -> new Exception("[SYS_ERROR] do not found station by id ("+id+")"));
-    }
-
     @Transactional
     public void deleteStationById(Long id) {
         stationRepository.deleteById(id);

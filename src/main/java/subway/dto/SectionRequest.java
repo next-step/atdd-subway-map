@@ -4,9 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Getter
-public class StationRequest {
-    private String name;
+public class SectionRequest {
+    private Long upStationId;
+    private Long downStationId;
+    private int distance;
 }

@@ -4,6 +4,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
+import subway.dto.SectionRequest;
 import subway.service.LineService;
 
 import java.net.URI;
@@ -24,6 +25,18 @@ public class LineController {
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
 
+    @PostMapping("/{id}/sections")
+    public ResponseEntity<LineResponse> addSection(@PathVariable String id, @RequestBody SectionRequest sectionRequest) throws Exception {
+        LineResponse line = lineService.addSection(id, sectionRequest);
+        return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
+    }
+
+    @DeleteMapping ("/{id}/sections")
+    public ResponseEntity<LineResponse> deleteSection(@PathVariable String id, @RequestParam(name = "sectionId") String sectionId) throws Exception {
+        LineResponse line = lineService.deleteSection(id, sectionId);
+        return ResponseEntity.ok().body(line);
+    }
+
     @GetMapping()
     public ResponseEntity<List<LineResponse>> showLines() {
         return ResponseEntity.ok().body(lineService.findAllLines());
@@ -35,9 +48,8 @@ public class LineController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateLine(@PathVariable Long id, @RequestBody LineRequest lineRequest) {
-        lineService.updateLine(id, lineRequest);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<LineResponse> updateLine(@PathVariable Long id, @RequestBody LineRequest lineRequest) {
+        return ResponseEntity.ok().body(lineService.updateLine(id, lineRequest));
     }
 
     @DeleteMapping("/{id}")

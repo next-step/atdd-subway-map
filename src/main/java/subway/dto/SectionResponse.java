@@ -7,7 +7,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-public class StationResponse {
+public class SectionResponse {
     private Long id;
-    private String name;
+    private StationResponse upStation;
+    private StationResponse downStation;
+    private int distance;
 }

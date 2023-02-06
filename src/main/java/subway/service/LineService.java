@@ -3,50 +3,66 @@ package subway.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.domain.Line;
+import subway.domain.Section;
+import subway.domain.Sections;
 import subway.domain.Station;
-import subway.dto.LineRequest;
-import subway.dto.LineResponse;
+import subway.dto.*;
+import subway.exception.SubwayRestApiException;
 import subway.repository.LineRepository;
+import subway.repository.StationRepository;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static subway.exception.ErrorResponseEnum.*;
+
 @Service
 @Transactional(readOnly = true)
 public class LineService {
     LineRepository lineRepository;
-    StationService stationService;
+    StationRepository stationRepository;
 
-    public LineService(LineRepository lineRepository, StationService stationService) {
+
+    public LineService(LineRepository lineRepository, StationRepository stationRepository) {
         this.lineRepository = lineRepository;
-        this.stationService = stationService;
+        this.stationRepository = stationRepository;
     }
 
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
-        Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor(), lineRequest.getUpStationId(), lineRequest.getDownStationId(), lineRequest.getDistance()));
+        Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor()));
         return createLineResponse(line);
     }
 
-    public List<LineResponse> findAllLines(){
+    public List<LineResponse> findAllLines() {
         return lineRepository.findAll().stream()
                 .map(this::createLineResponse)
                 .collect(Collectors.toList());
     }
 
-    private LineResponse createLineResponse(Line line) {
-        try {
-            List<Station> stationList = new ArrayList<>();
-            stationList.add(stationService.findById(line.getUpStationId()));
-            stationList.add(stationService.findById(line.getDownStationId()));
+    private LineResponse createLineResponse(Line line){
+        return new LineResponse(line.getId(), line.getName(), line.getColor(), this.createSectionsResponse(line));
+    }
 
-            return new LineResponse(line.getId(), line.getName(), line.getColor(), stationList);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+    private List<SectionResponse> createSectionsResponse(Line line) {
+        Sections sections = line.getSections();
 
-            return new LineResponse();
+        if (null == sections) {
+            return null;
         }
+
+        List<SectionResponse> sectionResponseList = new ArrayList<>();
+
+        for (Section section : sections.getSections()) {
+            StationResponse upStation = new StationResponse(section.getUpStation().getId(), section.getUpStation().getName());
+            StationResponse downStation = new StationResponse(section.getDownStation().getId(), section.getDownStation().getName());
+            SectionResponse sectionResponse = new SectionResponse(section.getId(), upStation, downStation, section.getDistance());
+
+            sectionResponseList.add(sectionResponse);
+        }
+
+        return sectionResponseList;
     }
 
     public LineResponse findLineById(Long id) {
@@ -59,11 +75,38 @@ public class LineService {
     }
 
     @Transactional
-    public void updateLine(Long id, LineRequest lineRequest) {
+    public LineResponse updateLine(Long id, LineRequest lineRequest) {
         Line line = lineRepository.findById(id).get();
 
         line.change(lineRequest.getName(), lineRequest.getColor());
 
-        lineRepository.save(line);
+        line = lineRepository.save(line);
+
+        return createLineResponse(line);
+    }
+
+    @Transactional
+    public LineResponse addSection(String id, SectionRequest sectionRequest) throws Exception {
+        Line line = lineRepository.findById(Long.valueOf(id)).orElseThrow(() -> new SubwayRestApiException(ERROR_NO_FOUND_LINE));
+
+        Station upStation = stationRepository.findById(sectionRequest.getUpStationId()).orElseThrow(() -> new SubwayRestApiException(ERROR_NO_FOUND_STATION));
+        Station downStation = stationRepository.findById(sectionRequest.getDownStationId()).orElseThrow(() -> new SubwayRestApiException(ERROR_NO_FOUND_STATION));
+
+        Section section = new Section(upStation, downStation, sectionRequest.getDistance());
+
+        line.addSection(section);
+        line = lineRepository.save(line);
+
+        return createLineResponse(line);
+    }
+
+    @Transactional
+    public LineResponse deleteSection(String id, String sectionId) throws Exception{
+        Line line = lineRepository.findById(Long.valueOf(id)).orElseThrow(() -> new SubwayRestApiException(ERROR_NO_FOUND_LINE));
+
+        line.deleteSection(Long.valueOf(sectionId));
+        Line deleteLine = lineRepository.save(line);
+
+        return createLineResponse(deleteLine);
     }
 }
