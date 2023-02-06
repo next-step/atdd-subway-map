@@ -1,4 +1,4 @@
-package subway;
+package subway.line;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -8,6 +8,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import subway.AcceptanceTest;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -19,7 +20,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.StationAcceptanceTest.*;
+import static subway.station.StationAcceptanceTest.*;
 
 @DisplayName("지하철 노선 관련 기능")
 public class LineAcceptanceTest extends AcceptanceTest {
@@ -36,7 +37,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     private Map<String, String> createLineParams;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         super.setUp();
 
         강남역_id = 지하철역_생성_요청("강남역").jsonPath().getLong(ID);
