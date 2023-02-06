@@ -4,10 +4,8 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
@@ -20,34 +18,7 @@ import java.util.Map;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-public class LineAcceptanceTest {
-
-    private static final int LENGTH_TWO = 2;
-    private static final String SHINBUNDANG_LINE = "신분당선";
-    private static final String RED = "bg-red-600";
-    private static final long DISTANCE_TEN = 10L;
-    private static final String BUNDANG_LINE = "분당선";
-    private static final String GREEN = "bg-green-600";
-    private static final long DISTANCE_FIFTEEN = 15L;
-    private static final String ANOTHER_BUNDANG_LINE = "다른분당선";
-    private static final String YELLOW = "bg-yellow-600";
-
-    @LocalServerPort
-    int port;
-
-    StationAcceptanceTest stationAcceptanceTest;
-    private Long firstStationId;
-    private Long secondStationId;
-    private Long thirdStationId;
-
-    @BeforeEach
-    void setUp() {
-        RestAssured.port = port;
-        stationAcceptanceTest = new StationAcceptanceTest();
-        firstStationId = stationAcceptanceTest.saveStation("지하철역");
-        secondStationId = stationAcceptanceTest.saveStation("새로운지하철역");
-        thirdStationId = stationAcceptanceTest.saveStation("또다른지하철역");
-    }
+public class LineAcceptanceTest extends LineAcceptanceTestSetting {
 
     /**
      * When 지하철 노선을 생성하면
