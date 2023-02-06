@@ -5,10 +5,7 @@ import lombok.NoArgsConstructor;
 import subway.domain.section.Section;
 import subway.domain.station.Station;
 import subway.dto.domain.UpAndDownStationsDto;
-import subway.exception.CannotDeleteStationFromALineWithOnlyTwoStationsException;
-import subway.exception.DownStationOfNewSectionMustNotExistingLineStationException;
-import subway.exception.ToBeDeletedStationMustBeLastException;
-import subway.exception.UpStationOfNewSectionMustBeDownStationOfExistingLineException;
+import subway.exception.*;
 
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
@@ -89,23 +86,23 @@ public class Sections {
     public void checkSectionExtendValid(Station upStation, Station downStation) {
         List<Station> stations = getStationsByAscendingOrder();
         if (!upStation.equals(stations.get(stations.size() - 1))) {
-            throw new UpStationOfNewSectionMustBeDownStationOfExistingLineException();
+            throw new ExtendSectionException("새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 한다.");
         }
         if (stations.stream().anyMatch(station -> station.equals(downStation))) {
-            throw new DownStationOfNewSectionMustNotExistingLineStationException();
+            throw new ExtendSectionException("새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없다.");
         }
     }
 
     public void checkSectionReduceValid(Station station) {
         List<Station> stations = getStationsByAscendingOrder();
         if (stations.isEmpty()) {
-            throw new IllegalArgumentException("해당 노선이 비어있습니다.");
+            throw new ReduceSectionException("해당 노선이 비어있습니다.");
         }
         if (!stations.get(stations.size() - 1).equals(station)) {
-            throw new ToBeDeletedStationMustBeLastException();
+            throw new ReduceSectionException("지하철 노선에 등록된 역(하행 종점역)만 제거할 수 있다. 즉, 마지막 구간만 제거할 수 있다.");
         }
         if (stations.size() == 2) {
-            throw new CannotDeleteStationFromALineWithOnlyTwoStationsException();
+            throw new ReduceSectionException("지하철 노선에 상행 종점역과 하행 종점역만 있는 경우(구간이 1개인 경우) 역을 삭제할 수 없다.");
         }
     }
 }
