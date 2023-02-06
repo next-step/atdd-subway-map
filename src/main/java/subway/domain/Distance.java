@@ -1,7 +1,5 @@
 package subway.domain;
 
-import subway.exception.InvalidDistanceException;
-
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
@@ -16,7 +14,9 @@ public class Distance {
 
     public Distance(int value) {
         if (value <= LOWER_LIMIT) {
-            throw new InvalidDistanceException(value);
+            throw new IllegalArgumentException(
+                    String.format("지하철 구간 길이의 하한값은 %d 입니다. (하한값: %d)", LOWER_LIMIT)
+            );
         }
         this.value = value;
     }

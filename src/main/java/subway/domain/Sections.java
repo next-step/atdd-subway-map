@@ -1,10 +1,5 @@
 package subway.domain;
 
-import subway.exception.AlreadyExistStationException;
-import subway.exception.MinimumLineException;
-import subway.exception.NonContinuousStationException;
-import subway.exception.OnlyCanRemoveTailStationException;
-
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
 import java.util.ArrayList;
@@ -56,12 +51,16 @@ public class Sections {
         Station upStation = section.getUpStation();
 
         if (!tailStation.equals(upStation)) {
-            throw new NonContinuousStationException(upStation.getId());
+            throw new IllegalArgumentException(
+                    String.format("새로운 구간의 상행역은 현재 노선의 하행 종점역이어야 합니다. (하행 종점역: %d)", tailStation.getId())
+            );
         }
 
         Station downStation = section.getDownStation();
         if (stations.contains(downStation)) {
-            throw new AlreadyExistStationException(downStation.getId());
+            throw new IllegalArgumentException(
+                    String.format("새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없습니다. (요청값: %d)", downStation.getId())
+            );
         }
 
         sections.add(section);
@@ -69,12 +68,14 @@ public class Sections {
 
     public void remove(Station station) {
         if (isRemainedOneSection()) {
-            throw new MinimumLineException(station.getId());
+            throw new IllegalStateException("지하철노선이 하나의 구간만 존재할 경우, 역을 삭제할 수 없습니다.");
         }
 
         Station tailStation = getTailStation();
         if (!tailStation.equals(station)) {
-            throw new OnlyCanRemoveTailStationException(station.getId());
+            throw new IllegalArgumentException(
+                    String.format("지하철 노선에 등록된 역(하행 종점역)만 제거할 수 있습니다. 즉, 마지막 구간만 제거할 수 있습니다. (하행 종점역: %d)", tailStation.getId())
+            );
         }
 
         sections.remove(sections.size() - 1);

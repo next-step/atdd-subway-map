@@ -11,12 +11,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import subway.exception.LineNotFoundException;
-import subway.exception.SectionException;
+import subway.application.LineService;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
-import subway.application.LineService;
 import subway.dto.SectionRequest;
+import subway.exception.LineNotFoundException;
+import subway.exception.StationNotFoundException;
 
 import java.net.URI;
 import java.util.List;
@@ -79,13 +79,13 @@ public class LineController {
         return ResponseEntity.noContent().build();
     }
 
-    @ExceptionHandler({LineNotFoundException.class})
-    public ResponseEntity<Void> catchLineNotFoundException(LineNotFoundException e) {
+    @ExceptionHandler({StationNotFoundException.class, LineNotFoundException.class})
+    public ResponseEntity<Void> catchNotFoundException() {
         return ResponseEntity.notFound().build();
     }
 
-    @ExceptionHandler({SectionException.class})
-    public ResponseEntity<Void> catchSectionException(SectionException e) {
+    @ExceptionHandler({IllegalArgumentException.class, IllegalStateException.class})
+    public ResponseEntity<Void> catchStandardException() {
         return ResponseEntity.badRequest().build();
     }
 }
