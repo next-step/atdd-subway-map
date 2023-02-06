@@ -1,14 +1,11 @@
 package subway.line;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.annotation.DirtiesContext;
 import subway.controller.request.LineRequest;
 import subway.controller.response.LineResponse;
 import subway.util.AcceptanceTestHelper;
@@ -28,13 +25,8 @@ import static subway.fixture.StationFixture.역삼역_이름;
 
 class LineAcceptanceTest extends AcceptanceTestHelper {
 
-    @LocalServerPort
-    int port;
-
     @BeforeEach
-    void setUp() {
-        RestAssured.port = port;
-
+    void setStations() {
         지하철역_생성(강남역_이름);
         지하철역_생성(역삼역_이름);
         지하철역_생성(교대역_이름);
@@ -147,13 +139,6 @@ class LineAcceptanceTest extends AcceptanceTestHelper {
                 .isEqualTo(HttpStatus.NO_CONTENT.value());
 
         assertThat(maybeLine).isEmpty();
-    }
-
-    public long 지하철역_생성(String name) {
-
-        return post(STATION_PATH, Map.of("name", name))
-                .jsonPath()
-                .getLong("id");
     }
 
     public ExtractableResponse<Response> 지하철노선_생성(final LineRequest req) {

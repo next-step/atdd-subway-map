@@ -66,7 +66,7 @@ public class Section {
                 .build();
     }
 
-    public void addLine(Line line) {
+    public void updateLine(Line line) {
         this.line = line;
     }
 

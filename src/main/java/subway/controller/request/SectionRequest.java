@@ -1,14 +1,11 @@
 package subway.controller.request;
 
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 
 @Getter
-@AllArgsConstructor
-@NoArgsConstructor
 public class SectionRequest {
 
     @NotBlank
@@ -19,5 +16,12 @@ public class SectionRequest {
 
     @NotBlank
     private Integer distance;
+
+    @Builder
+    private SectionRequest(Long upStationId, Long downStationId, Integer distance) {
+        this.upStationId = upStationId;
+        this.downStationId = downStationId;
+        this.distance = distance;
+    }
 
 }

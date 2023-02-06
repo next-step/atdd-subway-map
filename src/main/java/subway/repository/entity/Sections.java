@@ -14,6 +14,8 @@ import java.util.stream.Collectors;
 @Embeddable
 public class Sections {
 
+    private static final int MIN_SECTION_SIZE = 1;
+
     @OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
     private List<Section> sections = new ArrayList<>();
 
@@ -34,7 +36,7 @@ public class Sections {
             throw new SubwayRuntimeException(SubwayErrorCode.STATION_UPPER_SECTION);
         }
 
-        if (newSection.addable(stations()) == false) {
+        if (newSection.addable(getStations()) == false) {
             throw new SubwayRuntimeException(SubwayErrorCode.DOWN_STATION_HAS_BEEN_REGISTERED);
         }
     }
@@ -60,16 +62,8 @@ public class Sections {
                 .collect(Collectors.toList());
     }
 
-    public List<Station> stations() {
-        return sections.stream()
-                .map(section -> List.of(section.getUpStation(), section.getDownStation()))
-                .flatMap(Collection::stream)
-                .distinct()
-                .collect(Collectors.toUnmodifiableList());
-    }
-
     public void delete(long stationId) {
-        if (sections.size() == 1) {
+        if (sections.size() == MIN_SECTION_SIZE) {
             throw new SubwayRuntimeException(SubwayErrorCode.SECTION_DELETE_ERROR);
         }
 

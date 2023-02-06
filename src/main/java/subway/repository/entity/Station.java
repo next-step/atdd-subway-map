@@ -1,13 +1,11 @@
 package subway.repository.entity;
 
-import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
-@AllArgsConstructor
 @NoArgsConstructor
 public class Station {
     @Id

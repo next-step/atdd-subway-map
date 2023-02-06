@@ -35,11 +35,9 @@ public class Line {
     private Sections sections = new Sections();
 
     @Builder
-    private Line(String name, String color, Section section) {
+    private Line(String name, String color) {
         this.name = name;
         this.color = color;
-        sections.addSection(section);
-        section.addLine(this);
     }
 
     public void update(final String name, final String color) {
@@ -53,7 +51,7 @@ public class Line {
 
     public void addSection(Section section) {
         sections.addSection(section);
-        section.addLine(this);
+        section.updateLine(this);
     }
 
     public List<Long> getStationIds() {

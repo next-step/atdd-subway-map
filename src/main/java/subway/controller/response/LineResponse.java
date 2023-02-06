@@ -22,8 +22,10 @@ public class LineResponse {
 
     private int distance;
 
-    public static LineResponse from(final Line line, final List<Station> stations) {
-        List<StationResponse> stationResponses = stations.stream()
+    public static LineResponse from(final Line line) {
+        List<StationResponse> stations = line.getSections()
+                .getStations()
+                .stream()
                 .map(StationResponse::from)
                 .collect(Collectors.toList());
 
@@ -31,7 +33,7 @@ public class LineResponse {
                 .id(line.getId())
                 .name(line.getName())
                 .color(line.getColor())
-                .stations(stationResponses)
+                .stations(stations)
                 .distance(line.getDistance())
                 .build();
     }

@@ -5,12 +5,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.controller.request.StationRequest;
 import subway.controller.response.StationResponse;
+import subway.service.dto.Stations;
 import subway.exception.SubwayRuntimeException;
 import subway.exception.message.SubwayErrorCode;
 import subway.repository.StationRepository;
 import subway.repository.entity.Station;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -27,14 +29,11 @@ public class StationService {
     }
 
     public List<StationResponse> findAllStations() {
-        return stationRepository.findAll().stream()
-                .map(this::createStationResponse)
-                .collect(Collectors.toList());
+        return stationRepository.findAll().stream().map(this::createStationResponse).collect(Collectors.toList());
     }
 
     public Station find(Long id) {
-        return stationRepository.findById(id)
-                .orElseThrow(() -> new SubwayRuntimeException(SubwayErrorCode.NOT_FOUND_STATION));
+        return stationRepository.findById(id).orElseThrow(() -> new SubwayRuntimeException(SubwayErrorCode.NOT_FOUND_STATION));
     }
 
     @Transactional
@@ -46,7 +45,11 @@ public class StationService {
         return StationResponse.from(station);
     }
 
-    public List<Station> findByIdIn(final List<Long> id) {
-        return stationRepository.findByIdIn(id);
+    public Stations findByIdIn(final List<Long> id) {
+        Map<Long, Station> stations = stationRepository.findByIdIn(id)
+                .stream()
+                .collect(Collectors.toMap(Station::getId, station -> station));
+
+        return new Stations(stations);
     }
 }

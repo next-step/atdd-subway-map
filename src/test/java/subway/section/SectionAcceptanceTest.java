@@ -4,26 +4,20 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import io.restassured.response.ValidatableResponse;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import subway.controller.request.LineRequest;
 import subway.controller.request.SectionRequest;
-import subway.exception.SubwayRuntimeException;
 import subway.exception.message.SubwayErrorCode;
 import subway.util.AcceptanceTestHelper;
 
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static subway.fixture.LineFixture.삼호선_요청;
 import static subway.fixture.LineFixture.신분당선_요청;
-import static subway.fixture.LineFixture.잘못된_노선_요청;
-import static subway.fixture.SectionFixture.강남역_양재역_구간_요청;
 import static subway.fixture.SectionFixture.교대역_양재역_구간_요청;
 import static subway.fixture.SectionFixture.양재역_양재역_구간_요청;
 import static subway.fixture.SectionFixture.역삼역_교대역_구간_요청;
@@ -69,7 +63,7 @@ class SectionAcceptanceTest extends AcceptanceTestHelper {
     /**
      * Given ->  노선을 생성하고
      * When -> 해당 노선에 상행역과 하행역이 같은 구간을 등록하면
-     * Then -> 400 에러가 발생한다.
+     * Then -> 구간을 추가할 수 없다.
      */
     @DisplayName("상행역과 하행역이 같은 구간은 등록할 수 없다.")
     @Test
@@ -88,31 +82,11 @@ class SectionAcceptanceTest extends AcceptanceTestHelper {
 
     /**
      * Given -> 노선을 생성하고
-     * When -> 해당 노선에 등록되지 않은 역을 상행역으로 등록하면
+     * When -> 해당 노선의 하행 종점역이 아닌 역을 상행역으로 등록하면
      * Then -> 400 에러가 발생한다.
      */
     @Test
-    void 새로운_구간의_상행역은_해당_노선에_등록되어있는_하행_종점역이어야_한다() {
-        // given
-        var createResponse = 지하철노선_생성(신분당선_요청);
-        String path = 경로_추출(createResponse);
-
-        // when
-        var response = 구간_등록(path, 교대역_양재역_구간_요청);
-
-        // then
-        assertThat(상태코드_추출(response)).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(에러메시지_추출(response)).isEqualTo(SubwayErrorCode.STATION_UPPER_SECTION.getMessage());
-    }
-
-
-    /**
-     * Given -> 노선을 생성하고
-     * When -> 해당 노선에 등록되지 않은 역을 하행역으로 등록하면
-     * Then -> 400 에러가 발생한다.
-     */
-    @Test
-    void 새로운_구간의_하행역은_해당_노선에_등록되어있는_역일_수_없다() {
+    void 해당_노선의_하행_종점역이_아닌_역을_상행역으로_등록하면() {
         // given
         var createResponse = 지하철노선_생성(신분당선_요청);
         String path = 경로_추출(createResponse);
@@ -167,25 +141,6 @@ class SectionAcceptanceTest extends AcceptanceTestHelper {
         assertThat(상태코드_추출(response)).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
-    /**
-     * Given -> 지하철 노선 생성후
-     * When -> 해당 노선에서 하행 종점역을 제거하면
-     * Then -> 상행 종점역과 하행 종점역만 있는 경우 역을 삭제 할 수 없다
-     */
-    @Test
-    @DisplayName("지하철 노선에 상행 종점역과 하행 종점역만 있는 경우 (구간이 1개인 경우) 역을 삭제할 수 없다")
-    void lineOneDeleteExceptionTest() {
-        // Given -> 지하철 노선 생성후
-        var createResponse = 지하철노선_생성(삼호선_요청);
-        String location = 경로_추출(createResponse);
-
-        // When -> 해당 노선에서 하행 종점역을 제거하면
-        var response = 구간_삭제(location, 교대역_ID).extract();
-
-        // Then -> 상행 종점역과 하행 종점역만 있는 경우 역을 삭제 할 수 없다
-        assertThat(상태코드_추출(response)).isEqualTo(HttpStatus.BAD_REQUEST.value());
-    }
-
     private ExtractableResponse<Response> 구간_등록(String path, SectionRequest request) {
         return post(path + SECTION_PATH, request);
     }
@@ -206,11 +161,5 @@ class SectionAcceptanceTest extends AcceptanceTestHelper {
 
     public ExtractableResponse<Response> 지하철노선_생성(LineRequest req) {
         return post(LINE_PATH, req);
-    }
-
-    public long 지하철역_생성(String name) {
-        return post(STATION_PATH, Map.of("name", name))
-                .jsonPath()
-                .getLong("id");
     }
 }

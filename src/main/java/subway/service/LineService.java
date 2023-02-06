@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import subway.controller.request.LineRequest;
 import subway.controller.request.SectionRequest;
 import subway.controller.response.LineResponse;
+import subway.service.dto.Stations;
 import subway.exception.SubwayRuntimeException;
 import subway.exception.message.SubwayErrorCode;
 import subway.repository.LineRepository;
@@ -32,38 +33,25 @@ public class LineService {
      */
     @Transactional
     public LineResponse create(LineRequest request) {
-        Station upStation = stationService.find(request.getUpStationId());
-        Station downStation = stationService.find(request.getDownStationId());
+        Line line = lineRepository.save(request.toEntity());
+        line.addSection(sectionBuild(request.toSectionRequest()));
 
-        Section section = sectionBuild(request, upStation, downStation);
-
-        Line line = lineBuild(request, section);
-        lineRepository.save(line);
-        return getLineWithStations(line);
+        return LineResponse.from(line);
     }
 
-    private Line lineBuild(LineRequest request, Section section) {
-        return Line.builder()
-                .name(request.getName())
-                .color(request.getColor())
-                .section(section).build();
-    }
 
-    private Section sectionBuild(LineRequest request, Station upStation, final Station downStation) {
+    private Section sectionBuild(SectionRequest request) {
+        Stations stations = stationService.findByIdIn(List.of(request.getUpStationId(), request.getDownStationId()));
+
+        Station upStation = stations.getById(request.getUpStationId());
+        Station downStation = stations.getById(request.getDownStationId());
+        Integer distance = request.getDistance();
+
         return Section.builder()
                 .upStation(upStation)
                 .downStation(downStation)
-                .distance(request.getDistance())
+                .distance(distance)
                 .build();
-    }
-
-    /**
-     * 노선 생성 시, 노선에 포함된 역 목록 조회 편의 메서드
-     */
-    private LineResponse getLineWithStations(Line line) {
-        List<Station> stations = stationService.findByIdIn(line.getStationIds());
-
-        return LineResponse.from(line, stations);
     }
 
     /**
@@ -73,7 +61,7 @@ public class LineService {
         final List<Line> lines = lineRepository.findAll();
 
         return lines.stream()
-                .map(this::getLineWithStations)
+                .map(LineResponse::from)
                 .collect(Collectors.toList());
     }
 
@@ -82,14 +70,15 @@ public class LineService {
      */
     public LineResponse getLine(Long id) {
         final Line line = findLine(id);
-        return getLineWithStations(line);
+        return LineResponse.from(line);
     }
 
     /**
      * 노선 단건 조회 편의 메서드
      */
     public Line findLine(Long id) {
-        return lineRepository.findById(id).orElseThrow(() -> new SubwayRuntimeException(SubwayErrorCode.NOT_FOUND_STATION));
+        return lineRepository.findById(id)
+                .orElseThrow(() -> new SubwayRuntimeException(SubwayErrorCode.NOT_FOUND_STATION));
     }
 
     /**
@@ -111,23 +100,21 @@ public class LineService {
 
     /**
      * 노선에 구간 등록
+     *
      * @param id
      * @param sectionRequest
      */
     @Transactional
     public void addSection(Long id, SectionRequest sectionRequest) {
-        Station upStation = stationService.find(sectionRequest.getUpStationId());
-        Station downStation = stationService.find(sectionRequest.getDownStationId());
-
-        Section section = Section.of(upStation, downStation, sectionRequest.getDistance());
-
         Line line = findLine(id);
+        Section section = sectionBuild(sectionRequest);
 
         line.addSection(section);
     }
 
     /**
      * 노선에 구간 삭제
+     *
      * @param id
      * @param stationId
      */
