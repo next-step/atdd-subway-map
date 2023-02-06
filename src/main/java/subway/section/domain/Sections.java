@@ -20,11 +20,11 @@ import java.util.List;
 public class Sections {
 
     @OneToMany(mappedBy = "line", cascade = CascadeType.PERSIST, orphanRemoval = true, fetch = FetchType.EAGER)
-    private List<Section> stationList = new ArrayList<>();
+    private List<Section> sectionList = new ArrayList<>();
 
     public Section addSection(Section section) {
 
-        if (!stationList.isEmpty()) {
+        if (!sectionList.isEmpty()) {
             if (notEqualsLastStation(section.getUpStation()))
                 throw new DownStationAlreadyExistsException();
 
@@ -32,7 +32,7 @@ public class Sections {
                 throw new DownStationMustBeUpStationException();
         }
 
-        stationList.add(section);
+        sectionList.add(section);
 
         return section;
     }
@@ -45,12 +45,13 @@ public class Sections {
         if (isNotDownEndStation(station))
             throw new DownEndStationRegisteredOnLineException();
 
-        stationList.remove(station);
+        Section deleteSection = getDeleteSection(station);
+        sectionList.remove(deleteSection);
     }
 
     public List<Station> getStationList() {
         LinkedHashSet stationSet = new LinkedHashSet();
-        stationList.stream().forEach((section) -> {
+        sectionList.stream().forEach((section) -> {
             stationSet.add(section.getUpStation());
             stationSet.add(section.getDownStation());
         });
@@ -68,12 +69,18 @@ public class Sections {
 
     private boolean isNotDownEndStation(Station section) {
         Station lastStation = CollectionUtil.lastItemOfList(getStationList());
-        return section.equals(lastStation);
+        return !section.equals(lastStation);
     }
 
     private boolean isOnlyOneSection() {
-        return stationList.size() == 1;
+        return sectionList.size() == 1;
+    }
 
+    private Section getDeleteSection(Station station) {
+        return sectionList.stream()
+                .filter(section -> station.equals(section.getDownStation()))
+                .findFirst()
+                .get();
     }
 
 }

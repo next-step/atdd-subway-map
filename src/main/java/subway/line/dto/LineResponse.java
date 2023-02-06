@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Getter;
 import subway.line.domain.Line;
 import subway.station.dto.StationResponse;
-import subway.station.domain.Station;
 
 import java.util.List;
 import java.util.stream.Collectors;

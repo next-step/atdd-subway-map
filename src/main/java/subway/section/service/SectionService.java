@@ -23,9 +23,6 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 public class SectionService {
 
-    private final SectionCommandRepository sectionCommand;
-    private final SectionQueryRepository sectionQuery;
-
     private final LineService lineService;
     private final StationService stationService;
 
@@ -37,6 +34,7 @@ public class SectionService {
         return line.addSection(upStation, downStation, saveRequest.getDistance());
     }
 
+    @Transactional
     public void removeStationById(Long lineId, Long stationId) {
         Line line = getLine(lineId);
         Station station = getStation(stationId);

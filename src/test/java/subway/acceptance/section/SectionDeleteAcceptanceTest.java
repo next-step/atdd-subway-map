@@ -1,7 +1,5 @@
 package subway.acceptance.section;
 
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -51,7 +49,6 @@ public class SectionDeleteAcceptanceTest {
         var 교대역_아이디 = 지하철역_아이디.get(교대);
 
         연신내역_교대역_노선_아이디 = 아이디_추출(생성_지하철_노선(지하철_3_호선, 연신내역_아이디, 교대역_아이디, 19));
-        조회_지하철_노선(연신내역_교대역_노선_아이디);
     }
 
     @AfterEach
@@ -61,22 +58,45 @@ public class SectionDeleteAcceptanceTest {
     }
 
     /**
-     * Given ??
-     * When ??
-     * Then ??
+     * When 지하철 노선에서 구간을 삭제하면
+     * Then 구간이 삭제된다.
+     * Then 지하철 노선 조회 시 삭제한 구간이 없다.
      */
     @DisplayName("지하철 노선에 구간을 제거한다.")
     @Test
     void normal() {
         var 교대역_아이디 = 지하철역_아이디.get(교대);
         var 수서역_아이디 = 지하철역_아이디.get(수서);
-        var 생성_지하철_노선에_구간_응답 = 생성_지하철_노선에_구간(
-                연신내역_교대역_노선_아이디, 교대역_아이디, 수서역_아이디, 9
-        );
-        var 생성된
 
+        생성_지하철_노선에_구간(연신내역_교대역_노선_아이디, 교대역_아이디, 수서역_아이디, 9);
 
+        // when
+        var 삭제_지하철_노선의_구간_응답 = RequestHandler.삭제_지하철_노선의_구간(연신내역_교대역_노선_아이디, 수서역_아이디);
+
+        // then
+        HTTP_상태_NO_CONTENT_검증(삭제_지하철_노선의_구간_응답);
+
+        // then
+        var 연신내역_교대역_노선_응답 = 조회_지하철_노선(연신내역_교대역_노선_아이디);
+        HTTP_상태_OK_검증(연신내역_교대역_노선_응답);
+
+        var 지하철_3_호선_역_이름_목록 = 지하철역_이름_목록_추출(연신내역_교대역_노선_응답);
+
+        assertThat(지하철_3_호선_역_이름_목록).hasSize(2);
+        assertThat(지하철_3_호선_역_이름_목록).contains(연신내.name(), 교대.name());
+    }
+
+    /**
+     * When 지하철 노선에 [하나의 구간만 존재] 조건으로 구간 삭제하면
+     * Then 구간이 삭제 실패다.
+     * Then 지하철 노선 조회 시 삭제가 반영되어 있지 않다.
+     */
+    @DisplayName("하나의 구간만 존재할 때, 구간 삭제를 시도하고 실패한다.")
+    @Test
+    void when_onlyOneSectionException() {
         var 교대역_아이디 = 지하철역_아이디.get(교대);
+
+        // when
         var 삭제_지하철_노선의_구간_응답 = RequestHandler.삭제_지하철_노선의_구간(연신내역_교대역_노선_아이디, 교대역_아이디);
 
         // then
@@ -93,25 +113,33 @@ public class SectionDeleteAcceptanceTest {
     }
 
     /**
-     * Given ??
-     * When ??
-     * Then ??
-     */
-    @DisplayName("하나의 구간만 존재할 때, 구간 삭제를 시도하고 실패한다.")
-    @Test
-    void when_onlyOneSectionException() {
-//        ExtractableResponse<Response> 삭제_지하철_노선의_구간_응답 = RequestHandler.삭제_지하철_노선의_구간();
-    }
-
-    /**
-     * Given ??
-     * When ??
-     * Then ??
+     * When 지하철 노선에 [구간의 하행 종점역이 아닌 역에 대해 삭제] 조건으로 구간 삭제하면
+     * Then 구간이 삭제 실패다.
+     * Then 지하철 노선 조회 시 삭제가 반영되어 있지 않다.
      */
     @DisplayName("구간의 하행 종점역이 아닌 역에 대해 삭제를 시도하고 실패한다.")
     @Test
     void when_notDownEndStationRegisteredOnLine() {
-//        ExtractableResponse<Response> 삭제_지하철_노선의_구간_응답 = RequestHandler.삭제_지하철_노선의_구간();
+        var 교대역_아이디 = 지하철역_아이디.get(교대);
+        var 수서역_아이디 = 지하철역_아이디.get(수서);
+        var 충무로역_아이디 = 지하철역_아이디.get(충무로);
+
+        생성_지하철_노선에_구간(연신내역_교대역_노선_아이디, 교대역_아이디, 수서역_아이디, 9);
+
+        // when
+        var 삭제_지하철_노선의_구간_응답 = RequestHandler.삭제_지하철_노선의_구간(연신내역_교대역_노선_아이디, 충무로역_아이디);
+
+        // then
+        HTTP_상태_BAD_REQUEST_검증(삭제_지하철_노선의_구간_응답);
+
+        // then
+        var 연신내역_교대역_노선_응답 = 조회_지하철_노선(연신내역_교대역_노선_아이디);
+        HTTP_상태_OK_검증(연신내역_교대역_노선_응답);
+
+        var 지하철_3_호선_역_이름_목록 = 지하철역_이름_목록_추출(연신내역_교대역_노선_응답);
+
+        assertThat(지하철_3_호선_역_이름_목록).hasSize(3);
+        assertThat(지하철_3_호선_역_이름_목록).contains(연신내.name(), 교대.name(), 수서.name());
     }
 
 }

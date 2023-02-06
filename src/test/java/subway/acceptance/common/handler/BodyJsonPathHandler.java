@@ -21,7 +21,7 @@ public class BodyJsonPathHandler {
         지하철역_목록("stations"),
         ;
 
-        private String path;
+        private final String path;
 
         Path(String path) {
             this.path = path;
