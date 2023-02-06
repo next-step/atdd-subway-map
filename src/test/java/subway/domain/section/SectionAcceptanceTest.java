@@ -1,23 +1,18 @@
 package subway.domain.section;
 
-import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import subway.common.AcceptanceTest;
-import subway.domain.Section;
-import subway.domain.Sections;
-
+import subway.dto.LineResponse;
+import subway.dto.SectionResponse;
 import java.util.HashMap;
 import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static subway.domain.line.LineApiTest.지하철노선의_마지막_구간을_조회한다;
+import static subway.common.AssertResponseTest.*;
 import static subway.common.SetupTest.*;
+import static subway.domain.line.LineApiTest.특정지하철노선을_조회한다;
 import static subway.domain.station.StationApiTest.지하철역을_생성한다;
 
 @DisplayName("지하철구간 관련 기능")
@@ -48,16 +43,13 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         param.put("downStationId", 2);
         param.put("distance", 5);
 
-        var response = RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .body(param)
-                .when().post("/lines/{id}/sections", 1).then().log().all().extract();
+        var response = POST("/lines/{id}/sections", 1, param);
 
         //then
         assertAll("지하철 구간 등록 테스트 (독립적)",
-                () -> assertEquals(response.statusCode(), HttpStatus.CREATED.value(), "Fail https status code"),
-                () -> assertEquals(response.body().jsonPath().getObject("sections", Sections.class).getSections().get(0).getUpStation().getId(), 1, "fail add section upStation"),
-                () -> assertEquals(response.body().jsonPath().getObject("sections", Sections.class).getSections().get(0).getDownStation().getId(), 2, "fail add section downStation"));
+                () -> 응답_상태코드_검증(HttpStatus.CREATED.value(), response.statusCode()),
+                () -> 응답_정보_검증(1, response.body().jsonPath().getList("sections.upStation.id").get(0)),
+                () -> 응답_정보_검증(2, response.body().jsonPath().getList("sections.downStation.id").get(0)));
     }
 
     /**
@@ -68,7 +60,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @DisplayName("새로운 지하철 구간을 등록할때 상행역이 기존 구간의 하행 종점역이 아닌 경우 예외가 발생한다.")
     @Test
     void 새로운_지하철구간_추가_중_예외가_발생한다_1() {
-        신분당선_노선을_생성한뒤_새로운_구간을_추가한다();
+        신분당선_노선을_생성한뒤_새로운_구간_두개를_추가한다();
 
         //when
         Map<String, Object> param = new HashMap<>();
@@ -76,14 +68,10 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         param.put("downStationId", 5);
         param.put("distance", 5);
 
-        var response = RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .body(param)
-                .when().post("/lines/{id}/sections", 1)
-                .then().log().all()
-                .extract();
+        var response = POST("/lines/{id}/sections", 1, param);
+
         //then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        응답_상태코드_검증(HttpStatus.INTERNAL_SERVER_ERROR.value(), response.statusCode());
     }
 
     /**
@@ -95,7 +83,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void 새로운_지하철구간_등록_중_예외가_발생한다_2() {
         //given
-        신분당선_노선을_생성한뒤_새로운_구간을_추가한다();
+        신분당선_노선을_생성한뒤_새로운_구간_두개를_추가한다();
 
         //when
         Map<String, Object> param = new HashMap<>();
@@ -103,14 +91,10 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         param.put("downStationId", 1);
         param.put("distance", 4);
 
-        var response = RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .body(param)
-                .when().post("/lines/{id}/sections", 1)
-                .then().log().all()
-                .extract();
+        var response = POST("/lines/{id}/sections", 1, param);
+
         //then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        응답_상태코드_검증(HttpStatus.INTERNAL_SERVER_ERROR.value(), response.statusCode());
     }
 
     /**
@@ -121,20 +105,15 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void 기존_노선의_마지막_구간을_삭제한다() {
         //given
-        신분당선_노선을_생성한뒤_새로운_구간을_추가한다();
-        Section section = 지하철노선의_마지막_구간을_조회한다(1);
+        신분당선_노선을_생성한뒤_새로운_구간_두개를_추가한다();
+        SectionResponse sectionResponse = 지하철노선의_마지막_구간을_조회한다(1);
 
         //when
-        var response = RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .param("sectionId", section.getId())
-                .when().delete("/lines/{id}/sections", 1)
-                .then().log().all()
-                .extract();
+        var response = DELETE("/lines/{id}/sections", 1, "sectionId", sectionResponse.getId());
 
         assertAll("지하철 구간 삭제 테스트 (독립적)",
-                () -> assertEquals(response.statusCode(), HttpStatus.OK.value(), "Fail https status code"),
-                () -> assertEquals(response.body().jsonPath().getObject("sections", Sections.class).getSections().contains(section), false, "fail delete section"));
+                () -> 응답_상태코드_검증(HttpStatus.OK.value(), response.statusCode()),
+                () -> 응답_구간정보_미포함_검증(sectionResponse, response.body().jsonPath().getList("sections", SectionResponse.class)));
     }
 
     /**
@@ -146,17 +125,12 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void 기존_노선의_마지막_구간_삭제_중_예외가_발생한다_1() {
         //given
-        신분당선_노선을_생성한뒤_새로운_구간을_추가한다();
+        신분당선_노선을_생성한뒤_새로운_구간_두개를_추가한다();
 
         //when
-        var response = RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .param("sectionId", 1)
-                .when().delete("/lines/{id}/sections", 1)
-                .then().log().all()
-                .extract();
+        var response = DELETE("/lines/{id}/sections", 1, "sectionId", 1);
 
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        응답_상태코드_검증(HttpStatus.INTERNAL_SERVER_ERROR.value(), response.statusCode());
     }
 
     /**
@@ -168,16 +142,19 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void 기존_노선의_마지막_구간_삭제_중_예외가_발생한다_2() {
         //given
-        신분당선_노선을_생성한다();
+        신분당선_노선을_생성한뒤_새로운_구간_하나를_추가한다();
 
         //when
-        var response = RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .param("sectionId", 2)
-                .when().delete("/lines/{id}/sections", 1)
-                .then().log().all()
-                .extract();
+        var response = DELETE("/lines/{id}/sections", 1, "sectionId", 1);
 
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        응답_상태코드_검증(HttpStatus.INTERNAL_SERVER_ERROR.value(), response.statusCode());
     }
+
+    private SectionResponse 지하철노선의_마지막_구간을_조회한다(int i) {
+        LineResponse lineResponse = 특정지하철노선을_조회한다(i).as(LineResponse.class);
+
+        return lineResponse.getSections().get(lineResponse.getSections().size()-1);
+    }
+
+
 }

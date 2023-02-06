@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import subway.domain.Sections;
+import subway.domain.Station;
+
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -12,5 +15,5 @@ public class LineResponse {
     private Long id;
     private String name;
     private String color;
-    private Sections sections;
+    private List<SectionResponse> sections;
 }

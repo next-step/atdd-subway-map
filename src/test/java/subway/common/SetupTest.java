@@ -24,7 +24,21 @@ public class SetupTest {
         지하철노선을_생성한다(param);
     }
 
-    public static void 신분당선_노선을_생성한뒤_새로운_구간을_추가한다() {
+    public static void 신분당선_노선을_생성한뒤_새로운_구간_하나를_추가한다() {
+        Map<String, Object> param = new HashMap<>();
+        param.put("name", "신분당선");
+        param.put("color", "bg-red-600");
+
+        지하철노선을_생성한다(param);
+
+        Map<String, Object> subParam = new HashMap<>();
+        subParam.put("upStationId", 1);
+        subParam.put("downStationId", 2);
+        subParam.put("distance", 10);
+        지하철노선에_구간을_추가한다(1, subParam);
+    }
+
+    public static void 신분당선_노선을_생성한뒤_새로운_구간_두개를_추가한다() {
         Map<String, Object> param = new HashMap<>();
         param.put("name", "신분당선");
         param.put("color", "bg-red-600");

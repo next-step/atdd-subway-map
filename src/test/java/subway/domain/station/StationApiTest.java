@@ -1,42 +1,26 @@
 package subway.domain.station;
 
-import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.springframework.http.HttpStatus;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import static subway.common.AcceptanceTest.*;
+
 public class StationApiTest {
     public static ExtractableResponse<Response> 지하철역을_조회한다() {
-        return RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .when().get("/stations")
-                .then().statusCode(HttpStatus.OK.value())
-                .log().all()
-                .extract();
+        return GET("/stations");
     }
 
     public static ExtractableResponse<Response> 지하철역을_생성한다(String name) {
         Map<String, String> param = new HashMap<>();
         param.put("name", name);
 
-        return RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .body(param)
-                .when().post("/stations")
-                .then().statusCode(HttpStatus.CREATED.value())
-                .log().all()
-                .extract();
+        return POST("/stations", param);
     }
 
-    public static ExtractableResponse<Response> 지하철역을_삭제한다(Map<String, String> deleteStation) {
-        return RestAssured.given().log().all()
-                .when().delete("/stations/{id}", deleteStation.get("id"))
-                .then().statusCode(HttpStatus.NO_CONTENT.value())
-                .log().all()
-                .extract();
+    public static ExtractableResponse<Response> 지하철역을_삭제한다(String id) {
+        return DELETE("/stations/{id}", id);
     }
 }

@@ -1,19 +1,15 @@
 package subway.domain.line;
 
-import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import subway.common.AcceptanceTest;
-
-import java.util.ArrayList;
+import subway.dto.LineResponse;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static subway.common.AssertResponseTest.*;
 import static subway.common.SetupTest.*;
 import static subway.domain.line.LineApiTest.*;
 
@@ -33,17 +29,12 @@ public class LineAcceptanceTest extends AcceptanceTest {
         param.put("color", "bg-red-600");
 
         //when
-        var response = RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .body(param)
-                .when().post("/lines")
-                .then().log().all()
-                .extract();
+        var response = POST("/lines", param);
 
         //then
         assertAll("지하철 노선 생성 테스트 (독립적)",
-                () -> assertEquals(response.statusCode(), HttpStatus.CREATED.value(), "Fail https status code"),
-                () -> assertEquals(response.jsonPath().getString("name"), "신분당선", "fail create station"));
+                () -> 응답_상태코드_검증(HttpStatus.CREATED.value(), response.statusCode()),
+                () -> 응답_정보_검증("신분당선", response.jsonPath().getString("name")));
 
     }
 
@@ -60,12 +51,12 @@ public class LineAcceptanceTest extends AcceptanceTest {
         분당선_노선을_생성한다();
 
         //when
-        var response = 지하철노선_목록을_조회한다();
+        var response = 지하철노선을_조회한다();
 
         //then
         assertAll("지하철 노선 조회 테스트 (독립적)",
-                () -> assertEquals(response.statusCode(), HttpStatus.OK.value(), "Fail https status code"),
-                () -> assertEquals(response.jsonPath().getList("name").size(), 2, "fail show line"));
+                () -> 응답_상태코드_검증(HttpStatus.OK.value(), response.statusCode()),
+                () -> 응답_정보_검증(2, response.jsonPath().getList("name").size()));
     }
 
     /**
@@ -81,12 +72,12 @@ public class LineAcceptanceTest extends AcceptanceTest {
         분당선_노선을_생성한다();
 
         //when
-        var response = 지하철노선을_조회한다(2);
+        var response = 특정지하철노선을_조회한다(2);
 
         //then
         assertAll("특정 지하철 노선 조회 테스트 (독립적)",
-                () -> assertEquals(response.statusCode(), HttpStatus.OK.value(), "Fail https status code"),
-                () -> assertEquals(response.jsonPath().getString("name"), "분당선", "fail show line"));
+                () -> 응답_상태코드_검증(HttpStatus.OK.value(), response.statusCode()),
+                () -> 응답_정보_검증("분당선", response.jsonPath().getString("name")));
     }
 
     /**
@@ -105,15 +96,15 @@ public class LineAcceptanceTest extends AcceptanceTest {
         updateParam.put("name", "수정된 이름");
         updateParam.put("color", "bg-black-600");
 
-        int id = (Integer) 지하철노선_목록을_조회한다().jsonPath().getList("id").get(0);
+        int id = (Integer) 지하철노선을_조회한다().jsonPath().getList("id").get(0);
 
         var response = 지하철노선을_수정한다(id, updateParam);
 
         //then
         assertAll("특정 지하철 노선 수정 테스트 (독립적)",
-                () -> assertEquals(response.statusCode(), HttpStatus.OK.value(), "Fail https status code"),
-                () -> assertEquals(지하철노선을_조회한다(id).jsonPath().getString("name"), updateParam.get("name"), "fail update name line"),
-                () -> assertEquals(지하철노선을_조회한다(id).jsonPath().getString("color"), updateParam.get("color"), "fail update color line"));
+                () -> 응답_상태코드_검증(HttpStatus.OK.value(), response.statusCode()),
+                () -> 응답_정보_검증("수정된 이름", response.jsonPath().getString("name")),
+                () -> 응답_정보_검증("bg-black-600", response.jsonPath().getString("color")));
     }
 
     /**
@@ -124,20 +115,16 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("특정 지하철노선을 삭제한다.")
     @Test
     void deleteStationLineById(){
-        String deleteLineName = "분당선";
-
         신분당선_노선을_생성한다();
         분당선_노선을_생성한다();
 
-        ArrayList<Map<String, Object>> list = 지하철노선_목록을_조회한다().body().as(ArrayList.class);
-        Map<String, Object> deleteLine = list.stream().filter(item -> item.get("name").equals(deleteLineName))
-                .findFirst()
-                .orElse(null);
+        LineResponse deleteLine = 특정지하철노선을_조회한다(2).as(LineResponse.class);
 
-        var response = 지하철노선을_삭제한다((Integer) deleteLine.get("id"));
+        var response = 지하철노선을_삭제한다(Math.toIntExact(deleteLine.getId()));
 
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-        assertThat(지하철노선_목록을_조회한다().jsonPath().getList("name").contains(deleteLineName)).isFalse();
+        assertAll("특정 지하철 노선 삭제 테스트 (독립적)",
+                () -> 응답_상태코드_검증(HttpStatus.NO_CONTENT.value(), response.statusCode()),
+                () -> 응답_노선정보_미포함_검증(deleteLine.getName(), 지하철노선을_조회한다().jsonPath().getList("name")));
     }
 
 }

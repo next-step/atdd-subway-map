@@ -4,13 +4,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.domain.Line;
 import subway.domain.Section;
+import subway.domain.Sections;
 import subway.domain.Station;
-import subway.dto.LineRequest;
-import subway.dto.LineResponse;
-import subway.dto.SectionRequest;
+import subway.dto.*;
 import subway.exception.SubwayRestApiException;
 import subway.repository.LineRepository;
 import subway.repository.StationRepository;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,7 +42,27 @@ public class LineService {
     }
 
     private LineResponse createLineResponse(Line line){
-        return new LineResponse(line.getId(), line.getName(), line.getColor(), line.getSections());
+        return new LineResponse(line.getId(), line.getName(), line.getColor(), this.createSectionsResponse(line));
+    }
+
+    private List<SectionResponse> createSectionsResponse(Line line) {
+        Sections sections = line.getSections();
+
+        if (null == sections) {
+            return null;
+        }
+
+        List<SectionResponse> sectionResponseList = new ArrayList<>();
+
+        for (Section section : sections.getSections()) {
+            StationResponse upStation = new StationResponse(section.getUpStation().getId(), section.getUpStation().getName());
+            StationResponse downStation = new StationResponse(section.getDownStation().getId(), section.getDownStation().getName());
+            SectionResponse sectionResponse = new SectionResponse(section.getId(), upStation, downStation, section.getDistance());
+
+            sectionResponseList.add(sectionResponse);
+        }
+
+        return sectionResponseList;
     }
 
     public LineResponse findLineById(Long id) {
@@ -54,12 +75,14 @@ public class LineService {
     }
 
     @Transactional
-    public void updateLine(Long id, LineRequest lineRequest) {
+    public LineResponse updateLine(Long id, LineRequest lineRequest) {
         Line line = lineRepository.findById(id).get();
 
         line.change(lineRequest.getName(), lineRequest.getColor());
 
-        lineRepository.save(line);
+        line = lineRepository.save(line);
+
+        return createLineResponse(line);
     }
 
     @Transactional
