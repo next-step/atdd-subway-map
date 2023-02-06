@@ -1,8 +1,7 @@
-package subway.line;
+package subway.line.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;
-import subway.station.StationResponse;
 
 import java.util.List;
 @Builder

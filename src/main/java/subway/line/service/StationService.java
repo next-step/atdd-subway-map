@@ -1,7 +1,11 @@
-package subway.station;
+package subway.line.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.line.dto.request.StationRequest;
+import subway.line.dto.response.StationResponse;
+import subway.line.entity.Station;
+import subway.line.repository.StationRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,8 +31,9 @@ public class StationService {
                 .collect(Collectors.toList());
     }
 
-    public Station findOneStation(Long stationId) {
-        return stationRepository.getReferenceById(stationId);
+    public Station findOne(Long id) {
+        return stationRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("없는 역 입니다"));
     }
 
     @Transactional

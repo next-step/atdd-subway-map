@@ -1,22 +1,21 @@
-package subway.line;
+package subway.line.acceptance;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
-import subway.station.Station;
-import subway.station.StationApiClient;
+import subway.line.api.StationApiClient;
+import subway.line.dto.response.LineResponse;
+import subway.line.entity.Station;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.line.LineApiClient.*;
+import static subway.line.api.LineApiClient.*;
 
 @DisplayName("지하철 노선 관리 기능")
 @Sql("classpath:sql/delete-records.sql")
