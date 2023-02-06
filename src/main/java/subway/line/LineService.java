@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.common.DomainException;
 import subway.common.DomainExceptionType;
+import subway.section.AddSectionRequest;
 import subway.section.Section;
 import subway.section.SectionRepository;
 import subway.station.Station;
@@ -68,5 +69,47 @@ public class LineService {
     @Transactional
     public void deleteLineById(Long id) {
         lineRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void addSection(Long lineId, AddSectionRequest request) {
+        Line line =
+                lineRepository
+                        .findById(lineId)
+                        .orElseThrow(() -> new DomainException(DomainExceptionType.NO_LINE));
+
+        Optional<Station> upStation = stationRepository.findById(request.getUpStationId());
+        Optional<Station> downStation = stationRepository.findById(request.getDownStationId());
+
+        // 새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 한다.
+        if(upStation.get().getId() != line.getDownStationId()) throw new DomainException(DomainExceptionType.UPDOWN_STATION_MISS_MATCH);
+
+        // 새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없다.
+        if(line.getStationList().contains(downStation.get())) throw new DomainException(DomainExceptionType.DOWN_STATION_EXIST_IN_LINE);
+
+        if (upStation.isEmpty() || downStation.isEmpty())
+            throw new DomainException(DomainExceptionType.NO_STATION);
+
+        line.addSection(new Section(lineId, downStation.get(), upStation.get(), request.getDistance()));
+    }
+
+    @Transactional
+    public void deleteSection(Long lineId, Long stationId) {
+        Line line =
+                lineRepository
+                        .findById(lineId)
+                        .orElseThrow(() -> new DomainException(DomainExceptionType.NO_LINE));
+
+        if(line.getDownStationId() != stationId) throw new DomainException(DomainExceptionType.NOT_DOWN_STATION);
+
+        if(line.getSectionCount() == 1) throw new DomainException(DomainExceptionType.CANT_DELETE_SECTION);
+
+        Optional<Station> station = stationRepository.findById(stationId);
+
+        if(station.isEmpty())
+            throw new DomainException(DomainExceptionType.NO_STATION);
+
+
+        line.deleteSection(station.get());
     }
 }

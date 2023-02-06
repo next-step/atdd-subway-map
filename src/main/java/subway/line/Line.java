@@ -57,5 +57,14 @@ public class Line {
 
     public void addSection(Section section) {
         sections.addSections(section);
+        lineDistance += section.getSectionDistance();
+    }
+
+    public Integer getSectionCount(){
+        return sections.getSectionCount();
+    }
+
+    public void deleteSection(Station station) {
+        sections.deletionSection(station);
     }
 }

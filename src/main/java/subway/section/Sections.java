@@ -25,4 +25,12 @@ public class Sections {
 
         return Stream.concat(upStations, downStations).distinct().collect(Collectors.toList());
     }
+
+    public Integer getSectionCount(){
+        return sections.size();
+    }
+
+    public void deletionSection(Station station) {
+        sections.remove(station);
+    }
 }
