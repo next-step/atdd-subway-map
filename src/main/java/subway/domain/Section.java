@@ -1,6 +1,8 @@
 package subway.domain;
 
 import subway.application.domain.IllegalMinSizeDeleteSectionException;
+import subway.domain.exception.NotDownStationWhenDeleteSectionException;
+import subway.domain.exception.NotEqualUpStationAndDownStationException;
 
 import java.util.List;
 import java.util.Objects;

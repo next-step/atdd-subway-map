@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 import subway.application.service.output.LineCommandRepository;
 import subway.application.service.output.LineLoadRepository;
 import subway.domain.Line;
-import subway.domain.NotFoundLineException;
+import subway.domain.exception.NotFoundLineException;
 
 import java.util.List;
 import java.util.stream.Collectors;
