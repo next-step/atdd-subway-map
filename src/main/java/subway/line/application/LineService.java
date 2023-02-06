@@ -2,14 +2,17 @@ package subway.line.application;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import subway.line.domain.StationValidator;
-import subway.station.application.StationService;
-import subway.line.domain.Line;
-import subway.line.domain.LineRepository;
 import subway.line.application.dto.LineCreateRequest;
 import subway.line.application.dto.LineResponse;
 import subway.line.application.dto.LineUpdateRequest;
+import subway.line.application.dto.SectionAddRequest;
+import subway.line.domain.Line;
+import subway.line.domain.LineRepository;
+import subway.line.domain.Section;
+import subway.line.domain.StationValidator;
+import subway.station.application.StationService;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,14 +38,35 @@ public class LineService {
     public LineResponse createLine(LineCreateRequest request) {
         final Line line = new Line(
             request.getName(),
-            request.getColor(),
+            request.getColor()
+        );
+        final Section section = new Section(
+            line,
             request.getUpStationId(),
             request.getDownStationId(),
             request.getDistance(),
             stationValidator
         );
-        final Line savedLine = lineRepository.save(line);
-        return createLineResponse(savedLine);
+
+        line.addSection(section);
+        lineRepository.save(line);
+
+        return createLineResponse(line);
+    }
+
+    @Transactional
+    public void addSection(Long lindId, SectionAddRequest request) {
+        final Line line = findById(lindId);
+        final Section section = new Section(
+            line,
+            request.getUpStationId(),
+            request.getDownStationId(),
+            request.getDistance(),
+            stationValidator
+        );
+
+        line.addSection(section);
+        lineRepository.save(line);
     }
 
     public List<LineResponse> findAllLines() {
@@ -81,10 +105,10 @@ public class LineService {
             line.getName(),
             line.getColor(),
             stationService.findStationsByIds(
-                List.of(
-                    line.getUpStationId(),
-                    line.getDownStationId()
-                )
+                line.getSections().getElements().stream()
+                    .map(it -> List.of(it.getUpStationId(), it.getDownStationId()))
+                    .flatMap(Collection::stream)
+                    .collect(Collectors.toSet())
             )
         );
     }

@@ -7,6 +7,7 @@ import subway.station.application.dto.StationResponse;
 import subway.station.domain.Station;
 import subway.station.domain.StationRepository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,7 +44,7 @@ public class StationService {
         );
     }
 
-    public List<StationResponse> findStationsByIds(List<Long> ids) {
+    public List<StationResponse> findStationsByIds(Collection<Long> ids) {
         return stationRepository.findAllByIdIn(ids).stream()
             .map(this::createStationResponse)
             .collect(Collectors.toList());
