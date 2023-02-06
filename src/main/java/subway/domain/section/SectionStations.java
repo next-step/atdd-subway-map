@@ -5,7 +5,7 @@ import lombok.NoArgsConstructor;
 import subway.domain.sectionstation.Direction;
 import subway.domain.sectionstation.SectionStation;
 import subway.domain.station.Station;
-import subway.dto.domain.UpAndDownStationsDto;
+import subway.dto.domain.UpAndDownStationsVo;
 
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
@@ -19,7 +19,7 @@ public class SectionStations {
     @OneToMany(mappedBy = "section")
     private List<SectionStation> sectionStations = new ArrayList<>();
 
-    public UpAndDownStationsDto getUpAndDownStations() {
+    public UpAndDownStationsVo getUpAndDownStations() {
         Station upStation = sectionStations.stream()
                 .filter(sectionStation -> sectionStation.getDirection().equals(Direction.UP))
                 .findFirst()
@@ -30,7 +30,7 @@ public class SectionStations {
                 .findFirst()
                 .map(SectionStation::getStation)
                 .orElseThrow();
-        return new UpAndDownStationsDto(upStation, downStation);
+        return new UpAndDownStationsVo(upStation, downStation);
     }
 
 }

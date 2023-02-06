@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import subway.domain.section.Section;
 import subway.domain.station.Station;
-import subway.dto.domain.UpAndDownStationsDto;
+import subway.dto.domain.UpAndDownStationsVo;
 import subway.exception.*;
 
 import javax.persistence.Embeddable;
@@ -28,7 +28,7 @@ public class Sections {
             return Collections.emptyList();
         }
 
-        List<UpAndDownStationsDto> upAndDownStations = sections.stream()
+        List<UpAndDownStationsVo> upAndDownStations = sections.stream()
                 .map(Section::getUpAndDownStations)
                 .collect(toUnmodifiableList());
 
@@ -42,11 +42,11 @@ public class Sections {
         return Collections.unmodifiableList(stations);
     }
 
-    private List<Station> getUpperStations(List<UpAndDownStationsDto> upAndDownStations, Station upStation) {
+    private List<Station> getUpperStations(List<UpAndDownStationsVo> upAndDownStations, Station upStation) {
         List<Station> upperStations = new ArrayList<>();
         upperStations.add(upStation);
 
-        Optional<UpAndDownStationsDto> upAndDownStation =
+        Optional<UpAndDownStationsVo> upAndDownStation =
                 upAndDownStations.stream()
                         .filter(dto -> dto.getDownStation().equals(upStation))
                         .findFirst();
@@ -63,11 +63,11 @@ public class Sections {
         return upperStations;
     }
 
-    private List<Station> getDownerStations(List<UpAndDownStationsDto> upAndDownStations, Station downStation) {
+    private List<Station> getDownerStations(List<UpAndDownStationsVo> upAndDownStations, Station downStation) {
         List<Station> downerStations = new ArrayList<>();
         downerStations.add(downStation);
 
-        Optional<UpAndDownStationsDto> upAndDownStation =
+        Optional<UpAndDownStationsVo> upAndDownStation =
                 upAndDownStations.stream()
                         .filter(dto -> dto.getUpStation().equals(downStation))
                         .findFirst();

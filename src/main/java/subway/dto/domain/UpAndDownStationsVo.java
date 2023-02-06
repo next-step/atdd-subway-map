@@ -6,8 +6,8 @@ import subway.domain.station.Station;
 
 @Getter
 @AllArgsConstructor
-public class UpAndDownStationsDto {
-    private Station upStation;
-    private Station downStation;
+public class UpAndDownStationsVo {
+    private final Station upStation;
+    private final Station downStation;
 
 }

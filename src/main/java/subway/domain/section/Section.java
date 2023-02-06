@@ -3,7 +3,7 @@ package subway.domain.section;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import subway.domain.line.Line;
-import subway.dto.domain.UpAndDownStationsDto;
+import subway.dto.domain.UpAndDownStationsVo;
 
 import javax.persistence.*;
 import java.util.Objects;
@@ -32,7 +32,7 @@ public class Section {
         this.sectionStations = new SectionStations();
     }
 
-    public UpAndDownStationsDto getUpAndDownStations() {
+    public UpAndDownStationsVo getUpAndDownStations() {
         return sectionStations.getUpAndDownStations();
     }
 
