@@ -6,16 +6,15 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
 import subway.line.LineRequest;
 
 import java.util.List;
 
-import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD;
+import static subway.AcceptanceTestHelper.*;
 
 @DisplayName("지하철 노선 관련 기능")
 @DirtiesContext(classMode = BEFORE_EACH_TEST_METHOD)
@@ -96,44 +95,5 @@ class LineAcceptanceTest {
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-    }
-
-    private static ExtractableResponse<Response> get(String url) {
-        return given().log().all()
-                .when().get(url)
-                .then().log().all()
-                .extract();
-    }
-
-    private static ExtractableResponse<Response> get(String url, Long pathParams) {
-        return given().log().all()
-                .when().get(url, pathParams)
-                .then().log().all()
-                .extract();
-    }
-
-    private static ExtractableResponse<Response> post(String url, Object request) {
-        return given().log().all()
-                .body(request)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post(url)
-                .then().log().all()
-                .extract();
-    }
-
-    private static ExtractableResponse<Response> put(String url, Long pathParams, Object request) {
-        return given().log().all()
-                .body(request)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().put(url, pathParams)
-                .then().log().all()
-                .extract();
-    }
-
-    private static ExtractableResponse<Response> delete(String url, Long pathParams) {
-        return given().log().all()
-                .when().delete(url, pathParams)
-                .then().log().all()
-                .extract();
     }
 }
