@@ -20,13 +20,13 @@ public class Sections {
             return Collections.emptyList();
         }
 
-        List<Station> stations = sections.stream()
-                .map(Section::getDownStation)
-                .collect(Collectors.toList());
-
-        Station headStation = getHeadStation();
-        stations.add(0, headStation);
-
+        List<Station> stations = new ArrayList<>();
+        sections.forEach(section -> {
+            stations.add(section.getUpStation());
+            if (sections.indexOf(section) == sections.size() - 1) {
+                stations.add(section.getDownStation());
+            }
+        });
         return stations;
     }
 
@@ -46,10 +46,9 @@ public class Sections {
         }
 
         List<Station> stations = getStations();
-
         Station tailStation = getTailStation();
-        Station upStation = section.getUpStation();
 
+        Station upStation = section.getUpStation();
         if (!tailStation.equals(upStation)) {
             throw new IllegalArgumentException(
                     String.format("새로운 구간의 상행역은 현재 노선의 하행 종점역이어야 합니다. (하행 종점역: %d)", tailStation.getId())
