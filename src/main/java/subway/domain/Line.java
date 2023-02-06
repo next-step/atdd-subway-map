@@ -37,11 +37,7 @@ public class Line {
         }
     }
 
-    public void deleteSection(Section section) throws Exception{
-        this.sections.remove(section);
-
-        if (section.getLine() == this) {
-            section.setLine(null);
-        }
+    public void deleteSection(Long sectionId) throws Exception{
+        this.sections.remove(sectionId);
     }
 }

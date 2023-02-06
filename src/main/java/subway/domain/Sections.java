@@ -57,24 +57,24 @@ public class Sections {
         return false;
     }
 
-    public void remove(Section section) throws Exception{
-        this.validationDeleteSection(section);
+    public void remove(Long sectionId) throws Exception{
+        this.validationDeleteSection(sectionId);
 
-        this.sections.remove(section);
+        this.sections.remove(this.sections.size()-1);
     }
 
-    private void validationDeleteSection(Section section) throws Exception{
+    private void validationDeleteSection(Long sectionId) throws Exception{
         if (this.isNotValidSectionCount()) {
             throw new SubwayRestApiException(ERROR_DELETE_SECTION_COUNT_LINE);
         }
 
-        if (!this.isLastSection(section)) {
+        if (!this.isLastSection(sectionId)) {
             throw new SubwayRestApiException(ERROR_DELETE_SECTION_NO_LAST_SECTION_LINE);
         }
     }
 
-    private boolean isLastSection(Section section) {
-        return this.getLastSection().equals(section);
+    private boolean isLastSection(Long sectionId) {
+        return this.getLastSection().getId().equals(sectionId);
     }
 
     private boolean isNotValidSectionCount() {
