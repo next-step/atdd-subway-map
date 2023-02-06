@@ -13,11 +13,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import subway.common.DatabaseCleanup;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static subway.common.ResponseUtils.ID_추출;
+import static subway.common.ResponseUtils.httpStatus_확인;
+import static subway.common.ResponseUtils.목록_개수_및_이름_확인;
+import static subway.common.ResponseUtils.목록에_이름_없음;
 import static subway.fixtures.StationFixtures.강남역;
 import static subway.fixtures.StationFixtures.방배역;
 
@@ -42,12 +44,14 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        지하철역_생성(강남역);
+        ExtractableResponse<Response> 강남역_생성_응답 = 지하철역_생성(강남역);
 
         // then
-        List<String> stationNames =
-            지하철역_목록_조회().jsonPath().getList("name", String.class);
-        assertThat(stationNames).containsAnyOf(강남역);
+        httpStatus_확인(강남역_생성_응답, HttpStatus.CREATED);
+
+        ExtractableResponse<Response> 지하철역_목록_조회_응답 = 지하철역_목록_조회();
+        httpStatus_확인(지하철역_목록_조회_응답, HttpStatus.OK);
+        목록_개수_및_이름_확인(지하철역_목록_조회_응답, new String[]{강남역});
     }
 
     /**
@@ -63,16 +67,12 @@ public class StationAcceptanceTest {
         Arrays.stream(stations).forEach(StationAcceptanceTest::지하철역_생성);
 
         // when
-        ExtractableResponse<Response> response = 지하철역_목록_조회();
+        ExtractableResponse<Response> 지하철역_목록_조회_응답 = 지하철역_목록_조회();
 
         // then
-        List<String> stationNames = response.jsonPath().getList("name", String.class);
-
-        assertThat(stationNames.size()).isEqualTo(stations.length);
-
-        assertThat(stationNames).containsAnyOf(stations);
+        httpStatus_확인(지하철역_목록_조회_응답, HttpStatus.OK);
+        목록_개수_및_이름_확인(지하철역_목록_조회_응답, stations);
     }
-
 
     /**
      * Given 지하철역을 생성하고
@@ -83,53 +83,39 @@ public class StationAcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        long stationId = 지하철역_생성(강남역).body().jsonPath().getLong("id");
+        long 강남역_ID = ID_추출(지하철역_생성(강남역));
 
         // when
-        지하철역_삭제(stationId);
+        ExtractableResponse<Response> 지하철역_삭제_응답 = 지하철역_삭제(강남역_ID);
 
         // then
-        List<String> stationNames =
-            지하철역_목록_조회().jsonPath().getList("name", String.class);
-
-        assertThat(stationNames).doesNotContain(강남역);
+        httpStatus_확인(지하철역_삭제_응답, HttpStatus.NO_CONTENT);
+        목록에_이름_없음(지하철역_목록_조회(), 강남역);
     }
 
     public static ExtractableResponse<Response> 지하철역_생성(String name) {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
 
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
+        return RestAssured.given().log().all()
             .body(params)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .when().post("/stations")
             .then().log().all()
             .extract();
-
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-        return response;
     }
 
     private ExtractableResponse<Response> 지하철역_목록_조회() {
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
+        return RestAssured.given().log().all()
             .when().get("/stations")
             .then().log().all()
             .extract();
-
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-
-        return response;
     }
 
     private ExtractableResponse<Response> 지하철역_삭제(long stationId) {
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
+        return RestAssured.given().log().all()
             .when().delete("/stations/{id}", stationId)
             .then().log().all()
             .extract();
-
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-
-        return response;
     }
 }
