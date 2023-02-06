@@ -11,15 +11,13 @@ import subway.line.LineFixtures;
 import subway.line.presentation.AddSectionRequest;
 import subway.line.presentation.CreateLineRequest;
 import subway.line.presentation.LineResponse;
+import subway.station.presentation.StationResponse;
 import subway.utils.RestAssuredClient;
 
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static subway.common.TestHelper.응답_코드가_일치한다;
-import static subway.line.LineFixtures.노선을_생성하고_노선_아이디를_반환한다;
-import static subway.line.LineFixtures.노선의_정보가_일치한다;
-import static subway.line.LineFixtures.노선이_해당_역을_정확히_포함한다;
-import static subway.line.LineFixtures.노선이_해당_역을_포함하지_않는다;
 import static subway.station.StationFixtures.강남역_생성_요청;
 import static subway.station.StationFixtures.서울대입구역_생성_요청;
 import static subway.station.StationFixtures.신논현역_생성_요청;
@@ -229,5 +227,39 @@ public class SectionAcceptanceTest extends AcceptanceTest {
                 )
         );
         응답_코드가_일치한다(response.statusCode(), HttpStatus.CREATED);
+    }
+
+    public static void 노선이_해당_역을_정확히_포함한다(
+            LineResponse response,
+            List<String> stationNames
+    ) {
+        assertThat(response.getStations().stream().map(StationResponse::getName))
+                .containsExactly(stationNames.toArray(new String[stationNames.size()]));
+    }
+
+    public static void 노선이_해당_역을_포함하지_않는다(
+            LineResponse lineResponse,
+            long stationId
+    ) {
+        assertThat(lineResponse.getStations().stream().map(StationResponse::getId))
+                .doesNotContain(stationId);
+    }
+
+    public static long 노선을_생성하고_노선_아이디를_반환한다(Object request) {
+        var response = RestAssuredClient.post(
+                Endpoints.LINES,
+                request
+        );
+        응답_코드가_일치한다(response.statusCode(), HttpStatus.CREATED);
+        return response.jsonPath().getLong("id");
+    }
+
+    public static void 노선의_정보가_일치한다(
+            LineResponse response,
+            String expectedLineName,
+            String expectedColor
+    ) {
+        assertThat(response.getName()).isEqualTo(expectedLineName);
+        assertThat(response.getColor()).isEqualTo(expectedColor);
     }
 }

@@ -11,6 +11,7 @@ import subway.common.Endpoints;
 import subway.line.presentation.CreateLineRequest;
 import subway.line.presentation.LineResponse;
 import subway.line.presentation.UpdateLineRequest;
+import subway.station.presentation.StationResponse;
 import subway.utils.RestAssuredClient;
 
 import java.util.List;
@@ -19,8 +20,6 @@ import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.assertThat;
 import static subway.common.TestHelper.생성_헤더;
 import static subway.common.TestHelper.응답_코드가_일치한다;
-import static subway.line.LineFixtures.노선을_생성한다;
-import static subway.line.LineFixtures.노선의_정보가_일치한다;
 import static subway.station.StationFixtures.강남역_생성_요청;
 import static subway.station.StationFixtures.낙성대역_생성_요청;
 import static subway.station.StationFixtures.서울대입구역_생성_요청;
@@ -121,7 +120,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 신분당선_생성_요청.getName(),
                 신분당선_생성_요청.getColor(),
                 List.of(신분당선_생성_요청.getUpStationId(),
-                신분당선_생성_요청.getDownStationId())
+                        신분당선_생성_요청.getDownStationId())
         );
     }
 
@@ -149,7 +148,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 updateLineName,
                 updateColor,
                 List.of(신분당선_생성_요청.getUpStationId(),
-                신분당선_생성_요청.getDownStationId())
+                        신분당선_생성_요청.getDownStationId())
         );
     }
 
@@ -167,5 +166,26 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // = 해당 지하철 노선 정보 조회 시 NOT_FOUND를 응답받는다.
         ExtractableResponse<Response> 신분당선_조회_응답 = RestAssuredClient.get(생성_헤더(신분당선_생성_응답));
         응답_코드가_일치한다(신분당선_조회_응답.statusCode(), HttpStatus.NOT_FOUND);
+    }
+
+    public static ExtractableResponse<Response> 노선을_생성한다(Object request) {
+        var response = RestAssuredClient.post(
+                Endpoints.LINES,
+                request
+        );
+        응답_코드가_일치한다(response.statusCode(), HttpStatus.CREATED);
+        return response;
+    }
+
+    public static void 노선의_정보가_일치한다(
+            LineResponse response,
+            String expectedLineName,
+            String expectedColor,
+            List<Long> stationIds
+    ) {
+        assertThat(response.getName()).isEqualTo(expectedLineName);
+        assertThat(response.getColor()).isEqualTo(expectedColor);
+        assertThat(response.getStations().stream().map(StationResponse::getId)).containsExactly(
+                stationIds.toArray(new Long[stationIds.size()]));
     }
 }
