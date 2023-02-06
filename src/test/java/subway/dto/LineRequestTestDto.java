@@ -4,7 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-public class LineTestDto {
+public class LineRequestDto {
     private final String lineName;
     private final String lineColor;
     private final Long upStationId;
@@ -12,7 +12,7 @@ public class LineTestDto {
     private final Long distance;
 
     @Builder
-    public LineTestDto(String lineName, String lineColor, Long upStationId, Long downStationId, Long distance) {
+    public LineRequestDto(String lineName, String lineColor, Long upStationId, Long downStationId, Long distance) {
         this.lineName = lineName;
         this.lineColor = lineColor;
         this.upStationId = upStationId;
