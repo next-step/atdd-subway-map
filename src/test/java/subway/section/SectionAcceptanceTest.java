@@ -1,13 +1,10 @@
 package subway.section;
 
-import io.restassured.RestAssured;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.annotation.DirtiesContext;
 import subway.common.AcceptanceTest;
 import subway.common.Endpoints;
 import subway.line.LineFixtures;
@@ -29,7 +26,6 @@ import static subway.station.StationFixtures.신논현역_생성_요청;
 import static subway.station.StationFixtures.지하철역을_생성한다;
 
 @DisplayName("지하철 구간 관련 기능")
-@DirtiesContext
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class SectionAcceptanceTest extends AcceptanceTest {
     private long 강남역_아이디;
@@ -37,12 +33,9 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     private long 신논현역_아이디;
     private CreateLineRequest 신분당선_생성_요청;
 
-    @LocalServerPort
-    int port;
-
     @BeforeEach
     protected void setUp() {
-        RestAssured.port = port;
+        super.setUp();
         강남역_아이디 = 지하철역을_생성한다(강남역_생성_요청);
         서울대입구역_아이디 = 지하철역을_생성한다(서울대입구역_생성_요청);
         신논현역_아이디 = 지하철역을_생성한다(신논현역_생성_요청);

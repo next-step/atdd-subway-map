@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 
 @Embeddable
 public class Sections {
+    public static final int MIN_SECTION_SIZE_OF_LINE = 1;
     @ElementCollection
     @CollectionTable(name = "section", joinColumns = @JoinColumn(name = "line_id"))
     private List<Section> sections = new LinkedList<>();
@@ -37,9 +38,7 @@ public class Sections {
 
     public boolean contains(Station downStation) {
         return sections.stream()
-                .filter(section -> section.hasStation(downStation))
-                .findFirst()
-                .isPresent();
+                .anyMatch(section -> section.hasStation(downStation));
     }
 
     public List<Section> getSections() {
@@ -75,7 +74,7 @@ public class Sections {
     }
 
     public void deleteSection(Station deleteStation) {
-        if (sections.size() == 1) {
+        if (sections.size() == MIN_SECTION_SIZE_OF_LINE) {
             throw new CannotDeleteSectionException("Line has only 1 section");
         }
         if (!getLastSection().isDownStation(deleteStation)) {

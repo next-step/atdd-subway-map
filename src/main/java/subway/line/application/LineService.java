@@ -6,6 +6,7 @@ import subway.line.domain.Line;
 import subway.line.domain.LineRepository;
 import subway.line.presentation.LineResponse;
 import subway.station.application.StationQuery;
+import subway.station.application.dto.Stations;
 import subway.station.domain.Station;
 
 import java.util.List;
@@ -26,15 +27,14 @@ public class LineService {
 
     @Transactional
     public LineResponse createLine(LineDto lineDto) {
-        var upStation = stationQuery.findById(lineDto.getUpStationId());
-        var downStation = stationQuery.findById(lineDto.getDownStationId());
+        Stations stations = stationQuery.findAllByIdIn(List.of(lineDto.getUpStationId(), lineDto.getDownStationId()));
 
         var line = lineRepository.save(new Line(
                 lineDto.getName(),
                 lineDto.getColor(),
                 lineDto.getDistance(),
-                upStation,
-                downStation
+                stations.getById(lineDto.getUpStationId()),
+                stations.getById(lineDto.getDownStationId())
         ));
 
         return LineResponse.from(line);
@@ -66,11 +66,15 @@ public class LineService {
 
     @Transactional
     public LineResponse addSection(long lineId, SectionDto sectionDto) {
-        Station upStation = stationQuery.findById(sectionDto.getUpStationId());
-        Station downStation = stationQuery.findById(sectionDto.getDownStationId());
+        Stations stations = stationQuery.findAllByIdIn(List.of(sectionDto.getUpStationId(), sectionDto.getDownStationId()));
 
         Line line = lineQuery.findById(lineId);
-        Line updatedLine = lineRepository.save(line.addSection(upStation, downStation, sectionDto.getDistance()));
+        Line updatedLine = line.addSection(
+                stations.getById(sectionDto.getUpStationId()),
+                stations.getById(sectionDto.getDownStationId()),
+                sectionDto.getDistance()
+        );
+
         return LineResponse.from(updatedLine);
     }
 

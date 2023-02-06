@@ -2,10 +2,12 @@ package subway.station.application;
 
 import org.springframework.stereotype.Component;
 import subway.exception.StationNotFoundException;
-import subway.station.domain.StationRepository;
+import subway.station.application.dto.Stations;
 import subway.station.domain.Station;
+import subway.station.domain.StationRepository;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class StationQuery {
@@ -22,5 +24,13 @@ public class StationQuery {
     public Station findById(Long id) {
         return stationRepository.findById(id)
                 .orElseThrow(() -> new StationNotFoundException(id));
+    }
+
+    public Stations findAllByIdIn(List<Long> ids) {
+        return new Stations(stationRepository.findByIdIn(ids).stream()
+                .collect(Collectors.toMap(
+                        Station::getId,
+                        station -> station
+                )));
     }
 }
