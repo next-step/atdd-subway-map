@@ -109,7 +109,7 @@ public class StationSectionAcceptanceTest {
 
         JsonPath jsonPath = selectLine(1L).jsonPath();
         List<ReadLineResponse> responses = jsonPath.getList("stations", ReadLineResponse.class);
-        assertThat(responses.get(responses.size() - 1).getId()).isEqualTo(2L);
+        assertThat(responses).extracting(ReadLineResponse::getId).containsExactly(1L, 2L);
     }
 
     /**
