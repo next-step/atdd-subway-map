@@ -5,7 +5,6 @@ import lombok.Getter;
 import subway.station.domain.station.Station;
 
 import javax.persistence.*;
-import java.util.List;
 
 @Entity
 @Getter
@@ -13,38 +12,30 @@ public class Line {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "LINE_ID")
     private Long id;
 
-    @Column
     private String name;
-
-    @Column
     private String color;
+    @ManyToOne
+    @JoinColumn(foreignKey = @ForeignKey(name = "fk_up_station"))
+    private Station upStation;
 
-    @Column
-    private Long upStationId;
-
-    @Column
-    private Long downStationId;
-
-    @Column
+    @ManyToOne
+    @JoinColumn(foreignKey = @ForeignKey(name = "fk_down_station"))
+    private Station downStation;
     private Long distance;
-
-    @OneToMany
-    @Column
-    private List<Station> stations;
 
     public Line() {
     }
 
     @Builder
-    public Line(String name, String color, Long upStationId, Long downStationId, Long distance, List<Station> stations) {
+    public Line(String name, String color, Station upStation, Station downStation, Long distance) {
         this.name = name;
         this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
+        this.upStation = upStation;
+        this.downStation = downStation;
         this.distance = distance;
-        this.stations = stations;
     }
 
     public void changeName(String name) {

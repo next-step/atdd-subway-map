@@ -10,6 +10,7 @@ import javax.persistence.*;
 public class Station {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "STATION_ID")
     private Long id;
 
     @Column(length = 20, nullable = false)
