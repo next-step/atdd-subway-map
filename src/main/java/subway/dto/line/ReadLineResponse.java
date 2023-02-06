@@ -18,12 +18,12 @@ public class ReadLineResponse {
 
     public ReadLineResponse(Line line) {
         this.id = line.getId();
-        this.name = line.getName().getName();
+        this.name = line.getNameValue();
         this.color = line.getColor().getName();
 
         List<Station> stations = line.getStationsByAscendingOrder();
         for (Station station : stations) {
-            this.stations.add(new ReadLineStationResponse(station.getId(), station.getName().getName()));
+            this.stations.add(new ReadLineStationResponse(station.getId(), station.getNameValue()));
         }
     }
 

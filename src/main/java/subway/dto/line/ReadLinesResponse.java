@@ -17,12 +17,12 @@ public class ReadLinesResponse {
 
     public ReadLinesResponse(Line line) {
         this.id = line.getId();
-        this.name = line.getName().getName();
+        this.name = line.getNameValue();
         this.color = line.getColor().getName();
 
         List<Station> stations = line.getStationsByAscendingOrder();
         for (Station station : stations) {
-            this.stations.add(new ReadLinesStationResponse(station.getId(), station.getName().getName()));
+            this.stations.add(new ReadLinesStationResponse(station.getId(), station.getNameValue()));
         }
     }
 

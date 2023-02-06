@@ -16,11 +16,11 @@ public class CreateLineResponse {
 
     public CreateLineResponse(Line line, List<Station> stations) {
         this.id = line.getId();
-        this.name = line.getName().getName();
+        this.name = line.getNameValue();
         this.color = line.getColor().getName();
 
         for (Station station : stations) {
-            this.stations.add(new CreateLineStationResponse(station.getId(), station.getName().getName()));
+            this.stations.add(new CreateLineStationResponse(station.getId(), station.getNameValue()));
         }
     }
 

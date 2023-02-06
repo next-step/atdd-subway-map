@@ -10,7 +10,7 @@ public class ReadStationResponse {
 
     public ReadStationResponse(Station station) {
         this.id = station.getId();
-        this.name = station.getName().getName();
+        this.name = station.getNameValue();
     }
 
 }
