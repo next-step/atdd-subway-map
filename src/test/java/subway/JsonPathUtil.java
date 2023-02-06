@@ -9,7 +9,7 @@ import java.util.List;
 public class JsonPathUtil {
 
     public static LineResponse getLineResponse(ExtractableResponse<Response> response) {
-        return response.jsonPath().getObject("$", LineResponse.class);
+        return response.as(LineResponse.class);
     }
 
     public static List<LineResponse> getLineResponses(ExtractableResponse<Response> response) {

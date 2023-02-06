@@ -24,10 +24,6 @@ public class Stations {
         this.stations = stations;
     }
 
-    public List<Station> getStationList() {
-        return stations;
-    }
-
     public static Stations of(List<Station> stations) {
         return new Stations(stations);
     }

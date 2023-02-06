@@ -38,6 +38,10 @@ public class LineAcceptanceTest {
         StationAcceptanceFactory.createStation(YEOM_CHANG);
     }
 
+    /**
+     * When 한 개의 노선을 생성하면
+     * Then 한 개의 노선에는 상행역과 하행역이 존재한다.
+     */
     @DisplayName("지하철 노선을 생성한다.")
     @Test
     void createLine() {

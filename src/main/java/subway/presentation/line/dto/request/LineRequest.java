@@ -1,12 +1,13 @@
 package subway.presentation.line.dto.request;
 
-import lombok.Data;
+import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import subway.domain.line.Line;
 import subway.domain.station.Stations;
 
-@Data
-@NoArgsConstructor
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class LineRequest {
 
     private String name;

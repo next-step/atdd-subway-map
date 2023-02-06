@@ -18,13 +18,13 @@ public class LineController {
 
     private final LineFacade lineFacade;
 
-    @PostMapping("")
+    @PostMapping
     public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest request) {
         LineResponse line = lineFacade.createLine(request);
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
 
-    @GetMapping("")
+    @GetMapping
     public ResponseEntity<List<LineResponse>> getAllLines() {
         return ResponseEntity.ok(lineFacade.getAllLines());
     }

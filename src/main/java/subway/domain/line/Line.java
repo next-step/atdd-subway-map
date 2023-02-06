@@ -38,8 +38,8 @@ public class Line {
         stations.belongTo(this);
     }
 
-    public List<Station> getStationList() {
-        return stations.getStationList();
+    public List<Station> getStations() {
+        return stations.getStations();
     }
 
     public void update(String name, String color) {

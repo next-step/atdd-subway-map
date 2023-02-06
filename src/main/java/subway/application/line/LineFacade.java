@@ -1,10 +1,8 @@
 package subway.application.line;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
 import subway.domain.line.service.LineService;
 import subway.domain.station.Station;
 import subway.domain.station.service.StationService;
