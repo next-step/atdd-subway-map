@@ -5,9 +5,9 @@ import subway.application.service.output.LineLoadRepository;
 import subway.application.service.output.SectionCommandRepository;
 import subway.application.service.output.SectionLoadRepository;
 import subway.domain.Line;
+import subway.domain.Section;
 import subway.domain.exception.NotFoundSectionException;
 import subway.domain.exception.NotFoundStationException;
-import subway.domain.Section;
 
 import java.util.ArrayList;
 import java.util.List;
