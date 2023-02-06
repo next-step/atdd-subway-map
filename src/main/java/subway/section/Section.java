@@ -32,10 +32,10 @@ public class Section {
     @Column(name = "SECTION_DISTANCE")
     private Integer sectionDistance;
 
-    public Section(Long lineId, Station downStation, Station upStation, Integer sectionDistance) {
+    public Section(Long lineId, Station upStation, Station downStation, Integer sectionDistance) {
         this.lineId = lineId;
-        this.downStation = downStation;
         this.upStation = upStation;
+        this.downStation = downStation;
         this.sectionDistance = sectionDistance;
     }
 }

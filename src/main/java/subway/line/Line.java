@@ -27,11 +27,11 @@ public class Line {
     @Column(name = "COLOR")
     private String color;
 
-    @Column(name = "DOWN_STATION_ID")
-    private Long downStationId;
-
     @Column(name = "UP_STATION_ID")
     private Long upStationId;
+
+    @Column(name = "DOWN_STATION_ID")
+    private Long downStationId;
 
     @Column(name = "LINE_DISTANCE")
     private Integer lineDistance;
@@ -56,15 +56,18 @@ public class Line {
     }
 
     public void addSection(Section section) {
+        this.downStationId = section.getDownStation().getId();
         sections.addSections(section);
         lineDistance += section.getSectionDistance();
     }
 
-    public Integer getSectionCount(){
+    public Integer getSectionCount() {
         return sections.getSectionCount();
     }
 
     public void deleteSection(Station station) {
+        this.downStationId =
+                sections.getSectionByDownStatoinId(station.getId()).getUpStation().getId();
         sections.deletionSection(station);
     }
 }

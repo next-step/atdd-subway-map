@@ -10,5 +10,4 @@ public class AddSectionRequest {
     private Long upStationId;
 
     private Integer distance;
-
 }

@@ -26,11 +26,18 @@ public class Sections {
         return Stream.concat(upStations, downStations).distinct().collect(Collectors.toList());
     }
 
-    public Integer getSectionCount(){
+    public Integer getSectionCount() {
         return sections.size();
     }
 
     public void deletionSection(Station station) {
         sections.remove(station);
+    }
+
+    public Section getSectionByDownStatoinId(Long downStationId) {
+        return sections.stream()
+                .filter(e -> e.getDownStation().getId() == downStationId)
+                .findFirst()
+                .get();
     }
 }
