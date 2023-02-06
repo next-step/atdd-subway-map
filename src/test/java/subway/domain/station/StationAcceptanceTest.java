@@ -4,11 +4,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import subway.common.AcceptanceTest;
-
 import java.util.ArrayList;
 import java.util.Map;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static subway.domain.station.StationApiTest.*;
 
 @DisplayName("지하철역 관련 기능")
@@ -26,10 +26,9 @@ public class StationAcceptanceTest extends AcceptanceTest {
         var response = 지하철역을_생성한다("강남역");
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-        // then
-        assertThat(지하철역을_조회한다().jsonPath().getList("name").contains("강남역")).isEqualTo(true);
+        assertAll("지하철 역 생성 테스트 (독립적)",
+                () -> assertEquals(response.statusCode(), HttpStatus.CREATED.value(), "Fail https status code"),
+                () -> assertEquals(지하철역을_조회한다().jsonPath().getList("name").contains("강남역"), true, "fail create station"));
     }
 
     /**
@@ -47,10 +46,11 @@ public class StationAcceptanceTest extends AcceptanceTest {
 
         //When
         var response = 지하철역을_조회한다();
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         //then
-        assertThat(response.jsonPath().getList("name")).hasSize(2);
+        assertAll("지하철 역 조회 테스트 (독립적)",
+                () -> assertEquals(response.statusCode(), HttpStatus.OK.value(), "Fail https status code"),
+                () -> assertEquals(response.jsonPath().getList("name").size(), 2, "fail show stations"));
     }
 
     /**
@@ -71,10 +71,11 @@ public class StationAcceptanceTest extends AcceptanceTest {
 
         //when
         var response = 지하철역을_삭제한다(deleteStation);
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         //then
-        assertThat(지하철역을_조회한다().jsonPath().getList("name").contains(deleteStationName)).isEqualTo(false);
+        assertAll("지하철 역 삭제 테스트 (독립적)",
+                () -> assertEquals(response.statusCode(), HttpStatus.NO_CONTENT.value(), "Fail https status code"),
+                () -> assertEquals(지하철역을_조회한다().jsonPath().getList("name").contains(deleteStationName), false, "fail delete stations"));
     }
 
 }

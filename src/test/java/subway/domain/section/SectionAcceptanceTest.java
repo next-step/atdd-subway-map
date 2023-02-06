@@ -14,6 +14,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static subway.domain.line.LineApiTest.지하철노선의_마지막_구간을_조회한다;
 import static subway.common.SetupTest.*;
 import static subway.domain.station.StationApiTest.지하철역을_생성한다;
@@ -52,9 +54,10 @@ public class SectionAcceptanceTest extends AcceptanceTest {
                 .when().post("/lines/{id}/sections", 1).then().log().all().extract();
 
         //then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(response.body().jsonPath().getObject("sections", Sections.class).getSections().get(0).getUpStation().getId()).isEqualTo(1);
-        assertThat(response.body().jsonPath().getObject("sections", Sections.class).getSections().get(0).getDownStation().getId()).isEqualTo(2);
+        assertAll("지하철 구간 등록 테스트 (독립적)",
+                () -> assertEquals(response.statusCode(), HttpStatus.CREATED.value(), "Fail https status code"),
+                () -> assertEquals(response.body().jsonPath().getObject("sections", Sections.class).getSections().get(0).getUpStation().getId(), 1, "fail add section upStation"),
+                () -> assertEquals(response.body().jsonPath().getObject("sections", Sections.class).getSections().get(0).getDownStation().getId(), 2, "fail add section downStation"));
     }
 
     /**
@@ -129,8 +132,9 @@ public class SectionAcceptanceTest extends AcceptanceTest {
                 .then().log().all()
                 .extract();
 
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.body().jsonPath().getObject("sections", Sections.class).getSections().contains(section)).isEqualTo(false);
+        assertAll("지하철 구간 삭제 테스트 (독립적)",
+                () -> assertEquals(response.statusCode(), HttpStatus.OK.value(), "Fail https status code"),
+                () -> assertEquals(response.body().jsonPath().getObject("sections", Sections.class).getSections().contains(section), false, "fail delete section"));
     }
 
     /**

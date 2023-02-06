@@ -12,6 +12,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static subway.common.SetupTest.*;
 import static subway.domain.line.LineApiTest.*;
 
@@ -39,8 +41,10 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 .extract();
 
         //then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat((String) response.jsonPath().get("name")).isEqualTo("신분당선");
+        assertAll("지하철 노선 생성 테스트 (독립적)",
+                () -> assertEquals(response.statusCode(), HttpStatus.CREATED.value(), "Fail https status code"),
+                () -> assertEquals(response.jsonPath().getString("name"), "신분당선", "fail create station"));
+
     }
 
     /**
@@ -59,8 +63,9 @@ public class LineAcceptanceTest extends AcceptanceTest {
         var response = 지하철노선_목록을_조회한다();
 
         //then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.jsonPath().getList("name")).hasSize(2);
+        assertAll("지하철 노선 조회 테스트 (독립적)",
+                () -> assertEquals(response.statusCode(), HttpStatus.OK.value(), "Fail https status code"),
+                () -> assertEquals(response.jsonPath().getList("name").size(), 2, "fail show line"));
     }
 
     /**
@@ -79,8 +84,9 @@ public class LineAcceptanceTest extends AcceptanceTest {
         var response = 지하철노선을_조회한다(2);
 
         //then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat((String)response.jsonPath().get("name")).isEqualTo("분당선");
+        assertAll("특정 지하철 노선 조회 테스트 (독립적)",
+                () -> assertEquals(response.statusCode(), HttpStatus.OK.value(), "Fail https status code"),
+                () -> assertEquals(response.jsonPath().getString("name"), "분당선", "fail show line"));
     }
 
     /**
@@ -104,9 +110,10 @@ public class LineAcceptanceTest extends AcceptanceTest {
         var response = 지하철노선을_수정한다(id, updateParam);
 
         //then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat((String) 지하철노선을_조회한다(id).jsonPath().get("name")).isEqualTo(updateParam.get("name"));
-        assertThat((String) 지하철노선을_조회한다(id).jsonPath().get("color")).isEqualTo(updateParam.get("color"));
+        assertAll("특정 지하철 노선 수정 테스트 (독립적)",
+                () -> assertEquals(response.statusCode(), HttpStatus.OK.value(), "Fail https status code"),
+                () -> assertEquals(지하철노선을_조회한다(id).jsonPath().getString("name"), updateParam.get("name"), "fail update name line"),
+                () -> assertEquals(지하철노선을_조회한다(id).jsonPath().getString("color"), updateParam.get("color"), "fail update color line"));
     }
 
     /**
