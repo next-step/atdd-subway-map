@@ -10,7 +10,7 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor
-public class FindLineResponse {
+public class LineFindByLineResponse {
     private Long id;
     private String name;
     private String color;
@@ -18,7 +18,7 @@ public class FindLineResponse {
 
 
     @Builder
-    public FindLineResponse(Long id, String name, String color, Station upStation, Station downStation) {
+    public LineFindByLineResponse(Long id, String name, String color, Station upStation, Station downStation) {
         this.id = id;
         this.name = name;
         this.color = color;

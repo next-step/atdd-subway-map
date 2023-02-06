@@ -1,12 +1,11 @@
 package subway.station.web.dto;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class SaveLineRequest {
+public class LineSaveRequest {
 
     private String name;
     private String color;

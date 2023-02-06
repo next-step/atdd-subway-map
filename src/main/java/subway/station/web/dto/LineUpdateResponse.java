@@ -6,12 +6,12 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class UpdateLineResponse {
+public class LineUpdateResponse {
     private String name;
     private String color;
 
     @Builder
-    public UpdateLineResponse(String name, String color) {
+    public LineUpdateResponse(String name, String color) {
         this.name = name;
         this.color = color;
     }
