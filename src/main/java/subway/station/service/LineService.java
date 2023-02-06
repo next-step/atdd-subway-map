@@ -6,7 +6,7 @@ import subway.station.domain.line.Line;
 import subway.station.domain.line.LineRepository;
 import subway.station.domain.station.Station;
 import subway.station.domain.station.StationRepository;
-import subway.station.web.dto.*;
+import subway.station.service.dto.*;
 
 import java.util.List;
 import java.util.stream.Collectors;

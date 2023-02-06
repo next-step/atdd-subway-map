@@ -3,7 +3,7 @@ package subway.station.web;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import subway.station.service.LineService;
-import subway.station.web.dto.*;
+import subway.station.service.dto.*;
 
 import java.net.URI;
 import java.util.List;
