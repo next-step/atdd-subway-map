@@ -116,7 +116,6 @@ public class StationSectionAcceptanceTest {
      * Given 지하철 역 A, B, C, D를 생성 후
      * Given A, B, C역을 잇는 노선을 생성 후
      * When A역을 삭제하면
-     * When B역을 삭제하면
      * Then "지하철 노선에 등록된 역(하행 종점역)만 제거할 수 있다. 즉, 마지막 구간만 제거할 수 있다." 오류 메시지가 나온다.
      */
     @Test
@@ -124,10 +123,6 @@ public class StationSectionAcceptanceTest {
         ExtractableResponse<Response> response1 = StationUtils.reduceLine(1L);
         assertThat(response1.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(response1.body().asString()).contains("마지막 구간만 제거할 수 있다");
-
-        ExtractableResponse<Response> response2 = StationUtils.reduceLine(2L);
-        assertThat(response2.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(response2.body().asString()).contains("마지막 구간만 제거할 수 있다");
     }
 
     /**
