@@ -24,7 +24,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
      * Given 지하철역과 노선 생성을 요청 하고
      */
     @BeforeEach
-    void setup() {
+    public void setUp() {
         super.setUp();
 
         station1Id = createStation("강남역").jsonPath().getLong("id");

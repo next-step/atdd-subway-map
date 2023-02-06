@@ -2,6 +2,7 @@ package subway;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -20,6 +21,16 @@ import static subway.response.StationAcceptanceTestUtils.createStation;
 @DisplayName("지하철 노선 관련 기능")
 public class LineAcceptanceTest extends AcceptanceTest{
 	/**
+	 * Given 지하철역 생성을 요청 하고
+	 */
+	@BeforeEach
+	public void setUp() {
+		super.setUp();
+
+		createStation("지하철역");
+		createStation("새로운 지하철역");
+	}
+	/**
 	 * When 지하철 노선을 생성하면
 	 * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
 	 */
@@ -27,8 +38,6 @@ public class LineAcceptanceTest extends AcceptanceTest{
 	@Test
 	void addLine() {
 		//when
-		createStation("지하철역");
-		createStation("새로운 지하철역");
 		Map<String, Object> line1 = createLine("신분당선", "bg-red-600", 1, 2, 10);
 
 		ExtractableResponse<Response> createResponse = createLineResponse(line1);
@@ -52,8 +61,6 @@ public class LineAcceptanceTest extends AcceptanceTest{
 	@Test
 	void showLines() {
 		//given
-		createStation("지하철역");
-		createStation("새로운 지하철역");
 		createStation("또 다른 지하철역");
 		Map<String, Object> line1 = createLine("신분당선", "bg-red-600", 1, 2, 10);
 		createLineResponse(line1);
@@ -79,8 +86,6 @@ public class LineAcceptanceTest extends AcceptanceTest{
 	@Test
 	void showLine() {
 		//given
-		createStation("지하철역");
-		createStation("새로운 지하철역");
 		Map<String, Object> line1 = createLine("신분당선", "bg-red-600", 1, 2, 10);
 		ExtractableResponse<Response> lineResponse = createLineResponse(line1);
 		long id = lineResponse.response().jsonPath().getLong("id");
@@ -104,8 +109,6 @@ public class LineAcceptanceTest extends AcceptanceTest{
 	@Test
 	void updateLine() {
 		//given
-		createStation("지하철역");
-		createStation("새로운 지하철역");
 		Map<String, Object> line1 = createLine("신분당선", "bg-red-600", 1, 2, 10);
 		ExtractableResponse<Response> lineResponse = createLineResponse(line1);
 		long id = lineResponse.response().jsonPath().getLong("id");
@@ -139,8 +142,6 @@ public class LineAcceptanceTest extends AcceptanceTest{
 	@Test
 	void deleteLine() {
 		//given
-		createStation("지하철역");
-		createStation("새로운 지하철역");
 		Map<String, Object> line1 = createLine("신분당선", "bg-red-600", 1, 2, 10);
 
 		ExtractableResponse<Response> lineResponse = createLineResponse(line1);
