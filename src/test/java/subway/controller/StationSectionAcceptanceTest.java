@@ -1,7 +1,6 @@
 package subway.controller;
 
 
-import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -13,9 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import subway.dto.line.ReadLineResponse;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static subway.controller.StationUtils.*;
@@ -30,15 +27,9 @@ public class StationSectionAcceptanceTest {
         StationUtils.createStation(SIN_SA_STATION);
         StationUtils.createStation(PAN_GYEO_STATION);
         StationUtils.createStation(SIN_NONE_HYEON_STATION);
-
-        Map<String, Object> SIN_BUN_DANG_STATION_LINE = new HashMap<>();
-        SIN_BUN_DANG_STATION_LINE.put("name", SIN_BUN_DANG_LINE_NAME);
-        SIN_BUN_DANG_STATION_LINE.put("color", LINE_RED);
-        SIN_BUN_DANG_STATION_LINE.put("upStationId", 1L);
-        SIN_BUN_DANG_STATION_LINE.put("downStationId", 2L);
-        SIN_BUN_DANG_STATION_LINE.put("distance", 10);
-
-        StationUtils.createLine(SIN_BUN_DANG_STATION_LINE);
+        StationUtils.createColor(LINE_RED);
+        StationUtils.createColor(LINE_BLUE);
+        StationUtils.createLine(SIN_BUN_DANG_LINE_NAME, LINE_RED, 1L, 2L, 10L);
         StationUtils.extendLine(2L, 3L, 20L);
     }
 

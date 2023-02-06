@@ -3,16 +3,14 @@ package subway.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.domain.color.Color;
 import subway.domain.line.Line;
 import subway.domain.section.Section;
 import subway.domain.sectionstation.Direction;
 import subway.domain.sectionstation.SectionStation;
 import subway.domain.station.Station;
 import subway.dto.line.*;
-import subway.repository.LineRepository;
-import subway.repository.SectionRepository;
-import subway.repository.SectionStationRepository;
-import subway.repository.StationRepository;
+import subway.repository.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,10 +22,12 @@ public class LineService {
     private final StationRepository stationRepository;
     private final SectionRepository sectionRepository;
     private final SectionStationRepository sectionStationRepository;
+    private final ColorRepository colorRepository;
 
     @Transactional
     public CreateLineResponse createLine(CreateLineRequest request) {
-        Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
+        Color color = colorRepository.findByName(request.getColor()).orElseThrow();
+        Line line = lineRepository.save(new Line(request.getName(), color));
         Section section = sectionRepository.save(new Section(request.getDistance(), line));
 
         Station upStation = stationRepository.findById(request.getUpStationId()).orElseThrow();
@@ -58,7 +58,8 @@ public class LineService {
     @Transactional
     public void updateLine(Long stationLineId, UpdateLineRequest request) {
         Line line = lineRepository.findById(stationLineId).orElseThrow();
-        line.updateNameAndColor(request.convertToEntity());
+        Color color = colorRepository.findByName(request.getColor()).orElseThrow();
+        line.updateNameAndColor(request.getName(), color);
     }
 
     @Transactional

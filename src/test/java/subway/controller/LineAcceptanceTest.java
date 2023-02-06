@@ -30,6 +30,9 @@ public class LineAcceptanceTest {
         StationUtils.createStation(GANG_NAM_STATION);
         StationUtils.createStation(SIN_SA_STATION);
 
+        StationUtils.createColor(LINE_RED);
+        StationUtils.createColor(LINE_BLUE);
+
         SIN_BUN_DANG_STATION_LINE.put("name", SIN_BUN_DANG_LINE_NAME);
         SIN_BUN_DANG_STATION_LINE.put("color", LINE_RED);
         SIN_BUN_DANG_STATION_LINE.put("upStationId", 1);

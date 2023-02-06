@@ -112,4 +112,13 @@ public class StationUtils {
                 .then().log().all().extract();
     }
 
+    public static ExtractableResponse<Response> createColor(String name) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("name", name);
+        return RestAssured
+                .given().spec(getRequestSpecification()).body(body)
+                .when().post("/color")
+                .then().extract();
+    }
+
 }

@@ -2,6 +2,7 @@ package subway.domain.line;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import subway.domain.color.Color;
 import subway.domain.station.Station;
 
 import javax.persistence.*;
@@ -19,16 +20,16 @@ public class Line {
     @Embedded
     private Name name;
 
-    @Column(nullable = false)
-    @Enumerated(value = EnumType.STRING)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "color", referencedColumnName = "id")
     private Color color;
 
     @Embedded
     private Sections sections;
 
-    public Line(String name, String color) {
+    public Line(String name, Color color) {
         this.name = new Name(name);
-        this.color = Color.findByName(color);
+        this.color = color;
         this.sections = new Sections();
     }
 
@@ -36,9 +37,9 @@ public class Line {
         return sections.getStationsByAscendingOrder();
     }
 
-    public void updateNameAndColor(Line line) {
-        this.name = line.getName();
-        this.color = line.getColor();
+    public void updateNameAndColor(String name, Color color) {
+        this.name = new Name(name);
+        this.color = color;
     }
 
     public void checkLineExtendValid(Station upStation, Station downStation) {
