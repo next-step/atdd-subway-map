@@ -28,7 +28,8 @@ public class LineService {
 
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
-        Line line = lineRepository.save(toLineEntity(lineRequest));
+        Line entity = toLineEntity(lineRequest);
+        Line line = lineRepository.save(entity);
 
         return LineResponse.of(line);
     }

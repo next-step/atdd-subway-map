@@ -24,6 +24,11 @@ public class AssertUtil {
         assertThat(response.statusCode()).isEqualTo(NO_CONTENT.value());
     }
 
+    public static void assertFailBadRequest(ExtractableResponse<Response> response, String message) {
+        assertThat(response.statusCode()).isEqualTo(BAD_REQUEST.value());
+        assertThat(response.body().asString()).isEqualTo(message);
+    }
+
     public static void assertEqualToNames(List<String> names, String... expectedNames){
         assertThat(names.size()).isEqualTo(expectedNames.length);
 
