@@ -5,7 +5,9 @@ import subway.api.dto.SectionRequest;
 import javax.persistence.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.util.Optional.ofNullable;
 import static subway.api.validator.SectionValidator.addSectionValidator;
@@ -30,6 +32,21 @@ public class Line {
 		this.name = name;
 		this.color = color;
 	}
+
+	public List getSortedStations() {
+		if (this.getSections().isEmpty()) {
+			return Collections.emptyList();
+		}
+
+		List<Station> stations = this.getSections().stream()
+				.map(Section::getDownStation)
+				.collect(Collectors.toList());
+
+		stations.add(0, this.getSections().get(0).getUpStation());
+
+		return stations;
+	}
+
 	public void updateLineIfPresent(Line line) {
 		ofNullable(line.getName()).ifPresent(nameToUpdate -> name = nameToUpdate);
 		ofNullable(line.getColor()).ifPresent(colorToUpdate -> color = colorToUpdate);

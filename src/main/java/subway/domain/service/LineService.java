@@ -6,12 +6,10 @@ import subway.api.dto.LineRequest;
 import subway.api.dto.LineResponse;
 import subway.api.dto.SectionRequest;
 import subway.domain.entity.Line;
-import subway.domain.entity.Section;
 import subway.domain.entity.Station;
 import subway.domain.repository.LineRepository;
 import subway.global.error.exception.EntityNotFoundException;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -40,7 +38,7 @@ public class LineService {
                 line.getId(),
                 line.getName(),
                 line.getColor(),
-                createStations(line)
+                line.getSortedStations()
         );
     }
 
@@ -66,22 +64,6 @@ public class LineService {
     @Transactional
     public void deleteLine(Long id) {
         lineRepository.deleteById(id);
-    }
-
-    private List createStations(Line line) {
-        if (line.getSections().isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        List<Station> stations = line.getSections().stream()
-                .map(Section::getDownStation)
-                .collect(Collectors.toList());
-
-        stations.add(0, line.getSections().get(0).getUpStation());
-
-        return stations.stream()
-                .map(it -> stationService.createStationResponse(it))
-                .collect(Collectors.toList());
     }
 
     @Transactional
