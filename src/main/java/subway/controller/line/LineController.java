@@ -1,10 +1,14 @@
-package subway.line;
+package subway.controller.line;
 
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import subway.section.AddSectionRequest;
+import subway.controller.line.dto.CreateLineRequest;
+import subway.controller.line.dto.LineResponse;
+import subway.controller.line.dto.UpdateLineRequest;
+import subway.controller.line.dto.AddSectionRequest;
+import subway.service.LineService;
 
 @RestController
 public class LineController {

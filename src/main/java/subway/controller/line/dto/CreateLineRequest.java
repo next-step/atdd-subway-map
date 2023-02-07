@@ -1,6 +1,7 @@
-package subway.line;
+package subway.controller.line.dto;
 
 import lombok.Getter;
+import subway.domain.Line;
 
 @Getter
 public class CreateLineRequest {

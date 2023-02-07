@@ -1,4 +1,4 @@
-package subway.section;
+package subway.domain;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,7 +7,6 @@ import java.util.stream.Stream;
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
-import subway.station.Station;
 
 @Embeddable
 public class Sections {

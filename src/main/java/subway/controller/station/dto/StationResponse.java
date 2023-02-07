@@ -1,7 +1,8 @@
-package subway.station;
+package subway.controller.station.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import subway.domain.Station;
 
 @Getter
 @AllArgsConstructor

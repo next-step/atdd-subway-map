@@ -1,10 +1,11 @@
-package subway.line;
+package subway.controller.line.dto;
 
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import subway.station.StationResponse;
+import subway.domain.Line;
+import subway.controller.station.dto.StationResponse;
 
 @AllArgsConstructor
 @Getter

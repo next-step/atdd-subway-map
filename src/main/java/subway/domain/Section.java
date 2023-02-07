@@ -1,10 +1,9 @@
-package subway.section;
+package subway.domain;
 
 import javax.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import subway.station.Station;
 
 @Getter
 @Entity

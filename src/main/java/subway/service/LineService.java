@@ -1,4 +1,4 @@
-package subway.line;
+package subway.service;
 
 import java.util.List;
 import java.util.Optional;
@@ -8,11 +8,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.common.DomainException;
 import subway.common.DomainExceptionType;
-import subway.section.AddSectionRequest;
-import subway.section.Section;
-import subway.section.SectionRepository;
-import subway.station.Station;
-import subway.station.StationRepository;
+import subway.domain.Line;
+import subway.controller.line.dto.CreateLineRequest;
+import subway.controller.line.dto.LineResponse;
+import subway.controller.line.dto.UpdateLineRequest;
+import subway.repository.LineRepository;
+import subway.controller.line.dto.AddSectionRequest;
+import subway.domain.Section;
+import subway.repository.SectionRepository;
+import subway.domain.Station;
+import subway.repository.StationRepository;
 
 @Service
 @AllArgsConstructor
