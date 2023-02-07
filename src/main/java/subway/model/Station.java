@@ -1,6 +1,7 @@
 package subway.model;
 
 import lombok.Getter;
+
 import javax.persistence.*;
 
 @Entity

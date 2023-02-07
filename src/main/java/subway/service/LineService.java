@@ -3,6 +3,7 @@ package subway.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.dto.LinePatchResponse;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 import subway.dto.StationResponse;
@@ -48,6 +49,12 @@ public class LineService {
         list.add(upStationResponse);
         list.add(downStationResponse);
         return new LineResponse(line.getId(), line.getName(), line.getColor(), list);
+    }
+
+    @Transactional
+    public void updateLine(Long id, LinePatchResponse linePatchResponse) {
+        Line line = findLineById(id);
+        line.update(linePatchResponse.getName(), linePatchResponse.getColor());
     }
 
 

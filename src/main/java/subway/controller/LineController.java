@@ -2,8 +2,10 @@ package subway.controller;
 
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import subway.dto.LinePatchResponse;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 import subway.model.Line;
@@ -33,5 +35,11 @@ public class LineController {
     public ResponseEntity<LineResponse> getLine(@PathVariable Long id) {
         Line line = lineService.findLineById(id);
         return ResponseEntity.ok().body(lineService.createLineResponse(line));
+    }
+
+    @PatchMapping("/lines/{id}")
+    public ResponseEntity patchLine(@PathVariable Long id, @RequestBody LinePatchResponse linePatchResponse) {
+        lineService.updateLine(id, linePatchResponse);
+        return new ResponseEntity(HttpStatus.CREATED);
     }
 }
