@@ -2,8 +2,8 @@ package subway.line;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
+import subway.exception.CustomException;
+import subway.exception.ErrorCode;
 
 import java.util.List;
 import java.util.Optional;
@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional(readOnly = true)
 public class LineService {
-    private LineRepository lineRepository;
+    private final LineRepository lineRepository;
 
     public LineService(LineRepository lineRepository) {
         this.lineRepository = lineRepository;
@@ -26,25 +26,31 @@ public class LineService {
                 lineRequest.getUpStationId(),
                 lineRequest.getDownStationId(),
                 lineRequest.getDistance()));
+
         return createLineResponse(line);
     }
 
 
     @Transactional
-    public LineResponse updateLine(Long id, LineRequest lineRequest) {
+    public LineResponse updateLine(Long id, LineRequest lineRequest) throws CustomException {
         Optional<Line> updateLine = lineRepository.findById(id);
 
-        updateLine.ifPresent(selectLine->{
-            updateLine.get().setName(lineRequest.getName());
-            updateLine.get().setColor(lineRequest.getColor());
-            updateLine.get().setUpStationId(lineRequest.getUpStationId());
-            updateLine.get().setDownStationId(lineRequest.getDownStationId());
-            updateLine.get().setDistance(lineRequest.getDistance());
+        if (updateLine == null) {
+            //throw new NoSuchElementException("Line Id: " + id + " 의 Entity 가 존재 하지 않습니다.");
+            throw new CustomException(ErrorCode.LINE_NOT_FOUND);
+        } else {
+            updateLine.ifPresent(selectLine->{
+                updateLine.get().setName(lineRequest.getName());
+                updateLine.get().setColor(lineRequest.getColor());
+                updateLine.get().setUpStationId(lineRequest.getUpStationId());
+                updateLine.get().setDownStationId(lineRequest.getDownStationId());
+                updateLine.get().setDistance(lineRequest.getDistance());
 
-            lineRepository.save(updateLine.get());
-        });
+                lineRepository.save(updateLine.get());
+            });
 
-        return createLineResponse(updateLine.get());
+            return createLineResponse(updateLine.get());
+        }
     }
 
     public List<LineResponse> findAllLines() {
@@ -55,9 +61,7 @@ public class LineService {
 
     public LineResponse findLineById(Long id) {
         Line line = lineRepository.findById(id).get();
-        //if (line != null) {
         return createLineResponse(line);
-        //} else {return null;}
     }
 
     @Transactional

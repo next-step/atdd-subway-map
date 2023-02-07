@@ -5,20 +5,23 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import subway.line.LineResponse;
+import subway.exception.ErrorDto;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class LineTest {
+public class LineAcceptanceTest {
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
     /**
      * When 지하철노선을 생성하면
      * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
@@ -95,6 +98,7 @@ public class LineTest {
 
         // When 생성한 지하철 노선을 수정하면
         LineRequest updateLine8 = new LineRequest(Line8.getName(), "black", Line8.getUpStationId(),4L,100L);
+        lineId = 8L;
         LineResponse lineResponse = updateSubwayLine(lineId, updateLine8);
 
         // Then 해당 지하철 노선 정보는 수정된다
@@ -120,7 +124,7 @@ public class LineTest {
 
         // When 생성한 지하철 노선을 삭제하면 // Then 해당 지하철 노선 정보는 삭제된다
         deleteSubwayLine(lineId);
-        //assertThat(getAllSubwayLines()).doesNotContain(Line7.getName());
+        assertThat(getAllSubwayLines()).doesNotContain(Line7.getName());
     }
 
     private Long createSubwayLine(LineRequest lineRequest) {
@@ -206,6 +210,11 @@ public class LineTest {
                         .when().put("/lines/"+id)
                         .then().log().all()
                         .extract();
+
+        if (response.statusCode() == HttpStatus.NOT_FOUND.value()) {
+            ErrorDto errorDto = response.body().as(ErrorDto.class);
+            logger.error(">>>>>>>>>>>>>>>>>>>> "+ +  errorDto.getStatus() + " - " +  errorDto.getMessage());
+        }
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 

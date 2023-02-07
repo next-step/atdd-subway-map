@@ -6,9 +6,9 @@ import javax.persistence.*;
 public class Station {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    protected Long id;
+    private Long id;
     @Column(length = 20, nullable = false)
-    protected String name;
+    private String name;
 
     public Station() {
     }

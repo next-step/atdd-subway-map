@@ -2,6 +2,7 @@ package subway.line;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import subway.exception.CustomException;
 
 import java.net.URI;
 import java.util.List;
@@ -21,8 +22,9 @@ public class LineController {
     }
 
     @PutMapping("/lines/{id}")
-    public ResponseEntity<LineResponse> showStation(@PathVariable Long id, @RequestBody LineRequest lineRequest) {
-        return ResponseEntity.ok().body(lineService.updateLine(id, lineRequest));
+    public ResponseEntity<LineResponse> showStation(@PathVariable Long id, @RequestBody LineRequest lineRequest) throws CustomException {
+        LineResponse line = lineService.updateLine(id, lineRequest);
+        return ResponseEntity.ok().body(line);
     }
 
     @GetMapping(value = "/lines")
@@ -46,4 +48,26 @@ public class LineController {
         lineService.deleteLineById(id);
         return ResponseEntity.noContent().build();
     }
+
+//    @ExceptionHandler(CustomException.class)
+//    public ResponseEntity<ErrorDto> handleNoSuchElementFoundException(CustomException exception) {
+//        ErrorDto errorDto = new ErrorDto(exception.getErrorCode().getStatus(), exception.getErrorCode().getMessage());
+//        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorDto);
+//    }
+
+
+//    @ExceptionHandler(NoSuchElementFoundException.class)
+//    public ResponseEntity<ErrorResponse> handleItemNotFoundException(NoSuchElementFoundException exception) {
+//        ...
+//    }
+//
+//    @ExceptionHandler(MethodArgumentNotValidException.class)
+//    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
+//        ...
+//    }
+//
+//    @ExceptionHandler(Exception.class)
+//    public ResponseEntity<ErrorResponse> handleAllUncaughtException(Exception exception) {
+//        ...
+//    }
 }
