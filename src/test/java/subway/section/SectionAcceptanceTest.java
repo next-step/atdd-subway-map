@@ -21,14 +21,17 @@ import static subway.station.StationAcceptanceTest.createStationByName;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class SectionAcceptanceTest {
 
-    private final String 신분당선_이름 = "신분당선";
-    private final String 신분당선_색 = "bg-red-600";
-    private final String 분당선_이름 = "분당선";
-    private final String 다른분당선_이름 = "다른분당선";
-    private final String 다른분당선_색 = "bg-red-600";
+    private static final String 신분당선_이름 = "신분당선";
+    private static final String 신분당선_색 = "bg-red-600";
+    private static final String 분당선_이름 = "분당선";
+    private static final String 다른분당선_이름 = "다른분당선";
+    private static final String 다른분당선_색 = "bg-red-600";
 
+    private static final Long 지하철역_아이디 = 1L;
+    private static final Long 새로운지하철역_아이디 = 2L;
+    private static final Long 또다른지하철역_아이디 = 3L;
     private final static LineRequest 신분당선 = LineRequest.of(
-            "신분당선", "bg-red-600", 1L, 2L, 10L);
+            "신분당선", "bg-red-600", 지하철역_아이디, 새로운지하철역_아이디, 10L);
 
     @BeforeEach
     void setUp() {
@@ -49,17 +52,21 @@ public class SectionAcceptanceTest {
         long lineId = createLineAndGetId(신분당선);
 
         //When
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when().get("/lines/{lineId}/sections")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = readSectionsOfLine(lineId);
 
         //Then
-        List<Long> downStationIds = response.jsonPath().getList("sections.downStation.id");
-        List<Long> upStationIds = response.jsonPath().getList("sections.upStation.id");
-        assertThat(downStationIds).contains(2L);
-        assertThat(upStationIds).contains(1L);
+        assertThat(response.jsonPath().
+                getList("sections.downStation.id", Long.class)).contains(지하철역_아이디);
+        assertThat(response.jsonPath().
+                getList("sections.upStation.id", Long.class)).contains(새로운지하철역_아이디);
 
+    }
+
+    private static ExtractableResponse<Response> readSectionsOfLine(long lineId) {
+        return RestAssured.given().log().all()
+                .when().get("/lines/{lineId}/sections", lineId)
+                .then().log().all()
+                .extract();
     }
 
     /**

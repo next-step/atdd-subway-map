@@ -11,6 +11,7 @@ import subway.repository.LineRepository;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 import subway.dto.LineUpdateRequest;
+import subway.repository.SectionRepository;
 import subway.repository.StationRepository;
 
 import java.util.List;
@@ -24,10 +25,12 @@ public class LineService {
 
     private final StationRepository stationRepository;
     private final LineRepository lineRepository;
+    private final SectionRepository sectionRepository;
 
-    public LineService(StationRepository stationRepository, LineRepository lineRepository) {
+    public LineService(StationRepository stationRepository, LineRepository lineRepository, SectionRepository sectionRepository) {
         this.stationRepository = stationRepository;
         this.lineRepository = lineRepository;
+        this.sectionRepository = sectionRepository;
     }
 
     @Transactional
@@ -36,6 +39,7 @@ public class LineService {
         Station upStation = stationRepository.findById(lineRequest.getUpStationId()).orElseThrow(StationNotFoundException::new);
 
         Line line = lineRepository.save(lineRequest.toEntity(downStation, upStation));
+        sectionRepository.save(line.getSectionByStations(downStation, upStation));
 
         return createLineResponse(line);
     }

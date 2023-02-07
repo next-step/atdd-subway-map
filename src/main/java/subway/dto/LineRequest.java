@@ -1,6 +1,7 @@
 package subway.dto;
 
 import subway.domain.Line;
+import subway.domain.Section;
 import subway.domain.Station;
 
 public class LineRequest {
@@ -45,7 +46,7 @@ public class LineRequest {
     }
 
     public Line toEntity(Station downStation, Station upStation) {
-        return new Line(
+        return Line.newInstance(
                 this.name,
                 this.color,
                 downStation,
