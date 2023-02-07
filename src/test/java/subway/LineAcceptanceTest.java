@@ -147,12 +147,30 @@ class LineAcceptanceTest {
                .then().log().all().extract();
     }
 
+    /*
+    * Given 지하철 노선을 생성하고
+      When 생성한 지하철 노선을 삭제하면
+      Then 해당 지하철 노선 정보는 삭제된다
+    * */
 
+    @DisplayName("지하철노선 삭제 테스트")
+    @Test
+    void deleteLine() {
 
+        //given
+        createLine("신분당선", "bg-red-600", 1, 2, 10);
 
+        //when
+        ExtractableResponse<Response> response = deleteLine("/lines/1");
 
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
 
-
+    public ExtractableResponse<Response> deleteLine(String path) {
+        return RestAssured.given().log().all()
+                .when().delete(path)
+                .then().log().all().extract();
+    }
 
 
 }
