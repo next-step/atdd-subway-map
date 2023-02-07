@@ -3,6 +3,7 @@ package subway.application;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.application.util.Finder;
 import subway.domain.Line;
 import subway.domain.LineRepository;
 import subway.domain.Section;
@@ -22,15 +23,18 @@ public class SectionService {
     private final SectionRepository sectionRepository;
     private final LineRepository lineRepository;
     private final StationRepository stationRepository;
+    private final Finder finder;
 
     public SectionService(
             final SectionRepository sectionRepository,
             final LineRepository lineRepository,
-            final StationRepository stationRepository
+            final StationRepository stationRepository,
+            final Finder finder
     ) {
         this.sectionRepository = sectionRepository;
         this.lineRepository = lineRepository;
         this.stationRepository = stationRepository;
+        this.finder = finder;
     }
 
     @Transactional
@@ -42,8 +46,8 @@ public class SectionService {
                 List.of(registerSectionRequest.getDownStationId(), registerSectionRequest.getUpStationId())
         );
 
-        Station station = findStationById(stations, registerSectionRequest.getDownStationId());
-        Station upStation = findStationById(stations, registerSectionRequest.getUpStationId());
+        Station station = finder.findStationById(stations, registerSectionRequest.getDownStationId());
+        Station upStation = finder.findStationById(stations, registerSectionRequest.getUpStationId());
 
         validateRegisterStation(line, station);
 
@@ -60,13 +64,6 @@ public class SectionService {
                 .ifPresent(station -> {
                     throw new SectionConstraintException();
                 });
-    }
-
-    private Station findStationById(final List<Station> stations, final Long stationId) {
-        return stations.stream()
-                .filter(station -> station.getId() == stationId)
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("노선 지하철 정보가 올바르지 않습니다."));
     }
 
     @Transactional

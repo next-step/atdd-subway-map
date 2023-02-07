@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.application.util.Finder;
 import subway.domain.Line;
 import subway.domain.LineRepository;
 import subway.domain.Section;
@@ -23,15 +24,18 @@ public class LineService {
     private final LineRepository lineRepository;
     private final StationRepository stationRepository;
     private final SectionRepository sectionRepository;
+    private final Finder finder;
 
     public LineService(
             final LineRepository lineRepository,
             final StationRepository stationRepository,
-            final SectionRepository sectionRepository
+            final SectionRepository sectionRepository,
+            final Finder finder
     ) {
         this.lineRepository = lineRepository;
         this.stationRepository = stationRepository;
         this.sectionRepository = sectionRepository;
+        this.finder = finder;
     }
 
     public LineResponse getBy(final Long lineId) {
@@ -69,17 +73,10 @@ public class LineService {
         return new Line(
                 lineCreateRequest.getName(),
                 lineCreateRequest.getColor(),
-                findStationById(stations, lineCreateRequest.getUpStationId()),
-                findStationById(stations, lineCreateRequest.getDownStationId()),
+                finder.findStationById(stations, lineCreateRequest.getUpStationId()),
+                finder.findStationById(stations, lineCreateRequest.getDownStationId()),
                 lineCreateRequest.getDistance()
         );
-    }
-
-    private Station findStationById(final List<Station> stations, final Long stationId) {
-        return stations.stream()
-                .filter(station -> station.getId() == stationId)
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("노선 지하철 정보가 올바르지 않습니다."));
     }
 
     @Transactional
