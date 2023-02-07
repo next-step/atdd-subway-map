@@ -4,6 +4,7 @@ import lombok.*;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.*;
 import java.util.*;
 
 @RestController
@@ -14,38 +15,41 @@ public class LineController {
     private final LineService lineService;
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public LineResponse createLine(@RequestBody final LineCreateRequest lineCreateRequest) {
+    public ResponseEntity<LineResponse> createLine(@RequestBody final LineCreateRequest lineCreateRequest) {
 
-        return lineService.createLine(lineCreateRequest);
+        final var response = lineService.createLine(lineCreateRequest);
+        return ResponseEntity.created(URI.create("/lines/" + response.getId()))
+                .body(response);
+
     }
 
     @GetMapping("/{lineId}")
-    public LineResponse getLine(@PathVariable final Long lineId) {
+    public ResponseEntity<LineResponse> getLine(@PathVariable final Long lineId) {
 
-        return lineService.getLine(lineId);
+        return ResponseEntity.ok(lineService.getLine(lineId));
     }
 
     @GetMapping
-    public List<LineResponse> getLines(){
+    public ResponseEntity<List<LineResponse>> getLines() {
 
-        return lineService.getAll();
+        return ResponseEntity.ok(lineService.getAll());
     }
 
     @PutMapping("/{lineId}")
-    public void editLine(
+    public ResponseEntity<Void> editLine(
             @PathVariable final Long lineId,
             @RequestBody final LineEditRequest lineEditRequest
     ) {
 
         lineService.editLine(lineId, lineEditRequest);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{lineId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteLine(@PathVariable final Long lineId) {
+    public ResponseEntity<Void> deleteLine(@PathVariable final Long lineId) {
 
         lineService.deleteById(lineId);
+        return ResponseEntity.noContent().build();
     }
 
 }
