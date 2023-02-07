@@ -3,6 +3,9 @@ package subway.domain.section;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import subway.domain.line.Line;
+import subway.dto.domain.AddSectionStationVo;
+import subway.dto.domain.CreateSectionStationVo;
+import subway.dto.domain.DeleteSectionStationVo;
 import subway.dto.domain.UpAndDownStationsVo;
 
 import javax.persistence.*;
@@ -30,6 +33,22 @@ public class Section {
         this.distance = new Distance(distance);
         this.line = line;
         this.sectionStations = new SectionStations();
+    }
+
+    public void createSectionStations(CreateSectionStationVo createSectionStationVo) {
+        sectionStations.createSectionStation(createSectionStationVo);
+    }
+
+    public void deleteAllSectionStation() {
+        sectionStations.deleteAllSectionStation();
+    }
+
+    public void deleteSectionStation(DeleteSectionStationVo deleteSectionStationVo) {
+        sectionStations.deleteSectionStation(deleteSectionStationVo);
+    }
+
+    public void addSectionStations(AddSectionStationVo addSectionStationVo) {
+        sectionStations.addSectionStations(addSectionStationVo);
     }
 
     public UpAndDownStationsVo getUpAndDownStations() {

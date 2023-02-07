@@ -9,6 +9,9 @@ import subway.domain.section.Section;
 import subway.domain.sectionstation.Direction;
 import subway.domain.sectionstation.SectionStation;
 import subway.domain.station.Station;
+import subway.dto.domain.AddSectionVo;
+import subway.dto.domain.CreateSectionVo;
+import subway.dto.domain.DeleteSectionVo;
 import subway.dto.line.*;
 import subway.repository.*;
 
@@ -28,12 +31,11 @@ public class LineService {
     public CreateLineResponse createLine(CreateLineRequest request) {
         Color color = colorRepository.findByName(request.getColor()).orElseThrow();
         Line line = lineRepository.save(new Line(request.getName(), color));
-        Section section = sectionRepository.save(new Section(request.getDistance(), line));
 
         Station upStation = stationRepository.findById(request.getUpStationId()).orElseThrow();
         Station downStation = stationRepository.findById(request.getDownStationId()).orElseThrow();
-        sectionStationRepository.save(new SectionStation(section, upStation, Direction.UP));
-        sectionStationRepository.save(new SectionStation(section, downStation, Direction.DOWN));
+        Section section = new Section(request.getDistance(), line);
+        line.createSection(new CreateSectionVo(section, new SectionStation(section, upStation, Direction.UP), new SectionStation(section, downStation, Direction.DOWN)));
 
         return new CreateLineResponse(line, List.of(upStation, downStation));
     }
@@ -65,14 +67,7 @@ public class LineService {
     @Transactional
     public void deleteLine(Long stationLineId) {
         Line line = lineRepository.findById(stationLineId).orElseThrow();
-        List<Section> sections = line.getSections().getSections();
-        List<SectionStation> sectionStations = new ArrayList<>();
-        for (Section section : sections) {
-            sectionStations.addAll(section.getSectionStations().getSectionStations());
-        }
-
-        sectionStationRepository.deleteAll(sectionStations);
-        sectionRepository.deleteAll(sections);
+        line.deleteAllSection();
         lineRepository.delete(line);
     }
 
@@ -84,9 +79,10 @@ public class LineService {
 
         line.checkLineExtendValid(upStation, downStation);
 
-        Section section = sectionRepository.save(new Section(request.getDistance(), line));
-        sectionStationRepository.save(new SectionStation(section, upStation, Direction.UP));
-        sectionStationRepository.save(new SectionStation(section, downStation, Direction.DOWN));
+        Section section = new Section(request.getDistance(), line);
+        SectionStation upSectionStation = new SectionStation(section, upStation, Direction.UP);
+        SectionStation downSectionStation = new SectionStation(section, downStation, Direction.DOWN);
+        line.addSection(new AddSectionVo(section, upSectionStation, downSectionStation));
     }
 
     @Transactional
@@ -103,10 +99,8 @@ public class LineService {
         SectionStation downSectionStation = sectionStationRepository.findByStationAndDirection(lastStation, Direction.DOWN).orElseThrow();
         Section lastSection = upSectionStation.getSection();
 
-        sectionStationRepository.delete(upSectionStation);
-        sectionStationRepository.delete(downSectionStation);
+        line.deleteSection(new DeleteSectionVo(lastSection, upSectionStation, downSectionStation));
         stationRepository.delete(lastStation);
-        sectionRepository.delete(lastSection);
     }
 
 }

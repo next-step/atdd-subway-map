@@ -4,6 +4,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import subway.domain.color.Color;
 import subway.domain.station.Station;
+import subway.dto.domain.AddSectionVo;
+import subway.dto.domain.CreateSectionVo;
+import subway.dto.domain.DeleteSectionVo;
 
 import javax.persistence.*;
 import java.util.List;
@@ -31,6 +34,22 @@ public class Line {
         this.name = new Name(name);
         this.color = color;
         this.sections = new Sections();
+    }
+
+    public void createSection(CreateSectionVo createSectionVo) {
+        sections.createSection(createSectionVo);
+    }
+
+    public void deleteAllSection() {
+        sections.deleteAllSection();
+    }
+
+    public void deleteSection(DeleteSectionVo deleteSectionVo) {
+        sections.deleteSection(deleteSectionVo);
+    }
+
+    public void addSection(AddSectionVo addSectionVo) {
+        sections.addSection(addSectionVo);
     }
 
     public List<Station> getStationsByAscendingOrder() {

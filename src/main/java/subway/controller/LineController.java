@@ -3,7 +3,11 @@ package subway.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import subway.domain.section.Section;
+import subway.domain.sectionstation.SectionStation;
 import subway.dto.line.*;
+import subway.repository.SectionRepository;
+import subway.repository.SectionStationRepository;
 import subway.service.LineService;
 
 import java.net.URI;

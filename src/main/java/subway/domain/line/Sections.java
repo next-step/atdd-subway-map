@@ -4,9 +4,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import subway.domain.section.Section;
 import subway.domain.station.Station;
-import subway.dto.domain.UpAndDownStationsVo;
+import subway.dto.domain.*;
 import subway.exception.*;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
 import java.util.ArrayList;
@@ -20,8 +21,33 @@ import static java.util.stream.Collectors.toUnmodifiableList;
 @NoArgsConstructor
 @Embeddable
 public class Sections {
-    @OneToMany(mappedBy = "line")
+    @OneToMany(mappedBy = "line", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Section> sections = new ArrayList<>();
+
+    public void createSection(CreateSectionVo createSectionVo) {
+        Section section = createSectionVo.getSection();
+        sections.add(section);
+        section.createSectionStations(new CreateSectionStationVo(createSectionVo));
+    }
+
+    public void deleteAllSection() {
+        for (Section section : sections) {
+            section.deleteAllSectionStation();
+        }
+        sections.clear();
+    }
+
+    public void addSection(AddSectionVo addSectionVo) {
+        Section section = addSectionVo.getSection();
+        sections.add(section);
+        section.addSectionStations(new AddSectionStationVo(addSectionVo));
+    }
+
+    public void deleteSection(DeleteSectionVo deleteSectionVo) {
+        Section section = deleteSectionVo.getSection();
+        section.deleteSectionStation(new DeleteSectionStationVo(deleteSectionVo));
+        sections.remove(section);
+    }
 
     public List<Station> getStationsByAscendingOrder() {
         if (sections.isEmpty()) {
