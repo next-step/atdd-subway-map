@@ -1,16 +1,18 @@
 package subway;
 
 public class SectionResponse {
-    private final long id;
-    private final Long upStationId;
-    private final Long downStationId;
-    private final int distance;
+    private long id;
+    private Long upStationId;
+    private Long downStationId;
+    private int distance;
 
     public SectionResponse(Section section) {
-        this.id = section.getId();
-        this.upStationId = section.getUpStationId();
-        this.downStationId = section.getDownStationId();
-        this.distance = section.getDistance();
+        if (section != null) {
+            this.id = section.getId();
+            this.upStationId = section.getUpStationId();
+            this.downStationId = section.getDownStationId();
+            this.distance = section.getDistance();
+        }
     }
 
     public long getId() {

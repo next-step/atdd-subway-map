@@ -16,12 +16,6 @@ public class SectionController {
         this.sectionService = sectionService;
     }
 
-    @PostMapping("")
-    public ResponseEntity<SectionResponse> createSection(@RequestBody SectionRequest sectionRequest) {
-        SectionResponse sectionResponse = sectionService.saveSection(sectionRequest);
-        return ResponseEntity.created(URI.create("/lines/" + sectionResponse.getId())).body(sectionResponse);
-    }
-
     @GetMapping("/{id}")
     public ResponseEntity<SectionResponse> showSection(@PathVariable Long id) {
         return ResponseEntity.ok().body(sectionService.findSectionById(id));

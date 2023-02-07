@@ -66,4 +66,31 @@ public class LineService {
         return new LineResponse(line);
     }
 
+    @Transactional
+    public SectionResponse appendSection(Long lineId, SectionRequest sectionRequest) {
+        Line line = getById(lineId);
+
+        Section section = new Section(
+                line, sectionRequest.getDownStationId(), sectionRequest.getUpStationId(), sectionRequest.getDistance()
+        );
+
+        line.addSection(section);
+        lineRepository.save(line);
+
+        return new SectionResponse(section);
+    }
+
+    @Transactional
+    public Line deleteSection(Long lineId, Long stationId) {
+        Line line = getById(lineId);
+
+        line.deleteSection(stationId);
+        return lineRepository.save(line);
+    }
+
+    public SectionResponse findSectionByLineIdAndSectionId(Long lineId, Long sectionId) {
+        Line line = getById(lineId);
+
+        return new SectionResponse(line.findSection(sectionId).get());
+    }
 }

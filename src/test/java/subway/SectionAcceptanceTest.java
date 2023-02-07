@@ -25,7 +25,7 @@ public class SectionAcceptanceTest {
 
     private Long stationId1;
     private Long stationId2;
-    private Long line1Id;
+    private Long lineId;
 
     @BeforeEach
     void setUp() {
@@ -34,7 +34,7 @@ public class SectionAcceptanceTest {
         stationId1 = 지하철_역_등록_요청("송파역").jsonPath().getLong("id");
         stationId2 = 지하철_역_등록_요청("석촌역").jsonPath().getLong("id");
 
-        line1Id = 지하철_구간_생성(stationId1, stationId2, 10).jsonPath().getLong("id");
+        lineId = LineAcceptanceTestUtil.지하철_노선_생성_요청(stationId1, stationId2, "8호선").jsonPath().getLong("id");
     }
 
     /**
@@ -50,14 +50,14 @@ public class SectionAcceptanceTest {
         long stationId3 = 지하철_역_등록_요청("잠실역").jsonPath().getLong("id");
 
         // When
-        ExtractableResponse<Response> response = 지하철_구간_생성(stationId2, stationId3, 10);
+        ExtractableResponse<Response> response = 지하철_구간_생성(lineId, stationId2, stationId3, 10);
 
         // Then
         등록한_지하철_구간_정보_응답_확인(response, stationId3);
     }
 
     private void 등록한_지하철_구간_정보_응답_확인(ExtractableResponse<Response> response, long stationId3) {
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.jsonPath().getLong("downStationId")).isEqualTo(stationId3);
     }
 
@@ -73,18 +73,18 @@ public class SectionAcceptanceTest {
     void 구간_삭제() {
         // Given
         long stationId3 = 지하철_역_등록_요청("잠실역").jsonPath().getLong("id");
-        ExtractableResponse<Response> response = 지하철_구간_생성(stationId2, stationId3, 10);
+        지하철_구간_생성(lineId, stationId1, stationId2, 10);
+        지하철_구간_생성(lineId, stationId2, stationId3, 10);
 
-        long sectionId = response.jsonPath().getLong("id");
-        지하철_구간_삭제(sectionId);
+        지하철_구간_삭제(lineId, stationId3);
 
         ExtractableResponse<Response> findSectionsResponse = 지하철_구간_전체_조회();
-        삭제된_지하철_구간이_없는지_확인(findSectionsResponse, sectionId);
+        삭제된_지하철_구간이_없는지_확인(findSectionsResponse, stationId3);
     }
 
 
     private void 삭제된_지하철_구간이_없는지_확인(ExtractableResponse<Response> response, long deletedSectionId) {
-        List<Long> stationIds = response.jsonPath().getList("id", Long.class);
-        assertThat(stationIds).doesNotContain(deletedSectionId);
+        List<Long> downStationIds = response.jsonPath().getList("downStationId", Long.class);
+        assertThat(downStationIds).doesNotContain(deletedSectionId);
     }
 }

@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class SectionAcceptanceTestUtil {
 
-    public static ExtractableResponse<Response> 지하철_구간_생성(long upStationId, long downStationId, int distance) {
+    public static ExtractableResponse<Response> 지하철_구간_생성(long lineId, long upStationId, long downStationId, int distance) {
         Map<String, Object> params = new HashMap<>();
         params.put("upStationId", upStationId);
         params.put("downStationId", downStationId);
@@ -19,15 +19,16 @@ public class SectionAcceptanceTestUtil {
         return RestAssured.given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/sections")
+                .when().post("/lines/" + lineId + "/sections")
                 .then().log().all()
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 지하철_구간_삭제(long sectionId) {
+    public static ExtractableResponse<Response> 지하철_구간_삭제(long lineId, long stationId) {
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().delete("/sections/" + sectionId)
+                .queryParam("stationId", stationId)
+                .when().delete("/lines/" + lineId + "/sections")
                 .then().log().all()
                 .extract();
     }
