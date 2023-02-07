@@ -1,7 +1,8 @@
 package subway.presentation.line.dto.response;
 
+import lombok.AccessLevel;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import subway.domain.line.Line;
 import subway.presentation.station.dto.response.StationResponse;
@@ -9,8 +10,8 @@ import subway.presentation.station.dto.response.StationResponse;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Data
-@NoArgsConstructor
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class LineResponse {
 
     private Long id;

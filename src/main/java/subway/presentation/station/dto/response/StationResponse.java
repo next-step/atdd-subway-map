@@ -1,10 +1,13 @@
 package subway.presentation.station.dto.response;
 
+import lombok.AccessLevel;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import subway.domain.station.Station;
 
-@Data
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class StationResponse {
     private Long id;
     private String name;
