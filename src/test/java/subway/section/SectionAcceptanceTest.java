@@ -1,12 +1,66 @@
 package subway.section;
 
+import io.restassured.RestAssured;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import subway.dto.LineRequest;
+import subway.dto.LineResponse;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static subway.line.LineAcceptanceTest.createLine;
+import static subway.line.LineAcceptanceTest.createLineAndGetId;
+import static subway.station.StationAcceptanceTest.createStationByName;
 
 @DisplayName("노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class SectionAcceptanceTest {
+
+    private final String 신분당선_이름 = "신분당선";
+    private final String 신분당선_색 = "bg-red-600";
+    private final String 분당선_이름 = "분당선";
+    private final String 다른분당선_이름 = "다른분당선";
+    private final String 다른분당선_색 = "bg-red-600";
+
+    private final static LineRequest 신분당선 = LineRequest.of(
+            "신분당선", "bg-red-600", 1L, 2L, 10L);
+
+    @BeforeEach
+    void setUp() {
+        createStationByName("지하철역");
+        createStationByName("새로운지하철역");
+        createStationByName("또다른지하철역");
+    }
+
+    /**
+     * Given 지하철 노선을 하나 생성한다.
+     * When 해당 노선에서 구간 목록을 조회한다.
+     * Then 해당 노선에서 구간이 생성된 것을 확인한다.
+     */
+    @DisplayName("노선을 생성하면 구간이 자동 생성된 것을 확인한다.")
+    @Test
+    void 노선_생성시_구간_자동_생성() {
+        //Given
+        long lineId = createLineAndGetId(신분당선);
+
+        //When
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .when().get("/lines/{lineId}/sections")
+                .then().log().all()
+                .extract();
+
+        //Then
+        List<Long> downStationIds = response.jsonPath().getList("sections.downStation.id");
+        List<Long> upStationIds = response.jsonPath().getList("sections.upStation.id");
+        assertThat(downStationIds).contains(2L);
+        assertThat(upStationIds).contains(1L);
+
+    }
 
     /**
      * Given 지하철 노선을 하나 생성한다.

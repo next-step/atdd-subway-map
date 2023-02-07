@@ -7,15 +7,15 @@ public class LineRequest {
 
     private String name;
     private String color;
-    private Long upStationId;
     private Long downStationId;
+    private Long upStationId;
     private Long distance;
 
-    private LineRequest(String name, String color, Long upStationId, Long downStationId, Long distance) {
+    private LineRequest(String name, String color, Long downStationId, Long upStationId, Long distance) {
         this.name = name;
         this.color = color;
-        this.upStationId = upStationId;
         this.downStationId = downStationId;
+        this.upStationId = upStationId;
         this.distance = distance;
     }
 
@@ -40,8 +40,8 @@ public class LineRequest {
     }
 
     public static LineRequest of(
-            String name, String color, Long upStationId, Long downStationId, Long distance) {
-        return new LineRequest(name, color, upStationId, downStationId, distance);
+            String name, String color, Long downStationId, Long upStationId, Long distance) {
+        return new LineRequest(name, color, downStationId, upStationId, distance);
     }
 
     public Line toEntity(Station downStation, Station upStation) {

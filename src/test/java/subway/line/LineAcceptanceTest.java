@@ -87,7 +87,7 @@ public class LineAcceptanceTest {
     @Test
     void 노선_조회() {
         //Given
-        Long id = getCreatedLineId(신분당선);
+        Long id = createLineAndGetId(신분당선);
 
         //When
         ExtractableResponse<Response> response = readLine(id);
@@ -108,7 +108,7 @@ public class LineAcceptanceTest {
     @Test
     void 노선_수정() {
         //Given
-        long updateId = getCreatedLineId(신분당선);
+        long updateId = createLineAndGetId(신분당선);
 
         //When
         updateLine(updateId, 다른분당선_이름, 다른분당선_색);
@@ -128,7 +128,7 @@ public class LineAcceptanceTest {
     @Test
     void 노선_삭제() {
         //Given
-        long deleteId = getCreatedLineId(신분당선);
+        long deleteId = createLineAndGetId(신분당선);
         createLine(분당선);
 
         //When
@@ -147,7 +147,7 @@ public class LineAcceptanceTest {
                 .extract();
     }
 
-    private static ExtractableResponse<Response> createLine(LineRequest request) {
+    public static ExtractableResponse<Response> createLine(LineRequest request) {
 
         return RestAssured.given().log().all()
                 .body(request)
@@ -157,7 +157,7 @@ public class LineAcceptanceTest {
                 .extract();
     }
 
-    private static long getCreatedLineId(LineRequest request) {
+    public static long createLineAndGetId(LineRequest request) {
         return createLine(request)
                 .jsonPath().getLong("id");
     }
