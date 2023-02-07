@@ -1,5 +1,7 @@
 package subway.line;
 
+import subway.exception.SectionAlreadyCreateStationException;
+import subway.exception.SectionUpStationNotMatchException;
 import subway.exception.StationNotFoundException;
 import subway.section.Section;
 import subway.station.Station;
@@ -36,7 +38,7 @@ public class Line {
         if (upStation == null || downStation == null) {
             throw new StationNotFoundException();
         }
-        this.sections = List.of(new Section(upStation, downStation, distance, this));
+        this.sections.add(new Section(upStation, downStation, distance, this));
     }
 
     public Long getId() {
@@ -81,6 +83,8 @@ public class Line {
     }
 
     public void addSection(Section section) {
+        validateAddSection(section);
+        plusDistance(section.getDistance());
         this.sections.add(section);
     }
 
@@ -109,12 +113,21 @@ public class Line {
         return sections;
     }
 
-    public boolean isLastStationId(long upStationId) {
-        return getDownStation().getId() == upStationId;
+    public boolean isLastStation(Station upStation) {
+        return getDownStation() == upStation;
     }
 
     public boolean hasStation(Station downStation) {
         return getStations().stream()
                 .anyMatch(station -> station.equals(downStation));
+    }
+
+    private void validateAddSection(Section section) {
+        if (!isLastStation(section.getUpStation())) {
+            throw new SectionUpStationNotMatchException();
+        }
+        if (hasStation(section.getDownStation())) {
+            throw new SectionAlreadyCreateStationException();
+        }
     }
 }

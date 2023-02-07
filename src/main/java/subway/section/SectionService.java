@@ -28,8 +28,11 @@ public class SectionService {
     @Transactional
     public SectionResponse createSection(long line_id, SectionCreateRequest request) {
         Line line = lineService.findOneById(line_id);
+        Station upStation = stationService.findStation(request.getUpStationId());
         Station downStation = stationService.findStation(request.getDownStationId());
-        Section section = new Section(request.getUpStationId(), downStation, request.getDistance(), line);
+
+        Section section = new Section(upStation, downStation, request.getDistance(), line);
+        line.addSection(section);
         section = sectionRepository.save(section);
         return new SectionResponse(section.getId(), section.getUpStation().getId(), section.getDownStation().getId(), section.getDistance());
     }

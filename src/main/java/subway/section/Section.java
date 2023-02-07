@@ -3,13 +3,10 @@ package subway.section;
 import subway.exception.SectionAlreadyCreateStationException;
 import subway.exception.SectionUpStationNotMatchException;
 import subway.line.Line;
-import subway.sectionstation.SectionStation;
 import subway.station.Station;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Entity
 public class Section {
@@ -18,8 +15,11 @@ public class Section {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToMany(mappedBy = "section", cascade = CascadeType.ALL)
-    private List<SectionStation> sectionStations = new ArrayList<>();
+    @OneToOne
+    private Station upStation;
+
+    @OneToOne
+    private Station downStation;
 
     @ManyToOne
     @JoinColumn
@@ -31,24 +31,10 @@ public class Section {
     }
 
     public Section(Station upStation, Station downStation, long distance, Line line) {
-        this.sectionStations.addAll(List.of(new SectionStation(this, upStation), new SectionStation(this, downStation)));
+        this.upStation = upStation;
+        this.downStation = downStation;
         this.distance = distance;
         this.line = line;
-    }
-
-    public Section(long upStationId, Station downStation, long distance, Line line) {
-        if (!line.isLastStationId(upStationId)) {
-            throw new SectionUpStationNotMatchException();
-        }
-        if (line.hasStation(downStation)) {
-            throw new SectionAlreadyCreateStationException();
-        }
-        Station sectionUpStation = line.getDownStation();
-        this.sectionStations.addAll(List.of(new SectionStation(this, sectionUpStation), new SectionStation(this, downStation)));
-        this.distance = distance;
-        this.line = line;
-        line.addSection(this);
-        line.plusDistance(distance);
     }
 
     public Long getId() {
@@ -56,11 +42,11 @@ public class Section {
     }
 
     public Station getUpStation() {
-        return sectionStations.get(0).getStation();
+        return this.upStation;
     }
 
     public Station getDownStation() {
-        return sectionStations.get(sectionStations.size() - 1).getStation();
+        return this.downStation;
     }
 
     public long getDistance() {
@@ -72,9 +58,6 @@ public class Section {
     }
 
     public List<Station> getStations() {
-        return this.sectionStations.stream()
-                .map(SectionStation::getStation)
-                .distinct()
-                .collect(Collectors.toList());
+        return List.of(upStation, downStation);
     }
 }

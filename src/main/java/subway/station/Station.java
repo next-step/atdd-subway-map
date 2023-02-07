@@ -1,11 +1,6 @@
 package subway.station;
 
-import subway.section.Section;
-import subway.sectionstation.SectionStation;
-
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 @Entity
