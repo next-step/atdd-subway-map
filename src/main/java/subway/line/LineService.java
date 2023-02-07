@@ -30,9 +30,25 @@ public class LineService {
         final var upStation = stationFindEntityService.getById(lineCreateRequest.getUpStationId());
         final var downStation = stationFindEntityService.getById(lineCreateRequest.getDownStationId());
 
-        final Line line = new Line(lineCreateRequest.getName(), lineCreateRequest.getColor());
-        line.addLineStation(new LineStation(1, upStation, lineCreateRequest.getDistance()));
-        line.addLineStation(new LineStation(2, downStation, lineCreateRequest.getDistance()));
+        final var line = Line.builder()
+                .name(lineCreateRequest.getName())
+                .color(lineCreateRequest.getColor())
+                .build();
+
+        ;
+        line.addLineStation(
+                LineStation.builder()
+                        .station(upStation)
+                        .distance(lineCreateRequest.getDistance())
+                        .build()
+        );
+
+        line.addLineStation(
+                LineStation.builder()
+                        .station(downStation)
+                        .distance(lineCreateRequest.getDistance())
+                        .build()
+        );
 
         lineRepository.save(line);
     }
@@ -57,7 +73,7 @@ public class LineService {
         lineRepository.save(line);
     }
 
-    public void deleteById(final Long lineId){
+    public void deleteById(final Long lineId) {
 
         lineRepository.deleteById(lineId);
     }

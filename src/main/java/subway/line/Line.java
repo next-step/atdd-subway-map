@@ -1,8 +1,14 @@
 package subway.line;
 
+import lombok.*;
+
 import javax.persistence.*;
 
 @Entity
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder
+@Getter
 public class Line {
 
     @Id
@@ -15,16 +21,8 @@ public class Line {
     private String color;
 
     @Embedded
-    private LineStations lineStations;
-
-    protected Line() {
-    }
-
-    public Line(final String name, final String color) {
-        this.name = name;
-        this.color = color;
-        this.lineStations = new LineStations();
-    }
+    @Builder.Default
+    private LineStations lineStations = new LineStations();
 
     public Line addLineStation(final LineStation lineStation) {
 
@@ -39,19 +37,4 @@ public class Line {
         return this;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getColor() {
-        return color;
-    }
-
-    public LineStations getLineStations() {
-        return lineStations;
-    }
 }

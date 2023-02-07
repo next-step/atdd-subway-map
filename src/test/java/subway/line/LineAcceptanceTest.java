@@ -4,6 +4,7 @@ import io.restassured.response.*;
 import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.*;
 import org.springframework.http.*;
+import org.springframework.test.context.jdbc.*;
 
 import java.util.*;
 
@@ -12,6 +13,7 @@ import static org.assertj.core.api.Assertions.*;
 import static subway.given.GivenStationApi.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@Sql("/truncate.sql")
 public class LineAcceptanceTest {
 
     private static final String LINE_PATH = "/lines";
