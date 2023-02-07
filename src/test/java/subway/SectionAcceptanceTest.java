@@ -54,10 +54,10 @@ public class SectionAcceptanceTest {
         // given - SQL로 대체
 
         // when
-        addSection(노선ID, 역삼역ID, 선릉역ID, 7);
+        구간추가(노선ID, 역삼역ID, 선릉역ID, 7);
 
         // then
-        List<String> stationList = findLine(노선ID).jsonPath().getList("stations.name");
+        List<String> stationList = 노선조회(노선ID).jsonPath().getList("stations.name");
         assertThat(stationList).contains(선릉역);
     }
 
@@ -72,7 +72,7 @@ public class SectionAcceptanceTest {
         // given - SQL로 대체
 
         // when
-        String errorCode = addSection(노선ID, 선릉역ID, 삼성역ID, 7).jsonPath().getString("errorCode");
+        String errorCode = 구간추가(노선ID, 선릉역ID, 삼성역ID, 7).jsonPath().getString("errorCode");
 
         // then
         assertEquals(DomainExceptionType.UPDOWN_STATION_MISS_MATCH.getCode(), errorCode);
@@ -89,7 +89,7 @@ public class SectionAcceptanceTest {
         // given - SQL로 대체
 
         // when
-        String errorCode = addSection(노선ID, 역삼역ID, 강남역ID, 7).jsonPath().getString("errorCode");
+        String errorCode = 구간추가(노선ID, 역삼역ID, 강남역ID, 7).jsonPath().getString("errorCode");
 
         // then
         assertEquals(DomainExceptionType.DOWN_STATION_EXIST_IN_LINE.getCode(), errorCode);
@@ -107,7 +107,7 @@ public class SectionAcceptanceTest {
         // given - SQL 대체
 
         // when
-        var response = deleteSection(노선ID, 선릉역ID);
+        var response = 구간삭제(노선ID, 선릉역ID);
 
         // then
         assertEquals(response.statusCode(), HttpStatus.NO_CONTENT.value());
@@ -125,7 +125,7 @@ public class SectionAcceptanceTest {
         // given - SQL 대체
 
         // when
-        String errorCode = deleteSection(노선ID, 강남역ID).jsonPath().getString("errorCode");
+        String errorCode = 구간삭제(노선ID, 강남역ID).jsonPath().getString("errorCode");
 
         // then
         assertEquals(DomainExceptionType.NOT_DOWN_STATION.getCode(), errorCode);
@@ -142,13 +142,13 @@ public class SectionAcceptanceTest {
         // given - SQL 대체
 
         // when
-        String errorCode = deleteSection(노선ID, 역삼역ID).jsonPath().getString("errorCode");
+        String errorCode = 구간삭제(노선ID, 역삼역ID).jsonPath().getString("errorCode");
 
         // then
         assertEquals(DomainExceptionType.CANT_DELETE_SECTION.getCode(), errorCode);
     }
 
-    private ExtractableResponse<Response> addSection(
+    private ExtractableResponse<Response> 구간추가(
             Long lineId, Long upStationId, Long downStationId, Integer distance) {
 
         Map<String, Object> params = new HashMap<>();
@@ -172,7 +172,7 @@ public class SectionAcceptanceTest {
         return response;
     }
 
-    private ExtractableResponse<Response> findLine(Long lineId) {
+    private ExtractableResponse<Response> 노선조회(Long lineId) {
         ExtractableResponse<Response> response =
                 RestAssured.given()
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -188,7 +188,7 @@ public class SectionAcceptanceTest {
         return response;
     }
 
-    private ExtractableResponse<Response> deleteSection(Long lineId, Long stationId) {
+    private ExtractableResponse<Response> 구간삭제(Long lineId, Long stationId) {
         ExtractableResponse<Response> response =
                 RestAssured.given()
                         .param("stationId", stationId)
