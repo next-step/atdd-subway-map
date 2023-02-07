@@ -62,7 +62,6 @@ public class Sections {
         }
 
         sectionList.add(section);
-        section.getLine().changeDownStation(section.getDownStation());
     }
 
     /**

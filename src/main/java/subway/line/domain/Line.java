@@ -10,11 +10,8 @@ import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
 import java.util.Objects;
 
-import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
@@ -34,34 +31,21 @@ public class Line {
     @Column(length = 100, nullable = false)
     private String color;
 
-    @OneToOne(fetch = LAZY)
-    @JoinColumn(name = "up_station_id")
-    private Station upStation;
-
-    @OneToOne(fetch = LAZY)
-    @JoinColumn(name = "down_station_id")
-    private Station downStation;
-
     @Embedded
     private final Sections sections = new Sections();
 
     @Builder
-    private Line(final Long id, final String name, final String color,
-                 final Station upStation, final Station downStation) {
+    private Line(final Long id, final String name, final String color) {
         this.id = id;
         this.name = name;
         this.color = color;
-        this.upStation = upStation;
-        this.downStation = downStation;
     }
 
     public static Line createLine(final String name, final String color,
-                                  final Long distance, final Station upStation, final Station downStation) {
+                                  final Long distance, Station upStation, Station downStation) {
         Line line = Line.builder()
                 .name(name)
                 .color(color)
-                .upStation(upStation)
-                .downStation(downStation)
                 .build();
 
         createSections(distance, line, upStation, downStation);
@@ -84,19 +68,6 @@ public class Line {
     public void updateLine(final Line line) {
         this.name = line.getName();
         this.color = line.getColor();
-    }
-
-    /**
-     * 지하철 노선의 하행 종점역을 수정합니다.
-     *
-     * @param station 수정할 하행 종점역 정보
-     */
-    public void changeDownStation(final Station station) {
-        if (this.downStation.equals(station)) {
-            return;
-        }
-
-        this.downStation = station;
     }
 
     @Override
