@@ -17,7 +17,6 @@ public class LineResponse {
         this.id = line.getId();
         this.name = line.getName();
         this.color = line.getColor();
-        // station select 코드
     }
 
     public Long getId() {
