@@ -52,7 +52,7 @@ public class Line {
 
     public List<Station> getStations() {
         List<Station> stations = new ArrayList<>();
-        Station firstStation = sections.get(0).getUpStation();
+        Station firstStation = this.sections.get(0).getUpStation();
         stations.add(firstStation);
         for (Section section : this.sections) {
             stations.add(section.getDownStation());
@@ -63,5 +63,31 @@ public class Line {
     public void update(Line line) {
         this.name = line.getName();
         this.color = line.getColor();
+    }
+
+    public void addLineSection(Station upStation, Station downStation, int distance) {
+        validStation(upStation, downStation);
+        this.sections.add(new Section(this, upStation, downStation, distance));
+    }
+
+    private Station getFinalStation() {
+        return this.sections.get(this.sections.size() - 1).getDownStation();
+    }
+
+    private void validStation(Station upStation, Station downStation) {
+        validUpStation(upStation);
+        validDownStation(downStation);
+    }
+
+    private void validUpStation(Station upStation) {
+        if (!getFinalStation().equals(upStation)) {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    private void validDownStation(Station downStation) {
+        if (getStations().contains(downStation)) {
+            throw new IllegalArgumentException();
+        }
     }
 }

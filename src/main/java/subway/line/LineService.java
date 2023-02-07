@@ -51,4 +51,12 @@ public class LineService {
     public void deleteLineById(Long id) {
         lineRepository.deleteById(id);
     }
+
+    @Transactional
+    public void addLineSection(Long lineId, SectionRequest sectionRequest) {
+        Line line = findLineById(lineId);
+        Station upStation = stationService.findById(sectionRequest.getUpStationId());
+        Station downStation = stationService.findById(sectionRequest.getDownStationId());
+        line.addLineSection(upStation, downStation, sectionRequest.getDistance());
+    }
 }

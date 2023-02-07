@@ -6,6 +6,7 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import subway.AcceptanceTest;
 
@@ -75,9 +76,13 @@ public class LineSectionAcceptanceTest extends AcceptanceTest {
         // given
         신분당선_id = 지하철_노선_생성_요청(createLineParams).jsonPath().getLong(ID);
 
-        // when & then
-        assertThatThrownBy(() -> 지하철_노선에_지하철_구간_등록_요청(신분당선_id, 판교역_id, 정자역_id, 3))
-                .isInstanceOf(RuntimeException.class);
+
+        // when
+        Long 미금역_id = 지하철역_생성_요청("미금역").jsonPath().getLong(ID);
+        ExtractableResponse<Response> addLineSectionResponse = 지하철_노선에_지하철_구간_등록_요청(신분당선_id, 정자역_id, 미금역_id, 3);
+
+        // then
+        assertThat(addLineSectionResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
     /**
@@ -91,9 +96,11 @@ public class LineSectionAcceptanceTest extends AcceptanceTest {
         // given
         신분당선_id = 지하철_노선_생성_요청(createLineParams).jsonPath().getLong(ID);
 
-        // when & then
-        assertThatThrownBy(() -> 지하철_노선에_지하철_구간_등록_요청(신분당선_id, 판교역_id, 강남역_id, 14))
-                .isInstanceOf(RuntimeException.class);
+        // when
+        ExtractableResponse<Response> addLineSectionResponse = 지하철_노선에_지하철_구간_등록_요청(신분당선_id, 판교역_id, 강남역_id, 14);
+
+        // then
+        assertThat(addLineSectionResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
     /**
