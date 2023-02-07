@@ -1,4 +1,4 @@
-package subway.line;
+package subway.controller.line.dto;
 
 import lombok.Getter;
 

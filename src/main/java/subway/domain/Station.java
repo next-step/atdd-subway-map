@@ -1,4 +1,4 @@
-package subway.station;
+package subway.domain;
 
 import javax.persistence.*;
 import lombok.AllArgsConstructor;
@@ -16,18 +16,10 @@ public class Station {
     @Column(name = "STATION_ID")
     private Long id;
 
-    @Column(name = "LINE_ID")
-    private Long lineId;
-
     @Column(name = "STATION_NAME", length = 20, nullable = false)
     private String name;
 
-    public Station(Long lineId, String name) {
-        this.lineId = lineId;
+    public Station(String name) {
         this.name = name;
-    }
-
-    public void changeLine(Long lineId) {
-        this.lineId = lineId;
     }
 }
