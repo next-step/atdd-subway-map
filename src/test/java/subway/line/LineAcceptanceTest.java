@@ -1,66 +1,56 @@
 package subway.line;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import subway.common.DatabaseCleaner;
+import subway.common.AcceptanceTest;
 import subway.common.Endpoints;
+import subway.line.presentation.CreateLineRequest;
+import subway.line.presentation.LineResponse;
+import subway.line.presentation.UpdateLineRequest;
+import subway.station.presentation.StationResponse;
 import subway.utils.RestAssuredClient;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.common.TestHelper.노선을_생성한다;
-import static subway.common.TestHelper.노선의_정보가_일치한다;
 import static subway.common.TestHelper.생성_헤더;
 import static subway.common.TestHelper.응답_코드가_일치한다;
-import static subway.station.StationAcceptanceTest.지하철역_생성;
 import static subway.station.StationFixtures.강남역_생성_요청;
 import static subway.station.StationFixtures.낙성대역_생성_요청;
 import static subway.station.StationFixtures.서울대입구역_생성_요청;
 import static subway.station.StationFixtures.신논현역_생성_요청;
+import static subway.station.StationFixtures.지하철역을_생성한다;
 
 @DisplayName("지하철 노선 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class LineAcceptanceTest {
-    @LocalServerPort
-    int port;
-
-    @Autowired
-    private DatabaseCleaner databaseCleaner;
+public class LineAcceptanceTest extends AcceptanceTest {
     private long 강남역_아이디;
     private long 서울대입구역_아이디;
     private long 신논현역_아이디;
     private long 낙성대역_아이디;
-    private LineRequest 신분당선_생성_요청;
-    private LineRequest 이호선_생성_요청;
+    private CreateLineRequest 신분당선_생성_요청;
+    private CreateLineRequest 이호선_생성_요청;
 
     @BeforeEach
-    void setUp() {
-        RestAssured.port = port;
-        databaseCleaner.execute();
+    protected void setUp() {
+        super.setUp();
+        강남역_아이디 = 지하철역을_생성한다(강남역_생성_요청);
+        서울대입구역_아이디 = 지하철역을_생성한다(서울대입구역_생성_요청);
+        신논현역_아이디 = 지하철역을_생성한다(낙성대역_생성_요청);
+        낙성대역_아이디 = 지하철역을_생성한다(신논현역_생성_요청);
 
-        강남역_아이디 = 지하철역_생성(강남역_생성_요청);
-        서울대입구역_아이디 = 지하철역_생성(서울대입구역_생성_요청);
-        신논현역_아이디 = 지하철역_생성(낙성대역_생성_요청);
-        낙성대역_아이디 = 지하철역_생성(신논현역_생성_요청);
-
-        신분당선_생성_요청 = new LineRequest(
+        신분당선_생성_요청 = new CreateLineRequest(
                 "신분당선",
                 LineFixtures.RED,
                 강남역_아이디,
                 서울대입구역_아이디,
                 10L
         );
-        이호선_생성_요청 = new LineRequest(
+        이호선_생성_요청 = new CreateLineRequest(
                 "2호선",
                 LineFixtures.BLUE,
                 신논현역_아이디,
@@ -75,7 +65,7 @@ public class LineAcceptanceTest {
         // Given 지하철 노선을 생성하면
         var response = RestAssuredClient.post(
                 Endpoints.LINES,
-                new LineRequest(
+                new CreateLineRequest(
                         "신분당선",
                         LineFixtures.RED,
                         강남역_아이디,
@@ -95,8 +85,7 @@ public class LineAcceptanceTest {
                 신분당선_응답,
                 "신분당선",
                 LineFixtures.RED,
-                강남역_아이디,
-                서울대입구역_아이디
+                List.of(강남역_아이디, 서울대입구역_아이디)
         );
     }
 
@@ -130,8 +119,8 @@ public class LineAcceptanceTest {
                 신분당선_응답,
                 신분당선_생성_요청.getName(),
                 신분당선_생성_요청.getColor(),
-                신분당선_생성_요청.getUpStationId(),
-                신분당선_생성_요청.getDownStationId()
+                List.of(신분당선_생성_요청.getUpStationId(),
+                        신분당선_생성_요청.getDownStationId())
         );
     }
 
@@ -158,8 +147,8 @@ public class LineAcceptanceTest {
                 사호선_응답,
                 updateLineName,
                 updateColor,
-                신분당선_생성_요청.getUpStationId(),
-                신분당선_생성_요청.getDownStationId()
+                List.of(신분당선_생성_요청.getUpStationId(),
+                        신분당선_생성_요청.getDownStationId())
         );
     }
 
@@ -177,5 +166,26 @@ public class LineAcceptanceTest {
         // = 해당 지하철 노선 정보 조회 시 NOT_FOUND를 응답받는다.
         ExtractableResponse<Response> 신분당선_조회_응답 = RestAssuredClient.get(생성_헤더(신분당선_생성_응답));
         응답_코드가_일치한다(신분당선_조회_응답.statusCode(), HttpStatus.NOT_FOUND);
+    }
+
+    public static ExtractableResponse<Response> 노선을_생성한다(Object request) {
+        var response = RestAssuredClient.post(
+                Endpoints.LINES,
+                request
+        );
+        응답_코드가_일치한다(response.statusCode(), HttpStatus.CREATED);
+        return response;
+    }
+
+    public static void 노선의_정보가_일치한다(
+            LineResponse response,
+            String expectedLineName,
+            String expectedColor,
+            List<Long> stationIds
+    ) {
+        assertThat(response.getName()).isEqualTo(expectedLineName);
+        assertThat(response.getColor()).isEqualTo(expectedColor);
+        assertThat(response.getStations().stream().map(StationResponse::getId)).containsExactly(
+                stationIds.toArray(new Long[stationIds.size()]));
     }
 }

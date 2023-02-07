@@ -1,18 +1,21 @@
 package subway.common;
 
-import com.google.common.base.CaseFormat;
+import org.hibernate.Session;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
-import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.transaction.Transactional;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 public class DatabaseCleaner implements InitializingBean {
+
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -20,22 +23,42 @@ public class DatabaseCleaner implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() {
-        tableNames = entityManager.getMetamodel().getEntities().stream()
-                .filter(e -> e.getJavaType().getAnnotation(Entity.class) != null)
-                .map(e -> CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, e.getName()))
-                .collect(Collectors.toList());
+        entityManager.unwrap(Session.class)
+                .doWork(this::extractTableNames);
     }
 
-    @Transactional
-    public void execute() {
-        entityManager.flush();
-        entityManager.createNativeQuery("SET REFERENTIAL_INTEGRITY FALSE").executeUpdate();
+    private void extractTableNames(Connection conn) throws SQLException {
+        List<String> tableNames = new ArrayList<>();
 
-        for (String tableName : tableNames) {
-            entityManager.createNativeQuery("TRUNCATE TABLE " + tableName).executeUpdate();
-            entityManager.createNativeQuery("ALTER TABLE " + tableName + " ALTER COLUMN ID RESTART WITH 1").executeUpdate();
+        ResultSet tables = conn
+                .getMetaData()
+                .getTables(conn.getCatalog(), null, "%", new String[]{"TABLE"});
+
+        while(tables.next()) {
+            tableNames.add(tables.getString("table_name"));
         }
 
-        entityManager.createNativeQuery("SET REFERENTIAL_INTEGRITY TRUE").executeUpdate();
+        this.tableNames = tableNames;
+    }
+
+    public void execute() {
+        entityManager.unwrap(Session.class)
+                .doWork(this::cleanUpDatabase);
+    }
+
+    private void cleanUpDatabase(Connection conn) throws SQLException {
+        Statement statement = conn.createStatement();
+        statement.executeUpdate("SET REFERENTIAL_INTEGRITY FALSE");
+
+        for (String tableName : tableNames) {
+            try {
+                statement.executeUpdate("TRUNCATE TABLE " + tableName);
+                statement.executeUpdate("ALTER TABLE " + tableName + " ALTER COLUMN id RESTART WITH 1");
+            } catch (SQLException e) {
+                // do nothing
+            }
+        }
+
+        statement.executeUpdate("SET REFERENTIAL_INTEGRITY TRUE");
     }
 }

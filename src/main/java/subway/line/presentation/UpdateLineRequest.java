@@ -1,8 +1,6 @@
-package subway.line;
+package subway.line.presentation;
 
-import subway.common.Request;
-
-public class UpdateLineRequest implements Request {
+public class UpdateLineRequest {
     private String name;
     private String color;
 

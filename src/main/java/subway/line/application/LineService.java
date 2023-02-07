@@ -1,8 +1,13 @@
-package subway.line;
+package subway.line.application;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import subway.station.StationQuery;
+import subway.line.domain.Line;
+import subway.line.domain.LineRepository;
+import subway.line.presentation.LineResponse;
+import subway.station.application.StationQuery;
+import subway.station.application.dto.Stations;
+import subway.station.domain.Station;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,15 +27,14 @@ public class LineService {
 
     @Transactional
     public LineResponse createLine(LineDto lineDto) {
-        var upStation = stationQuery.findById(lineDto.getUpStationId());
-        var downStation = stationQuery.findById(lineDto.getDownStationId());
+        Stations stations = stationQuery.findAllByIdIn(List.of(lineDto.getUpStationId(), lineDto.getDownStationId()));
 
         var line = lineRepository.save(new Line(
                 lineDto.getName(),
                 lineDto.getColor(),
                 lineDto.getDistance(),
-                upStation,
-                downStation
+                stations.getById(lineDto.getUpStationId()),
+                stations.getById(lineDto.getDownStationId())
         ));
 
         return LineResponse.from(line);
@@ -58,5 +62,26 @@ public class LineService {
     @Transactional
     public void deleteLineById(long lineId) {
         lineRepository.deleteById(lineId);
+    }
+
+    @Transactional
+    public LineResponse addSection(long lineId, SectionDto sectionDto) {
+        Stations stations = stationQuery.findAllByIdIn(List.of(sectionDto.getUpStationId(), sectionDto.getDownStationId()));
+
+        Line line = lineQuery.findById(lineId);
+        Line updatedLine = line.addSection(
+                stations.getById(sectionDto.getUpStationId()),
+                stations.getById(sectionDto.getDownStationId()),
+                sectionDto.getDistance()
+        );
+
+        return LineResponse.from(updatedLine);
+    }
+
+    @Transactional
+    public void deleteSection(Long lineId, long stationId) {
+        Station deleteStation = stationQuery.findById(stationId);
+        Line line = lineQuery.findById(lineId);
+        line.deleteSection(deleteStation);
     }
 }

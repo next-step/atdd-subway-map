@@ -1,4 +1,6 @@
-package subway.line;
+package subway.line.application;
+
+import subway.line.presentation.CreateLineRequest;
 
 public class LineDto {
     private String name;
@@ -15,13 +17,13 @@ public class LineDto {
         this.distance = distance;
     }
 
-    public static LineDto from(LineRequest lineRequest) {
+    public static LineDto from(CreateLineRequest createLineRequest) {
         return new LineDto(
-                lineRequest.getName(),
-                lineRequest.getColor(),
-                lineRequest.getUpStationId(),
-                lineRequest.getDownStationId(),
-                lineRequest.getDistance()
+                createLineRequest.getName(),
+                createLineRequest.getColor(),
+                createLineRequest.getUpStationId(),
+                createLineRequest.getDownStationId(),
+                createLineRequest.getDistance()
         );
     }
 

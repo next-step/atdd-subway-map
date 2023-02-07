@@ -1,8 +1,10 @@
-package subway.line;
+package subway.line.presentation;
 
-import subway.station.StationResponse;
+import subway.line.domain.Line;
+import subway.station.presentation.StationResponse;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class LineResponse {
     private Long id;
@@ -22,10 +24,9 @@ public class LineResponse {
                 line.getId(),
                 line.getName(),
                 line.getColor(),
-                List.of(
-                        StationResponse.from(line.getUpStation()),
-                        StationResponse.from(line.getDownStation())
-                )
+                line.getAllStations().stream()
+                        .map(StationResponse::from)
+                        .collect(Collectors.toList())
         );
     }
 
