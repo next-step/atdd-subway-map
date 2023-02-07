@@ -37,6 +37,7 @@ public class StationAcceptanceTest extends AcceptanceTest{
 
         // then
         ExtractableResponse<Response> showResponse = StationAcceptanceTestUtils.showStationResponse();
+
         List<String> stationNames = showResponse.jsonPath().getList("name", String.class);
         assertThat(stationNames).containsAnyOf("강남역");
     }
@@ -61,6 +62,7 @@ public class StationAcceptanceTest extends AcceptanceTest{
 
         //when
         ExtractableResponse<Response> response = StationAcceptanceTestUtils.showStationResponse();
+
         List<String> stationNames = response.jsonPath().getList("name", String.class);
 
         //then
@@ -84,6 +86,7 @@ public class StationAcceptanceTest extends AcceptanceTest{
         Map<String, String> station = new HashMap<>();
         station.put("name", "강남역");
         ExtractableResponse<Response> request = StationAcceptanceTestUtils.createStationResponse(station);
+
         Long id = request.jsonPath().getLong("id");
 
         // when

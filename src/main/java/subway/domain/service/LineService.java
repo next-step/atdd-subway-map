@@ -31,6 +31,7 @@ public class LineService {
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
         Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor()));
+        
         return createLineResponse(line);
     }
 
