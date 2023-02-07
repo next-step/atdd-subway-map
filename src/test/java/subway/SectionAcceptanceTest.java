@@ -108,6 +108,23 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         assertThat(deleteSectionResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
         ExtractableResponse<Response> response = getLineResponse(line1Id);
         assertThat(response.jsonPath().getList("stations.id", Long.class)).doesNotContain(station3Id);
+    }
 
+    /**
+     * given 새로운 역을 생성하고 지하철 구간을 등록하고
+     * when 앞 쪽의 지하철 역을 삭제하면
+     * Then STATION_NOT_FINAL 예외발생
+     */
+    @DisplayName("지하철 구간 삭제 예외처리1 - 지하철 노선에 등록된 역(하행 종점역)만 제거할 수 있다. 즉, 마지막 구간만 제거할 수 있다.")
+    @Test
+    void deleteSection_exception1() {
+        //given
+        Long station3Id = createStation("청계산입구역").jsonPath().getLong("id");
+        createSectionResponse(line1Id, createSectionCreateParams(station2Id, station3Id));
+        //when
+        ExtractableResponse<Response> deleteSectionResponse = deleteSectionResponse(line1Id, station2Id);
+        //then
+        assertThat(deleteSectionResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(deleteSectionResponse.jsonPath().getList("errorMessages")).contains(STATION_NOT_FINAL.getMessage());
     }
 }
