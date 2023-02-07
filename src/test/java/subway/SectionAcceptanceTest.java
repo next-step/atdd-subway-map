@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static subway.global.error.exception.ErrorCode.ALREADY_REGISTERED_STAION;
 import static subway.global.error.exception.ErrorCode.STATION_NOT_FINAL;
 import static subway.response.LineAcceptanceTestUtils.*;
 import static subway.response.SectionAcceptanceTestUtils.*;
@@ -69,9 +70,23 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         Long station4Id = createStation("판교역").jsonPath().getLong("id");
         //when
         ExtractableResponse<Response> sectionResponse = createSectionResponse(line1Id, createSectionCreateParams(station3Id, station4Id));
+        //then
         assertThat(sectionResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(sectionResponse.jsonPath().getList("errorMessages")).contains(STATION_NOT_FINAL.getMessage());
+    }
+
+    /**
+     * when 새로운 구간의 하행역이 해당 노선에 등록되어있는 역이면은
+     * Then STATION_NOT_FINAL 예외발생
+     */
+    @DisplayName("지하철 구간 등록 예외처리2 - 새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없다.")
+    @Test
+    void addSection_exception2() {
+        //when
+        ExtractableResponse<Response> sectionResponse = createSectionResponse(line1Id, createSectionCreateParams(station2Id, station1Id));
         //then
+        assertThat(sectionResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(sectionResponse.jsonPath().getList("errorMessages")).contains(ALREADY_REGISTERED_STAION.getMessage());
     }
 
     /**

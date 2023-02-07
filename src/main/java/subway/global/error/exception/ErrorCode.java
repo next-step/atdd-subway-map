@@ -8,7 +8,7 @@ public enum ErrorCode {
 	STATION_NOT_FINAL(400, "마지막 구간이 아닙니다"),
 	STATION_LESS_THAN_TWO(400, "노선에 역이 두개 이하입니다."),
 	STATION_NOT_EXISTS(400, "해당 역은 존재하지 않습니다."),
-
+	ALREADY_REGISTERED_STAION(400, "이미 등록된 역입니다."),
 	//line
 	LINE_NOT_EXISTS(400, "해당 노선은 존재하지 않습니다."),
 

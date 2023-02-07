@@ -1,11 +1,11 @@
 package subway.api.validator;
 
 import subway.domain.entity.Line;
+import subway.domain.entity.Section;
 import subway.domain.entity.Station;
 import subway.global.error.exception.InvalidValueException;
 
-import static subway.global.error.exception.ErrorCode.STATION_NOT_FINAL;
-import static subway.global.error.exception.ErrorCode.STATION_LESS_THAN_TWO;
+import static subway.global.error.exception.ErrorCode.*;
 
 public class SectionValidator {
 
@@ -13,6 +13,11 @@ public class SectionValidator {
         if(line.getSections().size()>0){
             if (!line.getSections().get(line.getSections().size() - 1).getDownStation().equals(upStation)) {
                 throw new InvalidValueException(STATION_NOT_FINAL);
+            }
+            for (Section section : line.getSections()) {
+                if(section.getDownStation().equals(downStation)||section.getUpStation().equals(downStation)){
+                    throw new InvalidValueException(ALREADY_REGISTERED_STAION);
+                }
             }
         }
     }
