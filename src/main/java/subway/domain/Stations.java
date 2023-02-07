@@ -36,4 +36,12 @@ public class Stations {
     public Station getDownStation() {
         return downStation;
     }
+
+    public void updateDownStation(final Station station) {
+        this.downStation = station;
+    }
+
+    public boolean equalDownStation(final Station station) {
+        return this.downStation == station;
+    }
 }

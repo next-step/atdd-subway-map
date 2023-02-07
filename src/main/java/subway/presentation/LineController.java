@@ -15,6 +15,7 @@ import subway.application.LineService;
 import subway.dto.LineEditRequest;
 import subway.dto.LineCreateRequest;
 import subway.dto.LineResponse;
+import subway.dto.RegisterSectionRequest;
 
 @RestController
 public class LineController {
@@ -28,7 +29,7 @@ public class LineController {
     @PostMapping("/lines")
     public ResponseEntity createLine(@RequestBody @Valid final LineCreateRequest lineCreateRequest) {
         Long lineId = lineService.save(lineCreateRequest);
-        return ResponseEntity.created(URI.create("/lines/" + lineId)).build();
+        return ResponseEntity.created(showLineUriBy(lineId)).build();
     }
 
     @GetMapping("/lines")
@@ -58,5 +59,18 @@ public class LineController {
     public ResponseEntity deleteLine(@PathVariable final Long lineId) {
         lineService.delete(lineId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/lines/{lineId}/sections")
+    public ResponseEntity registerSection(
+            @PathVariable final Long lineId,
+            @RequestBody @Valid RegisterSectionRequest registerSectionRequest
+    ) {
+        lineService.registerSection(lineId, registerSectionRequest);
+        return ResponseEntity.created(showLineUriBy(lineId)).build();
+    }
+
+    private static URI showLineUriBy(final Long lineId) {
+        return URI.create("/lines/" + lineId);
     }
 }

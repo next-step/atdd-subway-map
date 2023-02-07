@@ -65,6 +65,14 @@ public class Line {
         return distance.getValue();
     }
 
+    public Station getUpStation() {
+        return stations.getUpStation();
+    }
+
+    public Station getDownStation() {
+        return stations.getDownStation();
+    }
+
     public void modify(final String name, final String color, final int distance) {
         editName(name);
         editColor(color);
@@ -87,5 +95,13 @@ public class Line {
 
     private void editDistance(final int distance) {
         this.distance = new Distance(distance);
+    }
+
+    public void updateDownStation(final Station station) {
+        stations.updateDownStation(station);
+    }
+
+    public boolean equalDownStation(final Station station) {
+        return this.stations.equalDownStation(station);
     }
 }

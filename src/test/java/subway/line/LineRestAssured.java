@@ -9,7 +9,8 @@ import org.springframework.http.HttpStatus;
 
 public class LineRestAssured {
 
-    private static final String LINE_BASE_PATH = "/lines";
+    public static final String LINE_BASE_PATH = "/lines";
+    public static final String LINE_BY_ID_FORMAT = "/lines/{id}";
 
     public static ExtractableResponse<Response> 노선_생성(
             final String name,
@@ -34,6 +35,15 @@ public class LineRestAssured {
                 .post(LINE_BASE_PATH)
                 .then().log().all()
                 .statusCode(HttpStatus.CREATED.value())
+                .extract();
+    }
+
+    public static ExtractableResponse<Response> 노선_조회(final Long id) {
+        return RestAssured.given().log().all()
+                .when()
+                .get(LINE_BY_ID_FORMAT, id)
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
                 .extract();
     }
 

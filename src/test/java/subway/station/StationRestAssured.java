@@ -47,7 +47,7 @@ public class StationRestAssured {
     }
 
     private static String stationDeletePath(final Long id) {
-        return STATION_BASE_PATH + id;
+        return STATION_BASE_PATH + "/" + id;
     }
 
     public static ExtractableResponse<Response> 역_목록_조회() {

@@ -8,14 +8,14 @@ public class LineResponse {
     private final Long id;
     private final String name;
     private final String color;
-    private final List<StationResponse> stations;
+    private final List<SectionResponse> stations;
     private final int distance;
 
     public LineResponse(
             final Long id,
             final String name,
             final String color,
-            final List<StationResponse> stations,
+            final List<SectionResponse> stations,
             final int distance
     ) {
         this.id = id;
@@ -25,7 +25,7 @@ public class LineResponse {
         this.distance = distance;
     }
 
-    public static LineResponse by(final Line line, final List<StationResponse> stations) {
+    public static LineResponse by(final Line line, final List<SectionResponse> stations) {
         return new LineResponse(
                 line.getId(),
                 line.getName(),
@@ -47,7 +47,7 @@ public class LineResponse {
         return color;
     }
 
-    public List<StationResponse> getStations() {
+    public List<SectionResponse> getStations() {
         return stations;
     }
 
