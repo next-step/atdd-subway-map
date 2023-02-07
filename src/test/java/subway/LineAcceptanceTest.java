@@ -146,7 +146,7 @@ public class LineAcceptanceTest {
         assertThat(req.getDownStationId()).isEqualTo(downStation.getId());
     }
 
-    private ExtractableResponse<Response> requestCreateLine(LineRequest req) {
+    public static ExtractableResponse<Response> requestCreateLine(LineRequest req) {
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .body(req)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -157,7 +157,7 @@ public class LineAcceptanceTest {
         return response;
     }
 
-    private LineResponse parseCreateLineResponse(ExtractableResponse<Response> res) {
+    public static LineResponse parseCreateLineResponse(ExtractableResponse<Response> res) {
         return res.jsonPath().getObject("$", LineResponse.class);
     }
 }

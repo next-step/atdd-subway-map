@@ -70,4 +70,22 @@ public class LineService {
         return LineResponse.fromLine(line, upStation, downStation);
     }
 
+    @Transactional
+    public LineAppendResponse appendLine(Long id, LineAppendRequest lineAppendRequest) {
+        Line line = lineRepository.findById(id).orElseThrow(() -> new NoSuchElementException(ErrorMessage.NO_DATA_LINE.message));
+
+        Long appendUpStationId = Long.parseLong(lineAppendRequest.getUpStationId());
+        Long appendDownStationsId = Long.parseLong(lineAppendRequest.getDownStationId());
+        Long appendDistance = lineAppendRequest.getDistance();
+
+        stationRepository.findById(line.getUpStationId()).orElseThrow(
+                () -> new NoSuchElementException(ErrorMessage.NO_DATA_STATION.message)
+        );
+        stationRepository.findById(line.getDownStationId()).orElseThrow(
+                () -> new NoSuchElementException(ErrorMessage.NO_DATA_STATION.message)
+        );
+
+        line.appendSelection(appendUpStationId, appendDownStationsId, appendDistance);
+        return LineAppendResponse.fromLine(line);
+    }
 }

@@ -1,6 +1,5 @@
 package subway.line;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,5 +40,10 @@ public class LineController {
     public ResponseEntity deleteLine(@PathVariable Long id) {
         lineService.deleteLine(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/lines/{id}/selections")
+    public ResponseEntity<LineAppendResponse> appendLine(@PathVariable Long id, @RequestBody LineAppendRequest lineAppendRequest) {
+        return ResponseEntity.ok().body(lineService.appendLine(id, lineAppendRequest));
     }
 }
