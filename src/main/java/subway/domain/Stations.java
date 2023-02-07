@@ -1,6 +1,5 @@
 package subway.domain;
 
-import java.util.List;
 import javax.persistence.Embeddable;
 import javax.persistence.FetchType;
 import javax.persistence.OneToOne;
@@ -17,16 +16,9 @@ public class Stations {
     protected Stations() {
     }
 
-    public Stations(final List<Station> stations, final Long upStationId, final Long downStationId) {
-        this.upStation = findStationById(stations, upStationId);
-        this.downStation = findStationById(stations, downStationId);
-    }
-
-    private Station findStationById(final List<Station> stations, final Long stationId) {
-        return stations.stream()
-                .filter(station -> station.getId() == stationId)
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("노선 지하철 정보가 올바르지 않습니다."));
+    public Stations(final Station upStation, final Station downStation) {
+        this.upStation = upStation;
+        this.downStation = downStation;
     }
 
     public Station getUpStation() {

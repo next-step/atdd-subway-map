@@ -72,9 +72,8 @@ public class LineService {
         return new Line(
                 lineCreateRequest.getName(),
                 lineCreateRequest.getColor(),
-                stations,
-                lineCreateRequest.getUpStationId(),
-                lineCreateRequest.getDownStationId(),
+                findStationById(stations, lineCreateRequest.getUpStationId()),
+                findStationById(stations, lineCreateRequest.getDownStationId()),
                 lineCreateRequest.getDistance()
         );
     }

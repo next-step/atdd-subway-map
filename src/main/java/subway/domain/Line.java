@@ -34,14 +34,13 @@ public class Line {
     public Line(
             final String name,
             final String color,
-            final List<Station> stations,
-            final Long upStationId,
-            final Long downStationId,
+            final Station upStation,
+            final Station downStation,
             final int distance
     ) {
         this.name = name;
         this.color = color;
-        this.stations = new Stations(stations, upStationId, downStationId);
+        this.stations = new Stations(upStation, downStation);
         this.distance = new Distance(distance);
     }
 
