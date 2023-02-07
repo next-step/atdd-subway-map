@@ -5,6 +5,8 @@ import javax.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import subway.common.DomainException;
+import subway.common.DomainExceptionType;
 
 @Getter
 @Entity
@@ -53,6 +55,13 @@ public class Line {
     }
 
     public void addSection(Section section) {
+        if(!isEqualsLineDownStationAndSectionUpStation(section.getUpStation()))
+            throw new DomainException(DomainExceptionType.UPDOWN_STATION_MISS_MATCH);
+
+        if(isContainStation(section.getDownStation()))
+            throw new DomainException(DomainExceptionType.DOWN_STATION_EXIST_IN_LINE);
+
+
         this.downStationId = section.getDownStation().getId();
         sections.addSections(section);
         lineDistance += section.getSectionDistance();
@@ -66,5 +75,13 @@ public class Line {
         this.downStationId =
                 sections.getSectionByDownStatoinId(station.getId()).getUpStation().getId();
         sections.deletionSection(station);
+    }
+
+    private boolean isEqualsLineDownStationAndSectionUpStation(Station newSectionUpStation){
+        return this.getDownStationId() == newSectionUpStation.getId();
+    }
+
+    private boolean isContainStation(Station station){
+        return getStationList().contains(station);
     }
 }

@@ -38,15 +38,13 @@ public class LineService {
             return LineResponse.entityToResponse(line);
         }
 
-        Optional<Station> downStation = stationRepository.findById(line.getDownStationId());
-        Optional<Station> upStation = stationRepository.findById(line.getUpStationId());
+        Station upStation = findStation(line.getUpStationId());
+        Station downStation = findStation(line.getDownStationId());
 
-        if (downStation.isEmpty() || upStation.isEmpty())
-            throw new DomainException(DomainExceptionType.NO_STATION);
 
         line.addSection(
                 new Section(
-                        line.getId(), downStation.get(), upStation.get(), line.getLineDistance()));
+                        line.getId(), downStation, upStation, line.getLineDistance()));
 
         return LineResponse.entityToResponse(line);
     }
@@ -62,11 +60,8 @@ public class LineService {
     }
 
     @Transactional
-    public void updateLineById(Long id, UpdateLineRequest request) {
-        Line line =
-                lineRepository
-                        .findById(id)
-                        .orElseThrow(() -> new DomainException(DomainExceptionType.NO_LINE));
+    public void updateLineById(Long lineId, UpdateLineRequest request) {
+        Line line = findLine(lineId);
 
         line.updateNameAndColor(request.getName(), request.getColor());
     }
@@ -78,35 +73,17 @@ public class LineService {
 
     @Transactional
     public void addSection(Long lineId, AddSectionRequest request) {
-        Line line =
-                lineRepository
-                        .findById(lineId)
-                        .orElseThrow(() -> new DomainException(DomainExceptionType.NO_LINE));
+        Line line = findLine(lineId);
 
-        Optional<Station> upStation = stationRepository.findById(request.getUpStationId());
-        Optional<Station> downStation = stationRepository.findById(request.getDownStationId());
+        Station upStation = findStation(line.getUpStationId());
+        Station downStation = findStation(line.getDownStationId());
 
-        // 새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 한다.
-        if (upStation.get().getId() != line.getDownStationId())
-            throw new DomainException(DomainExceptionType.UPDOWN_STATION_MISS_MATCH);
-
-        // 새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없다.
-        if (line.getStationList().contains(downStation.get()))
-            throw new DomainException(DomainExceptionType.DOWN_STATION_EXIST_IN_LINE);
-
-        if (upStation.isEmpty() || downStation.isEmpty())
-            throw new DomainException(DomainExceptionType.NO_STATION);
-
-        line.addSection(
-                new Section(lineId, upStation.get(), downStation.get(), request.getDistance()));
+        line.addSection(new Section(lineId, upStation, downStation, request.getDistance()));
     }
 
     @Transactional
     public void deleteSection(Long lineId, Long stationId) {
-        Line line =
-                lineRepository
-                        .findById(lineId)
-                        .orElseThrow(() -> new DomainException(DomainExceptionType.NO_LINE));
+        Line line = findLine(lineId);
 
         if (line.getDownStationId() != stationId)
             throw new DomainException(DomainExceptionType.NOT_DOWN_STATION);
@@ -119,5 +96,13 @@ public class LineService {
         if (station.isEmpty()) throw new DomainException(DomainExceptionType.NO_STATION);
 
         line.deleteSection(station.get());
+    }
+
+    private Station findStation(Long stationId){
+        return stationRepository.findById(stationId).orElseThrow(() -> new DomainException(DomainExceptionType.NO_STATION));
+    }
+
+    private Line findLine(Long lineId){
+        return lineRepository.findById(lineId).orElseThrow(() -> new DomainException(DomainExceptionType.NO_LINE));
     }
 }
