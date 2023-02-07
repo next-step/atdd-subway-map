@@ -1,10 +1,15 @@
 package subway;
 
 import io.restassured.RestAssured;
+import io.restassured.path.json.JsonPath;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
 import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import subway.dto.LinePatchResponse;
 import subway.dto.LineRequest;
 
 import java.util.List;
@@ -93,16 +98,59 @@ class LineAcceptanceTest {
         //given
         createLine("신분당선", "bg-red-600", 1, 2, 10);
         //when
-        List<String> line = getLine("/lines/1");
+        List<String> line = getLine("/lines/1").getList("stations.name", String.class);
         //then
         assertThat(line).containsAnyOf("강남역");
     }
 
-    public List<String> getLine(String path) {
+    public JsonPath getLine(String path) {
         return RestAssured.given().log().all()
                 .when().get(path)
-                .then().log().all().extract().jsonPath().getList("stations.name");
+                .then().log().all().extract().jsonPath();
     }
+
+    /*
+    * 지하철노선 수정
+    * given 지하철 노선을 생성하고
+    * when 생성한 지하철 노선을 수정하면
+    * then 해당 지하철 노선 정보는 수정된다.
+    * */
+
+    @DisplayName("지하철노선 수정 테스트")
+    @Test
+    void patchLine() {
+        //given
+        createLine("신분당선", "bg-red-600", 1, 2, 10);
+
+        //when
+        ExtractableResponse<Response> response = patchLine("다른분당선", "bg-red-600", "/lines/1");
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        //then
+        String lineName = getLine("/lines/1").getString("name");
+        String color = getLine("/lines/1").getString("color");
+
+        assertThat(lineName).isEqualTo("다른분당선");
+        assertThat(color).isEqualTo("bg-red-600");
+
+    }
+
+    public ExtractableResponse<Response> patchLine(String name, String color, String path) {
+        LinePatchResponse patchResponse = new LinePatchResponse(name, color);
+
+       return RestAssured.given().header("Content-type", "application/json")
+               .log().all()
+               .and()
+               .body(patchResponse)
+               .when().patch(path)
+               .then().log().all().extract();
+    }
+
+
+
+
+
 
 
 
