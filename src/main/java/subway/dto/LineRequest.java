@@ -2,7 +2,7 @@ package subway.dto;
 
 import subway.domain.Line;
 
-public class LineRequest {
+public class LineRequest implements EntityTransformable<Line> {
 
     private String name;
 
@@ -29,6 +29,7 @@ public class LineRequest {
         this.distance = distance;
     }
 
+    @Override
     public Line toEntity() {
         return new Line(
                 this.getName(),
