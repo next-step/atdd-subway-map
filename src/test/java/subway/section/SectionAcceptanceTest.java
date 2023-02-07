@@ -97,15 +97,17 @@ public class SectionAcceptanceTest {
         }
 
         /**
+         * Given 노선을 생성하고
          * When 노선에 구간을 등록했을 때 구간의 하행역이 해당 노선에 등록되어 있는 역일 경우
          * Then 에러 처리한다.
          */
         @DisplayName("노선에 새로운 구간 등록시 새로운 구간의 하행역이 해당 노선에 등록되어 있는 역일 경우 에러 처리한다.")
         @Test
         void registerSection_Error_SectionDownStationAlreadyRegisteredSection() {
-            // when
+            // given
             노선_생성("새로운 노선", "색깔", registerStationId, downStationId, 10);
 
+            // when
             ExtractableResponse<Response> response = 구간_등록(lineId, registerStationId, downStationId, distance);
 
             // then
@@ -154,6 +156,7 @@ public class SectionAcceptanceTest {
         }
 
         /**
+         * Given 구간을 생성하고
          * When 구간 제거시 노선에 상행 종점역과 하행 종점역만 있는 경우
          * Then 에러 처리한다.
          */
