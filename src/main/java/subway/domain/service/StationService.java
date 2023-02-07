@@ -6,9 +6,12 @@ import subway.api.dto.StationRequest;
 import subway.api.dto.StationResponse;
 import subway.domain.entity.Station;
 import subway.domain.repository.StationRepository;
+import subway.global.error.exception.EntityNotFoundException;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static subway.global.error.exception.ErrorCode.STATION_NOT_EXISTS;
 
 @Service
 @Transactional(readOnly = true)
@@ -36,10 +39,14 @@ public class StationService {
         stationRepository.deleteById(id);
     }
 
-    private StationResponse createStationResponse(Station station) {
+    StationResponse createStationResponse(Station station) {
         return new StationResponse(
                 station.getId(),
                 station.getName()
         );
+    }
+
+    public Station findById(Long stationId) {
+        return stationRepository.findById(stationId).orElseThrow(()-> new EntityNotFoundException(STATION_NOT_EXISTS));
     }
 }

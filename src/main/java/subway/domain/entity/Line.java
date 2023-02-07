@@ -1,8 +1,17 @@
 package subway.domain.entity;
 
+import subway.api.dto.SectionRequest;
+
 import javax.persistence.*;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import static java.util.Optional.ofNullable;
+import static subway.api.validator.SectionValidator.addSectionValidator;
+import static subway.api.validator.SectionValidator.deleteSectionValidator;
 
 @Entity
 public class Line {
@@ -12,27 +21,45 @@ public class Line {
 	@Column(length = 20, nullable = false)
 	private String name;
 	private String color;
-	private Long upStationId;
-	private Long downStationId;
-	private Long distance;
+	@OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
+	private List<Section> sections = new ArrayList<>();
 
 	protected Line() {
 
 	}
 
-	public Line(String name, String color, Long upStationId, Long downStationId, Long distance) {
+	public Line(String name, String color) {
 		this.name = name;
 		this.color = color;
-		this.upStationId = upStationId;
-		this.downStationId = downStationId;
-		this.distance = distance;
 	}
+
+	public List getSortedStations() {
+		if (this.getSections().isEmpty()) {
+			return Collections.emptyList();
+		}
+
+		List<Station> stations = this.getSections().stream()
+				.map(Section::getDownStation)
+				.collect(Collectors.toList());
+
+		stations.add(0, this.getSections().get(0).getUpStation());
+
+		return stations;
+	}
+
 	public void updateLineIfPresent(Line line) {
 		ofNullable(line.getName()).ifPresent(nameToUpdate -> name = nameToUpdate);
 		ofNullable(line.getColor()).ifPresent(colorToUpdate -> color = colorToUpdate);
-		ofNullable(line.getUpStationId()).ifPresent(upStationIdToUpdate -> upStationId = upStationIdToUpdate);
-		ofNullable(line.getDownStationId()).ifPresent(downStationIdToUpdate -> downStationId = downStationIdToUpdate);
-		ofNullable(line.getDistance()).ifPresent(distanceToUpdate -> distance = distanceToUpdate);
+	}
+
+	public void addSection(SectionRequest sectionRequest, Station upStation, Station downStation) {
+		addSectionValidator(this, upStation, downStation);
+		this.getSections().add(new Section(this, upStation, downStation, sectionRequest.getDistance()));
+	}
+
+	public void removeSection(Station station) {
+		deleteSectionValidator(this, station);
+		this.getSections().remove(this.getSections().size() - 1);
 	}
 
 	public String getName() {
@@ -43,19 +70,11 @@ public class Line {
 		return color;
 	}
 
-	public Long getUpStationId() {
-		return upStationId;
-	}
-
-	public Long getDownStationId() {
-		return downStationId;
-	}
-
-	public Long getDistance() {
-		return distance;
-	}
-
 	public Long getId() {
 		return id;
+	}
+
+	public List<Section> getSections() {
+		return sections;
 	}
 }

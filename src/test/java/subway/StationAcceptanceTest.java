@@ -5,10 +5,8 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.annotation.DirtiesContext;
-import subway.response.StationResponse;
+import subway.response.StationAcceptanceTestUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -19,9 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DisplayName("지하철역 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class StationAcceptanceTest {
+public class StationAcceptanceTest extends AcceptanceTest{
     /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다
@@ -34,20 +30,21 @@ public class StationAcceptanceTest {
         Map<String, String> params = new HashMap<>();
         params.put("name", "강남역");
 
-        ExtractableResponse<Response> response = StationResponse.createStationResponse(params);
+        ExtractableResponse<Response> response = StationAcceptanceTestUtils.createStationResponse(params);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        ExtractableResponse<Response> showResponse = StationResponse.showStationResponse();
+        ExtractableResponse<Response> showResponse = StationAcceptanceTestUtils.showStationResponse();
+
         List<String> stationNames = showResponse.jsonPath().getList("name", String.class);
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
     /**
      * Given 2개의 지하철역을 생성하고
-     * When 지하철역 목록을 조회하면
+     * When 지하철성역 목록을 조회하면
      * Then 2개의 지하철역을 응답 받는다
      */
     @DisplayName("지하철역 전체를 조회한다.")
@@ -58,13 +55,14 @@ public class StationAcceptanceTest {
         station1.put("name", "강남역");
         Map<String, String> station2 = new HashMap<>();
         station2.put("name", "역삼역");
-        StationResponse.createStationResponse(station1);
-        StationResponse.createStationResponse(station2);
+        StationAcceptanceTestUtils.createStationResponse(station1);
+        StationAcceptanceTestUtils.createStationResponse(station2);
 
         List<String> stations = List.of("강남역", "역삼역");
 
         //when
-        ExtractableResponse<Response> response = StationResponse.showStationResponse();
+        ExtractableResponse<Response> response = StationAcceptanceTestUtils.showStationResponse();
+
         List<String> stationNames = response.jsonPath().getList("name", String.class);
 
         //then
@@ -87,7 +85,8 @@ public class StationAcceptanceTest {
         //given
         Map<String, String> station = new HashMap<>();
         station.put("name", "강남역");
-        ExtractableResponse<Response> request = StationResponse.createStationResponse(station);
+        ExtractableResponse<Response> request = StationAcceptanceTestUtils.createStationResponse(station);
+
         Long id = request.jsonPath().getLong("id");
 
         // when

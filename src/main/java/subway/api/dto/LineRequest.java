@@ -18,7 +18,7 @@ public class LineRequest {
 	}
 
 	public Line toLineEntity(LineRequest lineRequest) {
-		return new Line(lineRequest.getName(), lineRequest.getColor(), lineRequest.getUpStationId(), lineRequest.getDownStationId(), lineRequest.getDistance());
+		return new Line(lineRequest.getName(), lineRequest.getColor());
 	}
 
 	public String getName() {
