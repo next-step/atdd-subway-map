@@ -14,11 +14,11 @@ import java.util.stream.*;
 public class LineService {
 
     private final LineRepository lineRepository;
-    private final StationFindEntityService stationFindEntityService;
+    private final StationService stationService;
 
     public void createLine(final LineCreateRequest lineCreateRequest) {
-        final var upStation = stationFindEntityService.getById(lineCreateRequest.getUpStationId());
-        final var downStation = stationFindEntityService.getById(lineCreateRequest.getDownStationId());
+        final var upStation = stationService.getById(lineCreateRequest.getUpStationId());
+        final var downStation = stationService.getById(lineCreateRequest.getDownStationId());
 
         final var line = Line.builder()
                 .name(lineCreateRequest.getName())
