@@ -1,10 +1,10 @@
-package subway.section.domain;
+package subway.line.domain;
 
-import subway.section.exception.DownStationAlreadyRegisteredException;
-import subway.section.exception.NotSameAsRegisteredDownStation;
-import subway.section.exception.NotLastSectionException;
-import subway.section.exception.SectionNotFoundException;
-import subway.section.exception.SingleSectionException;
+import subway.line.exception.DownStationAlreadyRegisteredException;
+import subway.line.exception.NotSameAsRegisteredDownStation;
+import subway.line.exception.NotLastSectionException;
+import subway.line.exception.SectionNotFoundException;
+import subway.line.exception.SingleSectionException;
 import subway.station.domain.Station;
 
 import javax.persistence.Embeddable;

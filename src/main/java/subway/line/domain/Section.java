@@ -1,9 +1,8 @@
-package subway.section.domain;
+package subway.line.domain;
 
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import subway.line.domain.Line;
 import subway.station.domain.Station;
 
 import javax.persistence.Column;

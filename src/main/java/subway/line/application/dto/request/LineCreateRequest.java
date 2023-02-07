@@ -2,7 +2,6 @@ package subway.line.application.dto.request;
 
 import lombok.Getter;
 import subway.line.domain.Line;
-import subway.section.application.dto.request.SectionCreateRequest;
 import subway.station.domain.Station;
 
 @Getter

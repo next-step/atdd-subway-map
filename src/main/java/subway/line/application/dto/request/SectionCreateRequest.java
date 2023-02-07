@@ -1,4 +1,4 @@
-package subway.section.application.dto.request;
+package subway.line.application.dto.request;
 
 import lombok.Builder;
 import lombok.Getter;

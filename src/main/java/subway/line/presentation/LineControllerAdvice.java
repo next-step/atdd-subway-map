@@ -7,11 +7,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import subway.common.exception.ErrorResponse;
 import subway.line.exception.LineNotFoundException;
-import subway.section.exception.DownStationAlreadyRegisteredException;
-import subway.section.exception.NotSameAsRegisteredDownStation;
-import subway.section.exception.NotLastSectionException;
-import subway.section.exception.SectionNotFoundException;
-import subway.section.exception.SingleSectionException;
+import subway.line.exception.DownStationAlreadyRegisteredException;
+import subway.line.exception.NotSameAsRegisteredDownStation;
+import subway.line.exception.NotLastSectionException;
+import subway.line.exception.SectionNotFoundException;
+import subway.line.exception.SingleSectionException;
 
 import static org.springframework.core.Ordered.HIGHEST_PRECEDENCE;
 
@@ -48,7 +48,6 @@ public class LineControllerAdvice {
     ErrorResponse handleNotLastSection(final NotLastSectionException exception) {
         return ErrorResponse.from(exception);
     }
-
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(SectionNotFoundException.class)

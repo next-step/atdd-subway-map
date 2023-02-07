@@ -3,8 +3,6 @@ package subway.line.domain;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import subway.section.domain.Section;
-import subway.section.domain.Sections;
 import subway.station.domain.Station;
 
 import javax.persistence.Column;

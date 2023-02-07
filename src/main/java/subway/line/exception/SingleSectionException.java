@@ -1,4 +1,4 @@
-package subway.section.exception;
+package subway.line.exception;
 
 import subway.common.exception.SubwayException;
 
