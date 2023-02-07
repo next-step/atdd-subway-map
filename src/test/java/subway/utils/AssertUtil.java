@@ -32,11 +32,18 @@ public class AssertUtil {
         }
     }
 
-    public static void assertEqualToLine(JsonPath line, String expectedName, String expectedColor, String... expectedStationNames) {
+    public static void assertEqualToLine(JsonPath line, String expectedName, String expectedColor) {
         assertAll(
                 () -> assertThat(line.getString("name")).isEqualTo(expectedName),
-                () -> assertThat(line.getString("color")).isEqualTo(expectedColor),
-                () -> assertEqualToNames(line.getList("stations.name", String.class), expectedStationNames)
+                () -> assertThat(line.getString("color")).isEqualTo(expectedColor)
+        );
+    }
+
+    public static void assertEqualToSections(JsonPath sections, String[] expectedDownStationNames, String[] expectedUpStationNames, Integer... expectedDistance) {
+        assertAll(
+                () -> assertEqualToNames(sections.getList("sections.downStation.name", String.class), expectedDownStationNames),
+                () -> assertEqualToNames(sections.getList("sections.upStation.name", String.class), expectedUpStationNames),
+                () -> assertThat(sections.getList("sections.distance", Integer.class)).containsExactly(expectedDistance)
         );
     }
 }

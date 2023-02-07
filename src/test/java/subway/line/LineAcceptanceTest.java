@@ -74,7 +74,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         JsonPath line = showLineResultResponse(lineId);
 
         // then
-        assertEqualToLine(line, "신분당선", "bg-red-600", "지하철역", "새로운지하철역");
+        assertEqualToLine(line, "신분당선", "bg-red-600");
     }
 
     /**
@@ -96,7 +96,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         JsonPath line = showLineResultResponse(lineId);
-        assertEqualToLine(line, "다른분당선", "bg-red-600", "지하철역", "새로운지하철역");
+        assertEqualToLine(line, "다른분당선", "bg-red-600");
     }
 
     /**

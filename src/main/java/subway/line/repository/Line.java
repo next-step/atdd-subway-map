@@ -1,8 +1,10 @@
 package subway.line.repository;
 
-import subway.station.repository.Station;
+import subway.section.repository.Section;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Line {
@@ -17,20 +19,27 @@ public class Line {
     @Column(length = 20, nullable = false)
     private String color;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Station upStation;
+    @OneToMany(mappedBy = "line", cascade = CascadeType.ALL)
+    private List<Section> sections = new ArrayList<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Station downStation;
-
-    private int distance;
-
-    public Line(String name, String color, Station upStation, Station downStation, int distance) {
+    public Line(String name, String color, Section section) {
         this.name = name;
         this.color = color;
-        this.upStation = upStation;
-        this.downStation = downStation;
-        this.distance = distance;
+        addSection(section);
+    }
+
+    public void addSection(Section section) {
+        if (section.getLine() != null) {
+            section.getLine().getSections().remove(section);
+        }
+
+        section.setLine(this);
+        sections.add(section);
+    }
+
+    public void update(String name, String color) {
+        this.name = name;
+        this.color = color;
     }
 
     protected Line() {}
@@ -47,20 +56,7 @@ public class Line {
         return color;
     }
 
-    public Station getUpStation() {
-        return upStation;
-    }
-
-    public Station getDownStation() {
-        return downStation;
-    }
-
-    public int getDistance() {
-        return distance;
-    }
-
-    public void update(String name, String color) {
-        this.name = name;
-        this.color = color;
+    public List<Section> getSections() {
+        return sections;
     }
 }

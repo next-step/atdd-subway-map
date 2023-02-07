@@ -7,8 +7,9 @@ import subway.line.dto.LineResponse;
 import subway.line.dto.LineUpdateRequest;
 import subway.line.repository.Line;
 import subway.line.repository.LineRepository;
-import subway.station.repository.Station;
-import subway.station.service.StationService;
+import subway.section.dto.SectionRequest;
+import subway.section.repository.Section;
+import subway.section.service.SectionService;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,11 +19,11 @@ import java.util.stream.Collectors;
 public class LineService {
 
     private final LineRepository lineRepository;
-    private final StationService stationService;
+    private final SectionService sectionService;
 
-    public LineService(LineRepository lineRepository, StationService stationService) {
+    public LineService(LineRepository lineRepository, SectionService sectionService) {
         this.lineRepository = lineRepository;
-        this.stationService = stationService;
+        this.sectionService = sectionService;
     }
 
     @Transactional
@@ -53,19 +54,33 @@ public class LineService {
         line.update(lineUpdateRequest.getName(), lineUpdateRequest.getColor());
     }
 
-    private Line toLineEntity(LineRequest lineRequest) {
-        Station upStation = stationService.findStation(lineRequest.getUpStationId());
-        Station downStation = stationService.findStation(lineRequest.getDownStationId());
-
-        return new Line(lineRequest.getName(),
-                lineRequest.getColor(),
-                upStation,
-                downStation,
-                lineRequest.getDistance());
-    }
-
     @Transactional
     public void deleteLine(Long id) {
         lineRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void addSection(Long id, SectionRequest sectionRequest) {
+        Section section = sectionService.createSection(sectionRequest);
+        Line line = findLine(id);
+        line.addSection(section);
+    }
+
+    private Line toLineEntity(LineRequest lineRequest) {
+        Section section = sectionService.createSection(toSectionRequest(lineRequest));
+
+        return new Line(
+                lineRequest.getName(),
+                lineRequest.getColor(),
+                section
+        );
+    }
+
+    private SectionRequest toSectionRequest(LineRequest lineRequest) {
+        return new SectionRequest(
+                lineRequest.getDownStationId(),
+                lineRequest.getUpStationId(),
+                lineRequest.getDistance()
+        );
     }
 }
