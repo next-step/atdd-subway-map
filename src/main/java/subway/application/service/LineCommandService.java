@@ -3,9 +3,13 @@ package subway.application.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.application.service.input.LineCommandUseCase;
+import subway.application.service.input.LineLoadUseCase;
+import subway.application.service.input.SectionCommandUseCase;
 import subway.application.service.output.LineCommandRepository;
-import subway.domain.*;
-import subway.infrastructor.repository.StationRepository;
+import subway.domain.Line;
+import subway.domain.LineCreateDto;
+import subway.domain.LineUpdateDto;
+import subway.domain.SectionCreateDto;
 
 @Service
 @Transactional
@@ -13,25 +17,20 @@ class LineCommandService implements LineCommandUseCase {
 
     private final LineCommandRepository lineCommandRepository;
     private final LineLoadUseCase lineLoadUseCase;
-    private final StationRepository stationRepository;
+    private final SectionCommandUseCase sectionCommandUseCase;
 
-    LineCommandService(LineCommandRepository lineCommandRepository, LineLoadUseCase lineLoadUseCase, StationRepository stationRepository) {
+    LineCommandService(LineCommandRepository lineCommandRepository, LineLoadUseCase lineLoadUseCase, SectionCommandUseCase sectionCommandUseCase) {
         this.lineCommandRepository = lineCommandRepository;
         this.lineLoadUseCase = lineLoadUseCase;
-        this.stationRepository = stationRepository;
+        this.sectionCommandUseCase = sectionCommandUseCase;
     }
 
     @Override
     public Long createLine(LineCreateDto lineCreateDto) {
-        Station upStation = stationRepository.findById(lineCreateDto.getUpStationId())
-            .map(stationJpaEntity -> new Station(stationJpaEntity.getId(), stationJpaEntity.getName()))
-            .orElseThrow(NotFoundStationException::new);
-        Station downStation = stationRepository.findById(lineCreateDto.getDownStationId())
-            .map(stationJpaEntity -> new Station(stationJpaEntity.getId(), stationJpaEntity.getName()))
-            .orElseThrow(NotFoundStationException::new);
-
-        Line line = Line.withoutId(lineCreateDto.getName(), lineCreateDto.getColor(), upStation, downStation, lineCreateDto.getDistance());
-        return lineCommandRepository.createLine(line);
+        Line line = Line.withoutId(lineCreateDto.getName(), lineCreateDto.getColor());
+        Long lineId = lineCommandRepository.createLine(line);
+        sectionCommandUseCase.createSection(new SectionCreateDto(lineId, lineCreateDto.getUpStationId(), lineCreateDto.getDownStationId(), lineCreateDto.getDistance()));
+        return lineId;
     }
 
     @Override
