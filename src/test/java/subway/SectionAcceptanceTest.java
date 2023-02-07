@@ -43,10 +43,12 @@ public class SectionAcceptanceTest {
     }
 
     /**
-     * Given - 구간을 1개 가진 노선을 생성하고 When - 해당 노선에 새로운 구간(노선의 하행선 = 구간의 상행선)을 추가하면 Then - 구의 하행역이 노선에
-     * 추가된다.
+     * Senario - 노선의 하행 종점역에 새로운 구간을 추가한다
+     * Given - 구간을 1개 가진 노선을 생성하고
+     * When - 해당 노선에 새로운 구간(노선의 하행선 = 구간의 상행선)을 추가하면
+     * Then - 구간의 하행역이 노선에 추가된다.
      */
-    @DisplayName("지하철 구간을 생성한다. - 성공")
+    @DisplayName("구간 추가 - 노선의 하행 종점역에 새로운 구간을 추가한다.")
     @Test
     void success_createSectionTest() {
         // given - SQL로 대체
@@ -59,8 +61,12 @@ public class SectionAcceptanceTest {
         assertThat(stationList).contains(선릉역);
     }
 
-    /** Given - 구간을 1개 가진 노선을 생성하고 When - 노선의 하행 종점역과 구간의 상행역이 다른 구간을 추가하면 Then - 예외를 발생시킨다. */
-    @DisplayName("지하철 구간을 생성한다. - 실패")
+    /**
+     * Senario - 추가 구간의 상행역이 노선의 하행종점역이 아니라면 예외를 발생시킨다.
+     * Given - 구간을 1개 가진 노선을 생성하고
+     * When - 노선의 하행 종점역과 구간의 상행역이 다른 구간을 추가하면
+     * Then - 예외를 발생시킨다. */
+    @DisplayName("구간 추가 - 추가 구간의 상행역이 노선의 하행종점역이 아니라면 예외를 발생시킨다.")
     @Test
     void fail_createSectionTest_missMatch() {
         // given - SQL로 대체
@@ -72,8 +78,12 @@ public class SectionAcceptanceTest {
         assertEquals(DomainExceptionType.UPDOWN_STATION_MISS_MATCH.getCode(), errorCode);
     }
 
-    /** Given - 구간을 1개 가진 노선을 생성하고 When - 하행역이 노선에 등록되어 있는 구간을 추가한다면 Then - 예외를 발생시킨다. */
-    @DisplayName("지하철 구간을 생성한다. - 실패")
+    /**
+     * Senario - 추가 구간의 하행역이 노선에 포함되어 있다면 예외를 발생시킨다.
+     * Given - 구간을 1개 가진 노선을 생성하고
+     * When - 하행역이 노선에 등록되어 있는 구간을 추가한다면
+     * Then - 예외를 발생시킨다. */
+    @DisplayName("구간 추가 - 추가 구간의 하행역이 노선에 포함되어 있다면 예외를 발생시킨다.")
     @Test
     void fail_createSectionTest_existStation() {
         // given - SQL로 대체
@@ -85,8 +95,12 @@ public class SectionAcceptanceTest {
         assertEquals(DomainExceptionType.DOWN_STATION_EXIST_IN_LINE.getCode(), errorCode);
     }
 
-    /** Given - 구간을 2개 가진 노선을 생성하고 When - 노선의 하행 종점역을 하행역으로 가진 구간을 삭제하면 Then - 하행역이 삭제된다. */
-    @DisplayName("지하철 구간을 생성한다. - 성공")
+    /**
+     * Senario - 노선의 하행 종점역을 하행역으로 가진 구간을 삭제한다.
+     * Given - 구간을 2개 가진 노선을 생성하고
+     * When - 노선의 하행 종점역을 하행역으로 가진 구간을 삭제하면
+     * Then - 하행역이 삭제된다. */
+    @DisplayName("구간 삭제 - 노선의 하행 종점역을 하행역으로 가진 구간을 삭제한다.")
     @Test
     @Sql(scripts = "/sql/insert-line-with-twoSection.sql")
     void success_deleteSectionTest() {
@@ -99,8 +113,12 @@ public class SectionAcceptanceTest {
         assertEquals(response.statusCode(), HttpStatus.NO_CONTENT.value());
     }
 
-    /** Given - 구간을 2개 가진 노선을 생성하고 When - 노선의 하행 종점역과 다른 하행역을 가지는 구간을 삭제하려 하면 Then - 예외를 발생시킨다. */
-    @DisplayName("지하철 구간을 생성한다. - 실패")
+    /**
+     * Senaril - 노선의 하행 종점역이 포함되지 않은 역을 삭제한다면 예외랄 발생시킨다.
+     * Given - 구간을 2개 가진 노선을 생성하고
+     * When - 노선의 하행 종점역과 다른 하행역을 가지는 구간을 삭제하려 하면
+     * Then - 예외를 발생시킨다. */
+    @DisplayName("구간 삭제 - 노선의 하행 종점역이 포함되지 않은 역을 삭제한다면 예외랄 발생시킨다.")
     @Test
     @Sql(scripts = "/sql/insert-line-with-twoSection.sql")
     void fail_deleteSectionTest_deleteNotDownSataion() {
@@ -113,8 +131,12 @@ public class SectionAcceptanceTest {
         assertEquals(DomainExceptionType.NOT_DOWN_STATION.getCode(), errorCode);
     }
 
-    /** Given - 구간을 1개 가진 노선을 생성하고 When - 노선 구간을 삭제하려 하면 Then - 예외를 발생시킨다. */
-    @DisplayName("지하철 구간을 생성한다. - 실패")
+    /**
+     * Senario - 구간을 1개 가진 노선의 구간을 삭제한다면 예외를 발생시킨다.
+     * Given - 구간을 1개 가진 노선을 생성하고
+     * When - 노선 구간을 삭제하려 하면
+     * Then - 예외를 발생시킨다. */
+    @DisplayName("구간 삭제 - 구간을 1개 가진 노선의 구간을 삭제한다면 예외를 발생시킨다.")
     @Test
     void fail_deleteSectionTest_hasOneSectionLine() {
         // given - SQL 대체
