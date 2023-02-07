@@ -33,7 +33,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
     private Long 강남역_id;
     private Long 판교역_id;
-
     private Map<String, String> createLineParams;
 
     @BeforeEach
@@ -172,7 +171,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         return Long.parseLong(createLineResponse.header(LOCATION).split(URI_DELIMITER)[ID_INDEX]);
     }
 
-    private Map<String, String> getLineParams(String name, String color, Long upStationId, Long downStationId, int distance) {
+    public static Map<String, String> getLineParams(String name, String color, Long upStationId, Long downStationId, int distance) {
         Map<String, String> lineCreateParams = new HashMap<>();
         lineCreateParams.put("name", name);
         lineCreateParams.put("color", color);
@@ -182,7 +181,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         return lineCreateParams;
     }
 
-    private ExtractableResponse<Response> 지하철_노선_생성_요청(Map<String, String> params) {
+    public static ExtractableResponse<Response> 지하철_노선_생성_요청(Map<String, String> params) {
         return RestAssured.given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -191,14 +190,14 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 .extract();
     }
 
-    private ExtractableResponse<Response> 지하철_노선_목록_조회_요청() {
+    public static ExtractableResponse<Response> 지하철_노선_목록_조회_요청() {
         return RestAssured.given().log().all()
                 .when().get(LINE_PATH)
                 .then().log().all()
                 .extract();
     }
 
-    private ExtractableResponse<Response> 지하철_노선_조회_요청(ExtractableResponse<Response> createLineResponse) {
+    public static ExtractableResponse<Response> 지하철_노선_조회_요청(ExtractableResponse<Response> createLineResponse) {
         String uri = createLineResponse.header(LOCATION);
         return RestAssured.given().log().all()
                 .when().get(uri)
@@ -206,7 +205,14 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 .extract();
     }
 
-    private ExtractableResponse<Response> 지하철_노선_수정_요청(ExtractableResponse<Response> createLineResponse, Map<String, String> params) {
+    public static ExtractableResponse<Response> 지하철_노선_조회_요청(Long lineId) {
+        return RestAssured.given().log().all()
+                .when().get("/lines/{lineId}", lineId)
+                .then().log().all()
+                .extract();
+    }
+
+    public static ExtractableResponse<Response> 지하철_노선_수정_요청(ExtractableResponse<Response> createLineResponse, Map<String, String> params) {
         String uri = createLineResponse.header(LOCATION);
         return RestAssured.given().log().all()
                 .body(params)
@@ -216,7 +222,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 .extract();
     }
 
-    private ExtractableResponse<Response> 지하철_노선_삭제_요청(ExtractableResponse<Response> createLineResponse) {
+    public static ExtractableResponse<Response> 지하철_노선_삭제_요청(ExtractableResponse<Response> createLineResponse) {
         String uri = createLineResponse.header(LOCATION);
         return RestAssured.given().log().all()
                 .when().delete(uri)
