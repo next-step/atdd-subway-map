@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import subway.domain.station.Station;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class StationResponse {
     private Long id;
     private String name;

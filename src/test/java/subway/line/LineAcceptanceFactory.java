@@ -35,24 +35,6 @@ public class LineAcceptanceFactory {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> createFixtureLine() {
-        HashMap<String, Object> params = createLineHashMap(
-                LineNameConstraints.Line2,
-                "bg-green-600",
-                1,
-                3,
-                10
-        );
-
-        return RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(params)
-                .when().post(LINE_BASE_URL)
-                .then().log().all()
-                .extract();
-    }
-
     private static HashMap<String, Object> createLineHashMap(String name, String color, long upStationId, long downStationId, int distance) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("name", name);

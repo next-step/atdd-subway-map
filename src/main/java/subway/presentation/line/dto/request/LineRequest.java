@@ -7,7 +7,7 @@ import subway.domain.line.Line;
 import subway.domain.station.Stations;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class LineRequest {
 
     private String name;

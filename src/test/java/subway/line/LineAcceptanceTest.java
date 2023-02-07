@@ -46,7 +46,13 @@ public class LineAcceptanceTest {
     @Test
     void createLine() {
         // given && when
-        ExtractableResponse<Response> response = LineAcceptanceFactory.createFixtureLine();
+        ExtractableResponse<Response> response = LineAcceptanceFactory.createLine(
+                Line2,
+                "bg-green-600",
+                1,
+                3,
+                10
+        );
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         // then
@@ -66,7 +72,13 @@ public class LineAcceptanceTest {
     @Test
     void getAllLines() {
         // given
-        LineAcceptanceFactory.createFixtureLine();
+        LineAcceptanceFactory.createLine(
+                Line2,
+                "bg-green-600",
+                1,
+                3,
+                10
+        );
         LineAcceptanceFactory.createLine(
                 Line9,
                 "bg-brown-600",
@@ -96,7 +108,15 @@ public class LineAcceptanceTest {
     @Test
     void getLine() {
         // given
-        ExtractableResponse<Response> line = LineAcceptanceFactory.createFixtureLine();
+        ExtractableResponse<Response> line = LineAcceptanceFactory.createLine(
+                Line2,
+                "bg-green-600",
+                1,
+                3,
+                10
+        );
+
+
         Long lineId = getId(line);
         // when
         ExtractableResponse<Response> response = LineAcceptanceFactory.getLine(lineId);
@@ -116,7 +136,13 @@ public class LineAcceptanceTest {
     @Test
     void updateLine() {
         // given
-        ExtractableResponse<Response> line = LineAcceptanceFactory.createFixtureLine();
+        ExtractableResponse<Response> line = LineAcceptanceFactory.createLine(
+                Line2,
+                "bg-green-600",
+                1,
+                3,
+                10
+        );
         Long lineId = getId(line);
         // when
         ExtractableResponse<Response> response = LineAcceptanceFactory.updateLine(
@@ -137,7 +163,13 @@ public class LineAcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        ExtractableResponse<Response> line = LineAcceptanceFactory.createFixtureLine();
+        ExtractableResponse<Response> line = LineAcceptanceFactory.createLine(
+                Line2,
+                "bg-green-600",
+                1,
+                3,
+                10
+        );
         Long lineId = getId(line);
         // when
         ExtractableResponse<Response> response = LineAcceptanceFactory.deleteLine(lineId);
