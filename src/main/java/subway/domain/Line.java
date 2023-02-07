@@ -31,7 +31,7 @@ public class Line {
 
     private Long distance;
 
-    @OneToMany(mappedBy = "line")
+    @OneToMany(mappedBy = "line", cascade = CascadeType.REMOVE)
     private List<Section> sections;
 
     protected Line() {
@@ -50,12 +50,12 @@ public class Line {
         return color;
     }
 
-    public Station getUpStation() {
-        return upStation;
-    }
-
     public Station getDownStation() {
         return downStation;
+    }
+
+    public Station getUpStation() {
+        return upStation;
     }
 
     public Long getDistance() {
@@ -72,7 +72,7 @@ public class Line {
     }
 
     private void addFirstSection() {
-        sections.add(new Section(this,upStation,downStation, distance));
+        sections.add(new Section(this,downStation, upStation, distance));
     }
 
     public static Line newInstance(String name, String color, Station downStation, Station upStation, Long distance) {
@@ -110,5 +110,14 @@ public class Line {
                 .filter(section ->
                         section.contains(downStation, upStation))
                 .findFirst().orElseThrow(SectionNotFoundException::new);
+    }
+
+    public void addSection(Section section) {
+        sections.add(section);
+        downStation = section.getDownStation();
+    }
+
+    public void addDistance(Long distance) {
+        this.distance += distance;
     }
 }

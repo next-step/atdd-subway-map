@@ -2,11 +2,13 @@ package subway.dto;
 
 public class SectionResponse {
     private Long id;
+    private Long distance;
     StationResponse downStation;
     StationResponse upStation;
 
-    public SectionResponse(Long id, StationResponse downStationResponse, StationResponse upStationResponse) {
+    public SectionResponse(Long id, Long distance, StationResponse downStationResponse, StationResponse upStationResponse) {
         this.id = id;
+        this.distance = distance;
         this.downStation = downStationResponse;
         this.upStation = upStationResponse;
     }

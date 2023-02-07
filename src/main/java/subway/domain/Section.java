@@ -48,10 +48,10 @@ public class Section {
     protected Section() {
 
     }
-    public Section(Line line, Station upStation, Station downStation, Long distance) {
+    public Section(Line line, Station downStation, Station upStation, Long distance) {
         this.line = line;
-        this.upStation = upStation;
         this.downStation = downStation;
+        this.upStation = upStation;
         this.distance = distance;
     }
 
