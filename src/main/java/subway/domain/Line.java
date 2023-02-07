@@ -104,15 +104,17 @@ public class Line {
         this.distance = new Distance(distance);
     }
 
-    public void updateDownStation(final Station station) {
-        this.downStation = station;
-    }
-
     public boolean isNotEqualDownStation(final Station station) {
         return !this.downStation.equals(station);
     }
 
-    public void canDeleteSection(final List<Section> sections, final Station station) {
+    public void setDeleteSection(final Section deleteSection, final List<Section> lineSections, final Station station) {
+        canDeleteSection(lineSections, station);
+        updateDownStation(deleteSection.getUpStation().orElseThrow(SectionConstraintException::new));
+        minusDistance(deleteSection.getDistance());
+    }
+
+    private void canDeleteSection(final List<Section> sections, final Station station) {
         validateDeleteSectionEqualLineDownStation(this, station);
         validateLineContainMoreDefaultSection(this, sections);
     }
@@ -125,11 +127,24 @@ public class Line {
 
     private void validateLineContainMoreDefaultSection(final Line line, final List<Section> sections) {
         List<Station> stations = sections.stream()
-                .map(Section::getStation)
+                .filter(section -> section.getUpStation().isPresent())
+                .map(section -> section.getUpStation().get())
                 .collect(Collectors.toUnmodifiableList());
 
         if (stations.equals(line.getStations())) {
             throw new SectionConstraintException();
         }
+    }
+
+    private void minusDistance(final Distance distance) {
+        this.distance.minus(distance);
+    }
+
+    public void updateDownStation(final Station station) {
+        this.downStation = station;
+    }
+
+    public void plusDistance(final Distance distance) {
+        this.distance.plus(distance);
     }
 }

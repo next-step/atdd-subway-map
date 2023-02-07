@@ -9,7 +9,6 @@ import static subway.section.SectionRestAssured.구간_제거;
 import static subway.station.StationRestAssured.역_생성;
 
 import io.restassured.RestAssured;
-import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,7 +40,6 @@ public class SectionAcceptanceTest {
     private Long upStationId;
     private Long downStationId;
     private Long registerStationId;
-    private String registerStationName;
     private String lineLocation;
     private int distance;
 
@@ -55,9 +53,7 @@ public class SectionAcceptanceTest {
         databaseCleanup.truncateTable();
         upStationId = 역_생성("상행역").jsonPath().getLong("id");
         downStationId = 역_생성("하행역").jsonPath().getLong("id");
-        JsonPath jsonPath = 역_생성("새로운역").jsonPath();
-        registerStationId = jsonPath.getLong("id");
-        registerStationName = jsonPath.getString("name");
+        registerStationId = 역_생성("새로운역").jsonPath().getLong("id");
         lineLocation = 노선_생성("2호선", "bg-red-600", upStationId, downStationId, distance)
                 .header(HttpHeaders.LOCATION);
         lineId = Location_조회(lineLocation).jsonPath().getLong("id");
@@ -83,14 +79,14 @@ public class SectionAcceptanceTest {
             assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
             // then
-            구간_등록_검증(lineId, registerStationId, registerStationName, downStationId);
+            구간_등록_검증(lineId, registerStationId, downStationId);
         }
 
         /**
          * When 노선에 구간을 등록했을 때 구간의 상행역이 해당 노선에 하행역이 아닐 경우
          * Then 에러 처리한다.
          */
-        @DisplayName("노노선에 구간을 등록했을 때 구간의 상행역이 해당 노선에 하행역이 아닐 경우 에러 처리한다.")
+        @DisplayName("노선에 구간을 등록했을 때 구간의 상행역이 해당 노선에 하행역이 아닐 경우 에러 처리한다.")
         @Test
         void registerSection_Error_SectionUpStationIsNotLineDownStation() {
             // when
@@ -108,8 +104,7 @@ public class SectionAcceptanceTest {
         @Test
         void registerSection_Error_SectionDownStationAlreadyRegisteredSection() {
             // when
-            노선_생성("새로운 노선", "bg-red-599", registerStationId, upStationId, 50)
-                    .header(HttpHeaders.LOCATION);
+            노선_생성("새로운 노선", "색깔", registerStationId, downStationId, 10);
 
             ExtractableResponse<Response> response = 구간_등록(lineId, registerStationId, downStationId, distance);
 
@@ -141,16 +136,18 @@ public class SectionAcceptanceTest {
         }
 
         /**
+         * Given 구간을 생성하고
          * When 제거할 구간이 노선의 하행 종점역이 아닌 경우
          * Then 에러 처리한다.
          */
         @DisplayName("제거할 구간이 노선의 하행 종점역이 아닌 경우 에러 처리한다.")
         @Test
         void removeSection_Error_RemoveSectionIsNotDownStation() {
-            // when
+            // given
             구간_등록(lineId, registerStationId, downStationId, distance);
 
-            ExtractableResponse<Response> response = 구간_제거(lineId, upStationId);
+            // when
+            ExtractableResponse<Response> response = 구간_제거(lineId, downStationId);
 
             // then
             assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -163,6 +160,9 @@ public class SectionAcceptanceTest {
         @DisplayName("구간 제거시 노선에 상행 종점역과 하행 종점역만 있는 경우 에러 처리한다.")
         @Test
         void removeSection_Error_LineOnlyHasUpStationAndDownStation() {
+            // given
+            구간_등록(lineId, registerStationId, downStationId, distance);
+
             // when
             ExtractableResponse<Response> response = 구간_제거(lineId, downStationId);
 

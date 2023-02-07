@@ -14,7 +14,7 @@ import subway.domain.StationRepository;
 import subway.dto.LineCreateRequest;
 import subway.dto.LineEditRequest;
 import subway.dto.LineResponse;
-import subway.dto.SectionResponse;
+import subway.dto.StationResponse;
 import subway.exception.LineNotFoundException;
 
 @Transactional(readOnly = true)
@@ -42,14 +42,12 @@ public class LineService {
         Line line = lineRepository.findByIdWithStation(lineId)
                 .orElseThrow(LineNotFoundException::new);
 
-        List<Section> sections = sectionRepository.findAllByStation(line.getStations());
-
-        return LineResponse.by(line, SectionResponse.by(sections));
+        return LineResponse.by(line, StationResponse.by(line.getStations()));
     }
 
     public List<LineResponse> getList() {
         return lineRepository.findAllWithStation().stream()
-                .map(line -> LineResponse.by(line, SectionResponse.by(sectionRepository.findAllByLine(line))))
+                .map(line -> LineResponse.by(line, StationResponse.by(line.getStations())))
                 .collect(Collectors.toUnmodifiableList());
     }
 
@@ -58,10 +56,9 @@ public class LineService {
         Line line = convertToLineBy(lineCreateRequest);
         lineRepository.save(line);
 
-        Section upStationSection = new Section(null, line.getUpStation(), line.getDownStation(), line);
-        Section downStationSection = new Section(line.getUpStation(), line.getDownStation(), null, line);
-
-        sectionRepository.saveAll(List.of(upStationSection, downStationSection));
+        Section section
+                = new Section(lineCreateRequest.getDistance(), line.getUpStation(), line.getDownStation(), line);
+        sectionRepository.save(section);
 
         return line.getId();
     }

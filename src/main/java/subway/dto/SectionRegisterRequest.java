@@ -1,10 +1,10 @@
 package subway.dto;
 
-public class RegisterSectionRequest {
+public class SectionRegisterRequest {
 
     private String downStationId;
     private String upStationId;
-    private Long distance;
+    private Integer distance;
 
     public Long getDownStationId() {
         return Long.parseLong(downStationId);
@@ -14,7 +14,7 @@ public class RegisterSectionRequest {
         return Long.parseLong(upStationId);
     }
 
-    public Long getDistance() {
+    public Integer getDistance() {
         return distance;
     }
 }

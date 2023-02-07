@@ -34,6 +34,19 @@ public class SectionRestAssured {
                 .extract();
     }
 
+    public static ExtractableResponse<Response> 구간_조회(
+            final Long lineId,
+            final Long stationId
+    ) {
+        return RestAssured
+                .given().log().all()
+                .param("stationId",stationId)
+                .when()
+                .get(SECTION_BASE_PATH, lineId)
+                .then().log().all()
+                .extract();
+    }
+
     public static ExtractableResponse<Response> 구간_제거(
             final Long lineId,
             final Long stationId

@@ -24,4 +24,12 @@ public class Distance {
     public int getValue() {
         return value;
     }
+
+    public void plus(Distance distance) {
+        this.value += distance.getValue();
+    }
+
+    public void minus(Distance distance) {
+        this.value -= distance.getValue();
+    }
 }

@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import subway.domain.SectionRepository;
 import subway.domain.Station;
 import subway.domain.StationRepository;
 import subway.dto.StationRequest;
@@ -16,11 +15,9 @@ import subway.exception.StationNotFoundException;
 public class StationService {
 
     private final StationRepository stationRepository;
-    private final SectionRepository sectionRepository;
 
-    public StationService(final StationRepository stationRepository, final SectionRepository sectionRepository) {
+    public StationService(final StationRepository stationRepository) {
         this.stationRepository = stationRepository;
-        this.sectionRepository = sectionRepository;
     }
 
     @Transactional
@@ -39,8 +36,6 @@ public class StationService {
     public void deleteStationById(final Long id) {
         Station station = stationRepository.findById(id)
                 .orElseThrow(StationNotFoundException::new);
-
-        sectionRepository.deleteAllByStation(station);
 
         stationRepository.delete(station);
     }

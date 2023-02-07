@@ -1,14 +1,14 @@
 package subway.domain;
 
 import java.util.Optional;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
-import javax.validation.constraints.NotNull;
-import subway.exception.SectionConstraintException;
 
 @Entity
 public class Section {
@@ -17,14 +17,13 @@ public class Section {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
+    @Embedded
+    private Distance distance;
+
+    @ManyToOne
     private Station upStation;
 
-    @NotNull
-    @OneToOne
-    private Station station;
-
-    @OneToOne
+    @ManyToOne
     private Station downStation;
 
     @OneToOne(fetch = FetchType.LAZY)
@@ -33,26 +32,24 @@ public class Section {
     protected Section() {
     }
 
-    public Section(final Station station, final Station upStation, final Line line) {
-        this.station = station;
-        this.line = line;
+    public Section(final int distance, final Station upStation, final Station downStation, final Line line) {
+        this.distance = new Distance(distance);
         this.upStation = upStation;
-        line.updateDownStation(station);
-    }
-
-    public Section(final Station upStation, final Station station, final Station downStation, final Line line) {
-        this.upStation = upStation;
-        this.station = station;
         this.downStation = downStation;
         this.line = line;
+        line.updateDownStation(downStation);
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public Distance getDistance() {
+        return distance;
     }
 
     public Optional<Station> getUpStation() {
         return Optional.ofNullable(upStation);
-    }
-
-    public Station getStation() {
-        return station;
     }
 
     public Optional<Station> getDownStation() {
@@ -63,19 +60,11 @@ public class Section {
         return Optional.ofNullable(line);
     }
 
-    public Section updateDownStation(final Station station, final Station upStation) {
-        if (line.isNotEqualDownStation(upStation)) {
-            throw new SectionConstraintException();
-        }
-        this.downStation = station;
-        return new Section(station, upStation, this.line);
-    }
-
     public void detachLine() {
         this.line = null;
     }
 
-    public boolean equalStation(final Station station) {
-        return this.station.equals(station);
+    public boolean isEqualDownStation(final Station station) {
+        return this.downStation.equals(station);
     }
 }

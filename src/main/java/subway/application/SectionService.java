@@ -1,6 +1,7 @@
 package subway.application;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.application.util.Finder;
@@ -10,7 +11,8 @@ import subway.domain.Section;
 import subway.domain.SectionRepository;
 import subway.domain.Station;
 import subway.domain.StationRepository;
-import subway.dto.RegisterSectionRequest;
+import subway.dto.SectionRegisterRequest;
+import subway.dto.SectionResponse;
 import subway.exception.LineNotFoundException;
 import subway.exception.SectionConstraintException;
 import subway.exception.SectionNotFoundException;
@@ -37,49 +39,81 @@ public class SectionService {
         this.finder = finder;
     }
 
+    public SectionResponse getSection(final Long lineId, final Long stationId) {
+        Line line = lineRepository.findById(lineId)
+                .orElseThrow(LineNotFoundException::new);
+
+        Station station = stationRepository.findById(stationId)
+                .orElseThrow(StationNotFoundException::new);
+
+        Section section = sectionRepository.findByLineAndDownStation(line, station)
+                .orElseThrow(SectionNotFoundException::new);
+
+        return SectionResponse.by(section);
+    }
+
     @Transactional
-    public void registerSection(final Long lineId, final RegisterSectionRequest registerSectionRequest) {
+    public void registerSection(final Long lineId, final SectionRegisterRequest sectionRegisterRequest) {
         Line line = lineRepository.findByIdWithStation(lineId)
                 .orElseThrow(LineNotFoundException::new);
 
-        List<Station> stations = stationRepository.findAllById(
-                List.of(registerSectionRequest.getDownStationId(), registerSectionRequest.getUpStationId())
-        );
+        Section section = createSection(sectionRegisterRequest, line);
 
-        Station downStation = finder.findStationById(stations, registerSectionRequest.getDownStationId());
-        Station upStation = finder.findStationById(stations, registerSectionRequest.getUpStationId());
-
-        validateRegisterDownStation(line, downStation);
-
-        Section section = sectionRepository.findByStationAndLine(line.getDownStation(), line)
-                .orElseThrow(SectionNotFoundException::new)
-                .updateDownStation(downStation, upStation);
+        line.plusDistance(section.getDistance());
 
         sectionRepository.save(section);
     }
 
-    private void validateRegisterDownStation(final Line line, final Station downStation) {
-        sectionRepository.findByStation(downStation).flatMap(Section::getDownStation)
-                .flatMap(station -> sectionRepository.findByStationAndLine(station, line))
-                .ifPresent(station -> {
-                    throw new SectionConstraintException();
-                });
+    private Section createSection(final SectionRegisterRequest sectionRegisterRequest, final Line line) {
+        List<Station> stations = stationRepository.findAllById(
+                List.of(sectionRegisterRequest.getDownStationId(), sectionRegisterRequest.getUpStationId())
+        );
+
+        Station downStation = finder.findStationById(stations, sectionRegisterRequest.getDownStationId());
+        Station upStation = finder.findStationById(stations, sectionRegisterRequest.getUpStationId());
+
+        validateRegisterSection(line, downStation, upStation);
+
+        return new Section(sectionRegisterRequest.getDistance(), upStation, downStation, line);
+    }
+
+    private void validateRegisterSection(final Line line, final Station downStation, final Station upStation) {
+        if (line.isNotEqualDownStation(upStation) || isLineStationsContainDownStation(line, downStation)) {
+            throw new SectionConstraintException();
+        }
+    }
+
+    private boolean isLineStationsContainDownStation(final Line line, final Station downStation) {
+        List<Station> lineStations = getLineStations(line);
+        return sectionRepository.findByUpStation(downStation).stream()
+                .filter(section -> section.getDownStation().isPresent())
+                .map(section -> section.getDownStation().get())
+                .anyMatch(lineStations::contains);
+    }
+
+    private List<Station> getLineStations(final Line line) {
+        List<Station> lineStations = sectionRepository.findAllByLine(line).stream()
+                .filter(section -> section.getDownStation().isPresent())
+                .map(section -> section.getDownStation().get())
+                .collect(Collectors.toList());
+
+        lineStations.add(line.getUpStation());
+
+        return lineStations;
     }
 
     @Transactional
     public void deleteSection(final Long lineId, final Long stationId) {
-        Line line = lineRepository.findById(lineId).orElseThrow(LineNotFoundException::new);
+        Line line = lineRepository.findByIdWithStation(lineId).orElseThrow(LineNotFoundException::new);
         Station station = stationRepository.findById(stationId).orElseThrow(StationNotFoundException::new);
         List<Section> sections = sectionRepository.findAllByLine(line);
 
-        line.canDeleteSection(sections, station);
-
         Section section = sections.stream()
-                .filter(s -> s.equalStation(station))
+                .filter(s -> s.isEqualDownStation(station))
                 .findAny()
-                .orElseThrow(SectionNotFoundException::new);
+                .orElseThrow(IllegalArgumentException::new);
 
-        line.updateDownStation(section.getUpStation().orElseThrow(SectionConstraintException::new));
+        line.setDeleteSection(section, sections, station);
 
         sectionRepository.delete(section);
     }

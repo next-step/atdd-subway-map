@@ -17,7 +17,8 @@ import subway.application.SectionService;
 import subway.dto.LineEditRequest;
 import subway.dto.LineCreateRequest;
 import subway.dto.LineResponse;
-import subway.dto.RegisterSectionRequest;
+import subway.dto.SectionRegisterRequest;
+import subway.dto.SectionResponse;
 
 @RestController
 public class LineController {
@@ -65,12 +66,22 @@ public class LineController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/lines/{lineId}/sections")
+    public ResponseEntity<SectionResponse> showSection(
+            @PathVariable final Long lineId,
+            @RequestParam(name = "stationId") final Long stationId
+    ) {
+        SectionResponse sectionResponse = sectionService.getSection(lineId, stationId);
+        return ResponseEntity.ok()
+                .body(sectionResponse);
+    }
+
     @PostMapping("/lines/{lineId}/sections")
     public ResponseEntity registerSection(
             @PathVariable final Long lineId,
-            @RequestBody @Valid RegisterSectionRequest registerSectionRequest
+            @RequestBody @Valid SectionRegisterRequest sectionRegisterRequest
     ) {
-        sectionService.registerSection(lineId, registerSectionRequest);
+        sectionService.registerSection(lineId, sectionRegisterRequest);
         return ResponseEntity.created(showLineUriBy(lineId)).build();
     }
 
