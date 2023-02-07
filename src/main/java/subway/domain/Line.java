@@ -55,7 +55,7 @@ public class Line {
     }
 
     public void addSection(Section section) {
-        if(!isEqualsLineDownStationAndSectionUpStation(section.getUpStation()))
+        if(!isLineDownStationEqualsSectionUpStation(section.getUpStation()))
             throw new DomainException(DomainExceptionType.UPDOWN_STATION_MISS_MATCH);
 
         if(isContainStation(section.getDownStation()))
@@ -67,12 +67,8 @@ public class Line {
         lineDistance += section.getSectionDistance();
     }
 
-    public Integer getSectionCount() {
-        return sections.getSectionCount();
-    }
-
     public void deleteSection(Station station) {
-        if(isLineDownStation(station))
+        if(!isLineDownStation(station))
             throw new DomainException(DomainExceptionType.NOT_DOWN_STATION);
 
         if(hasOnlyOneSection())
@@ -84,8 +80,8 @@ public class Line {
         sections.deletionSection(station);
     }
 
-    private boolean isEqualsLineDownStationAndSectionUpStation(Station newSectionUpStation){
-        return this.getDownStationId() == newSectionUpStation.getId();
+    private boolean isLineDownStationEqualsSectionUpStation(Station newSectionUpStation){
+        return this.downStationId == newSectionUpStation.getId();
     }
 
     private boolean isContainStation(Station station){

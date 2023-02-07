@@ -75,8 +75,8 @@ public class LineService {
     public void addSection(Long lineId, AddSectionRequest request) {
         Line line = findLine(lineId);
 
-        Station upStation = findStation(line.getUpStationId());
-        Station downStation = findStation(line.getDownStationId());
+        Station upStation = findStation(request.getUpStationId());
+        Station downStation = findStation(request.getDownStationId());
 
         line.addSection(new Section(lineId, upStation, downStation, request.getDistance()));
     }
@@ -86,7 +86,6 @@ public class LineService {
         Line line = findLine(lineId);
 
         Station station = findStation(stationId);
-
 
         line.deleteSection(station);
     }
