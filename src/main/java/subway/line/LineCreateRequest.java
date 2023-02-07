@@ -9,6 +9,6 @@ public class LineCreateRequest {
     private String color;
     private Long upStationId;
     private Long downStationId;
-    private Integer distance;
+    private int distance;
 
 }

@@ -29,7 +29,7 @@ public class LineStation {
     @JoinColumn(name = "line_id", nullable = false)
     private Line line;
 
-    private Integer distance;
+    private int distance;
 
     public void changeLine(final Line line) {
         this.line = line;
