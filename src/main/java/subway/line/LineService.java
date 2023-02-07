@@ -1,5 +1,6 @@
 package subway.line;
 
+import lombok.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
 import subway.*;
@@ -9,22 +10,11 @@ import java.util.stream.*;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class LineService {
 
     private final LineRepository lineRepository;
     private final StationFindEntityService stationFindEntityService;
-    private final LineFindEntityService lineFindEntityService;
-
-    public LineService(
-            final LineRepository lineRepository,
-            final StationFindEntityService stationFindEntityService,
-            final LineFindEntityService lineFindEntityService
-    ) {
-
-        this.lineRepository = lineRepository;
-        this.stationFindEntityService = stationFindEntityService;
-        this.lineFindEntityService = lineFindEntityService;
-    }
 
     public void createLine(final LineCreateRequest lineCreateRequest) {
         final var upStation = stationFindEntityService.getById(lineCreateRequest.getUpStationId());
@@ -35,27 +25,26 @@ public class LineService {
                 .color(lineCreateRequest.getColor())
                 .build();
 
-        ;
-        line.addLineStation(
-                LineStation.builder()
-                        .station(upStation)
-                        .distance(lineCreateRequest.getDistance())
-                        .build()
-        );
-
-        line.addLineStation(
-                LineStation.builder()
-                        .station(downStation)
-                        .distance(lineCreateRequest.getDistance())
-                        .build()
-        );
+        final var lineStation = LineStation.builder()
+                .line(line)
+                .upStation(upStation)
+                .downStation(downStation)
+                .distance(lineCreateRequest.getDistance())
+                .build();
+        line.addLineStation(lineStation);
 
         lineRepository.save(line);
     }
 
-    public LineResponse getById(final Long lineId) {
+    @Transactional(readOnly = true)
+    public LineResponse getLine(final Long lineId) {
 
-        return LineResponse.from(lineFindEntityService.getById(lineId));
+        return LineResponse.from(getById(lineId));
+    }
+
+    private Line getById(final Long lineId) {
+        return lineRepository.findById(lineId)
+                .orElseThrow(NoSuchElementException::new);
     }
 
     public List<LineResponse> getAll() {
@@ -68,8 +57,11 @@ public class LineService {
 
     public void editLine(final Long lineId, final LineEditRequest lineEditRequest) {
 
-        final var line = lineFindEntityService.getById(lineId)
-                .change(lineEditRequest.getName(), lineEditRequest.getColor());
+        final var line = getById(lineId)
+                .change(
+                        lineEditRequest.getName(),
+                        lineEditRequest.getColor()
+                );
         lineRepository.save(line);
     }
 

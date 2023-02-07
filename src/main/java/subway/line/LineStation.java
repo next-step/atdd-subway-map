@@ -18,8 +18,12 @@ public class LineStation {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "station_id", nullable = false)
-    private Station station;
+    @JoinColumn(name = "up_station_id", nullable = false)
+    private Station upStation;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "down_station_id", nullable = false)
+    private Station downStation;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "line_id", nullable = false)

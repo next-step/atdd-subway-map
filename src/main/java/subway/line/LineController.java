@@ -25,7 +25,7 @@ public class LineController {
     @GetMapping("/{lineId}")
     public LineResponse getLine(@PathVariable final Long lineId) {
 
-        return lineService.getById(lineId);
+        return lineService.getLine(lineId);
     }
 
     @GetMapping
