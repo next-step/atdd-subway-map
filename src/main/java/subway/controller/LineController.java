@@ -39,7 +39,13 @@ public class LineController {
 
     @PatchMapping("/lines/{id}")
     public ResponseEntity patchLine(@PathVariable Long id, @RequestBody LinePatchResponse linePatchResponse) {
-        lineService.updateLine(id, linePatchResponse);
+        lineService.updateLineById(id, linePatchResponse);
         return new ResponseEntity(HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("/lines/{id}")
+    public ResponseEntity deleteLine(@PathVariable Long id) {
+        lineService.deleteLineById(id);
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 }
