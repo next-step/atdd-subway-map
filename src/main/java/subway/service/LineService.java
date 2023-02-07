@@ -52,10 +52,9 @@ public class LineService {
     }
 
     @Transactional
-    public void updateLine(Long id, LinePatchResponse linePatchResponse) {
+    public void updateLineById(Long id, LinePatchResponse linePatchResponse) {
         Line line = findLineById(id);
         line.update(linePatchResponse.getName(), linePatchResponse.getColor());
     }
-
 
 }
