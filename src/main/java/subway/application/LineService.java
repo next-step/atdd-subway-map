@@ -2,7 +2,6 @@ package subway.application;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.domain.Line;
@@ -40,7 +39,7 @@ public class LineService {
 
     public LineResponse getBy(final Long lineId) {
         Line line = lineRepository.findByIdWithStation(lineId)
-                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 노선입니다."));
+                .orElseThrow(LineNotFoundException::new);
 
         List<Section> sections = sectionRepository.findAllByStation(line.getStations());
 
@@ -98,7 +97,7 @@ public class LineService {
 
     private Line findLineBy(final Long lineId) {
         return lineRepository.findById(lineId)
-                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 노선입니다."));
+                .orElseThrow(LineNotFoundException::new);
     }
 
     @Transactional
