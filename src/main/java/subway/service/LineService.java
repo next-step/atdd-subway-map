@@ -85,17 +85,10 @@ public class LineService {
     public void deleteSection(Long lineId, Long stationId) {
         Line line = findLine(lineId);
 
-        if (line.getDownStationId() != stationId)
-            throw new DomainException(DomainExceptionType.NOT_DOWN_STATION);
+        Station station = findStation(stationId);
 
-        if (line.getSectionCount() == 1)
-            throw new DomainException(DomainExceptionType.CANT_DELETE_SECTION);
 
-        Optional<Station> station = stationRepository.findById(stationId);
-
-        if (station.isEmpty()) throw new DomainException(DomainExceptionType.NO_STATION);
-
-        line.deleteSection(station.get());
+        line.deleteSection(station);
     }
 
     private Station findStation(Long stationId){

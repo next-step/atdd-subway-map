@@ -72,8 +72,15 @@ public class Line {
     }
 
     public void deleteSection(Station station) {
-        this.downStationId =
-                sections.getSectionByDownStatoinId(station.getId()).getUpStation().getId();
+        if(isLineDownStation(station))
+            throw new DomainException(DomainExceptionType.NOT_DOWN_STATION);
+
+        if(hasOnlyOneSection())
+            throw new DomainException(DomainExceptionType.CANT_DELETE_SECTION);
+
+        Section targetSection = sections.getSectionByDownStatoinId(station.getId());
+        this.lineDistance -= targetSection.getSectionDistance();
+        this.downStationId = targetSection.getUpStation().getId();
         sections.deletionSection(station);
     }
 
@@ -83,5 +90,13 @@ public class Line {
 
     private boolean isContainStation(Station station){
         return getStationList().contains(station);
+    }
+
+    private boolean hasOnlyOneSection(){
+        return sections.getSectionCount() == 1;
+    }
+
+    private boolean isLineDownStation(Station station){
+        return this.downStationId == station.getId();
     }
 }
