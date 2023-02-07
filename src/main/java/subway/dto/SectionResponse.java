@@ -2,47 +2,46 @@ package subway.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
+import subway.domain.Distance;
 import subway.domain.Section;
 import subway.domain.Station;
 
 @JsonInclude(Include.NON_NULL)
 public class SectionResponse {
 
-    private final Long id;
-    private final String name;
+    private Long id;
+    private Integer distance;
     private Long upStationId;
     private Long downStationId;
 
     public SectionResponse(
-            final Station station,
+            final Long id,
+            final Distance distance,
             final Optional<Station> upStation,
             final Optional<Station> downStation
     ) {
-        this.id = station.getId();
-        this.name = station.getName();
+        this.id = id;
+        this.distance = distance.getValue();
         this.upStationId = upStation.map(Station::getId).orElse(null);
         this.downStationId = downStation.map(Station::getId).orElse(null);
     }
 
-    public static List<SectionResponse> by(final List<Section> sections) {
-        return sections.stream()
-                .map(section -> new SectionResponse(
-                        section.getStation(),
-                        section.getUpStation(),
-                        section.getDownStation())
-                )
-                .collect(Collectors.toUnmodifiableList());
+    public static SectionResponse by(final Section section) {
+        return new SectionResponse(
+                section.getId(),
+                section.getDistance(),
+                section.getUpStation(),
+                section.getDownStation()
+        );
     }
 
     public Long getId() {
         return id;
     }
 
-    public String getName() {
-        return name;
+    public int getDistance() {
+        return distance;
     }
 
     public Long getUpStationId() {
