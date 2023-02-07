@@ -18,12 +18,12 @@ public class Line {
     private String color;
 
     @ManyToOne(fetch = LAZY, cascade = PERSIST)
-    @JoinColumn(name = "upStation_id")
-    private Station upStation;
-
-    @ManyToOne(fetch = LAZY, cascade = PERSIST)
     @JoinColumn(name = "downStation_id")
     private Station downStation;
+
+    @ManyToOne(fetch = LAZY, cascade = PERSIST)
+    @JoinColumn(name = "upStation_id")
+    private Station upStation;
 
     private Long distance;
 
@@ -55,15 +55,15 @@ public class Line {
         return distance;
     }
 
-    public Line(String name, String color, Station upStation, Station downStation, Long distance) {
+    public Line(String name, String color, Station downStation, Station upStation, Long distance) {
         this.name = name;
         this.color = color;
-        this.upStation = upStation;
         this.downStation = downStation;
+        this.upStation = upStation;
         this.distance = distance;
     }
 
-    public static void validateStations(Long upStationId, Long downStationId) {
+    public static void validateStations(Long downStationId, Long upStationId) {
         if (upStationId == null || downStationId == null) {
             throw new StationNotFoundException();
         }

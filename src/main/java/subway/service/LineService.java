@@ -16,7 +16,6 @@ import subway.repository.StationRepository;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static subway.domain.Line.validateStations;
 import static subway.service.StationService.createStationResponse;
 
 @Service
@@ -33,10 +32,10 @@ public class LineService {
 
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
-        Station upStation = stationRepository.findById(lineRequest.getUpStationId()).orElseThrow(StationNotFoundException::new);
         Station downStation = stationRepository.findById(lineRequest.getDownStationId()).orElseThrow(StationNotFoundException::new);
+        Station upStation = stationRepository.findById(lineRequest.getUpStationId()).orElseThrow(StationNotFoundException::new);
 
-        Line line = lineRepository.save(lineRequest.toEntity(upStation, downStation));
+        Line line = lineRepository.save(lineRequest.toEntity(downStation, upStation));
 
         return createLineResponse(line);
     }

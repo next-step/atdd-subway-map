@@ -44,12 +44,12 @@ public class LineRequest {
         return new LineRequest(name, color, upStationId, downStationId, distance);
     }
 
-    public Line toEntity(Station upStation, Station downStation) {
+    public Line toEntity(Station downStation, Station upStation) {
         return new Line(
                 this.name,
                 this.color,
-                upStation,
                 downStation,
+                upStation,
                 this.distance
         );
     }
