@@ -1,9 +1,10 @@
 package subway.line;
 
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.exception.LineNotFoundException;
+import subway.section.Section;
+import subway.section.SectionRepository;
 import subway.station.Station;
 import subway.station.StationResponse;
 import subway.station.StationService;
@@ -16,39 +17,46 @@ import java.util.stream.Collectors;
 public class LineService {
     private final LineRepository lineRepository;
     private final StationService stationService;
+    private final SectionRepository sectionRepository;
 
-    public LineService(LineRepository lineRepository, StationService stationService) {
+    public LineService(LineRepository lineRepository, StationService stationService, SectionRepository sectionRepository) {
         this.lineRepository = lineRepository;
         this.stationService = stationService;
+        this.sectionRepository = sectionRepository;
     }
 
     @Transactional
     public LineResponse saveLine(LineCreateRequest lineRequest) {
         Station upStation = stationService.findStation(lineRequest.getUpStationId());
         Station downStation = stationService.findStation(lineRequest.getDownStationId());
-
         Line line = new Line(lineRequest.getName(), lineRequest.getColor(), lineRequest.getDistance(), upStation, downStation);
         Line newLine = lineRepository.save(line);
         return new LineResponse(newLine.getId(), newLine.getName(), newLine.getColor(),
-                makeStationResponses(upStation, downStation));
+                makeStationResponses(newLine.getStations()));
     }
 
+    @Transactional
     public List<LineResponse> findAllLines() {
         List<Line> lines = lineRepository.findAll();
         return lines.stream().map(line -> {
             return new LineResponse(line.getId(), line.getName(), line.getColor(),
-                    makeStationResponses(line.getUpStation(), line.getDownStation()));
+                    makeStationResponses(line.getStations()));
         }).collect(Collectors.toList());
     }
 
     public LineResponse findLine(Long id) {
         Line line = lineRepository.findById(id)
                 .orElseThrow(LineNotFoundException::new);
-        return new LineResponse(line.getId(), line.getName(), line.getColor(), makeStationResponses(line.getUpStation(), line.getDownStation()));
+        return new LineResponse(line.getId(), line.getName(), line.getColor(), makeStationResponses(line.getStations()));
+    }
+
+    public Line findOneById(Long id) {
+        return lineRepository.findById(id)
+                .orElseThrow(LineNotFoundException::new);
     }
 
     @Transactional
-    public void updateLine(Long id, LineCreateRequest lineRequest) {
+    public void updateLine(Long id, LineUpdateRequest lineRequest) {
         Line line = lineRepository.findById(id)
                 .orElseThrow(LineNotFoundException::new);
         line.changeNameAndColor(lineRequest.getName(), lineRequest.getColor());
@@ -62,7 +70,9 @@ public class LineService {
         lineRepository.deleteById(id);
     }
 
-    private static List<StationResponse> makeStationResponses(Station line, Station line1) {
-        return List.of(StationResponse.of(line), StationResponse.of(line1));
+    private static List<StationResponse> makeStationResponses(List<Station> stations) {
+        return stations.stream()
+                .map(StationResponse::of)
+                .collect(Collectors.toList());
     }
 }
