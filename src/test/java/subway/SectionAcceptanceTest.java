@@ -10,8 +10,7 @@ import org.springframework.http.HttpStatus;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.global.error.exception.ErrorCode.ALREADY_REGISTERED_STAION;
-import static subway.global.error.exception.ErrorCode.STATION_NOT_FINAL;
+import static subway.global.error.exception.ErrorCode.*;
 import static subway.response.LineAcceptanceTestUtils.*;
 import static subway.response.SectionAcceptanceTestUtils.*;
 import static subway.response.StationAcceptanceTestUtils.createStation;
@@ -126,5 +125,19 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         //then
         assertThat(deleteSectionResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(deleteSectionResponse.jsonPath().getList("errorMessages")).contains(STATION_NOT_FINAL.getMessage());
+    }
+
+    /**
+     * when 지하철 노선에 상행 종점역과 하행 종점역만 있는 경우 지하철 역을 삭제하면
+     * Then STATION_LESS_THAN_TWO 예외발생
+     */
+    @DisplayName("지하철 구간 삭제 예외처리2 - 지하철 노선에 상행 종점역과 하행 종점역만 있는 경우(구간이 1개인 경우) 역을 삭제할 수 없다.")
+    @Test
+    void deleteSection_exception2() {
+        //when
+        ExtractableResponse<Response> deleteSectionResponse = deleteSectionResponse(line1Id, station2Id);
+        //then
+        assertThat(deleteSectionResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(deleteSectionResponse.jsonPath().getList("errorMessages")).contains(STATION_LESS_THAN_TWO.getMessage());
     }
 }
