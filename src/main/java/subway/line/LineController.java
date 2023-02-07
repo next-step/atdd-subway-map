@@ -1,5 +1,6 @@
 package subway.line;
 
+import lombok.*;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
@@ -7,13 +8,10 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/lines")
+@RequiredArgsConstructor
 public class LineController {
 
     private final LineService lineService;
-
-    public LineController(LineService lineService) {
-        this.lineService = lineService;
-    }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
