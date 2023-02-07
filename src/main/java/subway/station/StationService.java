@@ -2,9 +2,12 @@ package subway.station;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.line.LineNotFoundException;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static subway.station.StationResponse.createStationResponse;
 
 @Service
 @Transactional(readOnly = true)
@@ -23,7 +26,7 @@ public class StationService {
 
     public List<StationResponse> findAllStations() {
         return stationRepository.findAll().stream()
-                .map(this::createStationResponse)
+                .map(StationResponse::createStationResponse)
                 .collect(Collectors.toList());
     }
 
@@ -32,16 +35,14 @@ public class StationService {
         stationRepository.deleteById(id);
     }
 
-    private StationResponse createStationResponse(Station station) {
-        return new StationResponse(
-                station.getId(),
-                station.getName()
-        );
-    }
-
     public List<StationResponse> findStationsByIds(List<Long> stationIds) {
         return stationRepository.findAllById(stationIds).stream()
-                .map(this::createStationResponse)
+                .map(StationResponse::createStationResponse)
                 .collect(Collectors.toList());
+    }
+
+    public Station findStationByStationId(Long stationId) {
+        return stationRepository.findById(stationId)
+                .orElseThrow(() -> new LineNotFoundException(stationId));
     }
 }

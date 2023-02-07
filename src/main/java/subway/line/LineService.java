@@ -2,6 +2,9 @@ package subway.line;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.section.Section;
+import subway.station.Station;
+import subway.station.StationResponse;
 import subway.station.StationService;
 
 import java.util.List;
@@ -21,14 +24,17 @@ public class LineService {
     }
 
     public LineResponse saveLine(LineRequest lineRequest) {
+        Station upStation = stationService.findStationByStationId(lineRequest.getUpStationId());
+        Station downStation = stationService.findStationByStationId(lineRequest.getDownStationId());
+
         final var line = lineRepository.save(
                 new Line(lineRequest.getName(),
                         lineRequest.getColor(),
-                        lineRequest.getUpStationId(),
-                        lineRequest.getDownStationId(),
+                        upStation,
+                        downStation,
                         lineRequest.getDistance()));
 
-        return createLineResponse(line);
+        return createLineResponse(null);
     }
 
     @Transactional(readOnly = true)
@@ -61,11 +67,16 @@ public class LineService {
     }
 
     private LineResponse createLineResponse(Line line) {
+        List<Station> stations = line.getSections().getSections().stream()
+                .map(Section::getDownStation)
+                .collect(Collectors.toList());
+
         return new LineResponse(
                 line.getId(),
                 line.getName(),
                 line.getColor(),
-                stationService.findStationsByIds(
-                        List.of(line.getUpStationId(), line.getDownStationId())));
+                stations.stream()
+                        .map(StationResponse::createStationResponse)
+                        .collect(Collectors.toList()));
     }
 }
