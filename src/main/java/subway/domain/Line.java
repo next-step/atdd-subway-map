@@ -1,6 +1,7 @@
 package subway.domain;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -8,6 +9,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import org.springframework.util.StringUtils;
+import subway.exception.SectionConstraintException;
 
 @Entity
 public class Line {
@@ -102,5 +104,26 @@ public class Line {
 
     public boolean equalDownStation(final Station station) {
         return this.stations.equalDownStation(station);
+    }
+
+    public void canDeleteSection(final List<Section> sections, final Station station) {
+        validateDeleteSectionEqualLineDownStation(this, station);
+        validateLineContainMoreDefaultSection(this, sections);
+    }
+
+    private static void validateDeleteSectionEqualLineDownStation(final Line line, final Station station) {
+        if (!line.equalDownStation(station)) {
+            throw new SectionConstraintException();
+        }
+    }
+
+    private void validateLineContainMoreDefaultSection(final Line line, final List<Section> sections) {
+        List<Station> stations = sections.stream()
+                .map(Section::getStation)
+                .collect(Collectors.toUnmodifiableList());
+
+        if (stations.equals(line.getStations())) {
+            throw new SectionConstraintException();
+        }
     }
 }

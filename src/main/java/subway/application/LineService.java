@@ -18,6 +18,7 @@ import subway.dto.SectionResponse;
 import subway.exception.LineNotFoundException;
 import subway.exception.SectionConstraintException;
 import subway.exception.SectionNotFoundException;
+import subway.exception.StationNotFoundException;
 
 @Transactional(readOnly = true)
 @Service
@@ -49,7 +50,7 @@ public class LineService {
     public List<LineResponse> getList() {
         return lineRepository.findAllWithStation().stream()
                 .map(line -> LineResponse.by(
-                        line, SectionResponse.by(sectionRepository.findAllByLineOrderByUpStation(line))
+                        line, SectionResponse.by(sectionRepository.findAllByLine(line))
                 ))
                 .collect(Collectors.toUnmodifiableList());
     }
@@ -88,7 +89,7 @@ public class LineService {
     public void delete(final Long lineId) {
         Line line = findLineBy(lineId);
 
-        sectionRepository.findAllByLineOrderByUpStation(line)
+        sectionRepository.findAllByLine(line)
                 .forEach(Section::detachLine);
 
         lineRepository.delete(line);
@@ -133,5 +134,23 @@ public class LineService {
                 .filter(station -> station.getId() == stationId)
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("노선 지하철 정보가 올바르지 않습니다."));
+    }
+
+    @Transactional
+    public void deleteSection(final Long lineId, final Long stationId) {
+        Line line = lineRepository.findById(lineId).orElseThrow(LineNotFoundException::new);
+        Station station = stationRepository.findById(stationId).orElseThrow(StationNotFoundException::new);
+        List<Section> sections = sectionRepository.findAllByLine(line);
+
+        line.canDeleteSection(sections, station);
+
+        Section section = sections.stream()
+                .filter(s -> s.equalStation(station))
+                .findAny()
+                .orElseThrow(SectionNotFoundException::new);
+
+        line.updateDownStation(section.getUpStation().orElseThrow(SectionConstraintException::new));
+
+        sectionRepository.delete(section);
     }
 }

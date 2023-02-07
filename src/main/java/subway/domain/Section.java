@@ -74,4 +74,8 @@ public class Section {
     public void detachLine() {
         this.line = null;
     }
+
+    public boolean equalStation(final Station station) {
+        return this.station.equals(station);
+    }
 }

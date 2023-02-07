@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import subway.application.LineService;
 import subway.dto.LineEditRequest;
@@ -72,5 +73,14 @@ public class LineController {
 
     private static URI showLineUriBy(final Long lineId) {
         return URI.create("/lines/" + lineId);
+    }
+
+    @DeleteMapping("/lines/{lineId}/sections")
+    public ResponseEntity deleteSection(
+            @PathVariable final Long lineId,
+            @RequestParam(name = "stationId") final Long stationId
+    ) {
+        lineService.deleteSection(lineId, stationId);
+        return ResponseEntity.noContent().build();
     }
 }

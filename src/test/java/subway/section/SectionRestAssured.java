@@ -33,4 +33,17 @@ public class SectionRestAssured {
                 .then().log().all()
                 .extract();
     }
+
+    public static ExtractableResponse<Response> 구간_제거(
+            final Long lineId,
+            final Long stationId
+    ) {
+        return RestAssured
+                .given().log().all()
+                .param("stationId",stationId)
+                .when()
+                .delete(SECTION_BASE_PATH, lineId)
+                .then().log().all()
+                .extract();
+    }
 }

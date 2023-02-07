@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 
 public interface SectionRepository extends JpaRepository<Section, Long> {
 
-    List<Section> findAllByLineOrderByUpStation(Line line);
+    List<Section> findAllByLine(Line line);
 
     Optional<Section> findByStation(Station station);
 

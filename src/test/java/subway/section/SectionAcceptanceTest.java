@@ -5,6 +5,7 @@ import static subway.line.LineRestAssured.Location_조회;
 import static subway.line.LineRestAssured.노선_생성;
 import static subway.section.SectionAssert.구간_등록_검증;
 import static subway.section.SectionRestAssured.구간_등록;
+import static subway.section.SectionRestAssured.구간_제거;
 import static subway.station.StationRestAssured.역_생성;
 
 import io.restassured.RestAssured;
@@ -41,6 +42,7 @@ public class SectionAcceptanceTest {
     private Long downStationId;
     private Long registerStationId;
     private String registerStationName;
+    private String lineLocation;
     private int distance;
 
     public SectionAcceptanceTest(final DatabaseCleanup databaseCleanup) {
@@ -56,7 +58,7 @@ public class SectionAcceptanceTest {
         JsonPath jsonPath = 역_생성("새로운역").jsonPath();
         registerStationId = jsonPath.getLong("id");
         registerStationName = jsonPath.getString("name");
-        String lineLocation = 노선_생성("2호선", "bg-red-600", upStationId, downStationId, distance)
+        lineLocation = 노선_생성("2호선", "bg-red-600", upStationId, downStationId, distance)
                 .header(HttpHeaders.LOCATION);
         lineId = Location_조회(lineLocation).jsonPath().getLong("id");
         distance = 10;
@@ -121,13 +123,21 @@ public class SectionAcceptanceTest {
     class RemoveSectionTest {
 
         /**
+         * Given 구간을 생성하고
          * When 노선의 구간을 제거하면
          * Then 노선의 하행 종점역은 제거한 구간의 상행역이어야 한다.
          */
         @DisplayName("노선의 구간을 제거한다.")
         @Test
         void removeSection() {
+            // given
+            구간_등록(lineId, registerStationId, downStationId, distance);
 
+            // when
+            구간_제거(lineId, registerStationId);
+
+            // then
+            assertThat(Location_조회(lineLocation).jsonPath().getLong("stations.id[1]")).isEqualTo(downStationId);
         }
 
         /**
@@ -137,7 +147,13 @@ public class SectionAcceptanceTest {
         @DisplayName("제거할 구간이 노선의 하행 종점역이 아닌 경우 에러 처리한다.")
         @Test
         void removeSection_Error_RemoveSectionIsNotDownStation() {
+            // when
+            구간_등록(lineId, registerStationId, downStationId, distance);
 
+            ExtractableResponse<Response> response = 구간_제거(lineId, upStationId);
+
+            // then
+            assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         }
 
         /**
@@ -147,7 +163,11 @@ public class SectionAcceptanceTest {
         @DisplayName("구간 제거시 노선에 상행 종점역과 하행 종점역만 있는 경우 에러 처리한다.")
         @Test
         void removeSection_Error_LineOnlyHasUpStationAndDownStation() {
+            // when
+            ExtractableResponse<Response> response = 구간_제거(lineId, downStationId);
 
+            // then
+            assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         }
     }
 }
