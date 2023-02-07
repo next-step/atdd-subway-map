@@ -55,7 +55,6 @@ public class Line {
         this.downStation = downStation;
     }
 
-    // == 생성 메서드 ==
     public static Line createLine(final String name, final String color,
                                   final Long distance, final Station upStation, final Station downStation) {
         Line line = Line.builder()
@@ -70,20 +69,28 @@ public class Line {
         return line;
     }
 
-    // == 연관관계 편의 메서드 ==
     private static void createSections(final Long distance, final Line line,
                                        final Station upStation, final Station downStation) {
         Section section = Section.createSection(line, upStation, downStation, distance);
-        line.getSections().createSection(section);
+        line.getSections().createFirstSection(section);
     }
 
 
-    // == 비즈니스 로직 ==
+    /**
+     * 지하철 노선 정보를 수정합니다.
+     *
+     * @param line 수정할 지하철 노선 정보
+     */
     public void updateLine(final Line line) {
         this.name = line.getName();
         this.color = line.getColor();
     }
 
+    /**
+     * 지하철 노선의 하행 종점역을 수정합니다.
+     *
+     * @param station 수정할 하행 종점역 정보
+     */
     public void changeDownStation(final Station station) {
         if (this.downStation.equals(station)) {
             return;

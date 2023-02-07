@@ -1,40 +1,23 @@
 package subway.line.application.dto.request;
 
+import lombok.Builder;
 import lombok.Getter;
-import subway.line.domain.Line;
-import subway.station.domain.Station;
 
 @Getter
 public class LineCreateRequest {
-    private String name;
-    private String color;
-    private Long upStationId;
-    private Long downStationId;
-    private Long distance;
+    private final String name;
+    private final String color;
+    private final Long upStationId;
+    private final Long downStationId;
+    private final Long distance;
 
-    public LineCreateRequest(final String name, final String color,
+    @Builder
+    private LineCreateRequest(final String name, final String color,
                              final Long upStationId, final Long downStationId, final Long distance) {
         this.name = name;
         this.color = color;
         this.upStationId = upStationId;
         this.downStationId = downStationId;
         this.distance = distance;
-    }
-
-    public Line toEntity(final Station upStation, final Station downStation) {
-        return Line.builder()
-                .name(getName())
-                .color(getColor())
-                .upStation(upStation)
-                .downStation(downStation)
-                .build();
-    }
-
-    public SectionCreateRequest toSectionCreateRequest() {
-        return SectionCreateRequest.builder()
-                .upStationId(getUpStationId())
-                .downStationId(getDownStationId())
-                .distance(getDistance())
-                .build();
     }
 }
