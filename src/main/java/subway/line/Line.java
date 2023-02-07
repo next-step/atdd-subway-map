@@ -14,6 +14,8 @@ import java.util.List;
 
 @Entity
 public class Line {
+    private static final int MIN_SECTION_SIZE = 1;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -66,27 +68,58 @@ public class Line {
     }
 
     public void addLineSection(Station upStation, Station downStation, int distance) {
-        validStation(upStation, downStation);
+        validAddStation(upStation, downStation);
         this.sections.add(new Section(this, upStation, downStation, distance));
     }
 
     private Station getFinalStation() {
-        return this.sections.get(this.sections.size() - 1).getDownStation();
+        return getFinalSection().getDownStation();
     }
 
-    private void validStation(Station upStation, Station downStation) {
-        validUpStation(upStation);
-        validDownStation(downStation);
+    private Section getFinalSection() {
+        return this.sections.get(this.sections.size() - 1);
     }
 
-    private void validUpStation(Station upStation) {
-        if (!getFinalStation().equals(upStation)) {
+    private void validAddStation(Station upStation, Station downStation) {
+        validAddUpStation(upStation);
+        validAddDownStation(downStation);
+    }
+
+    private void validAddUpStation(Station upStation) {
+        if (!isFinalStation(upStation)) {
             throw new IllegalArgumentException();
         }
     }
 
-    private void validDownStation(Station downStation) {
+    private void validAddDownStation(Station downStation) {
         if (getStations().contains(downStation)) {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    private boolean isFinalStation(Station station) {
+        return getFinalStation().equals(station);
+    }
+
+    private boolean isFinalStation(Long stationId) {
+        return getFinalStation().getId().equals(stationId);
+    }
+
+    public void removeLineSection(Long stationId) {
+        validSectionSize();
+        validRemoveStation(stationId);
+
+        this.sections.remove(getFinalSection());
+    }
+
+    private void validSectionSize() {
+        if (this.sections.size() <= MIN_SECTION_SIZE) {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    private void validRemoveStation(Long stationId) {
+        if (!isFinalStation(stationId)) {
             throw new IllegalArgumentException();
         }
     }

@@ -17,7 +17,6 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static subway.line.LineAcceptanceTest.getLineParams;
 import static subway.line.LineAcceptanceTest.지하철_노선_생성_요청;
 import static subway.line.LineAcceptanceTest.지하철_노선_조회_요청;
@@ -137,9 +136,11 @@ public class LineSectionAcceptanceTest extends AcceptanceTest {
         신분당선_id = 지하철_노선_생성_요청(createLineParams).jsonPath().getLong(ID);
         지하철_노선에_지하철_구간_등록_요청(신분당선_id, 판교역_id, 정자역_id, 3);
 
-        // when & then
-                assertThatThrownBy(() -> 지하철_노선에_지하철_구간_제거_요청(신분당선_id, 판교역_id))
-                .isInstanceOf(RuntimeException.class);
+        // when
+        ExtractableResponse<Response> removeLineSectionResponse = 지하철_노선에_지하철_구간_제거_요청(신분당선_id, 판교역_id);
+
+        // then
+        assertThat(removeLineSectionResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
     /**
@@ -153,9 +154,11 @@ public class LineSectionAcceptanceTest extends AcceptanceTest {
         // given
         신분당선_id = 지하철_노선_생성_요청(createLineParams).jsonPath().getLong(ID);
 
-        // when & then
-        assertThatThrownBy(() -> 지하철_노선에_지하철_구간_제거_요청(신분당선_id, 판교역_id))
-                .isInstanceOf(RuntimeException.class);
+        // when
+        ExtractableResponse<Response> removeLineSectionResponse = 지하철_노선에_지하철_구간_제거_요청(신분당선_id, 판교역_id);
+
+        // then
+        assertThat(removeLineSectionResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
     public static Map<String, String> getSectionParams(Long upStationId, Long downStationId, int distance) {
