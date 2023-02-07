@@ -64,7 +64,7 @@ public class Section {
     }
 
     public Section updateDownStation(final Station station, final Station upStation) {
-        if (!line.equalDownStation(upStation)) {
+        if (line.isNotEqualDownStation(upStation)) {
             throw new SectionConstraintException();
         }
         this.downStation = station;

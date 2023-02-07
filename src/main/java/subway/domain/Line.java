@@ -5,9 +5,11 @@ import java.util.stream.Collectors;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 import org.springframework.util.StringUtils;
 import subway.exception.SectionConstraintException;
 
@@ -24,8 +26,11 @@ public class Line {
     @Column(nullable = false)
     private String color;
 
-    @Embedded
-    private Stations stations;
+    @OneToOne(fetch = FetchType.LAZY)
+    private Station upStation;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    private Station downStation;
 
     @Embedded
     private Distance distance;
@@ -42,7 +47,8 @@ public class Line {
     ) {
         this.name = name;
         this.color = color;
-        this.stations = new Stations(upStation, downStation);
+        this.upStation = upStation;
+        this.downStation = downStation;
         this.distance = new Distance(distance);
     }
 
@@ -55,7 +61,7 @@ public class Line {
     }
 
     public List<Station> getStations() {
-        return List.of(stations.getUpStation(), stations.getDownStation());
+        return List.of(upStation, downStation);
     }
 
     public String getColor() {
@@ -67,11 +73,11 @@ public class Line {
     }
 
     public Station getUpStation() {
-        return stations.getUpStation();
+        return upStation;
     }
 
     public Station getDownStation() {
-        return stations.getDownStation();
+        return downStation;
     }
 
     public void modify(final String name, final String color, final int distance) {
@@ -99,11 +105,11 @@ public class Line {
     }
 
     public void updateDownStation(final Station station) {
-        stations.updateDownStation(station);
+        this.downStation = station;
     }
 
-    public boolean equalDownStation(final Station station) {
-        return this.stations.equalDownStation(station);
+    public boolean isNotEqualDownStation(final Station station) {
+        return !this.downStation.equals(station);
     }
 
     public void canDeleteSection(final List<Section> sections, final Station station) {
@@ -111,8 +117,8 @@ public class Line {
         validateLineContainMoreDefaultSection(this, sections);
     }
 
-    private static void validateDeleteSectionEqualLineDownStation(final Line line, final Station station) {
-        if (!line.equalDownStation(station)) {
+    private void validateDeleteSectionEqualLineDownStation(final Line line, final Station station) {
+        if (line.isNotEqualDownStation(station)) {
             throw new SectionConstraintException();
         }
     }
