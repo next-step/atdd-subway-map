@@ -17,9 +17,9 @@ public class LineController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public void createLine(@RequestBody final LineCreateRequest lineCreateRequest) {
+    public LineResponse createLine(@RequestBody final LineCreateRequest lineCreateRequest) {
 
-        lineService.createLine(lineCreateRequest);
+        return lineService.createLine(lineCreateRequest);
     }
 
     @GetMapping("/{lineId}")

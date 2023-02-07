@@ -4,7 +4,6 @@ import io.restassured.response.*;
 import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.*;
 import org.springframework.http.*;
-import org.springframework.test.context.jdbc.*;
 
 import java.util.*;
 
@@ -13,7 +12,6 @@ import static org.assertj.core.api.Assertions.*;
 import static subway.given.GivenStationApi.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@Sql("/truncate.sql")
 public class LineAcceptanceTest {
 
     private static final String LINE_PATH = "/lines";
@@ -37,17 +35,16 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선 등록")
     void createLine() throws Exception {
         // Given
-        final ExtractableResponse<Response> createResponse = createLine(LINE_1, UP_STATION_ID_1, UP_STATION_ID_2);
+        final ExtractableResponse<Response> response = createLine(LINE_1, UP_STATION_ID_1, UP_STATION_ID_2);
 
         // Then
-        assertThat(createResponse.statusCode()).isEqualTo(201);
+        assertThat(response.statusCode()).isEqualTo(201);
 
-        final var findResponse = getById();
-        assertThat(findResponse.jsonPath().getLong("id")).isEqualTo(1L);
-        assertThat(findResponse.jsonPath().getString("name")).isEqualTo(LINE_1);
-        assertThat(findResponse.jsonPath().getString("color")).isEqualTo(BG_COLOR_600);
-        assertThat(findResponse.jsonPath().getString("stations[0].name")).isEqualTo(STATION_1);
-        assertThat(findResponse.jsonPath().getString("stations[1].name")).isEqualTo(STATION_2);
+        assertThat(response.jsonPath().getLong("id")).isEqualTo(1L);
+        assertThat(response.jsonPath().getString("name")).isEqualTo(LINE_1);
+        assertThat(response.jsonPath().getString("color")).isEqualTo(BG_COLOR_600);
+        assertThat(response.jsonPath().getString("stations[0].name")).isEqualTo(STATION_1);
+        assertThat(response.jsonPath().getString("stations[1].name")).isEqualTo(STATION_2);
     }
 
     private static ExtractableResponse<Response> getById() {

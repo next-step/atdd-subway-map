@@ -16,7 +16,7 @@ public class LineService {
     private final LineRepository lineRepository;
     private final StationService stationService;
 
-    public void createLine(final LineCreateRequest lineCreateRequest) {
+    public LineResponse createLine(final LineCreateRequest lineCreateRequest) {
         final var upStation = stationService.getById(lineCreateRequest.getUpStationId());
         final var downStation = stationService.getById(lineCreateRequest.getDownStationId());
 
@@ -33,7 +33,7 @@ public class LineService {
                 .build();
         line.addLineStation(lineStation);
 
-        lineRepository.save(line);
+        return LineResponse.from(lineRepository.save(line));
     }
 
     @Transactional(readOnly = true)
