@@ -46,19 +46,19 @@ public class SectionService {
                 List.of(registerSectionRequest.getDownStationId(), registerSectionRequest.getUpStationId())
         );
 
-        Station station = finder.findStationById(stations, registerSectionRequest.getDownStationId());
+        Station downStation = finder.findStationById(stations, registerSectionRequest.getDownStationId());
         Station upStation = finder.findStationById(stations, registerSectionRequest.getUpStationId());
 
-        validateRegisterStation(line, station);
+        validateRegisterDownStation(line, downStation);
 
         Section section = sectionRepository.findByStationAndLine(line.getDownStation(), line)
                 .orElseThrow(SectionNotFoundException::new)
-                .updateDownStation(station, upStation);
+                .updateDownStation(downStation, upStation);
 
         sectionRepository.save(section);
     }
 
-    private void validateRegisterStation(final Line line, final Station downStation) {
+    private void validateRegisterDownStation(final Line line, final Station downStation) {
         sectionRepository.findByStation(downStation).flatMap(Section::getDownStation)
                 .flatMap(station -> sectionRepository.findByStationAndLine(station, line))
                 .ifPresent(station -> {

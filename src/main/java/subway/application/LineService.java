@@ -49,9 +49,7 @@ public class LineService {
 
     public List<LineResponse> getList() {
         return lineRepository.findAllWithStation().stream()
-                .map(line -> LineResponse.by(
-                        line, SectionResponse.by(sectionRepository.findAllByLine(line))
-                ))
+                .map(line -> LineResponse.by(line, SectionResponse.by(sectionRepository.findAllByLine(line))))
                 .collect(Collectors.toUnmodifiableList());
     }
 
@@ -59,17 +57,19 @@ public class LineService {
     public Long save(final LineCreateRequest lineCreateRequest) {
         Line line = convertToLineBy(lineCreateRequest);
         lineRepository.save(line);
+
         Section upStationSection = new Section(null, line.getUpStation(), line.getDownStation(), line);
         Section downStationSection = new Section(line.getUpStation(), line.getDownStation(), null, line);
+
         sectionRepository.saveAll(List.of(upStationSection, downStationSection));
+
         return line.getId();
     }
 
-    private Line convertToLineBy(
-            final LineCreateRequest lineCreateRequest
-    ) {
+    private Line convertToLineBy(final LineCreateRequest lineCreateRequest) {
         List<Station> stations = stationRepository
                 .findAllById(List.of(lineCreateRequest.getUpStationId(), lineCreateRequest.getDownStationId()));
+
         return new Line(
                 lineCreateRequest.getName(),
                 lineCreateRequest.getColor(),
@@ -82,6 +82,7 @@ public class LineService {
     @Transactional
     public void edit(final Long lineId, final LineEditRequest lineEditRequest) {
         Line line = findLineBy(lineId);
+
         line.modify(lineEditRequest.getName(), lineEditRequest.getColor(), lineEditRequest.getDistance());
     }
 
