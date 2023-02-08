@@ -32,10 +32,21 @@ public class Line {
     }
 
     public Long removeSection(Long stationId) {
+        isRemoveValidation(stationId);
         Section lastSection = getLastSection();
         sections.remove(lastSection);
 
         return lastSection.getId();
+    }
+
+    private void isRemoveValidation(Long stationId) {
+        if (sections.size() < 2) {
+            throw new IllegalArgumentException(ONLY_ONE_SECTION);
+        }
+
+        if (!getDownStation().getId().equals(stationId)) {
+            throw new IllegalArgumentException(NOT_DELETE_LAST_STATION);
+        }
     }
 
     public void addSection(Section section) {

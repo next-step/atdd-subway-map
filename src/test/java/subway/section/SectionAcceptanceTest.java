@@ -7,8 +7,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import subway.common.AcceptanceTest;
 
-import static subway.common.constants.ErrorConstant.ALREADY_ENROLL_STATION;
-import static subway.common.constants.ErrorConstant.NOT_ADD_LAST_STATION;
+import static subway.common.constants.ErrorConstant.*;
 import static subway.utils.AssertUtil.*;
 import static subway.utils.LineUtil.createLineResultResponse;
 import static subway.utils.LineUtil.showLineResultResponse;
@@ -111,5 +110,50 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         // Then
         JsonPath line = showLineResultResponse(lineId);
         assertEqualToSections(line, new String[]{"역삼역"}, new String[]{"강남역"}, 7);
+    }
+
+    /**
+     * Given 노선을 생성한다.
+     * When 마지막이 아닌 구간을 삭제한다.
+     * Then 에러가 발생한다.
+     */
+    @Test
+    @DisplayName("지하철 삭제등록 실패 - 마지막이 아닌 구간")
+    void deleteSection_failure_notLastStation() {
+        // Given
+        Long upStationId = createStationResultResponse("강남역").getLong("id");
+        Long downStationId = createStationResultResponse("역삼역").getLong("id");
+        Long newStationId = createStationResultResponse("선릉역").getLong("id");
+
+        Long lineId = createLineResultResponse("2호선", "bg-green-600", upStationId, downStationId, 7).getLong("id");
+
+        addSectionResponse(lineId, downStationId, newStationId, 3);
+
+        // When
+        ExtractableResponse<Response> response = deleteSectionResponse(lineId, 2L);
+
+        // Then
+        assertFailBadRequest(response, NOT_DELETE_LAST_STATION);
+    }
+
+    /**
+     * Given 노선을 생성한다.
+     * When 1개의 구간만 가지는 노선의 구간 삭제
+     * Then 에러가 발생한다.
+     */
+    @Test
+    @DisplayName("지하철 구간삭제 실패 - 구간이 1개")
+    void deleteSection_failure_onlyOneStation() {
+        // Given
+        Long upStationId = createStationResultResponse("강남역").getLong("id");
+        Long downStationId = createStationResultResponse("역삼역").getLong("id");
+
+        Long lineId = createLineResultResponse("2호선", "bg-green-600", upStationId, downStationId, 7).getLong("id");
+
+        // When
+        ExtractableResponse<Response> response = deleteSectionResponse(lineId, 2L);
+
+        // Then
+        assertFailBadRequest(response, ONLY_ONE_SECTION);
     }
 }
