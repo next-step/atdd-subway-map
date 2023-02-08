@@ -26,4 +26,12 @@ public class SectionUtil {
         param.put("distance", distance);
         return param;
     }
+
+    public static ExtractableResponse<Response> deleteSectionResponse(Long lineId, Long stationId) {
+        return RestAssured
+                .given().log().all().params("stationId", stationId)
+                .when().delete("/lines/{id}/sections", lineId)
+                .then().log().all()
+                .extract();
+    }
 }

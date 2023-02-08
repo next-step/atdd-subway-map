@@ -25,6 +25,11 @@ public class SectionService {
         return sectionRepository.save(toSectionEntity(sectionRequest));
     }
 
+    @Transactional
+    public void deleteSection(Long id) {
+        sectionRepository.deleteById(id);
+    }
+
     private Section toSectionEntity(SectionRequest sectionRequest) {
         Station downStation = stationService.findStation(sectionRequest.getDownStationId());
         Station upStation = stationService.findStation(sectionRequest.getUpStationId());

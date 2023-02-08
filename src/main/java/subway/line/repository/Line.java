@@ -31,6 +31,13 @@ public class Line {
         setSection(section);
     }
 
+    public Long removeSection(Long stationId) {
+        Section lastSection = getLastSection();
+        sections.remove(lastSection);
+
+        return lastSection.getId();
+    }
+
     public void addSection(Section section) {
         isAddValidation(section);
         setSection(section);
@@ -57,7 +64,11 @@ public class Line {
     }
 
     private Station getDownStation() {
-        return sections.get(sections.size() - 1).getDownStation();
+        return getLastSection().getDownStation();
+    }
+
+    private Section getLastSection() {
+        return sections.get(sections.size() - 1);
     }
 
     protected Line() {}

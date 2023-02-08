@@ -13,6 +13,7 @@ import static subway.utils.AssertUtil.*;
 import static subway.utils.LineUtil.createLineResultResponse;
 import static subway.utils.LineUtil.showLineResultResponse;
 import static subway.utils.SectionUtil.addSectionResponse;
+import static subway.utils.SectionUtil.deleteSectionResponse;
 import static subway.utils.StationUtil.createStationResultResponse;
 
 @DisplayName("지하철 구간 관련 기능")
@@ -84,5 +85,31 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 
         // Then
         assertFailBadRequest(response, ALREADY_ENROLL_STATION);
+    }
+
+    /**
+     * Given 노선에 구간을 등록한다.
+     * When 등록한 구간을 삭제한다.
+     * Then 노선의 구간 목록에서 찾을 수 없다.
+     */
+    @Test
+    @DisplayName("지하철 구간 삭제")
+    void deleteSection() {
+        // Given
+        Long upStationId = createStationResultResponse("강남역").getLong("id");
+        Long downStationId = createStationResultResponse("역삼역").getLong("id");
+        Long newStationId = createStationResultResponse("선릉역").getLong("id");
+
+        Long lineId = createLineResultResponse("2호선", "bg-green-600", upStationId, downStationId, 7).getLong("id");
+
+        addSectionResponse(lineId, downStationId, newStationId, 3);
+
+        // When
+        ExtractableResponse<Response> response = deleteSectionResponse(lineId, 3L);
+        assertSuccessNoContent(response);
+
+        // Then
+        JsonPath line = showLineResultResponse(lineId);
+        assertEqualToSections(line, new String[]{"역삼역"}, new String[]{"강남역"}, 7);
     }
 }

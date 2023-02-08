@@ -67,6 +67,13 @@ public class LineService {
         line.addSection(section);
     }
 
+    @Transactional
+    public void deleteSection(Long id, Long stationId) {
+        Line line = findLine(id);
+        Long removeSectionId = line.removeSection(stationId);
+        sectionService.deleteSection(removeSectionId);
+    }
+
     private Line toLineEntity(LineRequest lineRequest) {
         Section section = sectionService.createSection(toSectionRequest(lineRequest));
 
