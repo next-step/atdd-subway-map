@@ -148,10 +148,11 @@ class SectionAcceptanceTest extends AcceptanceTestHelper {
         assertThat(상태코드_추출(response)).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(에러메시지_추출(response)).isEqualTo(SubwayErrorCode.ONLY_LAST_SEGMENT_CAN_BE_REMOVED.getMessage());
     }
+
     /**
      * Given -> 지하철 노선 생성 후
-     * When -> 구간을 등록하고
-     * Then -> 해당 노선에서 하행 종점역을 제거하면 해당 노선 조회 시 삭제된 구간을 찾을 수 없다.
+     * When -> 구간을 삭제한다.
+     * Then -> (구간이 1개인 경우) 예외가 발생한다.
      */
     @Test
     @DisplayName("지하철 노선에 상행 종점역과 하행 종점역만 있는 경우(구간이 1개인 경우) 역을 삭제할 수 없다.")
@@ -160,8 +161,10 @@ class SectionAcceptanceTest extends AcceptanceTestHelper {
         var createResponse = 지하철노선_생성(삼호선_요청);
         String location = 경로_추출(createResponse);
 
-        // Then -> 해당 노선에서 하행 종점역을 제거하면 해당 노선 조회 시 삭제된 구간을 찾을 수 없다.
+        // When -> 구간을 삭제한다.
         var response = 구간_삭제(location, 양재역_ID).extract();
+
+        // Then -> (구간이 1개인 경우) 예외가 발생한다.
         assertThat(상태코드_추출(response)).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(에러메시지_추출(response)).isEqualTo(SubwayErrorCode.CANNOT_DELETE_LAST_STATION.getMessage());
     }
@@ -172,8 +175,8 @@ class SectionAcceptanceTest extends AcceptanceTestHelper {
 
     private ValidatableResponse 구간_삭제(String path, long stationId) {
         return RestAssured.given()
-                .param("stationId", stationId).
-                when()
+                .param("stationId", stationId)
+                .when()
                 .delete(path + SECTION_PATH).
                 then().log().all();
     }
