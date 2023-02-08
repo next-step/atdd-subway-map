@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static subway.line.LineRestAssured.Location_조회;
 import static subway.line.LineRestAssured.노선_생성;
 import static subway.section.SectionAssert.구간_등록_검증;
+import static subway.section.SectionAssert.구간_조회_검증;
 import static subway.section.SectionRestAssured.구간_등록;
 import static subway.section.SectionRestAssured.구간_제거;
 import static subway.station.StationRestAssured.역_생성;
@@ -134,7 +135,7 @@ public class SectionAcceptanceTest {
             구간_제거(lineId, registerStationId);
 
             // then
-            assertThat(Location_조회(lineLocation).jsonPath().getLong("stations.id[1]")).isEqualTo(downStationId);
+            구간_조회_검증(lineLocation, downStationId);
         }
 
         /**
