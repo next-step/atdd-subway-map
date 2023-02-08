@@ -43,6 +43,10 @@ public class Line {
         sections.add(section);
     }
 
+    public void removeSection(Long stationId) {
+        sections.removeSection(stationId);
+    }
+
     public Long getId() {
         return id;
     }

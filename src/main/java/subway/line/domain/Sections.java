@@ -23,6 +23,9 @@ public class Sections {
     }
 
     public Sections(List<Section> elements) {
+        if (elements.size() == 0) {
+            throw new IllegalArgumentException();
+        }
         this.elements = elements;
     }
 
@@ -43,7 +46,7 @@ public class Sections {
             throw new IllegalArgumentException("새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없습니다");
         }
 
-        final Section lastSection = elements.get(elements.size() - 1);
+        final Section lastSection = findLastSection();
         if (lastSection.canBeConnect(section)) {
             elements.add(section);
             return;
@@ -55,6 +58,31 @@ public class Sections {
                 section
             )
         );
+    }
+
+    public void removeSection(Long stationId) {
+        if (elements.size() == 1) {
+            throw new IllegalStateException();
+        }
+
+        final Section lastSection = findLastSection();
+        if (lastSection.isSameDownStation(stationId)) {
+            elements.remove(lastSection);
+            return;
+        }
+        throw new IllegalArgumentException();
+    }
+
+    private Section findLastSection() {
+        return elements.stream()
+            .filter(it -> isLastSection(it))
+            .findFirst()
+            .orElseThrow(() -> new IllegalStateException());
+    }
+
+    private boolean isLastSection(Section section) {
+        return elements.stream()
+            .noneMatch(it -> section.canBeConnect(it));
     }
 
     public List<Section> getElements() {

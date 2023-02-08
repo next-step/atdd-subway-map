@@ -14,6 +14,7 @@ import subway.line.application.dto.LineCreateRequest;
 import subway.line.application.dto.LineResponse;
 import subway.line.application.dto.LineUpdateRequest;
 import subway.line.application.dto.SectionAddRequest;
+import subway.line.application.dto.SectionDeleteRequest;
 
 import java.net.URI;
 import java.util.List;
@@ -61,9 +62,15 @@ public class LineController {
     }
 
     @PostMapping("{lineId}/sections")
-    public ResponseEntity<Void> addSection(@PathVariable long lineId, @RequestBody SectionAddRequest request) {
+    public ResponseEntity<Void> addSection(@PathVariable Long lineId, @RequestBody SectionAddRequest request) {
         lineService.addSection(lineId, request);
         return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("{lineId}/sections")
+    public ResponseEntity<Void> removeSection(@PathVariable Long lineId, @RequestBody SectionDeleteRequest request) {
+        lineService.removeSection(lineId, request);
+        return ResponseEntity.noContent().build();
     }
 
 }

@@ -10,7 +10,7 @@ import org.springframework.http.HttpStatus;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DisplayName("지하철 구간 관련 기능 ")
+@DisplayName("지하철 구간 관련 기능")
 class SectionAcceptanceTest extends AcceptanceTest {
 
     private long 강남역Id;
@@ -59,6 +59,60 @@ class SectionAcceptanceTest extends AcceptanceTest {
                 final ExtractableResponse<Response> response = 구간을_추가_요청(이호선Id, 역삼역Id, 잠실역Id, 10);
 
                 assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+            }
+        }
+    }
+
+    @DisplayName("지하철 노선 구간 제거")
+    @Nested
+    class 지하철_노선_구간_제거 {
+
+        @DisplayName("지하철 노선에 등록된 역(하행 종점역)만 제거할 수 있다.")
+        @Nested
+        class 지하철_노선에_등록된_역_하행_종점역_만_제거할_수_있다 {
+
+            @BeforeEach
+            void setUp() {
+                구간을_추가_요청(이호선Id, 역삼역Id, 잠실역Id, 10);
+            }
+
+            @DisplayName("마지막 구간이 아니면 제거할 수 없다.")
+            @Test
+            void 마지막_구간이_아니면_제거할_수_없다() {
+                final ExtractableResponse<Response> response = 구간_삭제_요청(이호선Id, 강남역Id);
+
+                assertThat(response.statusCode()).isNotEqualTo(HttpStatus.OK.value());
+            }
+
+            @DisplayName("마지막 구간이면 제거할 수 있다")
+            @Test
+            void 마지막_구간이면_제거할_수_있다() {
+                final ExtractableResponse<Response> response = 구간_삭제_요청(이호선Id, 잠실역Id);
+
+                assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+            }
+        }
+
+        @DisplayName("지하철 노선에 구간이")
+        @Nested
+        class 지하철_노선에_구간이 {
+
+            @DisplayName("한개가 아닌 경우 삭제할 수 있다")
+            @Test
+            void 한개_가_아닌_경우_삭제할_수_있다() {
+                구간을_추가_요청(이호선Id, 역삼역Id, 잠실역Id, 10);
+
+                final ExtractableResponse<Response> response = 구간_삭제_요청(이호선Id, 잠실역Id);
+
+                assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+            }
+
+            @DisplayName("한개인 경우 삭제할 수 없다")
+            @Test
+            void 한개인_경우_삭제할_수_없다() {
+                final ExtractableResponse<Response> response = 구간_삭제_요청(이호선Id, 잠실역Id);
+
+                assertThat(response.statusCode()).isNotEqualTo(HttpStatus.NO_CONTENT.value());
             }
         }
     }

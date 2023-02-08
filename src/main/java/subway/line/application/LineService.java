@@ -6,6 +6,7 @@ import subway.line.application.dto.LineCreateRequest;
 import subway.line.application.dto.LineResponse;
 import subway.line.application.dto.LineUpdateRequest;
 import subway.line.application.dto.SectionAddRequest;
+import subway.line.application.dto.SectionDeleteRequest;
 import subway.line.domain.Line;
 import subway.line.domain.LineRepository;
 import subway.line.domain.Section;
@@ -94,8 +95,14 @@ public class LineService {
         lineRepository.deleteById(id);
     }
 
-    private Line findById(Long id) {
-        return lineRepository.findById(id)
+    @Transactional
+    public void removeSection(long lineId, SectionDeleteRequest request) {
+        final Line line = findById(lineId);
+        line.removeSection(request.getStationId());
+    }
+
+    private Line findById(Long lineId) {
+        return lineRepository.findById(lineId)
             .orElseThrow(() -> new IllegalArgumentException("노선을 찾을 수 없습니다."));
     }
 

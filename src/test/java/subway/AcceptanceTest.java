@@ -167,4 +167,18 @@ public class AcceptanceTest {
             .extract();
     }
 
+    ExtractableResponse<Response> 구간_삭제_요청(
+        long lineId,
+        long stationId
+    ) {
+        final Map<String, Object> params = Map.of(
+            "stationId", stationId
+        );
+        return RestAssured.given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(params)
+            .when().delete("/lines/{lineId}/sections", lineId)
+            .then().log().all()
+            .extract();
+    }
 }
