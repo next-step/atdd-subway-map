@@ -3,9 +3,10 @@ package subway.line.domain;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import subway.line.domain.exception.SectionAddFailException;
 
-import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class SectionsTest {
 
@@ -28,7 +29,7 @@ class SectionsTest {
         final Sections sections = new Sections(new Section(line, 상행역Id, 2L, 10, stationValidator));
         final Section newSection = new Section(line, 10L, 상행역Id, 10, stationValidator);
 
-        assertThatIllegalArgumentException().isThrownBy(() -> sections.add(newSection));
+        assertThrows(SectionAddFailException.class, () -> sections.add(newSection));
     }
 
     @DisplayName("새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 한다")
@@ -47,7 +48,7 @@ class SectionsTest {
         void 동일하지_않다면_등록_불가능하다() {
             final Section newSection = new Section(line, 3L, 10L, 1, stationValidator);
 
-            assertThatIllegalArgumentException().isThrownBy(() -> sections.add(newSection));
+            assertThrows(SectionAddFailException.class, () -> sections.add(newSection));
         }
     }
 }

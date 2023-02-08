@@ -81,7 +81,7 @@ class SectionAcceptanceTest extends AcceptanceTest {
             void 마지막_구간이_아니면_제거할_수_없다() {
                 final ExtractableResponse<Response> response = 구간_삭제_요청(이호선Id, 강남역Id);
 
-                assertThat(response.statusCode()).isNotEqualTo(HttpStatus.OK.value());
+                assertThat(response.statusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY.value());
             }
 
             @DisplayName("마지막 구간이면 제거할 수 있다")
@@ -112,7 +112,7 @@ class SectionAcceptanceTest extends AcceptanceTest {
             void 한개인_경우_삭제할_수_없다() {
                 final ExtractableResponse<Response> response = 구간_삭제_요청(이호선Id, 잠실역Id);
 
-                assertThat(response.statusCode()).isNotEqualTo(HttpStatus.NO_CONTENT.value());
+                assertThat(response.statusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY.value());
             }
         }
     }
