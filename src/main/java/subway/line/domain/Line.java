@@ -6,15 +6,13 @@ import lombok.NoArgsConstructor;
 import subway.station.domain.Station;
 
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
 import java.util.Objects;
 
-import static javax.persistence.FetchType.LAZY;
+import static javax.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
 @Entity
@@ -23,7 +21,7 @@ import static lombok.AccessLevel.PROTECTED;
 public class Line {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = IDENTITY)
     @Column(name = "line_id")
     private Long id;
 
@@ -33,28 +31,40 @@ public class Line {
     @Column(length = 100, nullable = false)
     private String color;
 
-    @OneToOne(fetch = LAZY)
-    @JoinColumn(name = "up_station_id")
-    private Station upStation;
-
-    @OneToOne(fetch = LAZY)
-    @JoinColumn(name = "down_station_id")
-    private Station downStation;
-
-    @Column(nullable = false)
-    private Long distance;
+    @Embedded
+    private final Sections sections = new Sections();
 
     @Builder
-    private Line(final Long id, final String name, final String color,
-                 final Station upStation, final Station downStation, final Long distance) {
+    private Line(final Long id, final String name, final String color) {
         this.id = id;
         this.name = name;
         this.color = color;
-        this.upStation = upStation;
-        this.downStation = downStation;
-        this.distance = distance;
     }
 
+    public static Line createLine(final String name, final String color,
+                                  final Long distance, Station upStation, Station downStation) {
+        Line line = Line.builder()
+                .name(name)
+                .color(color)
+                .build();
+
+        createSections(distance, line, upStation, downStation);
+
+        return line;
+    }
+
+    private static void createSections(final Long distance, final Line line,
+                                       final Station upStation, final Station downStation) {
+        Section section = Section.createSection(line, upStation, downStation, distance);
+        line.getSections().createFirstSection(section);
+    }
+
+
+    /**
+     * 지하철 노선 정보를 수정합니다.
+     *
+     * @param line 수정할 지하철 노선 정보
+     */
     public void updateLine(final Line line) {
         this.name = line.getName();
         this.color = line.getColor();

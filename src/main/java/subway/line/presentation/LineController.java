@@ -8,10 +8,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import subway.line.application.LineService;
+import subway.line.application.SectionService;
 import subway.line.application.dto.request.LineCreateRequest;
 import subway.line.application.dto.request.LineUpdateRequest;
+import subway.line.application.dto.request.SectionCreateRequest;
 import subway.line.application.dto.response.LineResponse;
 import subway.line.domain.Line;
 
@@ -23,9 +26,11 @@ import java.util.List;
 class LineController {
 
     private final LineService lineService;
+    private final SectionService sectionService;
 
-    LineController(final LineService lineService) {
+    LineController(final LineService lineService, final SectionService sectionService) {
         this.lineService = lineService;
+        this.sectionService = sectionService;
     }
 
     @PostMapping
@@ -64,6 +69,22 @@ class LineController {
     @DeleteMapping("/{lineId}")
     ResponseEntity<Void> deleteLine(@PathVariable final Long lineId) {
         lineService.deleteLine(lineId);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{lineId}/sections")
+    ResponseEntity<Void> createSection(@PathVariable final Long lineId,
+                                       @RequestBody final SectionCreateRequest sectionCreateRequest) {
+        sectionService.saveSection(lineId, sectionCreateRequest);
+
+        return ResponseEntity.created(URI.create("/lines/" + lineId)).build();
+    }
+
+    @DeleteMapping("/{lineId}/sections")
+    ResponseEntity<Void> deleteSection(@PathVariable final Long lineId,
+                                       @RequestParam final Long stationId) {
+        sectionService.deleteSection(lineId, stationId);
 
         return ResponseEntity.noContent().build();
     }

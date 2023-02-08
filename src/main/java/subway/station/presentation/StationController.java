@@ -18,7 +18,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/stations")
-public class StationController {
+class StationController {
     private final StationService stationService;
 
     public StationController(final StationService stationService) {
@@ -26,7 +26,7 @@ public class StationController {
     }
 
     @PostMapping
-    public ResponseEntity<StationResponse> createStation(@RequestBody final StationRequest stationRequest) {
+    ResponseEntity<StationResponse> createStation(@RequestBody final StationRequest stationRequest) {
         Long stationId = stationService.saveStation(stationRequest);
         Station findStation = stationService.findStationById(stationId);
 
@@ -35,7 +35,7 @@ public class StationController {
     }
 
     @GetMapping
-    public ResponseEntity<List<StationResponse>> showStations() {
+    ResponseEntity<List<StationResponse>> showStations() {
         List<Station> findStations = stationService.findAllStations();
 
         return ResponseEntity.ok()
@@ -43,7 +43,7 @@ public class StationController {
     }
 
     @DeleteMapping("/{stationId}")
-    public ResponseEntity<Void> deleteStation(@PathVariable final Long stationId) {
+    ResponseEntity<Void> deleteStation(@PathVariable final Long stationId) {
         stationService.deleteStationById(stationId);
 
         return ResponseEntity.noContent().build();

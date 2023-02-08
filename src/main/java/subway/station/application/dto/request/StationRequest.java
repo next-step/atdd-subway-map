@@ -1,9 +1,23 @@
 package subway.station.application.dto.request;
 
-public class StationRequest {
-    private String name;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import lombok.Builder;
+import lombok.Getter;
+import subway.station.domain.Station;
 
-    public String getName() {
-        return name;
+@Getter
+public class StationRequest {
+    private final String name;
+
+    @JsonCreator
+    @Builder
+    private StationRequest(final String name) {
+        this.name = name;
+    }
+
+    public Station toEntity() {
+        return Station.builder()
+                .name(getName())
+                .build();
     }
 }

@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static subway.common.fixture.FieldFixture.노선_내_역_이름_목록;
 import static subway.common.fixture.FieldFixture.노선_색깔;
 import static subway.common.fixture.FieldFixture.노선_이름;
@@ -81,11 +82,13 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> 지하철_노선_조회_결과 = 지하철_노선_단건_조회_요청(생성된_지하철_노선_id);
 
         // then
-        assertThat(문자열로_데이터_추출(지하철_노선_조회_결과, 노선_이름)).isEqualTo(이호선.노선_이름());
-        assertThat(문자열로_데이터_추출(지하철_노선_조회_결과, 노선_색깔)).isEqualTo(이호선.노선_색깔());
-        assertThat(리스트로_데이터_추출(지하철_노선_조회_결과, 노선_내_역_이름_목록))
-                .hasSize(2)
-                .contains(강남역.역_이름(), 서울대입구역.역_이름());
+        assertAll(
+                () -> assertThat(문자열로_데이터_추출(지하철_노선_조회_결과, 노선_이름)).isEqualTo(이호선.노선_이름()),
+                () -> assertThat(문자열로_데이터_추출(지하철_노선_조회_결과, 노선_색깔)).isEqualTo(이호선.노선_색깔()),
+                () -> assertThat(리스트로_데이터_추출(지하철_노선_조회_결과, 노선_내_역_이름_목록))
+                        .hasSize(2)
+                        .contains(강남역.역_이름(), 서울대입구역.역_이름())
+        );
     }
 
     /**
@@ -106,8 +109,10 @@ class LineAcceptanceTest extends AcceptanceTest {
         // then
         ExtractableResponse<Response> 지하철_노선_단건_조회_결과 = 지하철_노선_단건_조회_요청(생성된_지하철_노선_id);
 
-        assertThat(문자열로_데이터_추출(지하철_노선_단건_조회_결과, 노선_이름)).isEqualTo(사호선.노선_이름());
-        assertThat(문자열로_데이터_추출(지하철_노선_단건_조회_결과, 노선_색깔)).isEqualTo(사호선.노선_색깔());
+        assertAll(
+                () -> assertThat(문자열로_데이터_추출(지하철_노선_단건_조회_결과, 노선_이름)).isEqualTo(사호선.노선_이름()),
+                () -> assertThat(문자열로_데이터_추출(지하철_노선_단건_조회_결과, 노선_색깔)).isEqualTo(사호선.노선_색깔())
+        );
     }
 
     /**
@@ -126,9 +131,10 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> 지하철_노선_삭제_결과 = 지하철_노선_삭제_요청(생성된_지하철_노선_id);
 
         // then
-        assertThat(지하철_노선_삭제_결과.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-        assertThat(지하철_노선_단건_조회_요청(생성된_지하철_노선_id).statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
-
-        assertThat(문자열로_데이터_추출(지하철_노선_목록_조회_요청(), 노선_이름)).doesNotContain(이호선.노선_이름());
+        assertAll(
+                () -> assertThat(지하철_노선_삭제_결과.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value()),
+                () -> assertThat(지하철_노선_단건_조회_요청(생성된_지하철_노선_id).statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value()),
+                () -> assertThat(문자열로_데이터_추출(지하철_노선_목록_조회_요청(), 노선_이름)).doesNotContain(이호선.노선_이름())
+        );
     }
 }

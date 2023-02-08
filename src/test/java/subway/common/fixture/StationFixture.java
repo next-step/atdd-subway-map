@@ -8,6 +8,8 @@ import static subway.common.fixture.FieldFixture.역_이름;
 
 public enum StationFixture {
     강남역,
+    역삼역,
+    선릉역,
     서울대입구역,
     범계역,
     ;

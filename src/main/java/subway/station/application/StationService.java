@@ -23,21 +23,44 @@ public class StationService {
         this.stationCommandRepository = stationCommandRepository;
     }
 
+    /**
+     * 지하철 역 목록 정보를 조회합니다.
+     * 
+     * @return 지하철 역 목록 정보
+     */
     public List<Station> findAllStations() {
         return stationQueryRepository.findAll();
     }
 
+    /**
+     * 지하철 역 상세 정보를 조회합니다.
+     * 
+     * @param stationId 지하철 역 고유 번호
+     * @return 지하철 역 상세 정보
+     */
     public Station findStationById(final Long stationId) {
         return stationQueryRepository.findById(stationId)
                 .orElseThrow(StationNotFoundException::new);
     }
 
+    /**
+     * 지하철 역 정보를 등록합니다.
+     * 
+     * @param stationRequest 등록할 지하철 역 정보
+     * @return 등록된 지하철 역 고유 번호
+     */
     @Transactional
     public Long saveStation(final StationRequest stationRequest) {
-        Station station = stationCommandRepository.save(new Station(stationRequest.getName()));
+        Station station = stationCommandRepository.save(stationRequest.toEntity());
+
         return station.getId();
     }
 
+    /**
+     * 지하철 역 정보를 삭제합니다.
+     * 
+     * @param stationId 삭제할 지하철 역 고유 번호
+     */
     @Transactional
     public void deleteStationById(final Long stationId) {
         stationCommandRepository.deleteById(stationId);

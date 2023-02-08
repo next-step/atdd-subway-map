@@ -5,6 +5,7 @@ import lombok.Getter;
 import subway.station.domain.Station;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Getter
@@ -26,6 +27,12 @@ public class StationResponse {
     }
 
     public static List<StationResponse> fromList(final List<Station> stations) {
+        return stations.stream()
+                .map(StationResponse::from)
+                .collect(Collectors.toList());
+    }
+
+    public static List<StationResponse> fromList(final Set<Station> stations) {
         return stations.stream()
                 .map(StationResponse::from)
                 .collect(Collectors.toList());
