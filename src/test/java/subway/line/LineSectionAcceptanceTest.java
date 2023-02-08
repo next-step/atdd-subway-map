@@ -33,7 +33,7 @@ public class LineSectionAcceptanceTest extends AcceptanceTest {
     private Map<String, String> createLineParams;
 
     @BeforeEach
-    public void setUp() {
+    protected void setUp() {
         super.setUp();
 
         강남역_id = 지하철역_생성_요청("강남역").jsonPath().getLong(ID);
