@@ -3,7 +3,7 @@ package subway;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -17,7 +17,7 @@ public class StationService {
 
     @Transactional
     public StationResponse saveStation(StationRequest stationRequest) {
-        Station station = stationRepository.save(new Station(stationRequest.getName()));
+        Station station = stationRepository.save(Station.builder().name(stationRequest.getName()).build());
         return createStationResponse(station);
     }
 
@@ -37,5 +37,10 @@ public class StationService {
                 station.getId(),
                 station.getName()
         );
+    }
+
+    public Station getById(final Long id){
+        return stationRepository.findById(id)
+                .orElseThrow(NoSuchElementException::new);
     }
 }

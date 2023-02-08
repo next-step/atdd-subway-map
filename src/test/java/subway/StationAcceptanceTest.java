@@ -6,20 +6,18 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static io.restassured.RestAssured.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static subway.given.GivenStationApi.*;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationAcceptanceTest {
 
-    private static final String STATIONS_PATH = "/stations";
+
 
     /**
      * When 지하철역을 생성하면
@@ -30,28 +28,18 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        ExtractableResponse<Response> response = createStation("강남역");
+        ExtractableResponse<Response> response = createStationApi("강남역");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
         List<String> stationNames =
-                getStations().jsonPath().getList("name", String.class);
+                getStationsApi().jsonPath().getList("name", String.class);
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
-    private static ExtractableResponse<Response> createStation(final String name) {
-        final Map<String, String> params = new HashMap<>();
-        params.put("name", name);
 
-        return given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post(STATIONS_PATH)
-                .then().log().all()
-                .extract();
-    }
 
     /**
      * Given 2개의 지하철역을 생성하고
@@ -60,22 +48,22 @@ public class StationAcceptanceTest {
      */
     @DisplayName("지하철역 목록을 조회한다.")
     @Test
-    void test1() {
+    void getStations() {
         // given
-        createStation("지하철역1");
-        createStation("지하철역2");
+        createStationApi(STATION_1);
+        createStationApi(STATION_2);
 
         // when
-        final List<String> stationNames = getStations()
+        final List<String> stationNames = getStationsApi()
                 .jsonPath()
                 .getList("name", String.class);
 
         // then
         assertThat(stationNames.size()).isEqualTo(2);
-        assertThat(stationNames).containsAnyOf("지하철역1", "지하철역2");
+        assertThat(stationNames).containsAnyOf(STATION_1, STATION_2);
     }
 
-    private static ExtractableResponse<Response> getStations() {
+    private static ExtractableResponse<Response> getStationsApi() {
         return given().log().all()
                 .when()
                 .get(STATIONS_PATH)
@@ -90,9 +78,9 @@ public class StationAcceptanceTest {
      */
     @DisplayName("지하철역을 삭제한다.")
     @Test
-    void test2() {
+    void deleteByStationId() {
         // given
-        final long stationId = createStation("지하철역3")
+        final long stationId = createStationApi(STATION_3)
                 .jsonPath()
                 .getLong("id");
 
@@ -103,9 +91,9 @@ public class StationAcceptanceTest {
                 .then().log().all();
 
         // then
-        final List<String> stationNames = getStations().jsonPath()
+        final List<String> stationNames = getStationsApi().jsonPath()
                 .getList("name", String.class);
-        assertThat(stationNames).doesNotContain("지하철역3");
+        assertThat(stationNames).doesNotContain(STATION_3);
     }
 
 }
