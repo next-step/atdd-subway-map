@@ -7,10 +7,12 @@ import lombok.NoArgsConstructor;
 import subway.common.Comment;
 
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import java.util.List;
 
 @Entity
 @Getter
@@ -29,30 +31,32 @@ public class Line {
     @Column(length = 20)
     private String color;
 
-    @Comment("상행 종점역")
-    private Long upStationId;
-
-    @Comment("하행 종점역")
-    private Long downStationId;
-
-    @Comment("노선 간 거리")
-    private Integer distance;
+    @Embedded
+    private Sections sections = new Sections();
 
     @Builder
-    private Line(String name,
-                 String color,
-                 Long upStationId,
-                 Long downStationId,
-                 Integer distance) {
+    private Line(String name, String color) {
         this.name = name;
         this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
-        this.distance = distance;
     }
 
     public void update(final String name, final String color) {
         this.name = name;
         this.color = color;
+    }
+
+    public int getDistance() {
+        return sections.distance();
+    }
+
+    public void addSection(Station upStation, Station downStation, Integer distance) {
+        Section section = Section.of(upStation, downStation, distance);
+        section.updateLine(this);
+
+        sections.addSection(section);
+    }
+
+    public void delete(Long stationId) {
+        sections.delete(stationId);
     }
 }
