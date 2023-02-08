@@ -26,9 +26,6 @@ import static subway.common.util.JsonPathUtil.문자열로_데이터_추출;
 @DisplayName("지하철 구간 관련 기능")
 public class SectionAcceptanceTest extends AcceptanceTest {
 
-    // 새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 한다.
-    // 새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없다.
-    // 새로운 구간 등록시 위 조건에 부합하지 않는 경우 에러 처리한다.
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
     class 지하철_구간_생성 {
@@ -114,10 +111,6 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         }
     }
 
-
-    // 지하철 노선에 등록된 역(하행 종점역)만 제거할 수 있다. 즉, 마지막 구간만 제거할 수 있다.
-    // 지하철 노선에 상행 종점역과 하행 종점역만 있는 경우(구간이 1개인 경우) 역을 삭제할 수 없다.
-    // 새로운 구간 제거시 위 조건에 부합하지 않는 경우 에러 처리한다.
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
     class 지하철_구간_삭제 {
