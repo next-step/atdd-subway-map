@@ -12,7 +12,6 @@ import subway.section.exception.DownStationMustBeUpStationException;
 import subway.section.exception.OnlyOneSectionException;
 
 @RestControllerAdvice
-@RequiredArgsConstructor
 public class SectionExceptionAdvice {
 
     @ExceptionHandler(DownStationAlreadyExistsException.class)

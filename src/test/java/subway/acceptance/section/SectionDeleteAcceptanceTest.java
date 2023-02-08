@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import subway.acceptance.common.AcceptanceTest;
 import subway.acceptance.common.handler.RequestHandler;
 import subway.acceptance.station.fixture.StationFixture;
 import subway.acceptance.util.DatabaseCleanup;
@@ -15,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static subway.acceptance.common.handler.BodyJsonPathHandler.아이디_추출;
 import static subway.acceptance.common.handler.BodyJsonPathHandler.지하철역_이름_목록_추출;
 import static subway.acceptance.common.handler.HttpStatusValidationHandler.*;
@@ -25,12 +27,7 @@ import static subway.acceptance.station.fixture.StationFixture.교대;
 
 
 @DisplayName("지하철 노선의 구간 삭제 관련 기능")
-@ActiveProfiles("acceptance")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class SectionDeleteAcceptanceTest {
-
-    @Autowired
-    private DatabaseCleanup databaseCleanup;
+public class SectionDeleteAcceptanceTest extends AcceptanceTest {
 
     Map<StationFixture, Long> 지하철역_아이디 = new HashMap<>();
     Long 연신내역_교대역_노선_아이디 = null;
@@ -49,12 +46,6 @@ public class SectionDeleteAcceptanceTest {
         var 교대역_아이디 = 지하철역_아이디.get(교대);
 
         연신내역_교대역_노선_아이디 = 아이디_추출(생성_지하철_노선(지하철_3_호선, 연신내역_아이디, 교대역_아이디, 19));
-    }
-
-    @AfterEach
-    void cleanUp() {
-        databaseCleanup.afterPropertiesSet();
-        databaseCleanup.execute();
     }
 
     /**
@@ -82,8 +73,10 @@ public class SectionDeleteAcceptanceTest {
 
         var 지하철_3_호선_역_이름_목록 = 지하철역_이름_목록_추출(연신내역_교대역_노선_응답);
 
-        assertThat(지하철_3_호선_역_이름_목록).hasSize(2);
-        assertThat(지하철_3_호선_역_이름_목록).contains(연신내.name(), 교대.name());
+        assertAll("지하철_3_호선_역_이름_목록 검증",
+                () -> assertThat(지하철_3_호선_역_이름_목록).hasSize(2),
+                () -> assertThat(지하철_3_호선_역_이름_목록).contains(연신내.name(), 교대.name())
+        );
     }
 
     /**
@@ -108,8 +101,10 @@ public class SectionDeleteAcceptanceTest {
 
         var 지하철_3_호선_역_이름_목록 = 지하철역_이름_목록_추출(연신내역_교대역_노선_응답);
 
-        assertThat(지하철_3_호선_역_이름_목록).hasSize(2);
-        assertThat(지하철_3_호선_역_이름_목록).contains(연신내.name(), 교대.name());
+        assertAll("지하철_3_호선_역_이름_목록 검증",
+                () -> assertThat(지하철_3_호선_역_이름_목록).hasSize(2),
+                () -> assertThat(지하철_3_호선_역_이름_목록).contains(연신내.name(), 교대.name())
+        );
     }
 
     /**
@@ -138,8 +133,10 @@ public class SectionDeleteAcceptanceTest {
 
         var 지하철_3_호선_역_이름_목록 = 지하철역_이름_목록_추출(연신내역_교대역_노선_응답);
 
-        assertThat(지하철_3_호선_역_이름_목록).hasSize(3);
-        assertThat(지하철_3_호선_역_이름_목록).contains(연신내.name(), 교대.name(), 수서.name());
+        assertAll("지하철_3_호선_역_이름_목록 검증",
+                () -> assertThat(지하철_3_호선_역_이름_목록).hasSize(3),
+                () -> assertThat(지하철_3_호선_역_이름_목록).contains(연신내.name(), 교대.name(), 수서.name())
+        );
     }
 
 }

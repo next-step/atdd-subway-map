@@ -1,6 +1,6 @@
 package subway.section.domain;
 
-import subway.common.util.CollectionUtil;
+import org.springframework.util.CollectionUtils;
 import subway.section.exception.DownEndStationRegisteredOnLineException;
 import subway.section.exception.DownStationAlreadyExistsException;
 import subway.section.exception.DownStationMustBeUpStationException;
@@ -14,6 +14,8 @@ import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 @Embeddable
@@ -25,11 +27,15 @@ public class Sections {
     public Section addSection(Section section) {
 
         if (!sectionList.isEmpty()) {
-            if (notEqualsLastStation(section.getUpStation()))
+            if (notEqualsLastStation(section.getUpStation())) {
                 throw new DownStationAlreadyExistsException();
+            }
 
-            if (containStations(section.getDownStation()))
+
+            if (containStations(section.getDownStation())) {
                 throw new DownStationMustBeUpStationException();
+            }
+
         }
 
         sectionList.add(section);
@@ -50,25 +56,22 @@ public class Sections {
     }
 
     public List<Station> getStationList() {
-        LinkedHashSet stationSet = new LinkedHashSet();
-        sectionList.stream().forEach((section) -> {
-            stationSet.add(section.getUpStation());
-            stationSet.add(section.getDownStation());
-        });
-        return new ArrayList<>(stationSet);
+        return sectionList.stream().flatMap(
+                section -> Stream.of(section.getUpStation(), section.getDownStation())
+        ).distinct().collect(Collectors.toList());
     }
 
-    private boolean containStations(Station section) {
-        return getStationList().contains(section);
+    private boolean containStations(Station station) {
+        return getStationList().contains(station);
     }
 
     private boolean notEqualsLastStation(Station section) {
-        Station lastStation = CollectionUtil.lastItemOfList(getStationList());
+        Station lastStation = CollectionUtils.lastElement(getStationList());
         return !section.equals(lastStation);
     }
 
     private boolean isNotDownEndStation(Station section) {
-        Station lastStation = CollectionUtil.lastItemOfList(getStationList());
+        Station lastStation = CollectionUtils.lastElement(getStationList());
         return !section.equals(lastStation);
     }
 
