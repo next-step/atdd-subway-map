@@ -51,7 +51,7 @@ public class Section {
 
     private void validate(Station upStation, Station downStation) {
         if (upStation.equals(downStation)) {
-            throw new SubwayRuntimeException(SubwayErrorCode.SECTION_SAME_STATION);
+            throw new SubwayRuntimeException(SubwayErrorCode.VALIDATE_SECTION_SAME_STATION);
         }
     }
 

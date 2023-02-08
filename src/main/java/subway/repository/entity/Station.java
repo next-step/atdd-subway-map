@@ -1,11 +1,13 @@
 package subway.repository.entity;
 
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
+@Getter
 @NoArgsConstructor
 public class Station {
     @Id
@@ -17,14 +19,6 @@ public class Station {
 
     public Station(String name) {
         this.name = name;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     @Override

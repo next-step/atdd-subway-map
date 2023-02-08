@@ -56,7 +56,7 @@ public class Sections {
 
     public void delete(long stationId) {
         if (sections.size() == MIN_SECTION_SIZE) {
-            throw new SubwayRuntimeException(SubwayErrorCode.SECTION_DELETE_ERROR);
+            throw new SubwayRuntimeException(SubwayErrorCode.CANNOT_DELETE_LAST_STATION);
         }
 
         Section lastSection = lastSection();
