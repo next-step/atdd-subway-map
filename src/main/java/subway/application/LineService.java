@@ -1,9 +1,15 @@
-package subway.line;
+package subway.application;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import subway.station.Station;
-import subway.station.StationService;
+import subway.domain.Line;
+import subway.domain.Section;
+import subway.dto.LineRequest;
+import subway.dto.LineResponse;
+import subway.dto.SectionRequest;
+import subway.exception.LineNotFoundException;
+import subway.domain.Station;
+import subway.domain.LineRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,10 +31,13 @@ public class LineService {
         Station upStation = stationService.getStationById(lineRequest.getUpStationId());
         Station downStation = stationService.getStationById(lineRequest.getDownStationId());
 
-        Line line = lineRequest.toEntity(upStation, downStation);
-        Line savedLine = lineRepository.save(line);
+        Line line = lineRequest.toEntity();
+        lineRepository.save(line);
 
-        return LineResponse.of(savedLine);
+        Section section = new Section(line, upStation, downStation, lineRequest.getDistance());
+        line.addSection(section);
+
+        return LineResponse.of(line);
     }
 
     public List<LineResponse> findAllLines() {
@@ -73,5 +82,25 @@ public class LineService {
     @Transactional
     public void deleteLineById(long lineId) {
         lineRepository.deleteById(lineId);
+    }
+
+    @Transactional
+    public LineResponse addSection(Long lineId, SectionRequest sectionRequest) {
+        Station upStation = stationService.getStationById(sectionRequest.getUpStationId());
+        Station downStation = stationService.getStationById(sectionRequest.getDownStationId());
+        Line line = getLineById(lineId);
+
+        Section section = new Section(line, upStation, downStation, sectionRequest.getDistance());
+        line.addSection(section);
+
+        return LineResponse.of(line);
+    }
+
+    @Transactional
+    public void deleteSection(Long lineId, Long stationId) {
+        Line line = getLineById(lineId);
+        Station station = stationService.getStationById(stationId);
+
+        line.removeSection(station);
     }
 }

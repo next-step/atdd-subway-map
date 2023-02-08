@@ -9,24 +9,29 @@ import java.util.Map;
 
 import static io.restassured.RestAssured.given;
 
+/**
+ *
+ */
 public class LineApi {
 
     private LineApi() {}
 
+    public static final String LOCATION = "Location";
+
     public static final String LINE_ID_KEY = "id";
     public static final String LINE_NAME_KEY = "name";
     public static final String LINE_COLOR_KEY = "color";
-    public static final String LINE_UP_STATION_ID_KEY = "upStationId";
-    public static final String LINE_DOWN_STATION_ID_KEY = "downStationId";
-    public static final String LINE_DISTANCE_KEY = "distance";
+    public static final String SECTION_UP_STATION_ID_KEY = "upStationId";
+    public static final String SECTION_DOWN_STATION_ID_KEY = "downStationId";
+    public static final String SECTION_DISTANCE_KEY = "distance";
 
-    public static ExtractableResponse<Response> createLine(MockLine line) {
+    public static ExtractableResponse<Response> createLine(MockLine line, long upStationId, long downStationId, int distance) {
         Map<String, Object> params = new HashMap<>();
         params.put(LINE_NAME_KEY, line.getName());
         params.put(LINE_COLOR_KEY, line.getColor());
-        params.put(LINE_UP_STATION_ID_KEY, line.getUpStationId());
-        params.put(LINE_DOWN_STATION_ID_KEY, line.getDownStationId());
-        params.put(LINE_DISTANCE_KEY, line.getDistance());
+        params.put(SECTION_UP_STATION_ID_KEY, upStationId);
+        params.put(SECTION_DOWN_STATION_ID_KEY, downStationId);
+        params.put(SECTION_DISTANCE_KEY, distance);
 
         return given()
                     .log().all()
@@ -34,6 +39,18 @@ public class LineApi {
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                     .post("/lines")
+                .then()
+                    .log().all()
+                    .extract();
+    }
+
+    public static ExtractableResponse<Response> showLine(Long lineId) {
+        return given()
+                    .log().all()
+                    .pathParam(LINE_ID_KEY, lineId)
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                    .get("/lines/{"+LINE_ID_KEY+"}")
                 .then()
                     .log().all()
                     .extract();
@@ -61,7 +78,7 @@ public class LineApi {
                     .body(params)
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
-                    .put("/lines/{id}")
+                    .put("/lines/{"+LINE_ID_KEY+"}")
                 .then()
                     .log().all()
                     .extract();
@@ -71,8 +88,43 @@ public class LineApi {
         return given()
                     .log().all()
                     .pathParam(LINE_ID_KEY, lineId)
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
-                    .delete("/lines/{id}")
+                    .delete("/lines/{"+LINE_ID_KEY+"}")
+                .then()
+                    .log().all()
+                    .extract();
+    }
+
+    public static ExtractableResponse<Response> addSection(long lineId, long upStationId, long downStationId, int distance) {
+        Map<String, Object> params = new HashMap<>();
+        params.put(SECTION_UP_STATION_ID_KEY, upStationId);
+        params.put(SECTION_DOWN_STATION_ID_KEY, downStationId);
+        params.put(SECTION_DISTANCE_KEY, distance);
+
+        return given()
+                    .log().all()
+                    .pathParam(LINE_ID_KEY, lineId)
+                    .body(params)
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                    .post("/lines/{"+LINE_ID_KEY+"}/sections")
+                .then()
+                    .log().all()
+                    .extract();
+    }
+
+    /**
+     * http://localhost:50840/lines/%7Bid%7D/sections?stationId=3
+     */
+    public static ExtractableResponse<Response> deleteSection(long lineId, long stationId) {
+        return given()
+                .log().all()
+                    .pathParam(LINE_ID_KEY, lineId)
+                    .queryParam("stationId", stationId)
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                    .delete("/lines/{"+LINE_ID_KEY+"}/sections")
                 .then()
                     .log().all()
                     .extract();

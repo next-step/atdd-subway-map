@@ -1,4 +1,6 @@
-package subway.station;
+package subway.dto;
+
+import subway.domain.Station;
 
 public class StationResponse {
     private Long id;
@@ -22,5 +24,13 @@ public class StationResponse {
 
     public String getName() {
         return name;
+    }
+
+    @Override
+    public String toString() {
+        return "StationResponse{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
     }
 }

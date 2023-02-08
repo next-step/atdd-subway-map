@@ -1,4 +1,4 @@
-package subway.station;
+package subway.domain;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -50,5 +50,13 @@ public class Station {
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return "Station{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
     }
 }
