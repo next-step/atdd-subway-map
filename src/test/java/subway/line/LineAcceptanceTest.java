@@ -1,37 +1,27 @@
 package subway.line;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.annotation.DirtiesContext;
+import subway.AcceptanceTest;
 import subway.presentation.line.dto.response.LineResponse;
 import subway.station.StationAcceptanceFactory;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD;
-import static subway.JsonPathUtil.*;
 import static subway.line.LineNameConstraints.*;
 import static subway.station.StationNameConstraints.*;
+import static subway.utils.JsonPathUtil.*;
 
 @DisplayName("지하철 노선 관련 기능")
-@DirtiesContext(classMode = BEFORE_EACH_TEST_METHOD)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class LineAcceptanceTest {
-
-    @LocalServerPort
-    int port;
+public class LineAcceptanceTest extends AcceptanceTest {
 
     @BeforeEach
     void setUp() {
-        RestAssured.port = port;
         StationAcceptanceFactory.createStation(DANG_SAN);
         StationAcceptanceFactory.createStation(HAP_JEONG);
         StationAcceptanceFactory.createStation(HONG_DAE);
@@ -176,4 +166,6 @@ public class LineAcceptanceTest {
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
+
+
 }
