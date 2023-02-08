@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.controller.request.StationRequest;
 import subway.controller.response.StationResponse;
-import subway.service.dto.Stations;
 import subway.exception.SubwayRuntimeException;
 import subway.exception.message.SubwayErrorCode;
 import subway.repository.StationRepository;
@@ -43,13 +42,5 @@ public class StationService {
 
     private StationResponse createStationResponse(Station station) {
         return StationResponse.from(station);
-    }
-
-    public Stations findByIdIn(final List<Long> id) {
-        Map<Long, Station> stations = stationRepository.findByIdIn(id)
-                .stream()
-                .collect(Collectors.toMap(Station::getId, station -> station));
-
-        return new Stations(stations);
     }
 }

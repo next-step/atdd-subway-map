@@ -7,7 +7,6 @@ import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,12 +31,12 @@ public class Sections {
             return;
         }
 
-        if (newSection.addable(lastSection()) == false) {
-            throw new SubwayRuntimeException(SubwayErrorCode.STATION_UPPER_SECTION);
+        if (!newSection.addable(lastSection())) {
+            throw new SubwayRuntimeException(SubwayErrorCode.VALIDATE_SAME_UPPER_STATION);
         }
 
-        if (newSection.addable(getStations()) == false) {
-            throw new SubwayRuntimeException(SubwayErrorCode.DOWN_STATION_HAS_BEEN_REGISTERED);
+        if (!newSection.addable(getStations())) {
+            throw new SubwayRuntimeException(SubwayErrorCode.ALREADY_REGISTERED_DOWN_STATION);
         }
     }
 
@@ -55,20 +54,13 @@ public class Sections {
         return sections.get(sections.size() - 1).getDownStation();
     }
 
-    public List<Long> getStationIds() {
-        return getStations()
-                .stream()
-                .map(Station::getId)
-                .collect(Collectors.toList());
-    }
-
     public void delete(long stationId) {
         if (sections.size() == MIN_SECTION_SIZE) {
             throw new SubwayRuntimeException(SubwayErrorCode.SECTION_DELETE_ERROR);
         }
 
         Section lastSection = lastSection();
-        if (lastSection.isDownStationId(stationId) == false) {
+        if (!lastSection.isDownStationId(stationId)) {
             throw new SubwayRuntimeException(SubwayErrorCode.ONLY_LAST_SEGMENT_CAN_BE_REMOVED);
         }
 

@@ -14,8 +14,8 @@ public enum SubwayErrorCode {
     SECTION_NOT_FOUND("구간이 존재하지 않습니다."),
     ONLY_LAST_SEGMENT_CAN_BE_REMOVED("마지막 구간만 제거할 수 있습니다."),
 
-    DOWN_STATION_HAS_BEEN_REGISTERED("새로운 구간의 하행역이 해당 노선에 등록되어있습니다."),
-    STATION_UPPER_SECTION("새로운 구간의 상행역은 해당 노선의 하행 종점역이어야 합니다.");
+    ALREADY_REGISTERED_DOWN_STATION("새로운 구간의 하행역이 해당 노선에 등록되어있습니다."),
+    VALIDATE_SAME_UPPER_STATION("새로운 구간의 상행역은 해당 노선의 하행 종점역이어야 합니다.");
 
     private String message;
     private HttpStatus httpStatus;

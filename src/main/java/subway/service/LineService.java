@@ -7,12 +7,10 @@ import org.springframework.transaction.annotation.Transactional;
 import subway.controller.request.LineRequest;
 import subway.controller.request.SectionRequest;
 import subway.controller.response.LineResponse;
-import subway.service.dto.Stations;
 import subway.exception.SubwayRuntimeException;
 import subway.exception.message.SubwayErrorCode;
 import subway.repository.LineRepository;
 import subway.repository.entity.Line;
-import subway.repository.entity.Section;
 import subway.repository.entity.Station;
 
 import java.util.List;
@@ -33,25 +31,12 @@ public class LineService {
      */
     @Transactional
     public LineResponse create(LineRequest request) {
+        Station upStation = stationService.find(request.getUpStationId());
+        Station downStation = stationService.find(request.getDownStationId());
+
         Line line = lineRepository.save(request.toEntity());
-        line.addSection(sectionBuild(request.toSectionRequest()));
-
+        line.addSection(upStation, downStation, request.getDistance());
         return LineResponse.from(line);
-    }
-
-
-    private Section sectionBuild(SectionRequest request) {
-        Stations stations = stationService.findByIdIn(List.of(request.getUpStationId(), request.getDownStationId()));
-
-        Station upStation = stations.getById(request.getUpStationId());
-        Station downStation = stations.getById(request.getDownStationId());
-        Integer distance = request.getDistance();
-
-        return Section.builder()
-                .upStation(upStation)
-                .downStation(downStation)
-                .distance(distance)
-                .build();
     }
 
     /**
@@ -106,10 +91,11 @@ public class LineService {
      */
     @Transactional
     public void addSection(Long id, SectionRequest sectionRequest) {
-        Line line = findLine(id);
-        Section section = sectionBuild(sectionRequest);
+        Station upStation = stationService.find(sectionRequest.getUpStationId());
+        Station downStation = stationService.find(sectionRequest.getDownStationId());
 
-        line.addSection(section);
+        Line line = findLine(id);
+        line.addSection(upStation, downStation, sectionRequest.getDistance());
     }
 
     /**

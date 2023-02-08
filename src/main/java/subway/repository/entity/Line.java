@@ -49,16 +49,14 @@ public class Line {
         return sections.distance();
     }
 
-    public void addSection(Section section) {
-        sections.addSection(section);
+    public void addSection(Station upStation, Station downStation, Integer distance) {
+        Section section = Section.of(upStation, downStation, distance);
         section.updateLine(this);
+
+        sections.addSection(section);
     }
 
-    public List<Long> getStationIds() {
-        return sections.getStationIds();
-    }
-
-    public void delete(final Long stationId) {
+    public void delete(Long stationId) {
         sections.delete(stationId);
     }
 }

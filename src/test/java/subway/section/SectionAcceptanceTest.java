@@ -18,8 +18,8 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static subway.fixture.LineFixture.삼호선_요청;
 import static subway.fixture.LineFixture.신분당선_요청;
+import static subway.fixture.SectionFixture.강남역_양재역_구간_요청;
 import static subway.fixture.SectionFixture.교대역_양재역_구간_요청;
-import static subway.fixture.SectionFixture.양재역_양재역_구간_요청;
 import static subway.fixture.SectionFixture.역삼역_교대역_구간_요청;
 import static subway.fixture.StationFixture.강남역_ID;
 import static subway.fixture.StationFixture.강남역_이름;
@@ -33,20 +33,23 @@ import static subway.fixture.StationFixture.역삼역_이름;
 @DisplayName("지하철 구간 관련 기능")
 class SectionAcceptanceTest extends AcceptanceTestHelper {
 
+
     @BeforeEach
     void setup() {
         List<String> 역_목록 = List.of(강남역_이름, 역삼역_이름, 교대역_이름, 양재역_이름);
         for (String stationName : 역_목록) {
             지하철역_생성(stationName);
         }
+
+        지하철노선_생성(신분당선_요청);
     }
 
     /**
-     * Given -> 구간이 포함되어있는 지하철 노선을 생성하고
-     * When -> 해당 노선에 구간을 등록하면
+     * Given -> 노선을 생성하고
+     * When -> 구간을 등록하면
      * Then -> 해당 노선 조회 시 추가된 구간이 포함되어 있다.
      */
-    @DisplayName("지하철 노선에 구간을 등록한다.")
+    @DisplayName("지하철 노선에 구간등록 기능 테스트")
     @Test
     void addSection() {
         // given
@@ -61,42 +64,44 @@ class SectionAcceptanceTest extends AcceptanceTestHelper {
     }
 
     /**
-     * Given ->  노선을 생성하고
-     * When -> 해당 노선에 상행역과 하행역이 같은 구간을 등록하면
-     * Then -> 구간을 추가할 수 없다.
+     * When -> 노선을 생성후 새로운 구간을 등록시
+     * Then -> [구간의 상행역] 이 등록한 [노선의 하행 종점역] 이 아닐경우 예외가 발생한다.
      */
-    @DisplayName("상행역과 하행역이 같은 구간은 등록할 수 없다.")
+    @DisplayName("구간 등록시, 구간의 상행역과 노선의 하행 종점역이 상이 할 경우 예외가 발생한다.")
     @Test
     void addSectionException() {
-        // given
+        // When
         var createResponse = 지하철노선_생성(신분당선_요청);
         String path = 경로_추출(createResponse);
 
-        // when
-        var response = 구간_등록(path, 양재역_양재역_구간_요청);
+        // Then
+        assertThat(
+                상태코드_추출(구간_등록(path, 교대역_양재역_구간_요청))
+        ).isEqualTo(HttpStatus.BAD_REQUEST.value());
 
-        // then
-        assertThat(상태코드_추출(response)).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(에러메시지_추출(response)).isEqualTo(SubwayErrorCode.SECTION_SAME_STATION.getMessage());
+        assertThat(
+                에러메시지_추출(구간_등록(path, 교대역_양재역_구간_요청))
+        ).isEqualTo(SubwayErrorCode.VALIDATE_SAME_UPPER_STATION.getMessage());
     }
 
     /**
-     * Given -> 노선을 생성하고
-     * When -> 해당 노선의 하행 종점역이 아닌 역을 상행역으로 등록하면
-     * Then -> 400 에러가 발생한다.
+     * When -> 노선을 생성하고, 해당 노선의 하행 종점역이 아닌 역을 상행역으로 등록하면
+     * Then -> 예외가 발생한다.
      */
     @Test
-    void 해당_노선의_하행_종점역이_아닌_역을_상행역으로_등록하면() {
-        // given
+    void 해당_노선의_하행_종점역이_아닌_역을_상행역으로_등록한다() {
+        // When
         var createResponse = 지하철노선_생성(신분당선_요청);
         String path = 경로_추출(createResponse);
 
-        // when
-        var response = 구간_등록(path, 교대역_양재역_구간_요청);
+        // Then
+        assertThat(
+                상태코드_추출(구간_등록(path, 강남역_양재역_구간_요청))
+        ).isEqualTo(HttpStatus.BAD_REQUEST.value());
 
-        // then
-        assertThat(상태코드_추출(response)).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(에러메시지_추출(response)).isEqualTo(SubwayErrorCode.STATION_UPPER_SECTION.getMessage());
+        assertThat(
+                에러메시지_추출(구간_등록(path, 강남역_양재역_구간_요청))
+        ).isEqualTo(SubwayErrorCode.VALIDATE_SAME_UPPER_STATION.getMessage());
     }
 
     /**
