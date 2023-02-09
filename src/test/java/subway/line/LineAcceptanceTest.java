@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import subway.exception.ErrorDto;
+import subway.db.AcceptanceTest;
 
 import java.util.List;
 
@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class LineAcceptanceTest {
+public class LineAcceptanceTest extends AcceptanceTest {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -47,7 +47,7 @@ public class LineAcceptanceTest {
     void getSubwayLineWithCreatedSubwayLines() {
 
         // 데이터 무결성을 위함.
-        deleteAllSubway();
+        //deleteAllSubway();
 
         // Given 2개의 지하철 노선을 생성하고
         LineRequest Line1 = new LineRequest("1호선", "blue", 1L,2L,10L);
@@ -98,7 +98,7 @@ public class LineAcceptanceTest {
 
         // When 생성한 지하철 노선을 수정하면
         LineRequest updateLine8 = new LineRequest(Line8.getName(), "black", Line8.getUpStationId(),4L,100L);
-        lineId = 8L;
+        //lineId = 889L; //존재하지않는 ID 로 요청했을때 Exception Response 확인용
         LineResponse lineResponse = updateSubwayLine(lineId, updateLine8);
 
         // Then 해당 지하철 노선 정보는 수정된다
@@ -210,11 +210,6 @@ public class LineAcceptanceTest {
                         .when().put("/lines/"+id)
                         .then().log().all()
                         .extract();
-
-        if (response.statusCode() == HttpStatus.NOT_FOUND.value()) {
-            ErrorDto errorDto = response.body().as(ErrorDto.class);
-            logger.error(">>>>>>>>>>>>>>>>>>>> "+ +  errorDto.getStatus() + " - " +  errorDto.getMessage());
-        }
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 

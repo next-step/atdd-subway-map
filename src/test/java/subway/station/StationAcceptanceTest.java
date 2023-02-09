@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import subway.station.StationResponse;
+import subway.db.AcceptanceTest;
 
 import java.util.HashMap;
 import java.util.List;
@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class StationAcceptanceTest {
+public class StationAcceptanceTest extends AcceptanceTest {
 
     /**
      * When 지하철역을 생성하면
@@ -46,6 +46,7 @@ public class StationAcceptanceTest {
     void createAndGetStation() {
         //Given 2개의 지하철역을 생성하고, (createStation() test 에서 하나 이미 생성)
         createStation("왕십리역");
+        createStation("답십리역");
         //When 지하철역 목록을 조회하면, Then 2개의 지하철역을 응답 받는다
         assertThat(getAllStations()).hasSize(2);
     }

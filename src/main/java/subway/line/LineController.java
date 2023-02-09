@@ -16,58 +16,37 @@ public class LineController {
     }
 
     @PostMapping("/lines")
-    public ResponseEntity<LineResponse> createStation(@RequestBody LineRequest lineRequest) {
+    public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
         LineResponse line = lineService.saveLine(lineRequest);
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
 
     @PutMapping("/lines/{id}")
-    public ResponseEntity<LineResponse> showStation(@PathVariable Long id, @RequestBody LineRequest lineRequest) throws CustomException {
+    public ResponseEntity<LineResponse> editLine(@PathVariable Long id, @RequestBody LineRequest lineRequest) throws CustomException {
         LineResponse line = lineService.updateLine(id, lineRequest);
         return ResponseEntity.ok().body(line);
     }
 
     @GetMapping(value = "/lines")
-    public ResponseEntity<List<LineResponse>> showStations() {
+    public ResponseEntity<List<LineResponse>> showLines() {
         return ResponseEntity.ok().body(lineService.findAllLines());
     }
 
     @GetMapping("/lines/{id}")
-    public ResponseEntity<LineResponse> showStation(@PathVariable Long id) {
+    public ResponseEntity<LineResponse> showLine(@PathVariable Long id) throws CustomException {
         return ResponseEntity.ok().body(lineService.findLineById(id));
     }
 
     @DeleteMapping("/lines")
-    public ResponseEntity<Void> deleteStation() {
+    public ResponseEntity<Void> deleteLines() {
         lineService.deleteLines();
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/lines/{id}")
-    public ResponseEntity<Void> deleteStation(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteLine(@PathVariable Long id) {
         lineService.deleteLineById(id);
         return ResponseEntity.noContent().build();
     }
 
-//    @ExceptionHandler(CustomException.class)
-//    public ResponseEntity<ErrorDto> handleNoSuchElementFoundException(CustomException exception) {
-//        ErrorDto errorDto = new ErrorDto(exception.getErrorCode().getStatus(), exception.getErrorCode().getMessage());
-//        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorDto);
-//    }
-
-
-//    @ExceptionHandler(NoSuchElementFoundException.class)
-//    public ResponseEntity<ErrorResponse> handleItemNotFoundException(NoSuchElementFoundException exception) {
-//        ...
-//    }
-//
-//    @ExceptionHandler(MethodArgumentNotValidException.class)
-//    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
-//        ...
-//    }
-//
-//    @ExceptionHandler(Exception.class)
-//    public ResponseEntity<ErrorResponse> handleAllUncaughtException(Exception exception) {
-//        ...
-//    }
 }

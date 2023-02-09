@@ -1,9 +1,10 @@
 package subway.line;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.exception.CustomException;
-import subway.exception.ErrorCode;
+import subway.exception.ErrorDto;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,13 +34,12 @@ public class LineService {
 
     @Transactional
     public LineResponse updateLine(Long id, LineRequest lineRequest) throws CustomException {
-        Optional<Line> updateLine = lineRepository.findById(id);
 
-        if (updateLine == null) {
-            //throw new NoSuchElementException("Line Id: " + id + " 의 Entity 가 존재 하지 않습니다.");
-            throw new CustomException(ErrorCode.LINE_NOT_FOUND);
+        Optional<Line> updateLine = lineRepository.findById(id);
+        if (updateLine == null || updateLine.isEmpty()) {
+            throw new CustomException(new ErrorDto(HttpStatus.NOT_FOUND, "지하철노선 Id("+ id +") 가 존재 하지 않습니다."));
         } else {
-            updateLine.ifPresent(selectLine->{
+            updateLine.ifPresent(selectLine -> {
                 updateLine.get().setName(lineRequest.getName());
                 updateLine.get().setColor(lineRequest.getColor());
                 updateLine.get().setUpStationId(lineRequest.getUpStationId());
@@ -48,7 +48,6 @@ public class LineService {
 
                 lineRepository.save(updateLine.get());
             });
-
             return createLineResponse(updateLine.get());
         }
     }
@@ -59,9 +58,14 @@ public class LineService {
                 .collect(Collectors.toList());
     }
 
-    public LineResponse findLineById(Long id) {
-        Line line = lineRepository.findById(id).get();
-        return createLineResponse(line);
+    public LineResponse findLineById(Long id) throws CustomException {
+
+        try {
+            Line line = lineRepository.findById(id).get();
+            return createLineResponse(line);
+        } catch (Exception e) {
+            throw new CustomException(new ErrorDto(HttpStatus.BAD_REQUEST, "Line id: " + id + " (" + e.getMessage() +")" ));
+        }
     }
 
     @Transactional
