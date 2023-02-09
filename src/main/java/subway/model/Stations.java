@@ -14,7 +14,7 @@ public class Stations {
 
     private Long downStationId;
 
-    public Stations() {
+    protected Stations() {
     }
 
     public Stations(List<Station> stations) {

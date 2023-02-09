@@ -7,7 +7,7 @@ import subway.model.Stations;
 import static org.assertj.core.api.Assertions.assertThat;
 import static subway.unit.UnitTestFixture.*;
 
-public class StationsTest {
+class StationsTest {
 
     @DisplayName("지하철 상행 / 하행 확인")
     @Test

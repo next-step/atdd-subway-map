@@ -7,4 +7,5 @@
 
 ## 기능 변경
 
-* [ ] Line 이 Stations 를 가지도록 구현 : Line 은 순서가 있는 Stations 를 가지고 있다.
+* [x] Line 이 Stations 를 가지도록 구현 : Line 은 순서가 있는 Stations 를 가지고 있다.
+* [x] Station preStationId 추가 : Station 은 이전 지하철역 정보를 가지고 있다. 
