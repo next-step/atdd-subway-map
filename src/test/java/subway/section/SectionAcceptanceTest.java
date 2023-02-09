@@ -123,13 +123,27 @@ public class SectionAcceptanceTest {
     }
 
     /**
-     * Given 구간이 2개인 지하철 노선을 생성한다.
+     * Given 노선을 생성하고 구간을 추가한다.
      * When 노선에 등록된 하행 종점역을 제거한다.
-     * Then 오류가 발생한다.
+     * Then 노선의 갯수가 1개이고, 노선의 하행 종점역이 구간을 추가하기 전의 하행 종점역이다.
      */
     @DisplayName("구간이 두 개인 노선의 하행종점역을 제거한다.")
     @Test
     void 노선의_하행종점역을_제거() {
+        //Given
+        long lineId = createLineAndGetId(신분당선);
+        long stationId = createSection(lineId, 새로운구간).jsonPath().getLong("section.downStation.id");
+
+        //When
+        deleteSection(lineId, stationId);
+
+        //Then
+        //When
+        ExtractableResponse<Response> response = readSectionsOfLine(lineId);
+
+        //Then
+        assertThat(response.jsonPath().
+                getList("sections.downStation.id", Long.class)).contains(또다른지하철역_아이디).hasSize(1);
 
     }
 
@@ -167,6 +181,13 @@ public class SectionAcceptanceTest {
                 .body(request)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/lines/{lineId}/sections", lineId)
+                .then().log().all()
+                .extract();
+    }
+
+    private static ExtractableResponse<Response> deleteSection(long lineId, long stationId) {
+        return RestAssured.given().log().all()
+                .when().delete("/lines/{lineId}/sections/{stationId}", lineId, stationId)
                 .then().log().all()
                 .extract();
     }
