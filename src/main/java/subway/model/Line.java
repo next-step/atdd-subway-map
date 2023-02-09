@@ -1,9 +1,7 @@
 package subway.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -17,18 +15,16 @@ public class Line {
 
     private String color;
 
-    private Long upStationId;
-
-    private Long downStationId;
+    @Embedded
+    private Stations stations = new Stations();
 
     protected Line() {
     }
 
-    public Line(String name, String color, Long upStationId, Long downStationId) {
+    public Line(String name, String color, Station upStation, Station downStation) {
         this.name = name;
         this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
+        this.stations = new Stations(List.of(upStation, downStation));
     }
 
     public Long getId() {
@@ -44,11 +40,11 @@ public class Line {
     }
 
     public Long getUpStationId() {
-        return upStationId;
+        return stations.getUpStationId();
     }
 
     public Long getDownStationId() {
-        return downStationId;
+        return stations.getDownStationId();
     }
 
     public void modifyLine(String name, String color) {
@@ -61,11 +57,11 @@ public class Line {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Line line = (Line) o;
-        return Objects.equals(id, line.id) && Objects.equals(name, line.name) && Objects.equals(color, line.color) && Objects.equals(upStationId, line.upStationId) && Objects.equals(downStationId, line.downStationId);
+        return Objects.equals(id, line.id) && Objects.equals(name, line.name) && Objects.equals(color, line.color) && Objects.equals(stations, line.stations);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, color, upStationId, downStationId);
+        return Objects.hash(id, name, color, stations);
     }
 }

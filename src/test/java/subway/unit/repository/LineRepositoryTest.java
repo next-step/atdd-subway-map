@@ -12,8 +12,8 @@ import subway.repository.LineRepository;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.unit.UnitTestFixture.BUN_DANG_LINE;
-import static subway.unit.UnitTestFixture.SHIN_BUN_DANG_LINE;
+import static subway.unit.UnitTestFixture.분당선;
+import static subway.unit.UnitTestFixture.신분당선;
 
 @DataJpaTest
 class LineRepositoryTest {
@@ -27,8 +27,8 @@ class LineRepositoryTest {
     @BeforeEach
     void save() {
         lineRepository.deleteAllInBatch();
-        shinBunDangLine = lineRepository.save(SHIN_BUN_DANG_LINE);
-        bunDangLine = lineRepository.save(BUN_DANG_LINE);
+        shinBunDangLine = lineRepository.save(신분당선);
+        bunDangLine = lineRepository.save(분당선);
     }
 
     @DisplayName("지하철 노선 목록 조회")

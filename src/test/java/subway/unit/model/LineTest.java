@@ -13,19 +13,19 @@ class LineTest {
     @Test
     void createLine() {
         // when
-        Line line = new Line("신분당선", "bg-red-600", GANG_NAM_STATION.getId(), YEOK_SAM_STATION.getId());
+        Line line = new Line("신분당선", "bg-red-600", 강남역, 역삼역);
 
         // then
         assertThat(line.getName()).isEqualTo("신분당선");
         assertThat(line.getColor()).isEqualTo("bg-red-600");
-        assertThat(line).isEqualTo(SHIN_BUN_DANG_LINE);
+        assertThat(line).isEqualTo(신분당선);
     }
 
     @DisplayName("지하철 노선 수정")
     @Test
     void modifyLine() {
         // given
-        Line line = new Line("신분당선", "bg-red-600", GANG_NAM_STATION.getId(), YEOK_SAM_STATION.getId());
+        Line line = new Line("신분당선", "bg-red-600", 강남역, 역삼역);
 
         // when
         line.modifyLine("당당선", "bg-red-700");
