@@ -4,7 +4,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
-import subway.dto.LineSectionDeleteRequest;
 import subway.dto.LineSectionRequest;
 import subway.exception.LineNotFoundException;
 import subway.model.Line;
@@ -81,8 +80,8 @@ public class LineService {
     }
 
     @Transactional
-    public void deleteLineSection(Long id, LineSectionDeleteRequest lineSectionDeleteRequest) {
-        Station station = stationService.showStation(lineSectionDeleteRequest.getStationId());
+    public void deleteLineSection(Long id, Long stationId) {
+        Station station = stationService.showStation(stationId);
         Line line = findLineById(id);
         line.deleteLineSection(station);
     }

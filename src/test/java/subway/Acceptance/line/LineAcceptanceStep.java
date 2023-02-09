@@ -75,6 +75,17 @@ public class LineAcceptanceStep {
                 .extract();
     }
 
+    public static ExtractableResponse<Response> 노선_구간_삭제_요청(ExtractableResponse<Response> response, Long stationId) {
+        return RestAssured.given()
+                .pathParam("id", response.jsonPath().getLong("id"))
+                .pathParam("stationId", stationId)
+                .log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().delete("/lines/{id}/sections/{stationId}")
+                .then().log().all()
+                .extract();
+    }
+
     public static void 노선_생성됨(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
@@ -112,6 +123,14 @@ public class LineAcceptanceStep {
     }
 
     public static void 노선_구간_생성_실패됨(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    }
+
+    public static void 노선_구간_삭제됨(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    public static void 노선_구간_삭제_실패됨(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 }

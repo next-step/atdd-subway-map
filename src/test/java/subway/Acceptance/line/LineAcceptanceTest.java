@@ -159,4 +159,50 @@ public class LineAcceptanceTest extends AcceptanceTest {
         노선_구간_생성_실패됨(response);
     }
 
+    /**
+     * 지하철 노선에 구간을 제거하는 기능 구현
+     * 지하철 노선에 등록된 역(하행 종점역)만 제거할 수 있다. 즉, 마지막 구간만 제거할 수 있다.
+     * 지하철 노선에 상행 종점역과 하행 종점역만 있는 경우(구간이 1개인 경우) 역을 삭제할 수 없다.
+     * 새로운 구간 제거시 위 조건에 부합하지 않는 경우 에러 처리한다.
+     */
+    @DisplayName("지하철 노선 구간 삭제 성공")
+    @Test
+    void deleteLineSection() {
+        // given
+        ExtractableResponse<Response> createResponse = 노선_생성_요청(신분당선_생성_요청);
+
+        // when
+        노선_구간_등록_요청(createResponse, 구간_등록_요청_성공);
+        ExtractableResponse<Response> response = 노선_구간_삭제_요청(createResponse, 3L);
+
+        // then
+        노선_구간_삭제됨(response);
+    }
+
+    @DisplayName("지하철 노선 구간 삭제 실패 : 지하철 노선에 등록된 역(하행 종점역)만 제거할 수 있다.")
+    @Test
+    void deleteLineSection_fail1() {
+        // given
+        ExtractableResponse<Response> createResponse = 노선_생성_요청(신분당선_생성_요청);
+
+        // when
+        노선_구간_등록_요청(createResponse, 구간_등록_요청_성공);
+        ExtractableResponse<Response> response = 노선_구간_삭제_요청(createResponse, 2L);
+
+        // then
+        노선_구간_삭제_실패됨(response);
+    }
+
+    @DisplayName("지하철 노선 구간 삭제 실패 : 지하철 노선에 상행 종점역과 하행 종점역만 있는 경우(구간이 1개인 경우) 역을 삭제할 수 없다.")
+    @Test
+    void deleteLineSection_fail2() {
+        // given
+        ExtractableResponse<Response> createResponse = 노선_생성_요청(신분당선_생성_요청);
+
+        // when
+        ExtractableResponse<Response> response = 노선_구간_삭제_요청(createResponse, 3L);
+
+        // then
+        노선_구간_삭제_실패됨(response);
+    }
 }
