@@ -36,6 +36,7 @@ public class LineService {
             .sequence(FIRST)
             .upStation(upStation)
             .downStation(downStation)
+            .distance(lineRequest.getDistance())
             .build();
 
         line.addSection(section);
