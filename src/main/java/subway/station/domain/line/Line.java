@@ -2,12 +2,16 @@ package subway.station.domain.line;
 
 import lombok.Builder;
 import lombok.Getter;
+import subway.station.domain.section.Section;
 import subway.station.domain.station.Station;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-@Entity
 @Getter
+@Entity
 public class Line {
 
     @Id
@@ -17,25 +21,36 @@ public class Line {
 
     private String name;
     private String color;
-    @ManyToOne
-    @JoinColumn(foreignKey = @ForeignKey(name = "fk_up_station"))
-    private Station upStation;
 
-    @ManyToOne
-    @JoinColumn(foreignKey = @ForeignKey(name = "fk_down_station"))
-    private Station downStation;
-    private Long distance;
+    @OneToMany(mappedBy = "line", orphanRemoval = true)
+    private List<Section> sections = new ArrayList<>();
 
     public Line() {
     }
 
     @Builder
-    public Line(String name, String color, Station upStation, Station downStation, Long distance) {
+    public Line(String name, String color) {
         this.name = name;
         this.color = color;
-        this.upStation = upStation;
-        this.downStation = downStation;
-        this.distance = distance;
+    }
+
+    public void addSection(Section section) {
+        sections.add(section);
+    }
+
+    public List<Station> getStations() {
+        if (sections.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<Station> stations = new ArrayList<>();
+        stations.add(sections.get(0).getUpStation());
+        sections
+                .forEach(section -> {
+                    stations.add(section.getDownStation());
+                });
+
+        return stations;
     }
 
     public void changeName(String name) {
