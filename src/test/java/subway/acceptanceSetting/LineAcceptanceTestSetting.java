@@ -31,14 +31,15 @@ public class LineAcceptanceTestSetting {
     @LocalServerPort
     int port;
 
+    @Autowired
+    private DatabaseCleanUp databaseCleanUp;
+
     private StationRestAssured stationRestAssured = new StationRestAssured();
     protected LineRestAssured lineRestAssured = new LineRestAssured();
     protected Long firstStationId;
     protected Long secondStationId;
     protected Long thirdStationId;
 
-    @Autowired
-    private DatabaseCleanUp databaseCleanUp;
 
     @BeforeEach
     void setUp() {
