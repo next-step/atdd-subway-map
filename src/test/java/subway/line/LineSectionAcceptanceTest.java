@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import subway.AcceptanceTest;
+import subway.line.exception.ErrorCode;
 
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -81,7 +82,9 @@ public class LineSectionAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> addLineSectionResponse = 지하철_노선에_지하철_구간_등록_요청(신분당선_id, 정자역_id, 미금역_id, 3);
 
         // then
-        assertThat(addLineSectionResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        String code = addLineSectionResponse.body().jsonPath().getString("code");
+        assertThat(addLineSectionResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(code).isEqualTo(ErrorCode.ADD_UP_STATION_IS_NOT_FINAL_STATION.name());
     }
 
     /**
@@ -99,7 +102,9 @@ public class LineSectionAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> addLineSectionResponse = 지하철_노선에_지하철_구간_등록_요청(신분당선_id, 판교역_id, 강남역_id, 14);
 
         // then
-        assertThat(addLineSectionResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        String code = addLineSectionResponse.body().jsonPath().getString("code");
+        assertThat(addLineSectionResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(code).isEqualTo(ErrorCode.ADD_DOWN_STATION_IN_LINE.name());
     }
 
     /**
@@ -140,7 +145,9 @@ public class LineSectionAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> removeLineSectionResponse = 지하철_노선에_지하철_구간_제거_요청(신분당선_id, 판교역_id);
 
         // then
-        assertThat(removeLineSectionResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        String code = removeLineSectionResponse.body().jsonPath().getString("code");
+        assertThat(removeLineSectionResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(code).isEqualTo(ErrorCode.REMOVE_STATION_MUST_BE_FINAL_STATION.name());
     }
 
     /**
@@ -158,7 +165,9 @@ public class LineSectionAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> removeLineSectionResponse = 지하철_노선에_지하철_구간_제거_요청(신분당선_id, 판교역_id);
 
         // then
-        assertThat(removeLineSectionResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        String code = removeLineSectionResponse.body().jsonPath().getString("code");
+        assertThat(removeLineSectionResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(code).isEqualTo(ErrorCode.SECTION_NOT_EMPTY.name());
     }
 
     public static Map<String, String> getSectionParams(Long upStationId, Long downStationId, int distance) {

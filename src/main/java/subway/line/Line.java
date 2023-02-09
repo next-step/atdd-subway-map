@@ -1,5 +1,7 @@
 package subway.line;
 
+import subway.line.exception.ErrorCode;
+import subway.line.exception.RegisterLineSectionException;
 import subway.station.Station;
 
 import javax.persistence.CascadeType;
@@ -87,13 +89,13 @@ public class Line {
 
     private void validAddUpStation(Station upStation) {
         if (!isFinalStation(upStation)) {
-            throw new IllegalArgumentException("등록하고자 하는 구간의 상행역이 현재 노선의 하행종점역이 아니면 구간을 등록할 수 없습니다.");
+            throw new RegisterLineSectionException(ErrorCode.ADD_UP_STATION_IS_NOT_FINAL_STATION);
         }
     }
 
     private void validAddDownStation(Station downStation) {
         if (getStations().contains(downStation)) {
-            throw new IllegalArgumentException("등록하고자 하는 구간의 하행역이 현재 노선에 이미 포함되어 있다면 구간을 등록할 수 없습니다.");
+            throw new RegisterLineSectionException(ErrorCode.ADD_DOWN_STATION_IN_LINE);
         }
     }
 
@@ -114,13 +116,13 @@ public class Line {
 
     private void validSectionSize() {
         if (this.sections.size() <= MIN_SECTION_SIZE) {
-            throw new IllegalArgumentException("현재 구간 갯수가 하나이므로 구간을 삭제할 수 없습니다.");
+            throw new RegisterLineSectionException(ErrorCode.SECTION_NOT_EMPTY);
         }
     }
 
     private void validRemoveStation(Long stationId) {
         if (!isFinalStation(stationId)) {
-            throw new IllegalArgumentException("하행종점역이 아닌 역은 삭제할 수 없습니다.");
+            throw new RegisterLineSectionException(ErrorCode.REMOVE_STATION_MUST_BE_FINAL_STATION);
         }
     }
 }
