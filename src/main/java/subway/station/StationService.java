@@ -2,6 +2,8 @@ package subway.station;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.line.exception.ErrorCode;
+import subway.line.exception.NotFoundException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,7 +30,7 @@ public class StationService {
     }
 
     public Station findById(Long id) {
-        return stationRepository.findById(id).orElseThrow(RuntimeException::new);
+        return stationRepository.findById(id).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_STATION));
     }
 
     @Transactional

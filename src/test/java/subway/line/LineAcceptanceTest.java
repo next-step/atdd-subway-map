@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import subway.AcceptanceTest;
+import subway.line.exception.ErrorCode;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -159,6 +160,23 @@ public class LineAcceptanceTest extends AcceptanceTest {
         List<String> lineNames = 지하철_노선_목록_조회_요청().jsonPath().getList("name", String.class);
         assertThat(deleteLineResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
         assertThat(lineNames).doesNotContain("신분당선").isEmpty();
+    }
+
+    /**
+     * When 등록되지 않은 지하철 노선을 조회 요청하면
+     * Then 노선을 조회할 수 없다.
+     */
+    @DisplayName("등록되지 않은 지하철 노선은 조회할 수 없다.")
+    @Test
+    void cannotFoundLine() {
+        Long nonExistentLineId = 1L;
+        // when
+        ExtractableResponse<Response> cannotFoundLineResponse = 지하철_노선_조회_요청(nonExistentLineId);
+
+        // then
+        String code = cannotFoundLineResponse.body().jsonPath().getString("code");
+        assertThat(cannotFoundLineResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(code).isEqualTo(ErrorCode.NOT_FOUND_LINE.name());
     }
 
     private List<Long> getCreateLineIds(List<ExtractableResponse<Response>> createLineResponses) {

@@ -108,6 +108,27 @@ public class LineSectionAcceptanceTest extends AcceptanceTest {
     }
 
     /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 노선에 새로운 지하철 구간을 등록하는데, 등록할 구간의 역이 존재하지 않는 역이면
+     * Then 지하철 노선에 새로운 지하철 구간을 등록할 수 없다.
+     */
+    @DisplayName("지하철 노선에 등록할 구간에 역이 존재하지 않는 역은 구간을 등록할 수 없다.")
+    @Test
+    void addLineSectionException3() {
+        // given
+        신분당선_id = 지하철_노선_생성_요청(createLineParams).jsonPath().getLong(ID);
+
+        // when
+        final Long nonExistentStationId = 정자역_id + 1;
+        ExtractableResponse<Response> addLineSectionResponse = 지하철_노선에_지하철_구간_등록_요청(신분당선_id, 판교역_id, nonExistentStationId, 14);
+
+        // then
+        String code = addLineSectionResponse.body().jsonPath().getString("code");
+        assertThat(addLineSectionResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(code).isEqualTo(ErrorCode.NOT_FOUND_STATION.name());
+    }
+
+    /**
      * Given 지하철 노선을 생성하고 새로운 구간을 등록한 뒤에
      * When 지하철 노선의 하행 종점역을 제거하면 (마지막 구간 제거)
      * Then 지하철 노선 조회 시 삭제한 마지막 구간은 조회할 수 없다.
