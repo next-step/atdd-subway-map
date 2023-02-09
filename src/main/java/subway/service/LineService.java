@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
+import subway.dto.LineSectionRequest;
 import subway.exception.LineNotFoundException;
 import subway.model.Line;
 import subway.model.Station;
@@ -40,15 +41,13 @@ public class LineService {
 
     @Transactional(readOnly = true)
     public LineResponse showLine(Long id) {
-        Line line = lineRepository.findById(id)
-                .orElseThrow(LineNotFoundException::new);
+        Line line = findLineById(id);
         return createLineResponse(line);
     }
 
     @Transactional
     public void modifyLine(Long id, LineRequest lineRequest) {
-        Line line = lineRepository.findById(id)
-                .orElseThrow(LineNotFoundException::new);
+        Line line = findLineById(id);
         line.modifyLine(lineRequest.getName(), lineRequest.getColor());
     }
 
@@ -65,5 +64,18 @@ public class LineService {
                 List.of(stationService.createStationResponse(stationService.showStation(line.getUpStationId()))
                         , stationService.createStationResponse(stationService.showStation(line.getDownStationId())))
         );
+    }
+
+    @Transactional
+    public void createLineSection(Long id, LineSectionRequest lineSectionRequest) {
+        Station upStation = stationService.showStation(lineSectionRequest.getUpStationId());
+        Station downStation = stationService.showStation(lineSectionRequest.getDownStationId());
+        Line line = findLineById(id);
+        line.createLineSection(upStation, downStation);
+    }
+
+    private Line findLineById(Long id) {
+        return lineRepository.findById(id)
+                .orElseThrow(LineNotFoundException::new);
     }
 }

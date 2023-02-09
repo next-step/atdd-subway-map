@@ -52,6 +52,10 @@ public class Line {
         this.color = color;
     }
 
+    public void createLineSection(Station upStation, Station downStation) {
+        stations.createLineSection(upStation, downStation);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

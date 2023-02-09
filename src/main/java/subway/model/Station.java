@@ -20,7 +20,13 @@ public class Station {
         this.name = name;
     }
 
-    public Station(String name, Long preStationId) {
+    public Station(Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
+    public Station(Long id, String name, Long preStationId) {
+        this.id = id;
         this.name = name;
         this.preStationId = preStationId;
     }
