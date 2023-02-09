@@ -3,6 +3,7 @@ package subway.api;
 import static org.assertj.core.api.Assertions.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.HttpStatus;
@@ -50,6 +51,10 @@ public class LineTestApi {
 
 		assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 		return response;
+	}
+
+	public static List<Long> getStationIds(ExtractableResponse<Response> response) {
+		return response.jsonPath().getList("stations.id", Long.class);
 	}
 
 	public static ExtractableResponse<Response> updateLine(Long id, String name, String color) {

@@ -51,7 +51,7 @@ public class SectionAcceptanceTest {
 		long lineId = successCreateSection();
 
 		// then
-		List<Long> stationIds = showLineById(lineId).jsonPath().getList("stations.id", Long.class);
+		List<Long> stationIds = getStationIds(showLineById(lineId));
 		assertThat(stationIds).contains(registeredUpStationId, newDownStationId);
 	}
 
@@ -71,7 +71,7 @@ public class SectionAcceptanceTest {
 		assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
 
 		// then
-		List<Long> stationIds = showLineById(lineId).jsonPath().getList("stations.id", Long.class);
+		List<Long> stationIds = getStationIds(showLineById(lineId));
 		assertThat(stationIds).doesNotContain(newDownStationId);
 	}
 
@@ -91,7 +91,7 @@ public class SectionAcceptanceTest {
 		assertThat(alreadyRegisteredResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
 
 		// then
-		List<Long> stationIds = showLineById(lineId).jsonPath().getList("stations.id", Long.class);
+		List<Long> stationIds = getStationIds(showLineById(lineId));
 		assertThat(stationIds).contains(fixedId, registeredUpStationId, newDownStationId);
 	}
 
@@ -112,7 +112,7 @@ public class SectionAcceptanceTest {
 		assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
 		// then
-		List<Long> stationIds = showLineById(lineId).jsonPath().getList("stations.id", Long.class);
+		List<Long> stationIds = getStationIds(showLineById(lineId));
 		assertThat(stationIds).doesNotContain(newDownStationId);
 	}
 
@@ -135,7 +135,7 @@ public class SectionAcceptanceTest {
 		assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
 
 		// then
-		List<Long> stationIds = showLineById(lineId).jsonPath().getList("stations.id", Long.class);
+		List<Long> stationIds = getStationIds(showLineById(lineId));
 		assertThat(stationIds).contains(fixedId, registeredUpStationId, newDownStationId, anotherId);
 	}
 
@@ -156,7 +156,7 @@ public class SectionAcceptanceTest {
 		assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
 
 		// then
-		List<Long> stationIds = showLineById(lineId).jsonPath().getList("stations.id", Long.class);
+		List<Long> stationIds = getStationIds(showLineById(lineId));
 		assertThat(stationIds).contains(fixedId, registeredUpStationId);
 	}
 

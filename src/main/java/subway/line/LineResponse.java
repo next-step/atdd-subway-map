@@ -15,7 +15,7 @@ public class LineResponse {
 		this.id = line.getId();
 		this.name = line.getName();
 		this.color = line.getColor();
-		this.stations = line.getAllStation().stream().map(StationResponse::new).collect(Collectors.toList());
+		this.stations = line.getSections().getAllStation().stream().map(StationResponse::new).collect(Collectors.toList());
 	}
 
 	public Long getId() {
