@@ -1,7 +1,6 @@
 package subway;
 
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
@@ -25,7 +24,7 @@ public class LineAcceptanceTest {
     @DisplayName("지하철노선 생성")
     @Test
     void createLine(){
-        generateStations(new String[]{"왕십리역", "마장역"});
+        String[] lineName = new String[]{"왕십리역", "마장역"};
 
         Map<String, String> params = generateParams("신분당선", "bg-red-600", "1", "2", "10");
 
@@ -78,9 +77,10 @@ public class LineAcceptanceTest {
         //given
         Map<String, String> params = generateParams("신분당선", "bg-red-600", "1", "2"," 10");
         ExtractableResponse<Response> response = LineUtils.createLine(params);
+        Long id = response.body().jsonPath().getLong("id");
 
         //when
-        String lineName = LineUtils.getLineName();
+        String lineName = LineUtils.getLineName(id);
 
         //then
         assertThat(lineName).isEqualTo("신분당선");
@@ -98,14 +98,15 @@ public class LineAcceptanceTest {
 
         //given
         Map<String, String> params = generateParams("신분당선", "bg-red-600", "1", "2"," 10");
-        LineUtils.createLine(params);
+        ExtractableResponse<Response> response = LineUtils.createLine(params);
+        Long id = response.jsonPath().getLong("id");
 
         Map<String, String> updateParams = new HashMap<>();
         updateParams.put("name", "다른분당선");
         updateParams.put("color", "bg-red-600");
 
         //when
-        ExtractableResponse<Response> response = LineUtils.updateLine(updateParams);
+        response = LineUtils.updateLine(updateParams, id);
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -123,10 +124,11 @@ public class LineAcceptanceTest {
 
         //given
         Map<String, String> params = generateParams("신분당선", "bg-red-600", "1", "2"," 10");
-        LineUtils.createLine(params);
+        ExtractableResponse<Response> response = LineUtils.createLine(params);
+        Long id = response.jsonPath().getLong("id");
 
         //when
-        ExtractableResponse<Response> response = LineUtils.deteleLine();
+        response = LineUtils.deleteLine(id);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         //then
