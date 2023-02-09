@@ -13,6 +13,7 @@ import subway.presentation.line.dto.response.LineResponse;
 import static org.assertj.core.api.Assertions.assertThat;
 import static subway.line.LineAcceptanceFactory.createLine;
 import static subway.line.LineNameConstraints.Line2;
+import static subway.section.SectionAcceptanceFactory.*;
 import static subway.station.StationAcceptanceFactory.createStation;
 import static subway.station.StationNameConstraints.*;
 import static subway.utils.JsonPathUtil.getLineResponse;
@@ -42,9 +43,9 @@ public class SectionAcceptanceTest extends AcceptanceTest {
      */
     @DisplayName("지하철 노선 구간을 생성한다.")
     @Test
-    void createSection() {
+    void 지하철_구간_생성() {
         // given && when
-        ExtractableResponse<Response> response = SectionAcceptanceFactory.createSection(
+        ExtractableResponse<Response> response = createSection(
                 "4",
                 "2",
                 10
@@ -64,9 +65,9 @@ public class SectionAcceptanceTest extends AcceptanceTest {
      */
     @DisplayName("새로운 구간의 하행역이 이미 해당 노선에 등록되어 있는 경우 예외가 발생한다.")
     @Test
-    void createSection_fail1() {
+    void 지하철_구간_생성_예외1() {
         // given && when
-        ExtractableResponse<Response> response = SectionAcceptanceFactory.createSection(
+        ExtractableResponse<Response> response = createSection(
                 "1",
                 "2",
                 20
@@ -83,9 +84,9 @@ public class SectionAcceptanceTest extends AcceptanceTest {
      */
     @DisplayName("새로운 구간의 상행역이 해당 노선에 등록되어 있는 하행 종점역이 아닐 경우 예외가 발생한다.")
     @Test
-    void createSection_fail2() {
+    void 지하철_구간_생성_예외2() {
         // when
-        ExtractableResponse<Response> response = SectionAcceptanceFactory.createSection(
+        ExtractableResponse<Response> response = createSection(
                 "3",
                 "1",
                 20
@@ -103,16 +104,16 @@ public class SectionAcceptanceTest extends AcceptanceTest {
      */
     @DisplayName("구간을 삭제한다.")
     @Test
-    void deleteSection() {
+    void 지하철_구간_삭제() {
         // given
-        SectionAcceptanceFactory.createSection(
+        createSection(
                 "3",
                 "2",
                 20
         );
         long stationId = 3L;
         // when
-        ExtractableResponse<Response> response = SectionAcceptanceFactory.deleteSection(stationId);
+        ExtractableResponse<Response> response = deleteSection(stationId);
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
@@ -124,16 +125,16 @@ public class SectionAcceptanceTest extends AcceptanceTest {
      */
     @DisplayName("제거할 지하철 역이 하행 종점역이 아니라면 예외가 발생한다.")
     @Test
-    void deleteSection_fail1() {
+    void 지하철_구간_삭제_예외1() {
         // given
-        SectionAcceptanceFactory.createSection(
+        createSection(
                 "3",
                 "2",
                 20
         );
         long stationId = 2L;
         // when
-        ExtractableResponse<Response> response = SectionAcceptanceFactory.deleteSection(stationId);
+        ExtractableResponse<Response> response = deleteSection(stationId);
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         // then
@@ -147,11 +148,11 @@ public class SectionAcceptanceTest extends AcceptanceTest {
      */
     @DisplayName("제거할 지하철 역이 하행 종점역이 아니라면 예외가 발생한다.")
     @Test
-    void deleteSection_fail2() {
+    void 지하철_구간_삭제_예외2() {
         // given
         long stationId = 2L;
         // when
-        ExtractableResponse<Response> response = SectionAcceptanceFactory.deleteSection(stationId);
+        ExtractableResponse<Response> response = deleteSection(stationId);
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         // then

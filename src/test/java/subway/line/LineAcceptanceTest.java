@@ -13,6 +13,7 @@ import subway.station.StationAcceptanceFactory;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static subway.line.LineAcceptanceFactory.*;
 import static subway.line.LineNameConstraints.*;
 import static subway.station.StationNameConstraints.*;
 import static subway.utils.JsonPathUtil.*;
@@ -34,9 +35,9 @@ public class LineAcceptanceTest extends AcceptanceTest {
      */
     @DisplayName("지하철 노선을 생성한다.")
     @Test
-    void createLine() {
+    void 지하철_노선_생성() {
         // given && when
-        ExtractableResponse<Response> response = LineAcceptanceFactory.createLine(
+        ExtractableResponse<Response> response = createLine(
                 Line2,
                 "bg-green-600",
                 1,
@@ -60,16 +61,16 @@ public class LineAcceptanceTest extends AcceptanceTest {
      */
     @DisplayName("지하철노선 목록을 조회한다.")
     @Test
-    void getAllLines() {
+    void 지하철_노선_목록_조회() {
         // given
-        LineAcceptanceFactory.createLine(
+        createLine(
                 Line2,
                 "bg-green-600",
                 1,
                 3,
                 10
         );
-        LineAcceptanceFactory.createLine(
+        createLine(
                 Line9,
                 "bg-brown-600",
                 1,
@@ -78,7 +79,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         );
         // when
-        ExtractableResponse<Response> response = LineAcceptanceFactory.getAllLine();
+        ExtractableResponse<Response> response = getAllLine();
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         //then
@@ -96,9 +97,9 @@ public class LineAcceptanceTest extends AcceptanceTest {
      */
     @DisplayName("지하철노선을 조회한다.")
     @Test
-    void getLine() {
+    void 지하철_노선_조회() {
         // given
-        ExtractableResponse<Response> line = LineAcceptanceFactory.createLine(
+        ExtractableResponse<Response> line = createLine(
                 Line2,
                 "bg-green-600",
                 1,
@@ -109,7 +110,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         Long lineId = getId(line);
         // when
-        ExtractableResponse<Response> response = LineAcceptanceFactory.getLine(lineId);
+        ExtractableResponse<Response> response = getLine(lineId);
         // then
         LineResponse lineResponse = getLineResponse(response);
         assertThat(lineResponse).extracting("name").isEqualTo(Line2);
@@ -124,9 +125,9 @@ public class LineAcceptanceTest extends AcceptanceTest {
      */
     @DisplayName("지하철노선을 수정한다.")
     @Test
-    void updateLine() {
+    void 지하철_노선_수정() {
         // given
-        ExtractableResponse<Response> line = LineAcceptanceFactory.createLine(
+        ExtractableResponse<Response> line = createLine(
                 Line2,
                 "bg-green-600",
                 1,
@@ -135,7 +136,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         );
         Long lineId = getId(line);
         // when
-        ExtractableResponse<Response> response = LineAcceptanceFactory.updateLine(
+        ExtractableResponse<Response> response = updateLine(
                 lineId,
                 Line1,
                 "bg-blue-600"
@@ -151,9 +152,9 @@ public class LineAcceptanceTest extends AcceptanceTest {
      */
     @DisplayName("지하철노선을 삭제한다.")
     @Test
-    void deleteLine() {
+    void 지하철_노선_삭제() {
         // given
-        ExtractableResponse<Response> line = LineAcceptanceFactory.createLine(
+        ExtractableResponse<Response> line = createLine(
                 Line2,
                 "bg-green-600",
                 1,
@@ -162,7 +163,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         );
         Long lineId = getId(line);
         // when
-        ExtractableResponse<Response> response = LineAcceptanceFactory.deleteLine(lineId);
+        ExtractableResponse<Response> response = deleteLine(lineId);
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
