@@ -17,10 +17,10 @@ public class LineFindAllResponse {
     private List<Station> stations = new ArrayList<>();
 
     @Builder
-    public LineFindAllResponse(Long id, String name, String color, Station upStation, Station downStation) {
+    public LineFindAllResponse(Long id, String name, String color, List<Station> stations) {
         this.id = id;
         this.name = name;
         this.color = color;
-        this.stations.addAll(List.of(upStation, downStation));
+        this.stations = stations;
     }
 }
