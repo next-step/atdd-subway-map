@@ -23,6 +23,47 @@ import io.restassured.response.Response;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class LineAcceptanceTest {
 
+    static ExtractableResponse<Response> 지하철_노선_생성(Map<String, Object> params) {
+        return RestAssured.given().log().all()
+            .body(params)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().post("/lines")
+            .then().log().all()
+            .extract();
+    }
+
+    static ExtractableResponse<Response> 지하철_노선_목록_조회() {
+        return RestAssured.given().log().all()
+            .when().get("/lines")
+            .then().log().all()
+            .extract();
+    }
+
+    static ExtractableResponse<Response> 지하철_노선_조회(Long lineId) {
+        return RestAssured.given()
+            .when().get("/lines/" + lineId)
+            .then().log().all()
+            .extract();
+    }
+
+    static ExtractableResponse<Response> 지하철_노선_수정(Long lineId, Map<String, String> changedLineNameParam) {
+        return RestAssured.given()
+            .body(changedLineNameParam)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .log().all()
+            .when().put("/lines/" + lineId)
+            .then().log().all()
+            .extract();
+    }
+
+    static ExtractableResponse<Response> 지하철_노선_삭제(Long lineId) {
+        return RestAssured.given()
+            .log().all()
+            .when().delete("/lines/" + lineId)
+            .then().log().all()
+            .extract();
+    }
+
     @BeforeEach
     void setUp() {
         Map<String, String> firstParam = new HashMap<>();
@@ -174,47 +215,6 @@ class LineAcceptanceTest {
 
         // Then
         응답_상태_코드_검증(response, HttpStatus.NO_CONTENT);
-    }
-
-    private ExtractableResponse<Response> 지하철_노선_생성(Map<String, Object> params) {
-        return RestAssured.given().log().all()
-            .body(params)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().post("/lines")
-            .then().log().all()
-            .extract();
-    }
-
-    private ExtractableResponse<Response> 지하철_노선_목록_조회() {
-        return RestAssured.given().log().all()
-            .when().get("/lines")
-            .then().log().all()
-            .extract();
-    }
-
-    private ExtractableResponse<Response> 지하철_노선_조회(Long lineId) {
-        return RestAssured.given()
-            .when().get("/lines/" + lineId)
-            .then().log().all()
-            .extract();
-    }
-
-    private ExtractableResponse<Response> 지하철_노선_수정(Long lineId, Map<String, String> changedLineNameParam) {
-        return RestAssured.given()
-            .body(changedLineNameParam)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .log().all()
-            .when().put("/lines/" + lineId)
-            .then().log().all()
-            .extract();
-    }
-
-    private ExtractableResponse<Response> 지하철_노선_삭제(Long lineId) {
-        return RestAssured.given()
-            .log().all()
-            .when().delete("/lines/" + lineId)
-            .then().log().all()
-            .extract();
     }
 
     private void 응답_상태_코드_검증(ExtractableResponse<Response> response, HttpStatus httpStatus) {
