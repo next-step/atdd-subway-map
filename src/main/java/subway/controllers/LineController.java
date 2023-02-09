@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import subway.dto.request.LineRequest;
 import subway.dto.response.LineResponse;
+import subway.models.Line;
 import subway.services.LineService;
 
 @RestController
@@ -22,22 +23,24 @@ public class LineController {
 
     @PostMapping("/lines")
     public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest.Create lineRequest) {
-        LineResponse line = lineService.saveLine(lineRequest);
-        return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
+        Line line = lineService.saveLine(lineRequest);
+        return ResponseEntity.created(URI.create("/lines/" + line.getId()))
+            .body(LineResponse.of(line));
     }
 
     @GetMapping(value = "/lines")
     public ResponseEntity<List<LineResponse>> showStations() {
-        return ResponseEntity.ok().body(lineService.findAllLines());
+        return ResponseEntity.ok().body(LineResponse.of(lineService.findAllLines()));
     }
 
     @GetMapping(value = "/lines/{id}")
     public ResponseEntity<LineResponse> showStation(@PathVariable Long id) {
-        return ResponseEntity.ok().body(lineService.findById(id));
+        return ResponseEntity.ok().body(LineResponse.of(lineService.findById(id)));
     }
 
     @PutMapping(value = "/lines/{id}")
-    public ResponseEntity<Void> updateStation(@PathVariable Long id, @RequestBody LineRequest.Update lineRequest) {
+    public ResponseEntity<Void> updateStation(@PathVariable Long id,
+        @RequestBody LineRequest.Update lineRequest) {
         lineService.update(id, lineRequest);
         return ResponseEntity.ok().build();
     }

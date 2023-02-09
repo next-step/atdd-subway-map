@@ -28,4 +28,8 @@ public class LineResponse {
                 .collect(Collectors.toList()))
             .build();
     }
+
+    public static List<LineResponse> of(List<Line> lines) {
+        return lines.stream().map(LineResponse::of).collect(Collectors.toList());
+    }
 }

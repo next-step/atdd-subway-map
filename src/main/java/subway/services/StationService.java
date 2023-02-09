@@ -1,45 +1,36 @@
 package subway.services;
 
+import javax.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 import subway.dto.request.StationRequest;
-import subway.dto.response.StationResponse;
 import subway.models.Station;
 import subway.repositories.StationRepository;
 
 @Service
+@RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class StationService {
-    private StationRepository stationRepository;
-
-    public StationService(StationRepository stationRepository) {
-        this.stationRepository = stationRepository;
-    }
+    private final StationRepository stationRepository;
 
     @Transactional
-    public StationResponse saveStation(StationRequest stationRequest) {
-        Station station = stationRepository.save(new Station(stationRequest.getName()));
-        return createStationResponse(station);
+    public Station saveStation(StationRequest stationRequest) {
+        return stationRepository.save(new Station(stationRequest.getName()));
     }
 
-    public List<StationResponse> findAllStations() {
-        return stationRepository.findAll().stream()
-                .map(this::createStationResponse)
-                .collect(Collectors.toList());
+    public Station findById(Long id) {
+        return stationRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+    }
+
+    public List<Station> findAllStations() {
+        return stationRepository.findAll();
     }
 
     @Transactional
     public void deleteStationById(Long id) {
         stationRepository.deleteById(id);
-    }
-
-    private StationResponse createStationResponse(Station station) {
-        return new StationResponse(
-                station.getId(),
-                station.getName()
-        );
     }
 }

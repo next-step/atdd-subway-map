@@ -1,19 +1,15 @@
 package subway.services;
 
 import java.util.List;
-import java.util.stream.Collectors;
 import javax.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.dto.request.LineRequest;
-import subway.dto.response.LineResponse;
 import subway.models.Line;
 import subway.models.Section;
 import subway.models.Station;
 import subway.repositories.LineRepository;
-import subway.repositories.SectionRepository;
-import subway.repositories.StationRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -21,35 +17,44 @@ import subway.repositories.StationRepository;
 public class LineService {
 
     private final LineRepository lineRepository;
-    private final StationRepository stationRepository;
-    private final SectionRepository sectionRepository;
+    private final StationService stationService;
+
+    private final int FIRST = 1;
 
     @Transactional
-    public LineResponse saveLine(LineRequest.Create lineRequest) {
-        Station upStation = stationRepository.findById(lineRequest.getUpStationId())
-            .orElseThrow(EntityNotFoundException::new);
-        Station downStation = stationRepository.findById(lineRequest.getDownStationId())
-            .orElseThrow(EntityNotFoundException::new);
-        Section section = sectionRepository.save(lineRequest.toSectionEntity(upStation, downStation));
-        Line line = lineRepository.save(lineRequest.toEntity(section));
+    public Line saveLine(LineRequest.Create lineRequest) {
+        Station upStation = stationService.findById(lineRequest.getUpStationId());
+        Station downStation = stationService.findById(lineRequest.getDownStationId());
 
-        return LineResponse.of(line);
+        Line line = Line.builder()
+            .name(lineRequest.getName())
+            .color(lineRequest.getColor())
+            .build();
+
+        Section section = Section.builder()
+            .line(line)
+            .sequence(FIRST)
+            .upStation(upStation)
+            .downStation(downStation)
+            .build();
+
+        line.addSection(section);
+
+        return lineRepository.save(line);
     }
 
-    public List<LineResponse> findAllLines() {
-        return lineRepository.findAll().stream()
-            .map(LineResponse::of)
-            .collect(Collectors.toList());
+    public List<Line> findAllLines() {
+        return lineRepository.findAll();
     }
 
-    public LineResponse findById(Long id) {
-        return LineResponse.of(lineRepository.findById(id).orElseThrow(EntityNotFoundException::new));
+    public Line findById(Long id) {
+        return lineRepository.findById(id).orElseThrow(EntityNotFoundException::new);
     }
 
     @Transactional
     public void update(Long id, LineRequest.Update lineRequest) {
         Line line = lineRepository.findById(id).orElseThrow(EntityNotFoundException::new);
-        lineRequest.apply(line);
+        line.update(lineRequest.getName(), lineRequest.getColor());
         lineRepository.save(line);
     }
 
