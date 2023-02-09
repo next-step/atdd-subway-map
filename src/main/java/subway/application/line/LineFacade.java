@@ -9,6 +9,7 @@ import subway.domain.station.service.StationService;
 import subway.presentation.line.dto.request.LineRequest;
 import subway.presentation.line.dto.request.LineUpdateRequest;
 import subway.presentation.line.dto.response.LineResponse;
+import subway.presentation.section.dto.request.SectionRequest;
 
 import java.util.List;
 
@@ -46,4 +47,16 @@ public class LineFacade {
         lineService.deleteLine(lineId);
     }
 
+    @Transactional
+    public LineResponse addSection(Long lineId, SectionRequest request) {
+        Station upStation = stationService.getStation(Long.parseLong(request.getUpStationId()));
+        Station downStation = stationService.getStation(Long.parseLong(request.getDownStationId()));
+        return lineService.addSection(lineId, upStation, downStation, request.getDistance());
+    }
+
+    @Transactional
+    public void deleteSection(Long lineId, Long stationId) {
+        Station station = stationService.getStation(stationId);
+        lineService.deleteSection(lineId, station);
+    }
 }

@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import subway.domain.line.Line;
-import subway.domain.station.Stations;
+import subway.domain.section.Sections;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -16,11 +16,11 @@ public class LineRequest {
     private Long downStationId;
     private Integer distance;
 
-    public Line toEntity(Stations stations) {
+    public Line toEntity(Sections sections) {
         return Line.builder()
                 .name(name)
                 .color(color)
-                .stations(stations)
+                .sections(sections)
                 .distance(distance)
                 .build();
 

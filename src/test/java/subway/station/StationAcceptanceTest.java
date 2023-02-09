@@ -1,46 +1,32 @@
 package subway.station;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.annotation.DirtiesContext;
+import subway.AcceptanceTest;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD;
+import static subway.station.StationAcceptanceFactory.*;
 import static subway.station.StationNameConstraints.*;
 
 @DisplayName("지하철역 관련 기능")
-@DirtiesContext(classMode = BEFORE_EACH_TEST_METHOD)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class StationAcceptanceTest {
-
-    @LocalServerPort
-    int port;
-
-    @BeforeEach
-    void setUp() {
-        RestAssured.port = port;
-    }
+public class StationAcceptanceTest extends AcceptanceTest {
 
     @DisplayName("지하철역을 생성한다.")
     @Test
-    void createStation() {
+    void 지하철_역_생성() {
         // when
-        ExtractableResponse<Response> response = StationAcceptanceFactory.createStation(GANG_NAM);
+        ExtractableResponse<Response> response = createStation(GANG_NAM);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames = StationAcceptanceFactory.getAllStations()
+        List<String> stationNames = getAllStations()
                 .jsonPath().getList("name", String.class);
         assertThat(stationNames).containsAnyOf(GANG_NAM);
     }
@@ -52,12 +38,12 @@ public class StationAcceptanceTest {
      */
     @DisplayName("지하철 목록을 조회한다")
     @Test
-    void getStations() {
+    void 지하철_목록_조회() {
         // given
-        StationAcceptanceFactory.createStation(YEOM_CHANG);
-        StationAcceptanceFactory.createStation(DEUNG_CHON);
+        createStation(YEOM_CHANG);
+        createStation(DEUNG_CHON);
         // when
-        ExtractableResponse<Response> response = StationAcceptanceFactory.getAllStations();
+        ExtractableResponse<Response> response = getAllStations();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -75,19 +61,19 @@ public class StationAcceptanceTest {
      */
     @DisplayName("지하철역을 삭제한다.")
     @Test
-    void deleteStation() {
+    void 지하철_역_삭제() {
         // given
-        ExtractableResponse<Response> station = StationAcceptanceFactory.createStation(DANG_SAN);
+        ExtractableResponse<Response> station = createStation(DANG_SAN);
         long stationId = station.jsonPath().getLong("id");
 
         // when
-        ExtractableResponse<Response> response = StationAcceptanceFactory.deleteStation(stationId);
+        ExtractableResponse<Response> response = deleteStation(stationId);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         // then
-        List<String> stationNames = StationAcceptanceFactory.getAllStations()
+        List<String> stationNames = getAllStations()
                 .jsonPath().getList("name", String.class);
         assertThat(stationNames).doesNotContain(DANG_SAN);
     }

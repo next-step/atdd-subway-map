@@ -8,6 +8,10 @@ import java.util.Optional;
 
 public interface LineRepository extends JpaRepository<Line, Long> {
 
-    @Query("select l from Line l left join fetch l.stations.stations where l.id = :lineId")
+    @Query("SELECT l FROM Line l " +
+            "LEFT JOIN FETCH l.sections.sections s " +
+            "LEFT JOIN FETCH s.upStation " +
+            "LEFT JOIN FETCH s.downStation " +
+            "WHERE l.id = :lineId")
     Optional<Line> findByIdWithStations(Long lineId);
 }
