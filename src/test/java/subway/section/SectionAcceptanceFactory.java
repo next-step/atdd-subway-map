@@ -44,4 +44,14 @@ public class SectionAcceptanceFactory {
 
         return params;
     }
+
+    public static ExtractableResponse<Response> deleteSection(long stationId) {
+        return RestAssured
+                .given().log().all()
+                .param("stationId", stationId)
+                .when().delete(SECTION_BASE_URL)
+                .then().log().all()
+                .extract();
+    }
+
 }
