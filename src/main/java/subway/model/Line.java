@@ -56,6 +56,10 @@ public class Line {
         stations.createLineSection(upStation, downStation);
     }
 
+    public void deleteLineSection(Station station) {
+        stations.deleteLineSection(station);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

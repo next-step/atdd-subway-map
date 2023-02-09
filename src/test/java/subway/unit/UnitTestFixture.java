@@ -15,4 +15,5 @@ public class UnitTestFixture {
     public static final Line 분당선 = new Line("분당선", "bg-red-500", 강남역, 역삼역);
 
     public static final Stations 강남역_역삼역 = new Stations(List.of(강남역, 역삼역));
+    public static final Stations 강남역_역삼역_선릉역 = new Stations(List.of(강남역, 역삼역, 선릉역));
 }

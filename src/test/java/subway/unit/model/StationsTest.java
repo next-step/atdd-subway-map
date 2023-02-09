@@ -3,6 +3,7 @@ package subway.unit.model;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import subway.exception.CreateLineSectionException;
+import subway.exception.DeleteLineSectionException;
 import subway.model.Stations;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -50,6 +51,32 @@ class StationsTest {
         // when & then
         assertThatThrownBy(() -> 강남역_역삼역.createLineSection(역삼역, 강남역))
                 .isInstanceOf(CreateLineSectionException.class);
+    }
+
+    @DisplayName("지하철 구간 삭제 성공")
+    @Test
+    void deleteLineSection() {
+        // when
+        강남역_역삼역_선릉역.deleteLineSection(선릉역);
+
+        // then
+        assertThat(강남역_역삼역_선릉역.getDownStationId()).isEqualTo(역삼역.getId());
+    }
+
+    @DisplayName("지하철 구간 삭제 실패 : 지하철 노선에 등록된 역(하행 종점역)만 제거할 수 있다.")
+    @Test
+    void deleteLineSection_fail1() {
+        // when & then
+        assertThatThrownBy(() -> 강남역_역삼역_선릉역.deleteLineSection(역삼역))
+                .isInstanceOf(DeleteLineSectionException.class);
+    }
+
+    @DisplayName("지하철 구간 삭제 실패 : 지하철 노선에 상행 종점역과 하행 종점역만 있는 경우(구간이 1개인 경우) 역을 삭제할 수 없다.")
+    @Test
+    void deleteLineSection_fail2() {
+        // when & then
+        assertThatThrownBy(() -> 강남역_역삼역.deleteLineSection(선릉역))
+                .isInstanceOf(DeleteLineSectionException.class);
     }
 
 }
