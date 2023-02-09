@@ -7,6 +7,7 @@ import subway.domain.Section;
 import subway.domain.Station;
 import subway.dto.*;
 import subway.exception.IllegalSectionException;
+import subway.exception.IllegalStationDeleteException;
 import subway.repository.SectionRepository;
 
 import java.util.List;
@@ -70,9 +71,27 @@ public class SectionService {
         );
     }
 
+    @Transactional
+    public void deleteSection(Long lineId, Long stationId) {
+        Line line = lineService.getLineById(lineId);
+        validateDeleteDownStation(line, stationId);
+        Section section = line.getSections().stream()
+                .filter(s -> s.getDownStation().getId() == stationId)
+                .findFirst().orElseThrow();
+        line.removeSection(section);
+
+        sectionRepository.delete(section);
+    }
+
     private void validateCreateSection(Line line, Station upStation) {
         if (line.getDownStation() != upStation) {
             throw new IllegalSectionException();
+        }
+    }
+
+    private void validateDeleteDownStation(Line line, Long stationId) {
+        if (line.getDownStationId() != stationId) {
+            throw new IllegalStationDeleteException();
         }
     }
 }

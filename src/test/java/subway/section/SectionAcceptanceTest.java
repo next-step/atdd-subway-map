@@ -138,10 +138,7 @@ public class SectionAcceptanceTest {
         deleteSection(lineId, stationId);
 
         //Then
-        //When
         ExtractableResponse<Response> response = readSectionsOfLine(lineId);
-
-        //Then
         assertThat(response.jsonPath().
                 getList("sections.downStation.id", Long.class)).contains(또다른지하철역_아이디).hasSize(1);
 
@@ -149,7 +146,7 @@ public class SectionAcceptanceTest {
 
     /**
      * Given 구간이 2개인 지하철 노선을 생성한다.
-     * When 상행 종점역이 포함된 구간을 제거한다.
+     * When 상행종점역이 포함된 구간을 제거한다.
      * Then 오류가 발생한다.
      */
     @DisplayName("노선의 상행종점역을 제거한다.")
@@ -187,7 +184,8 @@ public class SectionAcceptanceTest {
 
     private static ExtractableResponse<Response> deleteSection(long lineId, long stationId) {
         return RestAssured.given().log().all()
-                .when().delete("/lines/{lineId}/sections/{stationId}", lineId, stationId)
+                .queryParam("stationId",stationId)
+                .when().delete("/lines/{lineId}/sections", lineId)
                 .then().log().all()
                 .extract();
     }

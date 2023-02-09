@@ -120,4 +120,9 @@ public class Line {
     public void addDistance(Long distance) {
         this.distance += distance;
     }
+
+    public void removeSection(Section section) {
+        downStation = section.getUpStation();
+        sections.remove(section);
+    }
 }
