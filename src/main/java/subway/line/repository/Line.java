@@ -1,6 +1,5 @@
 package subway.line.repository;
 
-import subway.section.repository.Section;
 import subway.station.repository.Station;
 
 import javax.persistence.*;
@@ -22,7 +21,7 @@ public class Line {
     @Column(length = 20, nullable = false)
     private String color;
 
-    @OneToMany(mappedBy = "line", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private List<Section> sections = new ArrayList<>();
 
     public Line(String name, String color, Section section) {
@@ -31,12 +30,10 @@ public class Line {
         setSection(section);
     }
 
-    public Long removeSection(Long stationId) {
+    public void removeSection(Long stationId) {
         isRemoveValidation(stationId);
         Section lastSection = getLastSection();
         sections.remove(lastSection);
-
-        return lastSection.getId();
     }
 
     private void isRemoveValidation(Long stationId) {

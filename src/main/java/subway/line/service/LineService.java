@@ -8,8 +8,9 @@ import subway.line.dto.LineUpdateRequest;
 import subway.line.repository.Line;
 import subway.line.repository.LineRepository;
 import subway.section.dto.SectionRequest;
-import subway.section.repository.Section;
-import subway.section.service.SectionService;
+import subway.line.repository.Section;
+import subway.station.repository.Station;
+import subway.station.service.StationService;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,11 +20,11 @@ import java.util.stream.Collectors;
 public class LineService {
 
     private final LineRepository lineRepository;
-    private final SectionService sectionService;
+    private final StationService stationService;
 
-    public LineService(LineRepository lineRepository, SectionService sectionService) {
+    public LineService(LineRepository lineRepository, StationService stationService) {
         this.lineRepository = lineRepository;
-        this.sectionService = sectionService;
+        this.stationService = stationService;
     }
 
     @Transactional
@@ -62,7 +63,12 @@ public class LineService {
 
     @Transactional
     public void addSection(Long id, SectionRequest sectionRequest) {
-        Section section = sectionService.createSection(sectionRequest);
+        Section section = toSectionEntity(
+                sectionRequest.getDownStationId(),
+                sectionRequest.getUpStationId(),
+                sectionRequest.getDistance()
+        );
+
         Line line = findLine(id);
         line.addSection(section);
     }
@@ -70,12 +76,15 @@ public class LineService {
     @Transactional
     public void deleteSection(Long id, Long stationId) {
         Line line = findLine(id);
-        Long removeSectionId = line.removeSection(stationId);
-        sectionService.deleteSection(removeSectionId);
+        line.removeSection(stationId);
     }
 
     private Line toLineEntity(LineRequest lineRequest) {
-        Section section = sectionService.createSection(toSectionRequest(lineRequest));
+        Section section = toSectionEntity(
+                lineRequest.getDownStationId(),
+                lineRequest.getUpStationId(),
+                lineRequest.getDistance()
+        );
 
         return new Line(
                 lineRequest.getName(),
@@ -84,11 +93,14 @@ public class LineService {
         );
     }
 
-    private SectionRequest toSectionRequest(LineRequest lineRequest) {
-        return new SectionRequest(
-                lineRequest.getDownStationId(),
-                lineRequest.getUpStationId(),
-                lineRequest.getDistance()
+    private Section toSectionEntity(Long downStationId, Long upStationId, int distance) {
+        Station downStation = stationService.findStation(downStationId);
+        Station upStation = stationService.findStation(upStationId);
+
+        return new Section(
+                downStation,
+                upStation,
+                distance
         );
     }
 }
