@@ -6,6 +6,7 @@ import io.restassured.response.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import subway.dto.LineRequest;
+import subway.dto.LineSectionRequest;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -63,6 +64,17 @@ public class LineAcceptanceStep {
                 .extract();
     }
 
+    public static ExtractableResponse<Response> 노선_구간_등록_요청(ExtractableResponse<Response> response, LineSectionRequest lineSectionRequest) {
+        return RestAssured.given()
+                .pathParam("id", response.jsonPath().getLong("id"))
+                .log().all()
+                .body(lineSectionRequest)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines/{id}/sections")
+                .then().log().all()
+                .extract();
+    }
+
     public static void 노선_생성됨(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
@@ -93,5 +105,13 @@ public class LineAcceptanceStep {
 
         // then
         assertThat(listResponse.jsonPath().getList("name", String.class)).doesNotContain(신분당선_생성_요청.getName());
+    }
+
+    public static void 노선_구간_생성됨(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+    }
+
+    public static void 노선_구간_생성_실패됨(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 }

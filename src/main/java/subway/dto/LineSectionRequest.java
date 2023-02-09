@@ -8,6 +8,9 @@ public class LineSectionRequest {
 
     private Integer distance;
 
+    public LineSectionRequest() {
+    }
+
     public LineSectionRequest(Long upStationId, Long downStationId, Integer distance) {
         this.upStationId = upStationId;
         this.downStationId = downStationId;

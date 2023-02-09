@@ -9,8 +9,7 @@ import subway.Acceptance.AcceptanceTest;
 
 import java.util.List;
 
-import static subway.Acceptance.line.LineAcceptanceFixture.분당선_생성_요청;
-import static subway.Acceptance.line.LineAcceptanceFixture.신분당선_생성_요청;
+import static subway.Acceptance.line.LineAcceptanceFixture.*;
 import static subway.Acceptance.line.LineAcceptanceStep.*;
 import static subway.Acceptance.station.StationAcceptanceStep.지하철역_생성_요청;
 
@@ -21,6 +20,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void setStations() {
         지하철역_생성_요청("강남역");
         지하철역_생성_요청("역삼역");
+        지하철역_생성_요청("선릉역");
+        지하철역_생성_요청("삼성역");
     }
 
     /**
@@ -119,10 +120,43 @@ public class LineAcceptanceTest extends AcceptanceTest {
      * 새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없다.
      * 새로운 구간 등록시 위 조건에 부합하지 않는 경우 에러 처리한다.
      */
-    @DisplayName("지하철 노선 구간 등록")
+    @DisplayName("지하철 노선 구간 등록 성공")
     @Test
     void createLineSection() {
+        // given
+        ExtractableResponse<Response> createResponse = 노선_생성_요청(신분당선_생성_요청);
 
+        // when
+        ExtractableResponse<Response> response = 노선_구간_등록_요청(createResponse, 구간_등록_요청_성공);
+
+        // then
+        노선_구간_생성됨(response);
+    }
+
+    @DisplayName("지하철 노선 구간 등록 실패 : 새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 한다.")
+    @Test
+    void createLineSection_fail1() {
+        // given
+        ExtractableResponse<Response> createResponse = 노선_생성_요청(신분당선_생성_요청);
+
+        // when
+        ExtractableResponse<Response> response = 노선_구간_등록_요청(createResponse, 구간_등록_요청_실패1);
+
+        // then
+        노선_구간_생성_실패됨(response);
+    }
+
+    @DisplayName("지하철 노선 구간 등록 실패 : 새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없다.")
+    @Test
+    void createLineSection_fail2() {
+        // given
+        ExtractableResponse<Response> createResponse = 노선_생성_요청(신분당선_생성_요청);
+
+        // when
+        ExtractableResponse<Response> response = 노선_구간_등록_요청(createResponse, 구간_등록_요청_실패2);
+
+        // then
+        노선_구간_생성_실패됨(response);
     }
 
 }
