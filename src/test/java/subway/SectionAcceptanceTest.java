@@ -38,7 +38,7 @@ class SectionAcceptanceTest extends AcceptanceTest {
         void 새로운_구간의_하행역은_해당_노선에_등록되어있는_역일_수_없다() {
             final ExtractableResponse<Response> response = 구간을_추가_요청(이호선Id, 잠실역Id, 강남역Id, 5);
 
-            assertThat(response.statusCode()).isNotEqualTo(200);
+            구간_추가_요청에_실패한다(response);
         }
 
         @DisplayName("새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 한다")
@@ -50,7 +50,7 @@ class SectionAcceptanceTest extends AcceptanceTest {
             void 동일하지_않다면_등록_불가능하다() {
                 final ExtractableResponse<Response> response = 구간을_추가_요청(이호선Id, 강남역Id, 잠실역Id, 10);
 
-                assertThat(response.statusCode()).isNotEqualTo(HttpStatus.OK.value());
+                구간_추가_요청에_실패한다(response);
             }
 
             @DisplayName("동일하다면 등록 가능하다")
@@ -58,8 +58,16 @@ class SectionAcceptanceTest extends AcceptanceTest {
             void 동일하다면_등록_가능하다() {
                 final ExtractableResponse<Response> response = 구간을_추가_요청(이호선Id, 역삼역Id, 잠실역Id, 10);
 
-                assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+                구간_추가_요청에_성공한다(response);
             }
+        }
+
+        private void 구간_추가_요청에_성공한다(ExtractableResponse<Response> response) {
+            assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        }
+
+        private void 구간_추가_요청에_실패한다(ExtractableResponse<Response> response) {
+            assertThat(response.statusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY.value());
         }
     }
 
@@ -81,7 +89,7 @@ class SectionAcceptanceTest extends AcceptanceTest {
             void 마지막_구간이_아니면_제거할_수_없다() {
                 final ExtractableResponse<Response> response = 구간_삭제_요청(이호선Id, 강남역Id);
 
-                assertThat(response.statusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY.value());
+                구간_삭제_요청이_실패한다(response);
             }
 
             @DisplayName("마지막 구간이면 제거할 수 있다")
@@ -89,7 +97,7 @@ class SectionAcceptanceTest extends AcceptanceTest {
             void 마지막_구간이면_제거할_수_있다() {
                 final ExtractableResponse<Response> response = 구간_삭제_요청(이호선Id, 잠실역Id);
 
-                assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+                구간_삭제_요청이_성공한다(response);
             }
         }
 
@@ -104,7 +112,7 @@ class SectionAcceptanceTest extends AcceptanceTest {
 
                 final ExtractableResponse<Response> response = 구간_삭제_요청(이호선Id, 잠실역Id);
 
-                assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+                구간_삭제_요청이_성공한다(response);
             }
 
             @DisplayName("한개인 경우 삭제할 수 없다")
@@ -112,8 +120,15 @@ class SectionAcceptanceTest extends AcceptanceTest {
             void 한개인_경우_삭제할_수_없다() {
                 final ExtractableResponse<Response> response = 구간_삭제_요청(이호선Id, 잠실역Id);
 
-                assertThat(response.statusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY.value());
+                구간_삭제_요청이_실패한다(response);
             }
+        }
+        private void 구간_삭제_요청이_성공한다(ExtractableResponse<Response> response) {
+            assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        }
+
+        private void 구간_삭제_요청이_실패한다(ExtractableResponse<Response> response) {
+            assertThat(response.statusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY.value());
         }
     }
 }
