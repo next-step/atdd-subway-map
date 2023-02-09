@@ -7,6 +7,7 @@ import subway.application.line.LineFacade;
 import subway.presentation.line.dto.request.LineRequest;
 import subway.presentation.line.dto.request.LineUpdateRequest;
 import subway.presentation.line.dto.response.LineResponse;
+import subway.presentation.section.dto.request.SectionRequest;
 
 import java.net.URI;
 import java.util.List;
@@ -47,5 +48,14 @@ public class LineController {
     public ResponseEntity<Void> deleteLine(@PathVariable Long lineId) {
         lineFacade.deleteLine(lineId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{lineId}/sections")
+    public ResponseEntity<LineResponse> addSection(
+            @PathVariable Long lineId,
+            @RequestBody SectionRequest request
+    ) {
+        LineResponse line = lineFacade.addSection(lineId, request);
+        return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
 }

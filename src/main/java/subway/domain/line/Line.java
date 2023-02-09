@@ -4,14 +4,11 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import subway.domain.section.Section;
+import subway.domain.section.Sections;
 import subway.domain.station.Station;
-import subway.domain.station.Stations;
 
-import javax.persistence.Embedded;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.List;
 
 @Entity
@@ -27,27 +24,31 @@ public class Line {
 
     private String color;
     @Embedded
-    private Stations stations;
+    private Sections sections;
 
     private Integer distance;
 
 
     @Builder
-    public Line(String name, String color, Stations stations, Integer distance) {
+    public Line(String name, String color, Sections sections, Integer distance) {
         this.name = name;
         this.color = color;
-        this.stations = stations;
+        this.sections = sections;
         this.distance = distance;
 
-        stations.belongTo(this);
+        sections.belongTo(this);
     }
 
     public List<Station> getStations() {
-        return stations.getStations();
+        return sections.getStations();
     }
 
     public void update(String name, String color) {
         this.name = name;
         this.color = color;
+    }
+
+    public void addSection(Section section) {
+        sections.addSection(section);
     }
 }

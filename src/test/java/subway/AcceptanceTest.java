@@ -1,14 +1,14 @@
 package subway;
 
 import io.restassured.RestAssured;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.test.context.ActiveProfiles;
 import subway.utils.DataBaseCleaner;
 
-@ActiveProfiles("test")
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class AcceptanceTest {
 
@@ -19,8 +19,12 @@ public class AcceptanceTest {
     int port;
 
     @BeforeEach
-    void setUp() {
+    public void init() {
         RestAssured.port = port;
+    }
+
+    @AfterEach
+    void clear() {
         dataBaseCleaner.execute();
     }
 
