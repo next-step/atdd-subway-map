@@ -72,4 +72,12 @@ public class LineService {
 
         return LineResponse.of(line);
     }
+
+    @Transactional
+    public void deleteSection(Long lineId, Station station) {
+        Line line = lineRepository.findByIdWithStations(lineId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_LINE));
+        Section section = line.getSection(station);
+        line.deleteSection(section);
+    }
 }

@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import subway.domain.line.Line;
 import subway.domain.station.Station;
 import subway.global.error.ErrorCode;
+import subway.global.error.exception.NotFoundException;
 import subway.global.error.exception.ValidateException;
 
 import javax.persistence.CascadeType;
@@ -66,5 +67,31 @@ public class Sections {
 
     private Station getLastStation() {
         return sections.get(sections.size() - 1).getDownStation();
+    }
+
+    public void deleteSection(Section section) {
+        validateDeleteStationIsEndOfStation(section.getDownStation());
+        validateLineHasOnlyOneSection();
+        sections.remove(section);
+    }
+
+    public Section getSection(Station station) {
+        return sections.stream()
+                .filter(section -> section.getDownStation().equals(station))
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_STATION));
+    }
+
+    private void validateLineHasOnlyOneSection() {
+        if (sections.size() == 1) {
+            throw new ValidateException(ErrorCode.CANNOT_DELETE_WHEN_LINE_HAS_ONLY_ONE_SECTION);
+        }
+    }
+
+    private void validateDeleteStationIsEndOfStation(Station station) {
+        Station lastStation = getLastStation();
+        if (!lastStation.equals(station)) {
+            throw new ValidateException(ErrorCode.SECTION_MUST_BE_DELETED_END_OF_LINE);
+        }
     }
 }

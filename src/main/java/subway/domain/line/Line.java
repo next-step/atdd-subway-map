@@ -50,5 +50,14 @@ public class Line {
 
     public void addSection(Section section) {
         sections.addSection(section);
+        section.belongTo(this);
+    }
+
+    public void deleteSection(Section section) {
+        sections.deleteSection(section);
+    }
+
+    public Section getSection(Station station) {
+        return sections.getSection(station);
     }
 }

@@ -147,7 +147,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
      */
     @DisplayName("제거할 지하철 역이 하행 종점역이 아니라면 예외가 발생한다.")
     @Test
-    void deleteSection_fail1() {
+    void deleteSection_fail2() {
         // given
         long stationId = 2L;
         // when

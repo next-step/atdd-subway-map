@@ -54,4 +54,9 @@ public class LineFacade {
         return lineService.addSection(lineId, upStation, downStation, request.getDistance());
     }
 
+    @Transactional
+    public void deleteSection(Long lineId, Long stationId) {
+        Station station = stationService.getStation(stationId);
+        lineService.deleteSection(lineId, station);
+    }
 }
