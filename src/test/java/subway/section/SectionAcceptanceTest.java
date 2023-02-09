@@ -11,10 +11,12 @@ import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import subway.dto.LineRequest;
 import subway.dto.SectionRequest;
+import subway.exception.IllegalSectionException;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static subway.line.LineAcceptanceTest.*;
 import static subway.station.StationAcceptanceTest.createStationByName;
 
@@ -39,6 +41,9 @@ public class SectionAcceptanceTest {
             "신분당선", "bg-red-600", 또다른지하철역_아이디, 새로운지하철역_아이디, 신분당선_거리);
     private static final SectionRequest 새로운구간 = SectionRequest.of(
             지하철역_아이디, 또다른지하철역_아이디, 새로운구간_거리);
+
+    private static final SectionRequest 또다른구간 = SectionRequest.of(
+            지하철역_아이디, 새로운지하철역_아이디, 새로운구간_거리);
 
 
     @BeforeEach
@@ -84,7 +89,7 @@ public class SectionAcceptanceTest {
         long lineId = createLineAndGetId(신분당선);
 
         //When
-        ExtractableResponse<Response> sectionResponse = createSection(lineId);
+        ExtractableResponse<Response> sectionResponse = createSection(lineId, 새로운구간);
 
         //Then
         ExtractableResponse<Response> sectionsResponse = readSectionsOfLine(lineId);
@@ -103,12 +108,28 @@ public class SectionAcceptanceTest {
 
     /**
      * Given 지하철 노선을 생성한다.
-     * When 지하철 구간을 생성하고, 새로운 구간의 상행역이 노선의 하행 종점역이 아니다.
-     * Then 노선에 등록시 오류가 난다.
+     * Then 새로운 구간의 상행역이 노선의 하행 종점역이 아니면 등록시 오류가 발생한다.
      */
     @DisplayName("구간의 상행역을 노선의 상행종점역에 등록한다.")
     @Test
     void 구간_상행역을_노선의_상행종점역에_등록() {
+        //Given
+        long lineId = createLineAndGetId(신분당선);
+
+        //Then
+        assertThatThrownBy(() ->
+                createSection(lineId, 또다른구간)).isInstanceOf(IllegalSectionException.class);
+
+    }
+
+    /**
+     * Given 구간이 2개인 지하철 노선을 생성한다.
+     * When 노선에 등록된 하행 종점역을 제거한다.
+     * Then 오류가 발생한다.
+     */
+    @DisplayName("구간이 두 개인 노선의 하행종점역을 제거한다.")
+    @Test
+    void 노선의_하행종점역을_제거() {
 
     }
 
@@ -134,17 +155,6 @@ public class SectionAcceptanceTest {
 
     }
 
-    /**
-     * Given 구간이 2개인 지하철 노선을 생성한다.
-     * When 노선에 등록된 하행 종점역을 제거한다.
-     * Then 오류가 발생한다.
-     */
-    @DisplayName("구간이 두 개인 노선의 하행종점역을 제거한다.")
-    @Test
-    void 노선의_하행종점역을_제거() {
-
-    }
-
     private static ExtractableResponse<Response> readSectionsOfLine(long lineId) {
         return RestAssured.given().log().all()
                 .when().get("/lines/{lineId}/sections", lineId)
@@ -152,9 +162,9 @@ public class SectionAcceptanceTest {
                 .extract();
     }
 
-    private static ExtractableResponse<Response> createSection(long lineId) {
+    private static ExtractableResponse<Response> createSection(long lineId, SectionRequest request) {
         return RestAssured.given().log().all()
-                .body(새로운구간)
+                .body(request)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/lines/{lineId}/sections", lineId)
                 .then().log().all()

@@ -6,6 +6,7 @@ import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Station;
 import subway.dto.*;
+import subway.exception.IllegalSectionException;
 import subway.repository.SectionRepository;
 
 import java.util.List;
@@ -48,6 +49,7 @@ public class SectionService {
         Station downStation = stationService.findById(request.getDownStationId());
         Station upStation = stationService.findById((request.getUpStationId()));
         Long distance = request.getDistance();
+        validateCreateSection(line, upStation);
         Section section = sectionRepository.save(new Section(
                         line,
                         downStation,
@@ -66,5 +68,11 @@ public class SectionService {
                         new StationResponse(upStation.getId(), upStation.getName())
                 )
         );
+    }
+
+    private void validateCreateSection(Line line, Station upStation) {
+        if (line.getDownStation() != upStation) {
+            throw new IllegalSectionException();
+        }
     }
 }
