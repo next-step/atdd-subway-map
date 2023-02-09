@@ -2,7 +2,7 @@ package subway.line.dto;
 
 import subway.line.repository.Line;
 import subway.section.dto.SectionResponse;
-import subway.section.repository.Section;
+import subway.line.repository.Section;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,6 +1,6 @@
 package subway.section.dto;
 
-import subway.section.repository.Section;
+import subway.line.repository.Section;
 import subway.station.dto.StationResponse;
 import subway.station.repository.Station;
 

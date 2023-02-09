@@ -1,6 +1,5 @@
-package subway.section.repository;
+package subway.line.repository;
 
-import subway.line.repository.Line;
 import subway.station.repository.Station;
 
 import javax.persistence.*;

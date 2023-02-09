@@ -3,7 +3,7 @@ package subway.section.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.section.dto.SectionRequest;
-import subway.section.repository.Section;
+import subway.line.repository.Section;
 import subway.section.repository.SectionRepository;
 import subway.station.repository.Station;
 import subway.station.service.StationService;
