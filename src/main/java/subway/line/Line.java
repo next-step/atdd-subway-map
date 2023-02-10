@@ -1,5 +1,7 @@
 package subway.line;
 
+import subway.line.exception.ErrorCode;
+import subway.line.exception.RegisterLineSectionException;
 import subway.station.Station;
 
 import javax.persistence.CascadeType;
@@ -14,6 +16,8 @@ import java.util.List;
 
 @Entity
 public class Line {
+    private static final int MIN_SECTION_SIZE = 1;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -52,7 +56,7 @@ public class Line {
 
     public List<Station> getStations() {
         List<Station> stations = new ArrayList<>();
-        Station firstStation = sections.get(0).getUpStation();
+        Station firstStation = this.sections.get(0).getUpStation();
         stations.add(firstStation);
         for (Section section : this.sections) {
             stations.add(section.getDownStation());
@@ -63,5 +67,62 @@ public class Line {
     public void update(Line line) {
         this.name = line.getName();
         this.color = line.getColor();
+    }
+
+    public void addLineSection(Station upStation, Station downStation, int distance) {
+        validAddStation(upStation, downStation);
+        this.sections.add(new Section(this, upStation, downStation, distance));
+    }
+
+    private Station getFinalStation() {
+        return getFinalSection().getDownStation();
+    }
+
+    private Section getFinalSection() {
+        return this.sections.get(this.sections.size() - 1);
+    }
+
+    private void validAddStation(Station upStation, Station downStation) {
+        validAddUpStation(upStation);
+        validAddDownStation(downStation);
+    }
+
+    private void validAddUpStation(Station upStation) {
+        if (!isFinalStation(upStation)) {
+            throw new RegisterLineSectionException(ErrorCode.ADD_UP_STATION_IS_NOT_FINAL_STATION);
+        }
+    }
+
+    private void validAddDownStation(Station downStation) {
+        if (getStations().contains(downStation)) {
+            throw new RegisterLineSectionException(ErrorCode.ADD_DOWN_STATION_IN_LINE);
+        }
+    }
+
+    private boolean isFinalStation(Station station) {
+        return getFinalStation().equals(station);
+    }
+
+    private boolean isFinalStation(Long stationId) {
+        return getFinalStation().getId().equals(stationId);
+    }
+
+    public void removeLineSection(Long stationId) {
+        validSectionSize();
+        validRemoveStation(stationId);
+
+        this.sections.remove(getFinalSection());
+    }
+
+    private void validSectionSize() {
+        if (this.sections.size() <= MIN_SECTION_SIZE) {
+            throw new RegisterLineSectionException(ErrorCode.SECTION_NOT_EMPTY);
+        }
+    }
+
+    private void validRemoveStation(Long stationId) {
+        if (!isFinalStation(stationId)) {
+            throw new RegisterLineSectionException(ErrorCode.REMOVE_STATION_MUST_BE_FINAL_STATION);
+        }
     }
 }
