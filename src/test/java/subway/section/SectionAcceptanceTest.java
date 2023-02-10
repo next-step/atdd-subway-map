@@ -18,7 +18,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static subway.line.LineAcceptanceTest.*;
-import static subway.station.StationAcceptanceTest.createStationByName;
+import static subway.station.StationAcceptanceTest.지하철역_생성_요청;
 
 @DisplayName("노선 관련 기능")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -48,9 +48,9 @@ public class SectionAcceptanceTest {
 
     @BeforeEach
     void setUp() {
-        createStationByName("지하철역");
-        createStationByName("새로운지하철역");
-        createStationByName("또다른지하철역");
+        지하철역_생성_요청("지하철역");
+        지하철역_생성_요청("새로운지하철역");
+        지하철역_생성_요청("또다른지하철역");
     }
 
     /**
@@ -97,7 +97,7 @@ public class SectionAcceptanceTest {
         assertThat(sectionIds).contains(sectionResponse.jsonPath().getLong("section.id"));
 
         //Then
-        ExtractableResponse<Response> lineResponse = readLine(lineId);
+        ExtractableResponse<Response> lineResponse = 노선_조회_요청(lineId);
         List<Long> stationIds = lineResponse.jsonPath().getList("stations.id", Long.class);
         assertThat(stationIds).contains(지하철역_아이디).doesNotContain(또다른지하철역_아이디);
 
@@ -146,12 +146,20 @@ public class SectionAcceptanceTest {
 
     /**
      * Given 구간이 2개인 지하철 노선을 생성한다.
-     * When 상행종점역이 포함된 구간을 제거한다.
+     * When 상행종점역이 포함된 구간을 제거시 오류가 발생한다.
      * Then 오류가 발생한다.
      */
     @DisplayName("노선의 상행종점역을 제거한다.")
     @Test
     void 노선의_상행종점역을_제거() {
+        //Given
+        long lineId = createLineAndGetId(신분당선);
+        long stationId = createSection(lineId, 새로운구간).jsonPath().getLong("section.downStation.id");
+
+        //When
+        deleteSection(lineId, 새로운지하철역_아이디);
+
+        //Then
 
     }
 
