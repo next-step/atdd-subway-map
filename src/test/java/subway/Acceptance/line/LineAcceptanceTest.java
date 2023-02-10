@@ -116,9 +116,9 @@ public class LineAcceptanceTest extends AcceptanceTest {
     }
 
     /**
-     * 새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 한다.
-     * 새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없다.
-     * 새로운 구간 등록시 위 조건에 부합하지 않는 경우 에러 처리한다.
+     * given 지하철 노선 생성
+     * when 지하철 구간을 등록하면
+     * then 지하철 구간이 등록된다.
      */
     @DisplayName("지하철 노선 구간 등록 성공")
     @Test
@@ -133,6 +133,11 @@ public class LineAcceptanceTest extends AcceptanceTest {
         노선_구간_생성됨(response);
     }
 
+    /**
+     * given 지하철 노선 생성
+     * when 지하철 구간을 등록하면
+     * then 새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이 아니라면 실패한다.
+     */
     @DisplayName("지하철 노선 구간 등록 실패 : 새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 한다.")
     @Test
     void createLineSection_fail1() {
@@ -146,6 +151,11 @@ public class LineAcceptanceTest extends AcceptanceTest {
         노선_구간_생성_실패됨(response);
     }
 
+    /**
+     * given 지하철 노선 생성
+     * when 지하철 구간을 등록하면
+     * then 새로운 구간의 하행역이 해당 노선에 등록되어있는 역이라면 실패한다.
+     */
     @DisplayName("지하철 노선 구간 등록 실패 : 새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없다.")
     @Test
     void createLineSection_fail2() {
@@ -160,10 +170,9 @@ public class LineAcceptanceTest extends AcceptanceTest {
     }
 
     /**
-     * 지하철 노선에 구간을 제거하는 기능 구현
-     * 지하철 노선에 등록된 역(하행 종점역)만 제거할 수 있다. 즉, 마지막 구간만 제거할 수 있다.
-     * 지하철 노선에 상행 종점역과 하행 종점역만 있는 경우(구간이 1개인 경우) 역을 삭제할 수 없다.
-     * 새로운 구간 제거시 위 조건에 부합하지 않는 경우 에러 처리한다.
+     * given 지하철 노선 등록
+     * when 지하철 구간을 제거하면
+     * then 지하철 구간이 삭제된다.
      */
     @DisplayName("지하철 노선 구간 삭제 성공")
     @Test
@@ -179,6 +188,11 @@ public class LineAcceptanceTest extends AcceptanceTest {
         노선_구간_삭제됨(response);
     }
 
+    /**
+     * given 지하철 노선 등록
+     * when 지하철 구간을 제거하면
+     * then 지하철 노선에 등록된 역(하행 종점역)이 아니라면 실패한다.
+     */
     @DisplayName("지하철 노선 구간 삭제 실패 : 지하철 노선에 등록된 역(하행 종점역)만 제거할 수 있다.")
     @Test
     void deleteLineSection_fail1() {
@@ -193,6 +207,11 @@ public class LineAcceptanceTest extends AcceptanceTest {
         노선_구간_삭제_실패됨(response);
     }
 
+    /**
+     * given 지하철 노선 등록
+     * when 지하철 구간을 제거하면
+     * then 지하철 노선에 상행 종점역과 하행 종점역만 있는 경우(구간이 1개인 경우) 역을 삭제가 실패한다.
+     */
     @DisplayName("지하철 노선 구간 삭제 실패 : 지하철 노선에 상행 종점역과 하행 종점역만 있는 경우(구간이 1개인 경우) 역을 삭제할 수 없다.")
     @Test
     void deleteLineSection_fail2() {
