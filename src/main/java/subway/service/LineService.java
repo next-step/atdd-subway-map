@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
+import subway.dto.LineSectionRequest;
 import subway.exception.LineNotFoundException;
 import subway.model.Line;
 import subway.model.Station;
@@ -27,7 +28,7 @@ public class LineService {
     public LineResponse createLine(LineRequest lineRequest) {
         Station upStation = stationService.showStation(lineRequest.getUpStationId());
         Station downStation = stationService.showStation(lineRequest.getDownStationId());
-        Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor(), upStation.getId(), downStation.getId()));
+        Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor(), upStation, downStation, lineRequest.getDistance()));
         return createLineResponse(line);
     }
 
@@ -40,15 +41,13 @@ public class LineService {
 
     @Transactional(readOnly = true)
     public LineResponse showLine(Long id) {
-        Line line = lineRepository.findById(id)
-                .orElseThrow(LineNotFoundException::new);
+        Line line = findLineById(id);
         return createLineResponse(line);
     }
 
     @Transactional
     public void modifyLine(Long id, LineRequest lineRequest) {
-        Line line = lineRepository.findById(id)
-                .orElseThrow(LineNotFoundException::new);
+        Line line = findLineById(id);
         line.modifyLine(lineRequest.getName(), lineRequest.getColor());
     }
 
@@ -65,5 +64,25 @@ public class LineService {
                 List.of(stationService.createStationResponse(stationService.showStation(line.getUpStationId()))
                         , stationService.createStationResponse(stationService.showStation(line.getDownStationId())))
         );
+    }
+
+    @Transactional
+    public void createLineSection(Long id, LineSectionRequest lineSectionRequest) {
+        Station upStation = stationService.showStation(lineSectionRequest.getUpStationId());
+        Station downStation = stationService.showStation(lineSectionRequest.getDownStationId());
+        Line line = findLineById(id);
+        line.createLineSection(upStation, downStation, lineSectionRequest.getDistance());
+    }
+
+    private Line findLineById(Long id) {
+        return lineRepository.findById(id)
+                .orElseThrow(LineNotFoundException::new);
+    }
+
+    @Transactional
+    public void deleteLineSection(Long id, Long stationId) {
+        Station station = stationService.showStation(stationId);
+        Line line = findLineById(id);
+        line.deleteLineSection(station);
     }
 }

@@ -10,11 +10,25 @@ public class Station {
     @Column(length = 20, nullable = false)
     private String name;
 
+    @Column
+    private Long preStationId;
+
     protected Station() {
     }
 
     public Station(String name) {
         this.name = name;
+    }
+
+    public Station(Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
+    public Station(Long id, String name, Long preStationId) {
+        this.id = id;
+        this.name = name;
+        this.preStationId = preStationId;
     }
 
     public Long getId() {
@@ -23,5 +37,9 @@ public class Station {
 
     public String getName() {
         return name;
+    }
+
+    public Long getPreStationId() {
+        return preStationId;
     }
 }

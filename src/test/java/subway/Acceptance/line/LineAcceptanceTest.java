@@ -1,23 +1,29 @@
 package subway.Acceptance.line;
 
-import io.restassured.RestAssured;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import subway.Acceptance.AcceptanceTest;
-import subway.dto.LineRequest;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static subway.Acceptance.AcceptanceTestFixture.BUN_DANG_LINE_REQUEST;
-import static subway.Acceptance.AcceptanceTestFixture.SHIN_BUN_DANG_LINE_REQUEST;
+import static subway.Acceptance.line.LineAcceptanceFixture.구간_등록_요청;
+import static subway.Acceptance.line.LineAcceptanceFixture.*;
+import static subway.Acceptance.line.LineAcceptanceStep.구간_등록_요청;
+import static subway.Acceptance.line.LineAcceptanceStep.*;
+import static subway.Acceptance.station.StationAcceptanceStep.지하철역_생성_요청;
 
 @DisplayName("노선 관련 기능")
 public class LineAcceptanceTest extends AcceptanceTest {
+
+    @BeforeEach
+    void setStations() {
+        지하철역_생성_요청("강남역");
+        지하철역_생성_요청("역삼역");
+        지하철역_생성_요청("선릉역");
+        지하철역_생성_요청("삼성역");
+        지하철역_생성_요청("선정릉");
+    }
 
     /**
      * When 지하철 노선을 생성하면
@@ -27,27 +33,14 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine() {
         // when
-        ExtractableResponse<Response> response = createLineResponse(SHIN_BUN_DANG_LINE_REQUEST);
+        var 노선_생성_응답 = 노선_생성_요청(이호선(강남역, 역삼역));
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        노선_생성됨(노선_생성_응답);
 
         // then
-        List<String> lineNames =
-                RestAssured.given().log().all()
-                        .when().get("/lines")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
-        assertThat(lineNames).containsAnyOf("신분당선");
-    }
-
-    private ExtractableResponse<Response> createLineResponse(LineRequest lineRequest) {
-        return RestAssured.given().log().all()
-                .body(lineRequest)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().log().all()
-                .extract();
+        var 노선_목록_조회_응답 = 노선_목록_조회_요청();
+        노선_목록_포함됨(노선_목록_조회_응답, List.of(노선_생성_응답));
     }
 
     /**
@@ -59,22 +52,14 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void showLines() {
         // given
-        createLineResponse(SHIN_BUN_DANG_LINE_REQUEST);
-        createLineResponse(BUN_DANG_LINE_REQUEST);
+        var 노선_생성_응답1 = 노선_생성_요청(이호선(강남역, 역삼역));
+        var 노선_생성_응답2 = 노선_생성_요청(분당선(선릉역, 강남역));
 
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/lines")
-                .then().log().all()
-                .extract();
+        var 노선_목록_조회_응답 = 노선_목록_조회_요청();
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-
-        // then
-        List<String> lineNames = response.jsonPath().getList("name", String.class);
-        assertThat(lineNames).containsAnyOf(SHIN_BUN_DANG_LINE_REQUEST.getName(), BUN_DANG_LINE_REQUEST.getName());
+        노선_목록_포함됨(노선_목록_조회_응답, List.of(노선_생성_응답1, 노선_생성_응답2));
     }
 
     /**
@@ -86,24 +71,13 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void showLine() {
         // given
-        ExtractableResponse<Response> shinBunDang = createLineResponse(SHIN_BUN_DANG_LINE_REQUEST);
+        var 노선_생성_응답 = 노선_생성_요청(이호선(강남역, 역삼역));
 
         // when
-        long id = shinBunDang.jsonPath().getLong("id");
-        ExtractableResponse<Response> response = RestAssured.given()
-                .pathParam("id", id)
-                .log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/lines/{id}")
-                .then().log().all()
-                .extract();
+        var 노선_조회_응답 = 노선_조회_요청(노선_생성_응답);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-
-        // then
-        String lineName = response.jsonPath().getString("name");
-        assertThat(lineName).isEqualTo(SHIN_BUN_DANG_LINE_REQUEST.getName());
+        노선_조회됨(노선_조회_응답);
     }
 
     /**
@@ -115,31 +89,13 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void modifyLine() {
         // given
-        ExtractableResponse<Response> shinBunDang = createLineResponse(SHIN_BUN_DANG_LINE_REQUEST);
+        var 노선_생성_응답 = 노선_생성_요청(이호선(강남역, 역삼역));
 
         // when
-        long id = shinBunDang.jsonPath().getLong("id");
-        ExtractableResponse<Response> response = RestAssured.given()
-                .pathParam("id", id)
-                .log().all()
-                .body(new LineRequest("당당선", "bg-red-500"))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().put("/lines/{id}")
-                .then().log().all()
-                .extract();
+        var 노선_수정_응답 = 노선_수정_요청(노선_생성_응답, 당당선_수정(당당선, 빨간색));
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-
-        // then
-        String lineName = RestAssured.given()
-                .pathParam("id", id)
-                .log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/lines/{id}")
-                .then().log().all()
-                .extract().jsonPath().getString("name");
-        assertThat(lineName).isEqualTo("당당선");
+        노선_수정됨(노선_수정_응답);
     }
 
     /**
@@ -151,30 +107,122 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        ExtractableResponse<Response> shinBunDang = createLineResponse(SHIN_BUN_DANG_LINE_REQUEST);
+        var 노선_생성_응답 = 노선_생성_요청(이호선(강남역, 역삼역));
 
         // when
-        long id = shinBunDang.jsonPath().getLong("id");
-        ExtractableResponse<Response> response = RestAssured.given()
-                .pathParam("id", id)
-                .log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().delete("/lines/{id}")
-                .then().log().all()
-                .extract();
+        var 노선_삭제_응답 = 노선_삭제_요청(노선_생성_응답);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-
-        // then
-        List<String> lineNames = RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/lines")
-                .then().log().all()
-                .extract().jsonPath().getList("name", String.class);
-
-        // then
-        assertThat(lineNames).doesNotContain(SHIN_BUN_DANG_LINE_REQUEST.getName());
+        노선_삭제됨(노선_삭제_응답);
     }
 
+    /**
+     * given 지하철 노선 생성
+     * when 지하철 구간을 등록하면
+     * then 지하철 구간이 등록된다.
+     */
+    @DisplayName("지하철 노선 구간 등록 성공")
+    @Test
+    void createLineSection() {
+        // given
+        var 노선_생성_응답 = 노선_생성_요청(이호선(강남역, 역삼역));
+
+        // when
+        var 구간_등록_응답 = 구간_등록_요청(이호선, 구간_등록_요청(역삼역, 선릉역));
+
+        // then
+        노선_구간_생성됨(구간_등록_응답);
+    }
+
+    /**
+     * given 지하철 노선 생성
+     * when 지하철 구간을 등록하면
+     * then 새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이 아니라면 실패한다.
+     */
+    @DisplayName("지하철 노선 구간 등록 실패 : 새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 한다.")
+    @Test
+    void createLineSection_fail1() {
+        // given
+        var 노선_생성_응답 = 노선_생성_요청(이호선(강남역, 역삼역));
+
+        // when
+        var 구간_등록_응답 = 구간_등록_요청(이호선, 구간_등록_요청(강남역, 선릉역));
+
+        // then
+        노선_구간_생성_실패됨(구간_등록_응답);
+    }
+
+    /**
+     * given 지하철 노선 생성
+     * when 지하철 구간을 등록하면
+     * then 새로운 구간의 하행역이 해당 노선에 등록되어있는 역이라면 실패한다.
+     */
+    @DisplayName("지하철 노선 구간 등록 실패 : 새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없다.")
+    @Test
+    void createLineSection_fail2() {
+        // given
+        var 노선_생성_요청 = 노선_생성_요청(이호선(강남역, 역삼역));
+
+        // when
+        var 구간_등록_응답 = 구간_등록_요청(이호선, 구간_등록_요청(역삼역, 강남역));
+
+        // then
+        노선_구간_생성_실패됨(구간_등록_응답);
+    }
+
+    /**
+     * given 지하철 노선 등록
+     * when 지하철 구간을 제거하면
+     * then 지하철 구간이 삭제된다.
+     */
+    @DisplayName("지하철 노선 구간 삭제 성공")
+    @Test
+    void deleteLineSection() {
+        // given
+        var 노선_생성_응답 = 노선_생성_요청(이호선(강남역, 역삼역));
+        var 구간_등록_응답 = 구간_등록_요청(이호선, 구간_등록_요청(역삼역, 선릉역));
+
+        // when
+        var 구간_삭제_응답 = 구간_삭제_요청(이호선, 선릉역);
+
+        // then
+        노선_구간_삭제됨(구간_삭제_응답);
+    }
+
+    /**
+     * given 지하철 노선 등록
+     * when 지하철 구간을 제거하면
+     * then 지하철 노선에 등록된 역(하행 종점역)이 아니라면 실패한다.
+     */
+    @DisplayName("지하철 노선 구간 삭제 실패 : 지하철 노선에 등록된 역(하행 종점역)만 제거할 수 있다.")
+    @Test
+    void deleteLineSection_fail1() {
+        // given
+        var 노선_생성_응답 = 노선_생성_요청(이호선(강남역, 역삼역));
+        var 구간_등록_응답 = 구간_등록_요청(이호선, 구간_등록_요청(역삼역, 선릉역));
+
+        // when
+        var 구간_삭제_응답 = 구간_삭제_요청(이호선, 역삼역);
+
+        // then
+        노선_구간_삭제_실패됨(구간_삭제_응답);
+    }
+
+    /**
+     * given 지하철 노선 등록
+     * when 지하철 구간을 제거하면
+     * then 지하철 노선에 상행 종점역과 하행 종점역만 있는 경우(구간이 1개인 경우) 역을 삭제가 실패한다.
+     */
+    @DisplayName("지하철 노선 구간 삭제 실패 : 지하철 노선에 상행 종점역과 하행 종점역만 있는 경우(구간이 1개인 경우) 역을 삭제할 수 없다.")
+    @Test
+    void deleteLineSection_fail2() {
+        // given
+        var 노선_생성_응답 = 노선_생성_요청(이호선(강남역, 역삼역));
+
+        // when
+        var 구간_삭제_응답 = 구간_삭제_요청(이호선, 역삼역);
+
+        // then
+        노선_구간_삭제_실패됨(구간_삭제_응답);
+    }
 }
