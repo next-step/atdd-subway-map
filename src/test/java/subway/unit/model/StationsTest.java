@@ -31,7 +31,7 @@ class StationsTest {
     @Test
     void createLineSection() {
         // when
-        강남역_역삼역.createLineSection(역삼역, 선릉역);
+        강남역_역삼역.createLineSection(역삼역, 선릉역, 15);
 
         // then
         assertThat(강남역_역삼역.getDownStationId()).isEqualTo(선릉역.getId());
@@ -41,7 +41,7 @@ class StationsTest {
     @Test
     void createLineSection_fail1() {
         // when & then
-        assertThatThrownBy(() -> 강남역_역삼역.createLineSection(삼성역, 선릉역))
+        assertThatThrownBy(() -> 강남역_역삼역.createLineSection(삼성역, 선릉역, 15))
                 .isInstanceOf(CreateLineSectionException.class);
     }
 
@@ -49,7 +49,15 @@ class StationsTest {
     @Test
     void createLineSection_fail2() {
         // when & then
-        assertThatThrownBy(() -> 강남역_역삼역.createLineSection(역삼역, 강남역))
+        assertThatThrownBy(() -> 강남역_역삼역.createLineSection(역삼역, 강남역, 15))
+                .isInstanceOf(CreateLineSectionException.class);
+    }
+
+    @DisplayName("지하철 구간 등록 실패 : 새로운 구간의 길이는 해당 노선 보다 길어야 합니다.")
+    @Test
+    void createLineSection_fail3() {
+        // when & then
+        assertThatThrownBy(() -> 강남역_역삼역.createLineSection(역삼역, 선릉역, 5))
                 .isInstanceOf(CreateLineSectionException.class);
     }
 

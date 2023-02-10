@@ -20,13 +20,16 @@ public class Stations {
 
     private Long downStationId;
 
+    private int distance;
+
     protected Stations() {
     }
 
-    public Stations(List<Station> stations) {
+    public Stations(List<Station> stations, int distance) {
         this.stations = isStationsNullOrEmpty(stations) ? this.stations : stations;
         this.upStationId = isStationsNullOrEmpty(stations) ? this.upStationId : stations.get(0).getId();
         this.downStationId = isStationsNullOrEmpty(stations) ? this.downStationId : stations.get(stations.size() - 1).getId();
+        this.distance = isStationsNullOrEmpty(stations) ? this.distance : distance;
     }
 
     private boolean isStationsNullOrEmpty(List<Station> stations) {
@@ -41,7 +44,7 @@ public class Stations {
         return downStationId;
     }
 
-    public void createLineSection(Station upStation, Station downStation) {
+    public void createLineSection(Station upStation, Station downStation, int distance) {
         if (!isDownStation(upStation)) {
             throw new CreateLineSectionException("새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 합니다.");
         }
@@ -50,6 +53,14 @@ public class Stations {
         }
         this.stations = addStation(downStation);
         this.downStationId = downStation.getId();
+        this.distance = validateDistance(distance);
+    }
+
+    private int validateDistance(int distance) {
+        if (distance < this.distance) {
+            throw new CreateLineSectionException("새로운 구간의 길이는 해당 노선 보다 길어야 합니다.");
+        }
+        return distance;
     }
 
     private List<Station> addStation(Station downStation) {

@@ -13,7 +13,7 @@ class LineTest {
     @Test
     void createLine() {
         // when
-        Line line = new Line("신분당선", "bg-red-600", 강남역, 역삼역);
+        Line line = new Line("신분당선", "bg-red-600", 강남역, 역삼역, 10);
 
         // then
         assertThat(line.getName()).isEqualTo("신분당선");
@@ -25,7 +25,7 @@ class LineTest {
     @Test
     void modifyLine() {
         // given
-        Line line = new Line("신분당선", "bg-red-600", 강남역, 역삼역);
+        Line line = new Line("신분당선", "bg-red-600", 강남역, 역삼역, 10);
 
         // when
         line.modifyLine("당당선", "bg-red-700");

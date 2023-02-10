@@ -21,10 +21,10 @@ public class Line {
     protected Line() {
     }
 
-    public Line(String name, String color, Station upStation, Station downStation) {
+    public Line(String name, String color, Station upStation, Station downStation, int distance) {
         this.name = name;
         this.color = color;
-        this.stations = new Stations(List.of(upStation, downStation));
+        this.stations = new Stations(List.of(upStation, downStation), distance);
     }
 
     public Long getId() {
@@ -52,8 +52,8 @@ public class Line {
         this.color = color;
     }
 
-    public void createLineSection(Station upStation, Station downStation) {
-        stations.createLineSection(upStation, downStation);
+    public void createLineSection(Station upStation, Station downStation, int distance) {
+        stations.createLineSection(upStation, downStation, distance);
     }
 
     public void deleteLineSection(Station station) {
