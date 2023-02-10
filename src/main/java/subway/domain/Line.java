@@ -1,12 +1,13 @@
 package subway.domain;
 
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -28,13 +29,11 @@ public class Line {
     @Column(name = "color")
     private String color;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Station upStation;
+    @Embedded
+    @JsonBackReference
+    private Sections sections = new Sections();
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Station downStation;
-
-    private int distance;
+    private int lineDistance;
 
     public void modify(String name, String color) {
         this.name = name;
@@ -42,11 +41,19 @@ public class Line {
     }
 
     @Builder(builderMethodName = "GenerateLine")
-    public Line(String name, String color, int distance, Station downStation, Station upStation) {
+    public Line(String name, String color, int distance) {
         this.name = name;
         this.color = color;
-        this.distance = distance;
-        this.upStation = upStation;
-        this.downStation = downStation;
+        this.lineDistance = distance;
+    }
+
+    public void addSection(Section section) {
+        this.sections.add(section);
+        this.lineDistance = sections.getTotalDistance();
+    }
+
+    public void deleteSection(Station station) {
+        this.sections.delete(station);
+        this.lineDistance = sections.getTotalDistance();
     }
 }
