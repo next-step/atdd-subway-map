@@ -1,4 +1,4 @@
-package subway.line;
+package subway.service;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -7,9 +7,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import subway.domain.Line;
+import subway.domain.Station;
+import subway.dto.request.LineRequest;
+import subway.dto.response.LineResponse;
 import subway.exception.NoStationException;
-import subway.station.Station;
-import subway.station.StationRepository;
+import subway.repository.LineRepository;
+import subway.repository.StationRepository;
 
 @Service
 @RequiredArgsConstructor

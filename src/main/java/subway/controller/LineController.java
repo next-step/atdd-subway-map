@@ -1,4 +1,4 @@
-package subway.line;
+package subway.controller;
 
 import java.net.URI;
 import java.util.List;
@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
+import subway.dto.request.LineRequest;
+import subway.dto.response.LineResponse;
+import subway.service.LineService;
 
 @RestController
 @RequiredArgsConstructor

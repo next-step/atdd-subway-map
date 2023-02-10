@@ -1,4 +1,4 @@
-package subway.line;
+package subway.domain;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,7 +12,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import subway.station.Station;
 
 @Getter
 @Entity
