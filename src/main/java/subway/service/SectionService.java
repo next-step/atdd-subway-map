@@ -38,4 +38,11 @@ public class SectionService {
         Line line = lineService.getLineById(lineId);
         line.addSection(section);
     }
+
+    @Transactional
+    public void deleteSection(Long lineId, Long stationId) {
+        Line line = lineService.getLineById(lineId);
+        Section section = line.deleteSection(stationId);
+        sectionRepository.delete(section);
+    }
 }

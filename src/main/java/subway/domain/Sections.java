@@ -32,6 +32,12 @@ public class Sections {
         return sections.get(0).getUpStation();
     }
 
+    public Section deleteSection(Long stationId) {
+        Section section = sections.get(sections.size()-1);
+        sections.remove(sections.size()-1);
+        return section;
+    }
+
     private void validateDownStationInSections(Section section) {
         if (anySectionContainDownStationOf(section)) {
             throw new IllegalSectionException();
