@@ -30,18 +30,20 @@ public class SectionAcceptanceTest {
 
     static ExtractableResponse<Response> 노선_구간_삭제(Long lineId, Long stationId) {
         return RestAssured.given()
-            .queryParam("stationId", stationId).log().all()
+            .queryParam("stationId", stationId)
+            .pathParam("lineId", lineId).log().all()
             .when()
-            .delete("/lines/" + lineId + "/sections")
+            .delete("/lines/{lineId}/sections")
             .then().log().all()
             .extract();
     }
 
     static ExtractableResponse<Response> 노선_구간_생성(Long lineId, Map<String, Object> sectionParams) {
-        return RestAssured.given().log().all()
+        return RestAssured.given()
             .body(sectionParams)
+            .pathParam("lineId", lineId).log().all()
             .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().post("/lines/" + lineId)
+            .when().post("/lines/{lineId}/sections")
             .then().log().all()
             .extract();
     }
@@ -78,7 +80,7 @@ public class SectionAcceptanceTest {
      */
     @DisplayName("지하철 구간을 생성한다")
     @Test
-    void 지하철_노선을_생성하면_목록_조회_시_생성한_노선을_찾을_수_있다() {
+    void 지하철_구간을_생성하면_생성된_구간의_하행역이_노선의_하행역이_된다() {
         // When
         Map<String, Object> sectionParams = new HashMap<>();
         sectionParams.put("upStationId", deokSoStation.getId());
@@ -91,8 +93,8 @@ public class SectionAcceptanceTest {
 
         // Then
         응답_상태_코드_검증(response, HttpStatus.CREATED);
-        Long downStationId = LineAcceptanceTest.지하철_노선_조회(lineId).body().jsonPath().getLong("downStationId");
-        assertThat(downStationId).isEqualTo(deokSoStation.getId());
+        Long downStationId = LineAcceptanceTest.지하철_노선_조회(lineId).body().jsonPath().getLong("stations[1].id");
+        assertThat(downStationId).isEqualTo(daSanStation.getId());
     }
 
     /**
@@ -106,7 +108,7 @@ public class SectionAcceptanceTest {
      */
     @DisplayName("지하철 구간을 삭제한다.")
     @Test
-    void 지하철_노선을_생성하고_생성한_노선을_삭제하면_해당_노선_정보는_삭제된다() {
+    void 지하철_구간을_생성하고_생성한_구간을_삭제하면_삭제된_역을_하행역으로_갖는_구간의_상행역이_노선의_하행역이_된다() {
         // Given
         Map<String, Object> sectionParams = new HashMap<>();
         sectionParams.put("upStationId", deokSoStation.getId());
@@ -122,7 +124,7 @@ public class SectionAcceptanceTest {
 
         // Then
         응답_상태_코드_검증(response, HttpStatus.NO_CONTENT);
-        Long downStationId = LineAcceptanceTest.지하철_노선_조회(lineId).body().jsonPath().getLong("downStationId");
+        Long downStationId = LineAcceptanceTest.지하철_노선_조회(lineId).body().jsonPath().getLong("stations[1].id");
         assertThat(downStationId).isEqualTo(deokSoStation.getId());
     }
 

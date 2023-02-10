@@ -1,10 +1,21 @@
 package subway.line;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+
+import subway.line.section.Section;
+import subway.station.Station;
 
 @Entity
 public class Line {
@@ -15,21 +26,27 @@ public class Line {
     private String name;
     @Column(length = 50, nullable = false)
     private String color;
-    @Column(nullable = false)
-    private Long upStationId;
-    @Column(nullable = false)
-    private Long downStationId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "up_station_id", referencedColumnName = "id")
+    private Station upStation;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "down_station_id", referencedColumnName = "id")
+    private Station downStation;
+    @OneToMany(mappedBy = "line", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Station> stations = new ArrayList<>();
+    @OneToMany(mappedBy = "line", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Section> sections = new ArrayList<>();
     @Column(nullable = false)
     private Long distance;
 
     protected Line() {
     }
 
-    public Line(String name, String color, Long upStationId, Long downStationId, Long distance) {
+    public Line(String name, String color, Station upStation, Station downStation, Long distance) {
         this.name = name;
         this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
+        this.upStation = upStation;
+        this.downStation = downStation;
         this.distance = distance;
     }
 
@@ -49,20 +66,52 @@ public class Line {
         return color;
     }
 
-    public Long getUpStationId() {
-        return upStationId;
+    public Station getUpStation() {
+        return upStation;
     }
 
-    public Long getDownStationId() {
-        return downStationId;
+    public Station getDownStation() {
+        return downStation;
     }
 
     public Long getDistance() {
         return distance;
     }
 
+    public List<Station> getStations() {
+        return stations;
+    }
+
+    public List<Section> getSections() {
+        return sections;
+    }
+
     public void changeLine(String name, String color) {
         this.name = name;
         this.color = color;
+    }
+
+    public void changeDownStation(Station station) {
+        this.downStation = station;
+    }
+
+    public void addStation(Station station) {
+        this.stations.add(station);
+
+        if (station.getLine() != this) {
+            station.setLine(this);
+        }
+    }
+
+    public void addSection(Section section) {
+        this.sections.add(section);
+
+        if (section.getLine() != this) {
+            section.setLine(this);
+        }
+    }
+
+    public boolean hasStation(Station station) {
+        return stations.contains(station);
     }
 }

@@ -1,6 +1,5 @@
 package subway.line;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -11,15 +10,14 @@ import subway.exception.ErrorMessage;
 import subway.exception.NotFoundException;
 import subway.line.dto.LineRequest;
 import subway.line.dto.LineResponse;
-import subway.line.dto.StationsDto;
 import subway.station.Station;
 import subway.station.StationRepository;
 import subway.station.dto.StationResponse;
 
 @Service
 public class LineService {
-    private LineRepository lineRepository;
-    private StationRepository stationRepository;
+    private final LineRepository lineRepository;
+    private final StationRepository stationRepository;
 
     public LineService(LineRepository lineRepository, StationRepository stationRepository) {
         this.lineRepository = lineRepository;
@@ -28,13 +26,21 @@ public class LineService {
 
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
+        Station upStation = stationRepository.findById(lineRequest.getUpStationId())
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.STATION_NOT_FOUND));
+        Station downStation = stationRepository.findById(lineRequest.getDownStationId())
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.STATION_NOT_FOUND));
+
         Line line = lineRepository.save(new Line(
             lineRequest.getName(),
             lineRequest.getColor(),
-            lineRequest.getUpStationId(),
-            lineRequest.getDownStationId(),
+            upStation,
+            downStation,
             lineRequest.getDistance())
         );
+        line.addStation(upStation);
+        line.addStation(downStation);
+
         return createLineResponse(line);
     }
 
@@ -64,19 +70,12 @@ public class LineService {
     }
 
     private LineResponse createLineResponse(Line line) {
-        Station upStation = stationRepository.findById(line.getUpStationId())
-            .orElseThrow(() -> new NotFoundException(ErrorMessage.STATION_NOT_FOUND));
-        Station downStation = stationRepository.findById(line.getDownStationId())
-            .orElseThrow(() -> new NotFoundException(ErrorMessage.STATION_NOT_FOUND));
-
-        List<StationResponse> stationResponse = new ArrayList<>();
-        stationResponse.add(new StationResponse(upStation.getId(), upStation.getName()));
-        stationResponse.add(new StationResponse(downStation.getId(), downStation.getName()));
         return new LineResponse(
             line.getId(),
             line.getName(),
             line.getColor(),
-            new StationsDto(stationResponse)
+            List.of(new StationResponse(line.getUpStation().getId(), line.getUpStation().getName()),
+                new StationResponse(line.getDownStation().getId(), line.getDownStation().getName()))
         );
     }
 }
