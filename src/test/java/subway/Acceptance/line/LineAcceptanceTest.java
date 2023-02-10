@@ -1,7 +1,5 @@
 package subway.Acceptance.line;
 
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,7 +7,9 @@ import subway.Acceptance.AcceptanceTest;
 
 import java.util.List;
 
+import static subway.Acceptance.line.LineAcceptanceFixture.구간_등록_요청;
 import static subway.Acceptance.line.LineAcceptanceFixture.*;
+import static subway.Acceptance.line.LineAcceptanceStep.구간_등록_요청;
 import static subway.Acceptance.line.LineAcceptanceStep.*;
 import static subway.Acceptance.station.StationAcceptanceStep.지하철역_생성_요청;
 
@@ -22,6 +22,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         지하철역_생성_요청("역삼역");
         지하철역_생성_요청("선릉역");
         지하철역_생성_요청("삼성역");
+        지하철역_생성_요청("선정릉");
     }
 
     /**
@@ -32,14 +33,14 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine() {
         // when
-        ExtractableResponse<Response> createResponse = 노선_생성_요청(신분당선_생성_요청);
+        var 노선_생성_응답 = 노선_생성_요청(이호선(강남역, 역삼역));
 
         // then
-        노선_생성됨(createResponse);
+        노선_생성됨(노선_생성_응답);
 
         // then
-        ExtractableResponse<Response> response = 노선_목록_조회_요청();
-        노선_목록_포함됨(response, List.of(createResponse));
+        var 노선_목록_조회_응답 = 노선_목록_조회_요청();
+        노선_목록_포함됨(노선_목록_조회_응답, List.of(노선_생성_응답));
     }
 
     /**
@@ -51,14 +52,14 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void showLines() {
         // given
-        ExtractableResponse<Response> createResponse1 = 노선_생성_요청(신분당선_생성_요청);
-        ExtractableResponse<Response> createResponse2 = 노선_생성_요청(분당선_생성_요청);
+        var 노선_생성_응답1 = 노선_생성_요청(이호선(강남역, 역삼역));
+        var 노선_생성_응답2 = 노선_생성_요청(분당선(선릉역, 강남역));
 
         // when
-        ExtractableResponse<Response> response = 노선_목록_조회_요청();
+        var 노선_목록_조회_응답 = 노선_목록_조회_요청();
 
         // then
-        노선_목록_포함됨(response, List.of(createResponse1, createResponse2));
+        노선_목록_포함됨(노선_목록_조회_응답, List.of(노선_생성_응답1, 노선_생성_응답2));
     }
 
     /**
@@ -70,13 +71,13 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void showLine() {
         // given
-        ExtractableResponse<Response> createResponse = 노선_생성_요청(신분당선_생성_요청);
+        var 노선_생성_응답 = 노선_생성_요청(이호선(강남역, 역삼역));
 
         // when
-        ExtractableResponse<Response> response = 노선_조회_요청(createResponse);
+        var 노선_조회_응답 = 노선_조회_요청(노선_생성_응답);
 
         // then
-        노선_조회됨(response);
+        노선_조회됨(노선_조회_응답);
     }
 
     /**
@@ -88,13 +89,13 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void modifyLine() {
         // given
-        ExtractableResponse<Response> createResponse = 노선_생성_요청(신분당선_생성_요청);
+        var 노선_생성_응답 = 노선_생성_요청(이호선(강남역, 역삼역));
 
         // when
-        ExtractableResponse<Response> response = 노선_수정_요청(createResponse);
+        var 노선_수정_응답 = 노선_수정_요청(노선_생성_응답, 당당선_수정(당당선, 빨간색));
 
         // then
-        노선_수정됨(response);
+        노선_수정됨(노선_수정_응답);
     }
 
     /**
@@ -106,13 +107,13 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        ExtractableResponse<Response> createResponse = 노선_생성_요청(신분당선_생성_요청);
+        var 노선_생성_응답 = 노선_생성_요청(이호선(강남역, 역삼역));
 
         // when
-        ExtractableResponse<Response> response = 노선_삭제_요청(createResponse);
+        var 노선_삭제_응답 = 노선_삭제_요청(노선_생성_응답);
 
         // then
-        노선_삭제됨(response);
+        노선_삭제됨(노선_삭제_응답);
     }
 
     /**
@@ -124,13 +125,13 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLineSection() {
         // given
-        ExtractableResponse<Response> createResponse = 노선_생성_요청(신분당선_생성_요청);
+        var 노선_생성_응답 = 노선_생성_요청(이호선(강남역, 역삼역));
 
         // when
-        ExtractableResponse<Response> response = 노선_구간_등록_요청(createResponse, 구간_등록_요청_성공);
+        var 구간_등록_응답 = 구간_등록_요청(이호선, 구간_등록_요청(역삼역, 선릉역));
 
         // then
-        노선_구간_생성됨(response);
+        노선_구간_생성됨(구간_등록_응답);
     }
 
     /**
@@ -142,13 +143,13 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLineSection_fail1() {
         // given
-        ExtractableResponse<Response> createResponse = 노선_생성_요청(신분당선_생성_요청);
+        var 노선_생성_응답 = 노선_생성_요청(이호선(강남역, 역삼역));
 
         // when
-        ExtractableResponse<Response> response = 노선_구간_등록_요청(createResponse, 구간_등록_요청_실패1);
+        var 구간_등록_응답 = 구간_등록_요청(이호선, 구간_등록_요청(강남역, 선릉역));
 
         // then
-        노선_구간_생성_실패됨(response);
+        노선_구간_생성_실패됨(구간_등록_응답);
     }
 
     /**
@@ -160,13 +161,13 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLineSection_fail2() {
         // given
-        ExtractableResponse<Response> createResponse = 노선_생성_요청(신분당선_생성_요청);
+        var 노선_생성_요청 = 노선_생성_요청(이호선(강남역, 역삼역));
 
         // when
-        ExtractableResponse<Response> response = 노선_구간_등록_요청(createResponse, 구간_등록_요청_실패2);
+        var 구간_등록_응답 = 구간_등록_요청(이호선, 구간_등록_요청(역삼역, 강남역));
 
         // then
-        노선_구간_생성_실패됨(response);
+        노선_구간_생성_실패됨(구간_등록_응답);
     }
 
     /**
@@ -178,14 +179,14 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLineSection() {
         // given
-        ExtractableResponse<Response> createResponse = 노선_생성_요청(신분당선_생성_요청);
+        var 노선_생성_응답 = 노선_생성_요청(이호선(강남역, 역삼역));
+        var 구간_등록_응답 = 구간_등록_요청(이호선, 구간_등록_요청(역삼역, 선릉역));
 
         // when
-        노선_구간_등록_요청(createResponse, 구간_등록_요청_성공);
-        ExtractableResponse<Response> response = 노선_구간_삭제_요청(createResponse, 3L);
+        var 구간_삭제_응답 = 구간_삭제_요청(이호선, 선릉역);
 
         // then
-        노선_구간_삭제됨(response);
+        노선_구간_삭제됨(구간_삭제_응답);
     }
 
     /**
@@ -197,14 +198,14 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLineSection_fail1() {
         // given
-        ExtractableResponse<Response> createResponse = 노선_생성_요청(신분당선_생성_요청);
+        var 노선_생성_응답 = 노선_생성_요청(이호선(강남역, 역삼역));
+        var 구간_등록_응답 = 구간_등록_요청(이호선, 구간_등록_요청(역삼역, 선릉역));
 
         // when
-        노선_구간_등록_요청(createResponse, 구간_등록_요청_성공);
-        ExtractableResponse<Response> response = 노선_구간_삭제_요청(createResponse, 2L);
+        var 구간_삭제_응답 = 구간_삭제_요청(이호선, 역삼역);
 
         // then
-        노선_구간_삭제_실패됨(response);
+        노선_구간_삭제_실패됨(구간_삭제_응답);
     }
 
     /**
@@ -216,12 +217,12 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLineSection_fail2() {
         // given
-        ExtractableResponse<Response> createResponse = 노선_생성_요청(신분당선_생성_요청);
+        var 노선_생성_응답 = 노선_생성_요청(이호선(강남역, 역삼역));
 
         // when
-        ExtractableResponse<Response> response = 노선_구간_삭제_요청(createResponse, 3L);
+        var 구간_삭제_응답 = 구간_삭제_요청(이호선, 역삼역);
 
         // then
-        노선_구간_삭제_실패됨(response);
+        노선_구간_삭제_실패됨(구간_삭제_응답);
     }
 }

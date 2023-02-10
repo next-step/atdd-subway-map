@@ -12,8 +12,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.Acceptance.line.LineAcceptanceFixture.당당선_수정_요청;
-import static subway.Acceptance.line.LineAcceptanceFixture.신분당선_생성_요청;
+import static subway.Acceptance.line.LineAcceptanceFixture.*;
 
 public class LineAcceptanceStep {
 
@@ -43,11 +42,11 @@ public class LineAcceptanceStep {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 노선_수정_요청(ExtractableResponse<Response> response) {
+    public static ExtractableResponse<Response> 노선_수정_요청(ExtractableResponse<Response> response, LineRequest lineRequest) {
         return RestAssured.given()
                 .pathParam("id", response.jsonPath().getLong("id"))
                 .log().all()
-                .body(당당선_수정_요청)
+                .body(lineRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().put("/lines/{id}")
                 .then().log().all()
@@ -64,9 +63,10 @@ public class LineAcceptanceStep {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 노선_구간_등록_요청(ExtractableResponse<Response> response, LineSectionRequest lineSectionRequest) {
+    public static ExtractableResponse<Response> 구간_등록_요청(Long id, LineSectionRequest lineSectionRequest) {
+
         return RestAssured.given()
-                .pathParam("id", response.jsonPath().getLong("id"))
+                .pathParam("id", id)
                 .log().all()
                 .body(lineSectionRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -75,9 +75,9 @@ public class LineAcceptanceStep {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 노선_구간_삭제_요청(ExtractableResponse<Response> response, Long stationId) {
+    public static ExtractableResponse<Response> 구간_삭제_요청(Long id, Long stationId) {
         return RestAssured.given()
-                .pathParam("id", response.jsonPath().getLong("id"))
+                .pathParam("id", id)
                 .pathParam("stationId", stationId)
                 .log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -115,7 +115,7 @@ public class LineAcceptanceStep {
         ExtractableResponse<Response> listResponse = 노선_목록_조회_요청();
 
         // then
-        assertThat(listResponse.jsonPath().getList("name", String.class)).doesNotContain(신분당선_생성_요청.getName());
+        assertThat(listResponse.jsonPath().getList("name", String.class)).doesNotContain(이호선(강남역, 역삼역).getName());
     }
 
     public static void 노선_구간_생성됨(ExtractableResponse<Response> response) {
