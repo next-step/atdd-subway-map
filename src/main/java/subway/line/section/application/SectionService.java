@@ -79,7 +79,8 @@ public class SectionService {
 
         Section deletedSection = sectionRepository.findByLineAndDownStation(line, station);
 
-        line.changeDownStation(deletedSection.getUpStation());
+        line.deleteSection(deletedSection);
+
         sectionRepository.delete(deletedSection);
     }
 

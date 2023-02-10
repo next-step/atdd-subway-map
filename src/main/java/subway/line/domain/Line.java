@@ -109,9 +109,24 @@ public class Line {
         if (section.getLine() != this) {
             section.setLine(this);
         }
+
+        plusDistance(section.getDistance());
+    }
+
+    private void plusDistance(Long distance) {
+        this.distance += distance;
+    }
+
+    private void subtractDistance(Long distance) {
+        this.distance -= distance;
     }
 
     public boolean hasStation(Station station) {
         return stations.contains(station);
+    }
+
+    public void deleteSection(Section deletedSection) {
+        this.changeDownStation(deletedSection.getUpStation());
+        this.subtractDistance(deletedSection.getDistance());
     }
 }
