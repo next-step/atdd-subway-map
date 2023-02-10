@@ -128,6 +128,31 @@ public class SectionAcceptanceTest {
         assertThat(downStationId).isEqualTo(deokSoStation.getId());
     }
 
+    @DisplayName("새로운 구간의 상행역이 노선의 하행역이 아닌 구간으로 생성하면 생성이 되지 않는다.")
+    @Test
+    void 새로운_구간의_상행역이_노선의_하행역이_아닌_구간으로_생성하면_생성이_되지_않는다() {
+        // When
+        Map<String, Object> sectionParams = new HashMap<>();
+        sectionParams.put("upStationId", gangNamStation.getId());
+        sectionParams.put("downStationId", daSanStation.getId());
+        sectionParams.put("distance", 10);
+
+        Long lineId = newBunDangLine.getId();
+
+        //Then
+        응답_상태_코드_검증(노선_구간_생성(lineId, sectionParams), HttpStatus.BAD_REQUEST);
+    }
+
+    @DisplayName("구간이 1개인 경우 삭제하면 삭제가 되지 않는다.")
+    @Test
+    void 구간이_1개인_경우_삭제하면_삭제가_되지_않는다() {
+        // Given
+        Long lineId = newBunDangLine.getId();
+
+        // Then
+        응답_상태_코드_검증(노선_구간_삭제(lineId, daSanStation.getId()), HttpStatus.BAD_REQUEST);
+    }
+
     private void 응답_상태_코드_검증(ExtractableResponse<Response> response, HttpStatus httpStatus) {
         assertThat(response.statusCode()).isEqualTo(httpStatus.value());
     }
