@@ -1,4 +1,4 @@
-package subway.line;
+package subway.line.domain;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,8 +14,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
-import subway.line.section.Section;
-import subway.station.Station;
+import subway.line.section.domain.Section;
+import subway.station.domain.Station;
 
 @Entity
 public class Line {

@@ -1,4 +1,4 @@
-package subway.line.section;
+package subway.line.section.domain;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,8 +9,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
-import subway.line.Line;
-import subway.station.Station;
+import subway.line.domain.Line;
+import subway.station.domain.Station;
 
 @Entity
 public class Section {

@@ -1,4 +1,4 @@
-package subway.line.section;
+package subway.line.section.web;
 
 import java.net.URI;
 
@@ -12,6 +12,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import subway.line.section.application.SectionService;
+import subway.line.section.dto.SectionRequest;
+import subway.line.section.dto.SectionResponse;
 
 @RequestMapping("/lines/{lineId}/sections")
 @RestController

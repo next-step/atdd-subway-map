@@ -1,4 +1,4 @@
-package subway.line.section;
+package subway.line.section.application;
 
 import java.util.List;
 import java.util.Objects;
@@ -10,10 +10,14 @@ import subway.exception.CannotCreateSectionException;
 import subway.exception.CannotDeleteSectionException;
 import subway.exception.ErrorMessage;
 import subway.exception.NotFoundException;
-import subway.line.Line;
-import subway.line.LineRepository;
-import subway.station.Station;
-import subway.station.StationRepository;
+import subway.line.domain.Line;
+import subway.line.domain.LineRepository;
+import subway.line.section.domain.Section;
+import subway.line.section.domain.SectionRepository;
+import subway.line.section.dto.SectionRequest;
+import subway.line.section.dto.SectionResponse;
+import subway.station.domain.Station;
+import subway.station.domain.StationRepository;
 import subway.station.dto.StationResponse;
 
 @Service

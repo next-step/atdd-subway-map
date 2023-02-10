@@ -1,4 +1,4 @@
-package subway.line.section;
+package subway.line.section.dto;
 
 import java.util.List;
 
