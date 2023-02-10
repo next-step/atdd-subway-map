@@ -3,6 +3,7 @@ package subway.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.domain.Line;
+import subway.domain.Section;
 import subway.domain.Station;
 import subway.dto.StationResponse;
 import subway.exception.LineNotFoundException;
@@ -23,23 +24,35 @@ import static subway.service.StationService.createStationResponse;
 @Transactional(readOnly = true)
 public class LineService {
 
-    private final StationRepository stationRepository;
+    private final StationService stationService;
     private final LineRepository lineRepository;
     private final SectionRepository sectionRepository;
 
-    public LineService(StationRepository stationRepository, LineRepository lineRepository, SectionRepository sectionRepository) {
-        this.stationRepository = stationRepository;
+    public LineService(StationService stationService, LineRepository lineRepository,
+                       SectionRepository sectionRepository) {
+        this.stationService = stationService;
         this.lineRepository = lineRepository;
         this.sectionRepository = sectionRepository;
     }
 
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
-        Station downStation = stationRepository.findById(lineRequest.getDownStationId()).orElseThrow(StationNotFoundException::new);
-        Station upStation = stationRepository.findById(lineRequest.getUpStationId()).orElseThrow(StationNotFoundException::new);
+        Station downStation = stationService.findById(lineRequest.getDownStationId());
+        Station upStation = stationService.findById(lineRequest.getUpStationId());
 
-        Line line = lineRepository.save(lineRequest.toEntity(downStation, upStation));
-        sectionRepository.save(line.getSectionByStations(downStation, upStation));
+        Section section = sectionRepository.save(new Section(
+                downStation,
+                upStation,
+                lineRequest.getDistance()
+                )
+        );
+
+        Line line = lineRepository.save(new Line(
+                lineRequest.getName(),
+                lineRequest.getColor(),
+                section
+                )
+        );
 
         return createLineResponse(line);
     }
@@ -71,8 +84,8 @@ public class LineService {
 
     private LineResponse createLineResponse(Line line) {
 
-        Station downStation = stationRepository.findById(line.getDownStationId()).orElseThrow(StationNotFoundException::new);
-        Station upStation = stationRepository.findById(line.getUpStationId()).orElseThrow(StationNotFoundException::new);
+        Station downStation = line.getDownStation();
+        Station upStation = line.getUpStation();
 
         StationResponse downStationResponse = createStationResponse(downStation);
         StationResponse upStationResponse = createStationResponse(upStation);

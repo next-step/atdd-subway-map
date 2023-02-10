@@ -4,6 +4,8 @@ import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Station;
 
+import java.util.List;
+
 public class LineRequest {
 
     private String name;
@@ -43,15 +45,5 @@ public class LineRequest {
     public static LineRequest of(
             String name, String color, Long downStationId, Long upStationId, Long distance) {
         return new LineRequest(name, color, downStationId, upStationId, distance);
-    }
-
-    public Line toEntity(Station downStation, Station upStation) {
-        return Line.newInstance(
-                this.name,
-                this.color,
-                downStation,
-                upStation,
-                this.distance
-        );
     }
 }

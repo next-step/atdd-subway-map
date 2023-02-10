@@ -21,21 +21,10 @@ public class Line {
 
     private String color;
 
-    @ManyToOne(fetch = LAZY, cascade = PERSIST)
-    @JoinColumn(name = "downStation_id")
-    private Station downStation;
-
-    @ManyToOne(fetch = LAZY, cascade = PERSIST)
-    @JoinColumn(name = "upStation_id")
-    private Station upStation;
-
-    private Long distance;
-
-    @OneToMany(mappedBy = "line", cascade = CascadeType.REMOVE)
-    private List<Section> sections;
+    @Embedded
+    private Sections sections = new Sections();
 
     protected Line() {
-
     }
 
     public Long getId() {
@@ -50,42 +39,14 @@ public class Line {
         return color;
     }
 
-    public Station getDownStation() {
-        return downStation;
+    public Sections getSections() {
+        return sections;
     }
 
-    public Station getUpStation() {
-        return upStation;
-    }
-
-    public Long getDistance() {
-        return distance;
-    }
-
-    private Line(String name, String color, Station downStation, Station upStation, Long distance) {
+    public Line(String name, String color, Section section) {
         this.name = name;
         this.color = color;
-        this.downStation = downStation;
-        this.upStation = upStation;
-        this.distance = distance;
-        this.sections = new ArrayList<>();
-    }
-
-    private void addFirstSection() {
-        sections.add(new Section(this,downStation, upStation, distance));
-    }
-
-    public static Line newInstance(String name, String color, Station downStation, Station upStation, Long distance) {
-        Line line = new Line(name, color, downStation, upStation, distance);
-        line.addFirstSection();
-        return line;
-    }
-
-
-    public static void validateStations(Long downStationId, Long upStationId) {
-        if (upStationId == null || downStationId == null) {
-            throw new StationNotFoundException();
-        }
+        this.sections.addSection(section);
     }
 
     public void update(String name, String color) {
@@ -93,36 +54,15 @@ public class Line {
         this.color =color;
     }
 
-    public Long getUpStationId() {
-        return upStation.getId();
+    public Long getTotalDistance() {
+        return sections.getTotalDistance();
     }
 
-    public Long getDownStationId() {
-        return downStation.getId();
+    public Station getDownStation() {
+        return sections.getDownStation();
     }
 
-    public List<Section> getSections() {
-        return sections;
-    }
-
-    public Section getSectionByStations(Station downStation, Station upStation) {
-        return sections.stream()
-                .filter(section ->
-                        section.contains(downStation, upStation))
-                .findFirst().orElseThrow(SectionNotFoundException::new);
-    }
-
-    public void addSection(Section section) {
-        sections.add(section);
-        downStation = section.getDownStation();
-    }
-
-    public void addDistance(Long distance) {
-        this.distance += distance;
-    }
-
-    public void removeSection(Section section) {
-        downStation = section.getUpStation();
-        sections.remove(section);
+    public Station getUpStation() {
+        return sections.getUpStation();
     }
 }

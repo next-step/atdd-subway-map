@@ -2,6 +2,8 @@ package subway.domain;
 
 import javax.persistence.*;
 
+import java.util.List;
+
 import static javax.persistence.CascadeType.PERSIST;
 import static javax.persistence.FetchType.LAZY;
 
@@ -12,16 +14,12 @@ public class Section {
     private Long id;
 
     @ManyToOne(fetch = LAZY, cascade = PERSIST)
-    @JoinColumn(name = "line_id")
-    private Line line;
+    @JoinColumn(name = "downStation_id")
+    private Station downStation;
 
     @ManyToOne(fetch = LAZY, cascade = PERSIST)
     @JoinColumn(name = "upStation_id")
     private Station upStation;
-
-    @ManyToOne(fetch = LAZY, cascade = PERSIST)
-    @JoinColumn(name = "downStation_id")
-    private Station downStation;
 
     private Long distance;
 
@@ -29,27 +27,22 @@ public class Section {
         return id;
     }
 
-    public Line getLine() {
-        return line;
-    }
-
-    public Station getUpStation() {
-        return upStation;
+    public Long getDistance() {
+        return distance;
     }
 
     public Station getDownStation() {
         return downStation;
     }
 
-    public Long getDistance() {
-        return distance;
+    public Station getUpStation() {
+        return upStation;
     }
 
     protected Section() {
 
     }
-    public Section(Line line, Station downStation, Station upStation, Long distance) {
-        this.line = line;
+    public Section(Station downStation, Station upStation ,Long distance) {
         this.downStation = downStation;
         this.upStation = upStation;
         this.distance = distance;

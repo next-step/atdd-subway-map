@@ -35,7 +35,7 @@ public class LineResponse {
         id = line.getId();
         name = line.getName();
         color = line.getColor();
-        distance = line.getDistance();
+        distance = line.getTotalDistance();
         this.stations = stations;
     }
 }

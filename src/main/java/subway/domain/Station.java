@@ -1,6 +1,8 @@
 package subway.domain;
 
 import javax.persistence.*;
+import java.util.List;
+import java.util.stream.DoubleStream;
 
 @Entity
 public class Station {
@@ -23,5 +25,9 @@ public class Station {
 
     public String getName() {
         return name;
+    }
+
+    public boolean containsAny(List<Long> stationIds) {
+        return stationIds.contains(this.id);
     }
 }
