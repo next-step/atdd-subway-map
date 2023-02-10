@@ -2,6 +2,8 @@ package subway.line.domain;
 
 import lombok.*;
 import subway.line.dto.LineModifyRequest;
+import subway.section.domain.Section;
+import subway.section.domain.Sections;
 import subway.station.domain.Station;
 
 import javax.persistence.*;
@@ -21,23 +23,14 @@ public class Line {
     @Column(nullable = false)
     private String color;
 
-    @ManyToOne
-    private Station upStation;
-
-    @ManyToOne
-    private Station downStation;
-
-    @Column(nullable = false)
-    private int distance;
+    @Embedded
+    private Sections sections = new Sections();
 
     @Builder
-    public Line(Long id, String name, String color, Station upStation, Station downStation, int distance) {
+    protected Line(Long id, String name, String color) {
         this.id = id;
         this.name = name;
         this.color = color;
-        this.upStation = upStation;
-        this.downStation = downStation;
-        this.distance = distance;
     }
 
     public void modify(LineModifyRequest request) {
@@ -55,6 +48,21 @@ public class Line {
         if (color != null && !color.isBlank()) {
             this.color = color;
         }
+    }
+
+    public Section addSection(Station upStation, Station downStation, int distance) {
+        return sections.addSection(
+                Section.builder()
+                        .distance(distance)
+                        .line(this)
+                        .upStation(upStation)
+                        .downStation(downStation)
+                        .build()
+        );
+    }
+
+    public void removeStation(Station station) {
+        sections.removeStation(station);
     }
 
 }

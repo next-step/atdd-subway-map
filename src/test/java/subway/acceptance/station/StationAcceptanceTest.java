@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import subway.acceptance.common.AcceptanceTest;
 import subway.acceptance.util.DatabaseCleanup;
 
 import java.util.List;
@@ -19,18 +20,7 @@ import static subway.acceptance.station.fixture.StationFixture.*;
 import static subway.acceptance.common.handler.BodyJsonPathHandler.*;
 
 @DisplayName("지하철역 관련 기능")
-@ActiveProfiles("acceptance")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class StationAcceptanceTest {
-
-    @Autowired
-    private DatabaseCleanup databaseCleanup;
-
-    @AfterEach
-    void cleanUp() {
-        databaseCleanup.afterPropertiesSet();
-        databaseCleanup.execute();
-    }
+public class StationAcceptanceTest extends AcceptanceTest {
 
     /**
      * When 지하철역을 생성하면

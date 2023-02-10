@@ -18,9 +18,10 @@ public class BodyJsonPathHandler {
         이름("name"),
         아이디("id"),
         색상("color"),
+        지하철역_목록("stations"),
         ;
 
-        private String path;
+        private final String path;
 
         Path(String path) {
             this.path = path;
@@ -49,6 +50,10 @@ public class BodyJsonPathHandler {
 
     public static String 색상_추출(ExtractableResponse<Response> 응답) {
         return 응답.jsonPath().get(Path.색상.path());
+    }
+
+    public static List<String> 지하철역_이름_목록_추출(ExtractableResponse<Response> 응답) {
+        return 응답.jsonPath().getList("stations.name", String.class);
     }
 
 }

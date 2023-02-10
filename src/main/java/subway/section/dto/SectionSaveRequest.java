@@ -1,4 +1,4 @@
-package subway.line.dto;
+package subway.section.dto;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -7,18 +7,14 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class LineSaveRequest {
+public class SectionSaveRequest {
 
-    private String name;
-    private String color;
     private Long upStationId;
     private Long downStationId;
     private int distance;
 
     @Builder
-    public LineSaveRequest(String name, String color, Long upStationId, Long downStationId, int distance) {
-        this.name = name;
-        this.color = color;
+    private SectionSaveRequest(Long upStationId, Long downStationId, int distance) {
         this.upStationId = upStationId;
         this.downStationId = downStationId;
         this.distance = distance;

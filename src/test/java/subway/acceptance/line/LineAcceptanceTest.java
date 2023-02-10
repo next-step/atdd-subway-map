@@ -1,12 +1,8 @@
 package subway.acceptance.line;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import subway.acceptance.util.DatabaseCleanup;
+import subway.acceptance.common.AcceptanceTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static subway.acceptance.common.handler.HttpStatusValidationHandler.*;
@@ -17,18 +13,7 @@ import static subway.acceptance.common.handler.BodyJsonPathHandler.*;
 
 
 @DisplayName("지하철 노선 관련 기능")
-@ActiveProfiles("acceptance")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class LineAcceptanceTest {
-
-    @Autowired
-    private DatabaseCleanup databaseCleanup;
-
-    @AfterEach
-    void cleanUp() {
-        databaseCleanup.afterPropertiesSet();
-        databaseCleanup.execute();
-    }
+public class LineAcceptanceTest extends AcceptanceTest {
 
     /**
      * When 지하철 노선을 생성하면
@@ -44,7 +29,7 @@ public class LineAcceptanceTest {
         HTTP_상태_CREATED_검증(생성_지하철_노선_응답);
 
         var 지하철_노선_이름 = 이름_추출(생성_지하철_노선_응답);
-        assertThat(지하철_노선_이름.equals(지하철_3_호선.이름()));
+        assertThat(지하철_노선_이름).isEqualTo(지하철_3_호선.이름());
     }
 
     /**
@@ -101,15 +86,15 @@ public class LineAcceptanceTest {
     void updateLine() {
         //given
         var 지하철_3_호선_생성_응답 = 생성_지하철_노선(지하철_3_호선, 연신내, 교대, 19);
-        var 지하철_3_호선_아이디 = 지하철_3_호선_생성_응답.jsonPath().getLong("id");
+        var 생성된_지하철_노선_아이디 = 아이디_추출(지하철_3_호선_생성_응답);
 
         // when
-        var 수정_지하철_노선_응답 = 수정_지하철_노선(지하철_3_호선_아이디, 지하철_2_호선);
+        var 수정_지하철_노선_응답 = 수정_지하철_노선(생성된_지하철_노선_아이디, 지하철_2_호선);
 
         // then
         HTTP_상태_OK_검증(수정_지하철_노선_응답);
 
-        var 조회_지하철_노선_응답 = 조회_지하철_노선(지하철_3_호선_아이디);
+        var 조회_지하철_노선_응답 = 조회_지하철_노선(생성된_지하철_노선_아이디);
         var 지하철_노선_이름 = 이름_추출(조회_지하철_노선_응답);
         var 지하철_노선_색상 = 색상_추출(조회_지하철_노선_응답);
 

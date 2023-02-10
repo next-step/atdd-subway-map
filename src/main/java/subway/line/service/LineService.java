@@ -5,17 +5,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.line.dto.LineModifyRequest;
 import subway.line.dto.LineSaveRequest;
-import subway.line.dto.LineResponse;
 import subway.line.domain.Line;
 import subway.line.exception.LineNotFoundException;
 import subway.line.repository.LineCommandRepository;
 import subway.line.repository.LineQueryRepository;
 import subway.station.domain.Station;
-import subway.station.repository.StationQueryRepository;
+import subway.station.service.StationService;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -24,22 +21,14 @@ public class LineService {
 
     private final LineCommandRepository lineCommand;
     private final LineQueryRepository lineQuery;
-    private final StationQueryRepository stationQuery;
+
+    private final StationService stationService;
 
     @Transactional
-    public LineResponse saveLine(LineSaveRequest saveRequest) {
-        Optional<Station> downStation = stationQuery.findById(saveRequest.getDownStationId());
-        Optional<Station> upStation = stationQuery.findById(saveRequest.getUpStationId());
-        Line line = lineCommand.save(
-                Line.builder()
-                        .name(saveRequest.getName())
-                        .color(saveRequest.getColor())
-                        .distance(saveRequest.getDistance())
-                        .downStation(downStation.get())
-                        .upStation(upStation.get())
-                        .build()
-        );
-        return createLineResponse(line);
+    public Line saveLine(LineSaveRequest saveRequest) {
+        Line saveLine = buildSaveLine(saveRequest);
+        Line line = lineCommand.save(saveLine);
+        return line;
     }
 
     @Transactional
@@ -48,24 +37,27 @@ public class LineService {
         line.modify(modifyRequest);
     }
 
-    public List<LineResponse> findAllLines() {
-        return lineQuery.findAll().stream()
-                .map(this::createLineResponse)
-                .collect(Collectors.toList());
+    public List<Line> findAllLines() {
+        return lineQuery.findAll();
     }
 
-    public LineResponse findLineById(Long id) {
-        return LineResponse.fromDomain(
-                lineQuery.findById(id).orElseThrow(LineNotFoundException::new)
-        );
+    public Line findLineById(Long id) {
+        return lineQuery.findById(id).orElseThrow(LineNotFoundException::new);
     }
 
     public void removeLineById(Long id) {
         lineCommand.deleteById(id);
     }
 
-    private LineResponse createLineResponse(Line line) {
-        return LineResponse.fromDomain(line);
+    private Line buildSaveLine(LineSaveRequest saveRequest) {
+        Station upStation = stationService.findStationById(saveRequest.getUpStationId());
+        Station downStation = stationService.findStationById(saveRequest.getDownStationId());
+        Line line = Line.builder()
+                .name(saveRequest.getName())
+                .color(saveRequest.getColor())
+                .build();
+        line.addSection(upStation, downStation, saveRequest.getDistance());
+        return line;
     }
 
 }
