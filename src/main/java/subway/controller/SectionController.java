@@ -3,26 +3,26 @@ package subway.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import subway.dto.SectionRequest;
-import subway.service.SectionService;
+import subway.service.LineService;
 
 @RestController
 public class SectionController {
 
-    private final SectionService sectionService;
+    private final LineService lineService;
 
-    public SectionController(SectionService sectionService) {
-        this.sectionService = sectionService;
+    public SectionController(LineService lineService) {
+        this.lineService = lineService;
     }
 
     @PostMapping("lines/{lineId}/sections")
     public ResponseEntity<Void> saveSection(@PathVariable Long lineId, @RequestBody SectionRequest request) {
-        sectionService.saveSection(lineId, request);
+        lineService.saveSection(lineId, request);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("lines/{lineId}/sections")
     public ResponseEntity<Void> deleteSection(@PathVariable Long lineId, @RequestParam Long stationId) {
-        sectionService.deleteSection(lineId, stationId);
+        lineService.deleteSection(lineId, stationId);
         return ResponseEntity.noContent().build();
     }
 }

@@ -5,12 +5,9 @@ import org.springframework.transaction.annotation.Transactional;
 import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Station;
-import subway.dto.StationResponse;
+import subway.dto.*;
 import subway.exception.LineNotFoundException;
 import subway.repository.LineRepository;
-import subway.dto.LineRequest;
-import subway.dto.LineResponse;
-import subway.dto.LineUpdateRequest;
 import subway.repository.SectionRepository;
 
 import java.util.List;
@@ -35,15 +32,7 @@ public class LineService {
 
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
-        Station downStation = stationService.findById(lineRequest.getDownStationId());
-        Station upStation = stationService.findById(lineRequest.getUpStationId());
-
-        Section section = sectionRepository.save(new Section(
-                downStation,
-                upStation,
-                lineRequest.getDistance()
-                )
-        );
+        Section section = createSection(lineRequest);
 
         Line line = lineRepository.save(new Line(
                 lineRequest.getName(),
@@ -53,6 +42,27 @@ public class LineService {
         );
 
         return createLineResponse(line);
+    }
+
+    @Transactional
+    public void saveSection(Long lineId, SectionRequest request) {
+        Section section = createSection(request);
+        Line line = getLineById(lineId);
+        line.addSection(section);
+    }
+
+    @Transactional
+    public Section createSection(SectionCreateReader request) {
+        Station downStation = stationService.findById(request.getDownStationId());
+        Station upStation = stationService.findById(request.getUpStationId());
+
+        Section section = sectionRepository.save(new Section(
+                downStation,
+                upStation,
+                request.getDistance()
+                )
+        );
+        return section;
     }
 
     public List<LineResponse> findAllLines() {
@@ -78,6 +88,13 @@ public class LineService {
     @Transactional
     public void deleteLine(Long id) {
         lineRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void deleteSection(Long lineId, Long stationId) {
+        Line line = getLineById(lineId);
+        Section section = line.deleteSection(stationId);
+        sectionRepository.delete(section);
     }
 
     private LineResponse createLineResponse(Line line) {

@@ -1,6 +1,6 @@
 package subway.dto;
 
-public class SectionRequest {
+public class SectionRequest implements SectionCreateReader {
 
     private Long downStationId;
 

@@ -6,7 +6,7 @@ import subway.domain.Station;
 
 import java.util.List;
 
-public class LineRequest {
+public class LineRequest implements SectionCreateReader {
 
     private String name;
     private String color;
