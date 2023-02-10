@@ -16,4 +16,8 @@ public class UnitTestFixture {
 
     public static final Stations 강남역_역삼역 = new Stations(List.of(강남역, 역삼역));
     public static final Stations 강남역_역삼역_선릉역 = new Stations(List.of(강남역, 역삼역, 선릉역));
+
+    public static Stations 지하철역_리스트_생성(Station upStation, Station downStation) {
+        return new Stations(List.of(upStation, downStation));
+    }
 }

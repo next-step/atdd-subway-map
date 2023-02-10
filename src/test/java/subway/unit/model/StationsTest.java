@@ -16,7 +16,7 @@ class StationsTest {
     @Test
     void getUpStation() {
         // given
-        Stations stations = 강남역_역삼역;
+        Stations stations = 지하철역_리스트_생성(강남역, 역삼역);
 
         // when
         Long upStationId = stations.getUpStationId();
