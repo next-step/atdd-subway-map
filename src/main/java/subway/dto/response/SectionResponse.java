@@ -1,12 +1,11 @@
 package subway.dto.response;
 
-import lombok.Builder;
 import lombok.Getter;
 import subway.domain.Line;
+import subway.domain.Section;
 import subway.domain.Station;
 
 @Getter
-@Builder
 public class SectionResponse {
 
     private Line line;
@@ -14,10 +13,10 @@ public class SectionResponse {
     private Station downStation;
     private int distance;
 
-    public SectionResponse(Line line, Station upStation, Station downStation, int distance) {
+    public SectionResponse(Line line, Section section) {
         this.line = line;
-        this.upStation = upStation;
-        this.downStation = downStation;
-        this.distance = distance;
+        this.upStation = section.getUpStation();
+        this.downStation = section.getDownStation();
+        this.distance = section.getDistance();
     }
 }
