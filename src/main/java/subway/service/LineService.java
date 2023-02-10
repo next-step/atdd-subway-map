@@ -7,13 +7,11 @@ import subway.domain.Section;
 import subway.domain.Station;
 import subway.dto.StationResponse;
 import subway.exception.LineNotFoundException;
-import subway.exception.StationNotFoundException;
 import subway.repository.LineRepository;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 import subway.dto.LineUpdateRequest;
 import subway.repository.SectionRepository;
-import subway.repository.StationRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;

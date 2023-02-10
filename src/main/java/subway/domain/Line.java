@@ -56,4 +56,8 @@ public class Line {
     public Station getUpStation() {
         return sections.getUpStation();
     }
+
+    public void addSection(Section section) {
+        sections.addSection(section);
+    }
 }

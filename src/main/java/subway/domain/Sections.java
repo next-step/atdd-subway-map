@@ -24,10 +24,10 @@ public class Sections {
     }
 
     public Station getDownStation() {
-        return sections.get(0).getDownStation();
+        return sections.get(sections.size()-1).getDownStation();
     }
 
     public Station getUpStation() {
-        return sections.get(sections.size()-1).getUpStation();
+        return sections.get(0).getUpStation();
     }
 }
