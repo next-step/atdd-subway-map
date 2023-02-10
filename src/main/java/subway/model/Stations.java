@@ -42,7 +42,7 @@ public class Stations {
     }
 
     public void createLineSection(Station upStation, Station downStation) {
-        if (!isSame(upStation)) {
+        if (!isDownStation(upStation)) {
             throw new CreateLineSectionException("새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 합니다.");
         }
         if (isContains(downStation)) {
@@ -62,12 +62,12 @@ public class Stations {
         return this.stations.contains(station);
     }
 
-    private boolean isSame(Station station) {
+    private boolean isDownStation(Station station) {
         return Objects.equals(this.downStationId, station.getId());
     }
 
     public void deleteLineSection(Station station) {
-        if (!isSame(station)) {
+        if (!isDownStation(station)) {
             throw new DeleteLineSectionException("지하철 노선에 등록된 역(하행 종점역)만 제거할 수 있습니다.");
         }
         if (stations.size() <= 2) {
