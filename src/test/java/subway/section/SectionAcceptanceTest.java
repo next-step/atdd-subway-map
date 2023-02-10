@@ -11,10 +11,12 @@ import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import subway.dto.LineRequest;
 import subway.dto.SectionRequest;
+import subway.exception.IllegalSectionException;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static subway.line.LineAcceptanceTest.노선_생성_요청;
 import static subway.line.LineAcceptanceTest.노선_조회_요청;
 import static subway.station.StationAcceptanceTest.지하철역_생성_요청;
@@ -44,6 +46,11 @@ public class SectionAcceptanceTest {
     private final static SectionRequest 새로운_구간 = new SectionRequest(
             새로운_하행역_아이디, 기존_하행역_아이디, 새로운_구간_거리
     );
+
+    private final static SectionRequest 예외_구간 = new SectionRequest(
+            기존_상행역_아이디, 새로운_하행역_아이디, 새로운_구간_거리
+    );
+
     @BeforeEach
     void setUp() {
         지하철역_생성_요청(새로운_하행역_이름);
@@ -70,6 +77,23 @@ public class SectionAcceptanceTest {
         List<String> 종착역목록 = 노선_조회_요청(lineId)
                 .jsonPath().getList("stations.name");
         assertThat(종착역목록).contains(새로운_하행역_이름);
+    }
+
+    /**
+     * When 노선을 생성한다.
+     * Then 새로운 구간의 하행역이 노선에 등록돼 있을시 에러가 발생한다.
+     */
+    @DisplayName("구간 등록시 에러가 발생한다.")
+    @Test
+    void 구간_등록_예외() {
+        //When
+        long lineId = 노선_생성_요청(신분당선)
+                .jsonPath().getLong("id");
+
+        //Then
+        assertThatThrownBy(() -> 구간_생성_요청(lineId, 예외_구간))
+                .isInstanceOf(IllegalSectionException.class);
+
     }
 
     private static ExtractableResponse<Response> 구간_생성_요청(Long lineId, SectionRequest sectionRequest) {
