@@ -24,9 +24,13 @@ public class Stations {
     }
 
     public Stations(List<Station> stations) {
-        this.stations = stations;
-        this.upStationId = stations.get(0).getId();
-        this.downStationId = stations.get(stations.size() - 1).getId();
+        this.stations = isStationsNullOrEmpty(stations) ? this.stations : stations;
+        this.upStationId = isStationsNullOrEmpty(stations) ? this.upStationId : stations.get(0).getId();
+        this.downStationId = isStationsNullOrEmpty(stations) ? this.downStationId : stations.get(stations.size() - 1).getId();
+    }
+
+    private boolean isStationsNullOrEmpty(List<Station> stations) {
+        return stations == null || stations.isEmpty();
     }
 
     public Long getUpStationId() {
