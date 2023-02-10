@@ -80,8 +80,9 @@ public class SectionAcceptanceTest {
     }
 
     /**
-     * When 노선을 생성한다.
-     * Then 새로운 구간의 하행역이 노선에 등록돼 있을시 에러가 발생한다.
+     * Given 노선을 생성한다.
+     * When 새로운 구간의 하행역이 노선에 등록돼 있을시 에러가 발생한다.
+     * Then
      */
     @DisplayName("구간 등록시 에러가 발생한다.")
     @Test
@@ -94,6 +95,36 @@ public class SectionAcceptanceTest {
         assertThatThrownBy(() -> 구간_생성_요청(lineId, 예외_구간))
                 .isInstanceOf(IllegalSectionException.class);
 
+    }
+
+    /**
+     * Given 노선을 생성하고 구간을 추가한다..
+     * When 지하철 노선의 하행종점역을 제거한다.
+     * Then 노선 조회시 삭제한 역을 찾을 수 없다.
+     */
+    @DisplayName("구간이 정상적으로 삭제된다.")
+    @Test
+    void 구간_삭제() {
+        //Given
+        long lineId = 노선_생성_요청(신분당선)
+                .jsonPath().getLong("id");
+        구간_생성_요청(lineId, 새로운_구간);
+
+        //When
+        구간_삭제_요청(lineId, 새로운_하행역_아이디);
+
+        //Then
+        List<String> 종착역목록 = 노선_조회_요청(lineId)
+                .jsonPath().getList("stations.name");
+        assertThat(종착역목록).doesNotContain(새로운_하행역_이름);
+    }
+
+    private static ExtractableResponse<Response> 구간_삭제_요청(long lineId, long stationId) {
+        return RestAssured.given().log().all()
+                .queryParam("stationId", stationId)
+                .when().delete("/lines/{lineId}/sections", lineId)
+                .then().log().all()
+                .extract();
     }
 
     private static ExtractableResponse<Response> 구간_생성_요청(Long lineId, SectionRequest sectionRequest) {

@@ -47,4 +47,8 @@ public class Section {
         this.upStation = upStation;
         this.distance = distance;
     }
+
+    public boolean contains(Station downStation) {
+        return (this.downStation.equals(downStation) || this.upStation.equals(downStation));
+    }
 }
