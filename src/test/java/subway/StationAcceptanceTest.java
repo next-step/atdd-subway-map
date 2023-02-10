@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +19,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationAcceptanceTest {
+
+    private static final String gangnamStation = "강남역";
+    private static final String kyodaeStation = "교대역";
     /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다
@@ -55,13 +59,69 @@ public class StationAcceptanceTest {
      * When 지하철역 목록을 조회하면
      * Then 2개의 지하철역을 응답 받는다
      */
-    // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
+    @DisplayName("지하철역을 조회한다.")
+    @Test
+    void selectStation() {
+
+        // given
+        createStation(gangnamStation);
+        createStation(kyodaeStation);
+
+        // when
+        List<String> stationNames = getStationNames();
+
+        // then
+        assertThat(stationNames).contains(gangnamStation, kyodaeStation);
+    }
 
     /**
      * Given 지하철역을 생성하고
      * When 그 지하철역을 삭제하면
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
-    // TODO: 지하철역 제거 인수 테스트 메서드 생성
+    @DisplayName("지하철역을 삭제한다.")
+    @Test
+    void deleteStation() {
+        // given
+        Map<String, String> params = new HashMap<>();
+        params.put("name", gangnamStation);
+
+        int createdStationId = createStation(gangnamStation).jsonPath().get("id");
+
+        // when
+        ExtractableResponse<Response> deleteResponse = deleteStation(createdStationId);
+
+        // then
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        // then
+        List<String> stationNames = getStationNames();
+        assertThat(stationNames).doesNotContain(gangnamStation);
+    }
+
+    ExtractableResponse<Response> createStation(String stationName) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", stationName);
+
+        return RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all().extract();
+    }
+
+    List<String> getStationNames() {
+        return RestAssured.given().log().all()
+                    .when().get("/stations")
+                    .then().log().all()
+                    .extract().jsonPath().getList("name", String.class);
+    }
+
+    ExtractableResponse<Response> deleteStation(int stationId) {
+        return RestAssured.given().log().all()
+                        .when().delete("/stations/" + stationId)
+                        .then().log().all()
+                        .extract();
+    }
 
 }
