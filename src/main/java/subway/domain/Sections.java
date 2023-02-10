@@ -1,6 +1,7 @@
 package subway.domain;
 
 import subway.exception.IllegalSectionException;
+import subway.exception.IllegalStationDeleteException;
 
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
@@ -33,6 +34,7 @@ public class Sections {
     }
 
     public Section deleteSection(Long stationId) {
+        validateSectionsSize();
         Section section = sections.get(sections.size()-1);
         sections.remove(sections.size()-1);
         return section;
@@ -47,5 +49,11 @@ public class Sections {
     private boolean anySectionContainDownStationOf(Section section) {
         return sections.stream()
                 .anyMatch(s -> s.contains(section.getDownStation()));
+    }
+
+    private void validateSectionsSize() {
+        if (sections.size() == 1) {
+            throw new IllegalStationDeleteException();
+        }
     }
 }
