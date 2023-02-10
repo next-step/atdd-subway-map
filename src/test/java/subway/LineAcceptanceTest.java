@@ -1,43 +1,38 @@
 package subway;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import subway.line.LineRequest;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static subway.api.LineTestApi.*;
 
 @DisplayName("지하철 노선 관리 기능")
-@Sql(scripts = {"classpath:sql/truncate.sql", "classpath:sql/setup.sql"})
+@Sql(scripts = {"classpath:sql/truncate.sql", "classpath:sql/setupLineTest.sql"})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {
+
 	/**
 	 * When 지하철 노선을 생성하면
 	 * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
 	 */
 	@DisplayName("지하철 노선 생성")
 	@Test
-	void createLine() {
+	void createLineTest() {
 		// when
-		LineRequest lineRequest = new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10);
-		createLine(lineRequest);
+		long id = createLine("신분당선", "bg-red-600", 1L, 2L, 10).jsonPath().getLong("id");
 
 		// then
-		ExtractableResponse<Response> showResponse = showLines();
-		List<String> lineNames = showResponse.jsonPath().getList("name", String.class);
-		assertThat(lineNames).containsAnyOf("신분당선");
+		String lineName = showLineById(id).jsonPath().getString("name");
+		assertThat(lineName).isEqualTo("신분당선");
 	}
 
 	/**
@@ -49,11 +44,8 @@ public class LineAcceptanceTest {
 	@Test
 	void showLineList() {
 		// given
-		LineRequest lineRequest1 = new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10);
-		LineRequest lineRequest2 = new LineRequest("분당선", "bg-green-600", 1L, 3L, 10);
-
-		createLine(lineRequest1);
-		createLine(lineRequest2);
+		createLine("신분당선", "bg-red-600", 1L, 2L, 10);
+		createLine("분당선", "bg-green-600", 1L, 3L, 10);
 
 		// when
 		ExtractableResponse<Response> showResponse = showLines();
@@ -73,9 +65,7 @@ public class LineAcceptanceTest {
 	@Test
 	void showLine() {
 		// given
-		LineRequest lineRequest = new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10);
-
-		long id = createLine(lineRequest).jsonPath().getLong("id");
+		long id = createLine("신분당선", "bg-red-600", 1L, 2L, 10).jsonPath().getLong("id");
 
 		// when
 		ExtractableResponse<Response> showResponse = showLineById(id);
@@ -95,11 +85,9 @@ public class LineAcceptanceTest {
 	 * */
 	@DisplayName("지하철 노선 수정")
 	@Test
-	void updateLine() {
+	void updateLineTest() {
 		// given
-		LineRequest lineRequest = new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10);
-
-		long id = createLine(lineRequest).jsonPath().getLong("id");
+		long id = createLine("신분당선", "bg-red-600", 1L, 2L, 10).jsonPath().getLong("id");
 
 		// when
 		updateLine(id, "다른분당선", "bg-red-600");
@@ -120,102 +108,14 @@ public class LineAcceptanceTest {
 	 * */
 	@DisplayName("지하철 노선 삭제")
 	@Test
-	void deleteLine() {
+	void deleteLineTest() {
 		// given
-		LineRequest lineRequest = new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10);
-
-		long id = createLine(lineRequest).jsonPath().getLong("id");
+		long id = createLine("신분당선", "bg-red-600", 1L, 2L, 10).jsonPath().getLong("id");
 
 		// when
 		ExtractableResponse<Response> deleteResponse = deleteLine(id);
 
 		// then
 		assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
-	}
-
-	private ExtractableResponse<Response> createLine(LineRequest lineRequest) {
-		ExtractableResponse<Response> response = RestAssured
-			.given().log().all()
-			.body(lineRequest)
-			.contentType(MediaType.APPLICATION_JSON_VALUE)
-			.when().post("/lines")
-			.then().log().all()
-			.extract();
-
-		assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-		return response;
-	}
-
-	private ExtractableResponse<Response> showLines() {
-		ExtractableResponse<Response> response = RestAssured
-			.given().log().all()
-			.when().get("/lines")
-			.then().log().all()
-			.extract();
-
-		assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-		return response;
-	}
-
-	private ExtractableResponse<Response> showLineById(Long id) {
-		ExtractableResponse<Response> response = RestAssured
-			.given().log().all()
-			.when().get("/lines/{id}", id)
-			.then().log().all()
-			.extract();
-
-		assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-		return response;
-	}
-
-	private ExtractableResponse<Response> updateLine(Long id, String name, String color) {
-		Map<String, String> params = new HashMap<>();
-		params.put("name", name);
-		params.put("color", color);
-
-		ExtractableResponse<Response> response = RestAssured
-			.given().log().all()
-			.body(params)
-			.contentType(MediaType.APPLICATION_JSON_VALUE)
-			.when().put("/lines/{id}", id)
-			.then().log().all()
-			.extract();
-
-		assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-		return response;
-	}
-
-	private ExtractableResponse<Response> deleteLine(Long id) {
-		ExtractableResponse<Response> response = RestAssured
-			.given().log().all()
-			.when().delete("/lines/{id}", id)
-			.then().log().all()
-			.extract();
-
-		assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-
-		ExtractableResponse<Response> afterDeleteResponse = RestAssured
-			.given().log().all()
-			.when().delete("/lines/{id}", id)
-			.then().log().all()
-			.extract();
-
-		return afterDeleteResponse;
-	}
-
-	private ExtractableResponse<Response> createStation(String stationName) {
-		Map<String, String> params = new HashMap<>();
-		params.put("name", stationName);
-
-		ExtractableResponse<Response> response = RestAssured
-			.given().log().all()
-			.body(params)
-			.contentType(MediaType.APPLICATION_JSON_VALUE)
-			.when().post("/stations")
-			.then().log().all()
-			.extract();
-
-		assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-		return response;
 	}
 }

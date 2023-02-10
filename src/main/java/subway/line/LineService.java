@@ -6,28 +6,27 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import subway.Station;
-import subway.StationRepository;
+import subway.section.Section;
+import subway.section.SectionCreateRequest;
+import subway.section.SectionService;
 
 @Service
 public class LineService {
-	private LineRepository lineRepository;
-	private StationRepository stationRepository;
+	private SectionService sectionService;
 
-	public LineService(LineRepository lineRepository, StationRepository stationRepository) {
+	private LineRepository lineRepository;
+
+	public LineService(SectionService sectionService, LineRepository lineRepository) {
+		this.sectionService = sectionService;
 		this.lineRepository = lineRepository;
-		this.stationRepository = stationRepository;
 	}
 
 	@Transactional
-	public LineResponse saveLine(LineRequest lineRequest) {
-		Station upStation = stationRepository.findById(lineRequest.getUpStationsId()).orElseThrow(() -> new NullPointerException("Station doesn't exist"));
-		Station downStation = stationRepository.findById(lineRequest.getDownStationsId()).orElseThrow(() -> new NullPointerException("Station doesn't exist"));
+	public LineResponse saveLine(LineCreateRequest lineRequest) {
+		Line saveLine = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor()));
 
-		Line saveLine = lineRepository.save(new Line(
-			lineRequest.getName(), lineRequest.getColor(),
-			upStation, downStation, lineRequest.getDistance()));
-
+		Section newSection = sectionService.saveSection(saveLine, new SectionCreateRequest(lineRequest.getDownStationsId(), lineRequest.getUpStationsId(), lineRequest.getDistance()));
+		saveLine.getSections().addSection(newSection);
 		return createLineResponse(saveLine);
 	}
 
@@ -40,12 +39,12 @@ public class LineService {
 
 	@Transactional(readOnly = true)
 	public LineResponse findLineById(Long id) {
-		return createLineResponse(lineRepository.findById(id).orElse(null));
+		return createLineResponse(lineRepository.findById(id).orElseThrow(() -> new NullPointerException("Line doesn't exist")));
 	}
 
 	@Transactional
 	public void updateLineById(Long id, LineUpdateRequest lineUpdateRequest) {
-		Line line = lineRepository.findById(id).orElse(null);
+		Line line = lineRepository.findById(id).orElseThrow(() -> new NullPointerException("Line doesn't exist"));
 		line.updateLine(lineUpdateRequest.getName(), lineUpdateRequest.getColor());
 	}
 
@@ -55,10 +54,6 @@ public class LineService {
 	}
 
 	private LineResponse createLineResponse(Line line) {
-		try {
-			return new LineResponse(line);
-		} catch (NullPointerException npe) {
-			throw new NullPointerException("Line doesn't exist");
-		}
+		return new LineResponse(line);
 	}
 }

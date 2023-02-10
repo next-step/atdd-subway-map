@@ -1,16 +1,13 @@
 package subway.line;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
 
-import subway.Station;
+import subway.section.Sections;
 
 @Entity
 public class Line {
@@ -26,24 +23,15 @@ public class Line {
 	@Column(length = 30, nullable = false)
 	private String color;
 
-	@ManyToOne
-	private Station upStationId;
-
-	@ManyToOne
-	private Station downStationId;
-
-	@Column(length = 20, nullable = false)
-	private int distance;
+	@Embedded
+	private Sections sections = new Sections();
 
 	public Line() {
 	}
 
-	public Line(String name, String color, Station upStationId, Station downStationId, int distance) {
+	public Line(String name, String color) {
 		this.name = name;
 		this.color = color;
-		this.upStationId = upStationId;
-		this.downStationId = downStationId;
-		this.distance = distance;
 	}
 
 	public void updateLine(String name, String color) {
@@ -63,14 +51,7 @@ public class Line {
 		return color;
 	}
 
-	public List<Station> getStations() {
-		List<Station> stations = new ArrayList<>();
-		stations.add(upStationId);
-		stations.add(downStationId);
-		return stations;
-	}
-
-	public int getDistance() {
-		return distance;
+	public Sections getSections() {
+		return sections;
 	}
 }
