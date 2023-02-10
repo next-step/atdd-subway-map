@@ -8,6 +8,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import subway.station.StationResponse;
 import subway.testsupport.AcceptanceTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -35,7 +36,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         강남역_Id = 지하철역_등록됨("강남역").body().jsonPath().getLong("id");
         역삼역_Id = 지하철역_등록됨("역삼역").body().jsonPath().getLong("id");
         선릉역_Id = 지하철역_등록됨("선릉역").body().jsonPath().getLong("id");
-        lineId = 지하철_노선_생성됨("2호선", "green darken-2", 강남역_Id, 역삼역_Id, 10L).jsonPath().getLong("id");
+        lineId = 지하철_노선_생성됨("2호선", "green darken-2", 강남역_Id, 역삼역_Id, 강남역_역삼역_거리).jsonPath().getLong("id");
     }
 
     /**
@@ -46,26 +47,25 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void createSection() {
         // when
-        지하철_구간_생성됨(lineId, new SectionRequest(강남역_Id, 역삼역_Id, 강남역_역삼역_거리));
+        지하철_구간_생성됨(lineId, new SectionRequest(선릉역_Id, 역삼역_Id, 역삼역_선릉역_거리));
 
         // then
-        ExtractableResponse<Response> response = 지하철_노선_Id로_조회됨(lineId);
-        assertThat(response.jsonPath().getList("station.id")).contains(강남역_Id, 역삼역_Id);
+        var response = 지하철_노선_Id로_조회됨(lineId).jsonPath();
+        assertThat(response.getList("stations.id")).contains(역삼역_Id.intValue(), 선릉역_Id.intValue());
     }
 
     /**
-     * When 새로운 구간 등록 시 기존 구간의 상행역이 하행역 종점이 아닐 때
+     * When 새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이 아닐때
      * Then 예외가 발생한다.
      */
-    @DisplayName("새로운 지하철 구간 등록 시 상행역은 기 노선의 하행 종점역이 아닐때 예외 발생")
+    @DisplayName("새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이 아닐때 예외 발생")
     @Test
     void createSection_WhenNotLastStopOfDownLine() {
         // when
-        지하철_구간_생성됨(lineId, new SectionRequest(강남역_Id, 역삼역_Id, 강남역_역삼역_거리));
-        ExtractableResponse<Response> response = 지하철_구간_생성됨(lineId, new SectionRequest(강남역_Id, 선릉역_Id, 역삼역_선릉역_거리));
+        ExtractableResponse<Response> response = 지하철_구간_등록_요청(lineId, new SectionRequest(선릉역_Id, 강남역_Id, 역삼역_선릉역_거리));
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY.value());
     }
 
     /**
@@ -76,11 +76,10 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void createSection_WhenAlreadySection() {
         // when
-        지하철_구간_생성됨(lineId, new SectionRequest(강남역_Id, 역삼역_Id, 강남역_역삼역_거리));
-        ExtractableResponse<Response> response = 지하철_구간_생성됨(lineId, new SectionRequest(선릉역_Id, 강남역_Id, 역삼역_선릉역_거리));
+        ExtractableResponse<Response> response = 지하철_구간_등록_요청(lineId, new SectionRequest(선릉역_Id, 강남역_Id, 역삼역_선릉역_거리));
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY.value());
     }
 
     /**
@@ -91,12 +90,17 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteSection() {
         // when
-        Long stationId = 지하철_구간_생성됨(lineId, new SectionRequest(강남역_Id, 역삼역_Id, 강남역_역삼역_거리)).jsonPath().getLong("stationId");
+        Long stationId = 지하철_구간_생성됨(lineId, new SectionRequest(선릉역_Id, 역삼역_Id, 역삼역_선릉역_거리)).jsonPath().getList("stations", StationResponse.class).stream()
+                .filter(station -> station.getName().equals("선릉역"))
+                .findFirst()
+                .map(StationResponse::getId)
+                .get();
+
         지하철_구간_삭제됨(lineId, stationId);
 
         // then
         ExtractableResponse<Response> response = 지하철_노선_Id로_조회됨(lineId);
-        assertThat(response.jsonPath().getList("station.id")).doesNotContain(stationId);
+        assertThat(response.jsonPath().getList("stations.id")).doesNotContain(stationId);
     }
 
     /**
@@ -107,11 +111,11 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteSection_WhenNotLastStopOfDownLine() {
         // when
-        지하철_구간_생성됨(lineId, new SectionRequest(강남역_Id, 역삼역_Id, 강남역_역삼역_거리)).jsonPath().getLong("stationId");
-        ExtractableResponse<Response> response = 지하철_구간_삭제됨(lineId, 강남역_Id);
+        지하철_구간_생성됨(lineId, new SectionRequest(선릉역_Id, 역삼역_Id, 역삼역_선릉역_거리));
+        ExtractableResponse<Response> response = 지하철_구간_삭제_요청(lineId, 역삼역_Id);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY.value());
     }
 
     /**
@@ -122,11 +126,10 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteSection_WhenOnlyOneSection() {
         // when
-        지하철_구간_생성됨(lineId, new SectionRequest(강남역_Id, 역삼역_Id, 강남역_역삼역_거리)).jsonPath().getLong("stationId");
-        ExtractableResponse<Response> response = 지하철_구간_삭제됨(lineId, 강남역_Id);
+        ExtractableResponse<Response> response = 지하철_구간_삭제_요청(lineId, 강남역_Id);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY.value());
     }
 
     public ExtractableResponse<Response> 지하철_구간_생성됨(Long lineId, SectionRequest request) {
@@ -137,10 +140,10 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 
     public static ExtractableResponse<Response> 지하철_구간_등록_요청(Long lineId, SectionRequest request) {
         return RestAssured.given().log().all()
-                .pathParam("lineId", lineId)
+                .pathParam("id", lineId)
                 .body(request)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines/{lineId}/sections")
+                .when().post("/lines/{id}/sections")
                 .then().log().all()
                 .extract();
     }
@@ -157,10 +160,10 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 
     public static ExtractableResponse<Response> 지하철_구간_삭제_요청(Long lineId, Long stationId) {
         return RestAssured.given().log().all()
-                .pathParam("lineId", lineId)
+                .pathParam("id", lineId)
                 .queryParam("stationId", stationId)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines/{id}/sections")
+                .when().delete("/lines/{id}/sections")
                 .then().log().all()
                 .extract();
     }

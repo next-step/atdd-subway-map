@@ -34,7 +34,7 @@ public class LineService {
                         downStation,
                         lineRequest.getDistance()));
 
-        return createLineResponse(null);
+        return createLineResponse(line);
     }
 
     @Transactional(readOnly = true)
@@ -57,16 +57,16 @@ public class LineService {
     }
 
     public void deleteLine(Long id) {
-        final var line = findById(id);
+        findById(id);
         lineRepository.deleteById(id);
     }
 
-    private Line findById(Long id) {
+    public Line findById(Long id) {
         return lineRepository.findById(id)
                 .orElseThrow(() -> new LineNotFoundException(id));
     }
 
-    private LineResponse createLineResponse(Line line) {
+    public LineResponse createLineResponse(Line line) {
         List<Station> stations = line.getSections().getSections().stream()
                 .map(Section::getDownStation)
                 .collect(Collectors.toList());
