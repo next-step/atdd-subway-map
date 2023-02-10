@@ -17,6 +17,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import subway.common.AssertUtils;
 
 @DisplayName("지하철 노선 관련 기능")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -90,7 +91,7 @@ class LineAcceptanceTest {
         params.put("downStationId", 2);
         params.put("distance", 10);
 
-        응답_상태_코드_검증(지하철_노선_생성(params), HttpStatus.CREATED);
+        AssertUtils.응답_상태_코드_검증(지하철_노선_생성(params), HttpStatus.CREATED);
 
         ExtractableResponse<Response> response = 지하철_노선_목록_조회();
 
@@ -122,15 +123,15 @@ class LineAcceptanceTest {
         secondParams.put("downStationId", 2);
         secondParams.put("distance", 5);
 
-        응답_상태_코드_검증(지하철_노선_생성(firstParams), HttpStatus.CREATED);
+        AssertUtils.응답_상태_코드_검증(지하철_노선_생성(firstParams), HttpStatus.CREATED);
 
-        응답_상태_코드_검증(지하철_노선_생성(secondParams), HttpStatus.CREATED);
+        AssertUtils.응답_상태_코드_검증(지하철_노선_생성(secondParams), HttpStatus.CREATED);
 
         // When
         ExtractableResponse<Response> response = 지하철_노선_목록_조회();
 
         // Then
-        응답_상태_코드_검증(response, HttpStatus.OK);
+        AssertUtils.응답_상태_코드_검증(response, HttpStatus.OK);
         List<String> lines = response.jsonPath()
             .getList("$");
         assertThat(lines).hasSize(2);
@@ -158,7 +159,7 @@ class LineAcceptanceTest {
         ExtractableResponse<Response> response = 지하철_노선_조회(lineId);
 
         // Then
-        응답_상태_코드_검증(response, HttpStatus.OK);
+        AssertUtils.응답_상태_코드_검증(response, HttpStatus.OK);
         String lineName = response.jsonPath().getString("name");
         assertThat(lineName).isEqualTo("신분당선");
     }
@@ -189,7 +190,7 @@ class LineAcceptanceTest {
         ExtractableResponse<Response> response = 지하철_노선_수정(lineId, changedLineParam);
 
         // Then
-        응답_상태_코드_검증(response, HttpStatus.NO_CONTENT);
+        AssertUtils.응답_상태_코드_검증(response, HttpStatus.NO_CONTENT);
     }
 
     /**
@@ -214,10 +215,6 @@ class LineAcceptanceTest {
         ExtractableResponse<Response> response = 지하철_노선_삭제(lineId);
 
         // Then
-        응답_상태_코드_검증(response, HttpStatus.NO_CONTENT);
-    }
-
-    private void 응답_상태_코드_검증(ExtractableResponse<Response> response, HttpStatus httpStatus) {
-        assertThat(response.statusCode()).isEqualTo(httpStatus.value());
+        AssertUtils.응답_상태_코드_검증(response, HttpStatus.NO_CONTENT);
     }
 }

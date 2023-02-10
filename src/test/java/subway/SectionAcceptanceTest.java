@@ -16,6 +16,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import subway.common.AssertUtils;
 import subway.line.dto.LineResponse;
 import subway.station.dto.StationResponse;
 
@@ -92,7 +93,7 @@ public class SectionAcceptanceTest {
         ExtractableResponse<Response> response = 노선_구간_생성(lineId, sectionParams);
 
         // Then
-        응답_상태_코드_검증(response, HttpStatus.CREATED);
+        AssertUtils.응답_상태_코드_검증(response, HttpStatus.CREATED);
         Long downStationId = LineAcceptanceTest.지하철_노선_조회(lineId).body().jsonPath().getLong("stations[1].id");
         assertThat(downStationId).isEqualTo(daSanStation.getId());
     }
@@ -117,13 +118,13 @@ public class SectionAcceptanceTest {
 
         Long lineId = newBunDangLine.getId();
 
-        응답_상태_코드_검증(노선_구간_생성(lineId, sectionParams), HttpStatus.CREATED);
+        AssertUtils.응답_상태_코드_검증(노선_구간_생성(lineId, sectionParams), HttpStatus.CREATED);
 
         // When
         ExtractableResponse<Response> response = 노선_구간_삭제(lineId, daSanStation.getId());
 
         // Then
-        응답_상태_코드_검증(response, HttpStatus.NO_CONTENT);
+        AssertUtils.응답_상태_코드_검증(response, HttpStatus.NO_CONTENT);
         Long downStationId = LineAcceptanceTest.지하철_노선_조회(lineId).body().jsonPath().getLong("stations[1].id");
         assertThat(downStationId).isEqualTo(deokSoStation.getId());
     }
@@ -140,7 +141,7 @@ public class SectionAcceptanceTest {
         Long lineId = newBunDangLine.getId();
 
         //Then
-        응답_상태_코드_검증(노선_구간_생성(lineId, sectionParams), HttpStatus.BAD_REQUEST);
+        AssertUtils.응답_상태_코드_검증(노선_구간_생성(lineId, sectionParams), HttpStatus.BAD_REQUEST);
     }
 
     @DisplayName("구간이 1개인 경우 삭제하면 삭제가 되지 않는다.")
@@ -150,10 +151,6 @@ public class SectionAcceptanceTest {
         Long lineId = newBunDangLine.getId();
 
         // Then
-        응답_상태_코드_검증(노선_구간_삭제(lineId, daSanStation.getId()), HttpStatus.BAD_REQUEST);
-    }
-
-    private void 응답_상태_코드_검증(ExtractableResponse<Response> response, HttpStatus httpStatus) {
-        assertThat(response.statusCode()).isEqualTo(httpStatus.value());
+        AssertUtils.응답_상태_코드_검증(노선_구간_삭제(lineId, daSanStation.getId()), HttpStatus.BAD_REQUEST);
     }
 }
