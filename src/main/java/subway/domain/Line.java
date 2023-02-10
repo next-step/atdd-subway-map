@@ -1,15 +1,6 @@
 package subway.domain;
 
-import subway.exception.SectionNotFoundException;
-import subway.exception.StationNotFoundException;
-
 import javax.persistence.*;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static javax.persistence.CascadeType.PERSIST;
-import static javax.persistence.FetchType.LAZY;
 
 @Entity
 public class Line {
