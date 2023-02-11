@@ -11,23 +11,27 @@ public class LineRestAssuredClient {
         return RestAssuredClient.post("/lines", requestParam);
     }
 
-    public static ExtractableResponse<Response> findLine(Long id) {
-        return RestAssuredClient.get(String.format("/lines/%d", id));
+    public static ExtractableResponse<Response> findLine(Long lineId) {
+        return RestAssuredClient.get(String.format("/lines/%d", lineId));
     }
 
-    public static ExtractableResponse<Response> updateLine(Long id, Map<String, Object> requestParam) {
-        return RestAssuredClient.put(String.format("/lines/%d", id), requestParam);
+    public static ExtractableResponse<Response> updateLine(Long lineId, Map<String, Object> requestParam) {
+        return RestAssuredClient.put(String.format("/lines/%d", lineId), requestParam);
     }
 
     public static ExtractableResponse<Response> listLine() {
         return RestAssuredClient.get("/lines");
     }
 
-    public static ExtractableResponse<Response> deleteLine(Long id) {
-        return RestAssuredClient.delete(String.format("/lines/%d", id));
+    public static ExtractableResponse<Response> deleteLine(Long lineId) {
+        return RestAssuredClient.delete(String.format("/lines/%d", lineId));
     }
 
-    public static ExtractableResponse<Response> addSection(Long id, Map<String, Object> requestParam) {
-        return RestAssuredClient.post(String.format("/lines/%d/sections", id), requestParam);
+    public static ExtractableResponse<Response> addSection(Long lineId, Map<String, Object> requestParam) {
+        return RestAssuredClient.post(String.format("/lines/%d/sections", lineId), requestParam);
+    }
+
+    public static ExtractableResponse<Response> deleteSection(Long lineId, Long stationId) {
+        return RestAssuredClient.delete(String.format("/lines/%d/sections?stationId=%d", lineId, stationId));
     }
 }

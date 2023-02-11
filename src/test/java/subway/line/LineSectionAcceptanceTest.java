@@ -74,7 +74,7 @@ public class LineSectionAcceptanceTest {
                 )
         );
         // then
-        assertThat(addedLineSection.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(addedLineSection.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
         var afterLines = LineRestAssuredClient.listLine();
@@ -98,7 +98,70 @@ public class LineSectionAcceptanceTest {
         );
     }
 
+    /**
+     * Given 지하철 노선 9호선 (석촌역 - 신논현역 - 논현역)이 있을때,
+     * When 지하철 노선에 하행종점역(논현역)을 제거하면,
+     * Then 변경된 지하철 노선(석촌역 - 신논현역)을 찾을 수 있다
+     * */
+    @DisplayName("지하철 구간 삭제")
+    @Test
+    void deleteSection() {
+        // given
+        var lineId = 1L;
+        Fixture.addLineSection(lineId);
+
+        var beforeLines = LineRestAssuredClient.listLine();
+        assertAll(
+                () -> assertThat(beforeLines.jsonPath().getList("$").size()).isEqualTo(1),
+                () -> assertThat(beforeLines.jsonPath().getLong("[0].id")).isEqualTo(1),
+                () -> assertThat(beforeLines.jsonPath().getString("[0].name")).isEqualTo("9호선"),
+                () -> assertThat(beforeLines.jsonPath().getString("[0].color")).isEqualTo("bg-red-600"),
+                () -> assertThat(beforeLines.jsonPath().getMap("[0].stations[0]")).containsExactly(
+                        entry("id", 1),
+                        entry("name", "석촌역")
+                ),
+                () -> assertThat(beforeLines.jsonPath().getMap("[0].stations[1]")).containsExactly(
+                        entry("id", 2),
+                        entry("name", "신논현역")
+                ),
+                () -> assertThat(beforeLines.jsonPath().getMap("[0].stations[2]")).containsExactly(
+                        entry("id", 4),
+                        entry("name", "동작역")
+                )
+        );
+
+        // when
+        var stationId = 4L;
+        var deletedLine = LineRestAssuredClient.deleteSection(lineId, stationId);
+        assertThat(deletedLine.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        // then
+        var afterLines = LineRestAssuredClient.listLine();
+        assertAll(
+                () -> assertThat(afterLines.jsonPath().getList("$").size()).isEqualTo(1),
+                () -> assertThat(afterLines.jsonPath().getLong("[0].id")).isEqualTo(1),
+                () -> assertThat(afterLines.jsonPath().getString("[0].name")).isEqualTo("9호선"),
+                () -> assertThat(afterLines.jsonPath().getString("[0].color")).isEqualTo("bg-red-600"),
+                () -> assertThat(afterLines.jsonPath().getMap("[0].stations[0]")).containsExactly(
+                        entry("id", 1),
+                        entry("name", "석촌역")
+                ),
+                () -> assertThat(afterLines.jsonPath().getMap("[0].stations[1]")).containsExactly(
+                        entry("id", 2),
+                        entry("name", "신논현역")
+                )
+        );
+    }
+
     private static class Fixture {
+        private static final List<Map<String, Object>> sections = List.of(
+                Map.ofEntries(
+                        entry("upStationId", 4),
+                        entry("downStationId", 3),
+                        entry("distance", 6)
+                )
+        );
+
         private static final List<Map<String, Object>> lines =  List.of(
                 Map.ofEntries(
                         entry("name", "9호선"),
@@ -125,6 +188,12 @@ public class LineSectionAcceptanceTest {
         private static void createStations() {
             for (var station : stations) {
                 StationRestAssuredClient.createStation(station);
+            }
+        }
+
+        public static void addLineSection(long lineId) {
+            for (var section : sections) {
+                LineRestAssuredClient.addSection(lineId, section);
             }
         }
     }
