@@ -42,7 +42,7 @@ public class LineService {
         return LineResponse.from(getById(lineId));
     }
 
-    private Line getById(final Long lineId) {
+    public Line getById(final Long lineId) {
         return lineRepository.findById(lineId)
                 .orElseThrow(NoSuchElementException::new);
     }

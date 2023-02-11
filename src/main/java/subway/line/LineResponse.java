@@ -25,6 +25,7 @@ public class LineResponse {
                         .getValues()
                         .stream()
                         .flatMap(LineResponse::getStationResponse)
+                        .distinct()
                         .collect(Collectors.toList())
         );
     }
