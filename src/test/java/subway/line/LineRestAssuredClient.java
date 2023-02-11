@@ -26,4 +26,8 @@ public class LineRestAssuredClient {
     public static ExtractableResponse<Response> deleteLine(Long id) {
         return RestAssuredClient.delete(String.format("/lines/%d", id));
     }
+
+    public static ExtractableResponse<Response> addSection(Long id, Map<String, Object> requestParam) {
+        return RestAssuredClient.post(String.format("/lines/%d/sections", id), requestParam);
+    }
 }
