@@ -20,15 +20,21 @@ import static subway.station.StationFixture.*;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class LineAcceptanceTest {
 
+    private StationResponse stationA;
+    private StationResponse stationB;
+    private StationResponse stationC;
+    private StationResponse stationD;
+
+
     private LineCreateRequest lineA;
     private LineCreateRequest lineB;
 
     @BeforeEach
     void setUp() {
-        final StationResponse stationA = 지하철역_생성(STATION_A).as(StationResponse.class);
-        final StationResponse stationB = 지하철역_생성(STATION_B).as(StationResponse.class);
-        final StationResponse stationC = 지하철역_생성(STATION_C).as(StationResponse.class);
-        final StationResponse stationD = 지하철역_생성(STATION_D).as(StationResponse.class);
+        stationA = 지하철역_생성(STATION_A).as(StationResponse.class);
+        stationB = 지하철역_생성(STATION_B).as(StationResponse.class);
+        stationC = 지하철역_생성(STATION_C).as(StationResponse.class);
+        stationD = 지하철역_생성(STATION_D).as(StationResponse.class);
 
         lineA = new LineCreateRequest("line-A", "line-A-color", stationA.getId(), stationB.getId(), 10);
         lineB = new LineCreateRequest("line-B", "line-B-color", stationC.getId(), stationD.getId(), 8);
