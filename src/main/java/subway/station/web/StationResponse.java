@@ -1,5 +1,8 @@
 package subway.station.web;
 
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor
 public class StationResponse {
     private Long id;
     private String name;
