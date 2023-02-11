@@ -1,8 +1,14 @@
 package subway.line;
 
+import subway.common.LineSectionValidator;
+import subway.section.Section;
+import subway.section.Sections;
 import subway.station.Station;
+import subway.station.Stations;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Line {
@@ -17,26 +23,15 @@ public class Line {
     @Column(length = 20, nullable = false)
     private String color;
 
-    @Column(nullable = false)
-    private Long distance;
-
-    @ManyToOne
-    @JoinColumn(name = "upStationId")
-    private Station upStation;
-
-    @ManyToOne
-    @JoinColumn(name = "downStationId")
-    private Station downStation;
+    @OneToMany(mappedBy = "line")
+    private List<Section> sections = new ArrayList<>();
 
     public Line() {
     }
 
-    public Line(String name, String color, Long distance, Station upStation, Station downStation) {
+    public Line(String name, String color) {
         this.name = name;
         this.color = color;
-        this.distance = distance;
-        this.upStation = upStation;
-        this.downStation = downStation;
     }
 
     public Long getId() {
@@ -51,11 +46,24 @@ public class Line {
         return color;
     }
 
-    public Long getDistance() {return distance;}
+    public List<Section> getSections() {
+        return sections;
+    }
 
-    public Station getUpStation() {return upStation;}
+    public List<Station> getStations() {
+        return new Sections(sections).getAllStation();
+    }
 
-    public Station getDownStation() {return downStation;}
+    public Line addSection(Station upStation, Station downStation, Long distance) {
+        var section = new Section(this, upStation, downStation,distance);
+
+        if (!this.getSections().isEmpty()) {
+            LineSectionValidator.validate(this, section);
+        }
+
+        sections.add(section);
+        return this;
+    }
 
     public Line update(String name, String color) {
         this.name = name;
