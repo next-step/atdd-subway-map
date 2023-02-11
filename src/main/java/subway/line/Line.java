@@ -2,6 +2,7 @@ package subway.line;
 
 import lombok.*;
 import subway.*;
+import subway.line.section.*;
 
 import javax.persistence.*;
 

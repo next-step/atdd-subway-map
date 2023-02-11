@@ -1,7 +1,6 @@
-package subway.line;
+package subway.line.section;
 
 import lombok.*;
-import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

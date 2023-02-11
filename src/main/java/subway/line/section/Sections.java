@@ -1,4 +1,4 @@
-package subway.line;
+package subway.line.section;
 
 import lombok.*;
 import subway.*;
@@ -7,7 +7,7 @@ import javax.persistence.*;
 import java.util.*;
 
 @Embeddable
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class Sections {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "line", cascade = CascadeType.ALL, orphanRemoval = true)

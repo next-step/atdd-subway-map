@@ -1,4 +1,4 @@
-package subway.line;
+package subway.line.section;
 
 import io.restassured.response.*;
 import org.apache.http.*;
