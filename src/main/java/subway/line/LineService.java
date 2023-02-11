@@ -25,7 +25,7 @@ public class LineService {
                 .color(lineCreateRequest.getColor())
                 .build();
 
-        final var lineStation = LineStation.builder()
+        final var lineStation = Section.builder()
                 .line(line)
                 .upStation(upStation)
                 .downStation(downStation)

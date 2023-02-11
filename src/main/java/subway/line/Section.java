@@ -10,7 +10,7 @@ import javax.persistence.*;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
 @Getter
-public class LineStation {
+public class Section {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

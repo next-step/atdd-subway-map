@@ -21,7 +21,7 @@ public class LineResponse {
                 line.getId(),
                 line.getName(),
                 line.getColor(),
-                line.getLineStations()
+                line.getSections()
                         .getValues()
                         .stream()
                         .flatMap(LineResponse::getStationResponse)
@@ -29,15 +29,15 @@ public class LineResponse {
         );
     }
 
-    private static Stream<StationResponse> getStationResponse(final LineStation lineStation) {
+    private static Stream<StationResponse> getStationResponse(final Section section) {
         return Stream.of(
                 new StationResponse(
-                        lineStation.getUpStation().getId(),
-                        lineStation.getUpStation().getName()
+                        section.getUpStation().getId(),
+                        section.getUpStation().getName()
                 ),
                 new StationResponse(
-                        lineStation.getDownStation().getId(),
-                        lineStation.getDownStation().getName()
+                        section.getDownStation().getId(),
+                        section.getDownStation().getName()
                 )
         );
     }

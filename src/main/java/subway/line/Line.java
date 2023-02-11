@@ -22,12 +22,12 @@ public class Line {
 
     @Embedded
     @Builder.Default
-    private LineStations lineStations = new LineStations();
+    private Sections sections = new Sections();
 
-    public Line addLineStation(final LineStation lineStation) {
+    public Line addLineStation(final Section section) {
 
-        this.lineStations.add(lineStation);
-        lineStation.changeLine(this);
+        this.sections.add(section);
+        section.changeLine(this);
         return this;
     }
 
