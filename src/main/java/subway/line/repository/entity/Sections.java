@@ -1,4 +1,4 @@
-package subway.section.repository.entity;
+package subway.line.repository.entity;
 
 import lombok.NoArgsConstructor;
 import subway.station.repository.entity.Station;
@@ -7,7 +7,10 @@ import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Embeddable
 @NoArgsConstructor
@@ -45,6 +48,26 @@ public class Sections {
 //    public int getDistance() {
 //        sections.stream().map(this::getDistance)
 //    }
+
+    public Set<Long> getAllStationIds() {
+        Set<Long> allStationIds = new HashSet<>();
+        for (Section sec : sections) {
+            allStationIds.add(sec.getUpStationId());
+            allStationIds.add(sec.getDownStationId());
+        }
+
+        return allStationIds;
+    }
+
+    public List<Station> getAllStations() {
+        Set<Station> allStations = new HashSet<>();
+        for (Section sec : sections) {
+            allStations.add(sec.getUpStation());
+            allStations.add(sec.getDownStation());
+        }
+
+        return allStations.stream().collect(Collectors.toList());
+    }
 
 
 }

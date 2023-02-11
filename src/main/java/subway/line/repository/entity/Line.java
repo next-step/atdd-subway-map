@@ -2,8 +2,6 @@ package subway.line.repository.entity;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import subway.section.repository.entity.Section;
-import subway.section.repository.entity.Sections;
 import subway.station.repository.entity.Station;
 
 import javax.persistence.Column;
@@ -13,6 +11,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.util.List;
 
 @Entity
 @Table(name = "line")
@@ -53,6 +52,10 @@ public class Line {
 
     public void addSection(Section section) {
         this.sections.addSection(section);
+    }
+
+    public List<Station> getAllStations() {
+        return sections.getAllStations();
     }
 
 }

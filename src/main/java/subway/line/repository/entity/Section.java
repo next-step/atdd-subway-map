@@ -1,4 +1,4 @@
-package subway.section.repository.entity;
+package subway.line.repository.entity;
 
 import lombok.NoArgsConstructor;
 import subway.station.repository.entity.Station;

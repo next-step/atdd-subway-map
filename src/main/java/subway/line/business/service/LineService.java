@@ -8,12 +8,14 @@ import subway.line.repository.LineRepository;
 import subway.line.repository.entity.Line;
 import subway.line.web.dto.LineRequest;
 import subway.line.web.dto.LineResponse;
-import subway.section.repository.entity.Section;
-import subway.section.repository.entity.Sections;
+import subway.line.web.dto.SectionRequest;
+import subway.line.repository.entity.Section;
+import subway.line.repository.entity.Sections;
 import subway.station.business.StationService;
 import subway.station.repository.entity.Station;
 import subway.station.web.StationResponse;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -62,15 +64,27 @@ public class LineService {
         lineRepository.deleteById(id);
     }
 
-    private LineResponse toLineResponse(Line newLine) {
-        StationResponse firstStation = stationService.toStationResponse(newLine.getFirstStation());
-        StationResponse lastStation = stationService.toStationResponse(newLine.getLastStation());
+    @Transactional
+    public void addSection(Long lineId, SectionRequest request) {
+        Line line = getLine(lineId);
+        Station upStation = stationService.findStation(request.getUpStationId());
+        Station downStation = stationService.findStation(request.getDownStationId());
+
+        line.addSection(new Section(upStation, downStation, request.getDistance()));
+        lineRepository.save(line);
+    }
+
+    private LineResponse toLineResponse(Line line) {
+        List<StationResponse> stationResponses = new ArrayList<>();
+        for (Station station : line.getAllStations()) {
+            stationResponses.add(stationService.toStationResponse(station));
+        }
 
         return LineResponse.builder()
-                .id(newLine.getId())
-                .name(newLine.getName())
-                .color(newLine.getColor())
-                .stations(List.of(firstStation, lastStation))
+                .id(line.getId())
+                .name(line.getName())
+                .color(line.getColor())
+                .stations(stationResponses)
                 .build();
     }
 
