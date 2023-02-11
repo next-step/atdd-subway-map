@@ -1,17 +1,21 @@
 package subway.line;
 
-import subway.station.Station;
+import lombok.Getter;
+import subway.station.StationResponse;
 
 import java.util.List;
+import java.util.Objects;
 
+
+@Getter
 public class LineResponse {
     private final Long id;
     private final String name;
     private final String color;
 
-    private final List<Station> stations;
+    private final List<StationResponse> stations;
 
-    private LineResponse(final Long id, final String name, final String color, final List<Station> stations) {
+    private LineResponse(final Long id, final String name, final String color, final List<StationResponse> stations) {
         this.id = id;
         this.name = name;
         this.color = color;
@@ -23,23 +27,20 @@ public class LineResponse {
                 line.getId(),
                 line.getName(),
                 line.getColor(),
-                List.of(line.getUpStation(), line.getDownStation())
+                List.of(StationResponse.from(line.getUpStation()), StationResponse.from(line.getDownStation()))
         );
     }
 
-    public Long getId() {
-        return id;
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        final LineResponse that = (LineResponse) o;
+        return Objects.equals(id, that.id) && Objects.equals(name, that.name) && Objects.equals(color, that.color) && Objects.equals(stations, that.stations);
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public String getColor() {
-        return color;
-    }
-
-    public List<Station> getStations() {
-        return stations;
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, color, stations);
     }
 }
