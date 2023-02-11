@@ -24,6 +24,10 @@ public class SectionService {
             throw new NotLastDownStationException();
         }
 
+        if(line.anyMatchStation(downStation)) {
+            throw new DuplicateSectionStationException();
+        }
+
         line.addLineStation(createSection(request, line, upStation, downStation));
     }
 

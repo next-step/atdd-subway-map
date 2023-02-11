@@ -40,4 +40,10 @@ public class Sections {
     private int lastIndex() {
         return this.values.size() - 1;
     }
+
+    public boolean anyMatchStation(final Station station) {
+        return this.values.stream()
+                .anyMatch(section -> section.anyMatchStation(station));
+
+    }
 }

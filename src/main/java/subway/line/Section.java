@@ -38,4 +38,8 @@ public class Section {
     public boolean isDownStation(final Station station) {
         return downStation.equals(station);
     }
+
+    public boolean anyMatchStation(final Station station) {
+        return upStation.equals(station) || isDownStation(station);
+    }
 }

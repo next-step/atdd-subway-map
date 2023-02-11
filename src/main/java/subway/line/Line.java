@@ -37,6 +37,11 @@ public class Line {
         return sections.isLastStation(station);
     }
 
+    public boolean anyMatchStation(final Station station) {
+
+        return sections.anyMatchStation(station);
+    }
+
     public Line change(final String name, final String color) {
         this.name = name;
         this.color = color;

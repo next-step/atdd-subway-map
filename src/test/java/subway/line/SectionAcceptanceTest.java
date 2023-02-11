@@ -83,4 +83,25 @@ public class SectionAcceptanceTest {
         // Then
         assertThat(response.statusCode()).isEqualTo(BAD_REQUEST.value());
     }
+
+    /**
+     * Given: 노선에 구간이 등록되어 있고,
+     * When: 구간을 추가 등록할 때,
+     * Then: 새로운 구간의 하행역이 해당 노선에 등록되어 있는 역이면 예외가 발생한다.
+     */
+    @Test
+    @DisplayName("구간 등록 - 새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없다.")
+    void addSectionThrow2() throws Exception {
+        // Given
+        final var params = new HashMap<>();
+        params.put("upStationId", "2");
+        params.put("downStationId", "1");
+        params.put("distance", "10");
+
+        // When
+        final var response = addSection(params);
+
+        // Then
+        assertThat(response.statusCode()).isEqualTo(BAD_REQUEST.value());
+    }
 }
