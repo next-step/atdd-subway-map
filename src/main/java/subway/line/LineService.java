@@ -7,7 +7,6 @@ import subway.exception.CustomException;
 import subway.exception.ErrorDto;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,42 +30,34 @@ public class LineService {
         return createLineResponse(line);
     }
 
-
-    @Transactional
-    public LineResponse updateLine(Long id, LineRequest lineRequest) throws CustomException {
-
-        Optional<Line> updateLine = lineRepository.findById(id);
-        if (updateLine == null || updateLine.isEmpty()) {
-            throw new CustomException(new ErrorDto(HttpStatus.NOT_FOUND, "지하철노선 Id("+ id +") 가 존재 하지 않습니다."));
-        } else {
-            updateLine.ifPresent(selectLine -> {
-                updateLine.get().setName(lineRequest.getName());
-                updateLine.get().setColor(lineRequest.getColor());
-                updateLine.get().setUpStationId(lineRequest.getUpStationId());
-                updateLine.get().setDownStationId(lineRequest.getDownStationId());
-                updateLine.get().setDistance(lineRequest.getDistance());
-
-                lineRepository.save(updateLine.get());
-            });
-            return createLineResponse(updateLine.get());
-        }
-    }
-
     public List<LineResponse> findAllLines() {
         return lineRepository.findAll().stream()
                 .map(this::createLineResponse)
                 .collect(Collectors.toList());
     }
 
-    public LineResponse findLineById(Long id) throws CustomException {
-
-        try {
-            Line line = lineRepository.findById(id).get();
-            return createLineResponse(line);
-        } catch (Exception e) {
-            throw new CustomException(new ErrorDto(HttpStatus.BAD_REQUEST, "Line id: " + id + " (" + e.getMessage() +")" ));
-        }
+    @Transactional
+    public LineResponse updateLine(Long id, LineRequest lineRequest) throws CustomException {
+        Line line = findLineById(id);
+        line.setName(lineRequest.getName());
+        line.setColor(lineRequest.getColor());
+        line.setUpStationId(lineRequest.getUpStationId());
+        line.setDownStationId(lineRequest.getDownStationId());
+        line.setDistance(lineRequest.getDistance());
+        lineRepository.save(line);
+        return createLineResponse(line);
     }
+
+
+    public Line findLineById(Long id) throws CustomException {
+        return lineRepository.findById(id).orElseThrow(()->new CustomException(
+                new ErrorDto(HttpStatus.NOT_FOUND, "지하철노선 Id("+ id +") 가 존재 하지 않습니다.")));
+    }
+
+    public LineResponse findLineResponseById(Long id) throws CustomException {
+        return createLineResponse(findLineById(id));
+    }
+
 
     @Transactional
     public void deleteLineById(Long id) {

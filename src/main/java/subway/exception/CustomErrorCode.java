@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 @Getter
 
-//Exception 처리 공부하면서, 테스트 해보 았습니다. CustomException 은 지양한다고 하네요.
+//Exception 처리 공부하면서, 테스트 해보 았습니다. CustomException - 솽황에 맞게 사용하자.
 public enum CustomErrorCode implements ErrorCode {
 
     //404 NOT_FOUND 잘못된 리소스 접근
