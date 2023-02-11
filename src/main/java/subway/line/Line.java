@@ -4,7 +4,6 @@ import subway.common.LineSectionValidator;
 import subway.section.Section;
 import subway.section.Sections;
 import subway.station.Station;
-import subway.station.Stations;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -23,7 +22,7 @@ public class Line {
     @Column(length = 20, nullable = false)
     private String color;
 
-    @OneToMany(mappedBy = "line")
+    @OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private List<Section> sections = new ArrayList<>();
 
     public Line() {
@@ -55,14 +54,18 @@ public class Line {
     }
 
     public Line addSection(Station upStation, Station downStation, Long distance) {
-        var section = new Section(this, upStation, downStation,distance);
-
-        if (!this.getSections().isEmpty()) {
-            LineSectionValidator.validate(this, section);
+        var newSection = new Section(this, upStation, downStation, distance);
+        if (!sections.isEmpty()) {
+            LineSectionValidator.validate(this, newSection);
         }
-
-        sections.add(section);
+        sections.add(newSection);
         return this;
+    }
+
+    public void deleteSection(Station downStation) {
+        var lineSection = new Sections(sections);
+        LineSectionValidator.deleteValidate(lineSection, downStation);
+        sections.remove(lineSection.getLastSection());
     }
 
     public Line update(String name, String color) {

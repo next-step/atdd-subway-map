@@ -25,6 +25,8 @@ public class Sections {
         return getLastSection().getDownStation().equals(station);
     }
 
+    public int getSize() { return sections.size(); }
+
     public List<Station> getAllStation() {
         var stations = sections.stream()
                 .map(Section::getUpStation)
@@ -37,7 +39,7 @@ public class Sections {
         return stations;
     }
 
-    private Section getLastSection() {
+    public Section getLastSection() {
         int size = sections.size();
         if (size == 0) {
             throw new IllegalStateException("section size is zero");

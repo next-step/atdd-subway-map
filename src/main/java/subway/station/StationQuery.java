@@ -1,6 +1,7 @@
 package subway.station;
 
 import org.springframework.stereotype.Service;
+import subway.exception.SubwayNotFoundException;
 import subway.line.dto.LineDto;
 
 import java.util.List;
@@ -22,5 +23,10 @@ public class StationQuery {
                                 )
                         )
         );
+    }
+
+    public Station getStation(Long stationId) {
+        return stationRepository.findById(stationId)
+                        .orElseThrow(() -> new SubwayNotFoundException("Station not found with id, " + stationId));
     }
 }

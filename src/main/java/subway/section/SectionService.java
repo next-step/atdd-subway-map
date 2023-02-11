@@ -4,11 +4,7 @@ import org.springframework.stereotype.Service;
 import subway.line.LineQuery;
 import subway.line.dto.LineResponse;
 import subway.section.dto.SectionDto;
-import subway.station.Station;
 import subway.station.StationQuery;
-import subway.station.Stations;
-
-import java.util.List;
 
 @Service
 public class SectionService {
@@ -23,15 +19,20 @@ public class SectionService {
     }
 
     public LineResponse addSection(Long lineId, SectionDto sectionDto) {
-        var stations = stationQuery.getStations(sectionDto.getStationIds());
         var line = lineQuery.findById(lineId);
-
-        var updatedLine = line.addSection(
-                stations.findById(sectionDto.getUpStationId()),
-                stations.findById(sectionDto.getDownStationId()),
-                sectionDto.getDistance()
+        var stations = stationQuery.getStations(sectionDto.getStationIds());
+        return LineResponse.from(
+                line.addSection(
+                        stations.findById(sectionDto.getUpStationId()),
+                        stations.findById(sectionDto.getDownStationId()),
+                        sectionDto.getDistance()
+                )
         );
+    }
 
-        return LineResponse.from(updatedLine);
+    public void deleteSection(Long lineId, Long stationId) {
+        var line = lineQuery.findById(lineId);
+        var station = stationQuery.getStation(stationId);
+        line.deleteSection(station);
     }
 }
