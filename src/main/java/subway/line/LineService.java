@@ -4,8 +4,8 @@ import org.springframework.stereotype.Service;
 import subway.line.dto.LineDto;
 import subway.line.dto.LineResponse;
 import subway.line.dto.UpdateLineDto;
-import subway.station.Station;
 import subway.station.StationQuery;
+import subway.station.Stations;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -25,24 +25,20 @@ public class LineService {
 
     @Transactional
     public LineResponse createLine(LineDto lineDto) {
-        var stations = queryStations(lineDto);
-
-        var line = lineRepository.save(
-                new Line(
-                        lineDto.getName(),
-                        lineDto.getColor(),
-                        lineDto.getDistance(),
-                        stations.get(0),
-                        stations.get(1)
+        var stations = getStations(lineDto);
+        var line = saveLine(lineDto);
+        return LineResponse.from(
+                line.addSection(
+                        stations.findById(lineDto.getUpStationId()),
+                        stations.findById(lineDto.getDownStationId()),
+                        lineDto.getDistance()
                 )
         );
-
-        return LineResponse.from(line);
     }
 
     public List<LineResponse> findAllLines() {
-        return lineQuery.findAll()
-                .stream().map(LineResponse::from)
+        return lineQuery.findAll().stream()
+                .map(LineResponse::from)
                 .collect(Collectors.toList());
     }
 
@@ -60,9 +56,16 @@ public class LineService {
         lineRepository.deleteById(lineId);
     }
 
-    private List<Station> queryStations(LineDto lineDto) {
-        return stationQuery.findByIds(
-                List.of(lineDto.getUpStationId(), lineDto.getDownStationId())
+    private Stations getStations(LineDto lineDto) {
+        return stationQuery.getStations(lineDto.getStationIds());
+    }
+
+    private Line saveLine(LineDto lineDto) {
+        return lineRepository.save(
+                new Line(
+                        lineDto.getName(),
+                        lineDto.getColor()
+                )
         );
     }
 }
