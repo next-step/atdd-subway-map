@@ -56,7 +56,7 @@ public class Line {
     public Line addSection(Station upStation, Station downStation, Long distance) {
         var newSection = new Section(this, upStation, downStation, distance);
         if (!sections.isEmpty()) {
-            LineSectionValidator.validate(this, newSection);
+            LineSectionValidator.addValidate(this, newSection);
         }
         sections.add(newSection);
         return this;

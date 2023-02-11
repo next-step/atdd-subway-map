@@ -7,16 +7,27 @@ import subway.section.Sections;
 import subway.station.Station;
 
 public class LineSectionValidator {
-    public static void validate(Line line, Section section) {
-        var lineSection = new Sections(line.getSections());
 
-        validateLineLastStationMatchUpStation(lineSection, section.getUpStation());
-        validateLineHasAlreadyDownStation(lineSection, section.getDownStation());
+    public static final int MIN_LINE_SECTION_SIZE = 1;
+
+    public static void addValidate(Line line, Section section) {
+        var sections = new Sections(line.getSections());
+        validateLineLastStationMatches(sections, section.getUpStation());
+        validateLineHasAlreadyDownStation(sections, section.getDownStation());
+    }
+    public static void deleteValidate(Sections sections, Station downStation) {
+        validateLineSectionSize(sections);
+        validateLineLastStationMatches(sections, downStation);
     }
 
-    private static void validateLineLastStationMatchUpStation(Sections lineSection, Station upStation) {
-        if (!lineSection.matchLastStation(upStation)) {
-            throw new SubwayBadRequestException("upStation(" + upStation + ") must be same with downStation of line");
+    private static void validateLineSectionSize(Sections sections) {
+        if (sections.getSize() <= MIN_LINE_SECTION_SIZE)
+            throw new SubwayBadRequestException("can delete section when line has more than 2 section, current size: " + sections.getSize());
+    }
+
+    private static void validateLineLastStationMatches(Sections sections, Station station) {
+        if (!sections.matchLastStation(station)) {
+            throw new SubwayBadRequestException("station(" + station + ") is not downStation of the line");
         }
     }
 
