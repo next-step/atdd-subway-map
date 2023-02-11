@@ -25,8 +25,8 @@ public class LineService {
 
     @Transactional
     public LineResponse createLine(LineDto lineDto) {
-        var stations = getStations(lineDto);
         var line = saveLine(lineDto);
+        var stations = getStations(lineDto);
         return LineResponse.from(
                 line.addSection(
                         stations.findById(lineDto.getUpStationId()),
