@@ -28,4 +28,8 @@ public class AssertionUtils {
     public static <T> void 목록은_다음을_포함하지_않는다(final List<T> list, final T... obj) {
         assertThat(list).doesNotContain(obj);
     }
+
+    public static <T> void 목록은_다음을_정확하게_포함한다(final List<T> list, T... obj) {
+        assertThat(list).containsExactly(obj);
+    }
 }
