@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-@Sql(value = "/init.sql")
+//@Sql(value = "/init.sql")
 @DisplayName("지하철 노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {
@@ -135,8 +135,7 @@ public class LineAcceptanceTest {
         // then
         var response = getLine(createId);
         assertAll(
-                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
-                () -> assertThat(response.asString()).isEqualTo(LineConstants.LINE_NOT_EXIST)
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value())
         );
     }
 

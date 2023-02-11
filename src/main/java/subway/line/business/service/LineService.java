@@ -4,11 +4,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.line.business.constant.LineConstants;
-import subway.line.business.model.Line;
 import subway.line.repository.LineRepository;
-import subway.line.repository.entity.LineEntity;
-import subway.station.repository.entity.StationEntity;
-import subway.station.repository.StationRepository;
+import subway.line.repository.entity.Line;
+import subway.line.web.dto.LineRequest;
+import subway.line.web.dto.LineResponse;
+import subway.section.repository.entity.Section;
+import subway.section.repository.entity.Sections;
+import subway.station.business.StationService;
+import subway.station.repository.entity.Station;
+import subway.station.web.StationResponse;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -19,39 +23,55 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class LineService {
 
+    private final StationService stationService;
+
     private final LineRepository lineRepository;
-    private final StationRepository stationRepository;
 
     @Transactional
-    public Line create(Line line, long upStationId, long downStationId) {
-        LineEntity lineEntity = new LineEntity(line);
-        StationEntity upStation = stationRepository.findById(upStationId).orElseThrow(() -> new NoSuchElementException());
-        StationEntity downStation = stationRepository.findById(downStationId).orElseThrow(() -> new NoSuchElementException());
+    public LineResponse create(LineRequest request) {
+        Station upStation = stationService.findStation(request.getUpStationId());
+        Station downStation = stationService.findStation(request.getDownStationId());
 
-        lineEntity.setStations(upStation, downStation);
+        Sections sections = new Sections(List.of(new Section(upStation, downStation, request.getDistance())));
+        Line newLine = lineRepository.save(new Line(request.getName(), request.getColor(), sections));
 
-        return lineRepository.save(lineEntity).toLine();
+        return toLineResponse(newLine);
     }
 
-    public List<Line> getAllLines() {
-        return lineRepository.findAll().stream().map(LineEntity::toLine).collect(Collectors.toList());
+    public List<LineResponse> getAllLines() {
+        return lineRepository.findAll().stream().map(this::toLineResponse).collect(Collectors.toList());
+    }
+
+    public LineResponse getLineResponse(Long lineId) {
+        return toLineResponse(getLine(lineId));
     }
 
     public Line getLine(Long lineId) {
         return lineRepository.findById(lineId)
-                .orElseThrow(() -> new NoSuchElementException(LineConstants.LINE_NOT_EXIST))
-                .toLine();
+                .orElseThrow(() -> new NoSuchElementException(LineConstants.LINE_NOT_EXIST));
     }
 
     @Transactional
     public void modify(Long id, String name, String color) {
-        LineEntity entity = lineRepository.findById(id).orElseThrow(() -> new NoSuchElementException(LineConstants.LINE_NOT_EXIST));
+        Line entity = lineRepository.findById(id).orElseThrow(() -> new NoSuchElementException(LineConstants.LINE_NOT_EXIST));
         lineRepository.save(entity.modify(name, color));
     }
 
     @Transactional
     public void remove(Long id) {
         lineRepository.deleteById(id);
+    }
+
+    private LineResponse toLineResponse(Line newLine) {
+        StationResponse firstStation = stationService.toStationResponse(newLine.getFirstStation());
+        StationResponse lastStation = stationService.toStationResponse(newLine.getLastStation());
+
+        return LineResponse.builder()
+                .id(newLine.getId())
+                .name(newLine.getName())
+                .color(newLine.getColor())
+                .stations(List.of(firstStation, lastStation))
+                .build();
     }
 
 }

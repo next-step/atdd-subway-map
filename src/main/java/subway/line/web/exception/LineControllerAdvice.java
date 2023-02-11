@@ -10,8 +10,8 @@ import java.util.NoSuchElementException;
 public class LineControllerAdvice {
 
     @ExceptionHandler(NoSuchElementException.class)
-    public ResponseEntity<String> lineNotExist(NoSuchElementException e) {
-        return ResponseEntity.badRequest().body(e.getMessage());
+    public ResponseEntity<String> lineNotExist() {
+        return ResponseEntity.notFound().build();
     }
 
 }

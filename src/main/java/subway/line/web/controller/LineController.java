@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import subway.line.business.model.Line;
 import subway.line.business.service.LineService;
 import subway.line.web.dto.LineRequest;
 import subway.line.web.dto.LineResponse;
@@ -18,7 +17,6 @@ import subway.line.web.dto.LineUpdateRequest;
 
 import java.net.URI;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RequestMapping("lines")
 @RestController
@@ -29,20 +27,20 @@ public class LineController {
 
     @PostMapping("")
     public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest request) {
-        Line newLine = lineService.create(request.toLine(), request.getUpStationId(), request.getDownStationId());
-        return ResponseEntity.created(URI.create("/lines/"+newLine.getId())).body(new LineResponse(newLine));
+        LineResponse response = lineService.create(request);
+        return ResponseEntity.created(URI.create("/lines/"+response.getId())).body(response);
     }
 
     @GetMapping("")
     public ResponseEntity<List<LineResponse>> getAllLines() {
-        List<LineResponse> response = lineService.getAllLines().stream().map(LineResponse::new).collect(Collectors.toList());
+        List<LineResponse> response = lineService.getAllLines();
         return ResponseEntity.ok().body(response);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<LineResponse> getLine(@PathVariable Long id) {
-        Line line = lineService.getLine(id);
-        return ResponseEntity.ok().body(new LineResponse(line));
+        LineResponse response = lineService.getLineResponse(id);
+        return ResponseEntity.ok().body(response);
     }
 
     @PutMapping("/{id}")
@@ -56,6 +54,5 @@ public class LineController {
         lineService.remove(id);
         return ResponseEntity.noContent().build();
     }
-
 
 }
