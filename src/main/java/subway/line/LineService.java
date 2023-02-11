@@ -61,4 +61,15 @@ public class LineService {
         final Line line = lineRepository.getLine(id);
         lineRepository.delete(line);
     }
+
+    public void addSection(final Long id, final SectionRequest sectionRequest) {
+        final Line line = lineRepository.getLine(id);
+
+        final Station downStation = stationRepository.getStation(sectionRequest.getDownStationId());
+        final Station upStation = stationRepository.getStation(sectionRequest.getUpStationId());
+
+        line.validate(downStation, upStation);
+
+        line.addSection(new Section(downStation, upStation, sectionRequest.getDistance()));
+    }
 }

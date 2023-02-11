@@ -1,9 +1,18 @@
 package subway.line;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import subway.common.exception.line.DownStationCouldNotExistStationExcetion;
+import subway.common.exception.line.UpStationMustTermianlStationException;
 import subway.station.Station;
 
 import javax.persistence.*;
+import java.util.List;
 
+import static lombok.AccessLevel.PROTECTED;
+
+@Getter
+@NoArgsConstructor(access = PROTECTED)
 @Entity
 public class Line {
 
@@ -14,23 +23,18 @@ public class Line {
     private String name;
     private String color;
 
-    @OneToOne
-    @JoinColumn(name = "up_station_id")
-    private Station upStation;
-    @OneToOne
-    @JoinColumn(name = "down_station_id")
-    private Station downStation;
+    @Embedded
+    private final Sections sections = new Sections();
 
-    private Integer distance;
-
-    protected Line() {}
-
-    private Line(final String name, final String color, final Station upStation, final Station downStation, final Integer distance) {
+    public Line(final String name, final String color, final Section section) {
         this.name = name;
         this.color = color;
-        this.upStation = upStation;
-        this.downStation = downStation;
-        this.distance = distance;
+        addSection(section);
+    }
+
+    public void addSection(final Section section) {
+        this.sections.add(section);
+        section.addLine(this);
     }
 
     public void update(final String name, final String color) {
@@ -38,67 +42,21 @@ public class Line {
         this.color = color;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getColor() {
-        return color;
-    }
-
-    public Station getUpStation() {
-        return upStation;
-    }
-
-    public Station getDownStation() {
-        return downStation;
-    }
-
-    public Integer getDistance() {
-        return distance;
-    }
-
-    private Line(Builder builder) {
-        this(builder.name, builder.color, builder.upStation, builder.downStation, builder.distance);
-    }
-    static class Builder {
-        private String name;
-        private String color;
-        private Station upStation;
-        private Station downStation;
-        private Integer distance;
-
-        public Builder name(String name) {
-            this.name = name;
-            return this;
+    public void validate(final Station downStation, final Station upStation) {
+        if (sections.hasStation(downStation)) {
+            throw new DownStationCouldNotExistStationExcetion();
         }
 
-        public Builder color(String color) {
-            this.color = color;
-            return this;
+        if (!isUpStationEqualsTerminalStation(upStation)) {
+            throw new UpStationMustTermianlStationException();
         }
+    }
 
-        public Builder upStation(Station upStation) {
-            this.upStation = upStation;
-            return this;
-        }
+    private boolean isUpStationEqualsTerminalStation(final Station upStation) {
+        return sections.getTerminalStation() == upStation;
+    }
 
-        public Builder downStation(Station downStation) {
-            this.downStation = downStation;
-            return this;
-        }
-
-        public Builder distance(Integer distance) {
-            this.distance = distance;
-            return this;
-        }
-
-        public Line build() {
-            return new Line(this);
-        }
+    public List<Station> getStations() {
+        return this.sections.getStations();
     }
 }

@@ -20,12 +20,7 @@ public class LineCreateRequest {
     }
 
     public Line toEntity(Station upStation, Station downStation) {
-        return new Line.Builder()
-                .name(this.name)
-                .color(this.color)
-                .upStation(upStation)
-                .downStation(downStation)
-                .distance(this.distance)
-                .build();
+        return new Line(this.name, this.color, new Section(downStation, upStation, distance));
     }
+
 }

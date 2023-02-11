@@ -5,6 +5,7 @@ import subway.station.StationResponse;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 
 @Getter
@@ -27,7 +28,9 @@ public class LineResponse {
                 line.getId(),
                 line.getName(),
                 line.getColor(),
-                List.of(StationResponse.from(line.getUpStation()), StationResponse.from(line.getDownStation()))
+                line.getStations().stream()
+                        .map(StationResponse::from)
+                        .collect(Collectors.toList())
         );
     }
 
