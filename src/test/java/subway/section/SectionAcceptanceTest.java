@@ -1,8 +1,5 @@
 package subway.section;
 
-import io.restassured.RestAssured;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,6 +13,7 @@ import subway.station.StationResponse;
 import static subway.AssertionUtils.목록은_다음을_정확하게_포함한다;
 import static subway.line.LineApi.지하철노선_단건_조회후_응답객체반환;
 import static subway.line.LineApi.지하철노선_생성;
+import static subway.section.SectionApi.지하철구간_등록;
 import static subway.station.StationApi.지하철역_생성;
 import static subway.station.StationFixture.*;
 
@@ -61,15 +59,5 @@ public class SectionAcceptanceTest {
 
         // then
         목록은_다음을_정확하게_포함한다(lineResponse.getStations(), stationA, stationB, stationC);
-    }
-
-    public static ExtractableResponse<Response> 지하철구간_등록(final Long id, final SectionRequest sectionRequest) {
-        return RestAssured
-                    .given()
-                        .body(sectionRequest)
-                    .when()
-                        .post("/lines/{id}/section", id)
-                    .then()
-                    .extract();
     }
 }
