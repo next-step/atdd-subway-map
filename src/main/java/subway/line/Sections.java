@@ -1,6 +1,7 @@
 package subway.line;
 
 import lombok.*;
+import subway.*;
 
 import javax.persistence.*;
 import java.util.*;
@@ -20,5 +21,23 @@ public class Sections {
     public List<Section> getValues() {
 
         return List.copyOf(this.values);
+    }
+
+    public boolean isLastStation(final Station station) {
+
+        return getLastSection()
+                .map(section -> section.isDownStation(station))
+                .orElse(false);
+    }
+
+    private Optional<Section> getLastSection() {
+        if(this.values.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(this.values.get(lastIndex()));
+    }
+
+    private int lastIndex() {
+        return this.values.size() - 1;
     }
 }

@@ -34,4 +34,8 @@ public class Section {
     public void changeLine(final Line line) {
         this.line = line;
     }
+
+    public boolean isDownStation(final Station station) {
+        return downStation.equals(station);
+    }
 }

@@ -17,10 +17,14 @@ public class SectionService {
 
         final var line = lineService.getById(lineId);
 
-        final var upStationId = stationService.getById(request.getUpStationId());
-        final var downStationId = stationService.getById(request.getDownStationId());
+        final var upStation = stationService.getById(request.getUpStationId());
+        final var downStation = stationService.getById(request.getDownStationId());
 
-        line.addLineStation(createSection(request, line, upStationId, downStationId));
+        if(!line.isLastStation(upStation)) {
+            throw new NotLastDownStationException();
+        }
+
+        line.addLineStation(createSection(request, line, upStation, downStation));
     }
 
     private static Section createSection(

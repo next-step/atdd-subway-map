@@ -1,6 +1,7 @@
 package subway.line;
 
 import lombok.*;
+import subway.*;
 
 import javax.persistence.*;
 
@@ -29,6 +30,11 @@ public class Line {
         this.sections.add(section);
         section.changeLine(this);
         return this;
+    }
+
+    public boolean isLastStation(final Station station) {
+
+        return sections.isLastStation(station);
     }
 
     public Line change(final String name, final String color) {
