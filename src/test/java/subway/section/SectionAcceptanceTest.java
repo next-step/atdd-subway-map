@@ -9,33 +9,18 @@ import static subway.section.SectionRestAssured.구간_등록;
 import static subway.section.SectionRestAssured.구간_제거;
 import static subway.station.StationRestAssured.역_생성;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestConstructor;
-import org.springframework.test.context.TestConstructor.AutowireMode;
-import subway.util.DatabaseCleanup;
+import subway.util.RandomPortAcceptanceTest;
 
-@ActiveProfiles("acceptance")
 @DisplayName("구간 관련 기능")
-@TestConstructor(autowireMode = AutowireMode.ALL)
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-public class SectionAcceptanceTest {
-
-    @LocalServerPort
-    private int port;
-
-    private final DatabaseCleanup databaseCleanup;
+public class SectionAcceptanceTest extends RandomPortAcceptanceTest {
 
     private Long lineId;
     private Long upStationId;
@@ -44,14 +29,10 @@ public class SectionAcceptanceTest {
     private String lineLocation;
     private int distance;
 
-    public SectionAcceptanceTest(final DatabaseCleanup databaseCleanup) {
-        this.databaseCleanup = databaseCleanup;
-    }
-
+    @Override
     @BeforeEach
-    void setUp() {
-        RestAssured.port = port;
-        databaseCleanup.truncateTable();
+    protected void setUp() {
+        super.setUp();
         upStationId = 역_생성("상행역").jsonPath().getLong("id");
         downStationId = 역_생성("하행역").jsonPath().getLong("id");
         registerStationId = 역_생성("새로운역").jsonPath().getLong("id");
