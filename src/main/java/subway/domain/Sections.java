@@ -58,4 +58,16 @@ public class Sections {
         return sections.stream()
                 .anyMatch(section -> section.isEqualDownStation(station));
     }
+
+    public void deleteBy(final Station station) {
+        if(sections.size() <= 1) {
+            throw new IllegalArgumentException("구간을 삭제할 수 없습니다.");
+        }
+        Section section = sections.stream()
+                .filter(s -> s.isEqualDownStation(station))
+                .findAny()
+                .orElseThrow(IllegalArgumentException::new);
+
+        sections.add(section);
+    }
 }

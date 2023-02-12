@@ -38,10 +38,10 @@ public class SectionAcceptanceTest extends RandomPortAcceptanceTest {
         양재역 = 역_생성("양재역").jsonPath().getLong("id");
         선릉역 = 역_생성("선릉역").jsonPath().getLong("id");
         정자역 = 역_생성("정자역").jsonPath().getLong("id");
+        distance = 10;
         lineLocation = 노선_생성("2호선", "bg-red-600", 강남역, 양재역, distance)
                 .header(HttpHeaders.LOCATION);
         lineId = Location_조회(lineLocation).jsonPath().getLong("id");
-        distance = 10;
     }
 
     @DisplayName("구간 등록 관련 기능")
@@ -56,7 +56,7 @@ public class SectionAcceptanceTest extends RandomPortAcceptanceTest {
         @Test
         void registerSection() {
             // when
-            ExtractableResponse<Response> response = 구간_등록(lineId, 선릉역, 양재역, distance);
+            var response = 구간_등록(lineId, 선릉역, 양재역, distance);
 
             // then
             assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -146,9 +146,6 @@ public class SectionAcceptanceTest extends RandomPortAcceptanceTest {
         @DisplayName("구간 제거시 노선에 상행 종점역과 하행 종점역만 있는 경우 에러 처리한다.")
         @Test
         void removeSectionLineOnlyHasUpStationAndDownStation() {
-            // given
-            구간_등록(lineId, 선릉역, 양재역, distance);
-
             // when
             ExtractableResponse<Response> response = 구간_제거(lineId, 양재역);
 

@@ -1,7 +1,6 @@
 package subway.domain;
 
 import java.util.List;
-import java.util.stream.Collectors;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -11,7 +10,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 import org.springframework.util.StringUtils;
-import subway.exception.SectionConstraintException;
 
 @Entity
 public class Line {
@@ -109,46 +107,13 @@ public class Line {
         this.distance = new Distance(distance);
     }
 
-    public boolean isNotEqualDownStation(final Station station) {
-        return !this.downStation.equals(station);
-    }
-
-    public void setDeleteSection(final Section deleteSection, final List<Section> lineSections, final Station station) {
-        canDeleteSection(lineSections, station);
-        minusDistance(deleteSection.getDistance());
-        sections.remove(deleteSection);
-    }
-
-    private void canDeleteSection(final List<Section> sections, final Station station) {
-        validateDeleteSectionEqualLineDownStation(this, station);
-        validateLineContainMoreDefaultSection(this, sections);
-    }
-
-    private void validateDeleteSectionEqualLineDownStation(final Line line, final Station station) {
-        if (line.isNotEqualDownStation(station)) {
-            throw new SectionConstraintException();
-        }
-    }
-
-    private void validateLineContainMoreDefaultSection(final Line line, final List<Section> sections) {
-        List<Station> stations = sections.stream()
-                .map(Section::getUpStation)
-                .collect(Collectors.toUnmodifiableList());
-
-        if (stations.equals(line.getStations())) {
-            throw new SectionConstraintException();
-        }
-    }
-
-    private void minusDistance(final Distance distance) {
-        this.distance.minus(distance);
-    }
-
-    public void plusDistance(final Distance distance) {
-        this.distance.plus(distance);
-    }
-
     public void addSection(final Section section) {
+        this.distance.plus(section.getDistance());
         this.sections.add(section);
+        this.downStation = section.getDownStation();
+    }
+
+    public void deleteBy(final Station station) {
+        sections.deleteBy(station);
     }
 }
