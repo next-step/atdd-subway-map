@@ -102,7 +102,7 @@ public class SectionAcceptanceTest extends SectionAcceptanceTestSetting {
      * LINE_HAS_ONLY_ONE_SECTION 에러가 발생한다.
      */
     @Test
-    void 지하철_노선에_상행_종점역과_하행_종점역만_있는_경우_구간이_1개인_경우_역을_삭제할_수_없다() {
+    void 예외_처리_지하철_노선에_상행_종점역과_하행_종점역만_있는_경우_구간이_1개인_경우_역을_삭제할_수_없다() {
         //given
         sectionRestAssured.delete(firstLineId, thirdStationId);
 
