@@ -4,8 +4,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.station.Station;
 import subway.station.StationRepository;
+import subway.station.exception.StationNotFoundException;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -22,20 +24,16 @@ public class LineService {
 
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
-        List<Station> stations = findStations(lineRequest);
+        Station upStation = stationRepository.findById(lineRequest.getUpStationId()).orElseThrow(StationNotFoundException::new);
+        Station downStation = stationRepository.findById(lineRequest.getDownStationId()).orElseThrow(StationNotFoundException::new);
 
         Line line = lineRepository.save(
                 new Line(lineRequest.getName(),
                         lineRequest.getColor(),
-                        stations.get(0),
-                        stations.get(1),
+                        upStation.getId(),
+                        downStation.getId(),
                         lineRequest.getDistance()));
 
         return new LineResponse(line);
-    }
-
-    private List<Station> findStations(LineRequest lineRequest) {
-        List<Long> stationIds = List.of(lineRequest.getUpStationId(), lineRequest.getDownStationId());
-        return stationRepository.findAllById(stationIds);
     }
 }
