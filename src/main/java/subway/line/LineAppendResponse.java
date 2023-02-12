@@ -5,6 +5,8 @@ import java.util.List;
 
 public class LineAppendResponse {
 
+    private Long id;
+
     private String lineName;
 
     private Long upStationId;
@@ -13,12 +15,17 @@ public class LineAppendResponse {
 
     private List<Long> stations = new ArrayList<>();
 
-    public LineAppendResponse(String lineName, Long upStationId, Long downStationId, Long distance, List<Long> stations) {
+    public LineAppendResponse(Long id, String lineName, Long upStationId, Long downStationId, Long distance, List<Long> stations) {
+        this.id = id;
         this.lineName = lineName;
         this.upStationId = upStationId;
         this.downStationId = downStationId;
         this.distance = distance;
         this.stations = stations;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public String getLineName() {
@@ -42,7 +49,7 @@ public class LineAppendResponse {
     }
 
     public static LineAppendResponse fromLine(Line line) {
-        LineAppendResponse res = new LineAppendResponse(line.getName(), line.getUpStationId(), line.getDownStationId(), line.getDistance(), line.getStations());
+        LineAppendResponse res = new LineAppendResponse(line.getId(), line.getName(), line.getUpStationId(), line.getDownStationId(), line.getDistance(), line.getStations());
 
         return res;
     }
