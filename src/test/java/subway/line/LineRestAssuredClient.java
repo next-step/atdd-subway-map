@@ -27,11 +27,11 @@ public class LineRestAssuredClient {
         return RestAssuredClient.delete(String.format("/lines/%d", lineId));
     }
 
-    public static ExtractableResponse<Response> addSection(Long lineId, Map<String, Object> requestParam) {
+    public static ExtractableResponse<Response> addLineSection(Long lineId, Map<String, Object> requestParam) {
         return RestAssuredClient.post(String.format("/lines/%d/sections", lineId), requestParam);
     }
 
-    public static ExtractableResponse<Response> deleteSection(Long lineId, Long stationId) {
+    public static ExtractableResponse<Response> deleteLineSection(Long lineId, Long stationId) {
         return RestAssuredClient.delete(String.format("/lines/%d/sections?stationId=%d", lineId, stationId));
     }
 }
