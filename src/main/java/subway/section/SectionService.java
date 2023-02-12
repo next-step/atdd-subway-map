@@ -6,6 +6,8 @@ import subway.line.dto.LineResponse;
 import subway.section.dto.SectionDto;
 import subway.station.StationQuery;
 
+import javax.transaction.Transactional;
+
 @Service
 public class SectionService {
 
@@ -18,6 +20,7 @@ public class SectionService {
         this.stationQuery = stationQuery;
     }
 
+    @Transactional
     public LineResponse addSection(Long lineId, SectionDto sectionDto) {
         var line = lineQuery.findById(lineId);
         var stations = stationQuery.getStations(sectionDto.getStationIds());
