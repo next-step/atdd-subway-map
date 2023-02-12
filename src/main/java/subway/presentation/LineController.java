@@ -14,11 +14,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import subway.application.LineService;
 import subway.application.SectionService;
-import subway.dto.LineEditRequest;
 import subway.dto.LineCreateRequest;
+import subway.dto.LineEditRequest;
 import subway.dto.LineResponse;
 import subway.dto.SectionRegisterRequest;
-import subway.dto.SectionResponse;
 
 @RestController
 public class LineController {
@@ -64,16 +63,6 @@ public class LineController {
     public ResponseEntity deleteLine(@PathVariable final Long lineId) {
         lineService.delete(lineId);
         return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping("/lines/{lineId}/sections")
-    public ResponseEntity<SectionResponse> showSection(
-            @PathVariable final Long lineId,
-            @RequestParam(name = "stationId") final Long stationId
-    ) {
-        SectionResponse sectionResponse = sectionService.getSection(lineId, stationId);
-        return ResponseEntity.ok()
-                .body(sectionResponse);
     }
 
     @PostMapping("/lines/{lineId}/sections")
