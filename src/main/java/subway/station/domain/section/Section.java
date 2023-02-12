@@ -6,6 +6,7 @@ import subway.station.domain.line.Line;
 import subway.station.domain.station.Station;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Getter
 @Entity
@@ -31,10 +32,23 @@ public class Section {
     }
 
     @Builder
-    public Section(Station upStation, Station downStation, Long distance, Line line) {
+    public Section(Station upStation, Station downStation, Long distance,Line line) {
         this.upStation = upStation;
         this.downStation = downStation;
         this.distance = distance;
         this.line = line;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Section section = (Section) o;
+        return Objects.equals(getId(), section.getId()) && Objects.equals(getUpStation(), section.getUpStation()) && Objects.equals(getDownStation(), section.getDownStation()) && Objects.equals(getDistance(), section.getDistance()) && Objects.equals(getLine(), section.getLine());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getUpStation(), getDownStation(), getDistance(), getLine());
     }
 }
