@@ -72,7 +72,7 @@ public class SectionAcceptanceTest extends RandomPortAcceptanceTest {
          */
         @DisplayName("노선에 구간을 등록했을 때 구간의 상행역이 해당 노선에 하행역이 아닐 경우 에러 처리한다.")
         @Test
-        void registerSection_Error_SectionUpStationIsNotLineDownStation() {
+        void registerSectionUpStationIsNotLineDownStation() {
             // when
             ExtractableResponse<Response> response = 구간_등록(lineId, 선릉역, 정자역, distance);
 
@@ -87,7 +87,7 @@ public class SectionAcceptanceTest extends RandomPortAcceptanceTest {
          */
         @DisplayName("노선에 새로운 구간 등록시 새로운 구간의 하행역이 해당 노선에 등록되어 있는 역일 경우 에러 처리한다.")
         @Test
-        void registerSection_Error_SectionDownStationAlreadyRegisteredSection() {
+        void registerSectionDownStationAlreadyRegisteredSection() {
             // given
             노선_생성("새로운 노선", "색깔", 선릉역, 양재역, 10);
 
@@ -128,7 +128,7 @@ public class SectionAcceptanceTest extends RandomPortAcceptanceTest {
          */
         @DisplayName("제거할 구간이 노선의 하행 종점역이 아닌 경우 에러 처리한다.")
         @Test
-        void removeSection_Error_RemoveSectionIsNotDownStation() {
+        void removeSectionIsNotDownStation() {
             // given
             구간_등록(lineId, 선릉역, 양재역, distance);
 
@@ -146,7 +146,7 @@ public class SectionAcceptanceTest extends RandomPortAcceptanceTest {
          */
         @DisplayName("구간 제거시 노선에 상행 종점역과 하행 종점역만 있는 경우 에러 처리한다.")
         @Test
-        void removeSection_Error_LineOnlyHasUpStationAndDownStation() {
+        void removeSectionLineOnlyHasUpStationAndDownStation() {
             // given
             구간_등록(lineId, 선릉역, 양재역, distance);
 
