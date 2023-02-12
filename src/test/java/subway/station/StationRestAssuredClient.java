@@ -2,7 +2,7 @@ package subway.station;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import subway.utils.RestAssuredClient;
+import subway.RestAssuredClient;
 
 import java.util.Map;
 
