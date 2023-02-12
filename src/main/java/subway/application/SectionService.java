@@ -12,10 +12,8 @@ import subway.domain.SectionRepository;
 import subway.domain.Station;
 import subway.domain.StationRepository;
 import subway.dto.SectionRegisterRequest;
-import subway.dto.SectionResponse;
 import subway.exception.LineNotFoundException;
 import subway.exception.SectionConstraintException;
-import subway.exception.SectionNotFoundException;
 import subway.exception.StationNotFoundException;
 
 @Transactional(readOnly = true)
@@ -37,19 +35,6 @@ public class SectionService {
         this.lineRepository = lineRepository;
         this.stationRepository = stationRepository;
         this.finder = finder;
-    }
-
-    public SectionResponse getSection(final Long lineId, final Long stationId) {
-        Line line = lineRepository.findById(lineId)
-                .orElseThrow(LineNotFoundException::new);
-
-        Station station = stationRepository.findById(stationId)
-                .orElseThrow(StationNotFoundException::new);
-
-        Section section = sectionRepository.findByLineAndDownStation(line, station)
-                .orElseThrow(SectionNotFoundException::new);
-
-        return SectionResponse.by(section);
     }
 
     @Transactional
