@@ -9,13 +9,13 @@ import java.util.Map;
 
 public class StationRestAssured {
 
-    private static final String apiPath = "/stations";
+    private static final String API_PATH = "/stations";
 
     public static ExtractableResponse<Response> createStation(Map<String, String> param) {
         return RestAssured.given()
                 .body(param)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post(apiPath)
+                .when().post(API_PATH)
                 .then().log().all()
                 .extract();
     }
