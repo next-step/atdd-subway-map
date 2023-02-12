@@ -19,10 +19,10 @@ public class Section {
     @Embedded
     private Distance distance;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     private Station upStation;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     private Station downStation;
 
     @ManyToOne(fetch = FetchType.LAZY)
