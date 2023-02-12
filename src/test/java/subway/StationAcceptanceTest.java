@@ -95,11 +95,11 @@ public class StationAcceptanceTest {
         assertThat(stationNames).doNotHave(new Condition<>(s -> s.equals(강남역), 강남역 + "이 조회되었습니다"));
     }
 
-    private static ExtractableResponse<Response> createStation(String name) {
+    public static ExtractableResponse<Response> createStation(String name) {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
         ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
+                RestAssured.given()
                         .body(params)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .when().post("/stations")
@@ -108,7 +108,7 @@ public class StationAcceptanceTest {
         return response;
     }
 
-    private static ExtractableResponse<Response> showStations() {
+    public static ExtractableResponse<Response> showStations() {
         return RestAssured.given().log().all()
                 .when().get("/stations")
                 .then().log().all()
