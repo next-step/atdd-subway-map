@@ -27,19 +27,6 @@ public class Sections {
         this.sections.add(section);
     }
 
-    public Station getFirstStation() {
-        return sections.get(0).getUpStation();
-    }
-
-    public Long getFirstStationId() {
-        return sections.get(0).getUpStationId();
-    }
-
-    public Station getLastStation() {
-        int lastIdx = sections.size() - 1;
-        return sections.get(lastIdx).getDownStation();
-    }
-
     public Long getLastStationId() {
         int lastIdx = sections.size() - 1;
         return sections.get(lastIdx).getDownStationId();
@@ -53,20 +40,6 @@ public class Sections {
         return this.sections.get(sections.size() - 1);
     }
 
-//    public int getDistance() {
-//        sections.stream().map(this::getDistance)
-//    }
-
-    public Set<Long> getAllStationIds() {
-        Set<Long> allStationIds = new HashSet<>();
-        for (Section sec : sections) {
-            allStationIds.add(sec.getUpStationId());
-            allStationIds.add(sec.getDownStationId());
-        }
-
-        return allStationIds;
-    }
-
     public List<Station> getAllStations() {
         Set<Station> allStations = new HashSet<>();
         for (Section sec : sections) {
@@ -78,10 +51,6 @@ public class Sections {
     }
 
     public void remove(Long stationId) {
-        if (stationId != getLastStationId()) {
-            // TODO : 예외처리
-        }
-
         this.sections.remove(sections.size() - 1);
     }
 

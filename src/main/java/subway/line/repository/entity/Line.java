@@ -36,14 +36,6 @@ public class Line {
         this.sections = sections;
     }
 
-    public Station getFirstStation() {
-        return sections.getFirstStation();
-    }
-
-    public Station getLastStation() {
-        return sections.getLastStation();
-    }
-
     public Long getLastStationId() {
         return sections.getLastStationId();
     }
