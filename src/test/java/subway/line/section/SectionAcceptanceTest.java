@@ -29,7 +29,7 @@ public class SectionAcceptanceTest {
     }
 
     /**
-     * Given: 노선에 구간이 등록되어 있을 때,
+     * Given: 노선에 하나의 구간이 등록되어 있을 때,
      * When: 구간을 추가 등록하면
      * Then: 목록 조회 시 추가된 구간을 확인할 수 있다.
      */
@@ -70,7 +70,7 @@ public class SectionAcceptanceTest {
     }
 
     /**
-     * Given: 노선에 구간이 등록되어 있고,
+     * Given: 노선에 하나의 구간이 등록되어 있고,
      * When: 구간을 추가 등록할 때,
      * Then: 상행역이 노선에 등록되어 있는 하행 종점역이 아니면 예외가 발생한다.
      */
@@ -88,7 +88,7 @@ public class SectionAcceptanceTest {
     }
 
     /**
-     * Given: 노선에 구간이 등록되어 있고,
+     * Given: 노선에 두 개의 구간이 등록되어 있고,
      * When: 구간을 추가 등록할 때,
      * Then: 새로운 구간의 하행역이 해당 노선에 등록되어 있는 역이면 예외가 발생한다.
      */
@@ -114,14 +114,10 @@ public class SectionAcceptanceTest {
     @DisplayName("구간 삭제")
     void removeSection() throws Exception {
         // Given
-        addSection(getAddSectionParams(2L, 3L));
+        addSection(getAddSectionParams(STATION_ID_2, STATION_ID_3));
 
         // When
-        final var response = given().log().all()
-                .when()
-                .delete(BASE_SECTION_PATH + "?stationId=" + STATION_ID_3)
-                .then().log().all()
-                .extract();
+        final var response = removeSection(STATION_ID_3);
 
         // Then
         assertThat(response.statusCode()).isEqualTo(NO_CONTENT.value());
@@ -130,5 +126,46 @@ public class SectionAcceptanceTest {
         final var stationIds = lineResponse.jsonPath().getList("stations.id", Long.class);
         assertThat(stationIds.size()).isEqualTo(2);
         assertThat(stationIds).containsAnyOf(1L, 2L);
+    }
+
+    private static ExtractableResponse<Response> removeSection(final Long stationId) {
+        return given().log().all()
+                .when()
+                .delete(BASE_SECTION_PATH + "?stationId=" + stationId)
+                .then().log().all()
+                .extract();
+    }
+
+    /**
+     * Given: 노선에 두 개의 구간이 등록되어 있고,
+     * When: 구간을 삭제할 때,
+     * Then: 마지막 구간이 아니면 삭제되지 않는다.
+     */
+    @Test
+    @DisplayName("구간 삭제 - 마지막 구간이 아니먄 예외가 발생한다.")
+    void removeSectionThrow1() throws Exception {
+        // Given
+        addSection(getAddSectionParams(STATION_ID_2, STATION_ID_3));
+
+        // When
+        final var response = removeSection(STATION_ID_2);
+        
+        // Then
+        assertThat(response.statusCode()).isEqualTo(BAD_REQUEST.value());
+    }
+
+    /**
+     * Given: 노선에 하나의 구간이 등록되어 있을 때
+     * When: 구간을 삭제하면
+     * Then: 구간을 삭제 할 수 없다.
+     */
+    @Test
+    @DisplayName("구간 삭제 - 구간이 하나일 경우 예외가 발생한다")
+    void removeSectionThrow2() throws Exception {
+        // When
+        final var response = removeSection(STATION_ID_2);
+
+        // Then
+        assertThat(response.statusCode()).isEqualTo(BAD_REQUEST.value());
     }
 }

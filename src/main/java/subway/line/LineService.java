@@ -21,18 +21,17 @@ public class LineService {
         final var upStation = stationService.getById(lineCreateRequest.getUpStationId());
         final var downStation = stationService.getById(lineCreateRequest.getDownStationId());
 
-        final var line = Line.builder()
-                .name(lineCreateRequest.getName())
-                .color(lineCreateRequest.getColor())
-                .build();
-
-        final var lineStation = Section.builder()
-                .line(line)
+        final var section = Section.builder()
                 .upStation(upStation)
                 .downStation(downStation)
                 .distance(lineCreateRequest.getDistance())
                 .build();
-        line.addSection(lineStation);
+
+        final var line = Line.builder()
+                .name(lineCreateRequest.getName())
+                .color(lineCreateRequest.getColor())
+                .section(section)
+                .build();
 
         return LineResponse.from(lineRepository.save(line));
     }

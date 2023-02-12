@@ -21,14 +21,6 @@ public class SectionService {
         final var upStation = stationService.getById(request.getUpStationId());
         final var downStation = stationService.getById(request.getDownStationId());
 
-        if (!line.isLastStation(upStation)) {
-            throw new NotLastDownStationException();
-        }
-
-        if (line.anyMatchStation(downStation)) {
-            throw new DuplicateSectionStationException();
-        }
-
         line.addSection(createSection(request, line, upStation, downStation));
     }
 

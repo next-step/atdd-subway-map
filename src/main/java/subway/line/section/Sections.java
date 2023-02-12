@@ -5,23 +5,50 @@ import subway.*;
 
 import javax.persistence.*;
 import java.util.*;
-import java.util.stream.*;
 
 @Embeddable
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Sections {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "line", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Section> values = new ArrayList<>();
 
+    public Sections(final Section section) {
+        final ArrayList<Section> sections = new ArrayList<>();
+        sections.add(section);
+        this.values = sections;
+    }
+
     public Sections add(final Section section) {
+
+        validationLastStation(section.getUpStation());
+
+        if (this.anyMatchStation(section.getDownStation())) {
+            throw new DuplicateSectionStationException();
+        }
+
         this.values.add(section);
         return this;
     }
 
+    private void validationLastStation(final Station section) {
+        if (!this.isLastStation(section)) {
+            throw new NotLastDownStationException();
+        }
+    }
+
     public Sections remove(final Station downStation) {
+        validationLastStation(downStation);
+        if(isOnlyOne()) {
+            throw new OnlyOneSectionException();
+        }
+
         this.values.removeIf(section -> section.isDownStation(downStation));
         return this;
+    }
+
+    private boolean isOnlyOne() {
+        return this.values.size() == 1;
     }
 
     public List<Section> getValues() {

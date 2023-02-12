@@ -8,8 +8,6 @@ import javax.persistence.*;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Builder
 @Getter
 public class Line {
 
@@ -23,24 +21,28 @@ public class Line {
     private String color;
 
     @Embedded
-    @Builder.Default
-    private Sections sections = new Sections();
+    private Sections sections;
+
+    @Builder
+    private Line(
+            final Long id,
+            final String name,
+            final String color,
+            final Section section
+    ) {
+
+        section.changeLine(this);
+        this.id = id;
+        this.name = name;
+        this.color = color;
+        this.sections = new Sections(section);
+    }
 
     public Line addSection(final Section section) {
 
         this.sections.add(section);
         section.changeLine(this);
         return this;
-    }
-
-    public boolean isLastStation(final Station station) {
-
-        return sections.isLastStation(station);
-    }
-
-    public boolean anyMatchStation(final Station station) {
-
-        return sections.anyMatchStation(station);
     }
 
     public Line change(final String name, final String color) {
