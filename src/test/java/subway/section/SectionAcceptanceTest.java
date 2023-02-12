@@ -61,7 +61,7 @@ public class SectionAcceptanceTest extends RandomPortAcceptanceTest {
             assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
             // then
-            구간_등록_검증(lineId, registerStationId, downStationId);
+            구간_등록_검증(lineId, registerStationId);
         }
 
         /**
