@@ -26,6 +26,7 @@ public class SectionAcceptanceTest extends RandomPortAcceptanceTest {
     private Long upStationId;
     private Long downStationId;
     private Long registerStationId;
+    private Long 정자역;
     private String lineLocation;
     private int distance;
 
@@ -36,6 +37,7 @@ public class SectionAcceptanceTest extends RandomPortAcceptanceTest {
         upStationId = 역_생성("상행역").jsonPath().getLong("id");
         downStationId = 역_생성("하행역").jsonPath().getLong("id");
         registerStationId = 역_생성("새로운역").jsonPath().getLong("id");
+        정자역 = 역_생성("정자역").jsonPath().getLong("id");
         lineLocation = 노선_생성("2호선", "bg-red-600", upStationId, downStationId, distance)
                 .header(HttpHeaders.LOCATION);
         lineId = Location_조회(lineLocation).jsonPath().getLong("id");
@@ -72,7 +74,7 @@ public class SectionAcceptanceTest extends RandomPortAcceptanceTest {
         @Test
         void registerSection_Error_SectionUpStationIsNotLineDownStation() {
             // when
-            ExtractableResponse<Response> response = 구간_등록(lineId, registerStationId, registerStationId, distance);
+            ExtractableResponse<Response> response = 구간_등록(lineId, registerStationId, 정자역, distance);
 
             // then
             assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
