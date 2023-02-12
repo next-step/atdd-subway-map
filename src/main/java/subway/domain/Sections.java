@@ -35,6 +35,7 @@ public class Sections {
 
     public Section deleteSection(Long stationId) {
         validateSectionsSize();
+        validateStationIdDownStation(stationId);
         Section section = sections.get(sections.size()-1);
         sections.remove(sections.size()-1);
         return section;
@@ -53,6 +54,11 @@ public class Sections {
 
     private void validateSectionsSize() {
         if (sections.size() == 1) {
+            throw new IllegalStationDeleteException();
+        }
+    }
+    private void validateStationIdDownStation(Long stationId) {
+        if (stationId != getDownStation().getId()) {
             throw new IllegalStationDeleteException();
         }
     }

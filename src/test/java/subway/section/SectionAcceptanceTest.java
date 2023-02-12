@@ -140,7 +140,32 @@ public class SectionAcceptanceTest {
         ExtractableResponse<Response> deleteResponse = 구간_삭제_요청(lineId, stationId);
 
         //Then
-        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    }
+
+    /**
+     * Given 노선을 생성하고 구간을 추가한다.
+     * When 노선의 상행종점역을 제거한다.
+     * Then 에러가 발생한다.
+     * When 노선의 중간역을 제거한다.
+     * Then 에러가 발생한다.
+     */
+    @DisplayName("하행종점역이 아닌 역을 제거 시 예외 발생")
+    @Test
+    void 구간_삭제_예외_잘못된역_제거() {
+        //Given
+        ExtractableResponse<Response> response = 노선_생성_요청(신분당선);
+        long lineId = response.jsonPath().getLong("id");
+        List<Long> stationNames = response.jsonPath().getList("stations.id", Long.class);
+        구간_생성_요청(lineId, 새로운_구간);
+
+        //When //Then
+        assertThat(구간_삭제_요청(lineId, stationNames.get(0)).statusCode())
+                .isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+
+        //When //Then
+        assertThat(구간_삭제_요청(lineId, stationNames.get(1)).statusCode())
+                .isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
     private static ExtractableResponse<Response> 구간_삭제_요청(long lineId, long stationId) {
