@@ -4,11 +4,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.station.domain.line.Line;
 import subway.station.domain.line.LineRepository;
+import subway.station.domain.section.Section;
 import subway.station.domain.station.Station;
 import subway.station.domain.station.StationRepository;
 import subway.station.global.error.exception.ErrorCode;
 import subway.station.global.error.exception.InvalidValueException;
-import subway.station.service.dto.*;
+import subway.station.service.dto.LineResponse;
+import subway.station.service.dto.LineRequest;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,31 +28,27 @@ public class LineService {
     }
 
     @Transactional
-    public LineSaveResponse save(LineSaveRequest lineSaveRequest) {
-        Line line = saveLine(lineSaveRequest);
-        addSection(line.getId(), lineSaveRequest.getUpStationId(), lineSaveRequest.getDownStationId(), lineSaveRequest.getDistance());
-        return toDtoForSaveResponse(line);
+    public LineResponse save(LineRequest lineRequest) {
+        Line line = saveLine(lineRequest);
+        addSection(line.getId(), lineRequest.getUpStationId(), lineRequest.getDownStationId(), lineRequest.getDistance());
+        return from(line);
     }
 
-    public List<LineFindAllResponse> findAll() {
-        List<Line> lines = lineRepository.findAll();
-
-        return toDtoForFindAllResponse(lines);
+    public List<LineResponse> findAll() {
+        List<Line> lines = lineRepository.findAllLinesWithSectionsAndStations();
+        return from(lines);
     }
 
-    public LineFindByLineResponse findById(Long id) {
+    public LineResponse findById(Long id) {
         Line line = findLineById(id);
-
-        return toDtoForFindByResponse(line);
+        return from(line);
     }
 
     @Transactional
-    public LineUpdateResponse update(Long id, String name, String color) {
+    public LineResponse update(Long id, String name, String color) {
         Line line = findLineById(id);
-
         updateLine(line, name, color);
-
-        return toDtoForUpdateResponse(line);
+        return fromForUpdate(line);
     }
 
     @Transactional
@@ -61,9 +59,13 @@ public class LineService {
     @Transactional
     public void addSection(Long id, Long upStationId, Long downStationId, Long distance) {
         Line line = findLineById(id);
-        Station upStation = findStationById(upStationId);
-        Station downStation = findStationById(downStationId);
-        line.addSection(upStation, downStation, distance);
+
+        Section section = Section.builder()
+                .upStation(findStationById(upStationId))
+                .downStation(findStationById(downStationId))
+                .distance(distance)
+                .build();
+        line.addSection(section);
     }
 
     @Transactional
@@ -86,55 +88,44 @@ public class LineService {
         return stationRepository.findById(stationId).orElseThrow(() -> new InvalidValueException(ErrorCode.NOT_EXISTS_STATION));
     }
 
-    private Line saveLine(LineSaveRequest lineSaveRequest) {
+    private Line saveLine(LineRequest lineRequest) {
         return lineRepository.save(
                 Line.builder()
-                        .name(lineSaveRequest.getName())
-                        .color(lineSaveRequest.getColor())
+                        .name(lineRequest.getName())
+                        .color(lineRequest.getColor())
                         .build());
     }
 
     private Line findLineById(Long lineId) {
-        return lineRepository.findById(lineId).orElseThrow(() -> new InvalidValueException(ErrorCode.STATION_NOT_EXISTS_IN_LINE));
+        return lineRepository.findLineWithSectionsAndStationsById(lineId);
     }
 
-    private List<LineFindAllResponse> toDtoForFindAllResponse(List<Line> lines) {
+    private List<LineResponse> from(List<Line> lines) {
         return lines.stream()
-                .map(this::toDtoFoFindAllResponse)
+                .map(this::from)
                 .collect(Collectors.toList());
     }
 
-    private LineSaveResponse toDtoForSaveResponse(Line line) {
-        return LineSaveResponse.builder()
+    private LineResponse from(Line line) {
+        List<Station> stations = convertToStations(line.getSections());
+        return LineResponse.builder()
                 .id(line.getId())
                 .name(line.getName())
                 .color(line.getColor())
-                .stations(line.getStations())
+                .stations(stations)
                 .build();
     }
 
-    private LineFindAllResponse toDtoFoFindAllResponse(Line line) {
-        return LineFindAllResponse.builder()
-                .id(line.getId())
+    private LineResponse fromForUpdate(Line line) {
+        return LineResponse.builder()
                 .name(line.getName())
                 .color(line.getColor())
-                .stations(line.getStations())
                 .build();
     }
 
-    private LineFindByLineResponse toDtoForFindByResponse(Line line) {
-        return LineFindByLineResponse.builder()
-                .id(line.getId())
-                .name(line.getName())
-                .color(line.getColor())
-                .stations(line.getStations())
-                .build();
-    }
-
-    private LineUpdateResponse toDtoForUpdateResponse(Line line) {
-        return LineUpdateResponse.builder()
-                .name(line.getName())
-                .color(line.getColor())
-                .build();
+    private List<Station> convertToStations(List<Section> orderedSections) {
+        List<Station> stations = orderedSections.stream().map(Section::getUpStation).collect(Collectors.toList());
+        stations.add(orderedSections.get(orderedSections.size() - 1).getDownStation());
+        return stations;
     }
 }

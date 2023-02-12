@@ -21,25 +21,25 @@ public class LineController {
     }
 
     @PostMapping("/lines")
-    public ResponseEntity<LineSaveResponse> saveLine(@RequestBody LineSaveRequest lineSaveRequest) {
-        LineSaveResponse line = lineService.save(lineSaveRequest);
+    public ResponseEntity<LineResponse> saveLine(@RequestBody LineRequest lineRequest) {
+        LineResponse line = lineService.save(lineRequest);
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
 
     @GetMapping("/lines")
-    public ResponseEntity<List<LineFindAllResponse>> viewLines() {
+    public ResponseEntity<List<LineResponse>> viewLines() {
         return ResponseEntity.ok().body(lineService.findAll());
     }
 
     @GetMapping("/lines/{id}")
-    public ResponseEntity<LineFindByLineResponse> findLineById(@PathVariable Long id) {
-        LineFindByLineResponse line = lineService.findById(id);
+    public ResponseEntity<LineResponse> findLineById(@PathVariable Long id) {
+        LineResponse line = lineService.findById(id);
         return ResponseEntity.ok().body(line);
     }
 
     @PutMapping("/lines/{id}")
-    public ResponseEntity<LineUpdateResponse> updateLine(@PathVariable Long id, @RequestBody LineUpdateResponse updateLineRequest) {
-        LineUpdateResponse line = lineService.update(id, updateLineRequest.getName(), updateLineRequest.getColor());
+    public ResponseEntity<LineResponse> updateLine(@PathVariable Long id, @RequestBody LineRequest lineRequest) {
+        LineResponse line = lineService.update(id, lineRequest.getName(), lineRequest.getColor());
         return ResponseEntity.ok().body(line);
     }
 
@@ -50,13 +50,13 @@ public class LineController {
     }
 
     @PostMapping("/lines/{id}/sections")
-    public ResponseEntity<SectionSaveResponse> saveSection(@PathVariable Long id, @RequestBody SectionSaveRequest sectionSaveRequest) {
-        sectionService.save(id, sectionSaveRequest);
+    public ResponseEntity<SectionResponse> saveSection(@PathVariable Long id, @RequestBody SectionRequest sectionRequest) {
+        sectionService.save(id, sectionRequest);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/lines/{lineId}/sections/{stationId}")
-    public ResponseEntity<SectionSaveResponse> deleteSection(@PathVariable Long lineId, @PathVariable Long stationId) {
+    public ResponseEntity<SectionResponse> deleteSection(@PathVariable Long lineId, @PathVariable Long stationId) {
         sectionService.delete(lineId, stationId);
         return ResponseEntity.noContent().build();
     }
