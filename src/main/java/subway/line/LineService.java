@@ -4,6 +4,7 @@ import lombok.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
 import subway.*;
+import subway.line.section.*;
 
 import java.util.*;
 import java.util.stream.*;
@@ -20,18 +21,17 @@ public class LineService {
         final var upStation = stationService.getById(lineCreateRequest.getUpStationId());
         final var downStation = stationService.getById(lineCreateRequest.getDownStationId());
 
-        final var line = Line.builder()
-                .name(lineCreateRequest.getName())
-                .color(lineCreateRequest.getColor())
-                .build();
-
-        final var lineStation = LineStation.builder()
-                .line(line)
+        final var section = Section.builder()
                 .upStation(upStation)
                 .downStation(downStation)
                 .distance(lineCreateRequest.getDistance())
                 .build();
-        line.addLineStation(lineStation);
+
+        final var line = Line.builder()
+                .name(lineCreateRequest.getName())
+                .color(lineCreateRequest.getColor())
+                .section(section)
+                .build();
 
         return LineResponse.from(lineRepository.save(line));
     }
@@ -42,7 +42,7 @@ public class LineService {
         return LineResponse.from(getById(lineId));
     }
 
-    private Line getById(final Long lineId) {
+    public Line getById(final Long lineId) {
         return lineRepository.findById(lineId)
                 .orElseThrow(NoSuchElementException::new);
     }

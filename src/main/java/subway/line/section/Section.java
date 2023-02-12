@@ -1,7 +1,8 @@
-package subway.line;
+package subway.line.section;
 
 import lombok.*;
 import subway.*;
+import subway.line.*;
 
 import javax.persistence.*;
 
@@ -10,7 +11,7 @@ import javax.persistence.*;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
 @Getter
-public class LineStation {
+public class Section {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,5 +34,13 @@ public class LineStation {
 
     public void changeLine(final Line line) {
         this.line = line;
+    }
+
+    public boolean isDownStation(final Station station) {
+        return downStation.equals(station);
+    }
+
+    public boolean anyMatchStation(final Station station) {
+        return upStation.equals(station) || isDownStation(station);
     }
 }

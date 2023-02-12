@@ -2,6 +2,7 @@ package subway.line;
 
 import lombok.*;
 import subway.*;
+import subway.line.section.*;
 
 import java.util.*;
 import java.util.stream.*;
@@ -21,23 +22,24 @@ public class LineResponse {
                 line.getId(),
                 line.getName(),
                 line.getColor(),
-                line.getLineStations()
+                line.getSections()
                         .getValues()
                         .stream()
                         .flatMap(LineResponse::getStationResponse)
+                        .distinct()
                         .collect(Collectors.toList())
         );
     }
 
-    private static Stream<StationResponse> getStationResponse(final LineStation lineStation) {
+    private static Stream<StationResponse> getStationResponse(final Section section) {
         return Stream.of(
                 new StationResponse(
-                        lineStation.getUpStation().getId(),
-                        lineStation.getUpStation().getName()
+                        section.getUpStation().getId(),
+                        section.getUpStation().getName()
                 ),
                 new StationResponse(
-                        lineStation.getDownStation().getId(),
-                        lineStation.getDownStation().getName()
+                        section.getDownStation().getId(),
+                        section.getDownStation().getName()
                 )
         );
     }
