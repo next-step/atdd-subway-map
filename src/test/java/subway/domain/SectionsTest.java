@@ -2,6 +2,7 @@ package subway.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -51,5 +52,23 @@ class SectionsTest {
         sections.remove(section);
 
         assertThat(sections.getSections()).doesNotContain(section);
+    }
+
+    @DisplayName("구간 목록의 하행역을 가져온다.")
+    @Test
+    void getDownStation() {
+        Section section1 = new Section(10, 강남역, 역삼역, line);
+        Section section2 = new Section(10, 역삼역, 정자역, line);
+        Sections sections = new Sections();
+        sections.add(section1);
+        sections.add(section2);
+
+        Station actual = sections.getDownStation();
+
+        Assertions.assertAll(
+                () -> assertThat(actual).isEqualTo(정자역),
+                () -> assertThat(actual).isNotEqualTo(강남역),
+                () -> assertThat(actual).isNotEqualTo(역삼역)
+        );
     }
 }

@@ -6,6 +6,7 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
+import subway.exception.StationNotFoundException;
 
 @Embeddable
 public class Sections {
@@ -30,5 +31,18 @@ public class Sections {
 
     public void remove(final Section deleteSection) {
         sections.remove(deleteSection);
+    }
+
+    public Station getDownStation() {
+        return sections.stream()
+                .map(Section::getDownStation)
+                .filter(station -> !this.getBasedOnUpStationBy(station))
+                .findFirst()
+                .orElseThrow(StationNotFoundException::new);
+    }
+
+    private boolean getBasedOnUpStationBy(final Station station) {
+        return sections.stream()
+                .anyMatch(section -> section.isEqualUpStation(station));
     }
 }
