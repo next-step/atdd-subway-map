@@ -2,7 +2,7 @@ package subway.line;
 
 import subway.station.Station;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class LineResponse {
     private Long id;
@@ -11,7 +11,7 @@ public class LineResponse {
 
     private String color;
 
-    private ArrayList<Station> stations;
+    private List<Station> stations;
 
     public LineResponse(Line line) {
         this.id = line.getId();
@@ -31,7 +31,7 @@ public class LineResponse {
         return color;
     }
 
-    public ArrayList<Station> getStations() {
+    public List<Station> getStations() {
         return stations;
     }
 }
