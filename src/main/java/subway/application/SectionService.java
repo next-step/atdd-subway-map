@@ -61,7 +61,7 @@ public class SectionService {
 
         line.plusDistance(section.getDistance());
 
-        sectionRepository.save(section);
+        line.addSection(section);
     }
 
     private Section createSection(final SectionRegisterRequest sectionRegisterRequest, final Line line) {
