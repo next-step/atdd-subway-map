@@ -23,22 +23,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {
 
-    private static final String 신분당선_line = "신분당선";
-    private static final String 수인분당선_line = "수인분당선";
-    private Long 강남역_id;
-    private Long 광교역_id;
-    private Long 성수역_id;
-    private Long 도곡역_id;
+    private static final String SINBUNDANG_LINE = "신분당선";
+    private static final String SUINBUNDANG_LINE = "수인분당선";
+    private Long GANGNAM_ID;
+    private Long GWANGKYO_ID;
+    private Long SUNGSOO_ID;
+    private Long DOKOK_ID;
 
     @Autowired
     private LineRepository lineRepository;
 
     @BeforeEach
     void setUp() {
-        강남역_id = 지하철역_생성("강남역");
-        광교역_id = 지하철역_생성("광교역");
-        성수역_id = 지하철역_생성("성수역");
-        도곡역_id = 지하철역_생성("도곡역");
+        GANGNAM_ID = 지하철역_생성("강남역");
+        GWANGKYO_ID = 지하철역_생성("광교역");
+        SUNGSOO_ID = 지하철역_생성("성수역");
+        DOKOK_ID = 지하철역_생성("도곡역");
     }
 
     @AfterEach
@@ -55,7 +55,7 @@ public class LineAcceptanceTest {
         assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         List<String> lineNames = 지하철_노선_목록_조회();
-        assertThat(lineNames).containsAnyOf(신분당선_line);
+        assertThat(lineNames).containsAnyOf(SINBUNDANG_LINE);
     }
 
     @DisplayName("지하철 노선 목록을 조회한다.")
@@ -67,7 +67,7 @@ public class LineAcceptanceTest {
         List<String> lineNames = 지하철_노선_목록_조회();
 
         assertThat(lineNames).hasSize(2);
-        assertThat(lineNames).containsExactly(신분당선_line, 수인분당선_line);
+        assertThat(lineNames).containsExactly(SINBUNDANG_LINE, SUINBUNDANG_LINE);
     }
 
     @DisplayName("지하철 노선을 조회한다.")
@@ -77,7 +77,7 @@ public class LineAcceptanceTest {
         Long line_id = createResponse.jsonPath().getLong("id");
 
         String lineName = 지하철_노선_조회(line_id);
-        assertThat(lineName).isEqualTo(신분당선_line);
+        assertThat(lineName).isEqualTo(SINBUNDANG_LINE);
     }
 
     @DisplayName("지하철 노선 정보를 수정한다.")
@@ -103,15 +103,15 @@ public class LineAcceptanceTest {
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         List<String> lineNames = 지하철_노선_목록_조회();
-        assertThat(lineNames).doesNotContain(신분당선_line);
+        assertThat(lineNames).doesNotContain(SINBUNDANG_LINE);
     }
 
     private ExtractableResponse<Response> 지하철_신분당선_생성() {
-        return 지하철_노선_생성(신분당선_line, "bg-red-600", 강남역_id, 광교역_id, 10);
+        return 지하철_노선_생성(SINBUNDANG_LINE, "bg-red-600", GANGNAM_ID, GWANGKYO_ID, 10);
     }
 
     private ExtractableResponse<Response> 지하철_수인분당선_생성() {
-        return 지하철_노선_생성(수인분당선_line, "bg-yellow-600", 성수역_id, 도곡역_id, 10);
+        return 지하철_노선_생성(SUINBUNDANG_LINE, "bg-yellow-600", SUNGSOO_ID, DOKOK_ID, 10);
     }
 
     private ExtractableResponse<Response> 지하철_노선_생성(String name, String color, Long upStationId, Long downStationId, Integer distance) {
