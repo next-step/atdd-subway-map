@@ -21,19 +21,19 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class LineAcceptanceTest {
 
-    private ExtractableResponse<Response> stationResponse1;
-    private ExtractableResponse<Response> stationResponse2;
+    private Long nonhyeonStationId;
+    private Long gangNamStationId;
 
     @BeforeEach
     void stationCreate() {
         // given - 역 생성
-        Map<String, String> station1 = new HashMap<>();
-        station1.put("name", "논현역");
-        stationResponse1 = StationRestAssured.createStation(station1);
+        Map<String, String> nonhyeon = new HashMap<>();
+        nonhyeon.put("name", "논현역");
+        nonhyeonStationId = StationRestAssured.getStationId(nonhyeon);
 
-        Map<String, String> station2 = new HashMap<>();
-        station2.put("name", "강남역");
-        stationResponse2 = StationRestAssured.createStation(station2);
+        Map<String, String> gangNam = new HashMap<>();
+        gangNam.put("name", "강남역");
+        gangNamStationId = StationRestAssured.getStationId(gangNam);
     }
 
     /**
@@ -47,8 +47,8 @@ class LineAcceptanceTest {
         LineRequest lineRequest = new LineRequest(
                 "신분당선",
                 "red",
-                stationResponse1.jsonPath().getLong("id"),
-                stationResponse2.jsonPath().getLong("id"),
+                nonhyeonStationId,
+                gangNamStationId,
                 10L);
 
         // when
@@ -76,15 +76,15 @@ class LineAcceptanceTest {
         LineRequest lineRequest1 = new LineRequest(
                 "신분당선",
                 "red",
-                stationResponse1.jsonPath().getLong("id"),
-                stationResponse2.jsonPath().getLong("id"),
+                nonhyeonStationId,
+                gangNamStationId,
                 10L);
 
         LineRequest lineRequest2 = new LineRequest(
                 "강남 2호선",
                 "green",
-                stationResponse1.jsonPath().getLong("id"),
-                stationResponse2.jsonPath().getLong("id"),
+                nonhyeonStationId,
+                gangNamStationId,
                 20L);
 
         LineRestAssured.createRoute(lineRequest1);
@@ -109,6 +109,18 @@ class LineAcceptanceTest {
     @DisplayName("지하철 노선을 조회한다.")
     @Test
     void searchRoute() {
+        // given
+        LineRequest lineRequest1 = new LineRequest(
+                "신분당선",
+                "red",
+                nonhyeonStationId,
+                gangNamStationId,
+                10L);
+
+        // when
+        ExtractableResponse<Response> route = LineRestAssured.createRoute(lineRequest1);
+
+        // then
 
     }
 
