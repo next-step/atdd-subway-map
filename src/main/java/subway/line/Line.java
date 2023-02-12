@@ -17,22 +17,20 @@ public class Line {
     @Column(nullable = false)
     private String color;
 
-    @ManyToOne
-    @JoinColumn(name = "upStationId")
-    private Station upStationId;
+    @Column(name = "up_station_id")
+    private Long upStationId;
 
-    @ManyToOne
-    @JoinColumn(name = "downStationId")
-    private Station downStationId;
+    @Column(name = "down_station_id")
+    private Long downStationId;
 
     @Column(nullable = false)
     private long distance;
 
-    public Line(String name, String color, Station upStation, Station downStation, Long distance) {
+    public Line(String name, String color, Long upStationId, Long downStationId, long distance) {
         this.name = name;
         this.color = color;
-        this.upStationId = upStation;
-        this.downStationId = downStation;
+        this.upStationId = upStationId;
+        this.downStationId = downStationId;
         this.distance = distance;
     }
 
@@ -51,11 +49,11 @@ public class Line {
         return color;
     }
 
-    public Station getUpStationId() {
+    public Long getUpStationId() {
         return upStationId;
     }
 
-    public Station getDownStationId() {
+    public Long getDownStationId() {
         return downStationId;
     }
 
