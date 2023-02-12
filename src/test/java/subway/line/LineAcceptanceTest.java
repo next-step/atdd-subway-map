@@ -1,21 +1,22 @@
 package subway.line;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.aspectj.lang.annotation.Before;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import subway.stations.StationRestAssured;
 
+import javax.persistence.EntityManager;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class LineAcceptanceTest {
@@ -43,18 +44,24 @@ class LineAcceptanceTest {
     @Test
     void createRoute() {
         // given - 노선 생성
-        LineRequest lineRequest = new LineRequest("신분당선", "red", stationResponse1.jsonPath().getLong("id"), stationResponse2.jsonPath().getLong("id"), 10L);
+        LineRequest lineRequest = new LineRequest(
+                "신분당선",
+                "red",
+                stationResponse1.jsonPath().getLong("id"),
+                stationResponse2.jsonPath().getLong("id"),
+                10L);
 
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .body(lineRequest)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = LineRestAssured.createRoute(lineRequest);
 
-        // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        // then - 노선 목록
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
+                () -> {
+                    ExtractableResponse<Response> readLines = LineRestAssured.readLines();
+                    assertThat(readLines.jsonPath().getList("name")).contains(lineRequest.getName());
+                }
+        );
     }
 
     /**
@@ -65,7 +72,33 @@ class LineAcceptanceTest {
     @DisplayName("지하철 노선 목록을 조회한다.")
     @Test
     void searchRouteList() {
+        // given
+        LineRequest lineRequest1 = new LineRequest(
+                "신분당선",
+                "red",
+                stationResponse1.jsonPath().getLong("id"),
+                stationResponse2.jsonPath().getLong("id"),
+                10L);
 
+        LineRequest lineRequest2 = new LineRequest(
+                "강남 2호선",
+                "green",
+                stationResponse1.jsonPath().getLong("id"),
+                stationResponse2.jsonPath().getLong("id"),
+                20L);
+
+        LineRestAssured.createRoute(lineRequest1);
+        LineRestAssured.createRoute(lineRequest2);
+
+        // when
+        ExtractableResponse<Response> response = LineRestAssured.readLines();
+
+        // then
+        List<String> lineNames = response.jsonPath().getList("name");
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
+                () -> assertThat(lineNames).containsExactly(lineRequest1.getName(), lineRequest2.getName())
+        );
     }
 
     /**
