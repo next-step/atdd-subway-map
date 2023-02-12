@@ -1,8 +1,11 @@
 package subway.line;
 
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import subway.AcceptanceTest;
 import subway.station.StationRestAssuredClient;
@@ -41,28 +44,28 @@ public class LineAcceptanceTest extends AcceptanceTest {
         );
 
         // then
-        assertAll(
-                () -> assertNotNull(newLine.jsonPath().get()),
-                () -> assertThat(newLine.jsonPath().getLong("id")).isEqualTo(1),
-                () -> assertThat(newLine.jsonPath().getString("name")).isEqualTo("신분당선"),
-                () -> assertThat(newLine.jsonPath().getString("color")).isEqualTo("bg-red-600"),
-                () -> assertThat(newLine.jsonPath().getLong("stations[0].id")).isEqualTo(1),
-                () -> assertThat(newLine.jsonPath().getString("stations[0].name")).isEqualTo("강남역"),
-                () -> assertThat(newLine.jsonPath().getLong("stations[1].id")).isEqualTo(2),
-                () -> assertThat(newLine.jsonPath().getString("stations[1].name")).isEqualTo("신논현역")
+        Fixture.assertLineEqual(
+                newLine,
+                1L,
+                "신분당선",
+                "bg-red-600",
+                List.of(
+                        Pair.of(1L, "강남역"),
+                        Pair.of(2L, "신논현역")
+                )
         );
 
         // then
         var lines = LineRestAssuredClient.listLine();
-        assertAll(
-                () -> assertThat(lines.jsonPath().getList("$").size()).isEqualTo(1),
-                () -> assertThat(lines.jsonPath().getLong("[0].id")).isEqualTo(1),
-                () -> assertThat(lines.jsonPath().getString("[0].name")).isEqualTo("신분당선"),
-                () -> assertThat(lines.jsonPath().getString("[0].color")).isEqualTo("bg-red-600"),
-                () -> assertThat(lines.jsonPath().getLong("[0].stations[0].id")).isEqualTo(1),
-                () -> assertThat(lines.jsonPath().getString("[0].stations[0].name")).isEqualTo("강남역"),
-                () -> assertThat(lines.jsonPath().getLong("[0].stations[1].id")).isEqualTo(2),
-                () -> assertThat(lines.jsonPath().getString("[0].stations[1].name")).isEqualTo("신논현역")
+
+        Fixture.assertLineListEqual(lines, 0,
+                1L,
+                "신분당선",
+                "bg-red-600",
+                List.of(
+                        Pair.of(1L, "강남역"),
+                        Pair.of(2L, "신논현역")
+                )
         );
     }
 
@@ -98,29 +101,23 @@ public class LineAcceptanceTest extends AcceptanceTest {
         var lines = LineRestAssuredClient.listLine();
 
         // then
-        assertAll(
-                () -> assertThat(lines.jsonPath().getList("$").size()).isEqualTo(2),
-                () -> assertThat(lines.jsonPath().getLong("[0].id")).isEqualTo(1),
-                () -> assertThat(lines.jsonPath().getString("[0].name")).isEqualTo("신분당선"),
-                () -> assertThat(lines.jsonPath().getString("[0].color")).isEqualTo("bg-red-600"),
-                () -> assertThat(lines.jsonPath().getMap("[0].stations[0]")).containsExactly(
-                        entry("id", 1),
-                        entry("name", "강남역")
-                ),
-                () -> assertThat(lines.jsonPath().getMap("[0].stations[1]")).containsExactly(
-                        entry("id", 2),
-                        entry("name", "신논현역")
-                ),
-                () -> assertThat(lines.jsonPath().getLong("[1].id")).isEqualTo(2),
-                () -> assertThat(lines.jsonPath().getString("[1].name")).isEqualTo( "분당선"),
-                () -> assertThat(lines.jsonPath().getString("[1].color")).isEqualTo( "bg-green-600"),
-                () -> assertThat(lines.jsonPath().getMap("[1].stations[0]")).containsExactly(
-                        entry("id", 1),
-                        entry("name", "강남역")
-                ),
-                () -> assertThat(lines.jsonPath().getMap("[1].stations[1]")).containsExactly(
-                        entry("id", 3),
-                        entry("name", "석촌역")
+        Fixture.assertLineListEqual(lines, 0,
+                1L,
+                "신분당선",
+                "bg-red-600",
+                List.of(
+                        Pair.of(1L, "강남역"),
+                        Pair.of(2L, "신논현역")
+                )
+        );
+
+        Fixture.assertLineListEqual(lines, 1,
+                2L,
+                "분당선",
+                "bg-green-600",
+                List.of(
+                        Pair.of(1L, "강남역"),
+                        Pair.of(3L, "석촌역")
                 )
         );
     }
@@ -148,15 +145,15 @@ public class LineAcceptanceTest extends AcceptanceTest {
         var line = LineRestAssuredClient.findLine(1L);
 
         // then
-        assertAll(
-                () -> assertNotNull(line.jsonPath().get()),
-                () -> assertThat(line.jsonPath().getLong("id")).isEqualTo(1),
-                () -> assertThat(line.jsonPath().getString("name")).isEqualTo("신분당선"),
-                () -> assertThat(line.jsonPath().getString("color")).isEqualTo("bg-red-600"),
-                () -> assertThat(line.jsonPath().getLong("stations[0].id")).isEqualTo(1),
-                () -> assertThat(line.jsonPath().getString("stations[0].name")).isEqualTo("강남역"),
-                () -> assertThat(line.jsonPath().getLong("stations[1].id")).isEqualTo(2),
-                () -> assertThat(line.jsonPath().getString("stations[1].name")).isEqualTo("신논현역")
+        Fixture.assertLineEqual(
+                line,
+                1L,
+                "신분당선",
+                "bg-red-600",
+                List.of(
+                        Pair.of(1L, "강남역"),
+                        Pair.of(2L, "신논현역")
+                )
         );
     }
 
@@ -180,10 +177,16 @@ public class LineAcceptanceTest extends AcceptanceTest {
         );
 
         var line = LineRestAssuredClient.findLine(1L);
-        assertAll(
-                () -> assertThat(line.jsonPath().getLong("id")).isEqualTo(1),
-                () -> assertThat(line.jsonPath().getString("name")).isEqualTo("신분당선"),
-                () -> assertThat(line.jsonPath().getString("color")).isEqualTo("bg-red-600")
+
+        Fixture.assertLineEqual(
+                line,
+                1L,
+                "신분당선",
+                "bg-red-600",
+                List.of(
+                        Pair.of(1L, "강남역"),
+                        Pair.of(2L, "신논현역")
+                )
         );
 
         // when
@@ -196,11 +199,16 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         var updatedLine = LineRestAssuredClient.findLine(1L);
-        assertAll(
-                () -> assertNotNull(updatedLine),
-                () -> assertThat(updatedLine.jsonPath().getLong("id")).isEqualTo(1),
-                () -> assertThat(updatedLine.jsonPath().getString("name")).isEqualTo("다른분당선"),
-                () -> assertThat(updatedLine.jsonPath().getString("color")).isEqualTo("bg-blue-600")
+
+        Fixture.assertLineEqual(
+                updatedLine,
+                1L,
+                "다른분당선",
+                "bg-blue-600",
+                List.of(
+                        Pair.of(1L, "강남역"),
+                        Pair.of(2L, "신논현역")
+                )
         );
     }
 
@@ -249,6 +257,29 @@ public class LineAcceptanceTest extends AcceptanceTest {
         private static void createLines(List<Map<String, Object>> lines) {
             for (var line: lines) {
                 LineRestAssuredClient.createLine(line);
+            }
+        }
+
+        private static void assertLineEqual(ExtractableResponse<Response> line, long lineId, String name, String color, List<Pair<Long, String>> stations) {
+            assertNotNull(line.jsonPath().get());
+            assertThat(line.jsonPath().getLong("id")).isEqualTo(lineId);
+            assertThat(line.jsonPath().getString("name")).isEqualTo(name);
+            assertThat(line.jsonPath().getString("color")).isEqualTo(color);
+
+            for (int i = 0; i < stations.size(); i++) {
+                assertThat(line.jsonPath().getLong("stations[" + i + "].id")).isEqualTo(stations.get(i).getFirst());
+                assertThat(line.jsonPath().getString("stations[" + i + "].name")).isEqualTo(stations.get(i).getSecond());
+            }
+        }
+
+        private static void assertLineListEqual(ExtractableResponse<Response> lines, int index, long lineId, String name, String color, List<Pair<Long, String>> stations) {
+            assertThat(lines.jsonPath().getLong("[" + index + "].id")).isEqualTo(lineId);
+            assertThat(lines.jsonPath().getString("[" + index + "].name")).isEqualTo(name);
+            assertThat(lines.jsonPath().getString("[" + index + "].color")).isEqualTo(color);
+
+            for (int i = 0; i < stations.size(); i++) {
+                assertThat(lines.jsonPath().getLong("[" + index + "].stations[" + i + "].id")).isEqualTo(stations.get(i).getFirst());
+                assertThat(lines.jsonPath().getString("[" + index + "].stations[" + i + "].name")).isEqualTo(stations.get(i).getSecond());
             }
         }
     }
