@@ -68,6 +68,6 @@ public class Sections {
                 .findAny()
                 .orElseThrow(IllegalArgumentException::new);
 
-        sections.add(section);
+        sections.remove(section);
     }
 }
