@@ -71,15 +71,13 @@ public class SectionService {
     private boolean isLineStationsContainDownStation(final Line line, final Station downStation) {
         List<Station> lineStations = getLineStations(line);
         return sectionRepository.findByUpStation(downStation).stream()
-                .filter(section -> section.getDownStation().isPresent())
-                .map(section -> section.getDownStation().get())
+                .map(Section::getDownStation)
                 .anyMatch(lineStations::contains);
     }
 
     private List<Station> getLineStations(final Line line) {
         List<Station> lineStations = sectionRepository.findAllByLine(line).stream()
-                .filter(section -> section.getDownStation().isPresent())
-                .map(section -> section.getDownStation().get())
+                .map(Section::getDownStation)
                 .collect(Collectors.toList());
 
         lineStations.add(line.getUpStation());

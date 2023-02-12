@@ -1,6 +1,5 @@
 package subway.domain;
 
-import java.util.Optional;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -47,16 +46,16 @@ public class Section {
         return distance;
     }
 
-    public Optional<Station> getUpStation() {
-        return Optional.ofNullable(upStation);
+    public Station getUpStation() {
+        return upStation;
     }
 
-    public Optional<Station> getDownStation() {
-        return Optional.ofNullable(downStation);
+    public Station getDownStation() {
+        return downStation;
     }
 
-    public Optional<Line> getLine() {
-        return Optional.ofNullable(line);
+    public Line getLine() {
+        return line;
     }
 
     public void detachLine() {

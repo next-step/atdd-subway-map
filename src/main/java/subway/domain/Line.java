@@ -115,7 +115,7 @@ public class Line {
 
     public void setDeleteSection(final Section deleteSection, final List<Section> lineSections, final Station station) {
         canDeleteSection(lineSections, station);
-        updateDownStation(deleteSection.getUpStation().orElseThrow(SectionConstraintException::new));
+        updateDownStation(deleteSection.getUpStation());
         minusDistance(deleteSection.getDistance());
         sections.remove(deleteSection);
     }
@@ -133,8 +133,7 @@ public class Line {
 
     private void validateLineContainMoreDefaultSection(final Line line, final List<Section> sections) {
         List<Station> stations = sections.stream()
-                .filter(section -> section.getUpStation().isPresent())
-                .map(section -> section.getUpStation().get())
+                .map(Section::getUpStation)
                 .collect(Collectors.toUnmodifiableList());
 
         if (stations.equals(line.getStations())) {
