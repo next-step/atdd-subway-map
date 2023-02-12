@@ -1,13 +1,12 @@
 package subway.line;
 
-import io.restassured.RestAssured;
+import io.restassured.http.Method;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import subway.RestTestUtils;
 import subway.line.business.constant.LineConstants;
 import subway.line.web.dto.LineRequest;
@@ -26,12 +25,12 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class SectionAcceptanceTest {
 
-    private LineRequest request;
+    private LineRequest lineRequest;
 
     @PostConstruct
     void init() {
         createStations();
-        this.request = LineRequest.builder()
+        this.lineRequest = LineRequest.builder()
                 .name("신분당선")
                 .color("bg-red-600")
                 .upStationId(1L)
@@ -55,7 +54,7 @@ public class SectionAcceptanceTest {
         List<StationResponse> beforeStations = RestTestUtils.getListFromResponse(getLine(lineId), "stations", StationResponse.class);
 
         // when
-        Long upStationId = request.getDownStationId();
+        Long upStationId = lineRequest.getDownStationId();
         Long downStationId = 3L;
         createSection(lineId, downStationId, upStationId, 10);
 
@@ -80,7 +79,7 @@ public class SectionAcceptanceTest {
         Long upStationId = 99L;
         Long downStationId = 3L;
 
-        assertThat(upStationId).isNotEqualTo(request.getDownStationId());
+        assertThat(upStationId).isNotEqualTo(lineRequest.getDownStationId());
 
         var response = createSection(lineId, downStationId, upStationId, 10);
 
@@ -106,8 +105,8 @@ public class SectionAcceptanceTest {
         Long lineId = createLine();
 
         // when
-        Long upStationId = request.getDownStationId();
-        Long downStationId = request.getUpStationId();
+        Long upStationId = lineRequest.getDownStationId();
+        Long downStationId = lineRequest.getUpStationId();
 
         var response = createSection(lineId, downStationId, upStationId, 10);
 
@@ -128,7 +127,7 @@ public class SectionAcceptanceTest {
     public void deleteSection() {
         // given
         Long lineId = createLine();
-        Long upStationId = request.getDownStationId();
+        Long upStationId = lineRequest.getDownStationId();
         Long downStationId = 3L;
         createSection(lineId, downStationId, upStationId, 10);
 
@@ -159,7 +158,7 @@ public class SectionAcceptanceTest {
         Long lineId = createLine();
 
         // when
-        var response = deleteSection(lineId, request.getDownStationId());
+        var response = deleteSection(lineId, lineRequest.getDownStationId());
 
         // then
         assertAll(
@@ -178,13 +177,13 @@ public class SectionAcceptanceTest {
     public void deleteSection_InvalidCase2() {
         // given
         Long lineId = createLine();
-        Long upStationId = request.getDownStationId();
+        Long upStationId = lineRequest.getDownStationId();
         Long downStationId = 3L;
 
         createSection(lineId, downStationId, upStationId, 10);
 
         // when
-        var response = deleteSection(lineId, request.getUpStationId());
+        var response = deleteSection(lineId, lineRequest.getUpStationId());
 
         // then
         assertAll(
@@ -196,55 +195,29 @@ public class SectionAcceptanceTest {
     private void createStations() {
         List<String> names = List.of("강남역", "양재역", "판교역");
         for (String name : names) {
-            RestAssured.given().log().all()
-                    .body(Map.of("name", name))
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                    .when().post("/stations")
-                    .then().log().all()
-                    .statusCode(HttpStatus.CREATED.value());
+            RestTestUtils.request(Method.POST, "/stations", Map.of("name", name));
         }
     }
 
     private Long createLine() {
-        var response = RestAssured.given().log().all()
-                .body(request)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().log().all()
-                .statusCode(HttpStatus.CREATED.value())
-                .extract();
-
+        var response = RestTestUtils.request(Method.POST, "/lines", lineRequest);
         return RestTestUtils.getLongFromResponse(response, "id");
     }
 
     private ExtractableResponse<Response> getLine(Long id) {
-        return RestAssured.given().log().all()
-                .when().get("/lines/"+id)
-                .then().log().all()
-                .extract();
+        return RestTestUtils.request(Method.GET, "/lines/"+id);
     }
 
     private ExtractableResponse<Response> getSections(Long id) {
-        return RestAssured.given().log().all()
-                .when().get("/lines/"+id+"/sections")
-                .then().log().all()
-                .extract();
+        return RestTestUtils.request(Method.GET, "/lines/"+id+"/sections");
     }
 
     private ExtractableResponse<Response> createSection(Long lineId, Long downStationId, Long upStationId, int distance) {
-        return RestAssured.given().log().all()
-                .body(new SectionRequest(downStationId, upStationId, 10))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines/"+lineId+"/sections")
-                .then().log().all()
-                .extract();
+        return RestTestUtils.request(Method.POST, "/lines/"+lineId+"/sections", new SectionRequest(downStationId, upStationId, distance));
     }
 
     private ExtractableResponse<Response> deleteSection(Long lineId, Long stationId) {
-        return RestAssured.given().log().all()
-                .when().delete("/lines/"+lineId+"/sections?stationId="+stationId)
-                .then().log().all()
-                .extract();
+        return RestTestUtils.request(Method.DELETE, "/lines/"+lineId+"/sections?stationId="+stationId);
     }
 
 
