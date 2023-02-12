@@ -8,6 +8,7 @@ import subway.station.exception.StationNotFoundException;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -35,5 +36,27 @@ public class LineService {
                         lineRequest.getDistance()));
 
         return new LineResponse(line);
+    }
+
+    public List<LineResponse> findAllLines() {
+        return lineRepository.findAll().stream()
+                .map(this::createLineResponse)
+                .collect(Collectors.toList());
+    }
+
+    private LineResponse createLineResponse(Line line) {
+        return new LineResponse(
+                line.getId(),
+                line.getName(),
+                line.getColor(),
+                findStations(line.getUpStationId(), line.getDownStationId())
+        );
+    }
+
+    private List<Station> findStations(Long upStationId, Long downStationId) {
+        Station upStation = stationRepository.findById(upStationId).orElseThrow(StationNotFoundException::new);
+        Station downStation = stationRepository.findById(downStationId).orElseThrow(StationNotFoundException::new);
+
+        return List.of(upStation, downStation);
     }
 }

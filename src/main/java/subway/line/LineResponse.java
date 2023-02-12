@@ -19,6 +19,13 @@ public class LineResponse {
         this.color = line.getColor();
     }
 
+    public LineResponse(Long id, String name, String color, List<Station> stations) {
+        this.id = id;
+        this.name = name;
+        this.color = color;
+        this.stations = stations;
+    }
+
     public Long getId() {
         return id;
     }
