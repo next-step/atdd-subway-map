@@ -33,7 +33,7 @@ public class LineController {
     @PostMapping("/lines")
     public ResponseEntity createLine(@RequestBody @Valid final LineCreateRequest lineCreateRequest) {
         Long lineId = lineService.save(lineCreateRequest);
-        return ResponseEntity.created(showLineUriBy(lineId)).build();
+        return ResponseEntity.created(URI.create("/lines/" + lineId)).build();
     }
 
     @GetMapping("/lines")
@@ -71,11 +71,7 @@ public class LineController {
             @RequestBody @Valid SectionRegisterRequest sectionRegisterRequest
     ) {
         sectionService.registerSection(lineId, sectionRegisterRequest);
-        return ResponseEntity.created(showLineUriBy(lineId)).build();
-    }
-
-    private static URI showLineUriBy(final Long lineId) {
-        return URI.create("/lines/" + lineId);
+        return ResponseEntity.created(URI.create("/lines/" + lineId)).build();
     }
 
     @DeleteMapping("/lines/{lineId}/sections")
