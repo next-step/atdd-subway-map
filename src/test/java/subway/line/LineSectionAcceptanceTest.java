@@ -119,7 +119,7 @@ public class LineSectionAcceptanceTest extends AcceptanceTest {
         // when
         var stationId = 4L;
         var deletedLine = LineRestAssuredClient.deleteSection(lineId, stationId);
-        assertThat(deletedLine.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(deletedLine.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         // then
         var afterLines = LineRestAssuredClient.listLine();
