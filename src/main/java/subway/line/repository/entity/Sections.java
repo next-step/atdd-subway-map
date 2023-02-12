@@ -85,4 +85,8 @@ public class Sections {
         this.sections.remove(sections.size() - 1);
     }
 
+    public int getSectionsCount() {
+        return this.sections.size();
+    }
+
 }

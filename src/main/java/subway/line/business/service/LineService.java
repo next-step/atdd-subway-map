@@ -74,7 +74,7 @@ public class LineService {
     public void addSection(Long lineId, SectionRequest request) {
         Line line = getLine(lineId);
 
-        validateSection(line, request);
+        validateAddSection(line, request);
 
         Station upStation = stationService.findStation(request.getUpStationId());
         Station downStation = stationService.findStation(request.getDownStationId());
@@ -86,6 +86,10 @@ public class LineService {
     @Transactional
     public void removeSection(Long lineId, Long stationId) {
         Line line = getLine(lineId);
+        if (line.getSectionsCount() == 1) {
+            throw new InvalidParameterException(LineConstants.CANNOT_REMOVE_ONLY_ONE_SECTION);
+        }
+
         line.removeSection(stationId);
 
         lineRepository.save(line);
@@ -113,7 +117,7 @@ public class LineService {
                 .build();
     }
 
-    private void validateSection(Line line, SectionRequest request) {
+    private void validateAddSection(Line line, SectionRequest request) {
         if (request.getUpStationId() != line.getLastStationId()) {
             throw new InvalidParameterException(LineConstants.INVALID_UP_STATION);
         }
@@ -121,6 +125,10 @@ public class LineService {
         if (line.hasStation(request.getDownStationId())) {
             throw new InvalidParameterException(LineConstants.ALREADY_EXIST_DOWN_STATION);
         }
+    }
+
+    private void validateRemoveSection() {
+
     }
 
 }

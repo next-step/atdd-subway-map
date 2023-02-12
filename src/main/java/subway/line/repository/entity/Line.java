@@ -64,7 +64,6 @@ public class Line {
         return getLastSection().getId();
     }
 
-
     public Line modify(String name, String color) {
         this.name = name;
         this.color = color;
@@ -89,6 +88,10 @@ public class Line {
                 .map(Station::getId)
                 .collect(Collectors.toList())
                 .contains(stationId);
+    }
+
+    public int getSectionsCount() {
+        return sections.getSectionsCount();
     }
 
 }

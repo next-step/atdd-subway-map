@@ -152,6 +152,18 @@ public class SectionAcceptanceTest {
     @DisplayName("지하철 구간 제거 - 예외 케이스 : 구간이 한 개인 노선의 하행 종점역을 제거하려는 경우")
     @Test
     public void deleteSection_InvalidCase1() {
+        // given
+        LineRequest request = requests.get(0);
+        Long lineId = RestTestUtils.getLongFromResponse(createLine(request), "id");
+
+        // when
+        var response = deleteSection(lineId, request.getDownStationId());
+
+        // then
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
+                () -> assertThat(response.asString()).isEqualTo(LineConstants.CANNOT_REMOVE_ONLY_ONE_SECTION)
+        );
     }
 
     /**
@@ -234,7 +246,7 @@ public class SectionAcceptanceTest {
         return RestAssured.given().log().all()
                 .when().delete("/lines/"+lineId+"/sections?stationId="+stationId)
                 .then().log().all()
-                .statusCode(HttpStatus.NO_CONTENT.value())
+//                .statusCode(HttpStatus.NO_CONTENT.value())
                 .extract();
     }
 
