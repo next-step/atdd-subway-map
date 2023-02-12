@@ -162,7 +162,7 @@ public class SectionAcceptanceTest {
         // then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
-                () -> assertThat(response.asString()).isEqualTo(LineConstants.CANNOT_REMOVE_ONLY_ONE_SECTION)
+                () -> assertThat(response.asString()).isEqualTo(LineConstants.CANNOT_REMOVE_SECTION_WHEN_ONLY_ONE)
         );
     }
 
@@ -174,6 +174,21 @@ public class SectionAcceptanceTest {
     @DisplayName("지하철 구간 제거 - 예외 케이스 : 하행 종점역이 아닌 역을 제거하려는 경우")
     @Test
     public void deleteSection_InvalidCase2() {
+        // given
+        LineRequest request = requests.get(0);
+        Long lineId = RestTestUtils.getLongFromResponse(createLine(request), "id");
+        Long upStationId = request.getDownStationId();
+        Long downStationId = 3L;
+        createSection(lineId, new SectionRequest(downStationId, upStationId, 10));
+
+        // when
+        var response = deleteSection(lineId, request.getUpStationId());
+
+        // then
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
+                () -> assertThat(response.asString()).isEqualTo(LineConstants.CANNOT_REMOVE_SECTION_WHEN_NOT_LAST_STATION)
+        );
     }
 
     private void createStations() {

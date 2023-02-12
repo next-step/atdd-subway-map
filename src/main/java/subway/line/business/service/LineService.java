@@ -86,9 +86,8 @@ public class LineService {
     @Transactional
     public void removeSection(Long lineId, Long stationId) {
         Line line = getLine(lineId);
-        if (line.getSectionsCount() == 1) {
-            throw new InvalidParameterException(LineConstants.CANNOT_REMOVE_ONLY_ONE_SECTION);
-        }
+
+        validateRemoveSection(line, stationId);
 
         line.removeSection(stationId);
 
@@ -127,8 +126,13 @@ public class LineService {
         }
     }
 
-    private void validateRemoveSection() {
-
+    private void validateRemoveSection(Line line, Long stationId) {
+        if (line.getLastStationId() != stationId) {
+            throw new InvalidParameterException(LineConstants.CANNOT_REMOVE_SECTION_WHEN_NOT_LAST_STATION);
+        }
+        if (line.getSectionsCount() == 1) {
+            throw new InvalidParameterException(LineConstants.CANNOT_REMOVE_SECTION_WHEN_ONLY_ONE);
+        }
     }
 
 }
