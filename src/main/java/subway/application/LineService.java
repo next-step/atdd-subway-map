@@ -39,14 +39,14 @@ public class LineService {
     }
 
     public LineResponse getBy(final Long lineId) {
-        Line line = lineRepository.findByIdWithStation(lineId)
+        Line line = lineRepository.findById(lineId)
                 .orElseThrow(LineNotFoundException::new);
 
         return LineResponse.by(line, StationResponse.by(line.getStations()));
     }
 
     public List<LineResponse> getList() {
-        return lineRepository.findAllWithStation().stream()
+        return lineRepository.findAll().stream()
                 .map(line -> LineResponse.by(line, StationResponse.by(line.getStations())))
                 .collect(Collectors.toUnmodifiableList());
     }

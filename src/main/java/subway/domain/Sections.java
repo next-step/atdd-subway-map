@@ -6,6 +6,7 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
+import subway.exception.SectionConstraintException;
 import subway.exception.StationNotFoundException;
 
 @Embeddable
@@ -22,7 +23,22 @@ public class Sections {
     }
 
     public void add(final Section section) {
+        validateAddSection(section);
         sections.add(section);
+    }
+
+    private void validateAddSection(Section section) {
+        if (!sections.isEmpty() && (isLineDownStation(section) || isAlreadyExistsSection(section.getDownStation()))) {
+            throw new SectionConstraintException();
+        }
+    }
+
+    private boolean isLineDownStation(final Section section) {
+        return !section.getUpStation().equals(getDownStation());
+    }
+
+    private boolean isAlreadyExistsSection(final Station station) {
+        return sections.stream().anyMatch(s -> s.contain(station));
     }
 
     public List<Section> getSections() {
@@ -60,7 +76,7 @@ public class Sections {
     }
 
     public void deleteBy(final Station station) {
-        if(sections.size() <= 1) {
+        if (sections.size() <= 1) {
             throw new IllegalArgumentException("구간을 삭제할 수 없습니다.");
         }
         Section section = sections.stream()

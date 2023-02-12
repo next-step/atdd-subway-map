@@ -36,7 +36,7 @@ public class SectionService {
 
     @Transactional
     public void registerSection(final Long lineId, final SectionRegisterRequest sectionRegisterRequest) {
-        Line line = lineRepository.findByIdWithStation(lineId)
+        Line line = lineRepository.findById(lineId)
                 .orElseThrow(LineNotFoundException::new);
 
         Section section = createSection(sectionRegisterRequest, line);
@@ -54,7 +54,7 @@ public class SectionService {
 
     @Transactional
     public void deleteSection(final Long lineId, final Long stationId) {
-        Line line = lineRepository.findByIdWithStation(lineId).orElseThrow(LineNotFoundException::new);
+        Line line = lineRepository.findById(lineId).orElseThrow(LineNotFoundException::new);
         Station station = stationRepository.findById(stationId).orElseThrow(StationNotFoundException::new);
         line.deleteBy(station);
     }

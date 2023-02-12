@@ -73,7 +73,7 @@ public class SectionAcceptanceTest extends RandomPortAcceptanceTest {
         @Test
         void registerSectionUpStationIsNotLineDownStation() {
             // when
-            ExtractableResponse<Response> response = 구간_등록(lineId, 선릉역, 정자역, distance);
+            var response = 구간_등록(lineId, 선릉역, 정자역, distance);
 
             // then
             assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -88,10 +88,7 @@ public class SectionAcceptanceTest extends RandomPortAcceptanceTest {
         @Test
         void registerSectionDownStationAlreadyRegisteredSection() {
             // given
-            노선_생성("새로운 노선", "색깔", 선릉역, 양재역, 10);
-
-            // when
-            ExtractableResponse<Response> response = 구간_등록(lineId, 선릉역, 양재역, distance);
+            ExtractableResponse<Response> response = 구간_등록(lineId, 강남역, 양재역, distance);
 
             // then
             assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());

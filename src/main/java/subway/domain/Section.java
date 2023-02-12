@@ -61,6 +61,10 @@ public class Section {
         this.line = null;
     }
 
+    public boolean contain(final Station station) {
+        return isEqualDownStation(station) || isEqualUpStation(station);
+    }
+
     public boolean isEqualDownStation(final Station station) {
         return this.downStation.equals(station);
     }

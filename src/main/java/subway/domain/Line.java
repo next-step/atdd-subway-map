@@ -4,12 +4,11 @@ import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToOne;
 import org.springframework.util.StringUtils;
+import subway.exception.SectionConstraintException;
 
 @Entity
 public class Line {
@@ -23,12 +22,6 @@ public class Line {
 
     @Column(nullable = false)
     private String color;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    private Station upStation;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    private Station downStation;
 
     @Embedded
     private Sections sections;
@@ -48,8 +41,6 @@ public class Line {
     ) {
         this.name = name;
         this.color = color;
-        this.upStation = upStation;
-        this.downStation = downStation;
         this.sections = new Sections();
         sections.add(new Section(distance, upStation, downStation, this));
         this.distance = new Distance(distance);
@@ -64,7 +55,7 @@ public class Line {
     }
 
     public List<Station> getStations() {
-        return List.of(upStation, downStation);
+        return List.of(sections.getUpStation(), sections.getDownStation());
     }
 
     public String getColor() {
@@ -76,11 +67,11 @@ public class Line {
     }
 
     public Station getUpStation() {
-        return upStation;
+        return sections.getUpStation();
     }
 
     public Station getDownStation() {
-        return downStation;
+        return sections.getDownStation();
     }
 
     public void modify(final String name, final String color, final int distance) {
@@ -108,12 +99,14 @@ public class Line {
     }
 
     public void addSection(final Section section) {
-        this.distance.plus(section.getDistance());
         this.sections.add(section);
-        this.downStation = section.getDownStation();
+        this.distance.plus(section.getDistance());
     }
 
     public void deleteBy(final Station station) {
+        if (!getDownStation().equals(station)) {
+            throw new SectionConstraintException();
+        }
         sections.deleteBy(station);
     }
 }
