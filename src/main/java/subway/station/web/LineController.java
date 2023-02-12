@@ -2,14 +2,12 @@ package subway.station.web;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import subway.station.domain.section.Section;
 import subway.station.service.LineService;
 import subway.station.service.SectionService;
 import subway.station.service.dto.*;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Objects;
 
 @RestController
 public class LineController {
@@ -53,19 +51,13 @@ public class LineController {
 
     @PostMapping("/lines/{id}/sections")
     public ResponseEntity<SectionSaveResponse> saveSection(@PathVariable Long id, @RequestBody SectionSaveRequest sectionSaveRequest) {
-        SectionSaveResponse section = sectionService.save(id, sectionSaveRequest);
-        if(Objects.isNull(section)) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.created(URI.create("/lines/" + id + "/sections/" + section.getId())).body(section);
+        sectionService.save(id, sectionSaveRequest);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/lines/{lineId}/sections/{stationId}")
     public ResponseEntity<SectionSaveResponse> deleteSection(@PathVariable Long lineId, @PathVariable Long stationId) {
-        Boolean result = sectionService.delete(lineId, stationId);
-        if(result.equals(false)) {
-            return ResponseEntity.notFound().build();
-        }
+        sectionService.delete(lineId, stationId);
         return ResponseEntity.noContent().build();
     }
 }
