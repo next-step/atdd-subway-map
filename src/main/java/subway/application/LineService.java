@@ -55,11 +55,6 @@ public class LineService {
     public Long save(final LineCreateRequest lineCreateRequest) {
         Line line = convertToLineBy(lineCreateRequest);
         lineRepository.save(line);
-
-        Section section
-                = new Section(lineCreateRequest.getDistance(), line.getUpStation(), line.getDownStation(), line);
-        sectionRepository.save(section);
-
         return line.getId();
     }
 

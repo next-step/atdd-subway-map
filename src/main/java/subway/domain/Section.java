@@ -35,7 +35,6 @@ public class Section {
         this.upStation = upStation;
         this.downStation = downStation;
         this.line = line;
-        line.updateDownStation(downStation);
     }
 
     public Long getId() {

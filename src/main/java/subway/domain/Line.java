@@ -115,7 +115,6 @@ public class Line {
 
     public void setDeleteSection(final Section deleteSection, final List<Section> lineSections, final Station station) {
         canDeleteSection(lineSections, station);
-        updateDownStation(deleteSection.getUpStation());
         minusDistance(deleteSection.getDistance());
         sections.remove(deleteSection);
     }
@@ -143,10 +142,6 @@ public class Line {
 
     private void minusDistance(final Distance distance) {
         this.distance.minus(distance);
-    }
-
-    public void updateDownStation(final Station station) {
-        this.downStation = station;
     }
 
     public void plusDistance(final Distance distance) {
