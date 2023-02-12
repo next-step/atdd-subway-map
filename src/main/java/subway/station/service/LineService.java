@@ -4,10 +4,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.station.domain.line.Line;
 import subway.station.domain.line.LineRepository;
-import subway.station.domain.section.Section;
-import subway.station.domain.section.SectionRepository;
 import subway.station.domain.station.Station;
 import subway.station.domain.station.StationRepository;
+import subway.station.global.error.exception.ErrorCode;
+import subway.station.global.error.exception.InvalidValueException;
 import subway.station.service.dto.*;
 
 import java.util.List;
@@ -18,22 +18,17 @@ import java.util.stream.Collectors;
 public class LineService {
 
     private final LineRepository lineRepository;
-    private final SectionRepository sectionRepository;
     private final StationRepository stationRepository;
 
-    public LineService(LineRepository lineRepository, SectionRepository sectionRepository, StationRepository stationRepository) {
+    public LineService(LineRepository lineRepository, StationRepository stationRepository) {
         this.lineRepository = lineRepository;
-        this.sectionRepository = sectionRepository;
         this.stationRepository = stationRepository;
     }
 
     @Transactional
     public LineSaveResponse save(LineSaveRequest lineSaveRequest) {
         Line line = saveLine(lineSaveRequest);
-        Section section = saveSection(line.getId(), lineSaveRequest);
-
-        line.addSection(section);
-
+        addSection(line.getId(), lineSaveRequest.getUpStationId(), lineSaveRequest.getDownStationId(), lineSaveRequest.getDistance());
         return toDtoForSaveResponse(line);
     }
 
@@ -63,6 +58,21 @@ public class LineService {
         lineRepository.deleteById(id);
     }
 
+    @Transactional
+    public void addSection(Long id, Long upStationId, Long downStationId, Long distance) {
+        Line line = findLineById(id);
+        Station upStation = findStationById(upStationId);
+        Station downStation = findStationById(downStationId);
+        line.addSection(upStation, downStation, distance);
+    }
+
+    @Transactional
+    public void deleteSection(Long lineId, Long stationId) {
+        Line line = findLineById(lineId);
+        Station station = findStationById(stationId);
+        line.deleteSection(station);
+    }
+
     private void updateLine(Line line, String name, String color) {
         if (!name.isEmpty()) {
             line.changeName(name);
@@ -72,19 +82,8 @@ public class LineService {
         }
     }
 
-    private Section saveSection(Long id, LineSaveRequest lineSaveRequest) {
-
-        return sectionRepository.save(
-                Section.builder()
-                        .upStation(findStation(lineSaveRequest.getUpStationId()))
-                        .downStation(findStation(lineSaveRequest.getDownStationId()))
-                        .distance(lineSaveRequest.getDistance())
-                        .line(findLineById(id))
-                        .build());
-    }
-
-    private Station findStation(Long stationId) {
-        return stationRepository.findById(stationId).orElseThrow(() -> new IllegalArgumentException("검색된 지하철이 없습니다. id를 바꿔주세요."));
+    private Station findStationById(Long stationId) {
+        return stationRepository.findById(stationId).orElseThrow(() -> new InvalidValueException(ErrorCode.NOT_EXISTS_STATION));
     }
 
     private Line saveLine(LineSaveRequest lineSaveRequest) {
@@ -96,7 +95,7 @@ public class LineService {
     }
 
     private Line findLineById(Long lineId) {
-        return lineRepository.findById(lineId).orElseThrow(() -> new IllegalArgumentException("검색된 노선이 없습니다. id를 바꿔주세요."));
+        return lineRepository.findById(lineId).orElseThrow(() -> new InvalidValueException(ErrorCode.STATION_NOT_EXISTS_IN_LINE));
     }
 
     private List<LineFindAllResponse> toDtoForFindAllResponse(List<Line> lines) {
