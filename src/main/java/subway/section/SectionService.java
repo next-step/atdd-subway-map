@@ -24,10 +24,18 @@ public class SectionService {
     public LineResponse addSection(Long lineId, SectionDto sectionDto) {
         var line = lineQuery.findById(lineId);
         var stations = stationQuery.getStations(sectionDto.getStationIds());
+
+        var lineSection = new Sections(line.getSections());
+        var upStation = stations.findById(sectionDto.getUpStationId());
+        var downStation = stations.findById(sectionDto.getDownStationId());
+
+        lineSection.checkLastStationEquals(upStation);
+        lineSection.checkLineAlreadyContains(downStation);
+
         return LineResponse.from(
                 line.addSection(
-                        stations.findById(sectionDto.getUpStationId()),
-                        stations.findById(sectionDto.getDownStationId()),
+                        upStation,
+                        downStation,
                         sectionDto.getDistance()
                 )
         );
@@ -36,6 +44,10 @@ public class SectionService {
     public void deleteSection(Long lineId, Long stationId) {
         var line = lineQuery.findById(lineId);
         var station = stationQuery.getStation(stationId);
-        line.deleteSection(station);
+
+        var lineSection = new Sections(line.getSections());
+        lineSection.checkSizeBeforeDelete();
+        lineSection.checkLastStationEquals(station);
+        line.deleteSection(lineSection.getLastSection());
     }
 }

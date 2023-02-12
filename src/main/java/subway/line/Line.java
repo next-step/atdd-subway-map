@@ -1,6 +1,5 @@
 package subway.line;
 
-import subway.common.LineSectionValidator;
 import subway.section.Section;
 import subway.section.Sections;
 import subway.station.Station;
@@ -54,18 +53,12 @@ public class Line {
     }
 
     public Line addSection(Station upStation, Station downStation, Long distance) {
-        var newSection = new Section(this, upStation, downStation, distance);
-        if (!sections.isEmpty()) {
-            LineSectionValidator.addValidate(this, newSection);
-        }
-        sections.add(newSection);
+        sections.add(new Section(this, upStation, downStation, distance));
         return this;
     }
 
-    public void deleteSection(Station downStation) {
-        var lineSection = new Sections(sections);
-        LineSectionValidator.deleteValidate(lineSection, downStation);
-        sections.remove(lineSection.getLastSection());
+    public void deleteSection(Section section) {
+        sections.remove(section);
     }
 
     public Line update(String name, String color) {
