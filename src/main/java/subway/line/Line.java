@@ -26,7 +26,7 @@ public class Line {
     @Builder.Default
     private Sections sections = new Sections();
 
-    public Line addLineStation(final Section section) {
+    public Line addSection(final Section section) {
 
         this.sections.add(section);
         section.changeLine(this);
@@ -46,6 +46,12 @@ public class Line {
     public Line change(final String name, final String color) {
         this.name = name;
         this.color = color;
+        return this;
+    }
+
+    public Line removeSection(final Station downStation) {
+
+        this.sections.remove(downStation);
         return this;
     }
 

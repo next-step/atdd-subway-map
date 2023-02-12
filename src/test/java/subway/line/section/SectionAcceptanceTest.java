@@ -18,6 +18,8 @@ import static subway.given.GivenStationApi.*;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class SectionAcceptanceTest {
 
+    public static final String BASE_SECTION_PATH = "/lines/1/sections";
+
     @BeforeEach
     void setUp() {
         createStationApi(STATION_1);
@@ -35,7 +37,7 @@ public class SectionAcceptanceTest {
     @DisplayName("구간 등록")
     void addSection() throws Exception {
         // Given
-        final var params = getParams(2L, 3L);
+        final var params = getAddSectionParams(STATION_ID_2, STATION_ID_3);
 
         // When
         final var response = addSection(params);
@@ -49,7 +51,7 @@ public class SectionAcceptanceTest {
         assertThat(stationIds).containsAnyOf(1L, 2L, 3L);
     }
 
-    private static HashMap<Object, Object> getParams(final Long upStationId, final Long downStationId) {
+    private static HashMap<Object, Object> getAddSectionParams(final Long upStationId, final Long downStationId) {
         final var params = new HashMap<>();
         params.put("upStationId", upStationId);
         params.put("downStationId", downStationId);
@@ -62,7 +64,7 @@ public class SectionAcceptanceTest {
                 .when()
                 .contentType(APPLICATION_JSON_VALUE)
                 .body(params)
-                .post("/lines/1/sections")
+                .post(BASE_SECTION_PATH)
                 .then().log().all()
                 .extract();
     }
@@ -76,7 +78,7 @@ public class SectionAcceptanceTest {
     @DisplayName("구간 등록 - 상행역은 노선에 등록되어 있는 하행 종점역이 아니면 예외가 발생한다.")
     void addSectionThrow1() throws Exception {
         // Given
-        final var params = getParams(1L, 3L);
+        final var params = getAddSectionParams(STATION_ID_1, STATION_ID_3);
 
         // When
         final var response = addSection(params);
@@ -94,12 +96,39 @@ public class SectionAcceptanceTest {
     @DisplayName("구간 등록 - 새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없다.")
     void addSectionThrow2() throws Exception {
         // Given
-        final var params = getParams(2L, 1L);
+        final var params = getAddSectionParams(STATION_ID_2, STATION_ID_1);
 
         // When
         final var response = addSection(params);
 
         // Then
         assertThat(response.statusCode()).isEqualTo(BAD_REQUEST.value());
+    }
+
+    /**
+     * Given: 노선에 구간이 등록되어 있고,
+     * When: 하행 종점역을 삭제 하면
+     * Then: 목록 조회 시 삭제된 구간은 나오지 않는다.
+     */
+    @Test
+    @DisplayName("구간 삭제")
+    void removeSection() throws Exception {
+        // Given
+        addSection(getAddSectionParams(2L, 3L));
+
+        // When
+        final var response = given().log().all()
+                .when()
+                .delete(BASE_SECTION_PATH + "?stationId=" + STATION_ID_3)
+                .then().log().all()
+                .extract();
+
+        // Then
+        assertThat(response.statusCode()).isEqualTo(NO_CONTENT.value());
+
+        final var lineResponse = getLineById(LINE_ID_1);
+        final var stationIds = lineResponse.jsonPath().getList("stations.id", Long.class);
+        assertThat(stationIds.size()).isEqualTo(2);
+        assertThat(stationIds).containsAnyOf(1L, 2L);
     }
 }

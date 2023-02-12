@@ -32,7 +32,7 @@ public class LineService {
                 .downStation(downStation)
                 .distance(lineCreateRequest.getDistance())
                 .build();
-        line.addLineStation(lineStation);
+        line.addSection(lineStation);
 
         return LineResponse.from(lineRepository.save(line));
     }

@@ -5,6 +5,7 @@ import subway.*;
 
 import javax.persistence.*;
 import java.util.*;
+import java.util.stream.*;
 
 @Embeddable
 @NoArgsConstructor
@@ -15,6 +16,11 @@ public class Sections {
 
     public Sections add(final Section section) {
         this.values.add(section);
+        return this;
+    }
+
+    public Sections remove(final Station downStation) {
+        this.values.removeIf(section -> section.isDownStation(downStation));
         return this;
     }
 
@@ -44,6 +50,5 @@ public class Sections {
     public boolean anyMatchStation(final Station station) {
         return this.values.stream()
                 .anyMatch(section -> section.anyMatchStation(station));
-
     }
 }

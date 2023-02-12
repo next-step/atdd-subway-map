@@ -21,15 +21,15 @@ public class SectionService {
         final var upStation = stationService.getById(request.getUpStationId());
         final var downStation = stationService.getById(request.getDownStationId());
 
-        if(!line.isLastStation(upStation)) {
+        if (!line.isLastStation(upStation)) {
             throw new NotLastDownStationException();
         }
 
-        if(line.anyMatchStation(downStation)) {
+        if (line.anyMatchStation(downStation)) {
             throw new DuplicateSectionStationException();
         }
 
-        line.addLineStation(createSection(request, line, upStation, downStation));
+        line.addSection(createSection(request, line, upStation, downStation));
     }
 
     private static Section createSection(
@@ -45,5 +45,13 @@ public class SectionService {
                 .downStation(downStationId)
                 .distance(request.getDistance())
                 .build();
+    }
+
+    public void removeSection(final Long lineId, final Long stationId) {
+
+        final var line = lineService.getById(lineId);
+        final var station = stationService.getById(stationId);
+
+        line.removeSection(station);
     }
 }
