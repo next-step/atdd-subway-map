@@ -1,14 +1,10 @@
 package subway.line;
 
-import io.restassured.RestAssured;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import subway.utils.DatabaseCleanser;
+import subway.AcceptanceTest;
 import subway.station.StationRestAssuredClient;
 
 import java.util.List;
@@ -20,20 +16,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DisplayName("지하철 노선 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT) // RandomPort 사용하는 이유, 각 Port는 언제 사용하면 좋은지
-public class LineAcceptanceTest {
-
-    @LocalServerPort
-    int port;
-
-    @Autowired
-    private DatabaseCleanser databaseCleanser;
-
+public class LineAcceptanceTest extends AcceptanceTest {
     @BeforeEach
     void init() {
-        RestAssured.port = port;
-        databaseCleanser.execute();
-
         Fixture.createStations();
     }
 
