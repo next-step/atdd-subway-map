@@ -26,10 +26,7 @@ public class Line {
     private Station downStationId;
 
     @Column(nullable = false)
-    private Long distance;
-
-    public Line() {
-    }
+    private long distance;
 
     public Line(String name, String color, Station upStation, Station downStation, Long distance) {
         this.name = name;
@@ -37,6 +34,9 @@ public class Line {
         this.upStationId = upStation;
         this.downStationId = downStation;
         this.distance = distance;
+    }
+
+    public Line() {
     }
 
     public Long getId() {
@@ -59,7 +59,7 @@ public class Line {
         return downStationId;
     }
 
-    public Long getDistance() {
+    public long getDistance() {
         return distance;
     }
 }
