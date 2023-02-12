@@ -7,14 +7,14 @@ import subway.station.domain.station.Station;
 
 @Getter
 @NoArgsConstructor
-public class SectionSaveResponse {
+public class SectionResponse {
     private Long id;
     private Station upStation;
     private Station downStation;
     private Long distance;
 
     @Builder
-    public SectionSaveResponse(Long id, Station upStation, Station downStation, Long distance) {
+    public SectionResponse(Long id, Station upStation, Station downStation, Long distance) {
         this.id = id;
         this.upStation = upStation;
         this.downStation = downStation;

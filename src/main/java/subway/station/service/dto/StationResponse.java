@@ -6,12 +6,12 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class StationFindAllResponse {
+public class StationResponse {
     private Long id;
     private String name;
 
     @Builder
-    public StationFindAllResponse(Long id, String name) {
+    public StationResponse(Long id, String name) {
         this.id = id;
         this.name = name;
     }

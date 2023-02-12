@@ -1,14 +1,14 @@
 package subway.station.service.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class LineSaveRequest {
+@AllArgsConstructor
+public class SectionRequest {
 
-    private String name;
-    private String color;
     private Long upStationId;
     private Long downStationId;
     private Long distance;
