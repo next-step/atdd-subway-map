@@ -1,9 +1,7 @@
 package subway.domain;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -11,7 +9,6 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import org.springframework.util.StringUtils;
 import subway.exception.SectionConstraintException;
@@ -35,8 +32,8 @@ public class Line {
     @OneToOne(fetch = FetchType.LAZY)
     private Station downStation;
 
-    @OneToMany(mappedBy = "line", cascade = {CascadeType.MERGE, CascadeType.PERSIST}, orphanRemoval = true)
-    private List<Section> sections = new ArrayList<>();
+    @Embedded
+    private Sections sections;
 
     @Embedded
     private Distance distance;
@@ -55,6 +52,8 @@ public class Line {
         this.color = color;
         this.upStation = upStation;
         this.downStation = downStation;
+        this.sections = new Sections();
+        sections.add(new Section(distance, upStation, downStation, this));
         this.distance = new Distance(distance);
     }
 
