@@ -17,10 +17,10 @@ public class Line {
     @Column(nullable = false)
     private String color;
 
-    @Column(name = "up_station_id")
+    @Column(name = "up_station_id", nullable = false)
     private Long upStationId;
 
-    @Column(name = "down_station_id")
+    @Column(name = "down_station_id", nullable = false)
     private Long downStationId;
 
     @Column(nullable = false)
