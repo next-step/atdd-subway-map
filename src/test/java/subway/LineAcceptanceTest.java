@@ -3,9 +3,11 @@ package subway;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.assertj.core.api.Condition;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import java.util.HashMap;
@@ -96,6 +98,60 @@ public class LineAcceptanceTest {
         String responseName = response.jsonPath()
                 .getString("name");
         assertThat(responseName).isEqualTo(lineName);
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 수정하면
+     * Then 해당 지하철 노선 정보는 수정된다
+     */
+    @DisplayName("지하철노선 수정")
+    @Test
+    void test_modifyLine() {
+        //given
+        String lineName = "newLine1";
+        long lineId = createLine(lineName, station1Id, station2Id)
+                .jsonPath().getLong("id");
+
+        // when
+        Map<String, String> params = new HashMap<>();
+        String modifiedLineName = "modifiedLineName";
+        String modifiedLineColor = "bg-2";
+        params.put("name", modifiedLineName);
+        params.put("color", modifiedLineColor);
+        ExtractableResponse<Response> response = RestAssured.given()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(params)
+                .when().put("/lines/{id}", lineId)
+                .then().extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 삭제하면
+     * Then 해당 지하철 노선 정보는 삭제된다
+     */
+    @DisplayName("지하철노선 삭제")
+    @Test
+    void test_deleteLine() {
+        // given
+        String lineName = "newLine1";
+        long lineId = createLine(lineName, station1Id, station2Id)
+                .jsonPath().getLong("id");
+
+        // when
+        RestAssured.given()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().delete("/lines/{id}", lineId)
+                .then().extract();
+
+        // then
+        List<String> lineNames =
+                getLines().jsonPath().getList("name", String.class);
+        assertThat(lineNames).doNotHave(new Condition<>(s -> s.equals(lineName), lineName + "이 조회되었습니다"));
     }
 
     public static ExtractableResponse<Response> createLine(String name, Long upStationId, Long downStationId) {

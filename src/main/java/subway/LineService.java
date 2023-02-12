@@ -35,4 +35,16 @@ public class LineService {
                 .map(LineResponse::from)
                 .collect(Collectors.toList());
     }
+
+    @Transactional
+    public void modify(Long id, LineModificationRequest lineModificationRequest) {
+        Line line = lineRepository.findById(id).orElseThrow(() -> new NoSuchElementException("no line for id"));
+        line.modify(lineModificationRequest);
+        lineRepository.save(line);
+    }
+
+    @Transactional
+    public void delete(Long id) {
+        lineRepository.deleteById(id);
+    }
 }

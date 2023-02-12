@@ -62,4 +62,9 @@ public class Line {
     public Long getDistance() {
         return distance;
     }
+
+    public void modify(LineModificationRequest lineModificationRequest) {
+        this.name = lineModificationRequest.getName();
+        this.color = lineModificationRequest.getColor();
+    }
 }
