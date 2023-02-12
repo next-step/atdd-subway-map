@@ -67,7 +67,7 @@ public class LineRestAssured {
 
     private Long saveLine(Map<String, String> params) {
         return RestAssured
-                .given()
+                .given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/lines")
