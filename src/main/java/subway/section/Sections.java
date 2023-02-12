@@ -62,7 +62,7 @@ public class Sections {
     }
 
     public void checkLineAlreadyContains(Station station) {
-        if (sections.contains(station)) {
+        if (getAllStation().contains(station)) {
             throw new SubwayBadRequestException("line already contains the station, " + station);
         }
     }
