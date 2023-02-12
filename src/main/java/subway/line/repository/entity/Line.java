@@ -12,6 +12,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "line")
@@ -82,4 +83,12 @@ public class Line {
     public void removeSection(Long stationId) {
         sections.remove(stationId);
     }
+
+    public boolean hasStation(Long stationId) {
+        return getAllStations().stream()
+                .map(Station::getId)
+                .collect(Collectors.toList())
+                .contains(stationId);
+    }
+
 }

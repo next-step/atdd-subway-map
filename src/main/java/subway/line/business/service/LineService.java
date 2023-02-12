@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.line.business.constant.LineConstants;
 import subway.line.repository.LineRepository;
-import subway.line.repository.SectionRepository;
 import subway.line.repository.entity.Line;
 import subway.line.web.dto.LineRequest;
 import subway.line.web.dto.LineResponse;
@@ -74,9 +73,8 @@ public class LineService {
     @Transactional
     public void addSection(Long lineId, SectionRequest request) {
         Line line = getLine(lineId);
-        if (request.getUpStationId() != line.getLastStationId()) {
-            throw new InvalidParameterException(LineConstants.INVALID_UP_STATION_ID);
-        }
+
+        validateSection(line, request);
 
         Station upStation = stationService.findStation(request.getUpStationId());
         Station downStation = stationService.findStation(request.getDownStationId());
@@ -113,6 +111,16 @@ public class LineService {
                 .firstSectionId(line.getFirstSectionId())
                 .lastSectionId(line.getLastSectionId())
                 .build();
+    }
+
+    private void validateSection(Line line, SectionRequest request) {
+        if (request.getUpStationId() != line.getLastStationId()) {
+            throw new InvalidParameterException(LineConstants.INVALID_UP_STATION);
+        }
+
+        if (line.hasStation(request.getDownStationId())) {
+            throw new InvalidParameterException(LineConstants.ALREADY_EXIST_DOWN_STATION);
+        }
     }
 
 }

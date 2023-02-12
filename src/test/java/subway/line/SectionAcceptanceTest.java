@@ -83,9 +83,8 @@ public class SectionAcceptanceTest {
         // then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
-                () -> assertThat(response.asString()).isEqualTo(LineConstants.INVALID_UP_STATION_ID)
+                () -> assertThat(response.asString()).isEqualTo(LineConstants.INVALID_UP_STATION)
         );
-
     }
 
     /**
@@ -99,7 +98,21 @@ public class SectionAcceptanceTest {
     @DisplayName("지하철 구간 등록 - 예외 케이스 : 새로운 구간의 하행역이 해당 노선에 등록되어있는 역인 경우")
     @Test
     public void createSection_InvalidCase2() {
+        // given
+        LineRequest request = requests.get(0);
+        Long lineId = RestTestUtils.getLongFromResponse(createLine(request), "id");
 
+        // when
+        Long upStationId = request.getDownStationId();
+        Long downStationId = request.getUpStationId();
+
+        var response = createSection(lineId, new SectionRequest(downStationId, upStationId, 10));
+
+        // then
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
+                () -> assertThat(response.asString()).isEqualTo(LineConstants.ALREADY_EXIST_DOWN_STATION)
+        );
     }
 
     /**
@@ -129,8 +142,6 @@ public class SectionAcceptanceTest {
         List<StationResponse> afterStations = RestTestUtils.getListFromResponse(getLine(lineId), "stations", StationResponse.class);
         assertThat(beforeStations.size()).isGreaterThan(afterStations.size());
         assertThat(afterStations.stream().map(StationResponse::getId).collect(Collectors.toList())).doesNotContain(downStationId);
-
-
     }
 
     /**
