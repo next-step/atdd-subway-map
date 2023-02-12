@@ -99,7 +99,5 @@ public class SectionService {
                 .orElseThrow(IllegalArgumentException::new);
 
         line.setDeleteSection(section, sections, station);
-
-        sectionRepository.delete(section);
     }
 }

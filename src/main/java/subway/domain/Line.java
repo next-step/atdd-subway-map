@@ -118,6 +118,7 @@ public class Line {
         canDeleteSection(lineSections, station);
         updateDownStation(deleteSection.getUpStation().orElseThrow(SectionConstraintException::new));
         minusDistance(deleteSection.getDistance());
+        sections.remove(deleteSection);
     }
 
     private void canDeleteSection(final List<Section> sections, final Station station) {
