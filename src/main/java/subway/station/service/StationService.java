@@ -3,7 +3,7 @@ package subway.station.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.station.service.dto.StationRequest;
-import subway.station.service.dto.StationFindAllResponse;
+import subway.station.service.dto.StationResponse;
 import subway.station.domain.station.Station;
 import subway.station.domain.station.StationRepository;
 
@@ -20,12 +20,12 @@ public class StationService {
     }
 
     @Transactional
-    public StationFindAllResponse save(StationRequest stationRequest) {
+    public StationResponse save(StationRequest stationRequest) {
         Station station = saveStation(stationRequest);
         return createStationResponse(station);
     }
 
-    public List<StationFindAllResponse> findAllStations() {
+    public List<StationResponse> findAllStations() {
         List<Station> stations = stationRepository.findAll();
         return toDtoFindAllResponse(stations);
     }
@@ -35,7 +35,7 @@ public class StationService {
         stationRepository.deleteById(id);
     }
 
-    private List<StationFindAllResponse> toDtoFindAllResponse(List<Station> stations) {
+    private List<StationResponse> toDtoFindAllResponse(List<Station> stations) {
         return stations.stream()
                 .map(this::createStationResponse)
                 .collect(Collectors.toList());
@@ -48,8 +48,8 @@ public class StationService {
         );
     }
 
-    private StationFindAllResponse createStationResponse(Station station) {
-        return StationFindAllResponse.builder()
+    private StationResponse createStationResponse(Station station) {
+        return StationResponse.builder()
                 .id(station.getId())
                 .name(station.getName())
                 .build();

@@ -2,7 +2,7 @@ package subway.station.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import subway.station.service.dto.SectionSaveRequest;
+import subway.station.service.dto.SectionRequest;
 
 @Service
 @Transactional(readOnly = true)
@@ -15,8 +15,8 @@ public class SectionService {
     }
 
     @Transactional
-    public void save(Long id, SectionSaveRequest sectionSaveRequest) {
-        lineService.addSection(id, sectionSaveRequest.getUpStationId(), sectionSaveRequest.getDownStationId(), sectionSaveRequest.getDistance());
+    public void save(Long id, SectionRequest sectionRequest) {
+        lineService.addSection(id, sectionRequest.getUpStationId(), sectionRequest.getDownStationId(), sectionRequest.getDistance());
     }
 
     @Transactional
