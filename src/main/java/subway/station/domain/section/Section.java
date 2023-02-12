@@ -15,16 +15,16 @@ public class Section {
     @Column(name = "SECTION_ID")
     private Long id;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinColumn(referencedColumnName = "STATION_ID")
     private Station upStation;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinColumn(referencedColumnName = "STATION_ID")
     private Station downStation;
     private Long distance;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinColumn(referencedColumnName = "LINE_ID")
     private Line line;
 
