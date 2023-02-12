@@ -9,16 +9,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
-import subway.line.LineAppendRequest;
-import subway.line.LineAppendResponse;
-import subway.line.LineRequest;
-import subway.line.LineResponse;
+import subway.line.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 import static subway.LineAcceptanceTest.parseCreateLineResponse;
 import static subway.LineAcceptanceTest.requestCreateLine;
 
@@ -39,7 +35,8 @@ public class LineSelectionAcceptanceTest {
 
         //when 상행-하행 2가지 역만 있는 노선에 구간을 등록하면
         LineAppendRequest lineAppendRequest = new LineAppendRequest("2", "4", 10L);
-        LineAppendResponse lineAppendResponse = appendSelection(createLineRes.getId(), lineAppendRequest.getUpStationId(), lineAppendRequest.getDownStationId(), lineAppendRequest.getDistance()).then().extract().jsonPath().getObject("$", LineAppendResponse.class);;
+        LineAppendResponse lineAppendResponse = appendSelection(createLineRes.getId(), lineAppendRequest.getUpStationId(), lineAppendRequest.getDownStationId(), lineAppendRequest.getDistance()).then().extract().jsonPath().getObject("$", LineAppendResponse.class);
+        ;
 
 
         //then 노선에 있는 역은 3개가 되고, 하행은 추가된 노선의 것을 따른다.
@@ -60,7 +57,8 @@ public class LineSelectionAcceptanceTest {
 
         //when 새로운 구간을 추가하면
         LineAppendRequest lineAppendRequest = new LineAppendRequest("4", "5", 10L);
-        LineAppendResponse lineAppendResponse = appendSelection(createdLine.getId(), lineAppendRequest.getUpStationId(), lineAppendRequest.getDownStationId(), lineAppendRequest.getDistance()).then().extract().jsonPath().getObject("$", LineAppendResponse.class);;
+        LineAppendResponse lineAppendResponse = appendSelection(createdLine.getId(), lineAppendRequest.getUpStationId(), lineAppendRequest.getDownStationId(), lineAppendRequest.getDistance()).then().extract().jsonPath().getObject("$", LineAppendResponse.class);
+        ;
 
 
         //then station 하나 추가되고, 하행은 새로운 것을 따른다.
@@ -110,7 +108,38 @@ public class LineSelectionAcceptanceTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
+    @DisplayName("3개 이상의 노선에서 마지막 구간은 제거 될 수 있다.")
+    @Test
+    void deleteLineSelection1() {
+        List<Long> stations = List.of(1L, 2L, 3L, 4L);
+        List<Long> distances = List.of(10L, 3L, 5L);
+
+        //given 3개 이상 역이 있는 노선에
+        LineAppendResponse createdLine = createLineWithStations(stations, distances, "신분당선", "bg-red-600");
+
+        //when 마지막 구간을 제거하면
+        LineRemoveResponse response = removeSelection(createdLine.getId(), stations.get(stations.size() - 1))
+                .then().extract().jsonPath().getObject("$", LineRemoveResponse.class);
+
+
+        //then 마지막 구간이 제거된 노선이 나온다.
+        LineRemoveResponse matcherResponse = new LineRemoveResponse(
+                createdLine.getId(),
+                createdLine.getLineName(),
+                1L, 3L, 13L, stations.subList(0, stations.size()-1)
+        );
+        checkLineRemoveResponse(response, matcherResponse);
+    }
+
     private void checkLineAppendResponse(LineAppendResponse actual, LineAppendResponse matcher) {
+        assertThat(actual.getLineName()).isEqualTo(matcher.getLineName());
+        assertThat(actual.getUpStationId()).isEqualTo(matcher.getUpStationId());
+        assertThat(actual.getDownStationId()).isEqualTo(matcher.getDownStationId());
+        assertThat(actual.getStations()).isEqualTo(matcher.getStations());
+        assertThat(actual.getDistance()).isEqualTo(matcher.getDistance());
+    }
+
+    private void checkLineRemoveResponse(LineRemoveResponse actual, LineRemoveResponse matcher) {
         assertThat(actual.getLineName()).isEqualTo(matcher.getLineName());
         assertThat(actual.getUpStationId()).isEqualTo(matcher.getUpStationId());
         assertThat(actual.getDownStationId()).isEqualTo(matcher.getDownStationId());
@@ -135,7 +164,7 @@ public class LineSelectionAcceptanceTest {
         return response.then().extract().jsonPath().getObject("$", LineAppendResponse.class);
     }
 
-    
+
     /**
      * 기존 노선에 구간을 등록하는 메소드
      */
@@ -145,6 +174,13 @@ public class LineSelectionAcceptanceTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(lineAppendRequest)
                 .when().post("/lines/" + lineId + "/selections");
+        return response;
+    }
+
+    private Response removeSelection(Long lineId, Long stationId) {
+        var response = RestAssured.given()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().delete("/lines/" + lineId + "/selections?stationId=" + stationId);
         return response;
     }
 }

@@ -46,4 +46,9 @@ public class LineController {
     public ResponseEntity<LineAppendResponse> appendLine(@PathVariable Long id, @RequestBody LineAppendRequest lineAppendRequest) {
         return ResponseEntity.ok().body(lineService.appendLine(id, lineAppendRequest));
     }
+
+    @DeleteMapping("/lines/{id}/selections")
+    public ResponseEntity<LineRemoveResponse> removeLine(@PathVariable Long id, @RequestParam Long stationId) {
+        return ResponseEntity.ok().body(lineService.removeLine(id, stationId));
+    }
 }

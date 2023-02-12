@@ -3,7 +3,7 @@ package subway.line;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LineAppendResponse {
+public class LineRemoveResponse {
 
     private Long id;
 
@@ -15,7 +15,7 @@ public class LineAppendResponse {
 
     private List<Long> stations = new ArrayList<>();
 
-    public LineAppendResponse(Long id, String lineName, Long upStationId, Long downStationId, Long distance, List<Long> stations) {
+    public LineRemoveResponse(Long id, String lineName, Long upStationId, Long downStationId, Long distance, List<Long> stations) {
         this.id = id;
         this.lineName = lineName;
         this.upStationId = upStationId;
@@ -48,8 +48,8 @@ public class LineAppendResponse {
         return stations;
     }
 
-    public static LineAppendResponse fromLine(Line line) {
-        LineAppendResponse res = new LineAppendResponse(line.getId(), line.getName(), line.getUpStationId(), line.getDownStationId(), line.getTotalDistance(), line.getStations());
+    public static LineRemoveResponse fromLine(Line line) {
+        LineRemoveResponse res = new LineRemoveResponse(line.getId(), line.getName(), line.getUpStationId(), line.getDownStationId(), line.getTotalDistance(), line.getStations());
 
         return res;
     }

@@ -25,20 +25,25 @@ public class Line {
     private List<Long> stations = new ArrayList<>();
 
     //우선 단위는 km라고 생각.
-    private Long distance;
+    private Long totalDistance;
+
+
+    @Convert(converter = StationListConverter.class)
+    private List<Long> distances = new ArrayList<>();
 
     public Line() {
     }
 
-    public Line(String name, String color, Long upStationId, Long downStationId, Long distance) {
+    public Line(String name, String color, Long upStationId, Long downStationId, Long totalDistance) {
         this.name = name;
         this.color = color;
         this.upStationId = upStationId;
         this.downStationId = downStationId;
-        this.distance = distance;
+        this.totalDistance = totalDistance;
 
         this.stations.add(upStationId);
         this.stations.add(downStationId);
+        this.distances.add(totalDistance);
     }
 
     public Long getId() {
@@ -61,8 +66,8 @@ public class Line {
         return downStationId;
     }
 
-    public Long getDistance() {
-        return distance;
+    public Long getTotalDistance() {
+        return totalDistance;
     }
 
     public List<Long> getStations() {
@@ -80,17 +85,20 @@ public class Line {
     }
 
     public void appendSelection(Long upStationId, Long downStationId, Long distance){
-        if(!upStationId.equals(this.downStationId)){
-            throw new IllegalStateException("추가되는 상행은, 기존 하행과 같아야 됩니다.");
-        }
-
-        if(stations.contains(downStationId)){
-            throw new IllegalStateException("추가되는 하행은, 기존 노선에 없어야 됩니다. ");
-        }
-
         stations.add(downStationId);
+        distances.add(distance);
         this.downStationId = downStationId;
-        this.distance += distance;
+        this.totalDistance += distance;
+    }
+
+    public void removeSelection(Long stationId){
+        int removeIndex = stations.indexOf(stationId);
+        Long removeDistance = distances.get(removeIndex-1);
+
+        stations.remove(removeIndex);
+        distances.remove(removeIndex-1);
+        downStationId = stations.get(stations.size()-1);
+        totalDistance -= removeDistance;
     }
 
 }
