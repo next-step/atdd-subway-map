@@ -54,7 +54,7 @@ class SectionsTest {
         assertThat(sections.getSections()).doesNotContain(section);
     }
 
-    @DisplayName("구간 목록의 하행역을 가져온다.")
+    @DisplayName("구간 목록의 상행역을 가져온다.")
     @Test
     void getDownStation() {
         Section section1 = new Section(10, 강남역, 역삼역, line);
@@ -63,12 +63,12 @@ class SectionsTest {
         sections.add(section1);
         sections.add(section2);
 
-        Station actual = sections.getDownStation();
+        Station actual = sections.getUpStation();
 
         Assertions.assertAll(
-                () -> assertThat(actual).isEqualTo(정자역),
-                () -> assertThat(actual).isNotEqualTo(강남역),
-                () -> assertThat(actual).isNotEqualTo(역삼역)
+                () -> assertThat(actual).isEqualTo(강남역),
+                () -> assertThat(actual).isNotEqualTo(역삼역),
+                () -> assertThat(actual).isNotEqualTo(정자역)
         );
     }
 }

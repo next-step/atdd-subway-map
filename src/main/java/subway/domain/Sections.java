@@ -45,4 +45,17 @@ public class Sections {
         return sections.stream()
                 .anyMatch(section -> section.isEqualUpStation(station));
     }
+
+    public Station getUpStation() {
+        return sections.stream()
+                .map(Section::getUpStation)
+                .filter(station -> !this.getBasedOnDownStationBy(station))
+                .findFirst()
+                .orElseThrow(StationNotFoundException::new);
+    }
+
+    private boolean getBasedOnDownStationBy(final Station station) {
+        return sections.stream()
+                .anyMatch(section -> section.isEqualDownStation(station));
+    }
 }
