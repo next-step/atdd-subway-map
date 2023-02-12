@@ -1,7 +1,6 @@
 package subway.line.section;
 
 import io.restassured.response.*;
-import org.apache.http.*;
 import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.*;
 import org.springframework.test.annotation.*;
@@ -36,10 +35,7 @@ public class SectionAcceptanceTest {
     @DisplayName("구간 등록")
     void addSection() throws Exception {
         // Given
-        final var params = new HashMap<>();
-        params.put("upStationId", "2");
-        params.put("downStationId", "3");
-        params.put("distance", "10");
+        final var params = getParams(2L, 3L);
 
         // When
         final var response = addSection(params);
@@ -53,7 +49,15 @@ public class SectionAcceptanceTest {
         assertThat(stationIds).containsAnyOf(1L, 2L, 3L);
     }
 
-    private static ExtractableResponse<Response> addSection(HashMap<Object, Object> params) {
+    private static HashMap<Object, Object> getParams(final Long upStationId, final Long downStationId) {
+        final var params = new HashMap<>();
+        params.put("upStationId", upStationId);
+        params.put("downStationId", downStationId);
+        params.put("distance", "10");
+        return params;
+    }
+
+    private static ExtractableResponse<Response> addSection(final HashMap<Object, Object> params) {
         return given().log().all()
                 .when()
                 .contentType(APPLICATION_JSON_VALUE)
@@ -72,14 +76,11 @@ public class SectionAcceptanceTest {
     @DisplayName("구간 등록 - 상행역은 노선에 등록되어 있는 하행 종점역이 아니면 예외가 발생한다.")
     void addSectionThrow1() throws Exception {
         // Given
-        final var params = new HashMap<>();
-        params.put("upStationId", "1");
-        params.put("downStationId", "3");
-        params.put("distance", "10");
+        final var params = getParams(1L, 3L);
 
         // When
         final var response = addSection(params);
-        
+
         // Then
         assertThat(response.statusCode()).isEqualTo(BAD_REQUEST.value());
     }
@@ -93,10 +94,7 @@ public class SectionAcceptanceTest {
     @DisplayName("구간 등록 - 새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없다.")
     void addSectionThrow2() throws Exception {
         // Given
-        final var params = new HashMap<>();
-        params.put("upStationId", "2");
-        params.put("downStationId", "1");
-        params.put("distance", "10");
+        final var params = getParams(2L, 1L);
 
         // When
         final var response = addSection(params);
