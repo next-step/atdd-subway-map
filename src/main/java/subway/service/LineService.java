@@ -45,13 +45,17 @@ public class LineService {
     }
 
     @Transactional
-    public void saveSection(Long lineId, SectionRequest request) {
+    public SectionResponse saveSection(Long lineId, SectionRequest request) {
         Section section = createSection(request);
         Line line = getLineById(lineId);
         line.addSection(section);
+        return new SectionResponse(
+                section.getId(),
+                List.of(createStationResponse(section.getDownStation()),
+                        createStationResponse(section.getUpStation()))
+        );
     }
 
-    @Transactional
     public Section createSection(SectionCreateReader request) {
         Station downStation = stationService.findById(request.getDownStationId());
         Station upStation = stationService.findById(request.getUpStationId());

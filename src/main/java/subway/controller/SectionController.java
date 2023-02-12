@@ -3,7 +3,10 @@ package subway.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import subway.dto.SectionRequest;
+import subway.dto.SectionResponse;
 import subway.service.LineService;
+
+import java.net.URI;
 
 @RestController
 public class SectionController {
@@ -15,9 +18,10 @@ public class SectionController {
     }
 
     @PostMapping("lines/{lineId}/sections")
-    public ResponseEntity<Void> saveSection(@PathVariable Long lineId, @RequestBody SectionRequest request) {
-        lineService.saveSection(lineId, request);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<SectionResponse> saveSection(@PathVariable Long lineId, @RequestBody SectionRequest request) {
+        SectionResponse sectionResponse = lineService.saveSection(lineId, request);
+        return ResponseEntity.created(URI.create("/lines/"+lineId+"/sections/"+sectionResponse.getId()))
+                .body(sectionResponse);
     }
 
     @DeleteMapping("lines/{lineId}/sections")

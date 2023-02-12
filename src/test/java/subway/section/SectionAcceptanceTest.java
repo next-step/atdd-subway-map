@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import subway.dto.LineRequest;
@@ -16,7 +17,6 @@ import subway.exception.IllegalSectionException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static subway.line.LineAcceptanceTest.노선_생성_요청;
 import static subway.line.LineAcceptanceTest.노선_조회_요청;
 import static subway.station.StationAcceptanceTest.지하철역_생성_요청;
@@ -71,30 +71,32 @@ public class SectionAcceptanceTest {
                 .jsonPath().getLong("id");
 
         //When
-        구간_생성_요청(lineId, 새로운_구간);
+        String newName = 구간_생성_요청(lineId, 새로운_구간)
+                .jsonPath().getList("stations.name", String.class).get(0);
 
         //Then
         List<String> 종착역목록 = 노선_조회_요청(lineId)
                 .jsonPath().getList("stations.name");
-        assertThat(종착역목록).contains(새로운_하행역_이름);
+        assertThat(종착역목록).contains(newName);
     }
 
     /**
      * Given 노선을 생성한다.
-     * When 새로운 구간의 하행역이 노선에 등록돼 있을시 에러가 발생한다.
-     * Then
+     * When 하행역이 노선에 등록된 새로운 구간을 생성한다.
+     * Then 구간 등록시 에러가 발생한다.
      */
     @DisplayName("구간 등록시 에러가 발생한다.")
     @Test
     void 구간_등록_예외() {
-        //When
+        //Given
         long lineId = 노선_생성_요청(신분당선)
                 .jsonPath().getLong("id");
 
-        //Then
-        assertThatThrownBy(() -> 구간_생성_요청(lineId, 예외_구간))
-                .isInstanceOf(IllegalSectionException.class);
+        //When
+        ExtractableResponse<Response> response = 구간_생성_요청(lineId, 예외_구간);
 
+        //Then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
     /**
@@ -108,15 +110,17 @@ public class SectionAcceptanceTest {
         //Given
         long lineId = 노선_생성_요청(신분당선)
                 .jsonPath().getLong("id");
-        구간_생성_요청(lineId, 새로운_구간);
+        ExtractableResponse<Response> response = 구간_생성_요청(lineId, 새로운_구간);
+        Long newStationId = response.jsonPath().getList("stations.id", Long.class).get(0);
+        String newStationName = response.jsonPath().getList("stations.name", String.class).get(0);
 
         //When
-        구간_삭제_요청(lineId, 새로운_하행역_아이디);
+        구간_삭제_요청(lineId, newStationId);
 
         //Then
         List<String> 종착역목록 = 노선_조회_요청(lineId)
                 .jsonPath().getList("stations.name");
-        assertThat(종착역목록).doesNotContain(새로운_하행역_이름);
+        assertThat(종착역목록).doesNotContain(newStationName);
     }
 
     private static ExtractableResponse<Response> 구간_삭제_요청(long lineId, long stationId) {
