@@ -32,10 +32,13 @@ public class Section {
     }
 
     @Builder
-    public Section(Station upStation, Station downStation, Long distance,Line line) {
+    public Section(Station upStation, Station downStation, Long distance) {
         this.upStation = upStation;
         this.downStation = downStation;
         this.distance = distance;
+    }
+
+    public void assignLine(Line line) {
         this.line = line;
     }
 
