@@ -1,16 +1,14 @@
 package subway.station;
 
-import io.restassured.RestAssured;
+import io.restassured.http.Method;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import subway.RestTestUtils;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -90,29 +88,15 @@ public class StationAcceptanceTest {
     }
 
     private ExtractableResponse<Response> create(String stationName) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", stationName);
-
-        return RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
+        return RestTestUtils.request(Method.POST, "/stations", Map.of("name", stationName));
     }
 
     private ExtractableResponse<Response> getAllStations() {
-        return RestAssured.given().log().all()
-                .when().get("/stations")
-                .then().log().all()
-                .extract();
+        return RestTestUtils.request(Method.GET, "/stations");
     }
 
     private ExtractableResponse<Response> delete(Long stationId) {
-        return RestAssured.given().log().all()
-                .when().delete("/stations/"+stationId)
-                .then().log().all()
-                .extract();
+        return RestTestUtils.request(Method.DELETE, "/stations/"+stationId);
     }
 
 }
