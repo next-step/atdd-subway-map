@@ -26,7 +26,7 @@ public class LineService {
     @Transactional
     public LineResponse createLine(LineDto lineDto) {
         var line = saveLine(lineDto);
-        var stations = getStations(lineDto);
+        var stations = getStations(lineDto.getStationIds());
         return LineResponse.from(
                 line.addSection(
                         stations.findById(lineDto.getUpStationId()),
@@ -56,8 +56,8 @@ public class LineService {
         lineRepository.deleteById(lineId);
     }
 
-    private Stations getStations(LineDto lineDto) {
-        return stationQuery.getStations(lineDto.getStationIds());
+    private Stations getStations(List<Long> stationIds) {
+        return stationQuery.getStations(stationIds);
     }
 
     private Line saveLine(LineDto lineDto) {
