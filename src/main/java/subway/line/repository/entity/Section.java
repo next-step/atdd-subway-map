@@ -1,5 +1,6 @@
 package subway.line.repository.entity;
 
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import subway.station.repository.entity.Station;
 
@@ -11,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
 @Entity
+@Getter
 @NoArgsConstructor
 public class Section {
 
@@ -28,14 +30,6 @@ public class Section {
         this.upStation = upStation;
         this.downStation = downStation;
         this.distance = distance;
-    }
-
-    public Station getUpStation() {
-        return upStation;
-    }
-
-    public Station getDownStation() {
-        return downStation;
     }
 
     public int getDistance() {

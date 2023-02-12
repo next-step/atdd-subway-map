@@ -43,6 +43,23 @@ public class Line {
         return sections.getLastStation();
     }
 
+    public Section getFirstSection() {
+        return sections.getFirstSection();
+    }
+
+    public Long getFirstSectionId() {
+        return getFirstSection().getId();
+    }
+
+    public Section getLastSection() {
+        return sections.getLastSection();
+    }
+
+    public Long getLastSectionId() {
+        return getLastSection().getId();
+    }
+
+
     public Line modify(String name, String color) {
         this.name = name;
         this.color = color;
@@ -58,4 +75,7 @@ public class Line {
         return sections.getAllStations();
     }
 
+    public void removeSection(Long stationId) {
+        sections.remove(stationId);
+    }
 }

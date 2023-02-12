@@ -16,6 +16,7 @@ import subway.station.web.StationResponse;
 import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -49,7 +50,7 @@ public class SectionAcceptanceTest {
         // when
         Long upStationId = request.getDownStationId();
         Long downStationId = 3L;
-        create(lineId, new SectionRequest(downStationId, upStationId, 10));
+        createSection(lineId, new SectionRequest(downStationId, upStationId, 10));
 
         // then
         List<StationResponse> afterStations = RestTestUtils.getListFromResponse(getLine(lineId), "stations", StationResponse.class);
@@ -90,6 +91,27 @@ public class SectionAcceptanceTest {
     @DisplayName("지하철 구간 제거 - 정상 케이스")
     @Test
     public void deleteSection() {
+        // given
+        LineRequest request = requests.get(0);
+        Long lineId = RestTestUtils.getLongFromResponse(createLine(request), "id");
+        Long upStationId = request.getDownStationId();
+        Long downStationId = 3L;
+        createSection(lineId, new SectionRequest(downStationId, upStationId, 10));
+        List<StationResponse> beforeStations = RestTestUtils.getListFromResponse(getLine(lineId), "stations", StationResponse.class);
+        Long beforeLastSectionId = RestTestUtils.getLongFromResponse(getSections(lineId), "lastSectionId");
+
+        // when
+        deleteSection(lineId, downStationId);
+
+        // then
+        Long afterLastSectionId = RestTestUtils.getLongFromResponse(getSections(lineId), "lastSectionId");
+        assertThat(afterLastSectionId).isNotEqualTo(beforeLastSectionId);
+
+        List<StationResponse> afterStations = RestTestUtils.getListFromResponse(getLine(lineId), "stations", StationResponse.class);
+        assertThat(beforeStations.size()).isGreaterThan(afterStations.size());
+        assertThat(afterStations.stream().map(StationResponse::getId).collect(Collectors.toList())).doesNotContain(downStationId);
+
+
     }
 
     /**
@@ -158,17 +180,31 @@ public class SectionAcceptanceTest {
         return RestAssured.given().log().all()
                 .when().get("/lines/"+id)
                 .then().log().all()
-//                .statusCode(HttpStatus.OK.value())
                 .extract();
     }
 
-    private ExtractableResponse<Response> create(Long lineId, SectionRequest request) {
+    private ExtractableResponse<Response> getSections(Long id) {
+        return RestAssured.given().log().all()
+                .when().get("/lines/"+id+"/sections")
+                .then().log().all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> createSection(Long lineId, SectionRequest request) {
         return RestAssured.given().log().all()
                 .body(request)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/lines/"+lineId+"/sections")
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
+                .extract();
+    }
+
+    private ExtractableResponse<Response> deleteSection(Long lineId, Long stationId) {
+        return RestAssured.given().log().all()
+                .when().delete("/lines/"+lineId+"/sections?stationId="+stationId)
+                .then().log().all()
+                .statusCode(HttpStatus.NO_CONTENT.value())
                 .extract();
     }
 

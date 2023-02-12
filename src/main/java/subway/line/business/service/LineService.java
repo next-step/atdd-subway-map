@@ -5,12 +5,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.line.business.constant.LineConstants;
 import subway.line.repository.LineRepository;
+import subway.line.repository.SectionRepository;
 import subway.line.repository.entity.Line;
 import subway.line.web.dto.LineRequest;
 import subway.line.web.dto.LineResponse;
 import subway.line.web.dto.SectionRequest;
 import subway.line.repository.entity.Section;
 import subway.line.repository.entity.Sections;
+import subway.line.web.dto.SectionResponse;
 import subway.station.business.StationService;
 import subway.station.repository.entity.Station;
 import subway.station.web.StationResponse;
@@ -28,6 +30,7 @@ public class LineService {
     private final StationService stationService;
 
     private final LineRepository lineRepository;
+    private final SectionRepository sectionRepository;
 
     @Transactional
     public LineResponse create(LineRequest request) {
@@ -64,6 +67,10 @@ public class LineService {
         lineRepository.deleteById(id);
     }
 
+    public SectionResponse getSections(Long lineId) {
+        return toSectionResponse(getLine(lineId));
+    }
+
     @Transactional
     public void addSection(Long lineId, SectionRequest request) {
         Line line = getLine(lineId);
@@ -71,6 +78,14 @@ public class LineService {
         Station downStation = stationService.findStation(request.getDownStationId());
 
         line.addSection(new Section(upStation, downStation, request.getDistance()));
+        lineRepository.save(line);
+    }
+
+    @Transactional
+    public void removeSection(Long lineId, Long stationId) {
+        Line line = getLine(lineId);
+        line.removeSection(stationId);
+
         lineRepository.save(line);
     }
 
@@ -85,6 +100,14 @@ public class LineService {
                 .name(line.getName())
                 .color(line.getColor())
                 .stations(stationResponses)
+                .build();
+    }
+
+    private SectionResponse toSectionResponse(Line line) {
+        return SectionResponse.builder()
+                .lineId(line.getId())
+                .firstSectionId(line.getFirstSectionId())
+                .lastSectionId(line.getLastSectionId())
                 .build();
     }
 

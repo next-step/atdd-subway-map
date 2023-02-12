@@ -45,6 +45,14 @@ public class Sections {
         return sections.get(lastIdx).getDownStationId();
     }
 
+    public Section getFirstSection() {
+        return this.sections.get(0);
+    }
+
+    public Section getLastSection() {
+        return this.sections.get(sections.size() - 1);
+    }
+
 //    public int getDistance() {
 //        sections.stream().map(this::getDistance)
 //    }
@@ -69,5 +77,12 @@ public class Sections {
         return allStations.stream().collect(Collectors.toList());
     }
 
+    public void remove(Long stationId) {
+        if (stationId != getLastStationId()) {
+            // TODO : 예외처리
+        }
+
+        this.sections.remove(sections.size() - 1);
+    }
 
 }
