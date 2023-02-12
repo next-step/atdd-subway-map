@@ -23,9 +23,9 @@ import subway.util.RandomPortAcceptanceTest;
 public class SectionAcceptanceTest extends RandomPortAcceptanceTest {
 
     private Long lineId;
-    private Long upStationId;
-    private Long downStationId;
-    private Long registerStationId;
+    private Long 강남역;
+    private Long 양재역;
+    private Long 선릉역;
     private Long 정자역;
     private String lineLocation;
     private int distance;
@@ -34,11 +34,11 @@ public class SectionAcceptanceTest extends RandomPortAcceptanceTest {
     @BeforeEach
     protected void setUp() {
         super.setUp();
-        upStationId = 역_생성("상행역").jsonPath().getLong("id");
-        downStationId = 역_생성("하행역").jsonPath().getLong("id");
-        registerStationId = 역_생성("새로운역").jsonPath().getLong("id");
+        강남역 = 역_생성("강남역").jsonPath().getLong("id");
+        양재역 = 역_생성("양재역").jsonPath().getLong("id");
+        선릉역 = 역_생성("선릉역").jsonPath().getLong("id");
         정자역 = 역_생성("정자역").jsonPath().getLong("id");
-        lineLocation = 노선_생성("2호선", "bg-red-600", upStationId, downStationId, distance)
+        lineLocation = 노선_생성("2호선", "bg-red-600", 강남역, 양재역, distance)
                 .header(HttpHeaders.LOCATION);
         lineId = Location_조회(lineLocation).jsonPath().getLong("id");
         distance = 10;
@@ -57,13 +57,13 @@ public class SectionAcceptanceTest extends RandomPortAcceptanceTest {
         @Test
         void registerSection() {
             // when
-            ExtractableResponse<Response> response = 구간_등록(lineId, registerStationId, downStationId, distance);
+            ExtractableResponse<Response> response = 구간_등록(lineId, 선릉역, 양재역, distance);
 
             // then
             assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
             // then
-            구간_등록_검증(lineId, registerStationId);
+            구간_등록_검증(lineId, 선릉역);
         }
 
         /**
@@ -74,7 +74,7 @@ public class SectionAcceptanceTest extends RandomPortAcceptanceTest {
         @Test
         void registerSection_Error_SectionUpStationIsNotLineDownStation() {
             // when
-            ExtractableResponse<Response> response = 구간_등록(lineId, registerStationId, 정자역, distance);
+            ExtractableResponse<Response> response = 구간_등록(lineId, 선릉역, 정자역, distance);
 
             // then
             assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -89,10 +89,10 @@ public class SectionAcceptanceTest extends RandomPortAcceptanceTest {
         @Test
         void registerSection_Error_SectionDownStationAlreadyRegisteredSection() {
             // given
-            노선_생성("새로운 노선", "색깔", registerStationId, downStationId, 10);
+            노선_생성("새로운 노선", "색깔", 선릉역, 양재역, 10);
 
             // when
-            ExtractableResponse<Response> response = 구간_등록(lineId, registerStationId, downStationId, distance);
+            ExtractableResponse<Response> response = 구간_등록(lineId, 선릉역, 양재역, distance);
 
             // then
             assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -112,13 +112,13 @@ public class SectionAcceptanceTest extends RandomPortAcceptanceTest {
         @Test
         void removeSection() {
             // given
-            구간_등록(lineId, registerStationId, downStationId, distance);
+            구간_등록(lineId, 선릉역, 양재역, distance);
 
             // when
-            구간_제거(lineId, registerStationId);
+            구간_제거(lineId, 선릉역);
 
             // then
-            구간_조회_검증(lineLocation, downStationId);
+            구간_조회_검증(lineLocation, 양재역);
         }
 
         /**
@@ -130,10 +130,10 @@ public class SectionAcceptanceTest extends RandomPortAcceptanceTest {
         @Test
         void removeSection_Error_RemoveSectionIsNotDownStation() {
             // given
-            구간_등록(lineId, registerStationId, downStationId, distance);
+            구간_등록(lineId, 선릉역, 양재역, distance);
 
             // when
-            ExtractableResponse<Response> response = 구간_제거(lineId, downStationId);
+            ExtractableResponse<Response> response = 구간_제거(lineId, 양재역);
 
             // then
             assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -148,10 +148,10 @@ public class SectionAcceptanceTest extends RandomPortAcceptanceTest {
         @Test
         void removeSection_Error_LineOnlyHasUpStationAndDownStation() {
             // given
-            구간_등록(lineId, registerStationId, downStationId, distance);
+            구간_등록(lineId, 선릉역, 양재역, distance);
 
             // when
-            ExtractableResponse<Response> response = 구간_제거(lineId, downStationId);
+            ExtractableResponse<Response> response = 구간_제거(lineId, 양재역);
 
             // then
             assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
