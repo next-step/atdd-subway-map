@@ -25,7 +25,7 @@ public class Section {
     @ManyToOne(optional = false)
     private Station downStation;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Line line;
 
     protected Section() {
