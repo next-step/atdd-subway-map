@@ -111,16 +111,36 @@ public class SectionAcceptanceTest {
         long lineId = 노선_생성_요청(신분당선)
                 .jsonPath().getLong("id");
         ExtractableResponse<Response> response = 구간_생성_요청(lineId, 새로운_구간);
-        Long newStationId = response.jsonPath().getList("stations.id", Long.class).get(0);
-        String newStationName = response.jsonPath().getList("stations.name", String.class).get(0);
 
         //When
+        Long newStationId = response.jsonPath().getList("stations.id", Long.class).get(0);
+        String newStationName = response.jsonPath().getList("stations.name", String.class).get(0);
         구간_삭제_요청(lineId, newStationId);
 
         //Then
         List<String> 종착역목록 = 노선_조회_요청(lineId)
                 .jsonPath().getList("stations.name");
         assertThat(종착역목록).doesNotContain(newStationName);
+    }
+
+    /**
+     * Given 노선을 생성한다.
+     * When 구간이 1개일 때, 구간 삭제를 시도한다.
+     * Then 에러가 발생한다.
+     */
+    @DisplayName("구간이 한개인 노선에서 역을 제거시 예외 발생")
+    @Test
+    void 구간_삭제_예외_구간_한개() {
+        //Given
+        ExtractableResponse<Response> response = 노선_생성_요청(신분당선);
+
+        //When
+        long lineId = response.jsonPath().getLong("id");
+        long stationId = response.jsonPath().getList("stations.id", Long.class).get(0);
+        ExtractableResponse<Response> deleteResponse = 구간_삭제_요청(lineId, stationId);
+
+        //Then
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     private static ExtractableResponse<Response> 구간_삭제_요청(long lineId, long stationId) {
