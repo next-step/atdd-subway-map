@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.net.URI;
+import java.util.List;
 
 @RestController
 public class LineController {
@@ -18,6 +19,11 @@ public class LineController {
     public ResponseEntity<LineResponse> createLine(@Valid @RequestBody LineRequest lineRequest) {
         LineResponse response = lineService.saveLine(lineRequest);
         return ResponseEntity.created(URI.create("/lines/" + response.getId())).body(response);
+    }
+
+    @GetMapping(value = "/lines")
+    public ResponseEntity<List<LineResponse>> showLines() {
+        return ResponseEntity.ok().body(lineService.findAllLines());
     }
 
     @GetMapping("/lines/{id}")
