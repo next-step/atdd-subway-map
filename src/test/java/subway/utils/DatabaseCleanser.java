@@ -1,4 +1,4 @@
-package subway.common;
+package subway.utils;
 
 import com.google.common.base.CaseFormat;
 import org.springframework.beans.factory.InitializingBean;

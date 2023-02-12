@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import subway.common.DatabaseCleanser;
+import subway.utils.DatabaseCleanser;
 import subway.station.StationRestAssuredClient;
 
 import java.util.List;
