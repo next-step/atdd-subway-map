@@ -2,12 +2,11 @@ package subway.line;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.line.exception.LineNotFoundException;
 import subway.station.Station;
-import subway.station.StationRepository;
-import subway.station.exception.StationNotFoundException;
+import subway.station.StationService;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -16,17 +15,17 @@ public class LineService {
 
     private LineRepository lineRepository;
 
-    private StationRepository stationRepository;
+    private StationService stationService;
 
-    public LineService(LineRepository lineRepository, StationRepository stationRepository) {
+    public LineService(LineRepository lineRepository, StationService stationService) {
         this.lineRepository = lineRepository;
-        this.stationRepository = stationRepository;
+        this.stationService = stationService;
     }
 
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
-        Station upStation = stationRepository.findById(lineRequest.getUpStationId()).orElseThrow(StationNotFoundException::new);
-        Station downStation = stationRepository.findById(lineRequest.getDownStationId()).orElseThrow(StationNotFoundException::new);
+        Station upStation = new Station(stationService.findStationById(lineRequest.getUpStationId()));
+        Station downStation = new Station(stationService.findStationById(lineRequest.getDownStationId()));
 
         Line line = lineRepository.save(
                 new Line(lineRequest.getName(),
@@ -44,6 +43,10 @@ public class LineService {
                 .collect(Collectors.toList());
     }
 
+    public LineResponse findLineById(Long id) {
+        return new LineResponse(lineRepository.findById(id).orElseThrow(LineNotFoundException::new));
+    }
+
     private LineResponse createLineResponse(Line line) {
         return new LineResponse(
                 line.getId(),
@@ -54,8 +57,8 @@ public class LineService {
     }
 
     private List<Station> findStations(Long upStationId, Long downStationId) {
-        Station upStation = stationRepository.findById(upStationId).orElseThrow(StationNotFoundException::new);
-        Station downStation = stationRepository.findById(downStationId).orElseThrow(StationNotFoundException::new);
+        Station upStation = new Station(stationService.findStationById(upStationId));
+        Station downStation = new Station(stationService.findStationById(downStationId));
 
         return List.of(upStation, downStation);
     }

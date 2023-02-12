@@ -17,6 +17,11 @@ public class Station {
         this.name = name;
     }
 
+    public Station(StationResponse stationResponse) {
+        this.id = stationResponse.getId();
+        this.name = stationResponse.getName();
+    }
+
     public Long getId() {
         return id;
     }
