@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import subway.RestTestUtils;
+import subway.line.business.constant.LineConstants;
 import subway.line.web.dto.LineRequest;
 import subway.line.web.dto.SectionRequest;
 import subway.station.web.StationResponse;
@@ -19,6 +20,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("지하철 구간 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -66,6 +68,23 @@ public class SectionAcceptanceTest {
     @DisplayName("지하철 구간 등록 - 예외 케이스 : 새로운 구간의 상행역이 해당 노선에 등록되어있는 하행 종점역이 아닌 경우")
     @Test
     public void createSection_InvalidCase1() {
+        // given
+        LineRequest request = requests.get(0);
+        Long lineId = RestTestUtils.getLongFromResponse(createLine(request), "id");
+
+        // when
+        Long upStationId = 99L;
+        Long downStationId = 3L;
+
+        assertThat(upStationId).isNotEqualTo(request.getDownStationId());
+
+        var response = createSection(lineId, new SectionRequest(downStationId, upStationId, 10));
+
+        // then
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
+                () -> assertThat(response.asString()).isEqualTo(LineConstants.INVALID_UP_STATION_ID)
+        );
 
     }
 
@@ -196,7 +215,7 @@ public class SectionAcceptanceTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/lines/"+lineId+"/sections")
                 .then().log().all()
-                .statusCode(HttpStatus.OK.value())
+//                .statusCode(HttpStatus.OK.value())
                 .extract();
     }
 

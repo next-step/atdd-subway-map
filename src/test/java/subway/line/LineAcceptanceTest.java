@@ -10,7 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 import subway.RestTestUtils;
-import subway.line.business.constant.LineConstants;
 import subway.line.web.dto.LineRequest;
 import subway.line.web.dto.LineUpdateRequest;
 
@@ -20,7 +19,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 //@Sql(value = "/init.sql")
 @DisplayName("지하철 노선 관련 기능")
@@ -134,9 +132,7 @@ public class LineAcceptanceTest {
 
         // then
         var response = getLine(createId);
-        assertAll(
-                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value())
-        );
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 
     private List<LineRequest> getRequests() {

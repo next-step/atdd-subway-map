@@ -43,6 +43,10 @@ public class Line {
         return sections.getLastStation();
     }
 
+    public Long getLastStationId() {
+        return sections.getLastStationId();
+    }
+
     public Section getFirstSection() {
         return sections.getFirstSection();
     }

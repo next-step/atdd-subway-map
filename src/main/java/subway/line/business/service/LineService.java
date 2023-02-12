@@ -17,6 +17,7 @@ import subway.station.business.StationService;
 import subway.station.repository.entity.Station;
 import subway.station.web.StationResponse;
 
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -30,7 +31,6 @@ public class LineService {
     private final StationService stationService;
 
     private final LineRepository lineRepository;
-    private final SectionRepository sectionRepository;
 
     @Transactional
     public LineResponse create(LineRequest request) {
@@ -74,6 +74,10 @@ public class LineService {
     @Transactional
     public void addSection(Long lineId, SectionRequest request) {
         Line line = getLine(lineId);
+        if (request.getUpStationId() != line.getLastStationId()) {
+            throw new InvalidParameterException(LineConstants.INVALID_UP_STATION_ID);
+        }
+
         Station upStation = stationService.findStation(request.getUpStationId());
         Station downStation = stationService.findStation(request.getDownStationId());
 
