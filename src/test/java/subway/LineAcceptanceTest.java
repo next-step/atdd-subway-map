@@ -67,11 +67,7 @@ public class LineAcceptanceTest {
                 .jsonPath().getLong("id");
 
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when().get("/lines")
-                .then().log().all()
-                .extract();
-
+        ExtractableResponse<Response> response = getLines();
         // then
         List<String> names = response.jsonPath()
                 .getList("name", String.class);
@@ -124,9 +120,12 @@ public class LineAcceptanceTest {
                 .body(params)
                 .when().put("/lines/{id}", lineId)
                 .then().extract();
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(getLine(lineId).jsonPath().getMap(""))
+                .containsAllEntriesOf(params);
+
     }
 
     /**
@@ -144,7 +143,6 @@ public class LineAcceptanceTest {
 
         // when
         RestAssured.given()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().delete("/lines/{id}", lineId)
                 .then().extract();
 

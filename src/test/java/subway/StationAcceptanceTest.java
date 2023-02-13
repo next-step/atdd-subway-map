@@ -85,7 +85,6 @@ public class StationAcceptanceTest {
 
         // when
         RestAssured.given()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().delete("/stations/{id}", id)
                 .then().extract();
 
@@ -99,7 +98,7 @@ public class StationAcceptanceTest {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
         ExtractableResponse<Response> response =
-                RestAssured.given()
+                RestAssured.given().log().all()
                         .body(params)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .when().post("/stations")

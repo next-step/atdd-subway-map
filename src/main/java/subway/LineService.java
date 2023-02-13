@@ -25,9 +25,7 @@ public class LineService {
     }
 
     public LineResponse findById(Long id) {
-        return lineRepository.findById(id)
-                .map(LineResponse::from)
-                .orElseThrow(() -> new NoSuchElementException("no line for id"));
+        return LineResponse.from(getLine(id));
     }
 
     public List<LineResponse> findAllLines() {
@@ -38,7 +36,7 @@ public class LineService {
 
     @Transactional
     public void modify(Long id, LineModificationRequest lineModificationRequest) {
-        Line line = lineRepository.findById(id).orElseThrow(() -> new NoSuchElementException("no line for id"));
+        Line line = getLine(id);
         line.modify(lineModificationRequest);
         lineRepository.save(line);
     }
@@ -46,5 +44,10 @@ public class LineService {
     @Transactional
     public void delete(Long id) {
         lineRepository.deleteById(id);
+    }
+
+    private Line getLine(Long id) {
+        return lineRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("no line for id"));
     }
 }
