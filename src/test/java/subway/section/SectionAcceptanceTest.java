@@ -1,11 +1,13 @@
 package subway.section;
 
+import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import subway.AssertionUtils;
 import subway.common.exception.line.DownStationCouldNotExistStationExcetion;
@@ -15,6 +17,8 @@ import subway.line.LineResponse;
 import subway.line.SectionRequest;
 import subway.station.StationResponse;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.http.HttpStatus.OK;
 import static subway.AssertionUtils.목록은_다음을_정확하게_포함한다;
 import static subway.line.LineApi.지하철노선_단건_조회후_응답객체반환;
 import static subway.line.LineApi.지하철노선_생성;
@@ -94,5 +98,36 @@ public class SectionAcceptanceTest {
 
         AssertionUtils.응답코드_400를_반환한다(response);
         AssertionUtils.응답메시지는_다음과_같다(response, DownStationCouldNotExistStationExcetion.MESSAGE);
+    }
+
+    /**
+     * given: 지하철 노선의 하행 종점역을
+     * when: 제거하면
+     * then: 해당 역은 삭제된다.
+     */
+    @DisplayName("지하철 구간을 삭제하면 하행 종점은 삭제된다.")
+    @Test
+    void deleteSectionTest() {
+        // given
+        지하철구간_등록(lineA.getId(), sectionA);
+
+        // when
+        ExtractableResponse<Response> response = 지하철구간_삭제(lineA.getId(), stationC.getId());
+
+        응답코드_200을_반환한다(response);
+    }
+
+    public static void 응답코드_200을_반환한다(final ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(OK.value());
+    }
+
+    private ExtractableResponse<Response> 지하철구간_삭제(Long lineId, Long stationId) {
+        return RestAssured
+                    .given()
+                        .accept(MediaType.ALL_VALUE)
+                    .when()
+                        .delete("/lines/{lineId}/sections?stationId={stationId}", lineId, stationId)
+                    .then()
+                    .extract();
     }
 }
