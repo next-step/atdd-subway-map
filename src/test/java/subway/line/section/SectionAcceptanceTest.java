@@ -62,7 +62,23 @@ public class SectionAcceptanceTest extends AbstractAcceptanceTest {
             .contains(createdSection);
     }
 
+    /**
+     * Given 새로운 구간의 상행역이 해당 노선에 등록되어있는 하행 종점역이 아닐 때,
+     * When 지하철 구간을 생성하면
+     * Then 지하철 구간 등록이 실패한다.
+     */
+    @Test
+    @DisplayName("지하철 구간 생성 실패")
+    void failToCreateSection() {
+        // When
+        SectionResponse createdSection = createSection(lineId, bStationId, cStationId, 20);
 
+        // Then
+        List<SectionResponse> sections = findSections(lineId);
+
+        assertThat(sections)
+            .contains(createdSection);
+    }
 
     /**
      * Given 지하철 구간을 생성하고
@@ -86,7 +102,44 @@ public class SectionAcceptanceTest extends AbstractAcceptanceTest {
 
         assertThat(findSectionResponse.statusCode())
             .isEqualTo(HttpStatus.NOT_FOUND.value());
+    }
 
+    /**
+     * When 현재 지하철 노선에 구간이 1개인 경우,
+     * Then 지하철 구간 삭제가 실패한다.
+     */
+    @Test
+    @DisplayName("구간 1개인 노선의 지하철 구간 삭제 실패")
+    void failToDeleteSection() {
+        // When
+        List<SectionResponse> sections = findSections(lineId);
+        assertThat(sections)
+            .hasSize(1);
+
+        // Then
+        ExtractableResponse<Response> deleteSectionResponse = deleteSection(lineId,
+            sections.get(0).getDownStationId());
+
+        assertThat(deleteSectionResponse.statusCode())
+            .isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    /**
+     * When 현재 지하철 노선에 마지막 구간이 아닌 구간에 대해,
+     * Then 지하철 구간 삭제가 실패한다.
+     */
+    @Test
+    @DisplayName("마지막 구간이 아닌 지하철 구간 삭제 실패")
+    void failToDeleteNotLastSection() {
+        // When
+        createSection(lineId, bStationId, cStationId, 20);
+        Long givenStationId = bStationId;
+
+        // Then
+        ExtractableResponse<Response> deleteSectionResponse = deleteSection(lineId, givenStationId);
+
+        assertThat(deleteSectionResponse.statusCode())
+            .isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     /**

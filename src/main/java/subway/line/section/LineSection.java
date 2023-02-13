@@ -74,4 +74,6 @@ public class LineSection {
     public Long getUpStationId() { return section.getUpStationId(); }
 
     public int getDistance() { return section.getDistance(); }
+
+    public Long lineId() { return line.getId(); }
 }

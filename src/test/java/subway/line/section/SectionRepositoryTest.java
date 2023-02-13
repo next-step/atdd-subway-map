@@ -10,7 +10,7 @@ import subway.section.SectionRepository;
 import subway.station.Station;
 import subway.station.StationRepository;
 
-@DisplayName("SectionRepository 단위 테스트")
+@DisplayName("지하철 구간 관련 SectionRepository 단위 테스트")
 public class SectionRepositoryTest extends JpaRepositoryTest<Section, Long> {
 
     @Autowired

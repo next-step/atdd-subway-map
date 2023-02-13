@@ -1,5 +1,7 @@
 package subway.line.section;
 
+import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -52,9 +54,12 @@ public class LineSectionController {
         return ResponseEntity.ok(sections);
     }
 
-    @GetMapping("/{sectionId}")
-    public ResponseEntity<SectionResponse> searchSection(@PathVariable Long lineId, @PathVariable Long sectionId) {
-        LineSection lineSection = lineSectionService.findLineSection(lineId, sectionId);
+    @GetMapping("/{lineSectionId}")
+    public ResponseEntity<SectionResponse> searchSection(@PathVariable Long lineId, @PathVariable Long lineSectionId) {
+        LineSection lineSection = lineSectionService.findLineSectionById(lineSectionId);
+
+        Preconditions.checkState(Objects.equal(lineSection.lineId(), lineId),
+            "The section is not in the line");
 
         SectionResponse response = SectionResponse.of(lineSection);
 

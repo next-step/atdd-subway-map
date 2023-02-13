@@ -1,5 +1,6 @@
 package subway.line.section;
 
+import com.google.common.base.Preconditions;
 import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +45,9 @@ public class LineSectionService {
         Line line = lineRepository.findByIdWithLineSections(lineId)
             .orElseThrow(NotFoundLineException::new);
 
+        Preconditions.checkState(line.getLineSections().size() > 1,
+            "There is only one section");
+
         LineSection lineSection = line.getLastLineSection();
 
         if (!Objects.equals(lineSection.getDownStationId(), downStationId)) {
@@ -63,8 +67,8 @@ public class LineSectionService {
         return savedLineSection;
     }
 
-    public LineSection findLineSection(Long lineId, Long sectionId) {
-        return lineSectionRepository.findById(sectionId)
+    public LineSection findLineSectionById(Long lineSectionId) {
+        return lineSectionRepository.findById(lineSectionId)
             .orElseThrow(NotFoundLineSectionException::new);
     }
 }

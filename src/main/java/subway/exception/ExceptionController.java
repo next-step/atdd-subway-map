@@ -20,7 +20,11 @@ public class ExceptionController {
         return ResponseEntity.notFound().build();
     }
 
-    @ExceptionHandler(value = {IllegalArgumentException.class, IllegalStateException.class})
+    @ExceptionHandler(value = {
+        IllegalArgumentException.class,
+        IllegalStateException.class,
+        CannotRemoveLineSectionException.class
+    })
     public ResponseEntity<?> badRequestException(Exception e) {
         log.info("Bad Request Exception: {}", e.getMessage(), e);
 
