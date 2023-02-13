@@ -13,21 +13,21 @@ public class Line {
     @Column(length = 20, nullable = false)
     private String color;
 
+    //@Column(nullable = true)
     private Long upStationId;
 
+    //@Column(nullable = true)
     private Long downStationId;
 
+    //@Column(nullable = true)
     private Long distance;
 
     public Line() {
     }
 
-    public Line(String name, String color, Long upStationId, Long downStationId, Long distance) {
+    public Line(String name, String color) {
         this.name = name;
         this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
-        this.distance = distance;
     }
 
     public Long getId() {

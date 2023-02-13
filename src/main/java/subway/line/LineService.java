@@ -20,12 +20,16 @@ public class LineService {
 
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
+//        Line line = lineRepository.save(new Line(
+//                lineRequest.getName(),
+//                lineRequest.getColor(),
+//                lineRequest.getUpStationId(),
+//                lineRequest.getDownStationId(),
+//                lineRequest.getDistance()));
+
         Line line = lineRepository.save(new Line(
                 lineRequest.getName(),
-                lineRequest.getColor(),
-                lineRequest.getUpStationId(),
-                lineRequest.getDownStationId(),
-                lineRequest.getDistance()));
+                lineRequest.getColor()));
 
         return createLineResponse(line);
     }
@@ -73,10 +77,7 @@ public class LineService {
         return new LineResponse(
                 line.getId(),
                 line.getName(),
-                line.getColor(),
-                line.getUpStationId(),
-                line.getDownStationId(),
-                line.getDistance()
+                line.getColor()
         );
     }
 }

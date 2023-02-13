@@ -13,13 +13,11 @@ public class LineResponse {
 
     private Long distance;
 
-    public LineResponse(Long id, String name, String color, Long upStationId, Long downStationId, Long distance) {
+
+    public LineResponse(Long id, String name, String color) {
         this.id = id;
         this.name = name;
         this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
-        this.distance = distance;
     }
 
     public Long getId() {return id;}

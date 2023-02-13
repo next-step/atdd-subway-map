@@ -30,7 +30,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createSubwayLine() {
         //When 지하철노선을 생성하면
-        LineRequest Line1 = new LineRequest("1호선", "blue", 1L,2L,10L);
+        LineRequest Line1 = new LineRequest("1호선", "blue");
         createSubwayLine(Line1);
 
         //Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
@@ -50,9 +50,9 @@ public class LineAcceptanceTest extends AcceptanceTest {
         //deleteAllSubway();
 
         // Given 2개의 지하철 노선을 생성하고
-        LineRequest Line1 = new LineRequest("1호선", "blue", 1L,2L,10L);
+        LineRequest Line1 = new LineRequest("1호선", "blue");
         createSubwayLine(Line1);
-        LineRequest Line5 = new LineRequest("5호선", "purple", 3L, 4L, 20L);
+        LineRequest Line5 = new LineRequest("5호선", "purple");
         createSubwayLine(Line5);
 
         // When 지하철 노선 목록을 조회하면 // Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
@@ -69,7 +69,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void getStationLine() {
 
         // Given 지하철 노선을 생성하고
-        LineRequest Line8 = new LineRequest("8호선", "pink", 6L,10L,200L);
+        LineRequest Line8 = new LineRequest("8호선", "pink");
         Long lineId = createSubwayLine(Line8);
 
         // When 생성한 지하철 노선을 조회하면
@@ -93,11 +93,11 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void updateSubwayLine() {
 
         // Given 지하철 노선을 생성하고
-        LineRequest Line8 = new LineRequest("8호선", "pink", 6L,10L,200L);
+        LineRequest Line8 = new LineRequest("8호선", "pink");
         Long lineId = createSubwayLine(Line8);
 
         // When 생성한 지하철 노선을 수정하면
-        LineRequest updateLine8 = new LineRequest(Line8.getName(), "black", Line8.getUpStationId(),4L,100L);
+        LineRequest updateLine8 = new LineRequest(Line8.getName(), "black"); //,4L,100L
         //lineId = 889L; //존재하지않는 ID 로 요청했을때 Exception Response 확인용
         LineResponse lineResponse = updateSubwayLine(lineId, updateLine8);
 
@@ -119,7 +119,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void deleteSubwayLine() {
 
         // Given 지하철 노선을 생성하고
-        LineRequest Line7 = new LineRequest("7호선","green", 3L, 5L, 30L);
+        LineRequest Line7 = new LineRequest("7호선","green");
         Long lineId = createSubwayLine(Line7);
 
         // When 생성한 지하철 노선을 삭제하면 // Then 해당 지하철 노선 정보는 삭제된다
