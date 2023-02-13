@@ -7,7 +7,6 @@ import subway.application.util.Finder;
 import subway.domain.Line;
 import subway.domain.LineRepository;
 import subway.domain.Section;
-import subway.domain.SectionRepository;
 import subway.domain.Station;
 import subway.domain.StationRepository;
 import subway.dto.SectionRegisterRequest;
@@ -17,19 +16,15 @@ import subway.exception.StationNotFoundException;
 @Transactional(readOnly = true)
 @Service
 public class SectionService {
-
-    private final SectionRepository sectionRepository;
     private final LineRepository lineRepository;
     private final StationRepository stationRepository;
     private final Finder finder;
 
     public SectionService(
-            final SectionRepository sectionRepository,
             final LineRepository lineRepository,
             final StationRepository stationRepository,
             final Finder finder
     ) {
-        this.sectionRepository = sectionRepository;
         this.lineRepository = lineRepository;
         this.stationRepository = stationRepository;
         this.finder = finder;

@@ -7,8 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 import subway.application.util.Finder;
 import subway.domain.Line;
 import subway.domain.LineRepository;
-import subway.domain.Section;
-import subway.domain.SectionRepository;
 import subway.domain.Station;
 import subway.domain.StationRepository;
 import subway.dto.LineCreateRequest;
@@ -23,18 +21,15 @@ public class LineService {
 
     private final LineRepository lineRepository;
     private final StationRepository stationRepository;
-    private final SectionRepository sectionRepository;
     private final Finder finder;
 
     public LineService(
             final LineRepository lineRepository,
             final StationRepository stationRepository,
-            final SectionRepository sectionRepository,
             final Finder finder
     ) {
         this.lineRepository = lineRepository;
         this.stationRepository = stationRepository;
-        this.sectionRepository = sectionRepository;
         this.finder = finder;
     }
 
@@ -81,10 +76,6 @@ public class LineService {
     @Transactional
     public void delete(final Long lineId) {
         Line line = findLineBy(lineId);
-
-        sectionRepository.findAllByLine(line)
-                .forEach(Section::detachLine);
-
         lineRepository.delete(line);
     }
 
