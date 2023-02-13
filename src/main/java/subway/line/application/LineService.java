@@ -38,10 +38,6 @@ public class LineService {
                         downStation.getId(),
                         lineRequest.getDistance()));
 
-        /*
-        * presentation 에서 외부로 노출되는 클래스는 가장 변화가 일어나기 쉽기 때문에, use case 마다 분리하는 것이 좋은 경우가 많습니다.
-        * use case 마다 분리
-        * */
         return new LineResponse(
                 line.getId(),
                 line.getName(),
