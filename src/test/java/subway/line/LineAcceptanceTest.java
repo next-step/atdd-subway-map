@@ -1,5 +1,6 @@
 package subway.line;
 
+import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 class LineAcceptanceTest {
 
     private Long nonhyeonStationId;
+
     private Long gangNamStationId;
 
     @BeforeEach
@@ -43,7 +45,7 @@ class LineAcceptanceTest {
     @Test
     void createRoute() {
         // given - 노선 생성
-        LineRequest lineRequest = new LineRequest(
+        LineRequest shinbundangLine = new LineRequest(
                 "신분당선",
                 "red",
                 nonhyeonStationId,
@@ -51,14 +53,14 @@ class LineAcceptanceTest {
                 10L);
 
         // when
-        ExtractableResponse<Response> response = LineRestAssured.createRoute(lineRequest);
+        ExtractableResponse<Response> response = LineRestAssured.createLine(shinbundangLine);
 
         // then - 노선 목록
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
                 () -> {
                     ExtractableResponse<Response> readLines = LineRestAssured.readLines();
-                    assertThat(readLines.jsonPath().getList("name")).contains(lineRequest.getName());
+                    assertThat(readLines.jsonPath().getList("name")).contains(shinbundangLine.getName());
                 }
         );
     }
@@ -72,22 +74,22 @@ class LineAcceptanceTest {
     @Test
     void searchRouteList() {
         // given
-        LineRequest lineRequest1 = new LineRequest(
+        LineRequest shinbundangLine = new LineRequest(
                 "신분당선",
                 "red",
                 nonhyeonStationId,
                 gangNamStationId,
                 10L);
 
-        LineRequest lineRequest2 = new LineRequest(
+        LineRequest gangnamLine = new LineRequest(
                 "강남 2호선",
                 "green",
                 nonhyeonStationId,
                 gangNamStationId,
                 20L);
 
-        LineRestAssured.createRoute(lineRequest1);
-        LineRestAssured.createRoute(lineRequest2);
+        LineRestAssured.createLine(shinbundangLine);
+        LineRestAssured.createLine(gangnamLine);
 
         // when
         ExtractableResponse<Response> response = LineRestAssured.readLines();
@@ -96,7 +98,7 @@ class LineAcceptanceTest {
         List<String> lineNames = response.jsonPath().getList("name");
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
-                () -> assertThat(lineNames).containsExactly(lineRequest1.getName(), lineRequest2.getName())
+                () -> assertThat(lineNames).containsExactly(shinbundangLine.getName(), gangnamLine.getName())
         );
     }
 
@@ -109,19 +111,43 @@ class LineAcceptanceTest {
     @Test
     void searchRoute() {
         // given
-        LineRequest lineRequest1 = new LineRequest(
+        LineRequest shinbundangLine = new LineRequest(
                 "신분당선",
                 "red",
                 nonhyeonStationId,
                 gangNamStationId,
                 10L);
 
+        ExtractableResponse<Response> createLine = LineRestAssured.createLine(shinbundangLine);
+
         // when
-        ExtractableResponse<Response> route = LineRestAssured.createRoute(lineRequest1);
+        JsonPath createLineJsonPath = createLine.jsonPath();
+        ExtractableResponse<Response> readLineResponse = LineRestAssured.readLine(createLineJsonPath.getLong("id"));
 
         // then
-
+        JsonPath responseJsonPath = readLineResponse.jsonPath();
+        assertAll(
+                () -> assertThat(readLineResponse.statusCode()).isEqualTo(HttpStatus.OK.value()),
+                () -> assertThat(responseJsonPath.getString("name")).isEqualTo(createLineJsonPath.getString("name"))
+        );
     }
+
+    /**
+     * When 존재하지 않는 지하철 노선 ID로 노선을 조회하면
+     * Then 404 응답을 리턴한다.
+     */
+    @DisplayName("존재하지 않는 id로 지하철 노선을 조회하면 404 상태코드를 리턴한다")
+    @Test
+    void 존재하지_않는_id로_지하철_노선을_조회하면_404_상태코드를_리턴한다() {
+        // when
+        ExtractableResponse<Response> readLineResponse = LineRestAssured.readLine(2L);
+
+        // then
+        assertAll(
+                () -> assertThat(readLineResponse.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value())
+        );
+    }
+
 
     /**
      * Given 지하철 노선을 생성하고
