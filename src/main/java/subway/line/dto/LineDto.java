@@ -1,5 +1,7 @@
 package subway.line.dto;
 
+import java.util.List;
+
 public class LineDto {
     private Long id;
     private String name;
@@ -49,6 +51,10 @@ public class LineDto {
 
     public Long getDownStationId() {
         return downStationId;
+    }
+
+    public List<Long> getStationIds() {
+        return List.of(upStationId, downStationId);
     }
 
     public Long getDistance() {

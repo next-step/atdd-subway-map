@@ -1,13 +1,8 @@
 package subway.station;
 
-import io.restassured.RestAssured;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
-import subway.common.DatabaseCleanser;
+import subway.AcceptanceTest;
 
 import java.util.List;
 import java.util.Map;
@@ -17,20 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("지하철역 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class StationAcceptanceTest {
-
-    @LocalServerPort
-    int port;
-
-    @Autowired
-    private DatabaseCleanser databaseCleanser;
-
-    @BeforeEach
-    void init() {
-        RestAssured.port = port;
-        databaseCleanser.execute();
-    }
+public class StationAcceptanceTest extends AcceptanceTest {
 
     /**
      * When 지하철역을 생성하면
