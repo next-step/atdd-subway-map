@@ -1,5 +1,6 @@
 package subway.application;
 
+import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.application.util.Finder;
@@ -45,10 +46,11 @@ public class SectionService {
     }
 
     private Section createSection(final SectionRegisterRequest sectionRegisterRequest, final Line line) {
-        Station upStation = stationRepository.findById(sectionRegisterRequest.getUpStationId())
-                .orElseThrow(StationNotFoundException::new);
-        Station downStation = stationRepository.findById(sectionRegisterRequest.getDownStationId())
-                .orElseThrow(StationNotFoundException::new);
+        List<Station> stations = stationRepository.findAllById(
+                List.of(sectionRegisterRequest.getUpStationId(), sectionRegisterRequest.getDownStationId())
+        );
+        Station upStation = finder.findStationById(stations, sectionRegisterRequest.getUpStationId());
+        Station downStation = finder.findStationById(stations, sectionRegisterRequest.getDownStationId());
         return new Section(sectionRegisterRequest.getDistance(), upStation, downStation, line);
     }
 
