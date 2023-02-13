@@ -1,28 +1,26 @@
 package subway.section;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
-import subway.AssertionUtils;
+import subway.common.exception.line.CannotRemoveNotTerminalStation;
 import subway.common.exception.line.DownStationCouldNotExistStationExcetion;
+import subway.common.exception.line.LineThatHasOnlyOneSectionCannotRemoveStationException;
 import subway.common.exception.line.UpStationMustTermianlStationException;
 import subway.line.LineCreateRequest;
 import subway.line.LineResponse;
 import subway.line.SectionRequest;
 import subway.station.StationResponse;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.http.HttpStatus.OK;
-import static subway.AssertionUtils.목록은_다음을_정확하게_포함한다;
+import static subway.AssertionUtils.*;
 import static subway.line.LineApi.지하철노선_단건_조회후_응답객체반환;
 import static subway.line.LineApi.지하철노선_생성;
 import static subway.section.SectionApi.지하철구간_등록;
+import static subway.section.SectionApi.지하철구간_삭제;
 import static subway.station.StationApi.지하철역_생성;
 import static subway.station.StationFixture.*;
 
@@ -82,8 +80,8 @@ public class SectionAcceptanceTest {
     void upStationMustBeTerminalStationTest() {
         ExtractableResponse<Response> response = 지하철구간_등록(lineA.getId(), sectionB);
 
-        AssertionUtils.응답코드_400를_반환한다(response);
-        AssertionUtils.응답메시지는_다음과_같다(response, UpStationMustTermianlStationException.MESSAGE);
+        응답코드_400를_반환한다(response);
+        응답메시지는_다음과_같다(response, UpStationMustTermianlStationException.MESSAGE);
     }
 
     /**
@@ -96,14 +94,14 @@ public class SectionAcceptanceTest {
     void downStationMustNotBeExistStationTest() {
         ExtractableResponse<Response> response = 지하철구간_등록(lineA.getId(), sectionC);
 
-        AssertionUtils.응답코드_400를_반환한다(response);
-        AssertionUtils.응답메시지는_다음과_같다(response, DownStationCouldNotExistStationExcetion.MESSAGE);
+        응답코드_400를_반환한다(response);
+        응답메시지는_다음과_같다(response, DownStationCouldNotExistStationExcetion.MESSAGE);
     }
 
     /**
      * given: 지하철 노선의 하행 종점역을
-     * when: 제거하면
-     * then: 해당 역은 삭제된다.
+     * when: 제거하고
+     * then: 노선 조회시 해당 역은 찾을 수 없다.
      */
     @DisplayName("지하철 구간을 삭제하면 하행 종점은 삭제된다.")
     @Test
@@ -112,22 +110,42 @@ public class SectionAcceptanceTest {
         지하철구간_등록(lineA.getId(), sectionA);
 
         // when
-        ExtractableResponse<Response> response = 지하철구간_삭제(lineA.getId(), stationC.getId());
+        지하철구간_삭제(lineA.getId(), stationC.getId());
+        final LineResponse lineResponse = 지하철노선_단건_조회후_응답객체반환(lineA.getId());
 
-        응답코드_200을_반환한다(response);
+        // then
+        목록은_다음을_포함하지_않는다(lineResponse.getStations(), stationC);
     }
 
-    public static void 응답코드_200을_반환한다(final ExtractableResponse<Response> response) {
-        assertThat(response.statusCode()).isEqualTo(OK.value());
+    /**
+     * given: 지하철 노선의 하행 종점역이 아닌 역을
+     * when: 제거하면
+     * then: 오류가 발생한다.
+     */
+    @DisplayName("지하철 구간을 삭제하면 하행 종점은 삭제된다.")
+    @Test
+    void deleteNotTerminalSectionTest() {
+        // given
+        지하철구간_등록(lineA.getId(), sectionA);
+
+        // when
+        ExtractableResponse<Response> response = 지하철구간_삭제(lineA.getId(), stationB.getId());
+
+        응답코드_400를_반환한다(response);
+        응답메시지는_다음과_같다(response, CannotRemoveNotTerminalStation.MESSAGE);
     }
 
-    private ExtractableResponse<Response> 지하철구간_삭제(Long lineId, Long stationId) {
-        return RestAssured
-                    .given()
-                        .accept(MediaType.ALL_VALUE)
-                    .when()
-                        .delete("/lines/{lineId}/sections?stationId={stationId}", lineId, stationId)
-                    .then()
-                    .extract();
+    /**
+     * when: 구간이 1개뿐인 지하철 노선의 하행 종점역을 제거하면
+     * then: 오류가 발생한다.
+     */
+    @DisplayName("지하철 구간을 삭제하면 하행 종점은 삭제된다.")
+    @Test
+    void deleteSectionFromLineHasOnlyOneSectionTest() {
+        // when
+        ExtractableResponse<Response> response = 지하철구간_삭제(lineA.getId(), stationB.getId());
+
+        응답코드_400를_반환한다(response);
+        응답메시지는_다음과_같다(response, LineThatHasOnlyOneSectionCannotRemoveStationException.MESSAGE);
     }
 }

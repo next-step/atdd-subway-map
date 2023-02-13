@@ -1,5 +1,7 @@
 package subway.line;
 
+import subway.common.exception.line.CannotRemoveNotTerminalStation;
+import subway.common.exception.line.LineThatHasOnlyOneSectionCannotRemoveStationException;
 import subway.station.Station;
 
 import javax.persistence.Embeddable;
@@ -8,20 +10,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static javax.persistence.CascadeType.MERGE;
 import static javax.persistence.CascadeType.PERSIST;
 import static javax.persistence.FetchType.LAZY;
 
 @Embeddable
 public class Sections {
 
-    @OneToMany(mappedBy = "line", fetch = LAZY, cascade = PERSIST, orphanRemoval = true)
+    @OneToMany(mappedBy = "line", fetch = LAZY, cascade = {PERSIST, MERGE}, orphanRemoval = true)
     private List<Section> sections = new ArrayList<>();
 
     public Station getTerminalStation() {
-        validateSections();
+        return getLastSection().getDownStation();
+    }
 
-        final Section lasSection = sections.get(sections.size() - 1);
-        return lasSection.getDownStation();
+    private Section getLastSection() {
+        validateSections();
+        return sections.get(sections.size() - 1);
     }
 
     public boolean hasStation(final Station station) {
@@ -47,5 +52,28 @@ public class Sections {
 
     public void add(final Section section) {
         this.sections.add(section);
+    }
+
+    public void remove(Station station) {
+        validateRemoveSection(station);
+        this.sections.remove(getLastSection());
+    }
+
+    private void validateRemoveSection(Station station) {
+        if (isNotTerminalStation(station)) {
+            throw new CannotRemoveNotTerminalStation();
+        }
+
+        if (isOnlyOneSection()) {
+            throw new LineThatHasOnlyOneSectionCannotRemoveStationException();
+        }
+    }
+
+    private boolean isOnlyOneSection() {
+        return sections.size() < 2;
+    }
+
+    private boolean isNotTerminalStation(Station station) {
+        return getTerminalStation() != station;
     }
 }
