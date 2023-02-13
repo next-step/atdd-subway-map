@@ -1,5 +1,6 @@
-package subway.line;
+package subway.line.controller;
 
+import subway.line.Line;
 import subway.station.Station;
 
 import java.util.List;

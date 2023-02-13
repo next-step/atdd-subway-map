@@ -19,4 +19,8 @@ public class StationRestAssured {
                 .then().log().all()
                 .extract();
     }
+
+    public static Long getStationId(Map<String, String> param) {
+        return createStation(param).jsonPath().getLong("id");
+    }
 }

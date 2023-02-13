@@ -1,5 +1,7 @@
 package subway.station;
 
+import subway.station.controller.StationResponse;
+
 import javax.persistence.*;
 
 @Entity
