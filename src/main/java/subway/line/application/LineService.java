@@ -42,7 +42,8 @@ public class LineService {
                 line.getId(),
                 line.getName(),
                 line.getColor(),
-                findStations(line.getUpStationId(), line.getDownStationId()));
+                findStations(line.getUpStationId(), line.getDownStationId())
+        );
     }
 
     public List<LineResponse> findAllLines() {
@@ -52,7 +53,13 @@ public class LineService {
     }
 
     public LineResponse findLineById(Long id) {
-        return new LineResponse(lineRepository.findById(id).orElseThrow(LineNotFoundException::new));
+        Line line = lineRepository.findById(id).orElseThrow(LineNotFoundException::new);
+        return new LineResponse(
+                line.getId(),
+                line.getName(),
+                line.getColor(),
+                findStations(line.getUpStationId(), line.getDownStationId())
+        );
     }
 
     private LineResponse createLineResponse(Line line) {
