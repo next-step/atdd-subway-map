@@ -1,6 +1,6 @@
 package subway.station;
 
-import subway.station.controller.StationResponse;
+import subway.station.presentation.StationResponse;
 
 import javax.persistence.*;
 

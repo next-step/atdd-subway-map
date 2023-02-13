@@ -1,4 +1,4 @@
-package subway.station.controller;
+package subway.station.presentation;
 
 public class StationResponse {
     private Long id;

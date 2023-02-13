@@ -1,4 +1,4 @@
-package subway.line.controller;
+package subway.line.presentation;
 
 public class LineRequest {
 

@@ -8,7 +8,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import subway.line.controller.LineRequest;
+import subway.line.presentation.LineRequest;
 import subway.stations.StationRestAssured;
 
 import java.util.HashMap;
