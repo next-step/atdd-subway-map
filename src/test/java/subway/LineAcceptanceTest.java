@@ -24,7 +24,7 @@ public class LineAcceptanceTest {
     @DisplayName("지하철노선 생성")
     @Test
     void createLine(){
-        String[] lineName = new String[]{"왕십리역", "마장역"};
+        generateStations(new String[]{"왕십리역", "마장역"});
 
         Map<String, String> params = generateParams("신분당선", "bg-red-600", "1", "2", "10");
 
@@ -34,7 +34,7 @@ public class LineAcceptanceTest {
 
         //then
         List<String> lineNames = LineUtils.getLineNames();
-        assertThat(lineNames).containsAnyOf(lineName);
+        assertThat(lineNames).containsAnyOf("신분당선");
     }
 
 
@@ -103,13 +103,16 @@ public class LineAcceptanceTest {
 
         Map<String, String> updateParams = new HashMap<>();
         updateParams.put("name", "다른분당선");
-        updateParams.put("color", "bg-red-600");
+        updateParams.put("color", "bg-blue-600");
 
         //when
         response = LineUtils.updateLine(updateParams, id);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         //then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        List<String> lineNames = LineUtils.getLineNames();
+        assertThat(lineNames.size()).isEqualTo(1);
+        assertThat(lineNames).containsExactly("다른분당선");
     }
 
     /** Given 지하철 노선을 생성하고
@@ -135,8 +138,6 @@ public class LineAcceptanceTest {
         List<String> lineNames = LineUtils.getLineNames();
         assertThat(lineNames.size()).isEqualTo(0);
         assertThat(lineNames).doesNotContain("신분당선");
-
-
     }
 
     private Map<String, String> generateParams(String lineName, String color, String upStationId, String downStationId, String distance) {
