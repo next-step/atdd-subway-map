@@ -3,24 +3,22 @@ package subway.ui.dto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import subway.domain.Line;
-import subway.domain.Station;
 
 @Getter
 @NoArgsConstructor
-public class LineRequest {
-    private Long id;
+public class LineSaveRequest {
     private String name;
     private String color;
-    private Station upStation;
-    private Station downStation;
+    private Long upStationId;
+    private Long downStationId;
     private Integer distance;
 
     public Line toEntity() {
         return Line.builder()
                 .name(name)
                 .color(color)
-                .upStation(upStation)
-                .downStation(downStation)
+                .upStationId(upStationId)
+                .downStationId(downStationId)
                 .distance(distance)
                 .build();
     }

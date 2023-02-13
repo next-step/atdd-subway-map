@@ -5,8 +5,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.domain.Line;
 import subway.domain.LineRepository;
-import subway.ui.dto.LineRequest;
 import subway.ui.dto.LineResponse;
+import subway.ui.dto.LineSaveRequest;
+import subway.ui.dto.LineUpdateRequest;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,18 +34,17 @@ public class LineService {
     }
 
     @Transactional
-    public LineResponse save(LineRequest lineRequest) {
-        Line line = lineRepository.save(lineRequest.toEntity());
+    public LineResponse save(LineSaveRequest lineSaveRequest) {
+        Line line = lineRepository.save(lineSaveRequest.toEntity());
         return createLineResponse(line);
     }
 
     @Transactional
-    public Long update(Long id, LineRequest lineRequest) {
+    public Long update(Long id, LineUpdateRequest lineUpdateRequest) {
         Line line = lineRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("지하철 노선이 존재하지 않습니다."));
 
-        line.update(lineRequest.getName(), lineRequest.getColor());
-
+        line.update(lineUpdateRequest.getName(), lineUpdateRequest.getColor());
         return id;
     }
 
