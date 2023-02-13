@@ -93,10 +93,11 @@ public class Line {
 
     public void removeSelection(Long stationId){
         int removeIndex = stations.indexOf(stationId);
-        Long removeDistance = distances.get(removeIndex-1);
+        int distanceIndex = Math.max(removeIndex - 1, 0);
 
+        Long removeDistance = distances.get(distanceIndex);
         stations.remove(removeIndex);
-        distances.remove(removeIndex-1);
+        distances.remove(distanceIndex);
         downStationId = stations.get(stations.size()-1);
         totalDistance -= removeDistance;
     }

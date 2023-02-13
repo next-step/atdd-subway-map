@@ -120,11 +120,15 @@ public class LineService {
 
     private void validateRemoveLine(Line line, Long removeStationId) {
         if(!line.getStations().contains(removeStationId)){
-            throw new IllegalStateException("삭제될 구간은 노선에 포함되어 있어야 합니다.");
+            throw new IllegalStateException("삭제될 역은 노선에 포함되어 있어야 합니다.");
         }
 
         if (line.getStations().size() == 2) {
             throw new IllegalStateException("구간이 1개인 경우 역을 삭제 할 수 없습니다.");
+        }
+
+        if (line.getDownStationId() != removeStationId){
+            throw new IllegalStateException("삭제될 역은 노선의 하행 종점역 이여야 됩니다.");
         }
     }
 
