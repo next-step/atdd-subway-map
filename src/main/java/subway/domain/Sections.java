@@ -75,7 +75,7 @@ public class Sections {
                 .anyMatch(section -> section.isEqualDownStation(station));
     }
 
-    public void deleteBy(final Station station) {
+    public Distance deleteBy(final Station station) {
         if (sections.size() <= 1) {
             throw new IllegalArgumentException("구간을 삭제할 수 없습니다.");
         }
@@ -85,5 +85,6 @@ public class Sections {
                 .orElseThrow(IllegalArgumentException::new);
 
         sections.remove(section);
+        return section.getDistance();
     }
 }

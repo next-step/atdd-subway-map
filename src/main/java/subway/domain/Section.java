@@ -57,10 +57,6 @@ public class Section {
         return line;
     }
 
-    public void detachLine() {
-        this.line = null;
-    }
-
     public boolean contain(final Station station) {
         return isEqualDownStation(station) || isEqualUpStation(station);
     }

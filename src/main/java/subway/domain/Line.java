@@ -66,10 +66,6 @@ public class Line {
         return distance.getValue();
     }
 
-    public Station getUpStation() {
-        return sections.getUpStation();
-    }
-
     public Station getDownStation() {
         return sections.getDownStation();
     }
@@ -107,6 +103,6 @@ public class Line {
         if (!getDownStation().equals(station)) {
             throw new SectionConstraintException();
         }
-        sections.deleteBy(station);
+        this.distance.minus(sections.deleteBy(station));
     }
 }
