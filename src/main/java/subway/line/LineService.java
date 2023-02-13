@@ -3,6 +3,8 @@ package subway.line;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.section.Section;
+import subway.section.SectionRepository;
 import subway.station.Station;
 import subway.station.StationService;
 
@@ -13,6 +15,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class LineService {
     private final LineRepository lineRepository;
+    private final SectionRepository sectionRepository;
     private final StationService stationService;
 
     @Transactional
@@ -22,29 +25,43 @@ public class LineService {
 
         Line line = lineRepository.save(request.toEntity(upStation, downStation));
 
+        sectionRepository.save(new Section(line, upStation, downStation,
+            request.getDistance()));
+
         return LineResponse.of(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                List.of(line.getUpStation(), line.getUpStation()));
+            line.getId(),
+            line.getName(),
+            line.getColor(),
+            List.of(line.getUpStation(), line.getUpStation()), line.getUpStation(),
+            line.getDownStation());
     }
 
     @Transactional(readOnly = true)
     public List<LineResponse> findAllLines() {
         return lineRepository.findAll()
-                .stream().map(line -> LineResponse.of(
-                        line.getId(),
-                        line.getName(),
-                        line.getColor(),
-                        List.of(line.getUpStation(), line.getDownStation())))
-                .collect(Collectors.toList());
+            .stream().map(line -> LineResponse.of(
+                line.getId(),
+                line.getName(),
+                line.getColor(),
+                findAllStations(line), line.getUpStation(), line.getDownStation())
+            )
+            .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
     public LineResponse findLineById(Long id) {
         Line line = getLineById(id);
-        List<Station> stations = List.of(line.getUpStation(), line.getDownStation());
-        return LineResponse.of(line.getId(), line.getName(), line.getColor(), stations);
+        List<Station> stations = findAllStations(line);
+
+        return LineResponse.of(line.getId(), line.getName(), line.getColor(), stations,
+            line.getUpStation(), line.getDownStation());
+    }
+
+    private List<Station> findAllStations(Line line){
+        List<Station> stations = line.getSections().stream().map(Section::getUpStation).collect(
+            Collectors.toList());
+        stations.add(line.getDownStation());
+        return stations;
     }
 
     @Transactional
@@ -58,7 +75,8 @@ public class LineService {
         line.update(request.getName(), request.getColor());
     }
 
-    private Line getLineById(Long id) {
+    @Transactional(readOnly = true)
+    public Line getLineById(Long id) {
         return lineRepository.findById(id).orElseThrow(IllegalArgumentException::new);
     }
 }
