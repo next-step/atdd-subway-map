@@ -29,10 +29,6 @@ public class SectionAcceptanceTest {
     private final static String 신분당선_이름 = "신분당선";
     private final static String 신분당선_색 = "bg-red-600";
 
-    private final static Long 새로운_하행역_아이디 = 1L;
-    private final static Long 기존_하행역_아이디 = 2L;
-    private final static Long 기존_상행역_아이디 = 3L;
-
     private final static String 새로운_하행역_이름 = "새로운 구간의 지하철역";
     private final static String 기존_하행역_이름 = "기존 구간의 지하철역";
     private final static String 기존_상행역_이름 = "기존 구간의 다른 지하철역";
@@ -40,22 +36,27 @@ public class SectionAcceptanceTest {
     private final static Long 기존_노선_거리 = 10L;
     private final static Long 새로운_구간_거리 = 15L;
 
-    private final static LineRequest 신분당선 = LineRequest.of(
-            신분당선_이름, 신분당선_색, 기존_하행역_아이디, 기존_상행역_아이디, 기존_노선_거리);
+    private LineRequest 신분당선;
 
-    private final static SectionRequest 새로운_구간 = new SectionRequest(
-            새로운_하행역_아이디, 기존_하행역_아이디, 새로운_구간_거리
-    );
+    private SectionRequest 새로운_구간;
 
-    private final static SectionRequest 예외_구간 = new SectionRequest(
-            기존_상행역_아이디, 새로운_하행역_아이디, 새로운_구간_거리
-    );
+    private SectionRequest 예외_구간;
 
     @BeforeEach
     void setUp() {
-        지하철역_생성_요청(새로운_하행역_이름);
-        지하철역_생성_요청(기존_하행역_이름);
-        지하철역_생성_요청(기존_상행역_이름);
+        Long 새로운_하행역_아이디 = 지하철역_생성_요청(새로운_하행역_이름).jsonPath().getLong("id");
+        Long 기존_하행역_아이디 = 지하철역_생성_요청(기존_하행역_이름).jsonPath().getLong("id");
+        Long 기존_상행역_아이디 = 지하철역_생성_요청(기존_상행역_이름).jsonPath().getLong("id");
+
+        신분당선 = LineRequest.of(
+                신분당선_이름, 신분당선_색, 기존_하행역_아이디, 기존_상행역_아이디, 기존_노선_거리);
+
+        새로운_구간 = new SectionRequest(
+                새로운_하행역_아이디, 기존_하행역_아이디, 새로운_구간_거리
+        );
+        예외_구간 = new SectionRequest(
+                기존_상행역_아이디, 새로운_하행역_아이디, 새로운_구간_거리
+        );
     }
 
     /**
