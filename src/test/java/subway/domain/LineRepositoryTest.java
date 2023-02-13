@@ -26,19 +26,15 @@ public class LineRepositoryTest {
     void findAllLines() {
         String name = "신분당선";
         String color = "bg-red-600";
-        Station upStation = Station.builder()
-                .name("강남역")
-                .build();
-        Station downStation = Station.builder()
-                .name("광교역")
-                .build();
+        Long upStationId = Long.valueOf(1);
+        Long downStationId = Long.valueOf(2);
         Integer distance = 10;
 
         lineRepository.save(Line.builder()
                 .name(name)
                 .color(color)
-                .upStation(upStation)
-                .downStation(downStation)
+                .upStationId(upStationId)
+                .downStationId(downStationId)
                 .distance(distance)
                 .build());
 
@@ -47,8 +43,8 @@ public class LineRepositoryTest {
 
         assertThat(line.getName()).isEqualTo(name);
         assertThat(line.getColor()).isEqualTo(color);
-        assertThat(line.getUpStation().getName()).isEqualTo(upStation.getName());
-        assertThat(line.getDownStation().getName()).isEqualTo(downStation.getName());
+        assertThat(line.getUpStationId()).isEqualTo(upStationId);
+        assertThat(line.getDownStationId()).isEqualTo(downStationId);
         assertThat(line.getDistance()).isEqualTo(distance);
     }
 }

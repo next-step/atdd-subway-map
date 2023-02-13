@@ -5,14 +5,11 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
 
 
 @Getter
@@ -30,21 +27,21 @@ public class Line {
     @Column(length = 100, nullable = false)
     private String color;
 
-    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
-    private Station upStation;
+    @Column
+    private Long upStationId;
 
-    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
-    private Station downStation;
+    @Column
+    private Long downStationId;
 
     @Column
     private Integer distance;
 
     @Builder
-    public Line(String name, String color, Station upStation, Station downStation, Integer distance) {
+    public Line(String name, String color, Long upStationId, Long downStationId, Integer distance) {
         this.name = name;
         this.color = color;
-        this.upStation = upStation;
-        this.downStation = downStation;
+        this.upStationId = upStationId;
+        this.downStationId = downStationId;
         this.distance = distance;
     }
 
