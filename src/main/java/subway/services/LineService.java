@@ -6,7 +6,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.dto.request.LineRequest;
+import subway.dto.request.SectionRequest;
 import subway.models.Line;
+import subway.models.Section;
+import subway.models.Sections;
 import subway.models.Station;
 import subway.repositories.LineRepository;
 
@@ -52,5 +55,28 @@ public class LineService {
     @Transactional
     public void deleteById(Long id) {
         lineRepository.deleteById(id);
+    }
+
+    @Transactional
+    public Line addSection(Long id, SectionRequest request) {
+        Line line = findById(id);
+        Station upStation = stationService.findById(request.getUpStationId());
+        Station downStation = stationService.findById(request.getDownStationId());
+
+        validateSection(line.getSections(), upStation, downStation);
+
+        line.addSection(Section.builder()
+            .line(line)
+            .upStation(upStation)
+            .downStation(downStation)
+            .distance(request.getDistance())
+            .build());
+
+        return lineRepository.save(line);
+    }
+
+    private void validateSection(Sections sections, Station upStation, Station downStation) {
+        sections.validateUpStation(upStation);
+        sections.validateDownStation(downStation);
     }
 }

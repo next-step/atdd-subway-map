@@ -22,6 +22,22 @@ public class Sections {
         return sections.stream()
             .map(Section::getStations)
             .flatMap(Collection::stream)
+            .distinct()
             .collect(Collectors.toList());
+    }
+
+    public void validateUpStation(Station upStation) {
+        Station downwardEndPoint = sections.get(sections.size() - 1).getDownStation();
+        if (!downwardEndPoint.getId().equals(upStation.getId())) {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    public void validateDownStation(Station downStation) {
+        getStations().forEach(station -> {
+            if (downStation.getId().equals(station.getId())) {
+                throw new IllegalArgumentException();
+            }
+        });
     }
 }

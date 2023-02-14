@@ -10,45 +10,55 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import subway.dto.request.LineRequest;
+import subway.dto.request.SectionRequest;
 import subway.dto.response.LineResponse;
 import subway.models.Line;
 import subway.services.LineService;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/lines")
 public class LineController {
     private final LineService lineService;
 
-    @PostMapping("/lines")
+    @PostMapping()
     public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest.Create lineRequest) {
         Line line = lineService.saveLine(lineRequest);
         return ResponseEntity.created(URI.create("/lines/" + line.getId()))
             .body(LineResponse.of(line));
     }
 
-    @GetMapping(value = "/lines")
+    @GetMapping()
     public ResponseEntity<List<LineResponse>> showStations() {
         return ResponseEntity.ok().body(LineResponse.of(lineService.findAllLines()));
     }
 
-    @GetMapping(value = "/lines/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<LineResponse> showStation(@PathVariable Long id) {
         return ResponseEntity.ok().body(LineResponse.of(lineService.findById(id)));
     }
 
-    @PutMapping(value = "/lines/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<Void> updateStation(@PathVariable Long id,
         @RequestBody LineRequest.Update lineRequest) {
         lineService.update(id, lineRequest);
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping(value = "/lines/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteStation(@PathVariable Long id) {
         lineService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/{id}/sections")
+    public ResponseEntity<LineResponse> createSection(@PathVariable Long id,
+        @RequestBody SectionRequest sectionRequest) {
+        Line line = lineService.addSection(id, sectionRequest);
+        return ResponseEntity.created(URI.create("/lines/" + line.getId()))
+            .body(LineResponse.of(line));
+    }
 }
