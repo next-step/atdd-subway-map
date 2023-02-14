@@ -16,7 +16,7 @@ import subway.exception.IllegalSectionException;
 @Embeddable
 public class Sections {
 
-    @OneToMany(mappedBy = "lineId", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "lineId", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private List<Section> sectionList = new ArrayList<>();
 
     public void add(Section newSection) {
