@@ -20,15 +20,13 @@ public class Sections {
     private List<Section> sectionList = new ArrayList<>();
 
     public void add(Section newSection) {
-        if (unMatchUpStationAndDownStation(newSection)) {
-            throw new IllegalSectionException();
-        }
-
-        if (containStationAlready(newSection.getDownStation())) {
-            throw new IllegalSectionException();
-        }
-
+        validateAdd(newSection);
         sectionList.add(newSection);
+    }
+
+    private void validateAdd(Section newSection) {
+        unMatchStationThrowException(newSection);
+        alreadyContainStationThrowException(newSection.getDownStation());
     }
 
     public void delete(Station station) {
@@ -43,21 +41,26 @@ public class Sections {
         sectionList.remove(sectionList.size() - 1);
     }
 
-    private boolean unMatchUpStationAndDownStation(Section newSection) {
+    private void unMatchStationThrowException(Section newSection) {
         if (sectionList.isEmpty()) {
-            return false;
+            return;
         }
-        return !newSection.getUpStation().equals(lastSection().getDownStation());
+        if (!newSection.getUpStation().equals(lastSection().getDownStation())) {
+            throw new IllegalSectionException();
+        }
     }
 
-    private boolean containStationAlready(Station downStation) {
-        List<Station> stations = sectionList.stream()
+    private void alreadyContainStationThrowException(Station downStation) {
+        boolean contains = sectionList.stream()
             .map(data -> List.of(data.getUpStation(), data.getDownStation()))
             .flatMap(Collection::stream)
             .distinct()
-            .collect(Collectors.toList());
+            .collect(Collectors.toList())
+            .contains(downStation);
 
-        return stations.contains(downStation);
+        if (contains) {
+            throw new IllegalSectionException();
+        }
     }
 
     public int getTotalDistance() {
