@@ -30,6 +30,11 @@ public class Sections {
     }
 
     public void delete(Station station) {
+        validateDelete(station);
+        sectionList.remove(sectionList.size() - 1);
+    }
+
+    private void validateDelete(Station station) {
         if (sectionList.isEmpty()) {
             throw new IllegalSectionException();
         }
@@ -37,8 +42,6 @@ public class Sections {
         if (!station.equals(lastSection().getDownStation())) {
             throw new IllegalSectionException();
         }
-
-        sectionList.remove(sectionList.size() - 1);
     }
 
     private void unMatchStationThrowException(Section newSection) {
