@@ -24,8 +24,6 @@ public class Section {
     private Long id;
     @Column
     private Long distance;
-    @Column
-    private Integer sequence;
     @ManyToOne
     private Line line;
     @ManyToOne
@@ -34,11 +32,9 @@ public class Section {
     private Station downStation;
 
     @Builder
-    private Section(@NonNull Long distance, @NonNull Integer sequence,
-        @NonNull Line line, @NonNull Station upStation,
+    private Section(@NonNull Long distance, @NonNull Line line, @NonNull Station upStation,
         Station downStation) {
         this.distance = distance;
-        this.sequence = sequence;
         this.line = line;
         this.upStation = upStation;
         this.downStation = downStation;

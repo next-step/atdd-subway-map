@@ -30,13 +30,10 @@ public class Line {
     @Builder
     private Line(@NonNull String name, @NonNull String color, @NonNull Station upStation,
         @NonNull Station downStation, @NonNull Long distance) {
-        int FIRST = 1;
-
         this.name = name;
         this.color = color;
         addSection(Section.builder()
             .line(this)
-            .sequence(FIRST)
             .downStation(downStation)
             .upStation(upStation)
             .distance(distance)
