@@ -1,18 +1,24 @@
 package subway.dto;
 
-public class LineRequest {
+import subway.domain.Line;
+import subway.domain.Section;
+import subway.domain.Station;
+
+import java.util.List;
+
+public class LineRequest implements SectionCreateReader {
 
     private String name;
     private String color;
-    private Long upStationId;
     private Long downStationId;
+    private Long upStationId;
     private Long distance;
 
-    private LineRequest(String name, String color, Long upStationId, Long downStationId, Long distance) {
+    private LineRequest(String name, String color, Long downStationId, Long upStationId, Long distance) {
         this.name = name;
         this.color = color;
-        this.upStationId = upStationId;
         this.downStationId = downStationId;
+        this.upStationId = upStationId;
         this.distance = distance;
     }
 
@@ -37,7 +43,7 @@ public class LineRequest {
     }
 
     public static LineRequest of(
-            String name, String color, Long upStationId, Long downStationId, Long distance) {
-        return new LineRequest(name, color, upStationId, downStationId, distance);
+            String name, String color, Long downStationId, Long upStationId, Long distance) {
+        return new LineRequest(name, color, downStationId, upStationId, distance);
     }
 }

@@ -1,7 +1,6 @@
 package subway.domain;
 
-import subway.exception.StationNotFoundException;
-
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -17,14 +16,10 @@ public class Line {
 
     private String color;
 
-    private Long upStationId;
-
-    private Long downStationId;
-
-    private Long distance;
+    @Embedded
+    private Sections sections = new Sections();
 
     protected Line() {
-
     }
 
     public Long getId() {
@@ -39,34 +34,34 @@ public class Line {
         return color;
     }
 
-    public Long getUpStationId() {
-        return upStationId;
-    }
-
-    public Long getDownStationId() {
-        return downStationId;
-    }
-
-    public Long getDistance() {
-        return distance;
-    }
-
-    public Line(String name, String color, Long upStationId, Long downStationId, Long distance) {
+    public Line(String name, String color, Section section) {
         this.name = name;
         this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
-        this.distance = distance;
-    }
-
-    public static void validateStations(Long upStationId, Long downStationId) {
-        if (upStationId == null || downStationId == null) {
-            throw new StationNotFoundException();
-        }
+        this.sections.addSection(section);
     }
 
     public void update(String name, String color) {
         this.name = name;
         this.color =color;
+    }
+
+    public Long getTotalDistance() {
+        return sections.getTotalDistance();
+    }
+
+    public Station getDownStation() {
+        return sections.getDownStation();
+    }
+
+    public Station getUpStation() {
+        return sections.getUpStation();
+    }
+
+    public void addSection(Section section) {
+        sections.addSection(section);
+    }
+
+    public Section deleteSection(Long stationId) {
+        return sections.deleteSection(stationId);
     }
 }

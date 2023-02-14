@@ -16,30 +16,31 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.station.StationAcceptanceTest.createStationByName;
+import static subway.station.StationAcceptanceTest.지하철역_생성_요청;
 
 @DisplayName("노선 관련 기능")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {
 
-    private final String 신분당선_이름 = "신분당선";
-    private final String 신분당선_색 = "bg-red-600";
-    private final String 분당선_이름 = "분당선";
-    private final String 다른분당선_이름 = "다른분당선";
-    private final String 다른분당선_색 = "bg-red-600";
+    private final static String 신분당선_이름 = "신분당선";
+    private final static String 신분당선_색 = "bg-red-600";
+    private final static String 분당선_이름 = "분당선";
+    private final static String 분당선_색 = "bg-green-600";
+    private final static String 다른분당선_이름 = "다른분당선";
+    private final static String 다른분당선_색 = "bg-red-600";
 
 
     private final static LineRequest 신분당선 = LineRequest.of(
-            "신분당선", "bg-red-600", 1L, 2L, 10L);
+            신분당선_이름, 신분당선_색, 1L, 2L, 10L);
     private final static LineRequest 분당선 = LineRequest.of(
-            "분당선", "bg-green-600", 1L, 3L, 15L);
+            분당선_이름, 분당선_색, 1L, 3L, 15L);
 
     @BeforeEach
     void setUp() {
-        createStationByName("지하철역");
-        createStationByName("새로운지하철역");
-        createStationByName("또다른지하철역");
+        지하철역_생성_요청("지하철역");
+        지하철역_생성_요청("새로운지하철역");
+        지하철역_생성_요청("또다른지하철역");
     }
 
     /**
@@ -50,8 +51,8 @@ public class LineAcceptanceTest {
     @Test
     void 노선_생성() {
         //when
-        createLine(신분당선);
-        List<String> lineNames = getLines()
+        노선_생성_요청(신분당선);
+        List<String> lineNames = 노선_목록_조회_요청()
                 .jsonPath().getList("name", String.class);
 
         //Then
@@ -67,11 +68,11 @@ public class LineAcceptanceTest {
     @Test
     void 노선_목록_조회() {
         //Given
-        createLine(신분당선);
-        createLine(분당선);
+        노선_생성_요청(신분당선);
+        노선_생성_요청(분당선);
 
         //When
-        List<String> lineNames = getLines()
+        List<String> lineNames = 노선_목록_조회_요청()
                 .jsonPath().getList("name", String.class);
 
         //Then
@@ -87,10 +88,11 @@ public class LineAcceptanceTest {
     @Test
     void 노선_조회() {
         //Given
-        Long id = getCreatedLineId(신분당선);
+        Long id = 노선_생성_요청(신분당선)
+                .jsonPath().getLong("id");
 
         //When
-        ExtractableResponse<Response> response = readLine(id);
+        ExtractableResponse<Response> response = 노선_조회_요청(id);
 
         //Then
         String name = response.jsonPath().get("name");
@@ -108,11 +110,12 @@ public class LineAcceptanceTest {
     @Test
     void 노선_수정() {
         //Given
-        long updateId = getCreatedLineId(신분당선);
+        Long updateId = 노선_생성_요청(신분당선)
+                .jsonPath().getLong("id");
 
         //When
-        updateLine(updateId, 다른분당선_이름, 다른분당선_색);
-        ExtractableResponse<Response> response = readLine(updateId);
+        노선_수정_요청(updateId, 다른분당선_이름, 다른분당선_색);
+        ExtractableResponse<Response> response = 노선_조회_요청(updateId);
 
         //Then
         assertThat(response.jsonPath().getString("name")).isEqualTo(다른분당선_이름);
@@ -128,26 +131,27 @@ public class LineAcceptanceTest {
     @Test
     void 노선_삭제() {
         //Given
-        long deleteId = getCreatedLineId(신분당선);
-        createLine(분당선);
+        Long deleteId = 노선_생성_요청(신분당선)
+                .jsonPath().getLong("id");
+        노선_생성_요청(분당선);
 
         //When
-        deleteLine(deleteId);
-        List<String> lineNames = getLines()
+        노선_삭제_요청(deleteId);
+        List<String> lineNames = 노선_목록_조회_요청()
                 .jsonPath().getList("name", String.class);
 
         //Then
         assertThat(lineNames).doesNotContain(신분당선_이름);
     }
 
-    private static ExtractableResponse<Response> deleteLine(Long id) {
+    private static ExtractableResponse<Response> 노선_삭제_요청(Long id) {
         return RestAssured.given().log().all()
                 .when().delete("lines/{id}", id)
                 .then().log().all()
                 .extract();
     }
 
-    private static ExtractableResponse<Response> createLine(LineRequest request) {
+    public static ExtractableResponse<Response> 노선_생성_요청(LineRequest request) {
 
         return RestAssured.given().log().all()
                 .body(request)
@@ -157,26 +161,26 @@ public class LineAcceptanceTest {
                 .extract();
     }
 
-    private static long getCreatedLineId(LineRequest request) {
-        return createLine(request)
+    public static long createLineAndGetId(LineRequest request) {
+        return 노선_생성_요청(request)
                 .jsonPath().getLong("id");
     }
 
-    private static ExtractableResponse<Response> getLines() {
+    private static ExtractableResponse<Response> 노선_목록_조회_요청() {
         return RestAssured.given().log().all()
                 .when().get("/lines")
                 .then().log().all()
                 .extract();
     }
 
-    private static ExtractableResponse<Response> readLine(Long id) {
+    public static ExtractableResponse<Response> 노선_조회_요청(Long id) {
         return RestAssured.given().log().all()
                 .when().get("lines/{id}", id)
                 .then().log().all()
                 .extract();
     }
 
-    private static ExtractableResponse<Response> updateLine(Long id, String name, String color) {
+    private static ExtractableResponse<Response> 노선_수정_요청(Long id, String name, String color) {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
         params.put("color", color);
