@@ -20,6 +20,8 @@ import subway.station.StationAcceptanceTest;
 @DisplayName("지하철역 구간 관련 기능")
 public class SectionAcceptanceTest extends AbstractAcceptanceTest {
 
+    public static final String LINES_SECTIONS_BASE_URL = "/lines/{lineId}/sections";
+
     private Long aStationId;
 
     private Long bStationId;
@@ -198,7 +200,7 @@ public class SectionAcceptanceTest extends AbstractAcceptanceTest {
                         .build()
                     )
             .when()
-                .post("/lines/{lineId}/sections", lineId)
+                .post(LINES_SECTIONS_BASE_URL, lineId)
             .then()
                 .log().all()
                 .extract().jsonPath().getObject("$", SectionResponse.class);
@@ -209,7 +211,7 @@ public class SectionAcceptanceTest extends AbstractAcceptanceTest {
             .given()
                 .param("stationId", stationId)
             .when()
-                .delete("/lines/{lineId}/sections", lineId)
+                .delete(LINES_SECTIONS_BASE_URL, lineId)
             .then()
                 .log().all()
                 .extract();
@@ -219,7 +221,7 @@ public class SectionAcceptanceTest extends AbstractAcceptanceTest {
         return RestAssured
             .given()
             .when()
-                .get("/lines/{lineId}/sections/{sectionId}", lineId, sectionId)
+                .get( LINES_SECTIONS_BASE_URL + "/{sectionId}", lineId, sectionId)
             .then()
                 .log().all()
                 .extract();
@@ -233,7 +235,7 @@ public class SectionAcceptanceTest extends AbstractAcceptanceTest {
         return RestAssured
             .given()
             .when()
-                .get("/lines/{lineId}/sections", lineId)
+                .get(LINES_SECTIONS_BASE_URL, lineId)
             .then()
                 .log().all()
                 .extract().jsonPath().getList("$", SectionResponse.class);

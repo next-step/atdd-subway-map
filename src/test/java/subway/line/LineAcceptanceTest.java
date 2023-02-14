@@ -87,7 +87,6 @@ public class LineAcceptanceTest extends AbstractAcceptanceTest {
     @Test
     void searchLine() {
         // Given
-        System.out.println(RestAssured.port);
         LineResponse givenLine = createLine(LINE_1, BLUE_COLOR, upStationId, downStationId, 20);
 
         // When

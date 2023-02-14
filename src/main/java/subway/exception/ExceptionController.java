@@ -15,7 +15,7 @@ public class ExceptionController {
         NotFoundSectionException.class
     })
     public ResponseEntity<?> notFoundException(Exception e) {
-        log.info("Not Found Exception: {}", e.getMessage(), e);
+        log.error("Not Found Exception: {}", e.getMessage(), e);
 
         return ResponseEntity.notFound().build();
     }
@@ -26,7 +26,7 @@ public class ExceptionController {
         CannotRemoveLineSectionException.class
     })
     public ResponseEntity<?> badRequestException(Exception e) {
-        log.info("Bad Request Exception: {}", e.getMessage(), e);
+        log.error("Bad Request Exception: {}", e.getMessage(), e);
 
         return ResponseEntity.badRequest().build();
     }
