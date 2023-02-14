@@ -144,6 +144,21 @@ public class SectionAcceptanceTest {
         AssertUtils.응답_상태_코드_검증(노선_구간_생성(lineId, sectionParams), HttpStatus.BAD_REQUEST);
     }
 
+    @DisplayName("새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없다.")
+    @Test
+    void 새로운_구간의_하행역은_해당_노선에_등록되어있는_역일_수_없다() {
+        // When
+        Map<String, Object> sectionParams = new HashMap<>();
+        sectionParams.put("upStationId", deokSoStation.getId());
+        sectionParams.put("downStationId", gangNamStation.getId());
+        sectionParams.put("distance", 10);
+
+        Long lineId = newBunDangLine.getId();
+
+        //Then
+        AssertUtils.응답_상태_코드_검증(노선_구간_생성(lineId, sectionParams), HttpStatus.BAD_REQUEST);
+    }
+
     @DisplayName("구간이 1개인 경우 삭제하면 삭제가 되지 않는다.")
     @Test
     void 구간이_1개인_경우_삭제하면_삭제가_되지_않는다() {
