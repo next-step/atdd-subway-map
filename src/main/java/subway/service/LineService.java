@@ -17,7 +17,6 @@ import subway.dto.response.SectionResponse;
 import subway.exception.NoLineException;
 import subway.exception.NoStationException;
 import subway.repository.LineRepository;
-import subway.repository.SectionRepository;
 import subway.repository.StationRepository;
 
 @Service
@@ -26,13 +25,12 @@ public class LineService {
 
     private final LineRepository lineRepository;
     private final StationRepository stationRepository;
-    private final SectionRepository sectionRepository;
 
     @Transactional
     public LineResponse createLine(LineRequest request) {
 
         Line line = lineRepository.save(lineBuilder(request));
-        Section section = sectionRepository.save(sectionBuilder(line.getId(), SectionRequest.of(request)));
+        Section section = sectionBuilder(line.getId(), SectionRequest.of(request));
         line.addSection(section);
 
         return LineResponse.of(line);

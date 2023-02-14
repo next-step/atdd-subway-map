@@ -146,7 +146,7 @@ class LineAcceptanceTest {
             .extract();
     }
 
-    public static List<String> 노선_목록_조회() {
+    private static List<String> 노선_목록_조회() {
         return RestAssured.given().log().all()
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .when()
