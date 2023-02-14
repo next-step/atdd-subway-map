@@ -1,13 +1,15 @@
 package subway.domain;
 
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-
-import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -30,10 +32,20 @@ public class Line {
     private String color;
 
     @Embedded
-    @JsonBackReference
     private Sections sections = new Sections();
 
     private int lineDistance;
+
+    public List<Station> getStations() {
+        List<Section> sections = this.sections.getSectionList();
+
+        var upStations = sections.stream().map(Section::getUpStation);
+        var downStations = sections.stream().map(Section::getDownStation);
+
+        return Stream.concat(upStations, downStations)
+            .distinct()
+            .collect(Collectors.toList());
+    }
 
     public void modify(String name, String color) {
         this.name = name;
