@@ -80,7 +80,7 @@ public class LineAcceptanceTest {
         Map<String, String> 신분당선_파라미터 = 신분당선_파라미터_생성(강남역_ID, 방배역_ID);
         Map<String, String> 분당선_파라미터 = 분당선_파라미터_생성(강남역_ID, 역삼역_ID);
         List<Map<String, String>> params = Arrays.asList(신분당선_파라미터, 분당선_파라미터);
-        params.forEach(this::지하철_노선_생성);
+        params.forEach(LineAcceptanceTest::지하철_노선_생성);
 
         // when
         ExtractableResponse<Response> 지하철_노선_목록_조회_응답 = 지하철_노선_목록_조회();
@@ -159,7 +159,7 @@ public class LineAcceptanceTest {
             () -> 적절한_응답_코드를_받을_수_있다(지하철_노선_조회_응답, HttpStatus.OK));
     }
 
-    private ExtractableResponse<Response> 지하철_노선_생성(Map<String, String> params) {
+    public static ExtractableResponse<Response> 지하철_노선_생성(Map<String, String> params) {
         return RestAssured.given().log().all()
             .body(params)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -175,7 +175,7 @@ public class LineAcceptanceTest {
             .extract();
     }
 
-    private ExtractableResponse<Response> 지하철_노선_조회(Long id) {
+    public static ExtractableResponse<Response> 지하철_노선_조회(Long id) {
         return RestAssured.given().log().all()
             .when().get("/lines/{id}", id)
             .then().log().all()
