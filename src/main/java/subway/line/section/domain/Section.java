@@ -17,15 +17,19 @@ public class Section {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "up_station_id", referencedColumnName = "id")
     private Station upStation;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "down_station_id", referencedColumnName = "id")
     private Station downStation;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(referencedColumnName = "id")
+    @JoinColumn(name = "line_id", referencedColumnName = "id")
     private Line line;
+
     @Column(nullable = false)
     private Long distance;
 

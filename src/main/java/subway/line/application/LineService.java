@@ -12,6 +12,9 @@ import subway.line.domain.Line;
 import subway.line.domain.LineRepository;
 import subway.line.dto.LineRequest;
 import subway.line.dto.LineResponse;
+import subway.line.section.domain.Section;
+import subway.line.section.dto.SectionRequest;
+import subway.line.section.dto.SectionResponse;
 import subway.station.domain.Station;
 import subway.station.domain.StationRepository;
 import subway.station.dto.StationResponse;
@@ -28,10 +31,8 @@ public class LineService {
 
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
-        Station upStation = stationRepository.findById(lineRequest.getUpStationId())
-            .orElseThrow(() -> new NotFoundException(ErrorMessage.STATION_NOT_FOUND));
-        Station downStation = stationRepository.findById(lineRequest.getDownStationId())
-            .orElseThrow(() -> new NotFoundException(ErrorMessage.STATION_NOT_FOUND));
+        Station upStation = getStation(lineRequest.getUpStationId());
+        Station downStation = getStation(lineRequest.getDownStationId());
 
         Line line = lineRepository.save(new Line(
             lineRequest.getName(),
@@ -40,8 +41,6 @@ public class LineService {
             downStation,
             lineRequest.getDistance())
         );
-        line.addStation(upStation);
-        line.addStation(downStation);
 
         return createLineResponse(line);
     }
@@ -54,14 +53,12 @@ public class LineService {
 
     public LineResponse findLineById(Long id) {
         return createLineResponse(
-            lineRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.LINE_NOT_FOUND))
+            getLine(id)
         );
     }
 
     public void updateLineById(Long id, LineRequest lineRequest) {
-        Line line = lineRepository.findById(id)
-            .orElseThrow(() -> new NotFoundException(ErrorMessage.LINE_NOT_FOUND));
+        Line line = getLine(id);
 
         line.changeLine(lineRequest.getName(), lineRequest.getColor());
         lineRepository.save(line);
@@ -71,13 +68,56 @@ public class LineService {
         lineRepository.deleteById(id);
     }
 
+    @Transactional
+    public SectionResponse createSection(Long lineId, SectionRequest sectionRequest) {
+        Line line = getLine(lineId);
+        Station upStation = getStation(sectionRequest.getUpStationId());
+        Station downStation = getStation(sectionRequest.getDownStationId());
+
+        Section section = new Section(
+            upStation,
+            downStation,
+            line, sectionRequest.getDistance());
+
+        line.createSection(section);
+
+        return createSectionResponse(section);
+    }
+
+    @Transactional
+    public void deleteSection(Long lineId, Long stationId) {
+        Line line = getLine(lineId);
+        Station station = getStation(stationId);
+
+        line.deleteSection(station);
+    }
+
+    private Line getLine(Long lineId) {
+        return lineRepository.findById(lineId)
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.LINE_NOT_FOUND));
+    }
+
+    private Station getStation(Long stationId) {
+        return stationRepository.findById(stationId)
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.STATION_NOT_FOUND));
+    }
+
+    private SectionResponse createSectionResponse(Section section) {
+        return new SectionResponse(
+            section.getId(),
+            List.of(new StationResponse(section.getUpStation().getId(), section.getUpStation().getName()),
+                new StationResponse(section.getDownStation().getId(), section.getDownStation().getName()))
+        );
+    }
+
     private LineResponse createLineResponse(Line line) {
         return new LineResponse(
             line.getId(),
             line.getName(),
             line.getColor(),
-            List.of(new StationResponse(line.getUpStation().getId(), line.getUpStation().getName()),
-                new StationResponse(line.getDownStation().getId(), line.getDownStation().getName()))
+            line.getAllStations().stream()
+                .map(station -> new StationResponse(station.getId(), station.getName()))
+                .collect(Collectors.toList())
         );
     }
 }

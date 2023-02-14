@@ -94,7 +94,7 @@ public class SectionAcceptanceTest {
 
         // Then
         AssertUtils.응답_상태_코드_검증(response, HttpStatus.CREATED);
-        Long downStationId = LineAcceptanceTest.지하철_노선_조회(lineId).body().jsonPath().getLong("stations[1].id");
+        Long downStationId = LineAcceptanceTest.지하철_노선_조회(lineId).body().jsonPath().getLong("stations[2].id");
         assertThat(downStationId).isEqualTo(daSanStation.getId());
     }
 
