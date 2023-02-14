@@ -3,20 +3,19 @@ package subway.dto.response;
 import lombok.Getter;
 import subway.domain.Line;
 import subway.domain.Section;
-import subway.domain.Station;
 
 @Getter
 public class SectionResponse {
 
-    private Line line;
-    private Station upStation;
-    private Station downStation;
-    private int distance;
+    private final LineResponse line;
+    private final StationResponse upStation;
+    private final StationResponse downStation;
+    private final int distance;
 
     public SectionResponse(Line line, Section section) {
-        this.line = line;
-        this.upStation = section.getUpStation();
-        this.downStation = section.getDownStation();
+        this.line = LineResponse.of(line);
+        this.upStation = StationResponse.of(section.getUpStation());
+        this.downStation = StationResponse.of(section.getDownStation());
         this.distance = section.getDistance();
     }
 }
