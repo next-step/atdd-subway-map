@@ -12,11 +12,13 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Section {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -32,7 +34,8 @@ public class Section {
     private Station downStation;
 
     @Builder
-    private Section(Long distance, Integer sequence, Line line, Station upStation,
+    private Section(@NonNull Long distance, @NonNull Integer sequence,
+        @NonNull Line line, @NonNull Station upStation,
         Station downStation) {
         this.distance = distance;
         this.sequence = sequence;

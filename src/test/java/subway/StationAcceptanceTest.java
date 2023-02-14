@@ -17,9 +17,9 @@ import java.util.Map;
 import subway.common.DatabaseCleanup;
 
 import static subway.common.ResponseUtils.ID_추출;
-import static subway.common.ResponseUtils.httpStatus_확인;
-import static subway.common.ResponseUtils.목록_개수_및_이름_확인;
-import static subway.common.ResponseUtils.목록에_이름_없음;
+import static subway.common.ResponseUtils.적절한_응답_코드를_받을_수_있다;
+import static subway.common.ResponseUtils.n개의_이름_목록을_조회할_수_있다;
+import static subway.common.ResponseUtils.목록에서_이름을_찾을_수_없다;
 import static subway.fixtures.StationFixtures.강남역;
 import static subway.fixtures.StationFixtures.방배역;
 
@@ -47,11 +47,11 @@ public class StationAcceptanceTest {
         ExtractableResponse<Response> 강남역_생성_응답 = 지하철역_생성(강남역);
 
         // then
-        httpStatus_확인(강남역_생성_응답, HttpStatus.CREATED);
+        적절한_응답_코드를_받을_수_있다(강남역_생성_응답, HttpStatus.CREATED);
 
         ExtractableResponse<Response> 지하철역_목록_조회_응답 = 지하철역_목록_조회();
-        httpStatus_확인(지하철역_목록_조회_응답, HttpStatus.OK);
-        목록_개수_및_이름_확인(지하철역_목록_조회_응답, new String[]{강남역});
+        적절한_응답_코드를_받을_수_있다(지하철역_목록_조회_응답, HttpStatus.OK);
+        n개의_이름_목록을_조회할_수_있다(지하철역_목록_조회_응답, new String[]{강남역});
     }
 
     /**
@@ -70,8 +70,8 @@ public class StationAcceptanceTest {
         ExtractableResponse<Response> 지하철역_목록_조회_응답 = 지하철역_목록_조회();
 
         // then
-        httpStatus_확인(지하철역_목록_조회_응답, HttpStatus.OK);
-        목록_개수_및_이름_확인(지하철역_목록_조회_응답, stations);
+        적절한_응답_코드를_받을_수_있다(지하철역_목록_조회_응답, HttpStatus.OK);
+        n개의_이름_목록을_조회할_수_있다(지하철역_목록_조회_응답, stations);
     }
 
     /**
@@ -89,8 +89,8 @@ public class StationAcceptanceTest {
         ExtractableResponse<Response> 지하철역_삭제_응답 = 지하철역_삭제(강남역_ID);
 
         // then
-        httpStatus_확인(지하철역_삭제_응답, HttpStatus.NO_CONTENT);
-        목록에_이름_없음(지하철역_목록_조회(), 강남역);
+        적절한_응답_코드를_받을_수_있다(지하철역_삭제_응답, HttpStatus.NO_CONTENT);
+        목록에서_이름을_찾을_수_없다(지하철역_목록_조회(), 강남역);
     }
 
     public static ExtractableResponse<Response> 지하철역_생성(String name) {

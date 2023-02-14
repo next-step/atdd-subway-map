@@ -4,8 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static subway.StationAcceptanceTest.지하철역_생성;
 import static subway.common.ResponseUtils.ID_추출;
-import static subway.common.ResponseUtils.httpStatus_확인;
-import static subway.common.ResponseUtils.목록_개수_및_이름_확인;
+import static subway.common.ResponseUtils.적절한_응답_코드를_받을_수_있다;
+import static subway.common.ResponseUtils.n개의_이름_목록을_조회할_수_있다;
 import static subway.fixtures.LineFixtures.분당선_파라미터_생성;
 import static subway.fixtures.LineFixtures.신분당선_수정_파라미터_생성;
 import static subway.fixtures.LineFixtures.신분당선_파라미터_생성;
@@ -60,22 +60,12 @@ public class LineAcceptanceTest {
         ExtractableResponse<Response> 지하철_노선_생성_응답 = 지하철_노선_생성(신분당선_파라미터);
 
         // then
-        httpStatus_확인(지하철_노선_생성_응답, HttpStatus.CREATED);
+        적절한_응답_코드를_받을_수_있다(지하철_노선_생성_응답, HttpStatus.CREATED);
 
         ExtractableResponse<Response> 지하철_노선_목록_조회_응답 = 지하철_노선_목록_조회();
 
-        httpStatus_확인(지하철_노선_목록_조회_응답, HttpStatus.OK);
-
-        assertThat(지하철_노선_목록_조회_응답.jsonPath().getList("id").get(0)).isNotNull();
-        assertThat(지하철_노선_목록_조회_응답.jsonPath().getList("name").get(0))
-            .isEqualTo(신분당선_파라미터.get("name"));
-        assertThat(지하철_노선_목록_조회_응답.jsonPath().getList("color").get(0))
-            .isEqualTo(신분당선_파라미터.get("color"));
-        assertThat(지하철_노선_목록_조회_응답.jsonPath().getString("stations[0].id[0]"))
-            .isEqualTo(강남역_ID);
-        assertThat(지하철_노선_목록_조회_응답.jsonPath().getString("stations[0].id[1]"))
-            .isEqualTo(방배역_ID);
-
+        적절한_응답_코드를_받을_수_있다(지하철_노선_목록_조회_응답, HttpStatus.OK);
+        목록에서_노선_정보를_찾을_수_있다(지하철_노선_목록_조회_응답, 신분당선_파라미터);
     }
 
     /**
@@ -96,8 +86,8 @@ public class LineAcceptanceTest {
         ExtractableResponse<Response> 지하철_노선_목록_조회_응답 = 지하철_노선_목록_조회();
 
         // then
-        httpStatus_확인(지하철_노선_목록_조회_응답, HttpStatus.OK);
-        목록_개수_및_이름_확인(지하철_노선_목록_조회_응답,
+        적절한_응답_코드를_받을_수_있다(지하철_노선_목록_조회_응답, HttpStatus.OK);
+        n개의_이름_목록을_조회할_수_있다(지하철_노선_목록_조회_응답,
             params.stream().map(p -> p.get("name")).toArray(String[]::new));
     }
 
@@ -117,16 +107,8 @@ public class LineAcceptanceTest {
         ExtractableResponse<Response> 지하철_노선_조회_응답 = 지하철_노선_조회(신분당선_ID);
 
         // then
-        httpStatus_확인(지하철_노선_조회_응답, HttpStatus.OK);
-
-        assertThat(지하철_노선_조회_응답.jsonPath().getString("id")).isNotNull();
-        assertThat(지하철_노선_조회_응답.jsonPath().getString("name")).isEqualTo(신분당선_파라미터.get("name"));
-        assertThat(지하철_노선_조회_응답.jsonPath().getString("color")).isEqualTo(신분당선_파라미터.get("color"));
-        assertThat(지하철_노선_조회_응답.jsonPath().getString("stations.id[0]"))
-            .isEqualTo(신분당선_파라미터.get("upStationId"));
-        assertThat(지하철_노선_조회_응답.jsonPath().getString("stations.id[1]"))
-            .isEqualTo(신분당선_파라미터.get("downStationId"));
-
+        적절한_응답_코드를_받을_수_있다(지하철_노선_조회_응답, HttpStatus.OK);
+        노선_정보를_응답_받을_수_있다(지하철_노선_조회_응답, 신분당선_파라미터);
     }
 
     /**
@@ -146,17 +128,12 @@ public class LineAcceptanceTest {
         ExtractableResponse<Response> 지하철_노선_수정_응답 = 지하철_노선_수정(신분당선_ID, 신분당선_수정_파라미터);
 
         // then
-        httpStatus_확인(지하철_노선_수정_응답, HttpStatus.OK);
+        적절한_응답_코드를_받을_수_있다(지하철_노선_수정_응답, HttpStatus.OK);
 
         ExtractableResponse<Response> 지하철_노선_조회_응답 = 지하철_노선_조회(신분당선_ID);
 
-        httpStatus_확인(지하철_노선_조회_응답, HttpStatus.OK);
-
-        assertThat(지하철_노선_조회_응답.jsonPath().getString("name"))
-            .isEqualTo(신분당선_수정_파라미터.get("name"));
-        assertThat(지하철_노선_조회_응답.jsonPath().getString("color"))
-            .isEqualTo(신분당선_수정_파라미터.get("color"));
-
+        적절한_응답_코드를_받을_수_있다(지하철_노선_조회_응답, HttpStatus.OK);
+        수정된_노선_정보를_응답_받을_수_있다(지하철_노선_조회_응답, 신분당선_수정_파라미터);
     }
 
     /**
@@ -175,11 +152,11 @@ public class LineAcceptanceTest {
         ExtractableResponse<Response> 지하철_노선_삭제_응답 = 지하철_노선_삭제(신분당선_ID);
 
         // then
-        httpStatus_확인(지하철_노선_삭제_응답, HttpStatus.NO_CONTENT);
+        적절한_응답_코드를_받을_수_있다(지하철_노선_삭제_응답, HttpStatus.NO_CONTENT);
 
         ExtractableResponse<Response> 지하철_노선_조회_응답 = 지하철_노선_조회(신분당선_ID);
         assertThrows(AssertionFailedError.class,
-            () -> httpStatus_확인(지하철_노선_조회_응답, HttpStatus.OK));
+            () -> 적절한_응답_코드를_받을_수_있다(지하철_노선_조회_응답, HttpStatus.OK));
     }
 
     private ExtractableResponse<Response> 지하철_노선_생성(Map<String, String> params) {
@@ -219,6 +196,36 @@ public class LineAcceptanceTest {
             .when().delete("/lines/{id}", id)
             .then().log().all()
             .extract();
+    }
+
+    private void 노선_정보를_응답_받을_수_있다(ExtractableResponse<Response> response, Map<String, String> params) {
+        assertThat(response.jsonPath().getString("id")).isNotNull();
+        assertThat(response.jsonPath().getString("name")).isEqualTo(params.get("name"));
+        assertThat(response.jsonPath().getString("color")).isEqualTo(params.get("color"));
+        assertThat(response.jsonPath().getString("stations.id[0]"))
+            .isEqualTo(params.get("upStationId"));
+        assertThat(response.jsonPath().getString("stations.id[1]"))
+            .isEqualTo(params.get("downStationId"));
+
+    }
+
+    private void 목록에서_노선_정보를_찾을_수_있다(ExtractableResponse<Response> response, Map<String, String> params) {
+        assertThat(response.jsonPath().getList("id").get(0)).isNotNull();
+        assertThat(response.jsonPath().getList("name").get(0))
+            .isEqualTo(params.get("name"));
+        assertThat(response.jsonPath().getList("color").get(0))
+            .isEqualTo(params.get("color"));
+        assertThat(response.jsonPath().getString("stations[0].id[0]"))
+            .isEqualTo(params.get("upStationId"));
+        assertThat(response.jsonPath().getString("stations[0].id[1]"))
+            .isEqualTo(params.get("downStationId"));
+    }
+
+    private void 수정된_노선_정보를_응답_받을_수_있다(ExtractableResponse<Response> response, Map<String, String> params) {
+        assertThat(response.jsonPath().getString("name"))
+            .isEqualTo(params.get("name"));
+        assertThat(response.jsonPath().getString("color"))
+            .isEqualTo(params.get("color"));
     }
 
 }

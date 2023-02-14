@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.dto.request.LineRequest;
 import subway.models.Line;
-import subway.models.Section;
 import subway.models.Station;
 import subway.repositories.LineRepository;
 
@@ -19,8 +18,6 @@ public class LineService {
     private final LineRepository lineRepository;
     private final StationService stationService;
 
-    private final int FIRST = 1;
-
     @Transactional
     public Line saveLine(LineRequest.Create lineRequest) {
         Station upStation = stationService.findById(lineRequest.getUpStationId());
@@ -29,17 +26,10 @@ public class LineService {
         Line line = Line.builder()
             .name(lineRequest.getName())
             .color(lineRequest.getColor())
-            .build();
-
-        Section section = Section.builder()
-            .line(line)
-            .sequence(FIRST)
             .upStation(upStation)
             .downStation(downStation)
             .distance(lineRequest.getDistance())
             .build();
-
-        line.addSection(section);
 
         return lineRepository.save(line);
     }

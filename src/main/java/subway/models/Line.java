@@ -1,23 +1,22 @@
 package subway.models;
 
-import java.util.ArrayList;
-import java.util.List;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Line {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -25,14 +24,23 @@ public class Line {
     private String name;
     @Column(length = 20, nullable = false)
     private String color;
-    @OneToMany(mappedBy = "line", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Section> sections = new ArrayList<>();
+    @Embedded
+    private Sections sections = new Sections();
 
     @Builder
-    private Line(String name, String color) {
+    private Line(@NonNull String name, @NonNull String color, @NonNull Station upStation,
+        @NonNull Station downStation, @NonNull Long distance) {
+        int FIRST = 1;
+
         this.name = name;
         this.color = color;
-        this.sections = new ArrayList<>();
+        addSection(Section.builder()
+            .line(this)
+            .sequence(FIRST)
+            .downStation(downStation)
+            .upStation(upStation)
+            .distance(distance)
+            .build());
     }
 
     public void addSection(Section section) {
