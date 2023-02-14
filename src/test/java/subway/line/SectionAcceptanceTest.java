@@ -9,7 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import subway.RestTestUtils;
-import subway.line.business.constant.LineConstants;
+import subway.line.business.constant.SectionExceptionMessage;
 import subway.line.web.dto.LineRequest;
 import subway.line.web.dto.SectionRequest;
 import subway.station.web.StationResponse;
@@ -79,7 +79,7 @@ public class SectionAcceptanceTest {
         Long lineId = createLine();
 
         // when
-        Long upStationId = 99L;
+        Long upStationId = 1L;
         Long downStationId = 3L;
 
         assertThat(upStationId).isNotEqualTo(lineRequest.getDownStationId());
@@ -89,7 +89,7 @@ public class SectionAcceptanceTest {
         // then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
-                () -> assertThat(response.asString()).isEqualTo(LineConstants.INVALID_UP_STATION)
+                () -> assertThat(response.asString()).isEqualTo(SectionExceptionMessage.INVALID_UP_STATION)
         );
     }
 
@@ -116,7 +116,7 @@ public class SectionAcceptanceTest {
         // then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
-                () -> assertThat(response.asString()).isEqualTo(LineConstants.ALREADY_EXIST_DOWN_STATION)
+                () -> assertThat(response.asString()).isEqualTo(SectionExceptionMessage.ALREADY_EXIST_DOWN_STATION)
         );
     }
 
@@ -166,7 +166,7 @@ public class SectionAcceptanceTest {
         // then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
-                () -> assertThat(response.asString()).isEqualTo(LineConstants.CANNOT_REMOVE_SECTION_WHEN_ONLY_ONE)
+                () -> assertThat(response.asString()).isEqualTo(SectionExceptionMessage.CANNOT_REMOVE_SECTION_WHEN_ONLY_ONE)
         );
     }
 
@@ -191,7 +191,7 @@ public class SectionAcceptanceTest {
         // then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
-                () -> assertThat(response.asString()).isEqualTo(LineConstants.CANNOT_REMOVE_SECTION_WHEN_NOT_LAST_STATION)
+                () -> assertThat(response.asString()).isEqualTo(SectionExceptionMessage.CANNOT_REMOVE_SECTION_WHEN_NOT_LAST_STATION)
         );
     }
 

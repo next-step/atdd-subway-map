@@ -47,7 +47,7 @@ public class LineController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity updateLine(@PathVariable Long id, @RequestBody LineUpdateRequest request) {
+    public ResponseEntity<Void> updateLine(@PathVariable Long id, @RequestBody LineUpdateRequest request) {
         lineService.modify(id, request.getName(), request.getColor());
         return ResponseEntity.ok().build();
     }
@@ -65,12 +65,13 @@ public class LineController {
     }
 
     @PostMapping("/{id}/sections")
-    public void addSection(@PathVariable Long id, @RequestBody SectionRequest request) {
+    public ResponseEntity<Void> addSection(@PathVariable Long id, @RequestBody SectionRequest request) {
         lineService.addSection(id, request);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}/sections")
-    public ResponseEntity removeSection(@PathVariable Long id, @RequestParam Long stationId) {
+    public ResponseEntity<Void> removeSection(@PathVariable Long id, @RequestParam Long stationId) {
         lineService.removeSection(id, stationId);
         return ResponseEntity.noContent().build();
     }

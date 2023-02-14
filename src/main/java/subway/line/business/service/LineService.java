@@ -3,20 +3,19 @@ package subway.line.business.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import subway.line.business.constant.LineConstants;
+import subway.line.business.constant.LineExceptionMessage;
 import subway.line.repository.LineRepository;
 import subway.line.repository.entity.Line;
+import subway.line.repository.entity.Section;
+import subway.line.repository.entity.Sections;
 import subway.line.web.dto.LineRequest;
 import subway.line.web.dto.LineResponse;
 import subway.line.web.dto.SectionRequest;
-import subway.line.repository.entity.Section;
-import subway.line.repository.entity.Sections;
 import subway.line.web.dto.SectionResponse;
 import subway.station.business.StationService;
 import subway.station.repository.entity.Station;
 import subway.station.web.StationResponse;
 
-import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -52,12 +51,12 @@ public class LineService {
 
     public Line getLine(Long lineId) {
         return lineRepository.findById(lineId)
-                .orElseThrow(() -> new NoSuchElementException(LineConstants.LINE_NOT_EXIST));
+                .orElseThrow(() -> new NoSuchElementException(LineExceptionMessage.LINE_NOT_EXIST));
     }
 
     @Transactional
     public void modify(Long id, String name, String color) {
-        Line entity = lineRepository.findById(id).orElseThrow(() -> new NoSuchElementException(LineConstants.LINE_NOT_EXIST));
+        Line entity = getLine(id);
         lineRepository.save(entity.modify(name, color));
     }
 
@@ -74,8 +73,6 @@ public class LineService {
     public void addSection(Long lineId, SectionRequest request) {
         Line line = getLine(lineId);
 
-        validateAddSection(line, request);
-
         Station upStation = stationService.findStation(request.getUpStationId());
         Station downStation = stationService.findStation(request.getDownStationId());
 
@@ -86,8 +83,6 @@ public class LineService {
     @Transactional
     public void removeSection(Long lineId, Long stationId) {
         Line line = getLine(lineId);
-
-        validateRemoveSection(line, stationId);
 
         line.removeSection(stationId);
 
@@ -114,25 +109,6 @@ public class LineService {
                 .firstSectionId(line.getFirstSectionId())
                 .lastSectionId(line.getLastSectionId())
                 .build();
-    }
-
-    private void validateAddSection(Line line, SectionRequest request) {
-        if (request.getUpStationId() != line.getLastStationId()) {
-            throw new InvalidParameterException(LineConstants.INVALID_UP_STATION);
-        }
-
-        if (line.hasStation(request.getDownStationId())) {
-            throw new InvalidParameterException(LineConstants.ALREADY_EXIST_DOWN_STATION);
-        }
-    }
-
-    private void validateRemoveSection(Line line, Long stationId) {
-        if (line.getLastStationId() != stationId) {
-            throw new InvalidParameterException(LineConstants.CANNOT_REMOVE_SECTION_WHEN_NOT_LAST_STATION);
-        }
-        if (line.getSectionsCount() == 1) {
-            throw new InvalidParameterException(LineConstants.CANNOT_REMOVE_SECTION_WHEN_ONLY_ONE);
-        }
     }
 
 }

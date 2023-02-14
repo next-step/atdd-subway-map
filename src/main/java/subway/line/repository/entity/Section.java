@@ -32,15 +32,11 @@ public class Section {
         this.distance = distance;
     }
 
-    public int getDistance() {
-        return distance;
-    }
-
-    public long getUpStationId() {
+    public Long getUpStationId() {
         return upStation.getId();
     }
 
-    public long getDownStationId() {
+    public Long getDownStationId() {
         return downStation.getId();
     }
 

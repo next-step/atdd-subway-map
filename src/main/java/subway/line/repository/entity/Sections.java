@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Embeddable
 @NoArgsConstructor
@@ -47,10 +46,10 @@ public class Sections {
             allStations.add(sec.getDownStation());
         }
 
-        return allStations.stream().collect(Collectors.toList());
+        return new ArrayList<>(allStations);
     }
 
-    public void remove(Long stationId) {
+    public void remove() {
         this.sections.remove(sections.size() - 1);
     }
 
