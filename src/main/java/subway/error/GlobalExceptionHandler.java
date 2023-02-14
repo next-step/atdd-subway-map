@@ -9,8 +9,8 @@ import java.util.NoSuchElementException;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(NoSuchElementException.class)
-    public ResponseEntity handleNoSuchElementException(NoSuchElementException ex){
+    @ExceptionHandler({NoSuchElementException.class, IllegalStateException.class})
+    public ResponseEntity handleNoSuchElementException(Exception ex){
         return ResponseEntity.badRequest().build();
     }
 }
