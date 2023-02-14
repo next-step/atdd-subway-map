@@ -6,12 +6,11 @@ import org.springframework.transaction.annotation.Transactional;
 import subway.dto.LinePatchResponse;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
-import subway.dto.StationResponse;
+
 import subway.model.Line;
 import subway.model.Station;
 import subway.repository.LineRepository;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,8 +25,7 @@ public class LineService {
 
     public List<LineResponse> findALlLines() {
         List<Line> list = lineRepository.findAll();
-        return list.stream()
-                .map(this::createLineResponse).collect(Collectors.toList());
+        return list.stream().map(this::createLineResponse).collect(Collectors.toList());
     }
 
     @Transactional
@@ -38,22 +36,26 @@ public class LineService {
         return createLineResponse(line);
     }
 
-    public Line findLineById(Long id) {
-        return lineRepository.findById(id).orElseThrow(IllegalAccessError::new);
+    public LineResponse createLineResponse(Line line) {
+        return new LineResponse(line.getId(), line.getName(), line.getColor(), List.of(stationService.createStationResponse(line.getUpStation()), stationService.createStationResponse(line.getDownStation())));
     }
 
-    public LineResponse createLineResponse(Line line) {
-        List<StationResponse> list = new ArrayList<>();
-        StationResponse upStationResponse = stationService.createStationResponse(line.getUpStation());
-        StationResponse downStationResponse = stationService.createStationResponse(line.getDownStation());
-        list.add(upStationResponse);
-        list.add(downStationResponse);
-        return new LineResponse(line.getId(), line.getName(), line.getColor(), list);
+
+    public LineResponse findLineById(Long id) {
+        Line line = findVerifiedLine(id);
+        return createLineResponse(line);
     }
+
+
+    private Line findVerifiedLine(Long id) {
+        return lineRepository.findById(id).orElseThrow(()
+                -> new IllegalArgumentException("존재하지 않는 Line 입니다"));
+    }
+
 
     @Transactional
     public void updateLineById(Long id, LinePatchResponse linePatchResponse) {
-        Line line = findLineById(id);
+        Line line = findVerifiedLine(id);
         line.update(linePatchResponse.getName(), linePatchResponse.getColor());
     }
 
