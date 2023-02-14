@@ -21,11 +21,15 @@ public class SectionService {
     @Transactional
     public SectionResponse saveSection(Long lineId, SectionRequest request) {
         Line line = lineService.getLineById(lineId);
-        Station upStation = stationService.getStationById(request.getUpStationId());
-        Station downStation = stationService.getStationById(request.getDownStationId());
+        Long upStationId = request.getUpStationId();
+        Long downStationId = request.getDownStationId();
+        Station upStation = stationService.getStationById(upStationId);
+        Station downStation = stationService.getStationById(downStationId);
 
-        Section section = sectionRepository.save(request.toEntity(line, upStation, downStation));
-
+        Section section = sectionRepository.save(
+            request.toEntity(line, upStation, downStation)
+        );
+        line.addSection(section);
         return SectionResponse.of(section, line);
     }
 
@@ -34,8 +38,12 @@ public class SectionService {
         Line line = lineService.getLineById(lineId);
         return sectionRepository.findAllByLine(line)
             .stream()
-            .map(section -> SectionResponse.of(section, line))
-            .collect(Collectors.toList());
+            .map(
+                section -> SectionResponse.of(section, line)
+            )
+            .collect(
+                Collectors.toList()
+            );
     }
 
     @Transactional

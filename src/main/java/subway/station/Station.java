@@ -24,4 +24,8 @@ public class Station {
         this.id = id;
         this.name = name;
     }
+
+    public boolean isIdEqaulTo(Long stationId) {
+        return stationId.equals(id);
+    }
 }

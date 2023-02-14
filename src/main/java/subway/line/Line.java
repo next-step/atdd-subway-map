@@ -2,6 +2,7 @@ package subway.line;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -25,6 +26,9 @@ import subway.station.Station;
 @Entity
 public class Line {
 
+    @OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.REMOVE},
+        orphanRemoval = true)
+    private final List<Section> sections = new ArrayList<>();
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -43,10 +47,6 @@ public class Line {
     @JoinColumn(name = "down_station_id")
     private Station downStation;
 
-    @OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.REMOVE},
-        orphanRemoval = true)
-    private final List<Section> sections = new ArrayList<>();
-
     @Column(nullable = false)
     private Long distance;
 
@@ -64,8 +64,26 @@ public class Line {
     }
 
     public void addSection(Section section) {
+        if (!sections.isEmpty()) {
+            validateEndStation(section.getUpStation());
+            validateUniqueDownStation(section.getDownStation());
+        }
         this.sections.add(section);
         this.downStation = section.getDownStation();
+    }
+
+    private void validateEndStation(Station station) {
+        boolean endStationMismatch = !isDownStationEqualTo(station);
+        if (endStationMismatch) {
+            throw new SubwayException(ErrorCode.END_STATION_MISMATCH);
+        }
+    }
+
+    private void validateUniqueDownStation(Station downStation) {
+        boolean duplicatedStation = hasStation(downStation.getId());
+        if (duplicatedStation) {
+            throw new SubwayException(ErrorCode.DUPLICATED_STATION);
+        }
     }
 
     public void deleteSection(Long stationId) {
@@ -78,25 +96,51 @@ public class Line {
         this.downStation = section.getUpStation();
     }
 
-    private void validateEndStation(Long stationId) {
-        if (!stationId.equals(downStation.getId())) {
-            throw new SubwayException(ErrorCode.NOT_END_STATION);
+    private void validateMultiSection() {
+        if (sections.size() < 2) {
+            throw new SubwayException(ErrorCode.INSUFFICIENT_SECTION);
         }
     }
 
     private void validateStationOnLine(Long stationId) {
-        boolean stationFound = sections.stream().anyMatch(section ->
-            stationId.equals(section.getUpStation().getId()) ||
-                stationId.equals(section.getDownStation().getId()));
-
+        boolean stationFound = hasStation(stationId);
         if (!stationFound) {
             throw new SubwayException(ErrorCode.NOT_FOUND_STATION);
         }
     }
 
-    private void validateMultiSection() {
-        if (sections.size() < 2) {
-            throw new SubwayException(ErrorCode.INSUFFICIENT_SECTION);
+    private void validateEndStation(Long stationId) {
+        if (!downStation.isIdEqaulTo(stationId)) {
+            throw new SubwayException(ErrorCode.NOT_END_STATION);
         }
+    }
+
+    public List<Station> getAllStations() {
+        List<Station> stations = sections
+            .stream()
+            .map(Section::getUpStation)
+            .collect(
+                Collectors.toList()
+            );
+        stations.add(downStation);
+        return stations;
+    }
+
+    public boolean isDownStationEqualTo(Station station) {
+        return station
+            .getId()
+            .equals(
+                downStation.getId()
+            );
+    }
+
+    public boolean hasStation(Long stationId) {
+        return getAllStations()
+            .stream()
+            .anyMatch(
+                s -> stationId.equals(
+                    s.getId()
+                )
+            );
     }
 }
