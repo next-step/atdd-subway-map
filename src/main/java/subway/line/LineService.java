@@ -46,9 +46,7 @@ public class LineService {
                     line.getDownStation()
                 )
             )
-            .collect(
-                Collectors.toList()
-            );
+            .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)

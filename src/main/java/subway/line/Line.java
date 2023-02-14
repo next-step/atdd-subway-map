@@ -120,9 +120,7 @@ public class Line {
         List<Station> stations = sections
             .stream()
             .map(Section::getUpStation)
-            .collect(
-                Collectors.toList()
-            );
+            .collect(Collectors.toList());
         stations.add(downStation);
         return stations;
     }
@@ -130,18 +128,14 @@ public class Line {
     public boolean isDownStationEqualTo(Station station) {
         return station
             .getId()
-            .equals(
-                downStation.getId()
-            );
+            .equals(downStation.getId());
     }
 
     public boolean hasStation(Long stationId) {
         return getAllStations()
             .stream()
             .anyMatch(
-                station -> stationId.equals(
-                    station.getId()
-                )
+                station -> stationId.equals(station.getId())
             );
     }
 }
