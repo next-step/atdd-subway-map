@@ -63,7 +63,7 @@ public class LineService {
         Station upStation = stationService.findById(request.getUpStationId());
         Station downStation = stationService.findById(request.getDownStationId());
 
-        validateSection(line.getSections(), upStation, downStation);
+        validateSectionForAdd(line.getSections(), upStation, downStation);
 
         line.addSection(Section.builder()
             .line(line)
@@ -75,8 +75,18 @@ public class LineService {
         return lineRepository.save(line);
     }
 
-    private void validateSection(Sections sections, Station upStation, Station downStation) {
-        sections.validateUpStation(upStation);
-        sections.validateDownStation(downStation);
+    private void validateSectionForAdd(Sections sections, Station upStation, Station downStation) {
+        sections.validateUpStationForAdd(upStation);
+        sections.validateDownStationForAdd(downStation);
+    }
+
+    @Transactional
+    public void deleteSection(Long id, Long stationId) {
+        Line line = findById(id);
+        Station station = stationService.findById(stationId);
+
+        line.getSections().validateStationForRemove(station);
+
+        line.removeLastSection();
     }
 }

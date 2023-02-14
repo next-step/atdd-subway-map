@@ -48,4 +48,8 @@ public class Line {
         this.name = name;
         this.color = color;
     }
+
+    public void removeLastSection() {
+        sections.removeLast();
+    }
 }

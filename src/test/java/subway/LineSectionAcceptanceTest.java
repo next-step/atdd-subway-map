@@ -114,7 +114,7 @@ public class LineSectionAcceptanceTest {
         ExtractableResponse<Response> 지하철_구간_삭제_응답 = 지하철_구간_삭제(신분당선_ID, 역삼역_ID);
 
         // then
-        적절한_응답_코드를_받을_수_있다(지하철_구간_삭제_응답, HttpStatus.OK);
+        적절한_응답_코드를_받을_수_있다(지하철_구간_삭제_응답, HttpStatus.NO_CONTENT);
         해당_역을_찾을_수_없다(지하철_노선_조회(신분당선_ID), 역삼역_ID);
     }
 

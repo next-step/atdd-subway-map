@@ -18,6 +18,10 @@ public class Sections {
         sections.add(section);
     }
 
+    public void removeLast() {
+        sections.remove(sections.size() - 1);
+    }
+
     public List<Station> getStations() {
         return sections.stream()
             .map(Section::getStations)
@@ -26,18 +30,42 @@ public class Sections {
             .collect(Collectors.toList());
     }
 
-    public void validateUpStation(Station upStation) {
-        Station downwardEndPoint = sections.get(sections.size() - 1).getDownStation();
-        if (!downwardEndPoint.getId().equals(upStation.getId())) {
+    public void validateUpStationForAdd(Station upStation) {
+        if (!isDownwardEndPoint(upStation)) {
             throw new IllegalArgumentException();
         }
     }
 
-    public void validateDownStation(Station downStation) {
-        getStations().forEach(station -> {
-            if (downStation.getId().equals(station.getId())) {
-                throw new IllegalArgumentException();
+    public void validateDownStationForAdd(Station downStation) {
+        if (containsStation(downStation)) {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    public void validateStationForRemove(Station station) {
+        if (hasLessThenTwoSections()) {
+            throw new IllegalArgumentException();
+        }
+        if (!isDownwardEndPoint(station)) {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    private boolean isDownwardEndPoint(Station station) {
+        Station downwardEndPoint = sections.get(sections.size() - 1).getDownStation();
+        return downwardEndPoint.getId().equals(station.getId());
+    }
+
+    private boolean containsStation(Station station) {
+        for (Station s : getStations()) {
+            if (station.getId().equals(s.getId())) {
+                return true;
             }
-        });
+        }
+        return false;
+    }
+
+    private boolean hasLessThenTwoSections() {
+        return sections.size() < 2;
     }
 }
