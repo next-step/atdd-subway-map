@@ -103,14 +103,15 @@ public class Line {
     }
 
     private void validateStationOnLine(Long stationId) {
-        boolean stationFound = hasStation(stationId);
-        if (!stationFound) {
+        boolean stationNotFound = !hasStation(stationId);
+        if (stationNotFound) {
             throw new SubwayException(ErrorCode.NOT_FOUND_STATION);
         }
     }
 
     private void validateEndStation(Long stationId) {
-        if (!downStation.isIdEqaulTo(stationId)) {
+        boolean notEqualToEndStation = !downStation.isIdEqaulTo(stationId);
+        if (notEqualToEndStation) {
             throw new SubwayException(ErrorCode.NOT_END_STATION);
         }
     }
@@ -138,8 +139,8 @@ public class Line {
         return getAllStations()
             .stream()
             .anyMatch(
-                s -> stationId.equals(
-                    s.getId()
+                station -> stationId.equals(
+                    station.getId()
                 )
             );
     }
