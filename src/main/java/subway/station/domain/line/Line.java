@@ -5,12 +5,8 @@ import lombok.Getter;
 import subway.station.domain.section.Section;
 import subway.station.domain.section.Sections;
 import subway.station.domain.station.Station;
-import subway.station.global.error.exception.ErrorCode;
-import subway.station.global.error.exception.InvalidValueException;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Getter
@@ -41,7 +37,8 @@ public class Line {
         this.color = color;
     }
 
-    public void addSection(Section section) {
+    public void addSection(Station upStation, Station downStation, Long distance) {
+        Section section = getSection(upStation, downStation, distance);
         section.assignLine(this);
         sections.addSection(section);
     }
@@ -57,4 +54,14 @@ public class Line {
     public void changeColor(String color) {
         this.color = color;
     }
+
+    private Section getSection(Station upStation, Station downStation, Long distance) {
+        return Section.builder()
+                .upStation(upStation)
+                .downStation(downStation)
+                .distance(distance)
+                .build();
+    }
+
+
 }
