@@ -2,6 +2,8 @@ package subway.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,6 +12,16 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 @DisplayName("거리 관련 기능")
 class DistanceTest {
+
+    @DisplayName("구간의 값은 0보다 커야한다.")
+    @Test
+    void createMustMoreThanZero() {
+        assertAll(
+                () ->  assertDoesNotThrow(() -> new Distance(0)),
+                () -> assertThatThrownBy(() -> new Distance(-1)).isInstanceOf(IllegalArgumentException.class)
+        );
+
+    }
 
     @DisplayName("구간에 값을 더한다.")
     @ParameterizedTest(name = "plus : {0}")
