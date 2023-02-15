@@ -45,7 +45,7 @@ public class LineService {
     @Transactional
     public LineResponse update(Long id, String name, String color) {
         Line line = findLineById(id);
-        updateLine(line, name, color);
+        line.update(name, color);
         return LineResponse.fromForUpdate(line);
     }
 
@@ -64,15 +64,6 @@ public class LineService {
     public void addSection(Long id, Long upStationId, Long downStationId, Long distance) {
         Line line = findLineById(id);
         line.addSection(findStationById(upStationId), findStationById(downStationId), distance);
-    }
-
-    private void updateLine(Line line, String name, String color) {
-        if (!name.isEmpty()) {
-            line.changeName(name);
-        }
-        if (!color.isEmpty()) {
-            line.changeColor(color);
-        }
     }
 
     private Station findStationById(Long stationId) {

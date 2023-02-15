@@ -47,11 +47,14 @@ public class Line {
         sections.deleteSection(station);
     }
 
-    public void changeName(String name) {
+    public void update(String name, String color) {
+        if(name.isEmpty()) {
+            name = this.name;
+        }
+        if(color.isEmpty()) {
+            color = this.color;
+        }
         this.name = name;
-    }
-
-    public void changeColor(String color) {
         this.color = color;
     }
 
