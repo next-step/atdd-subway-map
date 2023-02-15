@@ -78,15 +78,18 @@ public class Sections {
     }
 
     public Distance deleteBy(final Station station) {
-        if (sections.size() <= MIN) {
-            throw new SectionConstraintException();
-        }
+        validateSectionsSize();
         Section section = sections.stream()
                 .filter(s -> s.isEqualDownStation(station))
                 .findAny()
                 .orElseThrow(SectionConstraintException::new);
-
         sections.remove(section);
         return section.getDistance();
+    }
+
+    private void validateSectionsSize() {
+        if (sections.size() <= MIN) {
+            throw new SectionConstraintException();
+        }
     }
 }
