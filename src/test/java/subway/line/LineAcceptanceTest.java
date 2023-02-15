@@ -8,6 +8,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
+import subway.line.presentation.LinePatchRequest;
 import subway.line.presentation.LineRequest;
 import subway.stations.StationRestAssured;
 
@@ -113,7 +114,7 @@ class LineAcceptanceTest {
      */
     @DisplayName("지하철 노선을 조회한다.")
     @Test
-    void searchRoute() {
+    void 지하철_노선을_조회한다() {
         // given
         LineRequest 신분당선 = new LineRequest(
                 "신분당선",
@@ -160,8 +161,25 @@ class LineAcceptanceTest {
      */
     @DisplayName("지하철 노선을 수정한다.")
     @Test
-    void patchRoute() {
+    void 지하철_노선을_수정한다() {
+        // given
+        LineRequest 신분당선 = new LineRequest(
+                "신분당선",
+                "red",
+                논현역_id,
+                강남역_id,
+                10L);
 
+        ExtractableResponse<Response> 지하철_노선_생성_요청_응답 = LineRestAssured.지하철_노선_생성_요청(신분당선);
+
+        // when
+        LinePatchRequest 강남_2호선 = new LinePatchRequest("강남강남 2호선", "super green");
+        ExtractableResponse<Response> 지하철_노선_수정_요청_결과 = LineRestAssured.지하철_노선_수정_요청(강남_2호선, 지하철_노선_생성_요청_응답.jsonPath().getLong("id"));
+
+        // then
+        assertAll(
+                () -> assertThat(지하철_노선_수정_요청_결과.statusCode()).isEqualTo(HttpStatus.OK.value())
+        );
     }
 
     /**
@@ -171,7 +189,7 @@ class LineAcceptanceTest {
      */
     @DisplayName("지하철 노선을 삭제한다.")
     @Test
-    void deleteRoute() {
+    void 지하철_노선을_삭제한다() {
 
     }
 }
