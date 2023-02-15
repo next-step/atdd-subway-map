@@ -32,20 +32,20 @@ class SectionAcceptanceTest {
     String 러시아역 = "러시아역";
     LineRequest 제주선 = LineAcceptanceTest.제주선_생성();
 
-    long 제주선ID = 1L;
-    long 백두산역ID = 2L;
-    long 서귀포역ID = 3L;
-    long 금강산역ID = 4L;
-    long 러시아역ID = 5L;
+    long 제주선ID;
+    long 백두산역ID;
+    long 서귀포역ID;
+    long 금강산역ID;
+    long 러시아역ID;
 
     @BeforeEach
     void setUp() {
         StationAcceptanceTest.createOneStation(한라산역);
-        StationAcceptanceTest.createOneStation(백두산역);
-        StationAcceptanceTest.createOneStation(서귀포역);
-        StationAcceptanceTest.createOneStation(금강산역);
-        StationAcceptanceTest.createOneStation(러시아역);
-        LineAcceptanceTest.노선_생성(제주선);
+        백두산역ID = StationAcceptanceTest.createOneStation(백두산역).jsonPath().getLong("id");
+        서귀포역ID = StationAcceptanceTest.createOneStation(서귀포역).jsonPath().getLong("id");
+        금강산역ID = StationAcceptanceTest.createOneStation(금강산역).jsonPath().getLong("id");
+        러시아역ID = StationAcceptanceTest.createOneStation(러시아역).jsonPath().getLong("id");
+        제주선ID = LineAcceptanceTest.노선_생성(제주선).jsonPath().getLong("id");
     }
 
     /**
