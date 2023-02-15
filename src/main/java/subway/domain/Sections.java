@@ -12,6 +12,8 @@ import subway.exception.StationNotFoundException;
 @Embeddable
 public class Sections {
 
+    private static final int MIN = 1;
+
     @OneToMany(mappedBy = "line", cascade = {CascadeType.MERGE, CascadeType.PERSIST}, orphanRemoval = true)
     private List<Section> sections = new ArrayList<>();
 
@@ -46,7 +48,7 @@ public class Sections {
     }
 
     public void remove(final Section deleteSection) {
-        sections.remove(deleteSection);
+        deleteBy(deleteSection.getDownStation());
     }
 
     public Station getDownStation() {
@@ -76,13 +78,13 @@ public class Sections {
     }
 
     public Distance deleteBy(final Station station) {
-        if (sections.size() <= 1) {
-            throw new IllegalArgumentException("구간을 삭제할 수 없습니다.");
+        if (sections.size() <= MIN) {
+            throw new SectionConstraintException();
         }
         Section section = sections.stream()
                 .filter(s -> s.isEqualDownStation(station))
                 .findAny()
-                .orElseThrow(IllegalArgumentException::new);
+                .orElseThrow(SectionConstraintException::new);
 
         sections.remove(section);
         return section.getDistance();

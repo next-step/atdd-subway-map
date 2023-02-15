@@ -1,11 +1,14 @@
 package subway.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import subway.exception.SectionConstraintException;
 
 @DisplayName("구간 목록 관련 기능")
 class SectionsTest {
@@ -43,14 +46,45 @@ class SectionsTest {
         assertThat(sections.getSections()).hasSize(1).contains(역삼역_정자역);
     }
 
-    @DisplayName("구간을 제거한다.")
-    @Test
-    void remove() {
-        Sections sections = new Sections(역삼역_정자역);
+    @DisplayName("구간 제거 관련 기능")
+    @Nested
+    class DeleteSection {
+        @DisplayName("구간을 제거한다.")
+        @Test
+        void remove() {
+            Sections sections = new Sections(강남역_역삼역);
+            sections.add(역삼역_정자역);
 
-        sections.remove(역삼역_정자역);
+            sections.remove(역삼역_정자역);
 
-        assertThat(sections.getSections()).doesNotContain(역삼역_정자역);
+            assertThat(sections.getSections()).doesNotContain(역삼역_정자역);
+        }
+
+        @DisplayName("구간목록의 크기가 최소일때 제거를 요청할 경우 에러 처리한다.")
+        @Test
+        void removeSizeMin() {
+            Sections sections = new Sections(역삼역_정자역);
+
+            assertThatThrownBy(() -> sections.remove(역삼역_정자역)).isInstanceOf(SectionConstraintException.class);
+        }
+
+        @DisplayName("구간목록의 크기가 최소일때 제거를 요청할 경우 에러 처리한다.")
+        @Test
+        void removeSizeMinByStation() {
+            Sections sections = new Sections(역삼역_정자역);
+
+            assertThatThrownBy(() -> sections.deleteBy(정자역)).isInstanceOf(SectionConstraintException.class);
+        }
+
+        @DisplayName("구간목록에 포함되지 않은 역으로 제거를 요청할 경우 에러 처리한다.")
+        @Test
+        void removeNotExistsStation() {
+            Sections sections = new Sections(강남역_역삼역);
+            sections.add(역삼역_정자역);
+            Station station = new Station("새로운역");
+
+            assertThatThrownBy(() -> sections.deleteBy(station)).isInstanceOf(SectionConstraintException.class);
+        }
     }
 
     @DisplayName("구간 목록의 상행역을 가져온다.")
