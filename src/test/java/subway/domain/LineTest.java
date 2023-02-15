@@ -29,7 +29,7 @@ class LineTest {
     @DisplayName("수정 관련 기능")
     @Nested
     class Modify {
-        @DisplayName("구간 이름 수정")
+        @DisplayName("노선 이름 수정")
         @Test
         void modifyEditName() {
             String expected = "수정 후 이름";
@@ -40,7 +40,7 @@ class LineTest {
             assertThat(line.getName()).isEqualTo(expected);
         }
 
-        @DisplayName("구간 이름 수정시 이름은 null일 수 없습니다.")
+        @DisplayName("노선 이름 수정시 이름은 null일 수 없습니다.")
         @Test
         void modifyEditNameNull() {
             Line line = new Line("수정 전 이름", "색깔", 강남역, 정자역, 10);
@@ -49,7 +49,7 @@ class LineTest {
                     .isInstanceOf(LineModifyException.class);
         }
 
-        @DisplayName("구간 색깔 수정")
+        @DisplayName("노선 색깔 수정")
         @Test
         void modifyEditColor() {
             String expected = "수정 후 색깔";
@@ -60,7 +60,7 @@ class LineTest {
             assertThat(line.getColor()).isEqualTo(expected);
         }
 
-        @DisplayName("구간 이름 수정시 색깔은 null일 수 없습니다.")
+        @DisplayName("노선 이름 수정시 색깔은 null일 수 없습니다.")
         @Test
         void modifyEditColorNull() {
             Line line = new Line("수정 전 이름", "색깔", 강남역, 정자역, 10);
@@ -69,7 +69,7 @@ class LineTest {
                     .isInstanceOf(LineModifyException.class);
         }
 
-        @DisplayName("구간 거리 수정")
+        @DisplayName("노선 거리 수정")
         @Test
         void modifyEditDistance() {
             int expected = 15;
