@@ -5,7 +5,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class LineSaveRequest {
+public class LineRequest {
 
     private String name;
     private String color;

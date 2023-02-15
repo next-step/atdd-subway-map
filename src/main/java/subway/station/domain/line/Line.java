@@ -2,12 +2,15 @@ package subway.station.domain.line;
 
 import lombok.Builder;
 import lombok.Getter;
+import subway.station.domain.section.Section;
+import subway.station.domain.section.Sections;
 import subway.station.domain.station.Station;
 
 import javax.persistence.*;
+import java.util.List;
 
-@Entity
 @Getter
+@Entity
 public class Line {
 
     @Id
@@ -17,32 +20,51 @@ public class Line {
 
     private String name;
     private String color;
-    @ManyToOne
-    @JoinColumn(foreignKey = @ForeignKey(name = "fk_up_station"))
-    private Station upStation;
 
-    @ManyToOne
-    @JoinColumn(foreignKey = @ForeignKey(name = "fk_down_station"))
-    private Station downStation;
-    private Long distance;
+    @Embedded
+    private Sections sections = new Sections();
 
     public Line() {
     }
 
+    public List<Section> getSections() {
+        return sections.getSections();
+    }
+
     @Builder
-    public Line(String name, String color, Station upStation, Station downStation, Long distance) {
+    public Line(String name, String color) {
         this.name = name;
         this.color = color;
-        this.upStation = upStation;
-        this.downStation = downStation;
-        this.distance = distance;
     }
 
-    public void changeName(String name) {
+    public void addSection(Station upStation, Station downStation, Long distance) {
+        Section section = getSection(upStation, downStation, distance);
+        section.assignLine(this);
+        sections.addSection(section);
+    }
+
+    public void deleteSection(Station station) {
+        sections.deleteSection(station);
+    }
+
+    public void update(String name, String color) {
+        if(name.isEmpty()) {
+            name = this.name;
+        }
+        if(color.isEmpty()) {
+            color = this.color;
+        }
         this.name = name;
-    }
-
-    public void changeColor(String color) {
         this.color = color;
     }
+
+    private Section getSection(Station upStation, Station downStation, Long distance) {
+        return Section.builder()
+                .upStation(upStation)
+                .downStation(downStation)
+                .distance(distance)
+                .build();
+    }
+
+
 }

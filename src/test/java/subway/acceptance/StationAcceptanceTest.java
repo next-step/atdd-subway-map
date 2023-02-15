@@ -4,18 +4,13 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-import subway.DatabaseCleanUp;
+import subway.acceptanceSetting.StationAcceptanceTestSetting;
 
 import java.util.HashMap;
 import java.util.List;
@@ -26,24 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철역 관련 기능")
 @ActiveProfiles("acceptance")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class StationAcceptanceTest {
-
-    private static final String STATION_NAME = "지하철역이름";
-    private static final String NEW_STATION_NAME = "새로운지하철역이름";
-    private static final String ANOTHER_STATION_NAME = "또다른지하철역이름";
-
-    @LocalServerPort
-    int port;
-
-    @Autowired
-    private DatabaseCleanUp databaseCleanUp;
-
-    @BeforeEach
-    void setUp() {
-        databaseCleanUp.execute();
-        RestAssured.port = port;
-    }
-
+public class StationAcceptanceTest extends StationAcceptanceTestSetting {
 
     /**
      * When 지하철역을 생성하면
@@ -138,4 +116,3 @@ public class StationAcceptanceTest {
                 .extract().jsonPath().getObject("id", Long.class);
     }
 }
-

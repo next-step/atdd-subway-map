@@ -1,22 +1,15 @@
 package subway.acceptance;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
+import subway.acceptanceSetting.LineAcceptanceTestSetting;
 import subway.dto.LineRequestTestDto;
 import subway.station.domain.line.Line;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class LineAcceptanceTest extends LineAcceptanceTestSetting {
 
     /**
@@ -26,13 +19,13 @@ public class LineAcceptanceTest extends LineAcceptanceTestSetting {
     @Test
     void 지하철_노선_생성_후_목록_조회시_찾을_수_있다() {
         //when
-        LineRequestTestDto shinBunDangLine = getRequestTestDto(SHINBUNDANG_LINE, RED, firstStationId, secondStationId, DISTANCE_TEN);
-        restAssuredSave(shinBunDangLine);
+        LineRequestTestDto shinBunDangLine = 테스트용_데이터_생성(SHINBUNDANG_LINE, RED, firstStationId, secondStationId, DISTANCE_TEN);
+        lineRestAssured.save(shinBunDangLine);
 
         //then
-        ExtractableResponse<Response> findAllResponse = restAssuredFindAll();
+        ExtractableResponse<Response> findAllResponse = lineRestAssured.findAll();
 
-        Assertions.assertThat(findAllResponse.jsonPath().getList("name")).contains(shinBunDangLine.getName());
+        Assertions.assertThat(findAllResponse.jsonPath().getList(PATH_NAME)).contains(shinBunDangLine.getName());
     }
 
     /**
@@ -43,16 +36,16 @@ public class LineAcceptanceTest extends LineAcceptanceTestSetting {
     @Test
     void 두_개의_지하철_노선_생성_후_목록_조회시_응답_받은_Response의_길이는_2이다() {
         //given
-        LineRequestTestDto shinBunDangLine = getRequestTestDto(SHINBUNDANG_LINE, RED, firstStationId, secondStationId, DISTANCE_TEN);
-        restAssuredSave(shinBunDangLine);
-        LineRequestTestDto bunDangLine = getRequestTestDto(BUNDANG_LINE, GREEN, firstStationId, thirdStationId, DISTANCE_FIFTEEN);
-        restAssuredSave(bunDangLine);
+        LineRequestTestDto shinBunDangLine = 테스트용_데이터_생성(SHINBUNDANG_LINE, RED, firstStationId, secondStationId, DISTANCE_TEN);
+        lineRestAssured.save(shinBunDangLine);
+        LineRequestTestDto bunDangLine = 테스트용_데이터_생성(BUNDANG_LINE, GREEN, firstStationId, thirdStationId, DISTANCE_FIFTEEN);
+        lineRestAssured.save(bunDangLine);
 
         //when
-        ExtractableResponse<Response> findAllResponse = restAssuredFindAll();
+        ExtractableResponse<Response> findAllResponse = lineRestAssured.findAll();
 
         //then
-        List<Line> lines = findAllResponse.jsonPath().get("line");
+        List<Line> lines = findAllResponse.jsonPath().get(PATH_LINE);
 
         Assertions.assertThat(lines.size()).isEqualTo(LENGTH_TWO);
     }
@@ -66,14 +59,14 @@ public class LineAcceptanceTest extends LineAcceptanceTestSetting {
     void 지하철_노선_생성_후_생성된_노선으로_조회시_노선의_정보를_알_수_있다() {
         //given
         LineRequestTestDto shinBunDangLine = new LineRequestTestDto(SHINBUNDANG_LINE, RED, firstStationId, secondStationId, DISTANCE_TEN);
-        Long id = restAssuredSave(shinBunDangLine);
+        Long id = lineRestAssured.save(shinBunDangLine);
 
         //when
-        ExtractableResponse<Response> findByResponse = restAssuredFindBy(id);
+        ExtractableResponse<Response> findByResponse = lineRestAssured.findById(id);
 
         //then
-        String lineName = findByResponse.jsonPath().get("name");
-        String lineColor = findByResponse.jsonPath().get("color");
+        String lineName = findByResponse.jsonPath().get(PATH_NAME);
+        String lineColor = findByResponse.jsonPath().get(PATH_COLOR);
 
         Assertions.assertThat(lineName).isEqualTo(shinBunDangLine.getName());
         Assertions.assertThat(lineColor).isEqualTo(shinBunDangLine.getColor());
@@ -88,19 +81,19 @@ public class LineAcceptanceTest extends LineAcceptanceTestSetting {
     void 지하철_노선을_생성하고_수정하면_노선_정보는_수정된다() {
         //given
         LineRequestTestDto shinBunDangLine = new LineRequestTestDto(SHINBUNDANG_LINE, RED, firstStationId, secondStationId, DISTANCE_TEN);
-        Long id = restAssuredSave(shinBunDangLine);
+        Long id = lineRestAssured.save(shinBunDangLine);
 
         //when
-        ExtractableResponse<Response> updateResponse = restAssuredUpdate(id, ANOTHER_BUNDANG_LINE, YELLOW);
+        ExtractableResponse<Response> updateResponse = lineRestAssured.update(id, ANOTHER_BUNDANG_LINE, YELLOW);
 
         //then
-        String updatedName = updateResponse.body().jsonPath().get("name");
-        String updatedColor = updateResponse.body().jsonPath().get("color");
+        String updatedName = updateResponse.body().jsonPath().get(PATH_NAME);
+        String updatedColor = updateResponse.body().jsonPath().get(PATH_COLOR);
 
         Assertions.assertThat(updatedName).isEqualTo(ANOTHER_BUNDANG_LINE);
         Assertions.assertThat(updatedColor).isEqualTo(YELLOW);
 
-        restAssuredFindAll();
+        lineRestAssured.findAll();
     }
 
     /**
@@ -112,16 +105,16 @@ public class LineAcceptanceTest extends LineAcceptanceTestSetting {
     void 지하철_노선을_생성하고_삭제하면_노선_정보는_삭제_된다() {
         //given
         LineRequestTestDto shinBunDangLine = new LineRequestTestDto(SHINBUNDANG_LINE, RED, firstStationId, secondStationId, DISTANCE_TEN);
-        Long id = restAssuredSave(shinBunDangLine);
+        Long id = lineRestAssured.save(shinBunDangLine);
 
         //when
-        restAssuredDelete(id);
+        lineRestAssured.delete(id);
 
         // then
-        Assertions.assertThat(restAssuredFindAll().jsonPath().getList("name")).doesNotContain(shinBunDangLine.getName());
+        Assertions.assertThat(lineRestAssured.findAll().jsonPath().getList(PATH_NAME)).doesNotContain(shinBunDangLine.getName());
     }
 
-    private LineRequestTestDto getRequestTestDto(String name, String color, Long upStationId, Long downStationId, Long distance) {
+    private LineRequestTestDto 테스트용_데이터_생성(String name, String color, Long upStationId, Long downStationId, Long distance) {
         return LineRequestTestDto.builder()
                 .name(name)
                 .color(color)
@@ -129,77 +122,5 @@ public class LineAcceptanceTest extends LineAcceptanceTestSetting {
                 .downStationId(downStationId)
                 .distance(distance)
                 .build();
-    }
-
-    private ExtractableResponse<Response> restAssuredUpdate(Long id, String lineChangeName, String lineChangeColor) {
-        Map<String, String> lineParams = new HashMap<>();
-        lineParams.put("name", lineChangeName);
-        lineParams.put("color", lineChangeColor);
-
-        return restAssuredUpdate(lineParams, id);
-    }
-
-    private Long restAssuredSave(LineRequestTestDto testLineDto) {
-        final Map<String, String> lineParams = new HashMap<>();
-        putParams(lineParams, testLineDto);
-
-        return restAssuredSaveLine(lineParams);
-    }
-
-    private ExtractableResponse<Response> restAssuredDelete(Long id) {
-        return RestAssured
-                .given().log().all()
-                .when().delete("/lines/" + id)
-                .then().log().all()
-                .assertThat().statusCode(HttpStatus.NO_CONTENT.value())
-                .extract();
-    }
-
-    private ExtractableResponse<Response> restAssuredUpdate(Map<String, String> params, Long id) {
-        return RestAssured
-                .given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().put("/lines/" + id)
-                .then().log().all()
-                .assertThat().statusCode(HttpStatus.OK.value())
-                .extract();
-    }
-
-    private ExtractableResponse<Response> restAssuredFindBy(Long id) {
-        return RestAssured
-                .given().log().all()
-                .when().get("/lines/" + id)
-                .then().log().all()
-                .assertThat().statusCode(HttpStatus.OK.value())
-                .extract();
-    }
-
-    private ExtractableResponse<Response> restAssuredFindAll() {
-        return RestAssured
-                .given().log().all()
-                .when().get("/lines")
-                .then().log().all()
-                .assertThat().statusCode(HttpStatus.OK.value())
-                .extract();
-    }
-
-    private void putParams(Map<String, String> params, LineRequestTestDto lineTestDto) {
-        params.put("name", lineTestDto.getName());
-        params.put("color", lineTestDto.getColor());
-        params.put("upStationId", String.valueOf(lineTestDto.getUpStationId()));
-        params.put("downStationId", String.valueOf(lineTestDto.getDownStationId()));
-        params.put("distance", String.valueOf(lineTestDto.getDistance()));
-    }
-
-    private Long restAssuredSaveLine(Map<String, String> params) {
-        return RestAssured
-                .given()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().log().all()
-                .assertThat().statusCode(HttpStatus.CREATED.value())
-                .extract().jsonPath().getObject("id", Long.class);
     }
 }
