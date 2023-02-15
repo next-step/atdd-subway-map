@@ -148,7 +148,7 @@ public class AcceptanceTest {
             .extract();
     }
 
-    ExtractableResponse<Response> 구간을_추가_요청(
+    ExtractableResponse<Response> 구간을_등록_요청(
         long lineId,
         long upStationId,
         long downStationId,
