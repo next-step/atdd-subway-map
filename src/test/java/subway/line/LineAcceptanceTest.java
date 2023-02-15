@@ -18,23 +18,27 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
+/*
+* TODO
+* 중복된 JsonPath 분리하기
+* */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class LineAcceptanceTest {
 
-    private Long nonhyeonStationId;
+    private Long 논현역_id;
 
-    private Long gangNamStationId;
+    private Long 강남역_id;
 
     @BeforeEach
-    void stationCreate() {
+    void 역_생성() {
         // given - 역 생성
-        Map<String, String> nonhyeon = new HashMap<>();
-        nonhyeon.put("name", "논현역");
-        nonhyeonStationId = StationRestAssured.getStationId(nonhyeon);
+        Map<String, String> 논현역 = new HashMap<>();
+        논현역.put("name", "논현역");
+        논현역_id = StationRestAssured.getStationId(논현역);
 
-        Map<String, String> gangNam = new HashMap<>();
-        gangNam.put("name", "강남역");
-        gangNamStationId = StationRestAssured.getStationId(gangNam);
+        Map<String, String> 강남역 = new HashMap<>();
+        강남역.put("name", "강남역");
+        강남역_id = StationRestAssured.getStationId(강남역);
     }
 
     /**
@@ -43,24 +47,24 @@ class LineAcceptanceTest {
      */
     @DisplayName("지하철 노선을 생성한다.")
     @Test
-    void createRoute() {
+    void 지하철_노선을_생성한다() {
         // given - 노선 생성
-        LineRequest shinbundangLine = new LineRequest(
+        LineRequest 신분당선 = new LineRequest(
                 "신분당선",
                 "red",
-                nonhyeonStationId,
-                gangNamStationId,
+                논현역_id,
+                강남역_id,
                 10L);
 
         // when
-        ExtractableResponse<Response> response = LineRestAssured.createLine(shinbundangLine);
+        ExtractableResponse<Response> 지하철_노선_생성_요청_응답 = LineRestAssured.지하철_노선_생성_요청(신분당선);
 
         // then - 노선 목록
         assertAll(
-                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
+                () -> assertThat(지하철_노선_생성_요청_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
                 () -> {
-                    ExtractableResponse<Response> readLines = LineRestAssured.readLines();
-                    assertThat(readLines.jsonPath().getList("name")).contains(shinbundangLine.getName());
+                    ExtractableResponse<Response> 지하철_노선_목록_조회_요청_응답 = LineRestAssured.지하철_노선_목록_조회_요청();
+                    assertThat(지하철_노선_목록_조회_요청_응답.jsonPath().getList("name")).contains(신분당선.getName());
                 }
         );
     }
@@ -72,33 +76,33 @@ class LineAcceptanceTest {
      */
     @DisplayName("지하철 노선 목록을 조회한다.")
     @Test
-    void searchRouteList() {
+    void 지하철_노선_목록을_조회한다() {
         // given
-        LineRequest shinbundangLine = new LineRequest(
+        LineRequest 신분당선 = new LineRequest(
                 "신분당선",
                 "red",
-                nonhyeonStationId,
-                gangNamStationId,
+                논현역_id,
+                강남역_id,
                 10L);
 
-        LineRequest gangnamLine = new LineRequest(
+        LineRequest 강남_2호선 = new LineRequest(
                 "강남 2호선",
                 "green",
-                nonhyeonStationId,
-                gangNamStationId,
+                논현역_id,
+                강남역_id,
                 20L);
 
-        LineRestAssured.createLine(shinbundangLine);
-        LineRestAssured.createLine(gangnamLine);
+        LineRestAssured.지하철_노선_생성_요청(신분당선);
+        LineRestAssured.지하철_노선_생성_요청(강남_2호선);
 
         // when
-        ExtractableResponse<Response> response = LineRestAssured.readLines();
+        ExtractableResponse<Response> 지하철_노선_목록_조회_요청_응답 = LineRestAssured.지하철_노선_목록_조회_요청();
 
         // then
-        List<String> lineNames = response.jsonPath().getList("name");
+        List<String> 노선_이름 = 지하철_노선_목록_조회_요청_응답.jsonPath().getList("name");
         assertAll(
-                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
-                () -> assertThat(lineNames).containsExactly(shinbundangLine.getName(), gangnamLine.getName())
+                () -> assertThat(지하철_노선_목록_조회_요청_응답.statusCode()).isEqualTo(HttpStatus.OK.value()),
+                () -> assertThat(노선_이름).containsExactly(신분당선.getName(), 강남_2호선.getName())
         );
     }
 
@@ -111,24 +115,24 @@ class LineAcceptanceTest {
     @Test
     void searchRoute() {
         // given
-        LineRequest shinbundangLine = new LineRequest(
+        LineRequest 신분당선 = new LineRequest(
                 "신분당선",
                 "red",
-                nonhyeonStationId,
-                gangNamStationId,
+                논현역_id,
+                강남역_id,
                 10L);
 
-        ExtractableResponse<Response> createLine = LineRestAssured.createLine(shinbundangLine);
+        ExtractableResponse<Response> 지하철_노선_생성_요청_응답 = LineRestAssured.지하철_노선_생성_요청(신분당선);
 
         // when
-        JsonPath createLineJsonPath = createLine.jsonPath();
-        ExtractableResponse<Response> readLineResponse = LineRestAssured.readLine(createLineJsonPath.getLong("id"));
+        JsonPath createLineJson = 지하철_노선_생성_요청_응답.jsonPath();
+        ExtractableResponse<Response> readLineResponse = LineRestAssured.지하철_노선_조회_요청(createLineJson.getLong("id"));
 
         // then
-        JsonPath responseJsonPath = readLineResponse.jsonPath();
+        JsonPath responseJson = readLineResponse.jsonPath();
         assertAll(
                 () -> assertThat(readLineResponse.statusCode()).isEqualTo(HttpStatus.OK.value()),
-                () -> assertThat(responseJsonPath.getString("name")).isEqualTo(createLineJsonPath.getString("name"))
+                () -> assertThat(responseJson.getString("name")).isEqualTo(createLineJson.getString("name"))
         );
     }
 
@@ -140,11 +144,11 @@ class LineAcceptanceTest {
     @Test
     void 존재하지_않는_id로_지하철_노선을_조회하면_404_상태코드를_리턴한다() {
         // when
-        ExtractableResponse<Response> readLineResponse = LineRestAssured.readLine(2L);
+        ExtractableResponse<Response> 지하철_노선_조회_요청_응답 = LineRestAssured.지하철_노선_조회_요청(2L);
 
         // then
         assertAll(
-                () -> assertThat(readLineResponse.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value())
+                () -> assertThat(지하철_노선_조회_요청_응답.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value())
         );
     }
 
