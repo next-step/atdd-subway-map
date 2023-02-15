@@ -31,12 +31,34 @@ class SectionsTest {
         this.강남역_역삼역 = new Section(10, 강남역, 역삼역, line);
     }
 
-    @DisplayName("구간을 추가한다.")
-    @Test
-    void add() {
-        Sections sections = new Sections(역삼역_정자역);
+    @DisplayName("구간 추가 관련 기능")
+    @Nested
+    class AddSection {
+        @DisplayName("구간을 추가한다.")
+        @Test
+        void add() {
+            Sections sections = new Sections(역삼역_정자역);
 
-        assertThat(sections.getSections()).contains(역삼역_정자역);
+            assertThat(sections.getSections()).contains(역삼역_정자역);
+        }
+
+        @DisplayName("새로 추가할 구간의 상행역이 구간 목록의 하행역이 아닌 경우 에러 처리한다.")
+        @Test
+        void addSectionUpStationIsNotEqualSectionsDownStation() {
+            Sections sections = new Sections(역삼역_정자역);
+
+            assertThatThrownBy(() -> sections.add(강남역_역삼역)).isInstanceOf(SectionConstraintException.class);
+        }
+
+        @DisplayName("새로 추가할 구간의 하행역이 이미 구간 목록에 추가된 경우 에러 처리한다.")
+        @Test
+        void alreadyAddedSection() {
+            Sections sections = new Sections(강남역_역삼역);
+            sections.add(역삼역_정자역);
+
+            assertThatThrownBy(() -> sections.add(new Section(10, 정자역, 강남역, line)))
+                    .isInstanceOf(SectionConstraintException.class);
+        }
     }
 
     @DisplayName("구간 목록을 가져온다.")
