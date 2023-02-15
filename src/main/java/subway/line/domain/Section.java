@@ -1,5 +1,7 @@
 package subway.line.domain;
 
+import subway.line.domain.exception.SectionCreateFailException;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -40,7 +42,13 @@ public class Section {
         StationValidator stationValidator
     ) {
         if (!stationValidator.existsStations(upStationId, downStationId)) {
-            throw new IllegalArgumentException();
+            throw new SectionCreateFailException(
+                String.format(
+                    "존재하지 않는 station 입니다. StationIds: %s, %s",
+                    upStationId,
+                    downStationId
+                )
+            );
         }
         this.line = line;
         this.upStationId = upStationId;
@@ -52,7 +60,7 @@ public class Section {
         return this.upStationId.equals(section.downStationId) || this.downStationId.equals(section.downStationId);
     }
 
-    public boolean canBeConnect(Section other) {
+    public boolean isConnectable(Section other) {
         return this.downStationId.equals(other.upStationId);
     }
 

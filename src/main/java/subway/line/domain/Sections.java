@@ -50,7 +50,7 @@ public class Sections {
         }
 
         final Section lastSection = findLastSection();
-        if (lastSection.canBeConnect(section)) {
+        if (lastSection.isConnectable(section)) {
             elements.add(section);
             return;
         }
@@ -85,7 +85,7 @@ public class Sections {
 
     private boolean isLastSection(Section section) {
         return elements.stream()
-            .noneMatch(it -> section.canBeConnect(it));
+            .noneMatch(it -> section.isConnectable(it));
     }
 
     public List<Section> getElements() {
