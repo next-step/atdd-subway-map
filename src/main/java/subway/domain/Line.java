@@ -103,5 +103,6 @@ public class Line {
 
     public void addSection(final int distance, final Station upStation, final Station downStation) {
         this.sections.add(new Section(distance, upStation, downStation, this));
+        this.distance.plus(new Distance(distance));
     }
 }
