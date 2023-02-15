@@ -3,10 +3,7 @@ package subway.line;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -156,69 +153,78 @@ class LineAcceptanceTest {
         );
     }
 
-
-    /**
-     * Given 지하철 노선을 생성하고
-     * When 생성한 지하철 노선을 수정하면
-     * Then 해당 지하철 노선 정보는 수정된다
-     */
-    @DisplayName("지하철 노선을 수정한다.")
-    @Test
-    void 지하철_노선을_수정한다() {
-        // given
-        LineRequest 신분당선 = new LineRequest(
-                "신분당선",
-                "red",
-                논현역_id,
-                강남역_id,
-                10L);
-
-        ExtractableResponse<Response> 지하철_노선_생성_요청_응답 = LineRestAssured.지하철_노선_생성_요청(신분당선);
-
-        // when
-        LinePatchRequest 강남_2호선 = new LinePatchRequest("강남강남 2호선", "super green");
-        ExtractableResponse<Response> 지하철_노선_수정_요청_결과 = LineRestAssured.지하철_노선_수정_요청(강남_2호선, 지하철_노선_생성_요청_응답.jsonPath().getLong("id"));
-
-        // then
-        assertAll(
-                () -> assertThat(지하철_노선_수정_요청_결과.statusCode()).isEqualTo(HttpStatus.OK.value())
-        );
-    }
-
     @Nested
-    @DisplayName("지하철 노선 실패 테스트")
-    class 지하철_노선_실패_테스트 {
+    @DisplayName("지하철 노선 수정")
+    class 지하철_노선_수정 {
 
-        @Test
-        @DisplayName("존재하지 않는 노선 ID를 입력하면 404을 리턴한다.")
-        void 존재하지_않는_노선ID를_입력하면_404를_리턴한다() {
-            // when
-            ExtractableResponse<Response> response = LineRestAssured.지하철_노선_수정_요청(1L);
+        @Nested
+        @DisplayName("지하철 노선 수정 실패 테스트")
+        class 지하철_노선_수정_실패_테스트 {
 
-            // then
-            assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+            @Test
+            @DisplayName("존재하지 않는 노선 ID를 입력하면 404을 리턴한다.")
+            void 존재하지_않는_노선ID를_입력하면_404를_리턴한다() {
+                // when
+                ExtractableResponse<Response> response = LineRestAssured.지하철_노선_수정_요청(1L);
+
+                // then
+                assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+            }
+
+            @ParameterizedTest
+            @CsvSource(value = {"'':''", "'':'green'", "'강남2호선':''"}, delimiter = ':')
+            @DisplayName("수정할 값을 입력하지 않으면 400을 리턴한다")
+            void 수정할_값을_입력하지_않으면_400을_리턴한다(String name, String color) {
+                // given
+                LineRequest 신분당선 = new LineRequest(
+                        "신분당선",
+                        "red",
+                        논현역_id,
+                        강남역_id,
+                        10L);
+
+                ExtractableResponse<Response> 지하철_노선_생성_요청_응답 = LineRestAssured.지하철_노선_생성_요청(신분당선);
+                LinePatchRequest updateParam = new LinePatchRequest(name, color);
+
+                // when
+                ExtractableResponse<Response> 지하철_노선_수정_요청_응답 = LineRestAssured.지하철_노선_수정_요청(updateParam, 지하철_노선_생성_요청_응답.jsonPath().getLong("id"));
+
+                // then
+                assertThat(지하철_노선_수정_요청_응답.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+            }
         }
 
-        @ParameterizedTest
-        @CsvSource(value = {"'':''", "'':'green'", "'강남2호선':''"}, delimiter = ':')
-        @DisplayName("수정할 값을 입력하지 않으면 400을 리턴한다")
-        void 수정할_값을_입력하지_않으면_400을_리턴한다(String name, String color) {
-            // given
-            LineRequest 신분당선 = new LineRequest(
-                    "신분당선",
-                    "red",
-                    논현역_id,
-                    강남역_id,
-                    10L);
+        @Nested
+        @DisplayName("지하철 노선 수정 성공 테스트")
+        class 지하철_노선_수정_성공_테스트 {
+            /**
+             * Given 지하철 노선을 생성하고
+             * When 생성한 지하철 노선을 수정하면
+             * Then 해당 지하철 노선 정보는 수정된다
+             */
+            @DisplayName("지하철 노선을 수정한다.")
+            @Test
+            @Order(Integer.MAX_VALUE)
+            void 지하철_노선을_수정한다() {
+                // given
+                LineRequest 신분당선 = new LineRequest(
+                        "신분당선",
+                        "red",
+                        논현역_id,
+                        강남역_id,
+                        10L);
 
-            ExtractableResponse<Response> 지하철_노선_생성_요청_응답 = LineRestAssured.지하철_노선_생성_요청(신분당선);
-            LinePatchRequest updateParam = new LinePatchRequest(name, color);
+                ExtractableResponse<Response> 지하철_노선_생성_요청_응답 = LineRestAssured.지하철_노선_생성_요청(신분당선);
 
-            // when
-            ExtractableResponse<Response> 지하철_노선_수정_요청_응답 = LineRestAssured.지하철_노선_수정_요청(updateParam, 지하철_노선_생성_요청_응답.jsonPath().getLong("id"));
+                // when
+                LinePatchRequest 강남_2호선 = new LinePatchRequest("강남강남 2호선", "super green");
+                ExtractableResponse<Response> 지하철_노선_수정_요청_결과 = LineRestAssured.지하철_노선_수정_요청(강남_2호선, 지하철_노선_생성_요청_응답.jsonPath().getLong("id"));
 
-            // then
-            assertThat(지하철_노선_수정_요청_응답.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+                // then
+                assertAll(
+                        () -> assertThat(지하철_노선_수정_요청_결과.statusCode()).isEqualTo(HttpStatus.OK.value())
+                );
+            }
         }
     }
 
