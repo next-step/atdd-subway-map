@@ -36,7 +36,7 @@ public class Sections {
     }
 
     private boolean isLineDownStation(final Section section) {
-        return !section.getUpStation().equals(getDownStation());
+        return !section.getUpStation().equals(getLineDownStation());
     }
 
     private boolean isAlreadyExistsSection(final Station station) {
@@ -51,7 +51,7 @@ public class Sections {
         deleteBy(deleteSection.getDownStation());
     }
 
-    public Station getDownStation() {
+    public Station getLineDownStation() {
         return sections.stream()
                 .map(Section::getDownStation)
                 .filter(station -> !this.getBasedOnUpStationBy(station))
@@ -64,7 +64,7 @@ public class Sections {
                 .anyMatch(section -> section.isEqualUpStation(station));
     }
 
-    public Station getUpStation() {
+    public Station getLineUpStation() {
         return sections.stream()
                 .map(Section::getUpStation)
                 .filter(station -> !this.getBasedOnDownStationBy(station))

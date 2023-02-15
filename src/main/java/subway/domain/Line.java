@@ -54,7 +54,7 @@ public class Line {
     }
 
     public List<Station> getStations() {
-        return List.of(sections.getUpStation(), sections.getDownStation());
+        return List.of(sections.getLineUpStation(), sections.getLineDownStation());
     }
 
     public String getColor() {
@@ -66,7 +66,7 @@ public class Line {
     }
 
     public Station getDownStation() {
-        return sections.getDownStation();
+        return sections.getLineDownStation();
     }
 
     public void modify(final String name, final String color, final int distance) {

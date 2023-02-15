@@ -9,6 +9,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import subway.exception.SectionConstraintException;
+import subway.exception.StationNotFoundException;
 
 @DisplayName("구간 목록 관련 기능")
 class SectionsTest {
@@ -87,19 +88,55 @@ class SectionsTest {
         }
     }
 
-    @DisplayName("구간 목록의 상행역을 가져온다.")
-    @Test
-    void getDownStation() {
-        Sections sections = new Sections();
-        sections.add(강남역_역삼역);
-        sections.add(역삼역_정자역);
+    @DisplayName("구간 목록 종점 관련 기능")
+    @Nested
+    class GetLineDownStation {
+        @DisplayName("구간 목록의 상행역을 가져온다.")
+        @Test
+        void getUpStation() {
+            Sections sections = new Sections();
+            sections.add(강남역_역삼역);
+            sections.add(역삼역_정자역);
 
-        Station actual = sections.getUpStation();
+            Station actual = sections.getLineUpStation();
 
-        Assertions.assertAll(
-                () -> assertThat(actual).isEqualTo(강남역),
-                () -> assertThat(actual).isNotEqualTo(역삼역),
-                () -> assertThat(actual).isNotEqualTo(정자역)
-        );
+            Assertions.assertAll(
+                    () -> assertThat(actual).isEqualTo(강남역),
+                    () -> assertThat(actual).isNotEqualTo(역삼역),
+                    () -> assertThat(actual).isNotEqualTo(정자역)
+            );
+        }
+
+        @DisplayName("빈 구간 목록의 상행역을 가져올 경우 에러 처리한다.")
+        @Test
+        void getUpStationEmptySections() {
+            Sections sections = new Sections();
+
+            assertThatThrownBy(() -> sections.getLineUpStation()).isInstanceOf(StationNotFoundException.class);
+        }
+
+        @DisplayName("구간 목록의 하행역을 가져온다.")
+        @Test
+        void getDownStation() {
+            Sections sections = new Sections();
+            sections.add(강남역_역삼역);
+            sections.add(역삼역_정자역);
+
+            Station actual = sections.getLineDownStation();
+
+            Assertions.assertAll(
+                    () -> assertThat(actual).isEqualTo(정자역),
+                    () -> assertThat(actual).isNotEqualTo(역삼역),
+                    () -> assertThat(actual).isNotEqualTo(강남역)
+            );
+        }
+
+        @DisplayName("빈 구간 목록의 하행역을 가져올 경우 에러 처리한다.")
+        @Test
+        void getDownStationEmptySections() {
+            Sections sections = new Sections();
+
+            assertThatThrownBy(() -> sections.getLineDownStation()).isInstanceOf(StationNotFoundException.class);
+        }
     }
 }
