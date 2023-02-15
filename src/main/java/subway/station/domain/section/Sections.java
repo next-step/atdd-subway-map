@@ -38,7 +38,7 @@ public class Sections {
             return;
         }
         if (!this.getSections().get(this.getSections().size() - 1).getDownStation().equals(section.getUpStation())) {
-            throw new InvalidValueException(ErrorCode.MISMATCHED_BETWEEN_UP_STATION_OF_NEW_SECTION_AND_DOWN_STATION_OF_LINE);
+            throw new InvalidValueException(ErrorCode.MISMATCHED_DOWN_STATION_OF_LINE);
         }
         for (Section s : this.getSections()) {
             if (s.getUpStation().equals(section.getDownStation()) || s.getDownStation().equals(section.getDownStation())) {

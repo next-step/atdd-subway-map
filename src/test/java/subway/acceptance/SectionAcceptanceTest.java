@@ -45,7 +45,7 @@ public class SectionAcceptanceTest extends SectionAcceptanceTestSetting {
 
         //then
         Assertions.assertThat(saveResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        Assertions.assertThat(saveResponse.jsonPath().getList("errorMessages", String.class)).containsExactly(ErrorCode.MISMATCHED_BETWEEN_UP_STATION_OF_NEW_SECTION_AND_DOWN_STATION_OF_LINE.getErrorMessage());
+        Assertions.assertThat(saveResponse.jsonPath().getList("errorMessages", String.class)).containsExactly(ErrorCode.MISMATCHED_DOWN_STATION_OF_LINE.getErrorMessage());
     }
 
     /**

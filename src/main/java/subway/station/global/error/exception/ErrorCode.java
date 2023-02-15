@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 public enum ErrorCode {
-    MISMATCHED_BETWEEN_UP_STATION_OF_NEW_SECTION_AND_DOWN_STATION_OF_LINE(HttpStatus.BAD_REQUEST.value(), "새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 한다"),
+    MISMATCHED_DOWN_STATION_OF_LINE(HttpStatus.BAD_REQUEST.value(), "새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 한다"),
     ALREADY_REGISTERED_IN_LINE(HttpStatus.BAD_REQUEST.value(), "새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없다"),
     NOT_STATION_OF_END_SECTION(HttpStatus.BAD_REQUEST.value(), "지하철 노선에 등록된 역(하행 종점역)만 제거할 수 있다. 즉, 마지막 구간만 제거할 수 있다"),
     STATION_NOT_EXISTS_IN_LINE(HttpStatus.BAD_REQUEST.value(), "검색된 지하철 역이 노선에 존재하지 않습니다. id를 바꿔주세요"),
