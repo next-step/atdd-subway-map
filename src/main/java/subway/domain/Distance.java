@@ -16,10 +16,20 @@ public class Distance {
     }
 
     public Distance(final int distance) {
+        validateMin(distance);
+        this.value = distance;
+    }
+
+    public Distance minus(Distance distance) {
+        validateMin(this.value - distance.value);
+        this.value -= distance.getValue();
+        return this;
+    }
+
+    private void validateMin(final int distance) {
         if (distance < MIN) {
             throw new IllegalArgumentException("길이는 " + MIN + " 미만이 될 수 없습니다.");
         }
-        this.value = distance;
     }
 
     public int getValue() {
@@ -27,17 +37,12 @@ public class Distance {
     }
 
     public Distance plus(Distance distance) {
-        this.value += distance.getValue();
+        this.value += distance.value;
         return this;
-    }
-
-    public void minus(Distance distance) {
-        this.value -= distance.getValue();
     }
 
     @Override
     public boolean equals(final Object o) {
-
         if (this == o) {
             return true;
         }
