@@ -5,7 +5,10 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import subway.line.presentation.LinePatchRequest;
@@ -182,16 +185,42 @@ class LineAcceptanceTest {
         );
     }
 
-    /*
-    * TODO
-    *  1. 존재하지 않는 노선 id로 수정 요청 시 실패
-    *  2. 변경할 노선이름, 노선 색상을 넣지 않으면 실패
-    *    - ParameterizedTest
-    *
-    *  예외 처리 방법
-    *  1. BindingResult
-    *  2. ExceptionAdvice
-    * */
+    @Nested
+    @DisplayName("지하철 노선 실패 테스트")
+    class 지하철_노선_실패_테스트 {
+
+        @Test
+        @DisplayName("존재하지 않는 노선 ID를 입력하면 404을 리턴한다.")
+        void 존재하지_않는_노선ID를_입력하면_404를_리턴한다() {
+            // when
+            ExtractableResponse<Response> response = LineRestAssured.지하철_노선_수정_요청(1L);
+
+            // then
+            assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+        }
+
+        @ParameterizedTest
+        @CsvSource(value = {"'':''", "'':'green'", "'강남2호선':''"}, delimiter = ':')
+        @DisplayName("수정할 값을 입력하지 않으면 400을 리턴한다")
+        void 수정할_값을_입력하지_않으면_400을_리턴한다(String name, String color) {
+            // given
+            LineRequest 신분당선 = new LineRequest(
+                    "신분당선",
+                    "red",
+                    논현역_id,
+                    강남역_id,
+                    10L);
+
+            ExtractableResponse<Response> 지하철_노선_생성_요청_응답 = LineRestAssured.지하철_노선_생성_요청(신분당선);
+            LinePatchRequest updateParam = new LinePatchRequest(name, color);
+
+            // when
+            ExtractableResponse<Response> 지하철_노선_수정_요청_응답 = LineRestAssured.지하철_노선_수정_요청(updateParam, 지하철_노선_생성_요청_응답.jsonPath().getLong("id"));
+
+            // then
+            assertThat(지하철_노선_수정_요청_응답.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        }
+    }
 
     /**
      * Given 지하철 노선을 생성하고

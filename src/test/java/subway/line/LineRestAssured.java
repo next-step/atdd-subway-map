@@ -43,4 +43,15 @@ public class LineRestAssured {
                 .then().log().all()
                 .extract();
     }
+
+    public static ExtractableResponse<Response> 지하철_노선_수정_요청(Long id) {
+        LinePatchRequest linePatchRequest = new LinePatchRequest("강남 3호선", "red");
+
+        return RestAssured.given()
+                .body(linePatchRequest)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().patch(API_PATH + "/" + id)
+                .then().log().all()
+                .extract();
+    }
 }
