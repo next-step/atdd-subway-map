@@ -1,8 +1,11 @@
-package subway;
+package subway.model;
+
+import lombok.Getter;
 
 import javax.persistence.*;
 
 @Entity
+@Getter
 public class Station {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,11 +20,4 @@ public class Station {
         this.name = name;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
 }
