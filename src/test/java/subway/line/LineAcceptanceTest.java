@@ -222,14 +222,44 @@ class LineAcceptanceTest {
         }
     }
 
-    /**
-     * Given 지하철 노선을 생성하고
-     * When 생성한 지하철 노선을 삭제하면
-     * Then 해당 지하철 노선 정보는 삭제된다
-     */
-    @DisplayName("지하철 노선을 삭제한다.")
-    @Test
-    void 지하철_노선을_삭제한다() {
+    @Nested
+    @DisplayName("지하철 노선 삭제")
+    class 지하철_노선_삭제 {
 
+        /**
+         * Given 지하철 노선을 생성하고
+         * When 생성한 지하철 노선을 삭제하면
+         * Then 해당 지하철 노선 정보는 삭제된다
+         */
+        @DisplayName("지하철 노선을 삭제한다.")
+        @Test
+        void 지하철_노선을_삭제한다() {
+            // given
+            LineRequest 신분당선 = new LineRequest(
+                    "신분당선",
+                    "red",
+                    논현역_id,
+                    강남역_id,
+                    10L);
+
+            ExtractableResponse<Response> 지하철_노선_생성_요청_결과 = LineRestAssured.지하철_노선_생성_요청(신분당선);
+            long lineId = 지하철_노선_생성_요청_결과.jsonPath().getLong("id");
+
+            // when
+            ExtractableResponse<Response> 지하철_노선_삭제_요청_결과 = LineRestAssured.지하철_노선_삭제_요청(lineId);
+
+            // then
+            assertThat(지하철_노선_삭제_요청_결과.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        }
+
+        @DisplayName("존재하지 않는 노선 ID를 입력하면 404을 리턴한다.")
+        @Test
+        void 존재하지_않는_노선ID를_입력하면_404를_리턴한다() {
+            // when
+            ExtractableResponse<Response> 지하철_노선_삭제_요청_결과 = LineRestAssured.지하철_노선_삭제_요청(1L);
+
+            // then
+            assertThat(지하철_노선_삭제_요청_결과.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+        }
     }
 }
