@@ -14,6 +14,8 @@ class SectionsTest {
     private Station 역삼역;
     private Station 정자역;
     private Line line;
+    private Section 역삼역_정자역;
+    private Section 강남역_역삼역;
 
     @BeforeEach
     void setUp() {
@@ -21,47 +23,42 @@ class SectionsTest {
         this.역삼역 = new Station("역삼역");
         this.정자역 = new Station("정자역");
         this.line = new Line("2호선", "bg-red-500", 강남역, 역삼역, 10);
+        this.역삼역_정자역 = new Section(10, 역삼역, 정자역, line);
+        this.강남역_역삼역 = new Section(10, 강남역, 역삼역, line);
     }
 
     @DisplayName("구간을 추가한다.")
     @Test
     void add() {
-        Sections sections = new Sections();
-        Section expected = new Section(10, 역삼역, 정자역, line);
+        Sections sections = new Sections(역삼역_정자역);
 
-        sections.add(expected);
-
-        assertThat(sections.getSections()).contains(expected);
+        assertThat(sections.getSections()).contains(역삼역_정자역);
     }
 
     @DisplayName("구간 목록을 가져온다.")
     @Test
     void get() {
-        Section section = new Section(10, 역삼역, 정자역, line);
-        Sections sections = new Sections(section);
+        Sections sections = new Sections(역삼역_정자역);
 
-        assertThat(sections.getSections()).hasSize(1).contains(section);
+        assertThat(sections.getSections()).hasSize(1).contains(역삼역_정자역);
     }
 
     @DisplayName("구간을 제거한다.")
     @Test
     void remove() {
-        Section section = new Section(10, 역삼역, 정자역, line);
-        Sections sections = new Sections(section);
+        Sections sections = new Sections(역삼역_정자역);
 
-        sections.remove(section);
+        sections.remove(역삼역_정자역);
 
-        assertThat(sections.getSections()).doesNotContain(section);
+        assertThat(sections.getSections()).doesNotContain(역삼역_정자역);
     }
 
     @DisplayName("구간 목록의 상행역을 가져온다.")
     @Test
     void getDownStation() {
-        Section section1 = new Section(10, 강남역, 역삼역, line);
-        Section section2 = new Section(10, 역삼역, 정자역, line);
         Sections sections = new Sections();
-        sections.add(section1);
-        sections.add(section2);
+        sections.add(강남역_역삼역);
+        sections.add(역삼역_정자역);
 
         Station actual = sections.getUpStation();
 
