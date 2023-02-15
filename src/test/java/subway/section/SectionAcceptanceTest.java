@@ -81,7 +81,7 @@ public class SectionAcceptanceTest extends RandomPortAcceptanceTest {
 
         /**
          * Given 노선을 생성하고
-         * When 노선에 구간을 등록했을 때 구간의 하행역이 해당 노선에 등록되어 있는 역일 경우
+         * When 노선에 새로운 구간을 등록했을 때 새로운 구간의 하행역이 해당 노선에 등록되어 있는 역일 경우
          * Then 에러 처리한다.
          */
         @DisplayName("노선에 새로운 구간 등록시 새로운 구간의 하행역이 해당 노선에 등록되어 있는 역일 경우 에러 처리한다.")
