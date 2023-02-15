@@ -42,8 +42,8 @@ public class Line {
     }
 
     public void addSection(Section section) {
-        sections.addSection(section);
         section.assignLine(this);
+        sections.addSection(section);
     }
 
     public void deleteSection(Station station) {
