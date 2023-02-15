@@ -93,16 +93,15 @@ public class Line {
     private void editDistance(final int distance) {
         this.distance = new Distance(distance);
     }
-
-    public void addSection(final Section section) {
-        this.sections.add(section);
-        this.distance.plus(section.getDistance());
-    }
-
+    
     public void deleteBy(final Station station) {
         if (!getDownStation().equals(station)) {
             throw new SectionConstraintException();
         }
         this.distance.minus(sections.deleteBy(station));
+    }
+
+    public void addSection(final int distance, final Station upStation, final Station downStation) {
+        this.sections.add(new Section(distance, upStation, downStation, this));
     }
 }

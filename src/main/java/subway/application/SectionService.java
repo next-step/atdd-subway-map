@@ -6,7 +6,6 @@ import org.springframework.transaction.annotation.Transactional;
 import subway.application.util.Finder;
 import subway.domain.Line;
 import subway.domain.LineRepository;
-import subway.domain.Section;
 import subway.domain.Station;
 import subway.domain.StationRepository;
 import subway.dto.SectionRegisterRequest;
@@ -35,18 +34,13 @@ public class SectionService {
         Line line = lineRepository.findById(lineId)
                 .orElseThrow(LineNotFoundException::new);
 
-        Section section = createSection(sectionRegisterRequest, line);
-
-        line.addSection(section);
-    }
-
-    private Section createSection(final SectionRegisterRequest sectionRegisterRequest, final Line line) {
         List<Station> stations = stationRepository.findAllById(
                 List.of(sectionRegisterRequest.getUpStationId(), sectionRegisterRequest.getDownStationId())
         );
         Station upStation = finder.findStationById(stations, sectionRegisterRequest.getUpStationId());
         Station downStation = finder.findStationById(stations, sectionRegisterRequest.getDownStationId());
-        return new Section(sectionRegisterRequest.getDistance(), upStation, downStation, line);
+
+        line.addSection(sectionRegisterRequest.getDistance(), upStation, downStation);
     }
 
     @Transactional
