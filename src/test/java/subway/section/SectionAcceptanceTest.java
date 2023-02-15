@@ -50,7 +50,7 @@ public class SectionAcceptanceTest extends RandomPortAcceptanceTest {
 
         /**
          * When 지하철 노선에 새로운 구간을 등록하면
-         * Then 새로운 구간은 노선에 등록되어있는 하행 종점역이어야 한다.
+         * Then 새로운 구간의 하행역은 노선에 등록되어있는 하행 종점역이어야 한다.
          */
         @DisplayName("노선에 새로운 구간을 등록한다.")
         @Test
