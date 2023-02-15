@@ -1,5 +1,6 @@
 package subway.domain;
 
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
@@ -25,11 +26,30 @@ public class Distance {
         return value;
     }
 
-    public void plus(Distance distance) {
+    public Distance plus(Distance distance) {
         this.value += distance.getValue();
+        return this;
     }
 
     public void minus(Distance distance) {
         this.value -= distance.getValue();
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        final Distance distance = (Distance) o;
+        return value == distance.value;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(value);
     }
 }
