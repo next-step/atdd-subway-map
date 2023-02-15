@@ -80,4 +80,25 @@ class LineTest {
             assertThat(line.getDistance()).isEqualTo(expected);
         }
     }
+
+    @DisplayName("구간 추가시 노선의 총 길이가 늘어난다.")
+    @Test
+    void addSectionPlusLineDistance() {
+        int expected = 15;
+        Line line = new Line("이름", "색깔", 강남역, 정자역, 10);
+        line.addSection(5, 정자역, 미금역);
+
+        assertThat(line.getDistance()).isEqualTo(expected);
+    }
+
+    @DisplayName("구간 제거시 노선의 총 길이가 감소한다.")
+    @Test
+    void deleteSectionMinusDistance() {
+        int expected = 10;
+        Line line = new Line("이름", "색깔", 강남역, 정자역, expected);
+        line.addSection(5, 정자역, 미금역);
+        line.deleteBy(미금역);
+
+        assertThat(line.getDistance()).isEqualTo(expected);
+    }
 }
