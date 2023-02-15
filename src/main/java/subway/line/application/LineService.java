@@ -81,6 +81,11 @@ public class LineService {
         lineRepository.save(line.update(linePatchRequest.getName(), linePatchRequest.getColor()));
     }
 
+    public void deleteLineById(Long id) {
+        Line line = lineRepository.findById(id).orElseThrow(LineNotFoundException::new);
+        lineRepository.deleteById(line.getId());
+    }
+
     private LineResponse createLineResponse(Line line) {
         return new LineResponse(
                 line.getId(),
