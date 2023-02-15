@@ -8,12 +8,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import subway.feature.StationFeature;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -55,13 +57,50 @@ public class StationAcceptanceTest {
      * When 지하철역 목록을 조회하면
      * Then 2개의 지하철역을 응답 받는다
      */
-    // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
+    @DisplayName("지하철 목록을 조회한다.")
+    @Test
+    void getStations(){
+        //#. given
+        List<String> requestStationsName = List.of("삼성역", "까치산역");
+        requestStationsName.forEach(StationFeature::callCreateStation);
+
+        //#. when
+        ExtractableResponse<Response> response = StationFeature.callGetStations();
+        List<String> responseStationsName = response.jsonPath().getList("name", String.class);
+
+        //#. then
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
+                () -> assertEquals( responseStationsName.size() , requestStationsName.size()),
+                () -> assertThat(responseStationsName).containsAll(requestStationsName),
+                () -> assertThat(responseStationsName).containsExactly("삼성역", "까치산역")
+        );
+    }
 
     /**
      * Given 지하철역을 생성하고
      * When 그 지하철역을 삭제하면
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
-    // TODO: 지하철역 제거 인수 테스트 메서드 생성
+    @DisplayName("지하철을 삭제한다.")
+    @Test
+    void deleteStations(){
+        //#. given
+        String stationName = "삼성역";
+        ExtractableResponse<Response> createdStation = StationFeature.callCreateStation(stationName);
+        StationFeature.callCreateStation("까치산역");
+        Long stationId = createdStation.body().jsonPath().getLong("id");
 
+        //#. when
+        ExtractableResponse<Response> deleteResponse = StationFeature.deleteStation(stationId);
+        ExtractableResponse<Response> getResponse = StationFeature.callGetStations();
+        List<String> responseStationsName = getResponse.jsonPath().getList("name", String.class);
+
+        //#. then
+        assertAll(
+                () -> assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value()),
+                () -> assertThat(responseStationsName).doesNotContain(stationName)
+        );
+
+    }
 }
