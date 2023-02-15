@@ -1,4 +1,4 @@
-package subway.station;
+package subway.station.domain;
 
 import subway.station.presentation.StationResponse;
 

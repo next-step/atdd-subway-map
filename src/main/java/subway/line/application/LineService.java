@@ -2,15 +2,14 @@ package subway.line.application;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import subway.line.Line;
+import subway.line.domain.Line;
 import subway.line.infra.LineRepository;
 import subway.line.presentation.LinePatchRequest;
 import subway.line.presentation.LineRequest;
 import subway.line.presentation.LineResponse;
 import subway.line.exception.LineNotFoundException;
-import subway.station.Station;
+import subway.station.domain.Station;
 import subway.station.application.StationService;
-import subway.station.presentation.StationResponse;
 
 import java.util.List;
 import java.util.stream.Collectors;

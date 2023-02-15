@@ -186,6 +186,11 @@ class LineAcceptanceTest {
     * TODO
     *  1. 존재하지 않는 노선 id로 수정 요청 시 실패
     *  2. 변경할 노선이름, 노선 색상을 넣지 않으면 실패
+    *    - ParameterizedTest
+    *
+    *  예외 처리 방법
+    *  1. BindingResult
+    *  2. ExceptionAdvice
     * */
 
     /**
