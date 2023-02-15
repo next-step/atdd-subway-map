@@ -8,6 +8,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import org.springframework.util.StringUtils;
+import subway.exception.LineModifyException;
 import subway.exception.SectionConstraintException;
 
 @Entity
@@ -77,14 +78,14 @@ public class Line {
 
     private void editName(final String name) {
         if (!StringUtils.hasText(name)) {
-            throw new IllegalArgumentException("이름은 공백일 수 없습니다.");
+            throw new LineModifyException();
         }
         this.name = name;
     }
 
     private void editColor(final String color) {
         if (!StringUtils.hasText(color)) {
-            throw new IllegalArgumentException("색상은 공백일 수 없습니다.");
+            throw new LineModifyException();
         }
         this.color = color;
     }
