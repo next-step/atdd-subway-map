@@ -41,8 +41,7 @@ public class Line {
     ) {
         this.name = name;
         this.color = color;
-        this.sections = new Sections();
-        sections.add(new Section(distance, upStation, downStation, this));
+        this.sections = new Sections(new Section(distance, upStation, downStation, this));
         this.distance = new Distance(distance);
     }
 
@@ -93,7 +92,7 @@ public class Line {
     private void editDistance(final int distance) {
         this.distance = new Distance(distance);
     }
-    
+
     public void deleteBy(final Station station) {
         if (!getDownStation().equals(station)) {
             throw new SectionConstraintException();
