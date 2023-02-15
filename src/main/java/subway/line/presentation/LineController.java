@@ -4,6 +4,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import subway.line.application.LineService;
 
+import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
 
@@ -30,5 +31,12 @@ public class LineController {
     @GetMapping("/lines/{id}")
     public ResponseEntity<LineResponse> getLine(@PathVariable Long id) {
         return ResponseEntity.ok().body(lineService.findLineById(id));
+    }
+
+    @PatchMapping("/lines/{id}")
+    public ResponseEntity<Void> patchLine(@PathVariable Long id,
+                                          @Valid @RequestBody LinePatchRequest linePatchRequest) {
+        lineService.updateLineById(id, linePatchRequest);
+        return ResponseEntity.ok().build();
     }
 }

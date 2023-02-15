@@ -60,4 +60,10 @@ public class Line {
     public long getDistance() {
         return distance;
     }
+
+    public Line update(String name, String color) {
+        this.name = name;
+        this.color = color;
+        return this;
+    }
 }
