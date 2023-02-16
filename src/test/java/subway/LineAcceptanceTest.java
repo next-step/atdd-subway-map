@@ -17,11 +17,53 @@ import org.springframework.test.annotation.DirtiesContext;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import subway.common.AssertUtils;
 
 @DisplayName("지하철 노선 관련 기능")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class LineAcceptanceTest {
+
+    static ExtractableResponse<Response> 지하철_노선_생성(Map<String, Object> params) {
+        return RestAssured.given().log().all()
+            .body(params)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().post("/lines")
+            .then().log().all()
+            .extract();
+    }
+
+    static ExtractableResponse<Response> 지하철_노선_목록_조회() {
+        return RestAssured.given().log().all()
+            .when().get("/lines")
+            .then().log().all()
+            .extract();
+    }
+
+    static ExtractableResponse<Response> 지하철_노선_조회(Long lineId) {
+        return RestAssured.given()
+            .when().get("/lines/" + lineId)
+            .then().log().all()
+            .extract();
+    }
+
+    static ExtractableResponse<Response> 지하철_노선_수정(Long lineId, Map<String, String> changedLineNameParam) {
+        return RestAssured.given()
+            .body(changedLineNameParam)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .log().all()
+            .when().put("/lines/" + lineId)
+            .then().log().all()
+            .extract();
+    }
+
+    static ExtractableResponse<Response> 지하철_노선_삭제(Long lineId) {
+        return RestAssured.given()
+            .log().all()
+            .when().delete("/lines/" + lineId)
+            .then().log().all()
+            .extract();
+    }
 
     @BeforeEach
     void setUp() {
@@ -49,7 +91,7 @@ class LineAcceptanceTest {
         params.put("downStationId", 2);
         params.put("distance", 10);
 
-        지하철_노선_생성(params);
+        AssertUtils.응답_상태_코드_검증(지하철_노선_생성(params), HttpStatus.CREATED);
 
         ExtractableResponse<Response> response = 지하철_노선_목록_조회();
 
@@ -81,14 +123,15 @@ class LineAcceptanceTest {
         secondParams.put("downStationId", 2);
         secondParams.put("distance", 5);
 
-        지하철_노선_생성(firstParams);
+        AssertUtils.응답_상태_코드_검증(지하철_노선_생성(firstParams), HttpStatus.CREATED);
 
-        지하철_노선_생성(secondParams);
+        AssertUtils.응답_상태_코드_검증(지하철_노선_생성(secondParams), HttpStatus.CREATED);
 
         // When
         ExtractableResponse<Response> response = 지하철_노선_목록_조회();
 
         // Then
+        AssertUtils.응답_상태_코드_검증(response, HttpStatus.OK);
         List<String> lines = response.jsonPath()
             .getList("$");
         assertThat(lines).hasSize(2);
@@ -110,17 +153,13 @@ class LineAcceptanceTest {
         params.put("downStationId", 2);
         params.put("distance", 10);
 
-        Long lineId = RestAssured.given().log().all()
-            .body(params)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().post("/lines")
-            .then().log().all()
-            .extract().jsonPath().getLong("id");
+        Long lineId = 지하철_노선_생성(params).jsonPath().getLong("id");
 
         // When
         ExtractableResponse<Response> response = 지하철_노선_조회(lineId);
 
         // Then
+        AssertUtils.응답_상태_코드_검증(response, HttpStatus.OK);
         String lineName = response.jsonPath().getString("name");
         assertThat(lineName).isEqualTo("신분당선");
     }
@@ -141,21 +180,17 @@ class LineAcceptanceTest {
         params.put("downStationId", 2);
         params.put("distance", 10);
 
-        Long lineId = RestAssured.given().log().all()
-            .body(params)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().post("/lines")
-            .then().log().all()
-            .extract().jsonPath().getLong("id");
+        Long lineId = 지하철_노선_생성(params).jsonPath().getLong("id");
 
         // When
-        Map<String, String> changedLineNameParam = new HashMap<>();
-        changedLineNameParam.put("name", "경의중앙선");
+        Map<String, String> changedLineParam = new HashMap<>();
+        changedLineParam.put("name", "경의중앙선");
+        changedLineParam.put("color", "bg-red-500");
 
-        ExtractableResponse<Response> response = 지하철_노선_수정(lineId, changedLineNameParam);
+        ExtractableResponse<Response> response = 지하철_노선_수정(lineId, changedLineParam);
 
         // Then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        AssertUtils.응답_상태_코드_검증(response, HttpStatus.NO_CONTENT);
     }
 
     /**
@@ -174,59 +209,12 @@ class LineAcceptanceTest {
         params.put("downStationId", 2);
         params.put("distance", 10);
 
-        Long lineId = RestAssured.given().log().all()
-            .body(params)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().post("/lines")
-            .then().log().all()
-            .extract().jsonPath().getLong("id");
+        Long lineId = 지하철_노선_생성(params).jsonPath().getLong("id");
 
         // When
         ExtractableResponse<Response> response = 지하철_노선_삭제(lineId);
 
         // Then
-        List<Long> ids = response.jsonPath().getList("id", Long.class);
-        assertThat(ids).doesNotContain(lineId);
-    }
-
-    private void 지하철_노선_생성(Map<String, Object> params) {
-        RestAssured.given().log().all()
-            .body(params)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().post("/lines")
-            .then().log().all();
-    }
-
-    private ExtractableResponse<Response> 지하철_노선_목록_조회() {
-        return RestAssured.given().log().all()
-            .when().get("/lines")
-            .then().log().all()
-            .extract();
-    }
-
-    private ExtractableResponse<Response> 지하철_노선_조회(Long lineId) {
-        return RestAssured.given()
-            .when().get("/lines/" + lineId)
-            .then().log().all()
-            .extract();
-    }
-
-    private ExtractableResponse<Response> 지하철_노선_수정(Long lineId, Map<String, String> changedLineNameParam) {
-        return RestAssured.given()
-            .body(changedLineNameParam)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .log().all()
-            .when().put("/lines/" + lineId)
-            .then().log().all()
-            .extract();
-    }
-
-    private ExtractableResponse<Response> 지하철_노선_삭제(Long lineId) {
-        return RestAssured.given()
-            .queryParam("id", lineId)
-            .log().all()
-            .when().delete("/lines")
-            .then().log().all()
-            .extract();
+        AssertUtils.응답_상태_코드_검증(response, HttpStatus.NO_CONTENT);
     }
 }
