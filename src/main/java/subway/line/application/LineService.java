@@ -14,7 +14,6 @@ import subway.line.dto.LineRequest;
 import subway.line.dto.LineResponse;
 import subway.line.section.domain.Section;
 import subway.line.section.dto.SectionRequest;
-import subway.line.section.dto.SectionResponse;
 import subway.station.domain.Station;
 import subway.station.domain.StationRepository;
 import subway.station.dto.StationResponse;
@@ -69,7 +68,7 @@ public class LineService {
     }
 
     @Transactional
-    public SectionResponse createSection(Long lineId, SectionRequest sectionRequest) {
+    public LineResponse createSection(Long lineId, SectionRequest sectionRequest) {
         Line line = getLine(lineId);
         Station upStation = getStation(sectionRequest.getUpStationId());
         Station downStation = getStation(sectionRequest.getDownStationId());
@@ -81,7 +80,7 @@ public class LineService {
 
         line.createSection(section);
 
-        return createSectionResponse(section);
+        return createLineResponse(line);
     }
 
     @Transactional
@@ -100,14 +99,6 @@ public class LineService {
     private Station getStation(Long stationId) {
         return stationRepository.findById(stationId)
             .orElseThrow(() -> new NotFoundException(ErrorMessage.STATION_NOT_FOUND));
-    }
-
-    private SectionResponse createSectionResponse(Section section) {
-        return new SectionResponse(
-            section.getId(),
-            List.of(new StationResponse(section.getUpStation().getId(), section.getUpStation().getName()),
-                new StationResponse(section.getDownStation().getId(), section.getDownStation().getName()))
-        );
     }
 
     private LineResponse createLineResponse(Line line) {
