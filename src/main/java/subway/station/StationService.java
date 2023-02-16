@@ -42,4 +42,9 @@ public class StationService {
                 station.getName()
         );
     }
+
+    @Transactional(readOnly = true)
+    public Station getStationById(Long id) {
+        return stationRepository.findById(id).orElseThrow(IllegalArgumentException::new);
+    }
 }
