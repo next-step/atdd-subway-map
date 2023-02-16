@@ -1,7 +1,10 @@
 package subway.station;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.exception.CustomException;
+import subway.exception.ErrorDto;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -37,5 +40,10 @@ public class StationService {
                 station.getId(),
                 station.getName()
         );
+    }
+
+    public Station findById(Long id) {
+        return stationRepository.findById(id).orElseThrow(()->new CustomException(
+                new ErrorDto(HttpStatus.NOT_FOUND, "지하철역 Id("+ id +") 가 존재 하지 않습니다.")));
     }
 }

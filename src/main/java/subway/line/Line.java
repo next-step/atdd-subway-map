@@ -1,6 +1,8 @@
 package subway.line;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Line {
@@ -21,6 +23,8 @@ public class Line {
 
     //@Column(nullable = true)
     private Long distance;
+    @OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
+    private List<Section> sections = new ArrayList<>();
 
     public Line() {
     }
@@ -28,6 +32,14 @@ public class Line {
     public Line(String name, String color) {
         this.name = name;
         this.color = color;
+    }
+
+    public Line(String name, String color, Long upStationId, Long downStationId, Long distance) {
+        this.name = name;
+        this.color = color;
+        this.upStationId = upStationId;
+        this.downStationId = downStationId;
+        this.distance = distance;
     }
 
     public Long getId() {
@@ -72,5 +84,9 @@ public class Line {
 
     public void setDistance(Long distance) {
         this.distance = distance;
+    }
+
+    public List<Section> getSections() {
+        return sections;
     }
 }
