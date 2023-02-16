@@ -1,10 +1,11 @@
-package subway.line;
+package subway.dto.response;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import lombok.Builder;
 import lombok.Getter;
-import subway.station.StationResponse;
+import subway.domain.Line;
 
 @Getter
 @Builder
@@ -17,9 +18,9 @@ public class LineResponse {
 
     public static LineResponse of(Line line) {
 
-        List<StationResponse> stations =
-            List.of(StationResponse.of(line.getDownStation()),
-                StationResponse.of(line.getUpStation()));
+        List<StationResponse> stations = line.getStations().stream()
+            .map(StationResponse::of)
+            .collect(Collectors.toList());
 
         return LineResponse.builder()
             .id(line.getId())

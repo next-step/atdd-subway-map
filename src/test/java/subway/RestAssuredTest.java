@@ -1,21 +1,21 @@
 package subway;
 
-import io.restassured.RestAssured;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
+import static org.assertj.core.api.Assertions.*;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import io.restassured.RestAssured;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class RestAssuredTest {
 
     static final String GOOGLE = "https://google.com";
     static final int STATUS_OK = HttpStatus.OK.value();
-
 
     @DisplayName("구글 페이지 접근 테스트")
     @Test
@@ -24,9 +24,9 @@ class RestAssuredTest {
         ExtractableResponse<Response> response = RestAssured
             .given()
             .when()
-                .get(GOOGLE)
+            .get(GOOGLE)
             .then()
-                .statusCode(STATUS_OK)
+            .statusCode(STATUS_OK)
             .extract();
 
         assertThat(response.statusCode()).isEqualTo(STATUS_OK);

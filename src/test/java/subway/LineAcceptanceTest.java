@@ -15,7 +15,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import subway.line.LineRequest;
+import subway.dto.request.LineRequest;
 
 @DisplayName("지하철 노선 관련 기능")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -136,7 +136,7 @@ class LineAcceptanceTest {
         assertThat(lineNames).contains(반도선);
     }
 
-    private static ExtractableResponse<Response> 노선_생성(LineRequest request) {
+    public static ExtractableResponse<Response> 노선_생성(LineRequest request) {
         return RestAssured.given().log().all()
             .body(request)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -155,7 +155,7 @@ class LineAcceptanceTest {
             .extract().jsonPath().getList("name", String.class);
     }
 
-    private ExtractableResponse<Response> 노선_삭제(long id) {
+    public static ExtractableResponse<Response> 노선_삭제(long id) {
         return RestAssured.given().log().all()
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .when()
@@ -174,7 +174,7 @@ class LineAcceptanceTest {
             .extract();
     }
 
-    private ExtractableResponse<Response> 노선_조회(long id) {
+    public static ExtractableResponse<Response> 노선_조회(long id) {
         return RestAssured.given().log().all()
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .when()
@@ -183,11 +183,11 @@ class LineAcceptanceTest {
             .extract();
     }
 
-    private static LineRequest 제주선_생성() {
-        return LineRequest.of(제주선, "green", 1, 3, 10);
+    public static LineRequest 제주선_생성() {
+        return LineRequest.of(제주선, "green", 2, 1, 10);
     }
 
-    private static LineRequest 반도선_생성() {
-        return LineRequest.of(반도선, "red", 1, 2, 10);
+    public static LineRequest 반도선_생성() {
+        return LineRequest.of(반도선, "red", 3, 2, 10);
     }
 }

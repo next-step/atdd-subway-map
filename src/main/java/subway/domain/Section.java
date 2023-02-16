@@ -1,53 +1,47 @@
-package subway.line;
+package subway.domain;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import subway.station.Station;
 
-@Getter
 @Entity
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Line {
+public class Section {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name")
-    private String name;
+    @Column(name = "line_id")
+    private long lineId;
 
-    @Column(name = "color")
-    private String color;
-
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
+    @JoinColumn(name = "up_station_id")
     private Station upStation;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
+    @JoinColumn(name = "down_station_id")
     private Station downStation;
 
     private int distance;
 
-    public void modify(String name, String color) {
-        this.name = name;
-        this.color = color;
-    }
-
-    @Builder(builderMethodName = "GenerateLine")
-    public Line(String name, String color, int distance, Station downStation, Station upStation) {
-        this.name = name;
-        this.color = color;
+    @Builder(builderMethodName = "GenerateSection")
+    public Section(long lineId, Station upStation, Station downStation, int distance) {
+        assert (distance > 0);
+        this.lineId = lineId;
         this.distance = distance;
         this.upStation = upStation;
         this.downStation = downStation;
     }
+
 }
