@@ -32,22 +32,22 @@ public class Sections {
 
     public void validateUpStationForAdd(Station upStation) {
         if (!isDownwardEndPoint(upStation)) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("상행역은 노선의 하행종점이어야 합니다.");
         }
     }
 
     public void validateDownStationForAdd(Station downStation) {
         if (containsStation(downStation)) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("하행역은 노선에 등록된 역일 수 없습니다.");
         }
     }
 
     public void validateStationForRemove(Station station) {
         if (hasLessThenTwoSections()) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("노선에 두개 이상의 구간이 있어야 삭제가 가능합니다.");
         }
         if (!isDownwardEndPoint(station)) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("노선의 하행종점역만 삭제가 가능합니다.");
         }
     }
 
