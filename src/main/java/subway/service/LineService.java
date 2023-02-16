@@ -5,11 +5,13 @@ import org.springframework.transaction.annotation.Transactional;
 import subway.domain.Station;
 import subway.domain.Line;
 import subway.domain.repository.LineRepository;
+import subway.domain.repository.StationRepository;
 import subway.dtos.request.LineRequest;
 import subway.dtos.response.LineResponse;
 
 import javax.persistence.EntityManager;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
@@ -17,17 +19,17 @@ import java.util.stream.Collectors;
 public class LineService {
 
     private LineRepository lineRepository;
-    private EntityManager entityManager;
+    private StationRepository stationRepository;
 
-    public LineService(LineRepository lineRepository, EntityManager entityManager){
+    public LineService(LineRepository lineRepository, StationRepository stationRepository){
         this.lineRepository = lineRepository;
-        this.entityManager = entityManager;
+        this.stationRepository = stationRepository;
     }
 
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
-        Station upStation = entityManager.find(Station.class, lineRequest.getUpStationId());
-        Station downStation = entityManager.find(Station.class, lineRequest.getDownStationId());
+        Station upStation = stationRepository.findById(lineRequest.getUpStationId()).orElseThrow(NoSuchElementException::new);
+        Station downStation = stationRepository.findById(lineRequest.getDownStationId()).orElseThrow(NoSuchElementException::new);
         Line line = lineRepository.save(new Line(
                 lineRequest.getName(),
                 lineRequest.getColor(),
@@ -49,10 +51,9 @@ public class LineService {
     }
 
     @Transactional
-    public void updateLine(Long id, LineRequest lineRequest) {
-        Line line = lineRepository.findById(id).get();
+    public void updateLineById(Long id, LineRequest lineRequest) {
+        Line line = lineRepository.findById(id).orElseThrow(NoSuchElementException::new);
         line.updateLine(lineRequest.getName(), lineRequest.getColor());
-        lineRepository.save(line);
     }
 
     @Transactional
