@@ -25,7 +25,7 @@ public class LineResponse {
         this.distance = distance;
     }
 
-    public static LineResponse by(final Line line, final List<StationResponse> stations) {
+    public static LineResponse from(final Line line, final List<StationResponse> stations) {
         return new LineResponse(
                 line.getId(),
                 line.getName(),
