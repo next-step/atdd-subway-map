@@ -7,8 +7,8 @@ import subway.dto.LinePatchResponse;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 
-import subway.model.Line;
-import subway.model.Station;
+import subway.domain.Line;
+import subway.domain.Station;
 import subway.repository.LineRepository;
 
 import java.util.List;

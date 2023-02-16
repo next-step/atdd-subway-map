@@ -1,4 +1,4 @@
-package subway.model;
+package subway.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
