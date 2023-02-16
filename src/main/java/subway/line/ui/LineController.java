@@ -13,6 +13,8 @@ import subway.line.application.LineService;
 import subway.line.application.dto.LineCreateRequest;
 import subway.line.application.dto.LineResponse;
 import subway.line.application.dto.LineUpdateRequest;
+import subway.line.application.dto.SectionAddRequest;
+import subway.line.application.dto.SectionDeleteRequest;
 
 import java.net.URI;
 import java.util.List;
@@ -28,7 +30,7 @@ public class LineController {
     }
 
     @PostMapping
-    public ResponseEntity<LineResponse> create(@RequestBody LineCreateRequest request) {
+    public ResponseEntity<LineResponse> createLine(@RequestBody LineCreateRequest request) {
         final LineResponse lineResponse = lineService.createLine(request);
         return ResponseEntity.created(URI.create("/lines/" + lineResponse.getId()))
             .body(lineResponse);
@@ -52,11 +54,23 @@ public class LineController {
         return ResponseEntity.ok(lineResponse);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<LineResponse> delete(@PathVariable Long id) {
-        lineService.deleteLineById(id);
+    @DeleteMapping("/{lineId}")
+    public ResponseEntity<Void> delete(@PathVariable Long lineId) {
+        lineService.deleteLineById(lineId);
         return ResponseEntity.noContent()
             .build();
+    }
+
+    @PostMapping("{lineId}/sections")
+    public ResponseEntity<Void> addSection(@PathVariable Long lineId, @RequestBody SectionAddRequest request) {
+        lineService.addSection(lineId, request);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("{lineId}/sections")
+    public ResponseEntity<Void> removeSection(@PathVariable Long lineId, @RequestBody SectionDeleteRequest request) {
+        lineService.removeSection(lineId, request);
+        return ResponseEntity.noContent().build();
     }
 
 }

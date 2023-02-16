@@ -1,6 +1,7 @@
 package subway.line.domain;
 
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -19,41 +20,31 @@ public class Line {
     @Column(length = 20, nullable = false)
     private String color;
 
-    @Column(nullable = false)
-    private Long upStationId;
-
-    @Column(nullable = false)
-    private Long downStationId;
-
-    @Column(nullable = false)
-    private Integer distance;
+    @Embedded
+    private Sections sections = new Sections();
 
     protected Line() {
     }
 
     public Line(
         String name,
-        String color,
-        Long upStationId,
-        Long downStationId,
-        Integer distance,
-        StationValidator stationValidator
+        String color
     ) {
-        if (!stationValidator.existsStations(upStationId, downStationId)) {
-            throw new IllegalArgumentException(
-                String.format("station은 존재해야 한다. %s, %s", upStationId, downStationId)
-            );
-        }
         this.name = name;
         this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
-        this.distance = distance;
     }
 
     public void update(String name, String color) {
         this.name = name;
         this.color = color;
+    }
+
+    public void addSection(Section section) {
+        sections.add(section);
+    }
+
+    public void removeSection(Long stationId) {
+        sections.removeSection(stationId);
     }
 
     public Long getId() {
@@ -68,15 +59,7 @@ public class Line {
         return color;
     }
 
-    public Long getUpStationId() {
-        return upStationId;
-    }
-
-    public Long getDownStationId() {
-        return downStationId;
-    }
-
-    public Integer getDistance() {
-        return distance;
+    public Sections getSections() {
+        return sections;
     }
 }

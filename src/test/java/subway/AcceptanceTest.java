@@ -80,6 +80,31 @@ public class AcceptanceTest {
             .extract();
     }
 
+    ExtractableResponse<Response> 노선을_생성한다(
+        String name,
+        String color,
+        long upStationId,
+        long downStationId,
+        int distance
+    ) {
+
+        final Map<String, Object> params = Map.of(
+            "name", name,
+            "color", color,
+            "upStationId", upStationId,
+            "downStationId", downStationId,
+            "distance", distance
+        );
+        return RestAssured.given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(params)
+            .when().post("/lines")
+            .then().log().all()
+            .statusCode(HttpStatus.CREATED.value())
+            .header("Location", containsString("lines"))
+            .extract();
+    }
+
     ExtractableResponse<Response> 노선_목록을_조회한다() {
         return RestAssured.given().log().all()
             .when().get("/lines")
@@ -123,4 +148,37 @@ public class AcceptanceTest {
             .extract();
     }
 
+    ExtractableResponse<Response> 구간을_등록_요청(
+        long lineId,
+        long upStationId,
+        long downStationId,
+        int distance
+    ) {
+        final Map<String, Object> params = Map.of(
+            "upStationId", upStationId,
+            "downStationId", downStationId,
+            "distance", distance
+        );
+        return RestAssured.given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(params)
+            .when().post("/lines/{lineId}/sections", lineId)
+            .then().log().all()
+            .extract();
+    }
+
+    ExtractableResponse<Response> 구간_삭제_요청(
+        long lineId,
+        long stationId
+    ) {
+        final Map<String, Object> params = Map.of(
+            "stationId", stationId
+        );
+        return RestAssured.given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(params)
+            .when().delete("/lines/{lineId}/sections", lineId)
+            .then().log().all()
+            .extract();
+    }
 }
