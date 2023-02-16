@@ -19,7 +19,8 @@ public class Sections {
     }
 
     public void removeLast() {
-        sections.remove(sections.size() - 1);
+        int lastIndex = sections.size() - 1;
+        sections.remove(lastIndex);
     }
 
     public List<Station> getStations() {
@@ -31,7 +32,7 @@ public class Sections {
     }
 
     public void validateUpStationForAdd(Station upStation) {
-        if (!isDownwardEndPoint(upStation)) {
+        if (isNotDownwardEndPoint(upStation)) {
             throw new IllegalArgumentException("상행역은 노선의 하행종점이어야 합니다.");
         }
     }
@@ -46,26 +47,23 @@ public class Sections {
         if (hasLessThenTwoSections()) {
             throw new IllegalArgumentException("노선에 두개 이상의 구간이 있어야 삭제가 가능합니다.");
         }
-        if (!isDownwardEndPoint(station)) {
+        if (isNotDownwardEndPoint(station)) {
             throw new IllegalArgumentException("노선의 하행종점역만 삭제가 가능합니다.");
         }
     }
 
-    private boolean isDownwardEndPoint(Station station) {
-        Station downwardEndPoint = sections.get(sections.size() - 1).getDownStation();
-        return downwardEndPoint.getId().equals(station.getId());
+    private boolean isNotDownwardEndPoint(Station station) {
+        int lastIndex = sections.size() - 1;
+        Station downwardEndPoint = sections.get(lastIndex).getDownStation();
+        return !downwardEndPoint.equals(station);
     }
 
     private boolean containsStation(Station station) {
-        for (Station s : getStations()) {
-            if (station.getId().equals(s.getId())) {
-                return true;
-            }
-        }
-        return false;
+        return getStations().stream().anyMatch(s -> s.equals(station));
     }
 
     private boolean hasLessThenTwoSections() {
-        return sections.size() < 2;
+        int limitOfSectionCountForDelete = 2;
+        return sections.size() < limitOfSectionCountForDelete;
     }
 }

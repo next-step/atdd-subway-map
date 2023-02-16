@@ -1,5 +1,6 @@
 package subway.models;
 
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -44,6 +45,10 @@ public class Line {
         sections.add(section);
     }
 
+    public List<Station> getStations() {
+        return sections.getStations();
+    }
+
     public void update(String name, String color) {
         this.name = name;
         this.color = color;
@@ -52,4 +57,15 @@ public class Line {
     public void removeLastSection() {
         sections.removeLast();
     }
+
+    public void validateSectionForAdd(Station upStation, Station downStation) {
+        sections.validateUpStationForAdd(upStation);
+        sections.validateDownStationForAdd(downStation);
+    }
+
+    public void validateStationForRemove(Station station) {
+        sections.validateStationForRemove(station);
+    }
 }
+
+

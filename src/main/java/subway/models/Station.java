@@ -1,5 +1,6 @@
 package subway.models;
 
+import java.util.Objects;
 import javax.persistence.*;
 
 @Entity
@@ -23,5 +24,9 @@ public class Station {
 
     public String getName() {
         return name;
+    }
+
+    public boolean equals(Station station) {
+        return id.equals(station.getId());
     }
 }

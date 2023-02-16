@@ -19,7 +19,7 @@ public class LineResponse {
             .id(line.getId())
             .name(line.getName())
             .color(line.getColor())
-            .stations(line.getSections().getStations().stream()
+            .stations(line.getStations().stream()
                 .map(StationResponse::of).collect(Collectors.toList()))
             .build();
     }
