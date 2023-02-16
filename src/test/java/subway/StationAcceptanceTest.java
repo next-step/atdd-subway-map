@@ -27,13 +27,13 @@ public class StationAcceptanceTest {
     void createStation() {
         // when
         String stationName = "강남역";
-        ExtractableResponse<Response> response = StationUtils.createStation(stationName);
+        ExtractableResponse<Response> response = StationApiTest.createStation(stationName);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames = StationUtils.getStationNames();
+        List<String> stationNames = StationApiTest.getStationNames();
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
@@ -50,11 +50,11 @@ public class StationAcceptanceTest {
         //given
         List<String> requestStationNames = new ArrayList<>(Arrays.asList(new String[]{"왕십리역", "마장역"}));
 
-        requestStationNames.stream().map(StationUtils::createStation)
+        requestStationNames.stream().map(StationApiTest::createStation)
                 .forEach(response -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()));
 
         // when
-        List<String> stationNames = StationUtils.getStationNames();
+        List<String> stationNames = StationApiTest.getStationNames();
 
         //then
         assertThat(stationNames.size()).isEqualTo(2);
@@ -73,15 +73,15 @@ public class StationAcceptanceTest {
     void deleteStation(){
         //given
         String requestStationName = "동작역";
-        ExtractableResponse<Response> response = StationUtils.createStation(requestStationName);
+        ExtractableResponse<Response> response = StationApiTest.createStation(requestStationName);
 
         //when
-        response = StationUtils.deleteStation(response);
+        response = StationApiTest.deleteStation(response);
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         //then
-        List<String> stationNames = StationUtils.getStationNames();
+        List<String> stationNames = StationApiTest.getStationNames();
 
         assertThat(stationNames.size()).isEqualTo(0);
         assertThat(stationNames).doesNotContain(requestStationName);

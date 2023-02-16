@@ -3,19 +3,24 @@ package subway;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import subway.dtos.request.LineRequest;
 
 import java.util.List;
-import java.util.Map;
 
-public class LineUtils {
-    public static ExtractableResponse<Response> createLine(Map<String, String> params) {
+import static org.assertj.core.api.Assertions.assertThat;
+
+
+public class LineApiTest {
+    public static ExtractableResponse<Response> createLine(LineRequest lineRequest) {
             ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .body(params)
+                .body(lineRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/lines")
                 .then().log().all()
                 .extract();
+            assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         return response;
 
     }
@@ -30,27 +35,29 @@ public class LineUtils {
 
     public static String getLineName(Long id) {
         String lineName = RestAssured.given().log().all()
-                .when().get("/lines/" + String.valueOf(id))
+                .when().get("/lines/" + id)
                 .then().log().all()
                 .extract().jsonPath().getString("name");
         return lineName;
     }
 
-    public static ExtractableResponse<Response> updateLine(Map<String, String> updateParams, Long id) {
+    public static ExtractableResponse<Response> updateLine(LineRequest updateRequest, Long id) {
         ExtractableResponse<Response> response = RestAssured.given().log(). all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(updateParams)
-                .when().put("/lines/" + String.valueOf(id))
+                .body(updateRequest)
+                .when().put("/lines/" + id)
                 .then().log().all()
                 .extract();
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         return response;
     }
 
     public static ExtractableResponse<Response> deleteLine(Long id) {
         ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when().delete("/lines/" + String.valueOf(id))
+                .when().delete("/lines/" + id)
                 .then().log().all()
                 .extract();
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
         return response;
     }
 

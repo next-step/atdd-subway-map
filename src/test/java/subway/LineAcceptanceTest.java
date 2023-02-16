@@ -3,11 +3,12 @@ package subway;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
 import org.springframework.test.context.jdbc.Sql;
+import subway.dtos.request.LineRequest;
 
 import java.util.*;
 
@@ -18,24 +19,29 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {
 
+
+    private LineRequest lineRequest;
+
+    @BeforeEach
+    void setUp(){
+        lineRequest = new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10L);
+        generateStations("왕십리역", "마장역");
+    }
+
     /**
-    * When 지하철 노선을 생성하면
-    * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
-    */
+     * When 지하철 노선을 생성하면
+     * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
+     */
 
     @DisplayName("지하철노선 생성")
     @Test
     void createLine(){
-        generateStations(new String[]{"왕십리역", "마장역"});
-
-        Map<String, String> params = generateParams("신분당선", "bg-red-600", "1", "2", "10");
 
         //when
-        ExtractableResponse<Response> response = LineUtils.createLine(params);
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        LineApiTest.createLine(lineRequest);
 
         //then
-        List<String> lineNames = LineUtils.getLineNames();
+        List<String> lineNames = LineApiTest.getLineNames();
         assertThat(lineNames).containsAnyOf("신분당선");
     }
 
@@ -48,19 +54,16 @@ public class LineAcceptanceTest {
     @DisplayName("지하철노선 목록 조회")
     @Test
     void getLines(){
-        generateStations(new String[]{"왕십리역", "마장역", "동작역"});
+        generateStations("동작역");
 
         //given
-        Map<String, String> params = generateParams("신분당선", "bg-red-600", "1", "2"," 10");
-        ExtractableResponse<Response> response = LineUtils.createLine(params);
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        LineApiTest.createLine(lineRequest);
 
-        params = generateParams("분당선", "bg_green-600", "1", "3", "20");
-        response = LineUtils.createLine(params);
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        lineRequest = new LineRequest("분당선", "bg_green-600", 1L, 3L, 20L);
+        LineApiTest.createLine(lineRequest);
 
         //when
-        List<String> lineNames = LineUtils.getLineNames();
+        List<String> lineNames = LineApiTest.getLineNames();
         assertThat(lineNames.size()).isEqualTo(2);
         assertThat(lineNames).containsExactly("신분당선", "분당선");
     }
@@ -74,20 +77,16 @@ public class LineAcceptanceTest {
     @DisplayName("지하철노선 조회")
     @Test
     void getLine(){
-        generateStations(new String[]{"왕십리역", "마장역"});
 
         //given
-        Map<String, String> params = generateParams("신분당선", "bg-red-600", "1", "2"," 10");
-        ExtractableResponse<Response> response = LineUtils.createLine(params);
-        Long id = response.body().jsonPath().getLong("id");
+        Long id = getLineId(LineApiTest.createLine(lineRequest));
 
         //when
-        String lineName = LineUtils.getLineName(id);
+        String lineName = LineApiTest.getLineName(id);
 
         //then
         assertThat(lineName).isEqualTo("신분당선");
     }
-
 
     /** Given 지하철 노선을 생성하고
      * When 생성한 지하철 노선을 수정하면
@@ -96,23 +95,17 @@ public class LineAcceptanceTest {
     @DisplayName("지하철노선 수정")
     @Test
     void updateLine(){
-        generateStations(new String[]{"왕십리역", "마장역"});
 
         //given
-        Map<String, String> params = generateParams("신분당선", "bg-red-600", "1", "2"," 10");
-        ExtractableResponse<Response> response = LineUtils.createLine(params);
-        Long id = response.jsonPath().getLong("id");
+        Long id = getLineId(LineApiTest.createLine(lineRequest));
 
-        Map<String, String> updateParams = new HashMap<>();
-        updateParams.put("name", "다른분당선");
-        updateParams.put("color", "bg-blue-600");
+        LineRequest updateRequest = new LineRequest("다른분당선", "bg-blue-600");
 
         //when
-        response = LineUtils.updateLine(updateParams, id);
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        LineApiTest.updateLine(updateRequest, id);
 
         //then
-        List<String> lineNames = LineUtils.getLineNames();
+        List<String> lineNames = LineApiTest.getLineNames();
         assertThat(lineNames.size()).isEqualTo(1);
         assertThat(lineNames).containsExactly("다른분당선");
     }
@@ -125,35 +118,26 @@ public class LineAcceptanceTest {
     @DisplayName("지하철노선 삭제")
     @Test
     void deleteLine(){
-        generateStations(new String[]{"왕십리역", "마장역"});
 
         //given
-        Map<String, String> params = generateParams("신분당선", "bg-red-600", "1", "2"," 10");
-        ExtractableResponse<Response> response = LineUtils.createLine(params);
-        Long id = response.jsonPath().getLong("id");
+        Long id = getLineId(LineApiTest.createLine(lineRequest));
 
         //when
-        response = LineUtils.deleteLine(id);
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        LineApiTest.deleteLine(id);
 
         //then
-        List<String> lineNames = LineUtils.getLineNames();
+        List<String> lineNames = LineApiTest.getLineNames();
         assertThat(lineNames.size()).isEqualTo(0);
         assertThat(lineNames).doesNotContain("신분당선");
     }
 
-    private Map<String, String> generateParams(String lineName, String color, String upStationId, String downStationId, String distance) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", lineName);
-        params.put("color", color);
-        params.put("upStationId", upStationId);
-        params.put("downStationId", downStationId);
-        params.put("distance", distance);
-        return params;
+    private void generateStations(String... stationName ) {
+        List<String> stationNames = new ArrayList<>(Arrays.asList(stationName));
+        stationNames.stream().forEach(StationApiTest::createStation);
     }
 
-    private void generateStations(String[] stationName) {
-        List<String> stationNames = new ArrayList<>(Arrays.asList(stationName));
-        stationNames.stream().forEach(StationUtils::createStation);
+    private Long getLineId(ExtractableResponse<Response> response) {
+        return response.body().jsonPath().getLong("id");
     }
+
 }

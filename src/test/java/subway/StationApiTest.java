@@ -8,7 +8,7 @@ import subway.domain.Station;
 
 import java.util.List;
 
-public class StationUtils {
+public class StationApiTest {
     static ExtractableResponse<Response> createStation(String stationName){
         Station station = new Station(stationName);
         ExtractableResponse<Response> response =
