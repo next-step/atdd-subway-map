@@ -15,10 +15,15 @@ public class Sections {
     private List<Section> sections = new ArrayList<>();
 
     public void add(Section section) {
+        if (!sections.isEmpty()) {
+            validateUpStationForAdd(section.getUpStation());
+            validateDownStationForAdd(section.getDownStation());
+        }
         sections.add(section);
     }
 
-    public void removeLast() {
+    public void removeLast(Station station) {
+        validateStationForRemove(station);
         int lastIndex = sections.size() - 1;
         sections.remove(lastIndex);
     }

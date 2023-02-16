@@ -54,18 +54,10 @@ public class Line {
         this.color = color;
     }
 
-    public void removeLastSection() {
-        sections.removeLast();
+    public void removeLastSection(Station station) {
+        sections.removeLast(station);
     }
 
-    public void validateSectionForAdd(Station upStation, Station downStation) {
-        sections.validateUpStationForAdd(upStation);
-        sections.validateDownStationForAdd(downStation);
-    }
-
-    public void validateStationForRemove(Station station) {
-        sections.validateStationForRemove(station);
-    }
 }
 
 

@@ -63,8 +63,6 @@ public class LineService {
         Station upStation = stationService.findById(request.getUpStationId());
         Station downStation = stationService.findById(request.getDownStationId());
 
-        line.validateSectionForAdd(upStation, downStation);
-
         line.addSection(Section.builder()
             .line(line)
             .upStation(upStation)
@@ -80,8 +78,6 @@ public class LineService {
         Line line = findById(id);
         Station station = stationService.findById(stationId);
 
-        line.validateStationForRemove(station);
-
-        line.removeLastSection();
+        line.removeLastSection(station);
     }
 }
