@@ -23,12 +23,12 @@ public class StationService {
     @Transactional
     public StationResponse saveStation(final StationRequest stationRequest) {
         Station station = stationRepository.save(new Station(stationRequest.getName()));
-        return StationResponse.by(station);
+        return StationResponse.from(station);
     }
 
     public List<StationResponse> findAllStations() {
         return stationRepository.findAll().stream()
-                .map(StationResponse::by)
+                .map(StationResponse::from)
                 .collect(Collectors.toList());
     }
 

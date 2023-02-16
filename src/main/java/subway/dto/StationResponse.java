@@ -14,13 +14,13 @@ public class StationResponse {
         this.name = name;
     }
 
-    public static List<StationResponse> by(final List<Station> stations) {
+    public static List<StationResponse> from(final List<Station> stations) {
         return stations.stream()
                 .map(station -> new StationResponse(station.getId(), station.getName()))
                 .collect(Collectors.toUnmodifiableList());
     }
 
-    public static StationResponse by(final Station station) {
+    public static StationResponse from(final Station station) {
         return new StationResponse(station.getId(), station.getName());
     }
 

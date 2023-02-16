@@ -37,12 +37,12 @@ public class LineService {
         Line line = lineRepository.findById(lineId)
                 .orElseThrow(LineNotFoundException::new);
 
-        return LineResponse.from(line, StationResponse.by(line.getStations()));
+        return LineResponse.from(line, StationResponse.from(line.getStations()));
     }
 
     public List<LineResponse> getList() {
         return lineRepository.findAll().stream()
-                .map(line -> LineResponse.from(line, StationResponse.by(line.getStations())))
+                .map(line -> LineResponse.from(line, StationResponse.from(line.getStations())))
                 .collect(Collectors.toUnmodifiableList());
     }
 
