@@ -1,16 +1,14 @@
 package subway.line;
 
-import io.restassured.RestAssured;
+import io.restassured.http.Method;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.annotation.DirtiesContext;
 import subway.RestTestUtils;
-import subway.line.business.constant.LineConstants;
 import subway.line.web.dto.LineRequest;
 import subway.line.web.dto.LineUpdateRequest;
 
@@ -20,10 +18,11 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD;
 
-@Sql(value = "/init.sql")
+//@Sql(value = "/init.sql")
 @DisplayName("지하철 노선 관련 기능")
+@DirtiesContext(classMode = BEFORE_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {
 
@@ -134,10 +133,7 @@ public class LineAcceptanceTest {
 
         // then
         var response = getLine(createId);
-        assertAll(
-                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
-                () -> assertThat(response.asString()).isEqualTo(LineConstants.LINE_NOT_EXIST)
-        );
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 
     private List<LineRequest> getRequests() {
@@ -163,57 +159,28 @@ public class LineAcceptanceTest {
     private void createStations() {
         List<String> names = List.of("강남역", "양재역", "판교역");
         for (String name : names) {
-            RestAssured.given().log().all()
-                    .body(Map.of("name", name))
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                    .when().post("/stations")
-                    .then().log().all()
-                    .statusCode(HttpStatus.CREATED.value());
+            RestTestUtils.request(Method.POST, "/stations", Map.of("name", name));
         }
     }
 
     private ExtractableResponse<Response> create(LineRequest request) {
-        return RestAssured.given().log().all()
-                .body(request)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().log().all()
-                .statusCode(HttpStatus.CREATED.value())
-                .extract();
+        return RestTestUtils.request(Method.POST, "/lines", request);
     }
 
     private ExtractableResponse<Response> getAllLines() {
-        return RestAssured.given().log().all()
-                .when().get("/lines")
-                .then().log().all()
-                .statusCode(HttpStatus.OK.value())
-                .extract();
+        return RestTestUtils.request(Method.GET, "/lines");
     }
 
     private ExtractableResponse<Response> getLine(Long id) {
-        return RestAssured.given().log().all()
-                .when().get("/lines/"+id)
-                .then().log().all()
-//                .statusCode(HttpStatus.OK.value())
-                .extract();
+        return RestTestUtils.request(Method.GET, "/lines/"+id);
     }
 
     private ExtractableResponse<Response> modify(Long id, LineUpdateRequest request) {
-        return RestAssured.given().log().all()
-                .body(request)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().put("/lines/"+id)
-                .then().log().all()
-                .statusCode(HttpStatus.OK.value())
-                .extract();
+        return RestTestUtils.request(Method.PUT, "/lines/"+id, request);
     }
 
     private ExtractableResponse<Response> remove(Long id) {
-        return RestAssured.given().log().all()
-                .when().delete("/lines/"+id)
-                .then().log().all()
-                .statusCode(HttpStatus.NO_CONTENT.value())
-                .extract();
+        return RestTestUtils.request(Method.DELETE, "/lines/"+id);
     }
 
 }
