@@ -25,14 +25,14 @@ import subway.services.LineService;
 public class LineController {
     private final LineService lineService;
 
-    @PostMapping()
+    @PostMapping
     public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest.Create lineRequest) {
         Line line = lineService.saveLine(lineRequest);
         return ResponseEntity.created(URI.create("/lines/" + line.getId()))
             .body(LineResponse.of(line));
     }
 
-    @GetMapping()
+    @GetMapping
     public ResponseEntity<List<LineResponse>> showStations() {
         return ResponseEntity.ok().body(LineResponse.of(lineService.findAllLines()));
     }
