@@ -14,6 +14,8 @@ import org.springframework.http.MediaType;
 
 public class StationRestAssured {
 
+    private static final String STATION_BASE_PATH = "/stations";
+
     public static List<ExtractableResponse<Response>> 역_생성(final String... stationNames) {
         return Arrays.stream(stationNames)
                 .map(StationRestAssured::역_생성)
@@ -29,7 +31,7 @@ public class StationRestAssured {
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
-                .post("/stations")
+                .post(STATION_BASE_PATH)
                 .then().log().all()
                 .statusCode(HttpStatus.CREATED.value())
                 .extract();
@@ -38,16 +40,20 @@ public class StationRestAssured {
     public static ExtractableResponse<Response> 역_삭제(final Long id) {
         return givenLog()
                 .when()
-                .delete("/stations/{id}", id)
+                .delete(stationDeletePath(id))
                 .then().log().all()
                 .statusCode(HttpStatus.NO_CONTENT.value())
                 .extract();
     }
 
+    private static String stationDeletePath(final Long id) {
+        return STATION_BASE_PATH + "/" + id;
+    }
+
     public static ExtractableResponse<Response> 역_목록_조회() {
         return givenLog()
                 .when()
-                .get("/stations")
+                .get(STATION_BASE_PATH)
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
                 .extract();

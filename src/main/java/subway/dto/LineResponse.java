@@ -11,16 +11,6 @@ public class LineResponse {
     private final List<StationResponse> stations;
     private final int distance;
 
-    public static LineResponse by(final Line line, final List<StationResponse> stations) {
-        return new LineResponse(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                stations,
-                line.getDistance()
-        );
-    }
-
     public LineResponse(
             final Long id,
             final String name,
@@ -33,6 +23,16 @@ public class LineResponse {
         this.color = color;
         this.stations = stations;
         this.distance = distance;
+    }
+
+    public static LineResponse from(final Line line, final List<StationResponse> stations) {
+        return new LineResponse(
+                line.getId(),
+                line.getName(),
+                line.getColor(),
+                stations,
+                line.getDistance()
+        );
     }
 
     public Long getId() {

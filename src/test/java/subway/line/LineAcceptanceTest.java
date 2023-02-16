@@ -11,47 +11,28 @@ import static subway.line.LineRestAssured.노선_생성;
 import static subway.line.LineRestAssured.노선_수정;
 import static subway.station.StationRestAssured.역_생성;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpHeaders;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestConstructor;
-import org.springframework.test.context.TestConstructor.AutowireMode;
-import subway.util.DatabaseCleanup;
+import subway.util.RandomPortAcceptanceTest;
 
-@ActiveProfiles("acceptance")
 @DisplayName("지하철 노선 관련 기능")
-@TestConstructor(autowireMode = AutowireMode.ALL)
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-public class LineAcceptanceTest {
+public class LineAcceptanceTest extends RandomPortAcceptanceTest {
 
     private static final String LINE_NAME = "신분당선";
     private static final String COLOR = "bg-red-600";
     private static final int DISTANCE = 10;
 
-    @LocalServerPort
-    private int port;
-
     private Long upStationId;
     private Long downStationId;
 
-    private final DatabaseCleanup databaseCleanup;
-
-    public LineAcceptanceTest(final DatabaseCleanup databaseCleanup) {
-        this.databaseCleanup = databaseCleanup;
-    }
-
+    @Override
     @BeforeEach
-    void setUp() {
-        RestAssured.port = port;
-        this.databaseCleanup.truncateTable();
+    protected void setUp() {
+        super.setUp();
         this.upStationId = 역_생성("강남역").jsonPath().getLong("id");
         this.downStationId = 역_생성("양재역").jsonPath().getLong("id");
     }

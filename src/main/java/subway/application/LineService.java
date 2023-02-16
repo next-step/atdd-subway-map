@@ -2,42 +2,47 @@ package subway.application;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.application.util.Finder;
 import subway.domain.Line;
 import subway.domain.LineRepository;
 import subway.domain.Station;
-import subway.domain.StationRepository;
 import subway.dto.LineCreateRequest;
 import subway.dto.LineEditRequest;
 import subway.dto.LineResponse;
 import subway.dto.StationResponse;
+import subway.exception.LineNotFoundException;
 
 @Transactional(readOnly = true)
 @Service
 public class LineService {
 
     private final LineRepository lineRepository;
-    private final StationRepository stationRepository;
+    private final StationService stationService;
+    private final Finder finder;
 
-    public LineService(
-            final LineRepository lineRepository,
-            final StationRepository stationRepository
-    ) {
+    public LineService(final LineRepository lineRepository, final StationService stationService, final Finder finder) {
         this.lineRepository = lineRepository;
-        this.stationRepository = stationRepository;
+        this.stationService = stationService;
+        this.finder = finder;
+    }
+
+    private Line findLineBy(final Long lineId) {
+        return lineRepository.findById(lineId)
+                .orElseThrow(LineNotFoundException::new);
     }
 
     public LineResponse getBy(final Long lineId) {
-        Line line = lineRepository.findByIdWithStation(lineId)
-                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 노선입니다."));
-        return LineResponse.by(line, StationResponse.by(line.getStations()));
+        Line line = lineRepository.findById(lineId)
+                .orElseThrow(LineNotFoundException::new);
+
+        return LineResponse.from(line, StationResponse.from(line.getStations()));
     }
 
     public List<LineResponse> getList() {
-        return lineRepository.findAllWithStation().stream()
-                .map(line -> LineResponse.by(line, StationResponse.by(line.getStations())))
+        return lineRepository.findAll().stream()
+                .map(line -> LineResponse.from(line, StationResponse.from(line.getStations())))
                 .collect(Collectors.toUnmodifiableList());
     }
 
@@ -48,17 +53,15 @@ public class LineService {
         return line.getId();
     }
 
-    private Line convertToLineBy(
-            final LineCreateRequest lineCreateRequest
-    ) {
-        List<Station> stations = stationRepository
+    private Line convertToLineBy(final LineCreateRequest lineCreateRequest) {
+        List<Station> stations = stationService
                 .findAllById(List.of(lineCreateRequest.getUpStationId(), lineCreateRequest.getDownStationId()));
+
         return new Line(
                 lineCreateRequest.getName(),
                 lineCreateRequest.getColor(),
-                stations,
-                lineCreateRequest.getUpStationId(),
-                lineCreateRequest.getDownStationId(),
+                finder.findStationById(stations, lineCreateRequest.getUpStationId()),
+                finder.findStationById(stations, lineCreateRequest.getDownStationId()),
                 lineCreateRequest.getDistance()
         );
     }
@@ -66,6 +69,7 @@ public class LineService {
     @Transactional
     public void edit(final Long lineId, final LineEditRequest lineEditRequest) {
         Line line = findLineBy(lineId);
+
         line.modify(lineEditRequest.getName(), lineEditRequest.getColor(), lineEditRequest.getDistance());
     }
 
@@ -73,10 +77,5 @@ public class LineService {
     public void delete(final Long lineId) {
         Line line = findLineBy(lineId);
         lineRepository.delete(line);
-    }
-
-    private Line findLineBy(final Long lineId) {
-        return lineRepository.findById(lineId)
-                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 노선입니다."));
     }
 }

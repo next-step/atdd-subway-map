@@ -8,6 +8,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import org.springframework.util.StringUtils;
+import subway.exception.LineModifyException;
+import subway.exception.SectionConstraintException;
 
 @Entity
 public class Line {
@@ -23,7 +25,7 @@ public class Line {
     private String color;
 
     @Embedded
-    private Stations stations;
+    private Sections sections;
 
     @Embedded
     private Distance distance;
@@ -34,14 +36,13 @@ public class Line {
     public Line(
             final String name,
             final String color,
-            final List<Station> stations,
-            final Long upStationId,
-            final Long downStationId,
+            final Station upStation,
+            final Station downStation,
             final int distance
     ) {
         this.name = name;
         this.color = color;
-        this.stations = new Stations(stations, upStationId, downStationId);
+        this.sections = new Sections(new Section(distance, upStation, downStation, this));
         this.distance = new Distance(distance);
     }
 
@@ -54,7 +55,7 @@ public class Line {
     }
 
     public List<Station> getStations() {
-        return List.of(stations.getUpStation(), stations.getDownStation());
+        return List.of(sections.getLineUpStation(), sections.getLineDownStation());
     }
 
     public String getColor() {
@@ -65,6 +66,10 @@ public class Line {
         return distance.getValue();
     }
 
+    public Station getDownStation() {
+        return sections.getLineDownStation();
+    }
+
     public void modify(final String name, final String color, final int distance) {
         editName(name);
         editColor(color);
@@ -73,19 +78,31 @@ public class Line {
 
     private void editName(final String name) {
         if (!StringUtils.hasText(name)) {
-            throw new IllegalArgumentException("이름은 공백일 수 없습니다.");
+            throw new LineModifyException();
         }
         this.name = name;
     }
 
     private void editColor(final String color) {
         if (!StringUtils.hasText(color)) {
-            throw new IllegalArgumentException("색상은 공백일 수 없습니다.");
+            throw new LineModifyException();
         }
         this.color = color;
     }
 
     private void editDistance(final int distance) {
         this.distance = new Distance(distance);
+    }
+
+    public void deleteBy(final Station station) {
+        if (!getDownStation().equals(station)) {
+            throw new SectionConstraintException();
+        }
+        this.distance.minus(sections.deleteBy(station));
+    }
+
+    public void addSection(final int distance, final Station upStation, final Station downStation) {
+        this.sections.add(new Section(distance, upStation, downStation, this));
+        this.distance.plus(new Distance(distance));
     }
 }
