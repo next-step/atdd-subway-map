@@ -3,6 +3,7 @@ package subway;
 import static org.assertj.core.api.Assertions.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -167,5 +168,26 @@ public class SectionAcceptanceTest {
 
         // Then
         AssertUtils.응답_상태_코드_검증(노선_구간_삭제(lineId, daSanStation.getId()), HttpStatus.BAD_REQUEST);
+    }
+
+    @DisplayName("노선의 목록을 조회했을 때 구간의 역이 모두 조회된다.")
+    @Test
+    void 노선의_목록을_조회했을_때_구간의_역이_모두_조회된다() {
+        // Given
+        Map<String, Object> sectionParams = new HashMap<>();
+        sectionParams.put("upStationId", deokSoStation.getId());
+        sectionParams.put("downStationId", daSanStation.getId());
+        sectionParams.put("distance", 10);
+
+        Long lineId = newBunDangLine.getId();
+
+        // When
+        노선_구간_생성(lineId, sectionParams);
+        ExtractableResponse<Response> response = LineAcceptanceTest.지하철_노선_조회(lineId);
+
+        // Then
+        AssertUtils.응답_상태_코드_검증(response, HttpStatus.OK);
+        List<Long> stationIds = response.body().jsonPath().getList("stations.id", Long.class);
+        assertThat(stationIds).containsOnly(1L, 2L, 3L);
     }
 }
