@@ -23,7 +23,7 @@ public class SectionResponse {
         this.downStationId = downStation.getId();
     }
 
-    public static SectionResponse by(final Section section) {
+    public static SectionResponse from(final Section section) {
         return new SectionResponse(
                 section.getId(),
                 section.getDistance(),
