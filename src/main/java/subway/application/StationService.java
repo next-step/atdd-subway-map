@@ -32,6 +32,10 @@ public class StationService {
                 .collect(Collectors.toList());
     }
 
+    public List<Station> findAllById(final List<Long> ids) {
+        return stationRepository.findAllById(ids);
+    }
+
     @Transactional
     public void deleteStationById(final Long id) {
         Station station = stationRepository.findById(id)

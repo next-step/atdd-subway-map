@@ -8,7 +8,6 @@ import subway.application.util.Finder;
 import subway.domain.Line;
 import subway.domain.LineRepository;
 import subway.domain.Station;
-import subway.domain.StationRepository;
 import subway.dto.LineCreateRequest;
 import subway.dto.LineEditRequest;
 import subway.dto.LineResponse;
@@ -20,17 +19,18 @@ import subway.exception.LineNotFoundException;
 public class LineService {
 
     private final LineRepository lineRepository;
-    private final StationRepository stationRepository;
+    private final StationService stationService;
     private final Finder finder;
 
-    public LineService(
-            final LineRepository lineRepository,
-            final StationRepository stationRepository,
-            final Finder finder
-    ) {
+    public LineService(final LineRepository lineRepository, final StationService stationService, final Finder finder) {
         this.lineRepository = lineRepository;
-        this.stationRepository = stationRepository;
+        this.stationService = stationService;
         this.finder = finder;
+    }
+
+    private Line findLineBy(final Long lineId) {
+        return lineRepository.findById(lineId)
+                .orElseThrow(LineNotFoundException::new);
     }
 
     public LineResponse getBy(final Long lineId) {
@@ -54,7 +54,7 @@ public class LineService {
     }
 
     private Line convertToLineBy(final LineCreateRequest lineCreateRequest) {
-        List<Station> stations = stationRepository
+        List<Station> stations = stationService
                 .findAllById(List.of(lineCreateRequest.getUpStationId(), lineCreateRequest.getDownStationId()));
 
         return new Line(
@@ -77,10 +77,5 @@ public class LineService {
     public void delete(final Long lineId) {
         Line line = findLineBy(lineId);
         lineRepository.delete(line);
-    }
-
-    private Line findLineBy(final Long lineId) {
-        return lineRepository.findById(lineId)
-                .orElseThrow(LineNotFoundException::new);
     }
 }
