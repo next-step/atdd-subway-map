@@ -58,12 +58,14 @@ public class LineService {
     }
 
     @Transactional
-    public LineResponse saveSection(Long id, SectionRequest request) {
+    public LineResponse saveSection(Long id, SectionRequest request) throws WrongSectionCreateException {
         Line line = getLine(id);
         Section section = createSection(request.getUpStationId(), request.getDownStationId());
-        sectionRepository.save(section);
+
         line.addSection(section);
+        sectionRepository.save(section);
         lineRepository.save(line);
+
         return LineResponse.from(line);
     }
 

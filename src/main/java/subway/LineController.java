@@ -45,8 +45,12 @@ public class LineController {
     }
 
     @PostMapping("/lines/{id}/sections")
-    public ResponseEntity<LineResponse> createSection(@PathVariable Long id, @Valid @RequestBody SectionRequest request) {
-        LineResponse response = lineService.saveSection(id, request);
-        return ResponseEntity.created(URI.create("/lines/" + response.getId())).body(response);
+    public ResponseEntity createSection(@PathVariable Long id, @Valid @RequestBody SectionRequest request) {
+        try {
+            LineResponse response = lineService.saveSection(id, request);
+            return ResponseEntity.created(URI.create("/lines/" + response.getId())).body(response);
+        } catch (WrongSectionCreateException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }

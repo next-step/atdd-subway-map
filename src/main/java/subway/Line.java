@@ -1,10 +1,7 @@
 package subway;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Entity
 public class Line {
@@ -14,17 +11,16 @@ public class Line {
     private Long id;
     @Column(length = 20, nullable = false)
     private String name;
-
     @Column(length = 20)
     private String color;
-    @OneToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
-    private List<Section> sections = new ArrayList<>();
+    @Embedded
+    private Sections sections = new Sections();
     private Long distance;
 
     public Line() {
     }
 
-    public Line(String name, String color, List<Section> sections, Long distance) {
+    public Line(String name, String color, Sections sections, Long distance) {
         this.name = name;
         this.color = color;
         this.sections = sections;
@@ -34,7 +30,7 @@ public class Line {
     public static Line from(LineRequest lineRequest, Section section) {
         return new Line(lineRequest.getName(),
                 lineRequest.getColor(),
-                Arrays.asList(section),
+                new Sections(section),
                 lineRequest.getDistance());
     }
 
@@ -62,15 +58,10 @@ public class Line {
     }
 
     public List<Station> getStations() {
-        return getSections().stream().flatMap(section -> section.getStations().stream())
-                .collect(Collectors.toList());
+        return sections.getStations();
     }
 
-    public void addSection(Section section) {
-        getSections().add(section);
-    }
-
-    public List<Section> getSections() {
-        return sections;
+    public void addSection(Section section) throws WrongSectionCreateException {
+        sections.add(section);
     }
 }

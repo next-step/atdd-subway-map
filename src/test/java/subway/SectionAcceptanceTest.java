@@ -4,7 +4,6 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -65,10 +64,26 @@ public class SectionAcceptanceTest {
      * Then 실패한다.
      */
     @Test
-    @Disabled
     void createSection_failIfSectionUpStationIsNotLineLastDownStation() {
+        //given
+        Long upStationId = newStationIds.get(2);
+        Long downStationId = newStationIds.get(3);
+        Long distance = 10L;
 
+        //when
+        Map<String, String> params = new HashMap<>();
+        params.put("upStationId", upStationId.toString());
+        params.put("downStationId", downStationId.toString());
+        params.put("distance", distance.toString());
+        ExtractableResponse<Response> response = RestAssured.given()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(params)
+                .when().post("/lines/{lineId}/sections", newLineId)
+                .then().extract();
 
+        //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.response().asString()).contains("section's up station is not line's down end station");
     }
 
     /**
@@ -77,8 +92,25 @@ public class SectionAcceptanceTest {
      * Then 실패한다.
      */
     @Test
-    @Disabled
     void createSection_failIfSectionDownStationIsInLine() {
+        //given
+        Long upStationId = newStationIds.get(1);
+        Long downStationId = newStationIds.get(0);
+        Long distance = 10L;
 
+        //when
+        Map<String, String> params = new HashMap<>();
+        params.put("upStationId", upStationId.toString());
+        params.put("downStationId", downStationId.toString());
+        params.put("distance", distance.toString());
+        ExtractableResponse<Response> response = RestAssured.given()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(params)
+                .when().post("/lines/{lineId}/sections", newLineId)
+                .then().extract();
+
+        //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.response().asString()).contains("section's down station can't be in other section's station");
     }
 }
