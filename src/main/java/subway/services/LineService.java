@@ -6,8 +6,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.dto.request.LineRequest;
+import subway.dto.request.SectionRequest;
 import subway.models.Line;
 import subway.models.Section;
+import subway.models.Sections;
 import subway.models.Station;
 import subway.repositories.LineRepository;
 
@@ -19,8 +21,6 @@ public class LineService {
     private final LineRepository lineRepository;
     private final StationService stationService;
 
-    private final int FIRST = 1;
-
     @Transactional
     public Line saveLine(LineRequest.Create lineRequest) {
         Station upStation = stationService.findById(lineRequest.getUpStationId());
@@ -29,17 +29,10 @@ public class LineService {
         Line line = Line.builder()
             .name(lineRequest.getName())
             .color(lineRequest.getColor())
-            .build();
-
-        Section section = Section.builder()
-            .line(line)
-            .sequence(FIRST)
             .upStation(upStation)
             .downStation(downStation)
             .distance(lineRequest.getDistance())
             .build();
-
-        line.addSection(section);
 
         return lineRepository.save(line);
     }
@@ -62,5 +55,29 @@ public class LineService {
     @Transactional
     public void deleteById(Long id) {
         lineRepository.deleteById(id);
+    }
+
+    @Transactional
+    public Line addSection(Long id, SectionRequest request) {
+        Line line = findById(id);
+        Station upStation = stationService.findById(request.getUpStationId());
+        Station downStation = stationService.findById(request.getDownStationId());
+
+        line.addSection(Section.builder()
+            .line(line)
+            .upStation(upStation)
+            .downStation(downStation)
+            .distance(request.getDistance())
+            .build());
+
+        return lineRepository.save(line);
+    }
+
+    @Transactional
+    public void deleteSection(Long id, Long stationId) {
+        Line line = findById(id);
+        Station station = stationService.findById(stationId);
+
+        line.removeLastSection(station);
     }
 }
