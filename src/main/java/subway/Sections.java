@@ -74,4 +74,16 @@ public class Sections {
                 .findFirst()
                 .orElse(null);
     }
+
+    public void removeSection(Long stationId) throws WrongSectionDeleteException {
+        if (sections.size() == 1) {
+            throw new WrongSectionDeleteException("The line has only one section");
+        }
+
+        Section downEndSection = getDownEndSection();
+        if (!downEndSection.getDownStation().getId().equals(stationId)) {
+            throw new WrongSectionDeleteException("it is not the last section of line");
+        }
+        sections.remove(downEndSection);
+    }
 }

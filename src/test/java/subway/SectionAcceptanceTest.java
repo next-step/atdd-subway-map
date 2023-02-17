@@ -41,21 +41,25 @@ public class SectionAcceptanceTest {
         //given
         Long upStationId = newStationIds.get(1);
         Long downStationId = newStationIds.get(2);
-        Long distance = 10L;
 
         //when
-        Map<String, String> params = new HashMap<>();
-        params.put("upStationId", upStationId.toString());
-        params.put("downStationId", downStationId.toString());
-        params.put("distance", distance.toString());
-        ExtractableResponse<Response> response = RestAssured.given()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(params)
-                .when().post("/lines/{lineId}/sections", newLineId)
-                .then().extract();
+        ExtractableResponse<Response> response = createSection(newLineId, upStationId, downStationId);
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+    }
+
+    public static ExtractableResponse<Response> createSection(Long lineId, Long upStationId, Long downStationId) {
+        Map<String, String> params = new HashMap<>();
+        params.put("upStationId", upStationId.toString());
+        params.put("downStationId", downStationId.toString());
+        params.put("distance", "10");
+        ExtractableResponse<Response> response = RestAssured.given()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(params)
+                .when().post("/lines/{lineId}/sections", lineId)
+                .then().extract();
+        return response;
     }
 
     /**
@@ -68,18 +72,9 @@ public class SectionAcceptanceTest {
         //given
         Long upStationId = newStationIds.get(2);
         Long downStationId = newStationIds.get(3);
-        Long distance = 10L;
 
         //when
-        Map<String, String> params = new HashMap<>();
-        params.put("upStationId", upStationId.toString());
-        params.put("downStationId", downStationId.toString());
-        params.put("distance", distance.toString());
-        ExtractableResponse<Response> response = RestAssured.given()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(params)
-                .when().post("/lines/{lineId}/sections", newLineId)
-                .then().extract();
+        ExtractableResponse<Response> response = createSection(newLineId, upStationId, downStationId);
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -99,18 +94,74 @@ public class SectionAcceptanceTest {
         Long distance = 10L;
 
         //when
-        Map<String, String> params = new HashMap<>();
-        params.put("upStationId", upStationId.toString());
-        params.put("downStationId", downStationId.toString());
-        params.put("distance", distance.toString());
-        ExtractableResponse<Response> response = RestAssured.given()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(params)
-                .when().post("/lines/{lineId}/sections", newLineId)
-                .then().extract();
+        ExtractableResponse<Response> response = createSection(newLineId, upStationId, downStationId);
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(response.response().asString()).contains("section's down station can't be in other section's station");
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 구간을 제거하면
+     * Then 성공한다
+     */
+    @Test
+    void deleteSection_success() {
+        //given
+        createSection(newLineId, newStationIds.get(1), newStationIds.get(2));
+        Long stationId = newStationIds.get(2);
+
+        //when
+        ExtractableResponse<Response> response = RestAssured.given()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().delete("/lines/{lineId}/sections?stationId={stationId}", newLineId, stationId)
+                .then().extract();
+
+        //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 마지막이 아닌 구간을 제거하려할 경우
+     * Then 실패한다
+     */
+    @Test
+    void deleteSection_failIfSectionIsNotLast() {
+        //given
+        createSection(newLineId, newStationIds.get(1), newStationIds.get(2));
+        Long stationId = newStationIds.get(1);
+
+        //when
+        ExtractableResponse<Response> response = RestAssured.given()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().delete("/lines/{lineId}/sections?stationId={stationId}", newLineId, stationId)
+                .then().extract();
+
+        //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.response().asString()).contains("it is not the last section of line");
+    }
+
+    /**
+     * Given 1개 구간 지하철 노선을 생성하고
+     * When 해당 구간을 제거하려고 할 경우
+     * Then 실패한다
+     */
+    @Test
+    void deleteSection_failIfLineHasOnlyOneSection() {
+        //given
+        Long stationId = newStationIds.get(1);
+
+        //when
+        ExtractableResponse<Response> response = RestAssured.given()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().delete("/lines/{lineId}/sections?stationId={stationId}", newLineId, stationId)
+                .then().extract();
+
+        //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.response().asString()).contains("The line has only one section");
     }
 }

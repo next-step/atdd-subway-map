@@ -64,4 +64,8 @@ public class Line {
     public void addSection(Section section) throws WrongSectionCreateException {
         sections.add(section);
     }
+
+    public void deleteSection(Long stationId) throws WrongSectionDeleteException {
+        sections.removeSection(stationId);
+    }
 }

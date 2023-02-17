@@ -69,6 +69,14 @@ public class LineService {
         return LineResponse.from(line);
     }
 
+    @Transactional
+    public void deleteSection(Long lineId, Long stationId) throws WrongSectionDeleteException {
+        Line line = getLine(lineId);
+
+        line.deleteSection(stationId);
+        lineRepository.save(line);
+    }
+
     private Section createSection(Long upStationId, Long downStationId) {
         Station upStation = stationService.findById(upStationId);
         Station downStation = stationService.findById(downStationId);
