@@ -1,6 +1,10 @@
 package subway;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 public class Line {
@@ -13,28 +17,24 @@ public class Line {
 
     @Column(length = 20)
     private String color;
-    @ManyToOne
-    private Station upStation;
-    @ManyToOne
-    private Station downStation;
+    @OneToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    private List<Section> sections = new ArrayList<>();
     private Long distance;
 
     public Line() {
     }
 
-    public Line(String name, String color, Station upStation, Station downStation, Long distance) {
+    public Line(String name, String color, List<Section> sections, Long distance) {
         this.name = name;
         this.color = color;
-        this.upStation = upStation;
-        this.downStation = downStation;
+        this.sections = sections;
         this.distance = distance;
     }
 
-    public static Line from(LineRequest lineRequest) {
+    public static Line from(LineRequest lineRequest, Section section) {
         return new Line(lineRequest.getName(),
                 lineRequest.getColor(),
-                new Station(lineRequest.getUpStationId()),
-                new Station(lineRequest.getDownStationId()),
+                Arrays.asList(section),
                 lineRequest.getDistance());
     }
 
@@ -51,20 +51,26 @@ public class Line {
         return color;
     }
 
-    public Station getUpStation() {
-        return upStation;
-    }
-
-    public Station getDownStation() {
-        return downStation;
-    }
-
     public Long getDistance() {
         return distance;
     }
 
+
     public void modify(LineModificationRequest lineModificationRequest) {
         this.name = lineModificationRequest.getName();
         this.color = lineModificationRequest.getColor();
+    }
+
+    public List<Station> getStations() {
+        return getSections().stream().flatMap(section -> section.getStations().stream())
+                .collect(Collectors.toList());
+    }
+
+    public void addSection(Section section) {
+        getSections().add(section);
+    }
+
+    public List<Section> getSections() {
+        return sections;
     }
 }
