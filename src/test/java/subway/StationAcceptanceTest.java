@@ -13,6 +13,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.LongStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -112,5 +114,12 @@ public class StationAcceptanceTest {
                 .when().get("/stations")
                 .then().log().all()
                 .extract();
+    }
+
+    public static List<Long> createStations(int count) {
+        return LongStream.range(0, count)
+                .mapToObj(i -> createStation("station" + i).jsonPath()
+                        .getLong("id"))
+                .collect(Collectors.toList());
     }
 }

@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.StationAcceptanceTest.createStation;
+import static subway.StationAcceptanceTest.createStations;
 
 @AcceptanceTest
 @DisplayName("노선 관련 기능")
@@ -26,11 +26,11 @@ public class LineAcceptanceTest {
 
     @BeforeEach
     void setUp() {
-        station1Id = createStation("station1").jsonPath()
-                .getLong("id");
-        station2Id = createStation("station2").jsonPath()
-                .getLong("id");
+        List<Long> stations = createStations(2);
+        station1Id = stations.get(0);
+        station2Id = stations.get(1);
     }
+
 
     /**
      * When 지하철 노선을 생성하면
@@ -180,4 +180,6 @@ public class LineAcceptanceTest {
                 .then().log().all()
                 .extract();
     }
+
+
 }
