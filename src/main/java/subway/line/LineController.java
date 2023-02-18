@@ -32,6 +32,7 @@ public class LineController {
     @GetMapping
     ResponseEntity<List<LineResponse>> findAllLines() {
         List<LineResponse> lineResponses = lineService.findAllLines();
+
         return ResponseEntity.ok().body(lineResponses);
     }
 
@@ -56,6 +57,4 @@ public class LineController {
 
         return ResponseEntity.noContent().build();
     }
-
-
 }

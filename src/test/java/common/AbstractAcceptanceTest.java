@@ -1,18 +1,18 @@
 package common;
 
+import common.util.DatabaseCleanup;
 import io.restassured.RestAssured;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
-import subway.test.DatabaseCleanup;
 
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @ActiveProfiles(value = "acceptanceTest")
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Import({DatabaseCleanup.class})
 public abstract class AbstractAcceptanceTest {
-
     @LocalServerPort
     protected int port;
 
@@ -27,5 +27,4 @@ public abstract class AbstractAcceptanceTest {
 
         databaseCleanup.execute();
     }
-
 }

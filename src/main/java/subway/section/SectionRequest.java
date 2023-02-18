@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import subway.line.LineRequest;
 
 @Getter
 @Setter(AccessLevel.PROTECTED)
@@ -13,9 +14,17 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class SectionRequest {
-    private Long downStationId;
-
     private Long upStationId;
 
+    private Long downStationId;
+
     private int distance;
+
+    public static SectionRequest of(LineRequest lineRequest) {
+        return new SectionRequest(
+            lineRequest.getUpStationId(),
+            lineRequest.getDownStationId(),
+            lineRequest.getDistance()
+        );
+    }
 }

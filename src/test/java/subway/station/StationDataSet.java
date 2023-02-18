@@ -1,6 +1,4 @@
-package subway.line.station;
-
-import subway.station.Station;
+package subway.station;
 
 public class StationDataSet {
 

@@ -100,7 +100,7 @@ public class SectionAcceptanceTest extends AbstractAcceptanceTest {
         assertThat(response.statusCode())
             .isEqualTo(HttpStatus.NO_CONTENT.value());
 
-        ExtractableResponse<Response> findSectionResponse = findSectionById(lineId, givenSection.getId());
+        ExtractableResponse<Response> findSectionResponse = findSectionByLineIdAndUpStationIdAndDownStationId(lineId, givenSection.getUpStationId(), givenSection.getDownStationId());
 
         assertThat(findSectionResponse.statusCode())
             .isEqualTo(HttpStatus.NOT_FOUND.value());
@@ -153,19 +153,17 @@ public class SectionAcceptanceTest extends AbstractAcceptanceTest {
     @DisplayName("지하철 구간 목록 조회")
     void searchSections() {
         // Given
-        Long downStationId2 = StationAcceptanceTest.createStation("downStation");
-        Long upStationId2 = StationAcceptanceTest.createStation("upStation");
-
-        SectionResponse givenSection1 = createSection(lineId, bStationId, aStationId, 10);
-        SectionResponse givenSection2 = createSection(lineId, downStationId2, upStationId2, 20);
+        List<SectionResponse> givenSections = findSections(lineId);
+        SectionResponse givenSection = createSection(lineId, bStationId, cStationId, 20);
 
         // When
         List<SectionResponse> sections = findSections(lineId);
 
         // Then
         assertThat(sections)
-            .hasSizeGreaterThanOrEqualTo(2)
-            .contains(givenSection1, givenSection2);
+            .hasSizeGreaterThanOrEqualTo(givenSections.size() + 1)
+            .containsAll(givenSections)
+            .contains(givenSection);
     }
 
     /**
@@ -177,10 +175,10 @@ public class SectionAcceptanceTest extends AbstractAcceptanceTest {
     @DisplayName("지하철 구간 조회")
     void searchSection() {
         // Given
-        SectionResponse givenSection = createSection(lineId, bStationId, aStationId, 10);
+        SectionResponse givenSection = createSection(lineId, bStationId, cStationId, 10);
 
         // When
-        SectionResponse findSection = findSection(lineId, givenSection.getId());
+        SectionResponse findSection = findSection(lineId, givenSection.getUpStationId(), givenSection.getDownStationId());
 
         // Then
         assertThat(findSection)
@@ -206,10 +204,10 @@ public class SectionAcceptanceTest extends AbstractAcceptanceTest {
                 .extract().jsonPath().getObject("$", SectionResponse.class);
     }
 
-    public static ExtractableResponse<Response> deleteSection(Long lineId, Long stationId) {
+    public static ExtractableResponse<Response> deleteSection(Long lineId, Long downStationId) {
         return RestAssured
             .given()
-                .param("stationId", stationId)
+                .param("downStationId", downStationId)
             .when()
                 .delete(LINES_SECTIONS_BASE_URL, lineId)
             .then()
@@ -217,17 +215,17 @@ public class SectionAcceptanceTest extends AbstractAcceptanceTest {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> findSectionById(Long lineId, Long sectionId) {
+    public static ExtractableResponse<Response> findSectionByLineIdAndUpStationIdAndDownStationId(Long lineId, Long upStationId, Long downStationId) {
         return RestAssured
             .given()
             .when()
-                .get( LINES_SECTIONS_BASE_URL + "/{sectionId}", lineId, sectionId)
+                .get( LINES_SECTIONS_BASE_URL + "/{upStationId}/{downStationId}", lineId, upStationId, downStationId)
             .then()
                 .log().all()
                 .extract();
     }
-    public static SectionResponse findSection(Long lineId, Long sectionId) {
-        return findSectionById(lineId, sectionId)
+    public static SectionResponse findSection(Long lineId, Long upStationId, Long downStationId) {
+        return findSectionByLineIdAndUpStationIdAndDownStationId(lineId, upStationId, downStationId)
             .jsonPath().getObject("$", SectionResponse.class);
     }
 

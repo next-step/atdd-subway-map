@@ -15,6 +15,16 @@ public class SectionService {
 
     private final StationRepository stationRepository;
 
+
+    @Transactional
+    public Section registerSection(SectionRequest sectionRequest) {
+        return registerSection(
+            sectionRequest.getUpStationId(),
+            sectionRequest.getDownStationId(),
+            sectionRequest.getDistance()
+        );
+    }
+
     @Transactional
     public Section registerSection(Long upStationId, Long downStationId, int distance) {
         Station upStation = stationRepository.findById(upStationId)

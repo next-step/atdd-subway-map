@@ -1,9 +1,11 @@
-package subway.test;
+package common.util;
 
 import com.google.common.base.CaseFormat;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.persistence.Entity;
@@ -15,8 +17,8 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Service
 @Profile(value = "acceptanceTest")
+@Service
 public class DatabaseCleanup implements InitializingBean {
 
     @PersistenceContext
@@ -52,15 +54,19 @@ public class DatabaseCleanup implements InitializingBean {
             .filter(e -> e.getJavaType().getAnnotation(Entity.class) != null)
             .map(e -> CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, e.getName()))
             .collect(Collectors.toList());
+    }
 
-//        List<String> tableNames = new ArrayList<>();
-//
-//        ResultSet resultSet = conn.getMetaData()
-//            .getTables(conn.getCatalog(), null, "%", new String[]{"TABLE"});
-//
-//        while (resultSet.next()) {
-//            tableNames.add(resultSet.getString("table_name"));
-//        }
-//        this.tableNames = tableNames;
+    @SuppressWarnings("unused")
+    @Deprecated
+    private void extractTableNames2(Connection conn) throws SQLException {
+        List<String> tableNames = new ArrayList<>();
+
+        ResultSet resultSet = conn.getMetaData()
+            .getTables(conn.getCatalog(), null, "%", new String[]{"TABLE"});
+
+        while (resultSet.next()) {
+            tableNames.add(resultSet.getString("table_name"));
+        }
+        this.tableNames = tableNames;
     }
 }

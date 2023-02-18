@@ -1,9 +1,7 @@
 package subway.line.section;
 
-import com.google.common.base.Objects;
-import com.google.common.base.Preconditions;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,6 +12,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import subway.exception.NotFoundLineException;
+import subway.exception.NotFoundLineSectionException;
+import subway.line.LineResponse;
+import subway.line.LineService;
 import subway.section.SectionRequest;
 import subway.section.SectionResponse;
 
@@ -21,48 +23,46 @@ import subway.section.SectionResponse;
 @RequestMapping("/lines/{lineId}/sections")
 @RequiredArgsConstructor
 public class LineSectionController {
-    private final LineSectionService lineSectionService;
+
+    private final LineService lineService;
+
+
     @PostMapping
     public ResponseEntity<SectionResponse> registerSection(@PathVariable Long lineId,
         @RequestBody SectionRequest sectionRequest) {
 
-        LineSection lineSection = lineSectionService.registerLineSection(
-            lineId,
-            sectionRequest.getUpStationId(),
-            sectionRequest.getDownStationId(),
-            sectionRequest.getDistance()
-        );
-
-        SectionResponse response = SectionResponse.of(lineSection);
+        SectionResponse response = lineService.addLineSection(lineId, sectionRequest);
 
         return ResponseEntity.ok(response);
     }
 
     @DeleteMapping
-    public ResponseEntity<?> removeSection(@PathVariable Long lineId, @RequestParam Long stationId) {
-        lineSectionService.removeLineSection(lineId, stationId);
+    public ResponseEntity<?> removeSection(@PathVariable Long lineId, @RequestParam Long downStationId) {
+        lineService.removeLineSection(lineId, downStationId);
 
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping
     public ResponseEntity<List<SectionResponse>> searchSections(@PathVariable Long lineId) {
-        List<SectionResponse> sections = lineSectionService.findAllSections(lineId).stream()
-            .map(SectionResponse::of)
-            .collect(Collectors.toList());
+        LineResponse lineResponse = lineService.findById(lineId)
+            .orElseThrow(NotFoundLineException::new);
+
+        List<SectionResponse> sections = lineResponse.getSections();
 
         return ResponseEntity.ok(sections);
     }
 
-    @GetMapping("/{lineSectionId}")
-    public ResponseEntity<SectionResponse> searchSection(@PathVariable Long lineId, @PathVariable Long lineSectionId) {
-        LineSection lineSection = lineSectionService.findLineSectionById(lineSectionId);
+    @GetMapping("/{upStationId}/{downStationId}")
+    public ResponseEntity<SectionResponse> searchSection(@PathVariable Long lineId, @PathVariable Long downStationId, @PathVariable Long upStationId) {
+        LineResponse lineResponse = lineService.findById(lineId)
+            .orElseThrow(NotFoundLineException::new);
 
-        Preconditions.checkState(Objects.equal(lineSection.lineId(), lineId),
-            "The section is not in the line");
+        SectionResponse sectionResponse = lineResponse.getSections().stream()
+            .filter(it -> Objects.equals(it.getDownStationId(), downStationId))
+            .filter(it -> Objects.equals(it.getUpStationId(), upStationId))
+            .findFirst().orElseThrow(NotFoundLineSectionException::new);
 
-        SectionResponse response = SectionResponse.of(lineSection);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(sectionResponse);
     }
 }

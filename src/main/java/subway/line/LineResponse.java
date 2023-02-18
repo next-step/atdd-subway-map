@@ -9,6 +9,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import subway.section.SectionResponse;
 import subway.station.StationResponse;
 
 @Getter
@@ -25,11 +26,17 @@ public class LineResponse {
 
     private List<StationResponse> stations;
 
+    private List<SectionResponse> sections;
+
     public static LineResponse of(Line line) {
         List<StationResponse> stationResponses = Stream.of(line.getUpStation(), line.getDownStation())
             .map(StationResponse::of)
             .collect(Collectors.toList());
 
-        return new LineResponse(line.getId(), line.getName(), line.getColor(), stationResponses);
+        List<SectionResponse> sectionResponses = line.getLineSections().stream()
+            .map(SectionResponse::of)
+            .collect(Collectors.toList());
+
+        return new LineResponse(line.getId(), line.getName(), line.getColor(), stationResponses, sectionResponses);
     }
 }

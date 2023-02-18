@@ -4,7 +4,7 @@ import common.JpaRepositoryTest;
 import org.junit.jupiter.api.DisplayName;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
-import subway.line.station.StationDataSet;
+import subway.station.StationDataSet;
 import subway.section.Section;
 import subway.section.SectionRepository;
 import subway.station.Station;
