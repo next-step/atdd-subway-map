@@ -240,7 +240,7 @@ class LineAcceptanceTest {
         /**
          * Given 지하철 노선을 생성하고
          * When 생성한 지하철 노선을 삭제하면
-         * Then 해당 지하철 노선 정보는 삭제된다
+         * Then 해당 지하철 노선 정보는 삭제되고, 삭제한 지하철 노선으로 노선 조회 시 404를 반환한다.
          */
         @DisplayName("지하철 노선을 삭제한다.")
         @Test
@@ -260,7 +260,12 @@ class LineAcceptanceTest {
             ExtractableResponse<Response> 지하철_노선_삭제_요청_결과 = LineRestAssured.지하철_노선_삭제_요청(lineId);
 
             // then
-            assertThat(지하철_노선_삭제_요청_결과.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+            int 지하철_노선_조회_요청_상태코드 = LineRestAssured.지하철_노선_조회_요청(lineId).response().statusCode();
+
+            assertAll(
+                    () -> assertThat(지하철_노선_삭제_요청_결과.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value()),
+                    () -> assertThat(지하철_노선_조회_요청_상태코드).isEqualTo(HttpStatus.NOT_FOUND.value())
+            );
         }
 
         @DisplayName("존재하지 않는 노선 ID를 입력하면 404을 리턴한다.")
