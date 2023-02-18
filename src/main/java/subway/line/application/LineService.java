@@ -79,7 +79,6 @@ public class LineService {
     @Transactional
     public void updateLineById(Long id, LinePatchRequest linePatchRequest) {
         Line line = lineRepository.findById(id).orElseThrow(LineNotFoundException::new);
-//        lineRepository.save(line.update(linePatchRequest.getName(), linePatchRequest.getColor()));
         line.update(linePatchRequest.getName(), linePatchRequest.getColor());
     }
 
