@@ -47,7 +47,7 @@ public class SectionAcceptanceTest {
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(response.jsonPath().getList("stations.id", Long.class)).contains(1L, 2L);
+        assertThat(response.jsonPath().getList("stations.id", Long.class)).contains(upStationId, downStationId);
     }
 
     /**
