@@ -1,6 +1,7 @@
 package subway;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 public class Line {
@@ -10,32 +11,20 @@ public class Line {
     private Long id;
     @Column(length = 20, nullable = false)
     private String name;
-
     @Column(length = 20)
     private String color;
-    @ManyToOne
-    private Station upStation;
-    @ManyToOne
-    private Station downStation;
+    @Embedded
+    private Sections sections = new Sections();
     private Long distance;
 
     public Line() {
     }
 
-    public Line(String name, String color, Station upStation, Station downStation, Long distance) {
+    public Line(String name, String color, Sections sections, Long distance) {
         this.name = name;
         this.color = color;
-        this.upStation = upStation;
-        this.downStation = downStation;
+        this.sections = sections;
         this.distance = distance;
-    }
-
-    public static Line from(LineRequest lineRequest) {
-        return new Line(lineRequest.getName(),
-                lineRequest.getColor(),
-                new Station(lineRequest.getUpStationId()),
-                new Station(lineRequest.getDownStationId()),
-                lineRequest.getDistance());
     }
 
 
@@ -51,20 +40,25 @@ public class Line {
         return color;
     }
 
-    public Station getUpStation() {
-        return upStation;
-    }
-
-    public Station getDownStation() {
-        return downStation;
-    }
-
     public Long getDistance() {
         return distance;
     }
 
+
     public void modify(LineModificationRequest lineModificationRequest) {
         this.name = lineModificationRequest.getName();
         this.color = lineModificationRequest.getColor();
+    }
+
+    public List<Station> getStations() {
+        return sections.getStations();
+    }
+
+    public void addSection(Section section) throws WrongSectionCreateException {
+        sections.add(section);
+    }
+
+    public void deleteSection(Long stationId) throws WrongSectionDeleteException {
+        sections.removeSection(stationId);
     }
 }

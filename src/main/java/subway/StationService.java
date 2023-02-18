@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,6 +26,11 @@ public class StationService {
         return stationRepository.findAll().stream()
                 .map(this::createStationResponse)
                 .collect(Collectors.toList());
+    }
+
+    public Station findById(Long id) {
+        return stationRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("no station for " + id));
     }
 
     @Transactional

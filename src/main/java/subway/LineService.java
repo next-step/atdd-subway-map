@@ -12,15 +12,20 @@ import java.util.stream.Collectors;
 public class LineService {
 
     private LineRepository lineRepository;
+    private StationService stationService;
 
-    public LineService(LineRepository lineRepository) {
+
+    public LineService(LineRepository lineRepository, StationService stationService) {
         this.lineRepository = lineRepository;
+        this.stationService = stationService;
     }
 
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
-        Line line = lineRepository.save(Line.from(lineRequest));
-        return LineResponse.from(line);
+        Section section = createSection(lineRequest.getUpStationId(), lineRequest.getDownStationId());
+        Line line = lineRequest.toEntity(section);
+        Line lineSaved = lineRepository.save(line);
+        return LineResponse.from(lineSaved);
 
     }
 
@@ -49,5 +54,30 @@ public class LineService {
     private Line getLine(Long id) {
         return lineRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("no line for id"));
+    }
+
+    @Transactional
+    public LineResponse saveSection(Long id, SectionRequest request) throws WrongSectionCreateException {
+        Line line = getLine(id);
+        Section section = createSection(request.getUpStationId(), request.getDownStationId());
+
+        line.addSection(section);
+        lineRepository.save(line);
+
+        return LineResponse.from(line);
+    }
+
+    @Transactional
+    public void deleteSection(Long lineId, Long stationId) throws WrongSectionDeleteException {
+        Line line = getLine(lineId);
+
+        line.deleteSection(stationId);
+        lineRepository.save(line);
+    }
+
+    private Section createSection(Long upStationId, Long downStationId) {
+        Station upStation = stationService.findById(upStationId);
+        Station downStation = stationService.findById(downStationId);
+        return new Section(upStation, downStation);
     }
 }

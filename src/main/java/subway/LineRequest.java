@@ -35,4 +35,11 @@ public class LineRequest {
     public String getColor() {
         return color;
     }
+
+    public Line toEntity(Section section) {
+        return new Line(this.getName(),
+                this.getColor(),
+                new Sections(section),
+                this.getDistance());
+    }
 }
