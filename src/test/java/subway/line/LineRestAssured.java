@@ -7,11 +7,11 @@ import org.springframework.http.MediaType;
 import subway.line.presentation.LinePatchRequest;
 import subway.line.presentation.LineRequest;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+
 public class LineRestAssured {
 
     private static final String API_PATH = "/lines";
-
-    private static final String APPLICATION_JSON_VALUE = MediaType.APPLICATION_JSON_VALUE;;
 
     public static ExtractableResponse<Response> 지하철_노선_생성_요청(LineRequest lineRequest) {
         return RestAssured.given().log().all()
@@ -38,7 +38,7 @@ public class LineRestAssured {
     public static ExtractableResponse<Response> 지하철_노선_수정_요청(LinePatchRequest linePatchRequest, Long id) {
         return RestAssured.given()
                 .body(linePatchRequest)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .contentType(APPLICATION_JSON_VALUE)
                 .when().patch(API_PATH + "/" + id)
                 .then().log().all()
                 .extract();
@@ -49,7 +49,7 @@ public class LineRestAssured {
 
         return RestAssured.given()
                 .body(linePatchRequest)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .contentType(APPLICATION_JSON_VALUE)
                 .when().patch(API_PATH + "/" + id)
                 .then().log().all()
                 .extract();
