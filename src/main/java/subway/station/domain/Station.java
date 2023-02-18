@@ -1,4 +1,6 @@
-package subway;
+package subway.station.domain;
+
+import subway.station.presentation.StationResponse;
 
 import javax.persistence.*;
 
@@ -15,6 +17,11 @@ public class Station {
 
     public Station(String name) {
         this.name = name;
+    }
+
+    public Station(StationResponse stationResponse) {
+        this.id = stationResponse.getId();
+        this.name = stationResponse.getName();
     }
 
     public Long getId() {
