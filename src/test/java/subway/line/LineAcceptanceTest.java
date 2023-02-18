@@ -220,14 +220,20 @@ class LineAcceptanceTest {
                         10L);
 
                 ExtractableResponse<Response> 지하철_노선_생성_요청_응답 = LineRestAssured.지하철_노선_생성_요청(신분당선);
+                long lineId = 지하철_노선_생성_요청_응답.jsonPath().getLong("id");
 
                 // when
                 LinePatchRequest 강남_2호선 = new LinePatchRequest("강남강남 2호선", "super green");
-                ExtractableResponse<Response> 지하철_노선_수정_요청_결과 = LineRestAssured.지하철_노선_수정_요청(강남_2호선, 지하철_노선_생성_요청_응답.jsonPath().getLong("id"));
+                ExtractableResponse<Response> 지하철_노선_수정_요청_결과 = LineRestAssured.지하철_노선_수정_요청(강남_2호선, lineId);
 
                 // then
+                JsonPath 지하철_노선_조회_요청_결과 = LineRestAssured.지하철_노선_조회_요청(lineId).jsonPath();
+
                 assertAll(
-                        () -> assertThat(지하철_노선_수정_요청_결과.statusCode()).isEqualTo(HttpStatus.OK.value())
+                        () -> assertThat(지하철_노선_수정_요청_결과.statusCode()).isEqualTo(HttpStatus.OK.value()),
+                        () -> assertThat(지하철_노선_조회_요청_결과.getLong("id")).isEqualTo(lineId),
+                        () -> assertThat(지하철_노선_조회_요청_결과.getString("name")).isEqualTo(강남_2호선.getName()),
+                        () -> assertThat(지하철_노선_조회_요청_결과.getString("color")).isEqualTo(강남_2호선.getColor())
                 );
             }
         }
