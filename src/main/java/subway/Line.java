@@ -27,13 +27,6 @@ public class Line {
         this.distance = distance;
     }
 
-    public static Line from(LineRequest lineRequest, Section section) {
-        return new Line(lineRequest.getName(),
-                lineRequest.getColor(),
-                new Sections(section),
-                lineRequest.getDistance());
-    }
-
 
     public Long getId() {
         return id;

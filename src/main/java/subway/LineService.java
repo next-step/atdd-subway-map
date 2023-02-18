@@ -13,18 +13,17 @@ public class LineService {
 
     private LineRepository lineRepository;
     private StationService stationService;
-    private SectionRepository sectionRepository;
 
-    public LineService(LineRepository lineRepository, StationService stationService, SectionRepository sectionRepository) {
+
+    public LineService(LineRepository lineRepository, StationService stationService) {
         this.lineRepository = lineRepository;
         this.stationService = stationService;
-        this.sectionRepository = sectionRepository;
     }
 
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
         Section section = createSection(lineRequest.getUpStationId(), lineRequest.getDownStationId());
-        Line line = Line.from(lineRequest, section);
+        Line line = lineRequest.toEntity(section);
         Line lineSaved = lineRepository.save(line);
         return LineResponse.from(lineSaved);
 
@@ -63,7 +62,6 @@ public class LineService {
         Section section = createSection(request.getUpStationId(), request.getDownStationId());
 
         line.addSection(section);
-        sectionRepository.save(section);
         lineRepository.save(line);
 
         return LineResponse.from(line);

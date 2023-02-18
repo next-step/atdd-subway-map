@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 @Embeddable
 public class Sections {
 
-    @OneToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Section> sections = new ArrayList<>();
 
     public Sections() {
@@ -30,16 +30,23 @@ public class Sections {
     }
 
     public void add(Section newSection) throws WrongSectionCreateException {
-        if (getStations().contains(newSection.getDownStation())) {
-            throw new WrongSectionCreateException("section's down station can't be in other section's station");
-        }
-
-        Section downEndSection = getDownEndSection();
-        if (Objects.nonNull(downEndSection) && !downEndSection.getDownStation().equals(newSection.getUpStation())) {
-            throw new WrongSectionCreateException("section's up station is not line's down end station");
-        }
+        validateNewSectionDownStation(newSection.getDownStation());
+        validateNewSectionUpStation(newSection.getUpStation());
 
         this.sections.add(newSection);
+    }
+
+    private void validateNewSectionUpStation(Station newSectionUpStation) {
+        Section downEndSection = getDownEndSection();
+        if (Objects.nonNull(downEndSection) && !downEndSection.getDownStation().equals(newSectionUpStation)) {
+            throw new WrongSectionCreateException("section's up station is not line's down end station");
+        }
+    }
+
+    private void validateNewSectionDownStation(Station newSectionDownStation) {
+        if (getStations().contains(newSectionDownStation)) {
+            throw new WrongSectionCreateException("section's down station can't be in other section's station");
+        }
     }
 
     public List<Station> getStations() {

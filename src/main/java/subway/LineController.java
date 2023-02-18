@@ -45,13 +45,13 @@ public class LineController {
     }
 
     @PostMapping("/lines/{id}/sections")
-    public ResponseEntity createSection(@PathVariable Long id, @Valid @RequestBody SectionRequest request) {
+    public ResponseEntity<LineResponse> createSection(@PathVariable Long id, @Valid @RequestBody SectionRequest request) {
         LineResponse response = lineService.saveSection(id, request);
         return ResponseEntity.created(URI.create("/lines/" + response.getId())).body(response);
     }
 
     @DeleteMapping("/lines/{lineId}/sections")
-    public ResponseEntity deleteSection(@PathVariable Long lineId, @RequestParam("stationId") Long stationId) {
+    public ResponseEntity<Void> deleteSection(@PathVariable Long lineId, @RequestParam("stationId") Long stationId) {
         lineService.deleteSection(lineId, stationId);
         return ResponseEntity.ok().build();
     }

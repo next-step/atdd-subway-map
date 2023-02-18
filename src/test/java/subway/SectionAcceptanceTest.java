@@ -47,19 +47,7 @@ public class SectionAcceptanceTest {
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-    }
-
-    public static ExtractableResponse<Response> createSection(Long lineId, Long upStationId, Long downStationId) {
-        Map<String, String> params = new HashMap<>();
-        params.put("upStationId", upStationId.toString());
-        params.put("downStationId", downStationId.toString());
-        params.put("distance", "10");
-        ExtractableResponse<Response> response = RestAssured.given()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(params)
-                .when().post("/lines/{lineId}/sections", lineId)
-                .then().extract();
-        return response;
+        assertThat(response.jsonPath().getList("stations.id", Long.class)).contains(1L, 2L);
     }
 
     /**
@@ -113,10 +101,7 @@ public class SectionAcceptanceTest {
         Long stationId = newStationIds.get(2);
 
         //when
-        ExtractableResponse<Response> response = RestAssured.given()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().delete("/lines/{lineId}/sections?stationId={stationId}", newLineId, stationId)
-                .then().extract();
+        ExtractableResponse<Response> response = deleteSection(stationId);
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -134,10 +119,7 @@ public class SectionAcceptanceTest {
         Long stationId = newStationIds.get(1);
 
         //when
-        ExtractableResponse<Response> response = RestAssured.given()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().delete("/lines/{lineId}/sections?stationId={stationId}", newLineId, stationId)
-                .then().extract();
+        ExtractableResponse<Response> response = deleteSection(stationId);
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -155,13 +137,30 @@ public class SectionAcceptanceTest {
         Long stationId = newStationIds.get(1);
 
         //when
-        ExtractableResponse<Response> response = RestAssured.given()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().delete("/lines/{lineId}/sections?stationId={stationId}", newLineId, stationId)
-                .then().extract();
+        ExtractableResponse<Response> response = deleteSection(stationId);
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(response.response().asString()).contains("The line has only one section");
+    }
+
+    private ExtractableResponse<Response> deleteSection(Long stationId) {
+        ExtractableResponse<Response> response = RestAssured.given()
+                .when().delete("/lines/{lineId}/sections?stationId={stationId}", newLineId, stationId)
+                .then().extract();
+        return response;
+    }
+
+    public static ExtractableResponse<Response> createSection(Long lineId, Long upStationId, Long downStationId) {
+        Map<String, String> params = new HashMap<>();
+        params.put("upStationId", upStationId.toString());
+        params.put("downStationId", downStationId.toString());
+        params.put("distance", "10");
+        ExtractableResponse<Response> response = RestAssured.given()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(params)
+                .when().post("/lines/{lineId}/sections", lineId)
+                .then().extract();
+        return response;
     }
 }
