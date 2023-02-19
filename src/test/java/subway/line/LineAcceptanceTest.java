@@ -21,15 +21,7 @@ import static subway.line.LineRestAssured.*;
 import static subway.stations.StationRestAssured.*;
 import static subway.util.ResponseUtils.*;
 
-/*
-* TODO
-* 중복된 로직 분리하기
-*   - jsonPath
-*   - 테스트에 필요한 값 세팅 분리(LineRequest, LinePatchRequest ...)
-*   - 가독성을 위해 조금 더 나은 변수 네이밍 및 메서드 네이밍
-* 전체 테스트를 실행 했을때 성공하게 하기
-* 코드 정렬
-* */
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class LineAcceptanceTest {
 
