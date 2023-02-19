@@ -1,5 +1,6 @@
 package subway.line;
 
+import subway.line.presentation.LinePatchRequest;
 import subway.line.presentation.LineRequest;
 
 public class LineFixture {
@@ -24,5 +25,9 @@ public class LineFixture {
                 20L);
 
         return lineRequest;
+    }
+
+    public static LinePatchRequest 노선_수정_객체_생성(String name, String color) {
+        return new LinePatchRequest(name, color);
     }
 }
