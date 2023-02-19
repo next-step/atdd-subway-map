@@ -6,6 +6,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.Optional;
 import javax.persistence.Id;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -44,6 +45,7 @@ public abstract class JpaRepositoryTest<T, ID> {
     }
 
     @Test
+    @DisplayName("Entity 조회")
     protected void findById() {
         // given
         T entity = createTestInstance();
@@ -61,6 +63,7 @@ public abstract class JpaRepositoryTest<T, ID> {
 
     @ParameterizedTest
     @CsvSource(value = {"0,10", "1,10", "2,10", "3,10"})
+    @DisplayName("Entity 목록 조회")
     protected void findAll(int page, int size) {
         // given
         PageRequest pageRequest = PageRequest.of(page, size);
@@ -74,6 +77,7 @@ public abstract class JpaRepositoryTest<T, ID> {
     }
 
     @Test
+    @DisplayName("Entity 저장")
     protected void save() {
         // given
         long beforeCount = repository().count();
@@ -91,6 +95,7 @@ public abstract class JpaRepositoryTest<T, ID> {
     }
 
     @Test
+    @DisplayName("Entity 삭제")
     protected void delete() {
         // given
         T entity = createTestInstance();
@@ -109,6 +114,7 @@ public abstract class JpaRepositoryTest<T, ID> {
     }
 
     @Test
+    @DisplayName("Entity Count")
     protected void count() {
         // expected
         long count = repository().count();

@@ -1,7 +1,5 @@
 package subway.line;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,9 +21,4 @@ public class LineRequest {
     private Long downStationId;
 
     private Integer distance;
-
-    @JsonIgnore
-    public List<Long> getStationIds() {
-        return List.of(upStationId, downStationId);
-    }
 }

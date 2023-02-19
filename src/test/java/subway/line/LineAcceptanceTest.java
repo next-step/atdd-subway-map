@@ -2,6 +2,7 @@ package subway.line;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import common.AbstractAcceptanceTest;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.ExtractableResponse;
@@ -10,19 +11,11 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import subway.station.StationAcceptanceTest;
-import subway.station.StationRepository;
 
 @DisplayName("지하철 노선 관련 기능")
-@SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
-@DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
-public class LineAcceptanceTest {
+public class LineAcceptanceTest extends AbstractAcceptanceTest {
 
     public static final String LINE_1 = "1호선";
     public static final String LINE_2 = "2호선";
@@ -32,15 +25,11 @@ public class LineAcceptanceTest {
     public static final String LINE_NEW_BOONDANG = "신분당선";
     private Long upStationId;
     private Long downStationId;
-    @Autowired
-    private StationRepository stationRepository;
-    @Autowired
-    private LineRepository lineRepository;
 
     @BeforeEach
-    void beforeEach() {
-        stationRepository.deleteAll();
-        lineRepository.deleteAll();
+    protected void beforeEach() {
+        super.beforeEach();
+
         upStationId = StationAcceptanceTest.createStation("upStation");
         downStationId = StationAcceptanceTest.createStation("downStation");
     }
@@ -159,31 +148,33 @@ public class LineAcceptanceTest {
             .isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 
-    private List<LineResponse> findAllLines() {
+    public static List<LineResponse> findAllLines() {
         return RestAssured
             .given()
             .when()
                 .get("/lines")
             .then()
+                .log().all()
                 .statusCode(HttpStatus.OK.value())
                 .extract().jsonPath().getList("$", LineResponse.class);
     }
 
-    private LineResponse findLine(Long lineId) {
+    public static LineResponse findLine(Long lineId) {
         return findLineById(lineId)
             .jsonPath().getObject("$", LineResponse.class);
     }
 
-    private ExtractableResponse<Response> findLineById(Long lineId) {
+    public static ExtractableResponse<Response> findLineById(Long lineId) {
         return RestAssured
             .given()
             .when()
                 .get("/lines/{id}", lineId)
             .then()
+                .log().all()
                 .extract();
     }
 
-    private LineResponse createLine(String name, String color, Long upStationId, Long downStationId, Integer distance) {
+    public static LineResponse createLine(String name, String color, Long upStationId, Long downStationId, Integer distance) {
         return RestAssured
             .given()
                 .contentType(ContentType.JSON)
@@ -199,11 +190,12 @@ public class LineAcceptanceTest {
             .when()
                 .post("/lines")
             .then()
+                .log().all()
                 .statusCode(HttpStatus.CREATED.value())
                 .extract().jsonPath().getObject("$", LineResponse.class);
     }
 
-    private static ExtractableResponse<Response> modifyLine(
+    public static ExtractableResponse<Response> modifyLine(
         Long lineId, String modifiedName, String modifiedColor) {
         return RestAssured
             .given()
@@ -221,7 +213,7 @@ public class LineAcceptanceTest {
             .extract();
     }
 
-    private static ExtractableResponse<Response> deleteLine(
+    public static ExtractableResponse<Response> deleteLine(
         Long lineId) {
         return RestAssured
             .given()

@@ -1,7 +1,11 @@
 package subway.station;
 
-import javax.persistence.*;
-import subway.line.Line;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Entity
 @Table(name = "STATION")
@@ -11,10 +15,6 @@ public class Station {
     private Long id;
     @Column(length = 20, nullable = false)
     private String name;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "LINE_ID")
-    private Line line;
 
     public Station() {
     }
@@ -29,13 +29,5 @@ public class Station {
 
     public String getName() {
         return name;
-    }
-
-    public void changeLine(Line line) {
-        if (this.line != null) {
-            this.line.removeStation(this);
-        }
-
-        this.line = line;
     }
 }

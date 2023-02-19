@@ -1,18 +1,19 @@
 package subway.line;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import subway.line.section.LineSection;
+import subway.line.section.LineSections;
+import subway.section.Section;
 import subway.station.Station;
 
 @Entity
@@ -30,37 +31,22 @@ public class Line {
     @Column(length = 20, nullable = false)
     private String color;
 
-    private Integer distance;
+    @Embedded
+    private LineSections lineSections = new LineSections();
 
-    @OneToMany(mappedBy = "line")
-    private List<Station> stations = new ArrayList<>();
-
-    public Line(String name, String color, Integer distance) {
-        this(name, color, distance, new ArrayList<>());
-    }
-    public Line(String name, String color, Integer distance, List<Station> stations) {
+    public Line(String name, String color) {
         this.name = name;
         this.color = color;
-        this.distance = distance;
-        stations.forEach(this::addStation);
     }
 
-    public List<Long> getStationIds() {
-        return stations.stream().map(Station::getId)
-            .collect(Collectors.toList());
-    }
-    public void removeStation(Station station) {
-        if (stations.contains(station)) {
-            stations.remove(station);
-            station.changeLine(null);
-        }
+    public void addSection(Section section) {
+        LineSection lineSection = new LineSection(this, section);
+
+        lineSections.addLineSection(lineSection);
     }
 
-    public void addStation(Station station) {
-        if (!stations.contains(station)) {
-            stations.add(station);
-            station.changeLine(this);
-        }
+    public void removeLineSection(LineSection lineSection) {
+        lineSections.removeLineSection(lineSection);
     }
 
     public void modify(LineModifyRequest lineModifyRequest) {
@@ -73,5 +59,21 @@ public class Line {
         if (StringUtils.isNotBlank(modifiedColor)) {
             this.color = modifiedColor;
         }
+    }
+
+    public Station getUpStation() {
+        return lineSections.getUpStation();
+    }
+
+    public Station getDownStation() {
+        return lineSections.getDownStation();
+    }
+
+    public Optional<LineSection> getLastLineSection() {
+        return lineSections.getLastLineSection();
+    }
+
+    public int getLineSectionCount() {
+        return lineSections.size();
     }
 }

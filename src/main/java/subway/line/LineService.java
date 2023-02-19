@@ -1,38 +1,50 @@
 package subway.line;
 
+import com.google.common.base.Preconditions;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.exception.CannotRemoveLineSectionException;
 import subway.exception.NotFoundLineException;
-import subway.station.Station;
-import subway.station.StationRepository;
+import subway.exception.NotFoundLineSectionException;
+import subway.line.section.LineSection;
+import subway.section.Section;
+import subway.section.SectionRequest;
+import subway.section.SectionResponse;
+import subway.section.SectionService;
 
 @Service
 @RequiredArgsConstructor
 public class LineService {
+
     private final LineRepository lineRepository;
 
-    private final StationRepository stationRepository;
+    private final SectionService sectionService;
+
 
     @Transactional
-    public LineResponse saveLine(LineRequest request) {
-        Line line = createLine(request);
+    public Line saveLine(LineRequest lineRequest) {
+        Line savedLine = createAndSaveLine(lineRequest);
 
-        Line savedLine = lineRepository.save(line);
+        Section section = sectionService.registerSection(SectionRequest.of(lineRequest));
 
-        return LineResponse.of(savedLine);
+        savedLine.addSection(section);
+
+        return savedLine;
     }
 
     @Transactional(readOnly = true)
     public List<LineResponse> findAllLines() {
-        return lineRepository.findAllWithStation().stream()
+        return lineRepository.findAllWithDefault().stream()
             .map(LineResponse::of)
             .collect(Collectors.toList());
     }
+
     @Transactional(readOnly = true)
     public Optional<LineResponse> findById(Long id) {
         return lineRepository.findById(id)
@@ -42,25 +54,62 @@ public class LineService {
     @Transactional
     @Modifying(clearAutomatically = true)
     public void modifyLine(Long id, LineModifyRequest lineModifyRequest) {
-        Line line = lineRepository.findById(id).orElseThrow(NotFoundLineException::new);
+        Line line = lineRepository.findById(id)
+            .orElseThrow(NotFoundLineException::new);
+
         line.modify(lineModifyRequest);
     }
 
-    @Transactional()
+    @Transactional
     @Modifying(clearAutomatically = true)
     public void deleteLine(Long id) {
-        Line findLine = lineRepository.findById(id).orElseThrow(NotFoundLineException::new);
-
-        List<Long> stationIds = findLine.getStationIds();
-
-        stationRepository.updateLineByIds(stationIds, null);
+        Line findLine = lineRepository.findById(id)
+            .orElseThrow(NotFoundLineException::new);
 
         lineRepository.delete(findLine);
     }
 
-    private Line createLine(LineRequest request) {
-        List<Station> stations = stationRepository.findByIdIn(request.getStationIds());
+    @Transactional
+    public SectionResponse addLineSection(Long lineId, SectionRequest sectionRequest) {
+        Line line = findLineById(lineId);
 
-        return new Line(request.getName(), request.getColor(), request.getDistance(), stations);
+        Section section = sectionService.searchSection(
+            sectionRequest.getUpStationId(),
+            sectionRequest.getDownStationId()
+        ).orElseGet(() ->
+            sectionService.registerSection(sectionRequest)
+        );
+
+        line.addSection(section);
+
+        return SectionResponse.of(section);
+    }
+
+    @Transactional
+    public void removeLineSection(Long lineId, Long downStationId) {
+        Line line = findLineById(lineId);
+
+        Preconditions.checkState(line.getLineSectionCount() > 1,
+            "There is only one section");
+
+        LineSection lineSection = line.getLastLineSection()
+            .orElseThrow(NotFoundLineSectionException::new);
+
+        if (!Objects.equals(lineSection.getDownStationId(), downStationId)) {
+            throw new CannotRemoveLineSectionException();
+        }
+
+        line.removeLineSection(lineSection);
+    }
+
+    private Line createAndSaveLine(LineRequest lineRequest) {
+        Line line = new Line(lineRequest.getName(), lineRequest.getColor());
+
+        return lineRepository.save(line);
+    }
+
+    private Line findLineById(Long lineId) {
+        return lineRepository.findById(lineId)
+            .orElseThrow(NotFoundLineException::new);
     }
 }
