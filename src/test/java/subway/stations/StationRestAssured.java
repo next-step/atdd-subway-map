@@ -24,7 +24,7 @@ public class StationRestAssured {
                 .extract();
     }
 
-    public static Long 지하철역_ID_추출(ExtractableResponse<Response> response) {
+    public static Long 지하철역_ID(ExtractableResponse<Response> response) {
         return response.jsonPath().getLong("id");
     }
 }
