@@ -1,5 +1,8 @@
 package subway.line;
 
+import subway.station.Station;
+import subway.station.StationService;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,11 +30,6 @@ public class Line {
     private List<Section> sections = new ArrayList<>();
 
     public Line() {
-    }
-
-    public Line(String name, String color) {
-        this.name = name;
-        this.color = color;
     }
 
     public Line(String name, String color, Long upStationId, Long downStationId, Long distance) {
@@ -88,5 +86,11 @@ public class Line {
 
     public List<Section> getSections() {
         return sections;
+    }
+
+    public void addSection(StationService stationService, LineRequest lineRequest){
+        Station upStation = stationService.findById(lineRequest.getUpStationId());
+        Station downStation = stationService.findById(lineRequest.getDownStationId());
+        this.getSections().add(new Section(this, upStation, downStation, lineRequest.getDistance().intValue()));
     }
 }

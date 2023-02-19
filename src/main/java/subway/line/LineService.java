@@ -15,6 +15,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static subway.line.LineResponse.createLineResponse;
+
 @Service
 @Transactional(readOnly = true)
 public class LineService {
@@ -28,38 +30,30 @@ public class LineService {
 
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
-
-//        Line line = lineRepository.save(new Line(
-//                lineRequest.getName(),
-//                lineRequest.getColor(),
-//                lineRequest.getUpStationId(),
-//                lineRequest.getDownStationId(),
-//                lineRequest.getDistance()));
-
         Line line = lineRepository.save(new Line(
                 lineRequest.getName(),
-                lineRequest.getColor()));
-        Station upStation = stationService.findById(lineRequest.getUpStationId());
-        Station downStation = stationService.findById(lineRequest.getDownStationId());
-        line.getSections().add(new Section(line, upStation, downStation, lineRequest.getDistance().intValue()));
+                lineRequest.getColor(),
+                lineRequest.getUpStationId(),
+                lineRequest.getDownStationId(),
+                lineRequest.getDistance()));
+        line.addSection(stationService, lineRequest);
 
         return createLineResponse(line);
     }
 
     public List<LineResponse> findAllLines() {
         return lineRepository.findAll().stream()
-                .map(this::createLineResponse)
+                .map(this::_createLineResponse)
                 .collect(Collectors.toList());
+    }
+
+    private LineResponse _createLineResponse(Line line) {
+        return createLineResponse(line);
     }
 
     @Transactional
     public LineResponse updateLine(Long id, LineRequest lineRequest) throws CustomException {
         Line line = findLineById(id);
-        line.setName(lineRequest.getName());
-        line.setColor(lineRequest.getColor());
-        line.setUpStationId(lineRequest.getUpStationId());
-        line.setDownStationId(lineRequest.getDownStationId());
-        line.setDistance(lineRequest.getDistance());
         lineRepository.save(line);
         return createLineResponse(line);
     }
@@ -71,6 +65,7 @@ public class LineService {
     }
 
     public LineResponse findLineResponseById(Long id) throws CustomException {
+        createLineResponse(findLineById(id));
         return createLineResponse(findLineById(id));
     }
 
@@ -85,30 +80,6 @@ public class LineService {
         lineRepository.deleteAll();
     }
 
-    private LineResponse createLineResponse(Line line) {
-        List<Section> sections = line.getSections();
-        List<StationResponse> stations = new ArrayList<>();
-
-        for(int i=0; i<sections.size(); i++){
-            if(i==0){
-                Station upStation = sections.get(i).getUpStation();
-                StationResponse stationResponse = new StationResponse(upStation.getId(), upStation.getName());
-                stations.add(stationResponse);
-            }
-
-            Station downStation = sections.get(i).getDownStation();
-            StationResponse stationResponse = new StationResponse(downStation.getId(), downStation.getName());
-            stations.add(stationResponse);
-        }
-
-        return new LineResponse(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                stations
-        );
-    }
-
     @Transactional
     public void addSectionByLineId(Long lineId, SectionRequest sectionRequest) {
         Station upStation = stationService.findById(sectionRequest.getUpStationId());
@@ -119,5 +90,20 @@ public class LineService {
                 , upStation
                 , downStation
                 , sectionRequest.getDistance()));
+    }
+
+    @Transactional
+    public void deleteSection(Long lineId, Long stationId) {
+        Line line = lineRepository.findById(lineId).orElseThrow(()->new CustomException(
+                new ErrorDto(HttpStatus.NOT_FOUND, "지하철노선 Id("+ lineId +") 가 존재 하지 않습니다.")));
+        Station station = stationService.findById(stationId);
+
+        if (!line.getSections().get(line.getSections().size() - 1).getDownStation().equals(station)) {
+            throw new CustomException(
+                    new ErrorDto(HttpStatus.NOT_FOUND, "지하철노선 Id("+ lineId +") 가 존재 하지 않습니다.")
+            );
+        }
+
+        line.getSections().remove(line.getSections().size() - 1);
     }
 }

@@ -16,6 +16,7 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static subway.station.StationStep.지하철역_생성_요청;
 import static  subway.section.SectionStep.지하철_구간_생성_요청;
+import static  subway.section.SectionStep.지하철_구간_삭제_요청;
 import static  subway.line.LineStep.지하철_노선_생성_요청;
 import static  subway.line.LineStep.지하철_노선_조회_요청;
 
@@ -58,10 +59,36 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         param.put("downStationId", 정자역 + "");
         param.put("distance", 6 + "");
         ExtractableResponse<Response> createResponse = 지하철_구간_생성_요청(신분당선, param);
+        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         // Then 노선에 새로운 구간이 추가
         ExtractableResponse<Response> response = 지하철_노선_조회_요청(신분당선);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.jsonPath().getList("stations.id", Long.class)).containsExactly(강남역, 양재역, 정자역);
+    }
+
+    /**
+     * Given 새로운 지하철 구간 생성 요청
+     * When 지하철 노선에서 구간을 삭제 요청
+     * Then 구간이 삭제됨
+     */
+    @DisplayName("지하철 노선에서 구간을 삭제")
+    @Test
+    void removeSectionToLine() {
+        // Given 새로운 지하철 구산 생성 요청
+        Long 정자역 = 지하철역_생성_요청("정자역").jsonPath().getLong("id");
+        Map<String, String> createParam = new HashMap<>();
+        createParam.put("upStationId", 양재역 + "");
+        createParam.put("downStationId", 정자역 + "");
+        createParam.put("distance", 6 + "");
+        ExtractableResponse<Response> createResponse = 지하철_구간_생성_요청(신분당선, createParam);
+
+        // When 지하철 노선에서 구간을 삭제 요청
+        지하철_구간_삭제_요청(신분당선, 정자역);
+
+        // Then 구간이 삭제 됨
+        ExtractableResponse<Response> response = 지하철_노선_조회_요청(신분당선);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.jsonPath().getList("stations.id", Long.class)).containsExactly(강남역, 양재역);
     }
 }

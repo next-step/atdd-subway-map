@@ -15,6 +15,7 @@ import subway.db.AcceptanceTest;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static subway.station.StationStep.지하철역_생성_요청;
 
 @DisplayName("지하철노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -23,14 +24,19 @@ public class LineAcceptanceTest extends AcceptanceTest {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     /**
+     * Given 지하철역을 생성
      * When 지하철노선을 생성하면
      * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
      */
     @DisplayName("지하철노선 생성")
     @Test
     void createSubwayLine() {
+        // Given 지하철역을 생성
+        Long 강남역 = 지하철역_생성_요청("강남역").jsonPath().getLong("id");
+        Long 양재역 = 지하철역_생성_요청("양재역").jsonPath().getLong("id");
+
         //When 지하철노선을 생성하면
-        LineRequest Line1 = new LineRequest("1호선", "blue");
+        LineRequest Line1 = new LineRequest("1호선", "blue", 1L,2L,10L);
         createSubwayLine(Line1);
 
         //Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
