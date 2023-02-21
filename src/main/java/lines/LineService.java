@@ -1,7 +1,6 @@
 package lines;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.persistence.EntityNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,8 +31,9 @@ public class LineService {
     }
 
     public LineResponse selectLineById(Long id) {
-        Optional<Line> line = lineRepository.findById(id);
-        return line.map(this::createLineResponse).orElseThrow(EntityNotFoundException::new);
+        Line line = lineRepository.findById(id)
+            .orElseThrow(EntityNotFoundException::new);
+        return createLineResponse(line);
     }
 
     public LineResponse updateLineById(LineRequest lineRequest, Long id) {

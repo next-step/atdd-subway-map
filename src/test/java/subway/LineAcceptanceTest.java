@@ -12,7 +12,6 @@ import lines.LineApplication;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
@@ -21,26 +20,24 @@ import org.springframework.http.MediaType;
 public class LineAcceptanceTest {
 
     /**
-     * When 지하철 노선을 생성하면 Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
+     * When 지하철 노선을 생성하면
+     * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
      */
     @DisplayName("지하철노선을 생성한다.")
     @Test
     void createLine() {
+        // when
+        ExtractableResponse<Response> line = createLine("신분당선", "bg-red-600", "1", "2", "10");
+        assertThat(line.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
-        Map<String, String> param = new HashMap<>();
-        param.put("name", "신분당선");
-        param.put("color", "bg-red-600");
-        param.put("upStationId", "1");
-        param.put("downStationId", "2");
-        param.put("distance", "10");
-
+        // then
         ExtractableResponse<Response> response = RestAssured.given().log().all()
-            .body(param)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().post("/lines")
+            .when().get("/lines/" + line.jsonPath().getLong("id"))
             .then().log().all()
             .extract();
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        String name = response.jsonPath().getString("name");
+        assertThat(name).isEqualTo("신분당선");
     }
 
 
@@ -52,22 +49,10 @@ public class LineAcceptanceTest {
     void getLines() {
 
         // given
-        Map<String, String> param = new HashMap<>();
-        param.put("name", "신분당선");
-        param.put("color", "bg-red-600");
-        param.put("upStationId", "1");
-        param.put("downStationId", "2");
-        param.put("distance", "10");
-        ExtractableResponse<Response> line = createLine(param);
+        ExtractableResponse<Response> line = createLine("신분당선", "bg-red-600", "1", "2", "10");
         assertThat(line.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
-        Map<String, String> param2 = new HashMap<>();
-        param2.put("name", "분당선");
-        param2.put("color", "bg-green-600");
-        param2.put("upStationId", "3");
-        param2.put("downStationId", "4");
-        param2.put("distance", "10");
-        ExtractableResponse<Response> line2 = createLine(param2);
+        ExtractableResponse<Response> line2 = createLine("분당선", "bg-green-600", "3", "4", "10");
         assertThat(line2.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // when
@@ -89,13 +74,7 @@ public class LineAcceptanceTest {
     @Test
     void getLine() {
         // given
-        Map<String, String> param = new HashMap<>();
-        param.put("name", "신분당선");
-        param.put("color", "bg-red-600");
-        param.put("upStationId", "1");
-        param.put("downStationId", "2");
-        param.put("distance", "10");
-        ExtractableResponse<Response> line = createLine(param);
+        ExtractableResponse<Response> line = createLine("신분당선", "bg-red-600", "1", "2", "10");
         assertThat(line.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // when
@@ -117,13 +96,7 @@ public class LineAcceptanceTest {
     void updateLine() {
 
         // given
-        Map<String, String> param = new HashMap<>();
-        param.put("name", "신분당선");
-        param.put("color", "bg-red-600");
-        param.put("upStationId", "1");
-        param.put("downStationId", "2");
-        param.put("distance", "10");
-        ExtractableResponse<Response> line = createLine(param);
+        ExtractableResponse<Response> line = createLine("신분당선", "bg-red-600", "1", "2", "10");
         assertThat(line.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // when
@@ -145,20 +118,15 @@ public class LineAcceptanceTest {
 
 
     /**
-     * Given 지하철 노선을 생성하고 생성한 지하철 노선을 삭제하면 해당 지하철 노선 정보는 삭제된다.
+     * Given 지하철 노선을 생성하고 When 생성한 지하철 노선을 삭제하면 Then 해당 지하철 노선 정보는 삭제된다.
      */
 
     @DisplayName("지하철노선 삭제")
     @Test
     void deleteLine() {
         // given
-        Map<String, String> param = new HashMap<>();
-        param.put("name", "신분당선");
-        param.put("color", "bg-red-600");
-        param.put("upStationId", "1");
-        param.put("downStationId", "2");
-        param.put("distance", "10");
-        ExtractableResponse<Response> line = createLine(param);
+        ExtractableResponse<Response> line = createLine("신분당선", "bg-red-600", "1", "2", "10");
+        ;
         assertThat(line.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // when
@@ -173,13 +141,33 @@ public class LineAcceptanceTest {
     }
 
 
+    private ExtractableResponse<Response> createLine(String name, String color, String upStationId,
+        String downStationId, String distance) {
+        Map<String, String> param = new HashMap<>();
+        param.put("name", name);
+        param.put("color", color);
+        param.put("upStationId", upStationId);
+        param.put("downStationId", downStationId);
+        param.put("distance", distance);
 
-    private ExtractableResponse<Response> createLine(Map<String, String> param) {
         return RestAssured.given().log().all()
             .body(param)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .when().post("/lines")
             .then().log().all()
             .extract();
+    }
+
+    private ExtractableResponse<Response> createStation(String name) {
+        Map<String, String> param = new HashMap<>();
+        param.put("name", name);
+
+        return RestAssured.given().log().all()
+            .body(param)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().post("/stations")
+            .then().log().all()
+            .extract();
+
     }
 }

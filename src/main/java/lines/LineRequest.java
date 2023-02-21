@@ -6,11 +6,11 @@ public class LineRequest {
 
     private String color;
 
-    private String upStationId;
+    private Long upStationId;
 
-    private String downStationId;
+    private Long downStationId;
 
-    private String distance;
+    private Long distance;
 
     public String getName() {
         return name;
@@ -20,15 +20,15 @@ public class LineRequest {
         return color;
     }
 
-    public String getUpStationId() {
+    public Long getUpStationId() {
         return upStationId;
     }
 
-    public String getDownStationId() {
+    public Long getDownStationId() {
         return downStationId;
     }
 
-    public String getDistance() {
+    public Long getDistance() {
         return distance;
     }
 
