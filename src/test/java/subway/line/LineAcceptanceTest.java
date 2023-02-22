@@ -35,8 +35,8 @@ class LineAcceptanceTest {
     @BeforeEach
     void setUp() {
         databaseCleanup.execute();
-        논현역_ID = Json_ID_추출(지하철역_생성("논현역"));
-        강남역_ID = Json_ID_추출(지하철역_생성("강남역"));
+        논현역_ID = Json_추출(지하철역_생성("논현역")).getLong("id");
+        강남역_ID = Json_추출(지하철역_생성("강남역")).getLong("id");
     }
 
     /**
@@ -53,12 +53,8 @@ class LineAcceptanceTest {
         ExtractableResponse<Response> 지하철_노선_생성_요청_응답 = 지하철_노선_생성_요청(신분당선);
 
         // then - 노선 목록
-        assertAll(
-                () -> assertThat(응답코드(지하철_노선_생성_요청_응답)).isEqualTo(CREATED.value()),
-                () -> assertThat(Json_추출(지하철_노선_목록_조회_요청()).getList("name")).contains(신분당선.getName())
-        );
+        지하철_노선_생성_완료됨(신분당선, 지하철_노선_생성_요청_응답);
     }
-
 
 
     /**
@@ -79,7 +75,7 @@ class LineAcceptanceTest {
         ExtractableResponse<Response> 지하철_노선_목록_조회_요청_응답 = 지하철_노선_목록_조회_요청();
 
         // then
-        노선_목록_조회_성공(신분당선, 강남_2호선, 지하철_노선_목록_조회_요청_응답);
+        지하철_노선_목록_조회_완료됨(신분당선, 강남_2호선, 지하철_노선_목록_조회_요청_응답);
     }
 
     /**
@@ -95,13 +91,10 @@ class LineAcceptanceTest {
         ExtractableResponse<Response> 지하철_노선_생성_요청_응답 = 지하철_노선_생성_요청(신분당선);
 
         // when
-        ExtractableResponse<Response> 지하철_노선_조회_요청_응답 = 지하철_노선_조회_요청(Json_ID_추출(지하철_노선_생성_요청_응답));
+        ExtractableResponse<Response> 지하철_노선_조회_요청_응답 = 지하철_노선_조회_요청(Json_추출(지하철_노선_생성_요청_응답).getLong("id"));
 
         // then
-        assertAll(
-                () -> assertThat(응답코드(지하철_노선_조회_요청_응답)).isEqualTo(OK.value()),
-                () -> assertThat(Json_이름_추출(지하철_노선_조회_요청_응답)).isEqualTo(Json_이름_추출(지하철_노선_생성_요청_응답))
-        );
+        지하철_노선_조회_완료됨(지하철_노선_생성_요청_응답, 지하철_노선_조회_요청_응답);
     }
 
     /**
@@ -149,7 +142,7 @@ class LineAcceptanceTest {
                 LinePatchRequest 노선_수정_객체 = 노선_수정_객체_생성(name, color);
 
                 // when
-                ExtractableResponse<Response> 지하철_노선_수정_요청_응답 = 지하철_노선_수정_요청(노선_수정_객체, Json_ID_추출(지하철_노선_생성_요청_응답));
+                ExtractableResponse<Response> 지하철_노선_수정_요청_응답 = 지하철_노선_수정_요청(노선_수정_객체, Json_추출(지하철_노선_생성_요청_응답).getLong("id"));
 
                 // then
                 assertThat(응답코드(지하철_노선_수정_요청_응답)).isEqualTo(BAD_REQUEST.value());
@@ -172,7 +165,7 @@ class LineAcceptanceTest {
                 LineRequest 신분당선 = 신분당선_생성(논현역_ID, 강남역_ID);
 
                 ExtractableResponse<Response> 지하철_노선_생성_요청_응답 = 지하철_노선_생성_요청(신분당선);
-                long 신분당선_ID = Json_ID_추출(지하철_노선_생성_요청_응답);
+                long 신분당선_ID = Json_추출(지하철_노선_생성_요청_응답).getLong("id");
 
                 // when
                 LinePatchRequest 노선_수정_객체 = 노선_수정_객체_생성("강남강남 2호선", "super green");
@@ -181,12 +174,7 @@ class LineAcceptanceTest {
                 // then
                 ExtractableResponse<Response> 지하철_노선_조회_요청_응답 = 지하철_노선_조회_요청(신분당선_ID);
 
-                assertAll(
-                        () -> assertThat(응답코드(지하철_노선_수정_요청_결과)).isEqualTo(OK.value()),
-                        () -> assertThat(Json_ID_추출(지하철_노선_조회_요청_응답)).isEqualTo(신분당선_ID),
-                        () -> assertThat(Json_이름_추출(지하철_노선_조회_요청_응답)).isEqualTo(노선_수정_객체.getName()),
-                        () -> assertThat(Json_색_추출(지하철_노선_조회_요청_응답)).isEqualTo(노선_수정_객체.getColor())
-                );
+                지하철_노선_수정_완료됨(신분당선_ID, 노선_수정_객체, 지하철_노선_수정_요청_결과, 지하철_노선_조회_요청_응답);
             }
         }
     }
@@ -207,16 +195,13 @@ class LineAcceptanceTest {
             LineRequest 신분당선 = 신분당선_생성(논현역_ID, 강남역_ID);
 
             ExtractableResponse<Response> 지하철_노선_생성_요청_결과_응답 = 지하철_노선_생성_요청(신분당선);
-            long 신분당선_ID = Json_ID_추출(지하철_노선_생성_요청_결과_응답);
+            long 신분당선_ID = Json_추출(지하철_노선_생성_요청_결과_응답).getLong("id");
 
             // when
             ExtractableResponse<Response> 지하철_노선_삭제_요청_응답 = 지하철_노선_삭제_요청(신분당선_ID);
 
             // then
-            assertAll(
-                    () -> assertThat(응답코드(지하철_노선_삭제_요청_응답)).isEqualTo(NO_CONTENT.value()),
-                    () -> assertThat(응답코드(지하철_노선_조회_요청(신분당선_ID))).isEqualTo(NOT_FOUND.value())
-            );
+            지하철_노선_삭제_완료됨(신분당선_ID, 지하철_노선_삭제_요청_응답);
         }
 
         @DisplayName("존재하지 않는 노선 ID를 입력하면 404을 리턴한다.")
@@ -230,11 +215,41 @@ class LineAcceptanceTest {
         }
     }
 
-    private void 노선_목록_조회_성공(LineRequest 신분당선, LineRequest 강남_2호선, ExtractableResponse<Response> 지하철_노선_목록_조회_요청_응답) {
+    private void 지하철_노선_생성_완료됨(LineRequest 신분당선, ExtractableResponse<Response> 지하철_노선_생성_요청_응답) {
+        assertAll(
+                () -> assertThat(응답코드(지하철_노선_생성_요청_응답)).isEqualTo(CREATED.value()),
+                () -> assertThat(Json_추출(지하철_노선_목록_조회_요청()).getList("name")).contains(신분당선.getName())
+        );
+    }
+
+    private void 지하철_노선_조회_완료됨(ExtractableResponse<Response> 지하철_노선_생성_요청_응답, ExtractableResponse<Response> 지하철_노선_조회_요청_응답) {
+        assertAll(
+                () -> assertThat(응답코드(지하철_노선_조회_요청_응답)).isEqualTo(OK.value()),
+                () -> assertThat(Json_추출(지하철_노선_조회_요청_응답).getString("name")).isEqualTo(Json_추출(지하철_노선_생성_요청_응답).getString("name"))
+        );
+    }
+
+    private void 지하철_노선_목록_조회_완료됨(LineRequest 신분당선, LineRequest 강남_2호선, ExtractableResponse<Response> 지하철_노선_목록_조회_요청_응답) {
         List<String> 노선_이름 = Json_추출(지하철_노선_목록_조회_요청_응답).getList("name");
         assertAll(
                 () -> assertThat(응답코드(지하철_노선_목록_조회_요청_응답)).isEqualTo(OK.value()),
                 () -> assertThat(노선_이름).containsExactly(신분당선.getName(), 강남_2호선.getName())
+        );
+    }
+
+    private void 지하철_노선_수정_완료됨(long 신분당선_ID, LinePatchRequest 노선_수정_객체, ExtractableResponse<Response> 지하철_노선_수정_요청_결과, ExtractableResponse<Response> 지하철_노선_조회_요청_응답) {
+        assertAll(
+                () -> assertThat(응답코드(지하철_노선_수정_요청_결과)).isEqualTo(OK.value()),
+                () -> assertThat(Json_추출(지하철_노선_조회_요청_응답).getLong("id")).isEqualTo(신분당선_ID),
+                () -> assertThat(Json_추출(지하철_노선_조회_요청_응답).getString("name")).isEqualTo(노선_수정_객체.getName()),
+                () -> assertThat(Json_추출(지하철_노선_조회_요청_응답).getString("color")).isEqualTo(노선_수정_객체.getColor())
+        );
+    }
+
+    private void 지하철_노선_삭제_완료됨(long 신분당선_ID, ExtractableResponse<Response> 지하철_노선_삭제_요청_응답) {
+        assertAll(
+                () -> assertThat(응답코드(지하철_노선_삭제_요청_응답)).isEqualTo(NO_CONTENT.value()),
+                () -> assertThat(응답코드(지하철_노선_조회_요청(신분당선_ID))).isEqualTo(NOT_FOUND.value())
         );
     }
 }
