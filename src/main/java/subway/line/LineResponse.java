@@ -36,6 +36,16 @@ public class LineResponse {
         this.stations = stations;
     }
 
+    public LineResponse(Long id, String name, String color, Long upStationId, Long downStationId, Long distance, List<StationResponse> stations) {
+        this.id = id;
+        this.name = name;
+        this.color = color;
+        this.upStationId = upStationId;
+        this.downStationId = downStationId;
+        this.distance = distance;
+        this.stations = stations;
+    }
+
     public Long getId() {return id;}
 
     public String getName() {
@@ -80,6 +90,9 @@ public class LineResponse {
                 line.getId(),
                 line.getName(),
                 line.getColor(),
+                line.getUpStationId(),
+                line.getDownStationId(),
+                line.getDistance(),
                 stations
         );
     }

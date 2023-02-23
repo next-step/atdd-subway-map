@@ -36,26 +36,29 @@ public class LineService {
                 lineRequest.getUpStationId(),
                 lineRequest.getDownStationId(),
                 lineRequest.getDistance()));
-        line.addSection(stationService, lineRequest);
+
+        Station upStation = stationService.findById(lineRequest.getUpStationId());
+        Station downStation = stationService.findById(lineRequest.getDownStationId());
+        int distance = lineRequest.getDistance().intValue();
+
+        line.addSection(upStation, downStation, distance);
 
         return createLineResponse(line);
     }
 
     public List<LineResponse> findAllLines() {
         return lineRepository.findAll().stream()
-                .map(this::_createLineResponse)
+                .map(LineResponse::createLineResponse)
                 .collect(Collectors.toList());
-    }
-
-    private LineResponse _createLineResponse(Line line) {
-        return createLineResponse(line);
     }
 
     @Transactional
     public LineResponse updateLine(Long id, LineRequest lineRequest) throws CustomException {
         Line line = findLineById(id);
+        line.setColor(lineRequest.getColor());
         lineRepository.save(line);
-        return createLineResponse(line);
+        Line updateLine = findLineById(id);
+        return createLineResponse(updateLine);
     }
 
 
@@ -81,29 +84,51 @@ public class LineService {
     }
 
     @Transactional
-    public void addSectionByLineId(Long lineId, SectionRequest sectionRequest) {
+    public Boolean addSectionByLineId(Long lineId, SectionRequest sectionRequest) {
         Station upStation = stationService.findById(sectionRequest.getUpStationId());
         Station downStation = stationService.findById(sectionRequest.getDownStationId());
+        int distance = sectionRequest.getDistance();
         Line line = findLineById(lineId);
-        line.getSections().add(new Section(
-                line
-                , upStation
-                , downStation
-                , sectionRequest.getDistance()));
+
+        // 추가하는 구간의 상행역이 기존 구간의 하행역이 맞는지 체크
+        Boolean isLast = line.isLastSection(upStation.getId());
+        if(!isLast){
+            return false;
+        }
+
+        Boolean isExist = line.isStationExist(downStation);
+        if(isExist){
+            return false;
+        }
+
+        line.addSection(upStation, downStation, distance);
+
+        return true;
     }
 
     @Transactional
-    public void deleteSection(Long lineId, Long stationId) {
+    public Boolean deleteSection(Long lineId, Long stationId) {
         Line line = lineRepository.findById(lineId).orElseThrow(()->new CustomException(
                 new ErrorDto(HttpStatus.NOT_FOUND, "지하철노선 Id("+ lineId +") 가 존재 하지 않습니다.")));
         Station station = stationService.findById(stationId);
 
-        if (!line.getSections().get(line.getSections().size() - 1).getDownStation().equals(station)) {
-            throw new CustomException(
-                    new ErrorDto(HttpStatus.NOT_FOUND, "지하철노선 Id("+ lineId +") 가 존재 하지 않습니다.")
-            );
+        // station이 존재 하지 않으면 예외 발생
+        line.checkStationExist(station);
+
+        // 지하철 노선에 등록된 역만 제거 가능. 즉 마지막 구간만 제거 가능
+        Boolean isLast = line.isLastSection(stationId);
+        if(!isLast){
+            return false;
+        }
+
+        // 지하철 노선에 상행 종점역과 하행 종점역만 있는 경우(구간이 1개인 경우) 역을 삭제 할 수 없음
+        Boolean isOnly = line.isOnlySection();
+        if(isOnly){
+            return false;
         }
 
         line.getSections().remove(line.getSections().size() - 1);
+
+        return true;
     }
 }

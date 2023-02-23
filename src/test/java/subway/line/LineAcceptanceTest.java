@@ -3,6 +3,7 @@ package subway.line;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -12,9 +13,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import subway.db.AcceptanceTest;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static subway.line.LineStep.지하철_노선_생성_요청;
 import static subway.station.StationStep.지하철역_생성_요청;
 
 @DisplayName("지하철노선 관련 기능")
@@ -23,20 +27,31 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
+    Long 강남역;
+    Long 양재역;
+
     /**
-     * Given 지하철역을 생성
+     * Given 모든 line 테스트에서 사용되는 역생성
+     * */
+    @BeforeEach
+    public void setUp(){
+        super.setUp();
+
+        강남역 = 지하철역_생성_요청("강남역").jsonPath().getLong("id");
+        양재역 = 지하철역_생성_요청("양재역").jsonPath().getLong("id");
+    }
+
+    /**
+     *
      * When 지하철노선을 생성하면
      * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
      */
     @DisplayName("지하철노선 생성")
     @Test
     void createSubwayLine() {
-        // Given 지하철역을 생성
-        Long 강남역 = 지하철역_생성_요청("강남역").jsonPath().getLong("id");
-        Long 양재역 = 지하철역_생성_요청("양재역").jsonPath().getLong("id");
 
         //When 지하철노선을 생성하면
-        LineRequest Line1 = new LineRequest("1호선", "blue", 1L,2L,10L);
+        LineRequest Line1 = new LineRequest("1호선", "blue", 강남역,양재역,10L);
         createSubwayLine(Line1);
 
         //Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
@@ -56,9 +71,9 @@ public class LineAcceptanceTest extends AcceptanceTest {
         //deleteAllSubway();
 
         // Given 2개의 지하철 노선을 생성하고
-        LineRequest Line1 = new LineRequest("1호선", "blue");
+        LineRequest Line1 = new LineRequest("1호선", "blue", 강남역,양재역,10L);
         createSubwayLine(Line1);
-        LineRequest Line5 = new LineRequest("5호선", "purple");
+        LineRequest Line5 = new LineRequest("5호선", "purple", 강남역,양재역,10L);
         createSubwayLine(Line5);
 
         // When 지하철 노선 목록을 조회하면 // Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
@@ -75,7 +90,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void getStationLine() {
 
         // Given 지하철 노선을 생성하고
-        LineRequest Line8 = new LineRequest("8호선", "pink");
+        LineRequest Line8 = new LineRequest("8호선", "pink", 강남역,양재역,10L);
         Long lineId = createSubwayLine(Line8);
 
         // When 생성한 지하철 노선을 조회하면
@@ -99,11 +114,11 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void updateSubwayLine() {
 
         // Given 지하철 노선을 생성하고
-        LineRequest Line8 = new LineRequest("8호선", "pink");
+        LineRequest Line8 = new LineRequest("8호선", "pink", 강남역,양재역,10L);
         Long lineId = createSubwayLine(Line8);
 
         // When 생성한 지하철 노선을 수정하면
-        LineRequest updateLine8 = new LineRequest(Line8.getName(), "black"); //,4L,100L
+        LineRequest updateLine8 = new LineRequest(Line8.getName(), "black", 강남역,양재역,10L); //,4L,100L
         //lineId = 889L; //존재하지않는 ID 로 요청했을때 Exception Response 확인용
         LineResponse lineResponse = updateSubwayLine(lineId, updateLine8);
 
@@ -125,7 +140,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void deleteSubwayLine() {
 
         // Given 지하철 노선을 생성하고
-        LineRequest Line7 = new LineRequest("7호선","green");
+        LineRequest Line7 = new LineRequest("7호선","green", 강남역,양재역,10L);
         Long lineId = createSubwayLine(Line7);
 
         // When 생성한 지하철 노선을 삭제하면 // Then 해당 지하철 노선 정보는 삭제된다
