@@ -20,6 +20,13 @@ public class LineRequest {
         this.distance = distance;
     }
 
+    public LineRequest(){}
+
+    public LineRequest(String name, String color) {
+        this.name = name;
+        this.color = color;
+    }
+
 
     public String getName() {
         return name;

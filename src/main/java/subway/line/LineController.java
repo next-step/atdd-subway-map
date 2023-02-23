@@ -3,6 +3,7 @@ package subway.line;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import subway.exception.CustomException;
+import subway.section.SectionRequest;
 
 import java.net.URI;
 import java.util.List;
@@ -34,7 +35,8 @@ public class LineController {
 
     @GetMapping("/lines/{id}")
     public ResponseEntity<LineResponse> showLine(@PathVariable Long id) throws CustomException {
-        return ResponseEntity.ok().body(lineService.findLineById(id));
+        ResponseEntity<LineResponse> response = ResponseEntity.ok().body(lineService.findLineResponseById(id));
+        return response;
     }
 
     @DeleteMapping("/lines")
@@ -49,4 +51,15 @@ public class LineController {
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/lines/{lineId}/sections")
+    public ResponseEntity<Void> addSectionByLineId(@PathVariable Long lineId, @RequestBody SectionRequest sectionRequest) {
+        lineService.addSectionByLineId(lineId, sectionRequest);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/lines/{lineId}/sections")
+    public ResponseEntity<Void> deleteSectionByLineId(@PathVariable Long lineId, @RequestParam Long stationId) {
+        Boolean isDelete = lineService.deleteSection(lineId, stationId);
+        return ResponseEntity.noContent().build();
+    }
 }
