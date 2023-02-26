@@ -105,15 +105,15 @@ public class LineService {
     }
 
     @Transactional
-    public Line addSection (Long lineId, SectionRequest sectionRequest) {
+    public LineResponse addSection (Long lineId, SectionRequest sectionRequest) {
         Line line = selectLineById(lineId);
-
         Station upStation = new Station(stationService.findStationById(sectionRequest.getUpStationId()));
         Station downStation = new Station(stationService.findStationById(sectionRequest.getDownStationId()));
         long distance = sectionRequest.getDistance();
 
         line.addSection(new Section(line, upStation, downStation, distance));
+        lineRepository.save(line);
 
-        return lineRepository.save(line);
+        return new LineResponse(line);
     }
 }
