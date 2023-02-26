@@ -3,9 +3,9 @@ package subway.line;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.springframework.http.MediaType;
 import subway.line.presentation.LinePatchRequest;
 import subway.line.presentation.LineRequest;
+import subway.line.presentation.SectionRequest;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -58,6 +58,15 @@ public class LineRestAssured {
     public static ExtractableResponse<Response> 지하철_노선_삭제_요청(Long id) {
         return RestAssured.given().log().all()
                 .when().delete(API_PATH + "/" + id)
+                .then().log().all()
+                .extract();
+    }
+
+    public static ExtractableResponse<Response> 지하철_구간_등록(Long lineId, SectionRequest sectionRequest) {
+        return RestAssured.given().log().all()
+                .body(sectionRequest)
+                .contentType(APPLICATION_JSON_VALUE)
+                .when().post(API_PATH + "/" + lineId + "/sections")
                 .then().log().all()
                 .extract();
     }

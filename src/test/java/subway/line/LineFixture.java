@@ -2,6 +2,7 @@ package subway.line;
 
 import subway.line.presentation.LinePatchRequest;
 import subway.line.presentation.LineRequest;
+import subway.line.presentation.SectionRequest;
 
 public class LineFixture {
 
@@ -29,5 +30,13 @@ public class LineFixture {
 
     public static LinePatchRequest 노선_수정_객체_생성(String name, String color) {
         return new LinePatchRequest(name, color);
+    }
+
+    public static SectionRequest 구간_등록_객체_생성(Long upStationId, Long downStationId, long distance) {
+        return new SectionRequest(
+          upStationId,
+          downStationId,
+          distance
+        );
     }
 }

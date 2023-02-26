@@ -9,8 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import subway.line.presentation.LinePatchRequest;
 import subway.line.presentation.LineRequest;
+import subway.line.presentation.SectionRequest;
 import subway.util.DatabaseCleanup;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -18,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.http.HttpStatus.*;
 import static subway.line.LineFixture.*;
 import static subway.line.LineRestAssured.*;
+import static subway.line.LineRestAssured.지하철_노선_생성_요청;
 import static subway.stations.StationRestAssured.*;
 import static subway.util.ResponseUtils.*;
 
@@ -32,11 +35,14 @@ class LineAcceptanceTest {
 
     private Long 강남역_ID;
 
+    private Long 역삼역_ID;
+
     @BeforeEach
     void setUp() {
         databaseCleanup.execute();
         논현역_ID = Json_추출(지하철역_생성("논현역")).getLong("id");
         강남역_ID = Json_추출(지하철역_생성("강남역")).getLong("id");
+        역삼역_ID = Json_추출(지하철역_생성("역삼역")).getLong("id");
     }
 
     /**
@@ -213,6 +219,72 @@ class LineAcceptanceTest {
             // then
             assertThat(응답코드(지하철_노선_삭제_요청_응답)).isEqualTo(NOT_FOUND.value());
         }
+    }
+
+    @Nested
+    @DisplayName("지하철 구간 테스트")
+    class 지하철_구간_테스트 {
+
+        /**
+         * Given 지하철 노선을 생성하고
+         * When 생성한 지하철 노선에 구간을 등록하면
+         * Then 지하철 노선을 조회하면 등록된 구간에 역 ID를 확인할 수 있다.
+         */
+        @DisplayName("지하철 구간 등록에 성공한다")
+        @Test
+        void 지하철_구간_등록에_성공한다() {
+            // given
+            long 신분당선_ID = Json_추출(지하철_노선_생성_요청(신분당선_생성(논현역_ID, 강남역_ID))).getLong("id");
+
+            // when
+            SectionRequest 강남_역삼_구간 = 구간_등록_객체_생성(강남역_ID, 역삼역_ID, 15L);
+            ExtractableResponse<Response> 지하철_구간_등록_응답 = 지하철_구간_등록(신분당선_ID, 강남_역삼_구간);
+
+            // then
+            List<Long> 노선에_속한_역_ID = Arrays.asList(논현역_ID, 강남역_ID, 역삼역_ID);
+            지하철_구간_생성_완료됨(지하철_구간_등록_응답, 신분당선_ID, 노선에_속한_역_ID);
+        }
+
+        @DisplayName("지하철 구간 등록 실패 - 새로운 구간의 상행역은 노선의 하행 종점이어야 한다")
+        @Test
+        void 지하철_구간_등록_실패__새로운_구간의_상행역은_노선의_하행_종점이어야_한다() {
+            // given
+            long 신분당선_ID = Json_추출(지하철_노선_생성_요청(신분당선_생성(논현역_ID, 강남역_ID))).getLong("id");
+
+            // when
+            SectionRequest 논현_역삼_구간 = 구간_등록_객체_생성(논현역_ID, 역삼역_ID, 15L);
+            ExtractableResponse<Response> 지하철_구간_등록_응답 = 지하철_구간_등록(신분당선_ID, 논현_역삼_구간);
+
+            // then
+            assertThat(지하철_구간_등록_응답.statusCode()).isEqualTo(BAD_REQUEST.value());
+        }
+
+        @DisplayName("지하철 구간 등록 실패 - 새로운 구간의 하행역은 노선의 등록되어 있는 역일 수 없다")
+        @Test
+        void 지하철_구간_등록_실패__새로운_구간의_하행역은_노선의_등록되어_있는_역일_수_없다() {
+            // given
+            long 신분당선_ID = Json_추출(지하철_노선_생성_요청(신분당선_생성(논현역_ID, 강남역_ID))).getLong("id");
+
+            // when
+            SectionRequest 논현_역삼_구간 = 구간_등록_객체_생성(강남역_ID, 논현역_ID, 15L);
+            ExtractableResponse<Response> 지하철_구간_등록_응답 = 지하철_구간_등록(신분당선_ID, 논현_역삼_구간);
+
+            // then
+            assertThat(지하철_구간_등록_응답.statusCode()).isEqualTo(BAD_REQUEST.value());
+        }
+    }
+
+    private void 지하철_구간_생성_완료됨(ExtractableResponse<Response> 지하철_구간_등록_응답, Long 노선_ID, List<Long> stationIds) {
+        ExtractableResponse<Response> 지하철_노선_조회_요청_응답 = 지하철_노선_조회_요청(노선_ID);
+        assertAll(
+                () -> assertThat(지하철_구간_등록_응답.statusCode()).isEqualTo(CREATED.value()),
+                () -> assertThat(Json_추출(지하철_구간_등록_응답).getLong("id")).isEqualTo(노선_ID),
+                () -> {
+                    for (int i = 0; i < stationIds.size(); i++) {
+                        assertThat(Json_추출(지하철_노선_조회_요청_응답).getLong("stations.id[" + i + "]")).isEqualTo(stationIds.get(i));
+                    }
+                }
+        );
     }
 
     private void 지하철_노선_생성_완료됨(LineRequest 신분당선, ExtractableResponse<Response> 지하철_노선_생성_요청_응답) {
