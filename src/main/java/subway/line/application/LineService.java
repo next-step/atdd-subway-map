@@ -116,4 +116,12 @@ public class LineService {
 
         return new LineResponse(line);
     }
+
+    @Transactional
+    public void deleteSection(Long lineId, Long stationId) {
+        Line line = selectLineById(lineId);
+        Station station = new Station(stationService.findStationById(stationId));
+
+        line.removeStation(station);
+    }
 }
