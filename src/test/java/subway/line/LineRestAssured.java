@@ -70,4 +70,11 @@ public class LineRestAssured {
                 .then().log().all()
                 .extract();
     }
+
+    public static ExtractableResponse<Response> 지하철_구간_삭제(Long lineId, Long stationId) {
+        return RestAssured.given().log().all()
+                .when().delete(API_PATH + "/" + lineId + "/sections" + "/" + stationId)
+                .then().log().all()
+                .extract();
+    }
 }

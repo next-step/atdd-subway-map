@@ -272,6 +272,53 @@ class LineAcceptanceTest {
             // then
             assertThat(지하철_구간_등록_응답.statusCode()).isEqualTo(BAD_REQUEST.value());
         }
+
+        /**
+         * Given 지하철 노선과 지하철 구간을 등록하면
+         * When 생성한 지하철 노선의 구간을 삭제하면
+         * Then 해당 지하철 구간 정보는 삭제된다.
+         */
+        @DisplayName("지하철 구간 삭제에 성공한다")
+        @Test
+        void 지하철_구간_삭제에_성공한다() {
+            // given
+            long 신분당선_ID = Json_추출(지하철_노선_생성_요청(신분당선_생성(논현역_ID, 강남역_ID))).getLong("id");
+            SectionRequest 강남_역삼_구간 = 구간_등록_객체_생성(강남역_ID, 역삼역_ID, 15L);
+            지하철_구간_등록(신분당선_ID, 강남_역삼_구간);
+
+            // when
+            ExtractableResponse<Response> 지하철_구간_삭제_응답 = 지하철_구간_삭제(신분당선_ID, 역삼역_ID);
+
+            // then
+            구간_삭제_완료됨(지하철_구간_삭제_응답, 신분당선_ID, 역삼역_ID);
+        }
+
+        @DisplayName("지하철 구간 삭제에 실패한다 - 노선의 하행 종점역만 제거 할 수 있다")
+        @Test
+        void 지하철_구간_삭제에_실패한다__노선의_하행_종점역만_제거() {
+            // given
+            long 신분당선_ID = Json_추출(지하철_노선_생성_요청(신분당선_생성(논현역_ID, 강남역_ID))).getLong("id");
+
+            // when
+            ExtractableResponse<Response> 지하철_구간_삭제_응답 = 지하철_구간_삭제(신분당선_ID, 논현역_ID);
+
+            // then
+            assertThat(지하철_구간_삭제_응답.statusCode()).isEqualTo(BAD_REQUEST.value());
+        }
+
+        @DisplayName("지하철 구간 삭제에 실패한다 - 구간이 1개인 경우")
+        @Test
+        void 지하철_구간_삭제에_실패한다__구간이_1개인_경우() {
+            // given
+            long 신분당선_ID = Json_추출(지하철_노선_생성_요청(신분당선_생성(논현역_ID, 강남역_ID))).getLong("id");
+
+            // when
+            ExtractableResponse<Response> 지하철_구간_삭제_응답 = 지하철_구간_삭제(신분당선_ID, 강남역_ID);
+
+            // then
+            assertThat(지하철_구간_삭제_응답.statusCode()).isEqualTo(BAD_REQUEST.value());
+
+        }
     }
 
     private void 지하철_구간_생성_완료됨(ExtractableResponse<Response> 지하철_구간_등록_응답, Long 노선_ID, List<Long> stationIds) {
@@ -284,6 +331,13 @@ class LineAcceptanceTest {
                         assertThat(Json_추출(지하철_노선_조회_요청_응답).getLong("stations.id[" + i + "]")).isEqualTo(stationIds.get(i));
                     }
                 }
+        );
+    }
+
+    private void 구간_삭제_완료됨(ExtractableResponse<Response> 지하철_구간_삭제_응답, Long lineId, Long stationId) {
+        assertAll(
+                () -> assertThat(지하철_구간_삭제_응답.statusCode()).isEqualTo(NO_CONTENT.value()),
+                () -> assertThat(Json_추출(지하철_노선_조회_요청(lineId)).getList("stations.id", Long.class)).doesNotContain(stationId)
         );
     }
 
