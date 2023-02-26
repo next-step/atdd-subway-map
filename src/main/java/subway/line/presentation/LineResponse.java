@@ -1,6 +1,7 @@
 package subway.line.presentation;
 
 import subway.line.domain.Line;
+import subway.line.domain.Sections;
 import subway.station.domain.Station;
 
 import java.util.List;
@@ -14,10 +15,14 @@ public class LineResponse {
 
     private List<Station> stations;
 
+    public LineResponse() {
+    }
+
     public LineResponse(Line line) {
         this.id = line.getId();
         this.name = line.getName();
         this.color = line.getColor();
+        this.stations = line.getStations();
     }
 
     public LineResponse(Long id, String name, String color, List<Station> stations) {

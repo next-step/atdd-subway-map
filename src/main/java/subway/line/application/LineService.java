@@ -3,11 +3,13 @@ package subway.line.application;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.line.domain.Line;
+import subway.line.domain.Section;
 import subway.line.infra.LineRepository;
 import subway.line.presentation.LinePatchRequest;
 import subway.line.presentation.LineRequest;
 import subway.line.presentation.LineResponse;
 import subway.line.exception.LineNotFoundException;
+import subway.line.presentation.SectionRequest;
 import subway.station.domain.Station;
 import subway.station.application.StationService;
 
@@ -45,19 +47,13 @@ public class LineService {
         Station upStation = new Station(stationService.findStationById(lineRequest.getUpStationId()));
         Station downStation = new Station(stationService.findStationById(lineRequest.getDownStationId()));
 
-        Line line = lineRepository.save(
-                new Line(lineRequest.getName(),
-                        lineRequest.getColor(),
-                        upStation.getId(),
-                        downStation.getId(),
-                        lineRequest.getDistance()));
+        Line line = new Line(lineRequest.getName(),
+                lineRequest.getColor(),
+                upStation,
+                downStation,
+                lineRequest.getDistance());
 
-        return new LineResponse(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                findStations(line.getUpStationId(), line.getDownStationId())
-        );
+        return new LineResponse(lineRepository.save(line));
     }
 
     public List<LineResponse> findAllLines() {
@@ -67,25 +63,24 @@ public class LineService {
     }
 
     public LineResponse findLineById(Long id) {
-        Line line = lineRepository.findById(id).orElseThrow(LineNotFoundException::new);
+        Line line = selectLineById(id);
         return new LineResponse(
                 line.getId(),
                 line.getName(),
                 line.getColor(),
-                findStations(line.getUpStationId(), line.getDownStationId())
+                line.getStations()
         );
     }
 
     @Transactional
-    public void updateLineById(Long id, LinePatchRequest linePatchRequest) {
-        Line line = lineRepository.findById(id).orElseThrow(LineNotFoundException::new);
-//        lineRepository.save(line.update(linePatchRequest.getName(), linePatchRequest.getColor()));
+    public void updateLineById (Long id, LinePatchRequest linePatchRequest) {
+        Line line = selectLineById(id);
         line.update(linePatchRequest.getName(), linePatchRequest.getColor());
     }
 
     @Transactional
-    public void deleteLineById(Long id) {
-        Line line = lineRepository.findById(id).orElseThrow(LineNotFoundException::new);
+    public void deleteLineById (Long id) {
+        Line line = selectLineById(id);
         lineRepository.deleteById(line.getId());
     }
 
@@ -94,7 +89,7 @@ public class LineService {
                 line.getId(),
                 line.getName(),
                 line.getColor(),
-                findStations(line.getUpStationId(), line.getDownStationId())
+                line.getStations()
         );
     }
 
@@ -103,5 +98,30 @@ public class LineService {
         Station downStation = new Station(stationService.findStationById(downStationId));
 
         return List.of(upStation, downStation);
+    }
+
+    private Line selectLineById (Long id) {
+        return lineRepository.findById(id).orElseThrow(LineNotFoundException::new);
+    }
+
+    @Transactional
+    public LineResponse addSection (Long lineId, SectionRequest sectionRequest) {
+        Line line = selectLineById(lineId);
+        Station upStation = new Station(stationService.findStationById(sectionRequest.getUpStationId()));
+        Station downStation = new Station(stationService.findStationById(sectionRequest.getDownStationId()));
+        long distance = sectionRequest.getDistance();
+
+        line.addSection(new Section(line, upStation, downStation, distance));
+        lineRepository.save(line);
+
+        return new LineResponse(line);
+    }
+
+    @Transactional
+    public void deleteSection(Long lineId, Long stationId) {
+        Line line = selectLineById(lineId);
+        Station station = new Station(stationService.findStationById(stationId));
+
+        line.removeStation(station);
     }
 }

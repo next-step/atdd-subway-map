@@ -5,13 +5,17 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.MediaType;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class StationRestAssured {
 
     private static final String API_PATH = "/stations";
 
-    public static ExtractableResponse<Response> createStation(Map<String, String> param) {
+    public static ExtractableResponse<Response> 지하철역_생성(String name) {
+        Map<String, String> param = new HashMap<>();
+        param.put("name", name);
+
         return RestAssured.given()
                 .body(param)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -20,7 +24,7 @@ public class StationRestAssured {
                 .extract();
     }
 
-    public static Long getStationId(Map<String, String> param) {
-        return createStation(param).jsonPath().getLong("id");
+    public static Long 지하철역_ID(ExtractableResponse<Response> response) {
+        return response.jsonPath().getLong("id");
     }
 }
