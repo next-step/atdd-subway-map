@@ -5,9 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import subway.dto.LinePatchResponse;
-import subway.dto.LineRequest;
-import subway.dto.LineResponse;
+import subway.dto.*;
 import subway.service.LineService;
 
 import java.net.URI;
@@ -47,5 +45,11 @@ public class LineController {
     public ResponseEntity deleteLine(@PathVariable Long id) {
         lineService.deleteLineById(id);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
+    }
+
+    @PostMapping("/{id}/sections")
+    public ResponseEntity<SectionResponse> addSection(@PathVariable Long id , @RequestBody SectionRequest sectionRequest) {
+        SectionResponse sectionResponse = lineService.addSection(id, sectionRequest);
+        return ResponseEntity.created(URI.create("/lines/" + id + "/sections")).body(sectionResponse);
     }
 }

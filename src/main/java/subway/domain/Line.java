@@ -35,4 +35,9 @@ public class Line {
         this.name = name;
         this.color = color;
     }
+
+    public void update(Station station) {
+        this.downStation = station;
+    }
+
 }
