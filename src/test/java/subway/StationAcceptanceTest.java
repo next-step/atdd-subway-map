@@ -101,6 +101,5 @@ public class StationAcceptanceTest {
                 () -> assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value()),
                 () -> assertThat(responseStationsName).doesNotContain(stationName)
         );
-
     }
 }
