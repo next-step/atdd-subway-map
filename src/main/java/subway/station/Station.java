@@ -35,6 +35,10 @@ public class Station {
         return name;
     }
 
+    public boolean equals(Station station) {
+        return station != null && id.equals(station.getId());
+    }
+
     @Override
     public String toString() {
         return "id : " + id + ", name : " + name;

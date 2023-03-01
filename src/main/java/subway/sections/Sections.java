@@ -61,9 +61,9 @@ public class Sections {
       return false;
     }
 
-    if (Objects.equals(station.getId(), getDownStation().getId())) {
+    if (getDownStation().equals(station)) {
       return true;
     }
-    return sections.stream().anyMatch(s -> Objects.equals(s.getUpStation().getId(), station.getId()));
+    return sections.stream().anyMatch(s -> s.getUpStation().equals(station));
   }
 }

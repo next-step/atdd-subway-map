@@ -25,7 +25,7 @@ class SectionsValidator {
   }
 
   private static boolean isUpStationNotMatchesLastDownStation(Sections sections,Section section) {
-    return sections.getSize() != 0 && !Objects.equals(sections.getDownStation().getId(), section.getUpStation().getId());
+    return sections.getSize() != 0 && !sections.getDownStation().equals(section.getUpStation());
   }
 
   private static boolean isAlreadyAddedSection(Sections sections, Section section) {
@@ -33,6 +33,6 @@ class SectionsValidator {
   }
 
   private static boolean isStationNotLastDownStation(Sections sections, Station station) {
-    return !Objects.equals(sections.getDownStation().getId(), station.getId());
+    return !sections.getDownStation().equals(station);
   }
 }
