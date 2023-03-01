@@ -1,17 +1,18 @@
 package subway.section;
 
 import subway.station.Station;
+import subway.station.StationResponse;
 
 public class SectionResponse {
 
   private final Long id;
-  private final Station upStation;
-  private final Station downStation;
+  private final StationResponse upStation;
+  private final StationResponse downStation;
 
   public SectionResponse(Long id, Station upStation, Station downStation) {
     this.id = id;
-    this.upStation = upStation;
-    this.downStation = downStation;
+    this.upStation = StationResponse.from(upStation);
+    this.downStation = StationResponse.from(downStation);
   }
 
   public static SectionResponse from(Section section) {
@@ -22,11 +23,11 @@ public class SectionResponse {
     return id;
   }
 
-  public Station getUpStation() {
+  public StationResponse getUpStation() {
     return upStation;
   }
 
-  public Station getDownStation() {
+  public StationResponse getDownStation() {
     return downStation;
   }
 }
