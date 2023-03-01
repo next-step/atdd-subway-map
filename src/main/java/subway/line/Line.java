@@ -40,27 +40,12 @@ public class Line {
     return name;
   }
 
-  // 상행 종점역
-  public Station getUpStation() {
-    return sections.getUpStation();
-  }
-
-  // 하행 종점역
-  public Station getDownStation() {
-    return sections.getDownStation();
-  }
-
   public String getColor() {
     return color;
   }
 
   public List<Station> getStations() {
-    System.out.println("get Stations!");
     return sections.getStations();
-  }
-
-  public Sections getSections() {
-    return sections;
   }
 
   public Line updateLine(String name, String color) {
