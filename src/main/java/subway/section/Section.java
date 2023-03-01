@@ -25,10 +25,12 @@ public class Section {
     return id;
   }
 
+  // 상행역
   public Station getUpStation() {
     return upStation;
   }
 
+  // 하행역
   public Station getDownStation() {
     return downStation;
   }

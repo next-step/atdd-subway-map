@@ -12,7 +12,7 @@ public class LineTestUtils {
 
   private LineTestUtils() {}
 
-  public static Line 역_과_노선_생성(LineStationCreateDTO request) {
+  public static LineResponse 역_과_노선_생성(LineStationCreateDTO request) {
     Long upId = 지하철역_생성(request.getUpStation());
     Long downId = 지하철역_생성(request.getDownStation());
     return 지하철_노선_생성(
@@ -22,12 +22,12 @@ public class LineTestUtils {
     );
   }
 
-  public static Line 지하철_노선_생성(LineCreateRequest request) {
+  public static LineResponse 지하철_노선_생성(LineCreateRequest request) {
     return RestAssured
         .given().body(request).contentType(MediaType.APPLICATION_JSON_VALUE)
         .when().post("/lines")
         .then()
-        .extract().body().as(Line.class);
+        .extract().body().as(LineResponse.class);
   }
 
   public static ExtractableResponse<Response> 지하철_노선_조회(Long id) {
@@ -46,14 +46,14 @@ public class LineTestUtils {
         .extract();
   }
 
-  public static Line 지하철_노선_수정(Long id, String name, String color) {
+  public static LineResponse 지하철_노선_수정(Long id, String name, String color) {
     LinePatchRequest request = new LinePatchRequest(name, color);
 
     return RestAssured
         .given().body(request).contentType(MediaType.APPLICATION_JSON_VALUE)
         .when().patch("/lines/" + id)
         .then()
-        .extract().body().as(Line.class);
+        .extract().body().as(LineResponse.class);
   }
 
   public static void 지하철_노선_삭제(Long id) {

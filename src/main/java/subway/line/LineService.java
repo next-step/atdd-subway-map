@@ -29,10 +29,13 @@ public class LineService {
     Station downStation = stationService.findById(request.getDownStationId()).toEntity();
 
     Line created = lineRepository.save(
-        new Line(request.getName(), request.getColor(), upStation, downStation, request.getDistance())
+        new Line(request.getName(), request.getColor())
     );
 
-    sectionService.createSection(created.getId(), new SectionCreateRequest(upStation.getId(), downStation.getId(), request.getDistance()));
+    sectionService.createSection(
+        created.getId(),
+        new SectionCreateRequest(upStation.getId(), downStation.getId(), request.getDistance())
+    );
 
     return LineResponse.of(created);
   }
@@ -43,6 +46,10 @@ public class LineService {
 
   public Optional<LineResponse> showLine(Long id) {
     return lineRepository.findById(id).map(LineResponse::of);
+  }
+
+  public Line findById(Long id) {
+    return lineRepository.findById(id).orElseThrow(IllegalArgumentException::new);
   }
 
   public List<LineResponse> showLines() {
