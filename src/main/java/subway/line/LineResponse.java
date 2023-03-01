@@ -19,7 +19,7 @@ public class LineResponse {
     this.stations = stations.stream().map(s -> new StationResponse(s.getId(), s.getName())).collect(Collectors.toList());
   }
 
-  public static LineResponse of(Line line) {
+  public static LineResponse from(Line line) {
     return new LineResponse(
         line.getId(),
         line.getName(),

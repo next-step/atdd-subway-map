@@ -18,7 +18,7 @@ public class SectionTestUtils {
 
   public static ExtractableResponse<Response> 노선에_구간_제거(Long lineId, Long sectionId) {
     return RestAssured
-        .given().contentType(MediaType.APPLICATION_JSON_VALUE).queryParam("sectionId", sectionId)
+        .given().contentType(MediaType.APPLICATION_JSON_VALUE).queryParam("stationId", sectionId)
         .when().delete("/lines/" + lineId + "/sections")
         .then().extract();
   }

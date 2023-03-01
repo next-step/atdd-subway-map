@@ -16,8 +16,4 @@ public class StationResponse {
     public String getName() {
         return name;
     }
-
-    public Station toEntity() {
-        return new Station(id, name);
-    }
 }

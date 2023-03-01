@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
+import org.springframework.util.StringUtils;
 import subway.line.LineException.DuplicatedStationAddToSectionFailException;
 import subway.line.LineException.InvalidUpstationAppendInSection;
 import subway.line.LineException.MiddleSectionRemoveFailException;
@@ -51,14 +52,14 @@ public class Sections {
     sections.add(section);
   }
 
-  public void removeSection(Section section) {
+  public void removeSection(Station station) {
     if (sections.size() <= 1) {
       throw new ZeroSectionException();
     }
-    if (!sections.get(sections.size() - 1).getId().equals(section.getId())) {
+    System.out.println("no error occur!");
+    if (!Objects.equals(getDownStation().getId(), station.getId())) {
       throw new MiddleSectionRemoveFailException();
     }
-
 
     sections.remove(sections.size() - 1);
   }

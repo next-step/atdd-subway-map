@@ -23,8 +23,8 @@ public class SectionController {
   }
 
   @DeleteMapping("/lines/{lineId}/sections")
-  public ResponseEntity<Void> removeSection(@PathVariable Long lineId, @RequestParam Long sectionId) {
-    sectionService.removeSection(lineId, sectionId);
+  public ResponseEntity<Void> removeSection(@PathVariable Long lineId, @RequestParam Long stationId) {
+    sectionService.removeSection(lineId, stationId);
     return ResponseEntity.noContent().build();
   }
 }

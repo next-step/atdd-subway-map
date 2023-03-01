@@ -37,6 +37,4 @@ public class LineTestDTO {
       return distance;
     }
   }
-
-
 }

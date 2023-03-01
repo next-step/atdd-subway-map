@@ -28,8 +28,12 @@ public class StationService {
                 .collect(Collectors.toList());
     }
 
-    public StationResponse findById(Long id) {
+    public StationResponse showStation(Long id) {
         return createStationResponse(stationRepository.findById(id).get());
+    }
+
+    public Station findById(Long id) {
+        return stationRepository.findById(id).orElseThrow(IllegalArgumentException::new);
     }
 
     @Transactional

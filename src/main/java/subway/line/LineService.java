@@ -25,8 +25,8 @@ public class LineService {
 
   @Transactional
   public LineResponse saveLine(LineCreateRequest request) {
-    Station upStation = stationService.findById(request.getUpStationId()).toEntity();
-    Station downStation = stationService.findById(request.getDownStationId()).toEntity();
+    Station upStation = stationService.findById(request.getUpStationId());
+    Station downStation = stationService.findById(request.getDownStationId());
 
     Line created = lineRepository.save(
         new Line(request.getName(), request.getColor())
@@ -37,7 +37,7 @@ public class LineService {
         new SectionCreateRequest(upStation.getId(), downStation.getId(), request.getDistance())
     );
 
-    return LineResponse.of(created);
+    return LineResponse.from(created);
   }
 
   public void save(Line line) {
@@ -45,7 +45,7 @@ public class LineService {
   }
 
   public Optional<LineResponse> showLine(Long id) {
-    return lineRepository.findById(id).map(LineResponse::of);
+    return lineRepository.findById(id).map(LineResponse::from);
   }
 
   public Line findById(Long id) {
@@ -54,7 +54,7 @@ public class LineService {
 
   public List<LineResponse> showLines() {
     return lineRepository.findAll().stream()
-        .map(LineResponse::of)
+        .map(LineResponse::from)
         .collect(Collectors.toList());
   }
 
@@ -66,6 +66,6 @@ public class LineService {
     Optional<Line> optionalLine = lineRepository.findById(id);
 
     return optionalLine.map(line -> line.updateLine(name, color))
-        .map(line -> LineResponse.of(lineRepository.save(line)));
+        .map(line -> LineResponse.from(lineRepository.save(line)));
   }
 }

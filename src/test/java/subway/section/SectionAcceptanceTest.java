@@ -1,7 +1,6 @@
 package subway.section;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -108,10 +107,10 @@ public class SectionAcceptanceTest {
     Long 신규역아이디 = StationTestUtils.지하철역_생성(MockStation.신림역);
     SectionCreateRequest request = new SectionCreateRequest(기존_노선_하행역_ID, 신규역아이디, 서울2호선_거리);
 
-    Long 신규_섹션_ID = SectionTestUtils.노선에_구간_추가(line.getId(), request).jsonPath().getLong("id");
+    SectionTestUtils.노선에_구간_추가(line.getId(), request).jsonPath().getLong("id");
 
     // When
-    ExtractableResponse<Response> response = SectionTestUtils.노선에_구간_제거(line.getId(), 신규_섹션_ID);
+    ExtractableResponse<Response> response = SectionTestUtils.노선에_구간_제거(line.getId(), 신규역아이디);
 
     // then
     assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
@@ -122,36 +121,35 @@ public class SectionAcceptanceTest {
    * When 노선의 하행역이 아닌 구간을 제거하면
    * Then 에러를 반환한다.
    */
-//  @Test
-//  @DisplayName("하행역이 포함된 구간이 아닌 경우 지울 수 없다.")
-//  void 하행역이_포함안된_구간_삭제_실패_테스트() {
-//    // Given
-//    LineResponse line = LineTestUtils.역_과_노선_생성(LineCreateRequestDTO.서울2호선_노선_생성요청);
-//    Long 기존_노선_하행역_ID = line.getStations().get(1).getId();
-//    Long 신규역아이디 = StationTestUtils.지하철역_생성(MockStation.신림역);
-//
-//    // When
-//    SectionCreateRequest 서울2호선_하행선_구간_추가_요청 = new SectionCreateRequest(기존_노선_하행역_ID, 신규역아이디, 서울2호선_거리);
-//    SectionTestUtils.노선에_구간_추가(line.getId(), 서울2호선_하행선_구간_추가_요청);
-//
-//    // Then
-//    Long 상행역이_포함된_구간_ID;
-//    assertThrows(RuntimeException.class, () -> SectionTestUtils.노선에_구간_제거(line, line.getSections().get(0).getId()));
-//  }
-//
-//  /**
-//   * Given 구간이 1개인 지하철 노선을 생성하고
-//   * When 노선을 제거하면
-//   * 에러를 반환한다.
-//   */
-//  @Test
-//  @DisplayName("구간이 한 개인 역은 지울 수 없다")
-//  void 구간이_한개면_삭제_실패_테스트() {
-//    LineResponse line = LineTestUtils.역_과_노선_생성(LineCreateRequestDTO.서울2호선_노선_생성요청);
-//    String SectionId = line.getSections().get(0).getId();
-//
-//    assertThrows(RuntimeException.class,
-//        () ->SectionTestUtils.노선에_구간_제거(line, )
-//    );
-//  }
+  @Test
+  @DisplayName("하행역이 포함된 구간이 아닌 경우 지울 수 없다.")
+  void 하행역이_포함안된_구간_삭제_실패_테스트() {
+    // Given
+    LineResponse line = LineTestUtils.역_과_노선_생성(LineCreateRequestDTO.서울2호선_노선_생성요청);
+    Long 기존_노선_하행역_ID = line.getStations().get(1).getId();
+    Long 신규역아이디 = StationTestUtils.지하철역_생성(MockStation.신림역);
+
+    // When
+    SectionCreateRequest 서울2호선_하행선_구간_추가_요청 = new SectionCreateRequest(기존_노선_하행역_ID, 신규역아이디, 서울2호선_거리);
+    SectionTestUtils.노선에_구간_추가(line.getId(), 서울2호선_하행선_구간_추가_요청);
+
+    // Then
+    assertThat(SectionTestUtils.노선에_구간_제거(line.getId(), 기존_노선_하행역_ID).statusCode())
+        .isEqualTo(HttpStatus.BAD_REQUEST.value());
+  }
+
+  /**
+   * Given 구간이 1개인 지하철 노선을 생성하고
+   * When 노선을 제거하면
+   * 에러를 반환한다.
+   */
+  @Test
+  @DisplayName("구간이 한 개인 역은 지울 수 없다")
+  void 구간이_한개면_삭제_실패_테스트() {
+    LineResponse line = LineTestUtils.역_과_노선_생성(LineCreateRequestDTO.서울2호선_노선_생성요청);
+    Long stationId = line.getStations().get(line.getStations().size() - 1).getId();
+
+    assertThat(SectionTestUtils.노선에_구간_제거(line.getId(), stationId).statusCode())
+        .isEqualTo(HttpStatus.BAD_REQUEST.value());
+  }
 }

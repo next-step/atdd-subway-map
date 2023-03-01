@@ -30,22 +30,20 @@ public class SectionService {
    */
   @Transactional
   public SectionResponse createSection(Long lineId, SectionCreateRequest request) {
-    Station upStation = stationService.findById(request.getUpStationId()).toEntity();
-    Station downStation = stationService.findById(request.getDownStationId()).toEntity();
+    Station upStation = stationService.findById(request.getUpStationId());
+    Station downStation = stationService.findById(request.getDownStationId());
     Line line = lineService.findById(lineId);
 
     Section created = sectionRepository.save(new Section(upStation, downStation, request.getDistance()));
 
     lineService.save(line.addSection(created));
 
-    return SectionResponse.of(created);
+    return SectionResponse.from(created);
   }
 
-  public void removeSection(Long lineId, Long sectionId) {
+  public void removeSection(Long lineId, Long downStationId) {
     Line line = lineService.findById(lineId);
-    Section section = sectionRepository.findById(sectionId).orElseThrow(IllegalArgumentException::new);
-
-    line.removeSection(section);
-    sectionRepository.deleteById(sectionId);
+    Station station = stationService.findById(downStationId);
+    line.removeSection(station);
   }
 }
