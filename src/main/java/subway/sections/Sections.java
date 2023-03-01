@@ -22,10 +22,16 @@ public class Sections {
   }
 
   public Station getUpStation() {
+    if (sections.isEmpty()) {
+      return null;
+    }
     return sections.get(0).getUpStation();
   }
 
   public Station getDownStation() {
+    if (sections.isEmpty()) {
+      return null;
+    }
     return sections.get(sections.size() - 1).getDownStation();
   }
 

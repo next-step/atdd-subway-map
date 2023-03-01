@@ -19,7 +19,7 @@ class SectionsValidator {
       throw new IllegalStateException("노선의 구간은 한 개 이상 남아야 합니다.");
     }
 
-    if (isStationNotMatchedDownStation(sections, station)) {
+    if (isStationNotLastDownStation(sections, station)) {
       throw new IllegalArgumentException("노선의 중간 구간들은 지울 수 없습니다.");
     }
   }
@@ -29,14 +29,10 @@ class SectionsValidator {
   }
 
   private static boolean isAlreadyAddedSection(Sections sections, Section section) {
-    return sections.isStationContained(section.getDownStation()) && !isLastDownStation(sections, section.getDownStation());
+    return sections.isStationContained(section.getDownStation()) && isStationNotLastDownStation(sections, section.getDownStation());
   }
 
-  private static boolean isStationNotMatchedDownStation(Sections sections, Station station) {
+  private static boolean isStationNotLastDownStation(Sections sections, Station station) {
     return !Objects.equals(sections.getDownStation().getId(), station.getId());
-  }
-
-  private static boolean isLastDownStation(Sections sections, Station station) {
-    return Objects.equals(sections.getDownStation().getId(), station.getId());
   }
 }
