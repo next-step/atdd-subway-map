@@ -51,8 +51,13 @@ public class Sections {
   }
 
   public boolean isStationContained(Station station) {
-    return sections.size() != 0 &&
-        (sections.stream().anyMatch(s -> Objects.equals(s.getUpStation().getId(), station.getId()))
-            || Objects.equals(station.getId(), getDownStation().getId()));
+    if (sections.isEmpty()) {
+      return false;
+    }
+
+    if (Objects.equals(station.getId(), getDownStation().getId())) {
+      return true;
+    }
+    return sections.stream().anyMatch(s -> Objects.equals(s.getUpStation().getId(), station.getId()));
   }
 }
