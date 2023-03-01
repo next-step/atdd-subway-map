@@ -8,11 +8,6 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
-import org.springframework.util.StringUtils;
-import subway.line.LineException.DuplicatedStationAddToSectionFailException;
-import subway.line.LineException.InvalidUpstationAppendInSection;
-import subway.line.LineException.MiddleSectionRemoveFailException;
-import subway.line.LineException.ZeroSectionException;
 import subway.section.Section;
 import subway.station.Station;
 
@@ -34,6 +29,10 @@ public class Sections {
     return sections.get(sections.size() - 1).getDownStation();
   }
 
+  public Integer getSize() {
+    return sections.size();
+  }
+
   public List<Station> getStations() {
     List<Station> stations = new LinkedList<>();
     stations.add(getUpStation());
@@ -42,25 +41,18 @@ public class Sections {
   }
 
   public void addSection(Section section) {
-    if (sections.size() != 0 && !Objects.equals(getDownStation().getId(), section.getUpStation().getId())) {
-      throw new InvalidUpstationAppendInSection();
-    }
-    if (sections.stream().anyMatch(s -> Objects.equals(section.getDownStation().getId(), s.getUpStation().getId()))) {
-      throw new DuplicatedStationAddToSectionFailException();
-    };
-
+    SectionsValidator.validateAddedSection(this, section);
     sections.add(section);
   }
 
   public void removeSection(Station station) {
-    if (sections.size() <= 1) {
-      throw new ZeroSectionException();
-    }
-    System.out.println("no error occur!");
-    if (!Objects.equals(getDownStation().getId(), station.getId())) {
-      throw new MiddleSectionRemoveFailException();
-    }
-
+    SectionsValidator.validateRemoveSection(this, station);
     sections.remove(sections.size() - 1);
+  }
+
+  public boolean isStationContained(Station station) {
+    return sections.size() != 0 &&
+        (sections.stream().anyMatch(s -> Objects.equals(s.getUpStation().getId(), station.getId()))
+            || Objects.equals(station.getId(), getDownStation().getId()));
   }
 }
