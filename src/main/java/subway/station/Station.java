@@ -18,6 +18,11 @@ public class Station {
     public Station() {
     }
 
+    public Station(Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
     public Station(String name) {
         this.name = name;
     }
@@ -28,5 +33,14 @@ public class Station {
 
     public String getName() {
         return name;
+    }
+
+    public boolean equals(Station station) {
+        return station != null && id.equals(station.getId());
+    }
+
+    @Override
+    public String toString() {
+        return "id : " + id + ", name : " + name;
     }
 }

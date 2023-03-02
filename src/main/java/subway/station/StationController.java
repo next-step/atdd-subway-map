@@ -8,7 +8,7 @@ import java.util.List;
 
 @RestController
 public class StationController {
-    private StationService stationService;
+    private final StationService stationService;
 
     public StationController(StationService stationService) {
         this.stationService = stationService;
@@ -27,7 +27,7 @@ public class StationController {
 
     @GetMapping(value = "/stations/{id}")
     public ResponseEntity<StationResponse> showStation(@PathVariable Long id) {
-        return ResponseEntity.ok().body(stationService.findById(id));
+        return ResponseEntity.ok().body(stationService.showStation(id));
     }
 
     @DeleteMapping("/stations/{id}")

@@ -5,37 +5,44 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.section.Section;
+import subway.section.SectionCreateRequest;
+import subway.section.SectionRepository;
+import subway.section.SectionResponse;
 import subway.station.Station;
-import subway.station.StationRepository;
+import subway.station.StationService;
 
 @Service
 public class LineService {
 
   private final LineRepository lineRepository;
-  private final StationRepository stationRepository;
+  private final StationService stationService;
+  private final SectionRepository sectionRepository;
 
-  public LineService(LineRepository repository, StationRepository stationRepository) {
+  public LineService(LineRepository repository, StationService stationService, SectionRepository sectionRepository) {
     this.lineRepository = repository;
-    this.stationRepository = stationRepository;
+    this.stationService = stationService;
+    this.sectionRepository = sectionRepository;
   }
 
   @Transactional
-  public LineResponse saveLine(String name, String color, Long upStationId, Long downStationId, Long distance) {
-    Optional<Station> inbound = stationRepository.findById(upStationId);
-    Optional<Station> outbound = stationRepository.findById(downStationId);
-    Line created = lineRepository.save(new Line(name, color, inbound.get(), outbound.get(), distance));
-    return createServiceResponse(created);
+  public LineResponse saveLine(LineCreateRequest request) {
+    Station upStation = stationService.findById(request.getUpStationId());
+    Station downStation = stationService.findById(request.getDownStationId());
+
+    Line created = lineRepository.save(new Line(request.getName(), request.getColor()));
+    createSection(created.getId(), new SectionCreateRequest(upStation.getId(), downStation.getId(), request.getDistance()));
+
+    return LineResponse.from(created);
   }
 
   public Optional<LineResponse> showLine(Long id) {
-    Optional<Line> optionalLine = lineRepository.findById(id);
-
-    return optionalLine.map(this::createServiceResponse);
+    return lineRepository.findById(id).map(LineResponse::from);
   }
 
   public List<LineResponse> showLines() {
     return lineRepository.findAll().stream()
-        .map(this::createServiceResponse)
+        .map(LineResponse::from)
         .collect(Collectors.toList());
   }
 
@@ -47,11 +54,25 @@ public class LineService {
     Optional<Line> optionalLine = lineRepository.findById(id);
 
     return optionalLine.map(line -> line.updateLine(name, color))
-        .map(lineRepository::save)
-        .map(this::createServiceResponse);
+        .map(line -> LineResponse.from(lineRepository.save(line)));
   }
 
-  private LineResponse createServiceResponse(Line line) {
-    return new LineResponse(line.getId(), line.getName(), line.getColor(), line.getUpStation(), line.getDownStation(), line.getDistance());
+  @Transactional
+  public SectionResponse createSection(Long lineId, SectionCreateRequest request) {
+    Station upStation = stationService.findById(request.getUpStationId());
+    Station downStation = stationService.findById(request.getDownStationId());
+    Line line = lineRepository.findById(lineId).orElseThrow(IllegalArgumentException::new);
+
+    Section created = sectionRepository.save(new Section(upStation, downStation, request.getDistance()));
+
+    lineRepository.save(line.addSection(created));
+
+    return SectionResponse.from(created);
+  }
+
+  public void removeSection(Long lineId, Long downStationId) {
+    Line line = lineRepository.findById(lineId).orElseThrow(IllegalArgumentException::new);
+    Station station = stationService.findById(downStationId);
+    line.removeSection(station);
   }
 }

@@ -1,11 +1,13 @@
 package subway.line;
 
-import javax.persistence.CascadeType;
+import java.util.List;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import subway.section.Section;
+import subway.sections.Sections;
 import subway.station.Station;
 
 @Entity
@@ -19,23 +21,15 @@ public class Line {
 
   private String color;
 
-  @ManyToOne(cascade = CascadeType.ALL)
-  private Station upStation; // 상행역
-
-  @ManyToOne(cascade = CascadeType.ALL)
-  private Station downStation; // 하행역
-
-  private Long distance;
+  @Embedded
+  private Sections sections;
 
   public Line() {}
 
-  public Line(String name, String color, Station upStation, Station downStation,
-      Long distance) {
+  public Line(String name, String color) {
     this.name = name;
     this.color = color;
-    this.upStation = upStation;
-    this.downStation = downStation;
-    this.distance = distance;
+    this.sections = new Sections();
   }
 
   public Long getId() {
@@ -46,25 +40,26 @@ public class Line {
     return name;
   }
 
-  public Station getUpStation() {
-    return upStation;
-  }
-
-  public Station getDownStation() {
-    return downStation;
-  }
-
   public String getColor() {
     return color;
   }
 
-  public Long getDistance() {
-    return distance;
+  public List<Station> getStations() {
+    return sections.getStations();
   }
 
   public Line updateLine(String name, String color) {
     this.name = name;
     this.color = color;
     return this;
+  }
+
+  public Line addSection(Section add) {
+    sections.addSection(add);
+    return this;
+  }
+
+  public void removeSection(Station downStation) {
+    sections.removeSection(downStation);
   }
 }
