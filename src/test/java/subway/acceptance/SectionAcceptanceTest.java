@@ -14,7 +14,9 @@ import org.springframework.test.context.ActiveProfiles;
 import subway.utils.DatabaseCleanup;
 import static org.assertj.core.api.Assertions.*;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.OK;
 import static subway.steps.LineSteps.지하철_노선_생성_요청;
+import static subway.steps.SectionSteps.지하철_구간_삭제_요청;
 import static subway.steps.SectionSteps.지하철_구간_생성_요청;
 import static subway.steps.StationSteps.지하철_역_생성_요청;
 
@@ -94,7 +96,18 @@ class SectionAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(BAD_REQUEST.value());
     }
 
+    /* 지하철 구간 제거
+    * when 제거 하고 싶은 구간이 노선에 등록된 역(하행 종점역) 일 경우 , 마지막 구간일 경우
+    * then 구간을 제거할 수 있다.
+    * */
 
-
+    @DisplayName("지하철 구간 제거는 마지막 구간일 경우에 가능하다.")
+    @Test
+    void 지하철_구간_삭제_인수_테스트() {
+        long lineId = line.jsonPath().getLong("id");
+        지하철_구간_생성_요청(BOON_DANG_STATION, YANG_JAE_STATION, 10, lineId);
+        ExtractableResponse<Response> response = 지하철_구간_삭제_요청(lineId, BOON_DANG_STATION);
+        assertThat(response.statusCode()).isEqualTo(OK.value());
+    }
 
 }

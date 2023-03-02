@@ -19,6 +19,14 @@ public class SectionSteps {
                 .then().log().all().extract();
     }
 
+    public static ExtractableResponse<Response> 지하철_구간_삭제_요청(Long lineId, Long stationId) {
+        return RestAssured.given().log().all()
+                .pathParam("id", lineId)
+                .queryParam("stationId", stationId)
+                .when().delete("/lines/{id}/sections")
+                .then().log().all().extract();
+    }
+
 
 
 
