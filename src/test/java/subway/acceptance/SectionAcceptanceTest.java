@@ -110,4 +110,32 @@ class SectionAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(OK.value());
     }
 
+
+    /*
+     * 지하철 구간 제거 예외 테스트(1)
+     * when 제거하려는 구간이 마지막 구간(해당 지하철 노선의 하행 종점역)이 아닐 경우
+     * then 에러가 발생한다.
+     * */
+    @DisplayName("제거하려는 구간이 마지막 구간(해당 지하철 노선의 하행 종점역)이 아닐 경우 에러가 발생하는 테스트")
+    @Test
+    void 지하철_구간_삭제_예외_테스트_1() {
+        long lineId = line.jsonPath().getLong("id");
+        지하철_구간_생성_요청(BOON_DANG_STATION, YANG_JAE_STATION, 10, lineId);
+        ExtractableResponse<Response> response = 지하철_구간_삭제_요청(lineId, SEO_HYEON_STATION);
+        assertThat(response.statusCode()).isEqualTo(BAD_REQUEST.value());
+    }
+
+    /*
+     * 지하철 구간 제거 예외 테스트(2)
+     * when 구간이 1개일 경우 제거하면
+     * then 에러가 발생한다.
+     * */
+    @DisplayName("지하철 노선에 상행 종점역과 하행 종점역만 있을 경우 구간을 삭제하면 에러가 발생하는 테스트")
+    @Test
+    void 지하철_구간_삭제_예외_테스트_2() {
+        long lineId = line.jsonPath().getLong("id");
+        ExtractableResponse<Response> response = 지하철_구간_삭제_요청(lineId, YANG_JAE_STATION);
+        assertThat(response.statusCode()).isEqualTo(BAD_REQUEST.value());
+    }
+
 }
