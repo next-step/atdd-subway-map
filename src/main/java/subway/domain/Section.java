@@ -1,12 +1,14 @@
 package subway.domain;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
 @Getter
+@NoArgsConstructor
 public class Section {
 
     @Id

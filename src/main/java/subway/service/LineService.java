@@ -90,4 +90,23 @@ public class LineService {
         return new SectionResponse(section.getId(), section.getDistance(), stationService.createStationResponse(section.getUpStation()), stationService.createStationResponse(section.getDownStation()), section.getLine().getId());
     }
 
+    @Transactional
+    public void deleteSectionById(Long id, Long stationId) {
+        Section section = sectionRepository.findByLineIdAndDownStationId(id, stationId);
+        Line line = findVerifiedLine(id);
+        Station station = stationService.findStationById(stationId);
+        isDeleteValidation(line, station);
+        line.update(section.getUpStation());
+        sectionRepository.deleteById(section.getId());
+    }
+
+    public void isDeleteValidation(Line line, Station station) {
+        if (!line.getDownStation().equals(station)) {
+            throw new IllegalArgumentException(NOT_DELETE_LAST_STATION);
+        }
+
+        if (sectionRepository.findAllByLineId(line.getId()).size() < 2) {
+            throw new IllegalArgumentException(NOT_EXIST_SECTION);
+        }
+    }
 }
