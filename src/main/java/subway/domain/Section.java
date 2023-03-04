@@ -17,14 +17,20 @@ public class Section {
 
     private int distance;
 
-    @OneToOne
+    @ManyToOne
     private Station upStation;
 
-    @OneToOne
+    @ManyToOne
     private Station downStation;
 
     @ManyToOne
     private Line line;
+
+    public Section(Station upStation, Station downStation, Line line) {
+        this.upStation = upStation;
+        this.downStation = downStation;
+        this.line = line;
+    }
 
     public Section(int distance, Station upStation, Station downStation, Line line) {
         this.distance = distance;

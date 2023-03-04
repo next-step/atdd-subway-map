@@ -90,7 +90,7 @@ class LineAcceptanceTest {
     void 지하철_노선_조회_인수_테스트() {
         //given
         ExtractableResponse<Response> response = 지하철_노선_생성_요청("신분당선", "bg-red-600", GANG_NAM_STATION, YANG_JAE_STATION, 10);
-        long id = response.jsonPath().getLong("id");
+        var id = response.jsonPath().getLong("id");
         //when
         List<String> line = 지하철_노선_단건_조회_요청(id).getList("stations.name", String.class);
         //then
@@ -117,7 +117,7 @@ class LineAcceptanceTest {
         //given
         ExtractableResponse<Response> createResponse
                 = 지하철_노선_생성_요청("신분당선", "bg-red-600", GANG_NAM_STATION, YANG_JAE_STATION, 10);
-        long id = createResponse.jsonPath().getLong("id");
+        var id = createResponse.jsonPath().getLong("id");
 
         //when
         ExtractableResponse<Response> patchResponse = 지하철_노선_수정_요청("다른분당선", "bg-red-600", id);
@@ -148,7 +148,7 @@ class LineAcceptanceTest {
     void 지하철_노선_삭제_인수_테스트() {
 
         //given
-        long id = 지하철_노선_생성_요청("신분당선", "bg-red-600", GANG_NAM_STATION, YANG_JAE_STATION, 10).jsonPath().getLong("id");
+        var id = 지하철_노선_생성_요청("신분당선", "bg-red-600", GANG_NAM_STATION, YANG_JAE_STATION, 10).jsonPath().getLong("id");
 
         //when
         ExtractableResponse<Response> response = 지하철_노선_삭제_요청(id);

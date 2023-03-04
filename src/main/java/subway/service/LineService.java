@@ -14,7 +14,6 @@ import subway.repository.SectionRepository;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static subway.common.constants.ErrorConstant.*;
 
 
 @Service
@@ -36,6 +35,7 @@ public class LineService {
         Station upStation = stationService.findStationById(lineRequest.getUpStationId());
         Station downStation = stationService.findStationById(lineRequest.getDownStationId());
         Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor(), upStation, downStation));
+        sectionRepository.save(new Section(upStation, downStation, line));
         return createLineResponse(line);
     }
 
@@ -65,48 +65,30 @@ public class LineService {
         lineRepository.deleteById(id);
     }
 
-    @Transactional
-    public SectionResponse addSection(Long lineId, SectionRequest sectionRequest) {
-        Line line = findVerifiedLine(lineId);
-        Station upStation = stationService.findStationById(sectionRequest.getUpStationId());
-        Station downStation = stationService.findStationById(sectionRequest.getDownStationId());
-        isAddValidation(line, upStation, downStation);
-        line.update(downStation);
-        Section section = sectionRepository.save(new Section(sectionRequest.getDistance(), upStation, downStation, line));
-        return createSectionResponse(section);
-    }
-
-    public void isAddValidation(Line line, Station upStation, Station downStation) {
-        if (!line.getDownStation().equals(upStation)) {
-            throw new IllegalArgumentException(NOT_LAST_STATION);
-        }
-
-        if (line.getUpStation().equals(downStation)) {
-            throw new IllegalArgumentException(ALREADY_ENROLL_STATION);
-        }
-    }
 
     public SectionResponse createSectionResponse(Section section) {
         return new SectionResponse(section.getId(), section.getDistance(), stationService.createStationResponse(section.getUpStation()), stationService.createStationResponse(section.getDownStation()), section.getLine().getId());
     }
 
     @Transactional
-    public void deleteSectionById(Long id, Long stationId) {
-        Section section = sectionRepository.findByLineIdAndDownStationId(id, stationId);
-        Line line = findVerifiedLine(id);
-        Station station = stationService.findStationById(stationId);
-        isDeleteValidation(line, station);
-        line.update(section.getUpStation());
-        sectionRepository.deleteById(section.getId());
+    public SectionResponse addSection(Long lineId, SectionRequest sectionRequest) {
+        Line line = findVerifiedLine(lineId);
+        Station upStation = stationService.findStationById(sectionRequest.getUpStationId());
+        Station downStation = stationService.findStationById(sectionRequest.getDownStationId());
+        line.isAddValidation(upStation, downStation);
+        line.update(downStation);
+        Section section = sectionRepository.save(new Section(sectionRequest.getDistance(), upStation, downStation, line));
+        return createSectionResponse(section);
     }
 
-    public void isDeleteValidation(Line line, Station station) {
-        if (!line.getDownStation().equals(station)) {
-            throw new IllegalArgumentException(NOT_DELETE_LAST_STATION);
-        }
-
-        if (sectionRepository.findAllByLineId(line.getId()).size() < 2) {
-            throw new IllegalArgumentException(NOT_EXIST_SECTION);
-        }
+    @Transactional
+     public void deleteSectionById(Long lineId, Long stationId) {
+        Line line = findVerifiedLine(lineId);
+        List<Section> sections = line.getSections();
+        line.isDeleteValidation(stationService.findStationById(stationId));
+        sectionRepository.deleteById(sections.get(sections.size()-1).getId());
+        sections.remove(sections.size()-1);
+        line.update(sections.get(sections.size()-1).getDownStation());
     }
+
 }
