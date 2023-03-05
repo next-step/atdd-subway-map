@@ -34,13 +34,13 @@ public class LineService {
     public LineResponse saveLine(LineRequest lineRequest) {
         Station upStation = stationService.findStationById(lineRequest.getUpStationId());
         Station downStation = stationService.findStationById(lineRequest.getDownStationId());
-        Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor(), upStation, downStation));
-        sectionRepository.save(new Section(upStation, downStation, line));
+        Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor()));
+        line.addSections(new Section(upStation, downStation));
         return createLineResponse(line);
     }
 
     public LineResponse createLineResponse(Line line) {
-        return new LineResponse(line.getId(), line.getName(), line.getColor(), List.of(stationService.createStationResponse(line.getUpStation()), stationService.createStationResponse(line.getDownStation())));
+        return new LineResponse(line.getId(), line.getName(), line.getColor(), List.of(stationService.createStationResponse(line.getLastSection().getUpStation()), stationService.createStationResponse(line.getLastSection().getDownStation())));
     }
 
     public LineResponse findLineById(Long id) {
@@ -76,19 +76,13 @@ public class LineService {
         Station upStation = stationService.findStationById(sectionRequest.getUpStationId());
         Station downStation = stationService.findStationById(sectionRequest.getDownStationId());
         line.isAddValidation(upStation, downStation);
-        line.update(downStation);
         Section section = sectionRepository.save(new Section(sectionRequest.getDistance(), upStation, downStation, line));
         return createSectionResponse(section);
     }
 
     @Transactional
-     public void deleteSectionById(Long lineId, Long stationId) {
-        Line line = findVerifiedLine(lineId);
-        List<Section> sections = line.getSections();
-        line.isDeleteValidation(stationService.findStationById(stationId));
-        sectionRepository.deleteById(sections.get(sections.size()-1).getId());
-        sections.remove(sections.size()-1);
-        line.update(sections.get(sections.size()-1).getDownStation());
+    public void deleteSectionById(Long lineId, Long stationId) {
+        findVerifiedLine(lineId).deleteSection(stationService.findStationById(stationId));
     }
 
 }

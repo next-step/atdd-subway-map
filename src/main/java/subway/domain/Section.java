@@ -26,16 +26,19 @@ public class Section {
     @ManyToOne
     private Line line;
 
-    public Section(Station upStation, Station downStation, Line line) {
+    public Section(Station upStation, Station downStation) {
         this.upStation = upStation;
         this.downStation = downStation;
-        this.line = line;
     }
 
     public Section(int distance, Station upStation, Station downStation, Line line) {
         this.distance = distance;
         this.upStation = upStation;
         this.downStation = downStation;
+        this.line = line;
+    }
+
+    public void setLine(Line line) {
         this.line = line;
     }
 

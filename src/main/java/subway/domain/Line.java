@@ -23,20 +23,22 @@ public class Line {
     private String name;
     private String color;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    private Station upStation;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    private Station downStation;
-
-    @OneToMany(mappedBy = "line")
+    @OneToMany(mappedBy = "line", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private List<Section> sections = new ArrayList<>();
 
-    public Line(String name, String color, Station upStation, Station downStation) {
+
+    public Section getLastSection() {
+        return sections.get(sections.size()-1);
+    }
+
+    public void deleteSection(Station station) {
+        isDeleteValidation(station);
+        sections.remove(getLastSection());
+    }
+
+    public Line(String name, String color) {
         this.name = name;
         this.color = color;
-        this.upStation = upStation;
-        this.downStation = downStation;
     }
 
     public void update(String name, String color) {
@@ -44,24 +46,24 @@ public class Line {
         this.color = color;
     }
 
-    public void update(Station station) {
-        this.downStation = station;
+    public void addSections(Section section) {
+        sections.add(section);
+        section.setLine(this);
     }
 
-
     public void isAddValidation(Station upStation, Station downStation) {
-        if (!getDownStation().equals(upStation)) {
+        if (!getLastSection().getDownStation().equals(upStation)) {
             throw new IllegalArgumentException(NOT_LAST_STATION);
         }
 
-        if (getUpStation().equals(downStation)) {
+        if (getLastSection().getUpStation().equals(downStation)) {
             throw new IllegalArgumentException(ALREADY_ENROLL_STATION);
         }
     }
 
 
     public void isDeleteValidation(Station station) {
-        if (!getDownStation().equals(station)) {
+        if (!getLastSection().getDownStation().equals(station)) {
             throw new IllegalArgumentException(NOT_DELETE_LAST_STATION);
         }
 
