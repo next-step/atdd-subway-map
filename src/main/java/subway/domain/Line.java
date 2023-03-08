@@ -31,4 +31,9 @@ public class Line {
 
     @OneToOne
     private Station downStation;
+
+    public void modify(String name, String color){
+        this.name = name;
+        this.color = color;
+    }
 }

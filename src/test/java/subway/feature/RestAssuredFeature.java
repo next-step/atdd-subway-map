@@ -30,6 +30,7 @@ public class RestAssuredFeature {
     protected static ExtractableResponse<Response> callModify(final String url, final Map pathParams){
         return RestAssured.given().log().all()
                 .when()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(pathParams)
                 .put(url)
                 .then().log().all()
