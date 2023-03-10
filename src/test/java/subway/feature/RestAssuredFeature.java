@@ -3,14 +3,13 @@ package subway.feature;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
 
 import java.util.Collections;
 import java.util.Map;
 
 public class RestAssuredFeature {
-    protected static ExtractableResponse<Response> callCreate(final String url, final Map body){
+    protected static ExtractableResponse<Response> callCreate(final String url, final Object body){
         return RestAssured.given().log().all()
                 .body(body)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -24,6 +23,16 @@ public class RestAssuredFeature {
         return RestAssured.given().log().all()
                 .when()
                 .get(url, pathParams)
+                .then().log().all()
+                .extract();
+    }
+
+    protected static ExtractableResponse<Response> callModify(final String url, final Map pathParams){
+        return RestAssured.given().log().all()
+                .when()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(pathParams)
+                .put(url)
                 .then().log().all()
                 .extract();
     }
