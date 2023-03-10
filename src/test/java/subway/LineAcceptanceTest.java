@@ -28,32 +28,15 @@ public class LineAcceptanceTest {
 
     @BeforeEach
     void setUp(){
-
         //#. 상행역 하행역이 필수로 필요함.
-        shinUpStationId = StationFeature.callCreateStation("신사역")
-                .body()
-                .as(StationResponse.class)
-                .getId();
-        shinDownStationId = StationFeature.callCreateStation("광교역")
-                .body()
-                .as(StationResponse.class)
-                .getId();
+        shinUpStationId = 역생성("신사역");
 
-        bunUpStationId = StationFeature.callCreateStation("청량리")
-                .body()
-                .as(StationResponse.class)
-                .getId();
+        shinDownStationId = 역생성("광교역");
 
-        bunDownStationId = StationFeature.callCreateStation("인천")
-                .body()
-                .as(StationResponse.class)
-                .getId();
+        bunUpStationId =  역생성("청량리역");
+
+        bunDownStationId = 역생성("인천역");
     }
-
-    /**
-     * 노선 이름(name)
-     * 노선 색(color)
-     */
 
     /**
      * Given 지하철 노선을 생성한다.
@@ -178,5 +161,12 @@ public class LineAcceptanceTest {
                 () -> assertThat(responseLinesName).doesNotContain("신분당선")
 
         );
+    }
+
+    private Long 역생성(final String stationName){
+        return StationFeature.callCreateStation(stationName)
+                .body()
+                .as(StationResponse.class)
+                .getId();
     }
 }

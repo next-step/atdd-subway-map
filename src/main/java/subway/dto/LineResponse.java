@@ -16,5 +16,5 @@ public class LineResponse {
 
     private String color;
 
-    List<Station> stations = new ArrayList<>();
+    private List<StationResponse> stations = new ArrayList<>();
 }

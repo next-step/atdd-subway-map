@@ -4,6 +4,7 @@ import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 import subway.domain.Line;
 import subway.dto.LineResponse;
+import subway.dto.StationResponse;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +20,9 @@ public interface LineMapper {
 
     @AfterMapping
     default void setStations(@MappingTarget LineResponse response, Line line){
-        response.setStations(List.of(line.getUpStation(), line.getDownStation()));
+        StationResponse upStationResponse = StationMapper.INSTANCE.toResponse(line.getUpStation());
+        StationResponse downStationResponse = StationMapper.INSTANCE.toResponse(line.getDownStation());
+
+        response.setStations(List.of(upStationResponse, downStationResponse));
     }
 }
