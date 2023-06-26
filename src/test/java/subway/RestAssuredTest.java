@@ -18,11 +18,9 @@ public class RestAssuredTest {
     @DisplayName("구글 페이지 접근 테스트")
     @Test
     void accessGoogle() {
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when()
-                .get(GOOGLE_BASE_ADDRESS)
-                .then()
-                .log().all().extract();
+        ExtractableResponse<Response> response = RestAssured.given().baseUri(GOOGLE_BASE_ADDRESS).log().all()
+                .when().get()
+                .then().log().all().extract();
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
