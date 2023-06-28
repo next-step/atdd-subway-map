@@ -84,15 +84,16 @@ public class StationAcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        ExtractableResponse<Response> saved = insertStation("강남역");
+        Long savedStationId = insertStation("강남역").jsonPath().getLong(STATION_ID_KEY);
 
         // when
-        ExtractableResponse<Response> response = deleteStation(saved.jsonPath().getLong(STATION_ID_KEY));
+        ExtractableResponse<Response> response = deleteStation(savedStationId);
 
         // then
         assertAll(
             () -> assertThat(response.body().asString()).isBlank(),
-            () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value())
+            () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value()),
+            () -> assertThat(allStations().jsonPath().getList(STATION_ID_KEY, Long.class)).doesNotContain(savedStationId)
         );
     }
 
