@@ -69,7 +69,7 @@ public class StationAcceptanceTest {
         // then
         assertAll(
             () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
-            () -> assertThat(response.jsonPath().getList(STATION_NAME_KEY)).containsExactly("강남역", "양재역"),
+            () -> assertThat(response.jsonPath().getList(STATION_NAME_KEY, String.class)).containsExactly("강남역", "양재역"),
             () -> assertThat(response.contentType()).isEqualTo(MediaType.APPLICATION_JSON_VALUE)
         );
     }
