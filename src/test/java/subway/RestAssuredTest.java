@@ -13,8 +13,8 @@ public class RestAssuredTest {
     @DisplayName("구글 페이지 접근 테스트")
     @Test
     void accessGoogle() {
-        given().when().
-                get("https://www.google.co.kr")
+        given().when()
+                .get("https://www.google.co.kr")
                 .then()
                 .statusCode(HttpStatus.OK.value());
     }
