@@ -9,6 +9,7 @@ import io.restassured.response.Response;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,6 +19,22 @@ import org.springframework.http.MediaType;
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationAcceptanceTest {
+
+    @DisplayName("각 테스트 이후 모든 지하철역 정보를 삭제합니다.")
+    @AfterEach
+    void cleanUp() {
+        List<Long> idList = RestAssured.given().log().all()
+            .when().get("/stations")
+            .then().statusCode(HttpStatus.OK.value())
+            .extract()
+            .jsonPath().getList("id", Long.class);
+
+        idList.stream()
+            .forEach(id -> RestAssured.when().delete("/stations/" + id)
+                .then().statusCode(HttpStatus.NO_CONTENT.value())
+            );
+    }
+
     /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다
@@ -65,14 +82,14 @@ public class StationAcceptanceTest {
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .when().post("/stations")
             .then().log().all()
-            .extract();
+            .statusCode(HttpStatus.CREATED.value());
 
         RestAssured.given().log().all()
             .body(Map.of("name", "양재역"))
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .when().post("/stations")
             .then().log().all()
-            .extract();
+            .statusCode(HttpStatus.CREATED.value());
 
         // when
         ExtractableResponse<Response> response =
@@ -84,7 +101,7 @@ public class StationAcceptanceTest {
         assertAll(
             () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
             () -> assertThat(response.jsonPath().getList("name")).containsExactly("강남역", "양재역"),
-            () -> assertThat(response.header("Content-Type")).isEqualTo("application/json")
+            () -> assertThat(response.contentType()).isEqualTo(MediaType.APPLICATION_JSON_VALUE)
         );
     }
 
@@ -94,5 +111,31 @@ public class StationAcceptanceTest {
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
     // TODO: 지하철역 제거 인수 테스트 메서드 생성
+    @DisplayName("지하철역을 제거한다.")
+    @Test
+    void deleteStation() {
+        // given
+        ExtractableResponse<Response> saved = RestAssured.given().log().all()
+            .body(Map.of("name", "강남역"))
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when()
+            .post("/stations")
+            .then()
+            .statusCode(HttpStatus.CREATED.value())
+            .extract();
+
+        // when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+            .when()
+            .delete("/stations/" + saved.jsonPath().getLong("id"))
+            .then().log().all()
+            .extract();
+
+        // then
+        assertAll(
+            () -> assertThat(response.body().asString()).isBlank(),
+            () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value())
+        );
+    }
 
 }
