@@ -1,5 +1,6 @@
 package subway;
 
+import common.RestAssuredExecutorService;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -17,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class StationAcceptanceTest {
+class StationAcceptanceTest {
     /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다
@@ -55,7 +56,31 @@ public class StationAcceptanceTest {
      * When 지하철역 목록을 조회하면
      * Then 2개의 지하철역을 응답 받는다
      */
-    // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
+    @DisplayName("지하철역 목록을 조회한다")
+    @Test
+    void findStatins() {
+        // Given
+        StationRequest firstRequest = new StationRequest("사당역");
+        ExtractableResponse<Response> firstResponse = RestAssuredExecutorService.postForResponse("/stations", firstRequest);
+        String firstResponseStationsName = firstResponse.body().jsonPath().getString("name");
+
+        assertThat(firstResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(firstResponseStationsName).isEqualTo(firstRequest.getName());
+
+        StationRequest secondRequest = new StationRequest("동작역");
+        ExtractableResponse<Response> secondResponse = RestAssuredExecutorService.postForResponse("/stations", secondRequest);
+        String secondResponseStationsName = secondResponse.body().jsonPath().getString("name");
+
+        assertThat(secondResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(secondResponseStationsName).isEqualTo(secondRequest.getName());
+
+        // When
+        ExtractableResponse<Response> stationsResponse = RestAssuredExecutorService.getForResponse("/stations");
+        int responseSize = stationsResponse.body().jsonPath().getList("name", String.class).size();
+
+        // Then
+        assertThat(responseSize).isEqualTo(2);
+    }
 
     /**
      * Given 지하철역을 생성하고
