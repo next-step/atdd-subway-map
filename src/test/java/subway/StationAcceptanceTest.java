@@ -13,11 +13,12 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 @DisplayName("지하철역 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
 public class StationAcceptanceTest {
 
     public static final String STATION_NAME_KEY = "name";
@@ -61,7 +62,9 @@ public class StationAcceptanceTest {
     @Test
     void readStationList() {
         // given
-        Stream.of("강남역", "양재역").forEach(this::insertStation);
+        String station1 = "강남역";
+        String station2 = "양재역";
+        Stream.of(station1, station2).forEach(this::insertStation);
 
         // when
         ExtractableResponse<Response> response = allStations();
@@ -69,7 +72,7 @@ public class StationAcceptanceTest {
         // then
         assertAll(
             () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
-            () -> assertThat(response.jsonPath().getList(STATION_NAME_KEY, String.class)).containsExactly("강남역", "양재역"),
+            () -> assertThat(response.jsonPath().getList(STATION_NAME_KEY, String.class)).containsExactly(station1, station2),
             () -> assertThat(response.contentType()).isEqualTo(MediaType.APPLICATION_JSON_VALUE)
         );
     }
@@ -116,7 +119,7 @@ public class StationAcceptanceTest {
 
     private ExtractableResponse<Response> deleteStation(Long id) {
         return RestAssured.given().log().all()
-            .when().delete(STATION_BASE_URI + "/" + id)
+            .when().delete("/stations/{id}", id)
             .then().log().all()
             .statusCode(HttpStatus.NO_CONTENT.value())
             .extract();
