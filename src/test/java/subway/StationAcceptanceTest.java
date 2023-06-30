@@ -34,7 +34,7 @@ class StationAcceptanceTest {
         ExtractableResponse<Response> 지하철역_생성_됨 = 지하철역_생성_됨(지하철역_생성);
 
         // then
-        AcceptanceTestBuilder 지하철역_단건_조회 = 지하철역_조회(지하철역_생성_됨.header(HttpHeaders.LOCATION));
+        AcceptanceTestBuilder 지하철역_단건_조회 = 지하철역_조회(getLocation(지하철역_생성_됨));
         ValidatableResponse 지하철역_조회_됨 = 지하철역_조회_됨(지하철역_단건_조회);
 
         지하철역_조회_됨
@@ -62,14 +62,26 @@ class StationAcceptanceTest {
                 .body("[1].name", equalTo(secondStationName));
     }
 
-    /**
-     * Given 지하철역을 생성하고
-     * When 그 지하철역을 삭제하면
-     * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
-     */
-    // TODO: 지하철역 제거 인수 테스트 메서드 생성
+    @DisplayName("지하철역을 삭제한다.")
+    @Test
+    void deleteStation() {
+        // given
+        String stationName = "청담역";
 
+        // when
+        AcceptanceTestBuilder 지하철역_생성 = 지하철역_생성(stationName);
+        ExtractableResponse<Response> 지하철역_생성_됨 = 지하철역_생성_됨(지하철역_생성);
+        String createdResourceLocation = getLocation(지하철역_생성_됨);
 
+        // then
+        AcceptanceTestBuilder 지하철역_제거 = 지하철역_제거(createdResourceLocation);
+        ValidatableResponse 지하철역_제거_됨 = 지하철역_제거_됨(지하철역_제거);
+
+        지하철역_제거_됨.noRootPath();
+
+        AcceptanceTestBuilder 지하철역_조회 = 지하철역_조회(createdResourceLocation);
+        지하철역을_찾지_못함(지하철역_조회);
+    }
 
     private AcceptanceTestBuilder 지하철역_생성(String stationName) {
         Map<String, String> params = new HashMap<>();
@@ -92,5 +104,23 @@ class StationAcceptanceTest {
 
     private ValidatableResponse 지하철역_조회_됨(AcceptanceTestBuilder acceptanceTestBuilder) {
         return acceptanceTestBuilder.then(HttpStatus.OK);
+    }
+
+    private AcceptanceTestBuilder 지하철역_제거(String url) {
+        return AcceptanceTestBuilder
+                .given()
+                .when(HttpMethod.DELETE, url);
+    }
+
+    private ValidatableResponse 지하철역_제거_됨(AcceptanceTestBuilder acceptanceTestBuilder) {
+        return acceptanceTestBuilder.then(HttpStatus.NO_CONTENT);
+    }
+
+    private void 지하철역을_찾지_못함(AcceptanceTestBuilder 지하철역_조회) {
+        지하철역_조회.then(HttpStatus.NOT_FOUND);
+    }
+
+    private String getLocation(ExtractableResponse<Response> response) {
+        return response.header(HttpHeaders.LOCATION);
     }
 }
