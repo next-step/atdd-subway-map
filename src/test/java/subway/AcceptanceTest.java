@@ -15,6 +15,7 @@ import java.lang.annotation.RetentionPolicy;
 @Import(AcceptanceTest.SetUpRestAssured.class)
 public @interface AcceptanceTest {
 
+
     @TestComponent
     class SetUpRestAssured implements ApplicationListener<ServletWebServerInitializedEvent> {
 
