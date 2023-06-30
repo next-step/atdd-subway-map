@@ -78,7 +78,19 @@ class StationAcceptanceTest {
      * When 그 지하철역을 삭제하면
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
-    // TODO: 지하철역 제거 인수 테스트 메서드 생성
+    @DisplayName("지하철역을 생성한 후 삭제하면 목록 조회시 해당 역이 조회되지 않는다.")
+    @Test
+    void create_and_deleteStation() {
+        // given
+        ExtractableResponse<Response> response = 지하철_생성("우영우");
+
+        // when
+        지하철_삭제(response.jsonPath().getLong("id"));
+
+        // then
+        List<String> stationNames = 지하철_목록_조회().jsonPath().getList("name", String.class);
+        assertThat(stationNames).doesNotContain("우영우");
+    }
 
     private ExtractableResponse<Response> 지하철_생성(String name){
         return RestAssured.given().log().all()
@@ -92,6 +104,14 @@ class StationAcceptanceTest {
     private ExtractableResponse<Response> 지하철_목록_조회() {
         return RestAssured.given().log().all()
                 .when().get("/stations")
+                .then().log().all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> 지하철_삭제(Long id){
+        return RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().delete("/stations/{id}", id)
                 .then().log().all()
                 .extract();
     }
