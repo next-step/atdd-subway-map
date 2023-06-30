@@ -1,4 +1,4 @@
-package subway;
+package subway.acceptance;
 
 import static io.restassured.RestAssured.when;
 
