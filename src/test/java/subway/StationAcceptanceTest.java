@@ -1,6 +1,7 @@
 package subway;
 
 import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
@@ -56,6 +57,40 @@ public class StationAcceptanceTest {
      * Then 2개의 지하철역을 응답 받는다
      */
     // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
+    @DisplayName("지하철역을 조회한다.")
+    @Test
+    void 지하철역_조회() {
+        //given
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "마들역");
+        ExtractableResponse<Response> 마들역_생성 = RestAssured
+                .given().log().all()
+                .body(params).contentType(ContentType.JSON)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+
+        params.put("name", "노원역");
+        ExtractableResponse<Response> 노원역_생성 = RestAssured
+                .given().log().all()
+                .body(params).contentType(ContentType.JSON)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+
+        assertThat(마들역_생성.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(노원역_생성.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        //when
+        List<String> names = RestAssured
+                .given().log().all()
+                .when().get("/stations")
+                .then().log().all()
+                .extract().jsonPath().getList("name", String.class);
+
+        //then
+        assertThat(names.size()).isEqualTo(2);
+    }
 
     /**
      * Given 지하철역을 생성하고
