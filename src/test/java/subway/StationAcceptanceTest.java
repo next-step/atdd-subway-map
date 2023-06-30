@@ -63,17 +63,20 @@ public class StationAcceptanceTest {
 	@DisplayName("지하철역의 목록 조회")
 	@Test
 	void getStations() {
+		//given
 		createStations(List.of("수유역", "강변역"));
 
-		final ExtractableResponse<Response> response =
+		//when
+		final List<String> resultStationNames =
 			RestAssured.given()
 				.log().all()
 				.when().get("stations")
 				.then().log().all()
 				.statusCode(HttpStatus.OK.value())
-				.extract();
+				.extract()
+				.jsonPath().getList("name", String.class);
 
-		final List<String> resultStationNames = response.jsonPath().getList("name", String.class);
+		//then
 		Assertions.assertEquals(2, resultStationNames.size());
 	}
 
@@ -86,14 +89,17 @@ public class StationAcceptanceTest {
 	@DisplayName("지하철역 삭제")
 	@Test
 	void deleteStation() {
+		//given
 		final Long stationId = createStation("홍대입구역");
 
+		//when
 		RestAssured.given().log().all()
 			.when().delete("stations/" + stationId)
 			.then().log().all()
 			.statusCode(HttpStatus.NO_CONTENT.value())
 			.extract();
 
+		//then
 		final List<String> getStationsResponse = RestAssured.given()
 			.log().all()
 			.when().get("stations")
