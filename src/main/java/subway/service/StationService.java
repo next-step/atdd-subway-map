@@ -36,6 +36,12 @@ public class StationService {
         stationRepository.deleteById(id);
     }
 
+    public StationResponse findStation(Long id) {
+        Station station = stationRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException(String.format("not found station : %d", id)));
+        return this.createStationResponse(station);
+    }
+
     private StationResponse createStationResponse(Station station) {
         return new StationResponse(
                 station.getId(),
