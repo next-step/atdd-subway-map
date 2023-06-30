@@ -99,4 +99,40 @@ public class StationAcceptanceTest {
      */
     // TODO: 지하철역 제거 인수 테스트 메서드 생성
 
+    @DisplayName("지하철역 제거한다.")
+    @Test
+    void 지하철역_제거() {
+        //given
+        final String 마들역 = "마들역";
+        Map<String, String> params = new HashMap<>();
+        params.put("name", 마들역);
+
+        ExtractableResponse<Response> 마들역_생성 = RestAssured
+                .given().log().all()
+                .body(params).contentType(ContentType.JSON)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+
+        assertThat(마들역_생성.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        //when
+        ExtractableResponse<Response> 마들역_삭제 = RestAssured
+                .given().log().all()
+                .pathParam("id", 마들역_생성.body().jsonPath().getObject("id", Long.class))
+                .when().delete("/stations/{id}")
+                .then().log().all()
+                .extract();
+
+        assertThat(마들역_삭제.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        //then
+        List<String> names = RestAssured
+                .given().log().all()
+                .when().get("/stations")
+                .then().log().all()
+                .extract().jsonPath().getList("name", String.class);
+
+        assertThat(names).doesNotContain(마들역);
+    }
 }
