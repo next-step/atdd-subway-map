@@ -13,7 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class RestAssuredTest {
 
-    @DisplayName("구글 페이지 접근 테스트")
+    @DisplayName("구글 페이지 접근 테스트 - Assertions.assertThat() 을 사용하여 검증")
     @Test
     void accessGoogle() {
         RestAssured.baseURI = "https://www.google.com";
@@ -27,5 +27,18 @@ public class RestAssuredTest {
             .extract();
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
+    @DisplayName("구글 페이지 접근 테스트 - then().statusCode() 를 사용하여 검증")
+    @Test
+    void accessGoogleWithThenStatusCode() {
+        RestAssured.baseURI = "https://www.google.com";
+
+        RestAssured
+            .given()
+            .when()
+            .get("/")
+            .then()
+            .statusCode(200);
     }
 }
