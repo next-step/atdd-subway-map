@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 
 @DisplayName("지하철역 관련 기능")
 @AcceptanceTest
@@ -33,20 +34,33 @@ class StationAcceptanceTest {
         ExtractableResponse<Response> 지하철역_생성_됨 = 지하철역_생성_됨(지하철역_생성);
 
         // then
-        AcceptanceTestBuilder 지하철역_단건_조회 = 지하철역_단건_조회(지하철역_생성_됨.header(HttpHeaders.LOCATION));
+        AcceptanceTestBuilder 지하철역_단건_조회 = 지하철역_조회(지하철역_생성_됨.header(HttpHeaders.LOCATION));
         ValidatableResponse 지하철역_조회_됨 = 지하철역_조회_됨(지하철역_단건_조회);
 
         지하철역_조회_됨
                 .body("name", equalTo(stationName));
     }
 
+    @DisplayName("지하철역을 전체 조회한다.")
+    @Test
+    void showStations() {
+        // given
+        String firstStationName = "언주역";
+        String secondStationName = "삼성역";
 
-    /**
-     * Given 2개의 지하철역을 생성하고
-     * When 지하철역 목록을 조회하면
-     * Then 2개의 지하철역을 응답 받는다
-     */
-    // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
+        // when
+        지하철역_생성(firstStationName);
+        지하철역_생성(secondStationName);
+
+        // then
+        AcceptanceTestBuilder 지하철역_조회 = 지하철역_조회(RESOURCE_URL);
+        ValidatableResponse 지하철역_조회_됨 = 지하철역_조회_됨(지하철역_조회);
+
+        지하철역_조회_됨
+                .body("", hasSize(2))
+                .body("[0].name", equalTo(firstStationName))
+                .body("[1].name", equalTo(secondStationName));
+    }
 
     /**
      * Given 지하철역을 생성하고
@@ -54,6 +68,9 @@ class StationAcceptanceTest {
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
     // TODO: 지하철역 제거 인수 테스트 메서드 생성
+
+
+
     private AcceptanceTestBuilder 지하철역_생성(String stationName) {
         Map<String, String> params = new HashMap<>();
         params.put("name", stationName);
@@ -67,7 +84,7 @@ class StationAcceptanceTest {
         return acceptanceTestBuilder.then(HttpStatus.CREATED).extract();
     }
 
-    private AcceptanceTestBuilder 지하철역_단건_조회(String url) {
+    private AcceptanceTestBuilder 지하철역_조회(String url) {
         return AcceptanceTestBuilder
                 .given()
                 .when(HttpMethod.GET, url);
