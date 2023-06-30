@@ -1,54 +1,45 @@
 package subway;
 
-import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import io.restassured.response.ValidatableResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 
 @DisplayName("지하철역 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class StationAcceptanceTest {
-    /**
-     * When 지하철역을 생성하면
-     * Then 지하철역이 생성된다
-     * Then 지하철역 목록 조회 시 생성한 역을 찾을 수 있다
-     */
+@AcceptanceTest
+class StationAcceptanceTest {
+
+    private static final String RESOURCE_URL = "/stations";
+
+
     @DisplayName("지하철역을 생성한다.")
     @Test
     void createStation() {
+        // given
+        String stationName = "강남역";
+
         // when
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .body(params)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/stations")
-                        .then().log().all()
-                        .extract();
+        AcceptanceTestBuilder 지하철역_생성 = 지하철역_생성(stationName);
+        ExtractableResponse<Response> 지하철역_생성_됨 = 지하철역_생성_됨(지하철역_생성);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        AcceptanceTestBuilder 지하철역_단건_조회 = 지하철역_단건_조회(지하철역_생성_됨.header(HttpHeaders.LOCATION));
+        ValidatableResponse 지하철역_조회_됨 = 지하철역_조회_됨(지하철역_단건_조회);
 
-        // then
-        List<String> stationNames =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
-        assertThat(stationNames).containsAnyOf("강남역");
+        지하철역_조회_됨
+                .body("name", equalTo(stationName));
     }
+
 
     /**
      * Given 2개의 지하철역을 생성하고
@@ -63,5 +54,26 @@ public class StationAcceptanceTest {
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
     // TODO: 지하철역 제거 인수 테스트 메서드 생성
+    private AcceptanceTestBuilder 지하철역_생성(String stationName) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", stationName);
 
+        return AcceptanceTestBuilder
+                .given().body(params).contentType(ContentType.JSON)
+                .when(HttpMethod.POST, RESOURCE_URL);
+    }
+
+    private ExtractableResponse<Response> 지하철역_생성_됨(AcceptanceTestBuilder acceptanceTestBuilder) {
+        return acceptanceTestBuilder.then(HttpStatus.CREATED).extract();
+    }
+
+    private AcceptanceTestBuilder 지하철역_단건_조회(String url) {
+        return AcceptanceTestBuilder
+                .given()
+                .when(HttpMethod.GET, url);
+    }
+
+    private ValidatableResponse 지하철역_조회_됨(AcceptanceTestBuilder acceptanceTestBuilder) {
+        return acceptanceTestBuilder.then(HttpStatus.OK);
+    }
 }
