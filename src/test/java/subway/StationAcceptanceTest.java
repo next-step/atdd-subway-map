@@ -6,8 +6,10 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
@@ -17,14 +19,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Import(TestDatabaseCleaner.class)
 class StationAcceptanceTest {
 
     @LocalServerPort
     private int port;
 
+    @Autowired
+    private TestDatabaseCleaner dbCleaner;
+
+
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
+        dbCleaner.cleanUpStation();
     }
 
     /**
@@ -81,7 +89,7 @@ class StationAcceptanceTest {
                 .extract();
     }
 
-    private ExtractableResponse<Response> 지하철_목록_조회(){
+    private ExtractableResponse<Response> 지하철_목록_조회() {
         return RestAssured.given().log().all()
                 .when().get("/stations")
                 .then().log().all()
