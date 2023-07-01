@@ -19,6 +19,27 @@ public class LineAcceptanceTest {
      */
     @Test
     void createLine() {
+        /* # API 명세
+         *
+         * ## Request
+         * POST /lines
+         * Content-Type: application/json
+         * Body
+         * - name : 지하철 노선 이름 (ex: "신분당선")
+         * - color : 지하철 노선 색상 (ex: "bg-red-600")
+         * - upStationId : 상행 측면의 역 (ex: "상행 A - B - C 하행" 일 때 B의 upStation=A)
+         * - downStationId : 하행 측면의 역 (ex: "상행 A - B - C 하행" 일 때 B의 downStation=C)
+         * - distance: ???
+         *
+         * ## Response
+         * 201 Created
+         * Location: /lines/1
+         * Content-Type: application/json
+         * - id : 생성된 지하철 노선의 id값 (ex: 1)
+         * - name : 생성된 지하철 노선의 이름 (요청 명세 참고)
+         * - color : 생성된 지하철 노선 색상 (요청 명세 참고)
+         * - stations[] : 해당 노선에 속한 상행 지하철역과 하행 지하철역 리스트
+         */
 
     }
 
