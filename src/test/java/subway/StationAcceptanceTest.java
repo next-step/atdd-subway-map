@@ -133,13 +133,13 @@ public class StationAcceptanceTest {
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         // then
-        List<String> stationNames = RestAssured
+        List<StationResponse> stationResponse = RestAssured
                 .given().log().all()
                 .when()
                 .get("/stations")
                 .then().log().all()
-                .extract().jsonPath().getList("name", String.class);
+                .extract().jsonPath().getList(".", StationResponse.class);
 
-        assertThat(stationNames.size()).isEqualTo(0);
+        assertThat(stationResponse.size()).isEqualTo(0);
     }
 }
