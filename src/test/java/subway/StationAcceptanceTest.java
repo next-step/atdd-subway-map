@@ -60,12 +60,50 @@ public class StationAcceptanceTest {
         assertThat(stationNames.get(0)).isEqualTo("강남역");
     }
 
-    /**
-     * Given 2개의 지하철역을 생성하고
-     * When 지하철역 목록을 조회하면
-     * Then 2개의 지하철역을 응답 받는다
-     */
-    // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
+    @DisplayName("지하철역 목록을 조회한다.")
+    @Test
+    void showStations() {
+        // given
+        Map<String, String> param1 = new HashMap<>();
+        Map<String, String> param2 = new HashMap<>();
+
+        param1.put("name", "강남역");
+        param2.put("name", "서초역");
+
+        ExtractableResponse<Response> response1 = RestAssured
+                .given().log().all()
+                .body(param1)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/stations")
+                .then().log().all()
+                .extract();
+
+        assertThat(response1.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        ExtractableResponse<Response> response2 = RestAssured
+                .given().log().all()
+                .body(param2)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/stations")
+                .then().log().all()
+                .extract();
+
+        assertThat(response2.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        // when
+        List<String> stationNames = RestAssured
+                .when()
+                .get("/stations")
+                .then().log().all()
+                .extract().jsonPath().getList("name", String.class);
+
+        // then
+        assertThat(stationNames.size()).isEqualTo(2);
+        assertThat(stationNames.get(0)).isEqualTo("강남역");
+        assertThat(stationNames.get(1)).isEqualTo("서초역");
+    }
 
     /**
      * Given 지하철역을 생성하고
