@@ -65,14 +65,14 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 생성하고 지하철 역을 조회한다.")
     @Test
     void createStationAndGetStation() {
-        // when
+        // Given
         역_만들기(강남역);
         역_만들기(양재역);
 
-        // given
+        // When
         ExtractableResponse<Response> responseStations = 지하철역_조회하기();
 
-        // then
+        // Then
         assertThat(responseStations.jsonPath().getList(".").stream().count()).isEqualTo(2);
     }
 
@@ -85,18 +85,18 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 생성하고 삭제하면 지하철 목록에 지하철역이 없다.")
     @Test
     void createStationAndDeleteStationAndGetStationList() {
-        // when
+        // Given
         ExtractableResponse<Response> responseStationGangnam = 역_만들기(강남역);
         String createdId = responseStationGangnam.jsonPath().getString("id");
 
-        // given
+        // When
         역_삭제하기(createdId);
 
-        // then
+        // Then
         ExtractableResponse<Response> responseStations = 지하철역_조회하기();
         assertThat(responseStations.jsonPath().getList("name")).doesNotContain(강남역);
     }
-    private static ExtractableResponse<Response> 역_만들기(String stationName) {
+    protected static ExtractableResponse<Response> 역_만들기(String stationName) {
         Map<String, String> params = new HashMap<>();
         params.put("name", stationName);
 
