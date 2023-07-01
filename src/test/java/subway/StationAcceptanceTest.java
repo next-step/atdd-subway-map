@@ -20,7 +20,7 @@ public class StationAcceptanceTest {
     private final String STATION_GANGNAM = "강남역";
     private final String STATION_SAMSUNG = "삼성역";
     private final String PARAM_NAME = "name";
-    private final String PARAM_ID = "id";
+    private final String PARAM_STATION_ID = "id";
 
     /**
      * When 지하철역을 생성하면
@@ -29,7 +29,7 @@ public class StationAcceptanceTest {
      */
     @DisplayName("지하철역을 생성한다.")
     @Test
-    void createStation() {
+    void 지하철역_생성_테스트() {
         // when & then
         지하철역_생성(STATION_GANGNAM);
 
@@ -45,7 +45,7 @@ public class StationAcceptanceTest {
      */
     @DisplayName("지하철역 목록을 조회한다.")
     @Test
-    void getStationList() {
+    void 지하철역_목록_조회_테스트() {
         // given
         지하철역_생성(STATION_GANGNAM);
         지하철역_생성(STATION_SAMSUNG);
@@ -64,9 +64,9 @@ public class StationAcceptanceTest {
      */
     @DisplayName("지하철역을 삭제한다.")
     @Test
-    void deleteStation() {
+    void 지하철역_삭제_테스트() {
         // given
-        long stationId = 지하철역_생성(STATION_GANGNAM).jsonPath().getLong(PARAM_ID);
+        long stationId = 지하철역_생성(STATION_GANGNAM).jsonPath().getLong(PARAM_STATION_ID);
 
         // when
         지하철역_삭제(stationId);
