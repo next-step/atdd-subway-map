@@ -6,7 +6,10 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,6 +30,10 @@ public class LineAcceptanceTest {
     @DisplayName("RestAssured 에서 요청 보낼 포트를 설정합니다.")
     void setup() {
         RestAssured.port = port;
+        StationAcceptanceTest.insertStation("강남역");
+        StationAcceptanceTest.insertStation("양재역");
+        StationAcceptanceTest.insertStation("신사역");
+        StationAcceptanceTest.insertStation("논현역");
     }
 
     /**
@@ -65,20 +72,21 @@ public class LineAcceptanceTest {
 
         // then
         ExtractableResponse<Response> found = RestAssured.when()
-            .get("/lines")
+            .get("/lines/{id}", saved.jsonPath().getLong("id"))
             .then().log().all()
             .extract();
         assertAll(
+            () -> assertThat(found.statusCode()).isEqualTo(HttpStatus.OK.value()),
             () -> assertThat(found.jsonPath().getString("name")).isEqualTo(name),
             () -> assertThat(found.jsonPath().getString("color")).isEqualTo(color),
             () -> assertThat(found.jsonPath().getList("stations.id", Long.class)).contains(upStationId, downStationId)
         );
     }
 
-    /** given 지하철 노선을 생성하고
+    /** given 지하철 노선을 2개 생성하고
      * when 지하철 노선 목록을 조회하면
      * then 전체 지하철 노선 목록이 조회되고
-     * then 생성한 지하철 노선이 포함됩니다.
+     * then 생성한 지하철 노선 2개가 포함됩니다.
      */
     @DisplayName("지하철 노선 목록 조회")
     @Test
@@ -106,6 +114,28 @@ public class LineAcceptanceTest {
 
         assertThat(saved.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
+        Long upStationId2 = 3L;
+        Long downStationId2 = 4L;
+        String name2 = "2호선";
+        String color2 = "bg-green-600";
+        Long distance2 = 15L;
+        Map<String, Object> requestBody2 = Map.of(
+            "upStationId", upStationId2,
+            "downStationId", downStationId2,
+            "name", name2,
+            "color", color2,
+            "distance", distance2
+        );
+
+        ExtractableResponse<Response> saved2 = RestAssured.given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(requestBody2)
+            .when()
+            .post("/lines")
+            .then().log().all().extract();
+
+        assertThat(saved.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
         // when
         ExtractableResponse<Response> found = RestAssured.when()
             .get("/lines")
@@ -113,10 +143,16 @@ public class LineAcceptanceTest {
             .extract();
 
         // then
+        List<List<Integer>> list = found.jsonPath().getList("lines.stations.id");
+        Set<Long> stationIdSet = list.stream()
+            .flatMap(List::stream)
+            .mapToLong(Long::valueOf)
+            .boxed()
+            .collect(Collectors.toSet());
         assertAll(
-            () -> assertThat(found.jsonPath().getString("name")).isEqualTo(name),
-            () -> assertThat(found.jsonPath().getString("color")).isEqualTo(color),
-            () -> assertThat(found.jsonPath().getList("stations.id", Long.class)).contains(upStationId, downStationId)
+            () -> assertThat(found.jsonPath().getList("lines.name", String.class)).containsExactly(name, name2),
+            () -> assertThat(found.jsonPath().getList("lines.color", String.class)).containsExactly(color, color2),
+            () -> assertThat(stationIdSet).containsExactly(upStationId, downStationId, upStationId2, downStationId2)
         );
     }
 
@@ -283,4 +319,5 @@ public class LineAcceptanceTest {
             () -> assertThat(deleted.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value())
         );
     }
+
 }

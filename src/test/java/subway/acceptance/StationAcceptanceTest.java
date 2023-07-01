@@ -21,9 +21,9 @@ import org.springframework.http.MediaType;
 @SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
 public class StationAcceptanceTest {
 
-    public static final String STATION_NAME_KEY = "name";
-    public static final String STATION_ID_KEY = "id";
-    public static final String STATION_BASE_URI = "/stations";
+    private static final String STATION_NAME_KEY = "name";
+    private static final String STATION_ID_KEY = "id";
+    private static final String STATION_BASE_URI = "/stations";
 
     @DisplayName("각 테스트 이후 모든 지하철역 정보를 삭제합니다.")
     @AfterEach
@@ -64,7 +64,7 @@ public class StationAcceptanceTest {
         // given
         String station1 = "강남역";
         String station2 = "양재역";
-        Stream.of(station1, station2).forEach(this::insertStation);
+        Stream.of(station1, station2).forEach(StationAcceptanceTest::insertStation);
 
         // when
         ExtractableResponse<Response> response = allStations();
@@ -100,7 +100,7 @@ public class StationAcceptanceTest {
         );
     }
 
-    private ExtractableResponse<Response> insertStation(String name) {
+    public static ExtractableResponse<Response> insertStation(String name) {
         return RestAssured.given().log().all()
             .body(Map.of(STATION_NAME_KEY, name)).contentType(MediaType.APPLICATION_JSON_VALUE)
             .when().post(STATION_BASE_URI)
