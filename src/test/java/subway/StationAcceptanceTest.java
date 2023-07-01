@@ -62,17 +62,17 @@ class StationAcceptanceTest {
         // Given
         StationRequest firstRequest = new StationRequest("사당역");
         ExtractableResponse<Response> firstResponse = RestAssuredExecutorService.postForResponse("/stations", firstRequest);
-        String firstResponseStationsName = firstResponse.body().jsonPath().getString("name");
+        String firstResponseStationName = firstResponse.body().jsonPath().getString("name");
 
         assertThat(firstResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(firstResponseStationsName).isEqualTo(firstRequest.getName());
+        assertThat(firstResponseStationName).isEqualTo(firstRequest.getName());
 
         StationRequest secondRequest = new StationRequest("동작역");
         ExtractableResponse<Response> secondResponse = RestAssuredExecutorService.postForResponse("/stations", secondRequest);
-        String secondResponseStationsName = secondResponse.body().jsonPath().getString("name");
+        String secondResponseStationName = secondResponse.body().jsonPath().getString("name");
 
         assertThat(secondResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(secondResponseStationsName).isEqualTo(secondRequest.getName());
+        assertThat(secondResponseStationName).isEqualTo(secondRequest.getName());
 
         // When
         ExtractableResponse<Response> stationsResponse = RestAssuredExecutorService.getForResponse("/stations");
