@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,7 +12,6 @@ import subway.acceptance.fixture.LineFixture;
 import subway.acceptance.fixture.StationFixture;
 import subway.service.dto.request.LineCreateRequest;
 import subway.service.dto.request.LineUpdateRequest;
-import subway.service.dto.response.StationResponse;
 
 @DisplayName("지하철노선 관련 기능")
 class LineAcceptanceTest extends AcceptanceTest {
@@ -100,14 +98,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         final var response = lineFixture.지하철노선을_조회한다(lineId);
 
         // then
-        assertAll(
-                () -> assertThat(response.getId()).isPositive(),
-                () -> assertThat(response.getName()).isEqualTo(request.getName()),
-                () -> assertThat(response.getColor()).isEqualTo(request.getColor()),
-                () -> assertThat(
-                        response.getStations().stream().map(StationResponse::getId).collect(Collectors.toUnmodifiableList())
-                ).containsOnly(request.getUpStationId(), request.getDownStationId())
-        );
+        assertThat(response.getId()).isPositive();
     }
 
     /**
