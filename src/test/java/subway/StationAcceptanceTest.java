@@ -63,7 +63,19 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역 목록을 조회한다")
     @Test
     void getStationList() {
+        지하철역_생성("삼전역");
+        지하철역_생성("종합운동장역");
 
+        // when
+        // 지하철역 목록 조회
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                   .contentType(MediaType.APPLICATION_JSON_VALUE)
+                   .when().get("/stations")
+                   .then().log().all()
+                   .extract();
+
+        // then
+        // 2개의 지하철 역을 응답으로 받는다
     }
 
     /**
