@@ -15,7 +15,7 @@ public class StationFixture {
 
     public static final String BASE_URL = "/stations";
 
-    public void 지하철역을_생성한다(final String name) {
+    public StationResponse 지하철역을_생성한다(final String name) {
         final var response = RestAssured.given()
                 .body(Map.of("name", name))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -23,6 +23,10 @@ public class StationFixture {
                 .then();
 
         statusCodeShouldBe(response, HttpStatus.CREATED);
+
+        return response.extract()
+                .jsonPath()
+                .getObject("", StationResponse.class);
     }
 
     public void 지하철역을_생성한다(final List<String> names) {

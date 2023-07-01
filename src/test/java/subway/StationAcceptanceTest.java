@@ -1,6 +1,7 @@
 package subway;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.util.List;
 
@@ -32,9 +33,13 @@ class StationAcceptanceTest extends AcceptanceTest {
         final String name = "강남역";
 
         // when
-        stationFixture.지하철역을_생성한다(name);
+        final var response = stationFixture.지하철역을_생성한다(name);
 
         // then
+        assertAll(
+                () -> assertThat(response.getId()).isPositive(),
+                () -> assertThat(response.getName()).isEqualTo(name)
+        );
         assertThat(stationFixture.지하철역을_조회한다(name)).isPresent();
     }
 
@@ -71,20 +76,12 @@ class StationAcceptanceTest extends AcceptanceTest {
         final String name = "강남역";
 
         // given
-        stationFixture.지하철역을_생성한다(name);
-        final Long stationId = getStationId(name);
+        final Long stationId = stationFixture.지하철역을_생성한다(name).getId();
 
         // when
         stationFixture.지하철역을_제거한다(stationId);
 
         // then
         assertThat(stationFixture.모든_지하철역을_조회한다()).isEmpty();
-    }
-
-    private Long getStationId(final String name) {
-        final var station = stationFixture.지하철역을_조회한다(name);
-        assertThat(station).isPresent();
-
-        return station.get().getId();
     }
 }
