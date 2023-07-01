@@ -54,4 +54,9 @@ public class LineService {
     public List<LineResponse> getList() {
         return lineRepository.findAll().stream().map(LineResponse::new).collect(Collectors.toUnmodifiableList());
     }
+
+    @Transactional
+    public void modifyLine() {
+
+    }
 }

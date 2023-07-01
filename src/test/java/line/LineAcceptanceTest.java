@@ -27,6 +27,7 @@ public class LineAcceptanceTest {
     private static final String API_CREATE_LINE = "/lines";
     private static final String API_GET_LINE = "/lines";
     private static final String API_GET_LINE_LIST = "/lines";
+    private static final String API_MODIFY_LINE = "/lines";
 
     @DisplayName("노선을 생성한다")
     @Test
@@ -93,5 +94,30 @@ public class LineAcceptanceTest {
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.jsonPath().getList("name")).containsAnyOf("신분당선", "분당선");
+    }
+
+    @DisplayName("지하철 노선을 수정한다")
+    @Test
+    void modifyLine() {
+        // given
+        // 지하철 노선을 생성
+        ExtractableResponse<Response> createdResponse = 노선생성("신분당선", "bg-red-600", 1, 2, 10);
+        Long createdLineId = createdResponse.jsonPath().getLong("id");
+
+        // when
+        // 지하철 노선을 수정
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                   .when().put(getModifyLineRequestUrl(createdLineId))
+                   .then().log().all()
+                   .extract();
+
+        // then
+        // 해당 지하철 노선 정보는 수정된다
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+    }
+
+    private String getModifyLineRequestUrl(long id) {
+        return API_MODIFY_LINE + "/" + id;
     }
 }
