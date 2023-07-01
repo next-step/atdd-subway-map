@@ -26,6 +26,7 @@ import subway.line.LineCreateRequest;
 public class LineAcceptanceTest {
     private static final String API_CREATE_LINE = "/lines";
     private static final String API_GET_LINE = "/lines";
+    private static final String API_GET_LINE_LIST = "/lines";
 
     @DisplayName("노선을 생성한다")
     @Test
@@ -74,5 +75,23 @@ public class LineAcceptanceTest {
 
     private String getLineRequestUrl(long id) {
         return API_GET_LINE + "/" + id;
+    }
+
+    @DisplayName("지하철 노선 목록을 조회한다")
+    @Test
+    void getLineList() {
+        // given
+        노선생성("신분당선", "bg-red-600", 1, 2, 10);
+        노선생성("분당선", "bg-green-600", 1, 3, 20);
+
+        // when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                                                            .when().get(API_GET_LINE_LIST)
+                                                            .then().log().all()
+                                                            .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.jsonPath().getList("name")).containsAnyOf("신분당선", "분당선");
     }
 }

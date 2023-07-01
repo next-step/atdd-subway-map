@@ -1,6 +1,8 @@
 package subway.line;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
 
@@ -46,5 +48,10 @@ public class LineService {
     @Transactional
     public LineResponse getLine(Long id) {
         return new LineResponse(lineRepository.findById(id).orElseThrow(() -> new RuntimeException("not found")));
+    }
+
+    @Transactional
+    public List<LineResponse> getList() {
+        return lineRepository.findAll().stream().map(LineResponse::new).collect(Collectors.toUnmodifiableList());
     }
 }

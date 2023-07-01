@@ -2,6 +2,8 @@ package subway.line;
 
 import static org.springframework.http.ResponseEntity.status;
 
+import java.util.List;
+
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
@@ -25,5 +27,10 @@ public class LineController {
     @GetMapping("/lines/{id}")
     public ResponseEntity<LineResponse> getLine(@PathVariable Long id) {
         return ResponseEntity.ok(lineService.getLine(id));
+    }
+
+    @GetMapping("/lines")
+    public ResponseEntity<List<LineResponse>> getLines() {
+        return ResponseEntity.ok(lineService.getList());
     }
 }
