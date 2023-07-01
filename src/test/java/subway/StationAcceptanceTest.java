@@ -21,8 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationAcceptanceTest {
 
-    private final String CREATE_STATION_API_URL = "/stations";
-    private final String SHOW_STATIONS_API_URL = "/stations";
+    private final String STATION_API_URL = "/stations";
 
     static Stream stationNames() {
         return Stream.of("강남역");
@@ -39,7 +38,6 @@ public class StationAcceptanceTest {
     void createStation(String stationName) {
         // when
         Map<String, String> parameter = new HashMap<>();
-
         parameter.put("name", stationName);
 
         ExtractableResponse<Response> response =
@@ -50,7 +48,7 @@ public class StationAcceptanceTest {
                             .body(parameter)
                             .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .when()
-                            .post(CREATE_STATION_API_URL)
+                            .post(STATION_API_URL)
                         .then()
                             .log()
                                 .all()
@@ -66,7 +64,7 @@ public class StationAcceptanceTest {
                             .log()
                                 .all()
                         .when()
-                            .get(SHOW_STATIONS_API_URL)
+                            .get(STATION_API_URL)
                         .then()
                             .log()
                                 .all()
@@ -97,7 +95,7 @@ public class StationAcceptanceTest {
                             .log()
                                 .all()
                         .when()
-                            .get(SHOW_STATIONS_API_URL)
+                            .get(STATION_API_URL)
                         .then()
                             .log()
                                 .all()
@@ -114,5 +112,43 @@ public class StationAcceptanceTest {
      * When 그 지하철역을 삭제하면
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
-    // TODO: 지하철역 제거 인수 테스트 메서드 생성
+    @DisplayName("지하철 역을 삭제한다.")
+    @Test
+    void deleteStation() {
+        // given
+        Map<String, String> parameter = new HashMap<>();
+        parameter.put("name", "봉천역");
+
+        String responseId = RestAssured
+                .given()
+                    .log()
+                        .all()
+                    .body(parameter)
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                    .log()
+                        .all()
+                    .post(STATION_API_URL)
+                .then()
+                    .log()
+                        .all()
+                    .extract()
+                        .jsonPath()
+                            .getString("id");
+
+        // when
+        ExtractableResponse<Response> response = RestAssured
+                .given()
+                    .log()
+                        .all()
+                .when()
+                    .log()
+                        .all()
+                    .delete(STATION_API_URL + "/" + responseId)
+                .then()
+                    .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
 }
