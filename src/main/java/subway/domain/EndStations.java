@@ -40,7 +40,7 @@ public class EndStations {
 
     private Set<Station> valid(Set<Station> stations) {
         if (isCountNotValid(stations)) {
-            throw new LineNotEstablishedBySameEndStationException();
+            throw new LineNotEstablishedBySameEndStationException("노선의 종착역은 동일한 역으로 설정할 수 없습니다.");
         }
         return stations;
     }
