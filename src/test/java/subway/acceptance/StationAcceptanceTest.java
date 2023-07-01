@@ -9,7 +9,6 @@ import io.restassured.response.Response;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,14 +17,17 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 
+@DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class StationAcceptanceTest {
 
     private static final String STATION_NAME_KEY = "name";
     private static final String STATION_ID_KEY = "id";
-    private static final String STATION_BASE_URI = "/stations";
+    private static final String STATION_BASE_URL = "/stations";
 
     @LocalServerPort
     int port;
@@ -36,13 +38,13 @@ public class StationAcceptanceTest {
         RestAssured.port = port;
     }
 
-    @DisplayName("각 테스트 이후 모든 지하철역 정보를 삭제합니다.")
-    @AfterEach
-    void cleanUp() {
-        allStations().jsonPath().getList(STATION_ID_KEY, Long.class)
-            .stream()
-            .forEach(this::deleteStation);
-    }
+//    @DisplayName("각 테스트 이후 모든 지하철역 정보를 삭제합니다.")
+//    @AfterEach
+//    void cleanUp() {
+//        allStations().jsonPath().getList(STATION_ID_KEY, Long.class)
+//            .stream()
+//            .forEach(this::deleteStation);
+//    }
 
     /**
      * When 지하철역을 생성하면
@@ -112,28 +114,15 @@ public class StationAcceptanceTest {
     }
 
     public static ExtractableResponse<Response> insertStation(String name) {
-        return RestAssured.given().log().all()
-            .body(Map.of(STATION_NAME_KEY, name)).contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().post(STATION_BASE_URI)
-            .then().log().all()
-            .statusCode(HttpStatus.CREATED.value())
-            .extract();
+        return RestAssuredUtil.createWithCreated(STATION_BASE_URL, Map.of(STATION_NAME_KEY, name));
     }
 
     private ExtractableResponse<Response> allStations() {
-        return RestAssured.given().log().all()
-            .when().get(STATION_BASE_URI)
-            .then().log().all()
-            .statusCode(HttpStatus.OK.value())
-            .extract();
+        return RestAssuredUtil.findAllWithOk(STATION_BASE_URL);
     }
 
     private ExtractableResponse<Response> deleteStation(Long id) {
-        return RestAssured.given().log().all()
-            .when().delete("/stations/{id}", id)
-            .then().log().all()
-            .statusCode(HttpStatus.NO_CONTENT.value())
-            .extract();
+        return RestAssuredUtil.deleteWithNoContent("/stations/{id}", id);
     }
 
 }

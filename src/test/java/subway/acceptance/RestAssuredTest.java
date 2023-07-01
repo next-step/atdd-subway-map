@@ -7,8 +7,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@DirtiesContext
+@SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
 public class RestAssuredTest {
 
     @DisplayName("구글 페이지 접근 테스트")

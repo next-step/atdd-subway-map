@@ -18,10 +18,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 
-@DirtiesContext
+@DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 @DisplayName("지하철 노선의 인수 테스트입니다.")
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class LineAcceptanceTest {
@@ -238,51 +238,24 @@ public class LineAcceptanceTest {
         );
     }
 
-    private ExtractableResponse<Response> createLineResult(
-        Map<String, Object> requestBody) {
-        ExtractableResponse<Response> saved = RestAssured.given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .body(requestBody)
-            .when()
-            .post("/lines")
-            .then().log().all()
-            .statusCode(HttpStatus.CREATED.value())
-            .extract();
-        return saved;
+    private ExtractableResponse<Response> createLineResult(Map<String, Object> requestBody) {
+        return RestAssuredUtil.createWithCreated("/lines", requestBody);
     }
 
     private ExtractableResponse<Response> selectAll() {
-        return RestAssured.when()
-            .get("/lines")
-            .then().log().all()
-            .extract();
+        return RestAssuredUtil.findAllWithOk("/lines");
     }
 
     private ExtractableResponse<Response> selectLine(Long id) {
-        ExtractableResponse<Response> found = RestAssured.when()
-            .get("/lines/{id}", id)
-            .then().log().all()
-            .extract();
-        return found;
+        return RestAssuredUtil.findByIdWithOk("/lines/{id}", id);
     }
 
-    private ExtractableResponse<Response> updateLine(
-        Long id, Map<String, Object> putRequestBody) {
-        ExtractableResponse<Response> updated = RestAssured
-            .given().contentType(MediaType.APPLICATION_JSON_VALUE)
-            .body(putRequestBody)
-            .when()
-            .put("/lines/{id}", id)
-            .then().log().all()
-            .extract();
-        return updated;
+    private ExtractableResponse<Response> updateLine(Long id, Map<String, Object> putRequestBody) {
+        return RestAssuredUtil.updateWithOk("/lines/{id}", id, putRequestBody);
     }
 
     private ExtractableResponse<Response> deleteLineResult(Long id) {
-        return RestAssured.when()
-            .delete("/lines/{id}", id)
-            .then().log().all()
-            .extract();
+        return RestAssuredUtil.deleteWithNoContent("/lines/{id}", id);
     }
 
 }
