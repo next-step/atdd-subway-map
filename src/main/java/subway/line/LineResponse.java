@@ -11,13 +11,13 @@ import subway.station.StationResponse;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class LineCreateResponse {
+public class LineResponse {
     private Long id;
     private String name;
     private String color;
     private List<StationResponse> stations;
 
-    public LineCreateResponse(Line line) {
+    public LineResponse(Line line) {
         this.id = line.getId();
         this.name = line.getName();
         this.color = line.getColor();

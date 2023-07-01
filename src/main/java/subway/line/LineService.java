@@ -18,7 +18,7 @@ public class LineService {
 
 
     @Transactional
-    public LineCreateResponse createStation(LineCreateRequest request) {
+    public LineResponse createStation(LineCreateRequest request) {
         Optional<Station> upStation = stationService.findById(request.getUpStationId());
 
         if (upStation.isEmpty()) {
@@ -40,6 +40,11 @@ public class LineService {
 
         Line createdLine = lineRepository.save(line);
 
-        return new LineCreateResponse(createdLine);
+        return new LineResponse(createdLine);
+    }
+
+    @Transactional
+    public LineResponse getLine(Long id) {
+        return new LineResponse(lineRepository.findById(id).orElseThrow(() -> new RuntimeException("not found")));
     }
 }

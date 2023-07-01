@@ -10,7 +10,7 @@ import subway.SchemaInitSql;
 import subway.StationInitSql;
 import subway.SubwayApplication;
 import subway.line.LineCreateRequest;
-import subway.line.LineCreateResponse;
+import subway.line.LineResponse;
 import subway.line.LineService;
 
 @SchemaInitSql
@@ -25,9 +25,9 @@ public class LineServiceTest {
     void createLine() {
         LineCreateRequest lineCreateRequest = new LineCreateRequest("신분당선", "bg-600", 1L, 2L, 10);
 
-        LineCreateResponse lineCreateResponse = lineService.createStation(lineCreateRequest);
+        LineResponse lineResponse = lineService.createStation(lineCreateRequest);
 
-        Assertions.assertThat(lineCreateResponse.getName()).isEqualTo("신분당선");
+        Assertions.assertThat(lineResponse.getName()).isEqualTo("신분당선");
     }
 
 }
