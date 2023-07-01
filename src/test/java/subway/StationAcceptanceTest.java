@@ -40,7 +40,7 @@ class StationAcceptanceTest extends AcceptanceTest {
                 () -> assertThat(response.getId()).isPositive(),
                 () -> assertThat(response.getName()).isEqualTo(name)
         );
-        assertThat(stationFixture.지하철역을_조회한다(name)).isPresent();
+        assertThat(stationFixture.지하철역을_조회한다(name)).hasSize(1);
     }
 
     /**

@@ -2,7 +2,7 @@ package subway.fixture;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -45,10 +45,10 @@ public class StationFixture {
                 .getList("", StationResponse.class);
     }
 
-    public Optional<StationResponse> 지하철역을_조회한다(final String name) {
+    public List<StationResponse> 지하철역을_조회한다(final String name) {
         return 모든_지하철역을_조회한다().stream()
                 .filter(it -> it.getName().equals(name))
-                .findAny();
+                .collect(Collectors.toUnmodifiableList());
     }
 
     public void 지하철역을_제거한다(final Long stationId) {
