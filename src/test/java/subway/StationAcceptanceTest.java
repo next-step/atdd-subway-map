@@ -34,12 +34,15 @@ public class StationAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
+        List<String> stationNames = 지하철역_목록조회_이름반환();
         assertThat(stationNames).containsAnyOf("강남역");
+    }
+
+    private List<String> 지하철역_목록조회_이름반환() {
+        return RestAssured.given().log().all()
+                          .when().get("/stations")
+                          .then().log().all()
+                          .extract().jsonPath().getList("name", String.class);
     }
 
     private ExtractableResponse<Response> 지하철역_생성(String stationName) {
@@ -68,17 +71,9 @@ public class StationAcceptanceTest {
 
         // when
         // 지하철역 목록 조회
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                   .contentType(MediaType.APPLICATION_JSON_VALUE)
-                   .when().get("/stations")
-                   .then().log().all()
-                   .extract();
-
         // then
         // 2개의 지하철 역을 응답으로 받는다
-        List<String> creaetedStationNames = response.jsonPath().getList("name", String.class);
-
-        assertThat(creaetedStationNames).containsAnyOf("삼전역", "종합운동장역");
+        assertThat(지하철역_목록조회_이름반환()).containsAnyOf("삼전역", "종합운동장역");
     }
 
     /**
@@ -87,5 +82,11 @@ public class StationAcceptanceTest {
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
     // TODO: 지하철역 제거 인수 테스트 메서드 생성
+
+    @DisplayName("생성된 지하철역을 제거한다")
+    @Test
+    void deleteStations() {
+
+    }
 
 }
