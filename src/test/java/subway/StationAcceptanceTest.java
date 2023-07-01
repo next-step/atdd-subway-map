@@ -79,7 +79,8 @@ public class StationAcceptanceTest {
         assertThat(마들역_생성.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         //when
-        ExtractableResponse<Response> 마들역_삭제 = deleteSubwayStation(마들역_생성);
+        ExtractableResponse<Response> 마들역_삭제 =
+                deleteSubwayStation(마들역_생성.body().jsonPath().getObject("id", Long.class));
 
         assertThat(마들역_삭제.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
@@ -87,10 +88,10 @@ public class StationAcceptanceTest {
         assertThat(getSubwayStations()).doesNotContain(마들역);
     }
 
-    private ExtractableResponse<Response> deleteSubwayStation(ExtractableResponse<Response> 마들역_생성) {
+    private ExtractableResponse<Response> deleteSubwayStation(Long stationId) {
         return RestAssured
                 .given().log().all()
-                .pathParam("id", 마들역_생성.body().jsonPath().getObject("id", Long.class))
+                .pathParam("id", stationId)
                 .when().delete("/stations/{id}")
                 .then().log().all()
                 .extract();
