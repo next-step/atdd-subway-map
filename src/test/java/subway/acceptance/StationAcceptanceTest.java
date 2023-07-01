@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.util.List;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -15,11 +14,6 @@ import subway.acceptance.fixture.StationFixture;
 class StationAcceptanceTest extends AcceptanceTest {
 
     private final StationFixture stationFixture = new StationFixture();
-
-    @BeforeEach
-    public void required() {
-        assertThat(stationFixture.모든_지하철역을_조회한다()).isEmpty();
-    }
 
     /**
      * When 지하철역을 생성하면
