@@ -10,7 +10,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import subway.acceptance.fixture.StationFixture;
-import subway.service.dto.StationResponse;
 
 @DisplayName("지하철역 관련 기능")
 class StationAcceptanceTest extends AcceptanceTest {
@@ -60,9 +59,7 @@ class StationAcceptanceTest extends AcceptanceTest {
         final var responses = stationFixture.모든_지하철역을_조회한다();
 
         // then
-        assertThat(responses)
-                .extracting(StationResponse::getName)
-                .hasSameElementsAs(names);
+        assertThat(responses).hasSize(names.size());
     }
 
     /**

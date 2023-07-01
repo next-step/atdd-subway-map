@@ -1,7 +1,6 @@
 package subway.acceptance.fixture;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
@@ -9,7 +8,8 @@ import org.springframework.http.MediaType;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ValidatableResponse;
-import subway.service.dto.StationResponse;
+import subway.service.dto.request.StationRequest;
+import subway.service.dto.response.StationResponse;
 
 public class StationFixture {
 
@@ -17,8 +17,8 @@ public class StationFixture {
 
     public StationResponse 지하철역을_생성한다(final String name) {
         final var response = RestAssured.given()
-                .body(Map.of("name", name))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(new StationRequest(name))
                 .when().post(BASE_URL)
                 .then();
 
