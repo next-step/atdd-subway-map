@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,7 +19,9 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 
+@DirtiesContext
 @DisplayName("지하철 노선의 인수 테스트입니다.")
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class LineAcceptanceTest {
@@ -26,14 +29,19 @@ public class LineAcceptanceTest {
     @LocalServerPort
     int port;
 
+    List<Long> stationIds;
+
+    int stationIdIdx;
+
     @BeforeEach
-    @DisplayName("RestAssured 에서 요청 보낼 포트를 설정합니다.")
+    @DisplayName("RestAssured 에서 요청 보낼 포트를 설정하고, 4개의 지하철 역 정보를 생성합니다.")
     void setup() {
         RestAssured.port = port;
-        StationAcceptanceTest.insertStation("강남역");
-        StationAcceptanceTest.insertStation("양재역");
-        StationAcceptanceTest.insertStation("신사역");
-        StationAcceptanceTest.insertStation("논현역");
+        stationIds = Stream.of("강남역", "양재역", "신사역", "논현역")
+            .map(StationAcceptanceTest::insertStation)
+            .map(i -> i.jsonPath().getLong("id"))
+            .collect(Collectors.toList());
+        stationIdIdx = 0;
     }
 
     /**
@@ -46,8 +54,8 @@ public class LineAcceptanceTest {
     @Test
     void createLine() {
         // given
-        Long upStationId = 1L;
-        Long downStationId = 2L;
+        Long upStationId = stationIds.get(stationIdIdx++);
+        Long downStationId = stationIds.get(stationIdIdx++);
         String name = "신분당선";
         String color = "bg-red-600";
         Long distance = 10L;
@@ -92,8 +100,8 @@ public class LineAcceptanceTest {
     @Test
     void selectAllLines() {
         // given
-        Long upStationId = 1L;
-        Long downStationId = 2L;
+        Long upStationId = stationIds.get(stationIdIdx++);
+        Long downStationId = stationIds.get(stationIdIdx++);
         String name = "신분당선";
         String color = "bg-red-600";
         Long distance = 10L;
@@ -114,8 +122,8 @@ public class LineAcceptanceTest {
 
         assertThat(saved.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
-        Long upStationId2 = 3L;
-        Long downStationId2 = 4L;
+        Long upStationId2 = stationIds.get(stationIdIdx++);
+        Long downStationId2 = stationIds.get(stationIdIdx++);
         String name2 = "2호선";
         String color2 = "bg-green-600";
         Long distance2 = 15L;
@@ -127,7 +135,7 @@ public class LineAcceptanceTest {
             "distance", distance2
         );
 
-        ExtractableResponse<Response> saved2 = RestAssured.given().log().all()
+        RestAssured.given().log().all()
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .body(requestBody2)
             .when()
@@ -165,8 +173,8 @@ public class LineAcceptanceTest {
     @Test
     void selectALine() {
         // given
-        Long upStationId = 1L;
-        Long downStationId = 2L;
+        Long upStationId = stationIds.get(stationIdIdx++);
+        Long downStationId = stationIds.get(stationIdIdx++);
         String name = "신분당선";
         String color = "bg-red-600";
         Long distance = 10L;
@@ -213,8 +221,8 @@ public class LineAcceptanceTest {
     @Test
     void updateLine() {
         // given
-        Long upStationId = 1L;
-        Long downStationId = 2L;
+        Long upStationId = stationIds.get(stationIdIdx++);
+        Long downStationId = stationIds.get(stationIdIdx++);
         String name = "신분당선";
         String color = "bg-red-600";
         Long distance = 10L;
@@ -236,8 +244,8 @@ public class LineAcceptanceTest {
         assertThat(saved.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // and
-        Long newUpStationId = 3L;
-        Long newDownStationId = 4L;
+        Long newUpStationId = stationIds.get(stationIdIdx++);
+        Long newDownStationId = stationIds.get(stationIdIdx++);
         String newName = "2호선";
         String newColor = "bg-green-600";
         Long newDistance = 20L;
@@ -285,8 +293,8 @@ public class LineAcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        Long upStationId = 1L;
-        Long downStationId = 2L;
+        Long upStationId = stationIds.get(stationIdIdx++);
+        Long downStationId = stationIds.get(stationIdIdx++);
         String name = "신분당선";
         String color = "bg-red-600";
         Long distance = 10L;
