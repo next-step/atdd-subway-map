@@ -76,6 +76,9 @@ public class StationAcceptanceTest {
 
         // then
         // 2개의 지하철 역을 응답으로 받는다
+        List<String> creaetedStationNames = response.jsonPath().getList("name", String.class);
+
+        assertThat(creaetedStationNames).containsAnyOf("삼전역", "종합운동장역");
     }
 
     /**
