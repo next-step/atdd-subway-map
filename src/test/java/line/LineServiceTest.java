@@ -5,17 +5,16 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.test.context.jdbc.Sql;
 
+import subway.SchemaInitSql;
+import subway.StationInitSql;
 import subway.SubwayApplication;
 import subway.line.LineCreateRequest;
 import subway.line.LineCreateResponse;
 import subway.line.LineService;
 
-@Sql(scripts = {
-        "classpath:sql/schema.sql",
-        "classpath:sql/station_init.sql"
-})
+@SchemaInitSql
+@StationInitSql
 @SpringBootTest(classes = SubwayApplication.class, webEnvironment = WebEnvironment.DEFINED_PORT)
 public class LineServiceTest {
 
