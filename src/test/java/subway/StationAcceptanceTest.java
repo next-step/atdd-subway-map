@@ -49,13 +49,39 @@ public class StationAcceptanceTest {
                         .extract().jsonPath().getList("name", String.class);
         assertThat(stationNames).containsAnyOf("강남역");
     }
+    
+    @DisplayName("지하철역 목록을 조회한다.")
+    @Test
+    void showStations() {
+        // given
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "강남역");
+        RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
 
-    /**
-     * Given 2개의 지하철역을 생성하고
-     * When 지하철역 목록을 조회하면
-     * Then 2개의 지하철역을 응답 받는다
-     */
-    // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
+        params.put("name", "역삼역");
+        RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+
+        // when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .when().get("/stations")
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.jsonPath().getList("id")).hasSize(2).containsExactly(1, 2);
+        assertThat(response.jsonPath().getList("name")).hasSize(2).containsExactly("강남역", "역삼역");
+    }
 
     /**
      * Given 지하철역을 생성하고
