@@ -59,30 +59,16 @@ public class LineAcceptanceTest {
         String name = "신분당선";
         String color = "bg-red-600";
         Long distance = 10L;
-        Map<String, Object> requestBody = Map.of(
-            "upStationId", upStationId,
-            "downStationId", downStationId,
-            "name", name,
-            "color", color,
-            "distance", distance
-        );
 
         // when
-        ExtractableResponse<Response> saved = RestAssured.given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .body(requestBody)
-            .when()
-            .post("/lines")
-            .then().log().all().extract();
+        ExtractableResponse<Response> saved = responseOfLineCreationWithRequestBodyMap(
+            requestBodyOf(upStationId, downStationId, name, color, distance));
 
         // then
         assertThat(saved.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        ExtractableResponse<Response> found = RestAssured.when()
-            .get("/lines/{id}", saved.jsonPath().getLong("id"))
-            .then().log().all()
-            .extract();
+        ExtractableResponse<Response> found = responseOfFindLineWithId(saved.jsonPath().getLong("id"));
         assertAll(
             () -> assertThat(found.statusCode()).isEqualTo(HttpStatus.OK.value()),
             () -> assertThat(found.jsonPath().getString("name")).isEqualTo(name),
@@ -105,50 +91,19 @@ public class LineAcceptanceTest {
         String name = "신분당선";
         String color = "bg-red-600";
         Long distance = 10L;
-        Map<String, Object> requestBody = Map.of(
-            "upStationId", upStationId,
-            "downStationId", downStationId,
-            "name", name,
-            "color", color,
-            "distance", distance
-        );
-
-        ExtractableResponse<Response> saved = RestAssured.given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .body(requestBody)
-            .when()
-            .post("/lines")
-            .then().log().all().extract();
-
-        assertThat(saved.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        responseOfLineCreationWithRequestBodyMap(
+            requestBodyOf(upStationId, downStationId, name, color, distance));
 
         Long upStationId2 = stationIds.get(stationIdIdx++);
         Long downStationId2 = stationIds.get(stationIdIdx++);
         String name2 = "2호선";
         String color2 = "bg-green-600";
         Long distance2 = 15L;
-        Map<String, Object> requestBody2 = Map.of(
-            "upStationId", upStationId2,
-            "downStationId", downStationId2,
-            "name", name2,
-            "color", color2,
-            "distance", distance2
-        );
-
-        RestAssured.given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .body(requestBody2)
-            .when()
-            .post("/lines")
-            .then().log().all().extract();
-
-        assertThat(saved.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        responseOfLineCreationWithRequestBodyMap(
+            requestBodyOf(upStationId2, downStationId2, name2, color2, distance2));
 
         // when
-        ExtractableResponse<Response> found = RestAssured.when()
-            .get("/lines")
-            .then().log().all()
-            .extract();
+        ExtractableResponse<Response> found = responseOfFindAllLines();
 
         // then
         List<List<Integer>> list = found.jsonPath().getList("lines.stations.id");
@@ -157,6 +112,7 @@ public class LineAcceptanceTest {
             .mapToLong(Long::valueOf)
             .boxed()
             .collect(Collectors.toSet());
+
         assertAll(
             () -> assertThat(found.jsonPath().getList("lines.name", String.class)).containsExactly(name, name2),
             () -> assertThat(found.jsonPath().getList("lines.color", String.class)).containsExactly(color, color2),
@@ -178,28 +134,13 @@ public class LineAcceptanceTest {
         String name = "신분당선";
         String color = "bg-red-600";
         Long distance = 10L;
-        Map<String, Object> requestBody = Map.of(
-            "upStationId", upStationId,
-            "downStationId", downStationId,
-            "name", name,
-            "color", color,
-            "distance", distance
-        );
+        Map<String, Object> requestBody = requestBodyOf(upStationId, downStationId, name, color,
+            distance);
 
-        ExtractableResponse<Response> saved = RestAssured.given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .body(requestBody)
-            .when()
-            .post("/lines")
-            .then().log().all().extract();
-
-        assertThat(saved.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        ExtractableResponse<Response> saved = responseOfLineCreationWithRequestBodyMap(requestBody);
 
         // when
-        ExtractableResponse<Response> found = RestAssured.when()
-            .get("/lines/{id}", saved.jsonPath().getLong("id"))
-            .then().log().all()
-            .extract();
+        ExtractableResponse<Response> found = responseOfFindLineWithId(saved.jsonPath().getLong("id"));
 
         // then
         assertAll(
@@ -226,22 +167,10 @@ public class LineAcceptanceTest {
         String name = "신분당선";
         String color = "bg-red-600";
         Long distance = 10L;
-        Map<String, Object> requestBody = Map.of(
-            "upStationId", upStationId,
-            "downStationId", downStationId,
-            "name", name,
-            "color", color,
-            "distance", distance
-        );
+        Map<String, Object> requestBody = requestBodyOf(
+            upStationId, downStationId, name, color, distance);
 
-        ExtractableResponse<Response> saved = RestAssured.given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .body(requestBody)
-            .when()
-            .post("/lines")
-            .then().log().all().extract();
-
-        assertThat(saved.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        ExtractableResponse<Response> saved = responseOfLineCreationWithRequestBodyMap(requestBody);
 
         // and
         Long newUpStationId = stationIds.get(stationIdIdx++);
@@ -249,31 +178,18 @@ public class LineAcceptanceTest {
         String newName = "2호선";
         String newColor = "bg-green-600";
         Long newDistance = 20L;
-        Map<String, Object> putRequestBody = Map.of(
-            "upStationId", newUpStationId,
-            "downStationId", newDownStationId,
-            "name", newName,
-            "color", newColor,
-            "distance", newDistance
-        );
+        Map<String, Object> putRequestBody = requestBodyOf(
+            newUpStationId, newDownStationId, newName, newColor, newDistance);
 
         // when
-        ExtractableResponse<Response> updated = RestAssured
-            .given().contentType(MediaType.APPLICATION_JSON_VALUE)
-            .body(putRequestBody)
-            .when()
-            .put("/lines/{id}", saved.jsonPath().getLong("id"))
-            .then().log().all()
-            .extract();
+        ExtractableResponse<Response> updated = responseOfLineUpdateWithRequestBodyMap(
+            saved.jsonPath().getLong("id"), putRequestBody);
 
         // then
         assertThat(updated.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         // then
-        ExtractableResponse<Response> found = RestAssured.when()
-            .get("/lines/{id}", saved.jsonPath().getLong("id"))
-            .then().log().all()
-            .extract();
+        ExtractableResponse<Response> found = responseOfFindLineWithId(saved.jsonPath().getLong("id"));
 
         assertAll(
             () -> assertThat(found.statusCode()).isEqualTo(HttpStatus.OK.value()),
@@ -298,34 +214,75 @@ public class LineAcceptanceTest {
         String name = "신분당선";
         String color = "bg-red-600";
         Long distance = 10L;
-        Map<String, Object> requestBody = Map.of(
-            "upStationId", upStationId,
-            "downStationId", downStationId,
-            "name", name,
-            "color", color,
-            "distance", distance
-        );
-
-        ExtractableResponse<Response> saved = RestAssured.given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .body(requestBody)
-            .when()
-            .post("/lines")
-            .then().log().all().extract();
-
-        assertThat(saved.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        ExtractableResponse<Response> saved = responseOfLineCreationWithRequestBodyMap(
+            requestBodyOf(upStationId, downStationId, name, color, distance));
 
         // when
-        ExtractableResponse<Response> deleted = RestAssured.when()
-            .delete("/lines/{id}", saved.jsonPath().getLong("id"))
-            .then().log().all()
-            .extract();
+        ExtractableResponse<Response> deleted = responseOfLineDeleteWithId(saved.jsonPath().getLong("id"));
 
         // then
         assertAll(
             () -> assertThat(deleted.body().asString()).isBlank(),
             () -> assertThat(deleted.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value())
         );
+    }
+
+    private Map<String, Object> requestBodyOf(Long upStationId, Long downStationId, String name,
+        String color, Long distance) {
+        return Map.of(
+            "upStationId", upStationId,
+            "downStationId", downStationId,
+            "name", name,
+            "color", color,
+            "distance", distance
+        );
+    }
+
+    private ExtractableResponse<Response> responseOfLineDeleteWithId(Long id) {
+        return RestAssured.when()
+            .delete("/lines/{id}", id)
+            .then().log().all()
+            .extract();
+    }
+
+    private ExtractableResponse<Response> responseOfLineCreationWithRequestBodyMap(
+        Map<String, Object> requestBody) {
+        ExtractableResponse<Response> saved = RestAssured.given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(requestBody)
+            .when()
+            .post("/lines")
+            .then().log().all()
+            .statusCode(HttpStatus.CREATED.value())
+            .extract();
+        return saved;
+    }
+
+    private ExtractableResponse<Response> responseOfFindAllLines() {
+        return RestAssured.when()
+            .get("/lines")
+            .then().log().all()
+            .extract();
+    }
+
+    private ExtractableResponse<Response> responseOfFindLineWithId(Long id) {
+        ExtractableResponse<Response> found = RestAssured.when()
+            .get("/lines/{id}", id)
+            .then().log().all()
+            .extract();
+        return found;
+    }
+
+    private ExtractableResponse<Response> responseOfLineUpdateWithRequestBodyMap(
+        Long id, Map<String, Object> putRequestBody) {
+        ExtractableResponse<Response> updated = RestAssured
+            .given().contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(putRequestBody)
+            .when()
+            .put("/lines/{id}", id)
+            .then().log().all()
+            .extract();
+        return updated;
     }
 
 }
