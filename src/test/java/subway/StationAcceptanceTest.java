@@ -54,7 +54,7 @@ public class StationAcceptanceTest {
 	@Test
 	void getStations() {
 		//given
-		createStations(List.of("수유역", "강변역"));
+		AcceptanceUtils.createStations(List.of("수유역", "강변역"));
 
 		//when
 		final List<String> resultStationNames =
@@ -74,7 +74,7 @@ public class StationAcceptanceTest {
 	@Test
 	void deleteStation() {
 		//given
-		final Long stationId = createStation("홍대입구역");
+		final long stationId = AcceptanceUtils.createStation("홍대입구역");
 
 		//when
 		RestAssured.given().log().all()
@@ -93,26 +93,5 @@ public class StationAcceptanceTest {
 			.jsonPath().getList("name", String.class);
 
 		Assertions.assertEquals(0, getStationsResponse.size());
-	}
-
-	private static List<Long> createStations(List<String> names) {
-		return names.stream()
-			.map(StationAcceptanceTest::createStation)
-			.collect(Collectors.toList());
-	}
-
-	private static Long createStation(String name) {
-		final Map<String, String> stationCreateRequest = new HashMap<>();
-		stationCreateRequest.put("name", name);
-
-		final ExtractableResponse<Response> response =
-			RestAssured.given().log().all()
-				.body(stationCreateRequest)
-				.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.post("/stations")
-				.then().log().all()
-				.extract();
-
-		return response.body().jsonPath().getLong("id");
 	}
 }
