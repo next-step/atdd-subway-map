@@ -1,4 +1,4 @@
-package subway.fixture;
+package subway.acceptance;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.boot.test.context.SpringBootTest;

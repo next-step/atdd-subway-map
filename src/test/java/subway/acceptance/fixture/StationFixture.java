@@ -1,4 +1,4 @@
-package subway.fixture;
+package subway.acceptance.fixture;
 
 import java.util.List;
 import java.util.Map;
@@ -9,7 +9,7 @@ import org.springframework.http.MediaType;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ValidatableResponse;
-import subway.StationResponse;
+import subway.service.dto.StationResponse;
 
 public class StationFixture {
 
