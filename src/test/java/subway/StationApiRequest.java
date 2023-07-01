@@ -7,6 +7,13 @@ import org.springframework.http.MediaType;
 
 public class StationApiRequest {
 
+    public static final String 강남역 = "강남역";
+    public static final String 양재역 = "양재역";
+    public static final String 양재시민의숲역 = "양재시민의숲역";
+    public static final String 청계산입구역 = "청계산입구역";
+    public static final String 판교역 = "판교역";
+    public static final String 정자역 = "정자역";
+
     public static ExtractableResponse<Response> 지하철역_생성_요청(String name) {
         return RestAssured.given().log().all()
             .body(new StationRequest(name))
