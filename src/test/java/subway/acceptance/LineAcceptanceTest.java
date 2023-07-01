@@ -61,14 +61,14 @@ public class LineAcceptanceTest {
         Long distance = 10L;
 
         // when
-        ExtractableResponse<Response> saved = responseOfLineCreationWithRequestBodyMap(
+        ExtractableResponse<Response> saved = createLineResult(
             requestBodyOf(upStationId, downStationId, name, color, distance));
 
         // then
         assertThat(saved.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        ExtractableResponse<Response> found = responseOfFindLineWithId(saved.jsonPath().getLong("id"));
+        ExtractableResponse<Response> found = selectLine(saved.jsonPath().getLong("id"));
         assertAll(
             () -> assertThat(found.statusCode()).isEqualTo(HttpStatus.OK.value()),
             () -> assertThat(found.jsonPath().getString("name")).isEqualTo(name),
@@ -91,7 +91,7 @@ public class LineAcceptanceTest {
         String name = "신분당선";
         String color = "bg-red-600";
         Long distance = 10L;
-        responseOfLineCreationWithRequestBodyMap(
+        createLineResult(
             requestBodyOf(upStationId, downStationId, name, color, distance));
 
         Long upStationId2 = stationIds.get(stationIdIdx++);
@@ -99,11 +99,11 @@ public class LineAcceptanceTest {
         String name2 = "2호선";
         String color2 = "bg-green-600";
         Long distance2 = 15L;
-        responseOfLineCreationWithRequestBodyMap(
+        createLineResult(
             requestBodyOf(upStationId2, downStationId2, name2, color2, distance2));
 
         // when
-        ExtractableResponse<Response> found = responseOfFindAllLines();
+        ExtractableResponse<Response> found = selectAll();
 
         // then
         List<List<Integer>> list = found.jsonPath().getList("lines.stations.id");
@@ -137,10 +137,10 @@ public class LineAcceptanceTest {
         Map<String, Object> requestBody = requestBodyOf(upStationId, downStationId, name, color,
             distance);
 
-        ExtractableResponse<Response> saved = responseOfLineCreationWithRequestBodyMap(requestBody);
+        ExtractableResponse<Response> saved = createLineResult(requestBody);
 
         // when
-        ExtractableResponse<Response> found = responseOfFindLineWithId(saved.jsonPath().getLong("id"));
+        ExtractableResponse<Response> found = selectLine(saved.jsonPath().getLong("id"));
 
         // then
         assertAll(
@@ -170,7 +170,7 @@ public class LineAcceptanceTest {
         Map<String, Object> requestBody = requestBodyOf(
             upStationId, downStationId, name, color, distance);
 
-        ExtractableResponse<Response> saved = responseOfLineCreationWithRequestBodyMap(requestBody);
+        ExtractableResponse<Response> saved = createLineResult(requestBody);
 
         // and
         Long newUpStationId = stationIds.get(stationIdIdx++);
@@ -182,14 +182,14 @@ public class LineAcceptanceTest {
             newUpStationId, newDownStationId, newName, newColor, newDistance);
 
         // when
-        ExtractableResponse<Response> updated = responseOfLineUpdateWithRequestBodyMap(
+        ExtractableResponse<Response> updated = updateLine(
             saved.jsonPath().getLong("id"), putRequestBody);
 
         // then
         assertThat(updated.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         // then
-        ExtractableResponse<Response> found = responseOfFindLineWithId(saved.jsonPath().getLong("id"));
+        ExtractableResponse<Response> found = selectLine(saved.jsonPath().getLong("id"));
 
         assertAll(
             () -> assertThat(found.statusCode()).isEqualTo(HttpStatus.OK.value()),
@@ -214,11 +214,11 @@ public class LineAcceptanceTest {
         String name = "신분당선";
         String color = "bg-red-600";
         Long distance = 10L;
-        ExtractableResponse<Response> saved = responseOfLineCreationWithRequestBodyMap(
+        ExtractableResponse<Response> saved = createLineResult(
             requestBodyOf(upStationId, downStationId, name, color, distance));
 
         // when
-        ExtractableResponse<Response> deleted = responseOfLineDeleteWithId(saved.jsonPath().getLong("id"));
+        ExtractableResponse<Response> deleted = deleteLineResult(saved.jsonPath().getLong("id"));
 
         // then
         assertAll(
@@ -238,14 +238,7 @@ public class LineAcceptanceTest {
         );
     }
 
-    private ExtractableResponse<Response> responseOfLineDeleteWithId(Long id) {
-        return RestAssured.when()
-            .delete("/lines/{id}", id)
-            .then().log().all()
-            .extract();
-    }
-
-    private ExtractableResponse<Response> responseOfLineCreationWithRequestBodyMap(
+    private ExtractableResponse<Response> createLineResult(
         Map<String, Object> requestBody) {
         ExtractableResponse<Response> saved = RestAssured.given().log().all()
             .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -258,14 +251,14 @@ public class LineAcceptanceTest {
         return saved;
     }
 
-    private ExtractableResponse<Response> responseOfFindAllLines() {
+    private ExtractableResponse<Response> selectAll() {
         return RestAssured.when()
             .get("/lines")
             .then().log().all()
             .extract();
     }
 
-    private ExtractableResponse<Response> responseOfFindLineWithId(Long id) {
+    private ExtractableResponse<Response> selectLine(Long id) {
         ExtractableResponse<Response> found = RestAssured.when()
             .get("/lines/{id}", id)
             .then().log().all()
@@ -273,7 +266,7 @@ public class LineAcceptanceTest {
         return found;
     }
 
-    private ExtractableResponse<Response> responseOfLineUpdateWithRequestBodyMap(
+    private ExtractableResponse<Response> updateLine(
         Long id, Map<String, Object> putRequestBody) {
         ExtractableResponse<Response> updated = RestAssured
             .given().contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -283,6 +276,13 @@ public class LineAcceptanceTest {
             .then().log().all()
             .extract();
         return updated;
+    }
+
+    private ExtractableResponse<Response> deleteLineResult(Long id) {
+        return RestAssured.when()
+            .delete("/lines/{id}", id)
+            .then().log().all()
+            .extract();
     }
 
 }
