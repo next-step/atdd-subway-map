@@ -25,7 +25,7 @@ public class LineResponse {
     }
 
     public static LineResponse from(Line line) {
-        return new LineResponse(line.getId(), line.getName(), line.getColor(), line.getStations(),
+        return new LineResponse(line.getId(), line.getName(), line.getColor(), line.getEndStations().getStations(),
             line.getDistance());
     }
 

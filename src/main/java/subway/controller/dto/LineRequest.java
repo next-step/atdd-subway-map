@@ -1,7 +1,6 @@
 package subway.controller.dto;
 
-import java.util.Set;
-import subway.entity.Station;
+import subway.entity.EndStations;
 import subway.exception.LineNotEstablishedBySameEndStationException;
 
 public class LineRequest {
@@ -25,15 +24,6 @@ public class LineRequest {
         this.distance = distance;
     }
 
-    private Long valid(Long downStationId) {
-        if (downStationId.equals(upStationId)) {
-            throw new LineNotEstablishedBySameEndStationException(
-                String.format("노선의 두 종점역은 동일할 수 없습니다: %d / %d", upStationId, downStationId)
-            );
-        }
-        return downStationId;
-    }
-
     public String getName() {
         return name;
     }
@@ -54,17 +44,30 @@ public class LineRequest {
         return distance;
     }
 
+    private Long valid(Long downStationId) {
+        if (isSameWithUpStationId(downStationId)) {
+            throw new LineNotEstablishedBySameEndStationException(
+                String.format("노선의 두 종점역은 동일할 수 없습니다: %d / %d", upStationId, downStationId)
+            );
+        }
+        return downStationId;
+    }
+
+    private boolean isSameWithUpStationId(Long downStationId) {
+        return downStationId.equals(upStationId);
+    }
+
     public static class UpdateRequest {
 
         private final String name;
 
         private final String color;
 
-        private final Set<Station> endStations;
+        private final EndStations endStations;
 
         private final Long distance;
 
-        public UpdateRequest(String name, String color, Set<Station> endStations, Long distance) {
+        public UpdateRequest(String name, String color, EndStations endStations, Long distance) {
             this.name = name;
             this.color = color;
             this.endStations = endStations;
@@ -80,7 +83,7 @@ public class LineRequest {
         }
 
         public boolean hasEndStations() {
-            return endStations != null && endStations.size() > 0;
+            return endStations != null;
         }
 
         public boolean hasDistance() {
@@ -95,7 +98,7 @@ public class LineRequest {
             return color;
         }
 
-        public Set<Station> getEndStations() {
+        public EndStations getEndStations() {
             return endStations;
         }
 
@@ -108,7 +111,7 @@ public class LineRequest {
 
             private String color;
 
-            private Set<Station> endStations;
+            private EndStations endStations;
 
             private Long distance;
 
@@ -122,7 +125,7 @@ public class LineRequest {
                 return this;
             }
 
-            public Builder endStations(Set<Station> endStations) {
+            public Builder endStations(EndStations endStations) {
                 this.endStations = endStations;
                 return this;
             }

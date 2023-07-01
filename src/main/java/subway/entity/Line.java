@@ -1,18 +1,16 @@
 package subway.entity;
 
-import java.util.Set;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import subway.controller.dto.LineRequest.UpdateRequest;
-import subway.exception.LineNotEstablishedBySameEndStationException;
 
 @Entity
 public class Line {
 
-    public static final int VALID_LINE_STATION_COUNT = 2;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -21,18 +19,18 @@ public class Line {
 
     private String color;
 
-    @OneToMany
-    private Set<Station> stations;
+    @OneToOne(cascade = CascadeType.ALL)
+    private EndStations endStations;
 
     private Long distance;
 
     public Line() {}
 
-    public Line(Long id, String name, String color, Set<Station> stations, Long distance) {
+    public Line(Long id, String name, String color, EndStations stations, Long distance) {
         this.id = id;
         this.name = name;
         this.color = color;
-        this.stations = valid(stations);
+        this.endStations = stations;
         this.distance = distance;
     }
 
@@ -48,8 +46,8 @@ public class Line {
         return color;
     }
 
-    public Set<Station> getStations() {
-        return Set.copyOf(stations);
+    public EndStations getEndStations() {
+        return endStations.clone();
     }
 
     public Long getDistance() {
@@ -63,15 +61,16 @@ public class Line {
         updateDistance(request);
     }
 
-    private Set<Station> valid(Set<Station> stations) {
-        if (isCountNotValid(stations)) {
-            throw new LineNotEstablishedBySameEndStationException();
-        }
-        return stations;
-    }
 
-    private boolean isCountNotValid(Set<Station> stations) {
-        return stations.size() != VALID_LINE_STATION_COUNT;
+    @Override
+    public String toString() {
+        return "Line{" +
+            "id=" + id +
+            ", name='" + name + '\'' +
+            ", color='" + color + '\'' +
+            ", stations=" + endStations +
+            ", distance=" + distance +
+            '}';
     }
 
     private void updateName(UpdateRequest request) {
@@ -88,7 +87,7 @@ public class Line {
 
     private void updateEndStations(UpdateRequest request) {
         if (request.hasEndStations()) {
-            this.stations = valid(request.getEndStations());
+            this.endStations = request.getEndStations();
         }
     }
 
@@ -98,17 +97,6 @@ public class Line {
         }
     }
 
-    @Override
-    public String toString() {
-        return "Line{" +
-            "id=" + id +
-            ", name='" + name + '\'' +
-            ", color='" + color + '\'' +
-            ", stations=" + stations +
-            ", distance=" + distance +
-            '}';
-    }
-
     public static class Builder {
         private Long id;
 
@@ -116,7 +104,7 @@ public class Line {
 
         private String color;
 
-        private Set<Station> stations;
+        private EndStations endStations;
 
         private Long distance;
 
@@ -135,8 +123,8 @@ public class Line {
             return this;
         }
 
-        public Builder stations(Set<Station> stations) {
-            this.stations = Set.copyOf(stations);
+        public Builder stations(EndStations stations) {
+            this.endStations = stations.clone();
             return this;
         }
 
@@ -146,7 +134,7 @@ public class Line {
         }
 
         public Line build() {
-            return new Line(id, name, color, stations, distance);
+            return new Line(id, name, color, endStations, distance);
         }
     }
 }

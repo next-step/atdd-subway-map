@@ -12,6 +12,7 @@ import subway.controller.dto.LineRequest;
 import subway.controller.dto.LineRequest.UpdateRequest;
 import subway.controller.dto.LineResponse;
 import subway.controller.dto.LinesResponse;
+import subway.entity.EndStations;
 import subway.entity.Line;
 import subway.entity.Station;
 import subway.exception.LineNotFoundException;
@@ -36,7 +37,7 @@ public class LineService {
 
     @Transactional
     public LineResponse createdLineBy(LineRequest request) {
-        Set<Station> stations = streamOfEndStationIdFrom(request)
+        Set<Station> endStations = streamOfEndStationIdFrom(request)
             .filter(Objects::nonNull)
             .map(this::stationFoundById)
             .collect(Collectors.toSet());
@@ -45,7 +46,7 @@ public class LineService {
             .name(request.getName())
             .color(request.getColor())
             .distance(request.getDistance())
-            .stations(stations)
+            .stations(EndStations.of(endStations))
             .build()));
     }
 
@@ -65,7 +66,7 @@ public class LineService {
             .name(request.getName())
             .color(request.getColor())
             .distance(request.getDistance())
-            .endStations(renewableStationsFrom(request))
+            .endStations(EndStations.of(renewableStationsFrom(request)))
             .build());
 
         return LineResponse.from(lineRepository.save(line));
