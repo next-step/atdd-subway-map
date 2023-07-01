@@ -1,6 +1,6 @@
 package subway.controller.dto;
 
-import subway.entity.EndStations;
+import subway.domain.EndStations;
 import subway.exception.LineNotEstablishedBySameEndStationException;
 
 public class LineRequest {

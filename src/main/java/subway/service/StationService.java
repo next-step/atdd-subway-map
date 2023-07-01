@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import subway.controller.dto.StationRequest;
 import subway.controller.dto.StationResponse;
-import subway.entity.Station;
+import subway.domain.Station;
 import subway.repository.StationRepository;
 
 @Service

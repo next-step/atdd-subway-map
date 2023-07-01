@@ -1,4 +1,4 @@
-package subway.entity;
+package subway.domain;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;

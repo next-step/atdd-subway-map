@@ -1,8 +1,8 @@
 package subway.controller.dto;
 
 import java.util.Set;
-import subway.entity.Line;
-import subway.entity.Station;
+import subway.domain.Line;
+import subway.domain.Station;
 
 public class LineResponse {
 

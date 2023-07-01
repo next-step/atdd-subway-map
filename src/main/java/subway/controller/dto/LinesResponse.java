@@ -2,7 +2,7 @@ package subway.controller.dto;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import subway.entity.Line;
+import subway.domain.Line;
 
 public class LinesResponse {
 

@@ -1,4 +1,4 @@
-package subway.entity;
+package subway.domain;
 
 import java.util.Objects;
 import javax.persistence.*;
