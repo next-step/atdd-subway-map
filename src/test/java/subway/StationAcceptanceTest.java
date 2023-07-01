@@ -35,15 +35,15 @@ public class StationAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames = 지하철역_목록조회_이름반환();
+        List<String> stationNames = 지하철역_목록조회("name", String.class);
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
-    private List<String> 지하철역_목록조회_이름반환() {
+    private <T> List<T> 지하철역_목록조회(String pathName, Class<T> elementType) {
         return RestAssured.given().log().all()
                           .when().get("/stations")
                           .then().log().all()
-                          .extract().jsonPath().getList("name", String.class);
+                          .extract().jsonPath().getList(pathName, elementType);
     }
 
     private ExtractableResponse<Response> 지하철역_생성(String stationName) {
@@ -74,7 +74,7 @@ public class StationAcceptanceTest {
         // 지하철역 목록 조회
         // then
         // 2개의 지하철 역을 응답으로 받는다
-        assertThat(지하철역_목록조회_이름반환()).containsAnyOf(givenStationNames.toArray(new String[0]));
+        assertThat(지하철역_목록조회("name", String.class)).containsAnyOf(givenStationNames.toArray(new String[0]));
     }
 
     /**
@@ -87,7 +87,27 @@ public class StationAcceptanceTest {
     @DisplayName("생성된 지하철역을 제거한다")
     @Test
     void deleteStations() {
-//        지하철역_생성()
+        // given
+        String stationName = "강남역";
+        ExtractableResponse<Response> createResponse = 지하철역_생성(stationName);
+        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        List<Long> stationIds = 지하철역_목록조회("id", Long.class);
+
+        assertThat(stationIds).isNotEmpty();
+
+        Long createdStationId = stationIds.get(0);
+
+        // when
+        ExtractableResponse<Response> deleteResponse = RestAssured.given().log().all()
+                                                                  .when().delete("/stations/" + createdStationId)
+                                                                  .then().log().all().extract();
+
+        // then
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        assertThat(지하철역_목록조회("id", Long.class)).doesNotContain(createdStationId);
+
     }
 
 }
