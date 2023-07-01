@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -66,14 +67,14 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역 목록을 조회한다")
     @Test
     void getStationList() {
-        지하철역_생성("삼전역");
-        지하철역_생성("종합운동장역");
+        Set<String> givenStationNames = Set.of("삼전역", "종합운동장역");
+        givenStationNames.forEach(this::지하철역_생성);
 
         // when
         // 지하철역 목록 조회
         // then
         // 2개의 지하철 역을 응답으로 받는다
-        assertThat(지하철역_목록조회_이름반환()).containsAnyOf("삼전역", "종합운동장역");
+        assertThat(지하철역_목록조회_이름반환()).containsAnyOf(givenStationNames.toArray(new String[0]));
     }
 
     /**
@@ -86,7 +87,7 @@ public class StationAcceptanceTest {
     @DisplayName("생성된 지하철역을 제거한다")
     @Test
     void deleteStations() {
-
+//        지하철역_생성()
     }
 
 }
