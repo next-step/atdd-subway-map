@@ -3,6 +3,7 @@ package subway;
 import static org.assertj.core.api.Assertions.assertThat;
 import static subway.StationApiRequest.강남역;
 import static subway.StationApiRequest.양재역;
+import static subway.StationApiRequest.지하철역_삭제_요청;
 import static subway.StationApiRequest.지하철역_생성_요청;
 import static subway.StationApiRequest.지하철역_조회_요청;
 
@@ -42,11 +43,24 @@ public class StationAcceptanceTest {
         ExtractableResponse<Response> response = 지하철역_생성_요청(강남역);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        지하철역_생성됨(response, 강남역);
 
         // then
-        List<String> stationNames = 지하철역_조회_요청().jsonPath().getList("name", String.class);
-        assertThat(stationNames).containsAnyOf(강남역);
+        지하철역_조회됨(지하철역_조회_요청(), 강남역);
+    }
+
+    private void 지하철역_생성됨(ExtractableResponse<Response> response, String stationName) {
+        String name = response.jsonPath().getString("name");
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(name).isEqualTo(stationName);
+    }
+
+    private void 지하철역_조회됨(ExtractableResponse<Response> response, String ... stationNames) {
+        List<String> names = response.jsonPath().getList("name", String.class);
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(names).containsAnyOf(stationNames);
     }
 
     /**
@@ -66,8 +80,7 @@ public class StationAcceptanceTest {
         ExtractableResponse<Response> response = 지하철역_조회_요청();
 
         // then
-        List<String> stationNames = response.jsonPath().getList("name", String.class);
-        assertThat(stationNames).containsAnyOf(강남역, 양재역);
+        지하철역_조회됨(response, 강남역, 양재역);
     }
 
     /**
@@ -76,5 +89,23 @@ public class StationAcceptanceTest {
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
     // TODO: 지하철역 제거 인수 테스트 메서드 생성
+    @DisplayName("지하철역을 제거한다.")
+    @Test
+    void deleteStation() {
+        // given
+        long id = 지하철역_생성_요청(강남역).jsonPath().getLong("id");
 
+        // when
+        ExtractableResponse<Response> response = 지하철역_삭제_요청(id);
+
+        // then
+        지하철역_제거됨(response, 강남역);
+    }
+
+    private void 지하철역_제거됨(ExtractableResponse<Response> response, String ... stationNames) {
+        List<String> names = 지하철역_조회_요청().jsonPath().getList("name", String.class);
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertThat(names).doesNotContain(stationNames);
+    }
 }
