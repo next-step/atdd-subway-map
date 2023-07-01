@@ -1,7 +1,16 @@
 package subway;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import io.restassured.RestAssured;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 
 /**
  * 프로그래밍 요구사항
@@ -41,7 +50,36 @@ public class LineAcceptanceTest {
          * - stations[] : 해당 노선에 속한 상행 지하철역과 하행 지하철역 리스트
          */
 
+        // when
+        Map<String, Object> params = Map.of(
+                "name", "신분당선",
+                "color", "bg-red-600",
+                "upstationId", 1L,
+                "downStationId", 2L,
+                "distance", 10
+        );
 
+        ExtractableResponse<Response> responseOfCreate = RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines")
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(responseOfCreate.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        ExtractableResponse<Response> responseOfRead = RestAssured.given().log().all()
+                .pathParam("id", 1L)  // lineId를 넣어야 한다
+                .when().get("/lines")
+                .then().log().all()
+                .extract();
+
+        long lineId = responseOfRead.jsonPath().getLong("id");
+        List<Station> stations = responseOfRead.jsonPath().getList("stations", Station.class);
+
+        assertThat(lineId).isEqualTo(1L);  // lineId를 넣어야 한다
+        assertThat(stations).hasSize(2);  // 상행과 하행 두개가 있으므로 size는 2여야 한다
     }
 
     /**
