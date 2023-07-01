@@ -27,9 +27,9 @@ public class LineAcceptanceTest {
          * Body
          * - name : 지하철 노선 이름 (ex: "신분당선")
          * - color : 지하철 노선 색상 (ex: "bg-red-600")
-         * - upStationId : 상행 측면의 역 (ex: "상행 A - B - C 하행" 일 때 B의 upStation=A)
-         * - downStationId : 하행 측면의 역 (ex: "상행 A - B - C 하행" 일 때 B의 downStation=C)
-         * - distance: ???
+         * - upStationId : 상행 측면의 역 (ex: "상행 A - B 하행" 일 때 upStation=A)
+         * - downStationId : 하행 측면의 역 (ex: "상행 A - B 하행" 일 때 downStation=B)
+         * - distance: upStation과 downStation간의 거리
          *
          * ## Response
          * 201 Created
@@ -40,6 +40,7 @@ public class LineAcceptanceTest {
          * - color : 생성된 지하철 노선 색상 (요청 명세 참고)
          * - stations[] : 해당 노선에 속한 상행 지하철역과 하행 지하철역 리스트
          */
+
 
     }
 
