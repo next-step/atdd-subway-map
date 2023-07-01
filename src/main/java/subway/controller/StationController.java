@@ -1,7 +1,10 @@
-package subway;
+package subway.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import subway.controller.request.StationRequest;
+import subway.controller.resonse.StationResponse;
+import subway.service.StationService;
 
 import java.net.URI;
 import java.util.List;
@@ -25,9 +28,19 @@ public class StationController {
         return ResponseEntity.ok().body(stationService.findAllStations());
     }
 
+    @GetMapping(value = "/stations/{id}")
+    public ResponseEntity<StationResponse> showStation(@PathVariable Long id) {
+        return ResponseEntity.ok().body(stationService.findStation(id));
+    }
+
     @DeleteMapping("/stations/{id}")
     public ResponseEntity<Void> deleteStation(@PathVariable Long id) {
         stationService.deleteStationById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @ExceptionHandler(value = {RuntimeException.class})
+    public ResponseEntity<Void> notFound(Exception ex) {
+        return ResponseEntity.notFound().build();
     }
 }

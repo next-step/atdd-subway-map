@@ -1,4 +1,4 @@
-package subway;
+package subway.controller.resonse;
 
 public class StationResponse {
     private Long id;
