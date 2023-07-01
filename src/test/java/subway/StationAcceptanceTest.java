@@ -22,11 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationAcceptanceTest {
-	/**
-	 * When 지하철역을 생성하면
-	 * Then 지하철역이 생성된다
-	 * Then 지하철역 목록 조회 시 생성한 역을 찾을 수 있다
-	 */
+
 	@DisplayName("지하철역을 생성한다.")
 	@Test
 	void createStation() {
@@ -54,12 +50,6 @@ public class StationAcceptanceTest {
 		assertThat(stationNames).containsAnyOf("강남역");
 	}
 
-	/**
-	 * Given 2개의 지하철역을 생성하고
-	 * When 지하철역 목록을 조회하면
-	 * Then 2개의 지하철역을 응답 받는다
-	 */
-	// TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
 	@DisplayName("지하철역의 목록 조회")
 	@Test
 	void getStations() {
@@ -80,12 +70,6 @@ public class StationAcceptanceTest {
 		Assertions.assertEquals(2, resultStationNames.size());
 	}
 
-	/**
-	 * Given 지하철역을 생성하고
-	 * When 그 지하철역을 삭제하면
-	 * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
-	 */
-	// TODO: 지하철역 제거 인수 테스트 메서드 생성
 	@DisplayName("지하철역 삭제")
 	@Test
 	void deleteStation() {
@@ -113,22 +97,7 @@ public class StationAcceptanceTest {
 
 	private static List<Long> createStations(List<String> names) {
 		return names.stream()
-			.map(name -> {
-				final Map<String, String> stationCreateRequest = new HashMap<>();
-				stationCreateRequest.put("name", name);
-
-				return stationCreateRequest;
-			}).map(stationCreateRequest -> {
-				final ExtractableResponse<Response> response =
-					RestAssured.given().log().all()
-						.body(stationCreateRequest)
-						.contentType(MediaType.APPLICATION_JSON_VALUE)
-						.post("/stations")
-						.then().log().all()
-						.extract();
-
-				return response.body().jsonPath().getLong("id");
-			})
+			.map(StationAcceptanceTest::createStation)
 			.collect(Collectors.toList());
 	}
 
