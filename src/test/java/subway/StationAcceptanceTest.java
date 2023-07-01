@@ -20,6 +20,10 @@ import io.restassured.response.Response;
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationAcceptanceTest {
+    private static final String CREATE_STATION_PATH = "/stations";
+    private static final String GET_STATION_LIST_PATH = "/stations";
+    private static final String DELETE_STATION_PATH = "/stations";
+
     /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다
@@ -41,7 +45,7 @@ public class StationAcceptanceTest {
 
     private <T> List<T> 지하철역_목록조회(String pathName, Class<T> elementType) {
         return RestAssured.given().log().all()
-                          .when().get("/stations")
+                          .when().get(GET_STATION_LIST_PATH)
                           .then().log().all()
                           .extract().jsonPath().getList(pathName, elementType);
     }
@@ -53,7 +57,7 @@ public class StationAcceptanceTest {
         return RestAssured.given().log().all()
                    .body(params)
                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                   .when().post("/stations")
+                   .when().post(CREATE_STATION_PATH)
                    .then().log().all()
                    .extract();
     }
@@ -100,7 +104,7 @@ public class StationAcceptanceTest {
 
         // when
         ExtractableResponse<Response> deleteResponse = RestAssured.given().log().all()
-                                                                  .when().delete("/stations/" + createdStationId)
+                                                                  .when().delete(DELETE_STATION_PATH + "/" + createdStationId)
                                                                   .then().log().all().extract();
 
         // then
