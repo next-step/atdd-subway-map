@@ -36,14 +36,26 @@ public class StationAcceptanceTest {
                 .extract();
     }
 
+    private static void 지할척역_제거한다(int stationId) {
+        RestAssured.given().log().all()
+                .when().delete("/stations/" + stationId)
+                .then().log().all();
+    }
+
+    private static int 지하철역_아이디(ExtractableResponse<Response> response) {
+        return response.jsonPath().get("id");
+    }
+
     /**
-     * When 지하철역을 생성하면 Then 지하철역이 생성된다 Then 지하철역 목록 조회 시 생성한 역을 찾을 수 있다
+     * When 지하철역을 생성하면
+     * Then 지하철역이 생성된다
+     * Then 지하철역 목록 조회 시 생성한 역을 찾을 수 있다
      */
     @DisplayName("지하철역을 생성한다.")
     @Test
     void createStation() {
         // when
-        ExtractableResponse<Response> response = 지할철역을_생성한다("강남역");
+        var response = 지할철역을_생성한다("강남역");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -54,7 +66,9 @@ public class StationAcceptanceTest {
     }
 
     /**
-     * Given 2개의 지하철역을 생성하고 When 지하철역 목록을 조회하면 Then 2개의 지하철역을 응답 받는다
+     * Given 2개의 지하철역을 생성하고
+     * When 지하철역 목록을 조회하면
+     * Then 2개의 지하철역을 응답 받는다
      */
     @DisplayName("지하철역 목록 조회")
     @Test
@@ -76,5 +90,20 @@ public class StationAcceptanceTest {
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
     // TODO: 지하철역 제거 인수 테스트 메서드 생성
+    @DisplayName("지하철역 제거")
+    @Test
+    public void removeSubwayStation() {
+        // given
+        var response = 지할철역을_생성한다("강남역");
+
+        // when
+        지할척역_제거한다(지하철역_아이디(response));
+
+        // then
+        List<String> stationNames = 지하철역_목록_조회();
+        assertThat(stationNames).doesNotContain("강남역");
+
+    }
+
 
 }
