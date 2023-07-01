@@ -18,6 +18,7 @@ import subway.SchemaInitSql;
 import subway.StationInitSql;
 import subway.SubwayApplication;
 import subway.line.LineCreateRequest;
+import subway.line.LineModifyRequest;
 
 @SchemaInitSql
 @StationInitSql
@@ -61,17 +62,21 @@ public class LineAcceptanceTest {
         Long createdLineId = createResponse.jsonPath().getLong("id");
 
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                   .contentType(MediaType.APPLICATION_JSON_VALUE)
-                   .when().get(getLineRequestUrl(createdLineId))
-                   .then().log().all()
-                   .extract();
+        ExtractableResponse<Response> response = 노선조회(createdLineId);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.jsonPath().getString("name")).isEqualTo("신분당선");
         assertThat(response.jsonPath().getString("color")).isEqualTo("bg-red-600");
         assertThat(response.jsonPath().getList("stations.id")).containsSequence(List.of(1, 2));
+    }
+
+    private ExtractableResponse<Response> 노선조회(Long createdLineId) {
+        return RestAssured.given().log().all()
+                          .contentType(MediaType.APPLICATION_JSON_VALUE)
+                          .when().get(getLineRequestUrl(createdLineId))
+                          .then().log().all()
+                          .extract();
     }
 
     private String getLineRequestUrl(long id) {
@@ -104,16 +109,24 @@ public class LineAcceptanceTest {
         ExtractableResponse<Response> createdResponse = 노선생성("신분당선", "bg-red-600", 1, 2, 10);
         Long createdLineId = createdResponse.jsonPath().getLong("id");
 
+        LineModifyRequest lineModifyRequest = new LineModifyRequest("신분당선_수정", "bg-red-300");
+
         // when
         // 지하철 노선을 수정
         ExtractableResponse<Response> response = RestAssured.given().log().all()
-                   .when().put(getModifyLineRequestUrl(createdLineId))
-                   .then().log().all()
-                   .extract();
+                                                            .body(lineModifyRequest).contentType(MediaType.APPLICATION_JSON_VALUE)
+                                                            .when().put(getModifyLineRequestUrl(createdLineId))
+                                                            .then().log().all()
+                                                            .extract();
 
         // then
         // 해당 지하철 노선 정보는 수정된다
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        ExtractableResponse<Response> getLineResponse = 노선조회(createdLineId);
+
+        assertThat(getLineResponse.jsonPath().getString("name")).isEqualTo("신분당선_수정");
+        assertThat(getLineResponse.jsonPath().getString("color")).isEqualTo("bg-red-300");
 
     }
 

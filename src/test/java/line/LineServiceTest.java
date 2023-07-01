@@ -1,6 +1,7 @@
 package line;
 
-import org.assertj.core.api.Assertions;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -10,6 +11,7 @@ import subway.SchemaInitSql;
 import subway.StationInitSql;
 import subway.SubwayApplication;
 import subway.line.LineCreateRequest;
+import subway.line.LineModifyRequest;
 import subway.line.LineResponse;
 import subway.line.LineService;
 
@@ -23,11 +25,25 @@ public class LineServiceTest {
 
     @Test
     void createLine() {
-        LineCreateRequest lineCreateRequest = new LineCreateRequest("신분당선", "bg-600", 1L, 2L, 10);
+        LineResponse lineResponse = 노선생성("신분당선", "bg-red-600", 1, 2, 10);
 
-        LineResponse lineResponse = lineService.createStation(lineCreateRequest);
+        assertThat(lineResponse.getName()).isEqualTo("신분당선");
+    }
 
-        Assertions.assertThat(lineResponse.getName()).isEqualTo("신분당선");
+    private LineResponse 노선생성(String name, String color, long upStationId, long downStationId, int distance) {
+        return lineService.createStation(new LineCreateRequest(name, color, upStationId, downStationId, distance));
+    }
+
+    @Test
+    void modifyLine() {
+        LineResponse createLineResponse = 노선생성("신분당선", "bg-red-600", 1, 2, 10);
+
+        lineService.modifyLine(createLineResponse.getId(), new LineModifyRequest("테스트", "blue"));
+
+        LineResponse line = lineService.getLine(createLineResponse.getId());
+
+        assertThat(line.getName()).isEqualTo("테스트");
+        assertThat(line.getColor()).isEqualTo("blue");
     }
 
 }
