@@ -3,6 +3,14 @@ package subway;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
+/**
+ * 프로그래밍 요구사항
+ * - 아래의 순서로 기능을 구현한다
+ *   1. 인수 조건을 검증하는 인수 테스트를 작성한다
+ *   2. 인수 테스트를 충족하는 기능을 구현한다
+ * - 인수 테스트의 결과가 서로 영향을 끼치지 않도록 인수테스트를 서로 격리시킨다
+ * - 인수 테스트의 재사용성과 가독성, 그리고 빠른 테스트 의도 파악을 위해 인수 테스트를 리팩터링한다
+ */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {
     /**
