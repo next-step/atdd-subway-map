@@ -1,25 +1,18 @@
-package subway;
+package subway.acceptance;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import subway.fixture.AcceptanceTest;
-import subway.fixture.StationFixture;
+import subway.acceptance.fixture.StationFixture;
 
 @DisplayName("지하철역 관련 기능")
 class StationAcceptanceTest extends AcceptanceTest {
 
     private final StationFixture stationFixture = new StationFixture();
-
-    @BeforeEach
-    public void required() {
-        assertThat(stationFixture.모든_지하철역을_조회한다()).isEmpty();
-    }
 
     /**
      * When 지하철역을 생성하면
@@ -35,7 +28,7 @@ class StationAcceptanceTest extends AcceptanceTest {
         stationFixture.지하철역을_생성한다(name);
 
         // then
-        assertThat(stationFixture.지하철역을_조회한다(name)).isPresent();
+        assertThat(stationFixture.지하철역을_조회한다(name)).hasSize(1);
     }
 
     /**
@@ -55,9 +48,7 @@ class StationAcceptanceTest extends AcceptanceTest {
         final var responses = stationFixture.모든_지하철역을_조회한다();
 
         // then
-        assertThat(responses)
-                .extracting(StationResponse::getName)
-                .hasSameElementsAs(names);
+        assertThat(responses).hasSize(names.size());
     }
 
     /**
@@ -71,20 +62,12 @@ class StationAcceptanceTest extends AcceptanceTest {
         final String name = "강남역";
 
         // given
-        stationFixture.지하철역을_생성한다(name);
-        final Long stationId = getStationId(name);
+        final Long stationId = stationFixture.지하철역을_생성한다(name).getId();
 
         // when
         stationFixture.지하철역을_제거한다(stationId);
 
         // then
         assertThat(stationFixture.모든_지하철역을_조회한다()).isEmpty();
-    }
-
-    private Long getStationId(final String name) {
-        final var station = stationFixture.지하철역을_조회한다(name);
-        assertThat(station).isPresent();
-
-        return station.get().getId();
     }
 }

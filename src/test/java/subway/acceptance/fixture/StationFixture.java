@@ -1,28 +1,32 @@
-package subway.fixture;
+package subway.acceptance.fixture;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ValidatableResponse;
-import subway.StationResponse;
+import subway.service.dto.request.StationRequest;
+import subway.service.dto.response.StationResponse;
 
 public class StationFixture {
 
     public static final String BASE_URL = "/stations";
 
-    public void 지하철역을_생성한다(final String name) {
+    public StationResponse 지하철역을_생성한다(final String name) {
         final var response = RestAssured.given()
-                .body(Map.of("name", name))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(new StationRequest(name))
                 .when().post(BASE_URL)
                 .then();
 
         statusCodeShouldBe(response, HttpStatus.CREATED);
+
+        return response.extract()
+                .jsonPath()
+                .getObject("", StationResponse.class);
     }
 
     public void 지하철역을_생성한다(final List<String> names) {
@@ -41,10 +45,10 @@ public class StationFixture {
                 .getList("", StationResponse.class);
     }
 
-    public Optional<StationResponse> 지하철역을_조회한다(final String name) {
+    public List<StationResponse> 지하철역을_조회한다(final String name) {
         return 모든_지하철역을_조회한다().stream()
                 .filter(it -> it.getName().equals(name))
-                .findAny();
+                .collect(Collectors.toUnmodifiableList());
     }
 
     public void 지하철역을_제거한다(final Long stationId) {
