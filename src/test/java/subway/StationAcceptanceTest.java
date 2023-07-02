@@ -26,28 +26,31 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 생성한다.")
     @Test
     void createStation() {
-        // when
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
+        ExtractableResponse<Response> response = 지하철_역_추가_요청("강남역");
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
+        List<String> stationNames = 지하철_역_이름_조회();
+        assertThat(stationNames).containsAnyOf("강남역");
+    }
+
+    private ExtractableResponse<Response> 지하철_역_추가_요청(String name) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", name);
+
+        return RestAssured.given().log().all()
                         .body(params)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .when().post("/stations")
                         .then().log().all()
                         .extract();
 
-        // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+    }
 
-        // then
-        List<String> stationNames =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
-        assertThat(stationNames).containsAnyOf("강남역");
+    private List<String> 지하철_역_이름_조회() {
+        return RestAssured.given().log().all()
+                .when().get("/stations")
+                .then().log().all()
+                .extract().jsonPath().getList("name", String.class);
     }
 
     /**
