@@ -35,4 +35,11 @@ public class LineService {
         return stationRepository.findById(stationId)
                 .orElseThrow(() -> new IllegalArgumentException("station이 없습니다. stationId=" + stationId));
     }
+
+    public LineResponse findStation(Long id) {
+        Line line = lineRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("line이 없습니다. lineId=" + id));
+
+        return LineResponse.of(line);
+    }
 }
