@@ -17,6 +17,10 @@ public class StationService {
 
     @Transactional
     public StationResponse saveStation(StationRequest stationRequest) {
+        stationRepository.findByName(stationRequest.getName())
+                .ifPresent(station -> {
+                    throw new IllegalArgumentException("이미 존재하는 역 이름입니다.");
+                });
         Station station = stationRepository.save(new Station(stationRequest.getName()));
         return createStationResponse(station);
     }
