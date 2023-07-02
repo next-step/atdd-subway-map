@@ -85,11 +85,12 @@ public class LineAcceptanceTest {
         ExtractableResponse<Response> responseOfCreateLine = LineRequest.지하철_노선을_생성한다("강남역", "양재역", "신분당선");
 
         // when
-        ExtractableResponse<Response> responseOfFindLine = LineRequest.지하철_노선을_조회한다(지하철_노선_Id를_추출한다(responseOfCreateLine));
+        long lineId = 지하철_노선_Id를_추출한다(responseOfCreateLine);
+        ExtractableResponse<Response> responseOfFindLine = LineRequest.지하철_노선을_조회한다(lineId);
 
         // then
         assertThat(responseOfFindLine.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(지하철_노선_Id를_추출한다(responseOfFindLine)).isEqualTo(1L);
+        assertThat(지하철_노선_Id를_추출한다(responseOfFindLine)).isEqualTo(lineId);
     }
 
     /**
