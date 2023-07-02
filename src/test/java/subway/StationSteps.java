@@ -36,4 +36,11 @@ public class StationSteps {
                 .then().log().all()
                 .extract();
     }
+
+    public static ExtractableResponse<Response> 지하철삭제요청(Long id) {
+        return RestAssured.given().log().all()
+                .when().delete("/stations/{id}", id)
+                .then().log().all()
+                .extract();
+    }
 }
