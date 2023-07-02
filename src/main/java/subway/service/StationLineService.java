@@ -45,6 +45,15 @@ public class StationLineService {
                 .collect(Collectors.toList());
     }
 
+    public StationLineResponse findStationLine(Long id) {
+        StationLine stationLine = stationLineRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException(String.format("not found station line : %d", id)));
+        StationResponse upStation = stationService.findStation(stationLine.getUpStationId());
+        StationResponse downStation = stationService.findStation(stationLine.getDownStationId());
+
+        return createStationLineResponse(stationLine, upStation, downStation);
+    }
+
     private StationLineResponse createStationLineResponse(StationLine stationLine, StationResponse upStationResponse, StationResponse downStationResponse) {
         return new StationLineResponse(
                 stationLine.getId(),
