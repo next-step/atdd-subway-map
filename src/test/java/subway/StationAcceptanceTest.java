@@ -4,13 +4,14 @@ import io.restassured.response.ValidatableResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
+import subway.marker.AcceptanceTest;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
-import static subway.AcceptanceTestUtils.*;
+import static subway.utils.AcceptanceTestUtils.*;
 
 @DisplayName("지하철역 관련 기능")
 @AcceptanceTest
