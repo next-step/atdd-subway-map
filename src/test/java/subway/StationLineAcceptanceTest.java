@@ -146,21 +146,61 @@ class StationLineAcceptanceTest {
                 .body("stations[0].id", equalTo(upStationId))
                 .body("stations[0].name", equalTo(upStationName))
                 .body("stations[1].id", equalTo(downStationId))
-                .body("stations[1].name", equalTo(downStationName));
+                .body("stations[1].name", equalTo(downStationName))
         ;
     }
 
     /**
      * 지하철노선 수정
-     * Given 지하철 노선을 생성하고
+     * Given 지하철 노선을 생성하고
      * When 생성한 지하철 노선을 수정하면
      * Then 해당 지하철 노선 정보는 수정된다
      */
+    @Test
+    void 지하철_노선을_수정한다() {
+        //given
+        String lineName = "신분당선";
+        String color = "bg-red-600";
 
+        int upStationId = 1;
+        String upStationName = "강남역";
+        createStation(upStationName);
+
+        int downStationId = 2;
+        String downStationName = "언주역";
+        createStation(downStationName);
+
+        int distance = 10;
+
+        String newLineName = "바뀐 분당선";
+        String newColor = "bg-green-600";
+
+        ValidatableResponse stationLineCratedResponse = createStationLines(lineName, color, upStationId, downStationId, distance);
+
+        //when
+        ValidatableResponse modifiedStationLineResponse = modifyStationLine(newLineName, newColor, getLocation(stationLineCratedResponse));
+
+        //then
+        verifyResponseStatus(modifiedStationLineResponse, HttpStatus.OK);
+
+        ValidatableResponse foundStationLineResponse = getStationLine(getLocation(stationLineCratedResponse));
+        verifyResponseStatus(foundStationLineResponse, HttpStatus.OK);
+
+        foundStationLineResponse
+                .body("name", equalTo(newLineName))
+                .body("color", equalTo(newColor))
+                .body("stations", hasSize(2))
+                .body("stations[0].id", equalTo(upStationId))
+                .body("stations[0].name", equalTo(upStationName))
+                .body("stations[1].id", equalTo(downStationId))
+                .body("stations[1].name", equalTo(downStationName))
+        ;
+
+    }
 
     /**
      * 지하철노선 삭제
-     * Given 지하철 노선을 생성하고
+     * Given 지하철 노선을 생성하고
      * When 생성한 지하철 노선을 삭제하면
      * Then 해당 지하철 노선 정보는 삭제된다
      */
@@ -210,6 +250,19 @@ class StationLineAcceptanceTest {
                 .given().log().all()
                 .when()
                 .get(url)
+                .then().log().all();
+    }
+
+    private ValidatableResponse modifyStationLine(String lineName, String color, String url) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", lineName);
+        params.put("color", color);
+
+        return RestAssured
+                .given().log().all()
+                .body(AcceptanceTestUtils.convertToJsonString(params)).contentType(ContentType.JSON)
+                .when()
+                .put(url)
                 .then().log().all();
     }
 }
