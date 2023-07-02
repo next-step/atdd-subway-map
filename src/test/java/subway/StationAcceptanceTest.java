@@ -11,7 +11,6 @@ import org.springframework.http.HttpStatus;
 import javax.transaction.Transactional;
 import java.util.List;
 
-import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
