@@ -39,8 +39,4 @@ public class StationController {
         return ResponseEntity.noContent().build();
     }
 
-    @ExceptionHandler(value = {RuntimeException.class})
-    public ResponseEntity<Void> notFound(Exception ex) {
-        return ResponseEntity.notFound().build();
-    }
 }

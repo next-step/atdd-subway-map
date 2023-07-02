@@ -61,6 +61,12 @@ public class StationLineService {
         stationLine.modify(modifyCommand.getName(), modifyCommand.getColor());
     }
 
+    @Transactional
+    public void deleteStationLineById(Long id) {
+        StationLine stationLine = requireGetById(id);
+        stationLineRepository.delete(stationLine);
+    }
+
     private StationLine requireGetById(Long id) {
         return stationLineRepository.findById(id)
                 .orElseThrow(() -> new StationLineNotFoundException(id));
