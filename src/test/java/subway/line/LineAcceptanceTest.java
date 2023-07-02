@@ -31,20 +31,7 @@ public class LineAcceptanceTest {
         지정된_이름의_지하철역을_생성한다("양재역");
 
         // when
-        Map<String, Object> params = Map.of(
-                "name", "신분당선",
-                "color", "bg-red-600",
-                "upStationId", 1L,  //TODO 고정된 id값이 아닌, 저장된 역의 id값을 사용해야 함
-                "downStationId", 2L,
-                "distance", 10
-        );
-
-        ExtractableResponse<Response> responseOfCreate = RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> responseOfCreate = 지하철_노선을_생성한다();
 
         // then
         assertThat(responseOfCreate.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -75,6 +62,23 @@ public class LineAcceptanceTest {
                 .then().log().all();
     }
 
+    private ExtractableResponse<Response> 지하철_노선을_생성한다() {
+        Map<String, Object> params = Map.of(
+                "name", "신분당선",
+                "color", "bg-red-600",
+                "upStationId", 1L,  //TODO 고정된 id값이 아닌, 저장된 역의 id값을 사용해야 함
+                "downStationId", 2L,
+                "distance", 10
+        );
+
+        return RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines")
+                .then().log().all()
+                .extract();
+    }
+
     /**
      * Given: 지하철 노선을 생성하고
      * When: 생성한 지하철 노선을 조회하면
@@ -100,7 +104,21 @@ public class LineAcceptanceTest {
          *   - name : 지하철역 이름
          */
 
+        // given
+        지정된_이름의_지하철역을_생성한다("강남역");
+        지정된_이름의_지하철역을_생성한다("양재역");
+        지하철_노선을_생성한다();
 
+        // when
+        ExtractableResponse<Response> result = RestAssured.given().log().all()
+                .pathParam("id", 1L)
+                .when().get("/lines/{id}")
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(result.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(result.jsonPath().getLong("id")).isEqualTo(1L);
     }
 
     /**
