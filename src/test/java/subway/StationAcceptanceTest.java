@@ -74,9 +74,10 @@ public class StationAcceptanceTest {
         assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // when
+        String location = createResponse.response().getHeaders().get("location").getValue();
         ExtractableResponse<Response> deleteResponse = RestAssured
                 .when()
-                .delete("/stations/1")
+                .delete(location)
                 .then().log().all()
                 .extract();
 
