@@ -35,6 +35,27 @@ public class AcceptanceUtils {
 			.jsonPath().getLong("id");
 	}
 
+	public static void updateStationLine(Long lineId, String name, String color) {
+		final Map<String, String> stationLineUpdateRequest = new HashMap<>();
+
+		stationLineUpdateRequest.put("name", name);
+		stationLineUpdateRequest.put("color", color);
+
+		RestAssured.given().log().all()
+			.body(stationLineUpdateRequest)
+			.contentType(MediaType.APPLICATION_JSON_VALUE)
+			.when().put("/lines/" + lineId)
+			.then().log().all()
+			.statusCode(HttpStatus.OK.value());
+	}
+
+	public static void deleteStationLine(Long lineId) {
+		RestAssured.given().log().all()
+			.when().delete("/lines/" + lineId)
+			.then().log().all()
+			.statusCode(HttpStatus.OK.value());
+	}
+
 	public static JsonPath getStationLine(Long stationLineId) {
 		return RestAssured.given().log().all()
 			.when().get("/lines/" + stationLineId)

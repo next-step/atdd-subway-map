@@ -53,4 +53,9 @@ public class StationLine {
 		this.downStation = downStation;
 		this.distance = distance;
 	}
+
+	public void update(String name, String color) {
+		this.name = name;
+		this.color = color;
+	}
 }

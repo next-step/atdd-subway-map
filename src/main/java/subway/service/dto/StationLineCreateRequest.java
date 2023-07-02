@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 import lombok.Data;
 
 @Data
-public class StationLineRequest {
+public class StationLineCreateRequest {
 	private String name;
 	private String color;
 	private Long upStationId;

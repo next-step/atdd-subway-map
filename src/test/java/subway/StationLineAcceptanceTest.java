@@ -21,12 +21,12 @@ public class StationLineAcceptanceTest {
 		final List<Long> stationIds = AcceptanceUtils.createStations(List.of("수유역", "강변역"));
 
 		//when
-		final Long stationLineId = AcceptanceUtils.createStationLine("4호선", "blue", stationIds.get(0), stationIds.get(1), BigDecimal.TEN);
+		final Long lineId = AcceptanceUtils.createStationLine("4호선", "blue", stationIds.get(0), stationIds.get(1), BigDecimal.TEN);
 
 		//then
 		final List<Long> lineIds = AcceptanceUtils.getStationLines().getList("id", Long.class);
 
-		Assertions.assertTrue(lineIds.contains(stationLineId));
+		Assertions.assertTrue(lineIds.contains(lineId));
 	}
 
 	/**
@@ -57,30 +57,49 @@ public class StationLineAcceptanceTest {
 	@DisplayName("지하철 노선 조회한다")
 	@Test
 	void getStationLine() {
+		//given
+		final List<Long> stationIds = AcceptanceUtils.createStations(List.of("수유역", "강변역"));
+		final Long lineId = AcceptanceUtils.createStationLine("4호선", "blue", stationIds.get(0), stationIds.get(1), BigDecimal.TEN);
 
+		//when
+		final JsonPath jsonPath = AcceptanceUtils.getStationLine(lineId);
+
+		//then
+		Assertions.assertEquals("4호선", jsonPath.getString("name"));
+		Assertions.assertEquals("blue", jsonPath.getString("color"));
+		Assertions.assertEquals("수유역", jsonPath.getString("stations[0].name"));
+		Assertions.assertEquals("강변역", jsonPath.getString("stations[1].name"));
 	}
 
-	/**
-	 * 지하철 노선 수정
-	 * Given 지하철 노선도를 생성한다
-	 * When 생성한 지하철 노선도의 색과 이름 정보를 수정요청한다
-	 * Then 지하철 노선도 조회하면 수정된 색과 이름 정보를 응답한다
-	 **/
 	@DisplayName("지하철 노선 수정")
 	@Test
 	void updateStationLine() {
+		//given
+		final List<Long> stationIds = AcceptanceUtils.createStations(List.of("수유역", "강변역"));
+		final Long lineId = AcceptanceUtils.createStationLine("4호선", "blue", stationIds.get(0), stationIds.get(1), BigDecimal.TEN);
 
+		//when
+		AcceptanceUtils.updateStationLine(lineId, "9호선", "brown");
+
+		//then
+		final JsonPath jsonPath = AcceptanceUtils.getStationLine(lineId);
+		Assertions.assertEquals("9호선", jsonPath.getString("name"));
+		Assertions.assertEquals("brown", jsonPath.getString("color"));
 	}
 
-	/**
-	 * 지하철 노선 삭제
-	 * Given 지하철 노선도를 생성한다
-	 * When 생성된 지하철 노선도를 삭제요청한다
-	 * Then 지하철 노선도 목록 요청에서 해당 지하철 노선도를 찾을수 없다
-	 **/
 	@DisplayName("지하철 노선 삭제")
 	@Test
 	void deleteStationLine() {
+		//given
+		final List<Long> stationIds = AcceptanceUtils.createStations(List.of("수유역", "강변역"));
+		final Long lineId = AcceptanceUtils.createStationLine("4호선", "blue", stationIds.get(0), stationIds.get(1), BigDecimal.TEN);
 
+		//when
+		AcceptanceUtils.deleteStationLine(lineId);
+
+		//then
+		final List<Long> lineIds = AcceptanceUtils.getStationLines().getList("id", Long.class);
+
+		Assertions.assertFalse(lineIds.contains(lineId));
 	}
 }
