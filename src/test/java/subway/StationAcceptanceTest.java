@@ -1,7 +1,5 @@
 package subway;
 
-import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,8 +10,7 @@ import java.util.Map;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
-import static subway.AcceptanceTestUtils.getLocation;
-import static subway.AcceptanceTestUtils.verifyResponseStatus;
+import static subway.AcceptanceTestUtils.*;
 
 @DisplayName("지하철역 관련 기능")
 @AcceptanceTest
@@ -33,7 +30,7 @@ class StationAcceptanceTest {
         // then
         verifyResponseStatus(stationCreatedResponse, HttpStatus.CREATED);
 
-        ValidatableResponse stationFoundResponse = getStations(getLocation(stationCreatedResponse));
+        ValidatableResponse stationFoundResponse = getResource(getLocation(stationCreatedResponse));
         verifyResponseStatus(stationFoundResponse, HttpStatus.OK);
 
         stationFoundResponse
@@ -50,7 +47,7 @@ class StationAcceptanceTest {
         createStation(secondStationName);
 
         // when
-        ValidatableResponse foundStation = getStations(RESOURCE_URL);
+        ValidatableResponse foundStation = getResource(RESOURCE_URL);
 
         // then
         verifyResponseStatus(foundStation, HttpStatus.OK);
@@ -70,12 +67,12 @@ class StationAcceptanceTest {
         String createdResourceLocation = getLocation(stationCreatedResponse);
 
         // when
-        ValidatableResponse stationDeletedResponse = deleteStation(createdResourceLocation);
+        ValidatableResponse stationDeletedResponse = deleteResource(createdResourceLocation);
 
         // then
         verifyResponseStatus(stationDeletedResponse, HttpStatus.NO_CONTENT);
 
-        ValidatableResponse foundStation = getStations(createdResourceLocation);
+        ValidatableResponse foundStation = getResource(createdResourceLocation);
         verifyResponseStatus(foundStation, HttpStatus.NOT_FOUND);
     }
 
@@ -83,29 +80,6 @@ class StationAcceptanceTest {
         Map<String, String> params = new HashMap<>();
         params.put("name", stationName);
 
-        return RestAssured
-                .given().log().all()
-                .body(AcceptanceTestUtils.convertToJsonString(params)).contentType(ContentType.JSON)
-                .when()
-                .post(RESOURCE_URL)
-                .then().log().all();
+        return createResource(RESOURCE_URL, params);
     }
-
-    private ValidatableResponse getStations(String url) {
-        return RestAssured
-                .given().log().all()
-                .when()
-                .get(url)
-                .then().log().all();
-    }
-
-    private ValidatableResponse deleteStation(String url) {
-        return RestAssured
-                .given()
-                .given().log().all()
-                .when()
-                .delete(url)
-                .then().log().all();
-    }
-
 }

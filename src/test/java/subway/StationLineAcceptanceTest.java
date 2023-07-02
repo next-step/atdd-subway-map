@@ -1,7 +1,5 @@
 package subway;
 
-import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -51,7 +49,7 @@ class StationLineAcceptanceTest {
                 .body("stations[1].id", equalTo(downStationId))
                 .body("stations[1].name", equalTo(downStationName));
 
-        ValidatableResponse foundStationLineResponse = getStationLine(LINES_RESOURCE_URL);
+        ValidatableResponse foundStationLineResponse = getResource(LINES_RESOURCE_URL);
         verifyResponseStatus(foundStationLineResponse, HttpStatus.OK);
 
         foundStationLineResponse
@@ -96,7 +94,7 @@ class StationLineAcceptanceTest {
         createStationLines(secondLineName, secondColor, secondUpStationId, secondDownStationId, distance);
 
         //when
-        ValidatableResponse foundStationLineResponse = getStationLine(LINES_RESOURCE_URL);
+        ValidatableResponse foundStationLineResponse = getResource(LINES_RESOURCE_URL);
 
         //then
         verifyResponseStatus(foundStationLineResponse, HttpStatus.OK);
@@ -139,7 +137,7 @@ class StationLineAcceptanceTest {
         ValidatableResponse stationLineCratedResponse = createStationLines(lineName, color, upStationId, downStationId, distance);
 
         //when
-        ValidatableResponse foundStationLineResponse = getStationLine(getLocation(stationLineCratedResponse));
+        ValidatableResponse foundStationLineResponse = getResource(getLocation(stationLineCratedResponse));
 
         //then
         verifyResponseStatus(foundStationLineResponse, HttpStatus.OK);
@@ -182,7 +180,7 @@ class StationLineAcceptanceTest {
         //then
         verifyResponseStatus(modifiedStationLineResponse, HttpStatus.OK);
 
-        ValidatableResponse foundStationLineResponse = getStationLine(getLocation(stationLineCratedResponse));
+        ValidatableResponse foundStationLineResponse = getResource(getLocation(stationLineCratedResponse));
         verifyResponseStatus(foundStationLineResponse, HttpStatus.OK);
 
         foundStationLineResponse
@@ -215,21 +213,13 @@ class StationLineAcceptanceTest {
         ValidatableResponse stationLineCratedResponse = createStationLines(lineName, color, upStationId, downStationId, distance);
 
         //when
-        ValidatableResponse deletedStationLineResponse = deleteStationLine(getLocation(stationLineCratedResponse));
+        ValidatableResponse deletedStationLineResponse = deleteResource(getLocation(stationLineCratedResponse));
 
         //then
         verifyResponseStatus(deletedStationLineResponse, HttpStatus.NO_CONTENT);
 
-        ValidatableResponse foundStationLineResponse = getStationLine(getLocation(stationLineCratedResponse));
+        ValidatableResponse foundStationLineResponse = getResource(getLocation(stationLineCratedResponse));
         verifyResponseStatus(foundStationLineResponse, HttpStatus.NOT_FOUND);
-    }
-
-    private ValidatableResponse deleteStationLine(String url) {
-        return RestAssured
-                .given().log().all()
-                .when()
-                .delete(url)
-                .then().log().all();
     }
 
     private ValidatableResponse createStationLines(String lineName, String color, long upStationId, long downStationId, long distance) {
@@ -240,33 +230,14 @@ class StationLineAcceptanceTest {
         params.put("downStationId", downStationId);
         params.put("distance", distance);
 
-        return RestAssured
-                .given().log().all()
-                .body(convertToJsonString(params)).contentType(ContentType.JSON)
-                .when()
-                .post(LINES_RESOURCE_URL)
-                .then().log().all();
+        return createResource(LINES_RESOURCE_URL, params);
     }
 
     private ValidatableResponse createStation(String stationName) {
         Map<String, String> params = new HashMap<>();
         params.put("name", stationName);
 
-        return RestAssured
-                .given().log().all()
-                .body(AcceptanceTestUtils.convertToJsonString(params)).contentType(ContentType.JSON)
-                .when()
-                .post(STATIONS_RESOURCE_URL)
-                .then().log().all();
-    }
-
-
-    private ValidatableResponse getStationLine(String url) {
-        return RestAssured
-                .given().log().all()
-                .when()
-                .get(url)
-                .then().log().all();
+        return createResource(STATIONS_RESOURCE_URL, params);
     }
 
     private ValidatableResponse modifyStationLine(String lineName, String color, String url) {
@@ -274,11 +245,6 @@ class StationLineAcceptanceTest {
         params.put("name", lineName);
         params.put("color", color);
 
-        return RestAssured
-                .given().log().all()
-                .body(AcceptanceTestUtils.convertToJsonString(params)).contentType(ContentType.JSON)
-                .when()
-                .put(url)
-                .then().log().all();
+        return modifyResource(url, params);
     }
 }
