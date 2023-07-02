@@ -86,49 +86,12 @@ public class LineAcceptanceTest {
     }
 
     /**
-     * Given: 지하철 노선을 생성하고
-     * When: 생성한 지하철 노선을 조회하면
-     * Then: 생성한 지하철 노선의 정보를 응답받을 수 있다
-     */
-    @Test
-    void findLine() {
-        // given
-        지정된_이름의_지하철역을_생성한다("강남역");
-        지정된_이름의_지하철역을_생성한다("양재역");
-        지정된_이름의_지하철_노선을_생성한다("신분당선", 1L, 2L);
-
-        // when
-        ExtractableResponse<Response> result = 지하철_노선을_조회한다(1L);
-
-        // then
-        assertThat(result.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(result.jsonPath().getLong("id")).isEqualTo(1L);
-    }
-
-    /**
      * Given: 2개의 지하철 노선을 생성하고
      * When: 지하철 노선 목록을 조회하면
      * Then: 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다
      */
     @Test
     void findAllLines() {
-        /* # API 명세
-         *
-         * ## Request
-         * GET /lines
-         * Accept: application/json
-         *
-         * ## Response
-         * status: 200 OK
-         * Content-Type: application/json
-         * Body: 아래의 내용이 List 형태로 들어감
-         * - id : 생성된 지하철 노선의 id값 (ex: 1)
-         * - name : 생성된 지하철 노선의 이름 ("신분당선")
-         * - color : 생성된 지하철 노선 색상 ("bg-red-600")
-         * - stations[] : 해당 노선에 속한 상행 지하철역과 하행 지하철역 리스트
-         *   - id : 지하철역 id
-         *   - name : 지하철역 이름
-         */
         // given
         지정된_이름의_지하철역을_생성한다("강남역");
         지정된_이름의_지하철역을_생성한다("양재역");
@@ -151,6 +114,36 @@ public class LineAcceptanceTest {
 
     /**
      * Given: 지하철 노선을 생성하고
+     * When: 생성한 지하철 노선을 조회하면
+     * Then: 생성한 지하철 노선의 정보를 응답받을 수 있다
+     */
+    @Test
+    void findLine() {
+        // given
+        지정된_이름의_지하철역을_생성한다("강남역");
+        지정된_이름의_지하철역을_생성한다("양재역");
+        지정된_이름의_지하철_노선을_생성한다("신분당선", 1L, 2L);
+
+        // when
+        ExtractableResponse<Response> result = 지하철_노선을_조회한다(1L);
+
+        // then
+        assertThat(result.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(result.jsonPath().getLong("id")).isEqualTo(1L);
+    }
+
+    /**
+     * Given: 지하철 노선을 생성하고
+     * When: 생성한 지하철 노선을 수정하면
+     * Then: 해당 지하철 노선 정보는 수정된다
+     */
+    @Test
+    void updateLine() {
+
+    }
+
+    /**
+     * Given: 지하철 노선을 생성하고
      * When: 생성한 지하철 노선을 삭제하면
      * Then: 해당 지하철 노선 정보는 삭제된다
      */
@@ -159,6 +152,8 @@ public class LineAcceptanceTest {
         /* # API 명세
          *
          * ## Request
+         * GET /lines
+         * Accept: application/json
          *
          * ## Response
          */
