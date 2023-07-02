@@ -1,7 +1,8 @@
-package subway;
+package subway.ui;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import subway.service.StationService;
 
 import java.net.URI;
 import java.util.List;

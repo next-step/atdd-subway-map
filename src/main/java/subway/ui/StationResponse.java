@@ -1,4 +1,4 @@
-package subway;
+package subway.ui;
 
 public class StationResponse {
     private Long id;
