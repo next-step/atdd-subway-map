@@ -76,8 +76,7 @@ public class LineAcceptanceTest {
         assertThat(신분당선_생성_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         //when
-        ExtractableResponse<Response> 신분당선_조회_응답 =
-                getSubwayLine(신분당선_생성_응답.jsonPath().getObject("id", Long.class));
+        ExtractableResponse<Response> 신분당선_조회_응답 = getSubwayLine(getIdFromResponse(신분당선_생성_응답));
 
         //then
         assertThat(신분당선_조회_응답.jsonPath().getObject("name", String.class)).isEqualTo(신분당선);
