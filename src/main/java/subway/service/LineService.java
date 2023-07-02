@@ -4,10 +4,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.domain.Line;
 import subway.domain.LineRepository;
-import subway.domain.StationRepository;
 import subway.ui.LineCreateRequest;
 import subway.ui.LineResponse;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,5 +32,10 @@ public class LineService {
     public List<LineResponse> showLines() {
         List<Line> lines = lineRepository.findAll();
         return lines.stream().map(lineMapper::toLineResponse).collect(Collectors.toList());
+    }
+
+    public LineResponse showLine(Long lineId) {
+        return lineRepository.findById(lineId).map(lineMapper::toLineResponse)
+                .orElseThrow(EntityNotFoundException::new);
     }
 }
