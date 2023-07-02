@@ -74,11 +74,8 @@ public class StationAcceptanceTest {
     void deleteStationById() {
         //given
         String 가양역 = "가양역";
-        StationRequest.지하철역을_생성한다(가양역);
-
-        ExtractableResponse<Response> responseOfShowStations = StationRequest.지하철역_목록을_조회한다();
-        List<Long> stationIds = 지하철역_목록_Id를_추출한다(responseOfShowStations);
-        Long stationId = stationIds.get(0);
+        ExtractableResponse<Response> responseOfCreateStation = StationRequest.지하철역을_생성한다(가양역);
+        long stationId = responseOfCreateStation.jsonPath().getLong("id");
 
         //when
         ExtractableResponse<Response> responseOfDeleteStation = StationRequest.지하철역을_삭제한다(stationId);
@@ -89,7 +86,7 @@ public class StationAcceptanceTest {
         ExtractableResponse<Response> responseOfShowStationsAfterDelete = StationRequest.지하철역_목록을_조회한다();
         List<Long> stationIdsAfterDelete = 지하철역_목록_Id를_추출한다(responseOfShowStationsAfterDelete);
 
-        assertThat(stationIdsAfterDelete).hasSize(0);
+        assertThat(stationIdsAfterDelete).doesNotContain(stationId);
     }
 
     private List<Long> 지하철역_목록_Id를_추출한다(ExtractableResponse<Response> responseOfShowStations) {
