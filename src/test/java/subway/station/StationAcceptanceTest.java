@@ -32,7 +32,8 @@ public class StationAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames = 지하철역_목록_이름을_조회한다();
+        ExtractableResponse<Response> responseOfShowStations = 지하철역_목록을_조회한다();
+        List<String> stationNames = responseOfShowStations.jsonPath().getList("name", String.class);
 
         assertThat(stationNames).containsAnyOf(강남역);
     }
@@ -64,23 +65,20 @@ public class StationAcceptanceTest {
         지정된_이름의_지하철역을_생성한다(여의도역);
 
         //when
-        List<String> stationNames = 지하철역_목록_이름을_조회한다();  //TODO 지하철역 이름은 2개의 지하철역을 응답받는다에 대한 수단이므로, Then절에서 이루어지는 게 좋아보임
+        ExtractableResponse<Response> response = 지하철역_목록을_조회한다();
 
         //then
+        List<String> stationNames = response.jsonPath().getList("name", String.class);
+
         assertThat(stationNames).hasSize(2);
         assertThat(stationNames).contains(가양역, 여의도역);
     }
 
-    /**
-     * TODO 아래 두 가지 역할을 수행하는 메서드를 추출 해보는 것은 어떨까?
-     *  1. GET /stations
-     *  2. 응답으로 부터 name 추출
-     */
-    private List<String> 지하철역_목록_이름을_조회한다() {
+    private ExtractableResponse<Response> 지하철역_목록을_조회한다() {
         return RestAssured.given().log().all()
                 .when().get("/stations")  //TODO /stations 가 다른 path로 변경된다면?
                 .then().log().all()
-                .extract().jsonPath().getList("name", String.class);  //TODO 이름 뿐만 아니라, 다른 내용들도 조회하고 싶다면?
+                .extract();
     }
 
     private void 지정된_이름의_지하철역을_생성한다(String stationName) {
@@ -105,25 +103,20 @@ public class StationAcceptanceTest {
         String 가양역 = "가양역";
         지정된_이름의_지하철역을_생성한다(가양역);
 
-        List<Long> stationIds = 지하철역_목록_Id를_조회한다();
+        ExtractableResponse<Response> responseOfShowStations = 지하철역_목록을_조회한다();
+        List<Long> stationIds = responseOfShowStations.jsonPath().getList("id", Long.class);
         Long stationId = stationIds.get(0);
 
         //when
-        ExtractableResponse<Response> response = 지하철역을_삭제한다(stationId);
+        ExtractableResponse<Response> responseOfDeleteStation = 지하철역을_삭제한다(stationId);
 
         //then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertThat(responseOfDeleteStation.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
-        List<Long> stationIdsAfterDelete = 지하철역_목록_Id를_조회한다();
+        ExtractableResponse<Response> responseOfShowStationsAfterDelete = 지하철역_목록을_조회한다();
+        List<Long> stationIdsAfterDelete = responseOfShowStationsAfterDelete.jsonPath().getList("id", Long.class);
 
         assertThat(stationIdsAfterDelete).hasSize(0);
-    }
-
-    private List<Long> 지하철역_목록_Id를_조회한다() {
-        return RestAssured.given().log().all()
-                .when().get("/stations")
-                .then().log().all()
-                .extract().jsonPath().getList("id", Long.class);
     }
 
     private ExtractableResponse<Response> 지하철역을_삭제한다(Long stationId) {
