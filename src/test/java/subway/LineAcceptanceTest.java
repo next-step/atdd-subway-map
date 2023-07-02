@@ -11,6 +11,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import subway.line.LineResponse;
 
 import javax.transaction.Transactional;
@@ -23,6 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @Transactional
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class LineAcceptanceTest {
 
     /**
@@ -93,14 +96,15 @@ public class LineAcceptanceTest {
         LineResponse line = TestHelper.createLine("신분당선");
 
         // when
-        ExtractableResponse<Response> response = RestAssured
-                .given()
-                    .body(Map.of("name", "1호선", "color", "bg-red-600"))
-                .when()
-                    .put("/lines/{id}", line.getId())
-                .then()
-                    .statusCode(HttpStatus.OK.value())
-                    .extract();
+        RestAssured
+            .given()
+                .body(Map.of("name", "1호선", "color", "bg-red-600"))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when()
+                .put("/lines/{id}", line.getId())
+            .then()
+                .statusCode(HttpStatus.OK.value())
+                .extract();
 
         // then
         LineResponse lineResponse = TestHelper.selectLine(line.getId());

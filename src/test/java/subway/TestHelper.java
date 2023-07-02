@@ -55,7 +55,7 @@ public class TestHelper {
         ExtractableResponse<Response> response = RestAssured
                 .given()
                     .log().all()
-                    .body(Map.of("name", name))
+                    .body(Map.of("name", name, "color", "bg-red-600"))
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                     .post("/lines")
