@@ -112,21 +112,12 @@ public class StationAcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        Map<String, String> parameter = new HashMap<>();
-        parameter.put("name", "봉천역");
-
-        String responseId = RestAssured
-                .given().log().all()
-                    .body(parameter)
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().log().all()
-                    .post(STATION_API_URL)
-                .then().log().all()
-                    .extract()
-                        .jsonPath().getString("id");
+        ExtractableResponse<Response> createStationApiResponse = 지하철_노션에_지하철_역_요청("봉천역");
+        String responseId = createStationApiResponse
+                .jsonPath().getString("id");
 
         // when
-        ExtractableResponse<Response> response = RestAssured
+        ExtractableResponse<Response> deleteStationApiResponse = RestAssured
                 .given().log().all()
                 .when().log().all()
                     .delete(STATION_API_URL + "/" + responseId)
@@ -134,6 +125,6 @@ public class StationAcceptanceTest {
                     .extract();
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertThat(deleteStationApiResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 }
