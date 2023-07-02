@@ -31,8 +31,8 @@ public class LineService {
         return LineResponse.of(line);
     }
 
-    private Station getStation(Long lineRequest) {
-        return stationRepository.findById(lineRequest)
-                .orElseThrow(() -> new IllegalArgumentException("station이 없습니다. stationId=" + lineRequest));
+    private Station getStation(Long stationId) {
+        return stationRepository.findById(stationId)
+                .orElseThrow(() -> new IllegalArgumentException("station이 없습니다. stationId=" + stationId));
     }
 }
