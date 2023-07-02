@@ -83,6 +83,39 @@ public class LineAcceptanceTest {
         assertThat(신분당선_조회_응답.jsonPath().getObject("name", String.class)).isEqualTo(신분당선);
     }
 
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 수정하면
+     * Then 해당 지하철 노선 정보는 수정된다
+     */
+    @DisplayName("지하철노선 수정")
+    @Test
+    void updateLine() {
+        //given
+        final String 신분당선 = "신분당선";
+        ExtractableResponse<Response> 신분당선_생성_응답 = 지하철_노선_생성(신분당선);
+        assertThat(신분당선_생성_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        //when
+        final String 다른분당선 = "다른분당선";
+        LineUpdateRequest request = new LineUpdateRequest(다른분당선, "bg-red-600");
+        ExtractableResponse<Response> 다른분당선_수정_응답 = updateSubwayLine(getIdFromResponse(신분당선_생성_응답), request);
+
+        //then
+        assertThat(다른분당선_수정_응답.jsonPath().getObject("name", String.class)).isEqualTo(다른분당선);
+    }
+
+    private ExtractableResponse<Response> updateSubwayLine(Long lineId, LineUpdateRequest request) {
+        return RestAssured
+                .given().log().all()
+                .body(request)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .pathParam("id", lineId)
+                .when().put("/lines/{id}")
+                .then().log().all()
+                .extract();
+    }
+
     private ExtractableResponse<Response> getSubwayLine(Long lineId) {
         return RestAssured
                 .given().log().all()
