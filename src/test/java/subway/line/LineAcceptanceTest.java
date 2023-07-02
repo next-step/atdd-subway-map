@@ -1,4 +1,4 @@
-package subway;
+package subway.line;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class SubwayLineAcceptanceTest {
+public class LineAcceptanceTest {
 
     private final String SUBWAY_LINE_API_URL = "/subway-lines";
 
