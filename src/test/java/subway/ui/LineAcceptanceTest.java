@@ -6,8 +6,11 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -38,20 +41,22 @@ public class LineAcceptanceTest {
         ExtractableResponse<Response> response = generateSubwayLine(request);
 
         //then
-        assertThat(getSubwayLines(getIdFromResponse(response))).isEqualTo(신분당선);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        //then
+        assertThat(getSubwayLines()).containsExactly(신분당선);
     }
 
     private Long getIdFromResponse(ExtractableResponse<Response> response) {
         return response.jsonPath().getObject("id", Long.class);
     }
 
-    private String getSubwayLines(Long lineId) {
+    private List<String> getSubwayLines() {
         return RestAssured
                 .given().log().all()
-                .pathParam("id", lineId)
-                .when().get("/lines/{id}")
+                .when().get("/lines")
                 .then().log().all()
-                .extract().jsonPath().getObject("name", String.class);
+                .extract().jsonPath().getList("name");
     }
 
     private ExtractableResponse<Response> generateSubwayLine(LineCreateRequest request) {
