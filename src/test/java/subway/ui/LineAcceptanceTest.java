@@ -77,17 +77,17 @@ public class LineAcceptanceTest {
 
         //when
         ExtractableResponse<Response> 신분당선_조회_응답 =
-                getSubwayStation(신분당선_생성_응답.jsonPath().getObject("id", Long.class));
+                getSubwayLine(신분당선_생성_응답.jsonPath().getObject("id", Long.class));
 
         //then
         assertThat(신분당선_조회_응답.jsonPath().getObject("name", String.class)).isEqualTo(신분당선);
     }
 
-    private ExtractableResponse<Response> getSubwayStation(Long lineId) {
+    private ExtractableResponse<Response> getSubwayLine(Long lineId) {
         return RestAssured
                 .given().log().all()
                 .pathParam("id", lineId)
-                .when().get("/stations/{id}")
+                .when().get("/lines/{id}")
                 .then().log().all()
                 .extract();
     }
