@@ -192,10 +192,27 @@ public class LineAcceptanceTest {
         /* # API 명세
          *
          * ## Request
-         * GET /lines
-         * Accept: application/json
+         * DELETE /lines
          *
          * ## Response
+         * status: 204 NoContent
          */
+        // given
+        지정된_이름의_지하철역을_생성한다("강남역");
+        지정된_이름의_지하철역을_생성한다("양재역");
+        지정된_이름의_지하철_노선을_생성한다("신분당선", 1L, 2L);
+
+        // when
+        ExtractableResponse<Response> responseOfDelete = RestAssured.given().log().all()
+                .pathParam("id", 1L)
+                .when().delete("/lines/{id}")
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(responseOfDelete.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        ExtractableResponse<Response> responseOfShowLine = 지하철_노선을_조회한다(1L);
+        assertThat(responseOfShowLine.statusCode()).isEqualTo(HttpStatus.OK.value());  //TODO 없는 지하철 노선을 조회했으므로 예외가 발생할 것. 하지만 내가 ExceptionHandler를 따로 구현해주지 않았기 때문에 정해진 형식으로 내려오지 않는 문제가 있다. 어떻게 할지 고민 !
     }
 }
