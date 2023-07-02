@@ -1,7 +1,7 @@
 package subway.controller.request;
 
 
-public class StationLineRequest {
+public class StationLineCreateRequest {
 
     private String lineName;
     private String color;

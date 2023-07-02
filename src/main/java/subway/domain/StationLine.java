@@ -62,4 +62,9 @@ public class StationLine {
     public Long getDistance() {
         return distance;
     }
+
+    public void modify(String lineName, String color) {
+        this.name = lineName;
+        this.color = color;
+    }
 }

@@ -2,7 +2,8 @@ package subway.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import subway.controller.request.StationLineRequest;
+import subway.controller.request.StationLineCreateRequest;
+import subway.controller.request.StationLineModifyRequest;
 import subway.controller.resonse.StationLineResponse;
 import subway.controller.resonse.StationResponse;
 import subway.domain.StationLine;
@@ -24,8 +25,8 @@ public class StationLineService {
     }
 
     @Transactional
-    public StationLineResponse saveStationLine(StationLineRequest stationLineRequest) {
-        StationLine stationLine = StationLine.create(stationLineRequest.getLineName(), stationLineRequest.getColor(), stationLineRequest.getUpStationId(), stationLineRequest.getDownStationId(), stationLineRequest.getDistance());
+    public StationLineResponse saveStationLine(StationLineCreateRequest stationLineCreateRequest) {
+        StationLine stationLine = StationLine.create(stationLineCreateRequest.getLineName(), stationLineCreateRequest.getColor(), stationLineCreateRequest.getUpStationId(), stationLineCreateRequest.getDownStationId(), stationLineCreateRequest.getDistance());
 
         StationLine satedStationLine = stationLineRepository.save(stationLine);
         StationResponse upStation = stationService.findStation(stationLine.getUpStationId());
@@ -46,12 +47,22 @@ public class StationLineService {
     }
 
     public StationLineResponse findStationLine(Long id) {
-        StationLine stationLine = stationLineRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException(String.format("not found station line : %d", id)));
+        StationLine stationLine = requireGetById(id);
         StationResponse upStation = stationService.findStation(stationLine.getUpStationId());
         StationResponse downStation = stationService.findStation(stationLine.getDownStationId());
 
         return createStationLineResponse(stationLine, upStation, downStation);
+    }
+
+    @Transactional
+    public void modifyStationLine(Long id, StationLineModifyRequest stationLineModifyRequest) {
+        StationLine stationLine = requireGetById(id);
+        stationLine.modify(stationLineModifyRequest.getName(), stationLineModifyRequest.getColor());
+    }
+
+    private StationLine requireGetById(Long id) {
+        return stationLineRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException(String.format("not found station line : %d", id)));
     }
 
     private StationLineResponse createStationLineResponse(StationLine stationLine, StationResponse upStationResponse, StationResponse downStationResponse) {
