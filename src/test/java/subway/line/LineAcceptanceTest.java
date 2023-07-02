@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import subway.line.dto.LineResponse;
 import subway.line.dto.StationOnLineResponse;
 
 /**
@@ -145,7 +146,7 @@ public class LineAcceptanceTest {
 
         // then
         assertThat(result.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(result.jsonPath().getList("", StationOnLineResponse.class)).hasSize(2);
+        assertThat(result.jsonPath().getList("", LineResponse.class)).hasSize(2);
     }
 
     /**
