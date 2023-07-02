@@ -45,6 +45,12 @@ public class StationAcceptanceTest {
                 .extract();
     }
 
+    private static ExtractableResponse<Response> 지하철노선을_조회한다(int id) {
+        return RestAssured.given().log().all()
+                .when().get("/stations/" + id)
+                .then().log().all()
+                .extract();
+    }
 
     private static List<String> 지하철역_목록의_이름을_파싱한다(ExtractableResponse<Response> 지하철역_목록_조회_결과) {
         return 지하철역_목록_조회_결과.jsonPath().getList("name", String.class);
@@ -58,6 +64,9 @@ public class StationAcceptanceTest {
         return 지하철역_목록_조회_결과.jsonPath().getList("id", Integer.class);
     }
 
+    private static String 지하철역의_이름을_파싱한다(ExtractableResponse<Response> 지하철역_조회_결과) {
+        return 지하철역_조회_결과.jsonPath().getString("name");
+    }
 
     /**
      * When 지하철역을 생성하면
@@ -97,6 +106,25 @@ public class StationAcceptanceTest {
         // then
         assertThat(지하철역_목록_이름).contains("강남역", "이수역");
     }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 조회하면
+     * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
+     */
+    @DisplayName("지하철노선 조회")
+    @Test
+    void searchSubwayStation() {
+        // given
+        var 강남역 = 지하철역을_생성한다("강남역");
+
+        // when
+        var 조회된_강남역 = 지하철노선을_조회한다(지하철역의_아이디를_파싱한다(강남역));
+
+        // Then
+        assertThat(지하철역의_이름을_파싱한다(조회된_강남역)).isEqualTo("강남역");
+    }
+
 
     /**
      * Given 지하철역을 생성하고
