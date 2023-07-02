@@ -19,29 +19,15 @@ import static subway.station.StationAcceptanceTest.*;
 public class LineAcceptanceTest extends AcceptanceTest {
 
     private static final String SINBUNDANG_LINE_NAME = "신분당선";
+    private static final String BUNDANG_LINE_NAME = "신분당선";
 
     @Test
     void 지하철_노선_생성() {
         // given
-        ExtractableResponse<Response> upStationCreateResponse = 지하철역_생성_요청(GANGNAM_STATION_NAME);
-        Assertions.assertThat(upStationCreateResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        String upStationId = upStationCreateResponse.response().getHeaders().get("location").getValue().split("/stations/")[1];
-
-        ExtractableResponse<Response> downStationCreateResponse = 지하철역_생성_요청(SEOCHO_STATION_NAME);
-        Assertions.assertThat(downStationCreateResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        String downStationId = downStationCreateResponse.response().getHeaders().get("location").getValue().split("/stations/")[1];
-
-        LineRequest request = new LineRequest(SINBUNDANG_LINE_NAME, "bg-red-600", Long.valueOf(upStationId), Long.valueOf(downStationId), 10L);
+        LineRequest request = 지하철_노선_요청_객체_생성(SINBUNDANG_LINE_NAME, "bg-red-600", GANGNAM_STATION_NAME, SEOCHO_STATION_NAME, 10L);
 
         // when
-        ExtractableResponse<Response> createResponse = RestAssured
-                .given().log().all()
-                .body(request)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요쳥(request);
 
         // then
         assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -57,5 +43,55 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         assertThat(lineNames.size()).isEqualTo(1);
         assertThat(lineNames.get(0)).isEqualTo(SINBUNDANG_LINE_NAME);
+    }
+
+    @Test
+    void 지하철_노선_목록_조회() {
+        // given
+        LineRequest request1 = 지하철_노선_요청_객체_생성(SINBUNDANG_LINE_NAME, "bg-red-600", GANGNAM_STATION_NAME, SEOCHO_STATION_NAME, 10L);
+        LineRequest request2 = 지하철_노선_요청_객체_생성(BUNDANG_LINE_NAME, "bg-green-600", GANGNAM_STATION_NAME, SEOCHO_STATION_NAME, 10L);
+
+        ExtractableResponse<Response> createResponse1 = 지하철_노선_생성_요쳥(request1);
+        assertThat(createResponse1.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        ExtractableResponse<Response> createResponse2 = 지하철_노선_생성_요쳥(request2);
+        assertThat(createResponse2.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        // when
+        ExtractableResponse<Response> showResponse = RestAssured
+                .given().log().all()
+                .when()
+                .get("/lines")
+                .then().log().all()
+                .extract();
+        List<String> lineNames = showResponse.jsonPath().getList("name", String.class);
+
+        // then
+        assertThat(lineNames.size()).isEqualTo(2);
+        assertThat(lineNames.get(0)).isEqualTo(SINBUNDANG_LINE_NAME);
+        assertThat(lineNames.get(1)).isEqualTo(BUNDANG_LINE_NAME);
+    }
+
+    private LineRequest 지하철_노선_요청_객체_생성(String lineName, String color, String upStationName, String downStationName, Long distance) {
+        ExtractableResponse<Response> upStationCreateResponse = 지하철역_생성_요청(upStationName);
+        Assertions.assertThat(upStationCreateResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        String upStationId = upStationCreateResponse.response().getHeaders().get("location").getValue().split("/stations/")[1];
+
+        ExtractableResponse<Response> downStationCreateResponse = 지하철역_생성_요청(downStationName);
+        Assertions.assertThat(downStationCreateResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        String downStationId = downStationCreateResponse.response().getHeaders().get("location").getValue().split("/stations/")[1];
+
+        return new LineRequest(lineName, color, Long.valueOf(upStationId), Long.valueOf(downStationId), distance);
+    }
+
+    private ExtractableResponse<Response> 지하철_노선_생성_요쳥(LineRequest request) {
+        return RestAssured
+                .given().log().all()
+                .body(request)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines")
+                .then().log().all()
+                .extract();
     }
 }
