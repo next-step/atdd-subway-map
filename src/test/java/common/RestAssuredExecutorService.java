@@ -4,7 +4,8 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.MediaType;
-import subway.StationRequest;
+
+import java.util.Map;
 
 public class RestAssuredExecutorService {
 
@@ -17,7 +18,7 @@ public class RestAssuredExecutorService {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> postForResponse(String path, StationRequest parameter) {
+    public static ExtractableResponse<Response> postForResponseByBody(String path, Object parameter) {
         return RestAssured
                 .given().log().all()
                 .body(parameter)
@@ -28,4 +29,13 @@ public class RestAssuredExecutorService {
                 .extract();
     }
 
+    public static ExtractableResponse<Response> deleteForResponse(String path, Map<String, Object> params) {
+        return RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .delete(path, params)
+                .then().log().all()
+                .extract();
+    }
 }
