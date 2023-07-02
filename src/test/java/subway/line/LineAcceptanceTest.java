@@ -33,7 +33,7 @@ public class LineAcceptanceTest {
         지정된_이름의_지하철역을_생성한다("양재역");
 
         // when
-        ExtractableResponse<Response> responseOfCreate = 지하철_노선을_생성한다();
+        ExtractableResponse<Response> responseOfCreate = 지정된_이름의_지하철_노선을_생성한다("신분당선", 1L, 2L);
 
         // then
         assertThat(responseOfCreate.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -59,12 +59,12 @@ public class LineAcceptanceTest {
                 .when().post("/stations")
                 .then().log().all();
     }
-    private ExtractableResponse<Response> 지하철_노선을_생성한다() {
+    private ExtractableResponse<Response> 지정된_이름의_지하철_노선을_생성한다(String lineName, Long upStationId, Long downStationId) {
         Map<String, Object> params = Map.of(
-                "name", "신분당선",
+                "name", lineName,
                 "color", "bg-red-600",
-                "upStationId", 1L,  //TODO 고정된 id값이 아닌, 저장된 역의 id값을 사용해야 함
-                "downStationId", 2L,
+                "upStationId", upStationId,  //TODO 고정된 id값이 아닌, 저장된 역의 id값을 사용해야 함
+                "downStationId", downStationId,
                 "distance", 10
         );
 
@@ -94,7 +94,7 @@ public class LineAcceptanceTest {
         // given
         지정된_이름의_지하철역을_생성한다("강남역");
         지정된_이름의_지하철역을_생성한다("양재역");
-        지하철_노선을_생성한다();
+        지정된_이름의_지하철_노선을_생성한다("신분당선", 1L, 2L);
 
         // when
         ExtractableResponse<Response> result = 지하철_노선을_조회한다(1L);
@@ -114,9 +114,38 @@ public class LineAcceptanceTest {
         /* # API 명세
          *
          * ## Request
+         * GET /lines
+         * Accept: application/json
          *
          * ## Response
+         * status: 200 OK
+         * Content-Type: application/json
+         * Body: 아래의 내용이 List 형태로 들어감
+         * - id : 생성된 지하철 노선의 id값 (ex: 1)
+         * - name : 생성된 지하철 노선의 이름 ("신분당선")
+         * - color : 생성된 지하철 노선 색상 ("bg-red-600")
+         * - stations[] : 해당 노선에 속한 상행 지하철역과 하행 지하철역 리스트
+         *   - id : 지하철역 id
+         *   - name : 지하철역 이름
          */
+        // given
+        지정된_이름의_지하철역을_생성한다("강남역");
+        지정된_이름의_지하철역을_생성한다("양재역");
+        지정된_이름의_지하철_노선을_생성한다("신분당선", 1L, 2L);
+
+        지정된_이름의_지하철역을_생성한다("가양역");
+        지정된_이름의_지하철역을_생성한다("여의도역");
+        지정된_이름의_지하철_노선을_생성한다("9호선", 3L, 4L);
+
+        // when
+        ExtractableResponse<Response> result = RestAssured.given().log().all()
+                .when().get("/lines")
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(result.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(result.jsonPath().getList("", StationOnLineResponse.class)).hasSize(2);
     }
 
     /**
