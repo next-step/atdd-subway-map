@@ -1,5 +1,8 @@
 package subway.station;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class StationResponse {
     private Long id;
     private String name;
@@ -15,5 +18,15 @@ public class StationResponse {
 
     public String getName() {
         return name;
+    }
+
+    public static List<StationResponse> of(List<Station> stations) {
+        return stations.stream()
+                .map(StationResponse::of)
+                .collect(Collectors.toList());
+    }
+
+    public static StationResponse of(Station station) {
+        return new StationResponse(station.getId(), station.getName());
     }
 }

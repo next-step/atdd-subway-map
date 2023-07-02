@@ -1,0 +1,48 @@
+package subway.line;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import subway.station.StationResponse;
+
+public class LineResponse {
+    private Long id;
+    private String name;
+    private String color;
+    private List<StationResponse> stations;
+
+    public LineResponse(Long id, String name, String color, List<StationResponse> stations) {
+        this.id = id;
+        this.name = name;
+        this.color = color;
+        this.stations = stations;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public List<StationResponse> getStations() {
+        return stations;
+    }
+
+    public static List<LineResponse> of(List<Line> lines) {
+        return lines.stream()
+                .map(LineResponse::of)
+                .collect(Collectors.toList());
+    }
+
+    public static LineResponse of(Line line) {
+        StationResponse upStation = StationResponse.of(line.getUpStation());
+        StationResponse downStation = StationResponse.of(line.getDownStation());
+        return new LineResponse(line.getId(), line.getName(), line.getColor(), List.of(upStation, downStation));
+    }
+}

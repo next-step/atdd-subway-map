@@ -18,8 +18,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철역 관련 기능")
 public class StationAcceptanceTest extends AcceptanceTest {
 
-    private static final String GANGNAM_STATION_NAME = "강남역";
-    private static final String SEOCHO_STATION_NAME = "서초역";
+    public static final String GANGNAM_STATION_NAME = "강남역";
+    public static final String SEOCHO_STATION_NAME = "서초역";
 
     @Test
     void 지하철역_생성() {
@@ -79,7 +79,7 @@ public class StationAcceptanceTest extends AcceptanceTest {
         assertThat(stationResponse.size()).isEqualTo(0);
     }
 
-    private ExtractableResponse<Response> 지하철역_생성_요청(String stationName) {
+    public static ExtractableResponse<Response> 지하철역_생성_요청(String stationName) {
         Map<String, String> params = new HashMap<>();
         params.put("name", stationName);
 
@@ -93,7 +93,7 @@ public class StationAcceptanceTest extends AcceptanceTest {
                 .extract();
     }
 
-    private ExtractableResponse<Response> 지하철역_목록_조회_요청() {
+    public static ExtractableResponse<Response> 지하철역_목록_조회_요청() {
         return RestAssured
                 .given().log().all()
                 .when()
