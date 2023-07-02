@@ -60,4 +60,10 @@ public class LineService {
         Line line = getLine(id);
         line.update(lineUpdateRequest.getName(), lineUpdateRequest.getColor());
     }
+
+    @Transactional
+    public void deleteLine(Long id) {
+        Line line = getLine(id);
+        lineRepository.delete(line);
+    }
 }
