@@ -22,23 +22,6 @@ class StationLineAcceptanceTest {
     private static final String STATIONS_RESOURCE_URL = "/stations";
     private static final String LINES_RESOURCE_URL = "/lines";
 
-    /**
-     * 지하철노선 조회
-     * Given 지하철 노선을 생성하고
-     * When 생성한 지하철 노선을 조회하면
-     * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
-     */
-
-    /**
-     * 지하철노선 생성
-     * When 지하철 노선을 생성하면
-     * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
-     * <p>
-     * 노선 생성 시 상행종점역과 하행종점역을 등록합니다.
-     * 따라서 이번 단계에서는 지하철 노선에 역을 맵핑하는 기능은 아직 없지만
-     * 노선 조회시 포함된 역 목록이 함께 응답됩니다.
-     */
-
     @Test
     void 지하철노선을_생성한다() {
         //given
@@ -65,7 +48,71 @@ class StationLineAcceptanceTest {
         ValidatableResponse foundLineResponse = getStationLine(LINES_RESOURCE_URL);
         verifyResponseStatus(foundLineResponse, HttpStatus.OK);
 
-        verifyFindAllStationLineResponseBody(lineName, color, upStationId, upStationName, downStationId, downStationName, foundLineResponse);
+        foundLineResponse
+                .body("", hasSize(1))
+                .body("[0].name", equalTo(lineName))
+                .body("[0].color", equalTo(color))
+                .body("[0].stations", hasSize(2))
+                .body("[0].stations[0].id", equalTo(upStationId))
+                .body("[0].stations[0].name", equalTo(upStationName))
+                .body("[0].stations[1].id", equalTo(downStationId))
+                .body("[0].stations[1].name", equalTo(downStationName));
+    }
+
+    @Test
+    void 지하철노선_목록을_조회한다() {
+        //given
+        String firstLineName = "신분당선";
+        String firstColor = "bg-red-600";
+
+        int firstUpStationId = 1;
+        String firstUpStationName = "강남역";
+        createStation(firstUpStationName);
+
+        int firstDownStationId = 2;
+        String firstDownStationName = "언주역";
+        createStation(firstDownStationName);
+
+        String secondLineName = "수인분당선";
+        String secondColor = "bg-green-600";
+
+        int secondUpStationId = 3;
+        String secondUpStationName = "수원역";
+        createStation(secondUpStationName);
+
+        int secondDownStationId = 4;
+        String secondDownStationName = "분당역";
+        createStation(secondDownStationName);
+
+        int distance = 10;
+
+        createStationLines(firstLineName, firstColor, firstUpStationId, firstDownStationId, distance);
+        createStationLines(secondLineName, secondColor, secondUpStationId, secondDownStationId, distance);
+
+        //when
+        ValidatableResponse foundStationLineResponse = getStationLine(LINES_RESOURCE_URL);
+
+
+        //then
+        verifyResponseStatus(foundStationLineResponse, HttpStatus.OK);
+
+        foundStationLineResponse
+                .body("", hasSize(2))
+                .body("[0].name", equalTo(firstLineName))
+                .body("[0].color", equalTo(firstColor))
+                .body("[0].stations", hasSize(2))
+                .body("[0].stations[0].id", equalTo(firstUpStationId))
+                .body("[0].stations[0].name", equalTo(firstUpStationName))
+                .body("[0].stations[1].id", equalTo(firstDownStationId))
+                .body("[0].stations[1].name", equalTo(firstDownStationName))
+                .body("[1].name", equalTo(secondLineName))
+                .body("[1].color", equalTo(secondColor))
+                .body("[1].stations", hasSize(2))
+                .body("[1].stations[0].id", equalTo(secondUpStationId))
+                .body("[1].stations[0].name", equalTo(secondUpStationName))
+                .body("[1].stations[1].id", equalTo(secondDownStationId))
+                .body("[1].stations[1].name", equalTo(secondDownStationName))
+        ;
     }
 
     /**
@@ -81,13 +128,6 @@ class StationLineAcceptanceTest {
      * When 생성한 지하철 노선을 삭제하면
      * Then 해당 지하철 노선 정보는 삭제된다
      */
-    /**
-     * 지하철노선 목록 조회
-     * Given 2개의 지하철 노선을 생성하고
-     * When 지하철 노선 목록을 조회하면
-     * Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
-     */
-
 
     private ValidatableResponse verifyCreatedStationLineResponseBody(String lineName, String color, int upStationId, String upStationName, int downStationId, String downStationName, ValidatableResponse stationLineCratedResponse) {
         return stationLineCratedResponse
@@ -98,18 +138,6 @@ class StationLineAcceptanceTest {
                 .body("stations[0].name", equalTo(upStationName))
                 .body("stations[1].id", equalTo(downStationId))
                 .body("stations[1].name", equalTo(downStationName));
-    }
-
-    private ValidatableResponse verifyFindAllStationLineResponseBody(String lineName, String color, int upStationId, String upStationName, int downStationId, String downStationName, ValidatableResponse foundLineResponse) {
-        return foundLineResponse
-                .body("", hasSize(1))
-                .body("[0].name", equalTo(lineName))
-                .body("[0].color", equalTo(color))
-                .body("[0].stations", hasSize(2))
-                .body("[0].stations[0].id", equalTo(upStationId))
-                .body("[0].stations[0].name", equalTo(upStationName))
-                .body("[0].stations[1].id", equalTo(downStationId))
-                .body("[0].stations[1].name", equalTo(downStationName));
     }
 
     private ValidatableResponse createStationLines(String lineName, String color, long upStationId, long downStationId, long distance) {
