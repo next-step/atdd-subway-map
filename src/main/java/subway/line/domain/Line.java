@@ -1,29 +1,43 @@
 package subway.line.domain;
 
+import java.util.List;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
+import subway.station.domain.Station;
 
 @Entity
 public class Line {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String name;
+
     private String color;
-    private Long upStationId;
-    private Long downStationId;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "up_sation_id")
+    private Station upStation;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "down_sation_id")
+    private Station downStation;
+
     private Integer distance;
 
     protected Line() {
     }
 
-    public Line(String name, String color, Long upStationId, Long downStationId, Integer distance) {
+    public Line(String name, String color, Station upStation, Station downStation, Integer distance) {
         this.name = name;
         this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
+        this.upStation = upStation;
+        this.downStation = downStation;
         this.distance = distance;
     }
 
@@ -39,12 +53,8 @@ public class Line {
         return color;
     }
 
-    public Long getUpStationId() {
-        return upStationId;
-    }
-
-    public Long getDownStationId() {
-        return downStationId;
+    public List<Station> getStations() {
+        return List.of(upStation, downStation);
     }
 
     public Integer getDistance() {

@@ -1,13 +1,12 @@
 package subway.line.application;
 
-import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.line.domain.Line;
 import subway.line.domain.LineRepository;
 import subway.line.dto.LineRequest;
 import subway.line.dto.LineResponse;
-import subway.line.dto.StationOnLineResponse;
+import subway.station.domain.Station;
 import subway.station.domain.StationRepository;
 
 @Transactional(readOnly = true)
@@ -23,17 +22,17 @@ public class LineService {
 
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
-        Line line = new Line(lineRequest.getName(), lineRequest.getColor(), lineRequest.getUpStationId(), lineRequest.getDownStationId(), lineRequest.getDistance());
+        Station upStation = getStation(lineRequest.getUpStationId());
+        Station downStation = getStation(lineRequest.getDownStationId());
+
+        Line line = new Line(lineRequest.getName(), lineRequest.getColor(), upStation, downStation, lineRequest.getDistance());
         lineRepository.save(line);
 
-        StationOnLineResponse upStation = stationRepository.findById(lineRequest.getUpStationId())
-                .map(station -> new StationOnLineResponse(station.getId(), station.getName()))
-                .orElseThrow(() -> new IllegalArgumentException("station이 없습니다. stationId=" + lineRequest.getUpStationId()));
+        return LineResponse.of(line);
+    }
 
-        StationOnLineResponse downStation = stationRepository.findById(lineRequest.getDownStationId())
-                .map(station -> new StationOnLineResponse(station.getId(), station.getName()))
-                .orElseThrow(() -> new IllegalArgumentException("station이 없습니다. stationId=" + lineRequest.getDownStationId()));
-
-        return new LineResponse(line.getId(), line.getName(), line.getColor(), List.of(upStation, downStation));
+    private Station getStation(Long lineRequest) {
+        return stationRepository.findById(lineRequest)
+                .orElseThrow(() -> new IllegalArgumentException("station이 없습니다. stationId=" + lineRequest));
     }
 }

@@ -1,8 +1,14 @@
 package subway.line.dto;
 
+import subway.station.domain.Station;
+
 public class StationOnLineResponse {
     private final Long id;
     private final String name;
+
+    public static StationOnLineResponse of(Station station) {
+        return new StationOnLineResponse(station.getId(), station.getName());
+    }
 
     public StationOnLineResponse(Long id, String name) {
         this.id = id;
