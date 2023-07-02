@@ -6,8 +6,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.line.domain.Line;
 import subway.line.domain.LineRepository;
-import subway.line.dto.LineRequest;
+import subway.line.dto.LineCreateRequest;
 import subway.line.dto.LineResponse;
+import subway.line.dto.LineUpdateRequest;
 import subway.station.domain.Station;
 import subway.station.domain.StationRepository;
 
@@ -23,11 +24,11 @@ public class LineService {
     }
 
     @Transactional
-    public LineResponse saveLine(LineRequest lineRequest) {
-        Station upStation = getStation(lineRequest.getUpStationId());
-        Station downStation = getStation(lineRequest.getDownStationId());
+    public LineResponse saveLine(LineCreateRequest lineCreateRequest) {
+        Station upStation = getStation(lineCreateRequest.getUpStationId());
+        Station downStation = getStation(lineCreateRequest.getDownStationId());
 
-        Line line = new Line(lineRequest.getName(), lineRequest.getColor(), upStation, downStation, lineRequest.getDistance());
+        Line line = new Line(lineCreateRequest.getName(), lineCreateRequest.getColor(), upStation, downStation, lineCreateRequest.getDistance());
         lineRepository.save(line);
 
         return LineResponse.of(line);
@@ -44,10 +45,19 @@ public class LineService {
                 .collect(Collectors.toList());
     }
 
-    public LineResponse findStation(Long id) {
-        Line line = lineRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("line이 없습니다. lineId=" + id));
-
+    public LineResponse findLine(Long id) {
+        Line line = getLine(id);
         return LineResponse.of(line);
+    }
+
+    private Line getLine(Long id) {
+        return lineRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("line이 없습니다. lineId=" + id));
+    }
+
+    @Transactional
+    public void updateLine(Long id, LineUpdateRequest lineUpdateRequest) {
+        Line line = getLine(id);
+        line.update(lineUpdateRequest.getName(), lineUpdateRequest.getColor());
     }
 }

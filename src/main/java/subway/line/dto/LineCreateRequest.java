@@ -1,6 +1,6 @@
 package subway.line.dto;
 
-public class LineRequest {
+public class LineCreateRequest {
     private String name;
     private String color;
     private Long upStationId;

@@ -157,17 +157,7 @@ public class LineAcceptanceTest {
         지정된_이름의_지하철_노선을_생성한다("신분당선", 1L, 2L);
 
         // when
-        Map<String, String> params = Map.of(
-                "name", "구분당선",
-                "color", "bg-sky-500"
-        );
-
-        ExtractableResponse<Response> responseOfUpdate = RestAssured.given().log().all()
-                .body(params)
-                .pathParam("id", 1L)
-                .when().put("/lines/{id}")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> responseOfUpdate = 지하철_노선을_수정한다();
 
         // then
         assertThat(responseOfUpdate.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -175,6 +165,21 @@ public class LineAcceptanceTest {
         ExtractableResponse<Response> responseOfShowLine = 지하철_노선을_조회한다(1L);
         assertThat(responseOfShowLine.jsonPath().getString("name")).isEqualTo("구분당선");
         assertThat(responseOfShowLine.jsonPath().getString("color")).isEqualTo("bg-sky-500");
+    }
+
+    private ExtractableResponse<Response> 지하철_노선을_수정한다() {
+        Map<String, String> params = Map.of(
+                "name", "구분당선",
+                "color", "bg-sky-500"
+        );
+
+        return RestAssured.given().log().all()
+                .body(params)
+                .pathParam("id", 1L)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().put("/lines/{id}")
+                .then().log().all()
+                .extract();
     }
 
     /**

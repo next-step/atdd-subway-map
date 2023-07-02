@@ -60,4 +60,10 @@ public class Line {
     public Integer getDistance() {
         return distance;
     }
+
+    //TODO null이 들어오면 어떻게 할지 고민 -> null일 경우 예외를 던질까?
+    public void update(String name, String color) {
+        this.name = name;
+        this.color = color;
+    }
 }
