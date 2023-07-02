@@ -26,9 +26,9 @@ class StationAcceptanceTest {
     @Test
     void buildStation() {
         // when
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-        ExtractableResponse<Response> stationBuiltResponse = RestAssuredExecutorService.postForResponseByBody("/stations", params);
+        Map<String, String> request = new HashMap<>();
+        request.put("name", "강남역");
+        ExtractableResponse<Response> stationBuiltResponse = RestAssuredExecutorService.postForResponseByBody("/stations", request);
 
         // then
         assertThat(stationBuiltResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -36,7 +36,7 @@ class StationAcceptanceTest {
         // then
         ExtractableResponse<Response> stationsResponse = RestAssuredExecutorService.getForResponse("/stations");
         List<String> stationNames = stationsResponse.jsonPath().getList("name", String.class);
-        assertThat(stationNames).containsAnyOf(params.get("name"));
+        assertThat(stationNames).containsAnyOf(request.get("name"));
     }
 
     /**
@@ -48,10 +48,12 @@ class StationAcceptanceTest {
     @Test
     void getStatins() {
         // Given
-        StationRequest firstRequest = new StationRequest("사당역");
+        Map<String, String> firstRequest = new HashMap<>();
+        firstRequest.put("name", "사당역");
         RestAssuredExecutorService.postForResponseByBody("/stations", firstRequest);
 
-        StationRequest secondRequest = new StationRequest("동작역");
+        Map<String, String> secondRequest = new HashMap<>();
+        secondRequest.put("name", "동작역");
         RestAssuredExecutorService.postForResponseByBody("/stations", secondRequest);
 
         // When
@@ -73,7 +75,8 @@ class StationAcceptanceTest {
     @Test
     void closeStatin() {
         // Given
-        StationRequest request = new StationRequest("사당역");
+        Map<String, String> request = new HashMap<>();
+        request.put("name", "사당역");
         ExtractableResponse<Response> stationBuiltResponse =
                 RestAssuredExecutorService.postForResponseByBody("/stations", request);
 

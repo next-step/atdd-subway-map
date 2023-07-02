@@ -7,9 +7,4 @@ public class StationRequest {
     public String getName() {
         return name;
     }
-
-    public StationRequest() {}
-    public StationRequest(String name) {
-        this.name = name;
-    }
 }
