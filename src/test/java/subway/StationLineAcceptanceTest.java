@@ -42,7 +42,14 @@ class StationLineAcceptanceTest {
 
         //then
         verifyResponseStatus(stationLineCratedResponse, HttpStatus.CREATED);
-        verifyCreatedStationLineResponseBody(lineName, color, upStationId, upStationName, downStationId, downStationName, stationLineCratedResponse);
+        stationLineCratedResponse
+                .body("name", equalTo(lineName))
+                .body("color", equalTo(color))
+                .body("stations", hasSize(2))
+                .body("stations[0].id", equalTo(upStationId))
+                .body("stations[0].name", equalTo(upStationName))
+                .body("stations[1].id", equalTo(downStationId))
+                .body("stations[1].name", equalTo(downStationName));
 
         ValidatableResponse foundStationLineResponse = getStationLine(LINES_RESOURCE_URL);
         verifyResponseStatus(foundStationLineResponse, HttpStatus.OK);
@@ -91,7 +98,6 @@ class StationLineAcceptanceTest {
         //when
         ValidatableResponse foundStationLineResponse = getStationLine(LINES_RESOURCE_URL);
 
-
         //then
         verifyResponseStatus(foundStationLineResponse, HttpStatus.OK);
 
@@ -135,7 +141,6 @@ class StationLineAcceptanceTest {
         //when
         ValidatableResponse foundStationLineResponse = getStationLine(getLocation(stationLineCratedResponse));
 
-
         //then
         verifyResponseStatus(foundStationLineResponse, HttpStatus.OK);
 
@@ -150,12 +155,6 @@ class StationLineAcceptanceTest {
         ;
     }
 
-    /**
-     * 지하철노선 수정
-     * Given 지하철 노선을 생성하고
-     * When 생성한 지하철 노선을 수정하면
-     * Then 해당 지하철 노선 정보는 수정된다
-     */
     @Test
     void 지하철_노선을_수정한다() {
         //given
@@ -195,25 +194,42 @@ class StationLineAcceptanceTest {
                 .body("stations[1].id", equalTo(downStationId))
                 .body("stations[1].name", equalTo(downStationName))
         ;
-
     }
 
-    /**
-     * 지하철노선 삭제
-     * Given 지하철 노선을 생성하고
-     * When 생성한 지하철 노선을 삭제하면
-     * Then 해당 지하철 노선 정보는 삭제된다
-     */
+    @Test
+    void 지하철_노선을_제거한다() {
+        //given
+        String lineName = "신분당선";
+        String color = "bg-red-600";
 
-    private ValidatableResponse verifyCreatedStationLineResponseBody(String lineName, String color, int upStationId, String upStationName, int downStationId, String downStationName, ValidatableResponse stationLineCratedResponse) {
-        return stationLineCratedResponse
-                .body("name", equalTo(lineName))
-                .body("color", equalTo(color))
-                .body("stations", hasSize(2))
-                .body("stations[0].id", equalTo(upStationId))
-                .body("stations[0].name", equalTo(upStationName))
-                .body("stations[1].id", equalTo(downStationId))
-                .body("stations[1].name", equalTo(downStationName));
+        int upStationId = 1;
+        String upStationName = "강남역";
+        createStation(upStationName);
+
+        int downStationId = 2;
+        String downStationName = "언주역";
+        createStation(downStationName);
+
+        int distance = 10;
+
+        ValidatableResponse stationLineCratedResponse = createStationLines(lineName, color, upStationId, downStationId, distance);
+
+        //when
+        ValidatableResponse deletedStationLineResponse = deleteStationLine(getLocation(stationLineCratedResponse));
+
+        //then
+        verifyResponseStatus(deletedStationLineResponse, HttpStatus.NO_CONTENT);
+
+        ValidatableResponse foundStationLineResponse = getStationLine(getLocation(stationLineCratedResponse));
+        verifyResponseStatus(foundStationLineResponse, HttpStatus.NOT_FOUND);
+    }
+
+    private ValidatableResponse deleteStationLine(String url) {
+        return RestAssured
+                .given().log().all()
+                .when()
+                .delete(url)
+                .then().log().all();
     }
 
     private ValidatableResponse createStationLines(String lineName, String color, long upStationId, long downStationId, long distance) {
