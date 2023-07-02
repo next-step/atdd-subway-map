@@ -2,12 +2,12 @@ package subway.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import subway.controller.request.StationLineCreateRequest;
-import subway.controller.request.StationLineModifyRequest;
 import subway.controller.resonse.StationLineResponse;
 import subway.controller.resonse.StationResponse;
 import subway.domain.StationLine;
 import subway.repository.StationLineRepository;
+import subway.service.command.StationLineCreateCommand;
+import subway.service.command.StationLineModifyCommand;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,8 +25,8 @@ public class StationLineService {
     }
 
     @Transactional
-    public StationLineResponse saveStationLine(StationLineCreateRequest stationLineCreateRequest) {
-        StationLine stationLine = StationLine.create(stationLineCreateRequest.getLineName(), stationLineCreateRequest.getColor(), stationLineCreateRequest.getUpStationId(), stationLineCreateRequest.getDownStationId(), stationLineCreateRequest.getDistance());
+    public StationLineResponse saveStationLine(StationLineCreateCommand createCommand) {
+        StationLine stationLine = StationLine.create(createCommand.getName(), createCommand.getColor(), createCommand.getUpStationId(), createCommand.getDownStationId(), createCommand.getDistance());
 
         StationLine satedStationLine = stationLineRepository.save(stationLine);
         StationResponse upStation = stationService.findStation(stationLine.getUpStationId());
@@ -55,9 +55,9 @@ public class StationLineService {
     }
 
     @Transactional
-    public void modifyStationLine(Long id, StationLineModifyRequest stationLineModifyRequest) {
+    public void modifyStationLine(Long id, StationLineModifyCommand modifyCommand) {
         StationLine stationLine = requireGetById(id);
-        stationLine.modify(stationLineModifyRequest.getName(), stationLineModifyRequest.getColor());
+        stationLine.modify(modifyCommand.getName(), modifyCommand.getColor());
     }
 
     private StationLine requireGetById(Long id) {

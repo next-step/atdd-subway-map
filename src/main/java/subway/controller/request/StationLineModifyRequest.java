@@ -1,6 +1,8 @@
 package subway.controller.request;
 
-public class StationLineModifyRequest {
+import subway.service.command.StationLineModifyCommand;
+
+public class StationLineModifyRequest implements StationLineModifyCommand {
 
     private String name;
     private String color;

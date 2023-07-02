@@ -1,17 +1,19 @@
 package subway.controller.request;
 
 
-public class StationLineCreateRequest {
+import subway.service.command.StationLineCreateCommand;
 
-    private String lineName;
+public class StationLineCreateRequest implements StationLineCreateCommand {
+
+    private String name;
     private String color;
     private Long upStationId;
     private Long downStationId;
     private Long distance;
 
 
-    public String getLineName() {
-        return lineName;
+    public String getName() {
+        return name;
     }
 
     public String getColor() {

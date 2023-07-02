@@ -218,7 +218,7 @@ class StationLineAcceptanceTest {
 
     private ValidatableResponse createStationLines(String lineName, String color, long upStationId, long downStationId, long distance) {
         Map<String, Object> params = new HashMap<>();
-        params.put("lineName", lineName);
+        params.put("name", lineName);
         params.put("color", color);
         params.put("upStationId", upStationId);
         params.put("downStationId", downStationId);
