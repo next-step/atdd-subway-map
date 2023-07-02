@@ -1,6 +1,7 @@
 package subway.domain;
 
 import subway.ui.LineCreateRequest;
+import subway.ui.LineUpdateRequest;
 
 import javax.persistence.*;
 
@@ -69,5 +70,10 @@ public class Line {
 
     public Long getDistance() {
         return distance;
+    }
+
+    public void update(LineUpdateRequest request) {
+        this.name = request.getName();
+        this.color = request.getColor();
     }
 }

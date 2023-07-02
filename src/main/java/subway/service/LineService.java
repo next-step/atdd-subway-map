@@ -6,6 +6,7 @@ import subway.domain.Line;
 import subway.domain.LineRepository;
 import subway.ui.LineCreateRequest;
 import subway.ui.LineResponse;
+import subway.ui.LineUpdateRequest;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
@@ -37,5 +38,12 @@ public class LineService {
     public LineResponse showLine(Long lineId) {
         return lineRepository.findById(lineId).map(lineMapper::toLineResponse)
                 .orElseThrow(EntityNotFoundException::new);
+    }
+
+    @Transactional
+    public LineResponse updateLine(Long lineId, LineUpdateRequest request) {
+        Line line = lineRepository.findById(lineId).orElseThrow(EntityNotFoundException::new);
+        line.update(request);
+        return lineMapper.toLineResponse(line);
     }
 }
