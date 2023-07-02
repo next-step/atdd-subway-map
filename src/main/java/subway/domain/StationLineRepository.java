@@ -10,6 +10,6 @@ import subway.domain.StationLine;
 
 public interface StationLineRepository extends JpaRepository<StationLine, Long> {
 	@Override
-	@Query("SELECT SL FROM StationLine SL LEFT JOIN FETCH SL.upStation JOIN FETCH SL.downStation")
+	@Query("SELECT SL FROM StationLine SL LEFT JOIN FETCH SL.upStation LEFT JOIN FETCH SL.downStation")
 	List<StationLine> findAll();
 }
