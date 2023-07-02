@@ -1,4 +1,4 @@
-package subway.domain;
+package subway.ui;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
