@@ -30,10 +30,9 @@ public class LineAcceptanceTest {
      */
     @Test
     void createLine() {
+        // when
         지정된_이름의_지하철역을_생성한다("강남역");
         지정된_이름의_지하철역을_생성한다("양재역");
-
-        // when
         ExtractableResponse<Response> responseOfCreate = 지정된_이름의_지하철_노선을_생성한다("신분당선", 1L, 2L);
 
         // then
@@ -60,6 +59,7 @@ public class LineAcceptanceTest {
                 .when().post("/stations")
                 .then().log().all();
     }
+
     private ExtractableResponse<Response> 지정된_이름의_지하철_노선을_생성한다(String lineName, Long upStationId, Long downStationId) {
         Map<String, Object> params = Map.of(
                 "name", lineName,
