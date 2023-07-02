@@ -3,65 +3,91 @@ package subway;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
+import org.junit.platform.commons.util.StringUtils;
 import org.springframework.http.MediaType;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * 지하철역 관련 api 스펙을 함수로 정의한다.
+ */
 @DisplayName("지하철역 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class StationAcceptanceTest {
+public abstract class StationAcceptanceTest extends AcceptanceTest {
+
     /**
-     * When 지하철역을 생성하면
-     * Then 지하철역이 생성된다
-     * Then 지하철역 목록 조회 시 생성한 역을 찾을 수 있다
+     * 지하철 노선 생성 요청을 합니다
+     * @param name 지하철 노선 이름
+     * @return 지하철 노선 생성 요청 결과
      */
-    @DisplayName("지하철역을 생성한다.")
-    @Test
-    void createStation() {
-        // when
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
+    protected ExtractableResponse<Response> 지하철역_생성(String name) {
+        ParamBuilder params = new ParamBuilder()
+                .add("name", name);
 
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .body(params)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/stations")
-                        .then().log().all()
-                        .extract();
-
-        // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-        // then
-        List<String> stationNames =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
-        assertThat(stationNames).containsAnyOf("강남역");
+        return RestAssured
+                .given().log().all()
+                .body(params.build())
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
     }
 
     /**
-     * Given 2개의 지하철역을 생성하고
-     * When 지하철역 목록을 조회하면
-     * Then 2개의 지하철역을 응답 받는다
+     * 지하철 노선 조회 요청합니다
+     * @return 지하철 노선 조회 요청 결과
      */
-    // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
+    protected ExtractableResponse<Response> 지하철역_목록_조회() {
+
+        return RestAssured
+                .given().log().all()
+                .when().get("/stations")
+                .then().log().all()
+                .extract();
+    }
 
     /**
-     * Given 지하철역을 생성하고
-     * When 그 지하철역을 삭제하면
-     * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
+     * 지하철 노선 조회 요청을 합니다
+     * @param name 확인할 지하철 노선 이름
      */
-    // TODO: 지하철역 제거 인수 테스트 메서드 생성
+    protected void 지하철역_목록_포함_여부_확인(String name) {
 
+        ExtractableResponse<Response> response = 지하철역_목록_조회();
+
+        List<String> names = response.jsonPath().getList("name", String.class);
+        Assertions.assertThat(names).containsExactly(name);
+    }
+
+    /**
+     * 지하철 노선 삭제 요청을 합니다
+     * @param name 지하철 노선 이름
+     * @return 지하철 노선 삭제 요청 결과
+     */
+    protected ExtractableResponse<Response> 지하철역_삭제(String name) {
+        ExtractableResponse<Response> response = 지하철역_목록_조회();
+
+        long id = response.jsonPath().param("name", name).getLong("find { node -> node.name == name }.id");
+
+        return RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().delete("/stations/{id}", id)
+                .then().log().all()
+                .extract();
+    }
+
+    /**
+     * 지하철 노선 조회 요청을 합니다
+     * @param name 확인할 지하철 노선 이름
+     */
+    protected void 지하철역_목록_미포함_여부_확인(String name) {
+
+        ExtractableResponse<Response> response = 지하철역_목록_조회();
+
+        List<String> names = response.jsonPath().getList("name", String.class);
+        Assertions.assertThat(names).doesNotContain(name);
+    }
 }
