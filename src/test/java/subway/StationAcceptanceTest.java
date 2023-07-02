@@ -13,7 +13,7 @@ import java.util.Map;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static subway.AcceptanceTestUtils.getLocation;
-import static subway.AcceptanceTestUtils.verifyResponse;
+import static subway.AcceptanceTestUtils.verifyResponseStatus;
 
 @DisplayName("지하철역 관련 기능")
 @AcceptanceTest
@@ -31,10 +31,10 @@ class StationAcceptanceTest {
         ValidatableResponse stationCreatedResponse = createStation(stationName);
 
         // then
-        verifyResponse(stationCreatedResponse, HttpStatus.CREATED);
+        verifyResponseStatus(stationCreatedResponse, HttpStatus.CREATED);
 
         ValidatableResponse stationFoundResponse = getStations(getLocation(stationCreatedResponse));
-        verifyResponse(stationFoundResponse, HttpStatus.OK);
+        verifyResponseStatus(stationFoundResponse, HttpStatus.OK);
 
         stationFoundResponse
                 .body("name", equalTo(stationName));
@@ -53,7 +53,7 @@ class StationAcceptanceTest {
         ValidatableResponse foundStation = getStations(RESOURCE_URL);
 
         // then
-        verifyResponse(foundStation, HttpStatus.OK);
+        verifyResponseStatus(foundStation, HttpStatus.OK);
 
         foundStation
                 .body("", hasSize(2))
@@ -66,17 +66,17 @@ class StationAcceptanceTest {
         // given
         String stationName = "청담역";
         ValidatableResponse stationCreatedResponse = createStation(stationName);
-        verifyResponse(stationCreatedResponse, HttpStatus.CREATED);
+        verifyResponseStatus(stationCreatedResponse, HttpStatus.CREATED);
         String createdResourceLocation = getLocation(stationCreatedResponse);
 
         // when
         ValidatableResponse stationDeletedResponse = deleteStation(createdResourceLocation);
 
         // then
-        verifyResponse(stationDeletedResponse, HttpStatus.NO_CONTENT);
+        verifyResponseStatus(stationDeletedResponse, HttpStatus.NO_CONTENT);
 
         ValidatableResponse foundStation = getStations(createdResourceLocation);
-        verifyResponse(foundStation, HttpStatus.NOT_FOUND);
+        verifyResponseStatus(foundStation, HttpStatus.NOT_FOUND);
     }
 
     private ValidatableResponse createStation(String stationName) {

@@ -26,7 +26,7 @@ public final class AcceptanceTestUtils {
         }
     }
 
-    public static void verifyResponse(ValidatableResponse stationFoundResponse, HttpStatus status) {
+    public static void verifyResponseStatus(ValidatableResponse stationFoundResponse, HttpStatus status) {
         stationFoundResponse.assertThat().statusCode(status.value());
     }
     public static String getLocation(ValidatableResponse response) {

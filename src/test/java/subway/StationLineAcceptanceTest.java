@@ -13,7 +13,7 @@ import java.util.Map;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static subway.AcceptanceTestUtils.convertToJsonString;
-import static subway.AcceptanceTestUtils.verifyResponse;
+import static subway.AcceptanceTestUtils.verifyResponseStatus;
 
 @DisplayName("지하철 노선 관련 기능")
 @AcceptanceTest
@@ -59,50 +59,14 @@ class StationLineAcceptanceTest {
         ValidatableResponse stationLineCratedResponse = createStationLines(lineName, color, upStationId, downStationId, distance);
 
         //then
-        verifyResponse(stationLineCratedResponse, HttpStatus.CREATED);
-        stationLineCratedResponse
-                .body("name", equalTo(lineName))
-                .body("color", equalTo(color))
-                .body("stations", hasSize(2))
-                .body("stations[0].id", equalTo(upStationId))
-                .body("stations[0].name", equalTo(upStationName))
-                .body("stations[1].id", equalTo(downStationId))
-                .body("stations[1].name", equalTo(downStationName))
-        ;
+        verifyResponseStatus(stationLineCratedResponse, HttpStatus.CREATED);
+        verifyCreatedStationLineResponseBody(lineName, color, upStationId, upStationName, downStationId, downStationName, stationLineCratedResponse);
 
         ValidatableResponse foundLineResponse = getStationLine(LINES_RESOURCE_URL);
-        verifyResponse(foundLineResponse, HttpStatus.OK);
+        verifyResponseStatus(foundLineResponse, HttpStatus.OK);
 
-        foundLineResponse
-                .body("", hasSize(1))
-                .body("[0].name", equalTo(lineName))
-                .body("[0].color", equalTo(color))
-                .body("[0].stations", hasSize(2))
-                .body("[0].stations[0].id", equalTo(upStationId))
-                .body("[0].stations[0].name", equalTo(upStationName))
-                .body("[0].stations[1].id", equalTo(downStationId))
-                .body("[0].stations[1].name", equalTo(downStationName))
-        ;
+        verifyFindAllStationLineResponseBody(lineName, color, upStationId, upStationName, downStationId, downStationName, foundLineResponse);
     }
-
-    private ValidatableResponse createStationLines(String lineName, String color, long upStationId, long downStationId, long distance) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("lineName", lineName);
-        params.put("color", color);
-        params.put("upStationId", upStationId);
-        params.put("downStationId", downStationId);
-        params.put("distance", distance);
-
-        return RestAssured
-                .given().log().all()
-                .body(convertToJsonString(params)).contentType(ContentType.JSON)
-                .when()
-                .post(LINES_RESOURCE_URL)
-                .then().log().all();
-    }
-
-
-
 
     /**
      * 지하철노선 수정
@@ -123,6 +87,46 @@ class StationLineAcceptanceTest {
      * When 지하철 노선 목록을 조회하면
      * Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
      */
+
+
+    private ValidatableResponse verifyCreatedStationLineResponseBody(String lineName, String color, int upStationId, String upStationName, int downStationId, String downStationName, ValidatableResponse stationLineCratedResponse) {
+        return stationLineCratedResponse
+                .body("name", equalTo(lineName))
+                .body("color", equalTo(color))
+                .body("stations", hasSize(2))
+                .body("stations[0].id", equalTo(upStationId))
+                .body("stations[0].name", equalTo(upStationName))
+                .body("stations[1].id", equalTo(downStationId))
+                .body("stations[1].name", equalTo(downStationName));
+    }
+
+    private ValidatableResponse verifyFindAllStationLineResponseBody(String lineName, String color, int upStationId, String upStationName, int downStationId, String downStationName, ValidatableResponse foundLineResponse) {
+        return foundLineResponse
+                .body("", hasSize(1))
+                .body("[0].name", equalTo(lineName))
+                .body("[0].color", equalTo(color))
+                .body("[0].stations", hasSize(2))
+                .body("[0].stations[0].id", equalTo(upStationId))
+                .body("[0].stations[0].name", equalTo(upStationName))
+                .body("[0].stations[1].id", equalTo(downStationId))
+                .body("[0].stations[1].name", equalTo(downStationName));
+    }
+
+    private ValidatableResponse createStationLines(String lineName, String color, long upStationId, long downStationId, long distance) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("lineName", lineName);
+        params.put("color", color);
+        params.put("upStationId", upStationId);
+        params.put("downStationId", downStationId);
+        params.put("distance", distance);
+
+        return RestAssured
+                .given().log().all()
+                .body(convertToJsonString(params)).contentType(ContentType.JSON)
+                .when()
+                .post(LINES_RESOURCE_URL)
+                .then().log().all();
+    }
 
     private ValidatableResponse createStation(String stationName) {
         Map<String, String> params = new HashMap<>();
