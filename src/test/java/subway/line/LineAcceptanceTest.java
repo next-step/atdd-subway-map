@@ -5,11 +5,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import subway.line.dto.StationOnLineResponse;
 
 /**
  * 프로그래밍 요구사항
@@ -37,18 +39,14 @@ public class LineAcceptanceTest {
         assertThat(responseOfCreate.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         //TODO: 아래 인수 테스트는 조회 로직 구현 후에 다시해보기
-//        long id = responseOfCreate.jsonPath().getLong("id");
-//        ExtractableResponse<Response> responseOfRead = RestAssured.given().log().all()
-//                .pathParam("id", id)  // lineId를 넣어야 한다
-//                .when().get("/lines/{id}")
-//                .then().log().all()
-//                .extract();
-//
-//        long lineId = responseOfRead.jsonPath().getLong("id");
-//        List<Station> stations = responseOfRead.jsonPath().getList("stations", Station.class);
-//
-//        assertThat(lineId).isEqualTo(1L);  // lineId를 넣어야 한다
-//        assertThat(stations).hasSize(2);  // 상행과 하행 두개가 있으므로 size는 2여야 한다
+        long id = responseOfCreate.jsonPath().getLong("id");
+        ExtractableResponse<Response> responseOfRead = 지하철_노선을_조회한다(id);
+
+        long lineId = responseOfRead.jsonPath().getLong("id");
+        List<StationOnLineResponse> stations = responseOfRead.jsonPath().getList("stations", StationOnLineResponse.class);
+
+        assertThat(lineId).isEqualTo(1L);  // lineId를 넣어야 한다
+        assertThat(stations).hasSize(2);  // 상행과 하행 두개가 있으므로 size는 2여야 한다
     }
 
     //TODO: 해당 로직은 StationAcceptanceTest와 중복이 된다. 어떻게 해결할 지 고민
@@ -61,7 +59,6 @@ public class LineAcceptanceTest {
                 .when().post("/stations")
                 .then().log().all();
     }
-
     private ExtractableResponse<Response> 지하철_노선을_생성한다() {
         Map<String, Object> params = Map.of(
                 "name", "신분당선",
@@ -79,6 +76,14 @@ public class LineAcceptanceTest {
                 .extract();
     }
 
+    private ExtractableResponse<Response> 지하철_노선을_조회한다(long id) {
+        return RestAssured.given().log().all()
+                .pathParam("id", id)  // lineId를 넣어야 한다
+                .when().get("/lines/{id}")
+                .then().log().all()
+                .extract();
+    }
+
     /**
      * Given: 지하철 노선을 생성하고
      * When: 생성한 지하철 노선을 조회하면
@@ -86,35 +91,13 @@ public class LineAcceptanceTest {
      */
     @Test
     void findLine() {
-        /* # API 명세
-         *
-         * ## Request
-         * GET /lines/{id}
-         * Accept: application/json
-         *
-         * ## Response
-         * status: 200 OK
-         * Content-Type: application/json
-         * Body
-         * - id : 생성된 지하철 노선의 id값 (ex: 1)
-         * - name : 생성된 지하철 노선의 이름 ("신분당선")
-         * - color : 생성된 지하철 노선 색상 ("bg-red-600")
-         * - stations[] : 해당 노선에 속한 상행 지하철역과 하행 지하철역 리스트
-         *   - id : 지하철역 id
-         *   - name : 지하철역 이름
-         */
-
         // given
         지정된_이름의_지하철역을_생성한다("강남역");
         지정된_이름의_지하철역을_생성한다("양재역");
         지하철_노선을_생성한다();
 
         // when
-        ExtractableResponse<Response> result = RestAssured.given().log().all()
-                .pathParam("id", 1L)
-                .when().get("/lines/{id}")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> result = 지하철_노선을_조회한다(1L);
 
         // then
         assertThat(result.statusCode()).isEqualTo(HttpStatus.OK.value());
