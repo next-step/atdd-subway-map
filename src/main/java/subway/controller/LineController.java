@@ -9,8 +9,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import subway.controller.dto.LineRequest;
+import subway.controller.dto.LineCreateRequest;
 import subway.controller.dto.LineResponse;
+import subway.controller.dto.LineUpdateRequest;
 import subway.controller.dto.LinesResponse;
 import subway.service.LineService;
 
@@ -24,7 +25,7 @@ public class LineController {
     }
 
     @PostMapping("/lines")
-    public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest request) {
+    public ResponseEntity<LineResponse> createLine(@RequestBody LineCreateRequest request) {
         LineResponse line = lineService.createdLineBy(request);
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
@@ -40,8 +41,9 @@ public class LineController {
     }
 
     @PutMapping("/lines/{id}")
-    public ResponseEntity<LineResponse> updateLine(@PathVariable Long id, @RequestBody LineRequest request) {
-        return ResponseEntity.ok(lineService.updatedLineBy(id, request));
+    public ResponseEntity<LineResponse> updateLine(@PathVariable Long id, @RequestBody LineUpdateRequest request) {
+        lineService.updatedLineBy(id, request);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/lines/{id}")

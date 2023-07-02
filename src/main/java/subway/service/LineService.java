@@ -6,8 +6,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import subway.controller.dto.LineRequest;
+import subway.controller.dto.LineCreateRequest;
 import subway.controller.dto.LineResponse;
+import subway.controller.dto.LineUpdateRequest;
 import subway.controller.dto.LinesResponse;
 import subway.domain.EndStations;
 import subway.domain.Line;
@@ -31,12 +32,12 @@ public class LineService {
     }
 
     @Transactional
-    public LineResponse createdLineBy(LineRequest request) {
+    public LineResponse createdLineBy(LineCreateRequest request) {
         return LineResponse.from(lineRepository.save(new Line.Builder()
             .name(request.getName())
             .color(request.getColor())
             .distance(request.getDistance())
-            .stations(EndStations.of(distinctStationsGetByIdFrom(request)))
+            .stations(EndStations.of(distinctStationsGetByIdOf(request.getUpStationId(), request.getDownStationId())))
             .build()));
     }
 
@@ -49,19 +50,19 @@ public class LineService {
     }
 
     @Transactional
-    public LineResponse updatedLineBy(Long id, LineRequest request) {
+    public void updatedLineBy(Long id, LineUpdateRequest request) {
         Line line = lineFoundById(id);
 
-        line.updateNewInfo(request.getName(), request.getColor(), EndStations.of(renewableStationsFrom(request)), request.getDistance());
+        line.updateNewInfo(request.getName()
+            , request.getColor()
+            , EndStations.of(distinctStationsGetByIdOf(request.getUpStationId(), request.getDownStationId()))
+            , request.getDistance());
 
-        return LineResponse.from(lineRepository.save(line));
+        lineRepository.save(line);
     }
 
-    private Set<Station> distinctStationsGetByIdFrom(LineRequest request) {
-        return streamOfEndStationIdFrom(request)
-            .filter(Objects::nonNull)
-            .map(this::stationFoundById)
-            .collect(Collectors.toSet());
+    public void deleteLineBy(Long id) {
+        lineRepository.delete(lineFoundById(id));
     }
 
     private Line lineFoundById(Long id) {
@@ -69,20 +70,15 @@ public class LineService {
             .orElseThrow(() -> new LineNotFoundException("일치하는 지하철 노선 정보가 존재하지 않습니다: " + id));
     }
 
-    private Set<Station> renewableStationsFrom(LineRequest request) {
-        return distinctStationsGetByIdFrom(request);
+    private Set<Station> distinctStationsGetByIdOf(Long upStationId, Long downStationId) {
+        return Stream.of(upStationId, downStationId)
+            .filter(Objects::nonNull)
+            .map(this::stationGetById)
+            .collect(Collectors.toSet());
     }
 
-    private Stream<Long> streamOfEndStationIdFrom(LineRequest request) {
-        return Stream.of(request.getUpStationId(), request.getDownStationId());
-    }
-
-    private Station stationFoundById(Long id) {
+    private Station stationGetById(Long id) {
         return stationRepository.findById(id)
             .orElseThrow(() -> new StationNotFoundException("일치하는 지하철 역 정보가 존재하지 않습니다: " + id));
-    }
-
-    public void deleteLineBy(Long id) {
-        lineRepository.delete(lineFoundById(id));
     }
 }
