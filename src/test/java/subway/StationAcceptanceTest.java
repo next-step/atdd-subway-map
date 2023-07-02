@@ -1,13 +1,11 @@
 package subway;
 
+import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
 import io.restassured.response.ValidatableResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 
 import java.util.HashMap;
@@ -30,14 +28,15 @@ class StationAcceptanceTest {
         String stationName = "강남역";
 
         // when
-        AcceptanceTestBuilder 지하철역_생성 = 지하철역_생성(stationName);
-        ExtractableResponse<Response> 지하철역_생성_됨 = 지하철역_생성_됨(지하철역_생성);
+        ValidatableResponse stationCreatedResponse = createStation(stationName);
 
         // then
-        AcceptanceTestBuilder 지하철역_단건_조회 = 지하철역_조회(getLocation(지하철역_생성_됨));
-        ValidatableResponse 지하철역_조회_됨 = 지하철역_조회_됨(지하철역_단건_조회);
+        verifyResponse(stationCreatedResponse, HttpStatus.CREATED);
 
-        지하철역_조회_됨
+        ValidatableResponse stationFoundResponse = getStations(getLocation(stationCreatedResponse));
+        verifyResponse(stationFoundResponse, HttpStatus.OK);
+
+        stationFoundResponse
                 .body("name", equalTo(stationName));
     }
 
@@ -46,17 +45,18 @@ class StationAcceptanceTest {
     void showStations() {
         // given
         String firstStationName = "언주역";
+        createStation(firstStationName);
+
         String secondStationName = "삼성역";
+        createStation(secondStationName);
 
         // when
-        지하철역_생성(firstStationName);
-        지하철역_생성(secondStationName);
+        ValidatableResponse foundStation = getStations(RESOURCE_URL);
 
         // then
-        AcceptanceTestBuilder 지하철역_조회 = 지하철역_조회(RESOURCE_URL);
-        ValidatableResponse 지하철역_조회_됨 = 지하철역_조회_됨(지하철역_조회);
+        verifyResponse(foundStation, HttpStatus.OK);
 
-        지하철역_조회_됨
+        foundStation
                 .body("", hasSize(2))
                 .body("[0].name", equalTo(firstStationName))
                 .body("[1].name", equalTo(secondStationName));
@@ -67,60 +67,54 @@ class StationAcceptanceTest {
     void deleteStation() {
         // given
         String stationName = "청담역";
+        ValidatableResponse stationCreatedResponse = createStation(stationName);
+        verifyResponse(stationCreatedResponse, HttpStatus.CREATED);
+        String createdResourceLocation = getLocation(stationCreatedResponse);
 
         // when
-        AcceptanceTestBuilder 지하철역_생성 = 지하철역_생성(stationName);
-        ExtractableResponse<Response> 지하철역_생성_됨 = 지하철역_생성_됨(지하철역_생성);
-        String createdResourceLocation = getLocation(지하철역_생성_됨);
+        ValidatableResponse stationDeletedResponse = deleteStation(createdResourceLocation);
 
         // then
-        AcceptanceTestBuilder 지하철역_제거 = 지하철역_제거(createdResourceLocation);
-        ValidatableResponse 지하철역_제거_됨 = 지하철역_제거_됨(지하철역_제거);
+        verifyResponse(stationDeletedResponse, HttpStatus.NO_CONTENT);
 
-        지하철역_제거_됨.noRootPath();
-
-        AcceptanceTestBuilder 지하철역_조회 = 지하철역_조회(createdResourceLocation);
-        지하철역을_찾지_못함(지하철역_조회);
+        ValidatableResponse foundStation = getStations(createdResourceLocation);
+        verifyResponse(foundStation, HttpStatus.NOT_FOUND);
     }
 
-    private AcceptanceTestBuilder 지하철역_생성(String stationName) {
+    private void verifyResponse(ValidatableResponse stationFoundResponse, HttpStatus status) {
+        stationFoundResponse.assertThat().statusCode(status.value());
+    }
+
+    private ValidatableResponse createStation(String stationName) {
         Map<String, String> params = new HashMap<>();
         params.put("name", stationName);
 
-        return AcceptanceTestBuilder
-                .given().body(params).contentType(ContentType.JSON)
-                .when(HttpMethod.POST, RESOURCE_URL);
+        return RestAssured
+                .given().log().all()
+                .body(AcceptanceTestUtils.convertToJsonString(params)).contentType(ContentType.JSON)
+                .when()
+                .post(RESOURCE_URL)
+                .then().log().all();
     }
 
-    private ExtractableResponse<Response> 지하철역_생성_됨(AcceptanceTestBuilder acceptanceTestBuilder) {
-        return acceptanceTestBuilder.then(HttpStatus.CREATED).extract();
+    private ValidatableResponse getStations(String url) {
+        return RestAssured
+                .given().log().all()
+                .when()
+                .get(url)
+                .then().log().all();
     }
 
-    private AcceptanceTestBuilder 지하철역_조회(String url) {
-        return AcceptanceTestBuilder
+    private ValidatableResponse deleteStation(String url) {
+        return RestAssured
                 .given()
-                .when(HttpMethod.GET, url);
+                .given().log().all()
+                .when()
+                .delete(url)
+                .then().log().all();
     }
 
-    private ValidatableResponse 지하철역_조회_됨(AcceptanceTestBuilder acceptanceTestBuilder) {
-        return acceptanceTestBuilder.then(HttpStatus.OK);
-    }
-
-    private AcceptanceTestBuilder 지하철역_제거(String url) {
-        return AcceptanceTestBuilder
-                .given()
-                .when(HttpMethod.DELETE, url);
-    }
-
-    private ValidatableResponse 지하철역_제거_됨(AcceptanceTestBuilder acceptanceTestBuilder) {
-        return acceptanceTestBuilder.then(HttpStatus.NO_CONTENT);
-    }
-
-    private void 지하철역을_찾지_못함(AcceptanceTestBuilder 지하철역_조회) {
-        지하철역_조회.then(HttpStatus.NOT_FOUND);
-    }
-
-    private String getLocation(ExtractableResponse<Response> response) {
-        return response.header(HttpHeaders.LOCATION);
+    private String getLocation(ValidatableResponse response) {
+        return response.extract().header(HttpHeaders.LOCATION);
     }
 }
