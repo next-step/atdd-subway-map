@@ -45,7 +45,21 @@ class StationAcceptanceTest {
      * When 지하철역 목록을 조회하면
      * Then 2개의 지하철역을 응답 받는다
      */
-    // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
+    @DisplayName("지하철 역을 조회한다.")
+    @Test
+    void showStations() {
+        //given
+        지하철_노선도_등록("판교역");
+        지하철_노선도_등록("정자역");
+
+        //when
+        ExtractableResponse<Response> response = 지하철_노선도_조회();
+        List<StationResponse> stations = 지하철_노선도_리스트_반환();
+
+        //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(stations).hasSize(2);
+    }
 
     /**
      * Given 지하철역을 생성하고
