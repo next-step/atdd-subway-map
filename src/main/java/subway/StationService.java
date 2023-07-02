@@ -41,4 +41,11 @@ public class StationService {
     public Station findStation(Long id) {
         return stationRepository.findById(id).orElseThrow();
     }
+
+    @Transactional
+    public Station updateStation(Long id, StationRequest stationRequest) {
+        Station station = stationRepository.findById(id).orElseThrow();
+        station.update(stationRequest.getName());
+        return station;
+    }
 }

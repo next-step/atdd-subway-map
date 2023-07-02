@@ -1,6 +1,10 @@
 package subway;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
 @Entity
 public class Station {
@@ -23,5 +27,9 @@ public class Station {
 
     public String getName() {
         return name;
+    }
+
+    public void update(String name) {
+        this.name = name;
     }
 }

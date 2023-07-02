@@ -3,6 +3,7 @@ package subway;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.HashMap;
@@ -48,6 +49,16 @@ public class StationAcceptanceTest {
     private static ExtractableResponse<Response> 지하철노선을_조회한다(int id) {
         return RestAssured.given().log().all()
                 .when().get("/stations/" + id)
+                .then().log().all()
+                .extract();
+    }
+
+    private static ExtractableResponse<Response> 지하철노선_수정(int 수정할_자하철역_아이디, String 수정네이밍) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", 수정네이밍);
+        return RestAssured
+                .given().log().all().body(params).contentType(ContentType.JSON)
+                .when().put("/stations/" + 수정할_자하철역_아이디)
                 .then().log().all()
                 .extract();
     }
@@ -125,6 +136,26 @@ public class StationAcceptanceTest {
         assertThat(지하철역의_이름을_파싱한다(조회된_강남역)).isEqualTo("강남역");
     }
 
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 수정하면
+     * Then 해당 지하철 노선 정보는 수정된다
+     */
+    @DisplayName("지하철노선 수정")
+    @Test
+    void updateSubwayStation() {
+        // given
+        var 강남역 = 지하철역을_생성한다("강남역");
+        int 수정할_지하철역의_아이디 = 지하철역의_아이디를_파싱한다(강남역);
+
+
+        // when
+        var 수정후_지하철역 = 지하철노선_수정(수정할_지하철역의_아이디, "영등포역");
+
+        // Then
+        assertThat(지하철역의_이름을_파싱한다(수정후_지하철역)).isEqualTo("영등포역");
+        assertThat(지하철역의_이름을_파싱한다(지하철노선을_조회한다(수정할_지하철역의_아이디))).isEqualTo("영등포역");
+    }
 
     /**
      * Given 지하철역을 생성하고
