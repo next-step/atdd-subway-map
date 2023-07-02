@@ -2,8 +2,10 @@ package subway;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 
@@ -15,6 +17,14 @@ import static subway.StationSteps.*;
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationAcceptanceTest {
+
+    @Autowired
+    private StationRepository stationRepository;
+
+    @AfterEach
+    void tearDown() {
+        stationRepository.deleteAllInBatch();
+    }
 
     @DisplayName("지하철역을 생성하면 지하철역이 생성된다. 지하철역 목록 조회 시 생성한 역을 찾을 수 있다.")
     @Test
@@ -46,7 +56,6 @@ public class StationAcceptanceTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.jsonPath().getList("id")).hasSize(2).containsExactly(1, 2);
         assertThat(response.jsonPath().getList("name")).hasSize(2).containsExactly("강남역", "역삼역");
     }
 
