@@ -19,6 +19,18 @@ public class LineService {
         this.stationRepository = stationRepository;
     }
 
+    public LineResponse findLineById(Long id) {
+        Line line = lineRepository.findById(id).orElseThrow(() -> new RuntimeException());
+
+        return new LineResponse(
+                line.getId(),
+                line.getName(),
+                line.getColor(),
+                Arrays.asList(line.getUpStation(), line.getDownStation())
+                ,line.getDistance()
+        );
+    }
+
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
         Station upStation = stationRepository.findById(lineRequest.getUpStationId()).orElseThrow(() -> new RuntimeException());
@@ -39,6 +51,18 @@ public class LineService {
         return lineRepository.findAll().stream()
                 .map(this::createLineResponse)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public Line updateLineById(Long id, LineUpdateRequest lineUpdateRequest) {
+        Line line = lineRepository.findById(id).orElseThrow(() -> new RuntimeException());
+        line.updateNameAndColor(lineUpdateRequest.getName(), lineUpdateRequest.getColor());
+        return line;
+    }
+
+    @Transactional
+    public void deleteLineById(Long id) {
+        lineRepository.deleteById(id);
     }
 
     private LineResponse createLineResponse(Line line) {
