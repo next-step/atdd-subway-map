@@ -12,8 +12,7 @@ import java.util.Map;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
-import static subway.AcceptanceTestUtils.convertToJsonString;
-import static subway.AcceptanceTestUtils.verifyResponseStatus;
+import static subway.AcceptanceTestUtils.*;
 
 @DisplayName("지하철 노선 관련 기능")
 @AcceptanceTest
@@ -45,10 +44,10 @@ class StationLineAcceptanceTest {
         verifyResponseStatus(stationLineCratedResponse, HttpStatus.CREATED);
         verifyCreatedStationLineResponseBody(lineName, color, upStationId, upStationName, downStationId, downStationName, stationLineCratedResponse);
 
-        ValidatableResponse foundLineResponse = getStationLine(LINES_RESOURCE_URL);
-        verifyResponseStatus(foundLineResponse, HttpStatus.OK);
+        ValidatableResponse foundStationLineResponse = getStationLine(LINES_RESOURCE_URL);
+        verifyResponseStatus(foundStationLineResponse, HttpStatus.OK);
 
-        foundLineResponse
+        foundStationLineResponse
                 .body("", hasSize(1))
                 .body("[0].name", equalTo(lineName))
                 .body("[0].color", equalTo(color))
@@ -115,12 +114,49 @@ class StationLineAcceptanceTest {
         ;
     }
 
+    @Test
+    void 지하철노선을_조회한다() {
+        //given
+        String lineName = "신분당선";
+        String color = "bg-red-600";
+
+        int upStationId = 1;
+        String upStationName = "강남역";
+        createStation(upStationName);
+
+        int downStationId = 2;
+        String downStationName = "언주역";
+        createStation(downStationName);
+
+        int distance = 10;
+
+        ValidatableResponse stationLineCratedResponse = createStationLines(lineName, color, upStationId, downStationId, distance);
+
+        //when
+        ValidatableResponse foundStationLineResponse = getStationLine(getLocation(stationLineCratedResponse));
+
+
+        //then
+        verifyResponseStatus(foundStationLineResponse, HttpStatus.OK);
+
+        foundStationLineResponse
+                .body("name", equalTo(lineName))
+                .body("color", equalTo(color))
+                .body("stations", hasSize(2))
+                .body("stations[0].id", equalTo(upStationId))
+                .body("stations[0].name", equalTo(upStationName))
+                .body("stations[1].id", equalTo(downStationId))
+                .body("stations[1].name", equalTo(downStationName));
+        ;
+    }
+
     /**
      * 지하철노선 수정
      * Given 지하철 노선을 생성하고
      * When 생성한 지하철 노선을 수정하면
      * Then 해당 지하철 노선 정보는 수정된다
      */
+
 
     /**
      * 지하철노선 삭제
