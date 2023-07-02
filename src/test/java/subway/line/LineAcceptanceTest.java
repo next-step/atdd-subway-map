@@ -27,30 +27,8 @@ public class LineAcceptanceTest {
      */
     @Test
     void createLine() {
-        /* # API 명세
-         *
-         * ## Request
-         * POST /lines
-         * Content-Type: application/json
-         * Body
-         * - name : 지하철 노선 이름 (ex: "신분당선")
-         * - color : 지하철 노선 색상 (ex: "bg-red-600")
-         * - upStationId : 상행 측면의 역 (ex: "상행 A - B 하행" 일 때 upStation=A)
-         * - downStationId : 하행 측면의 역 (ex: "상행 A - B 하행" 일 때 downStation=B)
-         * - distance: upStation과 downStation간의 거리
-         *
-         * ## Response
-         * 201 Created
-         * Location: /lines/1
-         * Content-Type: application/json
-         * - id : 생성된 지하철 노선의 id값 (ex: 1)
-         * - name : 생성된 지하철 노선의 이름 (요청 명세 참고)
-         * - color : 생성된 지하철 노선 색상 (요청 명세 참고)
-         * - stations[] : 해당 노선에 속한 상행 지하철역과 하행 지하철역 리스트
-         */
-
-        지정된_이름의_지하철역을_생성한다("가양역");
-        지정된_이름의_지하철역을_생성한다("여의도역");
+        지정된_이름의_지하철역을_생성한다("강남역");
+        지정된_이름의_지하철역을_생성한다("양재역");
 
         // when
         Map<String, Object> params = Map.of(
@@ -86,6 +64,7 @@ public class LineAcceptanceTest {
 //        assertThat(stations).hasSize(2);  // 상행과 하행 두개가 있으므로 size는 2여야 한다
     }
 
+    //TODO: 해당 로직은 StationAcceptanceTest와 중복이 된다. 어떻게 해결할 지 고민
     private void 지정된_이름의_지하철역을_생성한다(String stationName) {
         Map<String, String> params = Map.of("name", stationName);
 
@@ -97,23 +76,44 @@ public class LineAcceptanceTest {
     }
 
     /**
-     * Given: 2개의 지하철 노선을 생성하고
-     * When: 지하철 노선 목록을 조회하면
-     * Then: 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다
-     */
-    @Test
-    void findAllLines() {
-
-    }
-
-    /**
      * Given: 지하철 노선을 생성하고
      * When: 생성한 지하철 노선을 조회하면
      * Then: 생성한 지하철 노선의 정보를 응답받을 수 있다
      */
     @Test
     void findLine() {
+        /* # API 명세
+         *
+         * ## Request
+         * GET /lines/{id}
+         * Accept: application/json
+         *
+         * ## Response
+         * status: 200 OK
+         * Content-Type: application/json
+         * Body
+         * - id : 생성된 지하철 노선의 id값 (ex: 1)
+         * - name : 생성된 지하철 노선의 이름 ("신분당선")
+         * - color : 생성된 지하철 노선 색상 ("bg-red-600")
+         * - stations[] : 해당 노선에 속한 상행 지하철역과 하행 지하철역 리스트
+         *   - id : 지하철역 id
+         *   - name : 지하철역 이름
+         */
+    }
 
+    /**
+     * Given: 2개의 지하철 노선을 생성하고
+     * When: 지하철 노선 목록을 조회하면
+     * Then: 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다
+     */
+    @Test
+    void findAllLines() {
+        /* # API 명세
+         *
+         * ## Request
+         *
+         * ## Response
+         */
     }
 
     /**
@@ -123,6 +123,11 @@ public class LineAcceptanceTest {
      */
     @Test
     void deleteLine() {
-
+        /* # API 명세
+         *
+         * ## Request
+         *
+         * ## Response
+         */
     }
 }
