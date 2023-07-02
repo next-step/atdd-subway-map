@@ -1,5 +1,7 @@
 package subway;
 
+import static org.springframework.test.annotation.DirtiesContext.ClassMode.*;
+
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -7,10 +9,12 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 
 import io.restassured.path.json.JsonPath;
 
 @DisplayName("지하철 노선 관련 기능")
+@DirtiesContext(classMode = BEFORE_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationLineAcceptanceTest {
 
@@ -29,9 +33,6 @@ public class StationLineAcceptanceTest {
 		Assertions.assertTrue(lineIds.contains(lineId));
 	}
 
-	/**
-	 * 지하철 노선 목록 조회
-	 **/
 	@DisplayName("지하철 노선 목록 조회한다")
 	@Test
 	void getStationLines() {
@@ -51,9 +52,6 @@ public class StationLineAcceptanceTest {
 		Assertions.assertEquals(2, lineIds.size());
 	}
 
-	/**
-	 * 지하철 노선 조회
-	 **/
 	@DisplayName("지하철 노선 조회한다")
 	@Test
 	void getStationLine() {
