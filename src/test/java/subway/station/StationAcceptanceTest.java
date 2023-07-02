@@ -33,7 +33,7 @@ public class StationAcceptanceTest {
 
         // then
         ExtractableResponse<Response> responseOfShowStations = 지하철역_목록을_조회한다();
-        List<String> stationNames = responseOfShowStations.jsonPath().getList("name", String.class);
+        List<String> stationNames = 지하철역_목록_이름을_추출한다(responseOfShowStations);
 
         assertThat(stationNames).containsAnyOf(강남역);
     }
@@ -68,7 +68,7 @@ public class StationAcceptanceTest {
         ExtractableResponse<Response> response = 지하철역_목록을_조회한다();
 
         //then
-        List<String> stationNames = response.jsonPath().getList("name", String.class);
+        List<String> stationNames = 지하철역_목록_이름을_추출한다(response);
 
         assertThat(stationNames).hasSize(2);
         assertThat(stationNames).contains(가양역, 여의도역);
@@ -79,6 +79,10 @@ public class StationAcceptanceTest {
                 .when().get("/stations")  //TODO /stations 가 다른 path로 변경된다면?
                 .then().log().all()
                 .extract();
+    }
+
+    private List<String> 지하철역_목록_이름을_추출한다(ExtractableResponse<Response> responseOfShowStations) {
+        return responseOfShowStations.jsonPath().getList("name", String.class);
     }
 
     private void 지정된_이름의_지하철역을_생성한다(String stationName) {
@@ -104,7 +108,7 @@ public class StationAcceptanceTest {
         지정된_이름의_지하철역을_생성한다(가양역);
 
         ExtractableResponse<Response> responseOfShowStations = 지하철역_목록을_조회한다();
-        List<Long> stationIds = responseOfShowStations.jsonPath().getList("id", Long.class);
+        List<Long> stationIds = 지하철역_목록_Id를_추출한다(responseOfShowStations);
         Long stationId = stationIds.get(0);
 
         //when
@@ -114,9 +118,13 @@ public class StationAcceptanceTest {
         assertThat(responseOfDeleteStation.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         ExtractableResponse<Response> responseOfShowStationsAfterDelete = 지하철역_목록을_조회한다();
-        List<Long> stationIdsAfterDelete = responseOfShowStationsAfterDelete.jsonPath().getList("id", Long.class);
+        List<Long> stationIdsAfterDelete = 지하철역_목록_Id를_추출한다(responseOfShowStationsAfterDelete);
 
         assertThat(stationIdsAfterDelete).hasSize(0);
+    }
+
+    private List<Long> 지하철역_목록_Id를_추출한다(ExtractableResponse<Response> responseOfShowStations) {
+        return responseOfShowStations.jsonPath().getList("id", Long.class);
     }
 
     private ExtractableResponse<Response> 지하철역을_삭제한다(Long stationId) {
