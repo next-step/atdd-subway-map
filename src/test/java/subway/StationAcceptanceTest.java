@@ -17,6 +17,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철역 관련 기능")
 public class StationAcceptanceTest extends AcceptanceTest{
 
+    private final String 강남역 = "강남역";
+    private final String 역삼역 = "역삼역";
+
+
     /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다
@@ -26,25 +30,16 @@ public class StationAcceptanceTest extends AcceptanceTest{
     @Test
     void createStationTest() {
         // when
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                        .body(params)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = 지하철역_생성(강남역);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        ExtractableResponse<Response> getStationRes = getStations();
+        ExtractableResponse<Response> getStationRes = 지하철역_조회();
         List<String> stationNames = getStationRes.jsonPath().getList("name", String.class);
 
-        assertThat(stationNames).containsAnyOf("강남역");
+        assertThat(stationNames).containsAnyOf(강남역);
     }
 
     /**
@@ -57,11 +52,11 @@ public class StationAcceptanceTest extends AcceptanceTest{
     @Test
     void selectStationsTest() {
         // given
-        createStation("강남역");
-        createStation("역삼역");
+        지하철역_생성(강남역);
+        지하철역_생성(역삼역);
 
         // when
-        ExtractableResponse<Response> response = getStations();
+        ExtractableResponse<Response> response = 지하철역_조회();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -71,8 +66,6 @@ public class StationAcceptanceTest extends AcceptanceTest{
 
         assertThat(stationNames.size()).isEqualTo(2);
     }
-
-
 
     /**
      * Given 지하철역을 생성하고
@@ -84,28 +77,32 @@ public class StationAcceptanceTest extends AcceptanceTest{
     @Test
     void deleteStationTest() {
         // given
-        ExtractableResponse<Response> gangnamStationCreationRes = createStation("강남역");
-        ExtractableResponse<Response> yeoksamStationCreationRes = createStation("역삼역");
+        ExtractableResponse<Response> gangnamStationCreationRes = 지하철역_생성(강남역);
+        ExtractableResponse<Response> yeoksamStationCreationRes = 지하철역_생성(역삼역);
 
-        String createdId = gangnamStationCreationRes.jsonPath().getString("id");
+        String stationId = gangnamStationCreationRes.jsonPath().getString("id");
 
         // when
+        지하철역_삭제(stationId);
+
+        // then
+        ExtractableResponse<Response> getRes = 지하철역_조회();
+        String 삭제된_역 = gangnamStationCreationRes.jsonPath().getString("name");
+
+        assertThat(getRes.jsonPath().getList("name")).doesNotContain(삭제된_역);
+    }
+
+    private static void 지하철역_삭제(String stationId) {
         RestAssured
             .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
             .when()
-                .delete(String.format("/stations/%s", createdId))
+                .delete(String.format("/stations/%s", stationId))
             .then().log().all()
             .extract();
-
-        // then
-        ExtractableResponse<Response> getRes = getStations();
-        String deletedStation = gangnamStationCreationRes.jsonPath().getString("name");
-
-        assertThat(getRes.jsonPath().getList("name")).doesNotContain(deletedStation);
     }
 
-    private static ExtractableResponse<Response> createStation(String stationName) {
+    private static ExtractableResponse<Response> 지하철역_생성(String stationName) {
         Map<String, String> params = new HashMap<>();
         params.put("name", stationName);
 
@@ -120,7 +117,7 @@ public class StationAcceptanceTest extends AcceptanceTest{
         return response;
     }
 
-    private static ExtractableResponse<Response> getStations() {
+    private static ExtractableResponse<Response> 지하철역_조회() {
         ExtractableResponse<Response> getRes = RestAssured
             .given().log().all()
             .when()
@@ -129,5 +126,4 @@ public class StationAcceptanceTest extends AcceptanceTest{
             .extract();
         return getRes;
     }
-
 }
