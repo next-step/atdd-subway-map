@@ -53,11 +53,32 @@ public class Line {
         return distance;
     }
 
-    public void updateNewInfo(String name, String color, EndStations endStations, Long distance) {
-        updateNameIfValid(name);
-        updateColorIfValid(color);
-        updateEndStationsIfValid(endStations);
-        updateDistanceIfValid(distance);
+    public Line updateName(String name) {
+        if (name != null && !name.isBlank()) {
+            this.name = name;
+        }
+        return this;
+    }
+
+    public Line updateColor(String color) {
+        if (color != null && !color.isBlank()) {
+            this.color = color;
+        }
+        return this;
+    }
+
+    public Line updateEndStations(EndStations endStations) {
+        if (endStations != null) {
+            this.endStations = endStations;
+        }
+        return this;
+    }
+
+    public Line updateDistance(Long distance) {
+        if (distance != null && distance > 0) {
+            this.distance = distance;
+        }
+        return this;
     }
 
     @Override
@@ -69,30 +90,6 @@ public class Line {
             ", stations=" + endStations +
             ", distance=" + distance +
             '}';
-    }
-
-    private void updateNameIfValid(String name) {
-        if (name != null && !name.isBlank()) {
-            this.name = name;
-        }
-    }
-
-    private void updateColorIfValid(String color) {
-        if (color != null && !color.isBlank()) {
-            this.color = color;
-        }
-    }
-
-    private void updateEndStationsIfValid(EndStations endStations) {
-        if (endStations != null) {
-            this.endStations = endStations;
-        }
-    }
-
-    private void updateDistanceIfValid(Long distance) {
-        if (distance != null && distance > 0) {
-            this.distance = distance;
-        }
     }
 
     public static class Builder {

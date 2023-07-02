@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class DatabaseCleanup implements InitializingBean {
 
     public static final String SELECT_ALL_TABLES_QUERY = "show tables";
-    private final String[] CLEANUP_QUERIES = {
+    private static final String[] CLEANUP_QUERIES = {
         "SET REFERENTIAL_INTEGRITY FALSE",
         "TRUNCATE TABLE %s",
         "ALTER TABLE %s ALTER COLUMN ID RESTART WITH 1",
@@ -25,7 +25,7 @@ public class DatabaseCleanup implements InitializingBean {
     };
 
     @PersistenceContext
-    private EntityManager em;
+    private EntityManager entityManager;
 
     @Autowired
     private DataSource dataSource;
@@ -36,7 +36,7 @@ public class DatabaseCleanup implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() {
-        resetAutoIncrementTableNames = em.getMetamodel().getEntities().stream()
+        resetAutoIncrementTableNames = entityManager.getMetamodel().getEntities().stream()
             .filter(entityType -> entityType.getJavaType().getAnnotation(Entity.class) != null)
             .map(EntityType::getName)
             .map(this::convertCamelToSnake)
@@ -47,13 +47,13 @@ public class DatabaseCleanup implements InitializingBean {
 
     @Transactional
     public void clean() {
-        em.flush();
-        em.createNativeQuery(CLEANUP_QUERIES[0]).executeUpdate();
+        entityManager.flush();
+        entityManager.createNativeQuery(CLEANUP_QUERIES[0]).executeUpdate();
 
         truncateTableNames.stream().forEach(this::executeTruncate);
         resetAutoIncrementTableNames.stream().forEach(this::resetAutoIncrement);
 
-        em.createNativeQuery(CLEANUP_QUERIES[3]).executeUpdate();
+        entityManager.createNativeQuery(CLEANUP_QUERIES[3]).executeUpdate();
     }
 
     private String convertCamelToSnake(String camelCase) {
@@ -64,10 +64,10 @@ public class DatabaseCleanup implements InitializingBean {
     }
 
     private void executeTruncate(String name) {
-        em.createNativeQuery(String.format(CLEANUP_QUERIES[1], name)).executeUpdate();
+        entityManager.createNativeQuery(String.format(CLEANUP_QUERIES[1], name)).executeUpdate();
     }
 
     private void resetAutoIncrement(String name) {
-        em.createNativeQuery(String.format(CLEANUP_QUERIES[2], name)).executeUpdate();
+        entityManager.createNativeQuery(String.format(CLEANUP_QUERIES[2], name)).executeUpdate();
     }
 }
