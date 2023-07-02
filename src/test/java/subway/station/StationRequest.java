@@ -28,7 +28,7 @@ public class StationRequest {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 지하철역을_삭제한다(Long stationId) {
+    public static ExtractableResponse<Response> 지하철역을_삭제한다(long stationId) {
         return RestAssured.given().log().all()
                 .pathParam("id", stationId)
                 .when().delete("/stations/{id}")

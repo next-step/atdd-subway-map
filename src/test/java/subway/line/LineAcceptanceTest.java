@@ -2,17 +2,13 @@ package subway.line;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.util.List;
-import java.util.Map;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import subway.line.dto.LineResponse;
-import subway.line.dto.StationOnLineResponse;
 
 /**
  * 프로그래밍 요구사항
@@ -28,61 +24,32 @@ public class LineAcceptanceTest {
      * When: 지하철 노선을 생성하면
      * Then: 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
      */
+    @DisplayName("지하철 노선 생성")
     @Test
     void createLine() {
         // when
-        지정된_이름의_지하철역을_생성한다("강남역");
-        지정된_이름의_지하철역을_생성한다("양재역");
-        ExtractableResponse<Response> responseOfCreate = 지정된_이름의_지하철_노선을_생성한다("신분당선", 1L, 2L);
+        String lineName = "신분당선";
+        ExtractableResponse<Response> responseOfCreate = LineRequest.지하철_노선을_생성한다("강남역", "역삼역", lineName);
 
         // then
         assertThat(responseOfCreate.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
-        //TODO: 아래 인수 테스트는 조회 로직 구현 후에 다시해보기
-        long id = responseOfCreate.jsonPath().getLong("id");
-        ExtractableResponse<Response> responseOfRead = 지하철_노선을_조회한다(id);
+        long createdLineId = 지하철_노선_Id를_추출한다(responseOfCreate);
+        ExtractableResponse<Response> responseOfRead = LineRequest.지하철_노선을_조회한다(createdLineId);
 
-        long lineId = responseOfRead.jsonPath().getLong("id");
-        List<StationOnLineResponse> stations = responseOfRead.jsonPath().getList("stations", StationOnLineResponse.class);
+        long findLineId = 지하철_노선_Id를_추출한다(responseOfRead);
+        String findLineName = 지하철_노선_이름을_추출한다(responseOfRead);
 
-        assertThat(lineId).isEqualTo(1L);  // lineId를 넣어야 한다
-        assertThat(stations).hasSize(2);  // 상행과 하행 두개가 있으므로 size는 2여야 한다
+        assertThat(findLineId).isEqualTo(createdLineId);
+        assertThat(findLineName).isEqualTo(lineName);
     }
 
-    //TODO: 해당 로직은 StationAcceptanceTest와 중복이 된다. 어떻게 해결할 지 고민
-    private void 지정된_이름의_지하철역을_생성한다(String stationName) {
-        Map<String, String> params = Map.of("name", stationName);
-
-        RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all();
+    private long 지하철_노선_Id를_추출한다(ExtractableResponse<Response> responseOfCreateStation) {
+        return responseOfCreateStation.jsonPath().getLong("id");
     }
 
-    private ExtractableResponse<Response> 지정된_이름의_지하철_노선을_생성한다(String lineName, Long upStationId, Long downStationId) {
-        Map<String, Object> params = Map.of(
-                "name", lineName,
-                "color", "bg-red-600",
-                "upStationId", upStationId,  //TODO 고정된 id값이 아닌, 저장된 역의 id값을 사용해야 함
-                "downStationId", downStationId,
-                "distance", 10
-        );
-
-        return RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().log().all()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> 지하철_노선을_조회한다(long id) {
-        return RestAssured.given().log().all()
-                .pathParam("id", id)  // lineId를 넣어야 한다
-                .when().get("/lines/{id}")
-                .then().log().all()
-                .extract();
+    private String 지하철_노선_이름을_추출한다(ExtractableResponse<Response> responseOfRead) {
+        return responseOfRead.jsonPath().getString("name");
     }
 
     /**
@@ -90,26 +57,19 @@ public class LineAcceptanceTest {
      * When: 지하철 노선 목록을 조회하면
      * Then: 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다
      */
+    @DisplayName("지하철 노선 목록 조회")
     @Test
     void findAllLines() {
         // given
-        지정된_이름의_지하철역을_생성한다("강남역");
-        지정된_이름의_지하철역을_생성한다("양재역");
-        지정된_이름의_지하철_노선을_생성한다("신분당선", 1L, 2L);
-
-        지정된_이름의_지하철역을_생성한다("가양역");
-        지정된_이름의_지하철역을_생성한다("여의도역");
-        지정된_이름의_지하철_노선을_생성한다("9호선", 3L, 4L);
+        LineRequest.지하철_노선을_생성한다("강남역", "양재역", "신분당선");
+        LineRequest.지하철_노선을_생성한다("가양역", "여의도역", "9호선");
 
         // when
-        ExtractableResponse<Response> result = RestAssured.given().log().all()
-                .when().get("/lines")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = LineRequest.지하철_노선_목록을_조회한다();
 
         // then
-        assertThat(result.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(result.jsonPath().getList("", LineResponse.class)).hasSize(2);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.jsonPath().getList("", LineResponse.class)).hasSize(2);
     }
 
     /**
@@ -117,19 +77,18 @@ public class LineAcceptanceTest {
      * When: 생성한 지하철 노선을 조회하면
      * Then: 생성한 지하철 노선의 정보를 응답받을 수 있다
      */
+    @DisplayName("지하철 노선 조회")
     @Test
     void findLine() {
         // given
-        지정된_이름의_지하철역을_생성한다("강남역");
-        지정된_이름의_지하철역을_생성한다("양재역");
-        지정된_이름의_지하철_노선을_생성한다("신분당선", 1L, 2L);
+        ExtractableResponse<Response> responseOfCreateLine = LineRequest.지하철_노선을_생성한다("강남역", "양재역", "신분당선");
 
         // when
-        ExtractableResponse<Response> result = 지하철_노선을_조회한다(1L);
+        ExtractableResponse<Response> responseOfFindLine = LineRequest.지하철_노선을_조회한다(지하철_노선_Id를_추출한다(responseOfCreateLine));
 
         // then
-        assertThat(result.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(result.jsonPath().getLong("id")).isEqualTo(1L);
+        assertThat(responseOfFindLine.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(지하철_노선_Id를_추출한다(responseOfFindLine)).isEqualTo(1L);
     }
 
     /**
@@ -137,37 +96,28 @@ public class LineAcceptanceTest {
      * When: 생성한 지하철 노선을 수정하면
      * Then: 해당 지하철 노선 정보는 수정된다
      */
+    @DisplayName("지하철 노선 수정")
     @Test
     void updateLine() {
         // given
-        지정된_이름의_지하철역을_생성한다("강남역");
-        지정된_이름의_지하철역을_생성한다("양재역");
-        지정된_이름의_지하철_노선을_생성한다("신분당선", 1L, 2L);
+        ExtractableResponse<Response> responseOfCreateLine = LineRequest.지하철_노선을_생성한다("강남역", "양재역", "신분당선");
 
         // when
-        ExtractableResponse<Response> responseOfUpdate = 지하철_노선을_수정한다();
+        long lineId = 지하철_노선_Id를_추출한다(responseOfCreateLine);
+        String lineNameForUpdate = "구분당선";
+        String lineColorForUpdate = "bg-sky-500";
+        ExtractableResponse<Response> responseOfUpdateLine = LineRequest.지하철_노선을_수정한다(lineId, lineNameForUpdate, lineColorForUpdate);
 
         // then
-        assertThat(responseOfUpdate.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(responseOfUpdateLine.statusCode()).isEqualTo(HttpStatus.OK.value());
 
-        ExtractableResponse<Response> responseOfShowLine = 지하철_노선을_조회한다(1L);
-        assertThat(responseOfShowLine.jsonPath().getString("name")).isEqualTo("구분당선");
-        assertThat(responseOfShowLine.jsonPath().getString("color")).isEqualTo("bg-sky-500");
+        ExtractableResponse<Response> responseOfShowLine = LineRequest.지하철_노선을_조회한다(lineId);
+        assertThat(지하철_노선_이름을_추출한다(responseOfShowLine)).isEqualTo(lineNameForUpdate);
+        assertThat(지하철_노선_색상을_추출한다(responseOfShowLine)).isEqualTo(lineColorForUpdate);
     }
 
-    private ExtractableResponse<Response> 지하철_노선을_수정한다() {
-        Map<String, String> params = Map.of(
-                "name", "구분당선",
-                "color", "bg-sky-500"
-        );
-
-        return RestAssured.given().log().all()
-                .body(params)
-                .pathParam("id", 1L)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().put("/lines/{id}")
-                .then().log().all()
-                .extract();
+    private String 지하철_노선_색상을_추출한다(ExtractableResponse<Response> responseOfShowLine) {
+        return responseOfShowLine.jsonPath().getString("color");
     }
 
     /**
@@ -175,24 +125,20 @@ public class LineAcceptanceTest {
      * When: 생성한 지하철 노선을 삭제하면
      * Then: 해당 지하철 노선 정보는 삭제된다
      */
+    @DisplayName("지하철 노선 삭제")
     @Test
     void deleteLine() {
         // given
-        지정된_이름의_지하철역을_생성한다("강남역");
-        지정된_이름의_지하철역을_생성한다("양재역");
-        지정된_이름의_지하철_노선을_생성한다("신분당선", 1L, 2L);
+        ExtractableResponse<Response> responseOfCreateLine = LineRequest.지하철_노선을_생성한다("강남역", "양재역", "신분당선");
 
         // when
-        ExtractableResponse<Response> responseOfDelete = RestAssured.given().log().all()
-                .pathParam("id", 1L)
-                .when().delete("/lines/{id}")
-                .then().log().all()
-                .extract();
+        long lineId = 지하철_노선_Id를_추출한다(responseOfCreateLine);
+        ExtractableResponse<Response> responseOfDelete = LineRequest.지하철_노선을_삭제한다(lineId);
 
         // then
         assertThat(responseOfDelete.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
-        ExtractableResponse<Response> responseOfShowLine = 지하철_노선을_조회한다(1L);
+        ExtractableResponse<Response> responseOfShowLine = LineRequest.지하철_노선을_조회한다(lineId);
         assertThat(responseOfShowLine.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());  //TODO 없는 지하철 노선을 조회했으므로 예외가 발생할 것. 하지만 내가 ExceptionHandler를 따로 구현해주지 않았기 때문에 정해진 형식으로 내려오지 않는 문제가 있다. 어떻게 할지 고민 !
     }
 }
