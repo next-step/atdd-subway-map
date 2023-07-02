@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import subway.station.domain.Station;
 
 /**
  * 프로그래밍 요구사항
