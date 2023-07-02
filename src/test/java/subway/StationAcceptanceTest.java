@@ -54,7 +54,7 @@ public class StationAcceptanceTest {
         // then
         assertThat(stationResponses).hasSize(2)
                 .map(StationResponse::getName)
-                .contains("강남역", "역삼역");
+                .containsExactly("강남역", "역삼역");
     }
 
     /**
@@ -72,7 +72,7 @@ public class StationAcceptanceTest {
         //when
         RestAssured.given().log().all()
                 .when().log().all()
-                    .delete(format("/stations/%d", station.getId()))
+                    .delete("/stations/{id}", station.getId())
                 .then()
                     .log().all()
                 .statusCode(HttpStatus.NO_CONTENT.value());
