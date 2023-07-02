@@ -34,7 +34,7 @@ public class StationAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        assertThat(getSubwayStations()).containsAnyOf("강남역");
+        assertThat(getSubwayStations()).containsExactly("강남역");
     }
 
     /**
@@ -42,7 +42,6 @@ public class StationAcceptanceTest {
      * When 지하철역 목록을 조회하면
      * Then 2개의 지하철역을 응답 받는다
      */
-    // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
     @DisplayName("지하철역을 조회한다.")
     @Test
     void 지하철역_조회() {
@@ -60,7 +59,7 @@ public class StationAcceptanceTest {
         List<String> names = getSubwayStations();
 
         //then
-        assertThat(names.size()).isEqualTo(2);
+        assertThat(names).containsOnly("마들역", "노원역");
     }
 
     /**
@@ -68,7 +67,6 @@ public class StationAcceptanceTest {
      * When 그 지하철역을 삭제하면
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
-    // TODO: 지하철역 제거 인수 테스트 메서드 생성
     @DisplayName("지하철역 제거한다.")
     @Test
     void 지하철역_제거() {
