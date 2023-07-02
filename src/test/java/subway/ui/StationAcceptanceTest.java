@@ -95,7 +95,7 @@ public class StationAcceptanceTest {
                 .extract();
     }
 
-    private ExtractableResponse<Response> generateSubwayStation(String name) {
+    public static ExtractableResponse<Response> generateSubwayStation(String name) {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
 

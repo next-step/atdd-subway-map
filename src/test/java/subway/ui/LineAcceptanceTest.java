@@ -24,15 +24,25 @@ public class LineAcceptanceTest {
     @Test
     void createLine() {
         //when
+        final String 지하철역 = "지하철역";
+        final String 새로운지하철역 = "새로운지하철역";
+
         final String 신분당선 = "신분당선";
-        LineCreateRequest request =
-                new LineCreateRequest(신분당선, "bg-red-600", 1L, 2L, 10L);
+        LineCreateRequest request = new LineCreateRequest(
+                신분당선,
+                "bg-red-600",
+                getIdFromResponse(StationAcceptanceTest.generateSubwayStation(지하철역)),
+                getIdFromResponse(StationAcceptanceTest.generateSubwayStation(새로운지하철역)),
+                10L
+        );
         ExtractableResponse<Response> response = generateSubwayLine(request);
 
         //then
-        String lineName = getSubwayLines(response.body().jsonPath().getObject("id", Long.class));
+        assertThat(getSubwayLines(getIdFromResponse(response))).isEqualTo(신분당선);
+    }
 
-        assertThat(lineName).isEqualTo(신분당선);
+    private Long getIdFromResponse(ExtractableResponse<Response> response) {
+        return response.jsonPath().getObject("id", Long.class);
     }
 
     private String getSubwayLines(Long lineId) {
