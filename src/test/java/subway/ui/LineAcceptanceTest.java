@@ -27,21 +27,11 @@ public class LineAcceptanceTest {
     @Test
     void createLine() {
         //when
-        final String 지하철역 = "지하철역";
-        final String 새로운지하철역 = "새로운지하철역";
-
         final String 신분당선 = "신분당선";
-        LineCreateRequest request = new LineCreateRequest(
-                신분당선,
-                "bg-red-600",
-                getIdFromResponse(StationAcceptanceTest.generateSubwayStation(지하철역)),
-                getIdFromResponse(StationAcceptanceTest.generateSubwayStation(새로운지하철역)),
-                10L
-        );
-        ExtractableResponse<Response> response = generateSubwayLine(request);
+        ExtractableResponse<Response> 신분당선_응답 = 지하철_노선_생성(신분당선);
 
         //then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(신분당선_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         //then
         assertThat(getSubwayLines()).containsExactly(신분당선);
@@ -56,30 +46,13 @@ public class LineAcceptanceTest {
     @Test
     void showLines() {
         //given
-        final String 지하철역 = "지하철역";
-        final String 새로운지하철역 = "새로운지하철역";
-        final String 또다른지하철역 = "또다른지하철역";
-
         final String 신분당선 = "신분당선";
-        LineCreateRequest 신분당선_요청 = new LineCreateRequest(
-                신분당선,
-                "bg-red-600",
-                getIdFromResponse(StationAcceptanceTest.generateSubwayStation(지하철역)),
-                getIdFromResponse(StationAcceptanceTest.generateSubwayStation(새로운지하철역)),
-                10L
-        );
-        ExtractableResponse<Response> 신분당선_응답 = generateSubwayLine(신분당선_요청);
+        final String 분당선 = "분당선";
+
+        ExtractableResponse<Response> 신분당선_응답 = 지하철_노선_생성(신분당선);
         assertThat(신분당선_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
-        final String 분당선 = "분당선";
-        LineCreateRequest 분당선_요청 = new LineCreateRequest(
-                분당선,
-                "bg-green-600",
-                getIdFromResponse(StationAcceptanceTest.generateSubwayStation(지하철역)),
-                getIdFromResponse(StationAcceptanceTest.generateSubwayStation(또다른지하철역)),
-                10L
-        );
-        ExtractableResponse<Response> 분당선_응답 = generateSubwayLine(분당선_요청);
+        ExtractableResponse<Response> 분당선_응답 = 지하철_노선_생성(분당선);
         assertThat(분당선_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         //when
@@ -87,6 +60,20 @@ public class LineAcceptanceTest {
 
         //then
         assertThat(subwayLines).containsOnly(분당선, 신분당선);
+    }
+
+    private ExtractableResponse<Response> 지하철_노선_생성(final String name) {
+        final String 상행종점역 = "상행좀점역";
+        final String 하행종점역 = "하행종점역";
+
+        LineCreateRequest request = new LineCreateRequest(
+                name,
+                "bg-red-600",
+                getIdFromResponse(StationAcceptanceTest.generateSubwayStation(상행종점역)),
+                getIdFromResponse(StationAcceptanceTest.generateSubwayStation(하행종점역)),
+                10L
+        );
+        return generateSubwayLine(request);
     }
 
     private Long getIdFromResponse(ExtractableResponse<Response> response) {
