@@ -33,8 +33,7 @@ public class StationAcceptanceTest {
         Map<String, String> parameter = new HashMap<>();
         parameter.put("name", DEFAULT_STATION_NAME);
 
-        ExtractableResponse<Response> response =
-                RestAssured
+        ExtractableResponse<Response> response = RestAssured
                         .given().log().all()
                             .body(parameter)
                             .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -47,8 +46,7 @@ public class StationAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames =
-                RestAssured
+        List<String> stationNames = RestAssured
                         .given().log().all()
                         .when()
                             .get(STATION_API_URL)
@@ -63,8 +61,7 @@ public class StationAcceptanceTest {
         Map<String, String> parameter = new HashMap<>();
         parameter.put("name", stationName);
 
-        ExtractableResponse<Response> response =
-                RestAssured
+        ExtractableResponse<Response> response = RestAssured
                         .given().log().all()
                             .body(parameter)
                             .contentType(MediaType.APPLICATION_JSON_VALUE)
