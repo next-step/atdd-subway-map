@@ -5,7 +5,6 @@ import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 
 import java.util.HashMap;
@@ -13,6 +12,8 @@ import java.util.Map;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
+import static subway.AcceptanceTestUtils.getLocation;
+import static subway.AcceptanceTestUtils.verifyResponse;
 
 @DisplayName("지하철역 관련 기능")
 @AcceptanceTest
@@ -21,9 +22,8 @@ class StationAcceptanceTest {
     private static final String RESOURCE_URL = "/stations";
 
 
-    @DisplayName("지하철역을 생성한다.")
     @Test
-    void createStation() {
+    void 지하철역을_생성한다() {
         // given
         String stationName = "강남역";
 
@@ -40,9 +40,8 @@ class StationAcceptanceTest {
                 .body("name", equalTo(stationName));
     }
 
-    @DisplayName("지하철역을 전체 조회한다.")
     @Test
-    void showStations() {
+    void 지하철역을_전체_조회한다() {
         // given
         String firstStationName = "언주역";
         createStation(firstStationName);
@@ -62,9 +61,8 @@ class StationAcceptanceTest {
                 .body("[1].name", equalTo(secondStationName));
     }
 
-    @DisplayName("지하철역을 삭제한다.")
     @Test
-    void deleteStation() {
+    void 지하철역을_삭제한다() {
         // given
         String stationName = "청담역";
         ValidatableResponse stationCreatedResponse = createStation(stationName);
@@ -79,10 +77,6 @@ class StationAcceptanceTest {
 
         ValidatableResponse foundStation = getStations(createdResourceLocation);
         verifyResponse(foundStation, HttpStatus.NOT_FOUND);
-    }
-
-    private void verifyResponse(ValidatableResponse stationFoundResponse, HttpStatus status) {
-        stationFoundResponse.assertThat().statusCode(status.value());
     }
 
     private ValidatableResponse createStation(String stationName) {
@@ -114,7 +108,4 @@ class StationAcceptanceTest {
                 .then().log().all();
     }
 
-    private String getLocation(ValidatableResponse response) {
-        return response.extract().header(HttpHeaders.LOCATION);
-    }
 }

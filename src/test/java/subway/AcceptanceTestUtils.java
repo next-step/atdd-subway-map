@@ -3,6 +3,9 @@ package subway;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.restassured.response.ValidatableResponse;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 
 
 public final class AcceptanceTestUtils {
@@ -21,5 +24,12 @@ public final class AcceptanceTestUtils {
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
+    }
+
+    public static void verifyResponse(ValidatableResponse stationFoundResponse, HttpStatus status) {
+        stationFoundResponse.assertThat().statusCode(status.value());
+    }
+    public static String getLocation(ValidatableResponse response) {
+        return response.extract().header(HttpHeaders.LOCATION);
     }
 }
