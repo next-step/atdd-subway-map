@@ -6,7 +6,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
-import subway.exception.LineNotEstablishedBySameEndStationException;
+import subway.exception.EndStationNotValidStationCountException;
 
 @Entity
 public class EndStations {
@@ -40,7 +40,8 @@ public class EndStations {
 
     private Set<Station> valid(Set<Station> stations) {
         if (isCountNotValid(stations)) {
-            throw new LineNotEstablishedBySameEndStationException("노선의 종착역은 동일한 역으로 설정할 수 없습니다.");
+            throw new EndStationNotValidStationCountException(
+                String.format("노선의 종착역은 항상 2개의 역으로만 구성가능합니다: %d 개", stations.size()));
         }
         return stations;
     }

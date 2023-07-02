@@ -55,12 +55,11 @@ public class Line {
     }
 
     public void updateNewInfo(UpdateRequest request) {
-        updateName(request);
-        updateColor(request);
-        updateEndStations(request);
-        updateDistance(request);
+        updateNameIfValid(request);
+        updateColorIfValid(request);
+        updateEndStationsIfValid(request);
+        updateDistanceIfValid(request);
     }
-
 
     @Override
     public String toString() {
@@ -73,25 +72,25 @@ public class Line {
             '}';
     }
 
-    private void updateName(UpdateRequest request) {
+    private void updateNameIfValid(UpdateRequest request) {
         if (request.hasName()) {
             this.name = request.getName();
         }
     }
 
-    private void updateColor(UpdateRequest request) {
+    private void updateColorIfValid(UpdateRequest request) {
         if (request.hasColor()) {
             this.color = request.getColor();
         }
     }
 
-    private void updateEndStations(UpdateRequest request) {
+    private void updateEndStationsIfValid(UpdateRequest request) {
         if (request.hasEndStations()) {
             this.endStations = request.getEndStations();
         }
     }
 
-    private void updateDistance(UpdateRequest request) {
+    private void updateDistanceIfValid(UpdateRequest request) {
         if (request.hasDistance()) {
             this.distance = request.getDistance();
         }

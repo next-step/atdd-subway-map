@@ -15,15 +15,15 @@ import org.assertj.core.api.ListAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext.ClassMode;
+import org.springframework.test.context.jdbc.Sql;
 
-@DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
+@Sql("/cleanup.sql")
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class StationAcceptanceTest {
@@ -34,6 +34,9 @@ public class StationAcceptanceTest {
 
     @LocalServerPort
     int port;
+
+    @Autowired
+    DatabaseCleanup databaseCleanup;
 
     @DisplayName("RestAssured 요청 포트 번호를 설정합니다.")
     @BeforeEach

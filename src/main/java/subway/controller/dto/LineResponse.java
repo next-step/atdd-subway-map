@@ -1,6 +1,7 @@
 package subway.controller.dto;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 import subway.domain.Line;
 import subway.domain.Station;
 
@@ -12,7 +13,7 @@ public class LineResponse {
 
     private final String color;
 
-    private final Set<Station> stations;
+    private final Set<StationResponse> stations;
 
     private final Long distance;
 
@@ -20,8 +21,14 @@ public class LineResponse {
         this.id = id;
         this.name = name;
         this.color = color;
-        this.stations = stations;
+        this.stations = responseOf(stations);
         this.distance = distance;
+    }
+
+    private Set<StationResponse> responseOf(Set<Station> stations) {
+        return stations.stream()
+            .map(StationResponse::responseFrom)
+            .collect(Collectors.toSet());
     }
 
     public static LineResponse from(Line line) {
@@ -41,7 +48,7 @@ public class LineResponse {
         return color;
     }
 
-    public Set<Station> getStations() {
+    public Set<StationResponse> getStations() {
         return stations;
     }
 

@@ -4,8 +4,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.controller.dto.LineRequest;
@@ -24,8 +22,6 @@ import subway.repository.StationRepository;
 @Service
 public class LineService {
 
-    public static final Logger LOGGER = LoggerFactory.getLogger(LineService.class);
-
     private final LineRepository lineRepository;
 
     private final StationRepository stationRepository;
@@ -37,16 +33,11 @@ public class LineService {
 
     @Transactional
     public LineResponse createdLineBy(LineRequest request) {
-        Set<Station> endStations = streamOfEndStationIdFrom(request)
-            .filter(Objects::nonNull)
-            .map(this::stationFoundById)
-            .collect(Collectors.toSet());
-
         return LineResponse.from(lineRepository.save(new Line.Builder()
             .name(request.getName())
             .color(request.getColor())
             .distance(request.getDistance())
-            .stations(EndStations.of(endStations))
+            .stations(EndStations.of(distinctStationsGetByIdFrom(request)))
             .build()));
     }
 
@@ -61,7 +52,7 @@ public class LineService {
     @Transactional
     public LineResponse updatedLineBy(Long id, LineRequest request) {
         Line line = lineFoundById(id);
-        
+
         line.updateNewInfo(new UpdateRequest.Builder()
             .name(request.getName())
             .color(request.getColor())
@@ -72,16 +63,20 @@ public class LineService {
         return LineResponse.from(lineRepository.save(line));
     }
 
+    private Set<Station> distinctStationsGetByIdFrom(LineRequest request) {
+        return streamOfEndStationIdFrom(request)
+            .filter(Objects::nonNull)
+            .map(this::stationFoundById)
+            .collect(Collectors.toSet());
+    }
+
     private Line lineFoundById(Long id) {
         return lineRepository.findById(id)
             .orElseThrow(() -> new LineNotFoundException("일치하는 지하철 노선 정보가 존재하지 않습니다: " + id));
     }
 
     private Set<Station> renewableStationsFrom(LineRequest request) {
-        return streamOfEndStationIdFrom(request)
-            .filter(Objects::nonNull)
-            .map(this::stationFoundById)
-            .collect(Collectors.toSet());
+        return distinctStationsGetByIdFrom(request);
     }
 
     private Stream<Long> streamOfEndStationIdFrom(LineRequest request) {
