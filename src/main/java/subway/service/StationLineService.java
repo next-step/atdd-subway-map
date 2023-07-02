@@ -2,6 +2,7 @@ package subway.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.common.StationLineNotFoundException;
 import subway.controller.resonse.StationLineResponse;
 import subway.controller.resonse.StationResponse;
 import subway.domain.StationLine;
@@ -62,7 +63,7 @@ public class StationLineService {
 
     private StationLine requireGetById(Long id) {
         return stationLineRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException(String.format("not found station line : %d", id)));
+                .orElseThrow(() -> new StationLineNotFoundException(id));
     }
 
     private StationLineResponse createStationLineResponse(StationLine stationLine, StationResponse upStationResponse, StationResponse downStationResponse) {
