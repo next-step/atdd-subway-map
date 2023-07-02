@@ -62,6 +62,36 @@ public class LineAcceptanceTest {
         assertThat(subwayLines).containsOnly(분당선, 신분당선);
     }
 
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 조회하면
+     * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
+     */
+    @DisplayName("지하철노선 조회")
+    @Test
+    void showLine() {
+        //given
+        final String 신분당선 = "신분당선";
+        ExtractableResponse<Response> 신분당선_생성_응답 = 지하철_노선_생성(신분당선);
+        assertThat(신분당선_생성_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        //when
+        ExtractableResponse<Response> 신분당선_조회_응답 =
+                getSubwayStation(신분당선_생성_응답.jsonPath().getObject("id", Long.class));
+
+        //then
+        assertThat(신분당선_조회_응답.jsonPath().getObject("name", String.class)).isEqualTo(신분당선);
+    }
+
+    private ExtractableResponse<Response> getSubwayStation(Long lineId) {
+        return RestAssured
+                .given().log().all()
+                .pathParam("id", lineId)
+                .when().get("/stations/{id}")
+                .then().log().all()
+                .extract();
+    }
+
     private ExtractableResponse<Response> 지하철_노선_생성(final String name) {
         final String 상행종점역 = "상행좀점역";
         final String 하행종점역 = "하행종점역";
