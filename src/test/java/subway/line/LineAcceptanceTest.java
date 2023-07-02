@@ -139,18 +139,6 @@ public class LineAcceptanceTest {
      */
     @Test
     void updateLine() {
-        /* # API 명세
-         *
-         * ## Request
-         * PUT /lines/{id}
-         * Content-Type: application/json
-         * Body
-         * - name : 수정하고자 하는 이름
-         * - color : 수정하고자 하는 색상
-         *
-         * ## Response
-         * status: 200 OK
-         */
         // given
         지정된_이름의_지하철역을_생성한다("강남역");
         지정된_이름의_지하철역을_생성한다("양재역");
@@ -189,14 +177,6 @@ public class LineAcceptanceTest {
      */
     @Test
     void deleteLine() {
-        /* # API 명세
-         *
-         * ## Request
-         * DELETE /lines/{id}
-         *
-         * ## Response
-         * status: 204 NoContent
-         */
         // given
         지정된_이름의_지하철역을_생성한다("강남역");
         지정된_이름의_지하철역을_생성한다("양재역");
