@@ -33,12 +33,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        ExtractableResponse<Response> showResponse = RestAssured
-                .given().log().all()
-                .when()
-                .get("/lines")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> showResponse = 지하철_노선_목록_조회_요청();
         List<String> lineNames = showResponse.jsonPath().getList("name", String.class);
 
         assertThat(lineNames.size()).isEqualTo(1);
@@ -58,12 +53,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         assertThat(createResponse2.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // when
-        ExtractableResponse<Response> showResponse = RestAssured
-                .given().log().all()
-                .when()
-                .get("/lines")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> showResponse = 지하철_노선_목록_조회_요청();
         List<String> lineNames = showResponse.jsonPath().getList("name", String.class);
 
         // then
@@ -91,6 +81,15 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post("/lines")
+                .then().log().all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> 지하철_노선_목록_조회_요청() {
+        return RestAssured
+                .given().log().all()
+                .when()
+                .get("/lines")
                 .then().log().all()
                 .extract();
     }
