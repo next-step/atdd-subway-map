@@ -64,18 +64,23 @@ public class StationAcceptanceTest {
         지정된_이름의_지하철역을_생성한다(여의도역);
 
         //when
-        List<String> stationNames = 지하철역_목록_이름을_조회한다();
+        List<String> stationNames = 지하철역_목록_이름을_조회한다();  //TODO 지하철역 이름은 2개의 지하철역을 응답받는다에 대한 수단이므로, Then절에서 이루어지는 게 좋아보임
 
         //then
         assertThat(stationNames).hasSize(2);
         assertThat(stationNames).contains(가양역, 여의도역);
     }
 
+    /**
+     * TODO 아래 두 가지 역할을 수행하는 메서드를 추출 해보는 것은 어떨까?
+     *  1. GET /stations
+     *  2. 응답으로 부터 name 추출
+     */
     private List<String> 지하철역_목록_이름을_조회한다() {
         return RestAssured.given().log().all()
-                .when().get("/stations")
+                .when().get("/stations")  //TODO /stations 가 다른 path로 변경된다면?
                 .then().log().all()
-                .extract().jsonPath().getList("name", String.class);
+                .extract().jsonPath().getList("name", String.class);  //TODO 이름 뿐만 아니라, 다른 내용들도 조회하고 싶다면?
     }
 
     private void 지정된_이름의_지하철역을_생성한다(String stationName) {
