@@ -1,4 +1,4 @@
-package subway;
+package subway.station;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import subway.station.StationResponse;
 
 import java.util.HashMap;
 import java.util.List;
