@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import subway.controller.request.StationLineRequest;
 import subway.controller.resonse.StationLineResponse;
-import subway.controller.resonse.StationResponse;
 import subway.service.StationLineService;
 
 import java.net.URI;
@@ -31,8 +30,6 @@ public class StationLineController {
 
     @GetMapping("/lines")
     public ResponseEntity<List<StationLineResponse>> showStationLines() {
-        List<StationResponse> stationResponses = List.of(new StationResponse(1L, "강남역"), new StationResponse(2L, "언주역"));
-        StationLineResponse response = new StationLineResponse(1L, "신분당선", "bg-red-600", stationResponses);
-        return ResponseEntity.ok().body(List.of(response));
+        return ResponseEntity.ok().body(stationLineService.findAllStationLines());
     }
 }

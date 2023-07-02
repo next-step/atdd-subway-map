@@ -9,6 +9,7 @@ import subway.domain.StationLine;
 import subway.repository.StationLineRepository;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -33,6 +34,16 @@ public class StationLineService {
         return createStationLineResponse(satedStationLine, upStation, downStation);
     }
 
+    public List<StationLineResponse> findAllStationLines() {
+        return stationLineRepository.findAll().stream()
+                .map(stationLine -> {
+                    StationResponse upStation = stationService.findStation(stationLine.getUpStationId());
+                    StationResponse downStation = stationService.findStation(stationLine.getDownStationId());
+
+                    return createStationLineResponse(stationLine, upStation, downStation);
+                })
+                .collect(Collectors.toList());
+    }
 
     private StationLineResponse createStationLineResponse(StationLine stationLine, StationResponse upStationResponse, StationResponse downStationResponse) {
         return new StationLineResponse(
