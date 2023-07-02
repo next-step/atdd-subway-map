@@ -139,7 +139,42 @@ public class LineAcceptanceTest {
      */
     @Test
     void updateLine() {
+        /* # API 명세
+         *
+         * ## Request
+         * PUT /lines/{id}
+         * Content-Type: application/json
+         * Body
+         * - name : 수정하고자 하는 이름
+         * - color : 수정하고자 하는 색상
+         *
+         * ## Response
+         * status: 200 OK
+         */
+        // given
+        지정된_이름의_지하철역을_생성한다("강남역");
+        지정된_이름의_지하철역을_생성한다("양재역");
+        지정된_이름의_지하철_노선을_생성한다("신분당선", 1L, 2L);
 
+        // when
+        Map<String, String> params = Map.of(
+                "name", "구분당선",
+                "color", "bg-sky-500"
+        );
+
+        ExtractableResponse<Response> responseOfUpdate = RestAssured.given().log().all()
+                .body(params)
+                .pathParam("id", 1L)
+                .when().put("/lines/{id}")
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(responseOfUpdate.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        ExtractableResponse<Response> responseOfShowLine = 지하철_노선을_조회한다(1L);
+        assertThat(responseOfShowLine.jsonPath().getString("name")).isEqualTo("구분당선");
+        assertThat(responseOfShowLine.jsonPath().getString("color")).isEqualTo("bg-sky-500");
     }
 
     /**
