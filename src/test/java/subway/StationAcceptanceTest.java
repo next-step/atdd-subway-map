@@ -50,7 +50,7 @@ public abstract class StationAcceptanceTest extends AcceptanceTest {
     }
 
     /**
-     * 지하철 노선 조회 요청을 합니다
+     * 존재하는 지하철역 중 name 을 가진 역이 있는지 확인합니다.
      * @param name 확인할 지하철 노선 이름
      */
     protected void 지하철역_목록_포함_여부_확인(String name) {
@@ -62,7 +62,7 @@ public abstract class StationAcceptanceTest extends AcceptanceTest {
     }
 
     /**
-     * 지하철 노선 삭제 요청을 합니다
+     * name 을 가진 지하철역을 삭제 요청을 합니다
      * @param name 지하철 노선 이름
      * @return 지하철 노선 삭제 요청 결과
      */
@@ -80,7 +80,7 @@ public abstract class StationAcceptanceTest extends AcceptanceTest {
     }
 
     /**
-     * 지하철 노선 조회 요청을 합니다
+     * 존재하는 지하철역 중 name 을 가진 역이 없는지 확인합니다.
      * @param name 확인할 지하철 노선 이름
      */
     protected void 지하철역_목록_미포함_여부_확인(String name) {
