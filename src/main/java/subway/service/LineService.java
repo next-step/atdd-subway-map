@@ -46,4 +46,8 @@ public class LineService {
         line.update(request);
         return lineMapper.toLineResponse(line);
     }
+
+    public void deleteLine(Long lineId) {
+        lineRepository.deleteById(lineId);
+    }
 }
