@@ -7,7 +7,6 @@ import java.util.stream.Stream;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.controller.dto.LineRequest;
-import subway.controller.dto.LineRequest.UpdateRequest;
 import subway.controller.dto.LineResponse;
 import subway.controller.dto.LinesResponse;
 import subway.domain.EndStations;
@@ -53,12 +52,7 @@ public class LineService {
     public LineResponse updatedLineBy(Long id, LineRequest request) {
         Line line = lineFoundById(id);
 
-        line.updateNewInfo(new UpdateRequest.Builder()
-            .name(request.getName())
-            .color(request.getColor())
-            .distance(request.getDistance())
-            .endStations(EndStations.of(renewableStationsFrom(request)))
-            .build());
+        line.updateNewInfo(request.getName(), request.getColor(), EndStations.of(renewableStationsFrom(request)), request.getDistance());
 
         return LineResponse.from(lineRepository.save(line));
     }

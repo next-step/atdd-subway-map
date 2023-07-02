@@ -6,7 +6,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
-import subway.controller.dto.LineRequest.UpdateRequest;
 
 @Entity
 public class Line {
@@ -54,11 +53,11 @@ public class Line {
         return distance;
     }
 
-    public void updateNewInfo(UpdateRequest request) {
-        updateNameIfValid(request);
-        updateColorIfValid(request);
-        updateEndStationsIfValid(request);
-        updateDistanceIfValid(request);
+    public void updateNewInfo(String name, String color, EndStations endStations, Long distance) {
+        updateNameIfValid(name);
+        updateColorIfValid(color);
+        updateEndStationsIfValid(endStations);
+        updateDistanceIfValid(distance);
     }
 
     @Override
@@ -72,27 +71,27 @@ public class Line {
             '}';
     }
 
-    private void updateNameIfValid(UpdateRequest request) {
-        if (request.hasName()) {
-            this.name = request.getName();
+    private void updateNameIfValid(String name) {
+        if (name != null && !name.isBlank()) {
+            this.name = name;
         }
     }
 
-    private void updateColorIfValid(UpdateRequest request) {
-        if (request.hasColor()) {
-            this.color = request.getColor();
+    private void updateColorIfValid(String color) {
+        if (color != null && !color.isBlank()) {
+            this.color = color;
         }
     }
 
-    private void updateEndStationsIfValid(UpdateRequest request) {
-        if (request.hasEndStations()) {
-            this.endStations = request.getEndStations();
+    private void updateEndStationsIfValid(EndStations endStations) {
+        if (endStations != null) {
+            this.endStations = endStations;
         }
     }
 
-    private void updateDistanceIfValid(UpdateRequest request) {
-        if (request.hasDistance()) {
-            this.distance = request.getDistance();
+    private void updateDistanceIfValid(Long distance) {
+        if (distance != null && distance > 0) {
+            this.distance = distance;
         }
     }
 
