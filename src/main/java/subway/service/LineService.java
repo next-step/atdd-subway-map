@@ -47,7 +47,18 @@ public class LineService {
 
     @Transactional
     public LineResponse modifyLine(Long lineId, LineModifyRequest lineModifyRequest) {
-        return null;
+        Line line = lineRepository.findById(lineId)
+                                  .orElseThrow(() -> new IllegalArgumentException("line id doesn't exist"));
+
+        if (lineModifyRequest.getName() != null) {
+            line.setName(lineModifyRequest.getName());
+        }
+
+        if (lineModifyRequest.getColor() != null) {
+            line.setColor(lineModifyRequest.getColor());
+        }
+
+        return LineResponse.from(line);
     }
 
     public List<LineResponse> findAllLines() {
@@ -56,7 +67,7 @@ public class LineService {
 
     @Transactional
     public void deleteLineById(Long id) {
-
+        lineRepository.deleteById(id);
     }
 
     public LineResponse findById(Long id) {

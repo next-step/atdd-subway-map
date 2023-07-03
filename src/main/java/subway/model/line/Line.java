@@ -1,17 +1,13 @@
 package subway.model.line;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import subway.controller.dto.station.StationResponse;
+import lombok.*;
 import subway.model.station.Station;
 
 import javax.persistence.*;
-import java.util.List;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -26,8 +22,10 @@ public class Line {
     private String color;
 
     @OneToOne
+    @JoinColumn(name = "upStationId", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Station upStation;
 
     @OneToOne
+    @JoinColumn(name = "downStationId", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Station downStation;
 }

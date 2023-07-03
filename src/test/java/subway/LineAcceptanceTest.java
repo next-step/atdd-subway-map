@@ -6,25 +6,28 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.jdbc.Sql;
 import subway.controller.dto.line.LineModifyRequest;
 import subway.controller.dto.line.LineSaveRequest;
+import subway.model.line.LineRepository;
+import subway.model.station.StationRepository;
 import subway.utils.StationApiHelper;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-//@Sql("truncate_station.sql")
+@Sql("truncate_tables.sql")
 @DisplayName("지하철 노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {
 
     private Long stationId1;
     private Long stationId2;
-
     private Long stationId3;
     private Long stationId4;
 
@@ -117,7 +120,8 @@ public class LineAcceptanceTest {
 
         // then
         assertThat(lineResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(lineResponse.jsonPath().getString("name")).isEqualTo(lineName);
+        assertThat(lineResponse.jsonPath()
+                               .getString("name")).isEqualTo(lineName);
     }
 
     /**
@@ -128,6 +132,27 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선 정보를 수정한다.")
     @Test
     void modifyLine() {
+
+        // given
+        String lineNameBefore = "line이름_before";
+        String lineNameAfter = "line이름_after";
+
+        ExtractableResponse<Response> creationResponse = callApiToCreateLine(makeLineSaveRequest(lineNameBefore, stationId1, stationId2));
+        Long lineId = creationResponse.jsonPath()
+                                      .getLong("id");
+        String color = creationResponse.jsonPath()
+                                       .getString("color");
+
+        // when
+        ExtractableResponse<Response> modificationResponse = callApiToModifyLine(lineId, LineModifyRequest.builder()
+                                                                                                  .name(lineNameAfter)
+                                                                                                  .color(color)
+                                                                                                  .build());
+
+        // then
+        assertThat(modificationResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+        ExtractableResponse<Response> lineResponse = callApiToGetSingleLine(lineId);
+        assertThat(lineResponse.jsonPath().getString("name")).isEqualTo(lineNameAfter);
 
     }
 
@@ -140,6 +165,18 @@ public class LineAcceptanceTest {
     @Test
     void deleteLine() {
 
+        // given
+        ExtractableResponse<Response> creationResponse = callApiToCreateLine(makeLineSaveRequest("line이름", stationId1, stationId2));
+        Long lineId = creationResponse.jsonPath()
+                                      .getLong("id");
+
+        // when
+        ExtractableResponse<Response> deletionResponse = callApiToDeleteLine(lineId);
+
+        // then
+        assertThat(deletionResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        ExtractableResponse<Response> lineResponse = callApiToGetSingleLine(lineId);
+        assertThat(lineResponse.jsonPath().getList("id", Long.class).size()).isEqualTo(0);
     }
 
     private static ExtractableResponse<Response> callApiToGetLines() {
@@ -185,11 +222,11 @@ public class LineAcceptanceTest {
         return RestAssured.given()
                           .log()
                           .all()
-                          .pathParam("lienId", lineId)
+                          .pathParam("lineId", lineId)
                           .body(lineModifyRequest)
                           .contentType(MediaType.APPLICATION_JSON_VALUE)
                           .when()
-                          .post("/lines/{lineId}")
+                          .put("/lines/{lineId}")
                           .then()
                           .log()
                           .all()
