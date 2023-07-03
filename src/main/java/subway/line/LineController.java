@@ -23,10 +23,11 @@ public class LineController {
     }
 
     @PostMapping("/lines")
-    public ResponseEntity<Line> createLine(@RequestBody LineRequest lineRequest) {
+    public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
         Station upStation = stationService.findStation(lineRequest.getUpStationId());
         Station downStation = stationService.findStation(lineRequest.getDownStationId());
-        Line line = lineService.saveLine(lineRequest.toEntity(List.of(upStation, downStation)));
+        LineResponse line = lineService.saveLine(
+                lineRequest.toEntity(List.of(upStation, downStation)));
         return ResponseEntity.created(URI.create("/lines/" + line.getId()))
                 .header(HttpHeaders.VARY, HttpHeaders.ORIGIN)
                 .header(HttpHeaders.VARY, HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD)
@@ -35,8 +36,8 @@ public class LineController {
     }
 
     @GetMapping("/lines")
-    public ResponseEntity<List<Line>> showLines() {
-        List<Line> line = lineService.showLines();
+    public ResponseEntity<List<LineResponse>> showLines() {
+        List<LineResponse> line = lineService.showLines();
         return ResponseEntity.ok()
                 .header(HttpHeaders.VARY, HttpHeaders.ORIGIN)
                 .header(HttpHeaders.VARY, HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD)
