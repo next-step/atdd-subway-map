@@ -1,4 +1,4 @@
-package subway;
+package subway.controller.dto.line;
 
 
 import lombok.AllArgsConstructor;
@@ -10,11 +10,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class LineSaveRequest {
+public class LineModifyRequest {
 
     private String name;
     private String color;
-    private Long upStationId;
-    private Long downStationId;
-    private Long distance;
 }
