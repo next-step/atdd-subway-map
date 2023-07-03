@@ -27,7 +27,7 @@ public class StationApi {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> deleteStationByLocation(String createdLocation) {
+    public static ExtractableResponse<Response> deleteStationByLocation(final String createdLocation) {
         return RestAssured.given().log().all()
                 .when().delete(createdLocation)
                 .then().log().all()

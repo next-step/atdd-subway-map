@@ -25,10 +25,10 @@ public class StationAcceptanceTest {
     void createStation() {
         // when
         final String stationName = "강남역";
-        ExtractableResponse<Response> response = StationApi.createStationByName(stationName);
+        ExtractableResponse<Response> createStationResponse = StationApi.createStationByName(stationName);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(createStationResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
         ExtractableResponse<Response> retrieveStationsResponse = StationApi.retrieveStations();
