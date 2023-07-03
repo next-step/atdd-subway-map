@@ -9,6 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.jdbc.Sql;
+import subway.domain.Station;
+import subway.repository.StationRepository;
 
 import java.util.HashMap;
 import java.util.List;
@@ -18,8 +21,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@Sql("/truncate.sql")
 public class LineAcceptanceTest {
-
     @Autowired
     StationRepository stationRepository;
 
@@ -34,13 +37,7 @@ public class LineAcceptanceTest {
         Station 새로운지하철역 = stationRepository.save(new Station("새로운지하철역"));
 
         // when
-        Map<String, Object> params = new HashMap<>();
-        params.put("name", "신분당선");
-        params.put("color", "bg-red-600");
-        params.put("upStationId", 지하철역.getId());
-        params.put("downStationId", 새로운지하철역.getId());
-        params.put("distance", 10);
-
+        Map<String, Object> params = createParams("신분당선", "bg-red-600", 지하철역.getId(), 새로운지하철역.getId(), 10);
         지하철노선을_생성한다(params);
 
         // then
@@ -64,19 +61,8 @@ public class LineAcceptanceTest {
         Station 또다른지하철역 = stationRepository.save(new Station("또다른지하철역"));
 
         // given
-        Map<String, Object> params_A = new HashMap<>();
-        params_A.put("name", "신분당선");
-        params_A.put("color", "bg-red-600");
-        params_A.put("upStationId", 지하철역.getId());
-        params_A.put("downStationId", 새로운지하철역.getId());
-        params_A.put("distance", 10);
-
-        Map<String, Object> params_B = new HashMap<>();
-        params_B.put("name", "분당선");
-        params_B.put("color", "bg-green-600");
-        params_B.put("upStationId", 지하철역.getId());
-        params_B.put("downStationId", 또다른지하철역.getId());
-        params_B.put("distance", 10);
+        Map<String, Object> params_A = createParams("신분당선", "bg-red-600", 지하철역.getId(), 새로운지하철역.getId(), 10);
+        Map<String, Object> params_B = createParams("분당선", "bg-green-600", 지하철역.getId(), 또다른지하철역.getId(), 10);
 
         지하철노선을_생성한다(params_A);
         지하철노선을_생성한다(params_B);
@@ -101,13 +87,7 @@ public class LineAcceptanceTest {
         Station 새로운지하철역 = stationRepository.save(new Station("새로운지하철역"));
 
         // given
-        Map<String, Object> params = new HashMap<>();
-        params.put("name", "신분당선");
-        params.put("color", "bg-red-600");
-        params.put("upStationId", 지하철역.getId());
-        params.put("downStationId", 새로운지하철역.getId());
-        params.put("distance", 10);
-
+        Map<String, Object> params = createParams("신분당선", "bg-red-600", 지하철역.getId(), 새로운지하철역.getId(), 10);
         ExtractableResponse<Response> response = 지하철노선을_생성한다(params);
         long createId = response.jsonPath().getLong("id");
 
@@ -117,19 +97,6 @@ public class LineAcceptanceTest {
         // then
         long id = extract.jsonPath().getLong("id");
         assertThat(createId).isEqualTo(id);
-    }
-
-    private static ExtractableResponse<Response> 지하철노선_한개를_조회한다(long id) {
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .when()
-                .get("/lines/" + id)
-                .then().log().all()
-                .extract();
-
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-
-        return response;
     }
 
     /**
@@ -144,20 +111,13 @@ public class LineAcceptanceTest {
         Station 새로운지하철역 = stationRepository.save(new Station("새로운지하철역"));
 
         // given
-        Map<String, Object> params = new HashMap<>();
-        params.put("name", "신분당선");
-        params.put("color", "bg-red-600");
-        params.put("upStationId", 지하철역.getId());
-        params.put("downStationId", 새로운지하철역.getId());
-        params.put("distance", 10);
-
+        Map<String, Object> params = createParams("신분당선", "bg-red-600", 지하철역.getId(), 새로운지하철역.getId(), 10);
         ExtractableResponse<Response> createResponse = 지하철노선을_생성한다(params);
         long id = createResponse.jsonPath().getLong("id");
 
         // when
         final String modifyName = "다른분당선";
         final String modifyColor = "bg-red-600";
-
         지하철노선_한개를_수정한다(id, modifyName, modifyColor);
 
         // then
@@ -179,17 +139,11 @@ public class LineAcceptanceTest {
         Station 새로운지하철역 = stationRepository.save(new Station("새로운지하철역"));
 
         // given
-        Map<String, Object> params = new HashMap<>();
-        params.put("name", "신분당선");
-        params.put("color", "bg-red-600");
-        params.put("upStationId", 지하철역.getId());
-        params.put("downStationId", 새로운지하철역.getId());
-        params.put("distance", 10);
-
+        Map<String, Object> params = createParams("신분당선", "bg-red-600", 지하철역.getId(), 새로운지하철역.getId(), 10);
         ExtractableResponse<Response> response = 지하철노선을_생성한다(params);
         long id = response.jsonPath().getLong("id");
 
-        // when
+        // when, then
         지하철노선을_하나를_삭제한다(id);
     }
 
@@ -242,5 +196,29 @@ public class LineAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         return response;
+    }
+
+    private static ExtractableResponse<Response> 지하철노선_한개를_조회한다(long id) {
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .when()
+                .get("/lines/" + id)
+                .then().log().all()
+                .extract();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        return response;
+    }
+
+    private Map<String, Object> createParams(String name, String color, Long upStationId, Long downStationId
+            , int distance) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("name", name);
+        params.put("color", color);
+        params.put("upStationId", upStationId);
+        params.put("downStationId", downStationId);
+        params.put("distance", distance);
+        return params;
     }
 }
