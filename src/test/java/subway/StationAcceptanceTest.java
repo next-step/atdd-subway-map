@@ -3,6 +3,7 @@ package subway;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,6 +19,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationAcceptanceTest {
+
+    @BeforeEach
+    public void init() {
+        List<Long> ids = callApiToGetStations().jsonPath().getList("id", Long.class);
+        ids.forEach(StationAcceptanceTest::callApiToDeleteStations);
+    }
+
     /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다
@@ -27,7 +35,7 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        String stationName = "강남역";
+        String stationName = "사당역";
         ExtractableResponse<Response> response = callApiToCreateStation(stationName);
 
         // then
@@ -75,8 +83,8 @@ public class StationAcceptanceTest {
     @Test
     void deleteStations() {
         // given
-        String stationName1 = "강남역";
-        String stationName2 = "잠실역";
+        String stationName1 = "홍대입구역";
+        String stationName2 = "건대입구역";
 
         callApiToCreateStation(stationName1);
         callApiToCreateStation(stationName2);
