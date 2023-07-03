@@ -1,23 +1,20 @@
 package subway;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationAcceptanceTest {
+
     /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다
@@ -28,27 +25,13 @@ public class StationAcceptanceTest {
     void createStation() {
         // when
         final String stationName = "강남역";
-        Map<String, String> params = new HashMap<>();
-        params.put("name", stationName);
-
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .body(params)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/stations")
-                        .then().log().all()
-                        .extract();
+        ExtractableResponse<Response> response = StationApi.callCreateStationApi(stationName);
 
         // then
-        System.out.println(response.body().toString());
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
+        List<String> stationNames = StationApi.callRetrieveStationsApi().jsonPath().getList("name", String.class);
         assertThat(stationNames).containsAnyOf(stationName);
     }
 
@@ -61,38 +44,12 @@ public class StationAcceptanceTest {
     @Test
     void retrieveStations() {
         // given
-        final int createdStations = 2;
-        Map<String, String> gangnamPostRequestMap = new HashMap<>();
-        gangnamPostRequestMap.put("name", "강남역");
-
-        ExtractableResponse<Response> gangnamResponse =
-                RestAssured.given().log().all()
-                        .body(gangnamPostRequestMap)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/stations")
-                        .then().log().all()
-                        .extract();
-
-
-        Map<String, String> yeoksamPostRequestMap = new HashMap<>();
-        yeoksamPostRequestMap.put("name", "역삼역");
-
-        ExtractableResponse<Response> yeoksamResponse =
-                RestAssured.given().log().all()
-                        .body(yeoksamPostRequestMap)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/stations")
-                        .then().log().all()
-                        .extract();
-
+        final List<String> createStationNames = List.of("강남역", "역삼역");
+        final int createdStations = createStationNames.size();
+        createStationNames.forEach(StationApi::callCreateStationApi);
 
         // when
-        ExtractableResponse<Response> retrieveStationsResponse =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract();
-
+        ExtractableResponse<Response> retrieveStationsResponse = StationApi.callRetrieveStationsApi();
         assertThat(retrieveStationsResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         // then
@@ -110,46 +67,16 @@ public class StationAcceptanceTest {
     void removeStation() {
         // given
         final String stationName = "강남역";
-        Map<String, String> gangnamPostRequestMap = new HashMap<>();
-        gangnamPostRequestMap.put("name", stationName);
-
-        ExtractableResponse<Response> gangnamResponse =
-                RestAssured.given().log().all()
-                        .body(gangnamPostRequestMap)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/stations")
-                        .then().log().all()
-                        .extract();
-
-        final String createdLocation = gangnamResponse.header("Location");
-        final Integer createdId = gangnamResponse.body().jsonPath().get("id");
-
-        // given: optional
-        Map<String, String> yeoksamPostRequestMap = new HashMap<>();
-        yeoksamPostRequestMap.put("name", "역삼역");
-
-        ExtractableResponse<Response> yeoksamResponse =
-                RestAssured.given().log().all()
-                        .body(yeoksamPostRequestMap)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/stations")
-                        .then().log().all()
-                        .extract();
+        ExtractableResponse<Response> createResponse = StationApi.callCreateStationApi(stationName);
+        final String createdLocation = createResponse.header("Location");
+        final Integer createdId = createResponse.body().jsonPath().get("id");
 
         // when
-        ExtractableResponse<Response> deletedStation = RestAssured.given().log().all()
-                .when().delete(createdLocation)
-                .then().log().all()
-                .extract();
-
+        ExtractableResponse<Response> deletedStation = StationApi.callDeleteStationByLocation(createdLocation);
         assertThat(deletedStation.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         // then
-        ExtractableResponse<Response> retrieveStationsResponse =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract();
+        ExtractableResponse<Response> retrieveStationsResponse = StationApi.callRetrieveStationsApi();
         assertThat(retrieveStationsResponse.body().jsonPath().getList("id")).doesNotContain(createdId);
 
     }
