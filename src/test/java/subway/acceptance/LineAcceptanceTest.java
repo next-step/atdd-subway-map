@@ -114,7 +114,7 @@ public class LineAcceptanceTest {
         assertThat(response.jsonPath().getLong("id")).isEqualTo(id);
         assertThat(response.jsonPath().getString("name")).isEqualTo("신분당선");
         assertThat(response.jsonPath().getString("color")).isEqualTo("bg-red-600");
-        assertThat(response.jsonPath().getList("$.stations.id", Long.class))
+        assertThat(response.jsonPath().getList("stations.id", Long.class))
                 .containsAnyOf(upStationId, downStationId);
 
     }

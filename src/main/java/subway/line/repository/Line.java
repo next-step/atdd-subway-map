@@ -10,7 +10,6 @@ import java.util.List;
 public class Line {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "line_id")
     private Long id;
 
     private String name;

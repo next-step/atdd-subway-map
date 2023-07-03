@@ -43,4 +43,10 @@ public class LineService {
                 .map(LineResponse::new)
                 .collect(Collectors.toList());
     }
+
+    public LineResponse getLine(Long id) {
+        return lineRepository.findById(id)
+                .map(LineResponse::new)
+                .orElseThrow(RuntimeException::new);
+    }
 }
