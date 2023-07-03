@@ -1,10 +1,19 @@
 package subway.util;
 
+import static subway.util.StationApiRequest.강남역;
+import static subway.util.StationApiRequest.양재역;
+import static subway.util.StationApiRequest.이매역;
+import static subway.util.StationApiRequest.지하철역_리스폰_변환;
+import static subway.util.StationApiRequest.지하철역_생성_요청;
+import static subway.util.StationApiRequest.판교역;
+
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.MediaType;
 import subway.dto.LineCreateRequest;
+import subway.dto.LineResponse;
+import subway.dto.StationResponse;
 
 public class LineApiRequest {
 
@@ -24,4 +33,28 @@ public class LineApiRequest {
             .extract();
     }
 
+    public static ExtractableResponse<Response> 지하철_노선_목록_조회_요청() {
+        return RestAssured.given().log().all()
+            .accept(MediaType.APPLICATION_JSON_VALUE)
+            .when().get("/lines")
+            .then().log().all()
+            .extract();
+    }
+
+    public static ExtractableResponse<Response> 신분당선_생성() {
+        StationResponse upStation = 지하철역_리스폰_변환(지하철역_생성_요청(강남역));
+        StationResponse downStation = 지하철역_리스폰_변환(지하철역_생성_요청(양재역));
+        return 지하철_노선_생성_요청(신분당선_이름, 신분당선_색상, upStation.getId(), downStation.getId(), 10);
+    }
+
+    public static ExtractableResponse<Response> 경강선_생성() {
+        StationResponse upStation = 지하철역_리스폰_변환(지하철역_생성_요청(판교역));
+        StationResponse downStation = 지하철역_리스폰_변환(지하철역_생성_요청(이매역));
+        return 지하철_노선_생성_요청(경강선_이름, 경강선_색상, upStation.getId(), downStation.getId(), 10);
+    }
+
+    public static LineResponse 지하철_노선_리스폰_변환(ExtractableResponse<Response> response) {
+        return response.response()
+            .as(LineResponse.class);
+    }
 }

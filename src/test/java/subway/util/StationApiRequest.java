@@ -5,6 +5,7 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.MediaType;
 import subway.dto.StationRequest;
+import subway.dto.StationResponse;
 
 public class StationApiRequest {
 
@@ -44,5 +45,10 @@ public class StationApiRequest {
             .when().delete("/stations/{id}", id)
             .then().log().all()
             .extract();
+    }
+
+    public static StationResponse 지하철역_리스폰_변환(ExtractableResponse<Response> response) {
+        return response.response()
+            .as(StationResponse.class);
     }
 }

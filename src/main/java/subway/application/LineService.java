@@ -1,5 +1,8 @@
 package subway.application;
 
+import java.util.List;
+import java.util.stream.Collectors;
+import org.apache.coyote.Response;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.domain.Line;
@@ -42,5 +45,12 @@ public class LineService {
     private Station getStation(Long stationId) {
         return stationRepository.findById(stationId)
             .orElseThrow(StationNotFoundException::new);
+    }
+
+    public List<LineResponse> findAll() {
+        return lineRepository.findAll()
+            .stream()
+            .map(LineResponse::of)
+            .collect(Collectors.toUnmodifiableList());
     }
 }
