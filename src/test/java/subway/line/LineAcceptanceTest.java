@@ -7,8 +7,8 @@ import io.restassured.response.Response;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
+import subway.AcceptanceTest;
 
 /**
  * 프로그래밍 요구사항
@@ -19,8 +19,7 @@ import org.springframework.http.HttpStatus;
  * - 인수 테스트의 재사용성과 가독성, 그리고 빠른 테스트 의도 파악을 위해 인수 테스트를 리팩터링한다
  */
 @DisplayName("지하철 노선 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class LineAcceptanceTest {
+public class LineAcceptanceTest extends AcceptanceTest {
     /**
      * When: 지하철 노선을 생성하면
      * Then: 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
