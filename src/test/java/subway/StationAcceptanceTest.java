@@ -28,7 +28,7 @@ public class StationAcceptanceTest {
                 .extract();
     }
 
-    private static ExtractableResponse<Response> 지하철역을_생성한다(String 역이름) {
+    static ExtractableResponse<Response> 지하철역을_생성한다(String 역이름) {
         Map<String, String> params = new HashMap<>();
         params.put("name", 역이름);
         return RestAssured.given().log().all()
@@ -67,7 +67,7 @@ public class StationAcceptanceTest {
         return 지하철역_목록_조회_결과.jsonPath().getList("name", String.class);
     }
 
-    private static int 지하철역의_아이디를_파싱한다(ExtractableResponse<Response> 지하철역_조회_결과) {
+    static int 지하철역의_아이디를_파싱한다(ExtractableResponse<Response> 지하철역_조회_결과) {
         return 지하철역_조회_결과.jsonPath().getInt("id");
     }
 
@@ -148,7 +148,6 @@ public class StationAcceptanceTest {
         var 강남역 = 지하철역을_생성한다("강남역");
         int 수정할_지하철역의_아이디 = 지하철역의_아이디를_파싱한다(강남역);
 
-
         // when
         var 수정후_지하철역 = 지하철노선_수정(수정할_지하철역의_아이디, "영등포역");
 
@@ -176,5 +175,6 @@ public class StationAcceptanceTest {
         List<Integer> 지할철역_목록_아이디 = 지하철역_목록에서_아이디를_파싱한다(지하철역_목록_조회());
         assertThat(지할철역_목록_아이디).doesNotContain(강남역_아이디);
     }
+
 
 }
