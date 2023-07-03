@@ -15,9 +15,9 @@ import subway.line.domain.Line;
 import subway.line.view.LineCreateRequest;
 import subway.line.view.LineModifyRequest;
 import subway.line.view.LineResponse;
-import subway.station.Station;
-import subway.station.StationNotFoundException;
-import subway.station.StationService;
+import subway.station.domain.Station;
+import subway.station.exception.StationNotFoundException;
+import subway.station.service.StationService;
 
 @Service
 @RequiredArgsConstructor

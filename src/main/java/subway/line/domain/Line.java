@@ -14,7 +14,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import subway.station.Station;
+import subway.station.domain.Station;
 
 @Getter
 @Setter

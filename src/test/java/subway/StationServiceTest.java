@@ -7,8 +7,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.jdbc.Sql;
 
-import subway.station.Station;
-import subway.station.StationRepository;
+import subway.station.domain.Station;
+import subway.station.repository.StationRepository;
 
 @Sql(scripts = {
         "classpath:sql/schema.sql",

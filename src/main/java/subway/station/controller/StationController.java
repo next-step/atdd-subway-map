@@ -1,10 +1,14 @@
-package subway.station;
+package subway.station.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
+
+import subway.station.service.StationService;
+import subway.station.view.StationRequest;
+import subway.station.view.StationResponse;
 
 @RestController
 public class StationController {

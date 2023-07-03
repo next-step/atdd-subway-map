@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import subway.line.domain.Line;
-import subway.station.StationResponse;
+import subway.station.view.StationResponse;
 
 @Getter
 @NoArgsConstructor
