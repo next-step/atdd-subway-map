@@ -21,11 +21,11 @@ public class Line {
     private String color;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "up_sation_id")
+    @JoinColumn(name = "up_station_id")
     private Station upStation;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "down_sation_id")
+    @JoinColumn(name = "down_station_id")
     private Station downStation;
 
     private Integer distance;
