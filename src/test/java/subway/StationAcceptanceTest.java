@@ -35,11 +35,6 @@ class StationAcceptanceTest {
         dbCleaner.cleanUpStation();
     }
 
-    /**
-     * When 지하철역을 생성하면
-     * Then 지하철역이 생성된다
-     * Then 지하철역 목록 조회 시 생성한 역을 찾을 수 있다
-     */
     @DisplayName("지하철역을 1개 생성하면 목록 조회시 생성한 1개의 역이 조회된다.")
     @Test
     void createOneStation() {
@@ -54,11 +49,6 @@ class StationAcceptanceTest {
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
-    /**
-     * Given 2개의 지하철역을 생성하고
-     * When 지하철역 목록을 조회하면
-     * Then 2개의 지하철역을 응답 받는다
-     */
     @DisplayName("지하철역을 2개 생성하면 목록 조회시 생성한 2개의 역이 조회된다.")
     @Test
     void createTwoStation() {
@@ -73,11 +63,7 @@ class StationAcceptanceTest {
         assertThat(stationNames.size()).isEqualTo(2);
         assertThat(stationNames).containsExactly("별똥별", "역삼역");
     }
-    /**
-     * Given 지하철역을 생성하고
-     * When 그 지하철역을 삭제하면
-     * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
-     */
+
     @DisplayName("지하철역을 생성한 후 삭제하면 목록 조회시 해당 역이 조회되지 않는다.")
     @Test
     void create_and_deleteStation() {
