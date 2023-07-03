@@ -31,8 +31,8 @@ public class StationAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames = StationApi.retrieveStations().jsonPath().getList("name", String.class);
-        assertThat(stationNames).containsAnyOf(stationName);
+        ExtractableResponse<Response> retrieveStationsResponse = StationApi.retrieveStations();
+        assertThat(retrieveStationsResponse.jsonPath().getList("name", String.class)).containsAnyOf(stationName);
     }
 
     /**
@@ -53,7 +53,7 @@ public class StationAcceptanceTest {
         assertThat(retrieveStationsResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         // then
-        assertThat(createdStations).isEqualTo(retrieveStationsResponse.body().jsonPath().getList("$").size());
+        assertThat(retrieveStationsResponse.body().jsonPath().getList("$").size()).isEqualTo(createdStations);
 
     }
 
