@@ -31,6 +31,9 @@ public class LineAcceptanceTest {
     public static final String 거리 = "10";
     public static final String BG_YELLOW_600 = "BG_YELLOW_600";
     public static final String 경인선 = "경인선";
+    public static final String 첫째지하철역1 = "첫째지하철역";
+    public static final String 세번째지하철역1 = "세번째지하철역";
+    public static final String 두번째지하철역1 = "두번째지하철역";
     @LocalServerPort
     int port;
     private ExtractableResponse<Response> 첫째지하철역;
@@ -49,14 +52,13 @@ public class LineAcceptanceTest {
     }
 
     void 세개의_역_만들기() {
-        첫째지하철역 = 역_만들기("첫째지하철역");
-        두번째지하철역 = 역_만들기("두번째지하철역");
-        세번째지하철역 = 역_만들기("세번째지하철역");
+        첫째지하철역 = 역_만들기(첫째지하철역1);
+        두번째지하철역 = 역_만들기(두번째지하철역1);
+        세번째지하철역 = 역_만들기(세번째지하철역1);
 
         첫째지하철역_아이디 = 첫째지하철역.jsonPath().getString("id");
         두번째지하철역_아이디 = 두번째지하철역.jsonPath().getString("id");
         세번째지하철역_아이디 = 세번째지하철역.jsonPath().getString("id");
-
     }
 
     /**
@@ -74,8 +76,8 @@ public class LineAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // Then
-        List<String> stationNames = 모든_노선_조회();
-        assertThat(stationNames).containsAnyOf("신분당선");
+        List<String> lineNames = 모든_노선_조회();
+        assertThat(lineNames).containsAnyOf("신분당선");
     }
 
     /**
@@ -92,10 +94,10 @@ public class LineAcceptanceTest {
         노선_만들기(분당선, BG_GREEN_600, 첫째지하철역_아이디, 세번째지하철역_아이디, 거리);
 
         // When
-        List<String> stationNames = 모든_노선_조회();
+        List<String> lineNames = 모든_노선_조회();
 
         // Then
-        assertThat(stationNames).contains(신분당선, 분당선);
+        assertThat(lineNames).contains(신분당선, 분당선);
     }
 
     /**
@@ -107,7 +109,7 @@ public class LineAcceptanceTest {
 
     @DisplayName("지하철 노선을 생성하고 생성한 지하철의 노선의 정보를 응답 받을 수 있다.")
     @Test
-    void GetStationById() {
+    void GetLineById() {
 
         // Given
         ExtractableResponse<Response> lineNewBundangResponse = 노선_만들기(신분당선, BG_RED_600, 첫째지하철역_아이디, 두번째지하철역_아이디, 거리);
@@ -120,7 +122,7 @@ public class LineAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.jsonPath().getString("name")).isEqualTo(신분당선);
         assertThat(response.jsonPath().getString("color")).isEqualTo(BG_RED_600);
-        assertThat(response.jsonPath().getList("stations.name")).contains(신분당선, 분당선);
+        assertThat(response.jsonPath().getList("stations.name")).contains(첫째지하철역1, 두번째지하철역1);
     }
 
     /**
@@ -187,12 +189,12 @@ public class LineAcceptanceTest {
     }
 
     private static List<String> 모든_노선_조회() {
-        List<String> stationNames =
+        List<String> lineNames =
                 RestAssured.given().log().all()
-                        .when().get("/stations")
+                        .when().get("/lines")
                         .then().log().all()
                         .extract().jsonPath().getList("name", String.class);
-        return stationNames;
+        return lineNames;
     }
 
     private static ExtractableResponse<Response> 노선_만들기(String name, String color, String upStationId, String downStationId, String distance) {
