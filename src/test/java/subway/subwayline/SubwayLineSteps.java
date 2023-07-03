@@ -1,11 +1,9 @@
-package subway;
+package subway.subwayline;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.MediaType;
-import subway.subwayline.CreateSubwayLineRequest;
-import subway.subwayline.ModifySubwayLineRequest;
 
 public class SubwayLineSteps {
 

@@ -4,6 +4,7 @@ import subway.station.Station;
 import subway.station.StationDto;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class SubwayLineDto {
@@ -49,7 +50,7 @@ public class SubwayLineDto {
                 Stream.of(
                         StationDto.from(subwayLine.getUpStationId()),
                         StationDto.from(subwayLine.getDownStationId())
-                ).collect(java.util.stream.Collectors.toSet())
+                ).collect(Collectors.toSet())
         );
     }
 

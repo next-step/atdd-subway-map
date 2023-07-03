@@ -32,7 +32,6 @@ public class SubwayLineService {
 
     @Transactional(readOnly = true)
     public List<SubwayLineDto> getSubwayLines() {
-
         return subwayLineRepository.findAll().stream()
                 .map(SubwayLineDto::of)
                 .collect(Collectors.toList());

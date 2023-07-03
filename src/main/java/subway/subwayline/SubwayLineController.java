@@ -1,6 +1,6 @@
 package subway.subwayline;
 
-import org.springframework.http.HttpStatus;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,8 +26,7 @@ public class SubwayLineController {
 
     @GetMapping
     public ResponseEntity<List<SubwayLineResponse>> getSubwayLines() {
-        List<SubwayLineResponse> response = subwayLineService.getSubwayLines().stream().map(SubwayLineResponse::from).collect(Collectors.toList());
-        return ResponseEntity.ok().body(response);
+        return ResponseEntity.ok().body(subwayLineService.getSubwayLines().stream().map(SubwayLineResponse::from).collect(Collectors.toList()));
     }
 
     @GetMapping("/{id}")
