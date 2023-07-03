@@ -69,26 +69,12 @@ public class StationAcceptanceTest {
     void createStations() {
         // given
         Map<String, String> params = new HashMap<>();
-
         params.put("name", MISA);
-        ExtractableResponse<Response> response1 =
-                RestAssured.given().log().all()
-                        .body(params)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/stations")
-                        .then().log().all()
-                        .extract();
-        assertThat(response1.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        ExtractableResponse<Response> stationByName = createStationByName(params);
+        assertThat(stationByName.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         params.replace("name", GANGIL);
-        ExtractableResponse<Response> response2 =
-                RestAssured.given().log().all()
-                        .body(params)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/stations")
-                        .then().log().all()
-                        .extract();
-        assertThat(response2.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
+        ExtractableResponse<Response> stationByName2 = createStationByName(params);
+        assertThat(stationByName2.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         //when
         List<String> names = RestAssured.given().log().all()
                 .when().get("/stations")
@@ -99,6 +85,14 @@ public class StationAcceptanceTest {
         assertThat(names).containsExactly(MISA, GANGIL);
     }
 
+    private ExtractableResponse<Response> createStationByName(Map<String, String> params) {
+        return RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+    }
 
     /**
      * Given 지하철역을 생성하고
