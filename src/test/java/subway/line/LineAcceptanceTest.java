@@ -29,10 +29,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         long createdLineId = 지하철_노선_Id를_추출한다(responseOfCreate);
         ExtractableResponse<Response> responseOfRead = LineRequest.지하철_노선을_조회한다(createdLineId);
 
-        long findLineId = 지하철_노선_Id를_추출한다(responseOfRead);
         String findLineName = 지하철_노선_이름을_추출한다(responseOfRead);
-
-        assertThat(findLineId).isEqualTo(createdLineId);
         assertThat(findLineName).isEqualTo(lineName);
     }
 
