@@ -29,9 +29,19 @@ public class SubwayLine {
         this.stations = stations;
     }
 
+    public void updateName(String name) {
+        this.name = name;
+    }
+
+    public void updateColor(String color) {
+        this.color = color;
+    }
+
     public Long getId() { return id; }
 
     public String getName() { return name; }
+
+    public String getColor() { return color; }
 
     public List<Station> getStations() { return stations; }
 }
