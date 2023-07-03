@@ -1,6 +1,7 @@
 package subway.line;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static subway.JsonParser.아이디;
 import static subway.JsonParser.아이디_리스트;
 import static subway.JsonParser.이름;
@@ -110,11 +111,13 @@ public class LineAcceptanceTest {
                 10);
 
         // then
-        assertThat(아이디(등록된_지하철노선)).isNotNull();
-        assertThat(이름(등록된_지하철노선)).isEqualTo("신분당선");
-        assertThat(컬러(등록된_지하철노선)).isEqualTo("bg-red-600");
-        assertThat(스테이션_아이디_리스트(등록된_지하철노선)).contains(강남역_아이디, 판교역_아이디);
-        assertThat(스테이션_이름_리스트(등록된_지하철노선)).contains("강남역", "판교역");
+        assertAll(
+                () -> assertThat(아이디(등록된_지하철노선)).isNotNull(),
+                () -> assertThat(이름(등록된_지하철노선)).isEqualTo("신분당선"),
+                () -> assertThat(컬러(등록된_지하철노선)).isEqualTo("bg-red-600"),
+                () -> assertThat(스테이션_아이디_리스트(등록된_지하철노선)).contains(강남역_아이디, 판교역_아이디),
+                () -> assertThat(스테이션_이름_리스트(등록된_지하철노선)).contains("강남역", "판교역")
+        );
     }
 
     /**
@@ -146,13 +149,15 @@ public class LineAcceptanceTest {
         var 지하철_노선_목록 = 지하철_노선_목록_조회한다();
 
         // then
-        assertThat(아이디_리스트(지하철_노선_목록)).contains(아이디(신분당선), 아이디(_2호선));
-        assertThat(이름_리스트(지하철_노선_목록)).contains("신분당선", "2호선");
-        assertThat(컬러_리스트(지하철_노선_목록)).contains("bg-red-600", "bg-red-500");
-        assertThat(스테이션_아이디_리스트(지하철_노선_목록, 0)).contains(강남역_아이디, 판교역_아이디);
-        assertThat(스테이션_이름_리스트(지하철_노선_목록, 0)).contains("강남역", "판교역");
-        assertThat(스테이션_아이디_리스트(지하철_노선_목록, 1)).contains(강남역_아이디, 사당역_아이디);
-        assertThat(스테이션_이름_리스트(지하철_노선_목록, 1)).contains("강남역", "사당역");
+        assertAll(
+                () -> assertThat(아이디_리스트(지하철_노선_목록)).contains(아이디(신분당선), 아이디(_2호선)),
+                () -> assertThat(이름_리스트(지하철_노선_목록)).contains("신분당선", "2호선"),
+                () -> assertThat(컬러_리스트(지하철_노선_목록)).contains("bg-red-600", "bg-red-500"),
+                () -> assertThat(스테이션_아이디_리스트(지하철_노선_목록, 0)).contains(강남역_아이디, 판교역_아이디),
+                () -> assertThat(스테이션_이름_리스트(지하철_노선_목록, 0)).contains("강남역", "판교역"),
+                () -> assertThat(스테이션_아이디_리스트(지하철_노선_목록, 1)).contains(강남역_아이디, 사당역_아이디),
+                () -> assertThat(스테이션_이름_리스트(지하철_노선_목록, 1)).contains("강남역", "사당역")
+        );
     }
 
     private static ExtractableResponse<Response> 지하철_노선_조회한다(int 지하철노선_아이디) {
@@ -185,11 +190,13 @@ public class LineAcceptanceTest {
         var 조회된_지하철노선 = 지하철_노선_조회한다(신분당선_아이디);
 
         // then
-        assertThat(아이디(조회된_지하철노선)).isEqualTo(신분당선_아이디);
-        assertThat(이름(조회된_지하철노선)).isEqualTo("신분당선");
-        assertThat(컬러(조회된_지하철노선)).isEqualTo("bg-red-600");
-        assertThat(스테이션_아이디_리스트(조회된_지하철노선)).contains(강남역_아이디, 판교역_아이디);
-        assertThat(스테이션_이름_리스트(조회된_지하철노선)).contains("강남역", "판교역");
+        assertAll(
+                () -> assertThat(아이디(조회된_지하철노선)).isEqualTo(신분당선_아이디),
+                () -> assertThat(이름(조회된_지하철노선)).isEqualTo("신분당선"),
+                () -> assertThat(컬러(조회된_지하철노선)).isEqualTo("bg-red-600"),
+                () -> assertThat(스테이션_아이디_리스트(조회된_지하철노선)).contains(강남역_아이디, 판교역_아이디),
+                () -> assertThat(스테이션_이름_리스트(조회된_지하철노선)).contains("강남역", "판교역")
+        );
     }
 
     /**
@@ -216,8 +223,10 @@ public class LineAcceptanceTest {
 
         // then
         var 수정된_지하철_노선 = 지하철_노선_조회한다(수정될_지하철_노선_아이디);
-        assertThat(이름(수정된_지하철_노선)).isEqualTo("다른분당선");
-        assertThat(컬러(수정된_지하철_노선)).isEqualTo("bg-red-500");
+        assertAll(
+                () -> assertThat(이름(수정된_지하철_노선)).isEqualTo("다른분당선"),
+                () -> assertThat(컬러(수정된_지하철_노선)).isEqualTo("bg-red-500")
+        );
     }
 
 
@@ -245,8 +254,10 @@ public class LineAcceptanceTest {
 
         // then
         var 지하철_노선_목록 = 지하철_노선_목록_조회한다();
-        assertThat(아이디_리스트(지하철_노선_목록)).doesNotContain(신분당선_아이디);
-        assertThat(이름_리스트(지하철_노선_목록)).doesNotContain("신분당선");
+        assertAll(
+                () -> assertThat(아이디_리스트(지하철_노선_목록)).doesNotContain(신분당선_아이디),
+                () -> assertThat(이름_리스트(지하철_노선_목록)).doesNotContain("신분당선")
+        );
     }
 
 
