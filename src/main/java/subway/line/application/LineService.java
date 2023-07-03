@@ -9,8 +9,10 @@ import subway.line.domain.LineRepository;
 import subway.line.dto.LineCreateRequest;
 import subway.line.dto.LineResponse;
 import subway.line.dto.LineUpdateRequest;
+import subway.line.exception.LineNotFoundException;
 import subway.station.domain.Station;
 import subway.station.domain.StationRepository;
+import subway.station.exception.StationNotFoundException;
 
 @Transactional(readOnly = true)
 @Service
@@ -36,7 +38,7 @@ public class LineService {
 
     private Station getStation(Long stationId) {
         return stationRepository.findById(stationId)
-                .orElseThrow(() -> new IllegalArgumentException("station이 없습니다. stationId=" + stationId));
+                .orElseThrow(StationNotFoundException::new);
     }
 
     public List<LineResponse> findAllStation() {
@@ -52,7 +54,7 @@ public class LineService {
 
     private Line getLine(Long id) {
         return lineRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("line이 없습니다. lineId=" + id));
+                .orElseThrow(LineNotFoundException::new);
     }
 
     @Transactional
