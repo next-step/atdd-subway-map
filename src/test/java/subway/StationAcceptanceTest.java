@@ -38,14 +38,14 @@ public class StationAcceptanceTest {
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
-    private static List<String> getStationNames() {
+    private List<String> getStationNames() {
         return RestAssured.given().log().all()
                 .when().get("/stations")
                 .then().log().all()
                 .extract().jsonPath().getList("name", String.class);
     }
 
-    private static ExtractableResponse<Response> createStation(String stationName) {
+    private ExtractableResponse<Response> createStation(String stationName) {
         Map<String, String> params = new HashMap<>();
         params.put("name", stationName);
 
