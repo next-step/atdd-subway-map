@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.jdbc.Sql;
 
 import java.util.HashMap;
 import java.util.List;
@@ -16,15 +18,10 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Sql("truncate_station.sql")
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationAcceptanceTest {
-
-    @BeforeEach
-    public void init() {
-        List<Long> ids = callApiToGetStations().jsonPath().getList("id", Long.class);
-        ids.forEach(StationAcceptanceTest::callApiToDeleteStations);
-    }
 
     /**
      * When 지하철역을 생성하면
