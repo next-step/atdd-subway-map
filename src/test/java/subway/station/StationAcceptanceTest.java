@@ -1,6 +1,10 @@
 package subway.station;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static subway.JsonParser.아이디;
+import static subway.JsonParser.아이디_리스트;
+import static subway.JsonParser.이름;
+import static subway.JsonParser.이름_리스트;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -46,14 +50,14 @@ public class StationAcceptanceTest {
                 .extract();
     }
 
-    private static ExtractableResponse<Response> 지하철노선을_조회한다(int id) {
+    private static ExtractableResponse<Response> 지하철역_조회한다(int id) {
         return RestAssured.given().log().all()
                 .when().get("/stations/" + id)
                 .then().log().all()
                 .extract();
     }
 
-    private static ExtractableResponse<Response> 지하철노선_수정(int 수정할_자하철역_아이디, String 수정네이밍) {
+    private static ExtractableResponse<Response> 지하철역을_수정한다(int 수정할_자하철역_아이디, String 수정네이밍) {
         Map<String, String> params = new HashMap<>();
         params.put("name", 수정네이밍);
         return RestAssured
@@ -63,21 +67,6 @@ public class StationAcceptanceTest {
                 .extract();
     }
 
-    private static List<String> 지하철역_목록의_이름을_파싱한다(ExtractableResponse<Response> 지하철역_목록_조회_결과) {
-        return 지하철역_목록_조회_결과.jsonPath().getList("name", String.class);
-    }
-
-    public static int 지하철역의_아이디를_파싱한다(ExtractableResponse<Response> 지하철역_조회_결과) {
-        return 지하철역_조회_결과.jsonPath().getInt("id");
-    }
-
-    private static List<Integer> 지하철역_목록에서_아이디를_파싱한다(ExtractableResponse<Response> 지하철역_목록_조회_결과) {
-        return 지하철역_목록_조회_결과.jsonPath().getList("id", Integer.class);
-    }
-
-    private static String 지하철역의_이름을_파싱한다(ExtractableResponse<Response> 지하철역_조회_결과) {
-        return 지하철역_조회_결과.jsonPath().getString("name");
-    }
 
     /**
      * When 지하철역을 생성하면
@@ -94,7 +83,7 @@ public class StationAcceptanceTest {
         assertThat(강남역.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> 지하철역_목록_이름 = 지하철역_목록의_이름을_파싱한다(지하철역_목록_조회());
+        List<String> 지하철역_목록_이름 = 이름_리스트(지하철역_목록_조회());
         assertThat(지하철역_목록_이름).containsAnyOf("강남역");
     }
 
@@ -112,48 +101,48 @@ public class StationAcceptanceTest {
         지하철역을_생성한다("이수역");
 
         // when
-        List<String> 지하철역_목록_이름 = 지하철역_목록의_이름을_파싱한다(지하철역_목록_조회());
+        List<String> 지하철역_목록_이름 = 이름_리스트(지하철역_목록_조회());
 
         // then
         assertThat(지하철역_목록_이름).contains("강남역", "이수역");
     }
 
     /**
-     * Given 지하철 노선을 생성하고
-     * When 생성한 지하철 노선을 조회하면
-     * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
+     * Given 지하철역을 생성하고
+     * When 생성한 지하철역을 조회하면
+     * Then 생성한 지하철역의 정보를 응답받을 수 있다.
      */
-    @DisplayName("지하철노선 조회")
+    @DisplayName("지하철역 조회")
     @Test
     void searchSubwayStation() {
         // given
         var 강남역 = 지하철역을_생성한다("강남역");
 
         // when
-        var 조회된_강남역 = 지하철노선을_조회한다(지하철역의_아이디를_파싱한다(강남역));
+        var 조회된_강남역 = 지하철역_조회한다(아이디(강남역));
 
         // Then
-        assertThat(지하철역의_이름을_파싱한다(조회된_강남역)).isEqualTo("강남역");
+        assertThat(이름(조회된_강남역)).isEqualTo("강남역");
     }
 
     /**
-     * Given 지하철 노선을 생성하고
-     * When 생성한 지하철 노선을 수정하면
-     * Then 해당 지하철 노선 정보는 수정된다
+     * Given 지하철역을 생성하고
+     * When 생성한 지하철역을 수정하면
+     * Then 해당 지하철역 정보는 수정된다
      */
-    @DisplayName("지하철노선 수정")
+    @DisplayName("지하철역 수정")
     @Test
     void updateSubwayStation() {
         // given
         var 강남역 = 지하철역을_생성한다("강남역");
-        int 수정할_지하철역의_아이디 = 지하철역의_아이디를_파싱한다(강남역);
+        int 수정할_지하철역의_아이디 = 아이디(강남역);
 
         // when
-        var 수정후_지하철역 = 지하철노선_수정(수정할_지하철역의_아이디, "영등포역");
+        var 수정후_지하철역 = 지하철역을_수정한다(수정할_지하철역의_아이디, "영등포역");
 
         // Then
-        assertThat(지하철역의_이름을_파싱한다(수정후_지하철역)).isEqualTo("영등포역");
-        assertThat(지하철역의_이름을_파싱한다(지하철노선을_조회한다(수정할_지하철역의_아이디))).isEqualTo("영등포역");
+        assertThat(이름(수정후_지하철역)).isEqualTo("영등포역");
+        assertThat(이름(지하철역_조회한다(수정할_지하철역의_아이디))).isEqualTo("영등포역");
     }
 
     /**
@@ -166,13 +155,13 @@ public class StationAcceptanceTest {
     public void removeSubwayStation() {
         // given
         var 강남역 = 지하철역을_생성한다("강남역");
-        int 강남역_아이디 = 지하철역의_아이디를_파싱한다(강남역);
+        int 강남역_아이디 = 아이디(강남역);
 
         // when
         지할척역_제거한다(강남역_아이디);
 
         // then
-        List<Integer> 지할철역_목록_아이디 = 지하철역_목록에서_아이디를_파싱한다(지하철역_목록_조회());
+        List<Integer> 지할철역_목록_아이디 = 아이디_리스트(지하철역_목록_조회());
         assertThat(지할철역_목록_아이디).doesNotContain(강남역_아이디);
     }
 
