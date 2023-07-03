@@ -1,6 +1,7 @@
 package subway.acceptance;
 
 import io.restassured.RestAssured;
+import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
@@ -104,17 +105,57 @@ public class LineAcceptanceTest extends AcceptanceTest {
         Long id = 지하철_노선_생성_요청("신분당선", "bg-red-600", upStationId, downStationId, 10L).jsonPath().getLong("id");
 
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .pathParam("id", id)
-                .when().get("/lines/{id}")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = 지하철_노선_조회(id);
 
         assertThat(response.jsonPath().getLong("id")).isEqualTo(id);
         assertThat(response.jsonPath().getString("name")).isEqualTo("신분당선");
         assertThat(response.jsonPath().getString("color")).isEqualTo("bg-red-600");
         assertThat(response.jsonPath().getList("stations.id", Long.class))
                 .containsAnyOf(upStationId, downStationId);
+    }
 
+    private static ExtractableResponse<Response> 지하철_노선_조회(Long id) {
+        return RestAssured.given().log().all()
+                .pathParam("id", id)
+                .when().get("/lines/{id}")
+                .then().log().all()
+                .extract();
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 수정하면
+     * Then 해당 지하철 노선 정보는 수정된다
+     */
+    @DisplayName("지하철 노선을 수정 한다.")
+    @Test
+    void updateLine() {
+        // given
+        Long upStationId = 지하철_역_생성_요청("강남역").jsonPath().getLong("id");
+        Long downStationId = 지하철_역_생성_요청("역삼역").jsonPath().getLong("id");
+
+        Long id = 지하철_노선_생성_요청("신분당선", "bg-red-600", upStationId, downStationId, 10L).jsonPath().getLong("id");
+
+        // when
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "2호선");
+        params.put("color", "bg-green-600");
+
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .pathParam("id", id)
+                .when().put("/lines/{id}")
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        // then
+        JsonPath lineResponse = 지하철_노선_조회(id).jsonPath();
+
+        assertThat(lineResponse.getString("name")).isEqualTo("2호선");
+        assertThat(lineResponse.getString("color")).isEqualTo("bg-green-600");
     }
 }
