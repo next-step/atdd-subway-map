@@ -1,10 +1,9 @@
-package subway;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+package subway.station;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
@@ -37,5 +36,16 @@ public class StationService {
                 station.getId(),
                 station.getName()
         );
+    }
+
+    public Station findStation(Long id) {
+        return stationRepository.findById(id).orElseThrow();
+    }
+
+    @Transactional
+    public Station updateStation(Long id, StationRequest stationRequest) {
+        Station station = stationRepository.findById(id).orElseThrow();
+        station.update(stationRequest.getName());
+        return station;
     }
 }
