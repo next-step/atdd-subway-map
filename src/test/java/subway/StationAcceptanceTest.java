@@ -1,5 +1,6 @@
 package subway;
 
+import common.IndependentTest;
 import io.restassured.RestAssured;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,9 +16,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@Transactional
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@IndependentTest
 public class StationAcceptanceTest {
     /**
      * When 지하철역을 생성하면
@@ -29,10 +28,10 @@ public class StationAcceptanceTest {
     @ValueSource(strings = {"강남역"})
     void createStation(String name) {
         // when
-        TestHelper.createStation(name);
+        StationTestHelper.createStation(name);
 
         // then
-        assertThat(TestHelper.selectAllStations())
+        assertThat(StationTestHelper.selectAllStations())
                 .extracting(StationResponse::getName)
                 .contains(name);
     }
@@ -46,11 +45,11 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 생성한 후 목록을 조회하면 생성한 지하철 역이 조회된다.")
     void selectStations() {
         // given
-        TestHelper.createStation("강남역");
-        TestHelper.createStation("역삼역");
+        StationTestHelper.createStation("강남역");
+        StationTestHelper.createStation("역삼역");
 
         // when
-        List<StationResponse> stationResponses = TestHelper.selectAllStations();
+        List<StationResponse> stationResponses = StationTestHelper.selectAllStations();
 
         // then
         assertThat(stationResponses).hasSize(2)
@@ -68,7 +67,7 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 제거하면 목록 조회시 조회되지 않는다")
     void deleteStation(String name) {
         // given
-        final StationResponse station = TestHelper.createStation(name);
+        final StationResponse station = StationTestHelper.createStation(name);
 
         //when
         RestAssured.given().log().all()
@@ -79,7 +78,7 @@ public class StationAcceptanceTest {
                 .statusCode(HttpStatus.NO_CONTENT.value());
 
         //then
-        assertThat(TestHelper.selectAllStations())
+        assertThat(StationTestHelper.selectAllStations())
                 .extracting(StationResponse::getName)
                 .allMatch(it -> !it.equals(name));
     }
