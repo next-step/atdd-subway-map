@@ -18,6 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class StationAcceptanceTest {
+
     /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다
@@ -26,15 +27,17 @@ class StationAcceptanceTest {
     @DisplayName("지하철역을 생성한다.")
     @Test
     void createStation() {
+        String stationName = "강남역";
+
         // when
-        ExtractableResponse<Response> response = createStationWithName("강남역");
+        ExtractableResponse<Response> response = 지하철역을_생성한다(stationName);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames = getStationNames();
-        assertThat(stationNames).containsAnyOf("강남역");
+        List<String> stationNames = 지하철역_목록을_조회한다();
+        assertThat(stationNames).containsAnyOf(stationName);
     }
 
     /**
@@ -45,12 +48,15 @@ class StationAcceptanceTest {
     @DisplayName("지하철역 목록을 조회한다.")
     @Test
     void searchStations() {
+        List<String> addStationNames = List.of("강남역", "선릉역");
+
         // given
-        createStationWithName("강남역");
-        createStationWithName("선릉역");
+        addStationNames.forEach(stationName -> {
+            지하철역을_생성한다(stationName);
+        });
 
         // when
-        List<String> stationNames = getStationNames();
+        List<String> stationNames = 지하철역_목록을_조회한다();
 
         // then
         assertThat(stationNames).hasSize(2);
@@ -66,47 +72,54 @@ class StationAcceptanceTest {
     @Test
     void removeStations() {
         // given
-        String stationId = createStationWithName("강남역")
+        String stationId = 지하철역을_생성한다("신논현역")
                 .jsonPath()
                 .get("id")
                 .toString();
 
         // when
-        ExtractableResponse<Response> response = deleteStationWithId(stationId);
+        ExtractableResponse<Response> response = 지하철역을_삭제한다(stationId);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         // then
-        List<String> stationNames = getStationNames();
-        assertThat(stationNames).doesNotContain("강남역");
+        List<String> stationNames = 지하철역_목록을_조회한다();
+        assertThat(stationNames).doesNotContain("신논현역");
     }
 
-    private static ExtractableResponse<Response> createStationWithName(String name) {
+    private static ExtractableResponse<Response> 지하철역을_생성한다(String name) {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
 
         ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
+                RestAssured.given()
                         .body(params)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/stations")
-                        .then().log().all()
+                        .when()
+                        .post("/stations")
+                        .then()
+                        .log().all()
                         .extract();
         return response;
     }
 
-    private static ExtractableResponse<Response> deleteStationWithId(String stationId) {
-        return RestAssured.given().log().all()
+    private static ExtractableResponse<Response> 지하철역을_삭제한다(String stationId) {
+        return RestAssured.given()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().delete("/stations/" + stationId)
-                .then().log().all()
+                .when()
+                .delete("/stations/" + stationId)
+                .then()
+                .log().all()
                 .extract();
     }
 
-    private static List<String> getStationNames() {
-        return RestAssured.given().log().all()
+    private static List<String> 지하철역_목록을_조회한다() {
+        return RestAssured
+                .given()
                 .when().get("/stations")
-                .then().log().all()
-                .extract().jsonPath()
+                .then()
+                .log().all()
+                .extract()
+                .jsonPath()
                 .getList("name", String.class);
     }
 }
