@@ -29,6 +29,7 @@ public class LineAcceptanceTest {
     private static final String API_GET_LINE = "/lines";
     private static final String API_GET_LINE_LIST = "/lines";
     private static final String API_MODIFY_LINE = "/lines";
+    private static final String API_DELETE_LINE = "/lines";
 
     @DisplayName("노선을 생성한다")
     @Test
@@ -70,6 +71,20 @@ public class LineAcceptanceTest {
         assertThat(response.jsonPath().getString("color")).isEqualTo("bg-red-600");
         assertThat(response.jsonPath().getList("stations.id")).containsSequence(List.of(1, 2));
     }
+
+    @DisplayName("존재하지 않는 노선을 조회하면 404 처리된다")
+    @Test
+    void getNotExistLine() {
+        // given
+        Long notExistLineId = Long.MAX_VALUE;
+
+        // when
+        ExtractableResponse<Response> response = 노선조회(notExistLineId);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+    }
+
 
     private ExtractableResponse<Response> 노선조회(Long createdLineId) {
         return RestAssured.given().log().all()
@@ -131,6 +146,32 @@ public class LineAcceptanceTest {
     }
 
     private String getModifyLineRequestUrl(long id) {
+        return API_MODIFY_LINE + "/" + id;
+    }
+
+    @DisplayName("지하철 노선을 삭제한다")
+    @Test
+    void deleteLine() {
+        // given
+        // 지하철 노선을 생성
+        ExtractableResponse<Response> createdResponse = 노선생성("신분당선", "bg-red-600", 1, 2, 10);
+        Long createdLineId = createdResponse.jsonPath().getLong("id");
+
+        // when
+        // 노선을 삭제
+
+        ExtractableResponse<Response> deleteResponse = RestAssured.given().log().all()
+                   .when().delete(getDeleteLineRequestUrl(createdLineId))
+                   .then().log().all().extract();
+
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        // then
+        ExtractableResponse<Response> getLineResponse = 노선조회(createdLineId);
+        assertThat(getLineResponse.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+    }
+
+    private String getDeleteLineRequestUrl(long id) {
         return API_MODIFY_LINE + "/" + id;
     }
 }

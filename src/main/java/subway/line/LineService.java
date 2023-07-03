@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import subway.station.Station;
+import subway.station.StationNotFoundException;
 import subway.station.StationService;
 
 @Service
@@ -18,19 +19,18 @@ public class LineService {
     private final StationService stationService;
     private final LineRepository lineRepository;
 
-
     @Transactional
     public LineResponse createStation(LineCreateRequest request) {
         Optional<Station> upStation = stationService.findById(request.getUpStationId());
 
         if (upStation.isEmpty()) {
-            throw new RuntimeException("station이 존재하지 않습니다");
+            throw new StationNotFoundException();
         }
 
         Optional<Station> downStation = stationService.findById(request.getDownStationId());
 
         if (downStation.isEmpty()) {
-            throw new RuntimeException("station이 존재하지 않습니다");
+            throw new StationNotFoundException();
         }
 
         Line line = new Line();
@@ -47,12 +47,16 @@ public class LineService {
 
     @Transactional
     public LineResponse getLine(Long id) {
-        return new LineResponse(lineRepository.findById(id).orElseThrow(() -> new RuntimeException("not found")));
+        return new LineResponse(lineRepository.findById(id)
+                                              .orElseThrow(LineNotFoundException::new));
     }
 
     @Transactional
     public List<LineResponse> getList() {
-        return lineRepository.findAll().stream().map(LineResponse::new).collect(Collectors.toUnmodifiableList());
+        return lineRepository.findAll()
+                             .stream()
+                             .map(LineResponse::new)
+                             .collect(Collectors.toUnmodifiableList());
     }
 
     @Transactional
