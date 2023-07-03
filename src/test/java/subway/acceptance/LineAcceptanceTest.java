@@ -1,4 +1,4 @@
-package subway;
+package subway.acceptance;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
