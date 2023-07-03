@@ -89,4 +89,33 @@ public class LineAcceptanceTest {
                         .extract().jsonPath().getList("name", String.class);
         assertThat(lineNames).containsAnyOf("신분당선", "2호선");
     }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 조회하면
+     * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
+     */
+    @DisplayName("지하철 노선을 조회 한다.")
+    @Test
+    void getLine() {
+        // given
+        Long upStationId = 지하철_역_생성_요청("강남역").jsonPath().getLong("id");
+        Long downStationId = 지하철_역_생성_요청("양재역").jsonPath().getLong("id");
+
+        Long id = 지하철_노선_생성_요청("신분당선", "bg-red-600", upStationId, downStationId, 10L).jsonPath().getLong("id");
+
+        // when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .pathParam("id", id)
+                .when().get("/lines/{id}")
+                .then().log().all()
+                .extract();
+
+        assertThat(response.jsonPath().getLong("id")).isEqualTo(id);
+        assertThat(response.jsonPath().getString("name")).isEqualTo("신분당선");
+        assertThat(response.jsonPath().getString("color")).isEqualTo("bg-red-600");
+        assertThat(response.jsonPath().getList("$.stations.id", Long.class))
+                .containsAnyOf(upStationId, downStationId);
+
+    }
 }
