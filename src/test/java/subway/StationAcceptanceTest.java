@@ -29,13 +29,13 @@ class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        ExtractableResponse<Response> response = 지하철_노선도_등록("강남역");
+        ExtractableResponse<Response> response = 지하철_역_등록("강남역");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<StationResponse> stations = 지하철_노선도_리스트_반환();
+        List<StationResponse> stations = 지하철_역_리스트_반환();
         assertThat(stations).hasSize(1);
 
         StationResponse 강남역 = stations.get(0);
@@ -52,12 +52,12 @@ class StationAcceptanceTest {
     @Test
     void showStations() {
         //given
-        지하철_노선도_등록("판교역");
-        지하철_노선도_등록("정자역");
+        지하철_역_등록("판교역");
+        지하철_역_등록("정자역");
 
         //when
-        ExtractableResponse<Response> response = 지하철_노선도_조회();
-        List<StationResponse> stations = 지하철_노선도_리스트_반환();
+        ExtractableResponse<Response> response = 지하철_역_조회();
+        List<StationResponse> stations = 지하철_역_리스트_반환();
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -76,15 +76,15 @@ class StationAcceptanceTest {
         Long savedId = 지하철_노선도_등록_Id_획득("판교역");
 
         //when
-        ExtractableResponse<Response> response = 지하철_노선도_삭제(savedId);
+        ExtractableResponse<Response> response = 지하철_역_삭제(savedId);
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-        List<StationResponse> stations = 지하철_노선도_리스트_반환();
+        List<StationResponse> stations = 지하철_역_리스트_반환();
         assertThat(stations).isEmpty();
     }
 
-    private ExtractableResponse<Response> 지하철_노선도_삭제(Long id) {
+    private ExtractableResponse<Response> 지하철_역_삭제(Long id) {
         String pathVariable = "/" + id;
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -93,7 +93,7 @@ class StationAcceptanceTest {
                 .extract();
     }
 
-    private ExtractableResponse<Response> 지하철_노선도_등록(String name) {
+    private ExtractableResponse<Response> 지하철_역_등록(String name) {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
         return RestAssured.given().log().all()
@@ -105,17 +105,17 @@ class StationAcceptanceTest {
     }
 
     private Long 지하철_노선도_등록_Id_획득(String name) {
-        return 지하철_노선도_등록(name).jsonPath().getLong("id");
+        return 지하철_역_등록(name).jsonPath().getLong("id");
     }
 
-    private ExtractableResponse<Response> 지하철_노선도_조회() {
+    private ExtractableResponse<Response> 지하철_역_조회() {
         return RestAssured.given().log().all()
                 .when().get("/stations")
                 .then().log().all()
                 .extract();
     }
 
-    private List<StationResponse> 지하철_노선도_리스트_반환() {
-        return 지하철_노선도_조회().jsonPath().getList("", StationResponse.class);
+    private List<StationResponse> 지하철_역_리스트_반환() {
+        return 지하철_역_조회().jsonPath().getList("", StationResponse.class);
     }
 }
