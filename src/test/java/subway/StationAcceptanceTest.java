@@ -7,29 +7,16 @@ import static subway.StationApiRequest.지하철역_삭제_요청;
 import static subway.StationApiRequest.지하철역_생성_요청;
 import static subway.StationApiRequest.지하철역_조회_요청;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
+import subway.util.AcceptanceTest;
 
 @DisplayName("지하철역 관련 기능")
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-public class StationAcceptanceTest {
-
-    @LocalServerPort
-    private int port;
-
-    @BeforeEach
-    void setUp() {
-        RestAssured.port = port;
-    }
+public class StationAcceptanceTest extends AcceptanceTest {
 
     /**
      * When 지하철역을 생성하면
