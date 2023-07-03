@@ -16,7 +16,7 @@ public class Line {
 
     private String color;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "line")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "line", cascade = CascadeType.ALL)
     private List<Station> stations = new ArrayList<>();
 
     public Line() {

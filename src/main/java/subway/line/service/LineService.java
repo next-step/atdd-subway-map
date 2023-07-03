@@ -58,4 +58,8 @@ public class LineService {
         line.updateName(request.getName());
         line.updateColor(request.getColor());
     }
+
+    public void deleteLine(Long id) {
+        lineRepository.deleteById(id);
+    }
 }

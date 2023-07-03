@@ -35,4 +35,9 @@ public class LineController {
     void updateLine(@PathVariable Long id, @RequestBody UpdateLineRequest request) {
         lineService.updateLine(id, request);
     }
+
+    @DeleteMapping("/lines/{id}")
+    void deleteLine(@PathVariable Long id) {
+        lineService.deleteLine(id);
+    }
 }
