@@ -25,13 +25,13 @@ public class StationAcceptanceTest {
     void createStation() {
         // when
         final String stationName = "강남역";
-        ExtractableResponse<Response> response = StationApi.callCreateStationApi(stationName);
+        ExtractableResponse<Response> response = StationApi.createStationByName(stationName);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames = StationApi.callRetrieveStationsApi().jsonPath().getList("name", String.class);
+        List<String> stationNames = StationApi.retrieveStations().jsonPath().getList("name", String.class);
         assertThat(stationNames).containsAnyOf(stationName);
     }
 
@@ -46,10 +46,10 @@ public class StationAcceptanceTest {
         // given
         final List<String> createStationNames = List.of("강남역", "역삼역");
         final int createdStations = createStationNames.size();
-        createStationNames.forEach(StationApi::callCreateStationApi);
+        createStationNames.forEach(StationApi::createStationByName);
 
         // when
-        ExtractableResponse<Response> retrieveStationsResponse = StationApi.callRetrieveStationsApi();
+        ExtractableResponse<Response> retrieveStationsResponse = StationApi.retrieveStations();
         assertThat(retrieveStationsResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         // then
@@ -67,16 +67,16 @@ public class StationAcceptanceTest {
     void removeStation() {
         // given
         final String stationName = "강남역";
-        ExtractableResponse<Response> createResponse = StationApi.callCreateStationApi(stationName);
+        ExtractableResponse<Response> createResponse = StationApi.createStationByName(stationName);
         final String createdLocation = createResponse.header("Location");
         final Integer createdId = createResponse.body().jsonPath().get("id");
 
         // when
-        ExtractableResponse<Response> deletedStation = StationApi.callDeleteStationByLocation(createdLocation);
+        ExtractableResponse<Response> deletedStation = StationApi.deleteStationByLocation(createdLocation);
         assertThat(deletedStation.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         // then
-        ExtractableResponse<Response> retrieveStationsResponse = StationApi.callRetrieveStationsApi();
+        ExtractableResponse<Response> retrieveStationsResponse = StationApi.retrieveStations();
         assertThat(retrieveStationsResponse.body().jsonPath().getList("id")).doesNotContain(createdId);
 
     }

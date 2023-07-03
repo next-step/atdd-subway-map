@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class StationApi {
-    public static ExtractableResponse<Response> callCreateStationApi(final String stationName) {
+    public static ExtractableResponse<Response> createStationByName(final String stationName) {
         Map<String, String> param = new HashMap<>();
         param.put("name", stationName);
         return RestAssured.given().log().all()
@@ -20,14 +20,14 @@ public class StationApi {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> callRetrieveStationsApi() {
+    public static ExtractableResponse<Response> retrieveStations() {
         return RestAssured.given().log().all()
                 .when().get("/stations")
                 .then().log().all()
                 .extract();
     }
 
-    public static ExtractableResponse<Response> callDeleteStationByLocation(String createdLocation) {
+    public static ExtractableResponse<Response> deleteStationByLocation(String createdLocation) {
         return RestAssured.given().log().all()
                 .when().delete(createdLocation)
                 .then().log().all()
