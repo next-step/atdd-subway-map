@@ -10,6 +10,7 @@ import java.util.Set;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
@@ -67,7 +68,6 @@ public class StationAcceptanceTest {
      * When 지하철역 목록을 조회하면
      * Then 2개의 지하철역을 응답 받는다
      */
-    // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
     @DisplayName("지하철역 목록을 조회한다")
     @Test
     void getStationList() {
@@ -76,9 +76,11 @@ public class StationAcceptanceTest {
 
         // when
         // 지하철역 목록 조회
+        List<String> stationNames = 지하철역_목록조회("name", String.class);
+
         // then
         // 2개의 지하철 역을 응답으로 받는다
-        assertThat(지하철역_목록조회("name", String.class)).containsAnyOf(givenStationNames.toArray(new String[0]));
+        assertThat(stationNames).containsAnyOf(givenStationNames.toArray(new String[0]));
     }
 
     /**
@@ -86,8 +88,6 @@ public class StationAcceptanceTest {
      * When 그 지하철역을 삭제하면
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
-    // TODO: 지하철역 제거 인수 테스트 메서드 생성
-
     @DisplayName("생성된 지하철역을 제거한다")
     @Test
     void deleteStations() {
@@ -96,11 +96,7 @@ public class StationAcceptanceTest {
         ExtractableResponse<Response> createResponse = 지하철역_생성(stationName);
         assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
-        List<Long> stationIds = 지하철역_목록조회("id", Long.class);
-
-        assertThat(stationIds).isNotEmpty();
-
-        Long createdStationId = stationIds.get(0);
+        Long createdStationId = extractCreateStationId(createResponse);
 
         // when
         ExtractableResponse<Response> deleteResponse = RestAssured.given().log().all()
@@ -112,6 +108,10 @@ public class StationAcceptanceTest {
 
         assertThat(지하철역_목록조회("id", Long.class)).doesNotContain(createdStationId);
 
+    }
+
+    private Long extractCreateStationId(ExtractableResponse<Response> response) {
+        return Long.valueOf(response.header(HttpHeaders.LOCATION).split("/")[2]);
     }
 
 }
