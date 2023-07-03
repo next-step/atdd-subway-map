@@ -171,6 +171,6 @@ public class LineAcceptanceTest {
     }
 
     private String getDeleteLineRequestUrl(long id) {
-        return API_MODIFY_LINE + "/" + id;
+        return API_DELETE_LINE + "/" + id;
     }
 }
