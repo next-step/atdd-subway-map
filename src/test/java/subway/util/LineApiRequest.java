@@ -41,6 +41,14 @@ public class LineApiRequest {
             .extract();
     }
 
+    public static ExtractableResponse<Response> 지하철_노선_조회_요청(Long id) {
+        return RestAssured.given().log().all()
+            .accept(MediaType.APPLICATION_JSON_VALUE)
+            .when().get("/lines/{id}", id)
+            .then().log().all()
+            .extract();
+    }
+
     public static ExtractableResponse<Response> 신분당선_생성() {
         StationResponse upStation = 지하철역_리스폰_변환(지하철역_생성_요청(강남역));
         StationResponse downStation = 지하철역_리스폰_변환(지하철역_생성_요청(양재역));

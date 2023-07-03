@@ -12,6 +12,7 @@ import subway.domain.StationRepository;
 import subway.dto.LineCreateRequest;
 import subway.dto.LineResponse;
 import subway.exception.LineDuplicationNameException;
+import subway.exception.LineNotFoundException;
 import subway.exception.StationNotFoundException;
 
 @Service
@@ -52,5 +53,10 @@ public class LineService {
             .stream()
             .map(LineResponse::of)
             .collect(Collectors.toUnmodifiableList());
+    }
+
+    public LineResponse findById(Long id) {
+        return LineResponse.of(lineRepository.findById(id)
+            .orElseThrow(LineNotFoundException::new));
     }
 }

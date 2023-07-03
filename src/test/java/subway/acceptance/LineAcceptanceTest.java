@@ -8,6 +8,7 @@ import static subway.util.LineApiRequest.신분당선_이름;
 import static subway.util.LineApiRequest.지하철_노선_리스폰_변환;
 import static subway.util.LineApiRequest.지하철_노선_목록_조회_요청;
 import static subway.util.LineApiRequest.지하철_노선_생성_요청;
+import static subway.util.LineApiRequest.지하철_노선_조회_요청;
 import static subway.util.StationApiRequest.강남역;
 import static subway.util.StationApiRequest.양재역;
 import static subway.util.StationApiRequest.지하철역_리스폰_변환;
@@ -15,8 +16,8 @@ import static subway.util.StationApiRequest.지하철역_생성_요청;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.util.Arrays;
 import java.util.List;
+import java.util.stream.IntStream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -38,19 +39,12 @@ public class LineAcceptanceTest extends AcceptanceTest {
             upStation.getId(), downStation.getId(), 10);
 
         // then
-        지하철_노선_생성됨(response, 신분당선_이름, 신분당선_색상, upStation.getName(), downStation.getName());
+        지하철_노선_생성됨(response);
     }
 
-    private void 지하철_노선_생성됨(ExtractableResponse<Response> response, String name, String color,
-        String ... stationNames) {
-        List<String> names = response.jsonPath().getList("stations.name", String.class);
-
+    private void 지하철_노선_생성됨(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(response.jsonPath().getLong("id")).isEqualTo(1L);
-        assertThat(response.jsonPath().getString("name")).isEqualTo(name);
-        assertThat(response.jsonPath().getString("color")).isEqualTo(color);
-        assertThat(names.size()).isEqualTo(2);
-        assertThat(names).containsAnyOf(stationNames);
+        지하철_노선_목록_조회됨(지하철_노선_목록_조회_요청(), 지하철_노선_리스폰_변환(response));
     }
 
     @DisplayName("지하철 노선 목록을 조회한다.")
@@ -68,27 +62,38 @@ public class LineAcceptanceTest extends AcceptanceTest {
     }
 
     private void 지하철_노선_목록_조회됨(ExtractableResponse<Response> response, LineResponse ... lineResponses) {
-        List<String> names = response.jsonPath().getList("name", String.class);
-        List<String> colors = response.jsonPath().getList("color", String.class);
+        List<LineResponse> responses = response.jsonPath().getList(".", LineResponse.class);
 
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(names).containsAnyOf(Arrays.stream(lineResponses)
-            .map(LineResponse::getName)
-            .toArray(String[]::new));
-        assertThat(colors).containsAnyOf(Arrays.stream(lineResponses)
-            .map(LineResponse::getColor)
-            .toArray(String[]::new));
-        containsStationNames(response, lineResponses);
+        IntStream.range(0, responses.size())
+            .forEach(i -> 지하철_노선_조회됨(response, responses.get(i), lineResponses[i]));
     }
 
-    private void containsStationNames(ExtractableResponse<Response> response, LineResponse ... lineResponses) {
-        for (int i = 0; i < lineResponses.length; i++) {
-            List<String> lineStationNames = response.jsonPath()
-                .getList(String.format("[%d].stations.name", i), String.class);
-            assertThat(lineStationNames).containsAnyOf(lineResponses[i].getStations()
-                .stream()
-                .map(StationResponse::getName)
-                .toArray(String[]::new));
-        }
+    @DisplayName("지하철 노선을 조회한다.")
+    @Test
+    void showLine() {
+        // given
+        LineResponse 신분당선 = 지하철_노선_리스폰_변환(신분당선_생성());
+
+        // when
+        ExtractableResponse<Response> response = 지하철_노선_조회_요청(신분당선.getId());
+
+        // then
+        지하철_노선_조회됨(response, 지하철_노선_리스폰_변환(response), 신분당선);
+    }
+
+    private void 지하철_노선_조회됨(ExtractableResponse<Response> response, LineResponse actual, LineResponse expected) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(actual.getId()).isEqualTo(expected.getId());
+        assertThat(actual.getName()).isEqualTo(expected.getName());
+        assertThat(actual.getColor()).isEqualTo(expected.getColor());
+
+        List<StationResponse> actualStations = actual.getStations();
+        List<StationResponse> expectedStations = expected.getStations();
+
+        IntStream.range(0, actualStations.size())
+            .forEach(i -> {
+                assertThat(actualStations.get(i).getId()).isEqualTo(expectedStations.get(i).getId());
+                assertThat(actualStations.get(i).getName()).isEqualTo(expectedStations.get(i).getName());
+            });
     }
 }
