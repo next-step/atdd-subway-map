@@ -1,21 +1,31 @@
 package subway;
 
 
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-
-import static org.assertj.core.api.Assertions.*;
+import org.springframework.http.HttpStatus;
+import subway.station.StationResponse;
+import subway.subwayline.CreateSubwayLineRequest;
+import subway.subwayline.ModifySubwayLineRequest;
 import static org.assertj.core.api.Assertions.assertThat;
+import static subway.StationSteps.지하철생성요청_다중생성;
 
 @DisplayName("지하철 노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class SubwayLineAcceptanceTest {
 
+    @Autowired
+    DatabaseCleanup databaseCleanup;
+    @BeforeEach
+    void setUp() {
+        databaseCleanup.afterPropertiesSet();
+        databaseCleanup.execute();
+    }
     /**
      * When 지하철 노선을 생성하면
      * Then 지하철 노선 목록 조회 시 생성한 노션을 찾을 수 있다.
@@ -24,25 +34,26 @@ class SubwayLineAcceptanceTest {
     @Test
     void createSubwayLine() {
         // given
-        Map<String, Object> request = new HashMap<>();
-        request.put("name", "7호선");
-        request.put("color", "bg-red-500");
-        request.put("upStationId", 1);
-        request.put("downStationId", 2);
-        request.put("distance", 52);
+        String name = "4호선";
+        String color = "bg-blue-500";
+        Long upStationId = 1L;
+        Long downStationId = 2L;
+        int distance = 50;
+        지하철생성요청_다중생성("오이도역", "이수역").stream()
+                .map(StationSteps::지하철생성요청)
+                .forEach(x -> assertThat(x.statusCode()).isEqualTo(HttpStatus.CREATED.value()));
+        CreateSubwayLineRequest subwayLineRequest = SubwayLineSteps.지하철노선등록요청_생성(name, color, upStationId, downStationId, distance);
 
         // when
-        Map<String, Object> response = new SubwayLineController().createSubwayLine(request);
+        ExtractableResponse<Response> response = SubwayLineSteps.지하철노선등록요청(subwayLineRequest);
 
         // then
-        assertThat(response).hasSize(7)
-                .containsEntry("id", 1)
-                .containsEntry("name", "7호선")
-                .containsEntry("color", "bg-red-500")
-                .containsEntry("upStationId", 1)
-                .containsEntry("downStationId", 2)
-                .containsEntry("distance", 52)
-                .containsEntry("stations", Map.of("id", 1, "name", "이수역"));
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(response.jsonPath().getString("name")).isEqualTo(subwayLineRequest.getName());
+        assertThat(response.jsonPath().getString("color")).isEqualTo(subwayLineRequest.getColor());
+        assertThat(response.jsonPath().getLong("distance")).isEqualTo(50);
+        assertThat(response.jsonPath().getList("stations", StationResponse.class)).hasSize(2)
+                .extracting("name").containsExactlyInAnyOrder("오이도역", "이수역");
     }
 
 
@@ -55,17 +66,27 @@ class SubwayLineAcceptanceTest {
     @Test
     void getSubwayLines() {
         // given
-        Long id = 1L;
+        지하철생성요청_다중생성("오이도역", "이수역", "남성역").stream()
+                .map(StationSteps::지하철생성요청)
+                .forEach(x -> assertThat(x.statusCode()).isEqualTo(HttpStatus.CREATED.value()));
+
+        CreateSubwayLineRequest subwayLineRequest = SubwayLineSteps.지하철노선등록요청_생성("4호선", "bg-blue-600", 1L, 2L, 50);
+        CreateSubwayLineRequest subwayLineRequest2 = SubwayLineSteps.지하철노선등록요청_생성("7호선", "bg-red-600", 2L, 3L, 50);
+        SubwayLineSteps.지하철노선등록요청(subwayLineRequest);
+        SubwayLineSteps.지하철노선등록요청(subwayLineRequest2);
 
         // when
-        Map<String, Object> response = new SubwayLineController().getSubwayLines(id);
+        ExtractableResponse<Response> response = SubwayLineSteps.지하철노선목록조회요청();
 
         // then
-        assertThat(response).hasSize(4)
-                .containsEntry("id", id)
-                .containsEntry("name", "7호선")
-                .containsEntry("color", "bg-red-500")
-                .containsEntry("stations", Map.of("id", 1, "name", "이수역"));
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.jsonPath().getList("id")).hasSize(2).containsExactlyInAnyOrder(1, 2);
+        assertThat(response.jsonPath().getList("name")).hasSize(2).containsExactlyInAnyOrder("4호선", "7호선");
+        assertThat(response.jsonPath().getList("color")).hasSize(2).containsExactlyInAnyOrder("bg-blue-600", "bg-red-600");
+        assertThat(response.jsonPath().getList("distance")).hasSize(2).containsExactlyInAnyOrder(50, 50);
+        assertThat(response.jsonPath().getList("stations[0].name")).hasSize(2)
+                .containsExactlyInAnyOrder("오이도역", "이수역");
+
     }
 
     /**
@@ -78,20 +99,25 @@ class SubwayLineAcceptanceTest {
     void getSubwayLine() {
         // given
         Long id = 1L;
+        지하철생성요청_다중생성("오이도역", "이수역").stream()
+                .map(StationSteps::지하철생성요청)
+                .forEach(x -> assertThat(x.statusCode()).isEqualTo(HttpStatus.CREATED.value()));
+        SubwayLineSteps.지하철노선등록요청(SubwayLineSteps.지하철노선등록요청_생성("4호선", "bg-blue-600", 1L, 2L, 50));
 
         // when
-        Map<String, Object> response = new SubwayLineController().getSubwayLine(id);
+        ExtractableResponse<Response> response = SubwayLineSteps.지하철노선조회요청(id);
 
         // then
-        assertThat(response).hasSize(4)
-                .containsEntry("id", id)
-                .containsEntry("name", "7호선")
-                .containsEntry("color", "bg-red-500")
-                .containsEntry("stations", Map.of("id", 1, "name", "이수역"));
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.jsonPath().getString("name")).isEqualTo("4호선");
+        assertThat(response.jsonPath().getString("color")).isEqualTo("bg-blue-600");
+        assertThat(response.jsonPath().getLong("distance")).isEqualTo(50);
+        assertThat(response.jsonPath().getList("stations", StationResponse.class)).hasSize(2)
+                .extracting("name").containsExactlyInAnyOrder("오이도역", "이수역");
     }
 
     /**
-     *Given 지하철 노선을 생성하고
+     *Given 지하철 노선을 생성하고
      * When 생성한 지하철 노선을 수정하면
      * Then 해당 지하철 노선 정보는 수정된다
      */
@@ -100,29 +126,21 @@ class SubwayLineAcceptanceTest {
     void modifySubwayLine() {
         // given
         Long id = 1L;
-        Map<String, Object> request = new HashMap<>();
-        request.put("name", "7호선");
-        request.put("color", "bg-red-500");
-        request.put("upStationId", 1);
-        request.put("downStationId", 2);
-        request.put("distance", 52);
+        지하철생성요청_다중생성("오이도역", "이수역").stream()
+                .map(StationSteps::지하철생성요청)
+                .forEach(x -> assertThat(x.statusCode()).isEqualTo(HttpStatus.CREATED.value()));
+        SubwayLineSteps.지하철노선등록요청(SubwayLineSteps.지하철노선등록요청_생성("4호선", "bg-blue-600", 1L, 2L, 50));
+        ModifySubwayLineRequest request = SubwayLineSteps.지하철노선수정요청_생성("4호선", "bg-red-500");
 
         // when
-        Map<String, Object> response = new SubwayLineController().modifySubwayLine(id, request);
+        ExtractableResponse<Response> response = SubwayLineSteps.지하철노선수정요청(id, request);
 
         // then
-        assertThat(response).hasSize(7)
-                .containsEntry("id", id)
-                .containsEntry("name", "4호선")
-                .containsEntry("color", "bg-red-500")
-                .containsEntry("upStationId", 1)
-                .containsEntry("downStationId", 2)
-                .containsEntry("distance", 52)
-                .containsEntry("stations", Map.of("id", 1, "name", "이수역"));
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
     /**
-     * Given 지하철 노선을 생성하고
+     * Given 지하철 노선을 생성하고
      * When 생성한 지하철 노선을 삭제하면
      * Then 해당 지하철 노선 정보는 삭제된다
      */
@@ -131,73 +149,16 @@ class SubwayLineAcceptanceTest {
     void deleteSubwayLine() {
         // given
         Long id = 1L;
+        지하철생성요청_다중생성("오이도역", "이수역").stream()
+                .map(StationSteps::지하철생성요청)
+                .forEach(x -> assertThat(x.statusCode()).isEqualTo(HttpStatus.CREATED.value()));
+        SubwayLineSteps.지하철노선등록요청(SubwayLineSteps.지하철노선등록요청_생성("4호선", "bg-blue-600", 1L, 2L, 50));
 
         // when
-        Map<String, Object> response = new SubwayLineController().deleteSubwayLine(id);
+        ExtractableResponse<Response> response = SubwayLineSteps.지하철노선삭제요청(id);
 
         // then
-        assertThat(response).hasSize(0);
-    }
-    
-    private static class SubwayLineController {
-
-        private final SubwayLineService subwayLineService = new SubwayLineService();
-        public Map<String, Object> createSubwayLine(Map<String, Object> request) {
-            return subwayLineService.createSubwayLine(request);
-        }
-
-        public Map<String, Object> getSubwayLines(Long id) {
-            return subwayLineService.getSubwayLines(id);
-        }
-
-        public Map<String, Object> getSubwayLine(Long id) {
-            return subwayLineService.getSubwayLine(id);
-        }
-
-        public Map<String, Object> modifySubwayLine(Long id, Map<String, Object> request) {
-            return subwayLineService.modifySubwayLine(id, request);
-        }
-
-        public Map<String, Object> deleteSubwayLine(Long id) {
-            return subwayLineService.deleteSubwayLine(id);
-        }
-    }
-
-    private static class SubwayLineService {
-        public Map<String, Object> createSubwayLine(Map<String, Object> response) {
-            response.put("id", 1);
-            response.put("stations", Map.of("id", 1, "name", "이수역"));
-            return response;
-        }
-
-        public Map<String, Object> getSubwayLines(Long id) {
-            Map<String, Object> response = new HashMap<>();
-            response.put("id", id);
-            response.put("name", "7호선");
-            response.put("color", "bg-red-500");
-            response.put("stations", Map.of("id", 1, "name", "이수역"));
-            return response;
-        }
-
-        public Map<String, Object> getSubwayLine(Long id) {
-            Map<String, Object> response = new HashMap<>();
-            response.put("id", id);
-            response.put("name", "7호선");
-            response.put("color", "bg-red-500");
-            response.put("stations", Map.of("id", 1, "name", "이수역"));
-            return response;
-        }
-
-        public Map<String, Object> modifySubwayLine(Long id, Map<String, Object> response) {
-            response.put("id", id);
-            response.put("stations", Map.of("id", 1, "name", "이수역"));
-            response.put("name", "4호선");
-            return response;
-        }
-
-        public Map<String, Object> deleteSubwayLine(Long id) {
-            return new HashMap<>();
-        }
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
 }

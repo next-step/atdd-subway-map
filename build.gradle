@@ -24,6 +24,8 @@ dependencies {
     testImplementation 'io.rest-assured:rest-assured:4.5.1'
 
     runtimeOnly 'com.h2database:h2'
+
+    implementation 'com.google.guava:guava:31.1-jre'
 }
 
 test {

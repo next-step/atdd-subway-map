@@ -1,4 +1,4 @@
-package subway;
+package subway.station;
 
 import javax.persistence.*;
 
@@ -15,6 +15,10 @@ public class Station {
 
     public Station(String name) {
         this.name = name;
+    }
+
+    public static Station from(String name) {
+        return new Station(name);
     }
 
     public Long getId() {
