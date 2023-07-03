@@ -1,6 +1,7 @@
 package subway;
 
 import io.restassured.RestAssured;
+import io.restassured.config.HeaderConfig;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.assertj.core.api.AbstractIntegerAssert;
@@ -75,7 +76,30 @@ public class StationAcceptanceTest {
      * When 그 지하철역을 삭제하면
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
-    // TODO: 지하철역 제거 인수 테스트 메서드 생성
+    @DisplayName("지하철역을 삭제한다.")
+    @Test
+    void deleteStation() {
+        // given
+        ExtractableResponse<Response> createdResponse = 지하철역을_생성한다("건대입구역");
+
+        // when
+        지하철역을_삭제한다(createdResponse.header("Location"));
+
+        // then
+        List<String> stationNames = 지하철역_목록을_조회한다();
+        삭제한_역은_조회되지_않는다(stationNames, "건대입구역");
+    }
+
+    private static void 지하철역을_삭제한다(String createdResourceUrl) {
+        RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().delete(createdResourceUrl)
+                .then().log().all();
+    }
+
+    private static void 삭제한_역은_조회되지_않는다(List<String> stationNames, String deletedName) {
+        assertThat(deletedName).isNotIn(stationNames);
+    }
 
     private static void 생성한_갯수의_지하철역_목록을_응답한다(List<String> stationNames, int createdCount) {
         assertThat(stationNames.size()).isEqualTo(createdCount);
@@ -87,13 +111,14 @@ public class StationAcceptanceTest {
                 .extract().jsonPath().getList("name", String.class);
     }
 
-    private static void 지하철역을_생성한다(String stationName) {
+    private static ExtractableResponse<Response> 지하철역을_생성한다(String stationName) {
         Map<String, String> params = new HashMap<>();
         params.put("name", stationName);
-        RestAssured.given().log().all()
+        return RestAssured.given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/stations")
-                .then().log().all();
+                .then().log().all()
+                .extract();
     }
 }
