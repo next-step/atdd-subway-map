@@ -1,16 +1,19 @@
 package subway.line.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import subway.line.repository.Line;
 import subway.line.repository.LineRepository;
 import subway.line.web.CreateLineRequest;
 import subway.line.web.LineResponse;
+import subway.line.web.UpdateLineRequest;
 import subway.station.repository.Station;
 import subway.station.repository.StationRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Transactional
 @Service
 public class LineService {
     private final LineRepository lineRepository;
@@ -48,5 +51,11 @@ public class LineService {
         return lineRepository.findById(id)
                 .map(LineResponse::new)
                 .orElseThrow(RuntimeException::new);
+    }
+
+    public void updateLine(Long id, UpdateLineRequest request) {
+        Line line = lineRepository.findById(id).orElseThrow(RuntimeException::new);
+        line.updateName(request.getName());
+        line.updateColor(request.getColor());
     }
 }

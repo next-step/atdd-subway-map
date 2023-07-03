@@ -19,7 +19,9 @@ public class Line {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "line")
     private List<Station> stations = new ArrayList<>();
 
-    public Line() {}
+    public Line() {
+    }
+
     public Line(String name, String color) {
         this.name = name;
         this.color = color;
@@ -45,4 +47,13 @@ public class Line {
     public List<Station> getStations() {
         return stations;
     }
+
+    public void updateName(String name) {
+        this.name = name;
+    }
+
+    public void updateColor(String color) {
+        this.color = color;
+    }
 }
+

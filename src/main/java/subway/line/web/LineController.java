@@ -31,4 +31,8 @@ public class LineController {
         return lineService.getLine(id);
     }
 
+    @PutMapping("/lines/{id}")
+    void updateLine(@PathVariable Long id, @RequestBody UpdateLineRequest request) {
+        lineService.updateLine(id, request);
+    }
 }
