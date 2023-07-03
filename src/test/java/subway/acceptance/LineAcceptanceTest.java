@@ -17,8 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static subway.acceptance.StationAcceptanceTest.지하철_역_생성_요청;
 
 @DisplayName("지하철 노선 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class LineAcceptanceTest {
+public class LineAcceptanceTest extends AcceptanceTest {
 
     /**
      * Given 2개의 지하철 역을 생성하고
