@@ -37,7 +37,7 @@ class StationAcceptanceTest {
 
     @DisplayName("지하철역을 1개 생성하면 목록 조회시 생성한 1개의 역이 조회된다.")
     @Test
-    void createOneStation() {
+    void createOne_findOne() {
         // when
         ExtractableResponse<Response> response = 지하철_생성("강남역");
 
@@ -50,7 +50,7 @@ class StationAcceptanceTest {
 
     @DisplayName("지하철역을 2개 생성하면 목록 조회시 생성한 2개의 역이 조회된다.")
     @Test
-    void createTwoStation() {
+    void createTwo_findTwo() {
         // given
         지하철_생성("별똥별");
         지하철_생성("역삼역");
@@ -61,7 +61,7 @@ class StationAcceptanceTest {
 
     @DisplayName("지하철역을 생성한 후 삭제하면 목록 조회시 해당 역이 조회되지 않는다.")
     @Test
-    void create_and_deleteStation() {
+    void createAndDelete_notFound() {
         // given
         ExtractableResponse<Response> response = 지하철_생성("우영우");
 
