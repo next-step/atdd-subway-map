@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -22,6 +24,10 @@ public class LineService {
                 request.getDownStationId()
         ));
 
+        return createLineResponse(lineEntity);
+    }
+
+    private LineResponse createLineResponse(LineEntity lineEntity) {
         Station upStation = stationRepository.getReferenceById(lineEntity.getUpStationId());
         Station downStation = stationRepository.getReferenceById(lineEntity.getDownStationId());
 
@@ -33,5 +39,11 @@ public class LineService {
                         new StationResponse(upStation.getId(), upStation.getName()),
                         new StationResponse(downStation.getId(), downStation.getName())
                 ));
+    }
+
+    public List<LineResponse> findAllLines() {
+        return lineRepository.findAll().stream()
+                .map(this::createLineResponse)
+                .collect(Collectors.toList());
     }
 }
