@@ -137,4 +137,57 @@ public class LineAcceptanceTest {
                 .contains("강남역", "사당역");
     }
 
+    private static ExtractableResponse<Response> 지하철노선_조회(int 지하철노선_아이디) {
+        return RestAssured.given().log().all()
+                .when().get("/lines/" + 지하철노선_아이디)
+                .then().log().all()
+                .extract();
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 조회하면
+     * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
+     */
+    @DisplayName("지하철노선 조회")
+    @Test
+    void searchLine() {
+        // given
+        int 강남역_아이디 = 아이디를_파싱한다(지하철역을_생성한다("강남역"));
+        int 판교역_아이디 = 아이디를_파싱한다(지하철역을_생성한다("판교역"));
+        var 신분당선 = 지하철_노선_등록한다(
+                "신분당선",
+                "bg-red-600",
+                String.valueOf(강남역_아이디),
+                String.valueOf(판교역_아이디),
+                String.valueOf(10));
+        int 신분당선_아이디 = 아이디를_파싱한다(신분당선);
+
+        // when
+        var 조회된_지하철노선 = 지하철노선_조회(신분당선_아이디);
+
+        // then
+        assertThat(아이디를_파싱한다(조회된_지하철노선)).isEqualTo(신분당선_아이디);
+        assertThat(이름(조회된_지하철노선)).isEqualTo("신분당선");
+        assertThat(컬러(조회된_지하철노선)).isEqualTo("bg-red-600");
+        assertThat(스테이션_아이디리스트(조회된_지하철노선)).contains(강남역_아이디, 판교역_아이디);
+        assertThat(스테이션_이름(조회된_지하철노선)).contains("강남역", "판교역");
+    }
+
+    private List<String> 스테이션_이름(ExtractableResponse<Response> response) {
+        return response.jsonPath().getList("stations.name", String.class);
+    }
+
+    private List<Integer> 스테이션_아이디리스트(ExtractableResponse<Response> response) {
+        return response.jsonPath().getList("stations.id", Integer.class);
+    }
+
+    private String 컬러(ExtractableResponse<Response> response) {
+        return response.jsonPath().getString("color");
+    }
+
+    private String 이름(ExtractableResponse<Response> response) {
+        return response.jsonPath().getString("name");
+    }
+
 }
