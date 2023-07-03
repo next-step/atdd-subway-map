@@ -1,4 +1,4 @@
-package subway.line;
+package subway.line.domain;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

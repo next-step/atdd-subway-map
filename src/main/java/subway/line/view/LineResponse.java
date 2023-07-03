@@ -1,4 +1,4 @@
-package subway.line;
+package subway.line.view;
 
 import java.util.List;
 
@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import subway.line.domain.Line;
 import subway.station.StationResponse;
 
 @Getter

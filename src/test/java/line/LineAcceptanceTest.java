@@ -17,8 +17,8 @@ import io.restassured.response.Response;
 import subway.SchemaInitSql;
 import subway.StationInitSql;
 import subway.SubwayApplication;
-import subway.line.LineCreateRequest;
-import subway.line.LineModifyRequest;
+import subway.line.view.LineCreateRequest;
+import subway.line.view.LineModifyRequest;
 
 @SchemaInitSql
 @StationInitSql
@@ -159,7 +159,6 @@ public class LineAcceptanceTest {
 
         // when
         // 노선을 삭제
-
         ExtractableResponse<Response> deleteResponse = RestAssured.given().log().all()
                    .when().delete(getDeleteLineRequestUrl(createdLineId))
                    .then().log().all().extract();

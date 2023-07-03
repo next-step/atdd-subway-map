@@ -10,10 +10,10 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import subway.SchemaInitSql;
 import subway.StationInitSql;
 import subway.SubwayApplication;
-import subway.line.LineCreateRequest;
-import subway.line.LineModifyRequest;
-import subway.line.LineResponse;
-import subway.line.LineService;
+import subway.line.view.LineCreateRequest;
+import subway.line.view.LineModifyRequest;
+import subway.line.view.LineResponse;
+import subway.line.service.LineService;
 
 @SchemaInitSql
 @StationInitSql
