@@ -4,11 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import subway.line.dto.LineResponse;
 
 /**
  * 프로그래밍 요구사항
@@ -70,7 +70,11 @@ public class LineAcceptanceTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.jsonPath().getList("", LineResponse.class)).hasSize(2);
+        assertThat(지하철_노선_목록_이름을_추출한다(response)).hasSize(2);
+    }
+
+    private List<String> 지하철_노선_목록_이름을_추출한다(ExtractableResponse<Response> response) {
+        return response.jsonPath().getList("name", String.class);
     }
 
     /**
