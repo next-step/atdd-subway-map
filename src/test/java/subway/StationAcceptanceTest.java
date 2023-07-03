@@ -3,12 +3,14 @@ package subway;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +20,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationAcceptanceTest {
+
+    @BeforeEach
+    @DisplayName("테이블 초기화")
+    void resetTable(){
+        지하철역_초기화();
+    }
+
     /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다
@@ -87,13 +96,14 @@ public class StationAcceptanceTest {
         final String[] names = {"수원역", "금정역"};
         Map<String, Integer> resultMap = new HashMap<>();
         // Given
-        for (String name : names){
+        for (String name : names) {
             Map<String, String> params = 지하철역_요청_만들기(name);
             ExtractableResponse<Response> response = 지하철역_생성(params);
             assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
             resultMap.put(name, response.jsonPath().getInt("id"));
         }
-
+        // Given
+        assertThat(resultMap.size()).isEqualTo(2);
         // When
         ExtractableResponse<Response> response = 지하철역_삭제(resultMap.get("수원역"));
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
@@ -132,5 +142,15 @@ public class StationAcceptanceTest {
                 .when().get("/stations")
                 .then().log().all()
                 .extract().jsonPath().getList("name");
+    }
+    private void 지하철역_초기화() {
+        List<Integer> idList = RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().get("/stations")
+                .then().log().all()
+                .extract().jsonPath().getList("id", Integer.class);
+        for (int id : idList){
+            지하철역_삭제(id);
+        }
     }
 }
