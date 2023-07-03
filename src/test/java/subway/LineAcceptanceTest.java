@@ -3,12 +3,12 @@ package subway;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.jdbc.Sql;
 import subway.controller.dto.line.LineModifyRequest;
 import subway.controller.dto.line.LineSaveRequest;
 import subway.utils.StationApiHelper;
@@ -22,6 +22,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {
 
+    private Long stationId1;
+    private Long stationId2;
+
+    private Long stationId3;
+    private Long stationId4;
+
+    @BeforeEach
+    public void init() {
+        stationId1 = saveStationAndGetId("강남역");
+        stationId2 = saveStationAndGetId("사당역");
+        stationId3 = saveStationAndGetId("역삼역");
+        stationId4 = saveStationAndGetId("삼성역");
+    }
+
     /**
      * When 지하철 노선을 생성하면
      * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
@@ -31,20 +45,13 @@ public class LineAcceptanceTest {
     void createLine() {
 
         // given
-
-        String stationName1 = "1번역";
-        String stationName2 = "2번역";
-
-        Long id1 = saveAndGetId(stationName1);
-        Long id2 = saveAndGetId(stationName2);
-
-        String lineName = stationName1 + "-" + stationName2;
+        String lineName = "line이름";
 
         LineSaveRequest request = LineSaveRequest.builder()
                                                  .name(lineName)
                                                  .color("bg-red-600")
-                                                 .upStationId(id1)
-                                                 .downStationId(id2)
+                                                 .upStationId(stationId1)
+                                                 .downStationId(stationId2)
                                                  .distance(10L)
                                                  .build();
 
@@ -60,13 +67,6 @@ public class LineAcceptanceTest {
         assertThat(names.get(0)).contains(lineName);
     }
 
-    private static long saveAndGetId(String stationName2) {
-        return Long.parseLong(StationApiHelper.callApiToCreateStation(stationName2)
-                                              .jsonPath()
-                                              .get("id")
-                                              .toString());
-    }
-
     /**
      * Given 2개의 지하철 노선을 생성하고
      * When 지하철 노선 목록을 조회하면
@@ -75,7 +75,42 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선 목록을 조회한다.")
     @Test
     void getLines() {
+        // given
+        String lineName1 = "line이름1";
+        String lineName2 = "line이름2";
 
+        createTwoLine(lineName1, lineName2);// 2개의 지하철 노선을 생성하고,
+
+        // when
+        ExtractableResponse<Response> linesResponse = callApiToGetLines(); // 지하철 노선 목록 조회하면
+
+        // then
+        assertThat(linesResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        List<String> names = linesResponse.jsonPath()
+                                          .getList("name", String.class); // 2개의 노선을 조회할 수 있다.
+        assertThat(names.size()).isEqualTo(2);
+        assertThat(names).contains(lineName1, lineName2);
+    }
+
+    private void createTwoLine(String lineName1, String lineName2) {
+        LineSaveRequest request1 = LineSaveRequest.builder()
+                                                  .name(lineName1)
+                                                  .color("bg-red-600")
+                                                  .upStationId(stationId1)
+                                                  .downStationId(stationId2)
+                                                  .distance(10L)
+                                                  .build();
+        LineSaveRequest request2 = LineSaveRequest.builder()
+                                                  .name(lineName2)
+                                                  .color("bg-red-600")
+                                                  .upStationId(stationId3)
+                                                  .downStationId(stationId4)
+                                                  .distance(10L)
+                                                  .build();
+
+        callApiToCreateLine(request1);
+        callApiToCreateLine(request2);
     }
 
     /**
@@ -176,5 +211,11 @@ public class LineAcceptanceTest {
                           .log()
                           .all()
                           .extract();
+    }
+
+    private static long saveStationAndGetId(String stationName) {
+        return StationApiHelper.callApiToCreateStation(stationName)
+                               .jsonPath()
+                               .getLong("id");
     }
 }
