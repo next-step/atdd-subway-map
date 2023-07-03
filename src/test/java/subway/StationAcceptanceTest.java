@@ -27,8 +27,9 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
+        final String stationName = "강남역";
         Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
+        params.put("name", stationName);
 
         ExtractableResponse<Response> response =
                 RestAssured.given().log().all()
@@ -39,6 +40,7 @@ public class StationAcceptanceTest {
                         .extract();
 
         // then
+        System.out.println(response.body().toString());
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
@@ -47,7 +49,7 @@ public class StationAcceptanceTest {
                         .when().get("/stations")
                         .then().log().all()
                         .extract().jsonPath().getList("name", String.class);
-        assertThat(stationNames).containsAnyOf("강남역");
+        assertThat(stationNames).containsAnyOf(stationName);
     }
 
     /**
@@ -55,11 +57,11 @@ public class StationAcceptanceTest {
      * When 지하철역 목록을 조회하면
      * Then 2개의 지하철역을 응답 받는다
      */
-    // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
     @DisplayName("지하철역 목록을 조회한다.")
     @Test
     void retrieveStations() {
         // given
+        final int createdStations = 2;
         Map<String, String> gangnamPostRequestMap = new HashMap<>();
         gangnamPostRequestMap.put("name", "강남역");
 
@@ -70,6 +72,7 @@ public class StationAcceptanceTest {
                         .when().post("/stations")
                         .then().log().all()
                         .extract();
+
 
         Map<String, String> yeoksamPostRequestMap = new HashMap<>();
         yeoksamPostRequestMap.put("name", "역삼역");
@@ -90,9 +93,10 @@ public class StationAcceptanceTest {
                         .then().log().all()
                         .extract();
 
+        assertThat(retrieveStationsResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+
         // then
-//        assertThat(retrieveStationsResponse.statusCode())
-//                .isEqualTo(retrieveStationsResponse.body().jsonPath());
+        assertThat(createdStations).isEqualTo(retrieveStationsResponse.body().jsonPath().getList("$").size());
 
     }
 
@@ -101,6 +105,53 @@ public class StationAcceptanceTest {
      * When 그 지하철역을 삭제하면
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
-    // TODO: 지하철역 제거 인수 테스트 메서드 생성
+    @DisplayName("지하철역을 삭제한다.")
+    @Test
+    void removeStation() {
+        // given
+        final String stationName = "강남역";
+        Map<String, String> gangnamPostRequestMap = new HashMap<>();
+        gangnamPostRequestMap.put("name", stationName);
+
+        ExtractableResponse<Response> gangnamResponse =
+                RestAssured.given().log().all()
+                        .body(gangnamPostRequestMap)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .when().post("/stations")
+                        .then().log().all()
+                        .extract();
+
+        final String createdLocation = gangnamResponse.header("Location");
+        final Integer createdId = gangnamResponse.body().jsonPath().get("id");
+
+        // given: optional
+        Map<String, String> yeoksamPostRequestMap = new HashMap<>();
+        yeoksamPostRequestMap.put("name", "역삼역");
+
+        ExtractableResponse<Response> yeoksamResponse =
+                RestAssured.given().log().all()
+                        .body(yeoksamPostRequestMap)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .when().post("/stations")
+                        .then().log().all()
+                        .extract();
+
+        // when
+        ExtractableResponse<Response> deletedStation = RestAssured.given().log().all()
+                .when().delete(createdLocation)
+                .then().log().all()
+                .extract();
+
+        assertThat(deletedStation.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        // then
+        ExtractableResponse<Response> retrieveStationsResponse =
+                RestAssured.given().log().all()
+                        .when().get("/stations")
+                        .then().log().all()
+                        .extract();
+        assertThat(retrieveStationsResponse.body().jsonPath().getList("id")).doesNotContain(createdId);
+
+    }
 
 }
