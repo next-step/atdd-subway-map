@@ -1,5 +1,7 @@
 package subway.domain;
 
+import java.util.Objects;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -38,8 +40,8 @@ public class Line {
     @Column(nullable = false)
     private Long distance;
 
-    public Line(final String name, final String color, final Station upStation, final Station downStation,
-                final Long distance) {
+    private Line(final String name, final String color, final Station upStation, final Station downStation,
+                 final Long distance) {
         this.name = name;
         this.color = color;
         this.upStation = upStation;
@@ -50,5 +52,52 @@ public class Line {
     public void update(final String name, final String color) {
         this.name = name;
         this.color = color;
+    }
+
+    public static LineBuilder builder() {
+        return new LineBuilder();
+    }
+
+    public static class LineBuilder {
+        private String name;
+        private String color;
+        private Station upStation;
+        private Station downStation;
+        private Long distance;
+
+        public LineBuilder name(final String name) {
+            this.name = name;
+            return this;
+        }
+
+        public LineBuilder color(final String color) {
+            this.color = color;
+            return this;
+        }
+
+        public LineBuilder upStation(final Station upStation) {
+            this.upStation = upStation;
+            return this;
+        }
+
+        public LineBuilder downStation(final Station downStation) {
+            this.downStation = downStation;
+            return this;
+        }
+
+        public LineBuilder distance(final Long distance) {
+            this.distance = distance;
+            return this;
+        }
+
+        public Line build() {
+            return new Line(
+                    Objects.requireNonNull(name),
+                    Objects.requireNonNull(color),
+                    Objects.requireNonNull(upStation),
+                    Objects.requireNonNull(downStation),
+                    Objects.requireNonNull(distance)
+            );
+        }
     }
 }

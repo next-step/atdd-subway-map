@@ -31,13 +31,13 @@ public class LineService {
         final var upStation = stationRepository.getById(request.getUpStationId());
         final var downStation = stationRepository.getById(request.getDownStationId());
 
-        return new Line(
-                request.getName(),
-                request.getColor(),
-                upStation,
-                downStation,
-                request.getDistance()
-        );
+        return Line.builder()
+                .name(request.getName())
+                .color(request.getColor())
+                .upStation(upStation)
+                .downStation(downStation)
+                .distance(request.getDistance())
+                .build();
     }
 
     public List<LineResponse> findAllLines() {
