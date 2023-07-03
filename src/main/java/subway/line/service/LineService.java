@@ -1,4 +1,4 @@
-package subway.service;
+package subway.line.service;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -7,12 +7,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
-import subway.domain.Line;
-import subway.domain.LineRepository;
-import subway.domain.StationRepository;
-import subway.service.dto.request.LineCreateRequest;
-import subway.service.dto.request.LineUpdateRequest;
-import subway.service.dto.response.LineResponse;
+import subway.line.domain.Line;
+import subway.line.domain.LineRepository;
+import subway.line.service.request.LineCreateRequest;
+import subway.line.service.request.LineUpdateRequest;
+import subway.line.service.response.LineResponse;
+import subway.station.domain.StationRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -31,13 +31,13 @@ public class LineService {
         final var upStation = stationRepository.getById(request.getUpStationId());
         final var downStation = stationRepository.getById(request.getDownStationId());
 
-        return Line.builder()
-                .name(request.getName())
-                .color(request.getColor())
-                .upStation(upStation)
-                .downStation(downStation)
-                .distance(request.getDistance())
-                .build();
+        return new Line(
+                request.getName(),
+                request.getColor(),
+                upStation,
+                downStation,
+                request.getDistance()
+        );
     }
 
     public List<LineResponse> findAllLines() {
@@ -52,13 +52,13 @@ public class LineService {
     }
 
     @Transactional
-    public void updateLineById(final Long id, final LineUpdateRequest request) {
+    public void updateLine(final Long id, final LineUpdateRequest request) {
         final var line = lineRepository.getById(id);
         line.update(request.getName(), request.getColor());
     }
 
     @Transactional
-    public void deleteLineById(final Long id) {
+    public void deleteLine(final Long id) {
         lineRepository.deleteById(id);
     }
 }

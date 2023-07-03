@@ -1,4 +1,4 @@
-package subway.service;
+package subway.station.service;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -7,10 +7,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
-import subway.domain.Station;
-import subway.domain.StationRepository;
-import subway.service.dto.request.StationRequest;
-import subway.service.dto.response.StationResponse;
+import subway.station.domain.Station;
+import subway.station.domain.StationRepository;
+import subway.station.service.request.StationRequest;
+import subway.station.service.response.StationResponse;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +31,7 @@ public class StationService {
     }
 
     @Transactional
-    public void deleteStationById(final Long id) {
+    public void deleteStation(final Long id) {
         stationRepository.deleteById(id);
     }
 }

@@ -1,4 +1,4 @@
-package subway.acceptance.fixture;
+package subway.acceptance.line;
 
 import java.util.List;
 
@@ -7,9 +7,9 @@ import org.springframework.http.MediaType;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ValidatableResponse;
-import subway.service.dto.request.LineCreateRequest;
-import subway.service.dto.request.LineUpdateRequest;
-import subway.service.dto.response.LineResponse;
+import subway.line.service.request.LineCreateRequest;
+import subway.line.service.request.LineUpdateRequest;
+import subway.line.service.response.LineResponse;
 
 public class LineFixture {
 

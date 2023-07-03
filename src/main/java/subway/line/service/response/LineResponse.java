@@ -1,11 +1,12 @@
-package subway.service.dto.response;
+package subway.line.service.response;
 
 import java.util.List;
 
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import subway.domain.Line;
+import subway.line.domain.Line;
+import subway.station.service.response.StationResponse;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
@@ -27,7 +28,7 @@ public class LineResponse {
                 line.getId(),
                 line.getName(),
                 line.getColor(),
-                StationResponse.toResponses(line.getUpStation(), line.getDownStation())
+                StationResponse.toResponses(line.getStations())
         );
     }
 }

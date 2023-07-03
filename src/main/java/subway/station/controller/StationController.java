@@ -1,4 +1,4 @@
-package subway.controller;
+package subway.station.controller;
 
 import java.net.URI;
 import java.util.List;
@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
-import subway.service.StationService;
-import subway.service.dto.request.StationRequest;
-import subway.service.dto.response.StationResponse;
+import subway.station.service.StationService;
+import subway.station.service.request.StationRequest;
+import subway.station.service.response.StationResponse;
 
 @RestController
 @RequiredArgsConstructor
@@ -40,7 +40,7 @@ public class StationController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteStation(@PathVariable final Long id) {
-        stationService.deleteStationById(id);
+        stationService.deleteStation(id);
         return ResponseEntity
                 .noContent()
                 .build();

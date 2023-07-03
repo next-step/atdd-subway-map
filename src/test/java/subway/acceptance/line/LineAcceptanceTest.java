@@ -1,4 +1,4 @@
-package subway.acceptance;
+package subway.acceptance.line;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -8,10 +8,10 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import subway.acceptance.fixture.LineFixture;
-import subway.acceptance.fixture.StationFixture;
-import subway.service.dto.request.LineCreateRequest;
-import subway.service.dto.request.LineUpdateRequest;
+import subway.acceptance.AcceptanceTest;
+import subway.acceptance.station.StationFixture;
+import subway.line.service.request.LineCreateRequest;
+import subway.line.service.request.LineUpdateRequest;
 
 @DisplayName("지하철노선 관련 기능")
 class LineAcceptanceTest extends AcceptanceTest {

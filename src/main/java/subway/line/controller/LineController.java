@@ -1,4 +1,4 @@
-package subway.controller;
+package subway.line.controller;
 
 import java.net.URI;
 import java.util.List;
@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
-import subway.service.LineService;
-import subway.service.dto.request.LineCreateRequest;
-import subway.service.dto.request.LineUpdateRequest;
-import subway.service.dto.response.LineResponse;
+import subway.line.service.LineService;
+import subway.line.service.request.LineCreateRequest;
+import subway.line.service.request.LineUpdateRequest;
+import subway.line.service.response.LineResponse;
 
 @RestController
 @RequiredArgsConstructor
@@ -49,7 +49,7 @@ public class LineController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Void> updateLine(@PathVariable final Long id, @RequestBody final LineUpdateRequest request) {
-        lineService.updateLineById(id, request);
+        lineService.updateLine(id, request);
         return ResponseEntity
                 .ok()
                 .build();
@@ -57,7 +57,7 @@ public class LineController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteLine(@PathVariable final Long id) {
-        lineService.deleteLineById(id);
+        lineService.deleteLine(id);
         return ResponseEntity
                 .noContent()
                 .build();

@@ -1,4 +1,6 @@
-package subway.domain;
+package subway.station.domain;
+
+import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -23,5 +25,9 @@ public class Station {
 
     public Station(final String name) {
         this.name = name;
+    }
+
+    public boolean equalsId(final Station other) {
+        return Objects.equals(this.getId(), other.getId());
     }
 }

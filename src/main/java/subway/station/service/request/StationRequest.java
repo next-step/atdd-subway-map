@@ -1,4 +1,4 @@
-package subway.service.dto.request;
+package subway.station.service.request;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -6,12 +6,10 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
-public class LineUpdateRequest {
+public class StationRequest {
     private String name;
-    private String color;
 
-    public LineUpdateRequest(final String name, final String color) {
+    public StationRequest(final String name) {
         this.name = name;
-        this.color = color;
     }
 }

@@ -6,7 +6,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
 import io.restassured.RestAssured;
 
@@ -17,8 +16,7 @@ class RestAssuredTest {
     @Test
     void accessGoogle() {
         final var response = RestAssured.given()
-                .accept(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("https://google.com")
+                .when().get("https://google.com:443")
                 .then()
                 .extract();
 
