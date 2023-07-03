@@ -1,6 +1,5 @@
 package subway.station;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,7 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+import subway.common.CommonRestAssured;
+import subway.common.CommonRestAssuredUseCondition;
 import subway.station.domain.Station;
 import subway.station.repository.StationRepository;
 
@@ -22,6 +22,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationAcceptanceTest {
+
+    private final String STATION_API_URI = "/api/stations";
 
     @Autowired
     StationRepository stationRepository;
@@ -43,17 +45,17 @@ public class StationAcceptanceTest {
         Map<String, String> params = new HashMap<>();
         params.put("name", "강남역");
 
-        ExtractableResponse<Response> response = createStation(params);
+        ExtractableResponse<Response> response =
+                CommonRestAssured.create(new CommonRestAssuredUseCondition(STATION_API_URI, params));
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
+        List<String> stationNames = CommonRestAssured
+                .inquriy(new CommonRestAssuredUseCondition(STATION_API_URI))
+                .jsonPath()
+                .getList("name", String.class);
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
@@ -69,22 +71,14 @@ public class StationAcceptanceTest {
         // given
         Map<String, String> params = new HashMap<>();
         params.put("name", "우리집역");
-        RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
+        CommonRestAssured.create(new CommonRestAssuredUseCondition(STATION_API_URI, params));
 
         params.put("name", "역삼역");
-        createStation(params);;
+        CommonRestAssured.create(new CommonRestAssuredUseCondition(STATION_API_URI, params));
 
         // when
         ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract();
+                CommonRestAssured.inquriy(new CommonRestAssuredUseCondition(STATION_API_URI));
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -103,35 +97,22 @@ public class StationAcceptanceTest {
         // given
         Map<String, String> params = new HashMap<>();
         params.put("name", "삼성역");
-        ExtractableResponse<Response> postResponse = createStation(params);
+        ExtractableResponse<Response> postResponse = CommonRestAssured.create(new CommonRestAssuredUseCondition(STATION_API_URI, params));
         Station stations = postResponse.jsonPath().getObject(".", Station.class);
 
         // when
         ExtractableResponse<Response> deleteResponse =
-                RestAssured.given().log().all()
-                        .when().delete("/stations/" + stations.getId())
-                        .then().log().all()
-                        .extract();
+                CommonRestAssured.delete(new CommonRestAssuredUseCondition(STATION_API_URI, String.valueOf(stations.getId())));
 
         // then
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         // then
-        List<String> stationNames =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
+        List<String> stationNames = CommonRestAssured
+                .inquriy(new CommonRestAssuredUseCondition(STATION_API_URI))
+                .jsonPath()
+                .getList("name", String.class);
         assertThat(stationNames).doesNotContain("삼성역");
-    }
-
-    private ExtractableResponse<Response> createStation(Map<String, String> params) {
-        return RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
     }
 
 }
