@@ -88,8 +88,8 @@ public class StationAcceptanceTest {
      * When 그 지하철역을 삭제하면
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
-    // TODO: 지하철역 제거 인수 테스트 메서드 생성
-    @DisplayName("지하철역을 제거한다.")
+    // TODO: 지하철역 삭제 인수 테스트 메서드 생성
+    @DisplayName("지하철역을 삭제한다.")
     @Test
     void deleteStation() {
         // given
@@ -99,10 +99,10 @@ public class StationAcceptanceTest {
         ExtractableResponse<Response> response = 지하철역_삭제_요청(id);
 
         // then
-        지하철역_제거됨(response, 강남역);
+        지하철역_삭제됨(response, 강남역);
     }
 
-    private void 지하철역_제거됨(ExtractableResponse<Response> response, String ... stationNames) {
+    private void 지하철역_삭제됨(ExtractableResponse<Response> response, String ... stationNames) {
         List<String> names = 지하철역_조회_요청().jsonPath().getList("name", String.class);
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
