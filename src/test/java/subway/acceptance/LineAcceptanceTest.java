@@ -40,10 +40,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         List<String> lineNames =
-                RestAssured.given().log().all()
-                        .when().get("/lines")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
+                지하철_노선_목록_조회().jsonPath().getList("name", String.class);
         assertThat(lineNames).containsAnyOf("신분당선");
     }
 
@@ -82,12 +79,17 @@ public class LineAcceptanceTest extends AcceptanceTest {
         지하철_노선_생성_요청("신분당선", "bg-red-600", station1, station2, 10L);
         지하철_노선_생성_요청("2호선", "bg-green-600", station3, station4, 10L);
 
-        List<String> lineNames =
-                RestAssured.given().log().all()
-                        .when().get("/lines")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
+        List<String> lineNames = 지하철_노선_목록_조회()
+                .jsonPath()
+                .getList("name", String.class);
         assertThat(lineNames).containsAnyOf("신분당선", "2호선");
+    }
+
+    private static ExtractableResponse<Response> 지하철_노선_목록_조회() {
+        return RestAssured.given().log().all()
+                .when().get("/lines")
+                .then().log().all()
+                .extract();
     }
 
     /**
@@ -157,5 +159,36 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         assertThat(lineResponse.getString("name")).isEqualTo("2호선");
         assertThat(lineResponse.getString("color")).isEqualTo("bg-green-600");
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 삭제하면
+     * Then 해당 지하철 노선 정보는 삭제된다
+     */
+    @DisplayName("지하철 노선을 삭제 한다.")
+    @Test
+    void deleteLIne() {
+        // given
+        Long upStationId = 지하철_역_생성_요청("강남역").jsonPath().getLong("id");
+        Long downStationId = 지하철_역_생성_요청("양재역").jsonPath().getLong("id");
+
+        Long id = 지하철_노선_생성_요청("신분당선", "bg-red-600", upStationId, downStationId, 10L).jsonPath().getLong("id");
+
+        // when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .pathParam("id", id)
+                .when().delete("/lines/{id}")
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        // then
+        List<String> lineNames = 지하철_노선_목록_조회().jsonPath().getList("name", String.class);
+
+        assertThat(lineNames).doesNotContain("신분당선");
     }
 }
