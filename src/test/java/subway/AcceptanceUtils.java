@@ -16,6 +16,22 @@ public class AcceptanceUtils {
 	private AcceptanceUtils() {
 	}
 
+	public static void createStationSection(Long lineId, Long upStationId, Long downStationId, BigDecimal distance,HttpStatus expectedStatus) {
+		final Map<String, String> stationSectionCreateRequest = new HashMap<>();
+
+		stationSectionCreateRequest.put("upStationId", String.valueOf(upStationId));
+		stationSectionCreateRequest.put("downStationId", String.valueOf(downStationId));
+		stationSectionCreateRequest.put("distance", distance.toString());
+
+		RestAssured.given().log().all()
+			.body(stationSectionCreateRequest)
+			.contentType(MediaType.APPLICATION_JSON_VALUE)
+			.when().post("/lines/" + lineId + "/sections")
+			.then().log().all()
+			.statusCode(expectedStatus.value())
+			.extract();
+	}
+
 	public static Long createStationLine(String name, String color, Long upStationId, Long downStationId, BigDecimal distance) {
 		final Map<String, String> stationLineCreateRequest = new HashMap<>();
 
