@@ -1,6 +1,7 @@
 package subway.dto;
 
 public class StationRequest {
+
     private String name;
 
     public StationRequest() {
