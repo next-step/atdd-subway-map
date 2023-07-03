@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.List;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,6 +28,16 @@ public class LineController {
         Station downStation = stationService.findStation(lineRequest.getDownStationId());
         Line line = lineService.saveLine(lineRequest.toEntity(List.of(upStation, downStation)));
         return ResponseEntity.created(URI.create("/lines/" + line.getId()))
+                .header(HttpHeaders.VARY, HttpHeaders.ORIGIN)
+                .header(HttpHeaders.VARY, HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD)
+                .header(HttpHeaders.VARY, HttpHeaders.ACCESS_CONTROL_REQUEST_HEADERS)
+                .body(line);
+    }
+
+    @GetMapping("/lines")
+    public ResponseEntity<List<Line>> showLines() {
+        List<Line> line = lineService.showLines();
+        return ResponseEntity.ok()
                 .header(HttpHeaders.VARY, HttpHeaders.ORIGIN)
                 .header(HttpHeaders.VARY, HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD)
                 .header(HttpHeaders.VARY, HttpHeaders.ACCESS_CONTROL_REQUEST_HEADERS)
