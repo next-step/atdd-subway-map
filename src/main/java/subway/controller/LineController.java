@@ -17,15 +17,20 @@ public class LineController {
         this.lineService = lineService;
     }
 
+    @GetMapping(value = "/lines")
+    public ResponseEntity<List<LineResponse>> showLines() {
+        return ResponseEntity.ok().body(lineService.findAllLines());
+    }
+
+    @GetMapping("/lines/{id}")
+    public ResponseEntity<LineResponse> getLine(@PathVariable Long id) {
+        return ResponseEntity.ok().body(lineService.findById(id));
+    }
+
     @PostMapping("/lines")
     public ResponseEntity<LineResponse> createLine(@RequestBody LineSaveRequest lineSaveRequest) {
         LineResponse line = lineService.saveLine(lineSaveRequest);
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
-    }
-
-    @GetMapping(value = "/lines")
-    public ResponseEntity<List<LineResponse>> showLines() {
-        return ResponseEntity.ok().body(lineService.findAllLines());
     }
 
     @DeleteMapping("/lines/{id}")

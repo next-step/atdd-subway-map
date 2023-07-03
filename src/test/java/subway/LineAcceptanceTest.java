@@ -47,13 +47,7 @@ public class LineAcceptanceTest {
         // given
         String lineName = "line이름";
 
-        LineSaveRequest request = LineSaveRequest.builder()
-                                                 .name(lineName)
-                                                 .color("bg-red-600")
-                                                 .upStationId(stationId1)
-                                                 .downStationId(stationId2)
-                                                 .distance(10L)
-                                                 .build();
+        LineSaveRequest request = makeLineSaveRequest(lineName, stationId1, stationId2);
 
         // when
         ExtractableResponse<Response> creationResponse = callApiToCreateLine(request);
@@ -79,7 +73,8 @@ public class LineAcceptanceTest {
         String lineName1 = "line이름1";
         String lineName2 = "line이름2";
 
-        createTwoLine(lineName1, lineName2);// 2개의 지하철 노선을 생성하고,
+        callApiToCreateLine(makeLineSaveRequest(lineName1, stationId1, stationId2));
+        callApiToCreateLine(makeLineSaveRequest(lineName2, stationId3, stationId4));
 
         // when
         ExtractableResponse<Response> linesResponse = callApiToGetLines(); // 지하철 노선 목록 조회하면
@@ -93,24 +88,14 @@ public class LineAcceptanceTest {
         assertThat(names).contains(lineName1, lineName2);
     }
 
-    private void createTwoLine(String lineName1, String lineName2) {
-        LineSaveRequest request1 = LineSaveRequest.builder()
-                                                  .name(lineName1)
-                                                  .color("bg-red-600")
-                                                  .upStationId(stationId1)
-                                                  .downStationId(stationId2)
-                                                  .distance(10L)
-                                                  .build();
-        LineSaveRequest request2 = LineSaveRequest.builder()
-                                                  .name(lineName2)
-                                                  .color("bg-red-600")
-                                                  .upStationId(stationId3)
-                                                  .downStationId(stationId4)
-                                                  .distance(10L)
-                                                  .build();
-
-        callApiToCreateLine(request1);
-        callApiToCreateLine(request2);
+    private LineSaveRequest makeLineSaveRequest(String lineName1, Long stationId1, Long stationId2) {
+        return LineSaveRequest.builder()
+                              .name(lineName1)
+                              .color("bg-red-600")
+                              .upStationId(stationId1)
+                              .downStationId(stationId2)
+                              .distance(10L)
+                              .build();
     }
 
     /**
@@ -122,6 +107,17 @@ public class LineAcceptanceTest {
     @Test
     void getSingleLine() {
 
+        // given
+        String lineName = "line이름";
+        long lineId = callApiToCreateLine(makeLineSaveRequest(lineName, stationId1, stationId2)).jsonPath()
+                                                                                                .getLong("id");
+
+        // when
+        ExtractableResponse<Response> lineResponse = callApiToGetSingleLine(lineId);
+
+        // then
+        assertThat(lineResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(lineResponse.jsonPath().getString("name")).isEqualTo(lineName);
     }
 
     /**
@@ -162,7 +158,7 @@ public class LineAcceptanceTest {
         return RestAssured.given()
                           .log()
                           .all()
-                          .pathParam("lienId", lineId)
+                          .pathParam("lineId", lineId)
                           .when()
                           .get("/lines/{lineId}")
                           .then()
