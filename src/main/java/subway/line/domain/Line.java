@@ -34,11 +34,19 @@ public class Line {
     }
 
     public Line(String name, String color, Station upStation, Station downStation, Integer distance) {
+        validateStation(upStation, downStation);
+
         this.name = name;
         this.color = color;
         this.upStation = upStation;
         this.downStation = downStation;
         this.distance = distance;
+    }
+
+    private void validateStation(Station upStation, Station downStation) {
+        if (upStation.equals(downStation)) {
+            throw new IllegalArgumentException("upStation과 downStation은 같을 수 없습니다.");
+        }
     }
 
     public Long getId() {
