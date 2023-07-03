@@ -1,10 +1,14 @@
-package subway;
+package subway.application;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import subway.domain.Station;
+import subway.domain.StationRepository;
+import subway.dto.StationRequest;
+import subway.dto.StationResponse;
 
 @Service
 @Transactional(readOnly = true)

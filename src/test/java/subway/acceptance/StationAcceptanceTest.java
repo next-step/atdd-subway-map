@@ -1,11 +1,11 @@
-package subway;
+package subway.acceptance;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.StationApiRequest.강남역;
-import static subway.StationApiRequest.양재역;
-import static subway.StationApiRequest.지하철역_삭제_요청;
-import static subway.StationApiRequest.지하철역_생성_요청;
-import static subway.StationApiRequest.지하철역_조회_요청;
+import static subway.util.StationApiRequest.강남역;
+import static subway.util.StationApiRequest.양재역;
+import static subway.util.StationApiRequest.지하철역_삭제_요청;
+import static subway.util.StationApiRequest.지하철역_생성_요청;
+import static subway.util.StationApiRequest.지하철역_조회_요청;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -13,7 +13,6 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import subway.util.AcceptanceTest;
 
 @DisplayName("지하철역 관련 기능")
 public class StationAcceptanceTest extends AcceptanceTest {
