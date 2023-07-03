@@ -15,7 +15,7 @@ public class DeleteStationAcceptanceTest extends StationAcceptanceTest {
      */
     @Test
     @DisplayName("지하철역을 제거한다.")
-    void deleteStation() throws Exception{
+    void deleteStation() {
         //given
         지하철역_생성("강남역");
         //when
