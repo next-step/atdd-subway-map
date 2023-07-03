@@ -1,8 +1,8 @@
-package subway;
+package subway.line;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.StationAcceptanceTest.지하철역을_생성한다;
-import static subway.StationAcceptanceTest.지하철역의_아이디를_파싱한다;
+import static subway.station.StationAcceptanceTest.지하철역을_생성한다;
+import static subway.station.StationAcceptanceTest.지하철역의_아이디를_파싱한다;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;

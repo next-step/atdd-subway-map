@@ -1,4 +1,4 @@
-package subway;
+package subway.station;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -28,7 +28,7 @@ public class StationAcceptanceTest {
                 .extract();
     }
 
-    static ExtractableResponse<Response> 지하철역을_생성한다(String 역이름) {
+    public static ExtractableResponse<Response> 지하철역을_생성한다(String 역이름) {
         Map<String, String> params = new HashMap<>();
         params.put("name", 역이름);
         return RestAssured.given().log().all()
@@ -67,7 +67,7 @@ public class StationAcceptanceTest {
         return 지하철역_목록_조회_결과.jsonPath().getList("name", String.class);
     }
 
-    static int 지하철역의_아이디를_파싱한다(ExtractableResponse<Response> 지하철역_조회_결과) {
+    public static int 지하철역의_아이디를_파싱한다(ExtractableResponse<Response> 지하철역_조회_결과) {
         return 지하철역_조회_결과.jsonPath().getInt("id");
     }
 
