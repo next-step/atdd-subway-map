@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import subway.AcceptanceTest;
+import subway.station.StationResponse;
 
 import java.util.List;
 
@@ -33,10 +34,11 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_노선_생성() {
         // given
-        LineRequest request = 지하철_노선_요청_객체_생성(SINBUNDANG_LINE_NAME, SINBUNDANG_LINE_COLOR, SINBUNDANG_UP_STATION_NAME, SINBUNDANG_DOWN_STATION_NAME, 10L);
+        LineRequest request = 지하철역_생성_및_지하철_노선_요청_객체_생성(SINBUNDANG_LINE_NAME, SINBUNDANG_LINE_COLOR, SINBUNDANG_UP_STATION_NAME, SINBUNDANG_DOWN_STATION_NAME, 10L);
 
         // when
         ExtractableResponse<Response> createResponse = 지하철_노선_생성_요쳥(request);
+        String lineId = createResponse.response().getHeaders().get("location").getValue().split("/lines/")[1];
 
         // then
         assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -48,18 +50,15 @@ public class LineAcceptanceTest extends AcceptanceTest {
         assertThat(responses.size()).isEqualTo(1);
 
         LineResponse response = responses.get(0);
-        assertThat(response.getName()).isEqualTo(SINBUNDANG_LINE_NAME);
-        assertThat(response.getColor()).isEqualTo(SINBUNDANG_LINE_COLOR);
-        assertThat(response.getStations().size()).isEqualTo(2);
-        assertThat(response.getStations().get(0).getName()).isEqualTo(SINBUNDANG_UP_STATION_NAME);
-        assertThat(response.getStations().get(1).getName()).isEqualTo(SINBUNDANG_DOWN_STATION_NAME);
+        List<StationResponse> stationsOfResponse = List.of(new StationResponse(1L, SINBUNDANG_UP_STATION_NAME), new StationResponse(2L, SINBUNDANG_DOWN_STATION_NAME));
+        assertThat(response).isEqualTo(new LineResponse(Long.valueOf(lineId), SINBUNDANG_LINE_NAME, SINBUNDANG_LINE_COLOR, stationsOfResponse));
     }
 
     @Test
     void 지하철_노선_목록_조회() {
         // given
-        LineRequest request1 = 지하철_노선_요청_객체_생성(SINBUNDANG_LINE_NAME, SINBUNDANG_LINE_COLOR, SINBUNDANG_UP_STATION_NAME, SINBUNDANG_DOWN_STATION_NAME, 10L);
-        LineRequest request2 = 지하철_노선_요청_객체_생성(SUINBUNDANG_LINE_NAME, SUINBUNDANG_LINE_COLOR, SUINBUNDANG_UP_STATION_NAME, SUINBUNDANG_DOWN_STATION_NAME, 10L);
+        LineRequest request1 = 지하철역_생성_및_지하철_노선_요청_객체_생성(SINBUNDANG_LINE_NAME, SINBUNDANG_LINE_COLOR, SINBUNDANG_UP_STATION_NAME, SINBUNDANG_DOWN_STATION_NAME, 10L);
+        LineRequest request2 = 지하철역_생성_및_지하철_노선_요청_객체_생성(SUINBUNDANG_LINE_NAME, SUINBUNDANG_LINE_COLOR, SUINBUNDANG_UP_STATION_NAME, SUINBUNDANG_DOWN_STATION_NAME, 10L);
 
         ExtractableResponse<Response> createResponse1 = 지하철_노선_생성_요쳥(request1);
         String lineId1 = createResponse1.response().getHeaders().get("location").getValue().split("/lines/")[1];
@@ -78,44 +77,34 @@ public class LineAcceptanceTest extends AcceptanceTest {
         assertThat(responses.size()).isEqualTo(2);
 
         LineResponse response1 = responses.get(0);
-        assertThat(response1.getId()).isEqualTo(Long.valueOf(lineId1));
-        assertThat(response1.getName()).isEqualTo(SINBUNDANG_LINE_NAME);
-        assertThat(response1.getColor()).isEqualTo(SINBUNDANG_LINE_COLOR);
-        assertThat(response1.getStations().size()).isEqualTo(2);
-        assertThat(response1.getStations().get(0).getName()).isEqualTo(SINBUNDANG_UP_STATION_NAME);
-        assertThat(response1.getStations().get(1).getName()).isEqualTo(SINBUNDANG_DOWN_STATION_NAME);
+        List<StationResponse> stationsOfResponse1 = List.of(new StationResponse(1L, SINBUNDANG_UP_STATION_NAME), new StationResponse(2L, SINBUNDANG_DOWN_STATION_NAME));
+        assertThat(response1).isEqualTo(new LineResponse(Long.valueOf(lineId1), SINBUNDANG_LINE_NAME, SINBUNDANG_LINE_COLOR, stationsOfResponse1));
 
         LineResponse response2 = responses.get(1);
-        assertThat(response2.getId()).isEqualTo(Long.valueOf(lineId2));
-        assertThat(response2.getName()).isEqualTo(SUINBUNDANG_LINE_NAME);
-        assertThat(response2.getColor()).isEqualTo(SUINBUNDANG_LINE_COLOR);
-        assertThat(response2.getStations().size()).isEqualTo(2);
-        assertThat(response2.getStations().get(0).getName()).isEqualTo(SUINBUNDANG_UP_STATION_NAME);
-        assertThat(response2.getStations().get(1).getName()).isEqualTo(SUINBUNDANG_DOWN_STATION_NAME);
+        List<StationResponse> stationsOfResponse2 = List.of(new StationResponse(3L, SUINBUNDANG_UP_STATION_NAME), new StationResponse(4L, SUINBUNDANG_DOWN_STATION_NAME));
+        assertThat(response2).isEqualTo(new LineResponse(Long.valueOf(lineId2), SUINBUNDANG_LINE_NAME, SUINBUNDANG_LINE_COLOR, stationsOfResponse2));
     }
 
     @Test
     void 지하철_노선_조회() throws JsonProcessingException {
         // given
-        LineRequest request = 지하철_노선_요청_객체_생성(SINBUNDANG_LINE_NAME, SINBUNDANG_LINE_COLOR, SINBUNDANG_UP_STATION_NAME, SINBUNDANG_DOWN_STATION_NAME, 10L);
+        LineRequest request = 지하철역_생성_및_지하철_노선_요청_객체_생성(SINBUNDANG_LINE_NAME, SINBUNDANG_LINE_COLOR, SINBUNDANG_UP_STATION_NAME, SINBUNDANG_DOWN_STATION_NAME, 10L);
 
         ExtractableResponse<Response> createResponse = 지하철_노선_생성_요쳥(request);
+        String lineId = createResponse.response().getHeaders().get("location").getValue().split("/lines/")[1];
+
         assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // when
-        String lineId = createResponse.response().getHeaders().get("location").getValue().split("/lines/")[1];
         ExtractableResponse<Response> showResponse = 지하철_노선_조회_요청(lineId);
 
         // then
         LineResponse response = new ObjectMapper().readValue(showResponse.response().body().asString(), LineResponse.class);
-        assertThat(response.getId()).isEqualTo(Long.valueOf(lineId));
-        assertThat(response.getName()).isEqualTo(SINBUNDANG_LINE_NAME);
-        assertThat(response.getColor()).isEqualTo(SINBUNDANG_LINE_COLOR);
-        assertThat(response.getStations().get(0).getName()).isEqualTo(SINBUNDANG_UP_STATION_NAME);
-        assertThat(response.getStations().get(1).getName()).isEqualTo(SINBUNDANG_DOWN_STATION_NAME);
+        List<StationResponse> stationsOfResponse1 = List.of(new StationResponse(1L, SINBUNDANG_UP_STATION_NAME), new StationResponse(2L, SINBUNDANG_DOWN_STATION_NAME));
+        assertThat(response).isEqualTo(new LineResponse(Long.valueOf(lineId), SINBUNDANG_LINE_NAME, SINBUNDANG_LINE_COLOR, stationsOfResponse1));
     }
 
-    private LineRequest 지하철_노선_요청_객체_생성(String lineName, String color, String upStationName, String downStationName, Long distance) {
+    private LineRequest 지하철역_생성_및_지하철_노선_요청_객체_생성(String lineName, String color, String upStationName, String downStationName, Long distance) {
         ExtractableResponse<Response> upStationCreateResponse = 지하철역_생성_요청(upStationName);
         Assertions.assertThat(upStationCreateResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         String upStationId = upStationCreateResponse.response().getHeaders().get("location").getValue().split("/stations/")[1];

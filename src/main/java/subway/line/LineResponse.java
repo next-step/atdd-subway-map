@@ -1,6 +1,7 @@
 package subway.line;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import subway.station.StationResponse;
@@ -46,5 +47,18 @@ public class LineResponse {
         StationResponse upStation = StationResponse.of(line.getUpStation());
         StationResponse downStation = StationResponse.of(line.getDownStation());
         return new LineResponse(line.getId(), line.getName(), line.getColor(), List.of(upStation, downStation));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        LineResponse response = (LineResponse) o;
+        return Objects.equals(id, response.id) && Objects.equals(name, response.name) && Objects.equals(color, response.color) && Objects.equals(stations, response.stations);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, color, stations);
     }
 }
