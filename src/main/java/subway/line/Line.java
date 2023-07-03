@@ -41,7 +41,8 @@ public class Line {
         this.distance = distance;
     }
 
-    public Line() {}
+    public Line() {
+    }
 
     public Long getId() {
         return id;
@@ -65,6 +66,16 @@ public class Line {
 
     public Long getDistance() {
         return distance;
+    }
+
+    public void update(String name, String color, Station upStation, Station downStation, Long distance) {
+        validate(name, color, upStation.getId(), downStation.getId(), distance);
+
+        this.name = name;
+        this.color = color;
+        this.upStation = upStation;
+        this.downStation = downStation;
+        this.distance = distance;
     }
 
     private void validate(String name, String color, Long upStationId, Long downStationId, Long distance) {
