@@ -45,8 +45,7 @@ class StationAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames = 지하철_목록_조회().jsonPath().getList("name", String.class);
-        assertThat(stationNames).containsAnyOf("강남역");
+        지하철_목록_조회됨("강남역");
     }
 
     @DisplayName("지하철역을 2개 생성하면 목록 조회시 생성한 2개의 역이 조회된다.")
@@ -56,12 +55,8 @@ class StationAcceptanceTest {
         지하철_생성("별똥별");
         지하철_생성("역삼역");
 
-        // when
-        List<String> stationNames = 지하철_목록_조회().jsonPath().getList("name", String.class);
-
-        // then
-        assertThat(stationNames.size()).isEqualTo(2);
-        assertThat(stationNames).containsExactly("별똥별", "역삼역");
+        // when & then
+        지하철_목록_조회됨("별똥별", "역삼역");
     }
 
     @DisplayName("지하철역을 생성한 후 삭제하면 목록 조회시 해당 역이 조회되지 않는다.")
@@ -74,8 +69,7 @@ class StationAcceptanceTest {
         지하철_삭제(response.jsonPath().getLong("id"));
 
         // then
-        List<String> stationNames = 지하철_목록_조회().jsonPath().getList("name", String.class);
-        assertThat(stationNames).doesNotContain("우영우");
+        지하철_목록_조회_안됨("우영우");
     }
 
     private ExtractableResponse<Response> 지하철_생성(String name){
@@ -87,18 +81,32 @@ class StationAcceptanceTest {
                 .extract();
     }
 
-    private ExtractableResponse<Response> 지하철_목록_조회() {
-        return RestAssured.given().log().all()
-                .when().get("/stations")
-                .then().log().all()
-                .extract();
-    }
-
     private ExtractableResponse<Response> 지하철_삭제(Long id){
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().delete("/stations/{id}", id)
                 .then().log().all()
                 .extract();
+    }
+
+    private void 지하철_목록_조회됨(String... expected) {
+        List<String> results = RestAssured.given().log().all()
+                .when().get("/stations")
+                .then().log().all()
+                .extract()
+                .jsonPath().getList("name", String.class);
+
+        assertThat(results.size()).isEqualTo(expected.length);
+        assertThat(results).containsExactly(expected);
+    }
+
+    private void 지하철_목록_조회_안됨(String... expected) {
+        List<String> results = RestAssured.given().log().all()
+                .when().get("/stations")
+                .then().log().all()
+                .extract()
+                .jsonPath().getList("name", String.class);
+
+        assertThat(results).doesNotContain(expected);
     }
 }
