@@ -1,4 +1,4 @@
-package subway;
+package subway.vo;
 
 public class StationResponse {
     private Long id;

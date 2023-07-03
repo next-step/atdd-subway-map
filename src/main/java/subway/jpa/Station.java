@@ -1,4 +1,4 @@
-package subway;
+package subway.jpa;
 
 import javax.persistence.*;
 
