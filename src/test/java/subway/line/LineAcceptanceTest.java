@@ -43,10 +43,23 @@ public class LineAcceptanceTest {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 지하철_노선_목록_조회한다() {
+    private static ExtractableResponse<Response> 지하철_노선_목록_조회한다() {
         return RestAssured
                 .given().accept(ContentType.JSON).log().all()
                 .when().get("/lines")
+                .then().log().all()
+                .extract();
+    }
+
+    private static ExtractableResponse<Response> 지하철_노선_수정한다(int 수정될_지하철_노선_아이디, String 수정될_이름,
+            String 수정될_컬러) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("name", 수정될_이름);
+        params.put("color", 수정될_컬러);
+
+        return RestAssured
+                .given().accept(ContentType.JSON).contentType(ContentType.JSON).body(params)
+                .when().put("/lines/" + 수정될_지하철_노선_아이디)
                 .then().log().all()
                 .extract();
     }
@@ -133,7 +146,7 @@ public class LineAcceptanceTest {
         assertThat(스테이션_이름_리스트(지하철_노선_목록, 1)).contains("강남역", "사당역");
     }
 
-    private static ExtractableResponse<Response> 지하철노선_조회(int 지하철노선_아이디) {
+    private static ExtractableResponse<Response> 지하철_노선_조회한다(int 지하철노선_아이디) {
         return RestAssured.given().log().all()
                 .when().get("/lines/" + 지하철노선_아이디)
                 .then().log().all()
@@ -160,7 +173,7 @@ public class LineAcceptanceTest {
         int 신분당선_아이디 = 아이디(신분당선);
 
         // when
-        var 조회된_지하철노선 = 지하철노선_조회(신분당선_아이디);
+        var 조회된_지하철노선 = 지하철_노선_조회한다(신분당선_아이디);
 
         // then
         assertThat(아이디(조회된_지하철노선)).isEqualTo(신분당선_아이디);
@@ -170,5 +183,31 @@ public class LineAcceptanceTest {
         assertThat(스테이션_이름_리스트(조회된_지하철노선)).contains("강남역", "판교역");
     }
 
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 수정하면
+     * Then 해당 지하철 노선 정보는 수정된다
+     */
+    @DisplayName("지하철노선 수정")
+    @Test
+    void updateLine() {
+        // given
+        int 강남역_아이디 = 아이디(지하철역을_생성한다("강남역"));
+        int 판교역_아이디 = 아이디(지하철역을_생성한다("판교역"));
+        var 신분당선 = 지하철_노선_등록한다(
+                "신분당선",
+                "bg-red-600",
+                강남역_아이디,
+                판교역_아이디,
+                10);
+        int 수정될_지하철_노선_아이디 = 아이디(신분당선);
 
+        // when
+        지하철_노선_수정한다(수정될_지하철_노선_아이디, "다른분당선", "bg-red-500");
+
+        // then
+        var 수정된_지하철_노선 = 지하철_노선_조회한다(수정될_지하철_노선_아이디);
+        assertThat(이름(수정된_지하철_노선)).isEqualTo("다른분당선");
+        assertThat(컬러(수정된_지하철_노선)).isEqualTo("bg-red-500");
+    }
 }

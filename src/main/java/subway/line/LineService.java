@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Transactional(readOnly = true)
 @Service
 public class LineService {
 
@@ -27,5 +28,11 @@ public class LineService {
 
     public LineResponse searchById(Long id) {
         return LineResponse.from(lineRepository.findById(id).orElseThrow());
+    }
+
+    @Transactional
+    public void update(Long id, UpdateLineRequest updateLineRequest) {
+        Line line = lineRepository.findById(id).orElseThrow();
+        line.update(updateLineRequest.getName(), updateLineRequest.getColor());
     }
 }
