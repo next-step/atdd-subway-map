@@ -34,4 +34,11 @@ public class LineService {
     public List<LineResponse> findAllLines() {
         return LineResponse.of(lineRepository.findAll());
     }
+
+    public LineResponse findLine(Long id) {
+        Line line = lineRepository.findById(id)
+                .orElseThrow(() -> new IllegalStateException(String.format("지하철 노선을 찾을 수 없습니다. (id: %d)", id)));
+
+        return LineResponse.of(line);
+    }
 }
