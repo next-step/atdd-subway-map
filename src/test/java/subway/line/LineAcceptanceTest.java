@@ -20,8 +20,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 
-@DirtiesContext
+@DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 @DisplayName("지하철 노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {
@@ -60,6 +61,14 @@ public class LineAcceptanceTest {
         return RestAssured
                 .given().accept(ContentType.JSON).contentType(ContentType.JSON).body(params)
                 .when().put("/lines/" + 수정될_지하철_노선_아이디)
+                .then().log().all()
+                .extract();
+    }
+
+    private static ExtractableResponse<Response> 지하철_노선_삭제한다(int 신분당선_아이디) {
+        return RestAssured
+                .given().log().all()
+                .when().delete("/lines/" + 신분당선_아이디)
                 .then().log().all()
                 .extract();
     }
@@ -210,4 +219,35 @@ public class LineAcceptanceTest {
         assertThat(이름(수정된_지하철_노선)).isEqualTo("다른분당선");
         assertThat(컬러(수정된_지하철_노선)).isEqualTo("bg-red-500");
     }
+
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 삭제하면
+     * Then 해당 지하철 노선 정보는 삭제된다
+     */
+    @DisplayName("지하철노선 삭제")
+    @Test
+    void deleteLne() {
+        // given
+        int 강남역_아이디 = 아이디(지하철역을_생성한다("강남역"));
+        int 판교역_아이디 = 아이디(지하철역을_생성한다("판교역"));
+        var 신분당선 = 지하철_노선_등록한다(
+                "신분당선",
+                "bg-red-600",
+                강남역_아이디,
+                판교역_아이디,
+                10);
+        int 신분당선_아이디 = 아이디(신분당선);
+
+        // when
+        지하철_노선_삭제한다(신분당선_아이디);
+
+        // then
+        var 지하철_노선_목록 = 지하철_노선_목록_조회한다();
+        assertThat(아이디_리스트(지하철_노선_목록)).doesNotContain(신분당선_아이디);
+        assertThat(이름_리스트(지하철_노선_목록)).doesNotContain("신분당선");
+    }
+
+
 }

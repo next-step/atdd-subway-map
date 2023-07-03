@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.List;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -60,9 +61,16 @@ public class LineController {
     @PutMapping("/lines/{id}")
     public ResponseEntity<Void> updateLine(@PathVariable Long id,
             @RequestBody UpdateLineRequest updateLineRequest) {
-
         lineService.update(id, updateLineRequest);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.VARY, HttpHeaders.ORIGIN)
+                .header(HttpHeaders.VARY, HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD)
+                .header(HttpHeaders.VARY, HttpHeaders.ACCESS_CONTROL_REQUEST_HEADERS).build();
+    }
 
+    @DeleteMapping("/lines/{id}")
+    public ResponseEntity<Void> updateLine(@PathVariable Long id) {
+        lineService.deleteById(id);
         return ResponseEntity.ok()
                 .header(HttpHeaders.VARY, HttpHeaders.ORIGIN)
                 .header(HttpHeaders.VARY, HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD)
