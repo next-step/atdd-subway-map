@@ -49,7 +49,7 @@ public class StationAcceptanceTest {
     @Test
     void showStations() {
         // given
-        지하철생성요청_다중생성("강남역", "역삼역").stream()
+        지하철생성요청_다중생성(List.of("강남역", "역삼역")).stream()
                 .map(StationSteps::지하철생성요청)
                 .forEach(x -> assertThat(x.statusCode()).isEqualTo(HttpStatus.CREATED.value()));
 

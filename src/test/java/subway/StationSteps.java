@@ -25,8 +25,8 @@ public class StationSteps {
                 .extract();
     }
 
-    public static List<StationRequest> 지하철생성요청_다중생성(String... stationName) {
-        return Stream.of(stationName)
+    public static List<StationRequest> 지하철생성요청_다중생성(List<String> stationName) {
+        return stationName.stream()
                 .map(StationSteps::지하철생성요청_생성)
                 .collect(Collectors.toList());
     }

@@ -12,6 +12,9 @@ import org.springframework.http.HttpStatus;
 import subway.station.StationResponse;
 import subway.subwayline.CreateSubwayLineRequest;
 import subway.subwayline.ModifySubwayLineRequest;
+
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static subway.StationSteps.지하철생성요청_다중생성;
 
@@ -39,7 +42,7 @@ class SubwayLineAcceptanceTest {
         Long upStationId = 1L;
         Long downStationId = 2L;
         int distance = 50;
-        지하철생성요청_다중생성("오이도역", "이수역").stream()
+        지하철생성요청_다중생성(List.of("오이도역", "이수역")).stream()
                 .map(StationSteps::지하철생성요청)
                 .forEach(x -> assertThat(x.statusCode()).isEqualTo(HttpStatus.CREATED.value()));
         CreateSubwayLineRequest subwayLineRequest = SubwayLineSteps.지하철노선등록요청_생성(name, color, upStationId, downStationId, distance);
@@ -66,7 +69,7 @@ class SubwayLineAcceptanceTest {
     @Test
     void getSubwayLines() {
         // given
-        지하철생성요청_다중생성("오이도역", "이수역", "남성역").stream()
+        지하철생성요청_다중생성(List.of("오이도역", "이수역", "남성역")).stream()
                 .map(StationSteps::지하철생성요청)
                 .forEach(x -> assertThat(x.statusCode()).isEqualTo(HttpStatus.CREATED.value()));
 
@@ -99,7 +102,7 @@ class SubwayLineAcceptanceTest {
     void getSubwayLine() {
         // given
         Long id = 1L;
-        지하철생성요청_다중생성("오이도역", "이수역").stream()
+        지하철생성요청_다중생성(List.of("오이도역", "이수역")).stream()
                 .map(StationSteps::지하철생성요청)
                 .forEach(x -> assertThat(x.statusCode()).isEqualTo(HttpStatus.CREATED.value()));
         SubwayLineSteps.지하철노선등록요청(SubwayLineSteps.지하철노선등록요청_생성("4호선", "bg-blue-600", 1L, 2L, 50));
@@ -126,7 +129,7 @@ class SubwayLineAcceptanceTest {
     void modifySubwayLine() {
         // given
         Long id = 1L;
-        지하철생성요청_다중생성("오이도역", "이수역").stream()
+        지하철생성요청_다중생성(List.of("오이도역", "이수역")).stream()
                 .map(StationSteps::지하철생성요청)
                 .forEach(x -> assertThat(x.statusCode()).isEqualTo(HttpStatus.CREATED.value()));
         SubwayLineSteps.지하철노선등록요청(SubwayLineSteps.지하철노선등록요청_생성("4호선", "bg-blue-600", 1L, 2L, 50));
@@ -149,7 +152,7 @@ class SubwayLineAcceptanceTest {
     void deleteSubwayLine() {
         // given
         Long id = 1L;
-        지하철생성요청_다중생성("오이도역", "이수역").stream()
+        지하철생성요청_다중생성(List.of("오이도역", "이수역")).stream()
                 .map(StationSteps::지하철생성요청)
                 .forEach(x -> assertThat(x.statusCode()).isEqualTo(HttpStatus.CREATED.value()));
         SubwayLineSteps.지하철노선등록요청(SubwayLineSteps.지하철노선등록요청_생성("4호선", "bg-blue-600", 1L, 2L, 50));
