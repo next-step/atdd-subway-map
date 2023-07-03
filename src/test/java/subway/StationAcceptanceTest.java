@@ -124,6 +124,10 @@ public class StationAcceptanceTest {
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-        assertThat(지하철역_목록을_조회한다().jsonPath().getList("").size()).isEqualTo(0);
+        assertThat(지하철역이_존재하지_않는다()).isTrue();
+    }
+
+    Boolean 지하철역이_존재하지_않는다() {
+        return 지하철역_목록을_조회한다().jsonPath().getList("").size() == 0;
     }
 }
