@@ -45,13 +45,13 @@ public class LineService {
         return new LineResponse(createdLine);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public LineResponse getLine(Long id) {
         return new LineResponse(lineRepository.findById(id)
                                               .orElseThrow(LineNotFoundException::new));
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<LineResponse> getList() {
         return lineRepository.findAll()
                              .stream()
@@ -67,5 +67,10 @@ public class LineService {
         line.setColor(request.getColor());
 
         lineRepository.save(line);
+    }
+
+    @Transactional
+    public void deleteLine(Long id) {
+        lineRepository.deleteById(id);
     }
 }
