@@ -71,14 +71,12 @@ public class LineService {
     }
 
     private Station getStation(Long id) {
-        Station upStation = stationRepository.findById(id)
+        return stationRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("station is not existed by id > " + id));
-        return upStation;
     }
 
     private Line getLine(Long id) {
-        Line line = lineRepository.findById(id)
+        return lineRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("line is not existed by id > " + id));
-        return line;
     }
 }
