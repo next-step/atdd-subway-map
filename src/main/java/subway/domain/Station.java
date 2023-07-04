@@ -1,13 +1,16 @@
 package subway.domain;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 public class Station {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "STATION_ID")
     private Long id;
-    @Column(length = 20, nullable = false)
+
+    @Column(name = "NAME", length = 20, nullable = false)
     private String name;
 
     public Station() {
