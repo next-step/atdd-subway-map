@@ -46,4 +46,26 @@ public class RouteAcceptanceTest {
 
     }
 
+    @DisplayName("지하철 노선 목록을 조회한다.")
+    @Test
+    void inquiryRoutes() {
+
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "1호선");
+
+        RestAssuredUtils.create(new RestAssuredCondition("/api/routes", params));
+
+        params.put("name", "2호선");
+
+        RestAssuredUtils.create(new RestAssuredCondition("/api/routes", params));
+
+        ExtractableResponse<Response> response =
+                RestAssuredUtils
+                        .inquriy(new RestAssuredCondition("/api/routes"));
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.body().jsonPath().getList("name", String.class).size()).isEqualTo(2);
+
+    }
+
 }
