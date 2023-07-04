@@ -3,8 +3,10 @@ package subway.unit.station;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import subway.line.domain.Line;
+import subway.line.domain.LineStationConnection;
 import subway.station.domain.Station;
 import subway.station.domain.StationList;
 
@@ -19,11 +21,15 @@ class StationListTest {
 
         //when
         Line line = new Line("신분당선", "abcd");
-        stationList.updateLine(line);
+        List<LineStationConnection> connections = stationList.connectLineWithStation(line);
 
         //then
-        assertThat(station1.getLine().getName()).isEqualTo("신분당선");
-        assertThat(station2.getLine().getName()).isEqualTo("신분당선");
+        assertThat(connections).hasSize(2);
+        assertThat(connections.get(0).getStation()).isEqualTo(station1);
+        assertThat(connections.get(0).getLine()).isEqualTo(line);
+
+        assertThat(connections.get(1).getStation()).isEqualTo(station2);
+        assertThat(connections.get(1).getLine()).isEqualTo(line);
     }
 
 }

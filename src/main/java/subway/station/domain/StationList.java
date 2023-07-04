@@ -1,7 +1,9 @@
 package subway.station.domain;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import subway.line.domain.Line;
+import subway.line.domain.LineStationConnection;
 
 public class StationList {
 
@@ -11,8 +13,8 @@ public class StationList {
         stations = stationList;
     }
 
-    public void updateLine(Line line) {
-        stations.forEach(station -> station.updateLine(line));
+    public List<LineStationConnection> connectLineWithStation(Line line) {
+        return stations.stream().map(station -> new LineStationConnection(line, station)).collect(Collectors.toList());
     }
 
     public List<Station> getStations() {

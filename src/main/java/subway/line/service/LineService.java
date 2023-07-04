@@ -8,7 +8,9 @@ import org.springframework.transaction.annotation.Transactional;
 import subway.line.controller.dto.LineRequest;
 import subway.line.controller.dto.LineResponse;
 import subway.line.domain.Line;
+import subway.line.domain.LineStationConnection;
 import subway.line.infra.LineRepository;
+import subway.line.infra.LineStationRepository;
 import subway.station.controller.dto.StationResponse;
 import subway.station.domain.Station;
 import subway.station.domain.StationList;
@@ -20,10 +22,13 @@ public class LineService {
 
     private final StationService stationService;
     private final LineRepository lineRepository;
+    private final LineStationRepository lineStationRepository;
 
-    public LineService(StationService stationService, LineRepository lineRepository) {
+    public LineService(StationService stationService, LineRepository lineRepository,
+            LineStationRepository lineStationRepository) {
         this.stationService = stationService;
         this.lineRepository = lineRepository;
+        this.lineStationRepository = lineStationRepository;
     }
 
     @Transactional
@@ -33,7 +38,8 @@ public class LineService {
 
         List<Long> stationIds = Arrays.asList(lineRequest.getUpStationId(), lineRequest.getDownStationId());
         StationList stations = stationService.findStationsByIdList(stationIds);
-        stations.updateLine(savedLine);
+        List<LineStationConnection> connections = stations.connectLineWithStation(savedLine);
+        lineStationRepository.saveAll(connections);
 
         return createLineResponse(savedLine, stations);
     }
@@ -47,8 +53,8 @@ public class LineService {
         return lines
                 .stream()
                 .map(line -> {
-                    List<StationResponse> stationResponses = getStationResponse(line.getStations());
-                    return new LineResponse(line.getId(), line.getName(), line.getColor(), stationResponses);
+                    List<Station> stations = getStations(line);
+                    return new LineResponse(line.getId(), line.getName(), line.getColor(), getStationResponse(stations));
                 }).collect(Collectors.toList());
     }
 
@@ -66,5 +72,10 @@ public class LineService {
         return stations.stream()
                 .map(station -> new StationResponse(station.getId(), station.getName()))
                 .collect(Collectors.toList());
+    }
+
+    private List<Station> getStations(Line line) {
+        List<LineStationConnection> connections = lineStationRepository.findAllByLine(line);
+        return connections.stream().map(LineStationConnection::getStation).collect(Collectors.toList());
     }
 }

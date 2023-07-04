@@ -22,9 +22,6 @@ public class Line {
     @Column(length = 20, nullable = false)
     private String color;
 
-    @OneToMany(mappedBy = "line")
-    private List<Station> stations;
-
     protected Line() {}
 
     public Line(String name, String color) {
@@ -42,9 +39,5 @@ public class Line {
 
     public String getColor() {
         return color;
-    }
-
-    public List<Station> getStations() {
-        return stations;
     }
 }
