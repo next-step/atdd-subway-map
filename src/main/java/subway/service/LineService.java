@@ -16,9 +16,9 @@ import java.util.stream.Collectors;
 @Transactional(readOnly =true)
 public class LineService {
 
-    private LineRepository lineRepository;
+    private final LineRepository lineRepository;
 
-    private StationRepository stationRepository;
+    private final StationRepository stationRepository;
 
     public LineService(LineRepository lineRepository, StationRepository stationRepository) {
         this.lineRepository = lineRepository;
@@ -41,6 +41,7 @@ public class LineService {
     }
 
 
+    @Transactional
     public LineResponse updateLine(LineRequest lineRequest) {
         Line line = lineRepository.findById(lineRequest.getId()).get();
         if(lineRequest.getName() != null) line.setName(lineRequest.getName());
@@ -52,8 +53,13 @@ public class LineService {
         return createLineResponse(line);
     }
 
+    @Transactional
+    public void deleteLineById(Long id) {
+        lineRepository.deleteById(id);
+    }
 
     private LineResponse createLineResponse(Line line) {
         return new LineResponse(line.getId(),line.getColor(), line.getName(),line.getUpStationId(),line.getDownStationId(),line.getDistance());
     }
+
 }

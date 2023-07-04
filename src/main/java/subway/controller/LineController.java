@@ -12,7 +12,7 @@ import java.util.List;
 @RestController
 public class LineController {
 
-    private LineService lineService;
+    private final LineService lineService;
 
     public LineController(LineService lineService) {
         this.lineService = lineService;
@@ -34,5 +34,11 @@ public class LineController {
 
         LineResponse line = lineService.updateLine(lineRequest);
         return ResponseEntity.ok().body(line);
+    }
+
+    @DeleteMapping("/line/{id}")
+    public ResponseEntity<Void> deleteLine(@PathVariable Long id){
+        lineService.deleteLineById(id);
+        return ResponseEntity.noContent().build();
     }
 }

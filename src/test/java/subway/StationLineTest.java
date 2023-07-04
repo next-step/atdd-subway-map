@@ -8,18 +8,19 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import subway.common.StationTest;
+import org.springframework.test.annotation.DirtiesContext;
 import subway.dto.LineResponse;
-import subway.dto.StationResponse;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.common.StationTest.*;
+import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD;
+import static subway.common.StationTest.createStationAndGetInfo;
 
 @DisplayName("노선 관련 기능")
+@DirtiesContext(classMode = BEFORE_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationLineTest {
 
@@ -143,11 +144,30 @@ public class StationLineTest {
      * When 생성한 지하철 노선을 삭제하면
      * Then 해당 지하철 노선 정보는 삭제된다
      * */
+    @DisplayName("노선 삭제")
     @Test
     void deleteLine() {
 
+        //given
+        Long 신분당선 = createLine("신분당선", "bg-red-600"
+                    , createStationAndGetInfo("신사역").getId()
+                    , createStationAndGetInfo("광교역").getId()
+                    ,10)
+                        .jsonPath().getObject("", LineResponse.class).getId();
+
+        //when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .when().delete("/line/" + 신분당선)
+                .then().log().all()
+                .extract();
+
+        //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
 
+        List<String> names = getLines().jsonPath().getList("name", String.class);
+
+        assertThat(names).isEmpty();
     }
 
     private ExtractableResponse<Response> createLine(String name, String color, Long upStationId, Long downStationId, int distance) {
