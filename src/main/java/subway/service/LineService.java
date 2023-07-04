@@ -1,18 +1,15 @@
 package subway.service;
 
-import org.modelmapper.ModelMapper;
-import org.modelmapper.config.Configuration;
-import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.jpa.Line;
 import subway.jpa.LineRepository;
 import subway.jpa.StationRepository;
+import subway.utils.ModelMapperUtil;
 import subway.vo.LineRequest;
 import subway.vo.LineResponse;
 import subway.vo.StationResponse;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,12 +27,8 @@ public class LineService {
     }
 
     public LineResponse saveLine(LineRequest lineRequest) {
-        ModelMapper mapper = new ModelMapper();
-        mapper.getConfiguration()
-                .setMatchingStrategy(MatchingStrategies.STRICT)
-                .setFieldAccessLevel(Configuration.AccessLevel.PRIVATE)
-                .setFieldMatchingEnabled(true);
-        Line lineEntity = mapper.map(lineRequest, Line.class);
+        // Entity 객체로 변환
+        Line lineEntity = ModelMapperUtil.modelMapper.map(lineRequest, Line.class);
 
         // 노선 저장
         Line savedLineEntity = lineRepository.save(lineEntity);
@@ -44,13 +37,13 @@ public class LineService {
         List<StationResponse> stationResponses = stationRepository.findAllByLineName(lineEntity.getName()).stream()
                 .map(s ->
                     {
-                        StationResponse stationResponse = mapper.map(s, StationResponse.class);
+                        StationResponse stationResponse = ModelMapperUtil.modelMapper.map(s, StationResponse.class);
                         return stationResponse;
                     })
                 .collect(Collectors.toList());
 
         // Response 객체로 변환
-        LineResponse lineResponse = mapper.map(lineEntity, LineResponse.class);
+        LineResponse lineResponse = ModelMapperUtil.modelMapper.map(lineEntity, LineResponse.class);
         lineResponse.setId(savedLineEntity.getId());
         lineResponse.setStations(stationResponses);
         return lineResponse;

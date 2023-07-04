@@ -1,6 +1,5 @@
 package subway.service;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -8,15 +7,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.modelmapper.ModelMapper;
-import org.modelmapper.config.Configuration;
-import org.modelmapper.convention.MatchingStrategies;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
+
 import subway.jpa.Line;
 import subway.jpa.LineRepository;
 import subway.jpa.Station;
 import subway.jpa.StationRepository;
+import subway.utils.ModelMapperUtil;
 import subway.vo.LineRequest;
 import subway.vo.LineResponse;
 import subway.vo.StationResponse;
@@ -24,7 +20,6 @@ import subway.vo.StationResponse;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 
 @ExtendWith(MockitoExtension.class)
@@ -39,6 +34,14 @@ class LineServiceTest {
     @InjectMocks
     LineService lineService;
 
+    static Station 지하철역 = new Station(1L, "지하철역");
+    static Station 새로운지하철역 = new Station(2L, "새로운지하철역");
+
+    static Line 신분당선 = new Line( "신분당선", "bg-red-600", 지하철역.getId(), 새로운지하철역.getId(), 10);
+    static {
+        신분당선.setId(1L);
+    }
+
     /**
      * Input = LineRequest
      * Output = LineResponse
@@ -51,35 +54,20 @@ class LineServiceTest {
     @DisplayName("노선을 생성한다")
     @Test
     void saveLine() {
-        ModelMapper modelMapper = new ModelMapper();
-        modelMapper.getConfiguration()
-                .setMatchingStrategy(MatchingStrategies.STRICT)
-                .setFieldAccessLevel(Configuration.AccessLevel.PRIVATE)
-                .setFieldMatchingEnabled(true);
-
         // data
-        Station 지하철역 = new Station(1L, "지하철역");
-        Station 새로운지하철역 = new Station(2L, "새로운지하철역");
-        StationResponse 지하철역_응답 = modelMapper.map(지하철역, StationResponse.class);
-        StationResponse 새로운지하철역_응답 = modelMapper.map(새로운지하철역, StationResponse.class);
-
-        LineRequest 노선_생성_요청 = new LineRequest("신분당선",
-                                                    "bg-red-600", 1L, 2L, 10);
-        LineResponse 노선_생성_응답 = new LineResponse(1L, "신분당선", "bg-red-600", List.of(지하철역_응답, 새로운지하철역_응답));
-
-        Line resLine = modelMapper.map(노선_생성_요청, Line.class);
-        resLine.setId(1L);
+        StationResponse 지하철역_응답 = ModelMapperUtil.modelMapper.map(지하철역, StationResponse.class);
+        StationResponse 새로운지하철역_응답 = ModelMapperUtil.modelMapper.map(새로운지하철역, StationResponse.class);
+        LineRequest 노선_생성_요청 = new LineRequest(신분당선.getName(), 신분당선.getColor(), 신분당선.getUpStationId(), 신분당선.getDownStationId(), 신분당선.getDistance());
+        LineResponse 노선_생성_응답 = new LineResponse(신분당선.getId(), 신분당선.getName(), 신분당선.getColor(), List.of(지하철역_응답, 새로운지하철역_응답));
 
         // given
-        Mockito.when(lineRepository.save(any())).thenReturn(resLine);
+        Mockito.when(lineRepository.save(any())).thenReturn(신분당선);
         Mockito.when(stationRepository.findAllByLineName(노선_생성_요청.getName())).thenReturn(List.of(지하철역, 새로운지하철역));
 
         // when
         LineResponse lineResponse = lineService.saveLine(노선_생성_요청);
 
         // then
-        System.out.println(lineResponse);
-        System.out.println(노선_생성_응답);
         assertThat(lineResponse).isEqualTo(노선_생성_응답);
     }
 }

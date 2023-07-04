@@ -22,11 +22,29 @@ public class Line {
     private Long downStationId;
 
     @Column(nullable = false)
-    private int distance;
+    private Integer distance;
+
+    public Line() {}
+
+    public Line(String name, String color, Long upStationId, Long downStationId, Integer distance) {
+        this.name = name;
+        this.color = color;
+        this.upStationId = upStationId;
+        this.downStationId = downStationId;
+        this.distance = distance;
+    }
 
     public Long getId() { return id; }
 
     public String getName() { return name; }
+
+    public String getColor() { return color; }
+
+    public Long getUpStationId() { return upStationId; }
+
+    public Long getDownStationId() { return downStationId; }
+
+    public Integer getDistance() { return distance; }
 
     public void setId(Long id) { this.id = id; }
 }
