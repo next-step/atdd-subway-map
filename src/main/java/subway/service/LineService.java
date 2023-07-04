@@ -7,6 +7,7 @@ import subway.domain.Station;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 import subway.dto.LineUpdateRequest;
+import subway.dto.SectionRequest;
 import subway.repository.LineRepository;
 import subway.repository.StationRepository;
 
@@ -57,5 +58,16 @@ public class LineService {
     public void updateStationById(Long id, LineUpdateRequest lineUpdateRequest) {
         Line line = lineRepository.findById(id).orElseThrow(NoSuchElementException::new);
         line.updateNameAndColor(lineUpdateRequest.getName(), lineUpdateRequest.getColor());
+    }
+    @Transactional
+    public LineResponse saveSection(Long lineId, SectionRequest sectionRequest){
+        Line line = lineRepository.findById(lineId).orElseThrow(NoSuchElementException::new);
+        line.addSection(sectionRequest.getUpStationId(), sectionRequest.getDownStationId());
+        return createLineResponse(line);
+    }
+    @Transactional
+    public void deleteSection(Long lineId, Long stationId){
+        Line line = lineRepository.findById(lineId).orElseThrow(NoSuchElementException::new);
+        line.deleteSection(stationId);
     }
 }
