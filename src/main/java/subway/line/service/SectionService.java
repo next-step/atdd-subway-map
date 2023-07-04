@@ -15,8 +15,8 @@ import subway.station.domain.StationRepository;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class SectionService {
-    private final StationRepository stationRepository;
     private final LineRepository lineRepository;
+    private final StationRepository stationRepository;
 
     @Transactional
     public LineResponse appendSection(final Long lineId, final SectionRequest request) {

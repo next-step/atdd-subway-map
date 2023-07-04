@@ -18,8 +18,8 @@ import subway.station.domain.StationRepository;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class LineService {
-    private final StationRepository stationRepository;
     private final LineRepository lineRepository;
+    private final StationRepository stationRepository;
 
     @Transactional
     public LineResponse saveLine(final LineCreateRequest request) {
@@ -40,6 +40,18 @@ public class LineService {
         );
     }
 
+    @Transactional
+    public void updateLine(final Long id, final LineUpdateRequest request) {
+        final var line = lineRepository.getById(id);
+        line.update(request.getName(), request.getColor());
+    }
+
+    @Transactional
+    public void deleteLine(final Long id) {
+        final var line = lineRepository.getById(id);
+        lineRepository.delete(line);
+    }
+
     public List<LineResponse> findAllLines() {
         return lineRepository.findAll().stream()
                 .map(LineResponse::toResponse)
@@ -49,16 +61,5 @@ public class LineService {
     public LineResponse findLine(final Long id) {
         final var line = lineRepository.getById(id);
         return LineResponse.toResponse(line);
-    }
-
-    @Transactional
-    public void updateLine(final Long id, final LineUpdateRequest request) {
-        final var line = lineRepository.getById(id);
-        line.update(request.getName(), request.getColor());
-    }
-
-    @Transactional
-    public void deleteLine(final Long id) {
-        lineRepository.deleteById(id);
     }
 }

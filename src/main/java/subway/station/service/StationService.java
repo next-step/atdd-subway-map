@@ -24,14 +24,15 @@ public class StationService {
         return StationResponse.toResponse(station);
     }
 
+    @Transactional
+    public void deleteStation(final Long id) {
+        final var station = stationRepository.getById(id);
+        stationRepository.delete(station);
+    }
+
     public List<StationResponse> findAllStations() {
         return stationRepository.findAll().stream()
                 .map(StationResponse::toResponse)
                 .collect(Collectors.toUnmodifiableList());
-    }
-
-    @Transactional
-    public void deleteStation(final Long id) {
-        stationRepository.deleteById(id);
     }
 }
