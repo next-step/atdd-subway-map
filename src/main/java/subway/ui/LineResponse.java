@@ -4,10 +4,10 @@ import java.util.List;
 
 public class LineResponse {
 
-    private final Long id;
-    private final String name;
-    private final String color;
-    private final List<StationResponse> stations;
+    private Long id;
+    private String name;
+    private String color;
+    private List<StationResponse> stations;
 
     public LineResponse(Long id, String name, String color, List<StationResponse> stations) {
         this.id = id;
@@ -18,6 +18,9 @@ public class LineResponse {
 
     public LineResponse(Long id, String name) {
         this(id, name, null, null);
+    }
+
+    public LineResponse() {
     }
 
     public Long getId() {

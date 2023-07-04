@@ -9,6 +9,9 @@ public class StationResponse {
         this.name = name;
     }
 
+    public StationResponse() {
+    }
+
     public Long getId() {
         return id;
     }

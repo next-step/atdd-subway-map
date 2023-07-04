@@ -68,9 +68,10 @@ public class LineAcceptanceTest {
 
         //when
         ExtractableResponse<Response> 신분당선_조회_응답 = getSubwayLine(getIdFromResponse(신분당선_생성_응답));
+        LineResponse lineResponse = 신분당선_조회_응답.as(LineResponse.class);
 
         //then
-        assertThat(신분당선_조회_응답.jsonPath().getObject("name", String.class)).isEqualTo(신분당선);
+        assertThat(lineResponse.getName()).isEqualTo(신분당선);
     }
 
     /**
@@ -89,9 +90,10 @@ public class LineAcceptanceTest {
         final String 다른분당선 = "다른분당선";
         LineUpdateRequest request = new LineUpdateRequest(다른분당선, "bg-red-600");
         ExtractableResponse<Response> 다른분당선_수정_응답 = updateSubwayLine(getIdFromResponse(신분당선_생성_응답), request);
+        LineResponse lineResponse = 다른분당선_수정_응답.as(LineResponse.class);
 
         //then
-        assertThat(다른분당선_수정_응답.jsonPath().getObject("name", String.class)).isEqualTo(다른분당선);
+        assertThat(lineResponse.getName()).isEqualTo(다른분당선);
     }
 
     /**
