@@ -41,12 +41,18 @@ public class LineService {
         List<LineStationConnection> connections = stations.connectLineWithStation(savedLine);
         lineStationRepository.saveAll(connections);
 
-        return createLineResponse(savedLine, stations);
+        return createLineResponse(savedLine, stations.getStations());
     }
 
     public List<LineResponse> findAllLines() {
         List<Line> lines = lineRepository.findAll();
         return createLineResponseList(lines);
+    }
+
+    public LineResponse findById(Long lineId) {
+        Line line = lineRepository.findById(lineId).orElseThrow();
+        List<Station> stations = getStations(line);
+        return createLineResponse(line, stations);
     }
 
     private List<LineResponse> createLineResponseList(List<Line> lines) {
@@ -58,14 +64,9 @@ public class LineService {
                 }).collect(Collectors.toList());
     }
 
-    private LineResponse createLineResponse(Line line, StationList stationList) {
+    private LineResponse createLineResponse(Line line, List<Station> stationList) {
         List<StationResponse> stationResponses = getStationResponse(stationList);
         return new LineResponse(line.getId(), line.getName(), line.getColor(), stationResponses);
-    }
-
-    private List<StationResponse> getStationResponse(StationList stationList) {
-        List<Station> stations = stationList.getStations();
-        return getStationResponse(stations);
     }
 
     private List<StationResponse> getStationResponse(List<Station> stations) {
