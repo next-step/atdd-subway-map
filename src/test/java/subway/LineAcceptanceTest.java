@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
 import subway.helper.LineTestHelper;
+import subway.helper.LineTestRequestHelper;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -42,57 +43,11 @@ public class LineAcceptanceTest {
     @Test
     public void createStationLine(){
         //when
-        ExtractableResponse<Response> createResponse = 지하철노선_생성(신분당선, 빨간색, 청계산입구역_ID, 판교역_ID, 10);
+        ExtractableResponse<Response> createResponse = LineTestRequestHelper.지하철노선_생성(신분당선, 빨간색, 청계산입구역_ID, 판교역_ID, 10);
         //then
-        ExtractableResponse<Response> getResponse = 지하철노선_조회(createResponse);
+        ExtractableResponse<Response> getResponse = LineTestRequestHelper.지하철노선_단건_조회(createResponse);
         지하철노선_검증(createResponse, getResponse);
     }
-
-    private ExtractableResponse<Response> 지하철노선_생성(String name, String color, Long upStationId, Long downStationId, Integer distance){
-        Map<String, Object> params = new HashMap<>();
-        params.put("name", name);
-        params.put("color", color);
-        params.put("upStationId", upStationId);
-        params.put("downStationId", downStationId);
-        params.put("distance", distance);
-        return RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("lines")
-                .then().log().all().extract();
-    }
-
-    private ExtractableResponse<Response> 지하철노선_조회(ExtractableResponse<Response> response){
-        return RestAssured.given().log().all()
-                .when().get("/lines" + "/"+ response.jsonPath().getLong("id"))
-                .then().log().all()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> 지하철노선_삭제(ExtractableResponse<Response> response){
-        return RestAssured.given().log().all()
-                .when().delete("/lines" + "/"+ response.jsonPath().getLong("id"))
-                .then().log().all()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> 지하철노선_수정(ExtractableResponse<Response> response, String name, String color){
-        Map<String, Object> params = new HashMap<>();
-        params.put("name", name);
-        params.put("color", color);
-        return RestAssured.given().log().all().body(params).contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().put("/lines" + "/"+ response.jsonPath().getLong("id"))
-                .then().log().all()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> 지하철노선_조회(){
-        return RestAssured.given().log().all()
-                .when().get("/lines")
-                .then().log().all()
-                .extract();
-    }
-
     private void 지하철노선_검증(ExtractableResponse<Response> createResponse, ExtractableResponse<Response> getResponse){
         assertThat(LineTestHelper.getId(createResponse)).isEqualTo(LineTestHelper.getId(getResponse));
         assertThat(LineTestHelper.getColor(createResponse)).isEqualTo(LineTestHelper.getColor(getResponse));
@@ -108,11 +63,11 @@ public class LineAcceptanceTest {
     @Test
     public void viewStationLineList(){
         //given
-        지하철노선_생성(신분당선, 빨간색, 청계산입구역_ID, 판교역_ID, 10);
-        지하철노선_생성(분당선, 노란색, 청계산입구역_ID, 선릉역_ID, 10);
+        LineTestRequestHelper.지하철노선_생성(신분당선, 빨간색, 청계산입구역_ID, 판교역_ID, 10);
+        LineTestRequestHelper.지하철노선_생성(분당선, 노란색, 청계산입구역_ID, 선릉역_ID, 10);
 
         //when
-        ExtractableResponse<Response> getResponse = 지하철노선_조회();
+        ExtractableResponse<Response> getResponse = LineTestRequestHelper.지하철노선_조회();
 
         //then
         assertThat(getResponse.jsonPath().getList("name", String.class)).containsAnyOf(신분당선);
@@ -130,10 +85,10 @@ public class LineAcceptanceTest {
     @Test
     public void viewSingleStationLine(){
         //given
-        ExtractableResponse<Response> createResponse = 지하철노선_생성(신분당선, 빨간색, 청계산입구역_ID, 판교역_ID, 10);
+        ExtractableResponse<Response> createResponse = LineTestRequestHelper.지하철노선_생성(신분당선, 빨간색, 청계산입구역_ID, 판교역_ID, 10);
 
         //when
-        ExtractableResponse<Response> getResponse = 지하철노선_조회(createResponse);
+        ExtractableResponse<Response> getResponse = LineTestRequestHelper.지하철노선_단건_조회(createResponse);
 
         //then
         지하철노선_검증(createResponse, getResponse);
@@ -148,15 +103,15 @@ public class LineAcceptanceTest {
     @Test
     public void updateStationLine(){
         //given
-        ExtractableResponse<Response> createResponse = 지하철노선_생성(신분당선, 빨간색, 청계산입구역_ID, 판교역_ID, 10);
+        ExtractableResponse<Response> createResponse = LineTestRequestHelper.지하철노선_생성(신분당선, 빨간색, 청계산입구역_ID, 판교역_ID, 10);
 
         //when
         final String 수내역 = "수내역";
         final String 파란색 = "bg-blue-600";
-        지하철노선_수정(createResponse, 수내역, 파란색);
+        LineTestRequestHelper.지하철노선_수정(createResponse, 수내역, 파란색);
 
         //then
-        ExtractableResponse<Response> changeResponse = 지하철노선_조회(createResponse);
+        ExtractableResponse<Response> changeResponse = LineTestRequestHelper.지하철노선_단건_조회(createResponse);
         assertThat(changeResponse.jsonPath().getString("name")).isEqualTo(수내역);
         assertThat(changeResponse.jsonPath().getString("color")).isEqualTo(파란색);
     }
@@ -170,13 +125,13 @@ public class LineAcceptanceTest {
     @Test
     public void removeStationLine(){
         //given
-        ExtractableResponse<Response> createResponse = 지하철노선_생성(신분당선, 빨간색, 청계산입구역_ID, 판교역_ID, 10);
+        ExtractableResponse<Response> createResponse = LineTestRequestHelper.지하철노선_생성(신분당선, 빨간색, 청계산입구역_ID, 판교역_ID, 10);
 
         //when
-        지하철노선_삭제(createResponse);
+        LineTestRequestHelper.지하철노선_삭제(createResponse);
 
         //then
-        ExtractableResponse<Response> getResponse = 지하철노선_조회();
+        ExtractableResponse<Response> getResponse = LineTestRequestHelper.지하철노선_조회();
         assertThat(getResponse.jsonPath().getList("name", String.class)).doesNotContain(신분당선);
         assertThat(getResponse.jsonPath().getList("color", String.class)).doesNotContain(빨간색);
     }
