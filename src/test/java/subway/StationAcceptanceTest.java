@@ -7,6 +7,7 @@ import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,14 +20,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class StationAcceptanceTest {
-
-    @BeforeEach
-    @DisplayName("테이블 초기화")
-    void resetTable(){
-        지하철역_초기화();
-    }
-
     /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다
@@ -142,15 +137,5 @@ public class StationAcceptanceTest {
                 .when().get("/stations")
                 .then().log().all()
                 .extract().jsonPath().getList("name");
-    }
-    private void 지하철역_초기화() {
-        List<Integer> idList = RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/stations")
-                .then().log().all()
-                .extract().jsonPath().getList("id", Integer.class);
-        for (int id : idList){
-            지하철역_삭제(id);
-        }
     }
 }
