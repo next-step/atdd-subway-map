@@ -6,6 +6,8 @@ import subway.StationRepository;
 import subway.domain.Line;
 import subway.repository.LineRepository;
 
+import java.util.List;
+
 @Service
 public class LineService {
 
@@ -26,5 +28,19 @@ public class LineService {
 
     public Line getStationLine(Long id){
         return lineRepository.findByIdFetchEager(id).orElseThrow(IllegalArgumentException::new);
+    }
+
+    public List<Line> getStationLines(){
+        return lineRepository.findAll();
+    }
+
+    public void updateStationLine(Long id, String changedName, String changedColor){
+        Line line = lineRepository.findById(id).orElseThrow(IllegalArgumentException::new);
+        line.changeLine(changedName, changedColor);
+        lineRepository.save(line);
+    }
+
+    public void deleteStationLine(Long id){
+        lineRepository.deleteById(id);
     }
 }

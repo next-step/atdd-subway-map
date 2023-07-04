@@ -38,6 +38,11 @@ public class Line {
         this.downStation = downStation;
     }
 
+    public void changeLine(String name, String color){
+        this.name = name;
+        this.color = color;
+    }
+
     public Long getId() {
         return id;
     }

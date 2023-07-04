@@ -6,9 +6,12 @@ import org.springframework.web.bind.annotation.*;
 import subway.domain.Line;
 import subway.packet.LineRequest;
 import subway.packet.LineResponse;
+import subway.packet.LineUpdateRequest;
 import subway.service.LineService;
 
 import java.net.URI;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 public class LineController {
@@ -31,5 +34,24 @@ public class LineController {
         Line line = lineService.getStationLine(id);
         LineResponse lineResponse = LineResponse.fromEntity(line);
         return ResponseEntity.ok(lineResponse);
+    }
+
+    @GetMapping("/lines")
+    public ResponseEntity<List<LineResponse>> getLines(){
+        List<Line> stationLines = lineService.getStationLines();
+        List<LineResponse> response = stationLines.stream().map(LineResponse::fromEntity).collect(Collectors.toList());
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/lines/{id}")
+    public ResponseEntity<Void> updateLine(@PathVariable Long id, @RequestBody LineUpdateRequest lineRequest){
+        lineService.updateStationLine(id, lineRequest.getName(), lineRequest.getColor());
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/lines/{id}")
+    public ResponseEntity<Void> deleteLine(@PathVariable Long id){
+        lineService.deleteStationLine(id);
+        return ResponseEntity.noContent().build();
     }
 }
