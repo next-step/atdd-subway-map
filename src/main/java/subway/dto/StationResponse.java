@@ -1,4 +1,8 @@
-package subway;
+package subway.dto;
+
+import subway.domain.Station;
+
+import java.util.stream.Collectors;
 
 public class StationResponse {
     private Long id;
@@ -15,5 +19,9 @@ public class StationResponse {
 
     public String getName() {
         return name;
+    }
+
+    public static StationResponse from(Station station){
+        return new StationResponse(station.getId(), station.getName());
     }
 }
