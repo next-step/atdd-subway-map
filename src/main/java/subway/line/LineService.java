@@ -5,9 +5,8 @@ import org.springframework.transaction.annotation.Transactional;
 import subway.station.Station;
 import subway.station.StationRepository;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,12 +33,18 @@ public class LineService {
 
 
     public List<LineResponse> getList() {
-        return lineRepository.findAll()
-                .stream()
-                .map(line -> {
-                    List<Station> stations = stationRepository.findByIdIn(Arrays.asList(line.getUpStationId(), line.getDownStationId()));
-                    return lineConverter.convert(line, stations);
-                })
+        List<Line> list = lineRepository.findAll();
+        List<Long> stationIds = list.stream()
+                .map(e -> Arrays.asList(e.getUpStationId(), e.getDownStationId()))
+                .flatMap(Collection::stream)
+                .distinct()
+                .collect(Collectors.toList());
+
+        Map<Long, Station> stationMap = stationRepository.findByIdIn(stationIds).stream()
+                .collect(Collectors.toMap(Station::getId, Function.identity()));
+
+        return list.stream()
+                .map(line -> lineConverter.convert(line, Arrays.asList(stationMap.get(line.getUpStationId()), stationMap.get(line.getDownStationId()))))
                 .collect(Collectors.toList());
     }
 
@@ -54,8 +59,8 @@ public class LineService {
     public void update(Long id, LineRequest request) {
         if (!lineRepository.existsById(id))
             throw new NoSuchElementException("line is not existed by id > " + id);
-        Station upStation = getStation(request.getUpStationId());
-        Station downStation = getStation(request.getDownStationId());
+        getStation(request.getUpStationId());
+        getStation(request.getDownStationId());
         Line line = Line.of(id, request.getName(), request.getColor(), request.getUpStationId(), request.getDownStationId(), request.getDistance());
         lineRepository.save(line);
     }
