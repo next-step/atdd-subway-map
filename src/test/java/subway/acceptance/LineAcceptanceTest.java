@@ -64,7 +64,15 @@ public class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 신분당선_생성();
 
         // then
-        요청_실패됨(response, new LineDuplicationNameException());
+        중복된_이름으로_실패됨(response);
+    }
+
+    private void 중복된_이름으로_실패됨(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.jsonPath().getInt("status"))
+            .isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.jsonPath().getString("message"))
+            .isEqualTo(LineDuplicationNameException.message);
     }
 
     @DisplayName("지하철 노선을 생성할 때 해당 지하철역이 없으면 실패한다.")
@@ -78,7 +86,15 @@ public class LineAcceptanceTest extends AcceptanceTest {
             upStation.getId(), 2L, 10);
 
         // then
-        요청_실패됨(response, new StationNotFoundException());
+        지하철역이_존재_하지_않아_실패됨(response);
+    }
+
+    private void 지하철역이_존재_하지_않아_실패됨(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+        assertThat(response.jsonPath().getInt("status"))
+            .isEqualTo(HttpStatus.NOT_FOUND.value());
+        assertThat(response.jsonPath().getString("message"))
+            .isEqualTo(StationNotFoundException.message);
     }
 
     @DisplayName("지하철 노선 목록을 조회한다.")
@@ -132,7 +148,15 @@ public class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 지하철_노선_조회_요청(1L);
 
         // then
-        요청_실패됨(response, new LineNotFoundException());
+        지하철_노선이_존재_하지_않아_실패됨(response);
+    }
+
+    private void 지하철_노선이_존재_하지_않아_실패됨(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+        assertThat(response.jsonPath().getInt("status"))
+            .isEqualTo(HttpStatus.NOT_FOUND.value());
+        assertThat(response.jsonPath().getString("message"))
+            .isEqualTo(LineNotFoundException.message);
     }
     
     @DisplayName("지하철 노선을 수정한다.")
@@ -165,7 +189,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 지하철_노선_수정_요청(1L, 경강선_이름, 경강선_색상);
 
         // then
-        요청_실패됨(response, new LineNotFoundException());
+        지하철_노선이_존재_하지_않아_실패됨(response);
     }
 
     @DisplayName("지하철 노선을 삭제한다.")
