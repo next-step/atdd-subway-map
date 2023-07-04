@@ -7,8 +7,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
-import subway.common.CommonRestAssured;
-import subway.common.CommonRestAssuredUseCondition;
+import subway.common.RestAssuredUtils;
+import subway.common.RestAssuredCondition;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,9 +31,17 @@ public class RouteAcceptanceTest {
         Map<String, String> params = new HashMap<>();
         params.put("name", "2호선");
 
-        ExtractableResponse<Response> response = CommonRestAssured.create(new CommonRestAssuredUseCondition("/api/routes", params));
+        ExtractableResponse<Response> response =
+                RestAssuredUtils
+                        .create(new RestAssuredCondition("/api/routes", params));
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        ExtractableResponse<Response> inquiryResponse =
+                RestAssuredUtils
+                        .inquriy(new RestAssuredCondition("/api/routes/" + response.body().jsonPath().getLong("id")));
+
+
 
     }
 

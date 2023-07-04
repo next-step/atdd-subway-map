@@ -8,8 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import subway.common.CommonRestAssured;
-import subway.common.CommonRestAssuredUseCondition;
+import subway.common.RestAssuredUtils;
+import subway.common.RestAssuredCondition;
 import subway.station.domain.Station;
 import subway.station.repository.StationRepository;
 
@@ -24,6 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class StationAcceptanceTest {
 
     private final String STATION_API_URI = "/api/stations";
+    private final String SLASH = "/";
 
     @Autowired
     StationRepository stationRepository;
@@ -46,14 +47,14 @@ public class StationAcceptanceTest {
         params.put("name", "강남역");
 
         ExtractableResponse<Response> response =
-                CommonRestAssured.create(new CommonRestAssuredUseCondition(STATION_API_URI, params));
+                RestAssuredUtils.create(new RestAssuredCondition(STATION_API_URI, params));
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames = CommonRestAssured
-                .inquriy(new CommonRestAssuredUseCondition(STATION_API_URI))
+        List<String> stationNames = RestAssuredUtils
+                .inquriy(new RestAssuredCondition(STATION_API_URI))
                 .jsonPath()
                 .getList("name", String.class);
         assertThat(stationNames).containsAnyOf("강남역");
@@ -71,14 +72,14 @@ public class StationAcceptanceTest {
         // given
         Map<String, String> params = new HashMap<>();
         params.put("name", "우리집역");
-        CommonRestAssured.create(new CommonRestAssuredUseCondition(STATION_API_URI, params));
+        RestAssuredUtils.create(new RestAssuredCondition(STATION_API_URI, params));
 
         params.put("name", "역삼역");
-        CommonRestAssured.create(new CommonRestAssuredUseCondition(STATION_API_URI, params));
+        RestAssuredUtils.create(new RestAssuredCondition(STATION_API_URI, params));
 
         // when
         ExtractableResponse<Response> response =
-                CommonRestAssured.inquriy(new CommonRestAssuredUseCondition(STATION_API_URI));
+                RestAssuredUtils.inquriy(new RestAssuredCondition(STATION_API_URI));
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -97,19 +98,19 @@ public class StationAcceptanceTest {
         // given
         Map<String, String> params = new HashMap<>();
         params.put("name", "삼성역");
-        ExtractableResponse<Response> postResponse = CommonRestAssured.create(new CommonRestAssuredUseCondition(STATION_API_URI, params));
+        ExtractableResponse<Response> postResponse = RestAssuredUtils.create(new RestAssuredCondition(STATION_API_URI, params));
         Station stations = postResponse.jsonPath().getObject(".", Station.class);
 
         // when
         ExtractableResponse<Response> deleteResponse =
-                CommonRestAssured.delete(new CommonRestAssuredUseCondition(STATION_API_URI, String.valueOf(stations.getId())));
+                RestAssuredUtils.delete(new RestAssuredCondition(STATION_API_URI + SLASH + String.valueOf(stations.getId())));
 
         // then
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         // then
-        List<String> stationNames = CommonRestAssured
-                .inquriy(new CommonRestAssuredUseCondition(STATION_API_URI))
+        List<String> stationNames = RestAssuredUtils
+                .inquriy(new RestAssuredCondition(STATION_API_URI))
                 .jsonPath()
                 .getList("name", String.class);
         assertThat(stationNames).doesNotContain("삼성역");

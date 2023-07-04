@@ -5,11 +5,9 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.MediaType;
 
-public class CommonRestAssured {
+public class RestAssuredUtils {
 
-    private static final String SLASH = "/";
-
-    public static ExtractableResponse<Response> create(CommonRestAssuredUseCondition condition) {
+    public static ExtractableResponse<Response> create(RestAssuredCondition condition) {
         return RestAssured.given().log().all()
                 .body(condition.getParams())
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -18,16 +16,16 @@ public class CommonRestAssured {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> inquriy(CommonRestAssuredUseCondition condition) {
+    public static ExtractableResponse<Response> inquriy(RestAssuredCondition condition) {
         return RestAssured.given().log().all()
                 .when().get(condition.getPath())
                 .then().log().all()
                 .extract();
     }
 
-    public static ExtractableResponse<Response> delete(CommonRestAssuredUseCondition condition) {
+    public static ExtractableResponse<Response> delete(RestAssuredCondition condition) {
         return RestAssured.given().log().all()
-                .when().delete(condition.getPath() + SLASH + condition.getId())
+                .when().delete(condition.getPath())
                 .then().log().all()
                 .extract();
     }
