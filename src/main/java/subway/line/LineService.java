@@ -34,7 +34,7 @@ public class LineService {
         return lineConverter.convert(newLine, Arrays.asList(upStation, downStation));
     }
 
-    public List<LineResponse> getLines() {
+    public List<LineResponse> getList() {
         return lineRepository.findAll()
                 .stream()
                 .map(line -> {
@@ -42,5 +42,12 @@ public class LineService {
                     return lineConverter.convert(line, stations);
                 })
                 .collect(Collectors.toList());
+    }
+
+    public LineResponse getById(Long id) {
+        Line line = lineRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("line is not existed by id > " + id));
+        List<Station> stations = stationRepository.findByIdIn(Arrays.asList(line.getUpStationId(), line.getDownStationId()));
+        return lineConverter.convert(line, stations);
     }
 }

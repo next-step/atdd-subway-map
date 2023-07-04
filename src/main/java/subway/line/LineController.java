@@ -2,12 +2,12 @@ package subway.line;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import subway.station.StationResponse;
 
 import java.net.URI;
 import java.util.List;
 
 @RestController
+@RequestMapping("lines")
 public class LineController {
     private final LineService lineService;
 
@@ -15,14 +15,22 @@ public class LineController {
         this.lineService = lineService;
     }
 
-    @PostMapping("/lines")
-    public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest request) {
-        LineResponse line = lineService.create(request);
-        return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
+    @PostMapping
+    public ResponseEntity<LineResponse> create(@RequestBody LineRequest request) {
+        var line = lineService.create(request);
+        return ResponseEntity.created(URI.create("/lines/" + line.getId()))
+                .body(line);
     }
 
-    @GetMapping("/lines")
-    public ResponseEntity<List<LineResponse>> getLines() {
-        return ResponseEntity.ok().body(lineService.getLines());
+    @GetMapping
+    public ResponseEntity<List<LineResponse>> getList() {
+        return ResponseEntity.ok()
+                .body(lineService.getList());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<LineResponse> get(@PathVariable Long id) {
+        return ResponseEntity.ok()
+                .body(lineService.getById(id));
     }
 }

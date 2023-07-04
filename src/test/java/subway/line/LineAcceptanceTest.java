@@ -57,6 +57,7 @@ public class LineAcceptanceTest {
         List<LineResponse> list = 지하철_노선_목록_조회();
         assertThat(list.size()).isEqualTo(1);
         assertThat(list.get(0).getStations().size()).isEqualTo(2);
+        assertThat(list.get(0).getName()).isEqualTo(name);
     }
 
     /**
@@ -83,6 +84,23 @@ public class LineAcceptanceTest {
      * When 생성한 지하철 노선을 조회하면
      * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
      */
+    @DisplayName("지하철 노선 조회")
+    @Test
+    void getLine() {
+        //given
+        final String name = "4호선";
+        final String color = "light-blue";
+
+        long id = 지하철_노선_생성_ID(name, color, firstStationId, secondStationId, 1);
+        //when
+        LineResponse line = 지하철_노선_조회(id);
+        //then
+        assertThat(line.getName()).isEqualTo(name);
+        assertThat(line.getStations().size()).isEqualTo(2);
+        assertThat(line.getColor()).isEqualTo(color);
+
+    }
+
 
     /**
      * Given 지하철역들이 등록되어 있다.
@@ -106,7 +124,11 @@ public class LineAcceptanceTest {
                 .extract().jsonPath().getList(".", LineResponse.class);
     }
 
-    private static ExtractableResponse<Response> 지하철_노선_생성(String name, String color, Long upStationId, Long downStationId, Integer distance) {
+    private long 지하철_노선_생성_ID(String name, String color, Long upStationId, Long downStationId, Integer distance) {
+        return 지하철_노선_생성(name, color, upStationId, downStationId, distance).getId();
+    }
+
+    private static LineResponse 지하철_노선_생성(String name, String color, Long upStationId, Long downStationId, Integer distance) {
         Map<String, Object> params = new HashMap<>();
         params.put("name", name);
         params.put("color", color);
@@ -120,9 +142,18 @@ public class LineAcceptanceTest {
                 .when().post("/lines")
                 .then().log().all()
                 .statusCode(HttpStatus.CREATED.value())
-                .extract();
+                .extract().jsonPath().getObject(".", LineResponse.class);
     }
 
+
+    private static LineResponse 지하철_노선_조회(Long id) {
+        return RestAssured.given().log().all()
+                .when()
+                .get("/lines/" + id)
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract().jsonPath().getObject(".", LineResponse.class);
+    }
 
     private long 지하철역_생성_ID(String name) {
         return 지하철역_생성(name).jsonPath().getLong("id");
