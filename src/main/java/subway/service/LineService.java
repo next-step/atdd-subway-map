@@ -41,6 +41,31 @@ public class LineService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
+    public LineResponse getLine(Long lineId) {
+        return lineRepository.findById(lineId)
+                .map(LineResponse::fromEntity)
+                .orElseThrow(() -> new EntityNotFoundException("line not found"));
+    }
+
+    @Transactional
+    public void updateLine(Long lineId, LineRequest lineRequest) {
+        final Line line = lineRepository.findById(lineId)
+                .orElseThrow(() -> new EntityNotFoundException("line not found"));
+
+        line.update(lineRequest.getName(), lineRequest.getColor());
+    }
+
+    @Transactional
+    public void deleteLine(Long lineId) {
+        Line line = lineRepository.findById(lineId)
+                .orElseThrow(() -> new EntityNotFoundException("line not found"));
+
+        lineRepository.delete(line);
+    }
+
+
+
 
 
 

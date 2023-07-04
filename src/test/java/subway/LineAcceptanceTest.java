@@ -1,12 +1,16 @@
 package subway;
 
+import io.restassured.path.json.JsonPath;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
+import subway.CommonStep.LineStep;
 import subway.CommonStep.StationStep;
 import subway.dto.StationResponse;
 
@@ -15,8 +19,10 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD;
 
 @DisplayName("지하철 노선 관련 기능")
+@DirtiesContext(classMode = BEFORE_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {
     /**
@@ -28,24 +34,23 @@ public class LineAcceptanceTest {
     @Test
     void createLine() {
         //given
-        Long lineId1 = StationStep.지하철역_생성( "강남역").body().as(StationResponse.class).getId();
-        Long lineId2  = StationStep.지하철역_생성( "역삼역").body().as(StationResponse.class).getId();
+        Long stationId1 = StationStep.지하철역_생성( "강남역").body().as(StationResponse.class).getId();
+        Long stationId2  = StationStep.지하철역_생성( "역삼역").body().as(StationResponse.class).getId();
 
         // when
         Map<String, String> params = new HashMap<>();
         params.put("name","2호선");
         params.put("color","green");
-        params.put("upStationId",String.valueOf(lineId1));
-        params.put("downStationId",String.valueOf(lineId2));
+        params.put("upStationId",String.valueOf(stationId1));
+        params.put("downStationId",String.valueOf(stationId2));
         params.put("distance","10");
 
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .body(params)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/lines")
-                        .then().log().all()
-                        .extract();
+        RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines")
+                .then().log().all()
+                .extract();
 
         //then
         List<String> lineNames =
@@ -54,5 +59,101 @@ public class LineAcceptanceTest {
                         .then().log().all()
                         .extract().jsonPath().getList("name", String.class);
         assertThat(lineNames).containsAnyOf("2호선");
+    }
+
+    /**
+     * Given 2개의 지하철 노선을 생성하고
+     * When 지하철 노선 목록을 조회하면
+     * Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
+     */
+    @DisplayName("지하노선 목록을 조회한다.")
+    @Test
+    void createLines() {
+        //given
+        LineStep.지하철_노선_생성("강남역", "역삼역", "2호선","green", 10L);
+        LineStep.지하철_노선_생성("흑석역", "노량진역", "9호선","brown", 20L);
+
+        //when
+        List<String> lineNames = LineStep.지하철노선_목록_전체조회();
+
+        //then
+        assertThat(lineNames).hasSize(2);
+    }
+
+    /**
+     * Given지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 조회하면
+     * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
+     */
+    @DisplayName("지하노선을 조회한다.")
+    @Test
+    void getLine(){
+        //given
+        Long lineId =  LineStep.지하철_노선_생성("강남역", "역삼역", "2호선", "grean",10L).jsonPath().getLong("id");
+
+        //when
+        JsonPath jsonPath = LineStep.지하철_노선_조회(lineId);
+
+        //then
+        assertThat("강남역").isEqualTo(jsonPath.getString("stations[0].name"));
+        assertThat("역삼역").isEqualTo(jsonPath.getString("stations[1].name"));
+        assertThat("2호선").isEqualTo(jsonPath.getString("name"));
+        assertThat("grean").isEqualTo(jsonPath.getString("color"));
+
+    }
+
+
+
+    /**
+     * Given지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 수정하면
+     * Then 해당 지하철 노선 정보는 수정된다
+     */
+
+    @DisplayName("지하노선을 수정한다.")
+    @Test
+    void updateLine(){
+        //given
+        Long lineId =  LineStep.지하철_노선_생성("강남역", "역삼역", "2호선", "grean",10L).jsonPath().getLong("id");
+
+        //when
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "9호선");
+        params.put("color", "brown");
+        ExtractableResponse<Response> response =
+                RestAssured.given().log().all()
+                        .body(params)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .when().put("/lines/"+lineId)
+                        .then().log().all()
+                        .extract();
+
+        //then
+        JsonPath jsonPath = LineStep.지하철_노선_조회(lineId);
+        assertThat("9호선").isEqualTo(jsonPath.getString("name"));
+        assertThat("brown").isEqualTo(jsonPath.getString("color"));
+    }
+
+    /**
+     * Given지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 삭제하면
+     * Then 해당 지하철 노선 정보는 삭제된다
+     */
+    @DisplayName("지하노선을 삭제한다.")
+    @Test
+    void deleteLine(){
+        //given
+        Long lineId =  LineStep.지하철_노선_생성("강남역", "역삼역", "2호선", "grean",10L).jsonPath().getLong("id");
+
+        //when
+        RestAssured.given().log().all()
+                .when().delete("/lines/" + lineId)
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value());
+
+        //then
+        List<String> lineNames = LineStep.지하철노선_목록_전체조회();
+        assertThat(lineNames).doesNotContain("2호선");
+
     }
 }

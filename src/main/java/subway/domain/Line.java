@@ -40,4 +40,9 @@ public class Line {
         this.distance = distance;
     }
 
+    public void update(String name, String color) {
+        this.name = name;
+        this.color = color;
+    }
+
 }
