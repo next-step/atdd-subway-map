@@ -55,7 +55,6 @@ public class SubwayLineService {
 
         subwayLine.updateName(subwayLineUpdateRequest.getName());
         subwayLine.updateColor(subwayLineUpdateRequest.getColor());
-        subwayLineRepository.save(subwayLine);
     }
 
 
