@@ -1,18 +1,17 @@
 package subway;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.util.HashMap;
-import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+
+import static api.StationLineApiRequest.*;
+import static fixture.StationLineRequestFixture.노선등록요청_데이터_생성;
+import static fixture.StationModifyRequestFixture.노선수정요청_데이터_생성;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -38,7 +37,7 @@ class LineAcceptanceTest {
 
         //when
         ExtractableResponse<Response> response = 지하철역_노선_등록_요청(
-            신분당선, red, 지하철역_id, 새로운지하철역_id, distance
+                노선등록요청_데이터_생성(신분당선, red, 지하철역_id, 새로운지하철역_id, distance)
         );
 
         //then
@@ -59,32 +58,6 @@ class LineAcceptanceTest {
             .contains(Long.valueOf(response.jsonPath().getLong("id")).intValue());
     }
 
-    private static ExtractableResponse<Response> 지하철역_노선_등록_요청(String name, String color
-        , long upStationId, long downStationId, int distance) {
-
-        Map<String, Object> params = new HashMap<>();
-        params.put("name", name);
-        params.put("color", color);
-        params.put("upStationId", upStationId);
-        params.put("downStationId", downStationId);
-        params.put("distance", distance);
-
-        return RestAssured
-            .given().log().all()
-            .body(params)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().post("/lines")
-            .then().log().all()
-            .extract();
-    }
-
-    private static ExtractableResponse<Response> 지하철역_노선_목록_조회_요청() {
-        return RestAssured
-            .given().log().all()
-            .when().get("/lines")
-            .then().log().all()
-            .extract();
-    }
 
     /**
      * Given 2개의 지하철 노선을 생성하고 <br> When 지하철 노선 목록을 조회하면 <br> Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
@@ -94,8 +67,8 @@ class LineAcceptanceTest {
     void getStationLines() {
 
         //given
-        지하철역_노선_등록_요청(신분당선, red, 지하철역_id, 새로운지하철역_id, distance);
-        지하철역_노선_등록_요청(분당선, green, 지하철역_id, 또다른지하철역_id, distance);
+        지하철역_노선_등록_요청(노선등록요청_데이터_생성(신분당선, red, 지하철역_id, 새로운지하철역_id, distance));
+        지하철역_노선_등록_요청(노선등록요청_데이터_생성(분당선, green, 지하철역_id, 또다른지하철역_id, distance));
 
         //when
         ExtractableResponse<Response> response = 지하철역_노선_목록_조회_요청();
@@ -117,8 +90,7 @@ class LineAcceptanceTest {
     void getStationLine() {
 
         //given
-        long 신규등록_노선_id = 지하철역_노선_등록_요청(신분당선, red, 지하철역_id, 새로운지하철역_id, distance).jsonPath()
-            .getLong("id");
+        long 신규등록_노선_id = 지하철역_노선_등록_요청_후_id_추출(노선등록요청_데이터_생성(신분당선, red, 지하철역_id, 새로운지하철역_id, distance));
 
         //when
         ExtractableResponse<Response> response = 지하철역_노선_단건_조회(신규등록_노선_id);
@@ -138,14 +110,6 @@ class LineAcceptanceTest {
 
     }
 
-    private static ExtractableResponse<Response> 지하철역_노선_단건_조회(long 신규_등록_노선_id) {
-        return RestAssured
-            .given().log().all()
-            .when().get("/lines/{id}", 신규_등록_노선_id)
-            .then().log().all()
-            .extract();
-    }
-
     /**
      * Given 지하철 노선을 생성하고 <br> When 생성한 지하철 노선을 수정하면 <br> Then 해당 지하철 노선 정보는 수정된다 <br>
      */
@@ -154,21 +118,10 @@ class LineAcceptanceTest {
     void modifyStationLine() {
 
         //given
-        long 신규등록_노선_id = 지하철역_노선_등록_요청(신분당선, red, 지하철역_id, 새로운지하철역_id, distance).jsonPath()
-            .getLong("id");
-
-        Map<String, String> params = new HashMap<>();
-        params.put("name", 다른분당선);
-        params.put("color", red);
+        long 신규등록_노선_id = 지하철역_노선_등록_요청_후_id_추출(노선등록요청_데이터_생성(신분당선, red, 지하철역_id, 새로운지하철역_id, distance));
 
         //when
-        RestAssured
-            .given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .body(params)
-            .when().put("lines/{id}", 신규등록_노선_id)
-            .then().log().all()
-            .extract();
+        지하철역_노선_수정(신규등록_노선_id, 노선수정요청_데이터_생성(다른분당선, red));
 
         //then
         ExtractableResponse<Response> response = 지하철역_노선_단건_조회(신규등록_노선_id);
@@ -188,18 +141,13 @@ class LineAcceptanceTest {
     void deleteStationLine() {
 
         //given
-        long 신규_등록_노선_id = 지하철역_노선_등록_요청(신분당선, red, 지하철역_id, 새로운지하철역_id, distance).jsonPath()
-            .getLong("id");
+        long 신규등록_노선_id = 지하철역_노선_등록_요청_후_id_추출(노선등록요청_데이터_생성(신분당선, red, 지하철역_id, 새로운지하철역_id, distance));
 
         //when
-        RestAssured
-            .given().log().all()
-            .when().delete("lines/{id}", 신규_등록_노선_id)
-            .then().log().all()
-            .statusCode(HttpStatus.NO_CONTENT.value());
+        지하철역_노선_삭제(신규등록_노선_id);
 
         //then
-        ExtractableResponse<Response> response = 지하철역_노선_단건_조회(신규_등록_노선_id);
+        ExtractableResponse<Response> response = 지하철역_노선_단건_조회(신규등록_노선_id);
 
         Assertions.assertAll(
             () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
