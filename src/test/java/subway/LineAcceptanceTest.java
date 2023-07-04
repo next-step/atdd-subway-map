@@ -18,25 +18,27 @@ import org.springframework.http.MediaType;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class LineAcceptanceTest {
 
+    private final static String 신분당선 = "신분당선";
+    private final static String 분당선 = "분당선";
+    private final static String red = "bg-red-600";
+    private final static String green = "bg-green-600";
+    private final static long 지하철역_id = 1;
+    private final static long 새로운지하철역_id = 2;
+    private final static long 또다른지하철역_id = 3;
+    private final static int distance = 10;
+
+
     /**
-     * When 지하철 노선을 생성하면
+     * When 지하철 노선을 생성하면 <br>
      * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
      */
-
     @DisplayName("지하철 노선을 생성한다.")
     @Test
     void createLine() {
 
-        //given
-        String 신분당선 = "신분당선";
-        String color = "bg-red-600";
-        long upStationId = 1;
-        long downStationId = 2;
-        int distance = 10;
-
         //when
         ExtractableResponse<Response> response = 지하철역_노선_등록_요청(
-            신분당선, color, upStationId, downStationId, distance
+            신분당선, red, 지하철역_id, 새로운지하철역_id, distance
         );
 
         //then
@@ -45,10 +47,9 @@ class LineAcceptanceTest {
             () -> assertThat(response.jsonPath().getString("name")).isEqualTo(신분당선),
             () -> assertThat(response.jsonPath().getList("stations")).hasSize(2),
             () -> assertThat(response.jsonPath().getList("stations.id")).contains(
-                Long.valueOf(upStationId).intValue(),
-                Long.valueOf(downStationId).intValue()
-            ),
-            () -> assertThat(response.jsonPath().getInt("distance")).isEqualTo(distance)
+                Long.valueOf(지하철역_id).intValue(),
+                Long.valueOf(새로운지하철역_id).intValue()
+            )
         );
 
         //Then
@@ -82,6 +83,29 @@ class LineAcceptanceTest {
             .when().get("/lines")
             .then().log().all()
             .extract();
+    }
+
+    /**
+     * Given 2개의 지하철 노선을 생성하고 <br>
+     * When 지하철 노선 목록을 조회하면 <br>
+     * Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
+     */
+    @DisplayName("지하철 노선 목록 조회")
+    @Test
+    void getStationLine() {
+
+        //given
+        지하철역_노선_등록_요청(신분당선, red, 지하철역_id, 새로운지하철역_id, distance);
+        지하철역_노선_등록_요청(분당선, green, 지하철역_id, 또다른지하철역_id, distance);
+
+        //when
+        ExtractableResponse<Response> response = 지하철역_노선_목록_조회_요청();
+
+        //then
+        Assertions.assertAll(
+            () -> assertThat(response.jsonPath().getList("")).hasSize(2),
+            () -> assertThat(response.jsonPath().getList("name")).containsOnly(신분당선, 분당선)
+        );
     }
 
 }

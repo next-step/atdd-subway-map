@@ -1,5 +1,7 @@
 package subway.stationline;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,4 +28,10 @@ public class StationLineService {
         ));
     }
 
+    public List<StationLineResponse> findAllStationLines() {
+
+        return repository.findAll().stream()
+            .map(StationLineResponse::of)
+            .collect(Collectors.toList());
+    }
 }

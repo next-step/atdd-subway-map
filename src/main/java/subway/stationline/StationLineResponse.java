@@ -13,11 +13,10 @@ public class StationLineResponse {
     public StationLineResponse() {
     }
 
-    public StationLineResponse(Long id, String name, List<StationResponse> stations, int distance) {
+    public StationLineResponse(Long id, String name, List<StationResponse> stations) {
         this.id = id;
         this.name = name;
         this.stations = stations;
-        this.distance = distance;
     }
 
     public static StationLineResponse of(final StationLine entity) {
@@ -27,8 +26,7 @@ public class StationLineResponse {
             List.of(
                 new StationResponse(entity.getUpStationId(), "상행 종점"),
                 new StationResponse(entity.getDownStationId(), "하행 종점")
-            ),
-            entity.getDistance()
+            )
         );
     }
 

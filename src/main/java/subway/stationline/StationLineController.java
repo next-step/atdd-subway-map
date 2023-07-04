@@ -30,8 +30,6 @@ public class StationLineController {
     @GetMapping("/lines")
     ResponseEntity<List<StationLineResponse>> getStationLineList() {
 
-        return ResponseEntity.ok(
-            List.of(new StationLineResponse(1L, "", List.of(), 1))
-        );
+        return ResponseEntity.ok(stationLineService.findAllStationLines());
     }
 }
