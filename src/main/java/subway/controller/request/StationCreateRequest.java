@@ -1,9 +1,8 @@
 package subway.controller.request;
 
-import subway.controller.ApiRequestBody;
+import subway.service.command.StationCreateCommand;
 
-@ApiRequestBody
-public class StationRequest {
+public class StationCreateRequest implements StationCreateCommand {
     private String name;
 
     public String getName() {

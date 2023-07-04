@@ -1,18 +1,21 @@
-package subway;
+package subway.marker;
 
 import io.restassured.RestAssured;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestComponent;
 import org.springframework.boot.web.servlet.context.ServletWebServerInitializedEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Import;
+import subway.utils.DataTruncateExtension;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Retention(RetentionPolicy.RUNTIME)
-@Import(AcceptanceTest.SetUpRestAssured.class)
+@ExtendWith(DataTruncateExtension.class)
+@Import({AcceptanceTest.SetUpRestAssured.class})
 public @interface AcceptanceTest {
 
 
