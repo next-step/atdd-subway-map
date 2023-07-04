@@ -3,6 +3,7 @@ package subway.line;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,10 +12,12 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
+import subway.station.StationResponse;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static subway.station.StationHelper.지하철역_생성;
@@ -52,7 +55,7 @@ public class LineAcceptanceTest {
         //given
         final String name = "4호선";
         //when
-        지하철_노선_생성(name, "light-blue", firstStationId, secondStationId, 10);
+        지하철_노선_생성(makeRequest(name, "light-blue", firstStationId, secondStationId));
         //then
         List<LineResponse> list = 지하철_노선_목록_조회();
         assertThat(list.size()).isEqualTo(1);
@@ -70,8 +73,8 @@ public class LineAcceptanceTest {
     @Test
     void getLines() {
         //given
-        지하철_노선_생성("4호선", "light-blue", firstStationId, secondStationId, 1);
-        지하철_노선_생성("2호선", "green", thirdStationId, fourthStationId, 5);
+        지하철_노선_생성(makeRequest("4호선", "light-blue", firstStationId, secondStationId));
+        지하철_노선_생성(makeRequest("2호선", "green", thirdStationId, fourthStationId));
         //when
         List<LineResponse> list = 지하철_노선_목록_조회();
         //then
@@ -91,7 +94,7 @@ public class LineAcceptanceTest {
         final String name = "4호선";
         final String color = "light-blue";
 
-        long id = 지하철_노선_생성_ID(name, color, firstStationId, secondStationId, 1);
+        long id = 지하철_노선_생성_ID(makeRequest(name, color, firstStationId, secondStationId));
         //when
         LineResponse line = 지하철_노선_조회(id);
         //then
@@ -108,6 +111,34 @@ public class LineAcceptanceTest {
      * When 생성한 지하철 노선을 수정하면
      * Then 해당 지하철 노선 정보는 수정된다
      */
+    @DisplayName("지하철 노선 수정")
+    @Test
+    void updateLine() {
+        //given
+        final String beforeName = "4호선";
+        final String beforeColor = "light-blue";
+
+        final String afterName = "9호선";
+        final String afterColor = "brown";
+
+        LineRequest saveRequest = makeRequest(beforeName, beforeColor, firstStationId, secondStationId);
+        LineRequest updateRequest = makeRequest(afterName, afterColor, secondStationId, fourthStationId);
+        long id = 지하철_노선_생성_ID(saveRequest);
+        //when
+        지하철_노선_수정(id, updateRequest);
+        //then : 지하철 노선 이름, 색깔이 수정됨을 확인
+        LineResponse response = 지하철_노선_조회(id);
+        assertThat(response.getName()).isEqualTo(afterName);
+        assertThat(response.getColor()).isEqualTo(afterColor);
+
+        //then : 지하철 노선에 연결된 역이 수정됨을 확인
+        List<Long> stationIds = response.getStations()
+                .stream()
+                .map(StationResponse::getId)
+                .collect(Collectors.toList());
+
+        assertThat(stationIds).containsExactly(secondStationId, fourthStationId);
+    }
 
     /**
      * Given 지하철역들이 등록되어 있다.
@@ -115,31 +146,58 @@ public class LineAcceptanceTest {
      * When 생성한 지하철 노선을 삭제하면
      * Then 해당 지하철 노선 정보는 삭제된다
      */
+    @DisplayName("지하철 노선 삭제")
+    @Test
+    void deleteLine() {
+        //given
+        long id = 지하철_노선_생성_ID(makeRequest("4호선", "light-blue", secondStationId, thirdStationId));
+        //when
+        지하철_노선_삭제(id);
+        //then
+        List<LineResponse> response = 지하철_노선_목록_조회();
+        assertThat(response.size()).isEqualTo(0);
+    }
+
+    private static void 지하철_노선_삭제(Long id) {
+        RestAssured.given()
+                .when()
+                .delete("/lines/" + id)
+                .then()
+                .statusCode(HttpStatus.NO_CONTENT.value());
+    }
+
+    private static void 지하철_노선_수정(Long id, LineRequest request) {
+        RestAssured.given().log().all()
+                .body(request)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .put("/lines/" + id)
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value());
+    }
+
     private static List<LineResponse> 지하철_노선_목록_조회() {
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/lines")
+                .when()
+                .get("/lines")
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
-                .extract().jsonPath().getList(".", LineResponse.class);
+                .extract()
+                .jsonPath()
+                .getList(".", LineResponse.class);
     }
 
-    private long 지하철_노선_생성_ID(String name, String color, Long upStationId, Long downStationId, Integer distance) {
-        return 지하철_노선_생성(name, color, upStationId, downStationId, distance).getId();
+    private long 지하철_노선_생성_ID(LineRequest request) {
+        return 지하철_노선_생성(request).getId();
     }
 
-    private static LineResponse 지하철_노선_생성(String name, String color, Long upStationId, Long downStationId, Integer distance) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("name", name);
-        params.put("color", color);
-        params.put("upStationId", upStationId);
-        params.put("downStationId", downStationId);
-        params.put("distance", distance);
-
+    private static LineResponse 지하철_노선_생성(LineRequest request) {
         return RestAssured.given().log().all()
-                .body(params)
+                .body(request)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
+                .when()
+                .post("/lines")
                 .then().log().all()
                 .statusCode(HttpStatus.CREATED.value())
                 .extract().jsonPath().getObject(".", LineResponse.class);
@@ -152,14 +210,28 @@ public class LineAcceptanceTest {
                 .get("/lines/" + id)
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
-                .extract().jsonPath().getObject(".", LineResponse.class);
+                .extract()
+                .jsonPath()
+                .getObject(".", LineResponse.class);
     }
 
     private long 지하철역_생성_ID(String name) {
-        return 지하철역_생성(name).jsonPath().getLong("id");
+        return 지하철역_생성(name)
+                .jsonPath()
+                .getLong("id");
     }
 
     private void 테스트용_포트_설정() {
         RestAssured.port = port;
+    }
+
+    private LineRequest makeRequest(String name, String color, Long upStationId, Long downStationId) {
+        return LineRequest.builder()
+                .name(name)
+                .color(color)
+                .upStationId(upStationId)
+                .downStationId(downStationId)
+                .distance(RandomUtils.nextInt())
+                .build();
     }
 }

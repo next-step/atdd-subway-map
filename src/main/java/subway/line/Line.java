@@ -13,7 +13,14 @@ public class Line {
     private Long downStationId;
     private Integer distance;
 
-    protected Line() {}
+    protected Line() {
+    }
+
+    public static Line of(Long id, String name, String color, Long upStationId, Long downStationId, Integer distance) {
+        Line line = Line.of(name, color, upStationId, downStationId, distance);
+        line.id = id;
+        return line;
+    }
 
     public static Line of(String name, String color, Long upStationId, Long downStationId, Integer distance) {
         Line line = new Line();

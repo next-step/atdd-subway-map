@@ -25,14 +25,13 @@ public class LineService {
 
     @Transactional
     public LineResponse create(LineRequest request) {
-        Station upStation = stationRepository.findById(request.getUpStationId())
-                .orElseThrow(() -> new NoSuchElementException("station is not existed by id > " + request.getUpStationId()));
-        Station downStation = stationRepository.findById(request.getDownStationId())
-                .orElseThrow(() -> new NoSuchElementException("station is not existed by id > " + request.getDownStationId()));
+        Station upStation = getStation(request.getUpStationId());
+        Station downStation = getStation(request.getDownStationId());
         Line newLine = Line.of(request.getName(), request.getColor(), request.getUpStationId(), request.getDownStationId(), request.getDistance());
         lineRepository.save(newLine);
         return lineConverter.convert(newLine, Arrays.asList(upStation, downStation));
     }
+
 
     public List<LineResponse> getList() {
         return lineRepository.findAll()
@@ -45,9 +44,36 @@ public class LineService {
     }
 
     public LineResponse getById(Long id) {
-        Line line = lineRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("line is not existed by id > " + id));
+        Line line = getLine(id);
         List<Station> stations = stationRepository.findByIdIn(Arrays.asList(line.getUpStationId(), line.getDownStationId()));
         return lineConverter.convert(line, stations);
+    }
+
+
+    @Transactional
+    public void update(Long id, LineRequest request) {
+        if (!lineRepository.existsById(id))
+            throw new NoSuchElementException("line is not existed by id > " + id);
+        Station upStation = getStation(request.getUpStationId());
+        Station downStation = getStation(request.getDownStationId());
+        Line line = Line.of(id, request.getName(), request.getColor(), request.getUpStationId(), request.getDownStationId(), request.getDistance());
+        lineRepository.save(line);
+    }
+
+    @Transactional
+    public void delete(Long id) {
+        lineRepository.delete(getLine(id));
+    }
+
+    private Station getStation(Long id) {
+        Station upStation = stationRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("station is not existed by id > " + id));
+        return upStation;
+    }
+
+    private Line getLine(Long id) {
+        Line line = lineRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("line is not existed by id > " + id));
+        return line;
     }
 }
