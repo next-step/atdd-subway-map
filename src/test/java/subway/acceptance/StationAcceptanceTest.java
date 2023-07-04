@@ -1,35 +1,21 @@
-package subway;
+package subway.acceptance;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.StationApiRequest.강남역;
-import static subway.StationApiRequest.양재역;
-import static subway.StationApiRequest.지하철역_삭제_요청;
-import static subway.StationApiRequest.지하철역_생성_요청;
-import static subway.StationApiRequest.지하철역_조회_요청;
+import static subway.util.StationApiRequest.강남역;
+import static subway.util.StationApiRequest.양재역;
+import static subway.util.StationApiRequest.지하철역_삭제_요청;
+import static subway.util.StationApiRequest.지하철역_생성_요청;
+import static subway.util.StationApiRequest.지하철역_조회_요청;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 
 @DisplayName("지하철역 관련 기능")
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-public class StationAcceptanceTest {
-
-    @LocalServerPort
-    private int port;
-
-    @BeforeEach
-    void setUp() {
-        RestAssured.port = port;
-    }
+public class StationAcceptanceTest extends AcceptanceTest {
 
     /**
      * When 지하철역을 생성하면
@@ -88,8 +74,8 @@ public class StationAcceptanceTest {
      * When 그 지하철역을 삭제하면
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
-    // TODO: 지하철역 제거 인수 테스트 메서드 생성
-    @DisplayName("지하철역을 제거한다.")
+    // TODO: 지하철역 삭제 인수 테스트 메서드 생성
+    @DisplayName("지하철역을 삭제한다.")
     @Test
     void deleteStation() {
         // given
@@ -99,10 +85,10 @@ public class StationAcceptanceTest {
         ExtractableResponse<Response> response = 지하철역_삭제_요청(id);
 
         // then
-        지하철역_제거됨(response, 강남역);
+        지하철역_삭제됨(response, 강남역);
     }
 
-    private void 지하철역_제거됨(ExtractableResponse<Response> response, String ... stationNames) {
+    private void 지하철역_삭제됨(ExtractableResponse<Response> response, String ... stationNames) {
         List<String> names = 지하철역_조회_요청().jsonPath().getList("name", String.class);
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
