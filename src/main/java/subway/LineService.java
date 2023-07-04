@@ -20,24 +20,21 @@ public class LineService {
         LineEntity lineEntity = lineRepository.save(new LineEntity(
                 request.getName(),
                 request.getColor(),
-                request.getUpStationId(),
-                request.getDownStationId()
+                stationRepository.getReferenceById(request.getUpStationId()),
+                stationRepository.getReferenceById(request.getDownStationId())
         ));
 
         return createLineResponse(lineEntity);
     }
 
     private LineResponse createLineResponse(LineEntity lineEntity) {
-        Station upStation = stationRepository.getReferenceById(lineEntity.getUpStationId());
-        Station downStation = stationRepository.getReferenceById(lineEntity.getDownStationId());
-
         return new LineResponse(
                 lineEntity.getId(),
                 lineEntity.getName(),
                 lineEntity.getColor(),
                 Arrays.asList(
-                        new StationResponse(upStation.getId(), upStation.getName()),
-                        new StationResponse(downStation.getId(), downStation.getName())
+                        new StationResponse(lineEntity.getUpStation().getId(), lineEntity.getUpStation().getName()),
+                        new StationResponse(lineEntity.getDownStation().getId(), lineEntity.getDownStation().getName())
                 ));
     }
 

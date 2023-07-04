@@ -18,15 +18,17 @@ public class LineEntity {
     private String name;
     @Column(nullable = false)
     private String color;
-    @Column(nullable = false)
-    private Long upStationId;
-    @Column(nullable = false)
-    private Long downStationId;
+    @OneToOne
+    @JoinColumn(name = "up_station_id")
+    private Station upStation;
+    @OneToOne
+    @JoinColumn(name = "down_station_id")
+    private Station downStation;
 
-    public LineEntity(String name, String color, Long upStationId, Long downStationId) {
+    public LineEntity(String name, String color, Station upStation, Station downStation) {
         this.name = name;
         this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
+        this.upStation = upStation;
+        this.downStation = downStation;
     }
 }
