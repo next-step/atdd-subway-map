@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import subway.line.model.LineStation;
 import subway.station.model.Station;
 
 @Getter
@@ -20,6 +21,13 @@ public class StationResponse {
         return StationResponse.builder()
                 .id(station.getId())
                 .name(station.getName())
+                .build();
+    }
+
+    public static StationResponse from(LineStation station) {
+        return StationResponse.builder()
+                .id(station.getStation().getId())
+                .name(station.getStation().getName())
                 .build();
     }
 }

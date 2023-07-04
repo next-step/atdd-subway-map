@@ -5,6 +5,7 @@ import subway.line.dto.LineCreateRequest;
 import subway.station.model.Station;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -36,18 +37,23 @@ public class Line {
     @Column(nullable = false)
     private Long distance;
 
-    @OneToMany(mappedBy = "id")
-    private List<Station> stations;
+    @OneToMany(mappedBy = "line")
+    private List<LineStation> stations;
+
+    public void addLineStation(LineStation station) {
+        if (stations == null) {
+            this.stations = new ArrayList<>();
+        }
+        stations.add(station);
+    }
 
     public static Line from(LineCreateRequest request, Station upStation, Station downStation) {
-        List<Station> stations = List.of(upStation, downStation);
         return Line.builder()
                 .name(request.getName())
                 .color(request.getColor())
                 .upStation(upStation)
                 .downStation(downStation)
                 .distance(10L)
-                .stations(stations)
                 .build();
     }
 }

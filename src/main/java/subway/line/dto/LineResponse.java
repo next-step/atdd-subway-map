@@ -20,20 +20,6 @@ public class LineResponse {
 
     private List<StationResponse> stations;
 
-    public void addStation(StationResponse station) {
-        if (this.stations == null){
-            this.stations = new ArrayList<>();
-        }
-        this.stations.add(station);
-    }
-
-    public void addAllStation(List<StationResponse> stations) {
-        if (this.stations == null){
-            this.stations = new ArrayList<>();
-        }
-        this.stations.addAll(stations);
-    }
-
     public static LineResponse from(Line line) {
         List<StationResponse> stationResponses = line.getStations().stream()
                 .map(StationResponse::from)

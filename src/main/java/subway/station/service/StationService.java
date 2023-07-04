@@ -9,6 +9,7 @@ import subway.station.model.Station;
 import subway.station.repository.StationRepository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -19,8 +20,12 @@ public class StationService {
 
     @Transactional
     public StationResponse saveStation(StationRequest stationRequest) {
-        Station station = stationRepository.save(new Station(stationRequest.getName()));
-        return StationResponse.from(station);
+        stationRepository.findByName(stationRequest.getName())
+                .ifPresent(e -> {throw new IllegalArgumentException("이미 역이 있습니다.");});
+        Station station = Station.builder()
+                .name(stationRequest.getName())
+                .build();
+        return StationResponse.from(stationRepository.save(station));
     }
 
     public List<StationResponse> findAllStations() {
