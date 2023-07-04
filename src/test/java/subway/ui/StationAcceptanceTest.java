@@ -7,15 +7,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.ui.AcceptanceTestUtil.*;
+import static subway.ui.AcceptanceTestUtil.create;
+import static subway.ui.AcceptanceTestUtil.get;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -37,7 +35,7 @@ public class StationAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        assertThat(getSubwayStations()).containsExactly("강남역");
+        assertThat(get("/stations", "name", String.class)).containsExactly("강남역");
     }
 
     /**
@@ -59,7 +57,7 @@ public class StationAcceptanceTest {
         assertThat(노원역_생성.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         //when
-        List<String> names = getSubwayStations();
+        List<String> names = get("/stations", "name", String.class);
 
         //then
         assertThat(names).containsOnly("마들역", "노원역");
@@ -86,7 +84,7 @@ public class StationAcceptanceTest {
         assertThat(마들역_삭제.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         //then
-        assertThat(getSubwayStations()).doesNotContain(마들역);
+        assertThat(get("/stations", "name", String.class)).doesNotContain(마들역);
     }
 
     private ExtractableResponse<Response> deleteSubwayStation(Long stationId) {
@@ -96,13 +94,6 @@ public class StationAcceptanceTest {
                 .when().delete("/stations/{id}")
                 .then().log().all()
                 .extract();
-    }
-
-    private List<String> getSubwayStations() {
-        return RestAssured.given().log().all()
-                .when().get("/stations")
-                .then().log().all()
-                .extract().jsonPath().getList("name", String.class);
     }
 
 }

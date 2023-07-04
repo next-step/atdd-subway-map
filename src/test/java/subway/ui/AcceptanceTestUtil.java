@@ -6,6 +6,8 @@ import io.restassured.response.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
+import java.util.List;
+
 public class AcceptanceTestUtil {
 
     public static <T> ExtractableResponse<Response> create(String path, T request) {
@@ -17,5 +19,12 @@ public class AcceptanceTestUtil {
                 .then().log().all()
                 .statusCode(HttpStatus.CREATED.value())
                 .extract();
+    }
+
+    public static <T> List<T> get(String path, String key, Class<T> genericType) {
+        return RestAssured.given().log().all()
+                .when().get(path)
+                .then().log().all()
+                .extract().jsonPath().getList(key, genericType);
     }
 }

@@ -13,6 +13,8 @@ import org.springframework.test.annotation.DirtiesContext;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static subway.ui.AcceptanceTestUtil.create;
+import static subway.ui.AcceptanceTestUtil.get;
 
 @DisplayName("지하철 노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -31,7 +33,7 @@ public class LineAcceptanceTest {
         지하철_노선_생성(신분당선);
 
         //then
-        assertThat(getSubwayLines()).containsExactly(신분당선);
+        assertThat(get("/lines", "name", String.class)).containsExactly(신분당선);
     }
 
     /**
@@ -48,7 +50,7 @@ public class LineAcceptanceTest {
         지하철_노선_여러개_생성(List.of(신분당선, 분당선));
 
         //when
-        List<String> subwayLines = getSubwayLines();
+        List<String> subwayLines = get("/lines", "name", String.class);
 
         //then
         assertThat(subwayLines).containsOnly(분당선, 신분당선);
@@ -151,11 +153,11 @@ public class LineAcceptanceTest {
         LineCreateRequest request = new LineCreateRequest(
                 name,
                 "bg-red-600",
-                getIdFromResponse(AcceptanceTestUtil.create("/stations", new StationRequest(상행종점역))),
-                getIdFromResponse(AcceptanceTestUtil.create("/stations", new StationRequest(하행종점역))),
+                getIdFromResponse(create("/stations", new StationRequest(상행종점역))),
+                getIdFromResponse(create("/stations", new StationRequest(하행종점역))),
                 10L
         );
-        return AcceptanceTestUtil.create("/lines", request);
+        return create("/lines", request);
     }
 
     private void 지하철_노선_여러개_생성(final List<String> names) {
@@ -164,14 +166,6 @@ public class LineAcceptanceTest {
 
     private Long getIdFromResponse(ExtractableResponse<Response> response) {
         return response.jsonPath().getObject("id", Long.class);
-    }
-
-    private List<String> getSubwayLines() {
-        return RestAssured
-                .given().log().all()
-                .when().get("/lines")
-                .then().log().all()
-                .extract().jsonPath().getList("name");
     }
 
 }
