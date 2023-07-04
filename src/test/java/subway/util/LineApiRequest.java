@@ -13,6 +13,7 @@ import io.restassured.response.Response;
 import org.springframework.http.MediaType;
 import subway.dto.LineCreateRequest;
 import subway.dto.LineResponse;
+import subway.dto.LineUpdateRequest;
 import subway.dto.StationResponse;
 
 public class LineApiRequest {
@@ -45,6 +46,16 @@ public class LineApiRequest {
         return RestAssured.given().log().all()
             .accept(MediaType.APPLICATION_JSON_VALUE)
             .when().get("/lines/{id}", id)
+            .then().log().all()
+            .extract();
+    }
+
+    public static ExtractableResponse<Response> 지하철_노선_수정_요청(Long id, String name, String color) {
+        return RestAssured.given().log().all()
+            .body(new LineUpdateRequest(name, color))
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .accept(MediaType.APPLICATION_JSON_VALUE)
+            .when().put("/lines/{id}", id)
             .then().log().all()
             .extract();
     }

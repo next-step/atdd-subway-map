@@ -2,7 +2,6 @@ package subway.application;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import org.apache.coyote.Response;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.domain.Line;
@@ -11,6 +10,7 @@ import subway.domain.Station;
 import subway.domain.StationRepository;
 import subway.dto.LineCreateRequest;
 import subway.dto.LineResponse;
+import subway.dto.LineUpdateRequest;
 import subway.exception.LineDuplicationNameException;
 import subway.exception.LineNotFoundException;
 import subway.exception.StationNotFoundException;
@@ -58,5 +58,12 @@ public class LineService {
     public LineResponse findById(Long id) {
         return LineResponse.of(lineRepository.findById(id)
             .orElseThrow(LineNotFoundException::new));
+    }
+
+    @Transactional
+    public void update(Long id, LineUpdateRequest lineUpdateRequest) {
+        Line line = lineRepository.findById(id)
+            .orElseThrow(LineNotFoundException::new);
+        line.update(lineUpdateRequest.getName(), lineUpdateRequest.getColor());
     }
 }

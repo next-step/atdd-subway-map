@@ -1,13 +1,16 @@
 package subway.acceptance;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static subway.util.LineApiRequest.경강선_색상;
 import static subway.util.LineApiRequest.경강선_생성;
+import static subway.util.LineApiRequest.경강선_이름;
 import static subway.util.LineApiRequest.신분당선_색상;
 import static subway.util.LineApiRequest.신분당선_생성;
 import static subway.util.LineApiRequest.신분당선_이름;
 import static subway.util.LineApiRequest.지하철_노선_리스폰_변환;
 import static subway.util.LineApiRequest.지하철_노선_목록_조회_요청;
 import static subway.util.LineApiRequest.지하철_노선_생성_요청;
+import static subway.util.LineApiRequest.지하철_노선_수정_요청;
 import static subway.util.LineApiRequest.지하철_노선_조회_요청;
 import static subway.util.StationApiRequest.강남역;
 import static subway.util.StationApiRequest.양재역;
@@ -23,6 +26,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import subway.dto.LineResponse;
 import subway.dto.StationResponse;
+import subway.exception.LineDuplicationNameException;
+import subway.exception.LineNotFoundException;
+import subway.exception.StationNotFoundException;
 
 @DisplayName("지하철 노선 관련 기능")
 public class LineAcceptanceTest extends AcceptanceTest {
@@ -47,6 +53,33 @@ public class LineAcceptanceTest extends AcceptanceTest {
         지하철_노선_목록_조회됨(지하철_노선_목록_조회_요청(), 지하철_노선_리스폰_변환(response));
     }
 
+    @DisplayName("지하철 노선을 생성할 때 중복된 이름이 있으면 실패한다.")
+    @Test
+    void crateLineFail() {
+        // given
+        신분당선_생성();
+
+        // when
+        ExtractableResponse<Response> response = 신분당선_생성();
+
+        // then
+        요청_실패됨(response, new LineDuplicationNameException());
+    }
+
+    @DisplayName("지하철 노선을 생성할 때 해당 지하철역이 없으면 실패한다.")
+    @Test
+    void crateLineFail2() {
+        // given
+        StationResponse upStation = 지하철역_리스폰_변환(지하철역_생성_요청(강남역));
+
+        // when
+        ExtractableResponse<Response> response = 지하철_노선_생성_요청(신분당선_이름, 신분당선_색상,
+            upStation.getId(), 2L, 10);
+
+        // then
+        요청_실패됨(response, new StationNotFoundException());
+    }
+
     @DisplayName("지하철 노선 목록을 조회한다.")
     @Test
     void showLines() {
@@ -64,6 +97,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     private void 지하철_노선_목록_조회됨(ExtractableResponse<Response> response, LineResponse ... lineResponses) {
         List<LineResponse> responses = response.jsonPath().getList(".", LineResponse.class);
 
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         IntStream.range(0, responses.size())
             .forEach(i -> 지하철_노선_조회됨(response, responses.get(i), lineResponses[i]));
     }
@@ -83,17 +117,53 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
     private void 지하철_노선_조회됨(ExtractableResponse<Response> response, LineResponse actual, LineResponse expected) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(actual.getId()).isEqualTo(expected.getId());
-        assertThat(actual.getName()).isEqualTo(expected.getName());
-        assertThat(actual.getColor()).isEqualTo(expected.getColor());
+        assertThat(actual)
+            .usingRecursiveComparison()
+            .isEqualTo(expected);
+    }
 
-        List<StationResponse> actualStations = actual.getStations();
-        List<StationResponse> expectedStations = expected.getStations();
+    @DisplayName("지하철 노선을 조회할 때 해당 지하철 노선이 없으면 실패한다.")
+    @Test
+    void showLineFail() {
+        // given
 
-        IntStream.range(0, actualStations.size())
-            .forEach(i -> {
-                assertThat(actualStations.get(i).getId()).isEqualTo(expectedStations.get(i).getId());
-                assertThat(actualStations.get(i).getName()).isEqualTo(expectedStations.get(i).getName());
-            });
+        // when
+        ExtractableResponse<Response> response = 지하철_노선_조회_요청(1L);
+
+        // then
+        요청_실패됨(response, new LineNotFoundException());
+    }
+    
+    @DisplayName("지하철 노선을 수정한다.")
+    @Test
+    void updateLine() {
+        // given
+        LineResponse 신분당선 = 지하철_노선_리스폰_변환(신분당선_생성());
+
+        // when
+        ExtractableResponse<Response> response = 지하철_노선_수정_요청(신분당선.getId(), 경강선_이름, 경강선_색상);
+
+        // then
+        LineResponse expected = new LineResponse(신분당선.getId(), 경강선_이름, 경강선_색상, 신분당선.getStations());
+        지하철_노선_수정됨(response, expected);
+    }
+
+    private void 지하철_노선_수정됨(ExtractableResponse<Response> response, LineResponse expected) {
+        ExtractableResponse<Response> findResponse = 지하철_노선_조회_요청(expected.getId());
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        지하철_노선_조회됨(findResponse, 지하철_노선_리스폰_변환(findResponse), expected);
+    }
+
+    @DisplayName("지하철 노선을 수정할 때 해당 지하철 노선이 없으면 실패한다.")
+    @Test
+    void updateLineFail() {
+        // given
+
+        // when
+        ExtractableResponse<Response> response = 지하철_노선_수정_요청(1L, 경강선_이름, 경강선_색상);
+
+        // then
+        요청_실패됨(response, new LineNotFoundException());
     }
 }

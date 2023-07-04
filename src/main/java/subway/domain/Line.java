@@ -2,7 +2,6 @@ package subway.domain;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -53,6 +52,11 @@ public class Line {
             Section lastSection = sections.get(sections.size() - 1);
             stations.add(lastSection.getDownStation());
         }
+    }
+
+    public void update(String name, String color) {
+        this.name = name;
+        this.color = color;
     }
 
     public Long getId() {
