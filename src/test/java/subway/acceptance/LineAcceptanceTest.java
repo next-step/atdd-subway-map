@@ -12,14 +12,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import subway.line.controller.dto.LineResponse;
-
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("지하철 노선 관련 기능")
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -152,7 +149,8 @@ class LineAcceptanceTest {
 
         //then
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-        assertThrows(NotFoundException.class, () -> 지하철_노선_조회(savedId));
+        ExtractableResponse<Response> notFoundResponse = 지하철_노선_조회(savedId);
+        assertThat(notFoundResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
 

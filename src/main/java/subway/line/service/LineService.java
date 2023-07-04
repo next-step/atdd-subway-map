@@ -50,17 +50,28 @@ public class LineService {
         return createLineResponseList(lines);
     }
 
-    public LineResponse findById(Long lineId) {
-        Line line = lineRepository.findById(lineId).orElseThrow();
+    public LineResponse getLineResponse(Long lineId) {
+        Line line = getLine(lineId);
         List<Station> stations = getStations(line);
         return createLineResponse(line, stations);
     }
 
     @Transactional
     public void updateLine(Long lineId, LineUpdateRequest updateRequest) {
-        Line line = lineRepository.findById(lineId).orElseThrow();
+        Line line = getLine(lineId);
         line.updateName(updateRequest.getName());
         line.updateColor(updateRequest.getColor());
+    }
+
+    @Transactional
+    public void deleteLine(Long lineId) {
+        Line line = getLine(lineId);
+        lineStationRepository.deleteAllByLine(line);
+        lineRepository.deleteById(lineId);
+    }
+
+    private Line getLine(Long lineId) {
+        return lineRepository.findById(lineId).orElseThrow();
     }
 
     private List<LineResponse> createLineResponseList(List<Line> lines) {

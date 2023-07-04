@@ -7,4 +7,5 @@ import subway.line.domain.LineStationConnection;
 public interface LineStationRepository {
     <S extends LineStationConnection> Iterable<S> saveAll(Iterable<S> entities);
     List<LineStationConnection> findAllByLine(Line line);
+    void deleteAllByLine(Line line);
 }
