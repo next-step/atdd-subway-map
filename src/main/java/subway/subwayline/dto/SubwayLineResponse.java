@@ -1,6 +1,6 @@
-package subway.subwayline;
+package subway.subwayline.dto;
 
-import subway.station.StationResponse;
+import subway.station.dto.StationResponse;
 
 import java.util.Comparator;
 import java.util.LinkedHashSet;

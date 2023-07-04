@@ -4,6 +4,8 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.MediaType;
+import subway.subwayline.dto.CreateSubwayLineRequest;
+import subway.subwayline.dto.ModifySubwayLineRequest;
 
 public class SubwayLineSteps {
 

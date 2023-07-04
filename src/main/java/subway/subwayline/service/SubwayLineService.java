@@ -1,9 +1,13 @@
-package subway.subwayline;
+package subway.subwayline.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import subway.station.Station;
-import subway.station.StationRepository;
+import subway.station.entity.Station;
+import subway.station.repository.StationRepository;
+import subway.subwayline.entity.SubwayLine;
+import subway.subwayline.dto.ModifySubwayLineRequest;
+import subway.subwayline.dto.SubwayLineDto;
+import subway.subwayline.repository.SubwayLineRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;

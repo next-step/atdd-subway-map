@@ -1,7 +1,8 @@
-package subway.subwayline;
+package subway.subwayline.dto;
 
-import subway.station.Station;
-import subway.station.StationDto;
+import subway.station.entity.Station;
+import subway.station.dto.StationDto;
+import subway.subwayline.entity.SubwayLine;
 
 import java.util.Set;
 import java.util.stream.Collectors;

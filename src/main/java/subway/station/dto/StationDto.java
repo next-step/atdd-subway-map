@@ -1,6 +1,6 @@
-package subway.station;
+package subway.station.dto;
 
-import javax.persistence.Column;
+import subway.station.entity.Station;
 
 public class StationDto {
 

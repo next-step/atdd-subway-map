@@ -7,8 +7,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import subway.ApiTest;
-import subway.station.StationResponse;
+import subway.station.dto.StationResponse;
 import subway.station.StationSteps;
+import subway.subwayline.dto.CreateSubwayLineRequest;
+import subway.subwayline.dto.ModifySubwayLineRequest;
 
 import java.util.List;
 
