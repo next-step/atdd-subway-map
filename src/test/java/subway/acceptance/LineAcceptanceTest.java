@@ -1,6 +1,5 @@
 package subway.acceptance;
 
-import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.restassured.RestAssured;
@@ -18,7 +17,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import subway.line.controller.dto.LineResponse;
-import subway.line.domain.Line;
 
 @DisplayName("지하철 노선 관련 기능")
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -44,7 +42,7 @@ class LineAcceptanceTest {
         assertThat(savedResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         //then
-        List<LineResponse> lines = 지하철_노선도_조회();
+        List<LineResponse> lines = 지하철_노선_목록_조회();
         LineResponse 신분당선 = lines.get(0);
         assertThat(lines).hasSize(1);
         assertThat(신분당선.getId()).isEqualTo(1L);
@@ -66,10 +64,11 @@ class LineAcceptanceTest {
         지하철_노선도_등록("7호선",  "bg-red-100", 1L, 3L, 10);
 
         //when
-        List<LineResponse> lines = 지하철_노선도_조회();
+        List<LineResponse> lines = 지하철_노선_목록_조회();
 
         //then
         assertThat(lines).hasSize(2);
+
         LineResponse 신분당선 = lines.get(0);
         assertThat(신분당선.getId()).isEqualTo(1L);
         assertThat(신분당선.getName()).isEqualTo("신분당선");
@@ -81,6 +80,38 @@ class LineAcceptanceTest {
         assertThat(line7.getName()).isEqualTo("7호선");
         assertThat(line7.getColor()).isEqualTo("bg-red-100");
         assertThat(line7.getStations()).hasSize(2);
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 조회하면
+     * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
+     */
+    @DisplayName("지하철 노선을 조회한다")
+    @Test
+    void showLine() {
+        //given
+        ExtractableResponse<Response> response = 지하철_노선도_등록("신분당선",  "bg-red-600", 2L, 3L, 5);
+        Long savedId = response.jsonPath().getLong("id");
+
+        //when
+        ExtractableResponse<Response> searchResponse = 지하철_노선_조회(savedId);
+
+        //then
+        assertThat(searchResponse.statusCode()).isEqualTo(200);
+        LineResponse 신분당선 = searchResponse.jsonPath().getObject("", LineResponse.class);
+        assertThat(신분당선.getId()).isEqualTo(savedId);
+        assertThat(신분당선.getName()).isEqualTo("신분당선");
+        assertThat(신분당선.getColor()).isEqualTo("bg-red-600");
+        assertThat(신분당선.getStations()).hasSize(2);
+    }
+
+    private ExtractableResponse<Response> 지하철_노선_조회(Long id) {
+        String pathVariable = "/" + id;
+        return RestAssured.given().log().all()
+                .when().get("/lines" + pathVariable)
+                .then().log().all()
+                .extract();
     }
 
 
@@ -98,7 +129,7 @@ class LineAcceptanceTest {
                 .extract();
     }
 
-    private List<LineResponse> 지하철_노선도_조회() {
+    private List<LineResponse> 지하철_노선_목록_조회() {
         return RestAssured.given().log().all()
                 .when().get("/lines")
                 .then().log().all()
