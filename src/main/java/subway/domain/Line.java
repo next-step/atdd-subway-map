@@ -1,14 +1,12 @@
 package subway.domain;
 
-import java.util.ArrayList;
 import java.util.List;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 
 @Entity
 public class Line {
@@ -23,35 +21,25 @@ public class Line {
     @Column(length = 20, nullable = false)
     private String color;
 
-    @OneToMany(mappedBy = "line", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Section> sections;
+    @Embedded
+    private Sections sections;
 
     public Line() {
-        this.sections = new ArrayList<>();
+        this.sections = new Sections();
     }
 
     public Line(String name, String color) {
         this.name = name;
         this.color = color;
-        this.sections = new ArrayList<>();
+        this.sections = new Sections();
     }
 
     public void addSection(Station upStation, Station downStation, Integer distance) {
-        this.sections.add(new Section(this, upStation, downStation, distance));
+        this.sections.addSection(this, upStation, downStation, distance);
     }
 
     public List<Station> getStations() {
-        List<Station> stations = new ArrayList<>();
-        sections.forEach(section -> stations.add(section.getUpStation()));
-        addLastStation(stations);
-        return stations;
-    }
-
-    private void addLastStation(List<Station> stations) {
-        if (sections.size() > 0) {
-            Section lastSection = sections.get(sections.size() - 1);
-            stations.add(lastSection.getDownStation());
-        }
+        return sections.getStations();
     }
 
     public void update(String name, String color) {
@@ -71,7 +59,7 @@ public class Line {
         return color;
     }
 
-    public List<Section> getSections() {
+    public Sections getSections() {
         return sections;
     }
 }
