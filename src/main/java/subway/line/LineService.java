@@ -13,8 +13,8 @@ import java.util.stream.Collectors;
 @Service
 public class LineService {
     private final LineRepository lineRepository;
-    private final LineConverter lineConverter;
     private final StationRepository stationRepository;
+    private final LineConverter lineConverter;
 
     public LineService(LineRepository lineRepository, LineConverter lineConverter, StationRepository stationRepository) {
         this.lineRepository = lineRepository;
@@ -37,7 +37,10 @@ public class LineService {
     public List<LineResponse> getLines() {
         return lineRepository.findAll()
                 .stream()
-                .map(line -> lineConverter.convert(line, stationRepository.findByIdIn(Arrays.asList(line.getUpStationId(), line.getDownStationId()))))
+                .map(line -> {
+                    List<Station> stations = stationRepository.findByIdIn(Arrays.asList(line.getUpStationId(), line.getDownStationId()));
+                    return lineConverter.convert(line, stations);
+                })
                 .collect(Collectors.toList());
     }
 }

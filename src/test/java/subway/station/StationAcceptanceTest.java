@@ -1,4 +1,4 @@
-package subway;
+package subway.station;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -40,8 +40,6 @@ public class StationAcceptanceTest {
         // when
         ExtractableResponse<Response> response = 지하철역_생성("강남역");
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        // then
         List<String> stationNames = 지하철역_목록_조회().jsonPath().getList("name", String.class);
         assertThat(stationNames).containsAnyOf("강남역");
     }
@@ -60,7 +58,6 @@ public class StationAcceptanceTest {
         //when
         ExtractableResponse<Response> response = 지하철역_목록_조회();
         //then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         List<String> stations = response.jsonPath().getList("name", String.class);
         assertThat(stations.size()).isEqualTo(2);
         assertThat(stations).contains("노원역", "창동역");
@@ -100,6 +97,7 @@ public class StationAcceptanceTest {
         return RestAssured.given().log().all()
                 .when().get("/stations")
                 .then().log().all()
+                .statusCode(HttpStatus.OK.value())
                 .extract();
     }
 
@@ -112,6 +110,7 @@ public class StationAcceptanceTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/stations")
                 .then().log().all()
+                .statusCode(HttpStatus.CREATED.value())
                 .extract();
     }
 }

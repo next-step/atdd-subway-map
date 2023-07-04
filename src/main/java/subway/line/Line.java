@@ -5,7 +5,7 @@ import javax.persistence.*;
 @Entity
 public class Line {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
     private String name;
     private String color;
