@@ -19,26 +19,6 @@ public class LineCreateRequest {
         this.distance = distance;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setColor(String color) {
-        this.color = color;
-    }
-
-    public void setUpStationId(Long upStationId) {
-        this.upStationId = upStationId;
-    }
-
-    public void setDownStationId(Long downStationId) {
-        this.downStationId = downStationId;
-    }
-
-    public void setDistance(Long distance) {
-        this.distance = distance;
-    }
-
     public String getName() {
         return name;
     }
