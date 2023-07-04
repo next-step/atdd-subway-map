@@ -66,4 +66,9 @@ public class LineService {
             .orElseThrow(LineNotFoundException::new);
         line.update(lineUpdateRequest.getName(), lineUpdateRequest.getColor());
     }
+
+    @Transactional
+    public void delete(Long id) {
+        lineRepository.deleteById(id);
+    }
 }

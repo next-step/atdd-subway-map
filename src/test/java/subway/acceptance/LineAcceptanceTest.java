@@ -9,6 +9,7 @@ import static subway.util.LineApiRequest.신분당선_생성;
 import static subway.util.LineApiRequest.신분당선_이름;
 import static subway.util.LineApiRequest.지하철_노선_리스폰_변환;
 import static subway.util.LineApiRequest.지하철_노선_목록_조회_요청;
+import static subway.util.LineApiRequest.지하철_노선_삭제_요청;
 import static subway.util.LineApiRequest.지하철_노선_생성_요청;
 import static subway.util.LineApiRequest.지하철_노선_수정_요청;
 import static subway.util.LineApiRequest.지하철_노선_조회_요청;
@@ -165,5 +166,25 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         요청_실패됨(response, new LineNotFoundException());
+    }
+
+    @DisplayName("지하철 노선을 삭제한다.")
+    @Test
+    void deleteLine() {
+        // given
+        LineResponse 신분당선 = 지하철_노선_리스폰_변환(신분당선_생성());
+
+        // when
+        ExtractableResponse<Response> response = 지하철_노선_삭제_요청(신분당선.getId());
+
+        // then
+        지하철_노선_삭제됨(response, 신분당선);
+    }
+
+    private void 지하철_노선_삭제됨(ExtractableResponse<Response> response, LineResponse expected) {
+        List<String> lineNames = 지하철_노선_목록_조회_요청().jsonPath().getList("name", String.class);
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertThat(lineNames).doesNotContain(expected.getName());
     }
 }
