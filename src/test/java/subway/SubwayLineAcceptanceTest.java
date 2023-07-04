@@ -19,6 +19,15 @@ class SubwayLineAcceptanceTest {
     private static final String STATIONS_RESOURCE_URL = "/stations";
     private static final String LINES_RESOURCE_URL = "/lines";
 
+    /**
+     * 지하철노선 생성
+     * When 지하철 노선을 생성하면
+     * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
+     * <p>
+     * 노선 생성 시 상행종점역과 하행종점역을 등록합니다.
+     * 따라서 이번 단계에서는 지하철 노선에 역을 맵핑하는 기능은 아직 없지만
+     * 노선 조회시 포함된 역 목록이 함께 응답됩니다.
+     */
     @Test
     void 지하철노선을_생성한다() {
         //given
@@ -64,6 +73,12 @@ class SubwayLineAcceptanceTest {
                 .body("[0].stations[1].name", equalTo(downStationName));
     }
 
+    /**
+     * 지하철노선 목록 조회
+     * Given 2개의 지하철 노선을 생성하고
+     * When 지하철 노선 목록을 조회하면
+     * Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
+     */
     @Test
     void 지하철노선_목록을_조회한다() {
         //given
@@ -119,6 +134,12 @@ class SubwayLineAcceptanceTest {
         ;
     }
 
+    /**
+     * 지하철노선 조회
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 조회하면
+     * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
+     */
     @Test
     void 지하철노선을_조회한다() {
         //given
@@ -154,6 +175,12 @@ class SubwayLineAcceptanceTest {
         ;
     }
 
+    /**
+     * 지하철노선 수정
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 수정하면
+     * Then 해당 지하철 노선 정보는 수정된다
+     */
     @Test
     void 지하철_노선을_수정한다() {
         //given
@@ -195,6 +222,12 @@ class SubwayLineAcceptanceTest {
         ;
     }
 
+    /**
+     * 지하철노선 삭제
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 삭제하면
+     * Then 해당 지하철 노선 정보는 삭제된다
+     */
     @Test
     void 지하철_노선을_제거한다() {
         //given
@@ -221,6 +254,69 @@ class SubwayLineAcceptanceTest {
 
         ValidatableResponse foundSubwayLineResponse = getResource(getLocation(subwayLineCratedResponse));
         verifyResponseStatus(foundSubwayLineResponse, HttpStatus.NOT_FOUND);
+    }
+
+
+    /**
+     * 지하철노선 구간 등록
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선에 추가로 구간을 등록할때
+     * 새로운 노선의 상행역이 기존 노선의 하행역이 아니면
+     * Then NotMatchedSectionException 이 발생한다
+     */
+    // TODO
+    @Test
+    void 신규_구간_상행역_불일치_등록_실패() {
+        //given
+
+
+        //when
+
+
+        //then
+
+    }
+
+    /**
+     * 지하철노선 구간 등록
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선에 추가로 구간을 등록할때
+     * 새로운 노선의 하행역이 기존 노선에 등록되어 있는 역이면
+     * Then NotMatchedSectionException 이 발생한다
+     */
+    // TODO
+    @Test
+    void 신규_구간_하행역_기등록_실패() {
+        //given
+
+
+        //when
+
+
+        //then
+
+    }
+
+
+    /**
+     /**
+     * 지하철노선 구간 등록
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선에 추가로 구간을 등록할때
+     * 새로운 노선의 상행역이 기존 노선의 하행역이라면
+     * Then 새로운 구간이 노선에 추가된다.
+     */
+    // TODO
+    @Test
+    void 신규_구간_등록_성공() {
+        //given
+
+
+        //when
+
+
+        //then
+
     }
 
     private ValidatableResponse createSubwayLines(String lineName, String color, long upStationId, long downStationId, long distance) {
