@@ -58,10 +58,10 @@ class StationAcceptanceTest {
 
         //when
         ExtractableResponse<Response> response = 지하철_역_조회();
-        List<StationResponse> stations = 지하철_역_리스트_반환();
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        List<StationResponse> stations = response.jsonPath().getList("", StationResponse.class);
         assertThat(stations).hasSize(2);
     }
 
@@ -74,7 +74,7 @@ class StationAcceptanceTest {
     @Test
     void deleteStation() {
         //given
-        Long savedId = 지하철_노선도_등록_Id_획득("판교역");
+        Long savedId = 지하철_역_등록_Id_획득("판교역");
 
         //when
         ExtractableResponse<Response> response = 지하철_역_삭제(savedId);
@@ -105,7 +105,7 @@ class StationAcceptanceTest {
                 .extract();
     }
 
-    private Long 지하철_노선도_등록_Id_획득(String name) {
+    private Long 지하철_역_등록_Id_획득(String name) {
         return 지하철_역_등록(name).jsonPath().getLong("id");
     }
 
