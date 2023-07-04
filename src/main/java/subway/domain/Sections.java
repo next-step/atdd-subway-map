@@ -5,6 +5,8 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
+import subway.exception.SectionDuplicationStationException;
+import subway.exception.SectionNotConnectingStationException;
 
 @Embeddable
 public class Sections {
@@ -16,8 +18,26 @@ public class Sections {
         this.sections = new ArrayList<>();
     }
 
-    public void addSection(Line line, Station upStation, Station downStation, Integer distance) {
-        this.sections.add(new Section(line, upStation, downStation, distance));
+    public void addSection(Section section) {
+        if (!sections.isEmpty()) {
+            validateConnectingStation(section.getUpStation());
+            validateDuplicationStation(section.getDownStation());
+        }
+
+        this.sections.add(section);
+    }
+
+    private void validateConnectingStation(Station upStation) {
+        if (getLastSection().isNotSameDownStation(upStation)) {
+            throw new SectionNotConnectingStationException();
+        }
+    }
+
+    private void validateDuplicationStation(Station downStation) {
+        if (sections.stream()
+            .anyMatch(section -> section.isSameUpStation(downStation))) {
+            throw new SectionDuplicationStationException();
+        }
     }
 
     public List<Station> getStations() {
@@ -29,8 +49,12 @@ public class Sections {
 
     private void addLastStation(List<Station> stations) {
         if (sections.size() > 0) {
-            Section lastSection = sections.get(sections.size() - 1);
+            Section lastSection = getLastSection();
             stations.add(lastSection.getDownStation());
         }
+    }
+
+    private Section getLastSection() {
+        return sections.get(sections.size() - 1);
     }
 }

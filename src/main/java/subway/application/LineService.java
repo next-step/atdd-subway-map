@@ -6,11 +6,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.domain.Line;
 import subway.domain.LineRepository;
+import subway.domain.Section;
 import subway.domain.Station;
 import subway.domain.StationRepository;
 import subway.dto.LineCreateRequest;
 import subway.dto.LineResponse;
 import subway.dto.LineUpdateRequest;
+import subway.dto.SectionCreateRequest;
 import subway.exception.LineDuplicationNameException;
 import subway.exception.LineNotFoundException;
 import subway.exception.StationNotFoundException;
@@ -31,9 +33,8 @@ public class LineService {
     public LineResponse save(LineCreateRequest lineCreateRequest) {
         validateDuplicationLineName(lineCreateRequest.getName());
         Line line = lineRepository.save(lineCreateRequest.toLine());
-        Station upStation = getStation(lineCreateRequest.getUpStationId());
-        Station downStation = getStation(lineCreateRequest.getDownStationId());
-        line.addSection(upStation, downStation, lineCreateRequest.getDistance());
+        addSection(line, lineCreateRequest.getUpStationId(), lineCreateRequest.getDownStationId(),
+            lineCreateRequest.getDistance());
         return LineResponse.from(line);
     }
 
@@ -41,6 +42,12 @@ public class LineService {
         if (lineRepository.existsByName(name)) {
             throw new LineDuplicationNameException();
         }
+    }
+
+    private void addSection(Line line, Long upStationId, Long DownStationId, Integer distance) {
+        Station upStation = getStation(upStationId);
+        Station downStation = getStation(DownStationId);
+        line.addSection(new Section(line, upStation, downStation, distance));
     }
 
     private Station getStation(Long stationId) {
@@ -70,5 +77,14 @@ public class LineService {
     @Transactional
     public void delete(Long id) {
         lineRepository.deleteById(id);
+    }
+
+    @Transactional
+    public LineResponse createSection(Long id, SectionCreateRequest sectionCreateRequest) {
+        Line line = lineRepository.findById(id)
+            .orElseThrow(LineNotFoundException::new);
+        addSection(line, sectionCreateRequest.getUpStationId(), sectionCreateRequest.getDownStationId(),
+            sectionCreateRequest.getDistance());
+        return LineResponse.from(line);
     }
 }

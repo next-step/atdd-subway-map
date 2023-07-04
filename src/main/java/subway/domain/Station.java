@@ -14,6 +14,10 @@ public class Station {
     public Station() {
     }
 
+    public boolean equalsId(Station station) {
+        return id.equals(station.getId());
+    }
+
     public Station(String name) {
         this.name = name;
     }

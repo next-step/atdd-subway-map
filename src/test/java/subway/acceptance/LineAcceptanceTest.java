@@ -1,22 +1,8 @@
 package subway.acceptance;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.util.LineApiRequest.경강선_색상;
-import static subway.util.LineApiRequest.경강선_생성;
-import static subway.util.LineApiRequest.경강선_이름;
-import static subway.util.LineApiRequest.신분당선_색상;
-import static subway.util.LineApiRequest.신분당선_생성;
-import static subway.util.LineApiRequest.신분당선_이름;
-import static subway.util.LineApiRequest.지하철_노선_리스폰_변환;
-import static subway.util.LineApiRequest.지하철_노선_목록_조회_요청;
-import static subway.util.LineApiRequest.지하철_노선_삭제_요청;
-import static subway.util.LineApiRequest.지하철_노선_생성_요청;
-import static subway.util.LineApiRequest.지하철_노선_수정_요청;
-import static subway.util.LineApiRequest.지하철_노선_조회_요청;
-import static subway.util.StationApiRequest.강남역;
-import static subway.util.StationApiRequest.양재역;
-import static subway.util.StationApiRequest.지하철역_리스폰_변환;
-import static subway.util.StationApiRequest.지하철역_생성_요청;
+import static subway.util.LineApiRequest.*;
+import static subway.util.StationApiRequest.*;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -29,7 +15,10 @@ import subway.dto.LineResponse;
 import subway.dto.StationResponse;
 import subway.exception.LineDuplicationNameException;
 import subway.exception.LineNotFoundException;
+import subway.exception.SectionDuplicationStationException;
+import subway.exception.SectionNotConnectingStationException;
 import subway.exception.StationNotFoundException;
+import subway.util.StationApiRequest;
 
 @DisplayName("지하철 노선 관련 기능")
 public class LineAcceptanceTest extends AcceptanceTest {
@@ -210,5 +199,77 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
         assertThat(lineNames).doesNotContain(expected.getName());
+    }
+
+    @DisplayName("지하철 노선에 구간을 등록한다.")
+    @Test
+    void createSection() {
+        // given
+        LineResponse 신분당선 = 지하철_노선_리스폰_변환(신분당선_생성());
+        StationResponse upStation = 신분당선.getStations().get(1);
+        StationResponse downStation = 지하철역_리스폰_변환(지하철역_생성_요청(StationApiRequest.양재시민의숲역));
+
+        // when
+        ExtractableResponse<Response> response = 지하철_노선에_구간_생성_요청(신분당선.getId(), upStation.getId(),
+            downStation.getId(), 10);
+
+        // then
+        지하철_노선에_구간_생성됨(response);
+    }
+
+    private void 지하철_노선에_구간_생성됨(ExtractableResponse<Response> response) {
+        LineResponse expected = 지하철_노선_리스폰_변환(response);
+        ExtractableResponse<Response> findResponse = 지하철_노선_조회_요청(expected.getId());
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        지하철_노선_조회됨(findResponse, 지하철_노선_리스폰_변환(findResponse), expected);
+    }
+
+    @DisplayName("지하철 노선에 구간을 생성할 때 하행 종점역이 새로운 구간의 상행역이 아니면 실패한다.")
+    @Test
+    void createSectionFail() {
+        // given
+        LineResponse 신분당선 = 지하철_노선_리스폰_변환(신분당선_생성());
+        StationResponse upStation = 지하철역_리스폰_변환(지하철역_생성_요청(StationApiRequest.양재시민의숲역));
+        StationResponse downStation = 지하철역_리스폰_변환(지하철역_생성_요청(StationApiRequest.청계산입구역));
+
+        // when
+        ExtractableResponse<Response> response = 지하철_노선에_구간_생성_요청(신분당선.getId(), upStation.getId(),
+            downStation.getId(), 10);
+
+        // then
+        하행_종점역이_새로운_구간의_상행역이_아니면_실패됨(response);
+    }
+
+    private void 하행_종점역이_새로운_구간의_상행역이_아니면_실패됨(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.jsonPath().getInt("status"))
+            .isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.jsonPath().getString("message"))
+            .isEqualTo(SectionNotConnectingStationException.MESSAGE);
+    }
+
+    @DisplayName("지하철 노선에 구간을 생성할 때 새로운 구간의 하행역이 중복된 역이라면 실패한다.")
+    @Test
+    void createSectionFail2() {
+        // given
+        LineResponse 신분당선 = 지하철_노선_리스폰_변환(신분당선_생성());
+        StationResponse upStation = 신분당선.getStations().get(1);
+        StationResponse downStation = 신분당선.getStations().get(0);
+
+        // when
+        ExtractableResponse<Response> response = 지하철_노선에_구간_생성_요청(신분당선.getId(), upStation.getId(),
+            downStation.getId(), 10);
+
+        // then
+        새로운_구간의_하행역이_중복된_역이면_실패됨(response);
+    }
+
+    private void 새로운_구간의_하행역이_중복된_역이면_실패됨(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.jsonPath().getInt("status"))
+            .isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.jsonPath().getString("message"))
+            .isEqualTo(SectionDuplicationStationException.MESSAGE);
     }
 }

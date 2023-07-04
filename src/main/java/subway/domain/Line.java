@@ -34,8 +34,8 @@ public class Line {
         this.sections = new Sections();
     }
 
-    public void addSection(Station upStation, Station downStation, Integer distance) {
-        this.sections.addSection(this, upStation, downStation, distance);
+    public void addSection(Section section) {
+        this.sections.addSection(section);
     }
 
     public List<Station> getStations() {

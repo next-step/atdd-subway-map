@@ -14,6 +14,7 @@ import org.springframework.http.MediaType;
 import subway.dto.LineCreateRequest;
 import subway.dto.LineResponse;
 import subway.dto.LineUpdateRequest;
+import subway.dto.SectionCreateRequest;
 import subway.dto.StationResponse;
 
 public class LineApiRequest {
@@ -64,6 +65,17 @@ public class LineApiRequest {
         return RestAssured.given().log().all()
             .accept(MediaType.APPLICATION_JSON_VALUE)
             .when().delete("/lines/{id}", id)
+            .then().log().all()
+            .extract();
+    }
+
+    public static ExtractableResponse<Response> 지하철_노선에_구간_생성_요청(Long id, Long upStationId,
+        Long downStationId, Integer distance) {
+        return RestAssured.given().log().all()
+            .body(new SectionCreateRequest(upStationId, downStationId, distance))
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .accept(MediaType.APPLICATION_JSON_VALUE)
+            .when().post("/lines/{id}/sections", id)
             .then().log().all()
             .extract();
     }
