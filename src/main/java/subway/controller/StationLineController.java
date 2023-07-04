@@ -2,7 +2,6 @@ package subway.controller;
 
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
+import subway.domain.StationLineSectionCreateRequest;
 import subway.service.StationLineService;
 import subway.service.dto.StationLineCreateRequest;
 import subway.service.dto.StationLineResponse;
@@ -37,7 +37,8 @@ public class StationLineController {
 
 	@GetMapping("/{lineId}")
 	public ResponseEntity<StationLineResponse> getStationLine(@PathVariable Long lineId) {
-		return ResponseEntity.ok(stationLineService.getStationLine(lineId));
+		final StationLineResponse result = stationLineService.getStationLine(lineId);
+		return ResponseEntity.ok(result);
 	}
 
 	@PutMapping("/{lineId}")
@@ -50,6 +51,13 @@ public class StationLineController {
 	@DeleteMapping("{lineId}")
 	public ResponseEntity<?> deleteStationLine(@PathVariable Long lineId) {
 		stationLineService.deleteStationLine(lineId);
+
+		return ResponseEntity.ok().build();
+	}
+
+	@PostMapping("/{lineId}/sections")
+	public ResponseEntity<?> createStationLineSection(@PathVariable Long lineId, @RequestBody StationLineSectionCreateRequest request) {
+		stationLineService.createStationLineSection(lineId, request);
 
 		return ResponseEntity.ok().build();
 	}

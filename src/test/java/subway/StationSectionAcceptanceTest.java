@@ -18,6 +18,7 @@ public class StationSectionAcceptanceTest {
 	 * Given 지하철 역 B를 생성한다
 	 * When 지하철 노선에 (C,B) 구간을 추가한다
 	 * Then 지하철 노선 조회 시 추가한 구간의 역이 목록에 포함된다
+	 * Then 지하철 노선의 하행 종점역은 새로 추가된 B역이 된다
 	 */
 	@DisplayName("지하철 구간 등록")
 	@Test
@@ -32,7 +33,11 @@ public class StationSectionAcceptanceTest {
 		AcceptanceUtils.createStationSection(lineId, cStationId, bStationId, BigDecimal.ONE, HttpStatus.OK);
 
 		//then
-		Assertions.assertEquals("B역", AcceptanceUtils.getStationLine(lineId).getString("stations[2].name"));
+		final List<String> stationNames = AcceptanceUtils.getStationLine(lineId).getList("stations.name", String.class);
+
+		Assertions.assertEquals("A역", stationNames.get(0));
+		Assertions.assertEquals("C역", stationNames.get(1));
+		Assertions.assertEquals("B역", stationNames.get(2));
 	}
 
 	/**
