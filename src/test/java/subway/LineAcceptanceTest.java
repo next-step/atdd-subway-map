@@ -29,8 +29,7 @@ class LineAcceptanceTest {
 
 
     /**
-     * When 지하철 노선을 생성하면 <br>
-     * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
+     * When 지하철 노선을 생성하면 <br> Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
      */
     @DisplayName("지하철 노선을 생성한다.")
     @Test
@@ -86,13 +85,11 @@ class LineAcceptanceTest {
     }
 
     /**
-     * Given 2개의 지하철 노선을 생성하고 <br>
-     * When 지하철 노선 목록을 조회하면 <br>
-     * Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
+     * Given 2개의 지하철 노선을 생성하고 <br> When 지하철 노선 목록을 조회하면 <br> Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
      */
     @DisplayName("지하철 노선 목록 조회")
     @Test
-    void getStationLine() {
+    void getStationLines() {
 
         //given
         지하철역_노선_등록_요청(신분당선, red, 지하철역_id, 새로운지하철역_id, distance);
@@ -108,4 +105,36 @@ class LineAcceptanceTest {
         );
     }
 
+    /**
+     * Given 지하철 노선을 생성하고 <br> When 생성한 지하철 노선을 조회하면 <br> Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
+     */
+
+    @DisplayName("지하철 노선 조회")
+    @Test
+    void getStationLine() {
+
+        //given
+        ExtractableResponse<Response> 신규_등록_노선 = 지하철역_노선_등록_요청(신분당선, red, 지하철역_id, 새로운지하철역_id,
+            distance);
+
+        //when
+        ExtractableResponse<Response> response = RestAssured
+            .given().log().all()
+            .when().get("/lines/{id}", 신규_등록_노선.jsonPath().getLong("id"))
+            .then().log().all()
+            .statusCode(HttpStatus.OK.value())
+            .extract();
+
+        //then
+        Assertions.assertAll(
+            () -> assertThat(response.jsonPath().getLong("id")).isEqualTo(1L),
+            () -> assertThat(response.jsonPath().getString("name")).isEqualTo(신분당선),
+            () -> assertThat(response.jsonPath().getList("stations")).hasSize(2),
+            () -> assertThat(response.jsonPath().getList("stations.id")).contains(
+                Long.valueOf(지하철역_id).intValue(),
+                Long.valueOf(새로운지하철역_id).intValue()
+            )
+        );
+
+    }
 }
