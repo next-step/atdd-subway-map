@@ -1,5 +1,9 @@
 package subway.subwayline.entity;
 
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import subway.station.entity.Station;
 
 import javax.persistence.Entity;
@@ -11,6 +15,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.FetchType;
 
 @Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SubwayLine {
 
     @Id
@@ -31,8 +37,7 @@ public class SubwayLine {
 
     private Integer distance;
 
-    protected SubwayLine() {}
-
+    @Builder
     public SubwayLine(String name, String color, Station upStationId, Station downStationId, Integer distance) {
         this.name = name;
         this.color = color;
@@ -42,31 +47,13 @@ public class SubwayLine {
     }
 
     public static SubwayLine of(String name, String color, Station upStationId, Station downStationId, Integer distance) {
-        return new SubwayLine(name, color, upStationId, downStationId, distance);
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getColor() {
-        return color;
-    }
-
-    public Station getUpStationId() {
-        return upStationId;
-    }
-
-    public Station getDownStationId() {
-        return downStationId;
-    }
-
-    public Integer getDistance() {
-        return distance;
+        return SubwayLine.builder()
+                .name(name)
+                .color(color)
+                .upStationId(upStationId)
+                .downStationId(downStationId)
+                .distance(distance)
+                .build();
     }
 
     public void modifySubwayLine(String name, String color) {

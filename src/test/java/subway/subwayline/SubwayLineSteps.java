@@ -10,7 +10,13 @@ import subway.subwayline.dto.ModifySubwayLineRequest;
 public class SubwayLineSteps {
 
     public static CreateSubwayLineRequest 지하철노선등록요청_생성(String name, String color, Long upStationId, Long downStationId, int distance) {
-        return new CreateSubwayLineRequest(name, color, upStationId, downStationId, distance);
+        return CreateSubwayLineRequest.builder()
+                .name(name)
+                .color(color)
+                .upStationId(upStationId)
+                .downStationId(downStationId)
+                .distance(distance)
+                .build();
     }
 
     public static ExtractableResponse<Response> 지하철노선등록요청(CreateSubwayLineRequest request) {
@@ -37,7 +43,10 @@ public class SubwayLineSteps {
     }
 
     public static ModifySubwayLineRequest 지하철노선수정요청_생성(String name, String color) {
-        return new ModifySubwayLineRequest(name, color);
+        return ModifySubwayLineRequest.builder()
+                .name(name)
+                .color(color)
+                .build();
     }
 
     public static ExtractableResponse<Response> 지하철노선수정요청(Long id, ModifySubwayLineRequest request) {

@@ -1,5 +1,9 @@
 package subway.subwayline.dto;
 
+import lombok.Builder;
+import lombok.Getter;
+
+@Getter
 public class CreateSubwayLineRequest {
     private String name;
     private String color;
@@ -7,6 +11,7 @@ public class CreateSubwayLineRequest {
     private Long downStationId;
     private Integer distance;
 
+    @Builder
     public CreateSubwayLineRequest(String name, String color, Long upStationId, Long downStationId, Integer distance) {
         this.name = name;
         this.color = color;
@@ -16,32 +21,12 @@ public class CreateSubwayLineRequest {
     }
 
     public SubwayLineDto toDto() {
-        return SubwayLineDto.of(
-                this.name,
-                this.color,
-                this.upStationId,
-                this.downStationId,
-                this.distance
-        );
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getColor() {
-        return color;
-    }
-
-    public Long getUpStationId() {
-        return upStationId;
-    }
-
-    public Long getDownStationId() {
-        return downStationId;
-    }
-
-    public Integer getDistance() {
-        return distance;
+        return SubwayLineDto.builder()
+                .name(name)
+                .color(color)
+                .upStationId(upStationId)
+                .downStationId(downStationId)
+                .distance(distance)
+                .build();
     }
 }
