@@ -1,9 +1,6 @@
 package subway.dto;
 
-import java.util.ArrayList;
 import subway.domain.Line;
-import subway.domain.Section;
-import subway.domain.Station;
 
 public class LineCreateRequest {
 
@@ -27,10 +24,6 @@ public class LineCreateRequest {
 
     public Line toLine() {
         return new Line(name, color);
-    }
-
-    public Section toSection(Line line, Station upStation, Station downStation) {
-        return new Section(line, upStation, downStation, distance);
     }
 
     public String getName() {

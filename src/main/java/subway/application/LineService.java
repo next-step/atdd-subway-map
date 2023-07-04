@@ -34,7 +34,7 @@ public class LineService {
         Station upStation = getStation(lineCreateRequest.getUpStationId());
         Station downStation = getStation(lineCreateRequest.getDownStationId());
         line.addSection(upStation, downStation, lineCreateRequest.getDistance());
-        return LineResponse.of(line);
+        return LineResponse.from(line);
     }
 
     private void validateDuplicationLineName(String name) {
@@ -51,12 +51,12 @@ public class LineService {
     public List<LineResponse> findAll() {
         return lineRepository.findAll()
             .stream()
-            .map(LineResponse::of)
+            .map(LineResponse::from)
             .collect(Collectors.toUnmodifiableList());
     }
 
     public LineResponse findById(Long id) {
-        return LineResponse.of(lineRepository.findById(id)
+        return LineResponse.from(lineRepository.findById(id)
             .orElseThrow(LineNotFoundException::new));
     }
 
