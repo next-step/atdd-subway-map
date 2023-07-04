@@ -40,4 +40,9 @@ public class RouteService {
                 .map(RouteResponse::new)
                 .collect(Collectors.toList());
     }
+
+    public RouteResponse updateRoute(RouteRequest routeRequest) {
+        return saveRoute(routeRequest);
+    }
+
 }

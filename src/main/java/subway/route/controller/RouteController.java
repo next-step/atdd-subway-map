@@ -38,5 +38,11 @@ public class RouteController {
         return ResponseEntity.ok().body(routes);
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<RouteResponse> updateRoute(@RequestBody RouteRequest routeRequest) {
+        RouteResponse route = routeService.updateRoute(routeRequest);
+        return ResponseEntity.ok().body(route);
+    }
+
 
 }

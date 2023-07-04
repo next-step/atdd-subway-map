@@ -30,4 +30,12 @@ public class RestAssuredUtils {
                 .extract();
     }
 
+    public static ExtractableResponse<Response> update(RestAssuredCondition condition) {
+        return RestAssured.given().log().all()
+                .body(condition.getParams())
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().put(condition.getPath())
+                .then().log().all()
+                .extract();
+    }
 }
