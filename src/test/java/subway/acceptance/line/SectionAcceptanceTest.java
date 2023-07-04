@@ -155,7 +155,7 @@ class SectionAcceptanceTest extends AcceptanceTest {
 
         // when & then
         sectionFixture.지하철구간_제거에_실패한다(lineId, 강남역);
-        assertThat(lineFixture.지하철노선을_조회한다(lineId).getStations()).hasSize(2);
+        assertThat(lineFixture.지하철노선을_조회한다(lineId).getStations()).hasSize(3);
     }
 
     /**
