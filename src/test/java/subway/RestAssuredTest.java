@@ -14,6 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class RestAssuredTest {
 
     private static final String GOOGLE_URL = "https://google.com";
+
     @DisplayName("구글 페이지 접근 테스트")
     @Test
     void accessGoogle() {
