@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.station.Station;
 
 @Transactional(readOnly = true)
 @Service
@@ -39,5 +40,12 @@ public class LineService {
     @Transactional
     public void deleteById(Long id) {
         lineRepository.deleteById(id);
+    }
+
+    @Transactional
+    public LineResponse addSection(Long id, Station upStation, Station downStation) {
+        Line line = lineRepository.findById(id).orElseThrow();
+        line.addSection(upStation, downStation);
+        return LineResponse.from(line);
     }
 }

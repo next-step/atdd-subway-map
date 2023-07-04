@@ -76,4 +76,18 @@ public class LineController {
                 .header(HttpHeaders.VARY, HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD)
                 .header(HttpHeaders.VARY, HttpHeaders.ACCESS_CONTROL_REQUEST_HEADERS).build();
     }
+
+
+    @PostMapping("/lines/{id}/sections")
+    public ResponseEntity<LineResponse> registerSection(@PathVariable Long id,
+            @RequestBody SectionRequest sectionRequest) {
+        Station upStation = stationService.findStation(sectionRequest.getUpStationId());
+        Station downStation = stationService.findStation(sectionRequest.getDownStationId());
+        LineResponse line = lineService.addSection(id, upStation, downStation);
+        return ResponseEntity.created(URI.create("/lines/" + line.getId()))
+                .header(HttpHeaders.VARY, HttpHeaders.ORIGIN)
+                .header(HttpHeaders.VARY, HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD)
+                .header(HttpHeaders.VARY, HttpHeaders.ACCESS_CONTROL_REQUEST_HEADERS)
+                .body(line);
+    }
 }

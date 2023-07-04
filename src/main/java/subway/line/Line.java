@@ -50,4 +50,18 @@ public class Line {
         this.name = name;
         this.color = color;
     }
+
+    public void addSection(Station upStation, Station downStation) {
+        if (!stations.get(getLastElementIndex()).equals(upStation)) {
+            throw new MismatchedUpstreamStationException();
+        }
+        if (stations.contains(downStation)) {
+            throw new DownstreamStationIncludedException();
+        }
+        stations.add(downStation);
+    }
+
+    private int getLastElementIndex() {
+        return stations.size() - 1;
+    }
 }
