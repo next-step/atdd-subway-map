@@ -1,22 +1,22 @@
 package subway.stationline;
 
+import java.util.List;
+import subway.station.StationResponse;
+
 public class StationLineResponse {
 
     private Long id;
     private String name;
-    private Long upStationId;
-    private Long downStationId;
+    private List<StationResponse> stations;
     private int distance;
 
     public StationLineResponse() {
     }
 
-    public StationLineResponse(Long id, String name, Long upStationId, Long downStationId,
-        int distance) {
+    public StationLineResponse(Long id, String name, List<StationResponse> stations, int distance) {
         this.id = id;
         this.name = name;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
+        this.stations = stations;
         this.distance = distance;
     }
 
@@ -24,8 +24,10 @@ public class StationLineResponse {
         return new StationLineResponse(
             entity.getId(),
             entity.getName(),
-            entity.getUpStationId(),
-            entity.getDownStationId(),
+            List.of(
+                new StationResponse(entity.getUpStationId(), "상행 종점"),
+                new StationResponse(entity.getDownStationId(), "하행 종점")
+            ),
             entity.getDistance()
         );
     }
@@ -38,12 +40,8 @@ public class StationLineResponse {
         return name;
     }
 
-    public Long getUpStationId() {
-        return upStationId;
-    }
-
-    public Long getDownStationId() {
-        return downStationId;
+    public List<StationResponse> getStations() {
+        return stations;
     }
 
     public int getDistance() {

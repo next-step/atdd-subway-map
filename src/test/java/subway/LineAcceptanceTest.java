@@ -43,8 +43,11 @@ class LineAcceptanceTest {
         Assertions.assertAll(
             () -> assertThat(response.jsonPath().getLong("id")).isEqualTo(1L),
             () -> assertThat(response.jsonPath().getString("name")).isEqualTo(신분당선),
-            () -> assertThat(response.jsonPath().getLong("upStationId")).isEqualTo(upStationId),
-            () -> assertThat(response.jsonPath().getLong("downStationId")).isEqualTo(downStationId),
+            () -> assertThat(response.jsonPath().getList("stations")).hasSize(2),
+            () -> assertThat(response.jsonPath().getList("stations.id")).contains(
+                Long.valueOf(upStationId).intValue(),
+                Long.valueOf(downStationId).intValue()
+            ),
             () -> assertThat(response.jsonPath().getInt("distance")).isEqualTo(distance)
         );
 

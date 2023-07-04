@@ -31,7 +31,7 @@ public class StationLineController {
     ResponseEntity<List<StationLineResponse>> getStationLineList() {
 
         return ResponseEntity.ok(
-            List.of(new StationLineResponse(1L, "", 1L, 1L, 1))
+            List.of(new StationLineResponse(1L, "", List.of(), 1))
         );
     }
 }
