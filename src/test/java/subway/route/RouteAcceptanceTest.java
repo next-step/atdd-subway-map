@@ -2,14 +2,17 @@ package subway.route;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import subway.common.RestAssuredUtils;
 import subway.common.RestAssuredCondition;
 import subway.route.domain.Route;
+import subway.route.repository.RouteRepository;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,12 +20,19 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
-@DirtiesContext
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class RouteAcceptanceTest {
 
+    @Autowired
+    RouteRepository routeRepository;
+
     private final String ROUTE_API_URI = "/api/routes";
     private final String SLASH = "/";
+
+    @BeforeEach
+    void setUp() {
+        routeRepository.deleteAll();
+    }
 
     /**
      * When 지하철 노선을 생성하면
@@ -96,6 +106,26 @@ public class RouteAcceptanceTest {
             assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
             assertThat(updateResponse.body().jsonPath().getObject(".", Route.class).getName()).isEqualTo("2호선");
 
+    }
+
+    @DisplayName("지하철 노선을 삭제")
+    @Test
+    void deleteRoute() {
+            Map<String, String> params = new HashMap<>();
+            params.put("name", "1호선");
+
+            ExtractableResponse<Response> response =
+                    RestAssuredUtils
+                            .create(new RestAssuredCondition(ROUTE_API_URI, params));
+            Route route = response.body().jsonPath().getObject(".", Route.class);
+
+            assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+            ExtractableResponse<Response> deleteResponse =
+                    RestAssuredUtils
+                            .delete(new RestAssuredCondition(ROUTE_API_URI + SLASH + route.getId()));
+
+            assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
 }
