@@ -6,7 +6,6 @@ import subway.subway.application.in.StationRegisterUsecase;
 import subway.subway.application.in.command.StationRegisterCommand;
 import subway.subway.application.out.StationRegisterPort;
 import subway.subway.application.query.StationResponse;
-import subway.rds_module.entity.StationJpa;
 import subway.subway.domain.Station;
 
 @Service
@@ -23,7 +22,7 @@ class StationRegisterService implements StationRegisterUsecase {
     @Override
     public StationResponse saveStation(StationRegisterCommand command) {
 
-        Station station = Station.register(stationMapper.toMap(command));
+        Station station = Station.register(command.getName());
         return stationRegisterPort.save(station);
     }
 }

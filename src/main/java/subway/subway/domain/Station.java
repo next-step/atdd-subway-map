@@ -1,22 +1,15 @@
 package subway.subway.domain;
 
-import javax.persistence.*;
-
 public class Station {
-    private StationId id;
-    private final StationInfo info;
+    private Station.Id id;
+    private final String name;
 
-    public static Station register(StationInfo info) {
-        return new Station(info);
+    public static Station register(String name) {
+        return new Station(name);
     }
 
-    private Station(StationInfo info) {
-        this.info = info;
-    }
-
-    private Station(StationId id, StationInfo info) {
-        this.id = id;
-        this.info = info;
+    private Station(String name) {
+        this.name = name;
     }
 
     public Long getId() {
@@ -27,10 +20,22 @@ public class Station {
     }
 
     public String getName() {
-        return info.getName();
+        return name;
     }
 
     public boolean isNew() {
         return id == null;
+    }
+
+    public static class Id {
+        private final Long id;
+
+        public Id(Long id) {
+            this.id = id;
+        }
+
+        public Long getId() {
+            return id;
+        }
     }
 }
