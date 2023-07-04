@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static subway.ui.AcceptanceTestUtil.*;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -30,7 +31,7 @@ public class StationAcceptanceTest {
     void createStation() {
         // when
         final String 강남역 = "강남역";
-        ExtractableResponse<Response> response = generateSubwayStation(강남역);
+        ExtractableResponse<Response> response = create("/stations", new StationRequest(강남역));
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -51,8 +52,8 @@ public class StationAcceptanceTest {
         final String 마들역 = "마들역";
         final String 노원역 = "노원역";
 
-        ExtractableResponse<Response> 마들역_생성 = generateSubwayStation(마들역);
-        ExtractableResponse<Response> 노원역_생성 = generateSubwayStation(노원역);
+        ExtractableResponse<Response> 마들역_생성 = create("/stations", new StationRequest(마들역));
+        ExtractableResponse<Response> 노원역_생성 = create("/stations", new StationRequest(노원역));
 
         assertThat(마들역_생성.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(노원역_생성.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -74,7 +75,7 @@ public class StationAcceptanceTest {
     void 지하철역_제거() {
         //given
         final String 마들역 = "마들역";
-        ExtractableResponse<Response> 마들역_생성 = generateSubwayStation(마들역);
+        ExtractableResponse<Response> 마들역_생성 = create("/stations", new StationRequest(마들역));
 
         assertThat(마들역_생성.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
@@ -93,18 +94,6 @@ public class StationAcceptanceTest {
                 .given().log().all()
                 .pathParam("id", stationId)
                 .when().delete("/stations/{id}")
-                .then().log().all()
-                .extract();
-    }
-
-    public static ExtractableResponse<Response> generateSubwayStation(String name) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-
-        return RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
                 .then().log().all()
                 .extract();
     }

@@ -151,11 +151,11 @@ public class LineAcceptanceTest {
         LineCreateRequest request = new LineCreateRequest(
                 name,
                 "bg-red-600",
-                getIdFromResponse(StationAcceptanceTest.generateSubwayStation(상행종점역)),
-                getIdFromResponse(StationAcceptanceTest.generateSubwayStation(하행종점역)),
+                getIdFromResponse(AcceptanceTestUtil.create("/stations", new StationRequest(상행종점역))),
+                getIdFromResponse(AcceptanceTestUtil.create("/stations", new StationRequest(하행종점역))),
                 10L
         );
-        return createSubwayLine(request);
+        return AcceptanceTestUtil.create("/lines", request);
     }
 
     private void 지하철_노선_여러개_생성(final List<String> names) {
@@ -174,14 +174,4 @@ public class LineAcceptanceTest {
                 .extract().jsonPath().getList("name");
     }
 
-    private ExtractableResponse<Response> createSubwayLine(LineCreateRequest request) {
-        return RestAssured
-                .given().log().all()
-                .body(request)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().log().all()
-                .statusCode(HttpStatus.CREATED.value())
-                .extract();
-    }
 }
