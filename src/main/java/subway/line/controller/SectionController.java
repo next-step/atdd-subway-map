@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
+import subway.line.service.SectionService;
 import subway.line.service.request.SectionRequest;
 import subway.line.service.response.LineResponse;
-import subway.line.service.SectionService;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,7 +22,7 @@ public class SectionController {
 
     @PostMapping
     public ResponseEntity<LineResponse> appendSection(@PathVariable final Long lineId,
-                                                   @RequestBody final SectionRequest request) {
+                                                      @RequestBody final SectionRequest request) {
         final var response = sectionService.appendSection(lineId, request);
         return ResponseEntity
                 .ok()
