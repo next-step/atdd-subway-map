@@ -4,9 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 
 import subway.acceptance.AcceptanceTest;
+import subway.acceptance.helper.Given;
+import subway.acceptance.helper.Then;
+import subway.acceptance.helper.When;
 import subway.acceptance.station.StationFixture;
 import subway.line.service.request.LineCreateRequest;
 import subway.line.service.request.SectionRequest;
@@ -27,160 +29,108 @@ class SectionAcceptanceTest extends AcceptanceTest {
         양재역 = stationFixture.지하철역을_생성한다("양재역").getId();
     }
 
-    /**
-     * Given 지하철 노선을 생성하고
-     * When 지하철 구간을 등록하면
-     * Then 등록된 구간을 응답받을 수 있다.
-     */
-    @DisplayName("지하철 노선에 구간을 등록한다")
-    @Test
-    void appendSection() {
-        final var request = new LineCreateRequest(
-                "신분당선",
-                "bg-red-600",
-                논현역,
-                신논현역,
-                10L
-        );
+    @Given
+    class Given_지하철_노선을_생성하고 {
 
-        // given
-        final var lineId = lineFixture.지하철노선을_생성한다(request).getId();
+        private Long 신분당선;
 
-        // when
-        final var response = sectionFixture.지하철구간을_등록한다(lineId, new SectionRequest(신논현역, 강남역, 10L));
+        @BeforeEach
+        public void setUp() {
+            final var 노선_논현역_신논현역 = new LineCreateRequest("신분당선", "bg-red-600", 논현역, 신논현역, 10L);
+            신분당선 = lineFixture.지하철노선을_생성한다(노선_논현역_신논현역).getId();
+        }
 
-        // then
-        assertThat(response.getStations()).hasSize(3);
-    }
+        @When
+        class When_지하철_구간을_등록하면 {
 
-    /**
-     * Given 지하철 노선을 생성하고
-     * When 지하철 구간을 등록할때
-     * When 새로운 구간의 상행역이 노선의 하행 종점역이 아니라면
-     * Then 새로운 구간을 등록할 수 없다
-     */
-    @DisplayName("지하철 구간 등록에 실패한다 - 노선의 하행역과 구간의 상행역이 일치하지 않은 경우")
-    @Test
-    void appendFail1() {
-        final var request = new LineCreateRequest(
-                "신분당선",
-                "bg-red-600",
-                논현역,
-                신논현역,
-                10L
-        );
+            @Then
+            void Then_등록한_구간을_응답받을_수_있다() {
+                // when
+                final var 신논현역_강남역 = new SectionRequest(신논현역, 강남역, 10L);
+                final var response = sectionFixture.지하철구간을_등록한다(신분당선, 신논현역_강남역);
 
-        // given
-        final var lineId = lineFixture.지하철노선을_생성한다(request).getId();
+                // then
+                assertThat(response.getStations()).hasSize(3);
+            }
 
-        // when & then
-        sectionFixture.지하철구간_등록에_실패한다(lineId, new SectionRequest(강남역, 양재역, 10L));
-        assertThat(lineFixture.지하철노선을_조회한다(lineId).getStations()).hasSize(2);
-    }
+            @When
+            class When_새로운_구간의_상행역이_노선의_하행_종점역이_아니라면 {
 
-    /**
-     * Given 지하철 노선을 생성하고
-     * When 지하철 구간을 등록할때
-     * When 새로운 구간의 하행역이 노선에 등록되어 있는 역이라면
-     * Then 새로운 구간을 등록할 수 없다
-     */
-    @DisplayName("지하철 구간 등록에 실패한다 - 구간의 하행역이 이미 노선에 등록되어 있는 경우")
-    @Test
-    void appendFail2() {
-        final var request = new LineCreateRequest(
-                "신분당선",
-                "bg-red-600",
-                신논현역,
-                강남역,
-                10L
-        );
+                @Then
+                void Then_새로운_구간을_등록할_수_없다() {
+                    // when
+                    final var 구간_강남역_양재역 = new SectionRequest(강남역, 양재역, 10L);
+                    sectionFixture.지하철구간_등록에_실패한다(신분당선, 구간_강남역_양재역);
 
-        // given
-        final var lineId = lineFixture.지하철노선을_생성한다(request).getId();
+                    // then
+                    assertThat(lineFixture.지하철노선을_조회한다(신분당선).getStations()).hasSize(2);
+                }
+            }
 
-        // when & then
-        sectionFixture.지하철구간_등록에_실패한다(lineId, new SectionRequest(강남역, 신논현역, 10L));
-        assertThat(lineFixture.지하철노선을_조회한다(lineId).getStations()).hasSize(2);
-    }
+            @When
+            class When_새로운_구간의_하행역이_노선에_등록되어_있는_역이라면 {
 
-    /**
-     * Given 지하철 노선을 생성하고
-     * Given 지하철 구간을 등록하고
-     * When 등록한 지하철 구간을 삭제하면
-     * Then 해당 지하철 구간 정보는 삭제된다
-     */
-    @DisplayName("지하철 노선에서 구간을 삭제한다")
-    @Test
-    void removeSection() {
-        final var request = new LineCreateRequest(
-                "신분당선",
-                "bg-red-600",
-                신논현역,
-                강남역,
-                10L
-        );
+                @Then
+                void Then_새로운_구간을_등록할_수_없다() {
+                    // when
+                    final var 구간_신논현역_논현역 = new SectionRequest(신논현역, 논현역, 10L);
+                    sectionFixture.지하철구간_등록에_실패한다(신분당선, 구간_신논현역_논현역);
 
-        // given
-        final var lineId = lineFixture.지하철노선을_생성한다(request).getId();
-        sectionFixture.지하철구간을_등록한다(lineId, new SectionRequest(강남역, 양재역, 10L));
+                    // then
+                    assertThat(lineFixture.지하철노선을_조회한다(신분당선).getStations()).hasSize(2);
+                }
+            }
+        }
 
-        // when
-        sectionFixture.지하철구간을_제거한다(lineId, 양재역);
+        @Given
+        class Given_지하철_구간을_등록하고 {
 
-        // then
-        assertThat(lineFixture.지하철노선을_조회한다(lineId).getStations()).hasSize(2);
-    }
+            @BeforeEach
+            public void setUp() {
+                final var 구간_신논현역_강남역 = new SectionRequest(신논현역, 강남역, 10L);
+                sectionFixture.지하철구간을_등록한다(신분당선, 구간_신논현역_강남역);
+            }
 
-    /**
-     * Given 지하철 노선을 생성하고
-     * Given 지하철 구간을 등록하고
-     * When 등록한 지하철 구간을 삭제할때
-     * When 삭제하고자 하는 구간이 마지막 구간이 아니라면
-     * Then 해당 지하철 구간 정보는 삭제할 수 없다
-     */
-    @DisplayName("지하철 구간 제거에 실패한다 - 삭제하고자 하는 구간이 마지막 구간이 아닌 경우")
-    @Test
-    void removeFail1() {
-        final var request = new LineCreateRequest(
-                "신분당선",
-                "bg-red-600",
-                신논현역,
-                강남역,
-                10L
-        );
+            @When
+            class When_등록한_지하철_구간을_삭제하면 {
 
-        // given
-        final var lineId = lineFixture.지하철노선을_생성한다(request).getId();
-        sectionFixture.지하철구간을_등록한다(lineId, new SectionRequest(강남역, 양재역, 10L));
+                @Then
+                void Then_해당_지하철_구간_정보는_삭제된다() {
+                    // when
+                    sectionFixture.지하철구간을_제거한다(신분당선, 강남역);
 
-        // when & then
-        sectionFixture.지하철구간_제거에_실패한다(lineId, 강남역);
-        assertThat(lineFixture.지하철노선을_조회한다(lineId).getStations()).hasSize(3);
-    }
+                    // then
+                    assertThat(lineFixture.지하철노선을_조회한다(신분당선).getStations()).hasSize(2);
+                }
 
-    /**
-     * Given 지하철 노선을 생성하고
-     * Given 지하철 구간을 등록하고
-     * When 등록한 지하철 구간을 삭제할때
-     * When 노선에 상행 종점역과 하행 종점역만 있는 경우
-     * Then 해당 지하철 구간 정보는 삭제할 수 없다
-     */
-    @DisplayName("지하철 구간 제거에 실패한다 - 노선에 상행 종점역과 하행 종점역만 있는 경우")
-    @Test
-    void removeFail2() {
-        final var request = new LineCreateRequest(
-                "신분당선",
-                "bg-red-600",
-                신논현역,
-                강남역,
-                10L
-        );
 
-        // given
-        final var lineId = lineFixture.지하철노선을_생성한다(request).getId();
+                @When
+                class When_삭제하고자_하는_구간이_마지막_구간이_아니라면 {
 
-        // when & then
-        sectionFixture.지하철구간_제거에_실패한다(lineId, 강남역);
-        assertThat(lineFixture.지하철노선을_조회한다(lineId).getStations()).hasSize(2);
+                    @Then
+                    void Then_해당_지하철_구간_정보는_삭제할_수_없다() {
+                        // when
+                        sectionFixture.지하철구간_제거에_실패한다(신분당선, 신논현역);
+
+                        // then
+                        assertThat(lineFixture.지하철노선을_조회한다(신분당선).getStations()).hasSize(3);
+                    }
+                }
+
+                @When
+                class When_노선에_상행_종점역과_하행_종점역만_있다면 {
+
+                    @Then
+                    void Then_해당_지하철_구간_정보는_삭제할_수_없다() {
+                        // when
+                        sectionFixture.지하철구간을_제거한다(신분당선, 강남역);
+                        sectionFixture.지하철구간_제거에_실패한다(신분당선, 신논현역);
+
+                        // then
+                        assertThat(lineFixture.지하철노선을_조회한다(신분당선).getStations()).hasSize(2);
+                    }
+                }
+            }
+        }
     }
 }
