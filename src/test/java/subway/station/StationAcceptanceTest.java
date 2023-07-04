@@ -72,7 +72,7 @@ public class StationAcceptanceTest {
     void showStations() {
         // given
         Stream.of("구디역", "봉천역")
-                .forEach(SubwayStationHelper::지하철_노션에_지하철_역_요청);
+                .forEach(SubwayStationHelper::지하철_역_생성_요청);
 
         // when
         List<String> response = RestAssured
@@ -96,7 +96,7 @@ public class StationAcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        ExtractableResponse<Response> createStationApiResponse = SubwayStationHelper.지하철_노션에_지하철_역_요청("봉천역");
+        ExtractableResponse<Response> createStationApiResponse = SubwayStationHelper.지하철_역_생성_요청("봉천역");
         String createStationApiResponseUrl = createStationApiResponse
                 .response().getHeaders().getValue("Location");
 

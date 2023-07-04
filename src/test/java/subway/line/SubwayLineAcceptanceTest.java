@@ -1,6 +1,5 @@
 package subway.line;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.assertj.core.api.Assertions;
@@ -9,14 +8,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import subway.helper.SubwayLineHelper;
+import subway.helper.SubwayStationHelper;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD;
@@ -26,15 +25,11 @@ import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFOR
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class SubwayLineAcceptanceTest {
 
-    private List<String> stationDataSet = Arrays.asList("지하철 역", "새로운 지하철 역", "또 다른 지하철 역"
-            , "또 다른 새로운 지하철 역");
-
     @DisplayName("4개의 지하철 역을 생성합니다.")
     @BeforeEach
     void setUp() {
-        for (String stationName : stationDataSet) {
-            SubwayLineHelper.지하철_노션에_지하철_역_요청(stationName);
-        }
+        Stream.of("지하철 역", "새로운 지하철 역", "또 다른 지하철 역", "또 다른 새로운 지하철 역")
+                .forEach(SubwayStationHelper::지하철_역_생성_요청);
     }
 
     /**
@@ -45,23 +40,11 @@ public class SubwayLineAcceptanceTest {
     @Test
     void createSubwayLine() {
         // when
-        ExtractableResponse<Response> createSubwayLineApiResponse = RestAssured
-                .given().log().all()
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                    .body(SubwayLineHelper.SUBWAY_LIEN_PARAMETERS_1)
-                .when().log().all()
-                    .post(SubwayLineHelper.SUBWAY_LINE_API_URL)
-                .then().log().all()
-                    .extract();
+        SubwayLineHelper.지하철_노선_생성_요청(SubwayLineHelper.SUBWAY_LIEN_PARAMETERS_1);
 
         // then
-        String actualSubwayLineName = RestAssured
-                .given().log().all()
-                .when().log().all()
-                    .get(SubwayLineHelper.SUBWAY_LINE_API_URL)
-                .then().log().all()
-                .extract()
-                    .jsonPath().getString("name");
+        String actualSubwayLineName = SubwayLineHelper.지하철_노선_목록_조회_요청()
+                .jsonPath().getString("name");
 
         Assertions.assertThat(actualSubwayLineName).contains("신분당선");
     }
@@ -80,16 +63,11 @@ public class SubwayLineAcceptanceTest {
         parametersList.add(SubwayLineHelper.SUBWAY_LIEN_PARAMETERS_2);
 
         for (Map<String, Object> parameters : parametersList) {
-            SubwayLineHelper.지하철_노션_요청(parameters);
+            SubwayLineHelper.지하철_노선_생성_요청(parameters);
         }
 
         // when
-        List<String> subwayLineNames = RestAssured
-                .given().log().all()
-                .when().log().all()
-                    .get(SubwayLineHelper.SUBWAY_LINE_API_URL)
-                .then().log().all()
-                .extract()
+        List<String> subwayLineNames = SubwayLineHelper.지하철_노선_목록_조회_요청()
                     .jsonPath().getList("name", String.class);
 
         // then
@@ -106,17 +84,12 @@ public class SubwayLineAcceptanceTest {
     void showSubwayLine() {
         // given
         ExtractableResponse<Response> createSubwayLineApiResponse = SubwayLineHelper
-                .지하철_노션_요청(SubwayLineHelper.SUBWAY_LIEN_PARAMETERS_1);
-        String createSubwayLineApiResponseId = createSubwayLineApiResponse.jsonPath()
-                .getString("id");
+                .지하철_노선_생성_요청(SubwayLineHelper.SUBWAY_LIEN_PARAMETERS_1);
+        String createSubwayLineApiResponseUrl = createSubwayLineApiResponse
+                .response().getHeaders().getValue("Location");
 
         // when
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .when().log().all()
-                    .get(SubwayLineHelper.SUBWAY_LINE_API_URL + "/" + createSubwayLineApiResponseId)
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = SubwayLineHelper.지하철_노선_정보_조회_요청(createSubwayLineApiResponseUrl);
 
         long actualId = response.jsonPath().getLong("id");
         String actualName = response.jsonPath().getString("name");
@@ -138,20 +111,15 @@ public class SubwayLineAcceptanceTest {
     void updateSubwayLine() {
         // given
         ExtractableResponse<Response> createSubwayLineApiResponse = SubwayLineHelper
-                .지하철_노션_요청(SubwayLineHelper.SUBWAY_LIEN_PARAMETERS_1);
-        String createSubwayLineApiResponseId = createSubwayLineApiResponse.jsonPath().getString("id");
+                .지하철_노선_생성_요청(SubwayLineHelper.SUBWAY_LIEN_PARAMETERS_1);
+        String createSubwayLineApiResponseUrl = createSubwayLineApiResponse
+                .response().getHeaders().getValue("Location");
 
         // when
-        Map<String, Object> updateLineParameters = Map.of("name", "다른분당선", "color", "bg-red-600");
+        Map<String, Object> updateLineRequest = Map.of("name", "다른분당선", "color", "bg-red-600");
 
-        ExtractableResponse<Response> updateSubwayLineApiResponse = RestAssured
-                .given().log().all()
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                    .body(updateLineParameters)
-                .when().log().all()
-                    .put(SubwayLineHelper.SUBWAY_LINE_API_URL + "/" + createSubwayLineApiResponseId)
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> updateSubwayLineApiResponse = SubwayLineHelper
+                .지하철_노선_정보_수정_요청(createSubwayLineApiResponseUrl, updateLineRequest);
 
         // then
         assertThat(updateSubwayLineApiResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -167,16 +135,13 @@ public class SubwayLineAcceptanceTest {
     void deleteSubwayLine() {
         // given
         ExtractableResponse<Response> createSubwayLineApiResponse = SubwayLineHelper
-                .지하철_노션_요청(SubwayLineHelper.SUBWAY_LIEN_PARAMETERS_1);
-        String createSubwayLineApiResponseId = createSubwayLineApiResponse.jsonPath().getString("id");
+                .지하철_노선_생성_요청(SubwayLineHelper.SUBWAY_LIEN_PARAMETERS_1);
+        String createSubwayLineApiResponseUrl = createSubwayLineApiResponse
+                .response().getHeaders().getValue("Location");
 
         // when
-        ExtractableResponse<Response> deleteSubwayLineApiResponse = RestAssured
-                .given().log().all()
-                .when().log().all()
-                    .delete(SubwayLineHelper.SUBWAY_LINE_API_URL + "/" + createSubwayLineApiResponseId)
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> deleteSubwayLineApiResponse = SubwayLineHelper
+                .지하철_노선_삭제_요청(createSubwayLineApiResponseUrl);
 
         // then
         assertThat(deleteSubwayLineApiResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());

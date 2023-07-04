@@ -12,7 +12,7 @@ public class SubwayStationHelper {
 
     public static final String STATION_API_URL = "/stations";
 
-    public static ExtractableResponse<Response> 지하철_노션에_지하철_역_요청(String stationName) {
+    public static ExtractableResponse<Response> 지하철_역_생성_요청(String stationName) {
         Map<String, String> parameter = new HashMap<>();
         parameter.put("name", stationName);
 
