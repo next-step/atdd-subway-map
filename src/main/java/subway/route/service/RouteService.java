@@ -45,4 +45,9 @@ public class RouteService {
         return saveRoute(routeRequest);
     }
 
+    public void deleteRoute(Long id) {
+        routeRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 노선입니다."));
+        routeRepository.deleteById(id);
+    }
 }
