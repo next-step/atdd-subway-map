@@ -1,4 +1,4 @@
-package subway.stationline;
+package subway.service.request;
 
 public class StationLineRequest {
 

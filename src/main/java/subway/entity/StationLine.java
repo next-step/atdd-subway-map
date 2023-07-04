@@ -1,4 +1,4 @@
-package subway.stationline;
+package subway.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

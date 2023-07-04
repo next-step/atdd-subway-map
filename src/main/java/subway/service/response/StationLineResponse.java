@@ -1,7 +1,7 @@
-package subway.stationline;
+package subway.service.response;
 
 import java.util.List;
-import subway.station.StationResponse;
+import subway.entity.StationLine;
 
 public class StationLineResponse {
 
