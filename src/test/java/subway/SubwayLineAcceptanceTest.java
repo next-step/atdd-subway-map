@@ -4,6 +4,7 @@ import io.restassured.response.ValidatableResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
+import subway.controller.resonse.SubwayLineResponse;
 import subway.marker.AcceptanceTest;
 
 import java.util.HashMap;
@@ -18,6 +19,7 @@ class SubwayLineAcceptanceTest {
 
     private static final String STATIONS_RESOURCE_URL = "/stations";
     private static final String LINES_RESOURCE_URL = "/lines";
+    private static final String SECTION_RESOURCE_URL = "/sections";
 
     /**
      * 지하철노선 생성
@@ -264,17 +266,34 @@ class SubwayLineAcceptanceTest {
      * 새로운 노선의 상행역이 기존 노선의 하행역이 아니면
      * Then NotMatchedSectionException 이 발생한다
      */
-    // TODO
     @Test
     void 신규_구간_상행역_불일치_등록_실패() {
         //given
+        String lineName = "신분당선";
+        String color = "bg-red-600";
 
+        int upStationId = 1;
+        String upStationName = "강남역";
+        createStation(upStationName);
+
+        int downStationId = 2;
+        String downStationName = "언주역";
+        createStation(downStationName);
+
+        int distance = 10;
+
+        ValidatableResponse subwayLineCratedResponse = createSubwayLines(lineName, color, upStationId, downStationId, distance);
+        long createdLineId = subwayLineCratedResponse.extract().as(SubwayLineResponse.class).getId();
+
+        int sectionDownStationId = 3;
+        String sectionDownStationName = "길음역";
+        createStation(sectionDownStationName);
 
         //when
-
+        ValidatableResponse subwayLineSectionCreatedResponse = createSubwayLineSection(createdLineId, sectionDownStationId, downStationId, distance);
 
         //then
-
+        verifyResponseStatus(subwayLineSectionCreatedResponse, HttpStatus.BAD_REQUEST);
     }
 
     /**
@@ -299,7 +318,7 @@ class SubwayLineAcceptanceTest {
 
 
     /**
-     /**
+     * /**
      * 지하철노선 구간 등록
      * Given 지하철 노선을 생성하고
      * When 생성한 지하철 노선에 추가로 구간을 등록할때
@@ -317,6 +336,15 @@ class SubwayLineAcceptanceTest {
 
         //then
 
+    }
+
+    private ValidatableResponse createSubwayLineSection(Long lineId, long upStationId, long downStationId, long distance) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("upStationId", upStationId);
+        params.put("downStationId", downStationId);
+        params.put("distance", distance);
+
+        return createResource(String.format("%s/%d%s", LINES_RESOURCE_URL, lineId, SECTION_RESOURCE_URL), params);
     }
 
     private ValidatableResponse createSubwayLines(String lineName, String color, long upStationId, long downStationId, long distance) {
