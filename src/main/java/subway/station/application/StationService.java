@@ -1,15 +1,19 @@
-package subway;
+package subway.station.application;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import subway.station.dto.StationRequest;
+import subway.station.dto.StationResponse;
+import subway.station.domain.Station;
+import subway.station.domain.StationRepository;
 
 @Service
 @Transactional(readOnly = true)
 public class StationService {
-    private StationRepository stationRepository;
+    private final StationRepository stationRepository;
 
     public StationService(StationRepository stationRepository) {
         this.stationRepository = stationRepository;
