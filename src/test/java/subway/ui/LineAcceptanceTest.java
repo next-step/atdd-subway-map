@@ -28,10 +28,7 @@ public class LineAcceptanceTest {
     void createLine() {
         //when
         final String 신분당선 = "신분당선";
-        ExtractableResponse<Response> 신분당선_응답 = 지하철_노선_생성(신분당선);
-
-        //then
-        assertThat(신분당선_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        지하철_노선_생성(신분당선);
 
         //then
         assertThat(getSubwayLines()).containsExactly(신분당선);
@@ -48,12 +45,7 @@ public class LineAcceptanceTest {
         //given
         final String 신분당선 = "신분당선";
         final String 분당선 = "분당선";
-
-        ExtractableResponse<Response> 신분당선_응답 = 지하철_노선_생성(신분당선);
-        assertThat(신분당선_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-        ExtractableResponse<Response> 분당선_응답 = 지하철_노선_생성(분당선);
-        assertThat(분당선_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        지하철_노선_여러개_생성(List.of(신분당선, 분당선));
 
         //when
         List<String> subwayLines = getSubwayLines();
@@ -73,7 +65,6 @@ public class LineAcceptanceTest {
         //given
         final String 신분당선 = "신분당선";
         ExtractableResponse<Response> 신분당선_생성_응답 = 지하철_노선_생성(신분당선);
-        assertThat(신분당선_생성_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         //when
         ExtractableResponse<Response> 신분당선_조회_응답 = getSubwayLine(getIdFromResponse(신분당선_생성_응답));
@@ -93,7 +84,6 @@ public class LineAcceptanceTest {
         //given
         final String 신분당선 = "신분당선";
         ExtractableResponse<Response> 신분당선_생성_응답 = 지하철_노선_생성(신분당선);
-        assertThat(신분당선_생성_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         //when
         final String 다른분당선 = "다른분당선";
@@ -115,7 +105,6 @@ public class LineAcceptanceTest {
         //given
         final String 신분당선 = "신분당선";
         ExtractableResponse<Response> 신분당선_생성_응답 = 지하철_노선_생성(신분당선);
-        assertThat(신분당선_생성_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         //when
         ExtractableResponse<Response> 신분당선_삭제_응답 = deleteSubwayLine(getIdFromResponse(신분당선_생성_응답));
@@ -164,7 +153,11 @@ public class LineAcceptanceTest {
                 getIdFromResponse(StationAcceptanceTest.generateSubwayStation(하행종점역)),
                 10L
         );
-        return generateSubwayLine(request);
+        return createSubwayLine(request);
+    }
+
+    private void 지하철_노선_여러개_생성(final List<String> names) {
+        names.forEach(name -> 지하철_노선_생성(name));
     }
 
     private Long getIdFromResponse(ExtractableResponse<Response> response) {
@@ -179,13 +172,14 @@ public class LineAcceptanceTest {
                 .extract().jsonPath().getList("name");
     }
 
-    private ExtractableResponse<Response> generateSubwayLine(LineCreateRequest request) {
+    private ExtractableResponse<Response> createSubwayLine(LineCreateRequest request) {
         return RestAssured
                 .given().log().all()
                 .body(request)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/lines")
                 .then().log().all()
+                .statusCode(HttpStatus.CREATED.value())
                 .extract();
     }
 }
