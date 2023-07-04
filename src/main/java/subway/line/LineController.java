@@ -81,13 +81,23 @@ public class LineController {
     @PostMapping("/lines/{id}/sections")
     public ResponseEntity<LineResponse> registerSection(@PathVariable Long id,
             @RequestBody SectionRequest sectionRequest) {
-        Station upStation = stationService.findStation(sectionRequest.getUpStationId());
-        Station downStation = stationService.findStation(sectionRequest.getDownStationId());
-        LineResponse line = lineService.addSection(id, upStation, downStation);
+        Station upstreamStation = stationService.findStation(sectionRequest.getUpStationId());
+        Station downstreamStation = stationService.findStation(sectionRequest.getDownStationId());
+        LineResponse line = lineService.addSection(id, upstreamStation, downstreamStation);
         return ResponseEntity.created(URI.create("/lines/" + line.getId()))
                 .header(HttpHeaders.VARY, HttpHeaders.ORIGIN)
                 .header(HttpHeaders.VARY, HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD)
                 .header(HttpHeaders.VARY, HttpHeaders.ACCESS_CONTROL_REQUEST_HEADERS)
                 .body(line);
+    }
+
+    @DeleteMapping("/lines/{id}/sections")
+    public ResponseEntity<Void> deleteSection(@PathVariable Long id, Long stationId) {
+        Station downStreamTerminusStation = stationService.findStation(stationId);
+        lineService.deleteSection(id, downStreamTerminusStation);
+        return ResponseEntity.noContent()
+                .header(HttpHeaders.VARY, HttpHeaders.ORIGIN)
+                .header(HttpHeaders.VARY, HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD)
+                .header(HttpHeaders.VARY, HttpHeaders.ACCESS_CONTROL_REQUEST_HEADERS).build();
     }
 }

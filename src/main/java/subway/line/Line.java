@@ -51,17 +51,28 @@ public class Line {
         this.color = color;
     }
 
-    public void addSection(Station upStation, Station downStation) {
-        if (!stations.get(getLastElementIndex()).equals(upStation)) {
+    public void addSection(Station upstreamStation, Station downstreamStation) {
+        if (!stations.get(getDownStreamTerminusStationIndex()).equals(upstreamStation)) {
             throw new MismatchedUpstreamStationException();
         }
-        if (stations.contains(downStation)) {
+        if (stations.contains(downstreamStation)) {
             throw new DownstreamStationIncludedException();
         }
-        stations.add(downStation);
+        stations.add(downstreamStation);
     }
 
-    private int getLastElementIndex() {
+    private int getDownStreamTerminusStationIndex() {
         return stations.size() - 1;
+    }
+
+    public void deleteSectionByDownStreamTerminusStation(Station downStreamTerminusStation) {
+        int downStreamTerminusStationIndex = getDownStreamTerminusStationIndex();
+        if (!stations.get(downStreamTerminusStationIndex).equals(downStreamTerminusStation)) {
+            throw new NonDownstreamTerminusException();
+        }
+        if (stations.size() == 2) {
+            throw new SingleSectionRemovalException();
+        }
+        stations.remove(downStreamTerminusStationIndex);
     }
 }

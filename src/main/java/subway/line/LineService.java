@@ -43,9 +43,15 @@ public class LineService {
     }
 
     @Transactional
-    public LineResponse addSection(Long id, Station upStation, Station downStation) {
+    public LineResponse addSection(Long id, Station upstreamStation, Station downstreamStation) {
         Line line = lineRepository.findById(id).orElseThrow();
-        line.addSection(upStation, downStation);
+        line.addSection(upstreamStation, downstreamStation);
         return LineResponse.from(line);
+    }
+
+    @Transactional
+    public void deleteSection(Long id, Station downStreamTerminusStation) {
+        Line line = lineRepository.findById(id).orElseThrow();
+        line.deleteSectionByDownStreamTerminusStation(downStreamTerminusStation);
     }
 }

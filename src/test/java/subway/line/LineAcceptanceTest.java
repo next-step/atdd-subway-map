@@ -89,6 +89,14 @@ public class LineAcceptanceTest {
                 .extract();
     }
 
+    private static ExtractableResponse<Response> 노선에서_구간_제거한다(int 종점역_아이디, int 노선_아이디) {
+        return RestAssured
+                .given().log().all().param("stationId", 종점역_아이디)
+                .when().delete("/lines/" + 노선_아이디 + "/sections")
+                .then().log().all()
+                .extract();
+    }
+
     private static List<String> 스테이션_이름_리스트(ExtractableResponse<Response> 지하철_노선_목록, int 위치) {
         return 지하철_노선_목록.jsonPath().getList("stations[" + 위치 + "].name", String.class);
     }
@@ -372,5 +380,108 @@ public class LineAcceptanceTest {
                 () -> assertThat(스테이션_아이디_리스트(조회된_신분당선)).size().isEqualTo(2)
         );
     }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * Given 구간도 추가하고
+     * When 여러구간의 종점역을 제거하면
+     * Then 마지막 구간이 제거된다
+     */
+    @DisplayName("구간 제거 성공")
+    @Test
+    void removeSectionSuccess() {
+        // given
+        int 강남역_아이디 = 아이디(지하철역을_생성한다("강남역"));
+        int 판교역_아이디 = 아이디(지하철역을_생성한다("판교역"));
+        int 정자역_아이디 = 아이디(지하철역을_생성한다("정자역"));
+        var 신분당선 = 지하철_노선_등록한다(
+                "신분당선",
+                "bg-red-600",
+                강남역_아이디,
+                판교역_아이디,
+                10);
+        int 신분당선_아이디 = 아이디(신분당선);
+        노선_구간을_등록한다(신분당선_아이디, 판교역_아이디, 정자역_아이디, 1);
+
+        // when
+        var 노선에서_구간_제거_결과 = 노선에서_구간_제거한다(정자역_아이디, 신분당선_아이디);
+
+        // then
+        var 조회된_신분당선 = 지하철_노선_조회한다(신분당선_아이디);
+        assertAll(
+                () -> assertThat(노선에서_구간_제거_결과.statusCode()).isEqualTo(
+                        HttpStatus.NO_CONTENT.value()),
+                () -> assertThat(스테이션_이름_리스트(조회된_신분당선)).doesNotContain("정자역"),
+                () -> assertThat(스테이션_아이디_리스트(조회된_신분당선)).doesNotContain(정자역_아이디)
+        );
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * Given 구간도 추가하고
+     * When 여러구간의 노선의 하행 종점역아닌 역을 제거하면
+     * Then 예외가 발생하고 역이 제거되지 않는다
+     */
+    @DisplayName("하행 종점역이 아니기 때문에 구간 제거 실패")
+    @Test
+    void removeSectionFailedByIsNotDownStreamTerminusStation() {
+        // given
+        int 강남역_아이디 = 아이디(지하철역을_생성한다("강남역"));
+        int 판교역_아이디 = 아이디(지하철역을_생성한다("판교역"));
+        int 정자역_아이디 = 아이디(지하철역을_생성한다("정자역"));
+        var 신분당선 = 지하철_노선_등록한다(
+                "신분당선",
+                "bg-red-600",
+                강남역_아이디,
+                판교역_아이디,
+                10);
+        int 신분당선_아이디 = 아이디(신분당선);
+        노선_구간을_등록한다(신분당선_아이디, 판교역_아이디, 정자역_아이디, 1);
+
+        // when
+        var 노선에서_구간_제거_결과 = 노선에서_구간_제거한다(판교역_아이디, 신분당선_아이디);
+
+        // then
+        var 조회된_신분당선 = 지하철_노선_조회한다(신분당선_아이디);
+        assertAll(
+                () -> assertThat(노선에서_구간_제거_결과.statusCode()).isEqualTo(
+                        HttpStatus.BAD_REQUEST.value()),
+                () -> assertThat(스테이션_이름_리스트(조회된_신분당선)).contains("판교역"),
+                () -> assertThat(스테이션_아이디_리스트(조회된_신분당선)).contains(판교역_아이디)
+        );
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 구간이 하나인 노선의 하행 종점역을 역을 제거하면
+     * Then 예외가 발생하고 역이 제거되지 않는다
+     */
+    @DisplayName("하행 종점역이 아니기 때문에 구간 제거 실패")
+    @Test
+    void removeSectionFailedByOnyOneSection() {
+        // given
+        int 강남역_아이디 = 아이디(지하철역을_생성한다("강남역"));
+        int 판교역_아이디 = 아이디(지하철역을_생성한다("판교역"));
+        var 신분당선 = 지하철_노선_등록한다(
+                "신분당선",
+                "bg-red-600",
+                강남역_아이디,
+                판교역_아이디,
+                10);
+        int 신분당선_아이디 = 아이디(신분당선);
+
+        // when
+        var 노선에서_구간_제거_결과 = 노선에서_구간_제거한다(판교역_아이디, 신분당선_아이디);
+
+        // then
+        var 조회된_신분당선 = 지하철_노선_조회한다(신분당선_아이디);
+        assertAll(
+                () -> assertThat(노선에서_구간_제거_결과.statusCode()).isEqualTo(
+                        HttpStatus.BAD_REQUEST.value()),
+                () -> assertThat(스테이션_이름_리스트(조회된_신분당선)).contains("판교역"),
+                () -> assertThat(스테이션_아이디_리스트(조회된_신분당선)).contains(판교역_아이디)
+        );
+    }
+
 
 }
