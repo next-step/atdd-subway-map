@@ -152,6 +152,37 @@ class LineAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 삭제하면
+     * Then 해당 지하철 노선 정보는 삭제된다
+     */
+    @DisplayName("지하철 노선을 삭제한다.")
+    @Test
+    void deleteLine() {
+        // given
+        지하철역을_생성한다("지하철역");
+        지하철역을_생성한다("새로운지하철역");
+
+        Map<String, Object> line = new HashMap<>();
+        line.put("name", "신분당선");
+        line.put("color", "bg-red-600");
+        line.put("upStationId", 1);
+        line.put("downStationId", 2);
+        line.put("distance", 10);
+
+        String lineId = 지하철노선을_생성한다(line)
+                .jsonPath()
+                .get("id")
+                .toString();
+
+        // when
+        ExtractableResponse<Response> response = 지하철노선을_삭제한다(lineId);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
     private static ExtractableResponse<Response> 지하철노선을_생성한다(Map<String, Object> params) {
         return RestAssured.given()
                 .body(params)
@@ -191,6 +222,16 @@ class LineAcceptanceTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post("/lines/" + lineId)
+                .then()
+                .log().all()
+                .extract();
+    }
+
+    public static ExtractableResponse<Response> 지하철노선을_삭제한다(String stationId) {
+        return RestAssured.given()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .delete("/lines/" + stationId)
                 .then()
                 .log().all()
                 .extract();

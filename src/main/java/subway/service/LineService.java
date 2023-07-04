@@ -52,4 +52,8 @@ public class LineService {
         lineRepository.save(line);
     }
 
+    @Transactional
+    public void delete(Long id) {
+        lineRepository.deleteById(id);
+    }
 }
