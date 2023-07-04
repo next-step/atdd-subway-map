@@ -1,8 +1,6 @@
 package subway;
 
 import io.restassured.RestAssured;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,38 +20,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class LineAcceptanceTest {
 
     //    When 지하철 노선을 생성하면
-    //    Then 지하철 노선이 생성된다
     //    Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
     @DisplayName("지하철 노선을 생성한다.")
     @Test
     void createLine() {
         // when
-        LineRequest request = new LineRequest(
-                "신분당선",
-                "bg-red-600",
-                1L,
-                2L,
-                10L
-        );
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .body(request)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/lines")
-                        .then().log().all()
-                        .extract();
+        지하철_노선을_생성한다("신분당선", "bg-red-600", 1L, 2L, 10L);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-        // then
-        List<String> lineNames = RestAssured.given().log().all()
-                        .when().get("/lines")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
-        assertThat(lineNames).containsAnyOf("신분당선");
+        List<String> lineNames = 지하철_노선_목록을_조회한다();
+        생성된_노선이_노선_목록에_포함된다(lineNames, "신분당선");
     }
-
 
     //    Given 2개의 지하철 노선을 생성하고
     //    When 지하철 노선 목록을 조회하면
@@ -89,13 +66,38 @@ public class LineAcceptanceTest {
                 .then().log().all();
 
         // when
-        List<String> lineNames = RestAssured.given().log().all()
-                        .when().get("/lines")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
+        List<String> lineNames = 지하철_노선_목록을_조회한다();
 
         // then
         assertThat(lineNames.size()).isEqualTo(2);
+    }
+
+    private static void 생성된_노선이_노선_목록에_포함된다(List<String> lineNames, String createdLineName) {
+        assertThat(lineNames).containsAnyOf(createdLineName);
+    }
+
+    private static List<String> 지하철_노선_목록을_조회한다() {
+        return RestAssured.given().log().all()
+                .when().get("/lines")
+                .then().log().all()
+                .extract().jsonPath().getList("name", String.class);
+    }
+
+    private static void 지하철_노선을_생성한다(String name, String color, Long upStationId, Long downStationId, Long distance) {
+        LineRequest request = new LineRequest(
+                name,
+                color,
+                upStationId,
+                downStationId,
+                distance
+        );
+
+        RestAssured.given().log().all()
+                .body(request)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines")
+                .then().log().all()
+                .statusCode(HttpStatus.CREATED.value());
     }
 
     //    Given 지하철 노선을 생성하고
