@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import subway.common.RestAssuredUtils;
 import subway.common.RestAssuredCondition;
+import subway.route.domain.Route;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,11 +21,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class RouteAcceptanceTest {
 
+    private final String ROUTE_API_URI = "/api/routes";
+    private final String SLASH = "/";
+
     /**
      * When 지하철 노선을 생성하면
      * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
      */
-    @DisplayName("지하철 노선을 생성한다.")
+    @DisplayName("지하철 노선을 생성 && 지하철노선 조회")
     @Test
     void createRoute() {
 
@@ -33,38 +37,64 @@ public class RouteAcceptanceTest {
 
         ExtractableResponse<Response> response =
                 RestAssuredUtils
-                        .create(new RestAssuredCondition("/api/routes", params));
+                        .create(new RestAssuredCondition(ROUTE_API_URI, params));
+        Route route = response.body().jsonPath().getObject(".", Route.class);
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
-        ExtractableResponse<Response> inquiryResponse =
+        ExtractableResponse<Response> inquiryStationsResponse =
                 RestAssuredUtils
-                        .inquriy(new RestAssuredCondition("/api/routes/" + response.body().jsonPath().getLong("id")));
+                        .inquriy(new RestAssuredCondition(ROUTE_API_URI + SLASH + route.getId()));
 
-        assertThat(inquiryResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(inquiryResponse.body().jsonPath().getString("name")).isEqualTo("2호선");
+        assertThat(inquiryStationsResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(inquiryStationsResponse.body().jsonPath().getObject(".", Route.class)).isEqualTo(route);
 
     }
 
-    @DisplayName("지하철 노선 목록을 조회한다.")
+    @DisplayName("지하철 노선 목록을 조회")
     @Test
     void inquiryRoutes() {
 
         Map<String, String> params = new HashMap<>();
         params.put("name", "1호선");
 
-        RestAssuredUtils.create(new RestAssuredCondition("/api/routes", params));
+        RestAssuredUtils.create(new RestAssuredCondition(ROUTE_API_URI, params));
 
         params.put("name", "2호선");
 
-        RestAssuredUtils.create(new RestAssuredCondition("/api/routes", params));
+        RestAssuredUtils.create(new RestAssuredCondition(ROUTE_API_URI, params));
 
         ExtractableResponse<Response> response =
                 RestAssuredUtils
-                        .inquriy(new RestAssuredCondition("/api/routes"));
+                        .inquriy(new RestAssuredCondition(ROUTE_API_URI));
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.body().jsonPath().getList("name", String.class).size()).isEqualTo(2);
+
+    }
+
+    @DisplayName("지하철 노선을 수정")
+    @Test
+    void updateRoute() {
+
+            Map<String, String> params = new HashMap<>();
+            params.put("name", "1호선");
+
+            ExtractableResponse<Response> response =
+                    RestAssuredUtils
+                            .create(new RestAssuredCondition(ROUTE_API_URI, params));
+            Route route = response.body().jsonPath().getObject(".", Route.class);
+
+            assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+            params.put("name", "2호선");
+
+            ExtractableResponse<Response> updateResponse =
+                    RestAssuredUtils
+                            .update(new RestAssuredCondition(ROUTE_API_URI + SLASH + route.getId(), params));
+
+            assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+            assertThat(updateResponse.body().jsonPath().getObject(".", Route.class).getName()).isEqualTo("2호선");
 
     }
 
