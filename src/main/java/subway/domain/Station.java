@@ -1,5 +1,6 @@
 package subway.domain;
 
+import java.util.Objects;
 import javax.persistence.*;
 
 @Entity
@@ -14,8 +15,8 @@ public class Station {
     public Station() {
     }
 
-    public boolean equalsId(Station station) {
-        return id.equals(station.getId());
+    public boolean equalsId(Long id) {
+        return Objects.equals(this.id, id);
     }
 
     public Station(String name) {

@@ -17,6 +17,8 @@ import subway.exception.LineDuplicationNameException;
 import subway.exception.LineNotFoundException;
 import subway.exception.SectionDuplicationStationException;
 import subway.exception.SectionNotConnectingStationException;
+import subway.exception.SectionRemoveLastStationException;
+import subway.exception.SectionRemoveSizeException;
 import subway.exception.StationNotFoundException;
 import subway.util.StationApiRequest;
 
@@ -27,8 +29,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine() {
         // given
-        StationResponse upStation = 지하철역_리스폰_변환(지하철역_생성_요청(강남역));
-        StationResponse downStation = 지하철역_리스폰_변환(지하철역_생성_요청(양재역));
+        StationResponse upStation = 지하철역_리스폰_변환(지하철역_생성_요청(신사역));
+        StationResponse downStation = 지하철역_리스폰_변환(지하철역_생성_요청(논현역));
 
         // when
         ExtractableResponse<Response> response = 지하철_노선_생성_요청(신분당선_이름, 신분당선_색상,
@@ -68,7 +70,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void crateLineFail2() {
         // given
-        StationResponse upStation = 지하철역_리스폰_변환(지하철역_생성_요청(강남역));
+        StationResponse upStation = 지하철역_리스폰_변환(지하철역_생성_요청(신사역));
 
         // when
         ExtractableResponse<Response> response = 지하철_노선_생성_요청(신분당선_이름, 신분당선_색상,
@@ -207,7 +209,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // given
         LineResponse 신분당선 = 지하철_노선_리스폰_변환(신분당선_생성());
         StationResponse upStation = 신분당선.getStations().get(1);
-        StationResponse downStation = 지하철역_리스폰_변환(지하철역_생성_요청(StationApiRequest.양재시민의숲역));
+        StationResponse downStation = 지하철역_리스폰_변환(지하철역_생성_요청(신논현역));
 
         // when
         ExtractableResponse<Response> response = 지하철_노선에_구간_생성_요청(신분당선.getId(), upStation.getId(),
@@ -230,8 +232,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void createSectionFail() {
         // given
         LineResponse 신분당선 = 지하철_노선_리스폰_변환(신분당선_생성());
-        StationResponse upStation = 지하철역_리스폰_변환(지하철역_생성_요청(StationApiRequest.양재시민의숲역));
-        StationResponse downStation = 지하철역_리스폰_변환(지하철역_생성_요청(StationApiRequest.청계산입구역));
+        StationResponse upStation = 지하철역_리스폰_변환(지하철역_생성_요청(StationApiRequest.신논현역));
+        StationResponse downStation = 지하철역_리스폰_변환(지하철역_생성_요청(StationApiRequest.강남역));
 
         // when
         ExtractableResponse<Response> response = 지하철_노선에_구간_생성_요청(신분당선.getId(), upStation.getId(),
@@ -271,5 +273,78 @@ public class LineAcceptanceTest extends AcceptanceTest {
             .isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(response.jsonPath().getString("message"))
             .isEqualTo(SectionDuplicationStationException.MESSAGE);
+    }
+
+    @DisplayName("지하철 노선에 구간을 삭제한다.")
+    @Test
+    void deleteSection() {
+        // given
+        LineResponse 신분당선 = 지하철_노선_리스폰_변환(신분당선_신사역_논현역_신논현역_구간_생성());
+        List<StationResponse> stations = 신분당선.getStations();
+        StationResponse removeStation = stations.get(stations.size() - 1);
+
+        // when
+        ExtractableResponse<Response> response = 지하철_노선에_구간_삭제_요청(신분당선.getId(),
+            removeStation.getId());
+
+        // then
+        지하철_노선에_구간이_삭제됨(response, 신분당선.getId(), removeStation.getName());
+    }
+
+    private void 지하철_노선에_구간이_삭제됨(ExtractableResponse<Response> response, Long lineId,
+        String removeStationName) {
+        List<String> lineNames = 지하철_노선_조회_요청(lineId).jsonPath()
+            .getList("stations.name", String.class);
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertThat(lineNames).doesNotContain(removeStationName);
+    }
+
+    @DisplayName("지하철 노선에 구간을 삭제할 떄 마지막 구간이 아닌 경우 실패한다.")
+    @Test
+    void deleteSectionFail() {
+        // given
+        LineResponse 신분당선 = 지하철_노선_리스폰_변환(신분당선_신사역_논현역_신논현역_구간_생성());
+        List<StationResponse> stations = 신분당선.getStations();
+        StationResponse removeStation = stations.get(stations.size() - 2);
+
+        // when
+        ExtractableResponse<Response> response = 지하철_노선에_구간_삭제_요청(신분당선.getId(),
+            removeStation.getId());
+
+        // then
+        마지막_구간이_아닌_경우_실패됨(response);
+    }
+
+    private void 마지막_구간이_아닌_경우_실패됨(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.jsonPath().getInt("status"))
+            .isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.jsonPath().getString("message"))
+            .isEqualTo(SectionRemoveLastStationException.MESSAGE);
+    }
+
+    @DisplayName("지하철 노선에 구간을 삭제할 때 구간이 1개인 경우 실패한다.")
+    @Test
+    void deleteSectionFail2() {
+        // given
+        LineResponse 신분당선 = 지하철_노선_리스폰_변환(신분당선_생성());
+        List<StationResponse> stations = 신분당선.getStations();
+        StationResponse removeStation = stations.get(stations.size() - 1);
+
+        // when
+        ExtractableResponse<Response> response = 지하철_노선에_구간_삭제_요청(신분당선.getId(),
+            removeStation.getId());
+
+        // then
+        구간이_1개인_경우_실패됨(response);
+    }
+
+    private void 구간이_1개인_경우_실패됨(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.jsonPath().getInt("status"))
+            .isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.jsonPath().getString("message"))
+            .isEqualTo(SectionRemoveSizeException.MESSAGE);
     }
 }

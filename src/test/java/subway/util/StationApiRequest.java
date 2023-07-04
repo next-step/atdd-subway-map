@@ -9,6 +9,9 @@ import subway.dto.StationResponse;
 
 public class StationApiRequest {
 
+    public static final String 신사역 = "신사역";
+    public static final String 논현역 = "논현역";
+    public static final String 신논현역 = "신논현역";
     public static final String 강남역 = "강남역";
     public static final String 양재역 = "양재역";
     public static final String 양재시민의숲역 = "양재시민의숲역";

@@ -38,13 +38,17 @@ public class Line {
         this.sections.addSection(section);
     }
 
-    public List<Station> getStations() {
-        return sections.getStations();
+    public void removeLastSection(Long stationId) {
+        this.sections.removeLastSection(stationId);
     }
 
     public void update(String name, String color) {
         this.name = name;
         this.color = color;
+    }
+
+    public List<Station> getStations() {
+        return sections.getStations();
     }
 
     public Long getId() {
