@@ -69,7 +69,7 @@ public class StationAcceptanceTest {
     void removeStation() {
         // given
         final String name = "강남역";
-        final int id = 지하철역_등록(name).jsonPath().getInt("id");
+        final long id = 지하철역_등록(name).jsonPath().getLong("id");
 
         // when
         final ExtractableResponse<Response> response = 지하철역_삭제(id);
@@ -99,7 +99,7 @@ public class StationAcceptanceTest {
                 .extract();
     }
 
-    ExtractableResponse<Response> 지하철역_삭제(final int id) {
+    ExtractableResponse<Response> 지하철역_삭제(final long id) {
         return RestAssured.
                 given().log().all()
                 .when().delete("/stations/"+ id)
