@@ -23,4 +23,10 @@ public class Line {
 
     @Column(nullable = false)
     private int distance;
+
+    public Long getId() { return id; }
+
+    public String getName() { return name; }
+
+    public void setId(Long id) { this.id = id; }
 }
