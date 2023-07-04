@@ -12,11 +12,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import subway.line.controller.dto.LineResponse;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("지하철 노선 관련 기능")
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -98,7 +101,7 @@ class LineAcceptanceTest {
         ExtractableResponse<Response> searchResponse = 지하철_노선_조회(savedId);
 
         //then
-        assertThat(searchResponse.statusCode()).isEqualTo(200);
+        assertThat(searchResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         LineResponse 신분당선 = searchResponse.jsonPath().getObject("", LineResponse.class);
         assertThat(신분당선.getId()).isEqualTo(savedId);
@@ -123,7 +126,7 @@ class LineAcceptanceTest {
         ExtractableResponse<Response> updateResponse =  지하철_노선_수정(savedId, "신신분당선", "bg-blue-100");
 
         //then
-        assertThat(updateResponse.statusCode()).isEqualTo(200);
+        assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         LineResponse 신신분당선 = 지하철_노선_조회(savedId).jsonPath().getObject("", LineResponse.class);
         assertThat(신신분당선.getId()).isEqualTo(savedId);
@@ -131,7 +134,36 @@ class LineAcceptanceTest {
         assertThat(신신분당선.getColor()).isEqualTo("bg-blue-100");
     }
 
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 삭제하면
+     * Then 해당 지하철 노선 정보는 삭제된다
+     */
 
+    @DisplayName("지하철 노선을 삭제한다")
+    @Test
+    void deleteLine() {
+        // given
+        ExtractableResponse<Response> response = 지하철_노선도_등록("신분당선",  "bg-red-600", 2L, 3L, 5);
+        Long savedId = response.jsonPath().getLong("id");
+
+        //when
+        ExtractableResponse<Response> deleteResponse =  지하철_노선_삭제(savedId);
+
+        //then
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertThrows(NotFoundException.class, () -> 지하철_노선_조회(savedId));
+    }
+
+
+
+    private ExtractableResponse<Response> 지하철_노선_삭제(Long id) {
+        String pathVariable = "/" + id;
+        return RestAssured.given().log().all()
+                .when().delete("/lines" + pathVariable)
+                .then().log().all()
+                .extract();
+    }
 
     private ExtractableResponse<Response> 지하철_노선_수정(Long id, String name, String color) {
         String pathVariable = "/" + id;
