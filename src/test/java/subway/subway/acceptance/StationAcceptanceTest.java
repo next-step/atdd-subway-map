@@ -1,30 +1,30 @@
-package subway;
+package subway.subway.acceptance;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.platform.commons.util.StringUtils;
 import org.springframework.http.MediaType;
+import subway.AcceptanceTest;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * 지하철역 관련 api 스펙을 함수로 정의한다.
+ * 지하철 관련 api 스펙을 함수로 정의한다.
  */
 @DisplayName("지하철역 관련 기능")
 public abstract class StationAcceptanceTest extends AcceptanceTest {
 
     /**
-     * 지하철 노선 생성 요청을 합니다
-     * @param name 지하철 노선 이름
-     * @return 지하철 노선 생성 요청 결과
+     * 지하철 역 생성 요청을 합니다
+     * @param name 지하철 역 이름
+     * @return 지하철 역 생성 요청 결과
      */
-    protected ExtractableResponse<Response> 지하철역_생성(String name) {
-        ParamBuilder params = new ParamBuilder()
+    protected ExtractableResponse<Response> 지하철_역_생성(String name) {
+        RequestBuilder params = new RequestBuilder()
                 .add("name", name);
 
         return RestAssured
@@ -37,8 +37,8 @@ public abstract class StationAcceptanceTest extends AcceptanceTest {
     }
 
     /**
-     * 지하철 노선 조회 요청합니다
-     * @return 지하철 노선 조회 요청 결과
+     * 지하철 역 조회 요청합니다
+     * @return 지하철 역 조회 요청 결과
      */
     protected ExtractableResponse<Response> 지하철역_목록_조회() {
 
@@ -51,25 +51,32 @@ public abstract class StationAcceptanceTest extends AcceptanceTest {
 
     /**
      * 존재하는 지하철역 중 name 을 가진 역이 있는지 확인합니다.
-     * @param name 확인할 지하철 노선 이름
+     * @param names 확인할 지하철 노선 이름들
      */
-    protected void 지하철역_목록_포함_여부_확인(String name) {
+    protected void 지하철역_목록_포함_여부_확인(String... names) {
 
         ExtractableResponse<Response> response = 지하철역_목록_조회();
 
-        List<String> names = response.jsonPath().getList("name", String.class);
-        Assertions.assertThat(names).containsExactly(name);
+        지하철역_목록_포함_여부_확인(response, names);
+    }
+
+    /**
+     * 지하철 역 목록 조회 응답 결과 중 지하철 역 중 names 을 가진 역이 있는지 확인합니다.
+     * @param response 지하철 역 목록 조회 응답 결과
+     * @param names 확인할 지하철 역 이름들
+     */
+    protected void 지하철역_목록_포함_여부_확인(ExtractableResponse<Response> response, String... names) {
+        List<String> nameResponses = response.jsonPath().getList("name", String.class);
+        Assertions.assertThat(nameResponses).containsExactly(names);
     }
 
     /**
      * name 을 가진 지하철역을 삭제 요청을 합니다
-     * @param name 지하철 노선 이름
-     * @return 지하철 노선 삭제 요청 결과
+     * @param name 지하철 역 이름
+     * @return 지하철 역 삭제 요청 결과
      */
     protected ExtractableResponse<Response> 지하철역_삭제(String name) {
-        ExtractableResponse<Response> response = 지하철역_목록_조회();
-
-        long id = response.jsonPath().param("name", name).getLong("find { node -> node.name == name }.id");
+        long id = 지하철_역_식별자_조회(name);
 
         return RestAssured
                 .given().log().all()
@@ -77,6 +84,17 @@ public abstract class StationAcceptanceTest extends AcceptanceTest {
                 .when().delete("/stations/{id}", id)
                 .then().log().all()
                 .extract();
+    }
+
+    /**
+     * name 을 가진 지하철 역의 식별자를 조회합니다
+     * @param name 지하철 역 이름
+     * @return 지하철 역 식별자
+     */
+    public long 지하철_역_식별자_조회(String name) {
+        ExtractableResponse<Response> response = 지하철역_목록_조회();
+
+        return response.jsonPath().param("name", name).getLong("find { node -> node.name == name }.id");
     }
 
     /**
@@ -90,4 +108,7 @@ public abstract class StationAcceptanceTest extends AcceptanceTest {
         List<String> names = response.jsonPath().getList("name", String.class);
         Assertions.assertThat(names).doesNotContain(name);
     }
+
+
+
 }

@@ -1,19 +1,21 @@
-package subway;
+package subway.rds_module.entity;
 
 import javax.persistence.*;
 
 @Entity
-public class Station {
+@Table(name = "stations")
+public class StationJpa {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "station_id")
     private Long id;
     @Column(length = 20, nullable = false)
     private String name;
 
-    public Station() {
+    public StationJpa() {
     }
 
-    public Station(String name) {
+    public StationJpa(String name) {
         this.name = name;
     }
 

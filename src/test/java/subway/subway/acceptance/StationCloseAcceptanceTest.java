@@ -1,4 +1,4 @@
-package subway;
+package subway.subway.acceptance;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -6,7 +6,8 @@ import org.junit.jupiter.api.Test;
 /**
  * 지하철역 제거 인수 테스트를 합니다.
  */
-public class DeleteStationAcceptanceTest extends StationAcceptanceTest {
+@DisplayName("지하철역 제거 인수 테스트")
+public class StationCloseAcceptanceTest extends StationAcceptanceTest {
 
     /**
      * Given 지하철역을 생성하고<br>
@@ -17,7 +18,7 @@ public class DeleteStationAcceptanceTest extends StationAcceptanceTest {
     @DisplayName("지하철역을 제거한다.")
     void deleteStation() {
         //given
-        지하철역_생성("강남역");
+        지하철_역_생성("강남역");
         //when
         지하철역_삭제("강남역");
         //then

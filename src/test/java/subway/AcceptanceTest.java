@@ -28,8 +28,15 @@ public abstract class AcceptanceTest extends ParentTest{
     void setUp() {
         RestAssured.port = port;
     }
-    @Autowired
-    protected EntityManager entityManager;
+    @Autowired protected EntityManager entityManager;
+    @Autowired private DatabaseCleanUp databaseCleanUp;
+
+    @BeforeEach
+    void init() {
+        databaseCleanUp.afterPropertiesSet();
+        databaseCleanUp.execute();
+    }
+
 
     /**
      * 생성 요청에 대한 응답을 확인한다.
@@ -42,10 +49,10 @@ public abstract class AcceptanceTest extends ParentTest{
     /**
      * query parameter 를 정의한다.
      */
-    protected class ParamBuilder {
+    protected static class RequestBuilder {
         private final Map<String, String> params;
 
-        protected ParamBuilder() {
+        public RequestBuilder() {
             this.params = new HashMap<>();
         }
 
@@ -55,32 +62,32 @@ public abstract class AcceptanceTest extends ParentTest{
          * @param value query parameter 의 value
          * @return query parameter 가 추가된 결과를 뱉는다.
          */
-        public ParamBuilder add(String key, String value) {
+        public RequestBuilder add(String key, String value) {
             params.put(key, value);
             return this;
         }
 
-        public ParamBuilder add(String key, int value) {
+        public RequestBuilder add(String key, int value) {
             return add(key, String.valueOf(value));
         }
 
-        public ParamBuilder add(String key, long value) {
+        public RequestBuilder add(String key, long value) {
             return add(key, String.valueOf(value));
         }
 
-        public ParamBuilder add(String key, char value) {
+        public RequestBuilder add(String key, char value) {
             return add(key, String.valueOf(value));
         }
 
-        public ParamBuilder add(String key, double value) {
+        public RequestBuilder add(String key, double value) {
             return add(key, String.valueOf(value));
         }
 
-        public ParamBuilder add(String key, float value) {
+        public RequestBuilder add(String key, float value) {
             return add(key, String.valueOf(value));
         }
 
-        public ParamBuilder add(String key, boolean value) {
+        public RequestBuilder add(String key, boolean value) {
             return add(key, String.valueOf(value));
         }
 

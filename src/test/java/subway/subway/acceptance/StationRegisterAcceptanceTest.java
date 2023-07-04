@@ -1,4 +1,4 @@
-package subway;
+package subway.subway.acceptance;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -10,7 +10,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * 지하철역 생성 인수 테스트를 합니다.
  */
-public class CreateStationAcceptanceTest extends StationAcceptanceTest{
+@DisplayName("지하철역 생성 인수 테스트")
+public class StationRegisterAcceptanceTest extends StationAcceptanceTest {
     /**
      * When 지하철역을 생성하면<br>
      * Then 지하철역이 생성된다<br>
@@ -20,7 +21,7 @@ public class CreateStationAcceptanceTest extends StationAcceptanceTest{
     @Test
     void createStation() {
         // when
-        ExtractableResponse<Response> response = 지하철역_생성("강남역");
+        ExtractableResponse<Response> response = 지하철_역_생성("강남역");
 
         // then
         생성_성공_확인(response);
