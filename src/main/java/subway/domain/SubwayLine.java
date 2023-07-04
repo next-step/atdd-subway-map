@@ -1,9 +1,11 @@
 package subway.domain;
 
+import subway.service.command.SubwayLineCreateCommand;
+
 import javax.persistence.*;
 
 @Entity
-public class StationLine {
+public class SubwayLine {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,10 +26,10 @@ public class StationLine {
     @Column(nullable = false)
     private Long distance;
 
-    protected StationLine() {
+    protected SubwayLine() {
     }
 
-    public StationLine(String name, String color, Long upStationId, Long downStationId, Long distance) {
+    private SubwayLine(String name, String color, Long upStationId, Long downStationId, Long distance) {
         this.name = name;
         this.color = color;
         this.upStationId = upStationId;
@@ -35,8 +37,8 @@ public class StationLine {
         this.distance = distance;
     }
 
-    public static StationLine create(String name, String color, Long upStationId, Long downStationId, Long distance) {
-        return new StationLine(name, color, upStationId, downStationId, distance);
+    public static SubwayLine create(SubwayLineCreateCommand createCommand) {
+        return new SubwayLine(createCommand.getName(), createCommand.getColor(), createCommand.getUpStationId(), createCommand.getDownStationId(), createCommand.getDistance());
     }
 
     public Long getId() {

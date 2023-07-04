@@ -1,9 +1,9 @@
 package subway.controller.request;
 
 
-import subway.service.command.StationLineCreateCommand;
+import subway.service.command.SubwayLineCreateCommand;
 
-public class StationLineCreateRequest implements StationLineCreateCommand {
+public class SubwayLineCreateRequest implements SubwayLineCreateCommand {
 
     private String name;
     private String color;

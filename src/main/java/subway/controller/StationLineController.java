@@ -2,10 +2,10 @@ package subway.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import subway.controller.request.StationLineCreateRequest;
-import subway.controller.request.StationLineModifyRequest;
-import subway.controller.resonse.StationLineResponse;
-import subway.service.StationLineService;
+import subway.controller.request.SubwayLineCreateRequest;
+import subway.controller.request.SubwayLineModifyRequest;
+import subway.controller.resonse.SubwayLineResponse;
+import subway.service.SubwayLineService;
 
 import java.net.URI;
 import java.util.List;
@@ -13,38 +13,38 @@ import java.util.List;
 @RestController
 public class StationLineController {
 
-    private final StationLineService stationLineService;
+    private final SubwayLineService subwayLineService;
 
-    public StationLineController(StationLineService stationLineService) {
-        this.stationLineService = stationLineService;
+    public StationLineController(SubwayLineService subwayLineService) {
+        this.subwayLineService = subwayLineService;
     }
 
     @PostMapping("/lines")
-    public ResponseEntity<StationLineResponse> createStationLine(@RequestBody StationLineCreateRequest stationLineCreateRequest) {
-        StationLineResponse stationLineResponse = stationLineService.saveStationLine(stationLineCreateRequest);
-        return ResponseEntity.created(URI.create("/lines/" + stationLineResponse.getId())).body(stationLineResponse);
+    public ResponseEntity<SubwayLineResponse> createStationLine(@RequestBody SubwayLineCreateRequest subwayLineCreateRequest) {
+        SubwayLineResponse subwayLineResponse = subwayLineService.saveStationLine(subwayLineCreateRequest);
+        return ResponseEntity.created(URI.create("/lines/" + subwayLineResponse.getId())).body(subwayLineResponse);
     }
 
 
     @GetMapping("/lines")
-    public ResponseEntity<List<StationLineResponse>> showStationLines() {
-        return ResponseEntity.ok().body(stationLineService.findAllStationLines());
+    public ResponseEntity<List<SubwayLineResponse>> showStationLines() {
+        return ResponseEntity.ok().body(subwayLineService.findAllSubwayLines());
     }
 
     @GetMapping("/lines/{id}")
-    public ResponseEntity<StationLineResponse> showStationLine(@PathVariable Long id) {
-        return ResponseEntity.ok().body(stationLineService.findStationLine(id));
+    public ResponseEntity<SubwayLineResponse> showStationLine(@PathVariable Long id) {
+        return ResponseEntity.ok().body(subwayLineService.findSubwayLine(id));
     }
 
     @PutMapping("/lines/{id}")
-    public ResponseEntity<Void> modifyStationLine(@PathVariable Long id, @RequestBody StationLineModifyRequest stationLineModifyRequest) {
-        stationLineService.modifyStationLine(id, stationLineModifyRequest);
+    public ResponseEntity<Void> modifyStationLine(@PathVariable Long id, @RequestBody SubwayLineModifyRequest subwayLineModifyRequest) {
+        subwayLineService.modifySubwayLine(id, subwayLineModifyRequest);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/lines/{id}")
     public ResponseEntity<Void> deleteStationLine(@PathVariable Long id) {
-        stationLineService.deleteStationLineById(id);
+        subwayLineService.deleteSubwayLineById(id);
         return ResponseEntity.noContent().build();
     }
 
