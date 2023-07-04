@@ -20,6 +20,7 @@ class LineAcceptanceTest {
 
     private final static String 신분당선 = "신분당선";
     private final static String 분당선 = "분당선";
+    private static final String 다른분당선 = "다른분당선";
     private final static String red = "bg-red-600";
     private final static String green = "bg-green-600";
     private final static long 지하철역_id = 1;
@@ -44,6 +45,7 @@ class LineAcceptanceTest {
         Assertions.assertAll(
             () -> assertThat(response.jsonPath().getLong("id")).isEqualTo(1L),
             () -> assertThat(response.jsonPath().getString("name")).isEqualTo(신분당선),
+            () -> assertThat(response.jsonPath().getString("color")).isEqualTo(red),
             () -> assertThat(response.jsonPath().getList("stations")).hasSize(2),
             () -> assertThat(response.jsonPath().getList("stations.id")).contains(
                 Long.valueOf(지하철역_id).intValue(),
@@ -114,21 +116,17 @@ class LineAcceptanceTest {
     void getStationLine() {
 
         //given
-        ExtractableResponse<Response> 신규_등록_노선 = 지하철역_노선_등록_요청(신분당선, red, 지하철역_id, 새로운지하철역_id,
-            distance);
+        long 신규등록_노선_id = 지하철역_노선_등록_요청(신분당선, red, 지하철역_id, 새로운지하철역_id, distance).jsonPath()
+            .getLong("id");
 
         //when
-        ExtractableResponse<Response> response = RestAssured
-            .given().log().all()
-            .when().get("/lines/{id}", 신규_등록_노선.jsonPath().getLong("id"))
-            .then().log().all()
-            .statusCode(HttpStatus.OK.value())
-            .extract();
+        ExtractableResponse<Response> response = 지하철역_노선_단건_조회(신규등록_노선_id);
 
         //then
         Assertions.assertAll(
             () -> assertThat(response.jsonPath().getLong("id")).isEqualTo(1L),
             () -> assertThat(response.jsonPath().getString("name")).isEqualTo(신분당선),
+            () -> assertThat(response.jsonPath().getString("color")).isEqualTo(red),
             () -> assertThat(response.jsonPath().getList("stations")).hasSize(2),
             () -> assertThat(response.jsonPath().getList("stations.id")).contains(
                 Long.valueOf(지하철역_id).intValue(),
@@ -136,5 +134,48 @@ class LineAcceptanceTest {
             )
         );
 
+    }
+
+    private static ExtractableResponse<Response> 지하철역_노선_단건_조회(long 신규_등록_노선_id) {
+        return RestAssured
+            .given().log().all()
+            .when().get("/lines/{id}", 신규_등록_노선_id)
+            .then().log().all()
+            .statusCode(HttpStatus.OK.value())
+            .extract();
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고 <br> When 생성한 지하철 노선을 수정하면 <br> Then 해당 지하철 노선 정보는 수정된다 <br>
+     */
+    @DisplayName("지하철 노선 수정")
+    @Test
+    void modifyStationLine() {
+
+        //given
+        long 신규등록_노선_id = 지하철역_노선_등록_요청(신분당선, red, 지하철역_id, 새로운지하철역_id, distance).jsonPath()
+            .getLong("id");
+
+        Map<String, String> params = new HashMap<>();
+        params.put("name", 다른분당선);
+        params.put("color", red);
+
+        //when
+        RestAssured
+            .given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(params)
+            .when().put("lines/{id}", 신규등록_노선_id)
+            .then().log().all()
+            .statusCode(HttpStatus.OK.value())
+            .extract();
+
+        //then
+        ExtractableResponse<Response> response = 지하철역_노선_단건_조회(신규등록_노선_id);
+
+        Assertions.assertAll(
+            () -> assertThat(response.jsonPath().getString("name")).isEqualTo(다른분당선),
+            () -> assertThat(response.jsonPath().getString("color")).isEqualTo(red)
+        );
     }
 }

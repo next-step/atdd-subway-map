@@ -7,15 +7,16 @@ public class StationLineResponse {
 
     private Long id;
     private String name;
+    private String color;
     private List<StationResponse> stations;
-    private int distance;
 
     public StationLineResponse() {
     }
 
-    public StationLineResponse(Long id, String name, List<StationResponse> stations) {
+    public StationLineResponse(Long id, String name, String color, List<StationResponse> stations) {
         this.id = id;
         this.name = name;
+        this.color = color;
         this.stations = stations;
     }
 
@@ -23,6 +24,7 @@ public class StationLineResponse {
         return new StationLineResponse(
             entity.getId(),
             entity.getName(),
+            entity.getColor(),
             List.of(
                 new StationResponse(entity.getUpStationId(), "상행 종점"),
                 new StationResponse(entity.getDownStationId(), "하행 종점")
@@ -42,7 +44,7 @@ public class StationLineResponse {
         return stations;
     }
 
-    public int getDistance() {
-        return distance;
+    public String getColor() {
+        return color;
     }
 }

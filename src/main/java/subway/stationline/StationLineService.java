@@ -36,8 +36,21 @@ public class StationLineService {
     }
 
     public StationLineResponse findById(long id) {
-        return StationLineResponse.of(repository.findById(id).orElseThrow(
+        return StationLineResponse.of(findEntityById(id));
+    }
+
+    private StationLine findEntityById(long id) {
+        return repository.findById(id).orElseThrow(
             () -> new NullPointerException("해당하는 id 에 맞는 지하철 노선이 존재하지 않습니다.")
-        ));
+        );
+    }
+
+    public void modify(long id, StationLineModifyRequest request) {
+
+        StationLine stationLine = findEntityById(id);
+        stationLine.updateName(request.getName());
+        stationLine.updateColor(request.getColor());
+
+        repository.save(stationLine);
     }
 }
