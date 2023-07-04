@@ -7,6 +7,8 @@ import subway.route.dto.RouteResponse;
 import subway.route.repository.RouteRepository;
 
 import javax.transaction.Transactional;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -31,5 +33,11 @@ public class RouteService {
         return routeRepository.findById(id)
                 .map(RouteResponse::new)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 노선입니다."));
+    }
+
+    public List<RouteResponse> inquiryRoutes() {
+        return routeRepository.findAll().stream()
+                .map(RouteResponse::new)
+                .collect(Collectors.toList());
     }
 }

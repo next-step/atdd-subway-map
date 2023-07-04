@@ -8,6 +8,7 @@ import subway.route.dto.RouteResponse;
 import subway.route.service.RouteService;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/routes")
@@ -29,6 +30,12 @@ public class RouteController {
     public ResponseEntity<RouteResponse> inquiryRoute(@PathVariable Long id) {
         RouteResponse route = routeService.inquiryRoute(id);
         return ResponseEntity.ok().body(route);
+    }
+
+    @GetMapping("")
+    public ResponseEntity<List<RouteResponse>> inquiryRoutes() {
+        List<RouteResponse> routes = routeService.inquiryRoutes();
+        return ResponseEntity.ok().body(routes);
     }
 
 
