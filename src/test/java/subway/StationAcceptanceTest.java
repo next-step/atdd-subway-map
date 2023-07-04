@@ -1,18 +1,15 @@
 package subway;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+import static helper.StationTestHelper.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
@@ -84,42 +81,5 @@ class StationAcceptanceTest {
         // then
         List<String> stationNames = 지하철역_목록을_조회한다();
         assertThat(stationNames).doesNotContain("신논현역");
-    }
-
-    private static ExtractableResponse<Response> 지하철역을_생성한다(String name) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-
-        ExtractableResponse<Response> response =
-                RestAssured.given()
-                        .body(params)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when()
-                        .post("/stations")
-                        .then()
-                        .log().all()
-                        .extract();
-        return response;
-    }
-
-    private static ExtractableResponse<Response> 지하철역을_삭제한다(String stationId) {
-        return RestAssured.given()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .delete("/stations/" + stationId)
-                .then()
-                .log().all()
-                .extract();
-    }
-
-    private static List<String> 지하철역_목록을_조회한다() {
-        return RestAssured
-                .given()
-                .when().get("/stations")
-                .then()
-                .log().all()
-                .extract()
-                .jsonPath()
-                .getList("name", String.class);
     }
 }

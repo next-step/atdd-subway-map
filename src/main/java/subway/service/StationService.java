@@ -25,6 +25,11 @@ public class StationService {
         return createStationResponse(station);
     }
 
+    public Station findStationById(Long id) {
+        return stationRepository.findById(id)
+                .orElseThrow();
+    }
+
     public List<StationResponse> findAllStations() {
         return stationRepository.findAll().stream()
                 .map(this::createStationResponse)
