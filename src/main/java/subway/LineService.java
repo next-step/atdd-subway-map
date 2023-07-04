@@ -43,4 +43,9 @@ public class LineService {
                 .map(this::createLineResponse)
                 .collect(Collectors.toList());
     }
+
+    public LineResponse findLineById(Long id) {
+        LineEntity lineEntity = lineRepository.findById(id).orElseThrow(() -> new RuntimeException("Not Exist Line"));
+        return createLineResponse(lineEntity);
+    }
 }

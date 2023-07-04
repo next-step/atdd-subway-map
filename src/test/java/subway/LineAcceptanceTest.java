@@ -71,8 +71,12 @@ public class LineAcceptanceTest {
         assertThat(createdLine).isEqualTo(selectedLine);
     }
 
-    private ExtractableResponse<Response> 지하철_노선을_조회한다(String location) {
-        return null;
+    private ExtractableResponse<Response> 지하철_노선을_조회한다(String createdResourceUrl) {
+        return RestAssured.given().log().all()
+                .when().get(createdResourceUrl)
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract();
     }
 
     private static void 생성한_갯수의_지하철_노선_목록을_응답한다(List<String> lineNames, int createdCount) {
