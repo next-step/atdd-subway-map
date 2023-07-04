@@ -9,6 +9,7 @@ import subway.route.repository.RouteRepository;
 import javax.transaction.Transactional;
 
 @Service
+@Transactional
 public class RouteService {
 
     private final RouteRepository routeRepository;
@@ -17,7 +18,6 @@ public class RouteService {
         this.routeRepository = routeRepository;
     }
 
-    @Transactional
     public RouteResponse saveRoute(RouteRequest routeRequest) {
         routeRepository.findByName(routeRequest.getName())
                 .ifPresent(route -> {
@@ -27,4 +27,9 @@ public class RouteService {
         return new RouteResponse(route);
     }
 
+    public RouteResponse inquiryRoute(Long id) {
+        return routeRepository.findById(id)
+                .map(RouteResponse::new)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 노선입니다."));
+    }
 }

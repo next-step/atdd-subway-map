@@ -41,7 +41,8 @@ public class RouteAcceptanceTest {
                 RestAssuredUtils
                         .inquriy(new RestAssuredCondition("/api/routes/" + response.body().jsonPath().getLong("id")));
 
-
+        assertThat(inquiryResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(inquiryResponse.body().jsonPath().getString("name")).isEqualTo("2호선");
 
     }
 
