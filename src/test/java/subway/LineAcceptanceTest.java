@@ -43,6 +43,7 @@ class LineAcceptanceTest {
 
         //then
         Assertions.assertAll(
+            () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
             () -> assertThat(response.jsonPath().getLong("id")).isEqualTo(1L),
             () -> assertThat(response.jsonPath().getString("name")).isEqualTo(신분당선),
             () -> assertThat(response.jsonPath().getString("color")).isEqualTo(red),
@@ -74,7 +75,6 @@ class LineAcceptanceTest {
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .when().post("/lines")
             .then().log().all()
-            .assertThat().statusCode(HttpStatus.CREATED.value())
             .extract();
     }
 
@@ -102,6 +102,7 @@ class LineAcceptanceTest {
 
         //then
         Assertions.assertAll(
+            () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
             () -> assertThat(response.jsonPath().getList("")).hasSize(2),
             () -> assertThat(response.jsonPath().getList("name")).containsOnly(신분당선, 분당선)
         );
@@ -124,6 +125,7 @@ class LineAcceptanceTest {
 
         //then
         Assertions.assertAll(
+            () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
             () -> assertThat(response.jsonPath().getLong("id")).isEqualTo(1L),
             () -> assertThat(response.jsonPath().getString("name")).isEqualTo(신분당선),
             () -> assertThat(response.jsonPath().getString("color")).isEqualTo(red),
@@ -141,7 +143,6 @@ class LineAcceptanceTest {
             .given().log().all()
             .when().get("/lines/{id}", 신규_등록_노선_id)
             .then().log().all()
-            .statusCode(HttpStatus.OK.value())
             .extract();
     }
 
@@ -167,15 +168,44 @@ class LineAcceptanceTest {
             .body(params)
             .when().put("lines/{id}", 신규등록_노선_id)
             .then().log().all()
-            .statusCode(HttpStatus.OK.value())
             .extract();
 
         //then
         ExtractableResponse<Response> response = 지하철역_노선_단건_조회(신규등록_노선_id);
 
         Assertions.assertAll(
+            () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
             () -> assertThat(response.jsonPath().getString("name")).isEqualTo(다른분당선),
             () -> assertThat(response.jsonPath().getString("color")).isEqualTo(red)
         );
     }
+
+    /**
+     * Given 지하철 노선을 생성하고 <br> When 생성한 지하철 노선을 삭제하면 <br> Then 해당 지하철 노선 정보는 삭제된다 <br>
+     */
+    @DisplayName("지하철 노선 삭제")
+    @Test
+    void deleteStationLine() {
+
+        //given
+        long 신규_등록_노선_id = 지하철역_노선_등록_요청(신분당선, red, 지하철역_id, 새로운지하철역_id, distance).jsonPath()
+            .getLong("id");
+
+        //when
+        RestAssured
+            .given().log().all()
+            .when().delete("lines/{id}", 신규_등록_노선_id)
+            .then().log().all()
+            .statusCode(HttpStatus.NO_CONTENT.value());
+
+        //then
+        ExtractableResponse<Response> response = 지하철역_노선_단건_조회(신규_등록_노선_id);
+
+        Assertions.assertAll(
+            () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
+            () -> assertThat(response.jsonPath().getString("message")).isEqualTo("해당하는 id 에 맞는 지하철 노선이 존재하지 않습니다.")
+        );
+
+    }
+
 }
