@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
+import subway.domain.Station;
 
 import java.util.HashMap;
 import java.util.List;
@@ -15,6 +17,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@DirtiesContext
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationAcceptanceTest {
@@ -66,7 +69,7 @@ public class StationAcceptanceTest {
         지하철역을_생성한다(독바위역);
 
         // when
-        ExtractableResponse<Response> response = 지하철역을_조회한다();
+        ExtractableResponse<Response> response = 지하철역을_모두_조회한다();
         List<Station> stations = response.jsonPath().getList(".", Station.class);
 
         // then
@@ -89,7 +92,7 @@ public class StationAcceptanceTest {
         지하철역을_삭제한다(createStation.getId());
 
         // then
-        ExtractableResponse<Response> response = 지하철역을_조회한다();
+        ExtractableResponse<Response> response = 지하철역을_모두_조회한다();
         List<String> stationNames = response.jsonPath().getList("name", String.class);
 
         assertThat(stationNames).doesNotContain(독바위역);
@@ -123,7 +126,7 @@ public class StationAcceptanceTest {
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
-    private ExtractableResponse<Response> 지하철역을_조회한다() {
+    private ExtractableResponse<Response> 지하철역을_모두_조회한다() {
         return RestAssured
                 .given().log().all()
                 .when()
