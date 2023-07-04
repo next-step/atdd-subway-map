@@ -11,7 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
-import subway.helper.SubwayHelper;
+import subway.helper.SubwayLineHelper;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,7 +33,7 @@ public class SubwayLineAcceptanceTest {
     @BeforeEach
     void setUp() {
         for (String stationName : stationDataSet) {
-            SubwayHelper.지하철_노션에_지하철_역_요청(stationName);
+            SubwayLineHelper.지하철_노션에_지하철_역_요청(stationName);
         }
     }
 
@@ -48,9 +48,9 @@ public class SubwayLineAcceptanceTest {
         ExtractableResponse<Response> createSubwayLineApiResponse = RestAssured
                 .given().log().all()
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
-                    .body(SubwayHelper.SUBWAY_LIEN_PARAMETERS_1)
+                    .body(SubwayLineHelper.SUBWAY_LIEN_PARAMETERS_1)
                 .when().log().all()
-                    .post(SubwayHelper.SUBWAY_LINE_API_URL)
+                    .post(SubwayLineHelper.SUBWAY_LINE_API_URL)
                 .then().log().all()
                     .extract();
 
@@ -58,7 +58,7 @@ public class SubwayLineAcceptanceTest {
         String actualSubwayLineName = RestAssured
                 .given().log().all()
                 .when().log().all()
-                    .get(SubwayHelper.SUBWAY_LINE_API_URL)
+                    .get(SubwayLineHelper.SUBWAY_LINE_API_URL)
                 .then().log().all()
                 .extract()
                     .jsonPath().getString("name");
@@ -76,18 +76,18 @@ public class SubwayLineAcceptanceTest {
     void showSubwayLines() {
         // given
         List<Map<String, Object>> parametersList = new ArrayList<>();
-        parametersList.add(SubwayHelper.SUBWAY_LIEN_PARAMETERS_1);
-        parametersList.add(SubwayHelper.SUBWAY_LIEN_PARAMETERS_2);
+        parametersList.add(SubwayLineHelper.SUBWAY_LIEN_PARAMETERS_1);
+        parametersList.add(SubwayLineHelper.SUBWAY_LIEN_PARAMETERS_2);
 
         for (Map<String, Object> parameters : parametersList) {
-            SubwayHelper.지하철_노션_요청(parameters);
+            SubwayLineHelper.지하철_노션_요청(parameters);
         }
 
         // when
         List<String> subwayLineNames = RestAssured
                 .given().log().all()
                 .when().log().all()
-                    .get(SubwayHelper.SUBWAY_LINE_API_URL)
+                    .get(SubwayLineHelper.SUBWAY_LINE_API_URL)
                 .then().log().all()
                 .extract()
                     .jsonPath().getList("name", String.class);
@@ -105,8 +105,8 @@ public class SubwayLineAcceptanceTest {
     @Test
     void showSubwayLine() {
         // given
-        ExtractableResponse<Response> createSubwayLineApiResponse = SubwayHelper
-                .지하철_노션_요청(SubwayHelper.SUBWAY_LIEN_PARAMETERS_1);
+        ExtractableResponse<Response> createSubwayLineApiResponse = SubwayLineHelper
+                .지하철_노션_요청(SubwayLineHelper.SUBWAY_LIEN_PARAMETERS_1);
         String createSubwayLineApiResponseId = createSubwayLineApiResponse.jsonPath()
                 .getString("id");
 
@@ -114,7 +114,7 @@ public class SubwayLineAcceptanceTest {
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .when().log().all()
-                    .get(SubwayHelper.SUBWAY_LINE_API_URL + "/" + createSubwayLineApiResponseId)
+                    .get(SubwayLineHelper.SUBWAY_LINE_API_URL + "/" + createSubwayLineApiResponseId)
                 .then().log().all()
                 .extract();
 
@@ -137,8 +137,8 @@ public class SubwayLineAcceptanceTest {
     @Test
     void updateSubwayLine() {
         // given
-        ExtractableResponse<Response> createSubwayLineApiResponse = SubwayHelper
-                .지하철_노션_요청(SubwayHelper.SUBWAY_LIEN_PARAMETERS_1);
+        ExtractableResponse<Response> createSubwayLineApiResponse = SubwayLineHelper
+                .지하철_노션_요청(SubwayLineHelper.SUBWAY_LIEN_PARAMETERS_1);
         String createSubwayLineApiResponseId = createSubwayLineApiResponse.jsonPath().getString("id");
 
         // when
@@ -149,7 +149,7 @@ public class SubwayLineAcceptanceTest {
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
                     .body(updateLineParameters)
                 .when().log().all()
-                    .put(SubwayHelper.SUBWAY_LINE_API_URL + "/" + createSubwayLineApiResponseId)
+                    .put(SubwayLineHelper.SUBWAY_LINE_API_URL + "/" + createSubwayLineApiResponseId)
                 .then().log().all()
                 .extract();
 
@@ -166,15 +166,15 @@ public class SubwayLineAcceptanceTest {
     @Test
     void deleteSubwayLine() {
         // given
-        ExtractableResponse<Response> createSubwayLineApiResponse = SubwayHelper
-                .지하철_노션_요청(SubwayHelper.SUBWAY_LIEN_PARAMETERS_1);
+        ExtractableResponse<Response> createSubwayLineApiResponse = SubwayLineHelper
+                .지하철_노션_요청(SubwayLineHelper.SUBWAY_LIEN_PARAMETERS_1);
         String createSubwayLineApiResponseId = createSubwayLineApiResponse.jsonPath().getString("id");
 
         // when
         ExtractableResponse<Response> deleteSubwayLineApiResponse = RestAssured
                 .given().log().all()
                 .when().log().all()
-                    .delete(SubwayHelper.SUBWAY_LINE_API_URL + "/" + createSubwayLineApiResponseId)
+                    .delete(SubwayLineHelper.SUBWAY_LINE_API_URL + "/" + createSubwayLineApiResponseId)
                 .then().log().all()
                 .extract();
 

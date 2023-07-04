@@ -8,9 +8,8 @@ import org.springframework.http.MediaType;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SubwayHelper {
+public class SubwayLineHelper {
 
-    public static final String STATION_API_URL = "/stations";
     public static final String SUBWAY_LINE_API_URL = "/subway-lines";
     public static final Map<String, Object> SUBWAY_LIEN_PARAMETERS_1 = Map.of("name", "신분당선"
             , "color", "bg-red-600"
@@ -27,7 +26,7 @@ public class SubwayHelper {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(parameters)
                 .when().log().all()
-                .post(SubwayHelper.SUBWAY_LINE_API_URL)
+                .post(SubwayLineHelper.SUBWAY_LINE_API_URL)
                 .then().log().all()
                 .extract();
 
@@ -43,7 +42,7 @@ public class SubwayHelper {
                     .body(parameter)
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
-                    .post(STATION_API_URL)
+                    .post(SubwayStationHelper.STATION_API_URL)
                 .then().log().all()
                 .extract();
 
