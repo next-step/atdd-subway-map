@@ -39,37 +39,18 @@ public class LineAcceptanceTest {
     @Test
     void showLines() {
         // given
-        LineRequest request1 = new LineRequest(
-                "신분당선",
-                "bg-red-600",
-                1L,
-                2L,
-                10L
-        );
-        RestAssured.given().log().all()
-                .body(request1)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().log().all();
-
-        LineRequest request2 = new LineRequest(
-                "분당선",
-                "bg-green-600",
-                1L,
-                3L,
-                15L
-        );
-        RestAssured.given().log().all()
-                .body(request2)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().log().all();
+        지하철_노선을_생성한다("신분당선", "bg-red-600", 1L, 2L, 10L);
+        지하철_노선을_생성한다("분당선", "bg-green-600", 1L, 3L, 15L);
 
         // when
         List<String> lineNames = 지하철_노선_목록을_조회한다();
 
         // then
-        assertThat(lineNames.size()).isEqualTo(2);
+        생성한_갯수의_지하철_노선_목록을_응답한다(lineNames, 2);
+    }
+
+    private static void 생성한_갯수의_지하철_노선_목록을_응답한다(List<String> lineNames, int createdCount) {
+        assertThat(lineNames.size()).isEqualTo(createdCount);
     }
 
     private static void 생성된_노선이_노선_목록에_포함된다(List<String> lineNames, String createdLineName) {
