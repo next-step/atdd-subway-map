@@ -13,8 +13,8 @@ public class RestAssuredUtil {
 
     private final DatabaseCleanup databaseCleanup;
 
-    public RestAssuredUtil(DatabaseCleanup databaseCleanup) {
-        this.databaseCleanup = databaseCleanup;
+    public RestAssuredUtil(DatabaseCleanup databaseCleanup1) {
+        this.databaseCleanup = databaseCleanup1;
     }
 
     public void initializePort(int port) {
@@ -55,6 +55,17 @@ public class RestAssuredUtil {
             .extract();
     }
 
+    public static ExtractableResponse<Response> createWithBadRequest(String url, Map<String, Object> param) {
+        return RestAssured.given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(param)
+            .when()
+            .post(url)
+            .then().log().all()
+            .statusCode(HttpStatus.BAD_REQUEST.value())
+            .extract();
+    }
+
     public static ExtractableResponse<Response> updateWithOk(String url, Long id, Map<String, Object> param) {
         return RestAssured.given().log().all()
             .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -74,5 +85,15 @@ public class RestAssuredUtil {
             .statusCode(HttpStatus.NO_CONTENT.value())
             .extract();
     }
+
+    public static ExtractableResponse<Response> deleteWithBadRequest(String url, Long id) {
+        return RestAssured.given().log().all()
+            .when()
+            .delete(url, id)
+            .then().log().all()
+            .statusCode(HttpStatus.BAD_REQUEST.value())
+            .extract();
+    }
+
 
 }
