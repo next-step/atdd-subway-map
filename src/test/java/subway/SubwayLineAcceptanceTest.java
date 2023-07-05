@@ -10,7 +10,8 @@ import subway.marker.AcceptanceTest;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 import static subway.utils.AcceptanceTestUtils.*;
 
 @DisplayName("지하철 노선 관련 기능")
@@ -56,7 +57,7 @@ class SubwayLineAcceptanceTest {
                 .body("name", equalTo(lineName))
                 .body("color", equalTo(color))
                 .body("stations", hasSize(2))
-                .body("stations[0].id", contains(upStationId, downStationId))
+                .body("stations[0].id", equalTo(upStationId))
                 .body("stations[0].name", equalTo(upStationName))
                 .body("stations[1].id", equalTo(downStationId))
                 .body("stations[1].name", equalTo(downStationName));
@@ -322,14 +323,11 @@ class SubwayLineAcceptanceTest {
         ValidatableResponse subwayLineCratedResponse = createSubwayLines(lineName, color, upStationId, downStationId, distance);
         long createdLineId = subwayLineCratedResponse.extract().as(SubwayLineResponse.class).getId();
 
-        int sectionDownStationId = 3;
-        String sectionDownStationName = "길음역";
-        createStation(sectionDownStationName);
         //when
-        ValidatableResponse subwayLineSectionCreatedResponse = createSubwayLineSection(createdLineId, downStationId, sectionDownStationId, distance);
+        ValidatableResponse subwayLineSectionCreatedResponse = createSubwayLineSection(createdLineId, downStationId, upStationId, distance);
 
         //then
-        verifyResponseStatus(subwayLineSectionCreatedResponse, HttpStatus.CREATED);
+        verifyResponseStatus(subwayLineSectionCreatedResponse, HttpStatus.BAD_REQUEST);
     }
 
 
@@ -339,7 +337,7 @@ class SubwayLineAcceptanceTest {
      * Given 지하철 노선을 생성하고
      * When 생성한 지하철 노선에 추가로 구간을 등록할때
      * 새로운 노선의 상행역이 기존 노선의 하행역이라면
-     * Then 새로운 구간이 노선에 추가된다.
+     * Then 새로운 구간이 노선에 추가되고 조회 시 하행역이 변경되고 거리가 추가 된다.
      */
     @Test
     void 신규_구간_등록_성공() {
@@ -360,11 +358,29 @@ class SubwayLineAcceptanceTest {
         ValidatableResponse subwayLineCratedResponse = createSubwayLines(lineName, color, upStationId, downStationId, distance);
         long createdLineId = subwayLineCratedResponse.extract().as(SubwayLineResponse.class).getId();
 
+        int sectionDownStationId = 3;
+        String sectionDownStationName = "길음역";
+        createStation(sectionDownStationName);
+        int sectionDistance = 3;
+
         //when
-        ValidatableResponse subwayLineSectionCreatedResponse = createSubwayLineSection(createdLineId, downStationId, upStationId, distance);
+        ValidatableResponse subwayLineSectionCreatedResponse = createSubwayLineSection(createdLineId, downStationId, sectionDownStationId, sectionDistance);
 
         //then
-        verifyResponseStatus(subwayLineSectionCreatedResponse, HttpStatus.BAD_REQUEST);
+        verifyResponseStatus(subwayLineSectionCreatedResponse, HttpStatus.CREATED);
+
+        ValidatableResponse createdSubwayLineSectionResponse = getResource(getLocation(subwayLineCratedResponse));
+        verifyResponseStatus(createdSubwayLineSectionResponse, HttpStatus.OK);
+
+        createdSubwayLineSectionResponse
+                .body("name", equalTo(lineName))
+                .body("color", equalTo(color))
+                .body("stations", hasSize(2))
+                .body("stations[0].id", equalTo(upStationId))
+                .body("stations[0].name", equalTo(upStationName))
+                .body("stations[1].id", equalTo(sectionDownStationId))
+                .body("stations[1].name", equalTo(sectionDownStationName))
+                .body("distance", equalTo(distance + sectionDistance));
     }
 
     private ValidatableResponse createSubwayLineSection(Long lineId, long upStationId, long downStationId, long distance) {

@@ -6,10 +6,12 @@ import subway.common.NotFoundSubwayLineException;
 import subway.controller.request.SubwayLineSectionAddRequest;
 import subway.controller.resonse.StationResponse;
 import subway.controller.resonse.SubwayLineResponse;
+import subway.controller.resonse.SubwayLineSectionResponse;
 import subway.domain.Section;
 import subway.domain.Station;
 import subway.domain.SubwayLine;
 import subway.repository.StationRepository;
+import subway.repository.StationSectionRepository;
 import subway.repository.SubwayLineRepository;
 import subway.service.command.SubwayLineCreateCommand;
 import subway.service.command.SubwayLineModifyCommand;
@@ -23,10 +25,12 @@ public class SubwayLineService {
 
     private final SubwayLineRepository subwayLineRepository;
     private final StationRepository stationRepository;
+    private final StationSectionRepository stationSectionRepository;
 
-    public SubwayLineService(SubwayLineRepository subwayLineRepository, StationRepository stationRepository) {
+    public SubwayLineService(SubwayLineRepository subwayLineRepository, StationRepository stationRepository, StationSectionRepository stationSectionRepository) {
         this.subwayLineRepository = subwayLineRepository;
         this.stationRepository = stationRepository;
+        this.stationSectionRepository = stationSectionRepository;
     }
 
     @Transactional
@@ -81,20 +85,20 @@ public class SubwayLineService {
                 subwayLine.getName(),
                 subwayLine.getColor(),
                 List.of(new StationResponse(subwayLine.getUpStation()),
-                        new StationResponse(subwayLine.getDownStation()))
-        );
+                        new StationResponse(subwayLine.getDownStation())),
+                subwayLine.getDistance());
     }
 
-    public SubwayLineResponse addStationSection(Long subwayLineId, SubwayLineSectionAddRequest subwayLineCreateRequest) {
+    @Transactional
+    public SubwayLineSectionResponse addStationSection(Long subwayLineId, SubwayLineSectionAddRequest subwayLineCreateRequest) {
         SubwayLine subwayLine = requireGetById(subwayLineId);
 
         Station upStation = stationRepository.getReferenceById(subwayLineCreateRequest.getUpStationId());
         Station downStation = stationRepository.getReferenceById(subwayLineCreateRequest.getDownStationId());
 
-        Section newSection = Section.of(upStation, downStation, subwayLineCreateRequest.getDistance());
+        Section savedSection = stationSectionRepository.save(Section.of(upStation, downStation, subwayLineCreateRequest.getDistance()));
+        subwayLine.expandLine(savedSection);
 
-        subwayLine.expandLine(newSection);
-
-        return null;
+        return SubwayLineSectionResponse.of(savedSection);
     }
 }

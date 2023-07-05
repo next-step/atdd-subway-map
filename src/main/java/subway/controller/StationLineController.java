@@ -6,6 +6,7 @@ import subway.controller.request.SubwayLineCreateRequest;
 import subway.controller.request.SubwayLineModifyRequest;
 import subway.controller.request.SubwayLineSectionAddRequest;
 import subway.controller.resonse.SubwayLineResponse;
+import subway.controller.resonse.SubwayLineSectionResponse;
 import subway.service.SubwayLineService;
 
 import java.net.URI;
@@ -50,9 +51,9 @@ public class StationLineController {
     }
 
     @PostMapping("/{id}/sections")
-    public ResponseEntity<SubwayLineResponse> addStationLineSection(@PathVariable Long id, @RequestBody SubwayLineSectionAddRequest subwayLineCreateRequest) {
-        SubwayLineResponse subwayLineResponse = subwayLineService.addStationSection(id, subwayLineCreateRequest);
-        return ResponseEntity.created(URI.create("/lines/" + id + "/sections")).body(subwayLineResponse);
+    public ResponseEntity<SubwayLineSectionResponse> addStationLineSection(@PathVariable Long id, @RequestBody SubwayLineSectionAddRequest subwayLineCreateRequest) {
+        SubwayLineSectionResponse subwayLineSectionResponse = subwayLineService.addStationSection(id, subwayLineCreateRequest);
+        return ResponseEntity.created(URI.create("/lines/" + id + "/sections" + subwayLineSectionResponse.getId())).body(subwayLineSectionResponse);
     }
 
 }

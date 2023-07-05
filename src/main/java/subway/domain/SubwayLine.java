@@ -21,15 +21,13 @@ public class SubwayLine {
     @Column(length = 20, nullable = false)
     private String color;
 
+    @Column(nullable = false)
+    private Long distance;
+
     @Embedded
     private Sections sections = new Sections();
 
     protected SubwayLine() {
-    }
-
-    private SubwayLine(String name, String color) {
-        this.name = name;
-        this.color = color;
     }
 
     public Station getUpStation() {
@@ -53,6 +51,11 @@ public class SubwayLine {
         }
 
         this.sections.add(newSection);
+        this.distance = sections.sumOfDistance();
+    }
+
+    public long getDistance() {
+        return this.distance;
     }
 
     public static class SubwayLineBuilder {
@@ -103,10 +106,10 @@ public class SubwayLine {
     }
 
     public SubwayLine(String name, String color, Station upStation, Station downStation, Long distance) {
-        this.id = id;
         this.name = name;
         this.color = color;
         this.sections.add(Section.of(upStation, downStation, distance));
+        this.distance = distance;
     }
 
     public Long getId() {

@@ -10,11 +10,11 @@ public class Section {
     private Long id;
 
     @JoinColumn(name = "up_station_id")
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     private Station upStation;
 
     @JoinColumn(name = "down_station_id")
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     private Station downStation;
 
     @Column(nullable = false)
@@ -34,11 +34,18 @@ public class Section {
         return new Section(upStation, downStation, distance);
     }
 
+    public Long getId(){
+        return this.id;}
+
     public Station getUpStation() {
         return this.upStation;
     }
 
     public Station getDownStation() {
         return this.downStation;
+    }
+
+    public Long getDistance() {
+        return distance;
     }
 }

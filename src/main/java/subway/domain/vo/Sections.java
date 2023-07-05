@@ -11,7 +11,7 @@ import java.util.Objects;
 @Embeddable
 public class Sections {
 
-    @JoinColumn(name = "subway_line_id")
+    @JoinColumn(name = "section_id")
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, orphanRemoval = true)
     private List<Section> sections = new ArrayList<>();
 
@@ -48,4 +48,7 @@ public class Sections {
                         || Objects.equals(section.getDownStation(), newSectionDownStation));
     }
 
+    public Long sumOfDistance() {
+        return this.sections.stream().mapToLong(Section::getDistance).sum();
+    }
 }
