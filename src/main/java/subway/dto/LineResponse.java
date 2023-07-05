@@ -1,4 +1,4 @@
-package subway.vo;
+package subway.dto;
 
 import java.util.List;
 import java.util.Objects;

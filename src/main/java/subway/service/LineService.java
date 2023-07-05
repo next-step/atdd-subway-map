@@ -6,9 +6,9 @@ import subway.jpa.Line;
 import subway.jpa.LineRepository;
 import subway.jpa.StationRepository;
 import subway.utils.ModelMapperUtil;
-import subway.vo.LineRequest;
-import subway.vo.LineResponse;
-import subway.vo.StationResponse;
+import subway.dto.LineRequest;
+import subway.dto.LineResponse;
+import subway.dto.StationResponse;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,23 +27,21 @@ public class LineService {
     }
 
     public LineResponse saveLine(LineRequest lineRequest) {
-        // Entity 객체로 변환
-        Line lineEntity = ModelMapperUtil.modelMapper.map(lineRequest, Line.class);
+        Line lineEntity = new Line(
+                lineRequest.getName(),
+                lineRequest.getColor(),
+                lineRequest.getUpStationId(),
+                lineRequest.getDownStationId(),
+                lineRequest.getDistance()
+        );
 
-        // 노선 저장
         Line savedLineEntity = lineRepository.save(lineEntity);
 
-        // 노선의 지하철 조회
         List<StationResponse> stationResponses = stationRepository.findAllByLineName(lineEntity.getName()).stream()
-                .map(s ->
-                    {
-                        StationResponse stationResponse = ModelMapperUtil.modelMapper.map(s, StationResponse.class);
-                        return stationResponse;
-                    })
+                .map(s -> ModelMapperUtil.modelMapper.map(s, StationResponse.class))
                 .collect(Collectors.toList());
 
-        // Response 객체로 변환
-        LineResponse lineResponse = ModelMapperUtil.modelMapper.map(lineEntity, LineResponse.class);
+        LineResponse lineResponse = ModelMapperUtil.modelMapper.map(savedLineEntity, LineResponse.class);
         lineResponse.setId(savedLineEntity.getId());
         lineResponse.setStations(stationResponses);
         return lineResponse;

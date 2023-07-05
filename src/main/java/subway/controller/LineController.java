@@ -5,8 +5,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import subway.service.LineService;
-import subway.vo.LineRequest;
-import subway.vo.LineResponse;
+import subway.dto.LineRequest;
+import subway.dto.LineResponse;
 
 import java.net.URI;
 

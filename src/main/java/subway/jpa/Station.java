@@ -10,6 +10,9 @@ public class Station {
     @Column(length = 20, nullable = false)
     private String name;
 
+    @Column(length = 20)
+    private String lineName;
+
     public Station() {
     }
 

@@ -13,9 +13,9 @@ import subway.jpa.LineRepository;
 import subway.jpa.Station;
 import subway.jpa.StationRepository;
 import subway.utils.ModelMapperUtil;
-import subway.vo.LineRequest;
-import subway.vo.LineResponse;
-import subway.vo.StationResponse;
+import subway.dto.LineRequest;
+import subway.dto.LineResponse;
+import subway.dto.StationResponse;
 
 import java.util.List;
 
