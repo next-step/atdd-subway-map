@@ -3,6 +3,7 @@ package subway;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.restassured.RestAssured;
+import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.List;
@@ -90,11 +91,52 @@ class LineAcceptanceTest {
 
         // when
         long lineId = creationResponse.jsonPath().get("id");
-        String path = new StringBuilder().append(urlPath).append("/").append(lineId).toString();
+        String path = generatePathForId(lineId);
         ExtractableResponse<Response> response = RestAssuredClient.requestGet(path)
             .statusCode(HttpStatus.OK.value()).extract();
 
         // then
         assertThat((String) response.jsonPath().get("name")).isEqualTo(LineFactory.LINE_NAMES[0]);
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 수정하면
+     * Then 해당 지하철 노선 정보는 수정된다
+     */
+    @DisplayName("지하철 노선을 수정한다.")
+    @Test
+    void updateLine() {
+        // given
+        ExtractableResponse<Response> creationResponse = RestAssuredClient.requestPost(urlPath,
+                LineFactory.create(LineFactory.LINE_NAMES[0]))
+            .statusCode(HttpStatus.CREATED.value()).extract();
+
+        // when
+        long lineId = creationResponse.jsonPath().get("id");
+        String path = generatePathForId(lineId);
+
+        String updatedLineName = "수인분당선";
+        String updatedLineColor = "bg-yellow-600";
+        ExtractableResponse<Response> updateResponse =
+            RestAssuredClient.requestPatch(path,
+                    LineFactory.createNameAndColorUpdateParams(updatedLineName, updatedLineColor))
+                .statusCode(HttpStatus.OK.value()).extract();
+
+        // then
+        ExtractableResponse<Response> response = RestAssuredClient.requestGet(path)
+            .statusCode(HttpStatus.OK.value()).extract();
+
+        JsonPath responseJsonPath = response.jsonPath();
+        assertThat((String) responseJsonPath.get("name")).isEqualTo(updatedLineName);
+        assertThat((String) responseJsonPath.get("color")).isEqualTo(updatedLineColor);
+    }
+
+    private String generatePathForId(long id) {
+        return new StringBuilder()
+            .append(urlPath)
+            .append("/")
+            .append(id)
+            .toString();
     }
 }

@@ -36,4 +36,11 @@ public class LineFactory {
     public static Map<String, String> create(String name) {
         return LINE_MAP.get(name);
     }
+
+    public static Map<String, String> createNameAndColorUpdateParams(String name, String color) {
+        return new HashMap<>() {{
+            put("name", name);
+            put("color", color);
+        }};
+    }
 }
