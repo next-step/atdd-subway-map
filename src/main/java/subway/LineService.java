@@ -17,24 +17,24 @@ public class LineService {
 
     @Transactional
     public LineResponse saveLine(CreateLineRequest request) {
-        LineEntity lineEntity = lineRepository.save(new LineEntity(
+        Line line = lineRepository.save(new Line(
                 request.getName(),
                 request.getColor(),
                 stationRepository.getReferenceById(request.getUpStationId()),
                 stationRepository.getReferenceById(request.getDownStationId())
         ));
 
-        return createLineResponse(lineEntity);
+        return createLineResponse(line);
     }
 
-    private LineResponse createLineResponse(LineEntity lineEntity) {
+    private LineResponse createLineResponse(Line line) {
         return new LineResponse(
-                lineEntity.getId(),
-                lineEntity.getName(),
-                lineEntity.getColor(),
+                line.getId(),
+                line.getName(),
+                line.getColor(),
                 Arrays.asList(
-                        new StationResponse(lineEntity.getUpStation().getId(), lineEntity.getUpStation().getName()),
-                        new StationResponse(lineEntity.getDownStation().getId(), lineEntity.getDownStation().getName())
+                        new StationResponse(line.getUpStation().getId(), line.getUpStation().getName()),
+                        new StationResponse(line.getDownStation().getId(), line.getDownStation().getName())
                 ));
     }
 
@@ -45,7 +45,7 @@ public class LineService {
     }
 
     public LineResponse findLineById(Long id) {
-        LineEntity lineEntity = lineRepository.findById(id).orElseThrow(() -> new RuntimeException("Not Exist Line"));
-        return createLineResponse(lineEntity);
+        Line line = lineRepository.findById(id).orElseThrow(() -> new RuntimeException("Not Exist Line"));
+        return createLineResponse(line);
     }
 }

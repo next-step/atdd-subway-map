@@ -9,8 +9,7 @@ import javax.persistence.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "line")
-public class LineEntity {
+public class Line {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -25,7 +24,7 @@ public class LineEntity {
     @JoinColumn(name = "down_station_id")
     private Station downStation;
 
-    public LineEntity(String name, String color, Station upStation, Station downStation) {
+    public Line(String name, String color, Station upStation, Station downStation) {
         this.name = name;
         this.color = color;
         this.upStation = upStation;
