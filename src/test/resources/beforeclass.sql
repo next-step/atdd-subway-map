@@ -1,2 +1,5 @@
-delete from line;
-delete from station;
+SET REFERENTIAL_INTEGRITY FALSE;
+SHOW TABLES;
+truncate table line;
+truncate table station;
+SET REFERENTIAL_INTEGRITY TRUE;
