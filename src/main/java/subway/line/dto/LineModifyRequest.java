@@ -2,7 +2,6 @@ package subway.line.dto;
 
 import lombok.Builder;
 import lombok.Getter;
-import subway.constants.LineConstant;
 
 import javax.validation.constraints.NotBlank;
 
@@ -10,7 +9,9 @@ import javax.validation.constraints.NotBlank;
 @Builder
 public class LineModifyRequest {
 
-    @NotBlank(message = LineConstant.NAME_NOT_BLANK_MODIFY_MESSAGE)
+    private final String NAME_NOT_BLANK_MODIFY_MESSAGE = "구간 수정을 위해 이름은 필수 값 입니다.";
+
+    @NotBlank(message = NAME_NOT_BLANK_MODIFY_MESSAGE)
     private String name;
 
     private String color;
