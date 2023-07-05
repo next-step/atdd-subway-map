@@ -4,6 +4,6 @@ import subway.subway.application.query.StationResponse;
 
 import java.util.List;
 
-public interface StationListGetQuery {
+public interface StationListQuery {
     List<StationResponse> findAllStations();
 }

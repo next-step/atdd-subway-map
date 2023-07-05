@@ -5,4 +5,5 @@ import subway.subway.application.query.StationResponse;
 
 public interface StationRegisterUsecase {
     StationResponse saveStation(StationRegisterCommand command);
+
 }

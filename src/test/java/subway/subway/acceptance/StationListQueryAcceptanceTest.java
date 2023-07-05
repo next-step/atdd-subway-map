@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
  * 지하철역 조회 인수 테스트를 합니다.
  */
 @DisplayName("지하철역 조회 인수 테스트")
-public class StationListReadAcceptanceTest extends StationAcceptanceTest {
+public class StationListQueryAcceptanceTest extends StationAcceptanceTest {
 
     /**
      * Given 2개의 지하철역을 생성하고<br>
