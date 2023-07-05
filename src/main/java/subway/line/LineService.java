@@ -6,6 +6,7 @@ import subway.station.Station;
 import subway.station.StationRepository;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
@@ -28,6 +29,10 @@ public class LineService {
                 .build();
 
         return lineRepository.save(line);
+    }
+
+    public List<Line> getLines() {
+        return lineRepository.findAll();
     }
 
 }
