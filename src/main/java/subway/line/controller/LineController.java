@@ -1,7 +1,6 @@
 package subway.line.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,8 +14,7 @@ import subway.line.dto.LineCreateRequest;
 import subway.line.dto.LineModifyRequest;
 import subway.line.dto.LineResponse;
 import subway.line.service.LineService;
-import subway.station.model.Station;
-import subway.station.service.StationService;
+import subway.line.service.LineStationService;
 
 import java.net.URI;
 import java.util.List;
@@ -27,13 +25,11 @@ import java.util.List;
 public class LineController {
 
     private final LineService lineService;
-    private final StationService stationService;
+    private final LineStationService lineStationService;
 
     @PostMapping
     public ResponseEntity<LineResponse> createLine(@RequestBody LineCreateRequest lineRequest) {
-        Station upStation = stationService.findEntityById(lineRequest.getUpStationId());
-        Station downStations = stationService.findEntityById(lineRequest.getDownStationId());
-        LineResponse line = lineService.saveLine(lineRequest, upStation, downStations);
+        LineResponse line = lineStationService.saveLine(lineRequest);
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
 

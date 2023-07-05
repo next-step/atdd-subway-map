@@ -27,8 +27,10 @@ public class LineService {
     private final LineStationRepository lineStationRepository;
 
     @Transactional
-    public LineResponse saveLine(LineCreateRequest createRequest, Station upStation, Station downStation) {
-        Line request = Line.from(createRequest, upStation, downStation);
+    public LineResponse saveLine(LineCreateRequest createRequest,
+                                 Station upStation,
+                                 Station downStation) {
+        Line request = LineCreateRequest.to(createRequest, upStation, downStation);
         Line line = lineRepository.save(request);
         line.addLineStation(generateLineStation(line, upStation));
         line.addLineStation(generateLineStation(line, downStation));
