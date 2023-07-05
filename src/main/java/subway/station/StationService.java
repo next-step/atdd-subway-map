@@ -39,12 +39,12 @@ public class StationService {
     }
 
     public Station findStation(Long id) {
-        return stationRepository.findById(id).orElseThrow();
+        return stationRepository.findById(id).orElseThrow(StationNotFoundException::new);
     }
 
     @Transactional
     public Station updateStation(Long id, StationRequest stationRequest) {
-        Station station = stationRepository.findById(id).orElseThrow();
+        Station station = stationRepository.findById(id).orElseThrow(StationNotFoundException::new);
         station.update(stationRequest.getName());
         return station;
     }

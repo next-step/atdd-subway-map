@@ -28,12 +28,13 @@ public class LineService {
     }
 
     public LineResponse searchById(Long id) {
-        return LineResponse.from(lineRepository.findById(id).orElseThrow());
+        return LineResponse.from(
+                lineRepository.findById(id).orElseThrow(LineNotFoundException::new));
     }
 
     @Transactional
     public void update(Long id, UpdateLineRequest updateLineRequest) {
-        Line line = lineRepository.findById(id).orElseThrow();
+        Line line = lineRepository.findById(id).orElseThrow(LineNotFoundException::new);
         line.update(updateLineRequest.getName(), updateLineRequest.getColor());
     }
 
@@ -44,14 +45,14 @@ public class LineService {
 
     @Transactional
     public LineResponse addSection(Long id, Station upstreamStation, Station downstreamStation) {
-        Line line = lineRepository.findById(id).orElseThrow();
+        Line line = lineRepository.findById(id).orElseThrow(LineNotFoundException::new);
         line.addSection(upstreamStation, downstreamStation);
         return LineResponse.from(line);
     }
 
     @Transactional
     public void deleteSection(Long id, Station downStreamTerminusStation) {
-        Line line = lineRepository.findById(id).orElseThrow();
+        Line line = lineRepository.findById(id).orElseThrow(LineNotFoundException::new);
         line.deleteSectionByDownStreamTerminusStation(downStreamTerminusStation);
     }
 }
