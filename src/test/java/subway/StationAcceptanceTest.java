@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
+import subway.station.StationResponse;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -17,9 +18,10 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Transactional
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class StationAcceptanceTest {
+class StationAcceptanceTest {
 
     private final String[] STATION_NAMES = {"강남역", "약삼역"};
     /**
@@ -27,7 +29,6 @@ public class StationAcceptanceTest {
      * Then 지하철역이 생성된다
      * Then 지하철역 목록 조회 시 생성한 역을 찾을 수 있다
      */
-    @Transactional
     @DisplayName("지하철역을 생성한다.")
     @Test
     void createStation() {
@@ -46,7 +47,6 @@ public class StationAcceptanceTest {
      * When 지하철역 목록을 조회하면
      * Then 2개의 지하철역을 응답 받는다
      */
-    @Transactional
     @DisplayName("지하철역을 조회한다.")
     @Test
     void searchStation() {
@@ -58,7 +58,7 @@ public class StationAcceptanceTest {
         List<String> stations = getStationName();
 
         //then
-        assertThat(stations).hasSize(2);
+        assertThat(stations).hasSize(STATION_NAMES.length);
     }
 
     /**
@@ -66,7 +66,6 @@ public class StationAcceptanceTest {
      * When 그 지하철역을 삭제하면
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
-    @Transactional
     @DisplayName("지하철역을 삭제한다.")
     @Test
     void removeStation() {
