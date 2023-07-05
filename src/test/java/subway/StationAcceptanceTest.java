@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -25,6 +26,7 @@ public class StationAcceptanceTest {
      * Then 지하철역이 생성된다
      * Then 지하철역 목록 조회 시 생성한 역을 찾을 수 있다
      */
+    @DirtiesContext
     @DisplayName("지하철역을 생성한다.")
     @Test
     void createStation() {
@@ -58,6 +60,7 @@ public class StationAcceptanceTest {
      * Then 2개의 지하철역을 응답 받는다
      */
     // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
+    @DirtiesContext
     @DisplayName("지하철역 목록을 조회한다.")
     @Test
     void getStationList() {
@@ -91,6 +94,7 @@ public class StationAcceptanceTest {
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
     // TODO: 지하철역 제거 인수 테스트 메서드 생성
+    @DirtiesContext
     @DisplayName("지하철역을 제거한다.")
     @Test
     void removeStation() {
@@ -113,7 +117,6 @@ public class StationAcceptanceTest {
             .then().log().all().extract();
 
         List<String> stationList = response.body().jsonPath().getList("name", String.class);
-        assertThat(stationList.contains("강남역")).isFalse();
-        assertThat(stationList.contains("판교역")).isTrue();
+        assertThat(stationList).containsOnly("판교역");
     }
 }
