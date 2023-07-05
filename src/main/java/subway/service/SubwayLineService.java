@@ -3,9 +3,13 @@ package subway.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.common.NotFoundSubwayLineException;
+import subway.controller.request.SubwayLineSectionAddRequest;
 import subway.controller.resonse.StationResponse;
 import subway.controller.resonse.SubwayLineResponse;
+import subway.domain.Section;
+import subway.domain.Station;
 import subway.domain.SubwayLine;
+import subway.repository.StationRepository;
 import subway.repository.SubwayLineRepository;
 import subway.service.command.SubwayLineCreateCommand;
 import subway.service.command.SubwayLineModifyCommand;
@@ -18,41 +22,40 @@ import java.util.stream.Collectors;
 public class SubwayLineService {
 
     private final SubwayLineRepository subwayLineRepository;
-    private final StationService stationService;
+    private final StationRepository stationRepository;
 
-    public SubwayLineService(SubwayLineRepository subwayLineRepository, StationService stationService) {
+    public SubwayLineService(SubwayLineRepository subwayLineRepository, StationRepository stationRepository) {
         this.subwayLineRepository = subwayLineRepository;
-        this.stationService = stationService;
+        this.stationRepository = stationRepository;
     }
 
     @Transactional
     public SubwayLineResponse saveStationLine(SubwayLineCreateCommand createCommand) {
-        SubwayLine subwayLine = SubwayLine.create(createCommand);
+        Station upStation = stationRepository.getReferenceById(createCommand.getUpStationId());
+        Station downStation = stationRepository.getReferenceById(createCommand.getDownStationId());
+
+        SubwayLine subwayLine = SubwayLine.builder()
+                .upStation(upStation)
+                .downStation(downStation)
+                .distance(createCommand.getDistance())
+                .name(createCommand.getName())
+                .color(createCommand.getColor())
+                .build();
 
         SubwayLine satedSubwayLine = subwayLineRepository.save(subwayLine);
-        StationResponse upStation = stationService.findStation(subwayLine.getUpStationId());
-        StationResponse downStation = stationService.findStation(subwayLine.getDownStationId());
 
-        return createSubwayLineResponse(satedSubwayLine, upStation, downStation);
+        return createSubwayLineResponse(satedSubwayLine);
     }
 
     public List<SubwayLineResponse> findAllSubwayLines() {
         return subwayLineRepository.findAll().stream()
-                .map(subwayLine -> {
-                    StationResponse upStation = stationService.findStation(subwayLine.getUpStationId());
-                    StationResponse downStation = stationService.findStation(subwayLine.getDownStationId());
-
-                    return createSubwayLineResponse(subwayLine, upStation, downStation);
-                })
+                .map(this::createSubwayLineResponse)
                 .collect(Collectors.toList());
     }
 
     public SubwayLineResponse findSubwayLine(Long id) {
         SubwayLine subwayLine = requireGetById(id);
-        StationResponse upStation = stationService.findStation(subwayLine.getUpStationId());
-        StationResponse downStation = stationService.findStation(subwayLine.getDownStationId());
-
-        return createSubwayLineResponse(subwayLine, upStation, downStation);
+        return createSubwayLineResponse(subwayLine);
     }
 
     @Transactional
@@ -72,12 +75,26 @@ public class SubwayLineService {
                 .orElseThrow(() -> new NotFoundSubwayLineException(id));
     }
 
-    private SubwayLineResponse createSubwayLineResponse(SubwayLine subwayLine, StationResponse upStationResponse, StationResponse downStationResponse) {
+    private SubwayLineResponse createSubwayLineResponse(SubwayLine subwayLine) {
         return new SubwayLineResponse(
                 subwayLine.getId(),
                 subwayLine.getName(),
                 subwayLine.getColor(),
-                List.of(upStationResponse, downStationResponse)
+                List.of(new StationResponse(subwayLine.getUpStation()),
+                        new StationResponse(subwayLine.getDownStation()))
         );
+    }
+
+    public SubwayLineResponse addStationSection(Long subwayLineId, SubwayLineSectionAddRequest subwayLineCreateRequest) {
+        SubwayLine subwayLine = requireGetById(subwayLineId);
+
+        Station upStation = stationRepository.getReferenceById(subwayLineCreateRequest.getUpStationId());
+        Station downStation = stationRepository.getReferenceById(subwayLineCreateRequest.getDownStationId());
+
+        Section newSection = Section.of(upStation, downStation, subwayLineCreateRequest.getDistance());
+
+        subwayLine.expandLine(newSection);
+
+        return null;
     }
 }

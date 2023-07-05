@@ -4,12 +4,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import subway.controller.request.SubwayLineCreateRequest;
 import subway.controller.request.SubwayLineModifyRequest;
+import subway.controller.request.SubwayLineSectionAddRequest;
 import subway.controller.resonse.SubwayLineResponse;
 import subway.service.SubwayLineService;
 
 import java.net.URI;
 import java.util.List;
 
+@RequestMapping("/lines")
 @RestController
 public class StationLineController {
 
@@ -19,33 +21,38 @@ public class StationLineController {
         this.subwayLineService = subwayLineService;
     }
 
-    @PostMapping("/lines")
+    @PostMapping
     public ResponseEntity<SubwayLineResponse> createStationLine(@RequestBody SubwayLineCreateRequest subwayLineCreateRequest) {
         SubwayLineResponse subwayLineResponse = subwayLineService.saveStationLine(subwayLineCreateRequest);
         return ResponseEntity.created(URI.create("/lines/" + subwayLineResponse.getId())).body(subwayLineResponse);
     }
 
-
-    @GetMapping("/lines")
+    @GetMapping
     public ResponseEntity<List<SubwayLineResponse>> showStationLines() {
         return ResponseEntity.ok().body(subwayLineService.findAllSubwayLines());
     }
 
-    @GetMapping("/lines/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<SubwayLineResponse> showStationLine(@PathVariable Long id) {
         return ResponseEntity.ok().body(subwayLineService.findSubwayLine(id));
     }
 
-    @PutMapping("/lines/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<Void> modifyStationLine(@PathVariable Long id, @RequestBody SubwayLineModifyRequest subwayLineModifyRequest) {
         subwayLineService.modifySubwayLine(id, subwayLineModifyRequest);
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/lines/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteStationLine(@PathVariable Long id) {
         subwayLineService.deleteSubwayLineById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/sections")
+    public ResponseEntity<SubwayLineResponse> addStationLineSection(@PathVariable Long id, @RequestBody SubwayLineSectionAddRequest subwayLineCreateRequest) {
+        SubwayLineResponse subwayLineResponse = subwayLineService.addStationSection(id, subwayLineCreateRequest);
+        return ResponseEntity.created(URI.create("/lines/" + id + "/sections")).body(subwayLineResponse);
     }
 
 }

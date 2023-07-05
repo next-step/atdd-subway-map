@@ -12,4 +12,9 @@ public class GlobalExceptionAdvice {
     public ResponseEntity<Void> notFound(Exception ex) {
         return ResponseEntity.notFound().build();
     }
+
+    @ExceptionHandler(value = {IllegalStateException.class})
+    public ResponseEntity<Void> badRequest(Exception ex) {
+        return ResponseEntity.badRequest().build();
+    }
 }
