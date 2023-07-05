@@ -15,6 +15,7 @@ import org.springframework.http.MediaType;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import subway.fixture.SubwayFixtures;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -61,18 +62,9 @@ public class StationAcceptanceTest {
     @Test
     void getStationList() {
         // given
-        Map<String, String> params = new HashMap<>();
         List<String> stations = List.of("강남역", "판교역");
         for (String station : stations) {
-            params.put("name", station);
-
-            given()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(params)
-                .when().post("/stations")
-                .then().statusCode(HttpStatus.CREATED.value());
-
-            params.clear();
+            SubwayFixtures.createSubwayStation(station);
         }
 
         // when
@@ -103,18 +95,9 @@ public class StationAcceptanceTest {
     @Test
     void removeStation() {
         // given
-        Map<String, String> params = new HashMap<>();
         List<String> stations = List.of("강남역", "판교역");
         for (String station : stations) {
-            params.put("name", station);
-
-            given()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(params)
-                .when().post("/stations")
-                .then().statusCode(HttpStatus.CREATED.value());
-
-            params.clear();
+            SubwayFixtures.createSubwayStation(station);
         }
 
         // when
