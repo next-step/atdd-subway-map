@@ -37,7 +37,7 @@ public class StationAcceptanceTest extends AcceptanceTestBase {
     void showStations() {
         // given 2개의 지하철역을 생성하고
         List<StationRequest> stationRequests = FixtureMonkeyWrapper.giveMe(stationRequestArbitraryBuilder(), 2);
-        stationRequests.forEach(stationRequest -> post("stations", stationRequest));
+        stationRequests.forEach(stationRequest -> post("/stations", stationRequest));
 
         // when 지하철역 목록을 조회하면
         ExtractableResponse<Response> response = get("/stations");
