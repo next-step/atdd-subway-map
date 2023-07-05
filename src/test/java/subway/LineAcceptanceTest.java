@@ -9,12 +9,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import subway.dto.StationResponse;
+import subway.service.LineTestUtils;
 import subway.service.StationTestUtils;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.*;
+import static subway.service.LineTestUtils.*;
 
 @DisplayName("지하철 노선 관련 기능")
 public class LineAcceptanceTest extends AcceptanceTest {
@@ -158,62 +160,15 @@ public class LineAcceptanceTest extends AcceptanceTest {
         지하철_삭제_여부_검증(지하철_노선_목록_조회());
     }
 
-    private static ExtractableResponse<Response> 지하철_노선_생성(Map<String, String> 노선_생성_요청_정보, Map<String, String> 상행역_정보, Map<String, String> 하행역_정보) {
-        노선_생성_요청_정보.put("upStationId", 상행역_정보.get("id"));
-        노선_생성_요청_정보.put("downStationId", 하행역_정보.get("id"));
-
-        StationTestUtils.지하철역_생성(상행역_정보);
-        StationTestUtils.지하철역_생성(하행역_정보);
-
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .body(노선_생성_요청_정보)
-                .when()
-                .post("/lines")
-                .then().log().all()
-                .extract();
-
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        return response;
-    }
-
     private static void 지하철_노선_생성_여부_검증(ExtractableResponse<Response> 노선_목록_조회_결과, Map<String, String> 노선_생성_요청_정보, Map<String, String> 상행역_정보, Map<String, String> 하행역_정보) {
         assertThat(노선_목록_조회_결과.jsonPath().getList("id")).isNotEmpty();
         assertThat(노선_목록_조회_결과.jsonPath().getList("name", String.class)).contains(노선_생성_요청_정보.get("name"));
         assertThat(노선_목록_조회_결과.jsonPath().getList("color", String.class)).contains(노선_생성_요청_정보.get("color"));
     }
 
-    private static ExtractableResponse<Response> 지하철_노선_목록_조회() {
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .when()
-                .accept(ContentType.JSON)
-                .get("/lines")
-                .then().log().all()
-                .extract();
-
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        return response;
-    }
-
     private static void 지하철_노선_목록_검증(ExtractableResponse<Response> 노선_목록_조회_결과, Map<String, String> 노선1_생성_요청_정보, Map<String, String> 상행역1_정보, Map<String, String> 하행역1_정보, Map<String, String> 노선2_생성_요청_정보, Map<String, String> 상행역2_정보, Map<String, String> 하행역2_정보) {
         지하철_노선_생성_여부_검증(노선_목록_조회_결과, 노선1_생성_요청_정보, 상행역1_정보, 하행역1_정보);
         지하철_노선_생성_여부_검증(노선_목록_조회_결과, 노선2_생성_요청_정보, 상행역2_정보, 하행역2_정보);
-    }
-
-    private ExtractableResponse<Response> 지하철_노선_조회(String lineUrl) {
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .when()
-                .accept(ContentType.JSON)
-                .get(lineUrl)
-                .then().log().all()
-                .extract();
-
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        return response;
     }
 
     private void 지하철_노선_조회_검증(ExtractableResponse<Response> 노선_조회_결과, Map<String, String> 노선_생성_요청_정보) {
@@ -225,35 +180,12 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 .extracting("id").containsExactlyInAnyOrder(Long.parseLong(노선_생성_요청_정보.get("upStationId")), Long.parseLong(노선_생성_요청_정보.get("downStationId")));
     }
 
-    private static ExtractableResponse<Response> 지하철_노선_수정_요청(String lineUrl, Map<String, String> 노선_수정_요청_정보) {
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .body(노선_수정_요청_정보)
-                .when()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .put(lineUrl)
-                .then().log().all()
-                .extract();
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        return response;
-    }
 
     private void 지하철_노선_수정_검증(String lineUrl, Map<String, String> 노선_수정_요청_정보) {
         ExtractableResponse<Response> 노선_조회_결과 = 지하철_노선_조회(lineUrl);
 
         assertThat(노선_수정_요청_정보.get("name")).isEqualTo(노선_조회_결과.jsonPath().getString("name"));
         assertThat(노선_수정_요청_정보.get("color")).isEqualTo(노선_조회_결과.jsonPath().getString("color"));
-    }
-
-    private ExtractableResponse<Response> 지하철_노선_삭제(String lineUrl) {
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .when()
-                .delete(lineUrl)
-                .then().log().all()
-                .extract();
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-        return response;
     }
 
     private void 지하철_삭제_여부_검증(ExtractableResponse<Response> 노선_조회_결과) {
