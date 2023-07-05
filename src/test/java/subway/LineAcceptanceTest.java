@@ -74,4 +74,27 @@ class LineAcceptanceTest {
         assertThat(lineNames.size()).isEqualTo(2);
         assertThat(lineNames).contains(LineFactory.LINE_NAMES[0], LineFactory.LINE_NAMES[1]);
     }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 조회하면
+     * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
+     */
+    @DisplayName("지하철 노선을 조회한다.")
+    @Test
+    void getLine() {
+        // given
+        ExtractableResponse<Response> creationResponse = RestAssuredClient.requestPost(urlPath,
+                LineFactory.create(LineFactory.LINE_NAMES[0]))
+            .statusCode(HttpStatus.CREATED.value()).extract();
+
+        // when
+        long lineId = creationResponse.jsonPath().get("id");
+        String path = new StringBuilder().append(urlPath).append("/").append(lineId).toString();
+        ExtractableResponse<Response> response = RestAssuredClient.requestGet(path)
+            .statusCode(HttpStatus.OK.value()).extract();
+
+        // then
+        assertThat((String) response.jsonPath().get("name")).isEqualTo(LineFactory.LINE_NAMES[0]);
+    }
 }
