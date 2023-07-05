@@ -194,7 +194,7 @@ public class LineAcceptanceTest {
 
         //when
         LineChangeRequest lineChangeRequest = new LineChangeRequest("98호선", "super_red");
-        지하철_노선_데이터를_수정한다(line, lineChangeRequest);
+        지하철_노선_데이터_수정_api를_호출한다(line.getId(), lineChangeRequest);
 
         //then
         Line result = 지하철_노선_아이디를_바탕으로_조회한다(line.getId());
@@ -202,24 +202,24 @@ public class LineAcceptanceTest {
         assertThat(result.getColor()).isEqualTo("super_red");
     }
 
-    class LineChangeRequest {
-        String name = null;
-        String color = null;
+    void 지하철_노선_데이터를_수정한다(Long id, LineChangeRequest lineChangeRequest) {
+        Line line = 지하철_노선_아이디를_바탕으로_조회한다(id);
 
-        public LineChangeRequest(String name, String color) {
-            this.name = name;
-            this.color = color;
+        if (lineChangeRequest.getColor() != null) {
+            line.updateColor(lineChangeRequest.getColor());
         }
-    }
-
-    void 지하철_노선_데이터를_수정한다(Line line, LineChangeRequest lineChangeRequest) {
-        if (lineChangeRequest.color != null) {
-            line.updateColor(lineChangeRequest.color);
-        }
-        if (lineChangeRequest.name != null) {
-            line.updateName(lineChangeRequest.name);
+        if (lineChangeRequest.getName() != null) {
+            line.updateName(lineChangeRequest.getName());
         }
         lineRepository.save(line);
+    }
+
+    void 지하철_노선_데이터_수정_api를_호출한다(Long id, LineChangeRequest lineChangeRequest) {
+        RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(lineChangeRequest)
+                .when().put("/lines/{id}", id)
+                .then().log().all();
     }
 
     /**
