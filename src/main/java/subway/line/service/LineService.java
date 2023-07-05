@@ -27,17 +27,8 @@ public class LineService {
 
     @Transactional
     public LineResponse createStation(LineCreateRequest request) {
-        Optional<Station> upStation = stationService.findById(request.getUpStationId());
-
-        if (upStation.isEmpty()) {
-            throw new StationNotFoundException();
-        }
-
-        Optional<Station> downStation = stationService.findById(request.getDownStationId());
-
-        if (downStation.isEmpty()) {
-            throw new StationNotFoundException();
-        }
+        Station upStation = stationService.get(request.getUpStationId());
+        Station downStation = stationService.get(request.getDownStationId());
 
         Line line = mapRequestToEntity(request, upStation, downStation);
 
@@ -46,12 +37,12 @@ public class LineService {
         return new LineResponse(createdLine);
     }
 
-    private Line mapRequestToEntity(LineCreateRequest request, Optional<Station> upStation, Optional<Station> downStation) {
+    private Line mapRequestToEntity(LineCreateRequest request, Station upStation, Station downStation) {
         return Line.builder()
                    .name(request.getName())
                    .color(request.getColor())
-                   .upStation(upStation.get())
-                   .downStation(downStation.get())
+                   .upStation(upStation)
+                   .downStation(downStation)
                    .distance(request.getDistance())
                    .build();
     }
