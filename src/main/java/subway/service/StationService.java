@@ -1,7 +1,11 @@
-package subway;
+package subway.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.dto.StationRequest;
+import subway.dto.StationResponse;
+import subway.model.Station;
+import subway.repository.StationRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,6 +23,11 @@ public class StationService {
     public StationResponse saveStation(StationRequest stationRequest) {
         Station station = stationRepository.save(new Station(stationRequest.getName()));
         return createStationResponse(station);
+    }
+
+    public Station findStationById(Long id) {
+        return stationRepository.findById(id)
+                .orElseThrow();
     }
 
     public List<StationResponse> findAllStations() {
