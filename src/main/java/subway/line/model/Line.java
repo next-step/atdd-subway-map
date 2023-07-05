@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import subway.line.dto.LineCreateRequest;
 import subway.station.model.Station;
 
 import javax.persistence.CascadeType;
@@ -36,11 +35,11 @@ public class Line {
     private String color;
 
     @OneToOne
-    @JoinColumn(name = "UP_STATION_ID")
+    @JoinColumn
     private Station upStation;
 
     @OneToOne
-    @JoinColumn(name = "DOWN_STATION_ID")
+    @JoinColumn
     private Station downStation;
 
     @Column(nullable = false)
@@ -49,16 +48,6 @@ public class Line {
     @Builder.Default
     @OneToMany(mappedBy = "line", cascade = CascadeType.ALL)
     private List<LineStation> lineStations = new ArrayList<>();
-
-    public static Line from(LineCreateRequest request, Station upStation, Station downStation) {
-        return Line.builder()
-                .name(request.getName())
-                .color(request.getColor())
-                .upStation(upStation)
-                .downStation(downStation)
-                .distance(request.getDistance())
-                .build();
-    }
 
     public void addLineStation(LineStation lineStation) {
         lineStations.add(lineStation);
