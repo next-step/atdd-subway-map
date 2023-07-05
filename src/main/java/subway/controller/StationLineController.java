@@ -56,4 +56,9 @@ public class StationLineController {
         return ResponseEntity.created(URI.create("/lines/" + id + "/sections" + subwayLineSectionResponse.getId())).body(subwayLineSectionResponse);
     }
 
+    @DeleteMapping("/{id}/sections")
+    public ResponseEntity<SubwayLineSectionResponse> deleteStationAtLineSection(@PathVariable Long id, @RequestParam Long stationId) {
+        subwayLineService.deleteStationAtLineSection(id, stationId);
+        return ResponseEntity.noContent().build();
+    }
 }

@@ -101,4 +101,13 @@ public class SubwayLineService {
 
         return SubwayLineSectionResponse.of(savedSection);
     }
+
+    @Transactional
+    public void deleteStationAtLineSection(Long subwayLineId, Long stationId) {
+        SubwayLine subwayLine = requireGetById(subwayLineId);
+
+        Station targetStation = stationRepository.getReferenceById(stationId);
+
+        subwayLine.pop(targetStation);
+    }
 }

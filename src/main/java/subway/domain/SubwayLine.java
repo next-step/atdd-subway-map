@@ -1,8 +1,9 @@
 package subway.domain;
 
 import org.springframework.util.StringUtils;
-import subway.domain.exception.InvalidSectionDownStationException;
-import subway.domain.exception.InvalidSectionUpStationException;
+import subway.domain.exception.AlreadyRegisteredSectionDownStationException;
+import subway.domain.exception.NotEnoughSectionException;
+import subway.domain.exception.NotMatchesSectionStationException;
 import subway.domain.vo.Sections;
 
 import javax.persistence.*;
@@ -44,13 +45,25 @@ public class SubwayLine {
 
     public void expandLine(Section newSection) {
         if (this.sections.isNotEndWith(newSection.getUpStation())) {
-            throw new InvalidSectionUpStationException(this.sections.getDownStation(), newSection.getUpStation());
+            throw new NotMatchesSectionStationException(this.getDownStation(), newSection.getUpStation());
         }
         if (this.sections.contains(newSection.getDownStation())) {
-            throw new InvalidSectionDownStationException(newSection.getDownStation());
+            throw new AlreadyRegisteredSectionDownStationException(newSection.getDownStation());
         }
 
         this.sections.add(newSection);
+        this.distance = sections.sumOfDistance();
+    }
+
+    public void pop(Station targetStation) {
+        if (this.sections.isMinimumSize()) {
+            throw new NotEnoughSectionException();
+        }
+        if (this.sections.isNotEndWith(targetStation)) {
+            throw new NotMatchesSectionStationException(this.getDownStation(), targetStation);
+        }
+
+        this.sections.pop();
         this.distance = sections.sumOfDistance();
     }
 

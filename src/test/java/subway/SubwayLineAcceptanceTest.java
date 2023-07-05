@@ -508,7 +508,8 @@ class SubwayLineAcceptanceTest {
                 .body("stations[0].id", equalTo(upStationId))
                 .body("stations[0].name", equalTo(upStationName))
                 .body("stations[1].id", equalTo(downStationId))
-                .body("stations[1].name", equalTo(downStationName));
+                .body("stations[1].name", equalTo(downStationName))
+                .body("distance", equalTo(distance));
 
     }
 

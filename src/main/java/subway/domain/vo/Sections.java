@@ -11,6 +11,8 @@ import java.util.Objects;
 @Embeddable
 public class Sections {
 
+    private static final int MINIMUM_SIZE = 1;
+
     @JoinColumn(name = "section_id")
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, orphanRemoval = true)
     private List<Section> sections = new ArrayList<>();
@@ -34,21 +36,30 @@ public class Sections {
         return sections.size() - 1;
     }
 
-    public boolean isNotEndWith(Station newSectionUpStation) {
-        return !this.endWith(newSectionUpStation);
+    public boolean isNotEndWith(Station targetStation) {
+        return !this.endWith(targetStation);
     }
 
-    public boolean endWith(Station newSectionUpStation) {
-        return Objects.equals(getDownStation(), newSectionUpStation);
+    public boolean endWith(Station targetStation) {
+        return Objects.equals(getDownStation(), targetStation);
     }
 
-    public boolean contains(Station newSectionDownStation) {
+    public boolean contains(Station targetStation) {
         return this.sections.stream()
-                .anyMatch(section -> Objects.equals(section.getUpStation(), newSectionDownStation)
-                        || Objects.equals(section.getDownStation(), newSectionDownStation));
+                .anyMatch(section -> Objects.equals(section.getUpStation(), targetStation)
+                        || Objects.equals(section.getDownStation(), targetStation));
     }
 
     public Long sumOfDistance() {
         return this.sections.stream().mapToLong(Section::getDistance).sum();
+    }
+
+    public boolean isMinimumSize() {
+        return this.sections.size() == MINIMUM_SIZE;
+    }
+
+    public void pop() {
+        Section lastSection = this.sections.get(getLastIndex());
+        this.sections.remove(lastSection);
     }
 }
