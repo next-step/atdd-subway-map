@@ -39,16 +39,21 @@ public class LineService {
             throw new StationNotFoundException();
         }
 
-        Line line = new Line();
-        line.setName(request.getName());
-        line.setColor(request.getColor());
-        line.setUpStation(upStation.get());
-        line.setDownStation(downStation.get());
-        line.setDistance(request.getDistance());
+        Line line = mapRequestToEntity(request, upStation, downStation);
 
         Line createdLine = lineRepository.save(line);
 
         return new LineResponse(createdLine);
+    }
+
+    private Line mapRequestToEntity(LineCreateRequest request, Optional<Station> upStation, Optional<Station> downStation) {
+        return Line.builder()
+                   .name(request.getName())
+                   .color(request.getColor())
+                   .upStation(upStation.get())
+                   .downStation(downStation.get())
+                   .distance(request.getDistance())
+                   .build();
     }
 
     @Transactional(readOnly = true)
