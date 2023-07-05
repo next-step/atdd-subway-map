@@ -3,6 +3,7 @@ package subway;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import java.util.List;
 import org.springframework.http.MediaType;
 
 import java.util.HashMap;
@@ -21,13 +22,19 @@ public class SubwayTestFixture {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 지하철_역_목록_조회_요청() {
+    public static int 지하철_역_생성_요청_상태_코드_반환(String name) {
+        return 지하철_역_생성_요청(name)
+            .statusCode();
+    }
+
+    public static List<String> 지하철_역_목록_조회_요청_역_이름_목록_반환() {
 
         return RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/stations")
-                .then().log().all()
-                .extract();
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().get("/stations")
+            .then().log().all()
+            .extract()
+            .jsonPath().getList("name", String.class);
     }
 
     public static ExtractableResponse<Response> 지하철_역_삭제_요청(Integer id) {

@@ -28,15 +28,13 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        ExtractableResponse<Response> stationCreateResponse = 지하철_역_생성_요청(강남역);
+        int statusCode = 지하철_역_생성_요청_상태_코드_반환(강남역);
 
         // then
-        assertThat(stationCreateResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(statusCode).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        ExtractableResponse<Response> stationListResponse = 지하철_역_목록_조회_요청();
-        List<String> stationNames = stationListResponse
-                .jsonPath().getList("name", String.class);
+        List<String> stationNames = 지하철_역_목록_조회_요청_역_이름_목록_반환();
 
         assertThat(stationNames).containsAnyOf(강남역);
     }
@@ -54,12 +52,9 @@ public class StationAcceptanceTest {
         지하철_역_생성_요청(신논현역);
 
         // given
-        ExtractableResponse<Response> response = 지하철_역_목록_조회_요청();
+        List<String> stationNames = 지하철_역_목록_조회_요청_역_이름_목록_반환();
 
         // then
-        List<String> stationNames = response
-                .jsonPath().getList("name", String.class);
-
         assertThat(stationNames).containsExactly(강남역, 신논현역);
     }
 
@@ -78,10 +73,7 @@ public class StationAcceptanceTest {
         지하철_역_삭제_요청(stationCreateResponse.jsonPath().getInt("id"));
 
         // then
-        ExtractableResponse<Response> response = 지하철_역_목록_조회_요청();
-
-        List<String> stationNames = response
-                .jsonPath().getList("name", String.class);
+        List<String> stationNames = 지하철_역_목록_조회_요청_역_이름_목록_반환();
 
         assertThat(stationNames).isEmpty();
     }
