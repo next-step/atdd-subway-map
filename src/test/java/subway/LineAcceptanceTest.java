@@ -3,12 +3,13 @@ package subway;
 import io.restassured.RestAssured;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 
-@DisplayName("지하철 노선 관련 기능")
+@DisplayName("노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class LineAcceptanceTest {
+class LineAcceptanceTest {
 
     @LocalServerPort
     int port;
@@ -18,4 +19,14 @@ public class LineAcceptanceTest {
         RestAssured.port = port;
     }
 
+    /**
+     * When 지하철 노선을 생성하면
+     * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
+     */
+    @DisplayName("노선을 생성한다.")
+    @Test
+    void createLine() {
+        // when
+
+    }
 }
