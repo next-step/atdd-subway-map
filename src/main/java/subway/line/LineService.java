@@ -35,4 +35,9 @@ public class LineService {
         return lineRepository.findAll();
     }
 
+    public Line getLineById(Long id) {
+        return lineRepository.findById(id)
+                .orElseThrow(NoSuchElementException::new);
+    }
+
 }

@@ -2,10 +2,7 @@ package subway.line;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
@@ -29,5 +26,10 @@ public class LineController {
     @GetMapping("/lines")
     public ResponseEntity<List<Line>> getLines() {
         return ResponseEntity.ok(lineService.getLines());
+    }
+
+    @GetMapping("/lines/{id}")
+    public ResponseEntity<Line> getLine(@PathVariable Long id) {
+        return ResponseEntity.ok(lineService.getLineById(id));
     }
 }
