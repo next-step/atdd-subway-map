@@ -3,6 +3,7 @@ package subway.station.dto;
 import subway.station.domain.Station;
 
 public class StationResponse {
+
     private Long id;
     private String name;
 
