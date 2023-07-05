@@ -124,10 +124,7 @@ class LineAcceptanceTest {
                 .statusCode(HttpStatus.OK.value()).extract();
 
         // then
-        ExtractableResponse<Response> response = RestAssuredClient.requestGet(path)
-            .statusCode(HttpStatus.OK.value()).extract();
-
-        JsonPath responseJsonPath = response.jsonPath();
+        JsonPath responseJsonPath = updateResponse.jsonPath();
         assertThat((String) responseJsonPath.get("name")).isEqualTo(updatedLineName);
         assertThat((String) responseJsonPath.get("color")).isEqualTo(updatedLineColor);
     }
