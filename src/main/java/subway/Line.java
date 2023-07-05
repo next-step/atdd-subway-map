@@ -3,6 +3,7 @@ package subway;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 
@@ -14,8 +15,10 @@ public class Line {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false)
+    @Setter
     private String name;
     @Column(nullable = false)
+    @Setter
     private String color;
     @OneToOne
     @JoinColumn(name = "up_station_id")
