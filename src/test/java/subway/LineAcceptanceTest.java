@@ -19,6 +19,8 @@ class LineAcceptanceTest {
         RestAssured.port = port;
     }
 
+    private static final String path = "/lines";
+
     /**
      * When 지하철 노선을 생성하면
      * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
