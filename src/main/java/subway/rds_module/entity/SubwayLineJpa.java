@@ -1,7 +1,5 @@
 package subway.rds_module.entity;
 
-import subway.subway.domain.SubwaySection;
-
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +23,8 @@ public class SubwayLineJpa {
     public SubwayLineJpa() {
     }
 
-    public SubwayLineJpa(String name, String color, List<SubwaySectionJpa> subwaySections) {
+    public SubwayLineJpa(Long id, String name, String color, List<SubwaySectionJpa> subwaySections) {
+        this.id = id;
         this.name = name;
         this.color = color;
         this.subwaySections = subwaySections;
@@ -45,5 +44,9 @@ public class SubwayLineJpa {
 
     public List<SubwaySectionJpa> getSubwaySections() {
         return subwaySections;
+    }
+
+    public boolean isNew() {
+        return id == null;
     }
 }

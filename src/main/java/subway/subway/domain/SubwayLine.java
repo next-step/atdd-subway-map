@@ -5,19 +5,30 @@ import java.util.List;
 public class SubwayLine {
     private SubwayLine.Id id;
 
-    private final String name;
+    private String name;
 
-    private final String color;
+    private String color;
     private final SubwaySectionList sectionList;
 
-    private SubwayLine(String name, String color, SubwaySectionList sectionList) {
+    public static SubwayLine register(String name, String color, SubwaySection... sections) {
+        return new SubwayLine(name, color, new SubwaySectionList(sections));
+    }
+
+    public static SubwayLine of(SubwayLine.Id id, String name, String color, List<SubwaySection> sectionList) {
+        return new SubwayLine(id, name, color, new SubwaySectionList(sectionList));
+    }
+
+    private SubwayLine(Id id, String name, String color, SubwaySectionList sectionList) {
+        this.id = id;
         this.name = name;
         this.color = color;
         this.sectionList = sectionList;
     }
 
-    public static SubwayLine register(String name, String color, SubwaySection... sections) {
-        return new SubwayLine(name, color, new SubwaySectionList(sections));
+    private SubwayLine(String name, String color, SubwaySectionList sectionList) {
+        this.name = name;
+        this.color = color;
+        this.sectionList = sectionList;
     }
 
     public SubwayLine.Id getId() {
@@ -41,6 +52,11 @@ public class SubwayLine {
 
     public boolean isNew() {
         return id == null;
+    }
+
+    public void update(String name, String color) {
+        this.name = name;
+        this.color = color;
     }
 
     public static class Id {

@@ -10,6 +10,11 @@ public class SubwaySectionStation {
         this.name = station.getName();
     }
 
+    public SubwaySectionStation(Station.Id id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
     public Station.Id getId() {
         return id;
     }

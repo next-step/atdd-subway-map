@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 import java.net.URI;
 
 @RestController
-public class SubwayLineRegisterController {
+class SubwayLineRegisterController {
 
     private final SubwayLineRegisterUsecase subwayLineRegisterUsecase;
 
@@ -53,8 +53,7 @@ public class SubwayLineRegisterController {
                     color,
                     new Station.Id(upStationId),
                     new Station.Id(downStationId),
-                    Kilometer.of(BigDecimal.valueOf(distance)));
+                    Kilometer.of(distance));
         }
     }
 }
-

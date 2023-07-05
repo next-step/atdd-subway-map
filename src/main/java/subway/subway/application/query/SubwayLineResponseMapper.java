@@ -1,7 +1,6 @@
-package subway.subway.application;
+package subway.subway.application.query;
 
 import org.springframework.stereotype.Component;
-import subway.subway.application.in.command.SubwayLineRegisterCommand;
 import subway.subway.application.query.SubwayLineResponse;
 import subway.subway.domain.SubwayLine;
 import subway.subway.domain.SubwaySection;
@@ -10,7 +9,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-class SubwayLineMapper {
+class SubwayLineResponseMapper {
 
     public SubwayLineResponse mapFrom(SubwayLine subwayLine) {
         return new SubwayLineResponse(

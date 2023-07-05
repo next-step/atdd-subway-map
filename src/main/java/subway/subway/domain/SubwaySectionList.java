@@ -11,6 +11,10 @@ public class SubwaySectionList {
         this.subwaySections = Arrays.asList(subwaySections);
     }
 
+    public SubwaySectionList(List<SubwaySection> subwaySectionList) {
+        this.subwaySections = subwaySectionList;
+    }
+
     public void add(SubwaySection station) {
         subwaySections.add(station);
     }

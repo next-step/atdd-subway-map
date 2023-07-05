@@ -1,6 +1,7 @@
-package subway.subway.adapter.in.web;
+package subway.subway.adapter.in.web.mapper;
 
 import org.springframework.stereotype.Component;
+import subway.subway.adapter.in.web.StationRegisterController;
 import subway.subway.application.in.command.StationRegisterCommand;
 
 @Component
