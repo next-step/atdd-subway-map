@@ -55,4 +55,9 @@ public class Line {
     public Station getDownStation() {
         return downStation;
     }
+
+    public void update(String name, String color) {
+        this.name = name;
+        this.color = color;
+    }
 }
