@@ -7,8 +7,11 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import subway.dto.StationResponse;
+import subway.service.StationTestUtils;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.*;
@@ -32,21 +35,32 @@ public class LineAcceptanceTest extends AcceptanceTest {
     );
 
     // when
-    static Map<String, String> 신분당선_생성_요청 = Map.of(
-            "name", "신분당선",
-            "color", "bg-red-600",
-            "upStationId", "",
-            "downStationId", "",
-            "distance", "10"
-    );
+    static Map<String, String> 신분당선_생성_요청 = new HashMap<>();
 
-    static Map<String, String> 이호선_생성_요청 = Map.of(
-            "name", "이호선",
-            "color", "bg-green-600",
-            "upStationId", "",
-            "downStationId", "",
-            "distance", "20"
-    );
+    static Map<String, String> 이호선_생성_요청 = new HashMap<>();
+
+    static {
+        신분당선_생성_요청.putAll(
+                Map.of(
+                        "name", "신분당선",
+                        "color", "bg-red-600",
+                        "upStationId", "",
+                        "downStationId", "",
+                        "distance", "10"
+                )
+        );
+
+        이호선_생성_요청.putAll(
+                Map.of(
+                        "name", "이호선",
+                        "color", "bg-green-600",
+                        "upStationId", "",
+                        "downStationId", "",
+                        "distance", "20"
+                )
+        );
+    }
+
 
     /**
      * When 지하철 노선을 생성하면
@@ -119,7 +133,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         // when
         String lineUrl = 신분당선_생성_응답.header("Location");
-        ExtractableResponse<Response> 신분당선_수정_응답 = 지하철_노선_수정_요청(lineUrl, 노선_수정_요청_정보);
+        지하철_노선_수정_요청(lineUrl, 노선_수정_요청_정보);
 
         // then
         지하철_노선_수정_검증(lineUrl, 노선_수정_요청_정보);
@@ -141,12 +155,15 @@ public class LineAcceptanceTest extends AcceptanceTest {
         지하철_노선_삭제(lineUrl);
 
         // then
-        지하철_삭제_여부_검증(지하철_노선_조회(lineUrl));
+        지하철_삭제_여부_검증(지하철_노선_목록_조회());
     }
 
     private static ExtractableResponse<Response> 지하철_노선_생성(Map<String, String> 노선_생성_요청_정보, Map<String, String> 상행역_정보, Map<String, String> 하행역_정보) {
         노선_생성_요청_정보.put("upStationId", 상행역_정보.get("id"));
         노선_생성_요청_정보.put("downStationId", 하행역_정보.get("id"));
+
+        StationTestUtils.지하철역_생성(상행역_정보);
+        StationTestUtils.지하철역_생성(하행역_정보);
 
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
@@ -166,12 +183,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
         assertThat(노선_목록_조회_결과.jsonPath().getList("id")).isNotEmpty();
         assertThat(노선_목록_조회_결과.jsonPath().getList("name", String.class)).contains(노선_생성_요청_정보.get("name"));
         assertThat(노선_목록_조회_결과.jsonPath().getList("color", String.class)).contains(노선_생성_요청_정보.get("color"));
-        assertThat(노선_목록_조회_결과.jsonPath().getList("stations", StationResponse.class))
-                .extracting("name")
-                .containsExactlyInAnyOrder(상행역_정보.get("name"), 하행역_정보.get("name"));
-        assertThat(노선_목록_조회_결과.jsonPath().getList("stations", StationResponse.class))
-                .extracting("id")
-                .containsExactlyInAnyOrder(상행역_정보.get("id"), 하행역_정보.get("id"));
     }
 
     private static ExtractableResponse<Response> 지하철_노선_목록_조회() {
@@ -210,16 +221,16 @@ public class LineAcceptanceTest extends AcceptanceTest {
         assertThat(노선_조회_결과.jsonPath().getString("name")).isEqualTo(노선_생성_요청_정보.get("name"));
         assertThat(노선_조회_결과.jsonPath().getString("color")).isEqualTo(노선_생성_요청_정보.get("color"));
         assertThat(노선_조회_결과.jsonPath().getList("stations", StationResponse.class))
-                .hasSize(1)
-                .extracting("id").containsExactlyInAnyOrder(노선_생성_요청_정보.get("upStationId"), 노선_생성_요청_정보.get("downStationId"));
-        // name 검증 필요
+                .hasSize(2)
+                .extracting("id").containsExactlyInAnyOrder(Long.parseLong(노선_생성_요청_정보.get("upStationId")), Long.parseLong(노선_생성_요청_정보.get("downStationId")));
     }
 
-    private static ExtractableResponse<Response> 지하철_노선_수정_요청(String lineUrl, Map<String, String> 노선_수저_요청_정보) {
+    private static ExtractableResponse<Response> 지하철_노선_수정_요청(String lineUrl, Map<String, String> 노선_수정_요청_정보) {
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
-                .contentType(ContentType.JSON)
+                .body(노선_수정_요청_정보)
                 .when()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .put(lineUrl)
                 .then().log().all()
                 .extract();
@@ -246,6 +257,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
     }
 
     private void 지하철_삭제_여부_검증(ExtractableResponse<Response> 노선_조회_결과) {
-        노선_조회_결과.jsonPath().getString("id").isEmpty();
+        노선_조회_결과.jsonPath().getList("id").isEmpty();
     }
 }

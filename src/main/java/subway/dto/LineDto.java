@@ -1,9 +1,12 @@
 package subway.dto;
 
+import lombok.Getter;
 import subway.jpa.Line;
+import subway.jpa.Station;
 
 import java.util.List;
 
+@Getter
 public class LineDto {
 
     private Long id;
@@ -14,12 +17,9 @@ public class LineDto {
     private Integer distance;
     private List<StationDto> stationDtos;
 
-    public LineDto(String name, String color, Long upStationId, Long downStationId, Integer distance) {
+    public LineDto(String name, String color) {
         this.name = name;
         this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
-        this.distance = distance;
     }
 
     public LineDto(Long id, String name, String color, List<StationDto> stationDtos) {
@@ -29,50 +29,30 @@ public class LineDto {
         this.stationDtos = stationDtos;
     }
 
-    public static LineDto from(Line lineEntity, List<StationDto> stationDtos) {
+    public LineDto(String name, String color, Long upStationId, Long downStationId, Integer distance) {
+        this.name = name;
+        this.color = color;
+        this.upStationId = upStationId;
+        this.downStationId = downStationId;
+        this.distance = distance;
+    }
+
+    public static LineDto from(Line lineEntity) {
         return new LineDto(
                 lineEntity.getId(),
                 lineEntity.getName(),
                 lineEntity.getColor(),
-                stationDtos
+                List.of(StationDto.from(lineEntity.getUpStation()), StationDto.from(lineEntity.getDownStation()))
         );
     }
 
-    public Line toEntity() {
+    public Line toEntity(Station upStation, Station downStation) {
         return new Line(
                 name,
                 color,
-                upStationId,
-                downStationId,
+                upStation,
+                downStation,
                 distance
         );
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getColor() {
-        return color;
-    }
-
-    public Long getUpStationId() {
-        return upStationId;
-    }
-
-    public Long getDownStationId() {
-        return downStationId;
-    }
-
-    public Integer getDistance() {
-        return distance;
-    }
-
-    public List<StationDto> getStationDtos() {
-        return stationDtos;
     }
 }

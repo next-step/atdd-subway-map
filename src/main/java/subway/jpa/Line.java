@@ -1,8 +1,11 @@
 package subway.jpa;
 
+import lombok.Getter;
+
 import javax.persistence.*;
 
 @Entity
+@Getter
 public class Line {
 
     @Id
@@ -15,36 +18,44 @@ public class Line {
     @Column(length = 20, nullable = false)
     private String color;
 
-    @Column(name = "up_station_id", nullable = false)
-    private Long upStationId;
+//    @Column(name = "up_station_id", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "up_station_id")
+    private Station upStation;
 
-    @Column(name = "down_station_id", nullable = false)
-    private Long downStationId;
+//    @Column(name = "down_station_id", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "down_station_id")
+    private Station downStation;
 
     @Column(nullable = false)
     private Integer distance;
 
     public Line() {}
 
-    public Line(String name, String color, Long upStationId, Long downStationId, Integer distance) {
+    public Line(String name, String color, Station upStation, Station downStation, Integer distance) {
         this.name = name;
         this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
+        this.upStation = upStation;
+        this.downStation = downStation;
         this.distance = distance;
     }
 
-    public Long getId() { return id; }
+    public void update(String name, String color) {
+        this.name = name;
+        this.color = color;
+    }
 
-    public String getName() { return name; }
 
-    public String getColor() { return color; }
-
-    public Long getUpStationId() { return upStationId; }
-
-    public Long getDownStationId() { return downStationId; }
-
-    public Integer getDistance() { return distance; }
-
-    public void setId(Long id) { this.id = id; }
+    @Override
+    public String toString() {
+        return "Line{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", color='" + color + '\'' +
+                ", upStation=" + upStation +
+                ", downStation=" + downStation +
+                ", distance=" + distance +
+                '}';
+    }
 }

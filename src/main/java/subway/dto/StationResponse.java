@@ -1,7 +1,12 @@
 package subway.dto;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.Objects;
 
+@Getter
+@Setter
 public class StationResponse {
     private Long id;
     private String name;
@@ -18,10 +23,6 @@ public class StationResponse {
                 stationDto.getId(),
                 stationDto.getName()
         );
-    }
-
-    public String getName() {
-        return name;
     }
 
     @Override

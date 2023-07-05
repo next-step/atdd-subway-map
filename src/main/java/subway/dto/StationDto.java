@@ -1,7 +1,9 @@
 package subway.dto;
 
+import lombok.Getter;
 import subway.jpa.Station;
 
+@Getter
 public class StationDto {
 
     private Long id;
@@ -22,13 +24,5 @@ public class StationDto {
                 station.getId(),
                 station.getName()
         );
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 }

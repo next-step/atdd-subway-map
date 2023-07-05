@@ -1,9 +1,12 @@
 package subway.dto;
 
+import lombok.Getter;
+
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+@Getter
 public class LineResponse {
 
     private Long id;
@@ -30,8 +33,6 @@ public class LineResponse {
                         .collect(Collectors.toList())
         );
     }
-
-    public String getName() { return name; }
 
     @Override
     public boolean equals(Object o) {

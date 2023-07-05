@@ -1,5 +1,8 @@
 package subway.dto;
 
+import lombok.Getter;
+
+@Getter
 public class LineRequest {
 
     private String name;
@@ -14,26 +17,6 @@ public class LineRequest {
         this.upStationId = upStationId;
         this.downStationId = downStationId;
         this.distance = distance;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getColor() {
-        return color;
-    }
-
-    public Long getUpStationId() {
-        return upStationId;
-    }
-
-    public Long getDownStationId() {
-        return downStationId;
-    }
-
-    public Integer getDistance() {
-        return distance;
     }
 
     public LineDto toDto() {

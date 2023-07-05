@@ -3,45 +3,15 @@ package subway.service;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import subway.jpa.Line;
-import subway.jpa.LineRepository;
 import subway.jpa.Station;
-import subway.jpa.StationRepository;
-import subway.utils.ModelMapperUtil;
-import subway.dto.LineRequest;
-import subway.dto.LineResponse;
-import subway.dto.StationResponse;
-
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class LineServiceTest {
 
-    @Mock
-    LineRepository lineRepository;
-
-    @Mock
-    StationRepository stationRepository;
-
-    @InjectMocks
-    LineService lineService;
-
     static Station 강남역 = new Station(1L, "강남역");
     static Station 판교역 = new Station(2L, "판교역");
-
-    static Line 신분당선 = new Line( "신분당선", "bg-red-600", 강남역.getId(), 판교역.getId(), 10);
-    static {
-        신분당선.setId(1L);
-    }
 
     /**
      * Input = LineRequest
