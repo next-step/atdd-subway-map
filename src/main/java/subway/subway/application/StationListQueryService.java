@@ -12,10 +12,10 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
-class StationListLoadService implements StationListQuery {
+class StationListQueryService implements StationListQuery {
     private final StationRepository stationRepository;
 
-    public StationListLoadService(StationRepository stationRepository) {
+    public StationListQueryService(StationRepository stationRepository) {
         this.stationRepository = stationRepository;
     }
     @Override

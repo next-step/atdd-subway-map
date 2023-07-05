@@ -10,7 +10,7 @@ import subway.subway.domain.SubwayLine;
 import java.util.List;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 class SubwayLineListQueryService implements SubwayLineListQuery {
 
     private final SubwayLineListQueryPort subwayLineListQueryPort;

@@ -6,11 +6,11 @@ import subway.subway.domain.SubwayLine;
 import java.util.List;
 
 public class SubwayLineResponse {
-    private final Long id;
-    private final String name;
-    private final String color;
+    private Long id;
+    private String name;
+    private String color;
 
-    private final List<SubwayLineResponse.StationResponse> stations;
+    private List<SubwayLineResponse.StationResponse> stations;
 
     public SubwayLineResponse(SubwayLine.Id id, String name, String color, List<StationResponse> stations) {
         this.id = id.getValue();
@@ -24,6 +24,9 @@ public class SubwayLineResponse {
         this.name = name;
         this.color = color;
         this.stations = stations;
+    }
+
+    private SubwayLineResponse() {
     }
 
     public Long getId() {
@@ -43,8 +46,8 @@ public class SubwayLineResponse {
     }
 
     public static class StationResponse {
-        private final Long id;
-        private final String name;
+        private Long id;
+        private String name;
 
         public StationResponse(Station.Id id, String name) {
             this.id = id.getValue();
@@ -54,6 +57,9 @@ public class SubwayLineResponse {
         public StationResponse(Long id, String name) {
             this.id = id;
             this.name = name;
+        }
+
+        private StationResponse() {
         }
 
         public Long getId() {

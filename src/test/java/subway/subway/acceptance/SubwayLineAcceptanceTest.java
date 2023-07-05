@@ -5,9 +5,11 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.assertj.core.api.Assertions;
 import org.springframework.http.MediaType;
+import subway.subway.application.query.SubwayLineResponse;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public abstract class SubwayLineAcceptanceTest extends StationAcceptanceTest{
 
@@ -70,6 +72,15 @@ public abstract class SubwayLineAcceptanceTest extends StationAcceptanceTest{
                 .when().get("/subway-lines/{subway-line-id}", id)
                 .then().log().all()
                 .extract();
+    }
+
+    protected void 지하철_노선_상세_조회_응답_비교(ExtractableResponse<Response> response, String name, String color, String upStationName, String downStationName) {
+        SubwayLineResponse subwayLineResponse = response.body().as(SubwayLineResponse.class);
+        Assertions.assertThat(subwayLineResponse.getName()).isEqualTo(name);
+        Assertions.assertThat(subwayLineResponse.getColor()).isEqualTo(color);
+        Assertions.assertThat(subwayLineResponse.getStations().stream()
+                .map(SubwayLineResponse.StationResponse::getName).collect(Collectors.toList())).containsOnly(upStationName, downStationName);
+
     }
 
     /**
@@ -141,4 +152,5 @@ public abstract class SubwayLineAcceptanceTest extends StationAcceptanceTest{
         List<String> nameResponses = response.jsonPath().getList("name", String.class);
         Assertions.assertThat(nameResponses).containsExactly(names);
     }
+
 }

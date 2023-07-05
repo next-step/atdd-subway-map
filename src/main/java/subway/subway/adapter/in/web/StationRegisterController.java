@@ -33,6 +33,5 @@ class StationRegisterController {
         public String getName() {
             return name;
         }
-
     }
 }
