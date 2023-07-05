@@ -72,15 +72,14 @@ public class StationAcceptanceTest {
         String id = createStation(GANGNAM_STATION_NAME).jsonPath().getObject("id", String.class);
 
         // when
-        ExtractableResponse<Response> deleteResponse = RestAssured.given().log().all()
-                .pathParam("id", id)
-                .when().delete("/stations/{id}")
-                .then().log().all().extract();
+        ExtractableResponse<Response> deleteResponse = deleteStation(id);
 
         // then
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
         assertThat(findStationIds()).doesNotContain(id);
     }
+
+
 
     private ExtractableResponse<Response> createStation(String stationName) {
         Map<String, String> params = new HashMap<>();
@@ -106,6 +105,13 @@ public class StationAcceptanceTest {
                 .when().get("/stations")
                 .then().log().all()
                 .extract().jsonPath().getList("id", String.class);
+    }
+
+    private ExtractableResponse<Response> deleteStation(String stationId) {
+        return RestAssured.given().log().all()
+                .pathParam("id", stationId)
+                .when().delete("/stations/{id}")
+                .then().log().all().extract();
     }
 
 }
