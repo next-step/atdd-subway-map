@@ -1,9 +1,9 @@
-package subway;
+package subway.line;
 
 import lombok.Value;
 
 @Value
-public class UpdateLineRequest {
+class UpdateLineRequest {
     String name;
     String color;
 }

@@ -1,4 +1,4 @@
-package subway;
+package subway.line;
 import lombok.Value;
 
 @Value

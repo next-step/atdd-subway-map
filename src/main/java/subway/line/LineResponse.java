@@ -1,11 +1,12 @@
-package subway;
+package subway.line;
 
 import lombok.Value;
+import subway.station.StationResponse;
 
 import java.util.List;
 
 @Value
-public class LineResponse {
+class LineResponse {
     Long id;
     String name;
     String color;

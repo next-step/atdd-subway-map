@@ -1,8 +1,10 @@
-package subway;
+package subway.line;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.station.StationRepository;
+import subway.station.StationResponse;
 
 import java.util.Arrays;
 import java.util.List;
@@ -11,7 +13,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class LineService {
+class LineService {
     private final LineRepository lineRepository;
     private final StationRepository stationRepository;
 

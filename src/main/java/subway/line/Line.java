@@ -1,16 +1,17 @@
-package subway;
+package subway.line;
 
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import subway.station.Station;
 
 import javax.persistence.*;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Line {
+class Line {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -27,7 +28,7 @@ public class Line {
     @JoinColumn(name = "down_station_id")
     private Station downStation;
 
-    public Line(String name, String color, Station upStation, Station downStation) {
+    Line(String name, String color, Station upStation, Station downStation) {
         this.name = name;
         this.color = color;
         this.upStation = upStation;
