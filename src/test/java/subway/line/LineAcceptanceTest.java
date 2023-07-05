@@ -27,12 +27,16 @@ public class LineAcceptanceTest {
     @DisplayName("지하철노선을 생성한다.")
     @Test
     void createLine() {
+        // TODO: BEF USE SQL
+        Integer stationId1 = this.getCreatedStationId("역1");
+        Integer stationId2 = this.getCreatedStationId("역2");
+
         // given
         Map<String, Object> params = new HashMap<>();
         params.put("name", "신분당선");
         params.put("color", "bg-red-600");
-        params.put("upStationId", 1);
-        params.put("downStationId", 2);
+        params.put("upStationId", stationId1);
+        params.put("downStationId", stationId2);
         params.put("distance", 10);
 
         // when
@@ -56,19 +60,23 @@ public class LineAcceptanceTest {
     @DisplayName("지하철노선 목록을 조회한다.")
     @Test
     void searchLines() {
+        // TODO: BEF USE SQL
+        Integer stationId1 = this.getCreatedStationId("역1");
+        Integer stationId2 = this.getCreatedStationId("역2");
+        Integer stationId3 = this.getCreatedStationId("역3");
         // given
         Map<String, Object> params1 = new HashMap<>();
         params1.put("name", "신분당선");
         params1.put("color", "bg-red-600");
-        params1.put("upStationId", 1);
-        params1.put("downStationId", 2);
+        params1.put("upStationId", stationId1);
+        params1.put("downStationId", stationId2);
         params1.put("distance", 10);
 
         Map<String, Object> params2 = new HashMap<>();
         params2.put("name", "분당선");
         params2.put("color", "bg-green-600");
-        params2.put("upStationId", 1);
-        params2.put("downStationId", 3);
+        params2.put("upStationId", stationId1);
+        params2.put("downStationId", stationId3);
         params2.put("distance", 20);
 
         this.requestCreateLine(params1);
@@ -90,12 +98,15 @@ public class LineAcceptanceTest {
     @DisplayName("지하철노선을 조회한다.")
     @Test
     void searchLine() {
+        // TODO: BEF USE SQL
+        Integer stationId1 = this.getCreatedStationId("역1");
+        Integer stationId2 = this.getCreatedStationId("역2");
         // given
         Map<String, Object> params = new HashMap<>();
         params.put("name", "신분당선");
         params.put("color", "bg-red-600");
-        params.put("upStationId", 1);
-        params.put("downStationId", 2);
+        params.put("upStationId", stationId1);
+        params.put("downStationId", stationId2);
         params.put("distance", 10);
 
         String createdId = this.requestCreateLine(params).jsonPath().getString("id");
@@ -117,12 +128,15 @@ public class LineAcceptanceTest {
     @DisplayName("지하철노선을 수정한다.")
     @Test
     void updateLine() {
+        // TODO: BEF USE SQL
+        Integer stationId1 = this.getCreatedStationId("역1");
+        Integer stationId2 = this.getCreatedStationId("역2");
         // given
         Map<String, Object> createParam = new HashMap<>();
         createParam.put("name", "신분당선");
         createParam.put("color", "bg-red-600");
-        createParam.put("upStationId", 1);
-        createParam.put("downStationId", 2);
+        createParam.put("upStationId", stationId1);
+        createParam.put("downStationId", stationId2);
         createParam.put("distance", 10);
 
         String createdId = this.requestCreateLine(createParam).jsonPath().getString("id");
@@ -149,18 +163,21 @@ public class LineAcceptanceTest {
     @DisplayName("지하철노선을 삭제한다.")
     @Test
     void deleteLine() {
+        // TODO: BEF USE SQL
+        Integer stationId1 = this.getCreatedStationId("역1");
+        Integer stationId2 = this.getCreatedStationId("역2");
         // given
         Map<String, Object> createParam = new HashMap<>();
         createParam.put("name", "신분당선");
         createParam.put("color", "bg-red-600");
-        createParam.put("upStationId", 1);
-        createParam.put("downStationId", 2);
+        createParam.put("upStationId", stationId1);
+        createParam.put("downStationId", stationId2);
         createParam.put("distance", 10);
 
         String createdId = this.requestCreateLine(createParam).jsonPath().getString("id");
 
         // when
-        assertThat(this.requestDeleteLine(createdId).statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(this.requestDeleteLine(createdId).statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         //then
         List<String> searchLines = this.requestSearchLines().jsonPath().getList("name", String.class);
@@ -169,8 +186,7 @@ public class LineAcceptanceTest {
 
 
     private Response requestCreateLine(Map<String, Object> params) {
-        return RestAssured.given().body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
+        return RestAssured.given().log().all().body(params).contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/lines")
                 .then().log().all()
                 .extract().response();
@@ -203,5 +219,16 @@ public class LineAcceptanceTest {
                 .when().delete("/lines/" + id)
                 .then().log().all()
                 .extract().response();
+    }
+
+    //!!TODO @SQL 사용전 임시 코드
+    private Integer getCreatedStationId(String stationName) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", stationName);
+        return RestAssured.given().body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all()
+                .extract().response().jsonPath().getInt("id");
     }
 }

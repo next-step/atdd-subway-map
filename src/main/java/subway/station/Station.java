@@ -24,4 +24,10 @@ public class Station {
     public String getName() {
         return name;
     }
+
+    public static Station saveId(Long id) {
+        Station station = new Station();
+        station.id = id;
+        return station;
+    }
 }
