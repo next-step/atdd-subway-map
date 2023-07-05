@@ -1,4 +1,4 @@
-package subway;
+package subway.station;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -6,17 +6,18 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
+import subway.ApiTest;
+import subway.station.dto.StationRequest;
+import subway.station.repository.StationRepository;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.StationSteps.*;
+import static subway.station.StationSteps.*;
 
 @DisplayName("지하철역 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class StationAcceptanceTest {
+public class StationAcceptanceTest extends ApiTest {
 
     @Autowired
     private StationRepository stationRepository;
@@ -47,7 +48,7 @@ public class StationAcceptanceTest {
     @Test
     void showStations() {
         // given
-        지하철생성요청_다중생성("강남역", "역삼역").stream()
+        지하철생성요청_다중생성(List.of("강남역", "역삼역")).stream()
                 .map(StationSteps::지하철생성요청)
                 .forEach(x -> assertThat(x.statusCode()).isEqualTo(HttpStatus.CREATED.value()));
 

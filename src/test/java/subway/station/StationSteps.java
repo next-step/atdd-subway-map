@@ -1,13 +1,13 @@
-package subway;
+package subway.station;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.MediaType;
+import subway.station.dto.StationRequest;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class StationSteps {
 
@@ -24,8 +24,8 @@ public class StationSteps {
                 .extract();
     }
 
-    public static List<StationRequest> 지하철생성요청_다중생성(String... stationName) {
-        return Stream.of(stationName)
+    public static List<StationRequest> 지하철생성요청_다중생성(List<String> stationName) {
+        return stationName.stream()
                 .map(StationSteps::지하철생성요청_생성)
                 .collect(Collectors.toList());
     }

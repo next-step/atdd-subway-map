@@ -1,6 +1,10 @@
-package subway;
+package subway.station.entity;
 
-import javax.persistence.*;
+import javax.persistence.Id;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Column;
 
 @Entity
 public class Station {
@@ -15,6 +19,10 @@ public class Station {
 
     public Station(String name) {
         this.name = name;
+    }
+
+    public static Station from(String name) {
+        return new Station(name);
     }
 
     public Long getId() {
