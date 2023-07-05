@@ -84,6 +84,34 @@ public class LineAcceptanceTest {
         조회한_노선은_요청한_정보로_수정된_상태이다(selectedResponse.as(LineResponse.class), "다른분당선", "bg-red-600");
     }
 
+    //    Given 지하철 노선을 생성하고
+    //    When 생성한 지하철 노선을 삭제하면
+    //    Then 해당 지하철 노선 정보는 삭제된다
+    @DisplayName("지하철 노선을 삭제한다")
+    @Test
+    void deleteLine() {
+        // given
+        ExtractableResponse<Response> createdResponse = 지하철_노선을_생성한다("신분당선", "bg-red-600", 1L, 2L, 10L);
+
+        // when
+        지하철_노선을_삭제한다(createdResponse.header("Location"));
+
+        // then
+        List<String> lineNames = 지하철_노선_목록을_조회한다();
+        삭제한_노선은_조회되지_않는다(lineNames, "신분당선");
+    }
+
+    private static void 삭제한_노선은_조회되지_않는다(List<String> lineNames, String deletedName) {
+        assertThat(deletedName).isNotIn((lineNames));
+    }
+
+    private static void 지하철_노선을_삭제한다(String createdResourceUrl) {
+        RestAssured.given().log().all()
+                .when().delete(createdResourceUrl)
+                .then().log().all()
+                .statusCode(HttpStatus.NO_CONTENT.value());
+    }
+
     private static void 조회한_노선은_요청한_정보로_수정된_상태이다(LineResponse selectedLineResponse, String updatedName, String updatedColor) {
         assertThat(updatedName).isEqualTo(selectedLineResponse.getName());
         assertThat(updatedColor).isEqualTo(selectedLineResponse.getColor());
@@ -143,9 +171,4 @@ public class LineAcceptanceTest {
                 .statusCode(HttpStatus.CREATED.value())
                 .extract();
     }
-
-    //    Given 지하철 노선을 생성하고
-    //    When 생성한 지하철 노선을 삭제하면
-    //    Then 해당 지하철 노선 정보는 삭제된다
-    //    TODO: 지하철노선 삭제 인수 테스트 작성
 }
