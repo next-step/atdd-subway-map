@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.jdbc.Sql;
 
 import java.util.HashMap;
 import java.util.List;
@@ -20,7 +21,12 @@ import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFOR
 @DisplayName("노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @DirtiesContext(classMode = BEFORE_EACH_TEST_METHOD)
+@Sql(scripts = {"classpath:SQLScripts/01.station-data.sql"})
 public class LineAcceptanceTest {
+    static final Long stationId1 = 1L;
+    static final Long stationId2 = 2L;
+    static final Long stationId3 = 3L;
+
     /**
      * When 지하철 노선을 생성하면
      * Then 지하철 노선이 생성된다
@@ -30,10 +36,6 @@ public class LineAcceptanceTest {
     @DisplayName("지하철노선을 생성한다.")
     @Test
     void createLine() {
-        // TODO: BEF USE SQL
-        Integer stationId1 = this.getCreatedStationId("역1");
-        Integer stationId2 = this.getCreatedStationId("역2");
-
         // given
         Map<String, Object> params = new HashMap<>();
         params.put("name", "신분당선");
@@ -63,10 +65,6 @@ public class LineAcceptanceTest {
     @DisplayName("지하철노선 목록을 조회한다.")
     @Test
     void searchLines() {
-        // TODO: BEF USE SQL
-        Integer stationId1 = this.getCreatedStationId("역1");
-        Integer stationId2 = this.getCreatedStationId("역2");
-        Integer stationId3 = this.getCreatedStationId("역3");
         // given
         Map<String, Object> params1 = new HashMap<>();
         params1.put("name", "신분당선");
@@ -101,9 +99,6 @@ public class LineAcceptanceTest {
     @DisplayName("지하철노선을 조회한다.")
     @Test
     void searchLine() {
-        // TODO: BEF USE SQL
-        Integer stationId1 = this.getCreatedStationId("역1");
-        Integer stationId2 = this.getCreatedStationId("역2");
         // given
         Map<String, Object> params = new HashMap<>();
         params.put("name", "신분당선");
@@ -131,9 +126,6 @@ public class LineAcceptanceTest {
     @DisplayName("지하철노선을 수정한다.")
     @Test
     void updateLine() {
-        // TODO: BEF USE SQL
-        Integer stationId1 = this.getCreatedStationId("역1");
-        Integer stationId2 = this.getCreatedStationId("역2");
         // given
         Map<String, Object> createParam = new HashMap<>();
         createParam.put("name", "신분당선");
@@ -166,9 +158,6 @@ public class LineAcceptanceTest {
     @DisplayName("지하철노선을 삭제한다.")
     @Test
     void deleteLine() {
-        // TODO: BEF USE SQL
-        Integer stationId1 = this.getCreatedStationId("역1");
-        Integer stationId2 = this.getCreatedStationId("역2");
         // given
         Map<String, Object> createParam = new HashMap<>();
         createParam.put("name", "신분당선");
@@ -222,16 +211,5 @@ public class LineAcceptanceTest {
                 .when().delete("/lines/" + id)
                 .then().log().all()
                 .extract().response();
-    }
-
-    //!!TODO @SQL 사용전 임시 코드
-    private Integer getCreatedStationId(String stationName) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", stationName);
-        return RestAssured.given().body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract().response().jsonPath().getInt("id");
     }
 }
