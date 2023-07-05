@@ -4,18 +4,16 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import subway.exception.ErrorCode;
-import subway.exception.SubwayException;
 import subway.station.entity.Station;
 import subway.subwayline.entity.SubwayLine;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
 import javax.persistence.JoinColumn;
-import javax.persistence.FetchType;
+import javax.persistence.ManyToOne;
 
 @Entity
 @Getter
@@ -27,15 +25,15 @@ public class Section {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "subway_line_id")
+    @JoinColumn(name = "subway_line_id", nullable = false)
     private SubwayLine subwayLine;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "up_station_id")
+    @JoinColumn(name = "up_station_id", nullable = false)
     private Station upStation;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "down_station_id")
+    @JoinColumn(name = "down_station_id", nullable = false)
     private Station downStation;
 
     private Integer distance;
@@ -50,12 +48,9 @@ public class Section {
 
     public void addSection(SubwayLine subwayLine) {
         this.subwayLine = subwayLine;
-        this.upStation = subwayLine.getUpStationId();
-        this.downStation = subwayLine.getDownStationId();
     }
 
     public boolean isDownStation(Station station) {
-        if (!downStation.equals(station)) throw new SubwayException(ErrorCode.NOT_DOWN_STATION);
-        return true;
+        return downStation.equals(station);
     }
 }

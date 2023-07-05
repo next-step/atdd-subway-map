@@ -21,6 +21,7 @@ import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 @Entity
 @Getter
@@ -55,8 +56,7 @@ public class SubwayLine {
         this.upStationId = upStationId;
         this.downStationId = downStationId;
         this.distance = distance;
-        this.sections.add(section);
-        section.addSection(this);
+        this.addSection(section);
     }
 
     public static SubwayLine of(String name, String color, Station upStationId, Station downStationId, Integer distance) {
@@ -87,14 +87,31 @@ public class SubwayLine {
         return Arrays.asList(upStationId, downStationId).contains(station);
     }
 
-    public void removeSection(Station station) {
+    public void removeSection(Station downStation) {
         if (isSectionOne()) {
             throw new SubwayException(ErrorCode.SECTION_IS_ONE);
         }
-        this.sections.removeIf(section -> section.isDownStation(station));
+        if (!isLastSection(downStation)) {
+            throw new SubwayException(ErrorCode.NOT_DOWN_STATION);
+        }
+        this.sections.removeIf(section -> section.isDownStation(downStation));
     }
 
     private boolean isSectionOne() {
         return this.sections.size() == 1;
+    }
+
+    private boolean isLastSection(Station downStation) {
+        return getLastSection()
+                .map(section -> section.isDownStation(downStation))
+                .orElse(false);
+    }
+
+    private Optional<Section> getLastSection() {
+        if (sections.isEmpty()) {
+            return Optional.empty();
+        } else {
+            return Optional.of(sections.get(sections.size() - 1));
+        }
     }
 }

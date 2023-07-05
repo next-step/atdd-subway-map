@@ -22,24 +22,6 @@ public class SectionDto {
         this.distance = distance;
     }
 
-    public static SectionDto of(Long id, Long upStationId, Long downStationId, Integer distance) {
-        return SectionDto.builder()
-                .id(id)
-                .upStationId(upStationId)
-                .downStationId(downStationId)
-                .distance(distance)
-                .build();
-    }
-
-    public static SectionDto from(Section section) {
-        return SectionDto.builder()
-                .id(section.getId())
-                .upStationId(section.getUpStation().getId())
-                .downStationId(section.getDownStation().getId())
-                .distance(section.getDistance())
-                .build();
-    }
-
     public Section toEntity(SubwayLine subwayLine, Station upStation, Station downStation, Integer distance) {
         return Section.builder()
                 .subwayLine(subwayLine)

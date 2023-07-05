@@ -10,6 +10,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(SubwayException.class)
     public ResponseEntity<Object> handleBadRequestException(SubwayException subwayException) {
         ErrorResponse errorResponse = new ErrorResponse(subwayException.getErrorCode().getStatus(), subwayException.getErrorCode().getMessage());
-        return ResponseEntity.badRequest().body(errorResponse);
+        return new ResponseEntity<>(errorResponse, subwayException.getErrorCode().getStatus());
     }
 }
