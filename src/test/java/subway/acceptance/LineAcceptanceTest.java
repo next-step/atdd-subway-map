@@ -3,7 +3,6 @@ package subway.acceptance;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.Collection;
@@ -35,7 +34,7 @@ public class LineAcceptanceTest {
     int port;
 
     @Autowired
-    DatabaseCleanup databaseCleanup;
+    RestAssuredUtil restAssuredUtil;
 
     @BeforeEach
     @DisplayName("RestAssured 에서 요청 보낼 포트를 설정하고, 4개의 지하철 역 정보를 생성합니다.")
@@ -46,12 +45,11 @@ public class LineAcceptanceTest {
     }
 
     private void 데이터베이스를_초기화합니다() {
-        databaseCleanup.afterPropertiesSet();
-        databaseCleanup.clean();
+        restAssuredUtil.cleanup();
     }
 
     private void 포트번호를_설정합니다() {
-        RestAssured.port = port;
+        restAssuredUtil.initializePort(port);
     }
 
     private void 지하철_역을_생성합니다(String... name) {

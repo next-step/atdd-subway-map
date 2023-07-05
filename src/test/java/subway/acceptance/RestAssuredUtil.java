@@ -6,8 +6,25 @@ import io.restassured.response.Response;
 import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.stereotype.Component;
 
+@Component
 public class RestAssuredUtil {
+
+    private final DatabaseCleanup databaseCleanup;
+
+    public RestAssuredUtil(DatabaseCleanup databaseCleanup) {
+        this.databaseCleanup = databaseCleanup;
+    }
+
+    public void initializePort(int port) {
+        RestAssured.port = port;
+    }
+
+    public void cleanup() {
+        databaseCleanup.afterPropertiesSet();
+        databaseCleanup.clean();
+    }
 
     public static ExtractableResponse<Response> findByIdWithOk(String url, Long id) {
         return RestAssured.given().log().all()

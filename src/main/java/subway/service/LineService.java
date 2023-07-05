@@ -53,10 +53,10 @@ public class LineService {
     public void updatedLineBy(Long id, LineUpdateRequest request) {
         Line line = lineFoundById(id);
 
-        line.updateName(request.getName())
-            .updateColor(request.getColor())
-            .updateEndStations(EndStations.of(distinctStationsGetByIdOf(request.getUpStationId(), request.getDownStationId())))
-            .updateDistance(request.getDistance());
+        line.modifyTheLine(request.getName()
+            , request.getColor()
+            , EndStations.of(distinctStationsGetByIdOf(request.getUpStationId(), request.getDownStationId()))
+            , request.getDistance());
 
         lineRepository.save(line);
     }

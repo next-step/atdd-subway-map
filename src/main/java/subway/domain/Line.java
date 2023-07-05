@@ -1,11 +1,13 @@
 package subway.domain;
 
+import java.util.Objects;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
+import org.springframework.util.StringUtils;
 
 @Entity
 public class Line {
@@ -53,32 +55,35 @@ public class Line {
         return distance;
     }
 
-    public Line updateName(String name) {
-        if (name != null && !name.isBlank()) {
+    public void modifyTheLine(String name, String color, EndStations endStations, Long distance) {
+        updateName(name);
+        updateColor(color);
+        updateEndStations(endStations);
+        updateDistance(distance);
+    }
+
+    private void updateName(String name) {
+        if (StringUtils.hasText(name)) {
             this.name = name;
         }
-        return this;
     }
 
-    public Line updateColor(String color) {
-        if (color != null && !color.isBlank()) {
+    private void updateColor(String color) {
+        if (StringUtils.hasText(color)) {
             this.color = color;
         }
-        return this;
     }
 
-    public Line updateEndStations(EndStations endStations) {
-        if (endStations != null) {
+    private void updateEndStations(EndStations endStations) {
+        if (Objects.nonNull(endStations)) {
             this.endStations = endStations;
         }
-        return this;
     }
 
-    public Line updateDistance(Long distance) {
-        if (distance != null && distance > 0) {
+    private void updateDistance(Long distance) {
+        if (isGreaterThanZero(distance)) {
             this.distance = distance;
         }
-        return this;
     }
 
     @Override
@@ -90,6 +95,10 @@ public class Line {
             ", stations=" + endStations +
             ", distance=" + distance +
             '}';
+    }
+
+    private boolean isGreaterThanZero(Long distance) {
+        return distance != null && distance > 0L;
     }
 
     public static class Builder {

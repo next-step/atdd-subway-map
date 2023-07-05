@@ -3,7 +3,6 @@ package subway.acceptance;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.List;
@@ -36,12 +35,12 @@ public class StationAcceptanceTest {
     int port;
 
     @Autowired
-    DatabaseCleanup databaseCleanup;
+    RestAssuredUtil restAssuredUtil;
 
     @DisplayName("RestAssured 요청 포트 번호를 설정합니다.")
     @BeforeEach
     void setup() {
-        RestAssured.port = port;
+        restAssuredUtil.initializePort(port);
     }
 
     /**
