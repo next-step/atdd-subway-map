@@ -129,6 +129,29 @@ class LineAcceptanceTest {
         assertThat((String) responseJsonPath.get("color")).isEqualTo(updatedLineColor);
     }
 
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 삭제하면
+     * Then 해당 지하철 노선 정보는 삭제된다
+     */
+    @DisplayName("지하철 노선을 삭제한다.")
+    @Test
+    void deleteLine() {
+        // given
+        ExtractableResponse<Response> creationResponse = RestAssuredClient.requestPost(urlPath,
+                LineFactory.create(LineFactory.LINE_NAMES[0]))
+            .statusCode(HttpStatus.CREATED.value()).extract();
+
+        // when
+        long lineId = creationResponse.jsonPath().get("id");
+        String path = generatePathForId(lineId);
+        ExtractableResponse<Response> response = RestAssuredClient.requestDelete(path).extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+
     private String generatePathForId(long id) {
         return new StringBuilder()
             .append(urlPath)
