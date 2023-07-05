@@ -27,6 +27,11 @@ public class StationTestFixture {
             .statusCode();
     }
 
+    public static StationResponse 지하철_역_생성_요청_역_정보_반환(String name) {
+        return 지하철_역_생성_요청(name)
+            .as(StationResponse.class);
+    }
+
     public static List<String> 지하철_역_목록_조회_요청_역_이름_목록_반환() {
 
         return RestAssured.given().log().all()
