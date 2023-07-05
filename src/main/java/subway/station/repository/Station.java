@@ -1,4 +1,6 @@
-package subway;
+package subway.station.repository;
+
+import subway.line.repository.Line;
 
 import javax.persistence.*;
 
@@ -6,9 +8,13 @@ import javax.persistence.*;
 public class Station {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+        private Long id;
     @Column(length = 20, nullable = false)
     private String name;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "line_id")
+    private Line line;
 
     public Station() {
     }
@@ -23,5 +29,9 @@ public class Station {
 
     public String getName() {
         return name;
+    }
+
+    public void updateLine(Line line) {
+        this.line = line;
     }
 }
