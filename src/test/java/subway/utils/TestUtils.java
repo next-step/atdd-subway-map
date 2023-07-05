@@ -20,6 +20,6 @@ public class TestUtils {
                 .then().log().all()
                 .extract();
 
-        return response.jsonPath().get("id");
+        return ((Number)response.jsonPath().get("id")).longValue();
     }
 }
