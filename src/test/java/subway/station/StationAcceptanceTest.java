@@ -1,15 +1,14 @@
-package subway;
+package subway.station;
 
 import io.restassured.RestAssured;
-import io.restassured.config.HeaderConfig;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.assertj.core.api.AbstractIntegerAssert;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.HashMap;
 import java.util.List;
@@ -19,7 +18,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class StationAcceptanceTest {
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+class StationAcceptanceTest {
     /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다
@@ -29,27 +29,11 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .body(params)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/stations")
-                        .then().log().all()
-                        .extract();
+        지하철역을_생성한다("강남역");
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-        // then
-        List<String> stationNames =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
-        assertThat(stationNames).containsAnyOf("강남역");
+        List<String> stationNames = 지하철역_목록을_조회한다();
+        생성한_역을_목록에서_찾을_수_있다(stationNames, "강남역");
     }
 
     /**
@@ -90,11 +74,16 @@ public class StationAcceptanceTest {
         삭제한_역은_조회되지_않는다(stationNames, "건대입구역");
     }
 
+    private static void 생성한_역을_목록에서_찾을_수_있다(List<String> stationNames, String createdName) {
+        assertThat(stationNames).containsAnyOf(createdName);
+    }
+
     private static void 지하철역을_삭제한다(String createdResourceUrl) {
         RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().delete(createdResourceUrl)
-                .then().log().all();
+                .then().log().all()
+                .statusCode(HttpStatus.NO_CONTENT.value());
     }
 
     private static void 삭제한_역은_조회되지_않는다(List<String> stationNames, String deletedName) {
@@ -104,10 +93,12 @@ public class StationAcceptanceTest {
     private static void 생성한_갯수의_지하철역_목록을_응답한다(List<String> stationNames, int createdCount) {
         assertThat(stationNames.size()).isEqualTo(createdCount);
     }
+
     private static List<String> 지하철역_목록을_조회한다() {
         return RestAssured.given().log().all()
                 .when().get("/stations")
                 .then().log().all()
+                .statusCode(HttpStatus.OK.value())
                 .extract().jsonPath().getList("name", String.class);
     }
 
@@ -119,6 +110,7 @@ public class StationAcceptanceTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/stations")
                 .then().log().all()
+                .statusCode(HttpStatus.CREATED.value())
                 .extract();
     }
 }

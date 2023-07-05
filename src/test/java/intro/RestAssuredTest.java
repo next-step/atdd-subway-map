@@ -1,4 +1,4 @@
-package subway;
+package intro;
 
 import io.restassured.RestAssured;
 import org.junit.jupiter.api.DisplayName;
