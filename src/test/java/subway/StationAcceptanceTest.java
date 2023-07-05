@@ -9,7 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
-import subway.station.StationResponse;
+import subway.station.dto.StationResponse;
 
 import java.util.Arrays;
 import java.util.HashMap;

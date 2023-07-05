@@ -1,9 +1,10 @@
-package subway.station;
+package subway.station.domain;
 
 import javax.persistence.*;
 
 @Entity
 public class Station {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
