@@ -6,12 +6,15 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.List;
 
 import static helper.StationTestHelper.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD;
 
+@DirtiesContext(classMode = BEFORE_EACH_TEST_METHOD)
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class StationAcceptanceTest {
@@ -69,7 +72,7 @@ class StationAcceptanceTest {
     @Test
     void removeStations() {
         // given
-        String stationId = 지하철역을_생성한다("신논현역")
+        String stationId = 지하철역을_생성한다("강남역")
                 .jsonPath()
                 .get("id")
                 .toString();
@@ -80,6 +83,6 @@ class StationAcceptanceTest {
 
         // then
         List<String> stationNames = 지하철역_목록을_조회한다();
-        assertThat(stationNames).doesNotContain("신논현역");
+        assertThat(stationNames).doesNotContain("강남역");
     }
 }
