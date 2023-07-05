@@ -1,7 +1,8 @@
 package subway.line.controller;
 
-import static org.springframework.http.ResponseEntity.status;
+import static org.springframework.http.ResponseEntity.created;
 
+import java.net.URI;
 import java.util.List;
 
 import lombok.RequiredArgsConstructor;
@@ -17,11 +18,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import subway.line.exception.LineNotFoundException;
+import subway.line.service.LineService;
 import subway.line.view.LineCreateRequest;
 import subway.line.view.LineModifyRequest;
-import subway.line.exception.LineNotFoundException;
 import subway.line.view.LineResponse;
-import subway.line.service.LineService;
 
 @RequestMapping("/lines")
 @RestController
@@ -31,7 +32,10 @@ public class LineController {
 
     @PostMapping
     public ResponseEntity<LineResponse> createLines(@RequestBody LineCreateRequest request) {
-        return status(HttpStatus.CREATED).body(lineService.createStation(request));
+        LineResponse lineResponse = lineService.createStation(request);
+
+        return created(URI.create("/lines/" + lineResponse.getId()))
+                .body(lineResponse);
     }
 
     @GetMapping("/{id}")
