@@ -16,7 +16,7 @@ public class LineService {
     private final StationRepository stationRepository;
 
     @Transactional
-    public LineResponse saveLine(LineRequest request) {
+    public LineResponse saveLine(CreateLineRequest request) {
         LineEntity lineEntity = lineRepository.save(new LineEntity(
                 request.getName(),
                 request.getColor(),

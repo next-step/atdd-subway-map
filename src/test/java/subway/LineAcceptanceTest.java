@@ -67,6 +67,31 @@ public class LineAcceptanceTest {
         생성한_노선의_정보를_응답한다(createdResponse.as(LineResponse.class), selectedResponse.as(LineResponse.class));
     }
 
+    //    Given 지하철 노선을 생성하고
+    //    When 생성한 지하철 노선을 수정하면
+    //    Then 해당 지하철 노선 정보는 수정된다
+    @DisplayName("지하철 노선을 수정한다.")
+    @Test
+    void updateLine() {
+        // given
+        ExtractableResponse<Response> createdResponse = 지하철_노선을_생성한다("신분당선", "bg-red-600", 1L, 2L, 10L);
+
+        // when
+        UpdateLineRequest request = new UpdateLineRequest("다른분당선", "bg-red-600");
+        RestAssured.given().log().all()
+                .body(request)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().put(createdResponse.header("Location"))
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value());
+
+        // then
+        ExtractableResponse<Response> selectedResponse = 지하철_노선을_조회한다(createdResponse.header("Location"));
+        LineResponse lineResponse = selectedResponse.as(LineResponse.class);
+        assertThat(request.getName()).isEqualTo(lineResponse.getName());
+        assertThat(request.getColor()).isEqualTo(lineResponse.getColor());
+    }
+
     private static void 생성한_노선의_정보를_응답한다(LineResponse createdLine, LineResponse selectedLine) {
         assertThat(createdLine).isEqualTo(selectedLine);
     }
@@ -96,7 +121,7 @@ public class LineAcceptanceTest {
     }
 
     private static ExtractableResponse<Response> 지하철_노선을_생성한다(String name, String color, Long upStationId, Long downStationId, Long distance) {
-        LineRequest request = new LineRequest(
+        CreateLineRequest request = new CreateLineRequest(
                 name,
                 color,
                 upStationId,
@@ -112,11 +137,6 @@ public class LineAcceptanceTest {
                 .statusCode(HttpStatus.CREATED.value())
                 .extract();
     }
-
-    //    Given 지하철 노선을 생성하고
-    //    When 생성한 지하철 노선을 수정하면
-    //    Then 해당 지하철 노선 정보는 수정된다
-    //    TODO: 지하철노선 수정 인수 테스트 작성
 
     //    Given 지하철 노선을 생성하고
     //    When 생성한 지하철 노선을 삭제하면

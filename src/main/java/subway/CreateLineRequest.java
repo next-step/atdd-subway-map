@@ -2,7 +2,7 @@ package subway;
 import lombok.Value;
 
 @Value
-class LineRequest {
+class CreateLineRequest {
     String name;
     String color;
     Long upStationId;
