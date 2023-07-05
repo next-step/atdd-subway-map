@@ -1,15 +1,13 @@
-package subway;
+package subway.station;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import subway.AcceptanceTest;
 
 import java.util.HashMap;
 import java.util.List;
@@ -18,19 +16,10 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class StationAcceptanceTest {
+public class StationAcceptanceTest extends AcceptanceTest {
 
     private static final String GANGNAM_STATION_NAME = "강남역";
     private static final String SEOCHO_STATION_NAME = "서초역";
-
-    @LocalServerPort
-    private int port;
-
-    @BeforeEach
-    void setUp() {
-        RestAssured.port = port;
-    }
 
     @Test
     void 지하철역_생성() {
@@ -74,9 +63,10 @@ public class StationAcceptanceTest {
         assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // when
+        String location = createResponse.response().getHeaders().get("location").getValue();
         ExtractableResponse<Response> deleteResponse = RestAssured
                 .when()
-                .delete("/stations/1")
+                .delete(location)
                 .then().log().all()
                 .extract();
 
@@ -89,7 +79,7 @@ public class StationAcceptanceTest {
         assertThat(stationResponse.size()).isEqualTo(0);
     }
 
-    private ExtractableResponse<Response> 지하철역_생성_요청(String stationName) {
+    public static ExtractableResponse<Response> 지하철역_생성_요청(String stationName) {
         Map<String, String> params = new HashMap<>();
         params.put("name", stationName);
 
@@ -103,7 +93,7 @@ public class StationAcceptanceTest {
                 .extract();
     }
 
-    private ExtractableResponse<Response> 지하철역_목록_조회_요청() {
+    public static ExtractableResponse<Response> 지하철역_목록_조회_요청() {
         return RestAssured
                 .given().log().all()
                 .when()
