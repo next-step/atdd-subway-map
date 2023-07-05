@@ -48,8 +48,9 @@ public class Line {
     @Column(nullable = false)
     private Long distance;
 
+    @Builder.Default
     @OneToMany(mappedBy = "line")
-    private List<LineStation> stations = new ArrayList<>();;
+    private List<LineStation> stations = new ArrayList<>();
 
     public static Line from(LineCreateRequest request, Station upStation, Station downStation) {
         return Line.builder()
