@@ -1,6 +1,6 @@
 package subway;
 
-import static org.springframework.test.annotation.DirtiesContext.ClassMode.*;
+import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.*;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -9,12 +9,12 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.jdbc.Sql;
 
 import io.restassured.path.json.JsonPath;
 
 @DisplayName("지하철 노선 관련 기능")
-@DirtiesContext(classMode = BEFORE_EACH_TEST_METHOD)
+@Sql(scripts = "classpath:reset.sql", executionPhase = AFTER_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationLineAcceptanceTest {
 
