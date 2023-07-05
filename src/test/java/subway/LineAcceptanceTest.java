@@ -119,7 +119,7 @@ class LineAcceptanceTest {
         String updatedLineName = "수인분당선";
         String updatedLineColor = "bg-yellow-600";
         ExtractableResponse<Response> response =
-            RestAssuredClient.requestPatch(path,
+            RestAssuredClient.requestPut(path,
                     LineFactory.createNameAndColorUpdateParams(updatedLineName, updatedLineColor))
                 .statusCode(HttpStatus.OK.value()).extract();
 
