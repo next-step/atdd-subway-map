@@ -3,6 +3,7 @@ package subway;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import lombok.experimental.UtilityClass;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 
@@ -10,6 +11,7 @@ import java.util.Map;
 
 import static io.restassured.RestAssured.given;
 
+@UtilityClass
 public class RestAssuredWrapper {
     public static ExtractableResponse<Response> get(String path) {
         return request(path, null, null, HttpMethod.GET);
