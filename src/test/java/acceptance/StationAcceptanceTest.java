@@ -1,36 +1,32 @@
-package subway;
+package acceptance;
 
-import static api.StationApiRequest.*;
+import static api.StationApiRequest.지하철역_리스트_조회;
+import static api.StationApiRequest.지하철역_삭제;
+import static api.StationApiRequest.지하철역_생성_요청;
+import static fixture.StationModifyRequestFixture.강남역;
+import static fixture.StationModifyRequestFixture.또다른지하철역이;
+import static fixture.StationModifyRequestFixture.새로운지하철역이름;
+import static fixture.StationModifyRequestFixture.지하철역이름;
 import static fixture.StationRequestFixture.지하철역_등록_요청_데이터_생성;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import fixture.StationRequestFixture;
-import io.restassured.RestAssured;
+import config.AcceptanceTestConfig;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import subway.service.response.StationResponse;
 
 @DisplayName("지하철역 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-class StationAcceptanceTest {
-
-    private static final String 지하철역이름 = "지하철역이름";
-    private static final String 새로운지하철역이름 = "새로운지하철역이름";
-    private static final String 또다른지하철역이 = "또다른지하철역이";
-    private static final String 강남역 = "강남역";
-
+class StationAcceptanceTest extends AcceptanceTestConfig {
 
     /**
-     * When 지하철역을 생성하면 Then 지하철역이 생성된다 Then 지하철역 목록 조회 시 생성한 역을 찾을 수 있다
+     * When 지하철역을 생성하면 <br>
+     * Then 지하철역이 생성된다 <br>
+     * Then 지하철역 목록 조회 시 생성한 역을 찾을 수 있다
      */
     @DisplayName("지하철역을 생성한다.")
     @Test
@@ -50,7 +46,9 @@ class StationAcceptanceTest {
     }
 
     /**
-     * Given 2개의 지하철역을 생성하고 When 지하철역 목록을 조회하면 Then 2개의 지하철역을 응답 받는다
+     * Given 2개의 지하철역을 생성하고 <br>
+     * When 지하철역 목록을 조회하면 <br>
+     * Then 2개의 지하철역을 응답 받는다
      */
     @Test
     @DisplayName("지하철역 목록을 조회한다.")
@@ -75,7 +73,9 @@ class StationAcceptanceTest {
     }
 
     /**
-     * Given 지하철역을 생성하고 When 그 지하철역을 삭제하면 Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
+     * Given 지하철역을 생성하고 <br>
+     * When 그 지하철역을 삭제하면 <br>
+     * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
     @Test
     @DisplayName("지하철역 삭제")

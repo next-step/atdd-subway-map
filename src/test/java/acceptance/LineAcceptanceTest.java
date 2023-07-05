@@ -1,35 +1,38 @@
-package subway;
+package acceptance;
 
+import static api.StationLineApiRequest.지하철역_노선_단건_조회;
+import static api.StationLineApiRequest.지하철역_노선_등록_요청;
+import static api.StationLineApiRequest.지하철역_노선_등록_요청_후_id_추출;
+import static api.StationLineApiRequest.지하철역_노선_목록_조회_요청;
+import static api.StationLineApiRequest.지하철역_노선_삭제;
+import static api.StationLineApiRequest.지하철역_노선_수정;
+import static fixture.StationLineRequestFixture.distance;
+import static fixture.StationLineRequestFixture.green;
+import static fixture.StationLineRequestFixture.red;
+import static fixture.StationLineRequestFixture.노선등록요청_데이터_생성;
+import static fixture.StationLineRequestFixture.다른분당선;
+import static fixture.StationLineRequestFixture.또다른지하철역_id;
+import static fixture.StationLineRequestFixture.분당선;
+import static fixture.StationLineRequestFixture.새로운지하철역_id;
+import static fixture.StationLineRequestFixture.신분당선;
+import static fixture.StationLineRequestFixture.지하철역_id;
+import static fixture.StationModifyRequestFixture.노선수정요청_데이터_생성;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import config.AcceptanceTestConfig;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 
-import static api.StationLineApiRequest.*;
-import static fixture.StationLineRequestFixture.노선등록요청_데이터_생성;
-import static fixture.StationModifyRequestFixture.노선수정요청_데이터_생성;
-import static org.assertj.core.api.Assertions.assertThat;
-
 @DisplayName("지하철 노선 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-class LineAcceptanceTest {
-
-    private final static String 신분당선 = "신분당선";
-    private final static String 분당선 = "분당선";
-    private static final String 다른분당선 = "다른분당선";
-    private final static String red = "bg-red-600";
-    private final static String green = "bg-green-600";
-    private final static long 지하철역_id = 1;
-    private final static long 새로운지하철역_id = 2;
-    private final static long 또다른지하철역_id = 3;
-    private final static int distance = 10;
-
+class LineAcceptanceTest extends AcceptanceTestConfig {
 
     /**
-     * When 지하철 노선을 생성하면 <br> Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
+     * When 지하철 노선을 생성하면 <br>
+     * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
      */
     @DisplayName("지하철 노선을 생성한다.")
     @Test
@@ -60,7 +63,9 @@ class LineAcceptanceTest {
 
 
     /**
-     * Given 2개의 지하철 노선을 생성하고 <br> When 지하철 노선 목록을 조회하면 <br> Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
+     * Given 2개의 지하철 노선을 생성하고 <br>
+     * When 지하철 노선 목록을 조회하면 <br>
+     * Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
      */
     @DisplayName("지하철 노선 목록 조회")
     @Test
@@ -82,7 +87,9 @@ class LineAcceptanceTest {
     }
 
     /**
-     * Given 지하철 노선을 생성하고 <br> When 생성한 지하철 노선을 조회하면 <br> Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
+     * Given 지하철 노선을 생성하고 <br>
+     * When 생성한 지하철 노선을 조회하면
+     * <br> Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
      */
 
     @DisplayName("지하철 노선 조회")
@@ -111,7 +118,9 @@ class LineAcceptanceTest {
     }
 
     /**
-     * Given 지하철 노선을 생성하고 <br> When 생성한 지하철 노선을 수정하면 <br> Then 해당 지하철 노선 정보는 수정된다 <br>
+     * Given 지하철 노선을 생성하고 <br>
+     * When 생성한 지하철 노선을 수정하면 <br>
+     * Then 해당 지하철 노선 정보는 수정된다 <br>
      */
     @DisplayName("지하철 노선 수정")
     @Test
@@ -134,7 +143,9 @@ class LineAcceptanceTest {
     }
 
     /**
-     * Given 지하철 노선을 생성하고 <br> When 생성한 지하철 노선을 삭제하면 <br> Then 해당 지하철 노선 정보는 삭제된다 <br>
+     * Given 지하철 노선을 생성하고 <br>
+     * When 생성한 지하철 노선을 삭제하면 <br>
+     * Then 해당 지하철 노선 정보는 삭제된다 <br>
      */
     @DisplayName("지하철 노선 삭제")
     @Test
