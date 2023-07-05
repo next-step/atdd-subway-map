@@ -75,7 +75,7 @@ public class StationAcceptanceTest {
         ExtractableResponse<Response> stationCreateResponse = 지하철_역_생성_요청(강남역);
 
         // given
-        지하철_역_삭제_요청(stationCreateResponse.header("location"));
+        지하철_역_삭제_요청(stationCreateResponse.jsonPath().getInt("id"));
 
         // then
         ExtractableResponse<Response> response = 지하철_역_목록_조회_요청();

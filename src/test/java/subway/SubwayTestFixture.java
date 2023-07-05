@@ -30,11 +30,11 @@ public class SubwayTestFixture {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 지하철_역_삭제_요청(String locationHeader) {
+    public static ExtractableResponse<Response> 지하철_역_삭제_요청(Integer id) {
 
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().delete(locationHeader)
+                .when().delete("/stations/" + id)
                 .then().log().all()
                 .extract();
     }
