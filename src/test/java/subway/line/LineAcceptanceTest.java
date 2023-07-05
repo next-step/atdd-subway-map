@@ -159,7 +159,7 @@ public class LineAcceptanceTest {
         Line line = 신분당선_노선_테스트_데이터_생성();
 
         //when
-        Line result = 지하철_노선_아이디를_바탕으로_조회한다(line.getId());
+        Line result = 지하철_노선_아이디를_바탕으로_조회하는_api를_호출한다(line.getId());
 
         //then
         assertThat(result.getName()).isEqualTo("신분당선");
@@ -168,6 +168,17 @@ public class LineAcceptanceTest {
     Line 지하철_노선_아이디를_바탕으로_조회한다(Long id) {
         return lineRepository.findById(id)
                 .orElseThrow(NoSuchElementException::new);
+    }
+
+    Line 지하철_노선_아이디를_바탕으로_조회하는_api를_호출한다(Long id) {
+        Line response = RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().get("/lines/{id}", id)
+                .then().log().all()
+                .extract()
+                .as(Line.class);
+
+        return response;
     }
 
 
