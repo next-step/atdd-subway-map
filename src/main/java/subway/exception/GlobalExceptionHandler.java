@@ -18,14 +18,9 @@ public class GlobalExceptionHandler {
 	}
 
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
-	@ExceptionHandler(StationLineCreateException.class)
-	public void stationLineCreateExceptionHandler(StationLineCreateException exception) {
+	@ExceptionHandler({StationLineCreateException.class, StationLineSectionCreateException.class, StationLineSectionDeleteException.class})
+	public void businessErrorExceptionHandler(RuntimeException exception) {
 		log.info("error occurred: {}", exception.getMessage());
 	}
 
-	@ResponseStatus(HttpStatus.BAD_REQUEST)
-	@ExceptionHandler(StationLineSectionCreateException.class)
-	public void stationLineSectionCreateExceptionHandler(StationLineSectionCreateException exception) {
-		log.info("error occurred: {}", exception.getMessage());
-	}
 }

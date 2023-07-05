@@ -23,6 +23,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import subway.exception.StationLineCreateException;
 import subway.exception.StationLineSectionCreateException;
+import subway.exception.StationLineSectionDeleteException;
 
 @Getter
 @Entity
@@ -92,6 +93,27 @@ public class StationLine {
 		}
 	}
 
+	public void deleteSection(Station targetStation) {
+		checkSectionCanDeleted(targetStation);
+
+		final StationLineSection targetSection = getSections().stream()
+			.filter(section -> targetStation.equals(section.getDownStation()))
+			.findFirst()
+			.orElseThrow(() -> new StationLineSectionDeleteException("not found deleted target section"));
+
+		getSections().remove(targetSection);
+	}
+
+	private void checkSectionCanDeleted(Station targetStation) {
+		if (!targetStation.equals(getLineLastDownStation())) {
+			throw new StationLineSectionDeleteException("target section must be last station of line");
+		}
+
+		if (getSections().size() < 2) {
+			throw new StationLineSectionDeleteException("section must be greater or equals than 2");
+		}
+	}
+
 	public List<Station> getAllStations() {
 		final List<Station> allUpStation = getSections().stream()
 			.map(StationLineSection::getUpStation)
@@ -125,5 +147,4 @@ public class StationLine {
 
 		return getSections().get(lastIndexOfSections);
 	}
-
 }

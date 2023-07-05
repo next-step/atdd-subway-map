@@ -88,4 +88,15 @@ public class StationLineService {
 
 		stationLine.createSection(upStation, downStation, request.getDistance());
 	}
+
+	@Transactional
+	public void deleteStationLineSection(Long lineId, Long stationId) {
+		final Station targetStation = stationRepository.findById(stationId)
+			.orElseThrow(() -> new EntityNotFoundException("upStation not found"));
+
+		final StationLine stationLine = stationLineRepository.findById(lineId)
+			.orElseThrow(() -> new EntityNotFoundException("station line not found"));
+
+		stationLine.deleteSection(targetStation);
+	}
 }
