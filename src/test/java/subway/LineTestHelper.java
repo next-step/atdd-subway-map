@@ -11,7 +11,6 @@ import subway.line.LineRequest;
 import subway.line.LineResponse;
 
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
