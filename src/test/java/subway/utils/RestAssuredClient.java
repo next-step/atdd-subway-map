@@ -25,7 +25,7 @@ public class RestAssuredClient {
         return RestAssured.given().log().all()
             .body(params)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().patch(path)
+            .when().put(path)
             .then().log().all();
     }
 
