@@ -8,23 +8,23 @@ public class SubwayLine {
     private final String name;
 
     private final String color;
-    private final SubwaySectionList stations;
+    private final SubwaySectionList sectionList;
 
-    private SubwayLine(String name, String color, SubwaySectionList stations) {
+    private SubwayLine(String name, String color, SubwaySectionList sectionList) {
         this.name = name;
         this.color = color;
-        this.stations = stations;
+        this.sectionList = sectionList;
     }
 
-    public static SubwayLine register(String name, String color, SubwaySectionList stations) {
-        return new SubwayLine(name, color, stations);
+    public static SubwayLine register(String name, String color, SubwaySection... sections) {
+        return new SubwayLine(name, color, new SubwaySectionList(sections));
     }
 
-    public Long getId() {
+    public SubwayLine.Id getId() {
         if (isNew()) {
             throw new IllegalArgumentException("아직 저장되지 않은 역입니다.");
         }
-        return id.getId();
+        return id;
     }
 
     public String getName() {
@@ -35,8 +35,8 @@ public class SubwayLine {
         return color;
     }
 
-    public List<SubwaySection> getStations() {
-        return stations.getSections();
+    public List<SubwaySection> getSectionList() {
+        return sectionList.getSections();
     }
 
     public boolean isNew() {
@@ -50,7 +50,7 @@ public class SubwayLine {
             this.id = id;
         }
 
-        public Long getId() {
+        public Long getValue() {
             return id;
         }
     }

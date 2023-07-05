@@ -4,13 +4,17 @@ import java.math.BigDecimal;
 
 public class Kilometer {
 
-    private final BigDecimal kilometer;
+    private final BigDecimal amount;
 
-    public Kilometer(BigDecimal kilometer) {
-        this.kilometer = kilometer;
+    private Kilometer(BigDecimal amount) {
+        this.amount = amount;
     }
 
-    public BigDecimal getKilometer() {
-        return kilometer;
+    public static Kilometer of(BigDecimal amount) {
+        return new Kilometer(amount);
+    }
+
+    public BigDecimal getValue() {
+        return amount;
     }
 }

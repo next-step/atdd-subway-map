@@ -5,17 +5,17 @@ import java.util.List;
 
 public class SubwaySectionList {
 
-    private final List<SubwaySection> stations;
+    private final List<SubwaySection> subwaySections;
 
-    public SubwaySectionList(SubwaySection... stations) {
-        this.stations = Arrays.asList(stations);
+    public SubwaySectionList(SubwaySection... subwaySections) {
+        this.subwaySections = Arrays.asList(subwaySections);
     }
 
     public void add(SubwaySection station) {
-        stations.add(station);
+        subwaySections.add(station);
     }
 
     public List<SubwaySection> getSections() {
-        return stations;
+        return subwaySections;
     }
 }

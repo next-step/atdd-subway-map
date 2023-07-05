@@ -6,12 +6,12 @@ public class SubwaySectionStation {
     private final String name;
 
     public SubwaySectionStation(Station station) {
-        this.id = new Station.Id(station.getId());
+        this.id = station.getId();
         this.name = station.getName();
     }
 
-    public Long getId() {
-        return id.getId();
+    public Station.Id getId() {
+        return id;
     }
 
     public String getName() {

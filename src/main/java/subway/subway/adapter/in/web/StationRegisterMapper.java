@@ -6,7 +6,7 @@ import subway.subway.application.in.command.StationRegisterCommand;
 @Component
 public class StationRegisterMapper {
 
-    public StationRegisterCommand toMap(StationRegisterController.Request request) {
+    public StationRegisterCommand mapFrom(StationRegisterController.Request request) {
         return new StationRegisterCommand(request.getName());
     }
 }

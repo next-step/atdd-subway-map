@@ -7,6 +7,7 @@ import org.assertj.core.api.Assertions;
 import org.springframework.http.MediaType;
 
 import java.util.List;
+import java.util.Map;
 
 public abstract class SubwayLineAcceptanceTest extends StationAcceptanceTest{
 

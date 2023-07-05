@@ -7,7 +7,7 @@ public class SubwaySection {
     private SubwaySection.Id id;
     private final SubwaySectionStation startStation;
     private final SubwaySectionStation endStation;
-    private final Kilometer kilometer;
+    private final Kilometer distance;
 
     public static SubwaySection register(Station startStation, Station endStation, Kilometer kilometer) {
         SubwaySectionStation startSectionStation = new SubwaySectionStation(startStation);
@@ -19,36 +19,45 @@ public class SubwaySection {
         return new SubwaySection(id, startStation, endStation, kilometer);
     }
 
-    private SubwaySection(SubwaySectionStation startStation, SubwaySectionStation endStation, Kilometer kilometer) {
+    private SubwaySection(SubwaySectionStation startStation, SubwaySectionStation endStation, Kilometer distance) {
         this.startStation = startStation;
         this.endStation = endStation;
-        this.kilometer = kilometer;
+        this.distance = distance;
     }
 
-    private SubwaySection(SubwaySection.Id id, SubwaySectionStation startStation, SubwaySectionStation endStation, Kilometer kilometer) {
+    private SubwaySection(SubwaySection.Id id, SubwaySectionStation startStation, SubwaySectionStation endStation, Kilometer distance) {
         this.id = id;
         this.startStation = startStation;
         this.endStation = endStation;
-        this.kilometer = kilometer;
+        this.distance = distance;
     }
 
-    public Long getStartStationId() {
+    public Station.Id getStartStationId() {
         return startStation.getId();
     }
 
-    public Long getEndStationId() {
+    public String getStartStationName() {
+        return startStation.getName();
+    }
+
+    public Station.Id getEndStationId() {
         return endStation.getId();
     }
 
-    public Long getId() {
+
+    public String getEndStationName() {
+        return endStation.getName();
+    }
+
+    public SubwaySection.Id getId() {
         if (isNew()) {
             throw new IllegalArgumentException("아직 저장되지 않은 지하철 역입니다.");
         }
-        return id.getId();
+        return id;
     }
 
-    public BigDecimal getKilometer() {
-        return kilometer.getKilometer();
+    public Kilometer getDistance() {
+        return distance;
     }
 
     public boolean isNew() {
@@ -62,7 +71,7 @@ public class SubwaySection {
             this.id = id;
         }
 
-        public Long getId() {
+        public Long getValue() {
             return id;
         }
     }

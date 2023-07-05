@@ -23,7 +23,7 @@ class StationRegisterController {
 
     @PostMapping("/stations")
     public ResponseEntity<StationResponse> createStation(@RequestBody Request stationRegisterRequest) {
-        StationRegisterCommand command = mapper.toMap(stationRegisterRequest);
+        StationRegisterCommand command = mapper.mapFrom(stationRegisterRequest);
         StationResponse station = stationRegisterUsecase.saveStation(command);
         return ResponseEntity.created(URI.create("/stations/" + station.getId())).body(station);
     }

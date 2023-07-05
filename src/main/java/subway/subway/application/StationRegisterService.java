@@ -12,11 +12,9 @@ import subway.subway.domain.Station;
 @Transactional
 class StationRegisterService implements StationRegisterUsecase {
     private final StationRegisterPort stationRegisterPort;
-    private final StationMapper stationMapper;
 
-    public StationRegisterService(StationRegisterPort stationRegisterPort, StationMapper stationMapper) {
+    public StationRegisterService(StationRegisterPort stationRegisterPort) {
         this.stationRegisterPort = stationRegisterPort;
-        this.stationMapper = stationMapper;
     }
 
     @Override
