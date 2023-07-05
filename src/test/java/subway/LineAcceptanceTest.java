@@ -27,7 +27,7 @@ class LineAcceptanceTest {
         RestAssured.port = port;
     }
 
-    private static final String path = "/lines";
+    private static final String urlPath = "/lines";
 
     /**
      * When 지하철 노선을 생성하면
@@ -37,11 +37,11 @@ class LineAcceptanceTest {
     @Test
     void createLine() {
         // when
-        RestAssuredClient.requestPost(path, LineFactory.create(LineFactory.LINE_NAMES[0]))
+        RestAssuredClient.requestPost(urlPath, LineFactory.create(LineFactory.LINE_NAMES[0]))
             .statusCode(HttpStatus.CREATED.value());
 
         // then
-        ExtractableResponse<Response> response = RestAssuredClient.requestGet(path)
+        ExtractableResponse<Response> response = RestAssuredClient.requestGet(urlPath)
             .statusCode(HttpStatus.OK.value())
             .extract();
 
@@ -50,4 +50,28 @@ class LineAcceptanceTest {
         assertThat(lineNames).contains(LineFactory.LINE_NAMES[0]);
     }
 
+    /**
+     * Given 2개의 지하철 노선을 생성하고
+     * When 지하철 노선 목록을 조회하면
+     * Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
+     */
+    @DisplayName("지하철 노선 목록을 조회한다.")
+    @Test
+    void getLines() {
+        // given
+        RestAssuredClient.requestPost(urlPath, LineFactory.create(LineFactory.LINE_NAMES[0]))
+            .statusCode(HttpStatus.CREATED.value());
+        RestAssuredClient.requestPost(urlPath, LineFactory.create(LineFactory.LINE_NAMES[2]))
+            .statusCode(HttpStatus.CREATED.value());
+
+        // when
+        ExtractableResponse<Response> response = RestAssuredClient.requestGet(urlPath)
+            .statusCode(HttpStatus.OK.value())
+            .extract();
+
+        // then
+        List<String> lineNames = response.jsonPath().getList("name", String.class);
+        assertThat(lineNames.size()).isEqualTo(2);
+        assertThat(lineNames).contains(LineFactory.LINE_NAMES[0], LineFactory.LINE_NAMES[1]);
+    }
 }
