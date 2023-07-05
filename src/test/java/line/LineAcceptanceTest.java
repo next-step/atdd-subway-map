@@ -82,7 +82,7 @@ public class LineAcceptanceTest {
         ExtractableResponse<Response> response = 노선조회(notExistLineId);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
 
