@@ -27,17 +27,6 @@ public class LineService {
         return createLineResponse(line);
     }
 
-    private LineResponse createLineResponse(Line line) {
-        return new LineResponse(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                Arrays.asList(
-                        new StationResponse(line.getUpStation().getId(), line.getUpStation().getName()),
-                        new StationResponse(line.getDownStation().getId(), line.getDownStation().getName())
-                ));
-    }
-
     public List<LineResponse> findAllLines() {
         return lineRepository.findAll().stream()
                 .map(this::createLineResponse)
@@ -50,7 +39,7 @@ public class LineService {
     }
 
     @Transactional
-    public void updateLine(Long id, UpdateLineRequest request) {
+    public void updateLineById(Long id, UpdateLineRequest request) {
         Line line = lineRepository.findById(id).orElseThrow(() -> new RuntimeException("Not Exist Line"));
         line.setName(request.getName());
         line.setColor(request.getColor());
@@ -59,5 +48,16 @@ public class LineService {
     @Transactional
     public void deleteLineById(Long id) {
         lineRepository.deleteById(id);
+    }
+
+    private LineResponse createLineResponse(Line line) {
+        return new LineResponse(
+                line.getId(),
+                line.getName(),
+                line.getColor(),
+                Arrays.asList(
+                        new StationResponse(line.getUpStation().getId(), line.getUpStation().getName()),
+                        new StationResponse(line.getDownStation().getId(), line.getDownStation().getName())
+                ));
     }
 }
