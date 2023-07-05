@@ -1,9 +1,6 @@
 package subway.line;
 
 import io.restassured.RestAssured;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
-import io.restassured.response.ValidatableResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -233,7 +230,7 @@ public class LineAcceptanceTest {
         Line line = 신분당선_노선_테스트_데이터_생성();
 
         //when
-        아이디_기반으로_지하철_노선_데이터를_삭제한다(line.getId());
+        아이디_기반으로_지하철_노선_데이터를_삭제_api를_호출한다(line.getId());
 
         //then
         assertThatThrownBy(() -> {
@@ -243,5 +240,12 @@ public class LineAcceptanceTest {
 
     void 아이디_기반으로_지하철_노선_데이터를_삭제한다(Long id) {
         lineRepository.deleteById(id);
+    }
+
+    void 아이디_기반으로_지하철_노선_데이터를_삭제_api를_호출한다(Long id) {
+        RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().delete("/lines/{id}", id)
+                .then().log().all();
     }
 }
