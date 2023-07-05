@@ -48,11 +48,8 @@ public class Line {
         return stations;
     }
 
-    public void updateName(String name) {
+    public void updateName(String name, String color) {
         this.name = name;
-    }
-
-    public void updateColor(String color) {
         this.color = color;
     }
 }

@@ -36,6 +36,7 @@ public class LineController {
         lineService.updateLine(id, request);
     }
 
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/lines/{id}")
     void deleteLine(@PathVariable Long id) {
         lineService.deleteLine(id);

@@ -2,6 +2,7 @@ package subway.line.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.line.exception.LineNotFoundException;
 import subway.line.repository.Line;
 import subway.line.repository.LineRepository;
 import subway.line.web.CreateLineRequest;
@@ -9,29 +10,33 @@ import subway.line.web.LineResponse;
 import subway.line.web.UpdateLineRequest;
 import subway.station.repository.Station;
 import subway.station.repository.StationRepository;
+import subway.station.service.StationService;
+import subway.station.web.StationResponse;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Transactional
+@Transactional(readOnly = true)
 @Service
 public class LineService {
     private final LineRepository lineRepository;
-    private final StationRepository stationRepository;
+    private final StationService stationRepository;
 
-    public LineService(LineRepository lineRepository, StationRepository stationRepository) {
+    public LineService(LineRepository lineRepository, StationService stationRepository) {
         this.lineRepository = lineRepository;
         this.stationRepository = stationRepository;
     }
 
+    @Transactional
     public LineResponse createLine(CreateLineRequest request) {
+
+        Station upStation = stationRepository.findStation(request.getUpStationId());
+        Station downStation = stationRepository.findStation(request.getDownStationId());
+
         Line line = new Line(
                 request.getName(),
                 request.getColor()
         );
-
-        Station upStation = stationRepository.findById(request.getUpStationId()).orElseThrow(RuntimeException::new);
-        Station downStation = stationRepository.findById(request.getDownStationId()).orElseThrow(RuntimeException::new);
 
         line.addStation(upStation);
         line.addStation(downStation);
@@ -48,18 +53,22 @@ public class LineService {
     }
 
     public LineResponse getLine(Long id) {
-        return lineRepository.findById(id)
-                .map(LineResponse::new)
-                .orElseThrow(RuntimeException::new);
+        Line line = findLine(id);
+        return new LineResponse(line);
     }
-
+    @Transactional
     public void updateLine(Long id, UpdateLineRequest request) {
-        Line line = lineRepository.findById(id).orElseThrow(RuntimeException::new);
-        line.updateName(request.getName());
-        line.updateColor(request.getColor());
+        Line line = findLine(id);
+        line.updateName(request.getName(), request.getColor());
     }
 
+    @Transactional
     public void deleteLine(Long id) {
         lineRepository.deleteById(id);
+    }
+
+    private Line findLine(Long id) {
+        return lineRepository.findById(id)
+                .orElseThrow(() -> new LineNotFoundException(id));
     }
 }

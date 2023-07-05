@@ -5,8 +5,10 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
+import subway.station.web.StationResponse;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static subway.acceptance.StationRequestFixture.*;
@@ -22,13 +24,13 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void createStation() {
         // when
-        ExtractableResponse<Response> response = 지하철_역_생성("강남역");
+        지하철_역_생성("강남역");
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        List<String> stationNames = 지하철_역_목록_조회().stream()
+                .map(StationResponse::getName)
+                .collect(Collectors.toList());
 
-        // then
-        List<String> stationNames = 지하철_역_목록_조회().jsonPath().getList("name", String.class);
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
@@ -45,7 +47,9 @@ public class StationAcceptanceTest extends AcceptanceTest {
         지하철_역_생성("논현역");
 
         // when
-        List<String> stationNames = 지하철_역_목록_조회().jsonPath().getList("name", String.class);
+        List<String> stationNames = 지하철_역_목록_조회().stream()
+                .map(StationResponse::getName)
+                .collect(Collectors.toList());
 
         // then
         assertThat(stationNames).containsAnyOf("강남역", "논현역");
@@ -60,13 +64,15 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        Long stationId = 지하철_역_생성("강남역").jsonPath().getLong("id");
+        Long 강남역 = 지하철_역_생성("강남역");
 
         // when
-        지하철_역_삭제(stationId);
+        지하철_역_삭제(강남역);
 
         // then
-        List<String> stationNames = 지하철_역_목록_조회().jsonPath().getList("name", String.class);
+        List<String> stationNames = 지하철_역_목록_조회().stream()
+                .map(StationResponse::getName)
+                .collect(Collectors.toList());
 
         assertThat(stationNames).doesNotContain("강남역");
     }
