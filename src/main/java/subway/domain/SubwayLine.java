@@ -31,6 +31,13 @@ public class SubwayLine {
     protected SubwayLine() {
     }
 
+    private SubwayLine(String name, String color, Station upStation, Station downStation, Long distance) {
+        this.name = name;
+        this.color = color;
+        this.sections.add(Section.of(upStation, downStation, distance));
+        this.distance = distance;
+    }
+
     public Station getUpStation() {
         return this.sections.getUpStation();
     }
@@ -116,13 +123,6 @@ public class SubwayLine {
         }
 
 
-    }
-
-    public SubwayLine(String name, String color, Station upStation, Station downStation, Long distance) {
-        this.name = name;
-        this.color = color;
-        this.sections.add(Section.of(upStation, downStation, distance));
-        this.distance = distance;
     }
 
     public Long getId() {
