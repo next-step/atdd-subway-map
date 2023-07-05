@@ -1,4 +1,4 @@
-package subway;
+package subway.station;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -83,15 +83,18 @@ public class StationAcceptanceTest {
         assertThat(stationNames).contains("판교역");
     }
 
-    void 주어진_이름으로_지하철역을_생성한다(String name) {
+    static Long 주어진_이름으로_지하철역을_생성한다(String name) {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
 
-        RestAssured.given().log().all()
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/stations")
-                .then().log().all();
+                .then().log().all()
+                .extract();
+
+        return response.jsonPath().get("id");
     }
 
     ExtractableResponse<Response> 지하철역_목록을_조회한다() {
