@@ -1,12 +1,16 @@
 package subway.line;
 
 import io.restassured.RestAssured;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
+import io.restassured.response.ValidatableResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.MediaType;
 import subway.station.Station;
 import subway.station.StationRepository;
 
@@ -50,7 +54,7 @@ public class LineAcceptanceTest {
                 = new LineCreateRequest("신분당선", "bg-red-600", gangnamStationId, pangyoStationId, 10);
 
         //when
-        Line line = 지하철_노선을_등록한다(lineCreateRequest);
+        Line line = 지하철_노선을_등록_api를_호출한다(lineCreateRequest);
 
         //then
         List<Line> lines = lineRepository.findAll();
@@ -59,14 +63,14 @@ public class LineAcceptanceTest {
 
     Line 지하철_노선을_등록한다(LineCreateRequest lineCreateRequest) {
         //given
-        Station downStation = 주어진_아이디로_지하철역을_조회한다(lineCreateRequest.downStationId);
-        Station upStation = 주어진_아이디로_지하철역을_조회한다(lineCreateRequest.upStationId);
+        Station downStation = 주어진_아이디로_지하철역을_조회한다(lineCreateRequest.getDownStationId());
+        Station upStation = 주어진_아이디로_지하철역을_조회한다(lineCreateRequest.getUpStationId());
 
         Line line = Line.builder()
-                .color(lineCreateRequest.color)
-                .name(lineCreateRequest.name)
+                .color(lineCreateRequest.getColor())
+                .name(lineCreateRequest.getName())
                 .stations(Arrays.asList(downStation, upStation))
-                .distance(lineCreateRequest.distance)
+                .distance(lineCreateRequest.getDistance())
                 .build();
 
         return lineRepository.save(line);
@@ -76,20 +80,16 @@ public class LineAcceptanceTest {
         return stationRepository.findById(id).get();
     }
 
-    class LineCreateRequest {
-        String name;
-        String color;
-        Long upStationId;
-        Long downStationId;
-        int distance;
+    Line 지하철_노선을_등록_api를_호출한다(LineCreateRequest lineCreateRequest) {
+        Line response = RestAssured.given().log().all()
+                .body(lineCreateRequest)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines")
+                .then().log().all()
+                .extract()
+                .as(Line.class);
 
-        public LineCreateRequest(String name, String color, Long upStationId, Long downStationId, int distance) {
-            this.name = name;
-            this.color = color;
-            this.upStationId = upStationId;
-            this.downStationId = downStationId;
-            this.distance = distance;
-        }
+        return response;
     }
 
     /**
@@ -191,10 +191,10 @@ public class LineAcceptanceTest {
     }
 
     void 지하철_노선_데이터를_수정한다(Line line, LineChangeRequest lineChangeRequest) {
-        if(lineChangeRequest.color != null) {
+        if (lineChangeRequest.color != null) {
             line.updateColor(lineChangeRequest.color);
         }
-        if(lineChangeRequest.name != null) {
+        if (lineChangeRequest.name != null) {
             line.updateName(lineChangeRequest.name);
         }
         lineRepository.save(line);
