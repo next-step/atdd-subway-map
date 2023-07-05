@@ -43,8 +43,9 @@ class LineAcceptanceTest {
 
         // then
         ExtractableResponse<Response> response = RestAssuredClient.requestGet(urlPath)
-            .statusCode(HttpStatus.OK.value())
             .extract();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         List<String> lineNames = response.jsonPath().getList("name", String.class);
         assertThat(lineNames.size()).isEqualTo(1);
@@ -67,10 +68,11 @@ class LineAcceptanceTest {
 
         // when
         ExtractableResponse<Response> response = RestAssuredClient.requestGet(urlPath)
-            .statusCode(HttpStatus.OK.value())
             .extract();
 
         // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
         List<String> lineNames = response.jsonPath().getList("name", String.class);
         assertThat(lineNames.size()).isEqualTo(2);
         assertThat(lineNames).contains(LineFactory.LINE_NAMES[0], LineFactory.LINE_NAMES[1]);
@@ -93,9 +95,10 @@ class LineAcceptanceTest {
         long lineId = creationResponse.jsonPath().get("id");
         String path = generatePathForId(lineId);
         ExtractableResponse<Response> response = RestAssuredClient.requestGet(path)
-            .statusCode(HttpStatus.OK.value()).extract();
+            .extract();
 
         // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat((String) response.jsonPath().get("name")).isEqualTo(LineFactory.LINE_NAMES[0]);
     }
 
@@ -121,9 +124,11 @@ class LineAcceptanceTest {
         ExtractableResponse<Response> response =
             RestAssuredClient.requestPut(path,
                     LineFactory.createNameAndColorUpdateParams(updatedLineName, updatedLineColor))
-                .statusCode(HttpStatus.OK.value()).extract();
+                .extract();
 
         // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
         JsonPath responseJsonPath = response.jsonPath();
         assertThat((String) responseJsonPath.get("name")).isEqualTo(updatedLineName);
         assertThat((String) responseJsonPath.get("color")).isEqualTo(updatedLineColor);
@@ -145,7 +150,8 @@ class LineAcceptanceTest {
         // when
         long lineId = creationResponse.jsonPath().get("id");
         String path = generatePathForId(lineId);
-        ExtractableResponse<Response> response = RestAssuredClient.requestDelete(path).extract();
+        ExtractableResponse<Response> response = RestAssuredClient.requestDelete(path)
+            .extract();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
