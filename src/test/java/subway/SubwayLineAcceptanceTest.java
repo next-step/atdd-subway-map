@@ -264,7 +264,7 @@ class SubwayLineAcceptanceTest {
      * Given 지하철 노선을 생성하고
      * When 생성한 지하철 노선에 추가로 구간을 등록할때
      * 새로운 노선의 상행역이 기존 노선의 하행역이 아니면
-     * Then NotMatchedSectionException 이 발생한다
+     * Then InvalidSectionUpStationException 이 발생한다
      */
     @Test
     void 신규_구간_상행역_불일치_등록_실패() {
@@ -301,7 +301,7 @@ class SubwayLineAcceptanceTest {
      * Given 지하철 노선을 생성하고
      * When 생성한 지하철 노선에 추가로 구간을 등록할때
      * 새로운 노선의 하행역이 기존 노선에 등록되어 있는 역이면
-     * Then NotMatchedSectionException 이 발생한다
+     * Then InvalidSectionDownStationException 이 발생한다
      */
     @Test
     void 신규_구간_하행역_기등록_실패() {
