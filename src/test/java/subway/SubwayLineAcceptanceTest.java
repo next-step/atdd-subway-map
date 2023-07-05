@@ -344,11 +344,27 @@ class SubwayLineAcceptanceTest {
     @Test
     void 신규_구간_등록_성공() {
         //given
+        String lineName = "신분당선";
+        String color = "bg-red-600";
 
+        int upStationId = 1;
+        String upStationName = "강남역";
+        createStation(upStationName);
+
+        int downStationId = 2;
+        String downStationName = "언주역";
+        createStation(downStationName);
+
+        int distance = 10;
+
+        ValidatableResponse subwayLineCratedResponse = createSubwayLines(lineName, color, upStationId, downStationId, distance);
+        long createdLineId = subwayLineCratedResponse.extract().as(SubwayLineResponse.class).getId();
 
         //when
+        ValidatableResponse subwayLineSectionCreatedResponse = createSubwayLineSection(createdLineId, downStationId, upStationId, distance);
 
         //then
+        verifyResponseStatus(subwayLineSectionCreatedResponse, HttpStatus.BAD_REQUEST);
     }
 
     private ValidatableResponse createSubwayLineSection(Long lineId, long upStationId, long downStationId, long distance) {
