@@ -107,7 +107,7 @@ public class LineAcceptanceTest {
         구호선_노선_테스트_데이터_생성();
 
         //when
-        List<Line> lines = 전체_지하철_노선_목록을_조회();
+        List<Line> lines = 전체_지하철_노선_목록_조회_api를_호출한다();
 
         //then
         assertThat(lines.size()).isEqualTo(2);
@@ -135,6 +135,17 @@ public class LineAcceptanceTest {
 
     List<Line> 전체_지하철_노선_목록을_조회() {
         return lineRepository.findAll();
+    }
+
+    List<Line> 전체_지하철_노선_목록_조회_api를_호출한다() {
+        List<Line> response = RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().get("/lines")
+                .then().log().all()
+                .extract()
+                .as(List.class);
+
+        return response;
     }
 
     /**
