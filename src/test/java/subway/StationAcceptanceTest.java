@@ -1,10 +1,8 @@
 package subway;
 
 import io.restassured.RestAssured;
-import io.restassured.config.HeaderConfig;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.assertj.core.api.AbstractIntegerAssert;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -95,6 +93,7 @@ public class StationAcceptanceTest {
     private static void 생성한_갯수의_지하철역_목록을_응답한다(List<String> stationNames, int createdCount) {
         assertThat(stationNames.size()).isEqualTo(createdCount);
     }
+
     private static List<String> 지하철역_목록을_조회한다() {
         return RestAssured.given().log().all()
                 .when().get("/stations")
