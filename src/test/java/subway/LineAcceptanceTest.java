@@ -91,6 +91,7 @@ public class LineAcceptanceTest {
         return RestAssured.given().log().all()
                 .when().get("/lines")
                 .then().log().all()
+                .statusCode(HttpStatus.OK.value())
                 .extract().jsonPath().getList("name", String.class);
     }
 
