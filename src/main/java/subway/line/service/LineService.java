@@ -30,14 +30,12 @@ public class LineService {
     public LineResponse saveLine(LineCreateRequest createRequest, Station upStation, Station downStation) {
         Line request = Line.from(createRequest, upStation, downStation);
         Line line = lineRepository.save(request);
-        LineStation upLineStation = lineStationRepository.save(generateLineStation(line, upStation));
-        LineStation downLineStation = lineStationRepository.save(generateLineStation(line, downStation));
-        line.addLineStation(upLineStation);
-        line.addLineStation(downLineStation);
+        line.addLineStation(generateLineStation(line, upStation));
+        line.addLineStation(generateLineStation(line, downStation));
         return LineResponse.from(line);
     }
 
-    private LineStation generateLineStation (Line line, Station station) {
+    private LineStation generateLineStation(Line line, Station station) {
         return LineStation.builder()
                 .station(station)
                 .line(line)

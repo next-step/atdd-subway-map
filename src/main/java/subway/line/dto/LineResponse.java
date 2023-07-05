@@ -5,7 +5,6 @@ import lombok.Getter;
 import subway.line.model.Line;
 import subway.station.dto.StationResponse;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,7 +20,7 @@ public class LineResponse {
     private List<StationResponse> stations;
 
     public static LineResponse from(Line line) {
-        List<StationResponse> stationResponses = line.getStations().stream()
+        List<StationResponse> stationResponses = line.getLineStations().stream()
                 .map(StationResponse::from)
                 .collect(Collectors.toList());
         return LineResponse.builder()

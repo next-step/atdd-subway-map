@@ -4,10 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import subway.line.dto.LineCreateRequest;
 import subway.station.model.Station;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -47,8 +47,8 @@ public class Line {
     private Long distance;
 
     @Builder.Default
-    @OneToMany(mappedBy = "line")
-    private List<LineStation> stations = new ArrayList<>();
+    @OneToMany(mappedBy = "line", cascade = CascadeType.ALL)
+    private List<LineStation> lineStations = new ArrayList<>();
 
     public static Line from(LineCreateRequest request, Station upStation, Station downStation) {
         return Line.builder()
@@ -60,8 +60,9 @@ public class Line {
                 .build();
     }
 
-    public void addLineStation(LineStation station) {
-        stations.add(station);
+    public void addLineStation(LineStation lineStation) {
+        lineStations.add(lineStation);
+        lineStation.setLine(this);
     }
 
     public void updateLine(String name, String color) {
