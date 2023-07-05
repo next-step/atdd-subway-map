@@ -118,7 +118,7 @@ public class StationAcceptanceTest {
         //when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().delete("/stations/" + stationId)
+                .when().delete("/stations/{stationId}", stationId)
                 .then().log().all()
                 .extract();
 
