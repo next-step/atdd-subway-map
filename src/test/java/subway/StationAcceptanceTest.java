@@ -65,7 +65,7 @@ public class StationAcceptanceTest extends AcceptanceTestBase {
         assertThat(stationResponses).isEmpty();
     }
 
-    private ArbitraryBuilder<StationRequest> stationRequestArbitraryBuilder() {
+    private static ArbitraryBuilder<StationRequest> stationRequestArbitraryBuilder() {
         return FixtureMonkeyWrapper.create().giveMeBuilder(StationRequest.class)
                 .set("name", Arbitraries.strings().ofMaxLength(STATION_NAME_MAX_LENGTH));
     }
