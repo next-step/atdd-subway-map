@@ -11,9 +11,11 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Line {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(length = 20, nullable = false)
     private String name;
 
@@ -27,6 +29,9 @@ public class Line {
     @OneToOne
     @JoinColumn(name = "downStationId", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Station downStation;
+
+    @Column(nullable = false)
+    private Long distance;
 
     public void setName(String name) {
         this.name = name;

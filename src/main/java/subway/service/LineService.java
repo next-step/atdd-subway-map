@@ -38,6 +38,7 @@ public class LineService {
                            .color(lineSaveRequest.getColor())
                            .upStation(upStation)
                            .downStation(downStation)
+                           .distance(lineSaveRequest.getDistance())
                            .build();
 
         Line savedLine = lineRepository.save(newLine);
