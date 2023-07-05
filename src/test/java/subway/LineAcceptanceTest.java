@@ -77,19 +77,25 @@ public class LineAcceptanceTest {
         ExtractableResponse<Response> createdResponse = 지하철_노선을_생성한다("신분당선", "bg-red-600", 1L, 2L, 10L);
 
         // when
-        UpdateLineRequest request = new UpdateLineRequest("다른분당선", "bg-red-600");
-        RestAssured.given().log().all()
-                .body(request)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().put(createdResponse.header("Location"))
-                .then().log().all()
-                .statusCode(HttpStatus.OK.value());
+        지하철_노선을_수정한다(createdResponse.header("Location"), "다른분당선", "bg-red-600");
 
         // then
         ExtractableResponse<Response> selectedResponse = 지하철_노선을_조회한다(createdResponse.header("Location"));
-        LineResponse lineResponse = selectedResponse.as(LineResponse.class);
-        assertThat(request.getName()).isEqualTo(lineResponse.getName());
-        assertThat(request.getColor()).isEqualTo(lineResponse.getColor());
+        조회한_노선은_요청한_정보로_수정된_상태이다(selectedResponse.as(LineResponse.class), "다른분당선", "bg-red-600");
+    }
+
+    private static void 조회한_노선은_요청한_정보로_수정된_상태이다(LineResponse selectedLineResponse, String updatedName, String updatedColor) {
+        assertThat(updatedName).isEqualTo(selectedLineResponse.getName());
+        assertThat(updatedColor).isEqualTo(selectedLineResponse.getColor());
+    }
+
+    private static void 지하철_노선을_수정한다(String createdResourceUrl, String name, String color) {
+        RestAssured.given().log().all()
+                .body(new UpdateLineRequest(name, color))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().put(createdResourceUrl)
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value());
     }
 
     private static void 생성한_노선의_정보를_응답한다(LineResponse createdLine, LineResponse selectedLine) {
