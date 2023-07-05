@@ -2,16 +2,12 @@ package subway.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.dto.*;
 import subway.jpa.Line;
 import subway.jpa.LineRepository;
 import subway.jpa.StationRepository;
-import subway.utils.ModelMapperUtil;
-import subway.dto.LineRequest;
-import subway.dto.LineResponse;
-import subway.dto.StationResponse;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -26,24 +22,14 @@ public class LineService {
         this.stationRepository = stationRepository;
     }
 
-    public LineResponse saveLine(LineRequest lineRequest) {
-        Line lineEntity = new Line(
-                lineRequest.getName(),
-                lineRequest.getColor(),
-                lineRequest.getUpStationId(),
-                lineRequest.getDownStationId(),
-                lineRequest.getDistance()
-        );
+    public LineDto saveLine(LineDto lineDto) {
+        Line lineEntity = lineDto.toEntity();
 
         Line savedLineEntity = lineRepository.save(lineEntity);
 
-        List<StationResponse> stationResponses = stationRepository.findAllByLineName(lineEntity.getName()).stream()
-                .map(s -> ModelMapperUtil.modelMapper.map(s, StationResponse.class))
-                .collect(Collectors.toList());
+        List<StationDto> stationDtos = List.of();
 
-        LineResponse lineResponse = ModelMapperUtil.modelMapper.map(savedLineEntity, LineResponse.class);
-        lineResponse.setId(savedLineEntity.getId());
-        lineResponse.setStations(stationResponses);
-        return lineResponse;
+        LineDto responseDto = LineDto.from(savedLineEntity, stationDtos);
+        return responseDto;
     }
 }

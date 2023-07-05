@@ -35,4 +35,14 @@ public class LineRequest {
     public Integer getDistance() {
         return distance;
     }
+
+    public LineDto toDto() {
+        return new LineDto(
+                name,
+                color,
+                upStationId,
+                downStationId,
+                distance
+        );
+    }
 }

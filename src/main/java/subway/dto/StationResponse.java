@@ -13,8 +13,11 @@ public class StationResponse {
         this.name = name;
     }
 
-    public Long getId() {
-        return id;
+    public static StationResponse from(StationDto stationDto) {
+        return new StationResponse(
+                stationDto.getId(),
+                stationDto.getName()
+        );
     }
 
     public String getName() {

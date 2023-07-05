@@ -2,6 +2,7 @@ package subway.dto;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class LineResponse {
 
@@ -19,14 +20,18 @@ public class LineResponse {
         this.stations = stations;
     }
 
-    public Long getId() { return id; }
+    public static LineResponse from(LineDto lineDto) {
+        return new LineResponse(
+                lineDto.getId(),
+                lineDto.getName(),
+                lineDto.getColor(),
+                lineDto.getStationDtos().stream()
+                        .map(StationResponse::from)
+                        .collect(Collectors.toList())
+        );
+    }
+
     public String getName() { return name; }
-    public String getColor() { return color; }
-    public List<StationResponse> getStations() { return stations; }
-
-    public void setId(Long id) { this.id = id; }
-
-    public void setStations(List<StationResponse> stations) { this.stations = stations; }
 
     @Override
     public boolean equals(Object o) {
