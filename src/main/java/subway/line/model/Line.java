@@ -29,11 +29,9 @@ public class Line {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Setter
     @Column(nullable = false)
     private String name;
 
-    @Setter
     @Column(nullable = false)
     private String color;
 
@@ -64,5 +62,10 @@ public class Line {
 
     public void addLineStation(LineStation station) {
         stations.add(station);
+    }
+
+    public void updateLine(String name, String color) {
+        this.name = name;
+        this.color = color;
     }
 }
