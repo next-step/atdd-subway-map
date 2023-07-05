@@ -29,4 +29,9 @@ public class RestAssuredClient {
             .then().log().all();
     }
 
+    public static ValidatableResponse requestDelete(String path) {
+        return RestAssured.given().log().all()
+            .when().delete(path)
+            .then().log().all();
+    }
 }
