@@ -8,9 +8,7 @@ import subway.line.dto.LineCreateRequest;
 import subway.line.dto.LineModifyRequest;
 import subway.line.dto.LineResponse;
 import subway.line.model.Line;
-import subway.line.model.LineStation;
 import subway.line.repository.LineRepository;
-import subway.line.repository.LineStationRepository;
 import subway.station.model.Station;
 
 import java.util.List;
@@ -24,7 +22,7 @@ public class LineService {
 
     private final LineRepository lineRepository;
 
-    private final LineStationRepository lineStationRepository;
+//    private final LineStationRepository lineStationRepository;
 
     @Transactional
     public LineResponse saveLine(LineCreateRequest createRequest,
@@ -32,16 +30,7 @@ public class LineService {
                                  Station downStation) {
         Line request = LineCreateRequest.to(createRequest, upStation, downStation);
         Line line = lineRepository.save(request);
-        line.addLineStation(generateLineStation(line, upStation));
-        line.addLineStation(generateLineStation(line, downStation));
         return LineResponse.from(line);
-    }
-
-    private LineStation generateLineStation(Line line, Station station) {
-        return LineStation.builder()
-                .station(station)
-                .line(line)
-                .build();
     }
 
     @Transactional
@@ -69,8 +58,9 @@ public class LineService {
 
     @Transactional
     public void deleteLineById(Long id) {
-        Line line = lineRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(LineConstant.NOT_FOUND));
-        lineStationRepository.deleteByLine(line);
+        lineRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException(LineConstant.NOT_FOUND));
+//        lineStationRepository.deleteByLine(line);
         lineRepository.deleteById(id);
     }
 }

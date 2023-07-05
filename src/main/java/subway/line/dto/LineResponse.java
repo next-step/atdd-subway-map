@@ -17,17 +17,11 @@ public class LineResponse {
 
     private String color;
 
-    private List<StationResponse> stations;
-
     public static LineResponse from(Line line) {
-        List<StationResponse> stationResponses = line.getLineStations().stream()
-                .map(StationResponse::from)
-                .collect(Collectors.toList());
         return LineResponse.builder()
                 .id(line.getId())
                 .name(line.getName())
                 .color(line.getColor())
-                .stations(stationResponses)
                 .build();
     }
 }

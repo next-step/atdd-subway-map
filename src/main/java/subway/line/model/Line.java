@@ -9,10 +9,12 @@ import subway.station.model.Station;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import java.util.ArrayList;
@@ -34,25 +36,16 @@ public class Line {
     @Column(nullable = false)
     private String color;
 
-    @OneToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn
     private Station upStation;
 
-    @OneToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn
     private Station downStation;
 
     @Column(nullable = false)
     private Long distance;
-
-    @Builder.Default
-    @OneToMany(mappedBy = "line", cascade = CascadeType.ALL)
-    private List<LineStation> lineStations = new ArrayList<>();
-
-    public void addLineStation(LineStation lineStation) {
-        lineStations.add(lineStation);
-        lineStation.setLine(this);
-    }
 
     public void updateLine(String name, String color) {
         this.name = name;
