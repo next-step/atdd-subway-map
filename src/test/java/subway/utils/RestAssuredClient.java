@@ -21,4 +21,12 @@ public class RestAssuredClient {
             .then().log().all();
     }
 
+    public static ValidatableResponse requestPatch(String path, Map<String, String> params) {
+        return RestAssured.given().log().all()
+            .body(params)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().patch(path)
+            .then().log().all();
+    }
+
 }
