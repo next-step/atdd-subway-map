@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static subway.utils.TestUtils.주어진_이름으로_지하철역을_생성한다;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -81,20 +82,6 @@ public class StationAcceptanceTest {
         assertThat(stationNames.size()).isEqualTo(2);
         assertThat(stationNames).contains("강남역");
         assertThat(stationNames).contains("판교역");
-    }
-
-    static Long 주어진_이름으로_지하철역을_생성한다(String name) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
-
-        return response.jsonPath().get("id");
     }
 
     ExtractableResponse<Response> 지하철역_목록을_조회한다() {
