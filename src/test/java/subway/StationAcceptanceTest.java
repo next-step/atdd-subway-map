@@ -31,27 +31,11 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .body(params)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/stations")
-                        .then().log().all()
-                        .extract();
+        지하철역을_생성한다("강남역");
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-        // then
-        List<String> stationNames =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
-        assertThat(stationNames).containsAnyOf("강남역");
+        List<String> stationNames = 지하철역_목록을_조회한다();
+        생성한_역을_목록에서_찾을_수_있다(stationNames, "강남역");
     }
 
     /**
@@ -92,11 +76,16 @@ public class StationAcceptanceTest {
         삭제한_역은_조회되지_않는다(stationNames, "건대입구역");
     }
 
+    private static void 생성한_역을_목록에서_찾을_수_있다(List<String> stationNames, String createdName) {
+        assertThat(stationNames).containsAnyOf(createdName);
+    }
+
     private static void 지하철역을_삭제한다(String createdResourceUrl) {
         RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().delete(createdResourceUrl)
-                .then().log().all();
+                .then().log().all()
+                .statusCode(HttpStatus.NO_CONTENT.value());
     }
 
     private static void 삭제한_역은_조회되지_않는다(List<String> stationNames, String deletedName) {
@@ -110,6 +99,7 @@ public class StationAcceptanceTest {
         return RestAssured.given().log().all()
                 .when().get("/stations")
                 .then().log().all()
+                .statusCode(HttpStatus.OK.value())
                 .extract().jsonPath().getList("name", String.class);
     }
 
@@ -121,6 +111,7 @@ public class StationAcceptanceTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/stations")
                 .then().log().all()
+                .statusCode(HttpStatus.CREATED.value())
                 .extract();
     }
 }
