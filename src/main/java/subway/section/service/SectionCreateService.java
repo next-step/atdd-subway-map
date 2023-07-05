@@ -10,7 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import subway.line.domain.Line;
 import subway.section.domain.Section;
-import subway.section.exception.InvalidSectionUpstationException;
+import subway.section.exception.InvalidSectionDownStationException;
+import subway.section.exception.InvalidSectionUpStationException;
 import subway.section.model.SectionCreateRequest;
 import subway.section.repository.SectionRepository;
 import subway.station.service.StationService;
@@ -24,8 +25,13 @@ public class SectionCreateService {
 
     @Transactional
     public Section create(Line line, SectionCreateRequest request) {
-        if (!Objects.equals(line.getDownStation().getId(), request.getUpStationId())) {
-            throw new InvalidSectionUpstationException();
+        if (!Objects.equals(request.getUpStationId(), line.getDownStation().getId())) {
+            throw new InvalidSectionUpStationException();
+        }
+
+        if (Objects.equals(request.getDownStationId(), line.getUpStation().getId()) ||
+        Objects.equals(request.getDownStationId(), line.getDownStation().getId())) {
+            throw new InvalidSectionDownStationException();
         }
 
         Section section = Section.builder()

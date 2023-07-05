@@ -34,11 +34,9 @@ public class SectionAcceptanceTest {
     LineFixture lineFixture = new LineFixture();
     StationFixture stationFixture = new StationFixture();
 
-    @DisplayName("새로운 구간의 상행역이 노선의 하행 종점역이 아니면 ")
+    @DisplayName("새로운 구간의 상행역이 노선의 하행 종점역이 아닐 때")
     @Nested
     class Given_section_upstation_is_not_lines_downstation {
-
-
 
         @DisplayName("구간을 등록하면")
         @Nested
@@ -70,11 +68,54 @@ public class SectionAcceptanceTest {
                 assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
                 assertThat(response.as(ErrorResponse.class).getErrorCode()).isEqualTo(ErrorCode.SECTION_CREATE_FAIL_BY_UPSTATION);
             }
+        }
+    }
+
+    private String getCreateSectionUrl(Long lineId) {
+        return "/lines/" + lineId + "/sections";
+    }
+
+    @DisplayName("새로운 구간의 하행역이 노선에 존재할때")
+    @Nested
+    class Given_section_downstation_on_same_line {
+
+        @DisplayName("구간을 등록하면")
+        @Nested
+        class When_create_section {
+
+            @DisplayName("오류가 발생한다")
+            @Test
+            void shouldThrowError() {
+                StationResponse lineUpstationA = stationFixture.지하철역_생성("upstationA");
+                StationResponse lineDownstationB = stationFixture.지하철역_생성("downStationB");
+                LineResponse lineAB = lineFixture.노선생성("line-ab", "yellow", lineUpstationA.getId(), lineDownstationB.getId(), 10);
+
+                StationResponse lineUpstationC = stationFixture.지하철역_생성("upstationC");
+                StationResponse lineDownstationD = stationFixture.지하철역_생성("downStationD");
+                LineResponse lineCD = lineFixture.노선생성("line-cd", "blue", lineUpstationC.getId(), lineDownstationD.getId(), 5);
+
+
+                SectionCreateRequest request = new SectionCreateRequest();
+                request.setUpStationId(lineDownstationB.getId());
+                request.setDownStationId(lineUpstationA.getId());
+                request.setDistance(3);
+
+                ExtractableResponse<Response> response = RestAssured.given().log().all()
+                                                                    .body(request).contentType(MediaType.APPLICATION_JSON_VALUE)
+                                                                    .when().post(getCreateSectionUrl(lineAB.getId()))
+                                                                    .then().log().all()
+                                                                    .extract();
+
+                assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+                assertThat(response.as(ErrorResponse.class).getErrorCode()).isEqualTo(ErrorCode.SECTION_CREATE_FAIL_BY_DOWNSTATION);
+            }
 
             private String getCreateSectionUrl(Long lineId) {
                 return "/lines/" + lineId + "/sections";
             }
         }
+
+
     }
 
 
