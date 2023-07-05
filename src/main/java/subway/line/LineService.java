@@ -2,6 +2,7 @@ package subway.line;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import subway.station.Station;
 import subway.station.StationRepository;
 
@@ -40,4 +41,12 @@ public class LineService {
                 .orElseThrow(NoSuchElementException::new);
     }
 
+    @Transactional
+    public void updateLine(Long id, LineChangeRequest lineChangeRequest) {
+        Line line = lineRepository.findById(id)
+                .orElseThrow(NoSuchElementException::new);
+
+        line.updateColor(lineChangeRequest.getColor());
+        line.updateName(lineChangeRequest.getName());
+    }
 }
