@@ -1,4 +1,4 @@
-package subway;
+package subway.station;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -6,11 +6,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD;
 
+@DirtiesContext(classMode = AFTER_EACH_TEST_METHOD)
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationAcceptanceTest {
@@ -25,14 +28,14 @@ public class StationAcceptanceTest {
     void createStation() {
         // when
         final String stationName = "강남역";
-        ExtractableResponse<Response> response = StationApi.createStationByName(stationName);
+        ExtractableResponse<Response> createStationResponse = StationApi.createStationByName(stationName);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(createStationResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames = StationApi.retrieveStations().jsonPath().getList("name", String.class);
-        assertThat(stationNames).containsAnyOf(stationName);
+        ExtractableResponse<Response> retrieveStationsResponse = StationApi.retrieveStations();
+        assertThat(retrieveStationsResponse.jsonPath().getList("name", String.class)).containsAnyOf(stationName);
     }
 
     /**
@@ -53,7 +56,7 @@ public class StationAcceptanceTest {
         assertThat(retrieveStationsResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         // then
-        assertThat(createdStations).isEqualTo(retrieveStationsResponse.body().jsonPath().getList("$").size());
+        assertThat(retrieveStationsResponse.body().jsonPath().getList("$").size()).isEqualTo(createdStations);
 
     }
 
