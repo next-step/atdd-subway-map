@@ -12,11 +12,12 @@ import org.springframework.http.MediaType;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import subway.station.view.StationResponse;
 
 public class StationFixture {
     private static final String CREATE_STATION_PATH = "/stations";
 
-    public Long 지하철역_생성(String stationName) {
+    public StationResponse 지하철역_생성(String stationName) {
         Map<String, String> params = new HashMap<>();
         params.put("name", stationName);
 
@@ -28,7 +29,7 @@ public class StationFixture {
                                                          .extract();
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
-        return extractCreateStationId(response);
+        return response.as(StationResponse.class);
     }
 
     private Long extractCreateStationId(ExtractableResponse<Response> response) {

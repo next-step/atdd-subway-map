@@ -42,7 +42,7 @@ public class LineController {
 
     @GetMapping("/{id}")
     public ResponseEntity<LineResponse> getLine(@PathVariable Long id) {
-        return ok(lineService.getLine(id));
+        return ok(LineResponse.from(lineService.getLine(id)));
     }
 
     @GetMapping

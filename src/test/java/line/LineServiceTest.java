@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import subway.SchemaInitSql;
 import subway.StationInitSql;
 import subway.SubwayApplication;
+import subway.line.domain.Line;
 import subway.line.view.LineCreateRequest;
 import subway.line.view.LineModifyRequest;
 import subway.line.view.LineResponse;
@@ -40,7 +41,7 @@ public class LineServiceTest {
 
         lineService.modifyLine(createLineResponse.getId(), new LineModifyRequest("테스트", "blue"));
 
-        LineResponse line = lineService.getLine(createLineResponse.getId());
+        Line line = lineService.getLine(createLineResponse.getId());
 
         assertThat(line.getName()).isEqualTo("테스트");
         assertThat(line.getColor()).isEqualTo("blue");

@@ -16,16 +16,66 @@ import org.springframework.http.MediaType;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import line.LineFixture;
 import subway.SchemaInitSql;
-import subway.StationInitSql;
+import subway.StationFixture;
 import subway.SubwayApplication;
+import subway.line.view.LineResponse;
 import subway.section.model.SectionCreateRequest;
+import subway.station.view.StationResponse;
+import subway.support.ErrorCode;
+import subway.support.ErrorResponse;
 
 @SchemaInitSql
-@StationInitSql
+//@StationInitSql
 @DisplayName("지하철 구간 관련 기능")
 @SpringBootTest(classes = SubwayApplication.class, webEnvironment = WebEnvironment.DEFINED_PORT)
 public class SectionAcceptanceTest {
+    LineFixture lineFixture = new LineFixture();
+    StationFixture stationFixture = new StationFixture();
+
+    @DisplayName("새로운 구간의 상행역이 노선의 하행 종점역이 아니면 ")
+    @Nested
+    class Given_section_upstation_is_not_lines_downstation {
+
+
+
+        @DisplayName("구간을 등록하면")
+        @Nested
+        class When_create_section {
+
+            @DisplayName("오류가 발생한다")
+            @Test
+            void shouldThrowError() {
+                StationResponse lineUpstationA = stationFixture.지하철역_생성("upstationA");
+                StationResponse lineDownstationB = stationFixture.지하철역_생성("downStationB");
+                LineResponse lineAB = lineFixture.노선생성("line-ab", "yellow", lineUpstationA.getId(), lineDownstationB.getId(), 10);
+
+                StationResponse lineUpstationC = stationFixture.지하철역_생성("upstationC");
+                StationResponse lineDownstationD = stationFixture.지하철역_생성("downStationD");
+                LineResponse lineCD = lineFixture.노선생성("line-cd", "blue", lineUpstationC.getId(), lineDownstationD.getId(), 5);
+
+
+                SectionCreateRequest request = new SectionCreateRequest();
+                request.setUpStationId(lineUpstationA.getId());
+                request.setDownStationId(lineUpstationC.getId());
+                request.setDistance(3);
+
+                ExtractableResponse<Response> response = RestAssured.given().log().all()
+                                                                    .body(request).contentType(MediaType.APPLICATION_JSON_VALUE)
+                                                                    .when().post(getCreateSectionUrl(lineAB.getId()))
+                                                                    .then().log().all()
+                                                                    .extract();
+
+                assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+                assertThat(response.as(ErrorResponse.class).getErrorCode()).isEqualTo(ErrorCode.SECTION_CREATE_FAIL_BY_UPSTATION);
+            }
+
+            private String getCreateSectionUrl(Long lineId) {
+                return "/lines/" + lineId + "/sections";
+            }
+        }
+    }
 
 
     @Nested

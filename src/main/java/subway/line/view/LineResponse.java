@@ -18,10 +18,14 @@ public class LineResponse {
     private String color;
     private List<StationResponse> stations;
 
-    public LineResponse(Line line) {
+    private LineResponse(Line line) {
         this.id = line.getId();
         this.name = line.getName();
         this.color = line.getColor();
         this.stations = List.of(new StationResponse(line.getUpStation()), new StationResponse(line.getDownStation()));
+    }
+
+    public static LineResponse from(Line line) {
+        return new LineResponse(line);
     }
 }
