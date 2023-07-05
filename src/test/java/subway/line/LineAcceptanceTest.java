@@ -32,7 +32,6 @@ public class LineAcceptanceTest {
      * Then 지하철 노선이 생성된다
      * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
      */
-    // TODO: 지하철노선 생성
     @DisplayName("지하철노선을 생성한다.")
     @Test
     void createLine() {
@@ -61,7 +60,6 @@ public class LineAcceptanceTest {
      * When 지하철 노선 목록을 조회하면
      * Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
      */
-    // TODO: 지하철노선 목록 조회
     @DisplayName("지하철노선 목록을 조회한다.")
     @Test
     void searchLines() {
@@ -95,7 +93,6 @@ public class LineAcceptanceTest {
      * When 생성한 지하철 노선을 조회하면
      * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
      */
-    // TODO: 지하철노선 조회
     @DisplayName("지하철노선을 조회한다.")
     @Test
     void searchLine() {
@@ -122,7 +119,6 @@ public class LineAcceptanceTest {
      * When 생성한 지하철 노선을 수정하면
      * Then 해당 지하철 노선 정보는 수정된다
      */
-    // TODO: 지하철노선 수정
     @DisplayName("지하철노선을 수정한다.")
     @Test
     void updateLine() {
@@ -154,7 +150,6 @@ public class LineAcceptanceTest {
      * Then 지하철 노선이 삭제된다
      * Then 해당 지하철 노선 정보는 삭제된다
      */
-    // TODO: 지하철노선 삭제
     @DisplayName("지하철노선을 삭제한다.")
     @Test
     void deleteLine() {
