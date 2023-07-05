@@ -1,10 +1,21 @@
 package subway.line.model;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import subway.line.dto.LineCreateRequest;
 import subway.station.model.Station;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,14 +49,7 @@ public class Line {
     private Long distance;
 
     @OneToMany(mappedBy = "line")
-    private List<LineStation> stations;
-
-    public void addLineStation(LineStation station) {
-        if (stations == null) {
-            this.stations = new ArrayList<>();
-        }
-        stations.add(station);
-    }
+    private List<LineStation> stations = new ArrayList<>();;
 
     public static Line from(LineCreateRequest request, Station upStation, Station downStation) {
         return Line.builder()
@@ -53,7 +57,11 @@ public class Line {
                 .color(request.getColor())
                 .upStation(upStation)
                 .downStation(downStation)
-                .distance(10L)
+                .distance(request.getDistance())
                 .build();
+    }
+
+    public void addLineStation(LineStation station) {
+        stations.add(station);
     }
 }

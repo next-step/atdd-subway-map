@@ -3,6 +3,7 @@ package subway.line.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.constants.LineConstant;
 import subway.line.dto.LineCreateRequest;
 import subway.line.dto.LineModifyRequest;
 import subway.line.dto.LineResponse;
@@ -21,7 +22,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class LineService {
 
-    public static final String NOT_FOUND_LINE = "노선이 존재하지 않습니다.";
     private final LineRepository lineRepository;
 
     private final LineStationRepository lineStationRepository;
@@ -60,17 +60,17 @@ public class LineService {
     public LineResponse findLineResponseById(Long id) {
         return lineRepository.findById(id)
                 .map(LineResponse::from)
-                .orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_LINE));
+                .orElseThrow(() -> new IllegalArgumentException(LineConstant.NOT_FOUND));
     }
 
     private Line findLineById(Long id) {
         return lineRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_LINE));
+                .orElseThrow(() -> new IllegalArgumentException(LineConstant.NOT_FOUND));
     }
 
     @Transactional
     public void deleteLineById(Long id) {
-        Line line = lineRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_LINE));
+        Line line = lineRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(LineConstant.NOT_FOUND));
         lineStationRepository.deleteByLine(line);
         lineRepository.deleteById(id);
     }

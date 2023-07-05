@@ -3,13 +3,13 @@ package subway.station.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.constants.StationConstant;
 import subway.station.dto.StationRequest;
 import subway.station.dto.StationResponse;
 import subway.station.model.Station;
 import subway.station.repository.StationRepository;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,7 +21,9 @@ public class StationService {
     @Transactional
     public StationResponse saveStation(StationRequest stationRequest) {
         stationRepository.findByName(stationRequest.getName())
-                .ifPresent(e -> {throw new IllegalArgumentException("이미 역이 있습니다.");});
+                .ifPresent(e -> {
+
+                    throw new IllegalArgumentException(StationConstant.ALREADY_EXISTED_MESSAGE);});
         Station station = Station.builder()
                 .name(stationRequest.getName())
                 .build();
@@ -41,6 +43,6 @@ public class StationService {
 
     public Station findEntityById(Long id) {
         return stationRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("없는 역 입니다"));
+                .orElseThrow(() -> new IllegalArgumentException(StationConstant.NOT_FOUND_MESSAGE));
     }
 }
