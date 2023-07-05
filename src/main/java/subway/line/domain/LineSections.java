@@ -11,6 +11,9 @@ import javax.persistence.OneToMany;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import subway.line.domain.exception.LineAppendSectionException;
+import subway.line.domain.exception.LineRemoveSectionException;
+import subway.line.domain.exception.LineSectionsEmptyException;
 import subway.station.domain.Station;
 
 @Embeddable
@@ -35,14 +38,14 @@ public class LineSections {
 
     private void requireSectionAppendable(final Section section) {
         if (!getLastStation().equalsId(section.getUpStation())) {
-            throw new IllegalArgumentException(String.format(
-                    "구간 등록 실패) 노선의 하행역이 구간의 상행역과 일치하지 않습니다 : 노선의 하행역 id=%d, 구간의 상행역 id=%d",
+            throw new LineAppendSectionException(String.format(
+                    "노선의 하행역이 구간의 상행역과 일치하지 않습니다 : 노선의 하행역 id=%d, 구간의 상행역 id=%d",
                     getLastStation().getId(), section.getUpStation().getId()
             ));
         }
         if (getStations().contains(section.getDownStation())) {
-            throw new IllegalArgumentException(
-                    "구간 등록 실패) 구간의 하행역이 이미 노선에 포함되어 있습니다 : 구간의 하행역 id=" + section.getDownStation().getId()
+            throw new LineAppendSectionException(
+                    "구간의 하행역이 이미 노선에 포함되어 있습니다 : 구간의 하행역 id=" + section.getDownStation().getId()
             );
         }
     }
@@ -54,10 +57,10 @@ public class LineSections {
 
     private void requireStationRemovable(final Station station) {
         if (!getLastStation().equalsId(station)) {
-            throw new IllegalArgumentException("구간 삭제 실패) 노선의 하행역이 아닙니다 : 역 id=" + station.getId());
+            throw new LineRemoveSectionException("노선의 하행역이 아닙니다 : 역 id=" + station.getId());
         }
         if (getStations().size() == MINIMUM_SECTION_SIZE) {
-            throw new IllegalArgumentException("구간 삭제 실패) 상행 종점역과 하행 종점역만 있습니다");
+            throw new LineRemoveSectionException("상행 종점역과 하행 종점역만 있습니다");
         }
     }
 
@@ -81,7 +84,7 @@ public class LineSections {
 
     private void checkSizeNotEmpty() {
         if (this.value.isEmpty()) {
-            throw new IllegalStateException("노선에 등록된 구간이 없습니다");
+            throw new LineSectionsEmptyException();
         }
     }
 

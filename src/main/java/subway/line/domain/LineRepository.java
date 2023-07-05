@@ -1,12 +1,12 @@
 package subway.line.domain;
 
-import java.util.NoSuchElementException;
-
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import subway.line.domain.exception.NoSuchLineException;
 
 public interface LineRepository extends JpaRepository<Line, Long> {
 
-    default Line getById(final Long id) throws NoSuchElementException {
-        return findById(id).orElseThrow(() -> new NoSuchElementException("지하철 노선을 찾을 수 없습니다 : id=" + id));
+    default Line getById(final Long id) throws NoSuchLineException {
+        return findById(id).orElseThrow(() -> NoSuchLineException.from(id));
     }
 }
