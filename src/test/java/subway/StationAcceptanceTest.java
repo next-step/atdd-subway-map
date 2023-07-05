@@ -25,6 +25,8 @@ public class StationAcceptanceTest {
     private static final String GET_STATION_LIST_PATH = "/stations";
     private static final String DELETE_STATION_PATH = "/stations";
 
+    private StationFixture stationFixture = new StationFixture();
+
     /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다
@@ -34,10 +36,7 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        ExtractableResponse<Response> response = 지하철역_생성("강남역");
-
-        // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        stationFixture.지하철역_생성("강남역");
 
         // then
         List<String> stationNames = 지하철역_목록조회("name", String.class);

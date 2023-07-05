@@ -3,6 +3,7 @@ package line;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,6 +20,8 @@ import subway.StationInitSql;
 import subway.SubwayApplication;
 import subway.line.view.LineCreateRequest;
 import subway.line.view.LineModifyRequest;
+import subway.line.view.LineResponse;
+import subway.station.view.StationResponse;
 
 @SchemaInitSql
 @StationInitSql
@@ -30,17 +33,18 @@ public class LineAcceptanceTest {
     private static final String API_GET_LINE_LIST = "/lines";
     private static final String API_MODIFY_LINE = "/lines";
     private static final String API_DELETE_LINE = "/lines";
+    private final LineFixture lineFixture = new LineFixture();
 
     @DisplayName("노선을 생성한다")
     @Test
     void createLine() {
-        ExtractableResponse<Response> createdResponse = 노선생성("신분당선", "bg-red-600", 1, 2, 10);
+        LineResponse lineResponse = lineFixture.노선생성("신분당선", "bg-red-600", 1, 2, 10);
 
         // then
-        assertThat(createdResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(createdResponse.jsonPath().getString("name")).isEqualTo("신분당선");
-        assertThat(createdResponse.jsonPath().getString("color")).isEqualTo("bg-red-600");
-        assertThat(createdResponse.jsonPath().getList("stations.id")).containsSequence(List.of(1, 2));
+
+        assertThat(lineResponse.getName()).isEqualTo("신분당선");
+        assertThat(lineResponse.getColor()).isEqualTo("bg-red-600");
+        assertThat(lineResponse.getStations().stream().map(StationResponse::getId).collect(Collectors.toList())).containsSequence(List.of(1L, 2L));
     }
 
     private ExtractableResponse<Response> 노선생성(String name, String color, long upStationId, long downStationId, int distance) {

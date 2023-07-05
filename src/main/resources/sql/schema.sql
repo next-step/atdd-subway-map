@@ -1,5 +1,14 @@
-drop table line;
-drop table station;
+-- truncate table line;
+-- truncate table section;
+-- truncate table station;
+
+-- delete from line where id >0;
+-- delete from station where id >0;
+-- delete from section where id >0;
+
+drop table if exists line;
+drop table if exists station;
+drop table if exists section;
 
 create table station (
                       ID int not null AUTO_INCREMENT,
@@ -15,4 +24,12 @@ create table line (
                          down_station_id int not null,
                          distance int not null,
                          PRIMARY KEY ( ID )
+);
+
+create table section (
+                      ID int not null AUTO_INCREMENT,
+                      up_station_id int not null,
+                      down_station_id int not null,
+                      distance int not null,
+                      PRIMARY KEY ( ID )
 );

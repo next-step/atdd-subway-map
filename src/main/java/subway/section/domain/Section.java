@@ -25,7 +25,7 @@ public class Section {
     private Station upStation;
 
     @ManyToOne
-    @JoinColumn(name = "up_station_id")
+    @JoinColumn(name = "down_station_id")
     private Station downStation;
 
     private Integer distance;
