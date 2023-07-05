@@ -1,25 +1,21 @@
 package subway;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 import subway.controller.dto.line.LineModifyRequest;
 import subway.controller.dto.line.LineSaveRequest;
-import subway.model.line.LineRepository;
-import subway.model.station.StationRepository;
 import subway.utils.StationApiHelper;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static subway.utils.LineApiHelper.*;
 
 @Sql("truncate_tables.sql")
 @DisplayName("지하철 노선 관련 기능")
@@ -177,73 +173,6 @@ public class LineAcceptanceTest {
         assertThat(deletionResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
         ExtractableResponse<Response> lineResponse = callApiToGetSingleLine(lineId);
         assertThat(lineResponse.jsonPath().getList("id", Long.class).size()).isEqualTo(0);
-    }
-
-    private static ExtractableResponse<Response> callApiToGetLines() {
-        return RestAssured.given()
-                          .log()
-                          .all()
-                          .when()
-                          .get("/lines")
-                          .then()
-                          .log()
-                          .all()
-                          .extract();
-    }
-
-    private static ExtractableResponse<Response> callApiToGetSingleLine(Long lineId) {
-        return RestAssured.given()
-                          .log()
-                          .all()
-                          .pathParam("lineId", lineId)
-                          .when()
-                          .get("/lines/{lineId}")
-                          .then()
-                          .log()
-                          .all()
-                          .extract();
-    }
-
-    private static ExtractableResponse<Response> callApiToCreateLine(LineSaveRequest lineSaveRequest) {
-        return RestAssured.given()
-                          .log()
-                          .all()
-                          .body(lineSaveRequest)
-                          .contentType(MediaType.APPLICATION_JSON_VALUE)
-                          .when()
-                          .post("/lines")
-                          .then()
-                          .log()
-                          .all()
-                          .extract();
-    }
-
-    private static ExtractableResponse<Response> callApiToModifyLine(Long lineId, LineModifyRequest lineModifyRequest) {
-        return RestAssured.given()
-                          .log()
-                          .all()
-                          .pathParam("lineId", lineId)
-                          .body(lineModifyRequest)
-                          .contentType(MediaType.APPLICATION_JSON_VALUE)
-                          .when()
-                          .put("/lines/{lineId}")
-                          .then()
-                          .log()
-                          .all()
-                          .extract();
-    }
-
-    private static ExtractableResponse<Response> callApiToDeleteLine(Long lineId) {
-        return RestAssured.given()
-                          .log()
-                          .all()
-                          .pathParam("lineId", lineId)
-                          .when()
-                          .delete("/lines/{lineId}")
-                          .then()
-                          .log()
-                          .all()
-                          .extract();
     }
 
     private static long saveStationAndGetId(String stationName) {
