@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 import subway.dto.LineUpdateRequest;
+import subway.exception.SubwayException;
 import subway.model.Line;
 import subway.model.Station;
 import subway.repository.LineRepository;
@@ -38,7 +39,10 @@ public class LineService {
     }
 
     public LineResponse findLineById(Long id) {
-        return createLineResponse(lineRepository.findById(id).orElseThrow());
+        return createLineResponse(
+                lineRepository.findById(id)
+                        .orElseThrow(() -> new SubwayException("존재하지 않는 지하철 노선 ID 입니다."))
+        );
     }
 
     private LineResponse createLineResponse(Line line) {
@@ -47,7 +51,8 @@ public class LineService {
 
     @Transactional
     public void update(Long id, LineUpdateRequest lineRequest) {
-        Line line = lineRepository.findById(id).orElseThrow();
+        Line line = lineRepository.findById(id)
+                .orElseThrow(() -> new SubwayException("존재하지 않는 지하철 노선 ID 입니다."));
         line.update(lineRequest.getName(), lineRequest.getColor());
         lineRepository.save(line);
     }
