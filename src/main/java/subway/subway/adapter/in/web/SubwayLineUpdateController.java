@@ -4,7 +4,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import subway.subway.adapter.in.web.mapper.SubwayLineUpdateMapper;
 import subway.subway.application.in.SubwayLineUpdateUsecase;
-import subway.subway.application.in.command.SubwayLineUpdateCommand;
 
 @RestController
 public class SubwayLineUpdateController {
@@ -19,7 +18,7 @@ public class SubwayLineUpdateController {
 
     @PutMapping("/subway-lines/{id}")
     public ResponseEntity<Void> updateSubwayLine(@PathVariable Long id,  @RequestBody Request request) {
-        SubwayLineUpdateCommand command = mapper.mapFrom(id, request);
+        SubwayLineUpdateUsecase.Command command = mapper.mapFrom(id, request);
         subwayLineUpdateUsecase.updateSubwayLine(command);
         return ResponseEntity.ok().build();
     }

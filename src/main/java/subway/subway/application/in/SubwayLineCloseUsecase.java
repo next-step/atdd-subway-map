@@ -1,11 +1,10 @@
 package subway.subway.application.in;
 
-import subway.subway.application.query.SubwayLineResponse;
 import subway.subway.domain.SubwayLine;
 
-public interface SubwayLineDetailQuery {
+public interface SubwayLineCloseUsecase {
 
-    SubwayLineResponse findOne(Command command);
+    void closeSubwayLine(Command command);
 
     class Command {
         private final SubwayLine.Id id;

@@ -3,7 +3,6 @@ package subway.subway.application;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.subway.application.in.SubwayLineRegisterUsecase;
-import subway.subway.application.in.command.SubwayLineRegisterCommand;
 import subway.subway.application.out.StationListLoadByIdInPort;
 import subway.subway.application.out.SubwayLineRegisterPort;
 import subway.subway.application.query.SubwayLineResponse;
@@ -26,7 +25,7 @@ class SubwayLineRegisterService implements SubwayLineRegisterUsecase {
     }
 
     @Override
-    public SubwayLineResponse registerSubwayLine(SubwayLineRegisterCommand command) {
+    public SubwayLineResponse registerSubwayLine(Command command) {
         List<Station> stations = stationListLoadByIdInPort.findAllIn(List.of(command.getUpStationId(), command.getDownStationId()));
         Station upStation = this.getStationBy(stations, command.getUpStationId());
         Station downStation = this.getStationBy(stations, command.getDownStationId());

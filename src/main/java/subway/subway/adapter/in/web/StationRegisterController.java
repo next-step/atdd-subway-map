@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import subway.subway.adapter.in.web.mapper.StationRegisterMapper;
 import subway.subway.application.in.StationRegisterUsecase;
-import subway.subway.application.in.command.StationRegisterCommand;
 import subway.subway.application.query.StationResponse;
 
 import java.net.URI;
@@ -24,7 +23,7 @@ public class StationRegisterController {
 
     @PostMapping("/stations")
     public ResponseEntity<StationResponse> createStation(@RequestBody Request stationRegisterRequest) {
-        StationRegisterCommand command = mapper.mapFrom(stationRegisterRequest);
+        StationRegisterUsecase.Command command = mapper.mapFrom(stationRegisterRequest);
         StationResponse station = stationRegisterUsecase.saveStation(command);
         return ResponseEntity.created(URI.create("/stations/" + station.getId())).body(station);
     }

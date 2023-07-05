@@ -19,6 +19,6 @@ class StationListQueryController {
 
     @GetMapping(value = "/stations")
     public ResponseEntity<List<StationResponse>> showStations() {
-        return ResponseEntity.ok().body(stationListQuery.findAllStations());
+        return ResponseEntity.ok().body(stationListQuery.findAll());
     }
 }

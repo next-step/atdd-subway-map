@@ -5,15 +5,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import subway.subway.application.in.SubwayLineRegisterUsecase;
-import subway.subway.application.in.command.StationRegisterCommand;
-import subway.subway.application.in.command.SubwayLineRegisterCommand;
-import subway.subway.application.query.StationResponse;
 import subway.subway.application.query.SubwayLineResponse;
 import subway.subway.domain.Kilometer;
 import subway.subway.domain.Station;
-
-import java.math.BigDecimal;
-import java.net.URI;
 
 @RestController
 class SubwayLineRegisterController {
@@ -26,7 +20,7 @@ class SubwayLineRegisterController {
 
     @PostMapping("/subway-lines")
     public ResponseEntity<SubwayLineResponse> createStation(@RequestBody SubwayLineRegisterController.Request request) {
-        SubwayLineRegisterCommand command = request.mapFrom();
+        SubwayLineRegisterUsecase.Command command = request.mapFrom();
         SubwayLineResponse subwayLineResponse = subwayLineRegisterUsecase.registerSubwayLine(command);
         return ResponseEntity.ok().body(subwayLineResponse);
     }
@@ -47,8 +41,8 @@ class SubwayLineRegisterController {
             this.distance = distance;
         }
 
-        SubwayLineRegisterCommand mapFrom() {
-            return new SubwayLineRegisterCommand(
+        SubwayLineRegisterUsecase.Command mapFrom() {
+            return new SubwayLineRegisterUsecase.Command(
                     name,
                     color,
                     new Station.Id(upStationId),

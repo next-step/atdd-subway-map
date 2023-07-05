@@ -2,12 +2,12 @@ package subway.subway.adapter.in.web.mapper;
 
 import org.springframework.stereotype.Component;
 import subway.subway.adapter.in.web.StationRegisterController;
-import subway.subway.application.in.command.StationRegisterCommand;
+import subway.subway.application.in.StationRegisterUsecase;
 
 @Component
 public class StationRegisterMapper {
 
-    public StationRegisterCommand mapFrom(StationRegisterController.Request request) {
-        return new StationRegisterCommand(request.getName());
+    public StationRegisterUsecase.Command mapFrom(StationRegisterController.Request request) {
+        return new StationRegisterUsecase.Command(request.getName());
     }
 }

@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import subway.subway.adapter.in.web.mapper.SubwayLineDetailQueryMapper;
 import subway.subway.application.in.SubwayLineDetailQuery;
-import subway.subway.application.in.command.SubwayLineDetailQueryCommand;
 import subway.subway.application.query.SubwayLineResponse;
 
 @RestController
@@ -22,7 +21,7 @@ public class SubwayLineDetailQueryController {
 
     @GetMapping("/subway-lines/{id}")
     ResponseEntity<SubwayLineResponse> findOne(@PathVariable Long id) {
-        SubwayLineDetailQueryCommand command = mapper.mapFrom(id);
+        SubwayLineDetailQuery.Command command = mapper.mapFrom(id);
         SubwayLineResponse response = subwayLineDetailQuery.findOne(command);
         return ResponseEntity.ok().body(response);
     }

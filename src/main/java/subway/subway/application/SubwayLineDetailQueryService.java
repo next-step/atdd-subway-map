@@ -3,7 +3,6 @@ package subway.subway.application;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.subway.application.in.SubwayLineDetailQuery;
-import subway.subway.application.in.command.SubwayLineDetailQueryCommand;
 import subway.subway.application.out.SubwayLineDetailQueryPort;
 import subway.subway.application.query.SubwayLineResponse;
 
@@ -18,7 +17,7 @@ class SubwayLineDetailQueryService implements SubwayLineDetailQuery {
     }
 
     @Override
-    public SubwayLineResponse findOne(SubwayLineDetailQueryCommand command) {
+    public SubwayLineResponse findOne(Command command) {
         return subwayLineDetailQueryPort.findOne(command.getId());
     }
 }

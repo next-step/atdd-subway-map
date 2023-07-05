@@ -3,7 +3,6 @@ package subway.subway.application;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.subway.application.in.StationRegisterUsecase;
-import subway.subway.application.in.command.StationRegisterCommand;
 import subway.subway.application.out.StationRegisterPort;
 import subway.subway.application.query.StationResponse;
 import subway.subway.domain.Station;
@@ -18,7 +17,7 @@ class StationRegisterService implements StationRegisterUsecase {
     }
 
     @Override
-    public StationResponse saveStation(StationRegisterCommand command) {
+    public StationResponse saveStation(Command command) {
 
         Station station = Station.register(command.getName());
         return stationRegisterPort.save(station);

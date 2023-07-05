@@ -1,9 +1,19 @@
 package subway.subway.application.in;
 
-import subway.subway.application.in.command.StationRegisterCommand;
 import subway.subway.application.query.StationResponse;
 
 public interface StationRegisterUsecase {
-    StationResponse saveStation(StationRegisterCommand command);
+    StationResponse saveStation(Command command);
 
+    class Command {
+        private final String name;
+
+        public Command(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
+    }
 }
