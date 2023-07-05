@@ -1,13 +1,13 @@
 package subway.line;
 
 import subway.exception.BusinessException;
-import subway.exception.ErrorCode;
+import subway.exception.ErrorMessage;
 
 public class DownstreamStationIncludedException extends BusinessException {
 
-    private static final ErrorCode errorCode = ErrorCode.DOWNSTREAM_STATION_INCLUDED_EXCEPTION;
+    private static final ErrorMessage ERROR_MESSAGE = ErrorMessage.DOWNSTREAM_STATION_INCLUDED_EXCEPTION;
 
     public DownstreamStationIncludedException() {
-        super(errorCode.getMessage());
+        super(ERROR_MESSAGE.getMessage());
     }
 }

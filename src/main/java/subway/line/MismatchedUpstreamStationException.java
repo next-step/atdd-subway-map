@@ -1,13 +1,13 @@
 package subway.line;
 
 import subway.exception.BusinessException;
-import subway.exception.ErrorCode;
+import subway.exception.ErrorMessage;
 
 public class MismatchedUpstreamStationException extends BusinessException {
 
-    private static final ErrorCode errorCode = ErrorCode.MISMATCHED_UPSTREAM_STATION_EXCEPTION;
+    private static final ErrorMessage ERROR_MESSAGE = ErrorMessage.MISMATCHED_UPSTREAM_STATION_EXCEPTION;
 
     public MismatchedUpstreamStationException() {
-        super(errorCode.getMessage());
+        super(ERROR_MESSAGE.getMessage());
     }
 }

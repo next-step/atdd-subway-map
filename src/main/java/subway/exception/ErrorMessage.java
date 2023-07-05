@@ -1,6 +1,6 @@
 package subway.exception;
 
-public enum ErrorCode {
+public enum ErrorMessage {
     MISMATCHED_UPSTREAM_STATION_EXCEPTION("구간의 상행역과 해당 노선에 등록된 하행 종점역과 일치하지 않아 등록할 수 없습니다!"),
     NON_DOWNSTREAM_TERMINUS_EXCEPTION("하행 종점역이 아니기 때문에 제거할 수 없습니다!"),
     SINGLE_SEGMENT_REMOVAL_EXCEPTION("구간이 하나뿐이기 때문에 구간을 제거할 수 없습니다!"),
@@ -8,7 +8,7 @@ public enum ErrorCode {
 
     private final String message;
 
-    ErrorCode(String message) {
+    ErrorMessage(String message) {
         this.message = message;
     }
 

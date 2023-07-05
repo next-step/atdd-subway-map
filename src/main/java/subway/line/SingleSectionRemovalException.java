@@ -1,13 +1,13 @@
 package subway.line;
 
 import subway.exception.BusinessException;
-import subway.exception.ErrorCode;
+import subway.exception.ErrorMessage;
 
 public class SingleSectionRemovalException extends BusinessException {
 
-    private static final ErrorCode errorCode = ErrorCode.NON_DOWNSTREAM_TERMINUS_EXCEPTION;
+    private static final ErrorMessage ERROR_MESSAGE = ErrorMessage.NON_DOWNSTREAM_TERMINUS_EXCEPTION;
 
     public SingleSectionRemovalException() {
-        super(errorCode.getMessage());
+        super(ERROR_MESSAGE.getMessage());
     }
 }
