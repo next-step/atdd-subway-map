@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import subway.station.Station;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.List;
 
 @Entity
@@ -14,7 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public class Line {
+public class Line implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -28,6 +29,7 @@ public class Line {
     @OneToMany(mappedBy = "line")
     private List<Station> stations;
 
+    @Column
     private int distance;
 
     public void updateName(String name) {
