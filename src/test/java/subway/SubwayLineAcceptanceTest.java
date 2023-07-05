@@ -4,6 +4,7 @@ import io.restassured.response.ValidatableResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
+import subway.controller.resonse.StationResponse;
 import subway.controller.resonse.SubwayLineResponse;
 import subway.marker.AcceptanceTest;
 
@@ -381,6 +382,134 @@ class SubwayLineAcceptanceTest {
                 .body("stations[1].id", equalTo(sectionDownStationId))
                 .body("stations[1].name", equalTo(sectionDownStationName))
                 .body("distance", equalTo(distance + sectionDistance));
+    }
+
+    /**
+     * /**
+     * 지하철노선 구간 제거
+     * Given 지하철 노선을 생성하고 생성한 지하철 노선에 추가로 구간을 등록한뒤
+     * When 중간에 있는 역을 제거하려 하면
+     * Then 예외가 발생하고 실패한다.
+     */
+    @Test
+    void 지하철노선_구간_제거시_하행_종점역이_아니면_실패() {
+        //given
+        String lineName = "신분당선";
+        String color = "bg-red-600";
+
+        int upStationId = 1;
+        String upStationName = "강남역";
+        createStation(upStationName);
+
+        int downStationId = 2;
+        String downStationName = "언주역";
+        ValidatableResponse stationCreatedResponse = createStation(downStationName);
+        StationResponse stationResponse = stationCreatedResponse.extract().as(StationResponse.class);
+
+        int distance = 10;
+
+        ValidatableResponse subwayLineCratedResponse = createSubwayLines(lineName, color, upStationId, downStationId, distance);
+        long createdLineId = subwayLineCratedResponse.extract().as(SubwayLineResponse.class).getId();
+
+        int sectionDownStationId = 3;
+        String sectionDownStationName = "길음역";
+        createStation(sectionDownStationName);
+        int sectionDistance = 3;
+
+        createSubwayLineSection(createdLineId, downStationId, sectionDownStationId, sectionDistance);
+
+        //when
+        ValidatableResponse subwayLineSectionDeletedResponse = deleteResource(getLocation(subwayLineCratedResponse) + SECTION_RESOURCE_URL + "?stationId=" + stationResponse.getId());
+
+        //then
+        verifyResponseStatus(subwayLineSectionDeletedResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * /**
+     * 지하철노선 구간 제거
+     * Given 지하철 노선을 생성하고
+     * When 하행역을 제거하려 하면
+     * Then 예외가 발생하고 실패한다.
+     */
+    @Test
+    void 지하철노선_구간_제거시_구간이_한개인_경우_실패() {
+        //given
+        String lineName = "신분당선";
+        String color = "bg-red-600";
+
+        int upStationId = 1;
+        String upStationName = "강남역";
+        createStation(upStationName);
+
+        int downStationId = 2;
+        String downStationName = "언주역";
+        ValidatableResponse stationCreatedResponse = createStation(downStationName);
+        StationResponse stationResponse = stationCreatedResponse.extract().as(StationResponse.class);
+
+        int distance = 10;
+
+        ValidatableResponse subwayLineCratedResponse = createSubwayLines(lineName, color, upStationId, downStationId, distance);
+
+        //when
+        ValidatableResponse subwayLineSectionDeletedResponse = deleteResource(getLocation(subwayLineCratedResponse) + SECTION_RESOURCE_URL + "?stationId=" + stationResponse.getId());
+
+        //then
+        verifyResponseStatus(subwayLineSectionDeletedResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * /**
+     * 지하철노선 구간 제거
+     * Given 지하철 노선을 생성하고 생성한 지하철 노선에 추가로 구간을 등록한뒤
+     * When 하행 종점역을 제거한뒤
+     * Then 다시 조회하면 제거된 역을 제외한 상행역과 하행역이 조회되고 거리도 줄어든다
+     */
+    @Test
+    void 지하철노선_구간_제거_성공() {
+        //given
+        String lineName = "신분당선";
+        String color = "bg-red-600";
+
+        int upStationId = 1;
+        String upStationName = "강남역";
+        createStation(upStationName);
+
+        int downStationId = 2;
+        String downStationName = "언주역";
+        createStation(downStationName);
+
+        int distance = 10;
+
+        ValidatableResponse subwayLineCratedResponse = createSubwayLines(lineName, color, upStationId, downStationId, distance);
+        long createdLineId = subwayLineCratedResponse.extract().as(SubwayLineResponse.class).getId();
+
+        int sectionDownStationId = 3;
+        String sectionDownStationName = "길음역";
+        ValidatableResponse stationCreatedResponse = createStation(sectionDownStationName);
+        StationResponse stationResponse = stationCreatedResponse.extract().as(StationResponse.class);
+        int sectionDistance = 3;
+
+        createSubwayLineSection(createdLineId, downStationId, sectionDownStationId, sectionDistance);
+
+        //when
+        ValidatableResponse subwayLineSectionDeletedResponse = deleteResource(getLocation(subwayLineCratedResponse) + SECTION_RESOURCE_URL + "?stationId=" + stationResponse.getId());
+
+        //then
+        verifyResponseStatus(subwayLineSectionDeletedResponse, HttpStatus.NO_CONTENT);
+
+        ValidatableResponse foundSubwayLineResponse = getResource(LINES_RESOURCE_URL + "/" + createdLineId);
+        verifyResponseStatus(foundSubwayLineResponse, HttpStatus.OK);
+
+        foundSubwayLineResponse
+                .body("name", equalTo(lineName))
+                .body("color", equalTo(color))
+                .body("stations", hasSize(2))
+                .body("stations[0].id", equalTo(upStationId))
+                .body("stations[0].name", equalTo(upStationName))
+                .body("stations[1].id", equalTo(downStationId))
+                .body("stations[1].name", equalTo(downStationName));
+
     }
 
     private ValidatableResponse createSubwayLineSection(Long lineId, long upStationId, long downStationId, long distance) {
