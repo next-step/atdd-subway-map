@@ -1,4 +1,4 @@
-package subway;
+package subway.station;
 
 import common.AcceptanceTest;
 import io.restassured.response.ExtractableResponse;
@@ -10,7 +10,7 @@ import org.springframework.http.HttpStatus;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.SubwayTestFixture.*;
+import static subway.station.StationTestFixture.*;
 
 @DisplayName("지하철역 관련 기능")
 @AcceptanceTest
