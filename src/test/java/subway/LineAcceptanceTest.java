@@ -118,13 +118,13 @@ class LineAcceptanceTest {
 
         String updatedLineName = "수인분당선";
         String updatedLineColor = "bg-yellow-600";
-        ExtractableResponse<Response> updateResponse =
+        ExtractableResponse<Response> response =
             RestAssuredClient.requestPatch(path,
                     LineFactory.createNameAndColorUpdateParams(updatedLineName, updatedLineColor))
                 .statusCode(HttpStatus.OK.value()).extract();
 
         // then
-        JsonPath responseJsonPath = updateResponse.jsonPath();
+        JsonPath responseJsonPath = response.jsonPath();
         assertThat((String) responseJsonPath.get("name")).isEqualTo(updatedLineName);
         assertThat((String) responseJsonPath.get("color")).isEqualTo(updatedLineColor);
     }
