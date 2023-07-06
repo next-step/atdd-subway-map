@@ -4,27 +4,39 @@ import io.restassured.path.json.JsonPath;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
+import subway.CommonStep.DatabaseCleanup;
 import subway.CommonStep.LineStep;
-import subway.CommonStep.StationStep;
-import subway.dto.StationResponse;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD;
 
 @DisplayName("지하철 노선 관련 기능")
-@DirtiesContext(classMode = BEFORE_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+
 public class LineAcceptanceTest {
+
+    @LocalServerPort
+    int port;
+
+    @Autowired
+    private DatabaseCleanup databaseCleanup;
+
+    @BeforeEach
+    public void setUp() {
+        RestAssured.port = port;
+        databaseCleanup.execute();
+    }
+
     /**
      * When 지하철 노선을 생성하면
      * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
@@ -33,31 +45,12 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선을 생성한다.")
     @Test
     void createLine() {
-        //given
-        Long stationId1 = StationStep.지하철역_생성( "강남역").body().as(StationResponse.class).getId();
-        Long stationId2  = StationStep.지하철역_생성( "역삼역").body().as(StationResponse.class).getId();
 
         // when
-        Map<String, String> params = new HashMap<>();
-        params.put("name","2호선");
-        params.put("color","green");
-        params.put("upStationId",String.valueOf(stationId1));
-        params.put("downStationId",String.valueOf(stationId2));
-        params.put("distance","10");
-
-        RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().log().all()
-                .extract();
+        LineStep.지하철_노선_생성("강남역", "역삼역", "2호선", "green", 10L);
 
         //then
-        List<String> lineNames =
-                RestAssured.given().log().all()
-                        .when().get("/lines")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
+        List<String> lineNames = LineStep.지하철노선_목록_전체조회();
         assertThat(lineNames).containsAnyOf("2호선");
     }
 
@@ -85,7 +78,7 @@ public class LineAcceptanceTest {
      * When 생성한 지하철 노선을 조회하면
      * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
      */
-    @DisplayName("지하노선을 조회한다.")
+    @DisplayName("지하철 노선을 조회한다.")
     @Test
     void getLine(){
         //given
@@ -146,12 +139,14 @@ public class LineAcceptanceTest {
         Long lineId =  LineStep.지하철_노선_생성("강남역", "역삼역", "2호선", "grean",10L).jsonPath().getLong("id");
 
         //when
-        RestAssured.given().log().all()
-                .when().delete("/lines/" + lineId)
-                .then().log().all()
-                .statusCode(HttpStatus.OK.value());
+        ExtractableResponse<Response> response =
+                RestAssured.given().log().all()
+                        .when().delete("/lines/" + lineId)
+                        .then().log().all().extract();
 
         //then
+        assertThat(response.statusCode()).isEqualTo(200);
+
         List<String> lineNames = LineStep.지하철노선_목록_전체조회();
         assertThat(lineNames).doesNotContain("2호선");
 
