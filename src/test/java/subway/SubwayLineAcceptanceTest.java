@@ -99,6 +99,7 @@ class SubwayLineAcceptanceTest {
                 "color", "bg-red-600",
                 "stations", List.of(Map.of("id", 1, "name", 지하철역.get(1L)), Map.of("id", 2, "name", 지하철역.get(2L)))));
     }
+
     @DisplayName("지하철 노선을 생성하고 해당 id로 수정하면 수정한 노선이 조회된다.")
     @Test
     void create_update_findById() {
@@ -126,6 +127,23 @@ class SubwayLineAcceptanceTest {
                 "stations", List.of(Map.of("id", 1, "name", 지하철역.get(1L)), Map.of("id", 2, "name", 지하철역.get(2L)))));
     }
 
+    @DisplayName("지하철 노선을 생성하고 해당 id로 삭제하면 수정한 노선이 조회되지 않는다.")
+    @Test
+    void create_delete_notFound() {
+        Map<String, Object> createRequest = Map.of(
+                "name", "신분당선",
+                "color", "bg-red-600",
+                "upStationId", 1L,
+                "downStationId", 2L,
+                "distance", 10L
+        );
+        assertThat(지하철노선_생성(createRequest).jsonPath().getLong("id")).isEqualTo(1);
+
+        ExtractableResponse<Response> response = 지하철노선_삭제(1L);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        지하철노선_조회안됨(1L);
+    }
 
     private ExtractableResponse<Response> 지하철노선_생성(Map<String, Object> request){
         return RestAssured.given().log().all()
@@ -145,6 +163,13 @@ class SubwayLineAcceptanceTest {
                 .extract();
     }
 
+    private ExtractableResponse<Response> 지하철노선_삭제(Long id){
+        return RestAssured.given().log().all()
+                .when().delete("/lines/{id}", id)
+                .then().log().all()
+                .extract();
+    }
+
     private void 지하철노선_조회됨(Map<String, Object> expected) {
         Map<String, Object> result = RestAssured.given().log().all()
                 .when().get("/lines/{id}", expected.get("id"))
@@ -153,6 +178,13 @@ class SubwayLineAcceptanceTest {
                 .jsonPath().get();
 
         assertThat(result).isEqualTo(expected);
+    }
+
+    private void 지하철노선_조회안됨(Long id) {
+         RestAssured.given().log().all()
+                .when().get("/lines/{id}", id)
+                .then().log().all()
+                .assertThat().statusCode(404);
     }
 
     private void 지하철노선_목록_조회됨(Map<String, Object>... expected) {
