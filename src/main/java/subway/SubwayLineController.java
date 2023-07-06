@@ -27,6 +27,12 @@ public class SubwayLineController {
         return ResponseEntity.ok().build();
     }
 
+    @DeleteMapping("/lines/{id}")
+    public ResponseEntity<Void> deleteLines(@PathVariable("id") Long lineId) {
+        lineService.deleteLine(lineId);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/lines")
     public ResponseEntity<List<SubwayLineResponse>> showLines() {
         return ResponseEntity.ok().body(lineService.findAllLines());
