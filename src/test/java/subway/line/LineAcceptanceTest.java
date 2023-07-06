@@ -54,6 +54,8 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선 목록을 조회한다.")
     @Test
     void getLineList() {
+        // TODO: equals와 hashCode를 Override해서 비교하는 것 외에도 비교할 수 있는 방법이 없을까?
+        // TODO: 서로 바라보고 있는 객체들 간 관계에서 equals와 hashCode는 어떻게 Override해야 할까? (무한루프 대비)
         // given
         StationResponse someStationResponse = 지하철_역_생성_요청_역_정보_반환(지하철역);
         StationResponse newStationResponse = 지하철_역_생성_요청_역_정보_반환(새로운지하철역);
