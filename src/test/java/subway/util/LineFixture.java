@@ -1,6 +1,6 @@
 package subway.util;
 
-import static subway.util.StationApiRequest.*;
+import static subway.util.StationFixture.*;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -12,7 +12,7 @@ import subway.dto.LineUpdateRequest;
 import subway.dto.SectionCreateRequest;
 import subway.dto.StationResponse;
 
-public class LineApiRequest {
+public class LineFixture {
 
     public static final String 신분당선_이름 = "신분당선";
     public static final String 신분당선_색상 = "red";
@@ -64,7 +64,7 @@ public class LineApiRequest {
             .extract();
     }
 
-    public static ExtractableResponse<Response> 지하철_노선에_구간_생성_요청(Long id, Long upStationId,
+    public static ExtractableResponse<Response> 지하철_노선의_구간_생성_요청(Long id, Long upStationId,
         Long downStationId, Integer distance) {
         return RestAssured.given().log().all()
             .body(new SectionCreateRequest(upStationId, downStationId, distance))
@@ -75,7 +75,7 @@ public class LineApiRequest {
             .extract();
     }
 
-    public static ExtractableResponse<Response> 지하철_노선에_구간_삭제_요청(Long id, Long stationId) {
+    public static ExtractableResponse<Response> 지하철_노선의_구간_삭제_요청(Long id, Long stationId) {
         return RestAssured.given().log().all()
             .accept(MediaType.APPLICATION_JSON_VALUE)
             .param("stationId", stationId)
@@ -84,25 +84,25 @@ public class LineApiRequest {
             .extract();
     }
 
-    public static ExtractableResponse<Response> 신분당선_생성() {
+    public static LineResponse 지하철_신분당선_노선_생성() {
         StationResponse upStation = 지하철역_리스폰_변환(지하철역_생성_요청(신사역));
         StationResponse downStation = 지하철역_리스폰_변환(지하철역_생성_요청(논현역));
-        return 지하철_노선_생성_요청(신분당선_이름, 신분당선_색상, upStation.getId(), downStation.getId(), 10);
+        return 지하철_노선_리스폰_변환(지하철_노선_생성_요청(신분당선_이름, 신분당선_색상, upStation.getId(), downStation.getId(), 10));
     }
 
-    public static ExtractableResponse<Response> 경강선_생성() {
+    public static LineResponse 지하철_경강선_노선_생성() {
         StationResponse upStation = 지하철역_리스폰_변환(지하철역_생성_요청(판교역));
         StationResponse downStation = 지하철역_리스폰_변환(지하철역_생성_요청(이매역));
-        return 지하철_노선_생성_요청(경강선_이름, 경강선_색상, upStation.getId(), downStation.getId(), 10);
+        return 지하철_노선_리스폰_변환(지하철_노선_생성_요청(경강선_이름, 경강선_색상, upStation.getId(), downStation.getId(), 10));
     }
 
-    public static ExtractableResponse<Response> 신분당선_신사역_논현역_신논현역_구간_생성() {
+    public static LineResponse 지하철_구간을_포함한_노선_생성() {
         StationResponse upStation = 지하철역_리스폰_변환(지하철역_생성_요청(신사역));
         StationResponse downStation = 지하철역_리스폰_변환(지하철역_생성_요청(논현역));
         StationResponse newDownStation = 지하철역_리스폰_변환(지하철역_생성_요청(신논현역));
         LineResponse 신분당선 = 지하철_노선_리스폰_변환(지하철_노선_생성_요청(신분당선_이름, 신분당선_색상,
             upStation.getId(), downStation.getId(), 10));
-        return 지하철_노선에_구간_생성_요청(신분당선.getId(), downStation.getId(), newDownStation.getId(), 10);
+        return 지하철_노선_리스폰_변환(지하철_노선의_구간_생성_요청(신분당선.getId(), downStation.getId(), newDownStation.getId(), 10));
     }
 
     public static LineResponse 지하철_노선_리스폰_변환(ExtractableResponse<Response> response) {
