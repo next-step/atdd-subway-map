@@ -14,6 +14,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import subway.line.domain.Line;
 import subway.station.domain.Station;
 
 @Getter
@@ -27,6 +28,10 @@ public class Section {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "line_id")
+    private Line line;
 
     @ManyToOne
     @JoinColumn(name = "up_station_id")

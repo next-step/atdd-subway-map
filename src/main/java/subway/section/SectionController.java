@@ -8,11 +8,13 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import subway.line.service.LineService;
@@ -22,6 +24,7 @@ import subway.section.exception.InvalidSectionUpStationException;
 import subway.section.model.SectionCreateRequest;
 import subway.section.model.SectionCreateResponse;
 import subway.section.service.SectionCreateService;
+import subway.section.service.SectionDeleteService;
 import subway.support.ErrorResponse;
 import subway.support.SubwayException;
 
@@ -31,6 +34,7 @@ import subway.support.SubwayException;
 public class SectionController {
     private final SectionCreateService sectionCreateService;
     private final LineService lineService;
+    private final SectionDeleteService sectionDeleteService;
 
     @PostMapping("/{lineId}/sections")
     public ResponseEntity<SectionCreateResponse> createSection(@PathVariable Long lineId, @RequestBody SectionCreateRequest request) {
@@ -39,6 +43,12 @@ public class SectionController {
 
         return ResponseEntity.created(URI.create("/lines/" + lineId + "/sections/" + section.getId()))
                              .body(new SectionCreateResponse(section));
+    }
+
+    @DeleteMapping("/{lineId}/sections")
+    public ResponseEntity<Void> deleteSection(@PathVariable Long lineId, @RequestParam Long stationId) {
+        sectionDeleteService.delete(lineId, stationId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @ExceptionHandler(value = { InvalidSectionUpStationException.class, InvalidSectionDownStationException.class, })

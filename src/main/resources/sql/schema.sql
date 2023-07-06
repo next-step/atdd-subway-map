@@ -28,6 +28,7 @@ create table line (
 
 create table section (
                       ID int not null AUTO_INCREMENT,
+                      line_id int not null,
                       up_station_id int not null,
                       down_station_id int not null,
                       distance int not null,

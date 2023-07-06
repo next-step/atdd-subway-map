@@ -20,8 +20,6 @@ import subway.SubwayApplication;
 import subway.line.view.LineResponse;
 import subway.section.model.SectionCreateResponse;
 import subway.station.view.StationResponse;
-import subway.support.ErrorCode;
-import subway.support.ErrorResponse;
 
 @SchemaInitSql
 @DisplayName("지하철 구간 삭제 기능")
@@ -51,7 +49,7 @@ public class SectionDeleteAcceptanceTest {
         lineDownstationD = stationFixture.지하철역_생성("downStationD");
         lineCD = lineFixture.노선생성("line-cd", "blue", lineUpstationC.getId(), lineDownstationD.getId(), 5);
 
-
+        section = sectionFixture.구간생성(lineAB.getId(), lineDownstationB.getId(), lineUpstationC.getId(), 4).as(SectionCreateResponse.class);
     }
 
     @DisplayName("구간이 있을때")
@@ -65,20 +63,18 @@ public class SectionDeleteAcceptanceTest {
             @DisplayName("구간이 제거된다")
             @Test
             void shouldThrowError() {
-
                 ExtractableResponse<Response> response = RestAssured.given().log().all()
-                                                                    .when().delete(getDeleteSectionUrl(lineAB.getId(), 1L))
+                                                                    .when().delete(getDeleteSectionUrl(lineAB.getId(), lineUpstationC.getId()))
                                                                     .then().log().all()
                                                                     .extract();
 
-                assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-                assertThat(response.as(ErrorResponse.class).getErrorCode()).isEqualTo(ErrorCode.SECTION_CREATE_FAIL_BY_UPSTATION);
+                assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
             }
         }
     }
 
-    private String getDeleteSectionUrl(Long lineId, Long sectionId) {
-        return "/lines/" + lineId + "/sections?sectionId=";
+    private String getDeleteSectionUrl(Long lineId, Long stationId) {
+        return "/lines/" + lineId + "/sections?stationId=" + stationId;
     }
 
 

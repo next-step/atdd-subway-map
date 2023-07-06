@@ -35,9 +35,10 @@ public class SectionCreateService {
         }
 
         Section section = Section.builder()
-                                 .distance(request.getDistance())
+                                 .line(line)
                                  .downStation(stationService.get(request.getDownStationId()))
                                  .upStation(stationService.get(request.getUpStationId()))
+                                 .distance(request.getDistance())
                                  .build();
 
         return sectionRepository.save(section);
