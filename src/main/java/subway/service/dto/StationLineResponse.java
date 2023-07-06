@@ -3,6 +3,7 @@ package subway.service.dto;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import lombok.Data;
 import subway.domain.StationLine;
@@ -19,10 +20,10 @@ public class StationLineResponse {
 			return null;
 		}
 
-		final List<StationResponse> stations = new ArrayList<>();
-
-		stations.add(StationResponse.fromEntity(stationLine.getUpStation()));
-		stations.add(StationResponse.fromEntity(stationLine.getDownStation()));
+		final List<StationResponse> stations = stationLine.getAllStations()
+			.stream()
+			.map(StationResponse::fromEntity)
+			.collect(Collectors.toList());
 
 		final StationLineResponse response = new StationLineResponse();
 

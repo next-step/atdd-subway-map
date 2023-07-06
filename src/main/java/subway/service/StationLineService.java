@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import subway.domain.Station;
 import subway.domain.StationLine;
 import subway.domain.StationLineRepository;
+import subway.domain.StationLineSectionCreateRequest;
 import subway.domain.StationRepository;
 import subway.exception.EntityNotFoundException;
 import subway.service.dto.StationLineCreateRequest;
@@ -72,5 +73,30 @@ public class StationLineService {
 			.orElseThrow(() -> new EntityNotFoundException("station line not found"));
 
 		stationLineRepository.delete(stationLine);
+	}
+
+	@Transactional
+	public void createStationLineSection(Long lineId, StationLineSectionCreateRequest request) {
+		final Station upStation = stationRepository.findById(request.getUpStationId())
+			.orElseThrow(() -> new EntityNotFoundException("upStation not found"));
+
+		final Station downStation = stationRepository.findById(request.getDownStationId())
+			.orElseThrow(() -> new EntityNotFoundException("downStation not found"));
+
+		final StationLine stationLine = stationLineRepository.findById(lineId)
+			.orElseThrow(() -> new EntityNotFoundException("station line not found"));
+
+		stationLine.createSection(upStation, downStation, request.getDistance());
+	}
+
+	@Transactional
+	public void deleteStationLineSection(Long lineId, Long stationId) {
+		final Station targetStation = stationRepository.findById(stationId)
+			.orElseThrow(() -> new EntityNotFoundException("upStation not found"));
+
+		final StationLine stationLine = stationLineRepository.findById(lineId)
+			.orElseThrow(() -> new EntityNotFoundException("station line not found"));
+
+		stationLine.deleteSection(targetStation);
 	}
 }
