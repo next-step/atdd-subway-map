@@ -1,6 +1,5 @@
 package subway.domain;
 
-import antlr.StringUtils;
 import subway.exception.SubwayException;
 
 import javax.persistence.*;
@@ -62,18 +61,6 @@ public class Line {
                 .collect(Collectors.toList());
     }
 
-//    private Station getUpStation() {
-//        return sections.get(0).getUpStation();
-//    }
-//
-//    private Station getDownStaion() {
-//        if(sections.size() == 1) {
-//            return sections.get(0).getDownStation();
-//        }
-//
-//        return sections.get(sections.size()).getDownStation();
-//    }
-
     public Long getDistance() {
         return sections.stream().mapToLong(Section::getDistance).sum();
     }
@@ -84,26 +71,42 @@ public class Line {
     }
 
     public void registerSection(Section section) {
-        validate(section);
+        validateRegister(section);
 
         sections.add(section);
     }
 
-    private void validate(Section section) {
-        String upStationName = section.getUpStation().getName();
-        String downStationName = section.getDownStation().getName();
+    public void deleteSection(Station station) {
+        validateDelete(station);
 
+        sections.remove(sections.size() - 1);
+    }
+
+    private void validateDelete(Station station) {
         Section lastSection = sections.get(sections.size() - 1);
 
-        if(!lastSection.equalsDownStation(section.getDownStation())) {
+        if (!lastSection.equalsDownStation(station)) {
+            throw new SubwayException("지하철 노선에 등록된 하행 종점역만 제거할 수 있습니다.");
+        }
+
+        if (sections.size() == 1) {
+            throw new SubwayException("노선에 구간이 한개인 경우 삭제할 수 없습니다.");
+        }
+    }
+
+    private void validateRegister(Section section) {
+        String downStationName = section.getDownStation().getName();
+        Section lastSection = sections.get(sections.size() - 1);
+
+        if (!lastSection.equalsDownStation(section.getUpStation())) {
             throw new SubwayException("새로운 구간의 상행역은 노선에 등록되어 있는 하행 종점역이어야 합니다.");
         }
 
         long count = sections.stream()
-                .filter(s -> s.isContainStation(upStationName) || s.isContainStation(downStationName))
+                .filter(s -> s.isContainStation(downStationName) || s.isContainStation(downStationName))
                 .count();
 
-        if(count > 0) {
+        if (count > 0) {
             throw new SubwayException("새로운 구간의 하행역은 노선에 등록되어 있는 역일 수 없습니다.");
         }
     }

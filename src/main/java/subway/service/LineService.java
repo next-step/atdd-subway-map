@@ -76,6 +76,26 @@ public class LineService {
         lineRepository.deleteById(id);
     }
 
+
+
+    @Transactional
+    public void registerSections(Long id, LineSectionRegisterRequest lineSectionRegisterRequest) {
+        Line line = lineRepository.findById(id).orElseThrow(() -> new RuntimeException());
+        Station downStation= stationRepository.findById(lineSectionRegisterRequest.getDownStationId()).orElseThrow(() -> new RuntimeException());
+        Station upStation = stationRepository.findById(lineSectionRegisterRequest.getUpStationId()).orElseThrow(() -> new RuntimeException());
+        Section section = sectionRepository.save(new Section(upStation, downStation, lineSectionRegisterRequest.getDistance()));
+
+        line.registerSection(section);
+    }
+
+    @Transactional
+    public void deleteSections(Long id, Long stationId) {
+        Line line = lineRepository.findById(id).orElseThrow(() -> new RuntimeException());
+        Station station = stationRepository.findById(stationId).orElseThrow(() -> new RuntimeException());
+
+        line.deleteSection(station);
+    }
+
     private LineResponse createLineResponse(Line line) {
         return new LineResponse(
                 line.getId(),
@@ -84,14 +104,5 @@ public class LineService {
                 line.getContainStations(),
                 line.getDistance()
         );
-    }
-
-    public void registerSections(Long id, LineSectionRegisterRequest lineSectionRegisterRequest) {
-        Line line = lineRepository.findById(id).orElseThrow(() -> new RuntimeException());
-        Station downStation= stationRepository.findById(lineSectionRegisterRequest.getDownStationId()).orElseThrow(() -> new RuntimeException());
-        Station upStation = stationRepository.findById(lineSectionRegisterRequest.getUpStationId()).orElseThrow(() -> new RuntimeException());
-
-        Section section = new Section(upStation, downStation, lineSectionRegisterRequest.getDistance());
-        line.registerSection(section);
     }
 }

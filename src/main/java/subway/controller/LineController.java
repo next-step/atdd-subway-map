@@ -9,6 +9,7 @@ import subway.dto.LineSectionRegisterRequest;
 import subway.service.LineService;
 import subway.dto.LineUpdateRequest;
 
+import javax.persistence.PreUpdate;
 import java.net.URI;
 import java.util.List;
 
@@ -53,6 +54,12 @@ public class LineController {
     public ResponseEntity<Void> registerSections(@PathVariable Long id
             , @RequestBody LineSectionRegisterRequest lineSectionRegisterRequest) {
         lineService.registerSections(id, lineSectionRegisterRequest);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping(value = "/lines/{id}/sections")
+    public ResponseEntity<Void> deleteSections(@PathVariable Long id, @RequestParam Long stationId) {
+        lineService.deleteSections(id, stationId);
         return ResponseEntity.ok().build();
     }
 }

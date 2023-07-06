@@ -1,12 +1,9 @@
 package subway.domain;
 
 import javax.persistence.*;
-import java.util.Objects;
 
 @Entity
 public class Section {
-
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -49,10 +46,6 @@ public class Section {
 
     public boolean isContainStation(String stationName) {
         return getDownStation().getName().equals(stationName) || getUpStation().getName().equals(stationName);
-    }
-
-    public boolean equalsUpStation(Station station) {
-        return upStation.getName().equals(station.getName());
     }
 
     public boolean equalsDownStation(Station station) {

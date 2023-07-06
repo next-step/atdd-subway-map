@@ -44,16 +44,15 @@ public class SectionAcceptanceTest {
     void createSection() {
         Station upStation = stationRepository.save(new Station("지하철역"));
         Station downStation = stationRepository.save(new Station("새로운지하철역"));
-        Section section = new Section(upStation, downStation, 10L);
-        sectionRepository.save(section);
+        Section section = sectionRepository.save(new Section(upStation, downStation, 10L));
 
         Line 신분당선 = lineRepository.save(new Line("신분당선", "bg-red-600", section));
         Station 새로운_지하철역 = stationRepository.save(new Station("새로운지하철역"));
         Station 또다른_지하철역 = stationRepository.save(new Station("또다른지하철역"));
 
         Map<String, Object> params = new HashMap<>();
-        params.put("downStationId", 또다른_지하철역.getId());
         params.put("upStationId", 새로운_지하철역.getId());
+        params.put("downStationId", 또다른_지하철역.getId());
         params.put("distance", 3L);
 
         // when
@@ -61,9 +60,9 @@ public class SectionAcceptanceTest {
 
         // then
         ExtractableResponse<Response> response = LineAcceptanceTest.지하철노선_한개를_조회한다(신분당선.getId());
-        List<Object> stations = response.jsonPath().getList("stations");
+        List<String> stationNames = response.jsonPath().getList("stations.name", String.class);
 
-        assertThat(stations.size()).isEqualTo(2);
+        assertThat(stationNames).contains(또다른_지하철역.getName());
     }
 
     /**
@@ -128,17 +127,78 @@ public class SectionAcceptanceTest {
      * Then 지하철 노선에 지하철 구간이 제거된다
      * Then 지하철 노선 정보 조회 시 제거한 지하철 구간을 찾을 수 없다
      * */
+    @DisplayName("지하철노선에 구간을 제거한다")
+    @Test
+    void deleteSection() {
+        Station upStation = stationRepository.save(new Station("지하철역"));
+        Station downStation = stationRepository.save(new Station("새로운지하철역"));
+        Section section = new Section(upStation, downStation, 10L);
+        sectionRepository.save(section);
+
+        Line 신분당선 = lineRepository.save(new Line("신분당선", "bg-red-600", section));
+        Station 새로운_지하철역 = stationRepository.save(new Station("새로운지하철역"));
+        Station 또다른_지하철역 = stationRepository.save(new Station("또다른지하철역"));
+        Section registSection = new Section(새로운_지하철역, 또다른_지하철역, 3L);
+        sectionRepository.save(registSection);
+        신분당선.registerSection(registSection);
+        lineRepository.save(신분당선);
+
+        // when
+        지하철노선에_구간을_제거한다(신분당선, 또다른_지하철역);
+        ExtractableResponse<Response> response = LineAcceptanceTest.지하철노선_한개를_조회한다(신분당선.getId());
+        List<String> stationNames = response.jsonPath().getList("stations.name", String.class);
+        assertThat(stationNames).doesNotContain(또다른_지하철역.getName());
+    }
 
     /**
-     * Given 지하철 노선에 등록된 하행종점역이 아닌 구간을 생성하고
+     * Given 지하철 노선에 등록된 하행종점역이 아닌 역을 생성하고
      * When 지하철 노선에 지하철 구간을 제거하면
      * Then 지하철 구간 제거시 에러가 발생한다.
      * */
+    @DisplayName("지하철노선에 구간을 제거할때 에러가 발생한다")
+    @Test
+    void deleteSectionErrorCaseOne() {
+        Station upStation = stationRepository.save(new Station("지하철역"));
+        Station downStation = stationRepository.save(new Station("새로운지하철역"));
+        Section section = sectionRepository.save(new Section(upStation, downStation, 10L));
+
+        Line 신분당선 = lineRepository.save(new Line("신분당선", "bg-red-600", section));
+        Station 새로운_지하철역 = stationRepository.save(new Station("새로운지하철역"));
+        Station 또다른_지하철역 = stationRepository.save(new Station("또다른지하철역"));
+        Section registSection = new Section(새로운_지하철역, 또다른_지하철역, 3L);
+        sectionRepository.save(registSection);
+        신분당선.registerSection(registSection);
+        lineRepository.save(신분당선);
+
+        // given
+        Station 다른_지하철역 = stationRepository.save(new Station("다른지하철역"));
+
+        // when
+        ExtractableResponse<Response> response = 지하철노선에_구간을_제거한다(신분당선, 다른_지하철역);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
 
     /**
      * When 지하철 노선에 지하철 구간을 제거할 때 지하철 노선에 구간이 1개라면
      * Then 지하철 구간 제거시 에러가 발생한다.
      */
+    @DisplayName("지하철노선에 구간을 제거할때 에러가 발생한다")
+    @Test
+    void deleteSectionErrorCaseTwo() {
+        Station upStation = stationRepository.save(new Station("지하철역"));
+        Station downStation = stationRepository.save(new Station("새로운지하철역"));
+        Section section = new Section(upStation, downStation, 10L);
+        sectionRepository.save(section);
+        Line 신분당선 = lineRepository.save(new Line("신분당선", "bg-red-600", section));
+
+        // when
+        ExtractableResponse<Response> response = 지하철노선에_구간을_제거한다(신분당선, downStation);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
 
     private static ExtractableResponse<Response> 지하철노선에_지하철구간을_등록한다(Line line, Map<String, Object> params) {
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -146,6 +206,17 @@ public class SectionAcceptanceTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post("/lines/" + line.getId() + "/sections")
+                .then().log().all()
+                .extract();
+        
+        return response;
+    }
+
+    private static ExtractableResponse<Response> 지하철노선에_구간을_제거한다(Line 신분당선, Station 또다른_지하철역) {
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .when()
+                .delete("/lines/" + 신분당선.getId() + "/sections?stationId=" + 또다른_지하철역.getId())
                 .then().log().all()
                 .extract();
 
