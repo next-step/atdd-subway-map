@@ -22,8 +22,8 @@ public class SubwayLineService {
 
     @Transactional
     public SubwayLineResponse saveLine(CreateSubwayLineRequest request) {
-        final Station upStation = stationRepository.findById(request.getUpStationId()).orElseThrow(RuntimeException::new);
-        final Station downStation = stationRepository.findById(request.getDownStationId()).orElseThrow(RuntimeException::new);
+        final Station upStation = stationRepository.findById(request.getUpStationId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "not found station"));
+        final Station downStation = stationRepository.findById(request.getDownStationId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "not found station"));
 
         SubwayLine subwayLine = SubwayLine.builder()
                 .name(request.getName())

@@ -42,6 +42,36 @@ class SubwayLineAcceptanceTest {
         dbCleaner.cleanUpStation();
     }
 
+    @DisplayName("지하철 노선을 생성할 때 upStation 에 해당하는 지하철역이 없으면 NOT_FOUND")
+    @Test
+    void createWithNoUpStation_notFound() {
+        Map<String, Object> request = Map.of(
+                "name", "신분당선",
+                "color", "bg-red-600",
+                "upStationId", 100L,
+                "downStationId", 2L,
+                "distance", 10L
+        );
+
+        ExtractableResponse<Response> response = 지하철노선_생성(request);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+    }
+
+    @DisplayName("지하철 노선을 생성할 때 downStation 에 해당하는 지하철역이 없으면 NOT_FOUND")
+    @Test
+    void createWithNoDownStation_notFound() {
+        Map<String, Object> request = Map.of(
+                "name", "신분당선",
+                "color", "bg-red-600",
+                "upStationId", 1L,
+                "downStationId", 200L,
+                "distance", 10L
+        );
+
+        ExtractableResponse<Response> response = 지하철노선_생성(request);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+    }
+
     @DisplayName("지하철 노선을 생성하면 목록 조회시 생성한 노선이 조회된다.")
     @Test
     void create_findAll() {
