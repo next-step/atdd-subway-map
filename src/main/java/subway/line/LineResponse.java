@@ -10,6 +10,15 @@ public class LineResponse {
     private String color;
     private List<Station> stations;
 
+    public LineResponse() {}
+
+    public LineResponse(Line line) {
+        this.id = line.getId();
+        this.name = line.getName();
+        this.color = line.getColor();
+        this.stations = List.of(line.getUpStation(), line.getDownStation());
+    }
+
     public LineResponse(Long id, String name, String color, List<Station> stations) {
         this.id = id;
         this.name = name;
