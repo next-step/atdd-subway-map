@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import subway.StationResponse;
+import subway.station.StationResponse;
 
 public class StationStep {
 
