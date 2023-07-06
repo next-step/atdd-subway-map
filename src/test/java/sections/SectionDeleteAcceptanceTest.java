@@ -50,8 +50,6 @@ public class SectionDeleteAcceptanceTest {
         lineUpstationC = stationFixture.지하철역_생성("upstationC");
         lineDownstationD = stationFixture.지하철역_생성("downStationD");
         lineCD = lineFixture.노선생성("line-cd", "blue", lineUpstationC.getId(), lineDownstationD.getId(), 5);
-
-//        section = sectionFixture.구간생성(lineAB.getId(), lineDownstationB.getId(), lineUpstationC.getId(), 4).as(SectionCreateResponse.class);
     }
 
     @DisplayName("구간이 1개만 있을때")
