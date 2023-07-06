@@ -40,6 +40,12 @@ public class Line {
         this.stations = List.of(upStation, downStation);
     }
 
+    public void updateLine(LineRequest lineRequest) {
+        this.name = lineRequest.getName().isBlank() ? this.name : lineRequest.getName();
+        this.color = lineRequest.getColor().isBlank() ? this.color : lineRequest.getColor();
+        this.distance = lineRequest.getDistance() == null ? this.distance : lineRequest.getDistance();
+    }
+
     public Long getId() {
         return id;
     }
@@ -50,6 +56,10 @@ public class Line {
 
     public String getColor() {
         return color;
+    }
+
+    public Long getDistance() {
+        return distance;
     }
 
     public List<Station> getStations() {

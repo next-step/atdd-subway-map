@@ -50,6 +50,14 @@ public class LineService {
         return createLineResponse(line);
     }
 
+    public LineResponse updateLine(Long id, LineRequest request) {
+        Line line = lineRepository.findById(id).orElseThrow(IllegalArgumentException::new);
+        line.updateLine(request);
+
+        Line updateLine = lineRepository.save(line);
+        return createLineResponse(updateLine);
+    }
+
     private LineResponse createLineResponse(Line line) {
         return new LineResponse(line);
     }
