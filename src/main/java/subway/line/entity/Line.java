@@ -48,4 +48,9 @@ public class Line {
         this.downStation = downStation;
         this.distance = distance;
     }
+
+    public void updateLine(Line updateLine) {
+        this.name = updateLine.name;
+        this.color = updateLine.color;
+    }
 }

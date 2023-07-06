@@ -5,12 +5,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.global.error.code.ErrorCode;
 import subway.global.error.exception.NotEntityFoundException;
+import subway.line.adapters.persistence.LineJpaAdapter;
 import subway.line.dto.request.SaveLineRequestDto;
+import subway.line.dto.request.UpdateLineRequestDto;
 import subway.line.dto.response.LineResponseDto;
 import subway.line.entity.Line;
 import subway.line.repository.LineRepository;
+import subway.station.adapters.persistence.StationJpaAdapter;
 import subway.station.entity.Station;
-import subway.station.repository.StationRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,29 +22,38 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class LineService {
 
-    private final StationRepository stationRepository;
+    private final StationJpaAdapter stationJpaAdapter;
 
-    private final LineRepository lineRepository;
+    private final LineJpaAdapter lineJpaAdapter;
 
     @Transactional
     public LineResponseDto saveLine(SaveLineRequestDto lineRequest) {
-        Station upStation = findStationInLineByStationId(lineRequest.getUpStationId());
-        Station downStation = findStationInLineByStationId(lineRequest.getDownStationId());
+        Station upStation = stationJpaAdapter.findById(lineRequest.getUpStationId());
+        Station downStation = stationJpaAdapter.findById(lineRequest.getDownStationId());
 
-        Line line = lineRepository.save(lineRequest.toEntity(upStation, downStation));
+        Line line = lineJpaAdapter.save(lineRequest.toEntity(upStation, downStation));
         return LineResponseDto.of(line);
     }
 
     public List<LineResponseDto> findAllLines() {
-        return lineRepository.findAll().stream()
+        return lineJpaAdapter.findAll()
+                .stream()
                 .map(LineResponseDto::of)
                 .collect(Collectors.toList());
     }
 
-    private Station findStationInLineByStationId(Long id) {
-        return stationRepository.findById(id)
-                .orElseThrow(() ->
-                        new NotEntityFoundException(ErrorCode.NOT_EXIST_STATION));
+    public LineResponseDto findLineById(Long id) {
+        return LineResponseDto.of(lineJpaAdapter.findById(id));
     }
 
+    @Transactional
+    public void updateLine(Long id, UpdateLineRequestDto lineRequest) {
+        Line targetLine = lineJpaAdapter.findById(id);
+        targetLine.updateLine(lineRequest.toEntity());
+    }
+
+    @Transactional
+    public void deleteLineById(Long id) {
+        lineJpaAdapter.deleteById(id);
+    }
 }

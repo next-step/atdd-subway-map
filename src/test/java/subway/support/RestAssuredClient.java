@@ -63,6 +63,32 @@ public class RestAssuredClient {
     /**
      * <pre>
      * path에
+     * PUT 방식으로
+     * RestAssured를 통해
+     * requestBody를 담아
+     * HTTP 요청을 보낼 때 사용합니다.
+     * </pre>
+     *
+     * @param path
+     * @param requestBody
+     * @return ExtractableResponse
+     */
+    public static <T> ExtractableResponse<Response> put(String path, T requestBody) {
+        return RestAssured
+                .given()
+                    .log().all()
+                    .body(requestBody)
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                    .put(path)
+                .then()
+                    .log().all()
+                    .extract();
+    }
+
+    /**
+     * <pre>
+     * path에
      * DELETE 방식으로
      * RestAssured를 통해
      * HTTP 요청을 보낼 때 사용합니다.

@@ -13,6 +13,7 @@ import subway.constants.Endpoint;
 import subway.fixture.LineFixture;
 import subway.fixture.StationFixture;
 import subway.line.dto.request.SaveLineRequestDto;
+import subway.line.dto.request.UpdateLineRequestDto;
 import subway.station.dto.request.SaveStationRequestDto;
 import subway.support.AcceptanceTest;
 import subway.support.DatabaseCleanUp;
@@ -134,6 +135,22 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선을 조회한다.")
     @Test
     void readLine() {
+        // given
+        SaveLineRequestDto gyeongchunLine = LineFixture.GYEONGCHUN_LINE;
+        gyeongchunLine
+                .setUpStationId(cheongnyangniStationId)
+                .setDownStationId(chuncheonStation);
+        Long savedLineId = saveLine(gyeongchunLine)
+                .jsonPath()
+                .getLong(LINE_ID_KEY);
+
+        // when
+        String foundStationName = findLineById(savedLineId)
+                .jsonPath()
+                .getString(LINE_NAME_KEY);
+
+        // then
+        assertThat(foundStationName).isEqualTo(gyeongchunLine.getName());
     }
 
     /**
@@ -146,6 +163,31 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선을 수정한다.")
     @Test
     void updateLine() {
+        // given
+        SaveLineRequestDto sinbundangLine = LineFixture.SINBUNDANG_LINE;
+        sinbundangLine
+                .setUpStationId(gangnamStationId)
+                .setDownStationId(gwanggyoStationId);
+        Long savedLineId = saveLine(sinbundangLine)
+                .jsonPath()
+                .getLong(LINE_ID_KEY);
+
+        // when
+        UpdateLineRequestDto updateSinbundangLine = LineFixture.UPDATE_SINBUNDANG_LINE;
+        String path = String.format("%s/%d", LINE_BASE_URL, savedLineId);
+        ExtractableResponse<Response> updateStationResponse = RestAssuredClient.put(path, updateSinbundangLine);
+
+        // then
+        assertAll(
+                () -> assertThat(updateStationResponse.statusCode()).isEqualTo(HttpStatus.OK.value()),
+                () -> {
+                    String updatedLine = findLineById(savedLineId)
+                            .jsonPath()
+                            .getString(LINE_NAME_KEY);
+
+                    assertThat(updatedLine).isEqualTo(updateSinbundangLine.getName());
+                }
+        );
     }
 
     /**
@@ -158,6 +200,30 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선을 삭제한다.")
     @Test
     void deleteLine() {
+        // given
+        SaveLineRequestDto gyeongchunLine = LineFixture.GYEONGCHUN_LINE;
+        gyeongchunLine
+                .setUpStationId(cheongnyangniStationId)
+                .setDownStationId(chuncheonStation);
+        Long savedLineId = saveLine(gyeongchunLine)
+                .jsonPath()
+                .getLong(LINE_ID_KEY);
+
+        // when
+        String path = String.format("%s/%d", LINE_BASE_URL, savedLineId);
+        ExtractableResponse<Response> deleteStationByIdResponse = RestAssuredClient.delete(path);
+
+        // then
+        assertAll(
+                () -> assertThat(deleteStationByIdResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value()),
+                () -> {
+                    List<String> LineNames = RestAssuredClient.get(LINE_BASE_URL)
+                            .jsonPath()
+                            .getList(LINE_NAME_KEY, String.class);
+
+                    assertThat(LineNames).doesNotContain(gyeongchunLine.getName());
+                }
+        );
     }
 
     /**
@@ -203,6 +269,22 @@ public class LineAcceptanceTest {
         assertThat(findStationsAllResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         return findStationsAllResponse;
+    }
+
+    /**
+     * <pre>
+     * 지하철 노선을 id로 조회하는 API를 호출하는 함수
+     * </pre>
+     *
+     * @param id
+     * @return ExtractableResponse
+     */
+    private ExtractableResponse<Response> findLineById(Long id) {
+        String path = String.format("%s/%d", LINE_BASE_URL, id);
+        ExtractableResponse<Response> findStationByIdResponse = RestAssuredClient.get(path);
+        assertThat(findStationByIdResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        return findStationByIdResponse;
     }
 
 }

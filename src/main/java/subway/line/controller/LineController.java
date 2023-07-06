@@ -2,11 +2,9 @@ package subway.line.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import subway.line.dto.request.SaveLineRequestDto;
+import subway.line.dto.request.UpdateLineRequestDto;
 import subway.line.dto.response.LineResponseDto;
 import subway.line.service.LineService;
 
@@ -31,8 +29,30 @@ public class LineController {
 
     @GetMapping("/lines")
     public ResponseEntity<List<LineResponseDto>> showLines() {
-        return ResponseEntity.ok()
-                .body(lineService.findAllLines());
+        return ResponseEntity.ok(lineService.findAllLines());
+    }
+
+    @GetMapping("/lines/{id}")
+    public ResponseEntity<LineResponseDto> showLine(@PathVariable Long id) {
+        return ResponseEntity.ok(lineService.findLineById(id));
+    }
+
+    @PutMapping("/lines/{id}")
+    public ResponseEntity<Void> updateLine(
+            @PathVariable Long id,
+            @RequestBody @Valid UpdateLineRequestDto lineRequest) {
+        lineService.updateLine(id, lineRequest);
+        return ResponseEntity
+                .ok()
+                .build();
+    }
+
+    @DeleteMapping("/lines/{id}")
+    public ResponseEntity<Void> deleteLine(@PathVariable Long id) {
+        lineService.deleteLineById(id);
+        return ResponseEntity
+                .noContent()
+                .build();
     }
 
 }

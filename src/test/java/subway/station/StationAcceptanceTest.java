@@ -109,15 +109,20 @@ public class StationAcceptanceTest {
                 .getLong(STATION_ID_KEY);
 
         // when
-        deleteStationById(savedStationId);
+        String path = String.format("%s/%d", STATION_BASE_URL, savedStationId);
+        ExtractableResponse<Response> deleteStationByIdResponse = RestAssuredClient.delete(path);
 
         // then
-        List<String> stationNames = RestAssuredClient.get(Endpoint.STATION_BASE_URL.getUrl())
-                .jsonPath()
-                .getList(STATION_NAME_KEY, String.class);
+        assertAll(
+                () -> assertThat(deleteStationByIdResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value()),
+                () -> {
+                    List<String> stationNames = RestAssuredClient.get(STATION_BASE_URL)
+                            .jsonPath()
+                            .getList(STATION_NAME_KEY, String.class);
 
-        assertThat(stationNames)
-                .doesNotContain(gangnamStation.getName());
+                    assertThat(stationNames).doesNotContain(gangnamStation.getName());
+                }
+        );
     }
 
     /**
@@ -148,23 +153,6 @@ public class StationAcceptanceTest {
         assertThat(findStationsAllResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         return findStationsAllResponse;
-    }
-
-        /**
-         * <pre>
-         * id를 가진
-         * 지하철역을 삭제하는 API를 호출하는 함수
-         * </pre>
-         *
-         * @param id
-         * @return ExtractableResponse
-         */
-    private ExtractableResponse<Response> deleteStationById(Long id) {
-        String path = String.format("%s/%d", STATION_BASE_URL, id);
-        ExtractableResponse<Response> deleteStationByIdResponse = RestAssuredClient.delete(path);
-        assertThat(deleteStationByIdResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-
-        return deleteStationByIdResponse;
     }
 
 }
