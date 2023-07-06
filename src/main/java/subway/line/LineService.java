@@ -32,10 +32,14 @@ public class LineService {
             .collect(Collectors.toList());
     }
 
-    public LineResponse findALine(Long id) {
+    public LineResponse findLineById(Long id) {
         return new LineResponse(
             lineRepository.findById(id)
                 .orElseThrow(IllegalAccessError::new));
+    }
+
+    public void deleteLineById(Long id) {
+        lineRepository.deleteById(id);
     }
 
     private Line toLine(final LineRequest lineRequest) {
