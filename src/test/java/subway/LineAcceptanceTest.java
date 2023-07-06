@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
 import subway.domain.Station;
 import subway.repository.StationRepository;
@@ -204,7 +203,7 @@ public class LineAcceptanceTest {
         return response;
     }
 
-    private static ExtractableResponse<Response> 지하철노선_한개를_조회한다(long id) {
+    public static ExtractableResponse<Response> 지하철노선_한개를_조회한다(long id) {
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .when()
