@@ -38,7 +38,7 @@ class LineAcceptanceTest {
     @Test
     void createLine() {
         // when
-        RestAssuredClient.requestPost(urlPath, LineFactory.create(LineFactory.LINE_NAMES[0]))
+        RestAssuredClient.requestPost(urlPath, LineFactory.create(LineFactory.신분당선))
             .statusCode(HttpStatus.CREATED.value());
 
         // then
@@ -49,7 +49,7 @@ class LineAcceptanceTest {
 
         List<String> lineNames = response.jsonPath().getList("name", String.class);
         assertThat(lineNames.size()).isEqualTo(1);
-        assertThat(lineNames).contains(LineFactory.LINE_NAMES[0]);
+        assertThat(lineNames).contains(LineFactory.신분당선);
     }
 
     /**
@@ -61,9 +61,9 @@ class LineAcceptanceTest {
     @Test
     void getLines() {
         // given
-        RestAssuredClient.requestPost(urlPath, LineFactory.create(LineFactory.LINE_NAMES[0]))
+        RestAssuredClient.requestPost(urlPath, LineFactory.create(LineFactory.신분당선))
             .statusCode(HttpStatus.CREATED.value());
-        RestAssuredClient.requestPost(urlPath, LineFactory.create(LineFactory.LINE_NAMES[1]))
+        RestAssuredClient.requestPost(urlPath, LineFactory.create(LineFactory.우이신설선))
             .statusCode(HttpStatus.CREATED.value());
 
         // when
@@ -75,7 +75,7 @@ class LineAcceptanceTest {
 
         List<String> lineNames = response.jsonPath().getList("name", String.class);
         assertThat(lineNames.size()).isEqualTo(2);
-        assertThat(lineNames).contains(LineFactory.LINE_NAMES[0], LineFactory.LINE_NAMES[1]);
+        assertThat(lineNames).contains(LineFactory.신분당선, LineFactory.우이신설선);
     }
 
     /**
@@ -88,7 +88,7 @@ class LineAcceptanceTest {
     void getLine() {
         // given
         ExtractableResponse<Response> creationResponse = RestAssuredClient.requestPost(urlPath,
-                LineFactory.create(LineFactory.LINE_NAMES[0]))
+                LineFactory.create(LineFactory.신분당선))
             .statusCode(HttpStatus.CREATED.value()).extract();
 
         // when
@@ -99,7 +99,7 @@ class LineAcceptanceTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat((String) response.jsonPath().get("name")).isEqualTo(LineFactory.LINE_NAMES[0]);
+        assertThat((String) response.jsonPath().get("name")).isEqualTo(LineFactory.우이신설선);
     }
 
     /**
@@ -112,14 +112,14 @@ class LineAcceptanceTest {
     void updateLine() {
         // given
         ExtractableResponse<Response> creationResponse = RestAssuredClient.requestPost(urlPath,
-                LineFactory.create(LineFactory.LINE_NAMES[0]))
+                LineFactory.create(LineFactory.신분당선))
             .statusCode(HttpStatus.CREATED.value()).extract();
 
         // when
         long lineId = creationResponse.jsonPath().get("id");
         String path = generatePathForId(lineId);
 
-        String updatedLineName = "수인분당선";
+        String updatedLineName = LineFactory.수인분당선;
         String updatedLineColor = "bg-yellow-600";
         ExtractableResponse<Response> response =
             RestAssuredClient.requestPut(path,
@@ -144,7 +144,7 @@ class LineAcceptanceTest {
     void deleteLine() {
         // given
         ExtractableResponse<Response> creationResponse = RestAssuredClient.requestPost(urlPath,
-                LineFactory.create(LineFactory.LINE_NAMES[0]))
+                LineFactory.create(LineFactory.신분당선))
             .statusCode(HttpStatus.CREATED.value()).extract();
 
         // when
