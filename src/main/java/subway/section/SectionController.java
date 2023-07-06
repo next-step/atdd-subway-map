@@ -16,9 +16,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import subway.line.service.LineService;
+import subway.section.domain.Section;
 import subway.section.exception.InvalidSectionDownStationException;
 import subway.section.exception.InvalidSectionUpStationException;
 import subway.section.model.SectionCreateRequest;
+import subway.section.model.SectionCreateResponse;
 import subway.section.service.SectionCreateService;
 import subway.support.ErrorResponse;
 import subway.support.SubwayException;
@@ -31,11 +33,12 @@ public class SectionController {
     private final LineService lineService;
 
     @PostMapping("/{lineId}/sections")
-    public ResponseEntity<Void> createSection(@PathVariable Long lineId, @RequestBody SectionCreateRequest request) {
+    public ResponseEntity<SectionCreateResponse> createSection(@PathVariable Long lineId, @RequestBody SectionCreateRequest request) {
 
-        sectionCreateService.create(lineService.getLine(lineId), request);
+        Section section = sectionCreateService.create(lineService.getLine(lineId), request);
 
-        return ResponseEntity.created(URI.create("/lines")).build();
+        return ResponseEntity.created(URI.create("/lines/" + lineId + "/sections/" + section.getId()))
+                             .body(new SectionCreateResponse(section));
     }
 
     @ExceptionHandler(value = { InvalidSectionUpStationException.class, InvalidSectionDownStationException.class, })

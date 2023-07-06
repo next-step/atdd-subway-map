@@ -9,9 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import line.LineFixture;
@@ -19,7 +17,6 @@ import subway.SchemaInitSql;
 import subway.StationFixture;
 import subway.SubwayApplication;
 import subway.line.view.LineResponse;
-import subway.section.model.SectionCreateRequest;
 import subway.station.view.StationResponse;
 import subway.support.ErrorCode;
 import subway.support.ErrorResponse;
@@ -30,6 +27,7 @@ import subway.support.ErrorResponse;
 public class SectionCreateAcceptanceTest {
     LineFixture lineFixture = new LineFixture();
     StationFixture stationFixture = new StationFixture();
+    SectionFixture sectionFixture = new SectionFixture();
 
     StationResponse lineUpstationA = null;
     StationResponse lineDownstationB = null;
@@ -61,16 +59,7 @@ public class SectionCreateAcceptanceTest {
             @DisplayName("오류가 발생한다")
             @Test
             void shouldThrowError() {
-                SectionCreateRequest request = new SectionCreateRequest();
-                request.setUpStationId(lineUpstationA.getId());
-                request.setDownStationId(lineUpstationC.getId());
-                request.setDistance(3);
-
-                ExtractableResponse<Response> response = RestAssured.given().log().all()
-                                                                    .body(request).contentType(MediaType.APPLICATION_JSON_VALUE)
-                                                                    .when().post(getCreateSectionUrl(lineAB.getId()))
-                                                                    .then().log().all()
-                                                                    .extract();
+                ExtractableResponse<Response> response = sectionFixture.구간생성(lineAB.getId(), lineUpstationA.getId(), lineUpstationC.getId(), 3);
 
                 assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
                 assertThat(response.as(ErrorResponse.class).getErrorCode()).isEqualTo(ErrorCode.SECTION_CREATE_FAIL_BY_UPSTATION);
@@ -93,16 +82,7 @@ public class SectionCreateAcceptanceTest {
             @DisplayName("then_오류가 발생한다")
             @Test
             void shouldThrowError() {
-                SectionCreateRequest request = new SectionCreateRequest();
-                request.setUpStationId(lineDownstationB.getId());
-                request.setDownStationId(lineUpstationA.getId());
-                request.setDistance(3);
-
-                ExtractableResponse<Response> response = RestAssured.given().log().all()
-                                                                    .body(request).contentType(MediaType.APPLICATION_JSON_VALUE)
-                                                                    .when().post(getCreateSectionUrl(lineAB.getId()))
-                                                                    .then().log().all()
-                                                                    .extract();
+                ExtractableResponse<Response> response = sectionFixture.구간생성(lineAB.getId(), lineDownstationB.getId(), lineUpstationA.getId(), 3);
 
                 assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
                 assertThat(response.as(ErrorResponse.class).getErrorCode()).isEqualTo(ErrorCode.SECTION_CREATE_FAIL_BY_DOWNSTATION);
@@ -121,16 +101,7 @@ public class SectionCreateAcceptanceTest {
             @DisplayName("then_구간을 등록할 수 있다")
             @Test
             void registerSection() {
-                SectionCreateRequest request = new SectionCreateRequest();
-                request.setUpStationId(lineDownstationB.getId());
-                request.setDownStationId(lineUpstationC.getId());
-                request.setDistance(4);
-
-                ExtractableResponse<Response> response = RestAssured.given().log().all()
-                                                                    .body(request).contentType(MediaType.APPLICATION_JSON_VALUE)
-                                                                    .when().post(getCreateSectionUrl(lineAB.getId()))
-                                                                    .then().log().all()
-                                                                    .extract();
+                ExtractableResponse<Response> response = sectionFixture.구간생성(lineAB.getId(), lineDownstationB.getId(), lineUpstationC.getId(), 4);
 
                 assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
             }

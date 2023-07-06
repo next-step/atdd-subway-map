@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -19,7 +18,7 @@ import subway.SchemaInitSql;
 import subway.StationFixture;
 import subway.SubwayApplication;
 import subway.line.view.LineResponse;
-import subway.section.model.SectionCreateRequest;
+import subway.section.model.SectionCreateResponse;
 import subway.station.view.StationResponse;
 import subway.support.ErrorCode;
 import subway.support.ErrorResponse;
@@ -30,6 +29,7 @@ import subway.support.ErrorResponse;
 public class SectionDeleteAcceptanceTest {
     LineFixture lineFixture = new LineFixture();
     StationFixture stationFixture = new StationFixture();
+    SectionFixture sectionFixture = new SectionFixture();
 
     StationResponse lineUpstationA = null;
     StationResponse lineDownstationB = null;
@@ -38,6 +38,8 @@ public class SectionDeleteAcceptanceTest {
     StationResponse lineUpstationC = null;
     StationResponse lineDownstationD = null;
     LineResponse lineCD = null;
+
+    SectionCreateResponse section = null;
 
     @BeforeEach
     public void beforeEach() {
@@ -48,27 +50,24 @@ public class SectionDeleteAcceptanceTest {
         lineUpstationC = stationFixture.지하철역_생성("upstationC");
         lineDownstationD = stationFixture.지하철역_생성("downStationD");
         lineCD = lineFixture.노선생성("line-cd", "blue", lineUpstationC.getId(), lineDownstationD.getId(), 5);
+
+
     }
 
-    @DisplayName("새로운 구간의 상행역이 노선의 하행 종점역이 아닐 때")
+    @DisplayName("구간이 있을때")
     @Nested
-    class Given_section_upstation_is_not_lines_downstation {
+    class Given_sections {
 
-        @DisplayName("구간을 등록하면")
+        @DisplayName("하행 종점역을 제거하면")
         @Nested
-        class When_create_section {
+        class When_remove_last_downstation {
 
-            @DisplayName("오류가 발생한다")
+            @DisplayName("구간이 제거된다")
             @Test
             void shouldThrowError() {
-                SectionCreateRequest request = new SectionCreateRequest();
-                request.setUpStationId(lineUpstationA.getId());
-                request.setDownStationId(lineUpstationC.getId());
-                request.setDistance(3);
 
                 ExtractableResponse<Response> response = RestAssured.given().log().all()
-                                                                    .body(request).contentType(MediaType.APPLICATION_JSON_VALUE)
-                                                                    .when().post(getCreateSectionUrl(lineAB.getId()))
+                                                                    .when().delete(getDeleteSectionUrl(lineAB.getId(), 1L))
                                                                     .then().log().all()
                                                                     .extract();
 
@@ -78,63 +77,13 @@ public class SectionDeleteAcceptanceTest {
         }
     }
 
-    private String getCreateSectionUrl(Long lineId) {
-        return "/lines/" + lineId + "/sections";
+    private String getDeleteSectionUrl(Long lineId, Long sectionId) {
+        return "/lines/" + lineId + "/sections?sectionId=";
     }
 
-    @DisplayName("given_새로운 구간의 하행역이 노선에 존재할때")
-    @Nested
-    class Given_section_downstation_on_same_line {
-
-        @DisplayName("when_구간을 등록하면")
-        @Nested
-        class When_create_section {
-
-            @DisplayName("then_오류가 발생한다")
-            @Test
-            void shouldThrowError() {
-                SectionCreateRequest request = new SectionCreateRequest();
-                request.setUpStationId(lineDownstationB.getId());
-                request.setDownStationId(lineUpstationA.getId());
-                request.setDistance(3);
-
-                ExtractableResponse<Response> response = RestAssured.given().log().all()
-                                                                    .body(request).contentType(MediaType.APPLICATION_JSON_VALUE)
-                                                                    .when().post(getCreateSectionUrl(lineAB.getId()))
-                                                                    .then().log().all()
-                                                                    .extract();
-
-                assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-                assertThat(response.as(ErrorResponse.class).getErrorCode()).isEqualTo(ErrorCode.SECTION_CREATE_FAIL_BY_DOWNSTATION);
-            }
-        }
-    }
-
-    @DisplayName("2개의 노선이 있을때")
-    @Nested
-    class Given_two_lines {
-
-        @DisplayName("given_상행역은 노선의 하행으로, 하행역은 다른 노선의 역으로 설정하면")
-        @Nested
-        class When_create_section {
 
 
-            @DisplayName("then_구간을 등록할 수 있다")
-            @Test
-            void registerSection() {
-                SectionCreateRequest request = new SectionCreateRequest();
-                request.setUpStationId(lineDownstationB.getId());
-                request.setDownStationId(lineUpstationC.getId());
-                request.setDistance(4);
 
-                ExtractableResponse<Response> response = RestAssured.given().log().all()
-                                                                    .body(request).contentType(MediaType.APPLICATION_JSON_VALUE)
-                                                                    .when().post(getCreateSectionUrl(lineAB.getId()))
-                                                                    .then().log().all()
-                                                                    .extract();
 
-                assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-            }
-        }
-    }
+
 }
