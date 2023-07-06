@@ -1,4 +1,4 @@
-package subway;
+package subway.ui;
 
 public class StationResponse {
     private Long id;
@@ -7,6 +7,9 @@ public class StationResponse {
     public StationResponse(Long id, String name) {
         this.id = id;
         this.name = name;
+    }
+
+    public StationResponse() {
     }
 
     public Long getId() {

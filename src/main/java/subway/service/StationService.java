@@ -1,7 +1,11 @@
-package subway;
+package subway.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.ui.StationRequest;
+import subway.ui.StationResponse;
+import subway.domain.Station;
+import subway.domain.StationRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
