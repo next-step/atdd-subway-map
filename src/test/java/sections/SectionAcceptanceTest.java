@@ -2,9 +2,6 @@ package sections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -27,7 +24,6 @@ import subway.support.ErrorCode;
 import subway.support.ErrorResponse;
 
 @SchemaInitSql
-//@StationInitSql
 @DisplayName("지하철 구간 관련 기능")
 @SpringBootTest(classes = SubwayApplication.class, webEnvironment = WebEnvironment.DEFINED_PORT)
 public class SectionAcceptanceTest {
@@ -75,15 +71,15 @@ public class SectionAcceptanceTest {
         return "/lines/" + lineId + "/sections";
     }
 
-    @DisplayName("새로운 구간의 하행역이 노선에 존재할때")
+    @DisplayName("given_새로운 구간의 하행역이 노선에 존재할때")
     @Nested
     class Given_section_downstation_on_same_line {
 
-        @DisplayName("구간을 등록하면")
+        @DisplayName("when_구간을 등록하면")
         @Nested
         class When_create_section {
 
-            @DisplayName("오류가 발생한다")
+            @DisplayName("then_오류가 발생한다")
             @Test
             void shouldThrowError() {
                 StationResponse lineUpstationA = stationFixture.지하철역_생성("upstationA");
@@ -109,42 +105,41 @@ public class SectionAcceptanceTest {
                 assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
                 assertThat(response.as(ErrorResponse.class).getErrorCode()).isEqualTo(ErrorCode.SECTION_CREATE_FAIL_BY_DOWNSTATION);
             }
-
-            private String getCreateSectionUrl(Long lineId) {
-                return "/lines/" + lineId + "/sections";
-            }
         }
-
-
     }
-
 
     @Nested
     class Given_2개의_노선이_있을때 {
 
+        @DisplayName("given_상행역은 노선의 하행으로, 하행역은 다른 노선의 역으로 설정하면")
         @Nested
         class When_구간을_등록하면 {
 
 
-            @DisplayName("Then_구간을 등록할 수 있다")
+            @DisplayName("then_구간을 등록할 수 있다")
             @Test
             void registerSection() {
-                Map<String, Object> requestBody = new HashMap<>();
-                requestBody.put("downStationId", 1L);
-                requestBody.put("upStationId", 2L);
-                requestBody.put("distance", 10);
+                StationResponse lineUpstationA = stationFixture.지하철역_생성("upstationA");
+                StationResponse lineDownstationB = stationFixture.지하철역_생성("downStationB");
+                LineResponse lineAB = lineFixture.노선생성("line-ab", "yellow", lineUpstationA.getId(), lineDownstationB.getId(), 10);
+
+                StationResponse lineUpstationC = stationFixture.지하철역_생성("upstationC");
+                StationResponse lineDownstationD = stationFixture.지하철역_생성("downStationD");
+                LineResponse lineCD = lineFixture.노선생성("line-cd", "blue", lineUpstationC.getId(), lineDownstationD.getId(), 5);
+
+
+                SectionCreateRequest request = new SectionCreateRequest();
+                request.setUpStationId(lineDownstationB.getId());
+                request.setDownStationId(lineUpstationC.getId());
+                request.setDistance(4);
 
                 ExtractableResponse<Response> response = RestAssured.given().log().all()
-                                                                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                                                                    .body(new SectionCreateRequest())
-                                                                    .when().post(buildCreateSectionUrl(1L))
-                                                                    .then().extract();
+                                                                    .body(request).contentType(MediaType.APPLICATION_JSON_VALUE)
+                                                                    .when().post(getCreateSectionUrl(lineAB.getId()))
+                                                                    .then().log().all()
+                                                                    .extract();
 
                 assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-            }
-
-            private String buildCreateSectionUrl(Long lineId) {
-                return "/lines/" + lineId + "/sections";
             }
         }
     }
