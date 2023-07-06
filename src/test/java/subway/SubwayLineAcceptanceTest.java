@@ -3,9 +3,7 @@ package subway;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -36,6 +34,11 @@ class SubwayLineAcceptanceTest {
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
+    }
+
+    @AfterEach
+    void tearDown() {
+        dbCleaner.cleanUpLine();
         dbCleaner.cleanUpStation();
     }
 
@@ -52,7 +55,11 @@ class SubwayLineAcceptanceTest {
         ExtractableResponse<Response> response = 지하철노선_생성(request);
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        지하철노선_목록_조회됨(Map.of("id", 1L, "name", "신분당선",  "color", "bg-red-600", "stations", List.of(지하철역.get(1L), 지하철역.get(2L))));
+        지하철노선_목록_조회됨(Map.of(
+                "id", 1,
+                "name", "신분당선",
+                "color", "bg-red-600",
+                "stations", List.of(Map.of("id", 1, "name", 지하철역.get(1L)), Map.of("id", 2, "name", 지하철역.get(2L)))));
     }
 
     @DisplayName("지하철 노선을 두 개 생성하면 목록 조회시 생성한 노선이 두 가지 조회된다.")
@@ -62,8 +69,15 @@ class SubwayLineAcceptanceTest {
         지하철노선_생성(Map.of("name", "분당선", "color", "bg-red-600", "upStationId", 1L, "downStationId", 3L, "distance", 10L));
 
         지하철노선_목록_조회됨(
-                Map.of("id", 1L, "name", "신분당선",  "color", "bg-red-600", "stations", List.of(지하철역.get(1L), 지하철역.get(2L))),
-                Map.of("id", 1L, "name", "분당선",  "color", "bg-red-600", "stations", List.of(지하철역.get(1L), 지하철역.get(3L)))
+                Map.of("id", 1,
+                        "name", "신분당선",
+                        "color", "bg-red-600",
+                        "stations", List.of(Map.of("id", 1, "name", 지하철역.get(1L)), Map.of("id",2, "name", 지하철역.get(2L))
+                        )),
+                Map.of("id", 2,
+                        "name", "분당선",
+                        "color", "bg-red-600",
+                        "stations", List.of(Map.of("id", 1, "name", 지하철역.get(1L)), Map.of("id", 3, "name", 지하철역.get(3L))))
         );
     }
 
@@ -81,7 +95,7 @@ class SubwayLineAcceptanceTest {
                 .when().get("/lines")
                 .then().log().all()
                 .extract()
-                .jsonPath().getList("stations");
+                .jsonPath().get();
 
         assertThat(results.size()).isEqualTo(expected.length);
         assertThat(results).containsExactly(expected);

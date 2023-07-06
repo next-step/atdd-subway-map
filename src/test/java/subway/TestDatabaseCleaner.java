@@ -18,4 +18,9 @@ public class TestDatabaseCleaner {
         JdbcTestUtils.deleteFromTables(jdbcTemplate, "station");
         jdbcTemplate.update("ALTER TABLE station ALTER COLUMN id RESTART WITH 1");
     }
+
+    public void cleanUpLine() {
+        JdbcTestUtils.deleteFromTables(jdbcTemplate, "subway_line");
+        jdbcTemplate.update("ALTER TABLE subway_line ALTER COLUMN id RESTART WITH 1");
+    }
 }
