@@ -3,14 +3,11 @@ package subway.line.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import subway.global.error.code.ErrorCode;
-import subway.global.error.exception.NotEntityFoundException;
 import subway.line.adapters.persistence.LineJpaAdapter;
 import subway.line.dto.request.SaveLineRequestDto;
 import subway.line.dto.request.UpdateLineRequestDto;
 import subway.line.dto.response.LineResponseDto;
 import subway.line.entity.Line;
-import subway.line.repository.LineRepository;
 import subway.station.adapters.persistence.StationJpaAdapter;
 import subway.station.entity.Station;
 
