@@ -4,12 +4,15 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.List;
+import org.springframework.http.MediaType;
 
 public class LineTestFixture {
 
     // body 채워야함
     public static ExtractableResponse<Response> 지하철_노선_생성_요청(LineRequest lineRequest) {
         return RestAssured.given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(lineRequest)
             .when().post("/lines")
             .then().log().all()
             .extract();
@@ -22,6 +25,7 @@ public class LineTestFixture {
 
     public static ExtractableResponse<Response> 지하철_노선_목록_조회_요청() {
         return RestAssured.given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
             .when().get("/lines")
             .then().log().all()
             .extract();
@@ -34,6 +38,8 @@ public class LineTestFixture {
 
     public static ExtractableResponse<Response> 지하철_노선_수정_요청(Long id, LineUpdateRequest lineUpdateRequest) {
         return RestAssured.given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(lineUpdateRequest)
             .when().patch("/lines/" + id)
             .then().log().all()
             .extract();
@@ -46,6 +52,7 @@ public class LineTestFixture {
 
     public static ExtractableResponse<Response> 지하철_노선_삭제_요청(Long id) {
         return RestAssured.given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
             .when().delete("/lines/" + id)
             .then().log().all()
             .extract();

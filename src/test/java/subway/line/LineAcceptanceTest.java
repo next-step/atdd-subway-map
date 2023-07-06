@@ -30,6 +30,7 @@ public class LineAcceptanceTest {
         // TODO: 성공하는 케이스만 인수테스트를 작성하는지?
         // TODO: 비즈니스 실패 케이스는 작성할 수도 있겠지만 4XX 5XX 에러는 어떻게 테스트하는지?
         // TODO: 뭔가 코드가 많이 지저분해졌는데 시나리오에 방해되는 메서드들을 private 메서드로 빼는게 좋을지? -> ~TestFixture에 RestAssured 관련 메서드만 넣을 필요는 없으니까?
+        // TODO: 매 역 생성마다 status code를 확인하는게 좋을지?
         // given
         StationResponse someStationResponse = 지하철_역_생성_요청_역_정보_반환(지하철역);
         StationResponse newStationResponse = 지하철_역_생성_요청_역_정보_반환(새로운지하철역);
