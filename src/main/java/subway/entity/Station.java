@@ -1,4 +1,4 @@
-package subway;
+package subway.entity;
 
 import javax.persistence.*;
 
@@ -24,4 +24,6 @@ public class Station {
     public String getName() {
         return name;
     }
+
+    public static Station EMPTY = new Station();
 }
