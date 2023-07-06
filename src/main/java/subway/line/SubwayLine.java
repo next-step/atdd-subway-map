@@ -33,9 +33,9 @@ public class SubwayLine {
   @Column(nullable = false)
   private int distance;
 
-  public SubwayLine() {}
+  protected SubwayLine() {}
 
-  public SubwayLine(Long id, String color, String name, Long upStationId, Long downStationId, int distance) {
+  private SubwayLine(Long id, String color, String name, Long upStationId, Long downStationId, int distance) {
     this.lineId = id;
     this.color = color;
     this.name = name;
