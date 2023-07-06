@@ -7,7 +7,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.jdbc.Sql;
 import subway.line.dto.LineResponse;
 import subway.util.Extractor;
 
@@ -17,7 +17,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@Sql("/sql/table-line-truncate.sql")
 @DisplayName("지하철노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class LineAcceptanceTest {
@@ -65,6 +65,7 @@ class LineAcceptanceTest {
         List<String> lines = Extractor.get(LINE_URL).jsonPath().getList("name", String.class);
         //then
         assertThat(lines).hasSize(2);
+        assertThat(lines).containsExactly(신분당선.get("name"), 분당선.get("name"));
     }
 
     /**
@@ -96,7 +97,8 @@ class LineAcceptanceTest {
         //given
         long id = saveLine(신분당선).jsonPath().getLong("id");
         //when
-        LineResponse lineResponse = Extractor.put(LINE_URL + "/" + id, 분당선).jsonPath().getObject("", LineResponse.class);
+        LineResponse lineResponse = Extractor.put(LINE_URL + "/" + id, 분당선)
+            .jsonPath().getObject("", LineResponse.class);
         //then
         assertThat(lineResponse.getName()).isEqualTo(분당선.get("name"));
         assertThat(lineResponse.getColor()).isEqualTo(분당선.get("color"));

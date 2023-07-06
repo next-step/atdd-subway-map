@@ -6,7 +6,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.jdbc.Sql;
 import subway.util.Extractor;
 
 import java.util.Arrays;
@@ -16,14 +16,15 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@Sql("/sql/table-station-truncate.sql")
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class StationAcceptanceTest {
 
     private static final String 강남역 = "강남역";
     private static final String 역삼역 = "약삼역";
-    private static final String STATION_URL = "/station";
+
+    private static final String STATION_URL = "/stations";
 
     /**
      * When 지하철역을 생성하면
