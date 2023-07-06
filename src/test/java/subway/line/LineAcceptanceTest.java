@@ -94,7 +94,8 @@ public class LineAcceptanceTest {
         LineResponse lineResponse = 지하철_노선_생성_요청_노선_정보_반환(lineRequest);
 
         // then
-        assertThat(lineResponse).isEqualTo(new LineResponse(lineResponse.getId(), 신분당선, "bg-red-600", stations));
+        assertThat(lineResponse).isEqualTo(
+            new LineResponse(lineResponse.getId(), 신분당선, "bg-red-600", stations));
     }
 
     // Given 지하철 노선을 생성하고
@@ -122,7 +123,10 @@ public class LineAcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        LineRequest lineRequest = new LineRequest(신분당선, "bg-red-600", 1L, 2L, 10);
+        StationResponse someStationResponse = 지하철_역_생성_요청_역_정보_반환(지하철역);
+        StationResponse newStationResponse = 지하철_역_생성_요청_역_정보_반환(새로운지하철역);
+        LineRequest lineRequest = new LineRequest(신분당선, "bg-red-600", someStationResponse.getId(),
+            newStationResponse.getId(), 10);
         지하철_노선_생성_요청(lineRequest);
 
         // when
