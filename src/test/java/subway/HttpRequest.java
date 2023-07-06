@@ -17,6 +17,15 @@ public class HttpRequest {
                 .extract();
     }
 
+    public static ExtractableResponse<Response> sendPutRequest(String path, Map<String, String> params) {
+        return RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().put(path)
+                .then().log().all()
+                .extract();
+    }
+
     public static ExtractableResponse<Response> sendDeleteRequest(String path) {
         return RestAssured.given().log().all()
                 .when().delete(path)
