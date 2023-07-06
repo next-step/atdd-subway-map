@@ -92,14 +92,14 @@ class LineAcceptanceTest {
             .statusCode(HttpStatus.CREATED.value()).extract();
 
         // when
-        long lineId = creationResponse.jsonPath().get("id");
+        long lineId = creationResponse.jsonPath().getLong("id");
         String path = generatePathForId(lineId);
         ExtractableResponse<Response> response = RestAssuredClient.requestGet(path)
             .extract();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat((String) response.jsonPath().get("name")).isEqualTo(LineFactory.우이신설선);
+        assertThat((String) response.jsonPath().get("name")).isEqualTo(LineFactory.신분당선);
     }
 
     /**
