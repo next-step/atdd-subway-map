@@ -97,13 +97,7 @@ public class SectionAcceptanceTest extends ApiTest {
     @Test
     void appendStationToMiddleOfSection() {
         // given
-        final String lineName = "2호선";
-        Map<String, String> stringStringMap = LineUtils.generateLineCreateRequest(lineName, "bg-blue-600", stationIds.get(0), stationIds.get(1), 10L);
-        ExtractableResponse<Response> createLineResponse = LineApi.createLine(stringStringMap);
-        final String location = createLineResponse.header("Location");
-        final String appendLocation = location + "/sections";
-        Map<String, String> sectionRequest = generateSectionRequest(stationIds.get(1), stationIds.get(2), 10L);
-        LineApi.appendSectionInLine(appendLocation, sectionRequest);
+        compositeCreateLineWithThreeStation();
 
         // when
         Map<String, String> otherSectionReqeust = generateSectionRequest(stationIds.get(1), stationIds.get(3), 10L);
@@ -111,6 +105,16 @@ public class SectionAcceptanceTest extends ApiTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()); // TODO: ExceptionHandler 로 에러 메시지 담아 보내기.
+    }
+
+    private void compositeCreateLineWithThreeStation() {
+        final String lineName = "2호선";
+        Map<String, String> stringStringMap = LineUtils.generateLineCreateRequest(lineName, "bg-blue-600", stationIds.get(0), stationIds.get(1), 10L);
+        ExtractableResponse<Response> createLineResponse = LineApi.createLine(stringStringMap);
+        final String location = createLineResponse.header("Location");
+        final String appendLocation = location + "/sections";
+        Map<String, String> sectionRequest = generateSectionRequest(stationIds.get(1), stationIds.get(2), 10L);
+        LineApi.appendSectionInLine(appendLocation, sectionRequest);
     }
 
     /**
@@ -122,13 +126,7 @@ public class SectionAcceptanceTest extends ApiTest {
     @Test
     void appendSectionWithDownStation() {
         // given
-        final String lineName = "2호선";
-        Map<String, String> stringStringMap = LineUtils.generateLineCreateRequest(lineName, "bg-blue-600", stationIds.get(0), stationIds.get(1), 10L);
-        ExtractableResponse<Response> createLineResponse = LineApi.createLine(stringStringMap);
-        final String location = createLineResponse.header("Location");
-        final String appendLocation = location + "/sections";
-        Map<String, String> sectionRequest = generateSectionRequest(stationIds.get(1), stationIds.get(2), 10L);
-        LineApi.appendSectionInLine(appendLocation, sectionRequest);
+        compositeCreateLineWithThreeStation();
 
         // when
         Map<String, String> otherSectionReqeust = generateSectionRequest(stationIds.get(2), stationIds.get(1), 10L);
@@ -151,13 +149,7 @@ public class SectionAcceptanceTest extends ApiTest {
     @Test
     void deleteStationInSection() {
         // given
-        final String lineName = "2호선";
-        Map<String, String> stringStringMap = LineUtils.generateLineCreateRequest(lineName, "bg-blue-600", stationIds.get(0), stationIds.get(1), 10L);
-        ExtractableResponse<Response> createLineResponse = LineApi.createLine(stringStringMap);
-        final String location = createLineResponse.header("Location");
-        final String appendLocation = location + "/sections";
-        Map<String, String> sectionRequest = generateSectionRequest(stationIds.get(1), stationIds.get(2), 10L);
-        LineApi.appendSectionInLine(appendLocation, sectionRequest);
+        compositeCreateLineWithThreeStation();
 
         // when
         final Long deleteLocation = stationIds.get(2);
@@ -181,13 +173,7 @@ public class SectionAcceptanceTest extends ApiTest {
     @Test
     void deleteStationInMiddleOfSection() {
         // given
-        final String lineName = "2호선";
-        Map<String, String> stringStringMap = LineUtils.generateLineCreateRequest(lineName, "bg-blue-600", stationIds.get(0), stationIds.get(1), 10L);
-        ExtractableResponse<Response> createLineResponse = LineApi.createLine(stringStringMap);
-        final String location = createLineResponse.header("Location");
-        final String appendLocation = location + "/sections";
-        Map<String, String> sectionRequest = generateSectionRequest(stationIds.get(1), stationIds.get(2), 10L);
-        LineApi.appendSectionInLine(appendLocation, sectionRequest);
+        compositeCreateLineWithThreeStation();
 
         // when
         final Long deleteLocation = stationIds.get(1);
@@ -207,13 +193,7 @@ public class SectionAcceptanceTest extends ApiTest {
     @Test
     void deleteStationFromMinimalSection() {
         // given
-        final String lineName = "2호선";
-        Map<String, String> stringStringMap = LineUtils.generateLineCreateRequest(lineName, "bg-blue-600", stationIds.get(0), stationIds.get(1), 10L);
-        ExtractableResponse<Response> createLineResponse = LineApi.createLine(stringStringMap);
-        final String location = createLineResponse.header("Location");
-        final String appendLocation = location + "/sections";
-        Map<String, String> sectionRequest = generateSectionRequest(stationIds.get(1), stationIds.get(2), 10L);
-        LineApi.appendSectionInLine(appendLocation, sectionRequest);
+        compositeCreateLineWithThreeStation();
 
         // when
         final Long deleteLocation = stationIds.get(2);
