@@ -10,12 +10,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import subway.constants.Endpoint;
+import subway.fixture.StationFixture;
+import subway.station.dto.request.SaveStationRequestDto;
 import subway.support.AcceptanceTest;
 import subway.support.DatabaseCleanUp;
 import subway.support.RestAssuredClient;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Stream;
 
 import static io.restassured.RestAssured.UNDEFINED_PORT;
@@ -53,8 +54,8 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        String stationName = "강남역";
-        saveStation(stationName);
+        SaveStationRequestDto gangnamStation = StationFixture.GANGNAM_STATION;
+        saveStation(gangnamStation);
 
         // then
         List<String> stationNames = findStationsAll()
@@ -63,7 +64,7 @@ public class StationAcceptanceTest {
 
         assertAll(
                 () -> assertThat(stationNames.size()).isEqualTo(1),
-                () -> assertThat(stationNames).containsAnyOf(stationName)
+                () -> assertThat(stationNames).containsAnyOf(gangnamStation.getName())
         );
     }
 
@@ -76,10 +77,10 @@ public class StationAcceptanceTest {
     @Test
     void readStations() {
         //give
-        String gangnamStationName = "강남역";
-        String gwanggyoStationName = "광교역";
+        SaveStationRequestDto gangnamStation = StationFixture.GANGNAM_STATION;
+        SaveStationRequestDto gwanggyoStation = StationFixture.GWANGGYO_STATION;
 
-        Stream.of(gangnamStationName, gwanggyoStationName)
+        Stream.of(gangnamStation, gwanggyoStation)
                 .forEach(this::saveStation);
 
         // when
@@ -89,7 +90,8 @@ public class StationAcceptanceTest {
                 .getList(STATION_NAME_KEY, String.class);
 
         // then
-        assertThat(stationNames).containsOnly(gangnamStationName, gwanggyoStationName);
+        assertThat(stationNames)
+                .containsOnly(gangnamStation.getName(), gwanggyoStation.getName());
     }
 
     /**
@@ -101,33 +103,32 @@ public class StationAcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        String stationName = "신도림역";
-        Long savedStationId = saveStation(stationName)
+        SaveStationRequestDto gangnamStation = StationFixture.GANGNAM_STATION;
+        Long savedStationId = saveStation(gangnamStation)
                 .jsonPath()
                 .getLong(STATION_ID_KEY);
 
         // when
-        ExtractableResponse<Response> deleteStationByIdResponse = deleteStationById(savedStationId);
+        deleteStationById(savedStationId);
 
         // then
         List<String> stationNames = RestAssuredClient.get(Endpoint.STATION_BASE_URL.getUrl())
                 .jsonPath()
                 .getList(STATION_NAME_KEY, String.class);
 
-        assertThat(stationNames).doesNotContain(stationName);
+        assertThat(stationNames)
+                .doesNotContain(gangnamStation.getName());
     }
 
     /**
      * <pre>
-     * stationName 이라는 이름을 가진
      * 지하철역을 생성하는 API를 호출하는 함수
      * </pre>
      *
-     * @param stationName
+     * @param station
      * @return ExtractableResponse
      */
-    private ExtractableResponse<Response> saveStation(String stationName) {
-        Map<String, String> station = Map.of(STATION_NAME_KEY, stationName);
+    private ExtractableResponse<Response> saveStation(SaveStationRequestDto station) {
         ExtractableResponse<Response> saveStationResponse =
                 RestAssuredClient.post(STATION_BASE_URL, station);
         assertThat(saveStationResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
