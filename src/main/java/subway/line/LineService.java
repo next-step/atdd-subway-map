@@ -10,10 +10,12 @@ import subway.station.StationRepository;
 @Service
 @Transactional(readOnly = true)
 public class LineService {
+
     private final LineRepository lineRepository;
     private final StationRepository stationRepository;
 
-    public LineService(final LineRepository lineRepository, final StationRepository stationRepository) {
+    public LineService(final LineRepository lineRepository,
+        final StationRepository stationRepository) {
         this.lineRepository = lineRepository;
         this.stationRepository = stationRepository;
     }
@@ -28,6 +30,12 @@ public class LineService {
         return lineRepository.findAll().stream()
             .map(LineResponse::new)
             .collect(Collectors.toList());
+    }
+
+    public LineResponse findALine(Long id) {
+        return new LineResponse(
+            lineRepository.findById(id)
+                .orElseThrow(IllegalAccessError::new));
     }
 
     private Line toLine(final LineRequest lineRequest) {
