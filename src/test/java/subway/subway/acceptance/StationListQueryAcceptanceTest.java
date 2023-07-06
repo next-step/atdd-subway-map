@@ -1,18 +1,15 @@
-package subway;
+package subway.subway.acceptance;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
 
 /**
  * 지하철역 조회 인수 테스트를 합니다.
  */
-public class ReadStationAcceptanceTest extends StationAcceptanceTest {
-
+@DisplayName("지하철역 조회 인수 테스트")
+public class StationListQueryAcceptanceTest extends StationAcceptanceTest {
 
     /**
      * Given 2개의 지하철역을 생성하고<br>
@@ -23,13 +20,12 @@ public class ReadStationAcceptanceTest extends StationAcceptanceTest {
     @Test
     void getStations() {
         //given
-        지하철역_생성("강남역");
-        지하철역_생성("역삼역");
+        지하철_역_생성("강남역");
+        지하철_역_생성("역삼역");
         //when
         ExtractableResponse<Response> response = 지하철역_목록_조회();
 
         //then
-        List<String> names = response.jsonPath().getList("name", String.class);
-        Assertions.assertThat(names).containsExactly("강남역", "역삼역");
+        지하철역_목록_포함_여부_확인(response, "강남역", "역삼역");
     }
 }
