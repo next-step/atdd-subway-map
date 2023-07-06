@@ -37,7 +37,7 @@ public class SubwayLineService {
 
     @Transactional
     public void updateLine(Long lineId, UpdateSubwayLineRequest request) {
-        final SubwayLine line = lineRepository.findById(lineId).orElseThrow(RuntimeException::new);
+        final SubwayLine line = lineRepository.findById(lineId).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "wrong subwayLine id"));
         line.change(request);
     }
 

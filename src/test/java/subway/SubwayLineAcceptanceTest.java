@@ -130,6 +130,27 @@ class SubwayLineAcceptanceTest {
                 "stations", List.of(Map.of("id", 1, "name", 지하철역.get(1L)), Map.of("id", 2, "name", 지하철역.get(2L)))));
     }
 
+    @DisplayName("지하철 노선을 생성하고 업데이트할 때 잘못된 지하철 id를 넣을 경우 BAD_REQUEST")
+    @Test
+    void create_update_findByWrongId_badRequest() {
+        Map<String, Object> createRequest = Map.of(
+                "name", "신분당선",
+                "color", "bg-red-600",
+                "upStationId", 1L,
+                "downStationId", 2L,
+                "distance", 10L
+        );
+        assertThat(지하철노선_생성(createRequest).jsonPath().getLong("id")).isEqualTo(1);
+
+        Map<String, Object> updateRequest = Map.of(
+                "id", 5,
+                "name", "다른분당선",
+                "color", "bg-red-600"
+        );
+        ExtractableResponse<Response> response = 지하철노선_수정(updateRequest);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
     @DisplayName("지하철 노선을 생성하고 해당 id로 수정하면 수정한 노선이 조회된다.")
     @Test
     void create_update_findById() {
