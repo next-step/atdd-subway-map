@@ -25,9 +25,9 @@ import subway.support.ErrorCode;
 import subway.support.ErrorResponse;
 
 @SchemaInitSql
-@DisplayName("지하철 구간 관련 기능")
+@DisplayName("지하철 구간 삭제 기능")
 @SpringBootTest(classes = SubwayApplication.class, webEnvironment = WebEnvironment.DEFINED_PORT)
-public class SectionAcceptanceTest {
+public class SectionDeleteAcceptanceTest {
     LineFixture lineFixture = new LineFixture();
     StationFixture stationFixture = new StationFixture();
 
@@ -110,12 +110,13 @@ public class SectionAcceptanceTest {
         }
     }
 
+    @DisplayName("2개의 노선이 있을때")
     @Nested
-    class Given_2개의_노선이_있을때 {
+    class Given_two_lines {
 
         @DisplayName("given_상행역은 노선의 하행으로, 하행역은 다른 노선의 역으로 설정하면")
         @Nested
-        class When_구간을_등록하면 {
+        class When_create_section {
 
 
             @DisplayName("then_구간을 등록할 수 있다")
