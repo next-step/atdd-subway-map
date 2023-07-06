@@ -99,12 +99,48 @@ class SubwayLineAcceptanceTest {
                 "color", "bg-red-600",
                 "stations", List.of(Map.of("id", 1, "name", 지하철역.get(1L)), Map.of("id", 2, "name", 지하철역.get(2L)))));
     }
+    @DisplayName("지하철 노선을 생성하고 해당 id로 수정하면 수정한 노선이 조회된다.")
+    @Test
+    void create_update_findById() {
+        Map<String, Object> createRequest = Map.of(
+                "name", "신분당선",
+                "color", "bg-red-600",
+                "upStationId", 1L,
+                "downStationId", 2L,
+                "distance", 10L
+        );
+        assertThat(지하철노선_생성(createRequest).jsonPath().getLong("id")).isEqualTo(1);
+
+        Map<String, Object> updateRequest = Map.of(
+                "id", 1,
+                "name", "다른분당선",
+                "color", "bg-red-600"
+        );
+        ExtractableResponse<Response> response = 지하철노선_수정(updateRequest);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        지하철노선_조회됨(Map.of(
+                "id", 1,
+                "name", "다른분당선",
+                "color", "bg-red-600",
+                "stations", List.of(Map.of("id", 1, "name", 지하철역.get(1L)), Map.of("id", 2, "name", 지하철역.get(2L)))));
+    }
+
 
     private ExtractableResponse<Response> 지하철노선_생성(Map<String, Object> request){
         return RestAssured.given().log().all()
                 .body(request)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/lines")
+                .then().log().all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> 지하철노선_수정(Map<String, Object> request){
+        return RestAssured.given().log().all()
+                .body(request)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().put("/lines/{id}", request.get("id"))
                 .then().log().all()
                 .extract();
     }
