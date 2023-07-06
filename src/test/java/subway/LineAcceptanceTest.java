@@ -63,7 +63,7 @@ class LineAcceptanceTest {
         // given
         RestAssuredClient.requestPost(urlPath, LineFactory.create(LineFactory.LINE_NAMES[0]))
             .statusCode(HttpStatus.CREATED.value());
-        RestAssuredClient.requestPost(urlPath, LineFactory.create(LineFactory.LINE_NAMES[2]))
+        RestAssuredClient.requestPost(urlPath, LineFactory.create(LineFactory.LINE_NAMES[1]))
             .statusCode(HttpStatus.CREATED.value());
 
         // when
