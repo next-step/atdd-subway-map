@@ -44,7 +44,7 @@ class SubwayLineAcceptanceTest {
 
     @DisplayName("지하철 노선을 생성하면 목록 조회시 생성한 노선이 조회된다.")
     @Test
-    void create_find() {
+    void create_findAll() {
         Map<String, Object> request = Map.of(
                 "name", "신분당선",
                 "color", "bg-red-600",
@@ -64,7 +64,7 @@ class SubwayLineAcceptanceTest {
 
     @DisplayName("지하철 노선을 두 개 생성하면 목록 조회시 생성한 노선이 두 가지 조회된다.")
     @Test
-    void createTwo_findTwo() {
+    void createTwo_findAll() {
         지하철노선_생성(Map.of("name", "신분당선", "color", "bg-red-600", "upStationId", 1L, "downStationId", 2L, "distance", 10L));
         지하철노선_생성(Map.of("name", "분당선", "color", "bg-red-600", "upStationId", 1L, "downStationId", 3L, "distance", 10L));
 
@@ -81,6 +81,25 @@ class SubwayLineAcceptanceTest {
         );
     }
 
+    @DisplayName("지하철 노선을 생성하고 해당 id로 조회시 생성한 노선이 조회된다.")
+    @Test
+    void create_findById() {
+        Map<String, Object> request = Map.of(
+                "name", "신분당선",
+                "color", "bg-red-600",
+                "upStationId", 1L,
+                "downStationId", 2L,
+                "distance", 10L
+        );
+        ExtractableResponse<Response> response = 지하철노선_생성(request);
+
+        지하철노선_조회됨(Map.of(
+                "id", response.jsonPath().get("id"),
+                "name", "신분당선",
+                "color", "bg-red-600",
+                "stations", List.of(Map.of("id", 1, "name", 지하철역.get(1L)), Map.of("id", 2, "name", 지하철역.get(2L)))));
+    }
+
     private ExtractableResponse<Response> 지하철노선_생성(Map<String, Object> request){
         return RestAssured.given().log().all()
                 .body(request)
@@ -88,6 +107,16 @@ class SubwayLineAcceptanceTest {
                 .when().post("/lines")
                 .then().log().all()
                 .extract();
+    }
+
+    private void 지하철노선_조회됨(Map<String, Object> expected) {
+        Map<String, Object> result = RestAssured.given().log().all()
+                .when().get("/lines/{id}", expected.get("id"))
+                .then().log().all()
+                .extract()
+                .jsonPath().get();
+
+        assertThat(result).isEqualTo(expected);
     }
 
     private void 지하철노선_목록_조회됨(Map<String, Object>... expected) {
