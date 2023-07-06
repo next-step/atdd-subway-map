@@ -38,4 +38,8 @@ public class SubwayLineService {
                 .map(SubwayLineResponse::toResponse)
                 .collect(Collectors.toList());
     }
+
+    public SubwayLineResponse findByLineId(Long id) {
+        return SubwayLineResponse.toResponse(lineRepository.findById(id).orElseThrow(RuntimeException::new));
+    }
 }
