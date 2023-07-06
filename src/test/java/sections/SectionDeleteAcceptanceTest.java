@@ -54,6 +54,28 @@ public class SectionDeleteAcceptanceTest {
         section = sectionFixture.구간생성(lineAB.getId(), lineDownstationB.getId(), lineUpstationC.getId(), 4).as(SectionCreateResponse.class);
     }
 
+    @DisplayName("구간이 1개만 있을때")
+    @Nested
+    class Given_no_section {
+
+        @DisplayName("마지막 구간을 삭제하면")
+        @Nested
+        class When_remove_last_section {
+
+            @DisplayName("예외가 발생한다")
+            @Test
+            void shouldThrowError() {
+                ExtractableResponse<Response> response = RestAssured.given().log().all()
+                                                                    .when().delete(getDeleteSectionUrl(lineAB.getId(), lineDownstationB.getId()))
+                                                                    .then().log().all()
+                                                                    .extract();
+
+                assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+                assertThat(response.as(ErrorResponse.class).getErrorCode()).isEqualTo(ErrorCode.SECTION_DELETE_FAIL_BY_NOT_ALLOWED_STATION);
+            }
+        }
+    }
+
     @DisplayName("구간이 있을때")
     @Nested
     class Given_sections {
