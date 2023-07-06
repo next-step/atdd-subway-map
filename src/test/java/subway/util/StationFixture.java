@@ -4,11 +4,15 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.MediaType;
+import subway.dto.LineResponse;
 import subway.dto.StationRequest;
 import subway.dto.StationResponse;
 
-public class StationApiRequest {
+public class StationFixture {
 
+    public static final String 신사역 = "신사역";
+    public static final String 논현역 = "논현역";
+    public static final String 신논현역 = "신논현역";
     public static final String 강남역 = "강남역";
     public static final String 양재역 = "양재역";
     public static final String 양재시민의숲역 = "양재시민의숲역";
@@ -45,6 +49,10 @@ public class StationApiRequest {
             .when().delete("/stations/{id}", id)
             .then().log().all()
             .extract();
+    }
+
+    public static StationResponse 지하철역_생성(String name) {
+        return 지하철역_리스폰_변환(지하철역_생성_요청(name));
     }
 
     public static StationResponse 지하철역_리스폰_변환(ExtractableResponse<Response> response) {
