@@ -67,10 +67,6 @@ public class SectionCreateAcceptanceTest {
         }
     }
 
-    private String getCreateSectionUrl(Long lineId) {
-        return "/lines/" + lineId + "/sections";
-    }
-
     @DisplayName("given_새로운 구간의 하행역이 노선에 존재할때")
     @Nested
     class Given_section_downstation_on_same_line {
