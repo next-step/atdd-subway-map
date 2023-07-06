@@ -16,6 +16,7 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import subway.CommonStep.StationStep;
+import subway.dto.StationResponse;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -83,12 +84,12 @@ public class StationAcceptanceTest {
      * When 그 지하철역을 삭제하면
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
-    @DisplayName("지하철역 목록을 조회한다")
+    @DisplayName("지하철역 목록 삭제")
     @Test
     void 지하철역_삭제_후_조회() {
         //given
         String stationName = "강남역";
-        StationResponse stationResponse = StationStep.지하철역_생성(stationName).body().as(StationResponse.class);;
+        StationResponse stationResponse = StationStep.지하철역_생성(stationName).body().as(StationResponse.class);
 
         //when
         RestAssured.given().log().all()
