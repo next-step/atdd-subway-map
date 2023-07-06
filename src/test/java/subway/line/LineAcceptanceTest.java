@@ -105,12 +105,15 @@ public class LineAcceptanceTest {
     @Test
     void updateLine() {
         // given
-        LineRequest lineRequest = new LineRequest(신분당선, "bg-red-600", 1L, 2L, 10);
-        지하철_노선_생성_요청(lineRequest);
+        StationResponse someStationResponse = 지하철_역_생성_요청_역_정보_반환(지하철역);
+        StationResponse newStationResponse = 지하철_역_생성_요청_역_정보_반환(새로운지하철역);
+        LineRequest lineRequest = new LineRequest(신분당선, "bg-red-600", someStationResponse.getId(),
+            newStationResponse.getId(), 10);
+        LineResponse lineResponse = 지하철_노선_생성_요청_노선_정보_반환(lineRequest);
 
         // when
         LineUpdateRequest lineUpdateRequest = new LineUpdateRequest("다른분당선", "bg-red-600");
-        int statusCode = 지하철_노선_수정_요청_상태_코드_반환(1L, lineUpdateRequest);
+        int statusCode = 지하철_노선_수정_요청_상태_코드_반환(lineResponse.getId(), lineUpdateRequest);
 
         // then
         assertThat(statusCode).isEqualTo(HttpStatus.OK.value());
@@ -127,10 +130,10 @@ public class LineAcceptanceTest {
         StationResponse newStationResponse = 지하철_역_생성_요청_역_정보_반환(새로운지하철역);
         LineRequest lineRequest = new LineRequest(신분당선, "bg-red-600", someStationResponse.getId(),
             newStationResponse.getId(), 10);
-        지하철_노선_생성_요청(lineRequest);
+        LineResponse lineResponse = 지하철_노선_생성_요청_노선_정보_반환(lineRequest);
 
         // when
-        int statusCode = 지하철_노선_삭제_요청_상태_코드_반환(1L);
+        int statusCode = 지하철_노선_삭제_요청_상태_코드_반환(lineResponse.getId());
 
         // then
         assertThat(statusCode).isEqualTo(HttpStatus.NO_CONTENT.value());
