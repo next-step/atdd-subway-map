@@ -31,9 +31,9 @@ public class SectionAcceptanceTest extends AcceptanceTest {
      * - "upStationId" : 상행 역의 id
      * - "distance" : 하행 역과 상행 역 간의 거리
      * ## 시나리오
-     * Given :
-     * When :
-     * Then :
+     * Given : 지하철 노선 1개를 등록하고
+     * When : 새로운 구간을 등록하면
+     * Then : 노선에 새로운 구간이 등록된다
      */
     @DisplayName("지하철 구간 등록")
     @Test
@@ -73,6 +73,11 @@ public class SectionAcceptanceTest extends AcceptanceTest {
      * - 새로운 구간 제거 시, 위 조건에 부합하지 않는 경우 에러 처리한다.
      * ## Request
      * - DELETE /lines/{lineId}/sections?stationId={stationId}
+     * ## 시나리오
+     * Given : 지하철 노선을 1개 등록하고
+     * And : 새로운 구간을 1개 등록한 후
+     * When : 하행 종점역을 제거하면
+     * Then : 구간이 삭제된다
      */
     @DisplayName("지하철 구간 삭제")
     @Test
