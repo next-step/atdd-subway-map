@@ -40,4 +40,20 @@ public class LineApi {
                 .then().log().all()
                 .extract();
     }
+
+    public static ExtractableResponse<Response> appendSectionInLine(final String appendLocation, final Map<String, String> request) {
+        return RestAssured.given().log().all()
+                .body(request)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post(appendLocation)
+                .then().log().all()
+                .extract();
+    }
+
+    public static ExtractableResponse<Response> removeSectionInLine(final Long deleteLocation) {
+        return RestAssured.given().log().all()
+                .when().delete(String.valueOf(deleteLocation))
+                .then().log().all()
+                .extract();
+    }
 }
