@@ -2,6 +2,7 @@ package sections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -30,6 +31,25 @@ public class SectionAcceptanceTest {
     LineFixture lineFixture = new LineFixture();
     StationFixture stationFixture = new StationFixture();
 
+    StationResponse lineUpstationA = null;
+    StationResponse lineDownstationB = null;
+    LineResponse lineAB = null;
+
+    StationResponse lineUpstationC = null;
+    StationResponse lineDownstationD = null;
+    LineResponse lineCD = null;
+
+    @BeforeEach
+    public void beforeEach() {
+        lineUpstationA = stationFixture.지하철역_생성("upstationA");
+        lineDownstationB = stationFixture.지하철역_생성("downStationB");
+        lineAB = lineFixture.노선생성("line-ab", "yellow", lineUpstationA.getId(), lineDownstationB.getId(), 10);
+
+        lineUpstationC = stationFixture.지하철역_생성("upstationC");
+        lineDownstationD = stationFixture.지하철역_생성("downStationD");
+        lineCD = lineFixture.노선생성("line-cd", "blue", lineUpstationC.getId(), lineDownstationD.getId(), 5);
+    }
+
     @DisplayName("새로운 구간의 상행역이 노선의 하행 종점역이 아닐 때")
     @Nested
     class Given_section_upstation_is_not_lines_downstation {
@@ -41,15 +61,6 @@ public class SectionAcceptanceTest {
             @DisplayName("오류가 발생한다")
             @Test
             void shouldThrowError() {
-                StationResponse lineUpstationA = stationFixture.지하철역_생성("upstationA");
-                StationResponse lineDownstationB = stationFixture.지하철역_생성("downStationB");
-                LineResponse lineAB = lineFixture.노선생성("line-ab", "yellow", lineUpstationA.getId(), lineDownstationB.getId(), 10);
-
-                StationResponse lineUpstationC = stationFixture.지하철역_생성("upstationC");
-                StationResponse lineDownstationD = stationFixture.지하철역_생성("downStationD");
-                LineResponse lineCD = lineFixture.노선생성("line-cd", "blue", lineUpstationC.getId(), lineDownstationD.getId(), 5);
-
-
                 SectionCreateRequest request = new SectionCreateRequest();
                 request.setUpStationId(lineUpstationA.getId());
                 request.setDownStationId(lineUpstationC.getId());
@@ -82,15 +93,6 @@ public class SectionAcceptanceTest {
             @DisplayName("then_오류가 발생한다")
             @Test
             void shouldThrowError() {
-                StationResponse lineUpstationA = stationFixture.지하철역_생성("upstationA");
-                StationResponse lineDownstationB = stationFixture.지하철역_생성("downStationB");
-                LineResponse lineAB = lineFixture.노선생성("line-ab", "yellow", lineUpstationA.getId(), lineDownstationB.getId(), 10);
-
-                StationResponse lineUpstationC = stationFixture.지하철역_생성("upstationC");
-                StationResponse lineDownstationD = stationFixture.지하철역_생성("downStationD");
-                LineResponse lineCD = lineFixture.노선생성("line-cd", "blue", lineUpstationC.getId(), lineDownstationD.getId(), 5);
-
-
                 SectionCreateRequest request = new SectionCreateRequest();
                 request.setUpStationId(lineDownstationB.getId());
                 request.setDownStationId(lineUpstationA.getId());
@@ -119,15 +121,6 @@ public class SectionAcceptanceTest {
             @DisplayName("then_구간을 등록할 수 있다")
             @Test
             void registerSection() {
-                StationResponse lineUpstationA = stationFixture.지하철역_생성("upstationA");
-                StationResponse lineDownstationB = stationFixture.지하철역_생성("downStationB");
-                LineResponse lineAB = lineFixture.노선생성("line-ab", "yellow", lineUpstationA.getId(), lineDownstationB.getId(), 10);
-
-                StationResponse lineUpstationC = stationFixture.지하철역_생성("upstationC");
-                StationResponse lineDownstationD = stationFixture.지하철역_생성("downStationD");
-                LineResponse lineCD = lineFixture.노선생성("line-cd", "blue", lineUpstationC.getId(), lineDownstationD.getId(), 5);
-
-
                 SectionCreateRequest request = new SectionCreateRequest();
                 request.setUpStationId(lineDownstationB.getId());
                 request.setDownStationId(lineUpstationC.getId());
