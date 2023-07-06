@@ -1,7 +1,11 @@
 package subway.line;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.line.dto.LineCreateRequest;
+import subway.line.dto.LineResponse;
+import subway.line.dto.LineUpdateRequest;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -9,15 +13,22 @@ import java.util.stream.Collectors;
 @Service
 @Transactional(readOnly = true)
 public class LineService {
-    private LineRepository lineRepository;
+    private final LineRepository lineRepository;
 
+    @Autowired
     public LineService(LineRepository lineRepository) {
         this.lineRepository = lineRepository;
     }
 
     @Transactional
-    public LineResponse saveLine(LineRequest lineRequest) {
-        Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor()));
+    public LineResponse saveLine(LineCreateRequest lineRequest) {
+        Line line = lineRepository.save(Line.builder()
+                .name(lineRequest.getName())
+                .color(lineRequest.getColor())
+                .upStationId(lineRequest.getUpStationId())
+                .downStationId(lineRequest.getDownStationId())
+                .distance(lineRequest.getDistance())
+                .build());
         return createLineResponse(line);
     }
 
@@ -32,9 +43,9 @@ public class LineService {
     }
 
     @Transactional
-    public void updateLine(Long id, LineRequest lineRequest) {
+    public void updateLine(Long id, LineUpdateRequest request) {
         Line line = lineRepository.findById(id).orElseThrow(IllegalArgumentException::new);
-        line.update(lineRequest.getName(), lineRequest.getColor());
+        line.updateLine(request.getName(), request.getColor());
     }
 
     @Transactional
@@ -43,10 +54,11 @@ public class LineService {
     }
 
     private LineResponse createLineResponse(Line line) {
-        return new LineResponse(
-                line.getId(),
-                line.getName(),
-                line.getColor()
-        );
+        return LineResponse.builder()
+                .id(line.getId())
+                .name(line.getName())
+                .color(line.getColor())
+                .stations(line.getStations())
+                .build();
     }
 }
