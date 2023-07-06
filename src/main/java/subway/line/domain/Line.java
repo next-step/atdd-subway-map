@@ -80,4 +80,16 @@ public class Line {
         return Objects.equals(this.sections.get(0).getUpStation().getId(), station.getId()) ||
                 Objects.equals(this.sections.get(0).getDownStation().getId(), station.getId());
     }
+
+    public boolean isLastDownStation(Station station) {
+        if (CollectionUtils.isEmpty(this.sections)) {
+            return false;
+        }
+
+        return Objects.equals(sections.get(sections.size()-1).getDownStation().getId(), station.getId());
+    }
+
+    public Station getLastDownStation() {
+        return this.sections.get(sections.size()-1).getDownStation();
+    }
 }
