@@ -21,7 +21,7 @@ public class LineResponse {
                            .id(line.getId())
                            .name(line.getName())
                            .color(line.getColor())
-                           .stations(List.of(StationResponse.from(line.getUpStation()), StationResponse.from(line.getUpStation())))
+                           .stations(List.of(StationResponse.from(line.getUpStation()), StationResponse.from(line.getDownStation())))
                            .build();
     }
 }

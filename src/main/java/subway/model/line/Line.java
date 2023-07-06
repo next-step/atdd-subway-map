@@ -40,4 +40,8 @@ public class Line {
     public void setColor(String color) {
         this.color = color;
     }
+
+    public void setDownStation(Station downStation) {
+        this.downStation = downStation;
+    }
 }

@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import subway.model.line.Line;
 import subway.model.station.Station;
 
 import javax.persistence.*;
@@ -29,4 +30,9 @@ public class Section {
 
     @Column(nullable = false)
     private Long distance;
+
+    @ManyToOne
+    @JoinColumn(name = "lineId", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private Line line;
+
 }
