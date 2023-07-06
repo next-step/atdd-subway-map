@@ -31,6 +31,23 @@ public class LineRequest {
                 .extract();
     }
 
+    public static ExtractableResponse<Response> 지하철_노선을_생성한다(Long upStationId, Long downStationId, String lineName) {
+        Map<String, Object> params = Map.of(
+                "name", lineName,
+                "color", "bg-red-600",
+                "upStationId", upStationId,
+                "downStationId", downStationId,
+                "distance", 10
+        );
+
+        return RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines")
+                .then().log().all()
+                .extract();
+    }
+
     private static long extractId(ExtractableResponse<Response> responseOfCreateStation) {
         return responseOfCreateStation.jsonPath().getLong("id");
     }

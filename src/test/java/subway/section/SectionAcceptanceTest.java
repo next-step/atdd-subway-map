@@ -1,8 +1,16 @@
 package subway.section;
 
+import io.restassured.RestAssured;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.MediaType;
 import subway.AcceptanceTest;
+import subway.line.LineRequest;
+import subway.station.StationRequest;
+
+import java.util.Map;
 
 /**
  * 프로그래밍 요구사항
@@ -31,14 +39,41 @@ public class SectionAcceptanceTest extends AcceptanceTest {
      * - "upStationId" : 상행 역의 id
      * - "distance" : 하행 역과 상행 역 간의 거리
      * ## 시나리오
-     * Given : 지하철 노선 1개를 등록하고
+     * Given : 지하철역을 3개 생성하고
+     * And : 지하철 노선을 1개 생성한 후
      * When : 새로운 구간을 등록하면
      * Then : 노선에 새로운 구간이 등록된다
      */
     @DisplayName("지하철 구간 등록")
     @Test
     void registerSectionOk() {
+        // given
+        long 노선_상행_Id = 응답_결과에서_Id를_추출한다(StationRequest.지하철역을_생성한다("강남역"));
+        long 노선_하행_Id = 응답_결과에서_Id를_추출한다(StationRequest.지하철역을_생성한다("양재역"));
+        long 구간_하행_Id = 응답_결과에서_Id를_추출한다(StationRequest.지하철역을_생성한다("양재시민의숲역"));
 
+        long lineId = 응답_결과에서_Id를_추출한다(LineRequest.지하철_노선을_생성한다(노선_상행_Id, 노선_하행_Id, "신분당선"));
+
+        // when
+        Map<String, ? extends Number> params = Map.of(
+                "upStationId", 노선_하행_Id,
+                "downStationId", 구간_하행_Id,
+                "distance", 10
+        );
+
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .pathParam("lineId", lineId)
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines/{lineId}/sections")
+                .then().log().all()
+                .extract();
+
+
+    }
+
+    private long 응답_결과에서_Id를_추출한다(ExtractableResponse<Response> responseOfCreateStation) {
+        return responseOfCreateStation.jsonPath().getLong("id");
     }
 
     /**
