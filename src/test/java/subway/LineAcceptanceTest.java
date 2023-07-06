@@ -148,7 +148,7 @@ class LineAcceptanceTest {
             .statusCode(HttpStatus.CREATED.value()).extract();
 
         // when
-        long lineId = creationResponse.jsonPath().get("id");
+        long lineId = creationResponse.jsonPath().getLong("id");
         String path = generatePathForId(lineId);
         ExtractableResponse<Response> response = RestAssuredClient.requestDelete(path)
             .extract();
