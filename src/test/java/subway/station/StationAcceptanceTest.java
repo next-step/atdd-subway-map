@@ -76,7 +76,7 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역 목록을 조회한다.")
     @Test
     void readStations() {
-        //give
+        //given
         SaveStationRequestDto gangnamStation = StationFixture.GANGNAM_STATION;
         SaveStationRequestDto gwanggyoStation = StationFixture.GWANGGYO_STATION;
 

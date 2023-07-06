@@ -18,9 +18,8 @@ import subway.support.AcceptanceTest;
 import subway.support.DatabaseCleanUp;
 import subway.support.RestAssuredClient;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Stream;
 
 import static io.restassured.RestAssured.UNDEFINED_PORT;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -76,7 +75,7 @@ public class LineAcceptanceTest {
         SaveLineRequestDto sinbundangLine = LineFixture.SINBUNDANG_LINE;
         sinbundangLine
                 .setUpStationId(gangnamStationId)
-                .setDownStationId(gangnamStationId);
+                .setDownStationId(gwanggyoStationId);
         saveLine(sinbundangLine);
 
         // then
@@ -100,6 +99,29 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선 목록을 조회한다.")
     @Test
     void readLines() {
+        // given
+        SaveLineRequestDto sinbundangLine = LineFixture.SINBUNDANG_LINE;
+        sinbundangLine
+                .setUpStationId(gangnamStationId)
+                .setDownStationId(gwanggyoStationId);
+
+        SaveLineRequestDto gyeongchunLine = LineFixture.GYEONGCHUN_LINE;
+        gyeongchunLine
+                .setUpStationId(cheongnyangniStationId)
+                .setDownStationId(chuncheonStation);
+
+        Stream.of(sinbundangLine, gyeongchunLine)
+                .forEach(this::saveLine);
+
+        // when
+        ExtractableResponse<Response> findLinesAllResponse = findLinesAll();
+        List<String> lineNames = findLinesAllResponse
+                .jsonPath()
+                .getList(LINE_NAME_KEY, String.class);
+
+        // then
+        assertThat(lineNames)
+                .containsOnly(sinbundangLine.getName(), gyeongchunLine.getName());
     }
 
     /**
