@@ -1,7 +1,9 @@
 package subway.line;
 
 import javax.persistence.Column;
+import javax.persistence.ConstraintMode;
 import javax.persistence.Entity;
+import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -23,10 +25,10 @@ public class LineStation {
   private Long stationId;
 
   @ManyToOne
-  @JoinColumn(name = "line_id")
+  @JoinColumn(name = "line_id", foreignKey = @ForeignKey(name="none",value = ConstraintMode.NO_CONSTRAINT))
   private SubwayLine subwayLine;
 
   @ManyToOne
-  @JoinColumn(name = "station_id")
+  @JoinColumn(name = "station_id", foreignKey = @ForeignKey(name="none",value = ConstraintMode.NO_CONSTRAINT))
   private Station station;
 }
