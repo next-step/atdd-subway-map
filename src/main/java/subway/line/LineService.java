@@ -33,9 +33,12 @@ public class LineService {
     }
 
     public LineResponse findLineById(Long id) {
-        return new LineResponse(
-            lineRepository.findById(id)
-                .orElseThrow(IllegalAccessError::new));
+        return new LineResponse(findById(id));
+    }
+
+    public void update(Long id, LineUpdateRequest lineUpdateRequest) {
+        Line line = findById(id);
+        line.update(lineUpdateRequest.getName(), lineUpdateRequest.getColor());
     }
 
     public void deleteLineById(Long id) {
@@ -50,5 +53,10 @@ public class LineService {
 
         return new Line(lineRequest.getName(), lineRequest.getColor(), upStation, downStation,
             lineRequest.getDistance());
+    }
+
+    private Line findById(Long id) {
+        return lineRepository.findById(id)
+            .orElseThrow(IllegalStateException::new);
     }
 }
