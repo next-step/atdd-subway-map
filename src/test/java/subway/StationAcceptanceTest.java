@@ -6,20 +6,20 @@ import io.restassured.response.Response;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import subway.config.IntegrationTest;
+import subway.station.StationResponse;
 import subway.step.StationStep;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class StationAcceptanceTest {
+public class StationAcceptanceTest extends IntegrationTest {
     /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다
@@ -61,14 +61,7 @@ public class StationAcceptanceTest {
         StationStep.지하철역_다중_생성_요청(역_생성_목록);
 
         // when
-        List<String> 역_목록 =
-            RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/stations")
-                .then().log().all()
-                .extract()
-                .jsonPath()
-                .getList("name", String.class);
+        List<String> 역_목록 = StationStep.지하철역_이름_전체조회_요청();
 
         // then
         Assertions.assertThat(역_목록)
