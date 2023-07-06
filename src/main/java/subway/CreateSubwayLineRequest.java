@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
-public class SubwayLineRequest {
+public class CreateSubwayLineRequest {
     private String name;
     private String color;
     private Long upStationId;

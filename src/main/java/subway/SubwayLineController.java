@@ -16,11 +16,16 @@ public class SubwayLineController {
     }
 
     @PostMapping("/lines")
-    public ResponseEntity<SubwayLineResponse> createStation(@RequestBody SubwayLineRequest lineRequest) {
-        SubwayLineResponse line = lineService.saveLine(lineRequest);
+    public ResponseEntity<SubwayLineResponse> createStation(@RequestBody CreateSubwayLineRequest createRequest) {
+        SubwayLineResponse line = lineService.saveLine(createRequest);
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
 
+    @PutMapping("/lines/{id}")
+    public ResponseEntity<Void> updateStation(@PathVariable("id") Long lineId, @RequestBody UpdateSubwayLineRequest updateRequest) {
+        lineService.updateLine(lineId, updateRequest);
+        return ResponseEntity.ok().build();
+    }
 
     @GetMapping("/lines")
     public ResponseEntity<List<SubwayLineResponse>> showLines() {

@@ -19,7 +19,7 @@ public class SubwayLineService {
     }
 
     @Transactional
-    public SubwayLineResponse saveLine(SubwayLineRequest request) {
+    public SubwayLineResponse saveLine(CreateSubwayLineRequest request) {
         final Station upStation = stationRepository.findById(request.getUpStationId()).orElseThrow(RuntimeException::new);
         final Station downStation = stationRepository.findById(request.getDownStationId()).orElseThrow(RuntimeException::new);
 
@@ -31,6 +31,12 @@ public class SubwayLineService {
                 .distance(request.getDistance())
                 .build();
         return SubwayLineResponse.toResponse(lineRepository.save(subwayLine));
+    }
+
+    @Transactional
+    public void updateLine(Long lineId, UpdateSubwayLineRequest request) {
+        final SubwayLine line = lineRepository.findById(lineId).orElseThrow(RuntimeException::new);
+        line.change(request);
     }
 
     public List<SubwayLineResponse> findAllLines() {

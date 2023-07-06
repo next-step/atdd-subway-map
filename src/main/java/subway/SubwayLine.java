@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -32,6 +33,12 @@ public class SubwayLine {
     @Column(nullable = false)
     private Long distance;
 
+    @Column(nullable = false)
+    private LocalDateTime createdAt;
+
+    @Column(nullable = false)
+    private LocalDateTime updatedAt;
+
     @Builder
     public SubwayLine(String name, String color, Station upStation, Station downStation, Long distance) {
         this.name = name;
@@ -39,7 +46,15 @@ public class SubwayLine {
         this.upStation = upStation;
         this.downStation = downStation;
         this.distance = distance;
+
+        final LocalDateTime now = LocalDateTime.now();
+        this.createdAt = now;
+        this.updatedAt = now;
     }
 
-
+    public void change(final UpdateSubwayLineRequest request) {
+        this.name = request.getName();
+        this.color = request.getColor();
+        this.updatedAt = LocalDateTime.now();
+    }
 }
