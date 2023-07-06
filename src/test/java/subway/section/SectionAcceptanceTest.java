@@ -1,16 +1,18 @@
 package subway.section;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import subway.AcceptanceTest;
 import subway.line.LineRequest;
 import subway.station.StationRequest;
-
-import java.util.Map;
 
 /**
  * 프로그래밍 요구사항
@@ -61,7 +63,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
                 "distance", 10
         );
 
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
+        ExtractableResponse<Response> createSectionResponse = RestAssured.given().log().all()
                 .pathParam("lineId", lineId)
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -69,7 +71,11 @@ public class SectionAcceptanceTest extends AcceptanceTest {
                 .then().log().all()
                 .extract();
 
+        // then
+        assertThat(createSectionResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
+        ExtractableResponse<Response> showLineResponse = LineRequest.지하철_노선을_조회한다(lineId);
+        assertThat(showLineResponse.jsonPath().getList("sections")).hasSize(2);  // section을 두 개 가지고있어야 한다.
     }
 
     private long 응답_결과에서_Id를_추출한다(ExtractableResponse<Response> responseOfCreateStation) {
