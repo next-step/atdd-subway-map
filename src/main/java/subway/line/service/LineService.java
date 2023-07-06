@@ -36,13 +36,7 @@ public class LineService {
     }
 
     private Line mapRequestToEntity(LineCreateRequest request, Station upStation, Station downStation) {
-        return Line.builder()
-                   .name(request.getName())
-                   .color(request.getColor())
-                   .upStation(upStation)
-                   .downStation(downStation)
-                   .distance(request.getDistance())
-                   .build();
+        return Line.firstLine(request.getName(), request.getColor(), upStation, downStation, request.getDistance());
     }
 
     @Transactional(readOnly = true)

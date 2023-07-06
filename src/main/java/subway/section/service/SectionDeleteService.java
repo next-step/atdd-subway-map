@@ -15,6 +15,7 @@ import subway.section.exception.InvalidSectionDeleteException;
 import subway.section.repository.SectionRepository;
 import subway.station.domain.Station;
 import subway.station.service.StationService;
+import subway.support.ErrorCode;
 
 @Service
 @Slf4j
@@ -29,10 +30,14 @@ public class SectionDeleteService {
         Line line = lineService.getLine(lineId);
         Station station = stationService.get(stationId);
 
+        if (line.isLastStation(station)) {
+            throw new InvalidSectionDeleteException(ErrorCode.SECTION_DELETE_FAIL_BY_LAST_STATION_REMOVED);
+        }
+
         Optional<Section> maybeSection = sectionRepository.findByLineAndDownStation(line, station);
 
         if (maybeSection.isEmpty()) {
-            throw new InvalidSectionDeleteException();
+            throw new InvalidSectionDeleteException(ErrorCode.SECTION_DELETE_FAIL_BY_NOT_ALLOWED_STATION);
         }
 
         sectionRepository.delete(maybeSection.get());

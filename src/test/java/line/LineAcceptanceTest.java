@@ -171,7 +171,7 @@ public class LineAcceptanceTest {
 
         // then
         ExtractableResponse<Response> getLineResponse = 노선조회(createdLineId);
-        assertThat(getLineResponse.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+        assertThat(getLineResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     private String getDeleteLineRequestUrl(long id) {

@@ -22,7 +22,6 @@ create table line (
                          COLOR varchar(20) not null,
                          up_station_id int not null,
                          down_station_id int not null,
-                         distance int not null,
                          PRIMARY KEY ( ID )
 );
 

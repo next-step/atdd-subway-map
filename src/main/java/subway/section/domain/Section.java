@@ -43,5 +43,12 @@ public class Section {
 
     private Integer distance;
 
-
+    public static Section firstSection(Line line, Station upStation, Station downStation, Integer distance) {
+        return Section.builder()
+                      .line(line)
+                      .upStation(upStation)
+                      .downStation(downStation)
+                      .distance(distance)
+                      .build();
+    }
 }
