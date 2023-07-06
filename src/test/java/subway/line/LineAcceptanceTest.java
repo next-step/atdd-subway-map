@@ -111,27 +111,18 @@ public class LineAcceptanceTest {
     @Test
     void updateLine() {
         //given
-        final String beforeName = "4호선";
-        final String beforeColor = "light-blue";
-
-        final String afterName = "9호선";
-        final String afterColor = "brown";
-
-        LineRequest saveRequest = makeRequest(beforeName, beforeColor, firstStationId, secondStationId);
-        LineRequest updateRequest = makeRequest(afterName, afterColor, secondStationId, fourthStationId);
-        long id = 지하철_노선_생성_ID(saveRequest);
+        long id = 지하철_노선_생성_ID(makeRequest("4호선", "light-blue", firstStationId, secondStationId));
+        String updatedName = "9호선";
+        String updatedColor = "brown";
         //when
-        지하철_노선_수정(id, updateRequest);
+        지하철_노선_수정(id, makeRequest(updatedName, updatedColor, secondStationId, fourthStationId));
         //then : 지하철 노선 이름, 색깔이 수정됨을 확인
         LineResponse response = 지하철_노선_조회(id);
-        assertThat(response.getName()).isEqualTo(afterName);
-        assertThat(response.getColor()).isEqualTo(afterColor);
+        assertThat(response.getName()).isEqualTo(updatedName);
+        assertThat(response.getColor()).isEqualTo(updatedColor);
 
         //then : 지하철 노선에 연결된 역이 수정됨을 확인
-        List<Long> stationIds = response.getStations()
-                .stream()
-                .map(StationResponse::getId)
-                .collect(Collectors.toList());
+        List<Long> stationIds = 노선에_상행_하행_지하철역_ID(response);
 
         assertThat(stationIds).containsExactly(secondStationId, fourthStationId);
     }
@@ -217,6 +208,13 @@ public class LineAcceptanceTest {
                 .getLong("id");
     }
 
+    private static List<Long> 노선에_상행_하행_지하철역_ID(LineResponse response) {
+        List<Long> stationIds = response.getStations()
+                .stream()
+                .map(StationResponse::getId)
+                .collect(Collectors.toList());
+        return stationIds;
+    }
     private void 테스트용_포트_설정() {
         RestAssured.port = port;
     }

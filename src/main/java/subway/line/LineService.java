@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.station.Station;
 import subway.station.StationRepository;
+import subway.station.StationService;
 
 import java.util.*;
 import java.util.function.Function;
@@ -11,21 +12,21 @@ import java.util.stream.Collectors;
 
 @Service
 public class LineService {
+    private final StationService stationService;
     private final LineRepository lineRepository;
-    private final StationRepository stationRepository;
     private final LineConverter lineConverter;
 
-    public LineService(LineRepository lineRepository, LineConverter lineConverter, StationRepository stationRepository) {
+    public LineService(LineRepository lineRepository, LineConverter lineConverter, StationService stationService) {
         this.lineRepository = lineRepository;
         this.lineConverter = lineConverter;
-        this.stationRepository = stationRepository;
+        this.stationService = stationService;
 
     }
 
     @Transactional
     public LineResponse create(LineRequest request) {
-        Station upStation = getStation(request.getUpStationId());
-        Station downStation = getStation(request.getDownStationId());
+        Station upStation = stationService.getStation(request.getUpStationId());
+        Station downStation = stationService.getStation(request.getDownStationId());
         Line newLine = Line.of(request.getName(), request.getColor(), request.getUpStationId(), request.getDownStationId(), request.getDistance());
         lineRepository.save(newLine);
         return lineConverter.convert(newLine, Arrays.asList(upStation, downStation));
@@ -40,7 +41,8 @@ public class LineService {
                 .distinct()
                 .collect(Collectors.toList());
 
-        Map<Long, Station> stationMap = stationRepository.findByIdIn(stationIds).stream()
+        Map<Long, Station> stationMap = stationService.findByIds(stationIds)
+                .stream()
                 .collect(Collectors.toMap(Station::getId, Function.identity()));
 
         return list.stream()
@@ -50,7 +52,7 @@ public class LineService {
 
     public LineResponse getById(Long id) {
         Line line = getLine(id);
-        List<Station> stations = stationRepository.findByIdIn(Arrays.asList(line.getUpStationId(), line.getDownStationId()));
+        List<Station> stations = stationService.findByIds(Arrays.asList(line.getUpStationId(), line.getDownStationId()));
         return lineConverter.convert(line, stations);
     }
 
@@ -59,8 +61,8 @@ public class LineService {
     public void update(Long id, LineRequest request) {
         if (!lineRepository.existsById(id))
             throw new NoSuchElementException("line is not existed by id > " + id);
-        getStation(request.getUpStationId());
-        getStation(request.getDownStationId());
+        stationService.getStation(request.getUpStationId());
+        stationService.getStation(request.getDownStationId());
         Line line = Line.of(id, request.getName(), request.getColor(), request.getUpStationId(), request.getDownStationId(), request.getDistance());
         lineRepository.save(line);
     }
@@ -68,11 +70,6 @@ public class LineService {
     @Transactional
     public void delete(Long id) {
         lineRepository.delete(getLine(id));
-    }
-
-    private Station getStation(Long id) {
-        return stationRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("station is not existed by id > " + id));
     }
 
     private Line getLine(Long id) {
