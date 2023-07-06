@@ -11,6 +11,7 @@ import subway.line.dto.LineResponse;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Transactional(readOnly = true)
 @Service
 public class LineService {
 
@@ -51,6 +52,7 @@ public class LineService {
         return new LineResponse(line);
     }
 
+    @Transactional
     public void deleteLine(long id) {
 
         Line line = lineRepository.findById(id).orElseThrow(() -> new NotFoundException(id));
