@@ -116,7 +116,7 @@ class LineAcceptanceTest {
             .statusCode(HttpStatus.CREATED.value()).extract();
 
         // when
-        long lineId = creationResponse.jsonPath().get("id");
+        long lineId = creationResponse.jsonPath().getLong("id");
         String path = generatePathForId(lineId);
 
         String updatedLineName = LineFactory.수인분당선;
