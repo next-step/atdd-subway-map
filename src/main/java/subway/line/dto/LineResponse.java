@@ -8,18 +8,15 @@ public class LineResponse {
     private final String name;
     private final String color;
 
-    public long getId()
-    {
+    public long getId() {
         return id;
     }
 
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
-    public String getColor()
-    {
+    public String getColor() {
         return color;
     }
 

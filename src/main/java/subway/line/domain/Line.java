@@ -14,8 +14,10 @@ public class Line {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(length = 20, nullable = false)
     private String name;
+
     @Column(length = 20, nullable = false)
     private String color;
 
@@ -26,18 +28,15 @@ public class Line {
         this.color = color;
     }
 
-    public Long getId()
-    {
+    public Long getId() {
         return id;
     }
 
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
-    public String getColor()
-    {
+    public String getColor() {
         return color;
     }
 
