@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,6 +30,20 @@ class SubwayLineAcceptanceTest {
     @Autowired
     private TestDatabaseCleaner dbCleaner;
 
+    private Map<String, Object> 신분당선노선 = new HashMap<>(Map.of(
+            "name", "신분당선",
+            "color", "bg-red-600",
+            "upStationId", 1L,
+            "downStationId", 2L,
+            "distance", 10L
+    ));
+    private Map<String, Object> 분당선노선 = new HashMap<>(Map.of(
+            "name", "분당선",
+            "color", "bg-red-600",
+            "upStationId", 1L,
+            "downStationId", 3L,
+            "distance", 10L
+    ));
     private static Map<Long, String> 지하철역 = Map.of(1L, "지하철역", 2L, "새로운지하철역", 3L, "또다른지하철역");
 
     @BeforeEach
@@ -45,44 +60,25 @@ class SubwayLineAcceptanceTest {
     @DisplayName("지하철 노선을 생성할 때 upStation 에 해당하는 지하철역이 없으면 NOT_FOUND")
     @Test
     void createWithNoUpStation_notFound() {
-        Map<String, Object> request = Map.of(
-                "name", "신분당선",
-                "color", "bg-red-600",
-                "upStationId", 100L,
-                "downStationId", 2L,
-                "distance", 10L
-        );
+        신분당선노선.replace("upStationId", 100L);
 
-        ExtractableResponse<Response> response = 지하철노선_생성(request);
+        ExtractableResponse<Response> response = 지하철노선_생성(신분당선노선);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 
     @DisplayName("지하철 노선을 생성할 때 downStation 에 해당하는 지하철역이 없으면 NOT_FOUND")
     @Test
     void createWithNoDownStation_notFound() {
-        Map<String, Object> request = Map.of(
-                "name", "신분당선",
-                "color", "bg-red-600",
-                "upStationId", 1L,
-                "downStationId", 200L,
-                "distance", 10L
-        );
+        신분당선노선.replace("downStationId", 200L);
 
-        ExtractableResponse<Response> response = 지하철노선_생성(request);
+        ExtractableResponse<Response> response = 지하철노선_생성(신분당선노선);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 
     @DisplayName("지하철 노선을 생성하면 목록 조회시 생성한 노선이 조회된다.")
     @Test
     void create_findAll() {
-        Map<String, Object> request = Map.of(
-                "name", "신분당선",
-                "color", "bg-red-600",
-                "upStationId", 1L,
-                "downStationId", 2L,
-                "distance", 10L
-        );
-        ExtractableResponse<Response> response = 지하철노선_생성(request);
+        ExtractableResponse<Response> response = 지하철노선_생성(신분당선노선);
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         지하철노선_목록_조회됨(Map.of(
@@ -95,8 +91,8 @@ class SubwayLineAcceptanceTest {
     @DisplayName("지하철 노선을 두 개 생성하면 목록 조회시 생성한 노선이 두 가지 조회된다.")
     @Test
     void createTwo_findAll() {
-        지하철노선_생성(Map.of("name", "신분당선", "color", "bg-red-600", "upStationId", 1L, "downStationId", 2L, "distance", 10L));
-        지하철노선_생성(Map.of("name", "분당선", "color", "bg-red-600", "upStationId", 1L, "downStationId", 3L, "distance", 10L));
+        지하철노선_생성(신분당선노선);
+        지하철노선_생성(분당선노선);
 
         지하철노선_목록_조회됨(
                 Map.of("id", 1,
@@ -114,14 +110,7 @@ class SubwayLineAcceptanceTest {
     @DisplayName("지하철 노선을 생성하고 해당 id로 조회시 생성한 노선이 조회된다.")
     @Test
     void create_findById() {
-        Map<String, Object> request = Map.of(
-                "name", "신분당선",
-                "color", "bg-red-600",
-                "upStationId", 1L,
-                "downStationId", 2L,
-                "distance", 10L
-        );
-        ExtractableResponse<Response> response = 지하철노선_생성(request);
+        ExtractableResponse<Response> response = 지하철노선_생성(신분당선노선);
 
         지하철노선_조회됨(Map.of(
                 "id", response.jsonPath().get("id"),
@@ -133,14 +122,7 @@ class SubwayLineAcceptanceTest {
     @DisplayName("지하철 노선을 생성하고 업데이트할 때 잘못된 지하철 id를 넣을 경우 BAD_REQUEST")
     @Test
     void create_update_findByWrongId_badRequest() {
-        Map<String, Object> createRequest = Map.of(
-                "name", "신분당선",
-                "color", "bg-red-600",
-                "upStationId", 1L,
-                "downStationId", 2L,
-                "distance", 10L
-        );
-        assertThat(지하철노선_생성(createRequest).jsonPath().getLong("id")).isEqualTo(1);
+        assertThat(지하철노선_생성(신분당선노선).jsonPath().getLong("id")).isEqualTo(1);
 
         Map<String, Object> updateRequest = Map.of(
                 "id", 5,
@@ -154,14 +136,7 @@ class SubwayLineAcceptanceTest {
     @DisplayName("지하철 노선을 생성하고 해당 id로 수정하면 수정한 노선이 조회된다.")
     @Test
     void create_update_findById() {
-        Map<String, Object> createRequest = Map.of(
-                "name", "신분당선",
-                "color", "bg-red-600",
-                "upStationId", 1L,
-                "downStationId", 2L,
-                "distance", 10L
-        );
-        assertThat(지하철노선_생성(createRequest).jsonPath().getLong("id")).isEqualTo(1);
+        assertThat(지하철노선_생성(신분당선노선).jsonPath().getLong("id")).isEqualTo(1);
 
         Map<String, Object> updateRequest = Map.of(
                 "id", 1,
@@ -181,14 +156,7 @@ class SubwayLineAcceptanceTest {
     @DisplayName("지하철 노선을 생성하고 삭제할 때 잘못된 지하철 id를 넣을 경우 BAD_REQUEST")
     @Test
     void create_delete_findByWrongId_badRequest() {
-        Map<String, Object> createRequest = Map.of(
-                "name", "신분당선",
-                "color", "bg-red-600",
-                "upStationId", 1L,
-                "downStationId", 2L,
-                "distance", 10L
-        );
-        assertThat(지하철노선_생성(createRequest).jsonPath().getLong("id")).isEqualTo(1);
+        assertThat(지하철노선_생성(신분당선노선).jsonPath().getLong("id")).isEqualTo(1);
 
         ExtractableResponse<Response> response = 지하철노선_삭제(100L);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -197,14 +165,7 @@ class SubwayLineAcceptanceTest {
     @DisplayName("지하철 노선을 생성하고 해당 id로 삭제하면 수정한 노선이 조회되지 않는다.")
     @Test
     void create_delete_notFound() {
-        Map<String, Object> createRequest = Map.of(
-                "name", "신분당선",
-                "color", "bg-red-600",
-                "upStationId", 1L,
-                "downStationId", 2L,
-                "distance", 10L
-        );
-        assertThat(지하철노선_생성(createRequest).jsonPath().getLong("id")).isEqualTo(1);
+        assertThat(지하철노선_생성(신분당선노선).jsonPath().getLong("id")).isEqualTo(1);
 
         ExtractableResponse<Response> response = 지하철노선_삭제(1L);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
