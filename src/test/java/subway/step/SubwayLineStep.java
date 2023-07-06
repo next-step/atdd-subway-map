@@ -41,7 +41,7 @@ public class SubwayLineStep {
         .get("/lines/{id}")
         .then()
         .assertThat()
-        .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        .statusCode(HttpStatus.NOT_FOUND.value());
   }
 
   public static List<SubwayLineResponse> 전체_노선조회() {

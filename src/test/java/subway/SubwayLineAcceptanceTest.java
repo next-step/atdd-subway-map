@@ -5,6 +5,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import subway.config.IntegrationTest;
 import subway.line.SubwayLineEditRequest;
 import subway.line.SubwayLineRequest;
@@ -12,7 +13,7 @@ import subway.line.SubwayLineResponse;
 import subway.step.SubwayLineStep;
 
 @DisplayName("지하철 노선도 관련 기능")
-@Sql("/truncate-subwayline.sql")
+@Sql(value = "/truncate-subwayline.sql", executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
 public class SubwayLineAcceptanceTest extends IntegrationTest {
 
   /**

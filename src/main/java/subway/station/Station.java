@@ -6,7 +6,8 @@ import javax.persistence.*;
 public class Station {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long stationId;
+
     @Column(length = 20, nullable = false)
     private String name;
 
@@ -17,8 +18,8 @@ public class Station {
         this.name = name;
     }
 
-    public Long getId() {
-        return id;
+    public Long getStationId() {
+        return stationId;
     }
 
     public String getName() {

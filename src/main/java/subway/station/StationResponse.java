@@ -1,21 +1,23 @@
 package subway.station;
 
 public class StationResponse {
-    private Long id;
-    private String name;
 
-    public StationResponse() {}
+  private Long id;
+  private String name;
 
-    public StationResponse(Long id, String name) {
-        this.id = id;
-        this.name = name;
-    }
+  public StationResponse() {
+  }
 
-    public Long getId() {
-        return id;
-    }
+  public StationResponse(Long stationId, String name) {
+    this.id = stationId;
+    this.name = name;
+  }
 
-    public String getName() {
-        return name;
-    }
+  public Long getId() {
+    return id;
+  }
+
+  public String getName() {
+    return name;
+  }
 }

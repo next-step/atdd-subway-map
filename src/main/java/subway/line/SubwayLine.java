@@ -16,7 +16,7 @@ public class SubwayLine {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  private Long lineId;
 
   @Column(nullable = false)
   private String color;
@@ -36,7 +36,7 @@ public class SubwayLine {
   public SubwayLine() {}
 
   public SubwayLine(Long id, String color, String name, Long upStationId, Long downStationId, int distance) {
-    this.id = id;
+    this.lineId = id;
     this.color = color;
     this.name = name;
     this.upStationId = upStationId;
@@ -44,8 +44,8 @@ public class SubwayLine {
     this.distance = distance;
   }
 
-  public Long getId() {
-    return id;
+  public Long getLineId() {
+    return lineId;
   }
 
   public String getColor() {

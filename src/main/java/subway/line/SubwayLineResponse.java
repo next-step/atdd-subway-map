@@ -12,7 +12,7 @@ public class SubwayLineResponse {
   public SubwayLineResponse() {}
 
   public SubwayLineResponse (SubwayLine subwayLine) {
-    this.id = subwayLine.getId();
+    this.id = subwayLine.getLineId();
     this.color = subwayLine.getColor();
     this.name = subwayLine.getName();
   }
