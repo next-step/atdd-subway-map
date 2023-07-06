@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import subway.line.domain.Line;
 import subway.line.service.LineService;
 import subway.section.domain.Section;
+import subway.section.exception.InvalidSectionDeleteException;
 import subway.section.repository.SectionRepository;
 import subway.station.domain.Station;
 import subway.station.service.StationService;
@@ -31,7 +32,7 @@ public class SectionDeleteService {
         Optional<Section> maybeSection = sectionRepository.findByLineAndDownStation(line, station);
 
         if (maybeSection.isEmpty()) {
-            throw new RuntimeException("TODO");
+            throw new InvalidSectionDeleteException();
         }
 
         sectionRepository.delete(maybeSection.get());

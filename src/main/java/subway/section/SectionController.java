@@ -19,8 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import subway.line.service.LineService;
 import subway.section.domain.Section;
-import subway.section.exception.InvalidSectionDownStationException;
-import subway.section.exception.InvalidSectionUpStationException;
+import subway.section.exception.InvalidSectionCreateException;
+import subway.section.exception.InvalidSectionDeleteException;
 import subway.section.model.SectionCreateRequest;
 import subway.section.model.SectionCreateResponse;
 import subway.section.service.SectionCreateService;
@@ -51,7 +51,7 @@ public class SectionController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @ExceptionHandler(value = { InvalidSectionUpStationException.class, InvalidSectionDownStationException.class, })
+    @ExceptionHandler(value = { InvalidSectionCreateException.class, InvalidSectionDeleteException.class, })
     public ResponseEntity<ErrorResponse> handleInvalidSectionUpstationException(SubwayException se) {
         return status(HttpStatus.BAD_REQUEST)
                 .body(new ErrorResponse(se));

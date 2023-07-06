@@ -20,6 +20,8 @@ import subway.SubwayApplication;
 import subway.line.view.LineResponse;
 import subway.section.model.SectionCreateResponse;
 import subway.station.view.StationResponse;
+import subway.support.ErrorCode;
+import subway.support.ErrorResponse;
 
 @SchemaInitSql
 @DisplayName("지하철 구간 삭제 기능")
@@ -56,6 +58,24 @@ public class SectionDeleteAcceptanceTest {
     @Nested
     class Given_sections {
 
+
+        @DisplayName("하행 종점역이 아닌 역을 제거하면")
+        @Nested
+        class When_remove_not_last_downstation {
+
+            @DisplayName("예외를 던진다")
+            @Test
+            void shouldThrowError() {
+                ExtractableResponse<Response> response = RestAssured.given().log().all()
+                                                                    .when().delete(getDeleteSectionUrl(lineAB.getId(), lineDownstationB.getId()))
+                                                                    .then().log().all()
+                                                                    .extract();
+
+                assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+                assertThat(response.as(ErrorResponse.class).getErrorCode()).isEqualTo(ErrorCode.SECTION_DELETE_FAIL_BY_NOT_ALLOWED_STATION);
+            }
+        }
+
         @DisplayName("하행 종점역을 제거하면")
         @Nested
         class When_remove_last_downstation {
@@ -76,9 +96,6 @@ public class SectionDeleteAcceptanceTest {
     private String getDeleteSectionUrl(Long lineId, Long stationId) {
         return "/lines/" + lineId + "/sections?stationId=" + stationId;
     }
-
-
-
 
 
 

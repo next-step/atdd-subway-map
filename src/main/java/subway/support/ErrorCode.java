@@ -3,5 +3,6 @@ package subway.support;
 public enum ErrorCode {
     SECTION_CREATE_FAIL_BY_UPSTATION,
     SECTION_CREATE_FAIL_BY_DOWNSTATION,
+    SECTION_DELETE_FAIL_BY_NOT_ALLOWED_STATION,
     ;
 }
