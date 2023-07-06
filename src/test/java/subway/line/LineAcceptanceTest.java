@@ -8,15 +8,23 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.HttpStatus;
 import subway.constants.Endpoint;
+import subway.fixture.LineFixture;
+import subway.fixture.StationFixture;
+import subway.line.dto.request.SaveLineRequestDto;
+import subway.station.dto.request.SaveStationRequestDto;
 import subway.support.AcceptanceTest;
 import subway.support.DatabaseCleanUp;
 import subway.support.RestAssuredClient;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static io.restassured.RestAssured.UNDEFINED_PORT;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("지하철 노선 관련 기능")
 @AcceptanceTest
@@ -31,7 +39,7 @@ public class LineAcceptanceTest {
 
     private static final String LINE_NAME_KEY = "name";
 
-    private Long gangnameStationId;
+    private Long gangnamStationId;
 
     private Long gwanggyoStationId;
 
@@ -49,22 +57,37 @@ public class LineAcceptanceTest {
         }
         databaseCleanUp.execute();
 
-        this.gangnameStationId = saveStation("강남역");
-        this.gwanggyoStationId = saveStation("광교역");
-        this.cheongnyangniStationId = saveStation("청량리역");
-        this.chuncheonStation = saveStation("춘천역");
+        this.gangnamStationId = saveStation(StationFixture.GANGNAM_STATION);
+        this.gwanggyoStationId = saveStation(StationFixture.GWANGGYO_STATION);
+        this.cheongnyangniStationId = saveStation(StationFixture.CHEONGNYANGNI_STATION);
+        this.chuncheonStation = saveStation(StationFixture.CHUNCHEONSTATION_STATION);
     }
 
     /**
      * <pre>
      * When 지하철 노선을 생성하면
-     * Then 지하철 노선이 생성된다
      * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
      * </pre>
      */
     @DisplayName("지하철 노선을 생성한다.")
     @Test
     void createLine() {
+        // when
+        SaveLineRequestDto sinbundangLine = LineFixture.SINBUNDANG_LINE;
+        sinbundangLine
+                .setUpStationId(gangnamStationId)
+                .setDownStationId(gangnamStationId);
+        saveLine(sinbundangLine);
+
+        // then
+        List<String> lineNames = findLinesAll()
+                .jsonPath()
+                .getList(LINE_NAME_KEY, String.class);
+
+        assertAll(
+                () -> assertThat(lineNames.size()).isEqualTo(1),
+                () -> assertThat(lineNames).containsAnyOf(sinbundangLine.getName())
+        );
     }
 
     /**
@@ -117,16 +140,14 @@ public class LineAcceptanceTest {
 
     /**
      * <pre>
-     * stationName 이라는 이름을 가진
      * 지하철역을 생성하는 API를 호출하고
      * 저장된 지하철역의 id를 반환하는 함수
      * </pre>
      *
-     * @param stationName
+     * @param station
      * @return saved station id
      */
-    private Long saveStation(String stationName) {
-        Map<String, String> station = Map.of("name", stationName);
+    private Long saveStation(SaveStationRequestDto station) {
         return RestAssuredClient.post(Endpoint.STATION_BASE_URL.getUrl(), station)
                 .jsonPath()
                 .getLong("id");
@@ -137,10 +158,29 @@ public class LineAcceptanceTest {
      * 지하철 노선을 생성하는 API를 호출하는 함수
      * </pre>
      *
+     * @param line
      * @return ExtractableResponse
      */
-    private ExtractableResponse<Response> saveStation() {
-        return RestAssuredClient.post(LINE_BASE_URL, new HashMap<String, Object>());
+    private ExtractableResponse<Response> saveLine(SaveLineRequestDto line) {
+        ExtractableResponse<Response> saveLineResponse =
+                RestAssuredClient.post(LINE_BASE_URL, line);
+        assertThat(saveLineResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        return saveLineResponse;
+    }
+
+    /**
+     * <pre>
+     * 모든 지하철 노선들을 조회하는 API를 호출하는 함수
+     * </pre>
+     *
+     * @return ExtractableResponse
+     */
+    private ExtractableResponse<Response> findLinesAll() {
+        ExtractableResponse<Response> findStationsAllResponse = RestAssuredClient.get(LINE_BASE_URL);
+        assertThat(findStationsAllResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        return findStationsAllResponse;
     }
 
 }

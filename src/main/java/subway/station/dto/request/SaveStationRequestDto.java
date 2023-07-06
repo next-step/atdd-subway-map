@@ -1,13 +1,17 @@
 package subway.station.dto.request;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import subway.station.entity.Station;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 
+@Builder
+@NoArgsConstructor
 @AllArgsConstructor
 @Getter
 public class SaveStationRequestDto {
