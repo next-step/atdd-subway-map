@@ -44,16 +44,17 @@ public class LineComponent {
                 .build();
 
         // 새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 한다.
-        if (line.getDownStation().equals(section.getUpStation())) {
+        if (!line.getDownStation().equals(section.getUpStation())) {
             throw new IllegalArgumentException("기존 노선의 하행역과 추가 하고자 하는 상행역이 일치하지 않습니다.");
         }
         // 새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없다.
         List<Station> stationsInLine = line.getStationsInSections();
-        stationsInLine.parallelStream()
+        stationsInLine.stream()
                 .filter(s -> s.equals(section.getDownStation()))
                 .findAny()
-                .ifPresent(e -> {throw new IllegalArgumentException("기존 노선에 등록된 역은 추가 하고자 하는 역이 될 수 없습니다.");});
+                .ifPresent(e -> {throw new IllegalArgumentException("기존 노선에 등록된 역은 추가 하고자 하는 구간의 역이 될 수 없습니다.");});
         line.addSection(section);
+        lineService.saveLine(line);
     }
 
 }

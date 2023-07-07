@@ -37,11 +37,11 @@ public class Line {
     @Column(nullable = false)
     private String color;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn
     private Station upStation;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn
     private Station downStation;
 
@@ -56,6 +56,7 @@ public class Line {
 
     public void addSection(Section section) {
         this.sections.add(section);
+        this.downStation = section.getDownStation();
         section.setLine(this);
     }
 

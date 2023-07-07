@@ -101,8 +101,8 @@ public class SectionAcceptanceTest extends ApiTest {
         final String appendLocation = location + "/sections";
 
         // when
-        Map<String, String> otherSectionReqeust = generateSectionRequest(stationIds.get(1), stationIds.get(3), 10L);
-        ExtractableResponse<Response> response = LineApi.appendSectionInLine(appendLocation, otherSectionReqeust);
+        Map<String, String> otherSectionRequest = generateSectionRequest(stationIds.get(1), stationIds.get(3), 10L);
+        ExtractableResponse<Response> response = LineApi.appendSectionInLine(appendLocation, otherSectionRequest);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()); // TODO: ExceptionHandler 로 에러 메시지 담아 보내기.
