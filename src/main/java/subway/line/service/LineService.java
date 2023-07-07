@@ -24,12 +24,16 @@ public class LineService {
     private final LineRepository lineRepository;
 
     @Transactional
-    public LineResponse saveLine(LineCreateRequest createRequest,
+    public Line saveLine(LineCreateRequest createRequest,
                                  Station upStation,
                                  Station downStation) {
         Line request = LineCreateRequest.to(createRequest, upStation, downStation);
-        Line line = lineRepository.save(request);
-        return LineResponse.from(line);
+        return lineRepository.save(request);
+    }
+
+    @Transactional
+    public Line saveLine(Line line) {
+        return lineRepository.save(line);
     }
 
     @Transactional

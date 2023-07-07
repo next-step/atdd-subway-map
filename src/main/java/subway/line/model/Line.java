@@ -19,6 +19,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Getter
 @Builder
@@ -44,11 +45,26 @@ public class Line {
     @JoinColumn
     private Station downStation;
 
-    @OneToMany(mappedBy = "line")
+    @Builder.Default
+    @OneToMany(mappedBy = "line", cascade = CascadeType.ALL)
     private List<Section> sections = new ArrayList<>();
 
     public void updateLine(String name, String color) {
         this.name = name;
         this.color = color;
+    }
+
+    public void addSection(Section section) {
+        this.sections.add(section);
+        section.setLine(this);
+    }
+
+    public List<Station> getStationsInSections() {
+        List<Station> stations = new ArrayList<>();
+        stations.add(this.upStation);
+        for (Section section : this.sections) {
+            stations.add(section.getDownStation());
+        }
+        return stations;
     }
 }

@@ -2,14 +2,20 @@ package subway.line.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import subway.line.dto.LineCreateRequest;
 import subway.line.dto.LineModifyRequest;
 import subway.line.dto.LineResponse;
 import subway.line.dto.SectionCreateRequest;
-import subway.line.service.LineSectionService;
+import subway.line.service.LineComponent;
 import subway.line.service.LineService;
-import subway.line.service.LineStationService;
 
 import java.net.URI;
 import java.util.List;
@@ -20,12 +26,11 @@ import java.util.List;
 public class LineController {
 
     private final LineService lineService;
-    private final LineStationService lineStationService;
-    private final LineSectionService lineSectionService;
+    private final LineComponent lineComponent;
 
     @PostMapping
     public ResponseEntity<LineResponse> createLine(@RequestBody LineCreateRequest lineRequest) {
-        LineResponse line = lineStationService.saveLine(lineRequest);
+        LineResponse line = lineComponent.createLine(lineRequest);
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
 
@@ -54,10 +59,7 @@ public class LineController {
 
     @PostMapping("/{id}/sections")
     public ResponseEntity<Void> appendSection(@PathVariable(name = "id") Long lineId, @RequestBody SectionCreateRequest request) {
-        // TODO: LineController.appendSection()
-        // 노선을 찾아서
-        // 노선에 섹션 추가하기
-        lineSectionService.appendSection(lineId, request);
+        lineComponent.appendSection(lineId, request);
         return ResponseEntity.ok().build();
     }
 

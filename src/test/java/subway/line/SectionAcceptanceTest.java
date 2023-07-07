@@ -52,14 +52,14 @@ public class SectionAcceptanceTest extends ApiTest {
 
         // then
         ExtractableResponse<Response> retrieveLineResponse = LineApi.retrieveLineByLocation(location);
-        String stationName = retrieveLineResponse.jsonPath().get("stations.name"); // TODO: jsonPath stations 로 손봐야됨.
-        assertThat(lineName).isEqualTo(stationName);
+        List<String> stationNames = retrieveLineResponse.jsonPath().getList("stations.name", String.class);
+        assertThat(stationNames.size()).isEqualTo(2);
 
     }
 
     /**
      * When 기본 노선의 구간이 있을 때
-     * Then 새로운 구간을 추가 한다.
+     * Then 노선의 하행역을 새로운 구간의 상행역으로 지정한 구간을 추가 한다.
      */
     @DisplayName("노선의 구간에 새로운 구간을 추가 한다.")
     @Test
