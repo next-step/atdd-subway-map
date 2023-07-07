@@ -1,29 +1,32 @@
-package subway;
+package subway.station;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
 public class StationService {
     private StationRepository stationRepository;
+    private StationConverter stationConverter;
 
-    public StationService(StationRepository stationRepository) {
+    public StationService(StationRepository stationRepository, StationConverter stationConverter) {
         this.stationRepository = stationRepository;
+        this.stationConverter = stationConverter;
     }
 
     @Transactional
     public StationResponse saveStation(StationRequest stationRequest) {
         Station station = stationRepository.save(new Station(stationRequest.getName()));
-        return createStationResponse(station);
+        return stationConverter.convert(station);
     }
 
     public List<StationResponse> findAllStations() {
         return stationRepository.findAll().stream()
-                .map(this::createStationResponse)
+                .map(stationConverter::convert)
                 .collect(Collectors.toList());
     }
 
@@ -32,10 +35,12 @@ public class StationService {
         stationRepository.deleteById(id);
     }
 
-    private StationResponse createStationResponse(Station station) {
-        return new StationResponse(
-                station.getId(),
-                station.getName()
-        );
+    public Station getStation(Long id) {
+        return stationRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("station is not existed by id > " + id));
+    }
+
+    public List<Station> findByIds(List<Long> stationIds) {
+        return stationRepository.findByIdIn(stationIds);
     }
 }
