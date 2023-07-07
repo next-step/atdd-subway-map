@@ -13,10 +13,6 @@ public class Station {
     @Column(length = 20, nullable = false)
     private String name;
 
-    @ManyToOne
-    @JoinColumn(name = "line_id")
-    private Line line;
-
     public Station() {
     }
 

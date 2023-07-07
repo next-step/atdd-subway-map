@@ -26,7 +26,7 @@ public class Line implements Serializable {
     @Column(nullable = false)
     private String color;
 
-    @OneToMany(mappedBy = "line")
+    @OneToMany
     private List<Station> stations;
 
     @Column
