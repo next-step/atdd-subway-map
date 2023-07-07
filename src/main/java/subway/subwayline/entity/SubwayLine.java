@@ -79,12 +79,16 @@ public class SubwayLine {
         section.addSection(this);
     }
 
-    public boolean isExistsDownStation(Station upStation) {
-        return this.downStationId.equals(upStation);
+    public void isExistsDownStation(Station upStation) {
+        if (!this.downStationId.equals(upStation)) {
+            throw new SubwayException(ErrorCode.INVALID_UP_STATION);
+        }
     }
 
-    public boolean isExistsStations(Station station) {
-        return Arrays.asList(upStationId, downStationId).contains(station);
+    public void isExistsStations(Station station) {
+        if (Arrays.asList(upStationId, downStationId).contains(station)) {
+            throw new SubwayException(ErrorCode.INVALID_DOWN_STATION);
+        }
     }
 
     public void removeSection(Station downStation) {
