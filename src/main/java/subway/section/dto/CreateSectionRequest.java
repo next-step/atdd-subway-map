@@ -4,12 +4,17 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
-@AllArgsConstructor
 public class CreateSectionRequest {
 
     private Long upStationId;
     private Long downStationId;
     private Integer distance;
+
+    public CreateSectionRequest(Long upStationId, Long downStationId, Integer distance) {
+        this.upStationId = upStationId;
+        this.downStationId = downStationId;
+        this.distance = distance;
+    }
 
     public SectionDto toDto() {
         return SectionDto.builder()
