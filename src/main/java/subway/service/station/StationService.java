@@ -1,11 +1,11 @@
-package subway.service;
+package subway.service.station;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import subway.service.request.StationRequest;
-import subway.service.response.StationResponse;
-import subway.domain.Station;
-import subway.domain.StationRepository;
+import subway.service.station.request.StationRequest;
+import subway.service.station.response.StationResponse;
+import subway.domain.station.Station;
+import subway.domain.station.StationRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,12 +22,12 @@ public class StationService {
     @Transactional
     public StationResponse saveStation(StationRequest stationRequest) {
         Station station = stationRepository.save(new Station(stationRequest.getName()));
-        return createStationResponse(station);
+        return StationResponse.of(station);
     }
 
     public List<StationResponse> findAllStations() {
         return stationRepository.findAll().stream()
-                .map(this::createStationResponse)
+                .map(StationResponse::of)
                 .collect(Collectors.toList());
     }
 
@@ -36,10 +36,4 @@ public class StationService {
         stationRepository.deleteById(id);
     }
 
-    private StationResponse createStationResponse(Station station) {
-        return new StationResponse(
-                station.getId(),
-                station.getName()
-        );
-    }
 }
