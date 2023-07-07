@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
+
 public abstract class SubwayLineAcceptanceTest extends StationAcceptanceTest{
 
     /**
@@ -76,10 +78,12 @@ public abstract class SubwayLineAcceptanceTest extends StationAcceptanceTest{
 
     protected void 지하철_노선_상세_조회_응답_비교(ExtractableResponse<Response> response, String name, String color, String upStationName, String downStationName) {
         SubwayLineResponse subwayLineResponse = response.body().as(SubwayLineResponse.class);
-        Assertions.assertThat(subwayLineResponse.getName()).isEqualTo(name);
-        Assertions.assertThat(subwayLineResponse.getColor()).isEqualTo(color);
-        Assertions.assertThat(subwayLineResponse.getStations().stream()
-                .map(SubwayLineResponse.StationResponse::getName).collect(Collectors.toList())).containsOnly(upStationName, downStationName);
+        assertSoftly(soft -> {
+            soft.assertThat(subwayLineResponse.getName()).isEqualTo(name);
+            soft.assertThat(subwayLineResponse.getColor()).isEqualTo(color);
+            soft.assertThat(subwayLineResponse.getStations().stream()
+                    .map(SubwayLineResponse.StationResponse::getName).collect(Collectors.toList())).containsOnly(upStationName, downStationName);
+        });
 
     }
 

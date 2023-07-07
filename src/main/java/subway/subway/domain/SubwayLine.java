@@ -33,7 +33,7 @@ public class SubwayLine {
 
     public SubwayLine.Id getId() {
         if (isNew()) {
-            throw new IllegalArgumentException("아직 저장되지 않은 역입니다.");
+            throw new IllegalArgumentException("아직 저장되지 않은 지하철 노선입니다.");
         }
         return id;
     }
