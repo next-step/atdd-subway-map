@@ -3,14 +3,13 @@ package subway.station;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
+import subway.RestAssuredTest;
 
 import java.util.HashMap;
 import java.util.List;
@@ -23,14 +22,7 @@ import static subway.utils.TestUtils.주어진_이름으로_지하철역을_생�
 @DisplayName("지하철역 관련 기능")
 @DirtiesContext(classMode = BEFORE_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class StationAcceptanceTest {
-    @LocalServerPort
-    private int serverPort;
-
-    @BeforeEach
-    void setUp() {
-        RestAssured.port = serverPort;
-    }
+public class StationAcceptanceTest extends RestAssuredTest {
 
     /**
      * When 지하철역을 생성하면
@@ -43,7 +35,6 @@ public class StationAcceptanceTest {
         // when
         Map<String, String> params = new HashMap<>();
         params.put("name", "강남역");
-
         ExtractableResponse<Response> response =
                 RestAssured.given().log().all()
                         .body(params)

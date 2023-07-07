@@ -1,14 +1,13 @@
 package subway.line;
 
 import io.restassured.RestAssured;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
+import subway.RestAssuredTest;
 import subway.station.Station;
 import subway.station.StationRepository;
 
@@ -25,19 +24,11 @@ import static subway.utils.TestUtils.주어진_이름으로_지하철역을_생�
 @DisplayName("지하철노선 관련 기능")
 @DirtiesContext(classMode = BEFORE_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class LineAcceptanceTest {
+public class LineAcceptanceTest extends RestAssuredTest {
     @Autowired
     private LineRepository lineRepository;
     @Autowired
     private StationRepository stationRepository;
-
-    @LocalServerPort
-    private int serverPort;
-
-    @BeforeEach
-    void setUp() {
-        RestAssured.port = serverPort;
-    }
 
 
     /**
