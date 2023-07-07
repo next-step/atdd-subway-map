@@ -49,9 +49,7 @@ public class DatabaseCleanUp {
 
         for (String tableName : tableNames) {
             entityManager
-                    .createNativeQuery(String.format("TRUNCATE TABLE %s", tableName)).executeUpdate();
-            entityManager
-                    .createNativeQuery(String.format("ALTER TABLE %s ALTER COLUMN ID RESTART WITH 1", tableName))
+                    .createNativeQuery(String.format("TRUNCATE TABLE %s", tableName))
                     .executeUpdate();
         }
 
