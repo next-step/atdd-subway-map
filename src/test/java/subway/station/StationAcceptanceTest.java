@@ -17,7 +17,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD;
-import static subway.utils.TestUtils.주어진_이름으로_지하철역을_생성한다;
+import static subway.utils.StationTestUtils.주어진_이름으로_지하철역을_생성한다;
 
 @DisplayName("지하철역 관련 기능")
 @DirtiesContext(classMode = BEFORE_EACH_TEST_METHOD)

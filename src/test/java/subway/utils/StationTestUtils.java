@@ -8,7 +8,7 @@ import org.springframework.http.MediaType;
 import java.util.HashMap;
 import java.util.Map;
 
-public class TestUtils {
+public class StationTestUtils {
     public static Long 주어진_이름으로_지하철역을_생성한다(String name) {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
