@@ -1,6 +1,10 @@
 package subway.line;
 
 import io.restassured.RestAssured;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
+import org.apache.http.HttpStatus;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,11 +49,20 @@ public class LineAcceptanceTest extends RestAssuredTest {
                 = new LineCreateRequest("신분당선", "bg-red-600", gangnamStationId, pangyoStationId, 10);
 
         //when
-        Line line = 지하철_노선을_등록_api를_호출한다(lineCreateRequest);
+        ExtractableResponse<Response> response = 지하철_노선을_등록_api를_호출한다(lineCreateRequest);
 
         //then
+        지하철_노선_등록_api_응답코드를_검증한다(response.statusCode());
+        지하철_노선_등록이_정상적인지_검증한다(((Number) response.jsonPath().get("id")).longValue());
+    }
+
+    void 지하철_노선_등록이_정상적인지_검증한다(Long targetId) {
         List<Line> lines = lineRepository.findAll();
-        assertThat(lines.get(0).getId()).isEqualTo(line.getId());
+        assertThat(lines.get(0).getId()).isEqualTo(targetId);
+    }
+
+    void 지하철_노선_등록_api_응답코드를_검증한다(int statusCode) {
+        assertThat(statusCode).isEqualTo(HttpStatus.SC_CREATED);
     }
 
     Line 지하철_노선을_등록한다(LineCreateRequest lineCreateRequest) {
@@ -71,14 +84,13 @@ public class LineAcceptanceTest extends RestAssuredTest {
         return stationRepository.findById(id).get();
     }
 
-    Line 지하철_노선을_등록_api를_호출한다(LineCreateRequest lineCreateRequest) {
-        Line response = RestAssured.given().log().all()
+    ExtractableResponse<Response> 지하철_노선을_등록_api를_호출한다(LineCreateRequest lineCreateRequest) {
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .body(lineCreateRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/lines")
                 .then().log().all()
-                .extract()
-                .as(Line.class);
+                .extract();
 
         return response;
     }
