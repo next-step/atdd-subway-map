@@ -33,7 +33,7 @@ public class SectionService {
         validationStation(subwayLine, upStation, downStation);
 
         // 신귶 구간 등록
-        subwayLine.addSection(sectionDto.toEntity(subwayLine, upStation, downStation, sectionDto.getDistance()));
+        subwayLine.addSection(sectionDto.toEntity(subwayLine, upStation, downStation));
     }
 
     public void removeSection(Long lineId, Long stationId) {

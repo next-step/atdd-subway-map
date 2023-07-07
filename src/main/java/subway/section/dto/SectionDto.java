@@ -22,7 +22,7 @@ public class SectionDto {
         this.distance = distance;
     }
 
-    public Section toEntity(SubwayLine subwayLine, Station upStation, Station downStation, Integer distance) {
+    public Section toEntity(SubwayLine subwayLine, Station upStation, Station downStation) {
         return Section.builder()
                 .subwayLine(subwayLine)
                 .upStation(upStation)
