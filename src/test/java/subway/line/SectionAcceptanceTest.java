@@ -52,7 +52,7 @@ public class SectionAcceptanceTest extends ApiTest {
 
         // then
         ExtractableResponse<Response> retrieveLineResponse = LineApi.retrieveLineByLocation(location);
-        String stationName = retrieveLineResponse.jsonPath().get("name"); // TODO: jsonPath stations 로 손봐야됨.
+        String stationName = retrieveLineResponse.jsonPath().get("stations.name"); // TODO: jsonPath stations 로 손봐야됨.
         assertThat(lineName).isEqualTo(stationName);
 
     }
@@ -97,7 +97,8 @@ public class SectionAcceptanceTest extends ApiTest {
     @Test
     void appendStationToMiddleOfSection() {
         // given
-        compositeCreateLineWithThreeStation();
+        final String location = compositeCreateLineWithThreeStation();
+        final String appendLocation = location + "/sections";
 
         // when
         Map<String, String> otherSectionReqeust = generateSectionRequest(stationIds.get(1), stationIds.get(3), 10L);
@@ -107,7 +108,7 @@ public class SectionAcceptanceTest extends ApiTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()); // TODO: ExceptionHandler 로 에러 메시지 담아 보내기.
     }
 
-    private void compositeCreateLineWithThreeStation() {
+    private String compositeCreateLineWithThreeStation() {
         final String lineName = "2호선";
         Map<String, String> stringStringMap = LineUtils.generateLineCreateRequest(lineName, "bg-blue-600", stationIds.get(0), stationIds.get(1), 10L);
         ExtractableResponse<Response> createLineResponse = LineApi.createLine(stringStringMap);
@@ -115,6 +116,7 @@ public class SectionAcceptanceTest extends ApiTest {
         final String appendLocation = location + "/sections";
         Map<String, String> sectionRequest = generateSectionRequest(stationIds.get(1), stationIds.get(2), 10L);
         LineApi.appendSectionInLine(appendLocation, sectionRequest);
+        return location;
     }
 
     /**
@@ -126,7 +128,8 @@ public class SectionAcceptanceTest extends ApiTest {
     @Test
     void appendSectionWithDownStation() {
         // given
-        compositeCreateLineWithThreeStation();
+        final String location = compositeCreateLineWithThreeStation();
+        final String appendLocation = location + "/sections";
 
         // when
         Map<String, String> otherSectionReqeust = generateSectionRequest(stationIds.get(2), stationIds.get(1), 10L);
@@ -149,11 +152,12 @@ public class SectionAcceptanceTest extends ApiTest {
     @Test
     void deleteStationInSection() {
         // given
-        compositeCreateLineWithThreeStation();
+        final String location = compositeCreateLineWithThreeStation();
+        final String appendLocation = location + "/sections";
 
         // when
-        final Long deleteLocation = stationIds.get(2);
-        ExtractableResponse<Response> response = LineApi.removeSectionInLine(deleteLocation);
+        final Long stationId = stationIds.get(2);
+        ExtractableResponse<Response> response = LineApi.removeSectionInLine(appendLocation, stationId);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
@@ -173,11 +177,12 @@ public class SectionAcceptanceTest extends ApiTest {
     @Test
     void deleteStationInMiddleOfSection() {
         // given
-        compositeCreateLineWithThreeStation();
+        final String location = compositeCreateLineWithThreeStation();
+        final String appendLocation = location + "/sections";
 
         // when
-        final Long deleteLocation = stationIds.get(1);
-        ExtractableResponse<Response> response = LineApi.removeSectionInLine(deleteLocation);
+        final Long stationId = stationIds.get(1);
+        ExtractableResponse<Response> response = LineApi.removeSectionInLine(appendLocation, stationId);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()); // TODO: ExceptionHandler 로 에러 메시지 담아 보내기.
@@ -193,15 +198,16 @@ public class SectionAcceptanceTest extends ApiTest {
     @Test
     void deleteStationFromMinimalSection() {
         // given
-        compositeCreateLineWithThreeStation();
+        String location = compositeCreateLineWithThreeStation();
+        final String appendLocation = location + "/sections";
 
         // when
-        final Long deleteLocation = stationIds.get(2);
-        LineApi.removeSectionInLine(deleteLocation);
+        final Long stationId = stationIds.get(2);
+        LineApi.removeSectionInLine(appendLocation, stationId);
 
         // when
         final Long additionalDeleteLocation = stationIds.get(1);
-        ExtractableResponse<Response> response = LineApi.removeSectionInLine(additionalDeleteLocation);
+        ExtractableResponse<Response> response = LineApi.removeSectionInLine(appendLocation, additionalDeleteLocation);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()); // TODO: ExceptionHandler 로 에러 메시지 담아 보내기.

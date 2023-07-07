@@ -44,8 +44,8 @@ public class Line {
     @JoinColumn
     private Station downStation;
 
-    @Column(nullable = false)
-    private Long distance;
+    @OneToMany(mappedBy = "line")
+    private List<Section> sections = new ArrayList<>();
 
     public void updateLine(String name, String color) {
         this.name = name;

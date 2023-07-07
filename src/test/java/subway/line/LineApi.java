@@ -4,6 +4,8 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.MediaType;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.Map;
 
@@ -50,9 +52,13 @@ public class LineApi {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> removeSectionInLine(final Long deleteLocation) {
+    public static ExtractableResponse<Response> removeSectionInLine(final String baseUri, final Long deleteLocation) {
+        UriComponents deleteQueryWithBaseUri = UriComponentsBuilder
+                .fromUriString(baseUri)
+                .queryParam("stationId", deleteLocation)
+                .build();
         return RestAssured.given().log().all()
-                .when().delete(String.valueOf(deleteLocation))
+                .when().delete(deleteQueryWithBaseUri.toUri())
                 .then().log().all()
                 .extract();
     }

@@ -38,7 +38,6 @@ public class LineCreateRequest {
                 .color(request.getColor())
                 .upStation(upStation)
                 .downStation(downStation)
-                .distance(request.getDistance())
                 .build();
     }
 }

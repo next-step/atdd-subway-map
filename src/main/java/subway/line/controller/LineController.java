@@ -2,17 +2,12 @@ package subway.line.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import subway.line.dto.LineCreateRequest;
 import subway.line.dto.LineModifyRequest;
 import subway.line.dto.LineResponse;
+import subway.line.dto.SectionCreateRequest;
+import subway.line.service.LineSectionService;
 import subway.line.service.LineService;
 import subway.line.service.LineStationService;
 
@@ -26,6 +21,7 @@ public class LineController {
 
     private final LineService lineService;
     private final LineStationService lineStationService;
+    private final LineSectionService lineSectionService;
 
     @PostMapping
     public ResponseEntity<LineResponse> createLine(@RequestBody LineCreateRequest lineRequest) {
@@ -55,4 +51,21 @@ public class LineController {
         lineService.deleteLineById(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/{id}/sections")
+    public ResponseEntity<Void> appendSection(@PathVariable(name = "id") Long lineId, @RequestBody SectionCreateRequest request) {
+        // TODO: LineController.appendSection()
+        // 노선을 찾아서
+        // 노선에 섹션 추가하기
+        lineSectionService.appendSection(lineId, request);
+        return ResponseEntity.ok().build();
+    }
+
+//    @DeleteMapping("/{id}/sections")
+//    public ResponseEntity<Void> deleteSection(@PathVariable(name = "id") Long lineId, @RequestParam(name = "stationId") Long stationId) {
+//        // TODO: LineController.deleteSection()
+//        return ResponseEntity.noContent().build();
+//    }
+
+
 }

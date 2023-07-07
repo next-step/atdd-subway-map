@@ -50,7 +50,7 @@ public class LineService {
                 .orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_MESSAGE));
     }
 
-    private Line findLineById(Long id) {
+    public Line findLineById(Long id) {
         return lineRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_MESSAGE));
     }
