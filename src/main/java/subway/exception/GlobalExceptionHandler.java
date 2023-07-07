@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(SubwayException.class)
-    public ResponseEntity<Object> handleBadRequestException(SubwayException subwayException) {
+    public ResponseEntity<ErrorResponse> handleBadRequestException(SubwayException subwayException) {
         ErrorResponse errorResponse = new ErrorResponse(subwayException.getErrorCode().getStatus(), subwayException.getErrorCode().getMessage());
         return new ResponseEntity<>(errorResponse, subwayException.getErrorCode().getStatus());
     }
