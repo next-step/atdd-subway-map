@@ -13,16 +13,8 @@ public class SectionService {
 
     private final SectionRepository sectionRepository;
 
-    public Section saveSection(Line line,
-                               Station upStation,
-                               Station downStation,
-                               Long distance) {
-        Section section = Section.builder()
-                .downStation(downStation)
-                .upStation(upStation)
-                .line(line)
-                .distance(distance)
-                .build();
-        return sectionRepository.save(section);
+
+    public void delete(Section section) {
+        sectionRepository.delete(section);
     }
 }

@@ -9,17 +9,14 @@ import subway.station.model.Station;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Getter
 @Builder
@@ -27,6 +24,9 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Line {
+
+    private final long MINIMAL_SECTION_SIZE = 2L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -67,5 +67,19 @@ public class Line {
             stations.add(section.getDownStation());
         }
         return stations;
+    }
+
+    public Section deleteSectionByStation(Station station) {
+        if (this.sections.size() < MINIMAL_SECTION_SIZE) {
+            throw new IllegalArgumentException("구간은 " + MINIMAL_SECTION_SIZE + "개 이하일 수 없습니다.");
+        }
+        if (!this.downStation.equals(station)) {
+            throw new IllegalArgumentException("마지막 구간만 삭제 할 수 있습니다.");
+        }
+        final int lastElementIndex = this.sections.size() - 1;
+        Section lastSection = this.sections.get(lastElementIndex);
+        this.downStation = lastSection.getUpStation();
+        this.sections.remove(lastSection);
+        return lastSection;
     }
 }

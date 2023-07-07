@@ -9,11 +9,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import subway.line.dto.LineCreateRequest;
 import subway.line.dto.LineModifyRequest;
 import subway.line.dto.LineResponse;
 import subway.line.dto.SectionCreateRequest;
+import subway.line.dto.SectionDeleteRequest;
 import subway.line.service.LineComponent;
 import subway.line.service.LineService;
 
@@ -63,11 +65,15 @@ public class LineController {
         return ResponseEntity.ok().build();
     }
 
-//    @DeleteMapping("/{id}/sections")
-//    public ResponseEntity<Void> deleteSection(@PathVariable(name = "id") Long lineId, @RequestParam(name = "stationId") Long stationId) {
-//        // TODO: LineController.deleteSection()
-//        return ResponseEntity.noContent().build();
-//    }
+    @DeleteMapping("/{id}/sections")
+    public ResponseEntity<Void> deleteSection(@PathVariable(name = "id") Long lineId, @RequestParam(name = "stationId") Long stationId) {
+        SectionDeleteRequest request = SectionDeleteRequest.builder()
+                .stationId(stationId)
+                .lineId(lineId)
+                .build();
+        lineComponent.deleteSectionByStationId(request);
+        return ResponseEntity.noContent().build();
+    }
 
 
 }

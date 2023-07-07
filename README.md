@@ -18,3 +18,17 @@
 - [x] 지하철 노선 조회
 - [x] 지하철 노선 수정
 - [x] 지하철 노선 삭제
+
+### week 1-3 : 지하철 구간 관리
+
+- [ ] 지하철 구간 등록 기능
+- [ ] 지하철 구간 삭제 기능
+
+#### Todo
+- [ ] ControllerAdvice: ExceptionHandler
+- [ ] Exception Message Enum
+- [ ] private code sequence
+- [ ] test: station create literal
+- [ ] test: `@MethodResource`
+- [ ] change `LineUtils` name
+- [ ] Component scan scope slicing

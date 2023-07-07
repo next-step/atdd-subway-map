@@ -38,7 +38,7 @@ public class StationService {
         stationRepository.deleteById(id);
     }
 
-    public Station findEntityById(Long id) {
+    public Station findStationById(Long id) {
         return stationRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_MESSAGE));
     }
