@@ -14,7 +14,6 @@ import subway.line.infra.LineRepository;
 import subway.line.infra.LineStationRepository;
 import subway.station.controller.dto.StationResponse;
 import subway.station.domain.Station;
-import subway.station.domain.StationList;
 import subway.station.service.StationService;
 
 @Service
@@ -38,11 +37,11 @@ public class LineService {
         Line savedLine = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor()));
 
         List<Long> stationIds = Arrays.asList(lineRequest.getUpStationId(), lineRequest.getDownStationId());
-        StationList stations = stationService.findStationsByIdList(stationIds);
-        List<LineStationConnection> connections = stations.connectLineWithStation(savedLine);
+        List<Station> stations = stationService.findStationsByIdList(stationIds);
+        List<LineStationConnection> connections = LineStationConnection.createConnectionsList(stations, savedLine);
         lineStationRepository.saveAll(connections);
 
-        return createLineResponse(savedLine, stations.getStations());
+        return createLineResponse(savedLine, stations);
     }
 
     public List<LineResponse> findAllLines() {

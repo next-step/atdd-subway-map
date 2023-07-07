@@ -1,5 +1,7 @@
 package subway.line.domain;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -24,6 +26,11 @@ public class LineStationConnection {
     public LineStationConnection(Line line, Station station) {
         this.line = line;
         this.station = station;
+    }
+
+    public static List<LineStationConnection> createConnectionsList(List<Station> stations, Line line) {
+        return stations.stream()
+                .map(station -> new LineStationConnection(line, station)).collect(Collectors.toList());
     }
 
     public Line getLine() {
