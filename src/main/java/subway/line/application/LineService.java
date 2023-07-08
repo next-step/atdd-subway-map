@@ -11,6 +11,7 @@ import subway.line.dto.LineResponse;
 import subway.line.dto.LineUpdateRequest;
 import subway.line.exception.LineNotFoundException;
 import subway.section.domain.Section;
+import subway.section.domain.SectionRepository;
 import subway.station.domain.Station;
 import subway.station.domain.StationRepository;
 import subway.station.exception.StationNotFoundException;
@@ -20,10 +21,12 @@ import subway.station.exception.StationNotFoundException;
 public class LineService {
     private final LineRepository lineRepository;
     private final StationRepository stationRepository;
+    private final SectionRepository sectionRepository;
 
-    public LineService(LineRepository lineRepository, StationRepository stationRepository) {
+    public LineService(LineRepository lineRepository, StationRepository stationRepository, SectionRepository sectionRepository) {
         this.lineRepository = lineRepository;
         this.stationRepository = stationRepository;
+        this.sectionRepository = sectionRepository;
     }
 
     @Transactional
@@ -34,8 +37,9 @@ public class LineService {
         Line line = new Line(lineCreateRequest.getName(), lineCreateRequest.getColor());
         lineRepository.save(line);
 
+        //TODO: 지하철 노선을 처음 등록할 때, 굳이 Section이 한 개 등록될 필요가 있을까?
         Section section = new Section(line, upStation, downStation, lineCreateRequest.getDistance());
-        line.addSection(section);
+        sectionRepository.save(section);
 
         return LineResponse.of(line);
     }
@@ -70,6 +74,9 @@ public class LineService {
     @Transactional
     public void deleteLine(Long id) {
         Line line = getLine(id);
+        List<Section> sections = line.getSections();
+
+        sectionRepository.deleteAll(sections);
         lineRepository.delete(line);
     }
 }

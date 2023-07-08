@@ -1,6 +1,5 @@
 package subway.section.domain;
 
-import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -78,7 +77,19 @@ public class Section {
         return distance;
     }
 
-    public List<Station> getStations() {
-        return List.of(upStation, downStation);
+    public Long getUpStationId() {
+        return upStation.getId();
+    }
+
+    public String getUpStationName() {
+        return upStation.getName();
+    }
+
+    public Long getDownStationId() {
+        return downStation.getId();
+    }
+
+    public String getDownStationName() {
+        return downStation.getName();
     }
 }

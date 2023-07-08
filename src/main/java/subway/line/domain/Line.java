@@ -2,14 +2,12 @@ package subway.line.domain;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import subway.section.domain.Section;
-import subway.station.domain.Station;
 
 /**
  * - 노선은 "여러 개의 순서가 있는" 역을 가질 수 있다.
@@ -62,9 +60,7 @@ public class Line {
         return color;
     }
 
-    public List<Station> getStations() {
-        return sections.stream()
-                .flatMap(section -> section.getStations().stream())
-                .collect(Collectors.toList());
+    public List<Section> getSections() {
+        return sections;
     }
 }

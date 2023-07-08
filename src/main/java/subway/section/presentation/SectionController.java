@@ -10,9 +10,6 @@ import subway.section.application.SectionService;
 import subway.section.dto.SectionRequest;
 import subway.section.dto.SectionResponse;
 
-/**
- * TODO: 도메인 모델을 다시 한번 생각 해보자...
- */
 @RequestMapping("/lines/{lineId}")
 @RestController
 public class SectionController {  //TODO 해당 API는 lines의 하위에 있다고 볼 수 있는데, 이렇게 분리하는게 맞는지, LineController에서 하는게 맞는지

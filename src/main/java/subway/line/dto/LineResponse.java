@@ -8,26 +8,27 @@ public class LineResponse {
     private final Long id;
     private final String name;
     private final String color;
-    private final List<StationOnLineResponse> stations;
+    private final List<SectionOnLineResponse> sections;
 
     public static LineResponse of(Line line) {
-        List<StationOnLineResponse> stationOnLineResponses = line.getStations().stream()
-                .map(StationOnLineResponse::of)
+        List<SectionOnLineResponse> sectionOnLineResponses = line.getSections().stream()
+                .map(SectionOnLineResponse::of)
                 .collect(Collectors.toList());
+
 
         return new LineResponse(
                 line.getId(),
                 line.getName(),
                 line.getColor(),
-                stationOnLineResponses
+                sectionOnLineResponses
         );
     }
 
-    public LineResponse(Long id, String name, String color, List<StationOnLineResponse> stations) {
+    public LineResponse(Long id, String name, String color, List<SectionOnLineResponse> sections) {
         this.id = id;
         this.name = name;
         this.color = color;
-        this.stations = stations;
+        this.sections = sections;
     }
 
     public Long getId() {
@@ -42,7 +43,7 @@ public class LineResponse {
         return color;
     }
 
-    public List<StationOnLineResponse> getStations() {
-        return stations;
+    public List<SectionOnLineResponse> getSections() {
+        return sections;
     }
 }
