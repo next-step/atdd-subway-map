@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import subway.domain.Station;
 import subway.domain.StationLine;
 import subway.exception.StationLineSectionCreateException;
+import subway.exception.StationLineSectionDeleteException;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -131,5 +132,63 @@ public class StationLineMockTest {
 
         Assertions.assertEquals(bStation, lineLastDownStation);
         Assertions.assertFalse(line.getAllStations().contains(cStation));
+    }
+
+    @DisplayName("삭제하려는 구간의 역이 지하철 노선의 하행 종점역이 아닌 경우 애러")
+    @Test
+    void deleteStationLineSection_Not_lastDownStation() {
+        //given
+        final Station aStation = new Station("aStation");
+        final Station bStation = new Station("bStation");
+        final Station cStation = new Station("cStation");
+
+        createEntityTestIds(List.of(aStation, bStation, cStation), 1L);
+
+        final StationLine line = StationLine.builder()
+                .name("1호선")
+                .color("blue")
+                .upStation(aStation)
+                .downStation(bStation)
+                .distance(BigDecimal.TEN)
+                .build();
+
+        line.createSection(bStation, cStation, BigDecimal.ONE);
+
+        createEntityTestId(line, 1L);
+        createEntityTestIds(line.getSections(), 1L);
+
+        //when & then
+        final Throwable throwable = Assertions.assertThrows(StationLineSectionDeleteException.class,
+                () -> line.deleteSection(bStation));
+
+        Assertions.assertEquals("target section must be last station of line", throwable.getMessage());
+    }
+
+
+    @DisplayName("삭제하려는 구간의 지하철 노선이 2개의 역만 가진 노선일 경우 애러")
+    @Test
+    void deleteStationLineSection_has_2_StationLine() {
+        //given
+        final Station aStation = new Station("aStation");
+        final Station bStation = new Station("bStation");
+
+        createEntityTestIds(List.of(aStation, bStation), 1L);
+
+        final StationLine line = StationLine.builder()
+                .name("1호선")
+                .color("blue")
+                .upStation(aStation)
+                .downStation(bStation)
+                .distance(BigDecimal.TEN)
+                .build();
+
+        createEntityTestId(line, 1L);
+        createEntityTestIds(line.getSections(), 1L);
+
+        //when & then
+        final Throwable throwable = Assertions.assertThrows(StationLineSectionDeleteException.class,
+                () -> line.deleteSection(bStation));
+
+        Assertions.assertEquals("section must be greater or equals than 2", throwable.getMessage());
     }
 }
