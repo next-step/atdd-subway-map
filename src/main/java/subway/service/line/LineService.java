@@ -4,12 +4,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.domain.line.Line;
 import subway.domain.line.LineRepository;
+import subway.domain.station.Station;
 import subway.domain.station.StationRepository;
 import subway.exception.LineNotFoundException;
 import subway.exception.StationNotFoundException;
 import subway.service.line.request.LineCreateRequest;
 import subway.service.line.request.LineModifyRequest;
 import subway.service.line.response.LineResponse;
+import subway.service.line.request.SectionAddRequest;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -62,6 +64,29 @@ public class LineService {
     @Transactional
     public void deleteLine(Long id) {
         lineRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void addSection(Long lineId, SectionAddRequest sectionAddRequest) {
+        Station upStation = stationRepository.findById(sectionAddRequest.getUpStationId())
+                .orElseThrow(StationNotFoundException::new);
+
+        Station downStation = stationRepository.findById(sectionAddRequest.getDownStationId())
+                .orElseThrow(StationNotFoundException::new);
+
+        lineRepository.findById(lineId)
+                .orElseThrow(LineNotFoundException::new)
+                .addSection(upStation, downStation, sectionAddRequest.getDistance());
+    }
+
+    @Transactional
+    public void deleteSection(Long lineId, Long stationId) {
+        Station station = stationRepository.findById(stationId)
+                .orElseThrow(StationNotFoundException::new);
+
+        lineRepository.findById(lineId)
+                .orElseThrow(LineNotFoundException::new)
+                .removeSection(station);
     }
 
 }
