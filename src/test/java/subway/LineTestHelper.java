@@ -9,6 +9,8 @@ import org.springframework.http.MediaType;
 import org.springframework.lang.Nullable;
 import subway.line.LineRequest;
 import subway.line.LineResponse;
+import subway.section.SectionRequest;
+import subway.section.SectionResponse;
 
 import java.util.List;
 
@@ -71,5 +73,20 @@ public class LineTestHelper {
 
     assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     return response.body().as(LineResponse.class);
+  }
+
+  public static SectionResponse createSection(Long lineId, Long upStationId, Long downStationId, long distance) {
+    ExtractableResponse<Response> response = RestAssured
+        .given()
+          .log().all()
+          .body(new SectionRequest(upStationId, downStationId, distance))
+          .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+          .post("/lines/{id}/sections", lineId)
+        .then()
+          .log().all()
+          .extract();
+
+    return response.body().as(SectionResponse.class);
   }
 }

@@ -1,11 +1,18 @@
 package subway.line;
 
+import subway.Station;
+import subway.StationNotFoundException;
+import subway.section.Section;
+
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 @Entity
 public class Line {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -19,24 +26,24 @@ public class Line {
         return distance;
     }
 
-    public List<LineStation> getLineStations() {
-        return lineStations;
+    public List<Section> getSections() {
+        return sections;
     }
 
     @Column(nullable = false)
     private Long distance = 0L;
 
     @OneToMany(mappedBy = "line")
-    private List<LineStation> lineStations;
+    private List<Section> sections;
 
     protected Line() {
     }
 
-    public Line(final String name, final String color, final Long distance, final List<LineStation> lineStations) {
+    public Line(final String name, final String color, final Long distance, final List<Section> sections) {
         this.name = name;
         this.color = color;
         this.distance = distance;
-        this.lineStations = lineStations;
+        this.sections = sections;
     }
 
     public Line(final String name, final String color, final Long distance) {
@@ -58,5 +65,33 @@ public class Line {
     public void update(String name, String color) {
         this.name = name;
         this.color = color;
+    }
+
+    public boolean isLastStation(Station station) {
+        Optional<Section> optionalSection = this.sections
+                .stream()
+                .max(Comparator.naturalOrder());
+
+        return optionalSection.map(section -> section.getDownStation().equals(station)).orElse(true);
+    }
+
+    public Long getNextSequence() {
+        Optional<Section> optionalSection = this.sections
+                .stream()
+                .max(Comparator.naturalOrder());
+
+        return optionalSection.map(section -> section.getSequence() + 1).orElse(1L);
+    }
+
+    public void addSection(Section section) {
+        this.sections.add(section);
+    }
+
+    public Section getLastSection() {
+        Optional<Section> optionalSection = this.sections
+                .stream()
+                .max(Comparator.naturalOrder());
+
+        return optionalSection.orElseThrow();
     }
 }

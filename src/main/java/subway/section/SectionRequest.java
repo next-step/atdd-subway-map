@@ -1,24 +1,17 @@
 package subway.section;
 
 public class SectionRequest {
-  private Long downStationId;
   private Long upStationId;
+  private Long downStationId;
   private Long distance;
 
-  public boolean isValid() {
-    if (downStationId == null) {
-      return false;
-    }
+  public SectionRequest() {
+  }
 
-    if (upStationId == null) {
-      return false;
-    }
-
-    if (distance == null) {
-      return false;
-    }
-
-    return true;
+  public SectionRequest(final Long upStationId, final Long downStationId, final Long distance) {
+      this.upStationId = upStationId;
+      this.downStationId = downStationId;
+      this.distance = distance;
   }
 
   public Long getDownStationId() {
