@@ -2,16 +2,14 @@ package subway.section;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.util.Map;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import subway.AcceptanceTest;
-import subway.line.LineRequest;
+import subway.line.LineStep;
 import subway.station.StationStep;
 
 /**
@@ -27,20 +25,16 @@ import subway.station.StationStep;
  */
 @DisplayName("지하철 구간 관련 기능")
 public class SectionAcceptanceTest extends AcceptanceTest {
+    /*
+      # 구간 등록 기능
+      ## 요구사항
+      - 지하철 노선에 구간을 등록한다.
+      - 새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 한다. 즉, 새로운 구간이 등록될 때, "기존 구간의 하행역 == 새로운 구간의 상행 역"이여야 등록 가능하다.
+      - 새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없다. -> 하행역이 N개가 될 수 있으므로..
+      - 새로운 구간 등록시 위 조건에 부합하지 않는 경우 에러 처리한다.
+     */
+
     /**
-     * # 구간 등록 기능
-     * ## 요구사항
-     * - 지하철 노선에 구간을 등록한다.
-     * - 새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 한다. 즉, 새로운 구간이 등록될 때, "기존 구간의 하행역 == 새로운 구간의 상행 역"이여야 등록 가능하다.
-     * - 새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없다. -> 하행역이 N개가 될 수 있으므로..
-     * - 새로운 구간 등록시 위 조건에 부합하지 않는 경우 에러 처리한다.
-     * ## Request
-     * - POST /lines/{lineId}/sections
-     * - application/json
-     * - "downStationId" : 하행 역의 id
-     * - "upStationId" : 상행 역의 id
-     * - "distance" : 하행 역과 상행 역 간의 거리
-     * ## 시나리오
      * Given : 지하철역을 3개 생성하고
      * And : 지하철 노선을 1개 생성한 후
      * When : 새로운 구간을 등록하면
@@ -54,32 +48,24 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         long 노선_하행_Id = 응답_결과에서_Id를_추출한다(StationStep.지하철역을_생성한다("양재역"));
         long 구간_하행_Id = 응답_결과에서_Id를_추출한다(StationStep.지하철역을_생성한다("양재시민의숲역"));
 
-        long lineId = 응답_결과에서_Id를_추출한다(LineRequest.지하철_노선을_생성한다(노선_상행_Id, 노선_하행_Id, "신분당선"));
+        long lineId = 응답_결과에서_Id를_추출한다(LineStep.지하철_노선을_생성한다(노선_상행_Id, 노선_하행_Id, "신분당선"));
 
         // when
-        Map<String, ? extends Number> params = Map.of(
-                "upStationId", 노선_하행_Id,
-                "downStationId", 구간_하행_Id,
-                "distance", 10
-        );
-
-        ExtractableResponse<Response> createSectionResponse = RestAssured.given().log().all()
-                .pathParam("lineId", lineId)
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines/{lineId}/sections")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> createSectionResponse = SectionStep.지하철_노선_구간을_등록한다(lineId, 노선_하행_Id, 구간_하행_Id);
 
         // then
         assertThat(createSectionResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
-        ExtractableResponse<Response> showLineResponse = LineRequest.지하철_노선을_조회한다(lineId);
-        assertThat(showLineResponse.jsonPath().getList("sections")).hasSize(2);  // section을 두 개 가지고있어야 한다.
+        ExtractableResponse<Response> showLineResponse = LineStep.지하철_노선을_조회한다(lineId);
+        assertThat(지하철_구간_목록을_추출한다(showLineResponse)).hasSize(2);
     }
 
     private long 응답_결과에서_Id를_추출한다(ExtractableResponse<Response> responseOfCreateStation) {
         return responseOfCreateStation.jsonPath().getLong("id");
+    }
+
+    private List<Object> 지하철_구간_목록을_추출한다(ExtractableResponse<Response> showLineResponse) {
+        return showLineResponse.jsonPath().getList("sections");
     }
 
     /**

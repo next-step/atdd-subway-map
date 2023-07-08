@@ -7,8 +7,8 @@ import java.util.Map;
 import org.springframework.http.MediaType;
 import subway.station.StationStep;
 
-public class LineRequest {
-    private LineRequest() {
+public class LineStep {
+    private LineStep() {
     }
 
     public static ExtractableResponse<Response> 지하철_노선을_생성한다(String upStationName, String downStationName, String lineName) {

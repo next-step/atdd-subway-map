@@ -21,13 +21,13 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void createLine() {
         // when
         String lineName = "신분당선";
-        ExtractableResponse<Response> responseOfCreate = LineRequest.지하철_노선을_생성한다("강남역", "역삼역", lineName);
+        ExtractableResponse<Response> responseOfCreate = LineStep.지하철_노선을_생성한다("강남역", "역삼역", lineName);
 
         // then
         assertThat(responseOfCreate.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         long createdLineId = 지하철_노선_Id를_추출한다(responseOfCreate);
-        ExtractableResponse<Response> responseOfRead = LineRequest.지하철_노선을_조회한다(createdLineId);
+        ExtractableResponse<Response> responseOfRead = LineStep.지하철_노선을_조회한다(createdLineId);
 
         String findLineName = 지하철_노선_이름을_추출한다(responseOfRead);
         assertThat(findLineName).isEqualTo(lineName);
@@ -50,11 +50,11 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void findAllLines() {
         // given
-        LineRequest.지하철_노선을_생성한다("강남역", "양재역", "신분당선");
-        LineRequest.지하철_노선을_생성한다("가양역", "여의도역", "9호선");
+        LineStep.지하철_노선을_생성한다("강남역", "양재역", "신분당선");
+        LineStep.지하철_노선을_생성한다("가양역", "여의도역", "9호선");
 
         // when
-        ExtractableResponse<Response> response = LineRequest.지하철_노선_목록을_조회한다();
+        ExtractableResponse<Response> response = LineStep.지하철_노선_목록을_조회한다();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -74,11 +74,11 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void findLine() {
         // given
-        ExtractableResponse<Response> responseOfCreateLine = LineRequest.지하철_노선을_생성한다("강남역", "양재역", "신분당선");
+        ExtractableResponse<Response> responseOfCreateLine = LineStep.지하철_노선을_생성한다("강남역", "양재역", "신분당선");
 
         // when
         long lineId = 지하철_노선_Id를_추출한다(responseOfCreateLine);
-        ExtractableResponse<Response> responseOfFindLine = LineRequest.지하철_노선을_조회한다(lineId);
+        ExtractableResponse<Response> responseOfFindLine = LineStep.지하철_노선을_조회한다(lineId);
 
         // then
         assertThat(responseOfFindLine.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -94,18 +94,18 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
-        ExtractableResponse<Response> responseOfCreateLine = LineRequest.지하철_노선을_생성한다("강남역", "양재역", "신분당선");
+        ExtractableResponse<Response> responseOfCreateLine = LineStep.지하철_노선을_생성한다("강남역", "양재역", "신분당선");
 
         // when
         long lineId = 지하철_노선_Id를_추출한다(responseOfCreateLine);
         String lineNameForUpdate = "구분당선";
         String lineColorForUpdate = "bg-sky-500";
-        ExtractableResponse<Response> responseOfUpdateLine = LineRequest.지하철_노선을_수정한다(lineId, lineNameForUpdate, lineColorForUpdate);
+        ExtractableResponse<Response> responseOfUpdateLine = LineStep.지하철_노선을_수정한다(lineId, lineNameForUpdate, lineColorForUpdate);
 
         // then
         assertThat(responseOfUpdateLine.statusCode()).isEqualTo(HttpStatus.OK.value());
 
-        ExtractableResponse<Response> responseOfShowLine = LineRequest.지하철_노선을_조회한다(lineId);
+        ExtractableResponse<Response> responseOfShowLine = LineStep.지하철_노선을_조회한다(lineId);
         assertThat(지하철_노선_이름을_추출한다(responseOfShowLine)).isEqualTo(lineNameForUpdate);
         assertThat(지하철_노선_색상을_추출한다(responseOfShowLine)).isEqualTo(lineColorForUpdate);
     }
@@ -123,16 +123,16 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        ExtractableResponse<Response> responseOfCreateLine = LineRequest.지하철_노선을_생성한다("강남역", "양재역", "신분당선");
+        ExtractableResponse<Response> responseOfCreateLine = LineStep.지하철_노선을_생성한다("강남역", "양재역", "신분당선");
 
         // when
         long lineId = 지하철_노선_Id를_추출한다(responseOfCreateLine);
-        ExtractableResponse<Response> responseOfDelete = LineRequest.지하철_노선을_삭제한다(lineId);
+        ExtractableResponse<Response> responseOfDelete = LineStep.지하철_노선을_삭제한다(lineId);
 
         // then
         assertThat(responseOfDelete.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
-        ExtractableResponse<Response> responseAfterDelete = LineRequest.지하철_노선을_조회한다(lineId);
+        ExtractableResponse<Response> responseAfterDelete = LineStep.지하철_노선을_조회한다(lineId);
         assertThat(responseAfterDelete.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 }
