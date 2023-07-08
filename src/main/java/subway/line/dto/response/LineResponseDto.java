@@ -34,4 +34,8 @@ public class LineResponseDto {
                 .build();
     }
 
+    public StationResponseDto getLastStation() {
+        return stations.get(stations.size() - 1);
+    }
+
 }

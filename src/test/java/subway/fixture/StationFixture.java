@@ -14,6 +14,11 @@ public class StationFixture {
                     .name("강남역")
                     .build();
 
+    public static final SaveStationRequestDto 판교역 =
+            SaveStationRequestDto.builder()
+                    .name("판교역")
+                    .build();
+
     public static final SaveStationRequestDto 광교역 =
             SaveStationRequestDto.builder()
                     .name("광교역")

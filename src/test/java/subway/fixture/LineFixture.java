@@ -9,7 +9,7 @@ public class LineFixture {
         return SaveLineRequestDto.builder()
                 .name("신분당선")
                 .color("#f5222d")
-                .distance(12)
+                .distance(15)
                 .upStationId(upStationId)
                 .downStationId(downStationId)
                 .build();

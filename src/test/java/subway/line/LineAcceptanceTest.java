@@ -39,13 +39,13 @@ public class LineAcceptanceTest {
 
     private static final String LINE_NAME_KEY = "name";
 
-    private Long gangnamStationId;
+    private Long 신사역_아이디;
 
-    private Long gwanggyoStationId;
+    private Long 광교역_아이디;
 
-    private Long cheongnyangniStationId;
+    private Long 청량리역_아이디;
 
-    private Long chuncheonStationId;
+    private Long 춘천역_아이디;
 
     @Autowired
     private DatabaseCleanUp databaseCleanUp;
@@ -57,10 +57,10 @@ public class LineAcceptanceTest {
         }
         databaseCleanUp.execute();
 
-        this.gangnamStationId = saveStation(StationFixture.강남역);
-        this.gwanggyoStationId = saveStation(StationFixture.광교역);
-        this.cheongnyangniStationId = saveStation(StationFixture.청량리역);
-        this.chuncheonStationId = saveStation(StationFixture.춘천역);
+        this.신사역_아이디 = saveStation(StationFixture.신사역);
+        this.광교역_아이디 = saveStation(StationFixture.광교역);
+        this.청량리역_아이디 = saveStation(StationFixture.청량리역);
+        this.춘천역_아이디 = saveStation(StationFixture.춘천역);
     }
 
     /**
@@ -73,7 +73,7 @@ public class LineAcceptanceTest {
     @Test
     void createLine() {
         // when
-        SaveLineRequestDto 신분당선 = LineFixture.신분당선을_생성한다(gangnamStationId, gwanggyoStationId);
+        SaveLineRequestDto 신분당선 = LineFixture.신분당선을_생성한다(신사역_아이디, 광교역_아이디);
         saveLine(신분당선);
 
         // then
@@ -98,8 +98,8 @@ public class LineAcceptanceTest {
     @Test
     void readLines() {
         // given
-        SaveLineRequestDto 신분당선 = LineFixture.신분당선을_생성한다(gangnamStationId, gwanggyoStationId);
-        SaveLineRequestDto 경춘선 = LineFixture.경춘선을_생성한다(cheongnyangniStationId, chuncheonStationId);
+        SaveLineRequestDto 신분당선 = LineFixture.신분당선을_생성한다(신사역_아이디, 광교역_아이디);
+        SaveLineRequestDto 경춘선 = LineFixture.경춘선을_생성한다(청량리역_아이디, 춘천역_아이디);
         Stream.of(신분당선, 경춘선)
                 .forEach(this::saveLine);
 
@@ -125,7 +125,7 @@ public class LineAcceptanceTest {
     @Test
     void readLine() {
         // given
-        SaveLineRequestDto 경춘선 = LineFixture.경춘선을_생성한다(cheongnyangniStationId, chuncheonStationId);
+        SaveLineRequestDto 경춘선 = LineFixture.경춘선을_생성한다(청량리역_아이디, 춘천역_아이디);
         Long savedLineId = saveLine(경춘선)
                 .jsonPath()
                 .getLong(LINE_ID_KEY);
@@ -150,7 +150,7 @@ public class LineAcceptanceTest {
     @Test
     void updateLine() {
         // given
-        SaveLineRequestDto 신분당선 = LineFixture.신분당선을_생성한다(gangnamStationId, gwanggyoStationId);
+        SaveLineRequestDto 신분당선 = LineFixture.신분당선을_생성한다(신사역_아이디, 광교역_아이디);
         Long savedLineId = saveLine(신분당선)
                 .jsonPath()
                 .getLong(LINE_ID_KEY);
@@ -184,7 +184,7 @@ public class LineAcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        SaveLineRequestDto 경춘선 = LineFixture.경춘선을_생성한다(cheongnyangniStationId, chuncheonStationId);
+        SaveLineRequestDto 경춘선 = LineFixture.경춘선을_생성한다(청량리역_아이디, 춘천역_아이디);
         Long savedLineId = saveLine(경춘선)
                 .jsonPath()
                 .getLong(LINE_ID_KEY);
