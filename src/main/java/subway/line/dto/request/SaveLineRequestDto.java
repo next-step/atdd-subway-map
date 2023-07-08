@@ -24,11 +24,9 @@ public class SaveLineRequestDto {
     @Size(max = 7, message = "지하철 노선 색깔은 7자 이내여야 합니다.")
     private String color;
 
-    @Setter
     @NotNull
     private Long upStationId;
 
-    @Setter
     @NotNull
     private Long downStationId;
 

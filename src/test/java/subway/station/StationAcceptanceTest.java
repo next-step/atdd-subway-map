@@ -54,8 +54,8 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        SaveStationRequestDto gangnamStation = StationFixture.강남역;
-        saveStation(gangnamStation);
+        SaveStationRequestDto 강남역 = StationFixture.강남역;
+        saveStation(강남역);
 
         // then
         List<String> stationNames = findStationsAll()
@@ -64,7 +64,7 @@ public class StationAcceptanceTest {
 
         assertAll(
                 () -> assertThat(stationNames.size()).isEqualTo(1),
-                () -> assertThat(stationNames).containsAnyOf(gangnamStation.getName())
+                () -> assertThat(stationNames).containsAnyOf(강남역.getName())
         );
     }
 
@@ -77,10 +77,10 @@ public class StationAcceptanceTest {
     @Test
     void readStations() {
         //given
-        SaveStationRequestDto gangnamStation = StationFixture.강남역;
-        SaveStationRequestDto gwanggyoStation = StationFixture.광교역;
+        SaveStationRequestDto 강남역 = StationFixture.강남역;
+        SaveStationRequestDto 광교역 = StationFixture.광교역;
 
-        Stream.of(gangnamStation, gwanggyoStation)
+        Stream.of(강남역, 광교역)
                 .forEach(this::saveStation);
 
         // when
@@ -91,7 +91,7 @@ public class StationAcceptanceTest {
 
         // then
         assertThat(stationNames)
-                .containsOnly(gangnamStation.getName(), gwanggyoStation.getName());
+                .containsOnly(강남역.getName(), 광교역.getName());
     }
 
     /**
@@ -103,8 +103,8 @@ public class StationAcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        SaveStationRequestDto gangnamStation = StationFixture.강남역;
-        Long savedStationId = saveStation(gangnamStation)
+        SaveStationRequestDto 강남역 = StationFixture.강남역;
+        Long savedStationId = saveStation(강남역)
                 .jsonPath()
                 .getLong(STATION_ID_KEY);
 
@@ -120,7 +120,7 @@ public class StationAcceptanceTest {
                             .jsonPath()
                             .getList(STATION_NAME_KEY, String.class);
 
-                    assertThat(stationNames).doesNotContain(gangnamStation.getName());
+                    assertThat(stationNames).doesNotContain(강남역.getName());
                 }
         );
     }
