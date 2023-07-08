@@ -4,11 +4,9 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 import subway.domain.Station;
-import subway.repository.StationRepository;
 
 import java.util.List;
 import java.util.Map;
@@ -20,8 +18,6 @@ import static subway.SubwayClient.*;
 @DisplayName("지하철노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {
-    @Autowired
-    StationRepository stationRepository;
 
     /**
      * When 지하철 노선을 생성하면
@@ -30,8 +26,8 @@ public class LineAcceptanceTest {
     @DisplayName("지하철노선을 생성한다.")
     @Test
     void createLine() {
-        Station 지하철역 = stationRepository.save(new Station("지하철역"));
-        Station 새로운_지하철역 = stationRepository.save(new Station("새로운지하철역"));
+        Station 지하철역 = 지하철역을_생성한다("지하철역");
+        Station 새로운_지하철역 = 지하철역을_생성한다("새로운지하철역");
 
         // when
         Map<String, Object> params = createLineParams("신분당선", "bg-red-600", 지하철역.getId()
@@ -54,9 +50,9 @@ public class LineAcceptanceTest {
     @DisplayName("지하철노선 목록을 조회한다.")
     @Test
     void selectLines() {
-        Station 지하철역 = stationRepository.save(new Station("지하철역"));
-        Station 새로운_지하철역 = stationRepository.save(new Station("새로운지하철역"));
-        Station 또다른_지하철역 = stationRepository.save(new Station("또다른지하철역"));
+        Station 지하철역 = 지하철역을_생성한다("지하철역");
+        Station 새로운_지하철역 = 지하철역을_생성한다("새로운지하철역");
+        Station 또다른_지하철역 = 지하철역을_생성한다("또다른지하철역");
 
         // given
         Map<String, Object> params_A = createLineParams("신분당선", "bg-red-600", 지하철역.getId()
@@ -83,8 +79,8 @@ public class LineAcceptanceTest {
     @DisplayName("지하철노선을 조회한다.")
     @Test
     void selectLine() {
-        Station 지하철역 = stationRepository.save(new Station("지하철역"));
-        Station 새로운_지하철역 = stationRepository.save(new Station("새로운지하철역"));
+        Station 지하철역 = 지하철역을_생성한다("지하철역");
+        Station 새로운_지하철역 = 지하철역을_생성한다("새로운지하철역");
 
         // given
         Map<String, Object> params = createLineParams("신분당선", "bg-red-600", 지하철역.getId()
@@ -108,8 +104,8 @@ public class LineAcceptanceTest {
     @DisplayName("지하철노선을 수정한다.")
     @Test
     void updateLine() {
-        Station 지하철역 = stationRepository.save(new Station("지하철역"));
-        Station 새로운_지하철역 = stationRepository.save(new Station("새로운지하철역"));
+        Station 지하철역 = 지하철역을_생성한다("지하철역");
+        Station 새로운_지하철역 = 지하철역을_생성한다("새로운지하철역");
 
         // given
         Map<String, Object> params = createLineParams("신분당선", "bg-red-600", 지하철역.getId()
@@ -137,8 +133,8 @@ public class LineAcceptanceTest {
     @DisplayName("지하철노선을 삭제한다.")
     @Test
     void deleteLine() {
-        Station 지하철역 = stationRepository.save(new Station("지하철역"));
-        Station 새로운_지하철역 = stationRepository.save(new Station("새로운지하철역"));
+        Station 지하철역 = 지하철역을_생성한다("지하철역");
+        Station 새로운_지하철역 = 지하철역을_생성한다("새로운지하철역");
 
         // given
         Map<String, Object> params = createLineParams("신분당선", "bg-red-600", 지하철역.getId()
