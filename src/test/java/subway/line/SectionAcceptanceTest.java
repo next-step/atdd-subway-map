@@ -34,24 +34,6 @@ public class SectionAcceptanceTest extends ApiTest {
         stationIds = response.body().jsonPath().getList("id", Long.class);
     }
 
-//    @ParameterizedTest
-//    @MethodSource("stationCreateRequests")
-//    void createStations(final String stationName) {
-//        StationApi.createStationByName(stationName);
-//
-//    }
-//
-//    static Stream<Arguments> stationCreateRequests() {
-//        return Stream.of(
-//                Arguments.of("강남역"),
-//                Arguments.of("역삼역"),
-//                Arguments.of("선릉역"),
-//                Arguments.of("잠실역"),
-//                Arguments.of("삼성역"),
-//                Arguments.of("강변역")
-//        );
-//    }
-
     // POST /lines/1/sections
 
     /**
@@ -130,7 +112,7 @@ public class SectionAcceptanceTest extends ApiTest {
         final String appendLocation = location + "/sections";
 
         // when
-        Map<String, String> otherSectionRequest = RequestGenerator.generateSectionCreateRequest(stationIds.get(2), stationIds.get(1), 10L);
+        Map<String, String> otherSectionRequest = RequestGenerator.generateSectionCreateRequest(stationIds.get(1), stationIds.get(3), 10L);
         ExtractableResponse<Response> response = LineApi.appendSectionInLine(appendLocation, otherSectionRequest);
 
         // then
@@ -212,12 +194,13 @@ public class SectionAcceptanceTest extends ApiTest {
     }
 
     private String compositeCreateLineWithThreeStation() {
-        Map<String, String> stringStringMap = RequestGenerator.이호선_요청_만들기(stationIds.get(0), stationIds.get(2));
+        Map<String, String> stringStringMap = RequestGenerator.이호선_요청_만들기(stationIds.get(0), stationIds.get(1));
         ExtractableResponse<Response> createLineResponse = LineApi.createLine(stringStringMap);
         final String location = createLineResponse.header("Location");
         final String appendLocation = location + "/sections";
         Map<String, String> sectionRequest = RequestGenerator.generateSectionCreateRequest(stationIds.get(1), stationIds.get(2), 10L);
         LineApi.appendSectionInLine(appendLocation, sectionRequest);
+        LineApi.retrieveLines();
         return location;
     }
 

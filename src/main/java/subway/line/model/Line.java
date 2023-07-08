@@ -72,7 +72,7 @@ public class Line {
     }
 
     public Section deleteSectionByStation(Station station) {
-        if (this.sections.size() <= MINIMAL_SECTION_SIZE) {
+        if (this.sections.size() < MINIMAL_SECTION_SIZE) {
             throw new SubwayBadRequestException(LineMessage.DOWN_STATION_MINIMAL_VALID_MESSAGE.getFormatMessage(MINIMAL_SECTION_SIZE));
         }
         if (!this.downStation.equals(station)) {
