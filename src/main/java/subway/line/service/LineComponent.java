@@ -3,6 +3,7 @@ package subway.line.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import subway.exception.SubwayBadRequestException;
 import subway.line.constant.LineMessage;
 import subway.line.dto.LineCreateRequest;
 import subway.line.dto.LineResponse;
@@ -51,14 +52,16 @@ public class LineComponent {
 
         // 새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 한다.
         if (!line.getDownStation().equals(section.getUpStation())) {
-            throw new IllegalArgumentException(LineMessage.DOWN_STATION_NOT_MATCH_WITH_UP_STATION.getMessage());
+            throw new SubwayBadRequestException(LineMessage.DOWN_STATION_NOT_MATCH_WITH_UP_STATION.getMessage());
         }
         // 새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없다.
         List<Station> stationsInLine = line.getStationsInSections();
         stationsInLine.stream()
                 .filter(s -> s.equals(section.getDownStation()))
                 .findAny()
-                .ifPresent(e -> {throw new IllegalArgumentException(LineMessage.ADD_SECTION_STATION_DUPLICATION_VALID_MESSAGE.getMessage());});
+                .ifPresent(e -> {
+                    throw new SubwayBadRequestException(LineMessage.ADD_SECTION_STATION_DUPLICATION_VALID_MESSAGE.getMessage());
+                });
         line.addSection(section);
         lineService.saveLine(line);
     }
@@ -67,7 +70,8 @@ public class LineComponent {
     public void deleteSectionByStationId(SectionDeleteRequest request) {
         Line line = lineService.findLineById(request.getLineId());
         Station station = stationService.findStationById(request.getStationId());
-        Section section = line.deleteSectionByStation(station);
+        Section section = null;
+        section = line.deleteSectionByStation(station);
         lineService.saveLine(line);
         sectionService.delete(section);
     }

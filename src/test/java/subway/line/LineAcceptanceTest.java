@@ -8,11 +8,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
-import subway.ApiTest;
+import subway.line.controller.LineController;
+import subway.line.repository.LineRepository;
+import subway.line.service.LineService;
 import subway.station.StationApi;
+import subway.station.controller.StationController;
+import subway.station.repository.StationRepository;
+import subway.station.service.StationService;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -21,7 +25,8 @@ import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER
 
 @DirtiesContext(classMode = AFTER_EACH_TEST_METHOD)
 @DisplayName("지하철 노선 관련 기능")
-public class LineAcceptanceTest extends ApiTest {
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+public class LineAcceptanceTest {
 
     public List<Long> stationIds = new ArrayList<>();
 
@@ -40,7 +45,7 @@ public class LineAcceptanceTest extends ApiTest {
     @Test
     void createLine() {
         // when
-        Map<String, String> secondGreenLine = LineUtils.generateLineCreateRequest("2호선", "bg-green-600", stationIds.get(0), stationIds.get(2), 10L);
+        Map<String, String> secondGreenLine = RequestGenerator.이호선_요청_만들기(stationIds.get(0), stationIds.get(2));
         LineApi.createLine(secondGreenLine);
 
         // then
@@ -58,10 +63,10 @@ public class LineAcceptanceTest extends ApiTest {
     @Test
     void retrieveLines() {
         // given
-        Map<String, String> firstBlueLine = LineUtils.generateLineCreateRequest("1호선", "bg-blue-600", stationIds.get(0), stationIds.get(1), 10L);
+        Map<String, String> firstBlueLine = RequestGenerator.일호선_요청_만들기(stationIds.get(0), stationIds.get(1));
         LineApi.createLine(firstBlueLine);
 
-        Map<String, String> secondGreenLine = LineUtils.generateLineCreateRequest("2호선", "bg-green-600", stationIds.get(0), stationIds.get(2), 10L);
+        Map<String, String> secondGreenLine = RequestGenerator.이호선_요청_만들기(stationIds.get(0), stationIds.get(2));
         LineApi.createLine(secondGreenLine);
 
         // when
@@ -82,7 +87,7 @@ public class LineAcceptanceTest extends ApiTest {
     @Test
     void createLineAndRetrieve() {
         // given
-        Map<String, String> firstBlueLine = LineUtils.generateLineCreateRequest("1호선", "bg-blue-600", stationIds.get(0), stationIds.get(1), 10L);
+        Map<String, String> firstBlueLine = RequestGenerator.일호선_요청_만들기(stationIds.get(0), stationIds.get(1));
         ExtractableResponse<Response> createResponse = LineApi.createLine(firstBlueLine);
         final String location = createResponse.header("Location");
 
@@ -104,12 +109,12 @@ public class LineAcceptanceTest extends ApiTest {
     @Test
     void modifyLine() {
         // given
-        Map<String, String> firstBlueLine = LineUtils.generateLineCreateRequest("1호선", "bg-blue-600", stationIds.get(0), stationIds.get(1), 10L);
+        Map<String, String> firstBlueLine = RequestGenerator.일호선_요청_만들기(stationIds.get(0), stationIds.get(1));
         ExtractableResponse<Response> createResponse = LineApi.createLine(firstBlueLine);
         final String createdLocation = createResponse.header("Location");
 
         // when
-        Map<String, String> firstBlueLineModify = generateLineModifyRequest("1호선천안", "bg-blue-800");
+        Map<String, String> firstBlueLineModify = RequestGenerator.generateLineModifyRequest("1호선천안", "bg-blue-800");
         ExtractableResponse<Response> modifyLineResponse = LineApi.modifyLineByLocation(createdLocation, firstBlueLineModify);
 
         // then
@@ -125,7 +130,7 @@ public class LineAcceptanceTest extends ApiTest {
     @Test
     void deleteLine() {
         // given
-        Map<String, String> firstBlueLine = LineUtils.generateLineCreateRequest("1호선", "bg-blue-600", stationIds.get(0), stationIds.get(1), 10L);
+        Map<String, String> firstBlueLine = RequestGenerator.일호선_요청_만들기(stationIds.get(0), stationIds.get(1));
         ExtractableResponse<Response> createResponse = LineApi.createLine(firstBlueLine);
         final String createdLocation = createResponse.header("Location");
         final Integer createdId = createResponse.body().jsonPath().get("id");
@@ -138,13 +143,4 @@ public class LineAcceptanceTest extends ApiTest {
         ExtractableResponse<Response> retrieveLinesResponse = LineApi.retrieveLines();
         assertThat(retrieveLinesResponse.body().jsonPath().getList("id")).doesNotContain(createdId);
     }
-
-    private Map<String, String> generateLineModifyRequest(String name,
-                                                          String color) {
-        Map<String, String> lineRequest = new HashMap<>();
-        lineRequest.put("name", name);
-        lineRequest.put("color", color);
-        return lineRequest;
-    }
-
 }

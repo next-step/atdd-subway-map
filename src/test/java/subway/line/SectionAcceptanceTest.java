@@ -5,15 +5,18 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import subway.ApiTest;
 import subway.station.StationApi;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD;
@@ -31,6 +34,24 @@ public class SectionAcceptanceTest extends ApiTest {
         stationIds = response.body().jsonPath().getList("id", Long.class);
     }
 
+//    @ParameterizedTest
+//    @MethodSource("stationCreateRequests")
+//    void createStations(final String stationName) {
+//        StationApi.createStationByName(stationName);
+//
+//    }
+//
+//    static Stream<Arguments> stationCreateRequests() {
+//        return Stream.of(
+//                Arguments.of("강남역"),
+//                Arguments.of("역삼역"),
+//                Arguments.of("선릉역"),
+//                Arguments.of("잠실역"),
+//                Arguments.of("삼성역"),
+//                Arguments.of("강변역")
+//        );
+//    }
+
     // POST /lines/1/sections
 
     /**
@@ -42,8 +63,7 @@ public class SectionAcceptanceTest extends ApiTest {
     @Test
     void createSection() {
         // when
-        final String lineName = "2호선";
-        Map<String, String> stringStringMap = LineUtils.generateLineCreateRequest(lineName, "bg-blue-600", stationIds.get(0), stationIds.get(1), 10L);
+        Map<String, String> stringStringMap = RequestGenerator.이호선_요청_만들기(stationIds.get(0), stationIds.get(1));
         ExtractableResponse<Response> createLineResponse = LineApi.createLine(stringStringMap);
         final String location = createLineResponse.header("Location");
 
@@ -65,27 +85,16 @@ public class SectionAcceptanceTest extends ApiTest {
     @Test
     void appendStationToSection() {
         // when
-        final String lineName = "2호선";
-        Map<String, String> stringStringMap = LineUtils.generateLineCreateRequest(lineName, "bg-blue-600", stationIds.get(0), stationIds.get(1), 10L);
+        Map<String, String> stringStringMap = RequestGenerator.이호선_요청_만들기(stationIds.get(0), stationIds.get(1));
         ExtractableResponse<Response> createLineResponse = LineApi.createLine(stringStringMap);
         final String location = createLineResponse.header("Location");
 
         // then
-        Map<String, String> sectionRequest = generateSectionRequest(stationIds.get(1), stationIds.get(2), 10L);
+        Map<String, String> sectionRequest = RequestGenerator.generateSectionCreateRequest(stationIds.get(1), stationIds.get(2), 10L);
         final String appendLocation = location + "/sections";
         ExtractableResponse<Response> response = LineApi.appendSectionInLine(appendLocation, sectionRequest);
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-    }
-
-    private Map<String, String> generateSectionRequest(final Long upStationId,
-                                                       final Long downStationId,
-                                                       final Long distance) {
-        Map<String, String> request = new HashMap<>();
-        request.put("downStationId", String.valueOf(downStationId));
-        request.put("upStationId", String.valueOf(upStationId));
-        request.put("distance", String.valueOf(distance));
-        return request;
     }
 
     /**
@@ -101,22 +110,11 @@ public class SectionAcceptanceTest extends ApiTest {
         final String appendLocation = location + "/sections";
 
         // when
-        Map<String, String> otherSectionRequest = generateSectionRequest(stationIds.get(1), stationIds.get(3), 10L);
+        Map<String, String> otherSectionRequest = RequestGenerator.generateSectionCreateRequest(stationIds.get(1), stationIds.get(3), 10L);
         ExtractableResponse<Response> response = LineApi.appendSectionInLine(appendLocation, otherSectionRequest);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()); // TODO: ExceptionHandler 로 에러 메시지 담아 보내기.
-    }
-
-    private String compositeCreateLineWithThreeStation() {
-        final String lineName = "2호선";
-        Map<String, String> stringStringMap = LineUtils.generateLineCreateRequest(lineName, "bg-blue-600", stationIds.get(0), stationIds.get(1), 10L);
-        ExtractableResponse<Response> createLineResponse = LineApi.createLine(stringStringMap);
-        final String location = createLineResponse.header("Location");
-        final String appendLocation = location + "/sections";
-        Map<String, String> sectionRequest = generateSectionRequest(stationIds.get(1), stationIds.get(2), 10L);
-        LineApi.appendSectionInLine(appendLocation, sectionRequest);
-        return location;
     }
 
     /**
@@ -132,8 +130,8 @@ public class SectionAcceptanceTest extends ApiTest {
         final String appendLocation = location + "/sections";
 
         // when
-        Map<String, String> otherSectionReqeust = generateSectionRequest(stationIds.get(2), stationIds.get(1), 10L);
-        ExtractableResponse<Response> response = LineApi.appendSectionInLine(appendLocation, otherSectionReqeust);
+        Map<String, String> otherSectionRequest = RequestGenerator.generateSectionCreateRequest(stationIds.get(2), stationIds.get(1), 10L);
+        ExtractableResponse<Response> response = LineApi.appendSectionInLine(appendLocation, otherSectionRequest);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -211,6 +209,16 @@ public class SectionAcceptanceTest extends ApiTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()); // TODO: ExceptionHandler 로 에러 메시지 담아 보내기.
+    }
+
+    private String compositeCreateLineWithThreeStation() {
+        Map<String, String> stringStringMap = RequestGenerator.이호선_요청_만들기(stationIds.get(0), stationIds.get(2));
+        ExtractableResponse<Response> createLineResponse = LineApi.createLine(stringStringMap);
+        final String location = createLineResponse.header("Location");
+        final String appendLocation = location + "/sections";
+        Map<String, String> sectionRequest = RequestGenerator.generateSectionCreateRequest(stationIds.get(1), stationIds.get(2), 10L);
+        LineApi.appendSectionInLine(appendLocation, sectionRequest);
+        return location;
     }
 
 }

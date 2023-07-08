@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import subway.exception.SubwayBadRequestException;
 import subway.line.constant.LineMessage;
 import subway.station.model.Station;
 
@@ -71,11 +72,11 @@ public class Line {
     }
 
     public Section deleteSectionByStation(Station station) {
-        if (this.sections.size() < MINIMAL_SECTION_SIZE) {
-            throw new IllegalArgumentException(LineMessage.DOWN_STATION_MINIMAL_VALID_MESSAGE.getFormatMessage(MINIMAL_SECTION_SIZE));
+        if (this.sections.size() <= MINIMAL_SECTION_SIZE) {
+            throw new SubwayBadRequestException(LineMessage.DOWN_STATION_MINIMAL_VALID_MESSAGE.getFormatMessage(MINIMAL_SECTION_SIZE));
         }
         if (!this.downStation.equals(station)) {
-            throw new IllegalArgumentException(LineMessage.SECTION_DELETE_LAST_STATION_VALID_MESSATE.getMessage());
+            throw new SubwayBadRequestException(LineMessage.SECTION_DELETE_LAST_STATION_VALID_MESSAGE.getMessage());
         }
 
         final int lastElementIndex = this.sections.size() - 1;
