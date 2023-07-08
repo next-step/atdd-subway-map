@@ -1,6 +1,5 @@
 package subway.domain.line;
 
-import subway.domain.section.Section;
 import subway.domain.station.Station;
 
 import javax.persistence.*;

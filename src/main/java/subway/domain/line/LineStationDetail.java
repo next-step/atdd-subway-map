@@ -1,7 +1,5 @@
 package subway.domain.line;
 
-import subway.domain.section.Section;
-import subway.domain.section.Sections;
 import subway.domain.station.Station;
 import subway.exception.SectionAddException;
 import subway.exception.SectionDeleteException;

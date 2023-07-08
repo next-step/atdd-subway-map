@@ -1,6 +1,5 @@
-package subway.domain.section;
+package subway.domain.line;
 
-import subway.domain.line.Line;
 import subway.domain.station.Station;
 import subway.exception.SectionDeleteMinSizeException;
 import subway.exception.SectionExistException;
