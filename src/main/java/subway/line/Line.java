@@ -20,11 +20,11 @@ public class Line {
     @Column(nullable = false)
     private String color;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "up_station_id", nullable = false)
     private Station upStation;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "down_station_id", nullable = false)
     private Station downStation;
 
