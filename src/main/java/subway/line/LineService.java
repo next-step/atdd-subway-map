@@ -43,7 +43,7 @@ public class LineService {
     }
 
     @Transactional
-    public LineResponse updateLine(Long id, LineRequest request) {
+    public void updateLine(Long id, LineRequest request) {
         Line line = lineRepository.findById(id)
                 .orElseThrow(() -> new IllegalStateException(String.format("지하철 노선을 찾을 수 없습니다. (id: %d)", id)));
 
@@ -54,8 +54,6 @@ public class LineService {
                 .orElseThrow(() -> new IllegalStateException(String.format("하행종점역을 찾을 수 없습니다. (downStationId: %d)", request.getDownStationId())));
 
         line.update(request.getName(), request.getColor(), upStation, downStation, request.getDistance());
-
-        return LineResponse.of(line);
     }
 
     @Transactional

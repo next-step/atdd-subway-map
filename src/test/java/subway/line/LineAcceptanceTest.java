@@ -111,7 +111,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    void 지하철_노선_수정() throws JsonProcessingException {
+    void 지하철_노선_수정() {
         // given
         LineRequest createRequest = 지하철역_생성_및_지하철_노선_요청_객체_생성(SINBUNDANG_LINE_NAME, SINBUNDANG_LINE_COLOR, SINBUNDANG_UP_STATION_NAME, SINBUNDANG_DOWN_STATION_NAME, SINBUNDANG_LINE_DISTANCE);
 
@@ -126,10 +126,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
-
-        LineResponse response = new ObjectMapper().readValue(updateResponse.response().body().asString(), LineResponse.class);
-        List<StationResponse> stationsOfResponse = List.of(new StationResponse(3L, SUINBUNDANG_UP_STATION_NAME), new StationResponse(4L, SUINBUNDANG_DOWN_STATION_NAME));
-        assertThat(response).isEqualTo(new LineResponse(Long.valueOf(lineId), SUINBUNDANG_LINE_NAME, SUINBUNDANG_LINE_COLOR, stationsOfResponse));
     }
 
     @Test
