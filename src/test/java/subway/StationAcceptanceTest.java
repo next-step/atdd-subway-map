@@ -21,14 +21,14 @@ public class StationAcceptanceTest extends AcceptanceTestBase {
     @DisplayName("지하철역을 생성한다.")
     @Test
     void createStation() {
-        // when 지하철역을 생성하면
+        // When: 지하철역을 생성하면
         StationRequest stationRequest = stationRequestArbitraryBuilder().sample();
         ExtractableResponse<Response> postResponse = post("/stations", stationRequest);
 
-        // then 지하철역이 생성된다
+        // Then: 지하철역이 생성된다
         assertThat(postResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
-        // then 지하철역 목록 조회 시 생성한 역을 찾을 수 있다
+        // Then: 지하철역 목록 조회 시 생성한 역을 찾을 수 있다
         ExtractableResponse<Response> getResponse = get("/stations");
         List<String> stationNames = getStationNames(getResponse);
         assertThat(stationNames).containsAnyOf(stationRequest.getName());
@@ -37,14 +37,14 @@ public class StationAcceptanceTest extends AcceptanceTestBase {
     @DisplayName("지하철역 목록을 조회한다.")
     @Test
     void findStations() {
-        // given 2개의 지하철역을 생성하고
+        // Given: 2개의 지하철역을 생성하고
         List<StationRequest> stationRequests = FixtureMonkeyWrapper.giveMe(stationRequestArbitraryBuilder(), 2);
         stationRequests.forEach(stationRequest -> post("/stations", stationRequest));
 
-        // when 지하철역 목록을 조회하면
+        // When: 지하철역 목록을 조회하면
         ExtractableResponse<Response> getResponse = get("/stations");
 
-        // then 2개의 지하철역을 응답 받는다
+        // Then: 2개의 지하철역을 응답 받는다
         List<String> stationNames = getStationNames(getResponse);
         assertThat(stationNames).containsExactlyElementsOf(stationRequests.stream().map(StationRequest::getName).collect(Collectors.toList()));
     }
@@ -52,15 +52,15 @@ public class StationAcceptanceTest extends AcceptanceTestBase {
     @DisplayName("지하철역을 삭제한다.")
     @Test
     void deleteStation() {
-        // given 지하철역을 생성하고
+        // Given: 지하철역을 생성하고
         StationRequest stationRequest = stationRequestArbitraryBuilder().sample();
         ExtractableResponse<Response> postResponse = post("/stations", stationRequest);
 
-        // when 그 지하철역을 삭제하면
+        // When: 그 지하철역을 삭제하면
         Long id = postResponse.as(StationResponse.class).getId();
         delete(String.format("/stations/%s", id));
 
-        // then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
+        // Then: 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
         ExtractableResponse<Response> deleteResponse = get("/stations");
         List<StationResponse> stationResponses = getResponse(deleteResponse);
 
