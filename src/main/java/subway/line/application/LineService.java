@@ -10,6 +10,7 @@ import subway.line.dto.LineCreateRequest;
 import subway.line.dto.LineResponse;
 import subway.line.dto.LineUpdateRequest;
 import subway.line.exception.LineNotFoundException;
+import subway.section.domain.Section;
 import subway.station.domain.Station;
 import subway.station.domain.StationRepository;
 import subway.station.exception.StationNotFoundException;
@@ -30,8 +31,11 @@ public class LineService {
         Station upStation = getStation(lineCreateRequest.getUpStationId());
         Station downStation = getStation(lineCreateRequest.getDownStationId());
 
-        Line line = new Line(lineCreateRequest.getName(), lineCreateRequest.getColor(), upStation, downStation, lineCreateRequest.getDistance());
+        Line line = new Line(lineCreateRequest.getName(), lineCreateRequest.getColor());
         lineRepository.save(line);
+
+        Section section = new Section(line, upStation, downStation, lineCreateRequest.getDistance());
+        line.addSection(section);
 
         return LineResponse.of(line);
     }
