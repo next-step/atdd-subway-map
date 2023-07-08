@@ -73,8 +73,7 @@ public class LineAcceptanceTest {
     @Test
     void createLine() {
         // when
-        SaveLineRequestDto sinbundangLine = LineFixture.신분당선;
-        sinbundangLine
+        SaveLineRequestDto sinbundangLine = LineFixture.신분당선
                 .setUpStationId(gangnamStationId)
                 .setDownStationId(gwanggyoStationId);
         saveLine(sinbundangLine);

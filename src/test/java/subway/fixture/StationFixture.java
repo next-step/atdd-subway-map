@@ -4,6 +4,11 @@ import subway.station.dto.request.SaveStationRequestDto;
 
 public class StationFixture {
 
+    public static final SaveStationRequestDto 신사역 =
+            SaveStationRequestDto.builder()
+                    .name("신사역")
+                    .build();
+
     public static final SaveStationRequestDto 강남역 =
             SaveStationRequestDto.builder()
                     .name("강남역")
