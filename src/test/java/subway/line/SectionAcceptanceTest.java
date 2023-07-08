@@ -96,7 +96,7 @@ public class SectionAcceptanceTest extends ApiTest {
         ExtractableResponse<Response> response = LineApi.appendSectionInLine(appendLocation, otherSectionRequest);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()); // TODO: ExceptionHandler 로 에러 메시지 담아 보내기.
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     /**
@@ -144,7 +144,7 @@ public class SectionAcceptanceTest extends ApiTest {
 
         // then
         ExtractableResponse<Response> retrieveLineResponse = LineApi.retrieveLineByLocation(location);
-        List<String> stations = retrieveLineResponse.jsonPath().getList("stations.name", String.class);// TODO: jsonPath stations 로 손봐야됨.
+        List<String> stations = retrieveLineResponse.jsonPath().getList("stations.name", String.class);
         assertThat(stations.size()).isEqualTo(2);
     }
 
@@ -165,7 +165,7 @@ public class SectionAcceptanceTest extends ApiTest {
         ExtractableResponse<Response> response = LineApi.removeSectionInLine(appendLocation, stationId);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()); // TODO: ExceptionHandler 로 에러 메시지 담아 보내기.
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     /**
@@ -190,7 +190,7 @@ public class SectionAcceptanceTest extends ApiTest {
         ExtractableResponse<Response> response = LineApi.removeSectionInLine(appendLocation, additionalDeleteLocation);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()); // TODO: ExceptionHandler 로 에러 메시지 담아 보내기.
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     private String compositeCreateLineWithThreeStation() {
