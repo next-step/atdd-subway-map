@@ -1,15 +1,12 @@
 package subway.line.domain;
 
-import java.util.ArrayList;
-import java.util.List;
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import org.springframework.util.StringUtils;
-import subway.station.domain.Station;
 
 @Entity
 public class Line {
@@ -23,14 +20,18 @@ public class Line {
     @Column(length = 20, nullable = false)
     private String color;
 
+    @Embedded
+    private LineLastStations lastStations;
+
     protected Line() {}
 
-    public Line(String name, String color) {
+    public Line(String name, String color, LineLastStations lastStations) {
         if (!StringUtils.hasText(name) || !StringUtils.hasText(color)) {
             throw new IllegalArgumentException();
         }
         this.name = name;
         this.color = color;
+        this.lastStations = lastStations;
     }
 
     public void updateName(String name) {
@@ -57,5 +58,9 @@ public class Line {
             throw new IllegalArgumentException();
         }
         this.color = color;
+    }
+
+    public LineLastStations getLastStations() {
+        return lastStations;
     }
 }
