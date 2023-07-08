@@ -16,13 +16,10 @@ public class RestAssuredTest {
     @DisplayName("구글 페이지 접근 테스트 - Assertions.assertThat() 을 사용하여 검증")
     @Test
     void accessGoogle() {
-        RestAssured.baseURI = "https://www.google.com";
-
-        // TODO: 구글 페이지 요청 구현
         ExtractableResponse<Response> response = RestAssured
             .given()
             .when()
-            .get("/")
+            .get("https://www.google.com")
             .then()
             .extract();
 
@@ -37,7 +34,7 @@ public class RestAssuredTest {
         RestAssured
             .given()
             .when()
-            .get("/")
+            .get("https://www.google.com")
             .then()
             .statusCode(200);
     }
