@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import subway.line.domain.LineLastStations;
 import subway.station.domain.Station;
 
-class LineStationsTest {
+class LineLastStationsTest {
 
     private final Station stationA = new Station("a");
     private final Station stationB = new Station("b");

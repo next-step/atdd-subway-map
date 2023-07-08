@@ -1,18 +1,20 @@
 package subway.acceptance;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static subway.utils.StationTestRequests.지하철_역_등록;
+import static subway.utils.StationTestRequests.지하철_역_등록_Id_획득;
+import static subway.utils.StationTestRequests.지하철_역_리스트_반환;
+import static subway.utils.StationTestRequests.지하철_역_삭제;
+import static subway.utils.StationTestRequests.지하철_역_조회;
+import static subway.utils.StatusCodeAssertions.응답코드_검증;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import subway.station.controller.dto.StationResponse;
@@ -33,7 +35,7 @@ class StationAcceptanceTest {
         ExtractableResponse<Response> response = 지하철_역_등록("강남역");
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        응답코드_검증(response, HttpStatus.CREATED);
 
         // then
         List<StationResponse> stations = 지하철_역_리스트_반환();
@@ -60,7 +62,7 @@ class StationAcceptanceTest {
         ExtractableResponse<Response> response = 지하철_역_조회();
 
         //then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        응답코드_검증(response, HttpStatus.OK);
         List<StationResponse> stations = response.jsonPath().getList("", StationResponse.class);
         assertThat(stations).hasSize(2);
     }
@@ -80,43 +82,8 @@ class StationAcceptanceTest {
         ExtractableResponse<Response> response = 지하철_역_삭제(savedId);
 
         //then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        응답코드_검증(response, HttpStatus.NO_CONTENT);
         List<StationResponse> stations = 지하철_역_리스트_반환();
         assertThat(stations).isEmpty();
-    }
-
-    private ExtractableResponse<Response> 지하철_역_삭제(Long id) {
-        String pathVariable = "/" + id;
-        return RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().delete("/stations" + pathVariable)
-                .then().log().all()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> 지하철_역_등록(String name) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-        return RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
-    }
-
-    private Long 지하철_역_등록_Id_획득(String name) {
-        return 지하철_역_등록(name).jsonPath().getLong("id");
-    }
-
-    private ExtractableResponse<Response> 지하철_역_조회() {
-        return RestAssured.given().log().all()
-                .when().get("/stations")
-                .then().log().all()
-                .extract();
-    }
-
-    private List<StationResponse> 지하철_역_리스트_반환() {
-        return 지하철_역_조회().jsonPath().getList("", StationResponse.class);
     }
 }
