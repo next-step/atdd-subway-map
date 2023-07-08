@@ -45,7 +45,7 @@ public class LineAcceptanceTest {
 
     private Long cheongnyangniStationId;
 
-    private Long chuncheonStation;
+    private Long chuncheonStationId;
 
     @Autowired
     private DatabaseCleanUp databaseCleanUp;
@@ -60,7 +60,7 @@ public class LineAcceptanceTest {
         this.gangnamStationId = saveStation(StationFixture.강남역);
         this.gwanggyoStationId = saveStation(StationFixture.광교역);
         this.cheongnyangniStationId = saveStation(StationFixture.청량리역);
-        this.chuncheonStation = saveStation(StationFixture.춘천역);
+        this.chuncheonStationId = saveStation(StationFixture.춘천역);
     }
 
     /**
@@ -109,7 +109,7 @@ public class LineAcceptanceTest {
         SaveLineRequestDto gyeongchunLine = LineFixture.GYEONGCHUN_LINE;
         gyeongchunLine
                 .setUpStationId(cheongnyangniStationId)
-                .setDownStationId(chuncheonStation);
+                .setDownStationId(chuncheonStationId);
 
         Stream.of(sinbundangLine, gyeongchunLine)
                 .forEach(this::saveLine);
@@ -139,7 +139,7 @@ public class LineAcceptanceTest {
         SaveLineRequestDto gyeongchunLine = LineFixture.GYEONGCHUN_LINE;
         gyeongchunLine
                 .setUpStationId(cheongnyangniStationId)
-                .setDownStationId(chuncheonStation);
+                .setDownStationId(chuncheonStationId);
         Long savedLineId = saveLine(gyeongchunLine)
                 .jsonPath()
                 .getLong(LINE_ID_KEY);
@@ -204,7 +204,7 @@ public class LineAcceptanceTest {
         SaveLineRequestDto gyeongchunLine = LineFixture.GYEONGCHUN_LINE;
         gyeongchunLine
                 .setUpStationId(cheongnyangniStationId)
-                .setDownStationId(chuncheonStation);
+                .setDownStationId(chuncheonStationId);
         Long savedLineId = saveLine(gyeongchunLine)
                 .jsonPath()
                 .getLong(LINE_ID_KEY);
