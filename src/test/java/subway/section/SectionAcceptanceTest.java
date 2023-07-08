@@ -12,7 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import subway.AcceptanceTest;
 import subway.line.LineRequest;
-import subway.station.StationRequest;
+import subway.station.StationStep;
 
 /**
  * 프로그래밍 요구사항
@@ -50,9 +50,9 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void registerSectionOk() {
         // given
-        long 노선_상행_Id = 응답_결과에서_Id를_추출한다(StationRequest.지하철역을_생성한다("강남역"));
-        long 노선_하행_Id = 응답_결과에서_Id를_추출한다(StationRequest.지하철역을_생성한다("양재역"));
-        long 구간_하행_Id = 응답_결과에서_Id를_추출한다(StationRequest.지하철역을_생성한다("양재시민의숲역"));
+        long 노선_상행_Id = 응답_결과에서_Id를_추출한다(StationStep.지하철역을_생성한다("강남역"));
+        long 노선_하행_Id = 응답_결과에서_Id를_추출한다(StationStep.지하철역을_생성한다("양재역"));
+        long 구간_하행_Id = 응답_결과에서_Id를_추출한다(StationStep.지하철역을_생성한다("양재시민의숲역"));
 
         long lineId = 응답_결과에서_Id를_추출한다(LineRequest.지하철_노선을_생성한다(노선_상행_Id, 노선_하행_Id, "신분당선"));
 

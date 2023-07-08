@@ -22,13 +22,13 @@ public class StationAcceptanceTest extends AcceptanceTest {
     void createStation() {
         // when
         String stationName = "강남역";
-        ExtractableResponse<Response> responseOfCreateStation = StationRequest.지하철역을_생성한다(stationName);
+        ExtractableResponse<Response> responseOfCreateStation = StationStep.지하철역을_생성한다(stationName);
 
         // then
         assertThat(responseOfCreateStation.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        ExtractableResponse<Response> responseOfShowStations = StationRequest.지하철역_목록을_조회한다();
+        ExtractableResponse<Response> responseOfShowStations = StationStep.지하철역_목록을_조회한다();
         List<String> stationNames = 지하철역_목록_이름을_추출한다(responseOfShowStations);
 
         assertThat(stationNames).containsAnyOf(stationName);
@@ -44,13 +44,13 @@ public class StationAcceptanceTest extends AcceptanceTest {
     void findAllStations() {
         //given
         String 가양역 = "가양역";
-        StationRequest.지하철역을_생성한다(가양역);
+        StationStep.지하철역을_생성한다(가양역);
 
         String 여의도역 = "여의도역";
-        StationRequest.지하철역을_생성한다(여의도역);
+        StationStep.지하철역을_생성한다(여의도역);
 
         //when
-        ExtractableResponse<Response> response = StationRequest.지하철역_목록을_조회한다();
+        ExtractableResponse<Response> response = StationStep.지하철역_목록을_조회한다();
 
         //then
         List<String> stationNames = 지하철역_목록_이름을_추출한다(response);
@@ -73,16 +73,16 @@ public class StationAcceptanceTest extends AcceptanceTest {
     void deleteStationById() {
         //given
         String 가양역 = "가양역";
-        ExtractableResponse<Response> responseOfCreateStation = StationRequest.지하철역을_생성한다(가양역);
+        ExtractableResponse<Response> responseOfCreateStation = StationStep.지하철역을_생성한다(가양역);
         long stationId = 지하철역_Id를_추출한다(responseOfCreateStation);
 
         //when
-        ExtractableResponse<Response> responseOfDeleteStation = StationRequest.지하철역을_삭제한다(stationId);
+        ExtractableResponse<Response> responseOfDeleteStation = StationStep.지하철역을_삭제한다(stationId);
 
         //then
         assertThat(responseOfDeleteStation.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
-        ExtractableResponse<Response> responseOfShowStationsAfterDelete = StationRequest.지하철역_목록을_조회한다();
+        ExtractableResponse<Response> responseOfShowStationsAfterDelete = StationStep.지하철역_목록을_조회한다();
         List<Long> stationIdsAfterDelete = 지하철역_목록_Id를_추출한다(responseOfShowStationsAfterDelete);
 
         assertThat(stationIdsAfterDelete).doesNotContain(stationId);
