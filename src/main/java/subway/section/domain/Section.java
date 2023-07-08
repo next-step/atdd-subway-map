@@ -14,13 +14,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import subway.line.domain.Line;
 import subway.station.domain.Station;
 
 @Getter
-@Setter
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -56,6 +54,10 @@ public class Section {
 
     public boolean containStation(Long stationId) {
         return Objects.equals(upStation.getId(), stationId) || Objects.equals(downStation.getId(), stationId);
+    }
+
+    public void detractFromLine() {
+        this.line = null;
     }
 
 }

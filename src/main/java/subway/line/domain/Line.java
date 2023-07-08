@@ -107,7 +107,8 @@ public class Line {
 
         for (Section section : sections) {
             if (section.containStation(stationId)) {
-                section.setLine(null);
+                section.detractFromLine();
+
                 sections.remove(section);
                 break;
             }
