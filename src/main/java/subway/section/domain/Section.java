@@ -43,7 +43,7 @@ public class Section {
     @JoinColumn(name = "down_station_id")
     private Station downStation;
 
-    private Integer distance;
+    private int distance;
 
     public static Section firstSection(Line line, Station upStation, Station downStation, Integer distance) {
         return Section.builder()
