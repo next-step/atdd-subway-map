@@ -1,6 +1,7 @@
 package subway.section.application;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import subway.line.domain.Line;
 import subway.line.domain.LineRepository;
 import subway.line.exception.LineNotFoundException;
@@ -13,6 +14,7 @@ import subway.station.domain.Station;
 import subway.station.domain.StationRepository;
 import subway.station.exception.StationNotFoundException;
 
+@Transactional(readOnly = true)
 @Service
 public class SectionService {
     private final LineRepository lineRepository;
@@ -25,6 +27,7 @@ public class SectionService {
         this.sectionRepository = sectionRepository;
     }
 
+    @Transactional
     public SectionResponse registerSection(Long lineId, SectionRequest sectionRequest) {
         Line line = getLine(lineId);
         Section lastSection = line.getLastSection();
