@@ -39,13 +39,13 @@ public class LineDetail {
     }
 
     private void validateName(String name) {
-        if (name.isEmpty()) {
+        if (name == null || name.isEmpty()) {
             throw new NameNotAvailableException();
         }
     }
 
     private void validateColor(String color) {
-        if (color.isEmpty()) {
+        if (color == null || color.isEmpty()) {
             throw new ColorNotAvailableException();
         }
     }
