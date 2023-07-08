@@ -1,5 +1,7 @@
 package subway.section.domain;
 
+import java.util.Objects;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -51,4 +53,9 @@ public class Section {
                       .distance(distance)
                       .build();
     }
+
+    public boolean containStation(Long stationId) {
+        return Objects.equals(upStation.getId(), stationId) || Objects.equals(downStation.getId(), stationId);
+    }
+
 }
