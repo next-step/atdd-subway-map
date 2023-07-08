@@ -54,7 +54,7 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        SaveStationRequestDto gangnamStation = StationFixture.GANGNAM_STATION;
+        SaveStationRequestDto gangnamStation = StationFixture.강남역;
         saveStation(gangnamStation);
 
         // then
@@ -77,8 +77,8 @@ public class StationAcceptanceTest {
     @Test
     void readStations() {
         //given
-        SaveStationRequestDto gangnamStation = StationFixture.GANGNAM_STATION;
-        SaveStationRequestDto gwanggyoStation = StationFixture.GWANGGYO_STATION;
+        SaveStationRequestDto gangnamStation = StationFixture.강남역;
+        SaveStationRequestDto gwanggyoStation = StationFixture.광교역;
 
         Stream.of(gangnamStation, gwanggyoStation)
                 .forEach(this::saveStation);
@@ -103,7 +103,7 @@ public class StationAcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        SaveStationRequestDto gangnamStation = StationFixture.GANGNAM_STATION;
+        SaveStationRequestDto gangnamStation = StationFixture.강남역;
         Long savedStationId = saveStation(gangnamStation)
                 .jsonPath()
                 .getLong(STATION_ID_KEY);

@@ -57,10 +57,10 @@ public class LineAcceptanceTest {
         }
         databaseCleanUp.execute();
 
-        this.gangnamStationId = saveStation(StationFixture.GANGNAM_STATION);
-        this.gwanggyoStationId = saveStation(StationFixture.GWANGGYO_STATION);
-        this.cheongnyangniStationId = saveStation(StationFixture.CHEONGNYANGNI_STATION);
-        this.chuncheonStation = saveStation(StationFixture.CHUNCHEONSTATION_STATION);
+        this.gangnamStationId = saveStation(StationFixture.강남역);
+        this.gwanggyoStationId = saveStation(StationFixture.광교역);
+        this.cheongnyangniStationId = saveStation(StationFixture.청량리역);
+        this.chuncheonStation = saveStation(StationFixture.춘천역);
     }
 
     /**
@@ -73,7 +73,7 @@ public class LineAcceptanceTest {
     @Test
     void createLine() {
         // when
-        SaveLineRequestDto sinbundangLine = LineFixture.SINBUNDANG_LINE;
+        SaveLineRequestDto sinbundangLine = LineFixture.신분당선;
         sinbundangLine
                 .setUpStationId(gangnamStationId)
                 .setDownStationId(gwanggyoStationId);
@@ -101,7 +101,7 @@ public class LineAcceptanceTest {
     @Test
     void readLines() {
         // given
-        SaveLineRequestDto sinbundangLine = LineFixture.SINBUNDANG_LINE;
+        SaveLineRequestDto sinbundangLine = LineFixture.신분당선;
         sinbundangLine
                 .setUpStationId(gangnamStationId)
                 .setDownStationId(gwanggyoStationId);
@@ -164,7 +164,7 @@ public class LineAcceptanceTest {
     @Test
     void updateLine() {
         // given
-        SaveLineRequestDto sinbundangLine = LineFixture.SINBUNDANG_LINE;
+        SaveLineRequestDto sinbundangLine = LineFixture.신분당선;
         sinbundangLine
                 .setUpStationId(gangnamStationId)
                 .setDownStationId(gwanggyoStationId);
@@ -173,7 +173,7 @@ public class LineAcceptanceTest {
                 .getLong(LINE_ID_KEY);
 
         // when
-        UpdateLineRequestDto updateSinbundangLine = LineFixture.UPDATE_SINBUNDANG_LINE;
+        UpdateLineRequestDto updateSinbundangLine = LineFixture.업데이트한_신분당선;
         String path = String.format("%s/%d", LINE_BASE_URL, savedLineId);
         ExtractableResponse<Response> updateStationResponse = RestAssuredClient.put(path, updateSinbundangLine);
 
@@ -225,6 +225,11 @@ public class LineAcceptanceTest {
                 }
         );
     }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     *
+     */
 
     /**
      * <pre>
