@@ -23,12 +23,3 @@
 
 - [x] 지하철 구간 등록 기능
 - [x] 지하철 구간 삭제 기능
-
-#### Todo
-- [ ] ControllerAdvice: ExceptionHandler
-- [x] Exception Message Enum
-- [x] private code sequence
-- [x] station create literal
-- [ ] ~~`@MethodSource` iterator~~
-- [x] change `LineUtils` name
-- [ ] ~~Component scan scope slicing~~
