@@ -1,7 +1,6 @@
-package subway.packet;
+package subway.line.packet;
 
-import subway.Station;
-import subway.domain.Line;
+import subway.line.domain.Line;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,7 +29,7 @@ public class LineResponse {
     private String color;
     private List<Station> stations;
 
-    private LineResponse(Long id, String name, String color, List<subway.Station> stations) {
+    private LineResponse(Long id, String name, String color, List<subway.station.domain.Station> stations) {
         this.id = id;
         this.name = name;
         this.color = color;

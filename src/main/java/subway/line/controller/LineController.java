@@ -1,13 +1,13 @@
-package subway.controller;
+package subway.line.controller;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import subway.domain.Line;
-import subway.packet.LineRequest;
-import subway.packet.LineResponse;
-import subway.packet.LineUpdateRequest;
-import subway.service.LineService;
+import subway.line.domain.Line;
+import subway.line.LineService;
+import subway.line.packet.LineRequest;
+import subway.line.packet.LineResponse;
+import subway.line.packet.LineUpdateRequest;
+import subway.line.service.LineService;
 
 import java.net.URI;
 import java.util.List;

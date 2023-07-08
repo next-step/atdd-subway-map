@@ -1,6 +1,6 @@
-package subway.domain;
+package subway.line.domain;
 
-import subway.Station;
+import subway.station.domain.Station;
 
 import javax.persistence.*;
 

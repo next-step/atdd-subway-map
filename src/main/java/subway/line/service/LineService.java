@@ -1,10 +1,10 @@
-package subway.service;
+package subway.line.service;
 
 import org.springframework.stereotype.Service;
-import subway.Station;
-import subway.StationRepository;
-import subway.domain.Line;
-import subway.repository.LineRepository;
+import subway.station.domain.Station;
+import subway.station.repository.StationRepository;
+import subway.line.domain.Line;
+import subway.line.repository.LineRepository;
 
 import java.util.List;
 
