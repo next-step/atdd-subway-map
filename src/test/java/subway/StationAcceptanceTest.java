@@ -61,10 +61,8 @@ public class StationAcceptanceTest extends AcceptanceTest{
     @Test
     void deleteStation() {
         // given
-        ExtractableResponse<Response> gangnamStationCreationRes = 지하철역_생성(강남역_정보);
+        String stationUrl = 지하철역_생성(강남역_정보);
         지하철역_생성(역삼역_정보);
-
-        String stationUrl = gangnamStationCreationRes.response().getHeader("Location");
 
         // when
         지하철역_삭제(stationUrl);

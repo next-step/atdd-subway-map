@@ -25,7 +25,7 @@ public class StationTestUtils {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
-    public static ExtractableResponse<Response> 지하철역_생성(Map<String, String> 지하철_정보) {
+    public static String 지하철역_생성(Map<String, String> 지하철_정보) {
 
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
@@ -38,7 +38,7 @@ public class StationTestUtils {
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
-        return response;
+        return response.header("Location");
     }
 
     public static ExtractableResponse<Response> 지하철역_조회() {

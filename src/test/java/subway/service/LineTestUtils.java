@@ -15,7 +15,7 @@ public class LineTestUtils {
 
     private LineTestUtils() {}
 
-    public static ExtractableResponse<Response> 지하철_노선_생성(Map<String, String> 노선_생성_요청_정보, Map<String, String> 상행역_정보, Map<String, String> 하행역_정보) {
+    public static String 지하철_노선_생성(Map<String, String> 노선_생성_요청_정보, Map<String, String> 상행역_정보, Map<String, String> 하행역_정보) {
         노선_생성_요청_정보.put("upStationId", 상행역_정보.get("id"));
         노선_생성_요청_정보.put("downStationId", 하행역_정보.get("id"));
 
@@ -30,7 +30,7 @@ public class LineTestUtils {
                 .extract();
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        return response;
+        return response.header("Location");
     }
 
     public static ExtractableResponse<Response> 지하철_노선_목록_조회() {

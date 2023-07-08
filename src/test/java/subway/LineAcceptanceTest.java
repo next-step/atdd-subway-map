@@ -116,10 +116,9 @@ public class LineAcceptanceTest extends AcceptanceTest {
         지하철역_생성(판교역_정보);
 
         // Given
-        ExtractableResponse<Response> 신분당선_생성_응답 = 지하철_노선_생성(신분당선_생성_요청, 강남역_정보, 판교역_정보);
+        String lineUrl = 지하철_노선_생성(신분당선_생성_요청, 강남역_정보, 판교역_정보);
 
         // when
-        String lineUrl = 신분당선_생성_응답.header("Location");
         ExtractableResponse<Response> 노선_조회_결과 = 지하철_노선_조회(lineUrl);
 
         // then
@@ -142,10 +141,9 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 "name", "다른분당선",
                 "color", "bg-red-700"
         );
-        ExtractableResponse<Response> 신분당선_생성_응답 = 지하철_노선_생성(신분당선_생성_요청, 강남역_정보, 판교역_정보);
+        String lineUrl = 지하철_노선_생성(신분당선_생성_요청, 강남역_정보, 판교역_정보);
 
         // when
-        String lineUrl = 신분당선_생성_응답.header("Location");
         지하철_노선_수정_요청(lineUrl, 노선_수정_요청_정보);
 
         // then
@@ -164,10 +162,9 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // given
         지하철역_생성(강남역_정보);
         지하철역_생성(판교역_정보);
-        ExtractableResponse<Response> 신분당선_생성_응답 = 지하철_노선_생성(신분당선_생성_요청, 강남역_정보, 판교역_정보);
+        String lineUrl = 지하철_노선_생성(신분당선_생성_요청, 강남역_정보, 판교역_정보);
 
         // when
-        String lineUrl = 신분당선_생성_응답.header("Location");
         지하철_노선_삭제(lineUrl);
 
         // then
