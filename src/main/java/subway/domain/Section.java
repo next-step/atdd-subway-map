@@ -1,5 +1,7 @@
 package subway.domain;
 
+import org.springframework.util.ObjectUtils;
+
 import javax.persistence.*;
 
 @Entity
@@ -44,11 +46,11 @@ public class Section {
         return distance;
     }
 
-    public boolean isContainStation(String stationName) {
+    public boolean containStation(String stationName) {
         return getDownStation().getName().equals(stationName) || getUpStation().getName().equals(stationName);
     }
 
     public boolean equalsDownStation(Station station) {
-        return downStation.getName().equals(station.getName());
+        return downStation.equals(station);
     }
 }

@@ -123,11 +123,9 @@ public class SectionAcceptanceTest {
     @DisplayName("지하철 노선에 구간을 제거한다")
     @Test
     void deleteSection() {
-        Station upStation = stationRepository.save(new Station("지하철역"));
-        Station downStation = stationRepository.save(new Station("새로운지하철역"));
-        Line 신분당선 = 지하철노선_생성(upStation, downStation, 10L, "신분당선", "bg-red-600");
-
+        Station 지하철역 = stationRepository.save(new Station("지하철역"));
         Station 새로운_지하철역 = stationRepository.save(new Station("새로운지하철역"));
+        Line 신분당선 = 지하철노선_생성(지하철역, 새로운_지하철역, 10L, "신분당선", "bg-red-600");
         Station 또다른_지하철역 = stationRepository.save(new Station("또다른지하철역"));
 
         Section registSection = sectionRepository.save(new Section(새로운_지하철역, 또다른_지하철역, 3L));
@@ -148,11 +146,10 @@ public class SectionAcceptanceTest {
     @DisplayName("지하철 노선에 등록된 하행종점역이 아닌 역을 생성하고 구간을 제거할때 에러가 발생한다")
     @Test
     void deleteSectionErrorCaseOne() {
-        Station upStation = stationRepository.save(new Station("지하철역"));
-        Station downStation = stationRepository.save(new Station("새로운지하철역"));
-        Line 신분당선 = 지하철노선_생성(upStation, downStation, 10L, "신분당선", "bg-red-600");
-
+        Station 지하철역 = stationRepository.save(new Station("지하철역"));
         Station 새로운_지하철역 = stationRepository.save(new Station("새로운지하철역"));
+        Line 신분당선 = 지하철노선_생성(지하철역, 새로운_지하철역, 10L, "신분당선", "bg-red-600");
+
         Station 또다른_지하철역 = stationRepository.save(new Station("또다른지하철역"));
         Section registSection = sectionRepository.save(new Section(새로운_지하철역, 또다른_지하철역, 3L));
         신분당선.registerSection(registSection);

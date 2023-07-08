@@ -102,11 +102,7 @@ public class Line {
             throw new SubwayException("새로운 구간의 상행역은 노선에 등록되어 있는 하행 종점역이어야 합니다.");
         }
 
-        long count = sections.stream()
-                .filter(s -> s.isContainStation(downStationName) || s.isContainStation(downStationName))
-                .count();
-
-        if (count > 0) {
+        if (sections.stream().anyMatch(s -> s.containStation(downStationName))) {
             throw new SubwayException("새로운 구간의 하행역은 노선에 등록되어 있는 역일 수 없습니다.");
         }
     }
