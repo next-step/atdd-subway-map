@@ -1,5 +1,6 @@
 package subway.line.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -9,11 +10,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import subway.line.domain.Line;
+import subway.line.domain.Sections;
 import subway.line.exception.LineNotFoundException;
 import subway.line.repository.LineRepository;
 import subway.line.view.LineCreateRequest;
 import subway.line.view.LineModifyRequest;
 import subway.line.view.LineResponse;
+import subway.section.domain.Section;
 import subway.station.domain.Station;
 import subway.station.service.StationService;
 
@@ -36,7 +39,23 @@ public class LineService {
     }
 
     private Line mapRequestToEntity(LineCreateRequest request, Station upStation, Station downStation) {
-        return Line.firstLine(request.getName(), request.getColor(), upStation, downStation, request.getDistance());
+        Section section = Section.builder()
+                                 .downStation(downStation)
+                                 .upStation(upStation)
+                                 .distance(request.getDistance())
+                                 .build();
+
+        Line line = Line.builder()
+                        .name(request.getName())
+                        .color(request.getColor())
+                        .upStation(upStation)
+                        .downStation(downStation)
+                        .sections(new Sections(new ArrayList<>()))
+                        .build();
+
+        line.addSection(section);
+
+        return line;
     }
 
     @Transactional(readOnly = true)

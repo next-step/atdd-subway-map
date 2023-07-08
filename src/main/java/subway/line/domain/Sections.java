@@ -9,6 +9,7 @@ import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
 
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -20,14 +21,11 @@ import subway.section.exception.SectionNotFoundException;
 @Getter
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class Sections {
 
     @OneToMany(mappedBy = "line", cascade = { CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private List<Section> sections = new ArrayList<>();
-
-    public Sections(List<Section> sections) {
-        this.sections = sections;
-    }
 
     public boolean isLastDownStation(Long stationId) {
         if (CollectionUtils.isEmpty(this.sections)) {
@@ -74,5 +72,13 @@ public class Sections {
                        .filter(section -> section.isMe(upStationId, downStationId))
                        .findFirst()
                        .orElseThrow(SectionNotFoundException::new);
+    }
+
+    public boolean isEmpty() {
+        return this.sections.isEmpty();
+    }
+
+    public boolean isNotEmpty() {
+        return !isEmpty();
     }
 }

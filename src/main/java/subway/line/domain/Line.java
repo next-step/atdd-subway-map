@@ -1,7 +1,5 @@
 package subway.line.domain;
 
-import java.util.List;
-
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -49,25 +47,8 @@ public class Line {
     @JoinColumn(name = "down_station_id")
     private Station downStation;
 
-//    @OneToMany(mappedBy = "line", cascade = { CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
-//    private List<Section> sections = new ArrayList<>();
-
     @Embedded
     private Sections sections = new Sections();
-
-    public static Line firstLine(String name, String color, Station upStation, Station downStation, int distance) {
-        return new Line(null, name, color, upStation, downStation, distance);
-    }
-
-    protected Line(Long id, String name, String color, Station upStation, Station downStation, int distance) {
-        this.id = id;
-        this.name = name;
-        this.color = color;
-        this.upStation = upStation;
-        this.downStation = downStation;
-
-        this.sections = new Sections(List.of(Section.firstSection(this, upStation, downStation, distance)));
-    }
 
     public void changeNameAndColor(String name, String color) {
         this.name = name;
@@ -88,12 +69,14 @@ public class Line {
     }
 
     public void addSection(Section section) {
-        if (!section.isUpstation(downStation.getId())) {
-            throw new InvalidSectionCreateException(ErrorCode.SECTION_CREATE_FAIL_BY_UPSTATION);
-        }
+        if (sections.isNotEmpty()) {
+            if (!section.isUpstation(downStation.getId())) {
+                throw new InvalidSectionCreateException(ErrorCode.SECTION_CREATE_FAIL_BY_UPSTATION);
+            }
 
-        if (section.isDownstation(downStation.getId()) || section.isDownstation(upStation.getId())) {
-            throw new InvalidSectionCreateException(ErrorCode.SECTION_CREATE_FAIL_BY_DOWNSTATION);
+            if (section.isDownstation(downStation.getId()) || section.isDownstation(upStation.getId())) {
+                throw new InvalidSectionCreateException(ErrorCode.SECTION_CREATE_FAIL_BY_DOWNSTATION);
+            }
         }
 
         section.attachToLine(this);

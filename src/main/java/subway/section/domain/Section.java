@@ -10,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,7 +21,7 @@ import subway.station.domain.Station;
 
 @Getter
 @Entity
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
 public class Section {
@@ -42,15 +43,6 @@ public class Section {
     private Station downStation;
 
     private int distance;
-
-    public static Section firstSection(Line line, Station upStation, Station downStation, Integer distance) {
-        return Section.builder()
-                      .line(line)
-                      .upStation(upStation)
-                      .downStation(downStation)
-                      .distance(distance)
-                      .build();
-    }
 
     public boolean containStation(Long stationId) {
         return Objects.equals(upStation.getId(), stationId) || Objects.equals(downStation.getId(), stationId);
