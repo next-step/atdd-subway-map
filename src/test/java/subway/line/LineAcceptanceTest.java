@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -130,15 +129,9 @@ public class LineAcceptanceTest extends AcceptanceTest {
     }
 
     private LineRequest 지하철역_생성_및_지하철_노선_요청_객체_생성(String lineName, String color, String upStationName, String downStationName, Long distance) {
-        ExtractableResponse<Response> upStationCreateResponse = 지하철역_생성_요청(upStationName);
-        Assertions.assertThat(upStationCreateResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        String upStationId = upStationCreateResponse.response().getHeaders().get("location").getValue().split("/stations/")[1];
-
-        ExtractableResponse<Response> downStationCreateResponse = 지하철역_생성_요청(downStationName);
-        Assertions.assertThat(downStationCreateResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        String downStationId = downStationCreateResponse.response().getHeaders().get("location").getValue().split("/stations/")[1];
-
-        return new LineRequest(lineName, color, Long.valueOf(upStationId), Long.valueOf(downStationId), distance);
+        Long upStationId = 지하철역_생성_요청_및_아이디_추출(upStationName);
+        Long downStationId = 지하철역_생성_요청_및_아이디_추출(downStationName);
+        return new LineRequest(lineName, color, upStationId, downStationId, distance);
     }
 
     private Long 지하철_노선_생성_요쳥_및_아이디_추출(LineRequest request) {

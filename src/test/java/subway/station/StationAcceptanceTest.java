@@ -89,6 +89,23 @@ public class StationAcceptanceTest extends AcceptanceTest {
                 .extract();
     }
 
+    public static Long 지하철역_생성_요청_및_아이디_추출(String stationName) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", stationName);
+
+        ExtractableResponse<Response> createResponse = RestAssured
+                .given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/stations")
+                .then().log().all()
+                .extract();
+
+        String stationId = createResponse.response().getHeaders().get("location").getValue().split("/stations/")[1];
+        return Long.valueOf(stationId);
+    }
+
     public static ExtractableResponse<Response> 지하철역_목록_조회_요청() {
         return RestAssured
                 .given().log().all()
