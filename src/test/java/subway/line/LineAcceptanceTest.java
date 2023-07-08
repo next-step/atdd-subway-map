@@ -40,7 +40,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         LineRequest request = 지하철역_생성_및_지하철_노선_요청_객체_생성(SINBUNDANG_LINE_NAME, SINBUNDANG_LINE_COLOR, SINBUNDANG_UP_STATION_NAME, SINBUNDANG_DOWN_STATION_NAME, SINBUNDANG_LINE_DISTANCE);
 
         // when
-        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요쳥(request);
+        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(request);
         String lineId = createResponse.response().getHeaders().get("location").getValue().split("/lines/")[1];
 
         // then
@@ -62,15 +62,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
         LineRequest request1 = 지하철역_생성_및_지하철_노선_요청_객체_생성(SINBUNDANG_LINE_NAME, SINBUNDANG_LINE_COLOR, SINBUNDANG_UP_STATION_NAME, SINBUNDANG_DOWN_STATION_NAME, SINBUNDANG_LINE_DISTANCE);
         LineRequest request2 = 지하철역_생성_및_지하철_노선_요청_객체_생성(SUINBUNDANG_LINE_NAME, SUINBUNDANG_LINE_COLOR, SUINBUNDANG_UP_STATION_NAME, SUINBUNDANG_DOWN_STATION_NAME, SUINBUNDANG_LINE_DISTANCE);
 
-        ExtractableResponse<Response> createResponse1 = 지하철_노선_생성_요쳥(request1);
-        String lineId1 = createResponse1.response().getHeaders().get("location").getValue().split("/lines/")[1];
-
-        assertThat(createResponse1.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-        ExtractableResponse<Response> createResponse2 = 지하철_노선_생성_요쳥(request2);
-        String lineId2 = createResponse2.response().getHeaders().get("location").getValue().split("/lines/")[1];
-
-        assertThat(createResponse2.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        Long lineId1 = 지하철_노선_생성_요쳥_및_아이디_추출(request1);
+        Long lineId2 = 지하철_노선_생성_요쳥_및_아이디_추출(request2);
 
         // when
         ExtractableResponse<Response> showResponse = 지하철_노선_목록_조회_요청();
@@ -93,11 +86,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void 지하철_노선_조회() throws JsonProcessingException {
         // given
         LineRequest request = 지하철역_생성_및_지하철_노선_요청_객체_생성(SINBUNDANG_LINE_NAME, SINBUNDANG_LINE_COLOR, SINBUNDANG_UP_STATION_NAME, SINBUNDANG_DOWN_STATION_NAME, SINBUNDANG_LINE_DISTANCE);
-
-        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요쳥(request);
-        String lineId = createResponse.response().getHeaders().get("location").getValue().split("/lines/")[1];
-
-        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        Long lineId = 지하철_노선_생성_요쳥_및_아이디_추출(request);
 
         // when
         ExtractableResponse<Response> showResponse = 지하철_노선_요청(lineId);
@@ -114,11 +103,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void 지하철_노선_수정() {
         // given
         LineRequest createRequest = 지하철역_생성_및_지하철_노선_요청_객체_생성(SINBUNDANG_LINE_NAME, SINBUNDANG_LINE_COLOR, SINBUNDANG_UP_STATION_NAME, SINBUNDANG_DOWN_STATION_NAME, SINBUNDANG_LINE_DISTANCE);
-
-        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요쳥(createRequest);
-        String lineId = createResponse.response().getHeaders().get("location").getValue().split("/lines/")[1];
-
-        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        Long lineId = 지하철_노선_생성_요쳥_및_아이디_추출(createRequest);
 
         // when
         LineRequest updateRequest = 지하철역_생성_및_지하철_노선_요청_객체_생성(SUINBUNDANG_LINE_NAME, SUINBUNDANG_LINE_COLOR, SUINBUNDANG_UP_STATION_NAME, SUINBUNDANG_DOWN_STATION_NAME, SUINBUNDANG_LINE_DISTANCE);
@@ -132,10 +117,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void 지하철_노선_삭제() {
         // given
         LineRequest createRequest = 지하철역_생성_및_지하철_노선_요청_객체_생성(SINBUNDANG_LINE_NAME, SINBUNDANG_LINE_COLOR, SINBUNDANG_UP_STATION_NAME, SINBUNDANG_DOWN_STATION_NAME, SINBUNDANG_LINE_DISTANCE);
-
-        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요쳥(createRequest);
-        String lineId = createResponse.response().getHeaders().get("location").getValue().split("/lines/")[1];
-        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        Long lineId = 지하철_노선_생성_요쳥_및_아이디_추출(createRequest);
 
         // when
         ExtractableResponse<Response> deleteResponse = 지하철_노선_제거_요청(lineId);
@@ -159,7 +141,13 @@ public class LineAcceptanceTest extends AcceptanceTest {
         return new LineRequest(lineName, color, Long.valueOf(upStationId), Long.valueOf(downStationId), distance);
     }
 
-    private ExtractableResponse<Response> 지하철_노선_생성_요쳥(LineRequest request) {
+    private Long 지하철_노선_생성_요쳥_및_아이디_추출(LineRequest request) {
+        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(request);
+        String lineId = createResponse.response().getHeaders().get("location").getValue().split("/lines/")[1];
+        return Long.valueOf(lineId);
+    }
+
+    private ExtractableResponse<Response> 지하철_노선_생성_요청(LineRequest request) {
         return RestAssured
                 .given().log().all()
                 .body(request)
@@ -179,7 +167,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 .extract();
     }
 
-    private ExtractableResponse<Response> 지하철_노선_요청(String lineId) {
+    private ExtractableResponse<Response> 지하철_노선_요청(Long lineId) {
         return RestAssured
                 .given().log().all()
                 .when()
@@ -188,7 +176,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 .extract();
     }
 
-    private ExtractableResponse<Response> 지하철_노선_수정_요청(String lineId, LineRequest request) {
+    private ExtractableResponse<Response> 지하철_노선_수정_요청(Long lineId, LineRequest request) {
         return RestAssured
                 .given().log().all()
                 .body(request)
@@ -199,7 +187,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 .extract();
     }
 
-    private ExtractableResponse<Response> 지하철_노선_제거_요청(String lineId) {
+    private ExtractableResponse<Response> 지하철_노선_제거_요청(Long lineId) {
         return RestAssured
                 .given().log().all()
                 .when()

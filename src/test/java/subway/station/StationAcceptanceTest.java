@@ -40,11 +40,8 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철역_목록_조회() {
         // given
-        ExtractableResponse<Response> createResponse1 = 지하철역_생성_요청(GANGNAM_STATION_NAME);
-        assertThat(createResponse1.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-        ExtractableResponse<Response> createResponse2 = 지하철역_생성_요청(SEOCHO_STATION_NAME);
-        assertThat(createResponse2.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        지하철역_생성_요청(GANGNAM_STATION_NAME);
+        지하철역_생성_요청(SEOCHO_STATION_NAME);
 
         // when
         ExtractableResponse<Response> showResponse = 지하철역_목록_조회_요청();
@@ -60,7 +57,6 @@ public class StationAcceptanceTest extends AcceptanceTest {
     void 지하철역_제거() {
         // given
         ExtractableResponse<Response> createResponse = 지하철역_생성_요청(GANGNAM_STATION_NAME);
-        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // when
         String location = createResponse.response().getHeaders().get("location").getValue();
