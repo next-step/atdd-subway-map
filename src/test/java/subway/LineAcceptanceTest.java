@@ -1,32 +1,23 @@
 package subway;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
 import subway.domain.Station;
-import subway.repository.StationRepository;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static subway.SubwayClient.*;
 
-@DirtiesContext
+@Sql("/truncate.sql")
 @DisplayName("지하철노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@Sql("/truncate.sql")
 public class LineAcceptanceTest {
-    @Autowired
-    StationRepository stationRepository;
 
     /**
      * When 지하철 노선을 생성하면
@@ -35,11 +26,12 @@ public class LineAcceptanceTest {
     @DisplayName("지하철노선을 생성한다.")
     @Test
     void createLine() {
-        Station 지하철역 = stationRepository.save(new Station("지하철역"));
-        Station 새로운지하철역 = stationRepository.save(new Station("새로운지하철역"));
+        Station 지하철역 = 지하철역을_생성한다("지하철역");
+        Station 새로운_지하철역 = 지하철역을_생성한다("새로운지하철역");
 
         // when
-        Map<String, Object> params = createParams("신분당선", "bg-red-600", 지하철역.getId(), 새로운지하철역.getId(), 10);
+        Map<String, Object> params = createLineParams("신분당선", "bg-red-600", 지하철역.getId()
+                , 새로운_지하철역.getId(), 10L);
         지하철노선을_생성한다(params);
 
         // then
@@ -58,13 +50,15 @@ public class LineAcceptanceTest {
     @DisplayName("지하철노선 목록을 조회한다.")
     @Test
     void selectLines() {
-        Station 지하철역 = stationRepository.save(new Station("지하철역"));
-        Station 새로운지하철역 = stationRepository.save(new Station("새로운지하철역"));
-        Station 또다른지하철역 = stationRepository.save(new Station("또다른지하철역"));
+        Station 지하철역 = 지하철역을_생성한다("지하철역");
+        Station 새로운_지하철역 = 지하철역을_생성한다("새로운지하철역");
+        Station 또다른_지하철역 = 지하철역을_생성한다("또다른지하철역");
 
         // given
-        Map<String, Object> params_A = createParams("신분당선", "bg-red-600", 지하철역.getId(), 새로운지하철역.getId(), 10);
-        Map<String, Object> params_B = createParams("분당선", "bg-green-600", 지하철역.getId(), 또다른지하철역.getId(), 10);
+        Map<String, Object> params_A = createLineParams("신분당선", "bg-red-600", 지하철역.getId()
+                , 새로운_지하철역.getId(), 10L);
+        Map<String, Object> params_B = createLineParams("분당선", "bg-green-600", 지하철역.getId()
+                , 또다른_지하철역.getId(), 10L);
 
         지하철노선을_생성한다(params_A);
         지하철노선을_생성한다(params_B);
@@ -85,11 +79,12 @@ public class LineAcceptanceTest {
     @DisplayName("지하철노선을 조회한다.")
     @Test
     void selectLine() {
-        Station 지하철역 = stationRepository.save(new Station("지하철역"));
-        Station 새로운지하철역 = stationRepository.save(new Station("새로운지하철역"));
+        Station 지하철역 = 지하철역을_생성한다("지하철역");
+        Station 새로운_지하철역 = 지하철역을_생성한다("새로운지하철역");
 
         // given
-        Map<String, Object> params = createParams("신분당선", "bg-red-600", 지하철역.getId(), 새로운지하철역.getId(), 10);
+        Map<String, Object> params = createLineParams("신분당선", "bg-red-600", 지하철역.getId()
+                , 새로운_지하철역.getId(), 10L);
         ExtractableResponse<Response> response = 지하철노선을_생성한다(params);
         long createId = response.jsonPath().getLong("id");
 
@@ -109,11 +104,12 @@ public class LineAcceptanceTest {
     @DisplayName("지하철노선을 수정한다.")
     @Test
     void updateLine() {
-        Station 지하철역 = stationRepository.save(new Station("지하철역"));
-        Station 새로운지하철역 = stationRepository.save(new Station("새로운지하철역"));
+        Station 지하철역 = 지하철역을_생성한다("지하철역");
+        Station 새로운_지하철역 = 지하철역을_생성한다("새로운지하철역");
 
         // given
-        Map<String, Object> params = createParams("신분당선", "bg-red-600", 지하철역.getId(), 새로운지하철역.getId(), 10);
+        Map<String, Object> params = createLineParams("신분당선", "bg-red-600", 지하철역.getId()
+                , 새로운_지하철역.getId(), 10L);
         ExtractableResponse<Response> createResponse = 지하철노선을_생성한다(params);
         long id = createResponse.jsonPath().getLong("id");
 
@@ -137,90 +133,21 @@ public class LineAcceptanceTest {
     @DisplayName("지하철노선을 삭제한다.")
     @Test
     void deleteLine() {
-        Station 지하철역 = stationRepository.save(new Station("지하철역"));
-        Station 새로운지하철역 = stationRepository.save(new Station("새로운지하철역"));
+        Station 지하철역 = 지하철역을_생성한다("지하철역");
+        Station 새로운_지하철역 = 지하철역을_생성한다("새로운지하철역");
 
         // given
-        Map<String, Object> params = createParams("신분당선", "bg-red-600", 지하철역.getId(), 새로운지하철역.getId(), 10);
+        Map<String, Object> params = createLineParams("신분당선", "bg-red-600", 지하철역.getId()
+                , 새로운_지하철역.getId(), 10L);
         ExtractableResponse<Response> response = 지하철노선을_생성한다(params);
         long id = response.jsonPath().getLong("id");
 
-        // when, then
+        // when
         지하철노선을_하나를_삭제한다(id);
-    }
 
-    private void 지하철노선_한개를_수정한다(Long id, String name, String color) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-        params.put("color", color);
-
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .put("/lines/" + id)
-                .then().log().all().extract();
-
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-    }
-
-    private void 지하철노선을_하나를_삭제한다(Long id) {
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .when()
-                .delete("/lines/" + id)
-                .then().log().all()
-                .extract();
-
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-    }
-
-    private static ExtractableResponse<Response> 지하철노선_목록을_조회한다() {
-        return RestAssured
-                .given().log().all()
-                .when()
-                .get("/lines")
-                .then().log().all()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> 지하철노선을_생성한다(Map<String, Object> params) {
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines")
-                .then().log().all()
-                .extract();
-
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-        return response;
-    }
-
-    private static ExtractableResponse<Response> 지하철노선_한개를_조회한다(long id) {
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .when()
-                .get("/lines/" + id)
-                .then().log().all()
-                .extract();
-
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-
-        return response;
-    }
-
-    private Map<String, Object> createParams(String name, String color, Long upStationId, Long downStationId
-            , int distance) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("name", name);
-        params.put("color", color);
-        params.put("upStationId", upStationId);
-        params.put("downStationId", downStationId);
-        params.put("distance", distance);
-        return params;
+        // then
+        ExtractableResponse<Response> selectResponse = 지하철노선_목록을_조회한다();
+        List<Long> stationIds = selectResponse.jsonPath().getList("id", Long.class);
+        assertThat(stationIds).doesNotContain(id);
     }
 }

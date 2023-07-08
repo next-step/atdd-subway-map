@@ -1,6 +1,12 @@
 package subway.domain;
 
+import subway.exception.SubwayException;
+
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Entity
 public class Line {
@@ -14,26 +20,16 @@ public class Line {
     @Column(nullable = false)
     private String color;
 
-    @ManyToOne
-    @JoinColumn(name = "upStation_id")
-    private Station upStation;
-
-    @ManyToOne
-    @JoinColumn(name = "downStation_id")
-    private Station downStation;
-
-    @Column(nullable = false)
-    private Long distance;
+    @OneToMany
+    private List<Section> sections = new ArrayList<>();
 
     public Line() {
     }
 
-    public Line(String name, String color, Station upStation, Station downStation, Long distance) {
+    public Line(String name, String color, Section section) {
         this.name = name;
         this.color = color;
-        this.upStation = upStation;
-        this.downStation = downStation;
-        this.distance = distance;
+        sections.add(section);
     }
 
     public Long getId() {
@@ -48,20 +44,66 @@ public class Line {
         return color;
     }
 
-    public Station getUpStation() {
-        return upStation;
+    public List<Section> getSections() {
+        return sections;
     }
 
-    public Station getDownStation() {
-        return downStation;
+    public List<Station> getContainStations() {
+        List<Station> list = sections.stream()
+                .flatMap(section -> Stream.of(section.getUpStation(), section.getDownStation()))
+                .collect(Collectors.toList());
+
+        return list.stream()
+                .map(station -> station.getName())
+                .distinct()
+                .map(name -> list.stream()
+                        .filter(n -> n.getName().equals(name)).findFirst().orElse(null))
+                .collect(Collectors.toList());
     }
 
     public Long getDistance() {
-        return distance;
+        return sections.stream().mapToLong(Section::getDistance).sum();
     }
 
     public void updateNameAndColor(String name, String color) {
         this.name = name;
         this.color = color;
+    }
+
+    public void registerSection(Section section) {
+        validateRegister(section);
+
+        sections.add(section);
+    }
+
+    public void deleteSection(Station station) {
+        validateDelete(station);
+
+        sections.remove(sections.size() - 1);
+    }
+
+    private void validateDelete(Station station) {
+        Section lastSection = sections.get(sections.size() - 1);
+
+        if (!lastSection.equalsDownStation(station)) {
+            throw new SubwayException("지하철 노선에 등록된 하행 종점역만 제거할 수 있습니다.");
+        }
+
+        if (sections.size() == 1) {
+            throw new SubwayException("노선에 구간이 한개인 경우 삭제할 수 없습니다.");
+        }
+    }
+
+    private void validateRegister(Section section) {
+        String downStationName = section.getDownStation().getName();
+        Section lastSection = sections.get(sections.size() - 1);
+
+        if (!lastSection.equalsDownStation(section.getUpStation())) {
+            throw new SubwayException("새로운 구간의 상행역은 노선에 등록되어 있는 하행 종점역이어야 합니다.");
+        }
+
+        if (sections.stream().anyMatch(s -> s.containStation(downStationName))) {
+            throw new SubwayException("새로운 구간의 하행역은 노선에 등록되어 있는 역일 수 없습니다.");
+        }
     }
 }

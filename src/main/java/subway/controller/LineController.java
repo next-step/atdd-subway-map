@@ -2,11 +2,14 @@ package subway.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import subway.domain.Section;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
+import subway.dto.LineSectionRegisterRequest;
 import subway.service.LineService;
 import subway.dto.LineUpdateRequest;
 
+import javax.persistence.PreUpdate;
 import java.net.URI;
 import java.util.List;
 
@@ -45,5 +48,18 @@ public class LineController {
     public ResponseEntity<Void> deleteById(@PathVariable Long id) {
         lineService.deleteLineById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping(value = "/lines/{id}/sections")
+    public ResponseEntity<Void> registerSections(@PathVariable Long id
+            , @RequestBody LineSectionRegisterRequest lineSectionRegisterRequest) {
+        lineService.registerSections(id, lineSectionRegisterRequest);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping(value = "/lines/{id}/sections")
+    public ResponseEntity<Void> deleteSections(@PathVariable Long id, @RequestParam Long stationId) {
+        lineService.deleteSections(id, stationId);
+        return ResponseEntity.ok().build();
     }
 }
