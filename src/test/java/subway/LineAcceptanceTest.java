@@ -6,11 +6,12 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import subway.dto.StationResponse;
-import subway.service.StationTestUtils;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.*;
 import static subway.service.LineTestUtils.*;
@@ -99,10 +100,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
         지하철_노선_생성(이호선_생성_요청, 강남역_정보, 삼성역_정보);
 
         // when
-        ExtractableResponse<Response> 노선_목록_조회_결과 = 지하철_노선_목록_조회();
-
         // then
-        지하철_노선_목록_검증(노선_목록_조회_결과, 신분당선_생성_요청, 강남역_정보, 판교역_정보, 이호선_생성_요청, 강남역_정보, 삼성역_정보);
+        지하철_노선_목록_검증(지하철_노선_목록_조회());
     }
 
     /**
@@ -176,22 +175,29 @@ public class LineAcceptanceTest extends AcceptanceTest {
     }
 
     private static void 지하철_노선_생성_여부_검증(ExtractableResponse<Response> 노선_목록_조회_결과, Map<String, String> 노선_생성_요청_정보,
-                                        Map<String, String> 상행역_정보, Map<String, String> 하행역_정보) {
+                                        Map<String, String>... 역_정보들) {
         assertThat(노선_목록_조회_결과.jsonPath().getList("id")).isNotEmpty();
         assertThat(노선_목록_조회_결과.jsonPath().getList("name", String.class)).contains(노선_생성_요청_정보.get("name"));
         assertThat(노선_목록_조회_결과.jsonPath().getList("color", String.class)).contains(노선_생성_요청_정보.get("color"));
 
         List<Object> ids = JsonPath.parse(노선_목록_조회_결과.body().asString()).read("$.[*].stations[*].id");
         List<Object> names = JsonPath.parse(노선_목록_조회_결과.body().asString()).read("$.[*].stations[*].name");
-        assertThat(ids).contains(Integer.valueOf(상행역_정보.get("id")), Integer.valueOf(하행역_정보.get("id")));
-        assertThat(names).contains(상행역_정보.get("name"), 하행역_정보.get("name"));
+        assertThat(ids).containsAll(
+                Arrays.stream(역_정보들)
+                        .map(m -> m.get("id"))
+                        .map(Integer::valueOf)
+                        .collect(Collectors.toList())
+        );
+        assertThat(names).containsAll(
+                Arrays.stream(역_정보들)
+                        .map(m -> m.get("name"))
+                        .collect(Collectors.toList())
+        );
     }
 
-    private static void 지하철_노선_목록_검증(ExtractableResponse<Response> 노선_목록_조회_결과,
-                                     Map<String, String> 노선1_생성_요청_정보, Map<String, String> 상행역1_정보, Map<String, String> 하행역1_정보,
-                                     Map<String, String> 노선2_생성_요청_정보, Map<String, String> 상행역2_정보, Map<String, String> 하행역2_정보) {
-        지하철_노선_생성_여부_검증(노선_목록_조회_결과, 노선1_생성_요청_정보, 상행역1_정보, 하행역1_정보);
-        지하철_노선_생성_여부_검증(노선_목록_조회_결과, 노선2_생성_요청_정보, 상행역2_정보, 하행역2_정보);
+    private static void 지하철_노선_목록_검증(ExtractableResponse<Response> 노선_목록_조회_결과) {
+        지하철_노선_생성_여부_검증(노선_목록_조회_결과, 신분당선_생성_요청, 강남역_정보, 판교역_정보);
+        지하철_노선_생성_여부_검증(노선_목록_조회_결과, 이호선_생성_요청, 강남역_정보, 삼성역_정보);
     }
 
     private void 지하철_노선_조회_검증(ExtractableResponse<Response> 노선_조회_결과, Map<String, String> 노선_생성_요청_정보) {
