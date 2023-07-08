@@ -1,6 +1,7 @@
 package subway.line.domain;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -62,5 +63,10 @@ public class Line {
 
     public List<Section> getSections() {
         return sections;
+    }
+
+    public Section getLastSection() {
+        sections.sort(Comparator.comparing(Section::getId));
+        return sections.get(sections.size() - 1);
     }
 }

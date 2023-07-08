@@ -69,14 +69,27 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     }
 
     /**
-     * Given : 새로운 노선을 1개 생성하고
+     * Given : 지하철역을 4개 생성하고
+     * And : 새로운 노선을 1개 생성한 후
      * When : 상행역이 해당 노선의 하행 종점역이 아닌 새로운 구간을 등록하면
      * Then : 예외가 발생한다
      */
     @DisplayName("지하철 구간 등록 예외 케이스 : 노선의 하행 종점역 != 새로운 노선의 상행역")
     @Test
     void registerSectionFailCase1() {
+        // given
+        long 노선_상행_Id = 응답_결과에서_Id를_추출한다(StationStep.지하철역을_생성한다("강남역"));
+        long 노선_하행_Id = 응답_결과에서_Id를_추출한다(StationStep.지하철역을_생성한다("양재역"));
+        long 구간_상행_Id = 응답_결과에서_Id를_추출한다(StationStep.지하철역을_생성한다("여의도역"));
+        long 구간_하행_Id = 응답_결과에서_Id를_추출한다(StationStep.지하철역을_생성한다("마곡나루역"));
 
+        long lineId = 응답_결과에서_Id를_추출한다(LineStep.지하철_노선을_생성한다(노선_상행_Id, 노선_하행_Id, "신분당선"));
+
+        // when
+        ExtractableResponse<Response> createSectionResponse = SectionStep.지하철_노선_구간을_등록한다(lineId, 구간_상행_Id, 구간_하행_Id);
+
+        // then
+        assertThat(createSectionResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     /**

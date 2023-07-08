@@ -1,8 +1,11 @@
 package subway.common.exception;
 
 public enum ErrorCode {
+    INVALID_SECTION_REGISTRATION_EXCEPTION(400, "새로운 구간의 상행역은 노선에 등록된 마지막 구간의 하행역과 같아야 합니다."),
+    ALREADY_REGISTERED_STATION_EXCEPTION(400, "새로운 구간의 하행역은 노선에 등록되어 있는 구간들의 역과 중복될 수 없습니다."),
+
     STATION_NOT_FOUND_EXCEPTION(404, "없는 지하철역입니다."),
-    LINE_NOT_FOUND_EXCEPTION(404, "없는 지하철 노선입니다.")
+    LINE_NOT_FOUND_EXCEPTION(404, "없는 지하철 노선입니다."),
     ;
 
     private final int status;

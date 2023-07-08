@@ -65,14 +65,6 @@ public class Section {
         return line;
     }
 
-    public Station getUpStation() {
-        return upStation;
-    }
-
-    public Station getDownStation() {
-        return downStation;
-    }
-
     public Integer getDistance() {
         return distance;
     }
@@ -91,5 +83,9 @@ public class Section {
 
     public String getDownStationName() {
         return downStation.getName();
+    }
+
+    public boolean downStationEqualsTo(Station upStation) {
+        return downStation.equals(upStation);
     }
 }
