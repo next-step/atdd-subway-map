@@ -42,12 +42,10 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         LineRequest request = 지하철역_생성_및_지하철_노선_요청_객체_생성(SINBUNDANG_LINE_NAME, SINBUNDANG_LINE_COLOR, SINBUNDANG_UP_STATION_NAME, SINBUNDANG_DOWN_STATION_NAME, SINBUNDANG_LINE_DISTANCE);
         ExtractableResponse<Response> createLineResponse = 지하철_노선_생성_요청(request);
         LineResponse lineResponse = ObjectMapperHolder.instance.readValue(createLineResponse.response().body().asString(), LineResponse.class);
-
-        Long downStationId = lineResponse.getStations().get(1).getId();
         Long newDownStationId = 지하철역_생성_요청_및_아이디_추출(SINBUNDANG_NEW_DOWN_STATION_NAME);
 
         // when
-        ExtractableResponse<Response> createSectionResponse = 지하철_구간_생성_요청(lineResponse.getId(), new SectionRequest(downStationId, newDownStationId, SINBUNDANG_NEW_DISTANCE));
+        ExtractableResponse<Response> createSectionResponse = 지하철_구간_생성_요청(lineResponse.getId(), new SectionRequest(newDownStationId, SINBUNDANG_NEW_DISTANCE));
 
         // then
         assertThat(createSectionResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
