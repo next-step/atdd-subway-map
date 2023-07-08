@@ -3,6 +3,7 @@ package subway.station.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.line.constant.StationMessage;
 import subway.station.dto.StationRequest;
 import subway.station.dto.StationResponse;
 import subway.station.model.Station;
@@ -16,7 +17,6 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class StationService {
 
-    private final String NOT_FOUND_MESSAGE = "존재하지 않는 역 입니다";
     private final StationRepository stationRepository;
 
     @Transactional
@@ -40,6 +40,6 @@ public class StationService {
 
     public Station findStationById(Long id) {
         return stationRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_MESSAGE));
+                .orElseThrow(() -> new IllegalArgumentException(StationMessage.NOT_FOUND_MESSAGE.getMessage()));
     }
 }

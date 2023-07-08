@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import subway.line.constant.LineMessage;
 import subway.station.model.Station;
 
 import javax.persistence.CascadeType;
@@ -71,11 +72,12 @@ public class Line {
 
     public Section deleteSectionByStation(Station station) {
         if (this.sections.size() < MINIMAL_SECTION_SIZE) {
-            throw new IllegalArgumentException("구간은 " + MINIMAL_SECTION_SIZE + "개 이하일 수 없습니다.");
+            throw new IllegalArgumentException(LineMessage.DOWN_STATION_MINIMAL_VALID_MESSAGE.getFormatMessage(MINIMAL_SECTION_SIZE));
         }
         if (!this.downStation.equals(station)) {
-            throw new IllegalArgumentException("마지막 구간만 삭제 할 수 있습니다.");
+            throw new IllegalArgumentException(LineMessage.SECTION_DELETE_LAST_STATION_VALID_MESSATE.getMessage());
         }
+
         final int lastElementIndex = this.sections.size() - 1;
         Section lastSection = this.sections.get(lastElementIndex);
         this.downStation = lastSection.getUpStation();
