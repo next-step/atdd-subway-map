@@ -1,17 +1,17 @@
 package subway.dto;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Objects;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class StationResponse {
     private Long id;
     private String name;
-
-    public StationResponse() {}
 
     public StationResponse(Long id, String name) {
         this.id = id;

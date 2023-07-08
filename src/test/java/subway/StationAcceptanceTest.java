@@ -49,7 +49,7 @@ public class StationAcceptanceTest extends AcceptanceTest{
         ExtractableResponse<Response> response = 지하철역_조회();
 
         // then
-        지하철_역_개수_검증(response, 2);
+        역_개수_검증(response, 2);
     }
 
     /**
@@ -73,7 +73,7 @@ public class StationAcceptanceTest extends AcceptanceTest{
         역_삭제_여부_검증(지하철역_조회(), 강남역_정보);
     }
 
-    private static void 지하철_역_개수_검증(ExtractableResponse<Response> response, int targetCount) {
+    private static void 역_개수_검증(ExtractableResponse<Response> response, int targetCount) {
         List<String> stationNames = response.jsonPath().getList("name", String.class);
 
         assertThat(stationNames.size()).isEqualTo(targetCount);

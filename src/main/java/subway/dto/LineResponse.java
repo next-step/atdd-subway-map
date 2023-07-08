@@ -1,20 +1,20 @@
 package subway.dto;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Getter
+@NoArgsConstructor
 public class LineResponse {
 
     private Long id;
     private String name;
     private String color;
     private List<StationResponse> stations;
-
-    public LineResponse() {}
 
     public LineResponse(long id, String name, String color, List<StationResponse> stations) {
         this.id = id;

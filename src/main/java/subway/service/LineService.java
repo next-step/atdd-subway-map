@@ -27,9 +27,9 @@ public class LineService {
     @Transactional
     public LineDto saveLine(LineDto lineDto) {
         Station upStation = stationRepository.findById(lineDto.getUpStationId())
-                .orElseThrow(() -> new IllegalArgumentException(String.format("상행역이 존재하지 않습니다. id:{}", lineDto.getUpStationId())));
+                .orElseThrow(() -> new IllegalArgumentException(String.format("상행역이 존재하지 않습니다. id:%s", lineDto.getUpStationId())));
         Station downStation = stationRepository.findById(lineDto.getDownStationId())
-                .orElseThrow(() -> new IllegalArgumentException(String.format("하행역 존재하지 않습니다. id:{}", lineDto.getDownStationId())));
+                .orElseThrow(() -> new IllegalArgumentException(String.format("하행역 존재하지 않습니다. id:%s", lineDto.getDownStationId())));
         Line lineEntity = lineDto.toEntity(upStation, downStation);
 
         Line savedLineEntity = lineRepository.save(lineEntity);
@@ -45,7 +45,7 @@ public class LineService {
 
     public LineDto getLine(Long id) {
         Line line = lineRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(String.format("노선이 존재하지 않습니다. id:{}", id)));
+                .orElseThrow(() -> new IllegalArgumentException(String.format("노선이 존재하지 않습니다. id:%s", id)));
 
         return LineDto.from(line);
     }
@@ -53,7 +53,7 @@ public class LineService {
     @Transactional
     public void updateLine(Long id, LineDto dto) {
         Line line = lineRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(String.format("노선이 존재하지 않습니다. id:{}", id)));
+                .orElseThrow(() -> new IllegalArgumentException(String.format("노선이 존재하지 않습니다. id:%s", id)));
 
         line.update(dto.getName(), dto.getColor());
     }

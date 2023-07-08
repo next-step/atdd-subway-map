@@ -19,9 +19,6 @@ public class LineTestUtils {
         노선_생성_요청_정보.put("upStationId", 상행역_정보.get("id"));
         노선_생성_요청_정보.put("downStationId", 하행역_정보.get("id"));
 
-        StationTestUtils.지하철역_생성(상행역_정보);
-        StationTestUtils.지하철역_생성(하행역_정보);
-
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .contentType(ContentType.JSON)
