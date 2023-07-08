@@ -3,6 +3,7 @@ package subway.section;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -19,8 +20,14 @@ import static subway.subwayline.SubwayLineSteps.지하철노선등록요청_생�
 
 class SectionAcceptanceTest extends ApiTest {
 
-    private Long 당고개역, 이수역, 사당역;
+    private Long 당고개역, 이수역, 사당역, 당고개역부터_이수역까지의_기존_노선_ID;
     private static final int distance = 10;
+
+    @BeforeEach
+    void before() {
+        // given : 선행조건 기술
+        당고개역부터_이수역까지의_기존_노선_ID = 당고개역부터_이수역까지의_기존_노선_생성();
+    }
 
     /**
      * Given 3개(당고개역, 이수역, 사당역)의 지하철 역을 생성한다.
@@ -32,7 +39,6 @@ class SectionAcceptanceTest extends ApiTest {
     @Test
     void addSection() {
         // given : 선행조건 기술
-        당고개역부터_이수역까지의_기존_노선_생성();
         CreateSectionRequest request = request(이수역, 사당역, distance);
 
         // when : 기능 수행
@@ -52,7 +58,6 @@ class SectionAcceptanceTest extends ApiTest {
     @Test
     void addSectionThrowExceptionIsINVALID_UP_STATION() {
         // given : 선행조건 기술
-        당고개역부터_이수역까지의_기존_노선_생성();
         CreateSectionRequest request = request(당고개역, 사당역, distance);
 
         // when : 기능 수행
@@ -73,7 +78,6 @@ class SectionAcceptanceTest extends ApiTest {
     @Test
     void addSectionThrowExceptionIsINVALID_DOWN_STATION() {
         // given : 선행조건 기술
-        당고개역부터_이수역까지의_기존_노선_생성();
         CreateSectionRequest request = request(이수역, 당고개역, distance);
 
         // when : 기능 수행
@@ -94,7 +98,6 @@ class SectionAcceptanceTest extends ApiTest {
     @Test
     void removeSection() {
         // given : 선행조건 기술
-        Long 당고개역부터_이수역까지의_기존_노선_ID = 당고개역부터_이수역까지의_기존_노선_생성();
         이수역부터_사당역까지의_신규노선_생성(당고개역부터_이수역까지의_기존_노선_ID);
 
         // when : 기능 수행
@@ -114,7 +117,6 @@ class SectionAcceptanceTest extends ApiTest {
     @Test
     void removeSectionThrowsExceptionIsNOT_DOWN_STATION() {
         // given : 선행조건 기술
-        Long 당고개역부터_이수역까지의_기존_노선_ID = 당고개역부터_이수역까지의_기존_노선_생성();
         이수역부터_사당역까지의_신규노선_생성(당고개역부터_이수역까지의_기존_노선_ID);
 
         // when : 기능 수행
@@ -134,9 +136,6 @@ class SectionAcceptanceTest extends ApiTest {
     @DisplayName("구간을 제거할때 제거하려는 노선이 하나만 있으면 예외를 반환한다.")
     @Test
     void removeSectionThrowsExceptionIsSECTION_IS_ONE() {
-        // given : 선행조건 기술
-        Long 당고개역부터_이수역까지의_기존_노선_ID = 당고개역부터_이수역까지의_기존_노선_생성();
-
         // when : 기능 수행
         ExtractableResponse<Response> response = 지하철_노선_구간_제거(당고개역부터_이수역까지의_기존_노선_ID, 이수역);
 
