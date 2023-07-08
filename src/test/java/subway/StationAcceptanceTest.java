@@ -11,8 +11,8 @@ import org.springframework.http.HttpStatus;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.common.StationTest.createStation;
-import static subway.common.StationTest.getStations;
+import static subway.common.StationFixture.createStation;
+import static subway.common.StationFixture.getStations;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)

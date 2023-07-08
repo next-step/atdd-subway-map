@@ -1,6 +1,6 @@
 package subway.dto;
 
-public class LineRequest {
+public class LineCreateRequest {
 
     private Long id;
 

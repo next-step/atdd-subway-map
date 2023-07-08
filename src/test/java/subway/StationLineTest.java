@@ -3,6 +3,7 @@ package subway;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -10,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import subway.dto.LineResponse;
+import subway.dto.StationResponse;
 
 import java.util.HashMap;
 import java.util.List;
@@ -17,12 +19,28 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD;
-import static subway.common.StationTest.createStationAndGetInfo;
+import static subway.common.LineFixture.createLine;
+import static subway.common.LineFixture.getLines;
+import static subway.common.StationFixture.createStationAndGetInfo;
 
 @DisplayName("노선 관련 기능")
 @DirtiesContext(classMode = BEFORE_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationLineTest {
+
+    private final String COLOR_RED = "bg-red-600";
+
+    private final String COLOR_BLUE = "bg-blue-600";
+    private final int DISTANCE = 10;
+
+    private StationResponse 신사역, 광교역, 소요산역, 광명역;
+    @BeforeEach
+    void set(){
+        신사역 = createStationAndGetInfo("신사역");
+        광교역 = createStationAndGetInfo("광교역");
+        소요산역 = createStationAndGetInfo("소요산역");
+        광명역 = createStationAndGetInfo("광명역");
+    }
 
     /**
      * When 지하철 노선을 생성하면
@@ -33,17 +51,18 @@ public class StationLineTest {
     void createLineTest() {
         //given
         //when
-        ExtractableResponse<Response> response = createLine("신분당선","bg-red-600"
-                , createStationAndGetInfo("신사역").getId()
-                , createStationAndGetInfo("광교역").getId()
-                ,10);
-        //then
+        ExtractableResponse<Response> response =
+                createLine("신분당선", COLOR_RED, 신사역.getId(), 광교역.getId(), DISTANCE);
 
+        //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
-        List<String> lineNames = getLines().jsonPath().getList("name", String.class);
+        LineResponse line = getLines().jsonPath().getList("",LineResponse.class).get(0);
 
-        assertThat(lineNames).contains("신분당선");
+        assertThat(line.getName()).isEqualTo("신분당선");
+        assertThat(line.getColor()).isEqualTo(COLOR_RED);
+        assertThat(line.getUpStationId()).isEqualTo(신사역.getId());
+        assertThat(line.getDownStationId()).isEqualTo(광교역.getId());
     }
 
 
@@ -57,14 +76,8 @@ public class StationLineTest {
     @Test
     void showLines() {
         //given
-        createLine("신분당선","bg-red-600"
-                , createStationAndGetInfo("신사역").getId()
-                , createStationAndGetInfo("광교역").getId()
-                , 10);
-        createLine("1호선","bg-blue-600"
-                , createStationAndGetInfo("소요산역").getId()
-                , createStationAndGetInfo("광명역").getId()
-                , 10);
+        createLine("신분당선", COLOR_RED, 신사역.getId(), 광교역.getId(), DISTANCE);
+        createLine("1호선", COLOR_BLUE,  소요산역.getId(), 광명역.getId(), DISTANCE);
 
         //when
         ExtractableResponse<Response> response = getLines();
@@ -86,10 +99,7 @@ public class StationLineTest {
     @Test
     void showLineInfo() {
         //given
-        Long 신사역 = createStationAndGetInfo("신사역").getId();
-        Long 광교역 = createStationAndGetInfo("광교역").getId();
-
-        createLine("신분당선","bg-red-600", 신사역, 광교역 , 10);
+        createLine("신분당선",COLOR_RED, 신사역.getId(), 광교역.getId() , DISTANCE);
 
         //when
         ExtractableResponse<Response> response = getLines();
@@ -98,8 +108,8 @@ public class StationLineTest {
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(line.getName()).isEqualTo("신분당선");
-        assertThat(line.getUpStationId()).isEqualTo(신사역);
-        assertThat(line.getDownStationId()).isEqualTo(광교역);
+        assertThat(line.getUpStationId()).isEqualTo(신사역.getId());
+        assertThat(line.getDownStationId()).isEqualTo(광교역.getId());
     }
 
     /**
@@ -111,22 +121,19 @@ public class StationLineTest {
     @Test
     void updateLineInfo() {
         //given
-        Long 신사역 = createStationAndGetInfo("신사역").getId();
-        Long 광교역 = createStationAndGetInfo("광교역").getId();
-        Long 신분당선 = createLine("신분당선", "bg-red-600", 신사역, 광교역,10)
+        Long 신분당선 = createLine("신분당선", COLOR_RED, 신사역.getId(), 광교역.getId(),DISTANCE)
                             .jsonPath().getObject("", LineResponse.class).getId();
 
         //when
-        Long 강남역 = createStationAndGetInfo("강남역").getId();
-
         Map<String, Object> param = new HashMap<>();
         param.put("id",신분당선);
-        param.put("downStationId",강남역);
+        param.put("name","1호선");
+        param.put("color",COLOR_BLUE);
 
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .body(param)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().patch("/line")
+                .when().patch("/lines")
                 .then().log().all()
                 .extract();
 
@@ -135,8 +142,8 @@ public class StationLineTest {
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(line.getDownStationId()).isEqualTo(강남역);
-        assertThat(line.getUpStationId()).isEqualTo(신사역);
+        assertThat(line.getName()).isEqualTo("1호선");
+        assertThat(line.getColor()).isEqualTo(COLOR_BLUE);
     }
 
     /**
@@ -149,15 +156,15 @@ public class StationLineTest {
     void deleteLine() {
 
         //given
-        Long 신분당선 = createLine("신분당선", "bg-red-600"
-                    , createStationAndGetInfo("신사역").getId()
-                    , createStationAndGetInfo("광교역").getId()
+        Long 신분당선 = createLine("신분당선", COLOR_RED
+                    , 신사역.getId()
+                    , 광교역.getId()
                     ,10)
                         .jsonPath().getObject("", LineResponse.class).getId();
 
         //when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when().delete("/line/" + 신분당선)
+                .when().delete("/lines/" + 신분당선)
                 .then().log().all()
                 .extract();
 
@@ -170,27 +177,4 @@ public class StationLineTest {
         assertThat(names).isEmpty();
     }
 
-    private ExtractableResponse<Response> createLine(String name, String color, Long upStationId, Long downStationId, int distance) {
-        Map<String,Object> param =new HashMap<>();
-        param.put("name",name);
-        param.put("color",color);
-        param.put("upStationId",upStationId);
-        param.put("downStationId",downStationId);
-        param.put("distance",distance);
-
-        return RestAssured.given().log().all()
-                .body(param)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/line")
-                .then().log().all()
-                .extract();
-    }
-
-
-    private ExtractableResponse<Response> getLines() {
-        return RestAssured.given().log().all()
-                .when().get("lines")
-                .then().log().all()
-                .extract();
-    }
 }

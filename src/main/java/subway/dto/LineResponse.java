@@ -1,5 +1,7 @@
 package subway.dto;
 
+import subway.domain.Line;
+
 public class LineResponse {
 
     private Long id;
@@ -26,12 +28,26 @@ public class LineResponse {
         this.distance = distance;
     }
 
+    public LineResponse(Line line) {
+        this.id = line.getId();
+        this.color = line.getColor();
+        this.name = line.getName();
+        this.upStationId = line.getUpStationId();
+        this.downStationId = line.getDownStationId();
+        this.distance = line.getDistance();
+    }
+
     public Long getId() {
         return id;
     }
 
     public String getName() {
         return name;
+    }
+
+
+    public String getColor() {
+        return color;
     }
 
     public Long getUpStationId() {

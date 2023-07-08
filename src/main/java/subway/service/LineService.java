@@ -3,8 +3,9 @@ package subway.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.domain.Line;
-import subway.dto.LineRequest;
+import subway.dto.LineCreateRequest;
 import subway.dto.LineResponse;
+import subway.dto.LineUpdateRequest;
 import subway.repository.LineRepository;
 import subway.repository.StationRepository;
 
@@ -26,40 +27,39 @@ public class LineService {
     }
 
     @Transactional
-    public LineResponse saveLine(LineRequest lineRequest) {
-        stationRepository.findById(lineRequest.getUpStationId()).orElseThrow(()-> new IllegalArgumentException("존재하지 않는 역입니다."));
-        stationRepository.findById(lineRequest.getDownStationId()).orElseThrow(()-> new IllegalArgumentException("존재하지 않는 역입니다."));
+    public LineResponse saveLine(LineCreateRequest lineCreateRequest) {
+        stationRepository.findById(lineCreateRequest.getUpStationId()).orElseThrow(()-> new IllegalArgumentException("존재하지 않는 역입니다."));
+        stationRepository.findById(lineCreateRequest.getDownStationId()).orElseThrow(()-> new IllegalArgumentException("존재하지 않는 역입니다."));
 
-        Line line = lineRepository.save(new Line(lineRequest.getId(),lineRequest.getColor(),lineRequest.getName(),lineRequest.getUpStationId(),lineRequest.getDownStationId(),lineRequest.getDistance()));
-        return createLineResponse(line);
+        Line line = lineRepository.save(Line.builder()
+                                                .name(lineCreateRequest.getName())
+                                                .color(lineCreateRequest.getColor())
+                                                .upStationId(lineCreateRequest.getUpStationId())
+                                                .downStationId(lineCreateRequest.getDownStationId())
+                                                .distance(lineCreateRequest.getDistance())
+                                                .build());
+        return new LineResponse(line);
     }
 
     public List<LineResponse> findAllLines() {
         return lineRepository.findAll().stream()
-                .map(this::createLineResponse)
+                .map(LineResponse :: new)
                 .collect(Collectors.toList());
     }
 
 
     @Transactional
-    public LineResponse updateLine(LineRequest lineRequest) {
-        Line line = lineRepository.findById(lineRequest.getId()).get();
-        if(lineRequest.getName() != null) line.setName(lineRequest.getName());
-        if(lineRequest.getColor() != null) line.setColor(lineRequest.getColor());
-        if(lineRequest.getUpStationId() != null) line.setUpStationId(lineRequest.getUpStationId());
-        if(lineRequest.getDownStationId() != null) line.setDownStationId(lineRequest.getDownStationId());
-        if(lineRequest.getDistance() != 0) line.setDistance(lineRequest.getDistance());
+    public LineResponse updateLine(LineUpdateRequest lineCreateRequest) {
+        Line line = lineRepository.findById(lineCreateRequest.getId()).get();
+        line.setName(lineCreateRequest.getName());
+        line.setColor(lineCreateRequest.getColor());
 
-        return createLineResponse(line);
+        return new LineResponse(line);
     }
 
     @Transactional
     public void deleteLineById(Long id) {
         lineRepository.deleteById(id);
-    }
-
-    private LineResponse createLineResponse(Line line) {
-        return new LineResponse(line.getId(),line.getColor(), line.getName(),line.getUpStationId(),line.getDownStationId(),line.getDistance());
     }
 
 }

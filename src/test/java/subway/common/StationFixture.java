@@ -9,7 +9,7 @@ import subway.dto.StationResponse;
 import java.util.HashMap;
 import java.util.Map;
 
-public class StationTest {
+public class StationFixture {
 
 
     public static ExtractableResponse<Response> createStation(String name) {

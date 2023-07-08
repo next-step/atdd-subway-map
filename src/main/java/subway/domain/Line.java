@@ -1,10 +1,15 @@
 package subway.domain;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.*;
-import java.util.List;
 
 @Entity
-
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Line {
 
     @Id
@@ -27,25 +32,6 @@ public class Line {
     @Column(name = "DISTANCE")
     private int distance;
 
-    public Line() {
-    }
-
-
-    public Line(String name, Long upStationId, Long downStationId) {
-        this.name = name;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
-    }
-
-    public Line(Long id, String color, String name, Long upStationId, Long downStationId, int distance) {
-        this.id = id;
-        this.color = color;
-        this.name = name;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
-        this.distance = distance;
-    }
-
     public Long getId() {
         return id;
     }
@@ -55,7 +41,9 @@ public class Line {
     }
 
     public void setColor(String color) {
-        this.color = color;
+        if(color != null ){
+            this.color = color;
+        }
     }
 
     public String getName() {
@@ -71,7 +59,9 @@ public class Line {
     }
 
     public void setName(String name) {
-        this.name = name;
+        if(name != null) {
+            this.name = name;
+        }
     }
 
     public void setUpStationId(Long upStationId) {
