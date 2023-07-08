@@ -20,11 +20,11 @@ public class Line {
     @Column(nullable = false)
     private String color;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "up_station_id", nullable = false)
     private Station upStation;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "down_station_id", nullable = false)
     private Station downStation;
 
@@ -94,5 +94,13 @@ public class Line {
         if (distance == null || distance <= MIN_DISTANCE) {
             throw new IllegalArgumentException(String.format("지하철 거리는 0 이상의 숫자여야 합니다. (distance: %d)", distance));
         }
+    }
+
+    public void setDownStation(Station downStation) {
+        this.downStation = downStation;
+    }
+
+    public void plusDistance(Long distance) {
+        this.distance += distance;
     }
 }

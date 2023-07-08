@@ -1,7 +1,6 @@
 package subway.line;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -11,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import subway.AcceptanceTest;
 import subway.station.StationResponse;
+import subway.util.ObjectMapperHolder;
 
 import java.util.List;
 
@@ -52,7 +52,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         LineResponse response = responses.get(0);
         List<StationResponse> stationsOfResponse = List.of(new StationResponse(1L, SINBUNDANG_UP_STATION_NAME), new StationResponse(2L, SINBUNDANG_DOWN_STATION_NAME));
-        assertThat(response).isEqualTo(new LineResponse(Long.valueOf(lineId), SINBUNDANG_LINE_NAME, SINBUNDANG_LINE_COLOR, stationsOfResponse));
+        assertThat(response).isEqualTo(new LineResponse(Long.valueOf(lineId), SINBUNDANG_LINE_NAME, SINBUNDANG_LINE_COLOR, stationsOfResponse, SINBUNDANG_LINE_DISTANCE));
     }
 
     @Test
@@ -74,11 +74,11 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         LineResponse response1 = responses.get(0);
         List<StationResponse> stationsOfResponse1 = List.of(new StationResponse(1L, SINBUNDANG_UP_STATION_NAME), new StationResponse(2L, SINBUNDANG_DOWN_STATION_NAME));
-        assertThat(response1).isEqualTo(new LineResponse(Long.valueOf(lineId1), SINBUNDANG_LINE_NAME, SINBUNDANG_LINE_COLOR, stationsOfResponse1));
+        assertThat(response1).isEqualTo(new LineResponse(Long.valueOf(lineId1), SINBUNDANG_LINE_NAME, SINBUNDANG_LINE_COLOR, stationsOfResponse1, SINBUNDANG_LINE_DISTANCE));
 
         LineResponse response2 = responses.get(1);
         List<StationResponse> stationsOfResponse2 = List.of(new StationResponse(3L, SUINBUNDANG_UP_STATION_NAME), new StationResponse(4L, SUINBUNDANG_DOWN_STATION_NAME));
-        assertThat(response2).isEqualTo(new LineResponse(Long.valueOf(lineId2), SUINBUNDANG_LINE_NAME, SUINBUNDANG_LINE_COLOR, stationsOfResponse2));
+        assertThat(response2).isEqualTo(new LineResponse(Long.valueOf(lineId2), SUINBUNDANG_LINE_NAME, SUINBUNDANG_LINE_COLOR, stationsOfResponse2, SUINBUNDANG_LINE_DISTANCE));
     }
 
     @Test
@@ -93,9 +93,9 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // then
         assertThat(showResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
-        LineResponse response = new ObjectMapper().readValue(showResponse.response().body().asString(), LineResponse.class);
+        LineResponse response = ObjectMapperHolder.instance.readValue(showResponse.response().body().asString(), LineResponse.class);
         List<StationResponse> stationsOfResponse = List.of(new StationResponse(1L, SINBUNDANG_UP_STATION_NAME), new StationResponse(2L, SINBUNDANG_DOWN_STATION_NAME));
-        assertThat(response).isEqualTo(new LineResponse(Long.valueOf(lineId), SINBUNDANG_LINE_NAME, SINBUNDANG_LINE_COLOR, stationsOfResponse));
+        assertThat(response).isEqualTo(new LineResponse(Long.valueOf(lineId), SINBUNDANG_LINE_NAME, SINBUNDANG_LINE_COLOR, stationsOfResponse, SINBUNDANG_LINE_DISTANCE));
     }
 
     @Test
@@ -128,19 +128,19 @@ public class LineAcceptanceTest extends AcceptanceTest {
         assertThat(showResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
-    private LineRequest 지하철역_생성_및_지하철_노선_요청_객체_생성(String lineName, String color, String upStationName, String downStationName, Long distance) {
+    public static LineRequest 지하철역_생성_및_지하철_노선_요청_객체_생성(String lineName, String color, String upStationName, String downStationName, Long distance) {
         Long upStationId = 지하철역_생성_요청_및_아이디_추출(upStationName);
         Long downStationId = 지하철역_생성_요청_및_아이디_추출(downStationName);
         return new LineRequest(lineName, color, upStationId, downStationId, distance);
     }
 
-    private Long 지하철_노선_생성_요쳥_및_아이디_추출(LineRequest request) {
+    public static Long 지하철_노선_생성_요쳥_및_아이디_추출(LineRequest request) {
         ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(request);
         String lineId = createResponse.response().getHeaders().get("location").getValue().split("/lines/")[1];
         return Long.valueOf(lineId);
     }
 
-    private ExtractableResponse<Response> 지하철_노선_생성_요청(LineRequest request) {
+    public static ExtractableResponse<Response> 지하철_노선_생성_요청(LineRequest request) {
         return RestAssured
                 .given().log().all()
                 .body(request)
@@ -160,7 +160,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 .extract();
     }
 
-    private ExtractableResponse<Response> 지하철_노선_요청(Long lineId) {
+    public static ExtractableResponse<Response> 지하철_노선_요청(Long lineId) {
         return RestAssured
                 .given().log().all()
                 .when()
