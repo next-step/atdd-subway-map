@@ -21,7 +21,7 @@ public class StationController {
     }
 
     @GetMapping(value = "/stations")
-    public ResponseEntity<List<StationResponse>> showStations() {
+    public ResponseEntity<List<StationResponse>> findStations() {
         return ResponseEntity.ok().body(stationService.findAllStations());
     }
 
