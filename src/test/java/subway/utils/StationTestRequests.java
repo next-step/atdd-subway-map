@@ -47,7 +47,4 @@ public class StationTestRequests {
     public static List<StationResponse> 지하철_역_리스트_반환() {
         return 지하철_역_조회().jsonPath().getList("", StationResponse.class);
     }
-
-
-
 }

@@ -59,4 +59,8 @@ public class LineTestRequests {
                 .then().log().all()
                 .extract();
     }
+
+    public static LineResponse 지하철_노선_조회_응답값_반환(Long id) {
+        return 지하철_노선_조회(id).jsonPath().getObject("", LineResponse.class);
+    }
 }
