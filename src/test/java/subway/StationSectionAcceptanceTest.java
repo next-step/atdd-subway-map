@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.jdbc.Sql;
+import utils.AcceptanceUtils;
 
 @DisplayName("지하철 구간 관리 기능")
 @Sql(scripts = "classpath:reset.sql", executionPhase = BEFORE_TEST_METHOD)

@@ -1,4 +1,4 @@
-package subway;
+package utils;
 
 import java.math.BigDecimal;
 import java.util.HashMap;

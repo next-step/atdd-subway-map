@@ -18,6 +18,7 @@ import org.springframework.test.context.jdbc.Sql;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import utils.AcceptanceUtils;
 
 @DisplayName("지하철역 관련 기능")
 @Sql(scripts = "classpath:reset.sql", executionPhase = BEFORE_TEST_METHOD)
