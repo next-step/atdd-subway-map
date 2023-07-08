@@ -8,32 +8,16 @@ import org.springframework.transaction.annotation.Transactional;
 
 import subway.line.domain.Line;
 import subway.line.service.LineService;
-import subway.section.repository.SectionRepository;
-import subway.station.service.StationService;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class SectionDeleteService {
     private final LineService lineService;
-    private final StationService stationService;
-    private final SectionRepository sectionRepository;
 
     @Transactional
     public void delete(Long lineId, Long stationId) {
         Line line = lineService.getLine(lineId);
-//        Station station = stationService.get(stationId);
-
-//        if (line.isLastStation(station)) {
-//            throw new InvalidSectionDeleteException(ErrorCode.SECTION_DELETE_FAIL_BY_LAST_STATION_REMOVED);
-//        }
-//
-//        if (!line.isLastDownStation(station)) {
-//            throw new InvalidSectionDeleteException(ErrorCode.SECTION_DELETE_FAIL_BY_NOT_ALLOWED_STATION);
-//        }
-//
-//        sectionRepository.deleteByLineAndDownStation(line, station);
-
         line.deleteSection(stationId);
     }
 }

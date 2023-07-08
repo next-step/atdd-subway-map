@@ -19,7 +19,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import org.springframework.util.CollectionUtils;
 
@@ -29,7 +28,6 @@ import subway.station.domain.Station;
 import subway.support.ErrorCode;
 
 @Getter
-@Setter
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -71,6 +69,11 @@ public class Line {
         this.sections = List.of(Section.firstSection(this, upStation, downStation, distance));
     }
 
+    public void changeNameAndColor(String name, String color) {
+        this.name = name;
+        this.color = color;
+    }
+
     public boolean isLastStation(Long stationId) {
         if (CollectionUtils.isEmpty(this.sections)) {
             return false;
@@ -90,10 +93,6 @@ public class Line {
         }
 
         return Objects.equals(sections.get(sections.size()-1).getDownStation().getId(), stationId);
-    }
-
-    public Station getLastDownStation() {
-        return this.sections.get(sections.size()-1).getDownStation();
     }
 
     public void deleteSection(Long stationId) {

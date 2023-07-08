@@ -55,10 +55,9 @@ public class LineService {
 
     @Transactional
     public void modifyLine(Long id, LineModifyRequest request) {
-        Line line = lineRepository.findById(id).get();
+        Line line = getLine(id);
 
-        line.setName(request.getName());
-        line.setColor(request.getColor());
+        line.changeNameAndColor(request.getName(), request.getColor());
 
         lineRepository.save(line);
     }
