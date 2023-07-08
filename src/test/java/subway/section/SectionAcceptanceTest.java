@@ -60,6 +60,26 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         assertThat(showLineResponse).isEqualTo(new LineResponse(lineResponse.getId(), SINBUNDANG_LINE_NAME, SINBUNDANG_LINE_COLOR, stationsOfResponse, sumOfDistance));
     }
 
+    /**
+     * Given 지하철 노선과 노선에 속하지 않은 새로운 지하철역을 생성하고
+     * When 지하철 노선의 하행역이 아닌 다른 역과 새로운 지하철역을 구간으로 등록하면
+     * Then 예외가 발생한다
+     */
+    @Test
+    void 지하철_구간_생성시_하행역이_아닌_역을_구간으로_등록하면_예외_발생() {
+
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 지하철 노선에 속한 지하철역을 구간으로 등록하면
+     * Then 예외가 발생한다
+     */
+    @Test
+    void 지하철_구간_생성시_노선에_속한_역을_구간으로_등록하면_예외_발생() {
+
+    }
+
     private ExtractableResponse<Response> 지하철_구간_생성_요청(Long lineId, SectionRequest request) {
         return RestAssured
                 .given().log().all()
