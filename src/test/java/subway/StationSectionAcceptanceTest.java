@@ -66,8 +66,8 @@ public class StationSectionAcceptanceTest {
 
 		final Long lineId = AcceptanceUtils.createStationLine("1호선", "blue", aStationId, bStationId, BigDecimal.TEN);
 
-		AcceptanceUtils.createStationLineSection(lineId, bStationId, cStationId, BigDecimal.ONE, HttpStatus.OK);
-		AcceptanceUtils.createStationLineSection(lineId, cStationId, dStationId, BigDecimal.ONE, HttpStatus.OK);
+		AcceptanceUtils.createStationLineSection(lineId, bStationId, cStationId, BigDecimal.ONE);
+		AcceptanceUtils.createStationLineSection(lineId, cStationId, dStationId, BigDecimal.ONE);
 
 		//when & then
 		AcceptanceUtils.createStationLineSection(lineId, aStationId, eStationId, BigDecimal.ONE, HttpStatus.BAD_REQUEST);
@@ -118,8 +118,8 @@ public class StationSectionAcceptanceTest {
 
 		final Long lineId = AcceptanceUtils.createStationLine("1호선", "blue", aStationId, bStationId, BigDecimal.TEN);
 
-		AcceptanceUtils.createStationLineSection(lineId, bStationId, cStationId, BigDecimal.ONE, HttpStatus.OK);
-		AcceptanceUtils.createStationLineSection(lineId, cStationId, dStationId, BigDecimal.ONE, HttpStatus.OK);
+		AcceptanceUtils.createStationLineSection(lineId, bStationId, cStationId, BigDecimal.ONE);
+		AcceptanceUtils.createStationLineSection(lineId, cStationId, dStationId, BigDecimal.ONE);
 
 		//when
 		AcceptanceUtils.deleteStationLineSection(lineId, dStationId, HttpStatus.OK);
@@ -149,7 +149,7 @@ public class StationSectionAcceptanceTest {
 
 		final Long lineId = AcceptanceUtils.createStationLine("1호선", "blue", aStationId, bStationId, BigDecimal.TEN);
 
-		AcceptanceUtils.createStationLineSection(lineId, bStationId, cStationId, BigDecimal.ONE, HttpStatus.OK);
+		AcceptanceUtils.createStationLineSection(lineId, bStationId, cStationId, BigDecimal.ONE);
 
 		//when & then
 		AcceptanceUtils.deleteStationLineSection(lineId, bStationId, HttpStatus.BAD_REQUEST);

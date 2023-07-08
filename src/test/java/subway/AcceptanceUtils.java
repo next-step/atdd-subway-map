@@ -16,6 +16,10 @@ public class AcceptanceUtils {
 	private AcceptanceUtils() {
 	}
 
+    public static void createStationLineSection(Long lineId, Long upStationId, Long downStationId, BigDecimal distance) {
+        createStationLineSection(lineId, upStationId, downStationId, distance, HttpStatus.OK);
+    }
+
 	public static void createStationLineSection(Long lineId, Long upStationId, Long downStationId, BigDecimal distance, HttpStatus expectedStatus) {
 		final Map<String, String> stationLineSectionCreateRequest = new HashMap<>();
 
