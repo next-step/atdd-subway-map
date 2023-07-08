@@ -27,16 +27,17 @@ public class Station {
         return name;
     }
 
+    // Hibernate Proxy equals 참고 https://tecoble.techcourse.co.kr/post/2022-10-17-jpa-hibernate-proxy/
     @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (!(o instanceof Station)) {
             return false;
         }
         Station station = (Station) o;
-        return Objects.equals(id, station.id);
+        return Objects.equals(id, station.getId());  // 프록시의 id값은 null이다. 프록시 내부의 인터셉터가 id값을 가지고 있기 때문. 그러므로 getId()로 초기화하자.
     }
 
     @Override
