@@ -56,8 +56,24 @@ public class Section {
         return Objects.equals(upStation.getId(), stationId) || Objects.equals(downStation.getId(), stationId);
     }
 
+    public void attachToLine(Line line) {
+        this.line = line;
+    }
+
     public void detractFromLine() {
         this.line = null;
     }
 
+    public boolean isUpstation(Long stationId) {
+        return Objects.equals(upStation.getId(), stationId);
+    }
+
+    public boolean isDownstation(Long stationId) {
+        return Objects.equals(downStation.getId(), stationId);
+    }
+
+
+    public boolean isMe(Long upStationId, Long downStationId) {
+        return isUpstation(upStationId) && isDownstation(downStationId);
+    }
 }

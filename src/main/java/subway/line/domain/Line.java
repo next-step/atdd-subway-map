@@ -23,7 +23,9 @@ import lombok.NoArgsConstructor;
 import org.springframework.util.CollectionUtils;
 
 import subway.section.domain.Section;
+import subway.section.exception.InvalidSectionCreateException;
 import subway.section.exception.InvalidSectionDeleteException;
+import subway.section.exception.SectionNotFoundException;
 import subway.station.domain.Station;
 import subway.support.ErrorCode;
 
@@ -52,7 +54,7 @@ public class Line {
     @JoinColumn(name = "down_station_id")
     private Station downStation;
 
-    @OneToMany(mappedBy = "line", cascade = CascadeType.PERSIST, orphanRemoval = true)
+    @OneToMany(mappedBy = "line", cascade = { CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private List<Section> sections = new ArrayList<>();
 
     public static Line firstLine(String name, String color, Station upStation, Station downStation, int distance) {
@@ -95,6 +97,19 @@ public class Line {
         return Objects.equals(sections.get(sections.size()-1).getDownStation().getId(), stationId);
     }
 
+    public void addSection(Section section) {
+        if (!section.isUpstation(downStation.getId())) {
+            throw new InvalidSectionCreateException(ErrorCode.SECTION_CREATE_FAIL_BY_UPSTATION);
+        }
+
+        if (section.isDownstation(downStation.getId()) || section.isDownstation(upStation.getId())) {
+            throw new InvalidSectionCreateException(ErrorCode.SECTION_CREATE_FAIL_BY_DOWNSTATION);
+        }
+
+        section.attachToLine(this);
+        sections.add(section);
+    }
+
     public void deleteSection(Long stationId) {
         if (isLastStation(stationId)) {
 
@@ -113,5 +128,12 @@ public class Line {
                 break;
             }
         }
+    }
+
+    public Section getSection(Long downStationId, Long upStationId) {
+        return sections.stream()
+                       .filter(section -> section.isMe(upStationId, downStationId))
+                       .findFirst()
+                       .orElseThrow(SectionNotFoundException::new);
     }
 }
