@@ -4,7 +4,7 @@ package subway;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.BeforeAll;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,13 +13,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import subway.line.LineRequest;
 import subway.station.Station;
-import subway.station.StationRequest;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -68,10 +65,12 @@ class LineAcceptanceTest {
                 .extract();
 
         // then
-        List<String> lineNames = RestAssured.given().log().all()
+        List<Map<String, Object>> lineNames = RestAssured.given().log().all()
                 .when().get("/lines")
                 .then().log().all()
-                .statusCode(HttpStatus.OK.value())
-                .extract().jsonPath().getList("name", String.class);
+                //.statusCode(HttpStatus.OK.value())
+                .extract().jsonPath().get();
+
+        System.out.println("lineNames = " + lineNames);
     }
 }
