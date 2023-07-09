@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static subway.utils.LineTestRequests.지하철_노선_조회_응답값_반환;
 import static subway.utils.LineTestRequests.지하철_노선도_등록;
 import static subway.utils.SectionTestRequests.지하철_구간_등록;
+import static subway.utils.SectionTestRequests.지하철_구간_삭제;
 import static subway.utils.StationTestRequests.지하철_역_등록;
 import static subway.utils.StatusCodeAssertions.응답코드_검증;
 
@@ -112,6 +113,118 @@ class SectionAcceptanceTest {
         //when
         지하철_구간_등록(1L, 2L, 3L, 7);
         ExtractableResponse<Response> response = 지하철_구간_등록(1L, 3L, 2L, 7);
+
+        //then
+        응답코드_검증(response, HttpStatus.BAD_REQUEST);
+        LineResponse line7 = 지하철_노선_조회_응답값_반환(1L);
+        StationResponse downwardLastStation = line7.getStations().get(1);
+        assertThat(downwardLastStation.getId()).isEqualTo(3L);
+        assertThat(downwardLastStation.getName()).isEqualTo("세번째역");
+    }
+
+    /**
+     * Given 노선을 생성한다, 구간을 생성한다.
+     * When  구간을 삭제한다.
+     * Then  노선의 하행선이 기존 구간을 생성하기 전과 동일해진다.
+     */
+    @DisplayName("지하철 구간을 삭제한다.")
+    @Test
+    void deleteSection() {
+        //given
+        지하철_노선도_등록("7호선", "bg-1234", 1L, 2L, 5);
+        지하철_구간_등록(1L, 2L, 3L, 7);
+
+        //when
+        ExtractableResponse<Response> response = 지하철_구간_삭제(1L, 3L);
+
+        //then
+        응답코드_검증(response, HttpStatus.NO_CONTENT);
+        LineResponse line7 = 지하철_노선_조회_응답값_반환(1L);
+        StationResponse downwardLastStation = line7.getStations().get(1);
+        assertThat(downwardLastStation.getId()).isEqualTo(2L);
+        assertThat(downwardLastStation.getName()).isEqualTo("두번째역");
+    }
+
+    /**
+     * Given 노선을 생성한다, 구간을 생성한다.
+     * When  노선 하행선 마지막 구간이 아닌 역을 삭제한다.
+     * Then  제거 불가능한 에러를 반환한다.
+     */
+    @DisplayName("지하철 마지막이 아닌 구간을 삭제한다. 제거 불가능한 에러를 반환한다.")
+    @Test
+    void deleteSectionExceptionWhenNotDownLastStation() {
+        //given
+        지하철_노선도_등록("7호선", "bg-1234", 1L, 2L, 5);
+        지하철_구간_등록(1L, 2L, 3L, 7);
+
+        //when
+        ExtractableResponse<Response> response = 지하철_구간_삭제(1L, 2L);
+
+        //then
+        응답코드_검증(response, HttpStatus.BAD_REQUEST);
+        LineResponse line7 = 지하철_노선_조회_응답값_반환(1L);
+        StationResponse downwardLastStation = line7.getStations().get(1);
+        assertThat(downwardLastStation.getId()).isEqualTo(3L);
+        assertThat(downwardLastStation.getName()).isEqualTo("세번째역");
+    }
+
+    /**
+     * Given 노선을 생성한다.
+     * When  노선에서 구간이 하나일 때 역을 삭제한다.
+     * Then  제거 불가능한 에러를 반환한다.
+     */
+    @DisplayName("노선의 구간이 하나일 때 삭제할 때 에러를 반환한다.")
+    @Test
+    void deleteSectionExceptionLastSection() {
+        //given
+        지하철_노선도_등록("7호선", "bg-1234", 1L, 2L, 5);
+
+        //when
+        ExtractableResponse<Response> response = 지하철_구간_삭제(1L, 2L);
+
+        //then
+        응답코드_검증(response, HttpStatus.BAD_REQUEST);
+        LineResponse line7 = 지하철_노선_조회_응답값_반환(1L);
+        StationResponse downwardLastStation = line7.getStations().get(1);
+        assertThat(downwardLastStation.getId()).isEqualTo(2L);
+        assertThat(downwardLastStation.getName()).isEqualTo("두번째역");
+    }
+
+    /**
+     * Given 노선을 생성한다.
+     * When  존재하지 않는 노선에서 역을 삭제한다.
+     * Then  제거 불가능한 에러를 반환한다.
+     */
+    @DisplayName("존재하지 않는 노선에서 역을 삭제할 때 에러를 반환한다.")
+    @Test
+    void deleteSectionExceptionWhenDoesNotHaveLine() {
+        //given
+        지하철_노선도_등록("7호선", "bg-1234", 1L, 2L, 5);
+        지하철_구간_등록(1L, 2L, 3L, 7);
+
+        //when
+        ExtractableResponse<Response> response = 지하철_구간_삭제(2L, 3L);
+
+        //then
+        응답코드_검증(response, HttpStatus.BAD_REQUEST);
+    }
+
+
+    /**
+     * Given 노선을 생성한다.
+     * When  노선에서 존재하지 않는 역을 삭제한다.
+     * Then  제거 불가능한 에러를 반환한다.
+     */
+    @DisplayName("노선에서 존재하지 않는 역을 삭제할 때 에러를 반환한다.")
+    @Test
+    void deleteSectionExceptionWhenDoesNotHaveStation() {
+        //given
+        지하철_노선도_등록("7호선", "bg-1234", 1L, 2L, 5);
+        지하철_구간_등록(1L, 2L, 3L, 7);
+
+
+        //when
+        ExtractableResponse<Response> response = 지하철_구간_삭제(1L, 4L);
 
         //then
         응답코드_검증(response, HttpStatus.BAD_REQUEST);

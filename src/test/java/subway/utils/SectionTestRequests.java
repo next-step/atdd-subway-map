@@ -20,4 +20,12 @@ public class SectionTestRequests {
                 .then().log().all()
                 .extract();
     }
+
+    public static ExtractableResponse<Response> 지하철_구간_삭제(Long lineId, Long stationId) {
+        String path = "/lines/" + lineId.toString() + "/sections?stationId=" + stationId.toString();
+        return RestAssured.given().log().all()
+                .when().delete(path)
+                .then().log().all()
+                .extract();
+    }
 }
