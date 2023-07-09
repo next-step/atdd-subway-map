@@ -8,15 +8,14 @@ import subway.exception.SubwayBadRequestException;
 import subway.line.constant.LineMessage;
 import subway.station.model.Station;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +26,7 @@ import java.util.List;
 @AllArgsConstructor
 public class Line {
 
-    private final long MINIMAL_SECTION_SIZE = 2L;
+    private static final long MINIMAL_SECTION_SIZE = 2L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -47,9 +46,8 @@ public class Line {
     @JoinColumn
     private Station downStation;
 
-    @Builder.Default
-    @OneToMany(mappedBy = "line", cascade = CascadeType.ALL)
-    private List<Section> sections = new ArrayList<>();
+    @Embedded
+    private LineSection lineSection;
 
     public void updateLine(String name, String color) {
         this.name = name;
@@ -57,22 +55,22 @@ public class Line {
     }
 
     public void addSection(Section section) {
-        this.sections.add(section);
+        LineSection ls = new LineSection();
+        ls.add(section);
+        this.lineSection = ls;
+//        this.lineSection.add(section);
         this.downStation = section.getDownStation();
-        section.setLine(this);
     }
 
     public List<Station> getStationsInSections() {
         List<Station> stations = new ArrayList<>();
         stations.add(this.upStation);
-        for (Section section : this.sections) {
-            stations.add(section.getDownStation());
-        }
+        stations.addAll(lineSection.getDownStations());
         return stations;
     }
 
     public Section deleteSectionByStation(Station station) {
-        if (this.sections.size() < MINIMAL_SECTION_SIZE) {
+        if (this.lineSection.getStationsCount() < MINIMAL_SECTION_SIZE) {
             throw new SubwayBadRequestException(LineMessage.DOWN_STATION_MINIMAL_VALID_MESSAGE.getCode(),
                     LineMessage.DOWN_STATION_MINIMAL_VALID_MESSAGE.getFormatMessage(MINIMAL_SECTION_SIZE));
         }
@@ -81,10 +79,10 @@ public class Line {
                     LineMessage.SECTION_DELETE_LAST_STATION_VALID_MESSAGE.getMessage());
         }
 
-        final int lastElementIndex = this.sections.size() - 1;
-        Section lastSection = this.sections.get(lastElementIndex);
+        final int lastElementIndex = this.lineSection.getStationsCount() - 1;
+        Section lastSection = this.lineSection.get(lastElementIndex);
         this.downStation = lastSection.getUpStation();
-        this.sections.remove(lastSection);
+        this.lineSection.remove(lastSection);
         return lastSection;
     }
 }
