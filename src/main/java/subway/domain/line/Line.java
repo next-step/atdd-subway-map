@@ -1,6 +1,5 @@
 package subway.domain.line;
 
-import org.springframework.util.Assert;
 import subway.domain.station.Station;
 
 import javax.persistence.*;
@@ -18,18 +17,26 @@ public class Line {
     private LineDetail lineDetail;
 
     @Embedded
-    private LineStations lineStations;
+    private LineStationDetail lineStationDetail;
 
     protected Line() {
     }
 
     public Line(String name, String color, Station upStation, Station downStation, int distance) {
-        this.lineDetail = new LineDetail(name, color, distance);
-        this.lineStations = new LineStations(this, upStation, downStation);
+        this.lineDetail = new LineDetail(name, color);
+        this.lineStationDetail = new LineStationDetail(this, upStation, downStation, distance);
     }
 
     public void modify(String name, String color) {
         lineDetail.modify(name, color);
+    }
+
+    public void addSection(Station upStation, Station downStation, int distance) {
+        lineStationDetail.addSection(new Section(this, upStation, downStation, distance));
+    }
+
+    public void removeSection(Station station) {
+        lineStationDetail.removeSection(station);
     }
 
     public Long getId() {
@@ -45,7 +52,7 @@ public class Line {
     }
 
     public List<Station> unmodifiableStations() {
-        return Collections.unmodifiableList(lineStations.getStations());
+        return Collections.unmodifiableList(lineStationDetail.getStations());
     }
 
 }

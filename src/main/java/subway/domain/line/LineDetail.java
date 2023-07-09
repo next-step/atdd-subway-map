@@ -15,16 +15,13 @@ public class LineDetail {
     @Column(length = 20, nullable = false)
     private String color;
 
-    private int distance;
-
     protected LineDetail() {
     }
 
-    public LineDetail(String name, String color, int distance) {
+    public LineDetail(String name, String color) {
         validate(name, color);
         this.name = name;
         this.color = color;
-        this.distance = distance;
     }
 
     public void modify(String name, String color) {
@@ -39,13 +36,13 @@ public class LineDetail {
     }
 
     private void validateName(String name) {
-        if (name.isEmpty()) {
+        if (name == null || name.isEmpty()) {
             throw new NameNotAvailableException();
         }
     }
 
     private void validateColor(String color) {
-        if (color.isEmpty()) {
+        if (color == null || color.isEmpty()) {
             throw new ColorNotAvailableException();
         }
     }
