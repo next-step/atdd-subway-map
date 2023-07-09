@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import subway.controller.dto.line.LineResponse;
 import subway.controller.dto.line.LineSaveRequest;
 import subway.model.line.Line;
-import subway.model.line.LineRepository;
+import subway.model.line.LineService;
 import subway.model.station.Station;
 import subway.model.station.StationRepository;
 
@@ -22,7 +22,7 @@ class LineCompositeServiceIntegrationTest {
     private StationRepository stationRepository;
 
     @Autowired
-    private LineRepository lineRepository;
+    private LineService lineService;
 
     @Test
     @Transactional
@@ -47,8 +47,7 @@ class LineCompositeServiceIntegrationTest {
 
     private void 생성된_LINE_조회(LineResponse lineResponse, String... stationNames) {
 
-        Line line = lineRepository.findById(lineResponse.getId())
-                                  .orElseThrow(() -> new RuntimeException("no saved line"));
+        Line line = lineService.findById(lineResponse.getId());
 
         for (int i = 0; i < stationNames.length; i++) {
             Assertions.assertThat(line.getStations()

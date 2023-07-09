@@ -6,7 +6,6 @@ import org.springframework.transaction.annotation.Transactional;
 import subway.controller.dto.section.SectionResponse;
 import subway.controller.dto.section.SectionSaveRequest;
 import subway.model.line.Line;
-import subway.model.line.LineRepository;
 import subway.model.line.LineService;
 import subway.model.section.Section;
 import subway.model.section.SectionRepository;

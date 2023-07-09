@@ -7,7 +7,6 @@ import subway.controller.dto.line.LineModifyRequest;
 import subway.controller.dto.line.LineResponse;
 import subway.controller.dto.line.LineSaveRequest;
 import subway.model.line.Line;
-import subway.model.line.LineRepository;
 import subway.model.line.LineService;
 import subway.model.section.Section;
 import subway.model.section.SectionRepository;

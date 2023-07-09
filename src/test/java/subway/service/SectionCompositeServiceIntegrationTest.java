@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import subway.controller.dto.section.SectionResponse;
 import subway.controller.dto.section.SectionSaveRequest;
 import subway.model.line.Line;
-import subway.model.line.LineRepository;
+import subway.model.line.LineService;
 import subway.model.section.Section;
 import subway.model.station.Station;
 import subway.model.station.StationRepository;
@@ -26,7 +26,7 @@ class SectionCompositeServiceIntegrationTest {
     private StationRepository stationRepository;
 
     @Autowired
-    private LineRepository lineRepository;
+    private LineService lineService;
 
     @Test
     @Transactional
@@ -57,8 +57,8 @@ class SectionCompositeServiceIntegrationTest {
 
     private void LINE_조회_및_검증(Long lineId, String... stationNames) {
 
-        Line line = lineRepository.findById(lineId)
-                                  .orElseThrow(() -> new RuntimeException("존재하지 않는 line"));
+        Line line = lineService.findById(lineId);
+
         List<Station> stations = line.getStations();
 
         assertThat(stations.size()).isEqualTo(stationNames.length);
@@ -78,16 +78,16 @@ class SectionCompositeServiceIntegrationTest {
 
     private Line LINE_생성(Station upStation, Station downStation) {
         long distance = 10L;
-        return lineRepository.save(Line.builder()
-                                       .name("라인1")
-                                       .color("color")
-                                       .sections(List.of(Section.builder()
+        return lineService.save(Line.builder()
+                                    .name("라인1")
+                                    .color("color")
+                                    .sections(List.of(Section.builder()
                                                                 .upStation(upStation)
                                                                 .downStation(downStation)
                                                                 .distance(distance)
                                                                 .build()))
-                                       .distance(distance)
-                                       .build());
+                                    .distance(distance)
+                                    .build());
     }
 
     private Station Station_생성(String stationName) {
