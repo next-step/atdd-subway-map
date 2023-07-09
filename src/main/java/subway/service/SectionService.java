@@ -83,6 +83,10 @@ public class SectionService {
         Line line = lineRepository.findById(lineId)
                                   .orElseThrow(() -> new IllegalArgumentException("line id doesn't exist"));
 
+        if (!line.isDeletableStation(targetStation)) {
+            throw new IllegalArgumentException("삭제할 수 없는 정거장입니다.");
+        }
+
         line.getSections().remove(targetSection);
 
         sectionRepository.deleteById(targetSection.getId());

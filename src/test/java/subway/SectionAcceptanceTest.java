@@ -162,6 +162,14 @@ public class SectionAcceptanceTest {
     @Test
     void deleteSection_에러__구간_1개_노선의_구간_삭제() {
 
+        // given
+        Long lineId = LINE_생성(stationId_A, stationId_B);
+
+        // when
+        ExtractableResponse<Response> deletionResponse = 구간_삭제(lineId, stationId_B);
+
+        // then
+        HTTP_STATUS_검증(deletionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     /**
@@ -172,6 +180,15 @@ public class SectionAcceptanceTest {
     @DisplayName("[오류] 마지막 구간이 아닌 노선을 삭제한다.")
     @Test
     void deleteSection_에러__마지막_구간이_아닌_구간_삭제() {
+
+        // given
+        Long lineId = 노선_A_B_C_생성();
+
+        // when
+        ExtractableResponse<Response> deletionResponse = 구간_삭제(lineId, stationId_B);
+
+        // then
+        HTTP_STATUS_검증(deletionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
 
     }
 

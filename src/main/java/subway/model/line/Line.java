@@ -85,4 +85,19 @@ public class Line {
 
         return true;
     }
+
+    public boolean isDeletableStation(Station station) {
+
+        if (!Objects.equals(getLastStation().getId(), station.getId())) {
+            log.warn("삭제하려는 구간의 정거장이 노선의 마지막 노선이 아닙니다.");
+            return false;
+        }
+
+        if (this.sections.size() <= 1) {
+            log.warn("구간이 1개 뿐인 노선은 삭제할 수 없습니다.");
+            return false;
+        }
+
+        return true;
+    }
 }
