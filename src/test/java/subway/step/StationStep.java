@@ -10,20 +10,21 @@ import subway.station.StationResponse;
 
 public class StationStep {
 
-  public static StationResponse 지하철역_생성_요청 (String 역_이름) {
+  public static Map 지하철역_생성_요청 (String 역_이름) {
       return RestAssured.given()
           .body(Map.of("name", 역_이름))
           .contentType(MediaType.APPLICATION_JSON_VALUE)
           .post("/stations")
-          .then()
+          .then().log().all()
           .assertThat()
           .statusCode(HttpStatus.CREATED.value())
           .extract()
-          .as(StationResponse.class);
+          .jsonPath()
+          .get("$");
   }
 
-  public static List<StationResponse> 지하철역_다중_생성_요청 (List<String> 역_목록) {
-    List<StationResponse> responses = new ArrayList<>();
+  public static List<Map> 지하철역_다중_생성_요청 (List<String> 역_목록) {
+    List<Map> responses = new ArrayList<>();
 
     for (String 역이름 : 역_목록) {
       responses.add(RestAssured.given()
@@ -34,7 +35,8 @@ public class StationStep {
           .assertThat()
           .statusCode(HttpStatus.CREATED.value())
           .extract()
-          .as(StationResponse.class)
+          .jsonPath()
+          .get("$")
       );
     }
 

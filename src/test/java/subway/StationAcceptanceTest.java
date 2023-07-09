@@ -79,12 +79,12 @@ public class StationAcceptanceTest extends IntegrationTest {
     void 지하철역_삭제 () {
         // given
         String 역_이름 = "판교역";
-        StationResponse 역 = StationStep.지하철역_생성_요청(역_이름);
+        Map 역 = StationStep.지하철역_생성_요청(역_이름);
 
         // when
         RestAssured.given().log().all()
             .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .pathParam("id", 역.getId())
+            .pathParam("id", 역.get("id"))
             .when().delete("/stations/{id}")
             .then().log().all();
 

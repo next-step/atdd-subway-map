@@ -3,6 +3,7 @@ package subway.step;
 import io.restassured.RestAssured;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import subway.line.SubwayLineEditRequest;
@@ -10,6 +11,19 @@ import subway.line.SubwayLineRequest;
 import subway.line.SubwayLineResponse;
 
 public class SubwayLineStep {
+
+  public static Map 지하철_노선_생성(Map<String, Object> body) {
+    return RestAssured.given()
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(body)
+        .post("/lines")
+        .then().log().all()
+        .assertThat()
+        .statusCode(HttpStatus.CREATED.value())
+        .extract()
+        .jsonPath()
+        .get("$");
+  }
 
   public static SubwayLineResponse 지하철_노선_생성(SubwayLineRequest 신규노선) {
     return RestAssured.given()
