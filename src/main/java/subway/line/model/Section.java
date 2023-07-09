@@ -25,12 +25,10 @@ public class Section {
     private Line line;
 
     @ManyToOne(fetch = FetchType.LAZY)
-//    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn
     private Station upStation;
 
     @ManyToOne(fetch = FetchType.LAZY)
-//    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn
     private Station downStation;
 
