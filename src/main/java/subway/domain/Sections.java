@@ -24,7 +24,7 @@ public class Sections {
                 throw new IllegalArgumentException(ADD_ERROR_MESSAGE);
             }
             if (getStations().contains(section.getDownStation())) {
-                throw new IllegalArgumentException();
+                throw new IllegalArgumentException(ADD_DUPLICATE_ERROR_MESSAGE);
             }
         }
         sections.add(section);
