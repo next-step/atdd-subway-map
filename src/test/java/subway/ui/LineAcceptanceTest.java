@@ -152,7 +152,7 @@ public class LineAcceptanceTest extends AbstractAcceptanceTest {
                 지하철_노선_구간_등록_요청(신분당선.getId(), new SectionRequest(신사역.getId(), 신논현역.getId(), 5L));
 
         //then
-        assertThat(지하철_노선_구간_등록_응답.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(지하철_노선_구간_등록_응답.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     /**
