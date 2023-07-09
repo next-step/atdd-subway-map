@@ -8,7 +8,7 @@ import subway.controller.dto.section.SectionSaveRequest;
 import subway.model.line.Line;
 import subway.model.line.LineService;
 import subway.model.section.Section;
-import subway.model.section.SectionRepository;
+import subway.model.section.SectionService;
 import subway.model.station.Station;
 import subway.model.station.StationRepository;
 
@@ -19,12 +19,12 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class SectionCompositeService {
 
-    private final SectionRepository sectionRepository;
+    private final SectionService sectionService;
     private final LineService lineService;
     private final StationRepository stationRepository;
 
-    public SectionCompositeService(SectionRepository sectionRepository, LineService lineService, StationRepository stationRepository) {
-        this.sectionRepository = sectionRepository;
+    public SectionCompositeService(SectionService sectionService, LineService lineService, StationRepository stationRepository) {
+        this.sectionService = sectionService;
         this.lineService = lineService;
         this.stationRepository = stationRepository;
     }
@@ -40,7 +40,7 @@ public class SectionCompositeService {
             throw new IllegalArgumentException("추가할 수 없는 구간입니다.");
         }
 
-        sectionRepository.save(newSection);
+        sectionService.save(newSection);
         line.addSection(newSection);
 
         return SectionResponse.from(newSection);
@@ -64,10 +64,10 @@ public class SectionCompositeService {
 
         Line line = lineService.findById(lineId);
 
-        return sectionRepository.findByLine(line)
-                                .stream()
-                                .map(SectionResponse::from)
-                                .collect(Collectors.toList());
+        return sectionService.findByLine(line)
+                             .stream()
+                             .map(SectionResponse::from)
+                             .collect(Collectors.toList());
     }
 
     @Transactional
@@ -76,8 +76,7 @@ public class SectionCompositeService {
         Station targetStation = stationRepository.findById(stationId)
                                                  .orElseThrow(() -> new IllegalArgumentException("station id doesn't exist"));
 
-        Section targetSection = sectionRepository.findByDownStation(targetStation)
-                                                 .orElseThrow(() -> new IllegalArgumentException("section doesn't exist"));
+        Section targetSection = sectionService.findByDownStation(targetStation);
 
         Line line = lineService.findById(lineId);
 
@@ -87,12 +86,11 @@ public class SectionCompositeService {
 
         line.getSections().remove(targetSection);
 
-        sectionRepository.deleteById(targetSection.getId());
+        sectionService.deleteById(targetSection.getId());
     }
 
     public SectionResponse findById(Long sectionId) {
-        Section section = sectionRepository.findById(sectionId)
-                                           .orElseThrow(() -> new IllegalArgumentException("section doesn't exist"));
+        Section section = sectionService.findById(sectionId);
         return SectionResponse.from(section);
     }
 }

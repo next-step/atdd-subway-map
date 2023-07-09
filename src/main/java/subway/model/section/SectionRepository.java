@@ -7,7 +7,7 @@ import subway.model.station.Station;
 import java.util.List;
 import java.util.Optional;
 
-public interface SectionRepository extends JpaRepository<Section, Long> {
+interface SectionRepository extends JpaRepository<Section, Long> {
 
     List<Section> findByLine(Line line);
 

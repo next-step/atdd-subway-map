@@ -9,7 +9,6 @@ import subway.controller.dto.line.LineSaveRequest;
 import subway.model.line.Line;
 import subway.model.line.LineService;
 import subway.model.section.Section;
-import subway.model.section.SectionRepository;
 import subway.model.station.Station;
 import subway.model.station.StationRepository;
 
@@ -22,12 +21,10 @@ public class LineCompositeService {
 
     private final LineService lineService;
     private final StationRepository stationRepository;
-    private final SectionRepository sectionRepository;
 
-    public LineCompositeService(LineService lineService, StationRepository stationRepository, SectionRepository sectionRepository) {
+    public LineCompositeService(LineService lineService, StationRepository stationRepository) {
         this.lineService = lineService;
         this.stationRepository = stationRepository;
-        this.sectionRepository = sectionRepository;
     }
 
     @Transactional
