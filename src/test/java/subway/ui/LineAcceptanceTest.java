@@ -233,9 +233,14 @@ public class LineAcceptanceTest extends AbstractAcceptanceTest {
     @DisplayName("상행 종점역과 하행 종점역만 등록된 지하철 노선의 하행 종점역을 제거하는 경우")
     void 상행_종점역과_하행_종점역만_등록된_지하철_노선의_하행_종점역을_제거하는_경우() {
         //given
+        StationResponse 신사역 = StationSteps.지하철역_생성_요청_Response_반환("신사역");
+        StationResponse 논현역 = StationSteps.지하철역_생성_요청_Response_반환("논현역");
+        LineResponse 신분당선 = 지하철_노선_생성_요청_Response_반환("신분당선", 신사역.getId(), 논현역.getId());
 
         //when
+        ExtractableResponse<Response> 지하철_노선_구간_삭제_응답 = 지하철_노선_구간_삭제_요청(신분당선.getId(), 논현역.getId());
 
         //then
+        assertThat(지하철_노선_구간_삭제_응답.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 }
