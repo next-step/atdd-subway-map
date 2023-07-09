@@ -9,6 +9,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import subway.section.domain.Section;
+import subway.station.domain.Station;
 
 /**
  * - 노선은 "여러 개의 순서가 있는" 역을 가질 수 있다.
@@ -68,5 +69,10 @@ public class Line {
     public Section getLastSection() {
         sections.sort(Comparator.comparing(Section::getId));
         return sections.get(sections.size() - 1);
+    }
+
+    public boolean hasStation(Station downStation) {
+        return sections.stream()
+                .anyMatch(section -> section.hasStation(downStation));
     }
 }

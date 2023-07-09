@@ -88,4 +88,8 @@ public class Section {
     public boolean downStationEqualsTo(Station upStation) {
         return downStation.equals(upStation);
     }
+
+    public boolean hasStation(Station downStation) {
+        return downStation.equals(upStation) || downStation.equals(this.downStation);
+    }
 }

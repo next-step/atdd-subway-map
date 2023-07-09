@@ -90,17 +90,36 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(createSectionResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(응답_결과에서_Message를_추출한다(createSectionResponse)).contains("새로운 구간의 상행역은 노선에 등록된 마지막 구간의 하행역과 같아야 합니다.");
+    }
+
+    private String 응답_결과에서_Message를_추출한다(ExtractableResponse<Response> createSectionResponse) {
+        return createSectionResponse.jsonPath().getString("message");
     }
 
     /**
-     * Given : 새로운 노선을 1개 생성하고
+     * Given : 지하철역을 4개 생성하고
+     * And : 새로운 노선을 1개 생성한 후
      * When : 해당 노선에 등록되어 있는 하행 역을 가진 새로운 구간을 등록하면
      * Then : 예외가 발생한다
      */
     @DisplayName("지하철 구간 등록 예외 케이스 : 노선에 등록된 하행 역을 가진 새로운 구간 등록")
     @Test
     void registerSectionFailCase2() {
+        // given
+        ExtractableResponse<Response> 강남역 = StationStep.지하철역을_생성한다("강남역");
 
+        long 노선_상행_Id = 응답_결과에서_Id를_추출한다(강남역);
+        long 노선_하행_Id = 응답_결과에서_Id를_추출한다(StationStep.지하철역을_생성한다("양재역"));
+        long 구간_하행_Id = 응답_결과에서_Id를_추출한다(강남역);
+
+        long lineId = 응답_결과에서_Id를_추출한다(LineStep.지하철_노선을_생성한다(노선_상행_Id, 노선_하행_Id, "신분당선"));
+
+        // when
+        ExtractableResponse<Response> createSectionResponse = SectionStep.지하철_노선_구간을_등록한다(lineId, 노선_하행_Id, 구간_하행_Id);
+
+        // then
+        assertThat(createSectionResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
 

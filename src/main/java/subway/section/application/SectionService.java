@@ -9,6 +9,7 @@ import subway.section.domain.Section;
 import subway.section.domain.SectionRepository;
 import subway.section.dto.SectionRequest;
 import subway.section.dto.SectionResponse;
+import subway.section.exception.AlreadyRegisteredStationException;
 import subway.section.exception.InvalidSectionRegistrationException;
 import subway.station.domain.Station;
 import subway.station.domain.StationRepository;
@@ -33,9 +34,10 @@ public class SectionService {
         Section lastSection = line.getLastSection();
 
         Station upStation = getStation(sectionRequest.getUpStationId());
-        validateLastSectionAndNewUpStation(lastSection, upStation);
+        validateLastStationEqualToNewUpStation(lastSection, upStation);
 
         Station downStation = getStation(sectionRequest.getDownStationId());
+        validateDuplicationOfStationInLine(line, downStation);
 
         Section section = new Section(line, upStation, downStation, sectionRequest.getDistance());
         sectionRepository.save(section);
@@ -48,14 +50,20 @@ public class SectionService {
                 .orElseThrow(LineNotFoundException::new);
     }
 
-    private void validateLastSectionAndNewUpStation(Section lastSection, Station upStation) {
+    private Station getStation(Long stationId) {
+        return stationRepository.findById(stationId)
+                .orElseThrow(StationNotFoundException::new);
+    }
+
+    private void validateLastStationEqualToNewUpStation(Section lastSection, Station upStation) {
         if (!lastSection.downStationEqualsTo(upStation)) {
             throw new InvalidSectionRegistrationException();
         }
     }
 
-    private Station getStation(Long stationId) {
-        return stationRepository.findById(stationId)
-                .orElseThrow(StationNotFoundException::new);
+    private void validateDuplicationOfStationInLine(Line line, Station downStation) {
+        if (line.hasStation(downStation)) {
+            throw new AlreadyRegisteredStationException();
+        }
     }
 }
