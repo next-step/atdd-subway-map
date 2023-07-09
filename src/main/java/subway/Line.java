@@ -14,7 +14,7 @@ public class Line {
     private String color;
     @Column(nullable = false)
     private Integer distance;
-    @OneToMany(mappedBy = "line")
+    @OneToMany(mappedBy = "line", cascade = CascadeType.REMOVE)
     private List<LineStation> lineStations;
 
     public Long getId() {
@@ -44,5 +44,10 @@ public class Line {
         this.name = name;
         this.color = color;
         this.distance = distance;
+    }
+
+    public void updateLine(String name, String color) {
+        this.name = name;
+        this.color = color;
     }
 }

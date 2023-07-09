@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,6 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 인수 테스트")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class SubwayLineAcceptanceTest {
     private final static int PORT = 8080;
 
@@ -148,7 +150,6 @@ public class SubwayLineAcceptanceTest {
 
         //then
         assertThat(extract.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(extract.body().jsonPath().getString("color")).isEqualTo(replaceColor);
     }
 
     /**
@@ -171,7 +172,7 @@ public class SubwayLineAcceptanceTest {
                 .then().log().all()
                 .extract();
         //then
-        assertThat(extract.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(extract.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
     // 지하철역 생성

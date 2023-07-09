@@ -54,4 +54,13 @@ public class LineService {
         LineStation down = lineStationRepository.findFirstByLineIdOrderBySequenceDesc(line.getId());
         return new LineResponse(line.getId(), line.getName(), line.getColor(), List.of(createStationResponse(up), createStationResponse(down)));
     }
+
+    public void updateLine(Long id, LineRequest request) {
+        Line line = lineRepository.findById(id).orElseThrow(() -> new RuntimeException("해당 아이디의 지하철 노선이 없습니다."));
+        line.updateLine(request.getName(), request.getColor());
+    }
+
+    public void deleteLine(Long id) {
+        lineRepository.deleteById(id);
+    }
 }
