@@ -2,7 +2,6 @@ package subway.line.domain;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import javax.persistence.CascadeType;
@@ -36,7 +35,7 @@ public class Sections {
             return false;
         }
 
-        return Objects.equals(sections.get(sections.size()-1).getDownStation().getId(), stationId);
+        return getLastSection().equalsDownStation(stationId);
     }
 
     public boolean hasOneSection() {

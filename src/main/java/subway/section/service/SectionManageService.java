@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import subway.line.domain.Line;
-import subway.line.repository.LineRepository;
 import subway.line.service.LineManageService;
 import subway.line.service.LineReadService;
 import subway.section.domain.Section;
@@ -17,12 +16,12 @@ import subway.station.service.StationService;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class SectionCreateService {
+@Transactional
+public class SectionManageService {
     private final StationService stationService;
     private final LineManageService lineManageService;
     private final LineReadService lineReadService;
 
-    @Transactional
     public Section create(Long lineId, SectionCreateRequest request) {
         Line line = lineReadService.getLine(lineId);
 
@@ -37,5 +36,11 @@ public class SectionCreateService {
         Line createdLine = lineManageService.save(line);
 
         return createdLine.getSection(request.getDownStationId(), request.getUpStationId());
+    }
+
+    public void delete(Long lineId, Long stationId) {
+        Line line = lineReadService.getLine(lineId);
+
+        line.deleteSection(stationId);
     }
 }
