@@ -6,20 +6,15 @@ import io.restassured.response.Response;
 import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import subway.RestAssuredTest;
-import subway.station.Station;
-import subway.station.StationRepository;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD;
 import static subway.utils.StationTestUtils.주어진_이름으로_지하철역을_생성한다;
 
@@ -28,10 +23,6 @@ import static subway.utils.StationTestUtils.주어진_이름으로_지하철역�
 @DirtiesContext(classMode = BEFORE_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class LineAcceptanceTest extends RestAssuredTest {
-    @Autowired
-    private LineRepository lineRepository;
-    @Autowired
-    private StationRepository stationRepository;
 
 
     /**
@@ -56,31 +47,17 @@ public class LineAcceptanceTest extends RestAssuredTest {
     }
 
     void 지하철_노선_등록이_정상적인지_검증한다(Long targetId) {
-        List<Line> lines = lineRepository.findAll();
-        assertThat(lines.get(0).getId()).isEqualTo(targetId);
+        ExtractableResponse<Response> response = 전체_지하철_노선_목록_조회_api를_호출한다();
+        List<Object> responseIds = response.jsonPath().getList("id");
+        List<Long> responseIdList = responseIds.stream()
+                .map(r -> ((Number) r).longValue())
+                .collect(Collectors.toList());
+
+        assertThat(responseIdList).contains(targetId);
     }
 
     void 지하철_노선_등록_api_응답코드를_검증한다(int statusCode) {
         assertThat(statusCode).isEqualTo(HttpStatus.SC_CREATED);
-    }
-
-    Line 지하철_노선을_등록한다(LineCreateRequest lineCreateRequest) {
-        //given
-        Station downStation = 주어진_아이디로_지하철역을_조회한다(lineCreateRequest.getDownStationId());
-        Station upStation = 주어진_아이디로_지하철역을_조회한다(lineCreateRequest.getUpStationId());
-
-        Line line = Line.builder()
-                .color(lineCreateRequest.getColor())
-                .name(lineCreateRequest.getName())
-                .stations(Arrays.asList(downStation, upStation))
-                .distance(lineCreateRequest.getDistance())
-                .build();
-
-        return lineRepository.save(line);
-    }
-
-    Station 주어진_아이디로_지하철역을_조회한다(Long id) {
-        return stationRepository.findById(id).get();
     }
 
     ExtractableResponse<Response> 지하철_노선을_등록_api를_호출한다(LineCreateRequest lineCreateRequest) {
@@ -109,43 +86,38 @@ public class LineAcceptanceTest extends RestAssuredTest {
         구호선_노선_테스트_데이터_생성();
 
         //when
-        List<Line> lines = 전체_지하철_노선_목록_조회_api를_호출한다();
+        ExtractableResponse<Response> response = 전체_지하철_노선_목록_조회_api를_호출한다();
 
         //then
-        assertThat(lines.size()).isEqualTo(2);
+        assertThat(response.jsonPath().getList(".").size()).isEqualTo(2);
     }
 
-    Line 신분당선_노선_테스트_데이터_생성() {
+    ExtractableResponse<Response> 신분당선_노선_테스트_데이터_생성() {
         Long gangnamStationId = 주어진_이름으로_지하철역을_생성한다("강남역");
         Long pangyoStationId = 주어진_이름으로_지하철역을_생성한다("판교역");
 
         LineCreateRequest sinboonLineCreateRequest
                 = new LineCreateRequest("신분당선", "bg-red-600", gangnamStationId, pangyoStationId, 10);
 
-        return 지하철_노선을_등록한다(sinboonLineCreateRequest);
+        return 지하철_노선을_등록_api를_호출한다(sinboonLineCreateRequest);
     }
 
-    Line 구호선_노선_테스트_데이터_생성() {
+    ExtractableResponse<Response> 구호선_노선_테스트_데이터_생성() {
         Long sinnonhyeonStationId = 주어진_이름으로_지하철역을_생성한다("신논현역");
         Long sapyongStationId = 주어진_이름으로_지하철역을_생성한다("사평역");
 
         LineCreateRequest lineNineCreateRequest
                 = new LineCreateRequest("9호선", "bg-yellow-400", sinnonhyeonStationId, sapyongStationId, 10);
 
-        return 지하철_노선을_등록한다(lineNineCreateRequest);
+        return 지하철_노선을_등록_api를_호출한다(lineNineCreateRequest);
     }
 
-    List<Line> 전체_지하철_노선_목록을_조회() {
-        return lineRepository.findAll();
-    }
-
-    List<Line> 전체_지하철_노선_목록_조회_api를_호출한다() {
-        List<Line> response = RestAssured.given().log().all()
+    ExtractableResponse<Response> 전체_지하철_노선_목록_조회_api를_호출한다() {
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().get("/lines")
                 .then().log().all()
-                .extract()
-                .as(List.class);
+                .extract();
 
         return response;
     }
@@ -158,27 +130,22 @@ public class LineAcceptanceTest extends RestAssuredTest {
     @Test
     void 지하철_노선_조회한다() {
         //given
-        Line line = 신분당선_노선_테스트_데이터_생성();
+        ExtractableResponse<Response> response = 신분당선_노선_테스트_데이터_생성();
+        Long createdId = ((Number) response.jsonPath().get("id")).longValue();
 
         //when
-        Line result = 지하철_노선_아이디를_바탕으로_조회하는_api를_호출한다(line.getId());
+        ExtractableResponse<Response> result = 지하철_노선_아이디를_바탕으로_조회하는_api를_호출한다(createdId);
 
         //then
-        assertThat(result.getName()).isEqualTo("신분당선");
+        assertThat((String) result.jsonPath().get("name")).isEqualTo("신분당선");
     }
 
-    Line 지하철_노선_아이디를_바탕으로_조회한다(Long id) {
-        return lineRepository.findById(id)
-                .orElseThrow(NoSuchElementException::new);
-    }
-
-    Line 지하철_노선_아이디를_바탕으로_조회하는_api를_호출한다(Long id) {
-        Line response = RestAssured.given().log().all()
+    ExtractableResponse<Response> 지하철_노선_아이디를_바탕으로_조회하는_api를_호출한다(Long id) {
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().get("/lines/{id}", id)
                 .then().log().all()
-                .extract()
-                .as(Line.class);
+                .extract();
 
         return response;
     }
@@ -192,28 +159,17 @@ public class LineAcceptanceTest extends RestAssuredTest {
     @Test
     void 지하철_노선을_수정한다() {
         //given
-        Line line = 신분당선_노선_테스트_데이터_생성();
+        ExtractableResponse<Response> response = 신분당선_노선_테스트_데이터_생성();
+        Long createdId = ((Number) response.jsonPath().get("id")).longValue();
 
         //when
         LineChangeRequest lineChangeRequest = new LineChangeRequest("98호선", "super_red");
-        지하철_노선_데이터_수정_api를_호출한다(line.getId(), lineChangeRequest);
+        지하철_노선_데이터_수정_api를_호출한다(createdId, lineChangeRequest);
 
         //then
-        Line result = 지하철_노선_아이디를_바탕으로_조회한다(line.getId());
-        assertThat(result.getName()).isEqualTo("98호선");
-        assertThat(result.getColor()).isEqualTo("super_red");
-    }
-
-    void 지하철_노선_데이터를_수정한다(Long id, LineChangeRequest lineChangeRequest) {
-        Line line = 지하철_노선_아이디를_바탕으로_조회한다(id);
-
-        if (lineChangeRequest.getColor() != null) {
-            line.updateColor(lineChangeRequest.getColor());
-        }
-        if (lineChangeRequest.getName() != null) {
-            line.updateName(lineChangeRequest.getName());
-        }
-        lineRepository.save(line);
+        ExtractableResponse<Response> result = 지하철_노선_아이디를_바탕으로_조회하는_api를_호출한다(createdId);
+        assertThat((String) result.jsonPath().get("name")).isEqualTo("98호선");
+        assertThat((String) result.jsonPath().get("color")).isEqualTo("super_red");
     }
 
     void 지하철_노선_데이터_수정_api를_호출한다(Long id, LineChangeRequest lineChangeRequest) {
@@ -232,20 +188,17 @@ public class LineAcceptanceTest extends RestAssuredTest {
     @Test
     void 지하철_노선을_삭제한다() {
         //given
-        Line line = 신분당선_노선_테스트_데이터_생성();
+        ExtractableResponse<Response> response = 신분당선_노선_테스트_데이터_생성();
+        Long createdId = ((Number) response.jsonPath().get("id")).longValue();
 
         //when
-        아이디_기반으로_지하철_노선_데이터를_삭제_api를_호출한다(line.getId());
+        아이디_기반으로_지하철_노선_데이터를_삭제_api를_호출한다(createdId);
 
         //then
-        assertThatThrownBy(() -> {
-            지하철_노선_아이디를_바탕으로_조회한다(line.getId());
-        }).isInstanceOf(NoSuchElementException.class);
+        ExtractableResponse<Response> result = 지하철_노선_아이디를_바탕으로_조회하는_api를_호출한다(createdId);
+        assertThat(result.statusCode()).isNotEqualTo(HttpStatus.SC_OK);
     }
 
-    void 아이디_기반으로_지하철_노선_데이터를_삭제한다(Long id) {
-        lineRepository.deleteById(id);
-    }
 
     void 아이디_기반으로_지하철_노선_데이터를_삭제_api를_호출한다(Long id) {
         RestAssured.given().log().all()
