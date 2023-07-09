@@ -164,10 +164,16 @@ public class LineAcceptanceTest extends AbstractAcceptanceTest {
     @DisplayName("새로운 구간의 하행역이 해당 노선에 등록되어있는 역인 경우")
     void 새로운_구간의_하행역이_해당_노선에_등록되어있는_역인_경우() {
         //given
+        StationResponse 신사역 = StationSteps.지하철역_생성_요청_Response_반환("신사역");
+        StationResponse 논현역 = StationSteps.지하철역_생성_요청_Response_반환("논현역");
+        LineResponse 신분당선 = 지하철_노선_생성_요청_Response_반환("신분당선", 신사역.getId(), 논현역.getId());
 
         //when
+        ExtractableResponse<Response> 지하철_노선_구간_등록_응답 =
+                지하철_노선_구간_등록_요청(신분당선.getId(), new SectionRequest(논현역.getId(), 신사역.getId(), 5L));
 
         //then
+        assertThat(지하철_노선_구간_등록_응답.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     /**
