@@ -109,4 +109,93 @@ public class LineAcceptanceTest extends AbstractAcceptanceTest {
         assertThat(신분당선_삭제_응답.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선에 구간 등록을 하면
+     * Then 지하철 노선 조회 시 새로운 구간의 하행역이 조회된다
+     */
+    @Test
+    @DisplayName("지하철 노선에 구간 등록")
+    void createSection() {
+        //given
+
+        //when
+
+        //then
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 노선의 하행 종점역이 아닌 상행역을 가진 구간을 등록하면
+     * Then 예외를 발생한다.
+     */
+    @Test
+    @DisplayName("새로운 구간의 상행역이 해당 노선에 등록되어있는 하행 종점역이 아닌 경우")
+    void 새로운_구간의_상행역이_해당_노선에_등록되어있는_하행_종점역이_아닌_경우() {
+        //given
+
+        //when
+
+        //then
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 노선에 등록되어있는 역이 하행역인 구간을 등록하면
+     * Then 예외를 발생한다.
+     */
+    @Test
+    @DisplayName("새로운 구간의 하행역이 해당 노선에 등록되어있는 역인 경우")
+    void 새로운_구간의_하행역이_해당_노선에_등록되어있는_역인_경우() {
+        //given
+
+        //when
+
+        //then
+    }
+
+    /**
+     * Given 3개의 역을 가지는 지하철 노선을 생성하고
+     * When 지하철 노선에 등록된 하행 종점역을 제거하면
+     * Then 지하철 노선 조회 시 제거한 종점역은 존재하지 않는다.
+     */
+    @Test
+    @DisplayName("지하철 노선에 구간 제거")
+    void deleteSection() {
+        //given
+
+        //when
+
+        //then
+    }
+
+    /**
+     * Given 3개의 역을 가지는 지하철 노선을 생성하고
+     * When 지하철 노선의 하행 종점역이 아닌 역을 제거하면
+     * Then 예외를 발생한다.
+     */
+    @Test
+    @DisplayName("지하철 노선의 하행 종점역이 아닌 역을 제거하는 경우")
+    void 지하철_노선의_하행_종점역이_아닌_역을_제거하는_경우() {
+        //given
+
+        //when
+
+        //then
+    }
+
+    /**
+     * Given 상행 종점역과 하행 종점역만 등록된 노선을 생성하고
+     * When 지하철 노선의 하행 종점역을 제거하면
+     * Then 예외를 발생한다.
+     */
+    @Test
+    @DisplayName("상행 종점역과 하행 종점역만 등록된 지하철 노선의 하행 종점역을 제거하는 경우")
+    void 상행_종점역과_하행_종점역만_등록된_지하철_노선의_하행_종점역을_제거하는_경우() {
+        //given
+
+        //when
+
+        //then
+    }
 }
