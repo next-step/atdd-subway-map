@@ -25,4 +25,13 @@ public class SectionStep {
                 .then().log().all()
                 .extract();
     }
+
+    public static ExtractableResponse<Response> 하행_종점역을_가진_지하철_구간을_삭제한다(long lineId, long stationId) {
+        return RestAssured.given().log().all()
+                .pathParam("lineId", lineId)
+                .queryParam("stationId", stationId)
+                .when().delete("/lines/{lineId}/sections")
+                .then().log().all()
+                .extract();
+    }
 }

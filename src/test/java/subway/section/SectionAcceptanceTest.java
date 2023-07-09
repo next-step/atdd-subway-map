@@ -123,17 +123,21 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     }
 
 
+    /*
+      # 구간 제거 기능
+      ## 요구사항
+      - 지하철 노선에 구간을 제거한다.
+      - 지하철 노선에 등록된 "하행 종점역"만 제거할 수 있다. (마지막 구간만 제거)
+      - 지하철 노선에 상행 종점역과 하행 종점역만 있는 경우, 즉 구간이 1개인 경우 역을 삭제할 수 없다.
+      - 새로운 구간 제거 시, 위 조건에 부합하지 않는 경우 에러 처리한다.
+      ## Request
+      - DELETE /lines/{lineId}/sections?stationId={stationId}
+      ## 시나리오
+     */
+
     /**
-     * # 구간 제거 기능
-     * ## 요구사항
-     * - 지하철 노선에 구간을 제거한다.
-     * - 지하철 노선에 등록된 "하행 종점역"만 제거할 수 있다. (마지막 구간만 제거)
-     * - 지하철 노선에 상행 종점역과 하행 종점역만 있는 경우, 즉 구간이 1개인 경우 역을 삭제할 수 없다.
-     * - 새로운 구간 제거 시, 위 조건에 부합하지 않는 경우 에러 처리한다.
-     * ## Request
-     * - DELETE /lines/{lineId}/sections?stationId={stationId}
-     * ## 시나리오
-     * Given : 지하철 노선을 1개 등록하고
+     * Given : 지하철역을 3개 생성하고
+     * And : 지하철 노선을 1개 생성하고
      * And : 새로운 구간을 1개 등록한 후
      * When : 하행 종점역을 제거하면
      * Then : 구간이 삭제된다
@@ -141,7 +145,23 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 구간 삭제")
     @Test
     void deleteSectionOk() {
+        // given
+        long 노선_상행_Id = 응답_결과에서_Id를_추출한다(StationStep.지하철역을_생성한다("강남역"));
+        long 노선_하행_Id = 응답_결과에서_Id를_추출한다(StationStep.지하철역을_생성한다("양재역"));
+        long 구간_하행_Id = 응답_결과에서_Id를_추출한다(StationStep.지하철역을_생성한다("양재시민의숲역"));
 
+        long lineId = 응답_결과에서_Id를_추출한다(LineStep.지하철_노선을_생성한다(노선_상행_Id, 노선_하행_Id, "신분당선"));
+
+        SectionStep.지하철_노선_구간을_등록한다(lineId, 노선_하행_Id, 구간_하행_Id);
+
+        // when
+        ExtractableResponse<Response> deleteSectionResponse = SectionStep.하행_종점역을_가진_지하철_구간을_삭제한다(lineId, 구간_하행_Id);
+
+        // then
+        assertThat(deleteSectionResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        ExtractableResponse<Response> showLineResponse = LineStep.지하철_노선을_조회한다(lineId);
+        assertThat(지하철_구간_목록을_추출한다(showLineResponse)).hasSize(1);
     }
 
     /**
