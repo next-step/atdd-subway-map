@@ -35,4 +35,8 @@ public class Sections {
                 .flatMap(section -> Stream.of(section.getUpStation(), section.getDownStation()))
                 .collect(Collectors.toSet());
     }
+
+    public void delete(Long stationId) {
+        sections.remove(sections.get(sections.size() - 1));
+    }
 }

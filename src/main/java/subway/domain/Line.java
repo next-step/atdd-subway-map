@@ -65,4 +65,8 @@ public class Line {
     public Set<Station> getStations() {
         return sections.getStations();
     }
+
+    public void deleteSection(Long stationId) {
+        sections.delete(stationId);
+    }
 }
