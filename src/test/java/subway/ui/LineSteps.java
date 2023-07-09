@@ -1,5 +1,6 @@
 package subway.ui;
 
+import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 
@@ -55,6 +56,16 @@ public class LineSteps {
 
     public static ExtractableResponse<Response> 지하철_노선_구간_등록_요청(Long lineId, SectionRequest request) {
         return post("/lines/{id}/sections", lineId, request);
+    }
+
+    public static ExtractableResponse<Response> 지하철_노선_구간_삭제_요청(Long lineId, Long stationId) {
+        return RestAssured
+                .given().log().all()
+                .queryParam("stationId", stationId)
+                .pathParam("id", lineId)
+                .when().delete("/lines/{id}/sections")
+                .then().log().all()
+                .extract();
     }
 
     private static LineCreateRequest createLineCreateRequest(String name) {
