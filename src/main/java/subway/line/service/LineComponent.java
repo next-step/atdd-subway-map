@@ -52,7 +52,8 @@ public class LineComponent {
 
         // 새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 한다.
         if (!line.getDownStation().equals(section.getUpStation())) {
-            throw new SubwayBadRequestException(LineMessage.DOWN_STATION_NOT_MATCH_WITH_UP_STATION.getMessage());
+            throw new SubwayBadRequestException(LineMessage.DOWN_STATION_NOT_MATCH_WITH_UP_STATION.getCode(),
+                    LineMessage.DOWN_STATION_NOT_MATCH_WITH_UP_STATION.getMessage());
         }
         // 새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없다.
         List<Station> stationsInLine = line.getStationsInSections();
@@ -60,7 +61,8 @@ public class LineComponent {
                 .filter(s -> s.equals(section.getDownStation()))
                 .findAny()
                 .ifPresent(e -> {
-                    throw new SubwayBadRequestException(LineMessage.ADD_SECTION_STATION_DUPLICATION_VALID_MESSAGE.getMessage());
+                    throw new SubwayBadRequestException(LineMessage.ADD_SECTION_STATION_DUPLICATION_VALID_MESSAGE.getCode(),
+                            LineMessage.ADD_SECTION_STATION_DUPLICATION_VALID_MESSAGE.getMessage());
                 });
         line.addSection(section);
         lineService.saveLine(line);

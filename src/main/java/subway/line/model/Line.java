@@ -73,10 +73,12 @@ public class Line {
 
     public Section deleteSectionByStation(Station station) {
         if (this.sections.size() < MINIMAL_SECTION_SIZE) {
-            throw new SubwayBadRequestException(LineMessage.DOWN_STATION_MINIMAL_VALID_MESSAGE.getFormatMessage(MINIMAL_SECTION_SIZE));
+            throw new SubwayBadRequestException(LineMessage.DOWN_STATION_MINIMAL_VALID_MESSAGE.getCode(),
+                    LineMessage.DOWN_STATION_MINIMAL_VALID_MESSAGE.getFormatMessage(MINIMAL_SECTION_SIZE));
         }
         if (!this.downStation.equals(station)) {
-            throw new SubwayBadRequestException(LineMessage.SECTION_DELETE_LAST_STATION_VALID_MESSAGE.getMessage());
+            throw new SubwayBadRequestException(LineMessage.SECTION_DELETE_LAST_STATION_VALID_MESSAGE.getCode(),
+                    LineMessage.SECTION_DELETE_LAST_STATION_VALID_MESSAGE.getMessage());
         }
 
         final int lastElementIndex = this.sections.size() - 1;

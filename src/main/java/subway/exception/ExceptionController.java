@@ -20,12 +20,4 @@ public class ExceptionController {
     public ErrorResponse exception(SubwayNotFoundException e) {
         return e.getResponse();
     }
-
-    @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse exception(Exception e) {
-        return ErrorResponse.builder()
-                .message(e.getMessage())
-                .build();
-    }
 }

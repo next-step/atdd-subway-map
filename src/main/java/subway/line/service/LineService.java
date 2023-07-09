@@ -52,18 +52,21 @@ public class LineService {
     public LineResponse findLineResponseById(Long id) {
         return lineRepository.findById(id)
                 .map(LineResponse::from)
-                .orElseThrow(() -> new SubwayNotFoundException(LineMessage.NOT_FOUND_MESSAGE.getMessage()));
+                .orElseThrow(() -> new SubwayNotFoundException(LineMessage.NOT_FOUND_MESSAGE.getCode(),
+                        LineMessage.NOT_FOUND_MESSAGE.getMessage()));
     }
 
     public Line findLineById(Long id) {
         return lineRepository.findById(id)
-                .orElseThrow(() -> new SubwayNotFoundException(LineMessage.NOT_FOUND_MESSAGE.getMessage()));
+                .orElseThrow(() -> new SubwayNotFoundException(LineMessage.NOT_FOUND_MESSAGE.getCode(),
+                        LineMessage.NOT_FOUND_MESSAGE.getMessage()));
     }
 
     @Transactional
     public void deleteLineById(Long id) {
         lineRepository.findById(id)
-                .orElseThrow(() -> new SubwayNotFoundException(LineMessage.NOT_FOUND_MESSAGE.getMessage()));
+                .orElseThrow(() -> new SubwayNotFoundException(LineMessage.NOT_FOUND_MESSAGE.getCode(),
+                        LineMessage.NOT_FOUND_MESSAGE.getMessage()));
         lineRepository.deleteById(id);
     }
 }

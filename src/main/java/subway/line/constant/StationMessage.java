@@ -7,7 +7,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum StationMessage {
 
-    NOT_FOUND_MESSAGE("존재하지 않는 역 입니다");
+    NOT_FOUND_MESSAGE(2000L, "존재하지 않는 역 입니다");
 
+    private final long code;
     private final String message;
 }
