@@ -70,6 +70,10 @@ class SectionAcceptanceTest {
 
         //then
         응답코드_검증(response, HttpStatus.BAD_REQUEST);
+        LineResponse line7 = 지하철_노선_조회_응답값_반환(1L);
+        StationResponse downwardLastStation = line7.getStations().get(1);
+        assertThat(downwardLastStation.getId()).isEqualTo(2L);
+        assertThat(downwardLastStation.getName()).isEqualTo("두번째역");
     }
 
     /**
@@ -88,5 +92,9 @@ class SectionAcceptanceTest {
 
         //then
         응답코드_검증(response, HttpStatus.BAD_REQUEST);
+        LineResponse line7 = 지하철_노선_조회_응답값_반환(1L);
+        StationResponse downwardLastStation = line7.getStations().get(1);
+        assertThat(downwardLastStation.getId()).isEqualTo(2L);
+        assertThat(downwardLastStation.getName()).isEqualTo("두번째역");
     }
 }
