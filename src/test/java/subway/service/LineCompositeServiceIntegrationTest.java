@@ -13,10 +13,10 @@ import subway.model.station.Station;
 import subway.model.station.StationRepository;
 
 @SpringBootTest
-class LineServiceIntegrationTest {
+class LineCompositeServiceIntegrationTest {
 
     @Autowired
-    private LineService lineService;
+    private LineCompositeService lineCompositeService;
 
     @Autowired
     private StationRepository stationRepository;
@@ -33,13 +33,13 @@ class LineServiceIntegrationTest {
         Station downStation = Station_생성("정거장 B");
 
         // when
-        LineResponse lineResponse = lineService.saveLine(LineSaveRequest.builder()
-                                                                        .name("테스트 라인")
-                                                                        .color("color")
-                                                                        .distance(1L)
-                                                                        .upStationId(upStation.getId())
-                                                                        .downStationId(downStation.getId())
-                                                                        .build());
+        LineResponse lineResponse = lineCompositeService.saveLine(LineSaveRequest.builder()
+                                                                                 .name("테스트 라인")
+                                                                                 .color("color")
+                                                                                 .distance(1L)
+                                                                                 .upStationId(upStation.getId())
+                                                                                 .downStationId(downStation.getId())
+                                                                                 .build());
 
         // then
         생성된_LINE_조회(lineResponse);

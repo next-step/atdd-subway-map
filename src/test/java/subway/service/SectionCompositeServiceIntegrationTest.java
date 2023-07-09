@@ -17,10 +17,10 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-class SectionServiceIntegrationTest {
+class SectionCompositeServiceIntegrationTest {
 
     @Autowired
-    private SectionService sectionService;
+    private SectionCompositeService sectionCompositeService;
 
     @Autowired
     private StationRepository stationRepository;
@@ -40,7 +40,7 @@ class SectionServiceIntegrationTest {
         Station newStation = Station_생성("정거장 C");
 
         // when
-        SectionResponse sectionResponse = sectionService.saveSection(line.getId(), SectionSaveRequest_생성(downStation, newStation));
+        SectionResponse sectionResponse = sectionCompositeService.saveSection(line.getId(), SectionSaveRequest_생성(downStation, newStation));
 
         // then
         생성된_Section_조회(sectionResponse, downStation.getName(), newStation.getName());

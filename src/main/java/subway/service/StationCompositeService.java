@@ -12,10 +12,10 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
-public class StationService {
+public class StationCompositeService {
     private final StationRepository stationRepository;
 
-    public StationService(StationRepository stationRepository) {
+    public StationCompositeService(StationRepository stationRepository) {
         this.stationRepository = stationRepository;
     }
 

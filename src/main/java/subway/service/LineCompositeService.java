@@ -18,13 +18,13 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
-public class LineService {
+public class LineCompositeService {
 
     private final LineRepository lineRepository;
     private final StationRepository stationRepository;
     private final SectionRepository sectionRepository;
 
-    public LineService(LineRepository lineRepository, StationRepository stationRepository, SectionRepository sectionRepository) {
+    public LineCompositeService(LineRepository lineRepository, StationRepository stationRepository, SectionRepository sectionRepository) {
         this.lineRepository = lineRepository;
         this.stationRepository = stationRepository;
         this.sectionRepository = sectionRepository;
