@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import subway.line.service.LineManageService;
 import subway.section.domain.Section;
 import subway.section.model.SectionCreateRequest;
 import subway.section.model.SectionCreateResponse;
@@ -24,6 +25,7 @@ import subway.section.service.SectionManageService;
 @RequiredArgsConstructor
 public class SectionController {
     private final SectionManageService sectionManageService;
+    private final LineManageService lineManageService;
 
     @PostMapping("/{lineId}/sections")
     public ResponseEntity<SectionCreateResponse> createSection(@PathVariable Long lineId, @RequestBody SectionCreateRequest request) {
@@ -35,7 +37,7 @@ public class SectionController {
 
     @DeleteMapping("/{lineId}/sections")
     public ResponseEntity<Void> deleteSection(@PathVariable Long lineId, @RequestParam Long stationId) {
-        sectionManageService.delete(lineId, stationId);
+        lineManageService.delete(lineId, stationId);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }

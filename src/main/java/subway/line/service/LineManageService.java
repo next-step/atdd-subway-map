@@ -19,12 +19,12 @@ import subway.station.service.StationService;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class LineManageService {
     private final StationService stationService;
     private final LineRepository lineRepository;
     private final LineReadService lineReadService;
 
-    @Transactional
     public LineResponse createLine(LineCreateRequest request) {
         Station upStation = stationService.get(request.getUpStationId());
         Station downStation = stationService.get(request.getDownStationId());
@@ -56,7 +56,6 @@ public class LineManageService {
         return line;
     }
 
-    @Transactional
     public void modifyLine(Long id, LineModifyRequest request) {
         Line line = lineReadService.getLine(id);
 
@@ -65,13 +64,14 @@ public class LineManageService {
         lineRepository.save(line);
     }
 
-    @Transactional
     public void deleteLine(Long id) {
         lineRepository.deleteById(id);
     }
 
-    @Transactional
-    public Line save(Line line) {
-        return lineRepository.save(line);
+    public void delete(Long lineId, Long stationId) {
+        Line line = lineReadService.getLine(lineId);
+
+        line.deleteSection(stationId);
     }
+
 }

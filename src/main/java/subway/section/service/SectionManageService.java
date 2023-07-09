@@ -37,10 +37,4 @@ public class SectionManageService {
 
         return sectionRepository.save(section);
     }
-
-    public void delete(Long lineId, Long stationId) {
-        Line line = lineReadService.getLine(lineId);
-
-        line.deleteSection(stationId);
-    }
 }
