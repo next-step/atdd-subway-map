@@ -2,7 +2,6 @@ package subway;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -37,19 +36,10 @@ public class SectionAcceptanceTest {
 
     @BeforeEach
     public void init() {
-
-        stationId_A = StationApiHelper.callApiToCreateStation(stationName_A)
-                                      .jsonPath()
-                                      .getLong("id");
-        stationId_B = StationApiHelper.callApiToCreateStation(stationName_B)
-                                      .jsonPath()
-                                      .getLong("id");
-        stationId_C = StationApiHelper.callApiToCreateStation(stationName_C)
-                                      .jsonPath()
-                                      .getLong("id");
-        stationId_D = StationApiHelper.callApiToCreateStation(stationName_D)
-                                      .jsonPath()
-                                      .getLong("id");
+        stationId_A = Station_생성(stationName_A);
+        stationId_B = Station_생성(stationName_B);
+        stationId_C = Station_생성(stationName_C);
+        stationId_D = Station_생성(stationName_D);
     }
 
     /**
@@ -63,25 +53,17 @@ public class SectionAcceptanceTest {
     void createSection_성공__2개역_노선() {
 
         // given
-        Long lineId = createLine(stationId_A, stationId_B);
+        Long lineId = LINE_생성(stationId_A, stationId_B);
 
         // when
-        ExtractableResponse<Response> creationResponse = createSection(lineId, stationId_B, stationId_C);
+        ExtractableResponse<Response> creationResponse = Section_생성(lineId, stationId_B, stationId_C);
 
         // then
-        assertThat(creationResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        HTTP_STATUS_검증(creationResponse, HttpStatus.CREATED);
 
-        List<StationResponse> stations = LineApiHelper.callApiToGetSingleLine(lineId)
-                                                      .jsonPath()
-                                                      .getList("stations", StationResponse.class);
-        assertThat(stations.size()).isEqualTo(3);
-        assertThat(stations.stream()
-                           .map(StationResponse::getId)
-                           .collect(Collectors.toList())).contains(stationId_A, stationId_B, stationId_C);
-        assertThat(stations.stream()
-                           .map(StationResponse::getName)
-                           .collect(Collectors.toList())).contains(stationName_A, stationName_B, stationName_C);
-
+        Long[] expectedStationIds = {stationId_A, stationId_B, stationId_C};
+        String[] expectedStationNames = {stationName_A, stationName_B, stationName_C};
+        LINE의_스테이션_전체_조회_및_검증(lineId, expectedStationIds, expectedStationNames);
     }
 
     /**
@@ -95,25 +77,18 @@ public class SectionAcceptanceTest {
     void createSection_성공__3개역_노선() {
 
         // given
-        Long lineId = createLine(stationId_A, stationId_B);
-        createSection(lineId, stationId_B, stationId_C);
+        Long lineId = LINE_생성(stationId_A, stationId_B);
+        Section_생성(lineId, stationId_B, stationId_C);
 
         // when
-        ExtractableResponse<Response> creationResponse = createSection(lineId, stationId_C, stationId_D);
+        ExtractableResponse<Response> creationResponse = Section_생성(lineId, stationId_C, stationId_D);
 
         // then
-        assertThat(creationResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        HTTP_STATUS_검증(creationResponse, HttpStatus.CREATED);
 
-        List<StationResponse> stations = LineApiHelper.callApiToGetSingleLine(lineId)
-                                                      .jsonPath()
-                                                      .getList("stations", StationResponse.class);
-        assertThat(stations.size()).isEqualTo(4);
-        assertThat(stations.stream()
-                           .map(StationResponse::getId)
-                           .collect(Collectors.toList())).contains(stationId_A, stationId_B, stationId_C, stationId_D);
-        assertThat(stations.stream()
-                           .map(StationResponse::getName)
-                           .collect(Collectors.toList())).contains(stationName_A, stationName_B, stationName_C, stationName_D);
+        Long[] expectedStationIds = {stationId_A, stationId_B, stationId_C, stationId_D};
+        String[] expectedStationsNames = {stationName_A, stationName_B, stationName_C, stationName_D};
+        LINE의_스테이션_전체_조회_및_검증(lineId, expectedStationIds, expectedStationsNames);
     }
 
     /**
@@ -126,13 +101,13 @@ public class SectionAcceptanceTest {
     void createSection_에러__하행종점역이_아닌_상행역_구간() {
 
         // given
-        Long lineId = createLine(stationId_A, stationId_B);
+        Long lineId = LINE_생성(stationId_A, stationId_B);
 
         // when
-        ExtractableResponse<Response> creationResponse = createSection(lineId, stationId_C, stationId_A);
+        ExtractableResponse<Response> creationResponse = Section_생성(lineId, stationId_C, stationId_A);
 
         // then
-        assertThat(creationResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        HTTP_STATUS_검증(creationResponse, HttpStatus.INTERNAL_SERVER_ERROR);
 
     }
 
@@ -146,17 +121,17 @@ public class SectionAcceptanceTest {
     void createSection_에러__노선에_등록된_하행역() {
 
         // given
-        Long lineId = createLine(stationId_A, stationId_B);
-        createSection(lineId, stationId_B, stationId_C);
+        Long lineId = LINE_생성(stationId_A, stationId_B);
+        Section_생성(lineId, stationId_B, stationId_C);
 
         // when
-        ExtractableResponse<Response> creationResponse = createSection(lineId, stationId_C, stationId_B);
+        ExtractableResponse<Response> creationResponse = Section_생성(lineId, stationId_C, stationId_B);
 
         // then
-        assertThat(creationResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        HTTP_STATUS_검증(creationResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    private ExtractableResponse<Response> createSection(Long lineId, Long upStationId, Long downStationId) {
+    private ExtractableResponse<Response> Section_생성(Long lineId, Long upStationId, Long downStationId) {
         return callApiToCreateSection(lineId, SectionSaveRequest.builder()
                                                                 .upStationId(upStationId)
                                                                 .downStationId(downStationId)
@@ -164,7 +139,7 @@ public class SectionAcceptanceTest {
                                                                 .build());
     }
 
-    private static Long createLine(Long upStationId, Long downStationId) {
+    private static Long LINE_생성(Long upStationId, Long downStationId) {
         return LineApiHelper.callApiToCreateLine(LineSaveRequest.builder()
                                                                 .name("테스트 노선")
                                                                 .color("bg-red-600")
@@ -176,4 +151,28 @@ public class SectionAcceptanceTest {
                             .getLong("id");
     }
 
+    private long Station_생성(String stationName) {
+        return StationApiHelper.callApiToCreateStation(stationName)
+                               .jsonPath()
+                               .getLong("id");
+    }
+
+
+    private static void HTTP_STATUS_검증(ExtractableResponse<Response> creationResponse, HttpStatus httpStatus) {
+        assertThat(creationResponse.statusCode()).isEqualTo(httpStatus.value());
+    }
+
+
+    private static void LINE의_스테이션_전체_조회_및_검증(Long lineId, Long[] expectedStationIds, String[] expectedStationNames) {
+        List<StationResponse> stations = LineApiHelper.callApiToGetSingleLine(lineId)
+                                                      .jsonPath()
+                                                      .getList("stations", StationResponse.class);
+        assertThat(stations.size()).isEqualTo(expectedStationIds.length);
+        assertThat(stations.stream()
+                           .map(StationResponse::getId)
+                           .collect(Collectors.toList())).contains(expectedStationIds);
+        assertThat(stations.stream()
+                           .map(StationResponse::getName)
+                           .collect(Collectors.toList())).contains(expectedStationNames);
+    }
 }
