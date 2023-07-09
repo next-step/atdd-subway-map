@@ -32,31 +32,34 @@ public class LineService {
             .collect(Collectors.toList());
     }
 
-    public LineResponse findLineById(Long id) {
-        return new LineResponse(findById(id));
+    public LineResponse findLine(final Long id) {
+        return new LineResponse(findLineById(id));
     }
 
-    public void update(Long id, LineUpdateRequest lineUpdateRequest) {
-        Line line = findById(id);
+    public void update(final Long id, final LineUpdateRequest lineUpdateRequest) {
+        Line line = findLineById(id);
         line.update(lineUpdateRequest.getName(), lineUpdateRequest.getColor());
     }
 
-    public void deleteLineById(Long id) {
+    public void deleteLineById(final Long id) {
         lineRepository.deleteById(id);
     }
 
     private Line toLine(final LineRequest lineRequest) {
-        Station upStation = stationRepository.findById(lineRequest.getUpStationId())
-            .orElseThrow(IllegalStateException::new);
-        Station downStation = stationRepository.findById(lineRequest.getDownStationId())
-            .orElseThrow(IllegalStateException::new);
+        Station upStation = findStationById(lineRequest.getUpStationId());
+        Station downStation = findStationById(lineRequest.getDownStationId());
 
         return new Line(lineRequest.getName(), lineRequest.getColor(), upStation, downStation,
             lineRequest.getDistance());
     }
 
-    private Line findById(Long id) {
+    private Line findLineById(final Long id) {
         return lineRepository.findById(id)
-            .orElseThrow(IllegalStateException::new);
+            .orElseThrow(() -> new IllegalStateException(String.format("존재하지 않는 노선입니다. 요청한 노선 Id : ", id)));
+    }
+
+    private Station findStationById(final Long id) {
+        return stationRepository.findById(id)
+            .orElseThrow(() -> new IllegalStateException(String.format("존재하지 않는 역입니다. 요청한 역 Id : ", id)));
     }
 }
