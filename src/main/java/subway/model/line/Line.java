@@ -30,7 +30,7 @@ public class Line {
     @Column(length = 20, nullable = false)
     private String color;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "line", cascade = CascadeType.ALL) // TODO: lazy vs eager. TODO: N+1문제 확인
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "line", cascade = CascadeType.ALL)
     List<Section> sections;
 
     @Column(nullable = false)
