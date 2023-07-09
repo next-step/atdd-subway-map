@@ -10,8 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import subway.constants.Endpoint;
-import subway.fixture.LineFixture;
-import subway.fixture.StationFixture;
+import subway.station.StationFixture;
 import subway.global.error.code.ErrorCode;
 import subway.line.dto.request.SaveLineRequestDto;
 import subway.line.dto.request.SaveLineSectionRequestDto;
@@ -38,7 +37,7 @@ public class LineSectionAcceptanceTest {
 
     private static final String LINE_BASE_URL = Endpoint.LINE_BASE_URL.getUrl();
 
-    private static final String EXCEPTION_MESSAGES_KEY = "messages";
+    private static final String ERROR_MESSAGES_KEY = "errorMessages";
 
     private Long 신사역_아이디;
 
@@ -65,13 +64,19 @@ public class LineSectionAcceptanceTest {
         this.판교역_아이디 = saveStation(StationFixture.판교역);
         this.광교역_아이디 = saveStation(StationFixture.광교역);
 
-        this.신분당선 = saveLine(LineFixture.신분당선을_생성한다(신사역_아이디, 강남역_아이디));
+        this.신분당선 = saveLine(SaveLineRequestDto.builder()
+                .name("신분당선")
+                .color("#f5222d")
+                .distance(15)
+                .upStationId(this.신사역_아이디)
+                .downStationId(this.강남역_아이디)
+                .build());
     }
 
     /**
      * <pre>
      * When 지하철 노선의 구간을 추가하면
-     * Then 지하철 노선 상세 조회 시 등록한 구간의 하행 종점역을 찾을 수 있다
+     * Then 지하철 노선의 하행 종점역은 추가한 구간의 하행 종점역이다.
      * </pre>
      */
     @DisplayName("지하철 노선의 구간을 추가한다.")
@@ -79,9 +84,7 @@ public class LineSectionAcceptanceTest {
     void addLineSection() {
         // when
         SaveLineSectionRequestDto 광교역이_하행_종점역인_구간 = 광교역이_하행_종점역인_구간을_생성한다(
-                신분당선
-                        .getLastStation()
-                        .getId()
+                지하철_노선의_하행종점역_아이디를_찾는다(신분당선)
         );
         ExtractableResponse<Response> saveLineSectionResponse = saveLineSection(광교역이_하행_종점역인_구간);
 
@@ -89,12 +92,10 @@ public class LineSectionAcceptanceTest {
         assertAll(
                 () -> assertThat(saveLineSectionResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
                 () -> {
-                    List<Long> stationIds = findLineStationsById(신분당선.getId())
-                            .stream()
-                            .map(StationResponseDto::getId)
-                            .collect(Collectors.toList());
+                    LineResponseDto 추가한_지하철_구간 = saveLineSectionResponse.as(LineResponseDto.class);
 
-                    assertThat(stationIds).containsAnyOf(광교역_아이디);
+                    assertThat(지하철_노선의_하행종점역_아이디를_찾는다(추가한_지하철_구간))
+                            .isEqualTo(광교역이_하행_종점역인_구간.getDownStationId());
                 }
         );
 
@@ -111,7 +112,7 @@ public class LineSectionAcceptanceTest {
     void addAlreadyRegisteredDownStation() {
         // given
         SaveLineSectionRequestDto 판교역이_하행_종점역인_구간 = 판교역이_하행_종점역인_구간을_생성한다(
-                신분당선.getLastStation().getId()
+                지하철_노선의_하행종점역_아이디를_찾는다(신분당선)
         );
         SaveLineSectionRequestDto 광교역이_하행_종점역인_구간 = 광교역이_하행_종점역인_구간을_생성한다(
                 판교역이_하행_종점역인_구간.getDownStationId()
@@ -130,7 +131,7 @@ public class LineSectionAcceptanceTest {
                 () -> assertThat(
                         saveLineSectionResponse
                                 .jsonPath()
-                                .getList(EXCEPTION_MESSAGES_KEY, String.class))
+                                .getList(ERROR_MESSAGES_KEY, String.class))
                         .containsAnyOf(ErrorCode.ALREADY_REGISTERED_STATION.getMessage())
         );
     }
@@ -146,9 +147,7 @@ public class LineSectionAcceptanceTest {
     void createNotExistDownStation() {
         // when
         SaveLineSectionRequestDto 존재하지_않는_역이_하행_종점역인_구간 = SaveLineSectionRequestDto.builder()
-                .downStationId(신분당선
-                        .getLastStation()
-                        .getId())
+                .downStationId(지하철_노선의_하행종점역_아이디를_찾는다(신분당선))
                 .upStationId(0L)
                 .distance(1)
                 .build();
@@ -160,7 +159,7 @@ public class LineSectionAcceptanceTest {
                 () -> assertThat(
                         saveLineSectionResponse
                                 .jsonPath()
-                                .getList(EXCEPTION_MESSAGES_KEY, String.class))
+                                .getList(ERROR_MESSAGES_KEY, String.class))
                         .containsAnyOf(ErrorCode.NOT_EXIST_STATION.getMessage())
         );
     }
@@ -177,7 +176,7 @@ public class LineSectionAcceptanceTest {
     void deleteLastLineSection() {
         // given
         SaveLineSectionRequestDto 광교역이_하행_종점역인_구간 = 광교역이_하행_종점역인_구간을_생성한다(
-                신분당선.getLastStation().getId()
+                지하철_노선의_하행종점역_아이디를_찾는다(신분당선)
         );
         saveLineSection(광교역이_하행_종점역인_구간);
 
@@ -190,7 +189,10 @@ public class LineSectionAcceptanceTest {
                 () -> assertThat(deleteLineSectionByStationIdResponse.statusCode())
                         .isEqualTo(HttpStatus.NO_CONTENT.value()),
                 () -> {
-                    List<Long> stationIds = findLineStationsById(신분당선.getId())
+                    List<Long> stationIds = RestAssuredClient.get(
+                            String.format("%s/%d", LINE_BASE_URL, 신분당선.getId()))
+                            .jsonPath()
+                            .getList("stations", StationResponseDto.class)
                             .stream()
                             .map(StationResponseDto::getId)
                             .collect(Collectors.toList());
@@ -212,7 +214,7 @@ public class LineSectionAcceptanceTest {
     void deleteMiddleLineSection() {
         // given
         SaveLineSectionRequestDto 광교역이_하행_종점역인_구간 = 광교역이_하행_종점역인_구간을_생성한다(
-                신분당선.getLastStation().getId()
+                지하철_노선의_하행종점역_아이디를_찾는다(신분당선)
         );
         saveLineSection(광교역이_하행_종점역인_구간);
 
@@ -227,7 +229,7 @@ public class LineSectionAcceptanceTest {
                 () -> assertThat(
                         deleteLineSectionByStationIdResponse
                                 .jsonPath()
-                                .getList(EXCEPTION_MESSAGES_KEY, String.class))
+                                .getList(ERROR_MESSAGES_KEY, String.class))
                         .containsAnyOf(ErrorCode.IS_NOT_LAST_LINE_SECTION.getMessage())
         );
     }
@@ -244,7 +246,7 @@ public class LineSectionAcceptanceTest {
     void deleteNotExistLineSection() {
         // given
         SaveLineSectionRequestDto 광교역이_하행_종점역인_구간 = 광교역이_하행_종점역인_구간을_생성한다(
-                신분당선.getLastStation().getId()
+                지하철_노선의_하행종점역_아이디를_찾는다(신분당선)
         );
         saveLineSection(광교역이_하행_종점역인_구간);
 
@@ -259,7 +261,7 @@ public class LineSectionAcceptanceTest {
                 () -> assertThat(
                         deleteLineSectionByStationIdResponse
                                 .jsonPath()
-                                .getList(EXCEPTION_MESSAGES_KEY, String.class))
+                                .getList(ERROR_MESSAGES_KEY, String.class))
                         .containsAnyOf(ErrorCode.UNREGISTERED_STATION.getMessage())
         );
     }
@@ -275,7 +277,7 @@ public class LineSectionAcceptanceTest {
     void deleteStandAloneLineSection() {
         // when
         ExtractableResponse<Response> deleteLineSectionByStationIdResponse =
-                deleteLineSectionByStationId(신분당선.getLastStation().getId());
+                deleteLineSectionByStationId(지하철_노선의_하행종점역_아이디를_찾는다(신분당선));
 
         // then
         assertAll(
@@ -284,7 +286,7 @@ public class LineSectionAcceptanceTest {
                 () -> assertThat(
                         deleteLineSectionByStationIdResponse
                                 .jsonPath()
-                                .getList(EXCEPTION_MESSAGES_KEY, String.class))
+                                .getList(ERROR_MESSAGES_KEY, String.class))
                         .containsAnyOf(ErrorCode.STAND_ALONE_LINE_SECTION.getMessage())
         );
     }
@@ -316,25 +318,6 @@ public class LineSectionAcceptanceTest {
     private LineResponseDto saveLine(SaveLineRequestDto line) {
         return RestAssuredClient.post(LINE_BASE_URL, line)
                 .as(LineResponseDto.class);
-    }
-
-    /**
-     * <pre>
-     * 지하철 노선을 id로 조회하는 API를 호출하고
-     * 조회된 지하철 노선에 등록된 지하철역 목록을 반환하는 함수
-     * </pre>
-     *
-     * @param lineId
-     * @return found line
-     */
-    private List<StationResponseDto> findLineStationsById(Long lineId) {
-        String path = String.format("%s/%d", LINE_BASE_URL, lineId);
-        ExtractableResponse<Response> findStationByIdResponse = RestAssuredClient.get(path);
-        assertThat(findStationByIdResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
-
-        return findStationByIdResponse
-                .jsonPath()
-                .getList("stations", StationResponseDto.class);
     }
 
     /**
@@ -373,7 +356,7 @@ public class LineSectionAcceptanceTest {
     private SaveLineSectionRequestDto 판교역이_하행_종점역인_구간을_생성한다(Long upStationId) {
         return SaveLineSectionRequestDto.builder()
                 .upStationId(upStationId)
-                .downStationId(판교역_아이디)
+                .downStationId(this.판교역_아이디)
                 .distance(4)
                 .build();
     }
@@ -381,9 +364,17 @@ public class LineSectionAcceptanceTest {
     private SaveLineSectionRequestDto 광교역이_하행_종점역인_구간을_생성한다(Long upStationId) {
         return SaveLineSectionRequestDto.builder()
                 .upStationId(upStationId)
-                .downStationId(광교역_아이디)
+                .downStationId(this.광교역_아이디)
                 .distance(8)
                 .build();
+    }
+
+    private Long 지하철_노선의_하행종점역_아이디를_찾는다(LineResponseDto lineResponseDto) {
+        List<StationResponseDto> stations = lineResponseDto.getStations();
+        int lastIndex = stations.size() - 1;
+        return stations
+                .get(lastIndex)
+                .getId();
     }
 
 }

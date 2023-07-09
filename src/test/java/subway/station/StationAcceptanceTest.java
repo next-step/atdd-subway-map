@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import subway.constants.Endpoint;
-import subway.fixture.StationFixture;
 import subway.station.dto.request.SaveStationRequestDto;
 import subway.support.AcceptanceTest;
 import subway.support.DatabaseCleanUp;

@@ -10,8 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import subway.constants.Endpoint;
-import subway.fixture.LineFixture;
-import subway.fixture.StationFixture;
+import subway.station.StationFixture;
 import subway.line.dto.request.SaveLineRequestDto;
 import subway.line.dto.request.UpdateLineRequestDto;
 import subway.station.dto.request.SaveStationRequestDto;
@@ -73,7 +72,7 @@ public class LineAcceptanceTest {
     @Test
     void createLine() {
         // when
-        SaveLineRequestDto 신분당선 = LineFixture.신분당선을_생성한다(신사역_아이디, 광교역_아이디);
+        SaveLineRequestDto 신분당선 = 신분당선을_생성한다(신사역_아이디, 광교역_아이디);
         saveLine(신분당선);
 
         // then
@@ -98,8 +97,8 @@ public class LineAcceptanceTest {
     @Test
     void readLines() {
         // given
-        SaveLineRequestDto 신분당선 = LineFixture.신분당선을_생성한다(신사역_아이디, 광교역_아이디);
-        SaveLineRequestDto 경춘선 = LineFixture.경춘선을_생성한다(청량리역_아이디, 춘천역_아이디);
+        SaveLineRequestDto 신분당선 = 신분당선을_생성한다(신사역_아이디, 광교역_아이디);
+        SaveLineRequestDto 경춘선 = 경춘선을_생성한다(청량리역_아이디, 춘천역_아이디);
         Stream.of(신분당선, 경춘선)
                 .forEach(this::saveLine);
 
@@ -125,7 +124,7 @@ public class LineAcceptanceTest {
     @Test
     void readLine() {
         // given
-        SaveLineRequestDto 경춘선 = LineFixture.경춘선을_생성한다(청량리역_아이디, 춘천역_아이디);
+        SaveLineRequestDto 경춘선 = 경춘선을_생성한다(청량리역_아이디, 춘천역_아이디);
         Long savedLineId = saveLine(경춘선)
                 .jsonPath()
                 .getLong(LINE_ID_KEY);
@@ -150,13 +149,12 @@ public class LineAcceptanceTest {
     @Test
     void updateLine() {
         // given
-        SaveLineRequestDto 신분당선 = LineFixture.신분당선을_생성한다(신사역_아이디, 광교역_아이디);
+        SaveLineRequestDto 신분당선 = 신분당선을_생성한다(신사역_아이디, 광교역_아이디);
         Long savedLineId = saveLine(신분당선)
                 .jsonPath()
                 .getLong(LINE_ID_KEY);
 
         // when
-        UpdateLineRequestDto 수정한_신분당선 = LineFixture.수정한_신분당선;
         String path = String.format("%s/%d", LINE_BASE_URL, savedLineId);
         ExtractableResponse<Response> updateStationResponse = RestAssuredClient.put(path, 수정한_신분당선);
 
@@ -184,7 +182,7 @@ public class LineAcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        SaveLineRequestDto 경춘선 = LineFixture.경춘선을_생성한다(청량리역_아이디, 춘천역_아이디);
+        SaveLineRequestDto 경춘선 = 경춘선을_생성한다(청량리역_아이디, 춘천역_아이디);
         Long savedLineId = saveLine(경춘선)
                 .jsonPath()
                 .getLong(LINE_ID_KEY);
@@ -266,5 +264,30 @@ public class LineAcceptanceTest {
 
         return findStationByIdResponse;
     }
+
+    private SaveLineRequestDto 신분당선을_생성한다(Long upStationId, Long downStationId) {
+        return SaveLineRequestDto.builder()
+                .name("신분당선")
+                .color("#f5222d")
+                .distance(15)
+                .upStationId(upStationId)
+                .downStationId(downStationId)
+                .build();
+    }
+
+    private SaveLineRequestDto 경춘선을_생성한다(Long upStationId, Long downStationId) {
+        return SaveLineRequestDto.builder()
+                .name("경춘선")
+                .color("#13c2c2")
+                .distance(25)
+                .upStationId(upStationId)
+                .downStationId(downStationId)
+                .build();
+    }
+
+    private final UpdateLineRequestDto 수정한_신분당선 = UpdateLineRequestDto.builder()
+                    .name("수정한 신분당선")
+                    .color("#cf1322")
+                    .build();
 
 }

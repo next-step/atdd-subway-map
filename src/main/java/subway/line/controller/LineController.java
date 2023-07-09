@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import subway.line.dto.request.SaveLineRequestDto;
+import subway.line.dto.request.SaveLineSectionRequestDto;
 import subway.line.dto.request.UpdateLineRequestDto;
 import subway.line.dto.response.LineResponseDto;
 import subway.line.service.LineService;
@@ -53,6 +54,17 @@ public class LineController {
         return ResponseEntity
                 .noContent()
                 .build();
+    }
+
+    @PostMapping("/lines/{lineId}/sections")
+    public ResponseEntity<LineResponseDto> saveLineSection(
+            @PathVariable Long lineId,
+            @RequestBody @Valid SaveLineSectionRequestDto lineSectionRequest) {
+        LineResponseDto line = lineService.saveLineSection(lineId, lineSectionRequest);
+
+        return ResponseEntity
+                .created(URI.create(String.format("/lines/%d", line.getId())))
+                .body(line);
     }
 
 }

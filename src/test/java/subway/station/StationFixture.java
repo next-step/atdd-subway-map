@@ -1,4 +1,4 @@
-package subway.fixture;
+package subway.station;
 
 import subway.station.dto.request.SaveStationRequestDto;
 
