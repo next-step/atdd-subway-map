@@ -66,4 +66,12 @@ public class SectionService {
             throw new AlreadyRegisteredStationException();
         }
     }
+
+    @Transactional
+    public void deleteSection(Long lineId, Long stationId) {
+        Line line = getLine(lineId);
+        Section lastSection = line.getLastSection();
+
+        sectionRepository.delete(lastSection);
+    }
 }
