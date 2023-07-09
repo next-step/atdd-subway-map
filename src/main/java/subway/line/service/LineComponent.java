@@ -34,7 +34,6 @@ public class LineComponent {
                 .distance(lineRequest.getDistance())
                 .build();
         line.addSection(section);
-//        lineService.saveLine(line);
         return LineResponse.from(line);
     }
 
@@ -49,7 +48,6 @@ public class LineComponent {
                 .distance(request.getDistance())
                 .build();
         foundLine.addSection(section);
-        lineService.saveLine(foundLine);
     }
 
     @Transactional
@@ -57,6 +55,5 @@ public class LineComponent {
         Line line = lineService.findLineById(request.getLineId());
         Station station = stationService.findStationById(request.getStationId());
         line.deleteSectionByStation(station);
-        lineService.saveLine(line);
     }
 }
