@@ -5,18 +5,18 @@ import java.util.Objects;
 import subway.station.Station;
 
 public class LineResponse {
+
     private Long id;
     private String name;
     private String color;
     private List<Station> stations;
 
-    public LineResponse() {}
+    public LineResponse() {
+    }
 
     public LineResponse(Line line) {
-        this.id = line.getId();
-        this.name = line.getName();
-        this.color = line.getColor();
-        this.stations = List.of(line.getUpStation(), line.getDownStation());
+        this(line.getId(), line.getName(), line.getColor(),
+            List.of(line.getUpStation(), line.getDownStation()));
     }
 
     public LineResponse(Long id, String name, String color, List<Station> stations) {
