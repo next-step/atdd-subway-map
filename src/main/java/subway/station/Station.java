@@ -1,8 +1,11 @@
 package subway.station;
 
+import lombok.AllArgsConstructor;
+
 import javax.persistence.*;
 
 @Entity
+@AllArgsConstructor
 public class Station {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

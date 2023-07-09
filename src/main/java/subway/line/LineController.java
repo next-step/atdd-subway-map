@@ -1,5 +1,6 @@
 package subway.line;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import subway.station.StationService;
@@ -8,16 +9,10 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 public class LineController {
-    private LineService lineService;
+    private final LineService lineService;
 
-    protected LineController() {
-
-    }
-
-    public LineController(LineService lineService) {
-        this.lineService = lineService;
-    }
 
     @PostMapping("/lines")
     public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) throws Exception {
@@ -25,12 +20,12 @@ public class LineController {
         return ResponseEntity.created(URI.create("/lines" + lineResponse.getId())).body(lineResponse);
     }
 
-    @GetMapping(value="/lines")
+    @GetMapping("/lines")
     public ResponseEntity<List<LineResponse>> showLines() {
         return ResponseEntity.ok().body(lineService.findAllLines());
     }
 
-    @DeleteMapping("/stations/{id}")
+    @DeleteMapping("/lines/{id}")
     public ResponseEntity<Void> deleteLine(@PathVariable Long id) {
         lineService.deleteLineById(id);
         return ResponseEntity.noContent().build();

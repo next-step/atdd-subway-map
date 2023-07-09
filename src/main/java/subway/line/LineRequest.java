@@ -1,11 +1,8 @@
 package subway.line;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
-import subway.station.Station;
 
-@Data
 @Getter
 @AllArgsConstructor
 public class LineRequest {
@@ -20,8 +17,5 @@ public class LineRequest {
 
     private int distance;
 
-    public Line toEntity(Station upStation, Station downStation) {
-        return new Line(name, color, upStation, downStation, distance);
-    }
 
 }

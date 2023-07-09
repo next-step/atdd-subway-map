@@ -1,29 +1,24 @@
 package subway.line;
 
-import com.sun.istack.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.springframework.lang.NonNull;
 import subway.station.Station;
+import subway.station.StationResponse;
 
-import javax.persistence.ManyToOne;
+import java.util.List;
 
 
-@AllArgsConstructor
 @Getter
+@AllArgsConstructor
 public class LineResponse {
     private Long id;
     private String name;
     private String color;
-    private Station upStation;
-    private Station downStation;
+    private List<StationResponse> stations;
 
-    public void setDownStation(Station downStation) {
-        this.downStation = downStation;
+    public static LineResponse toResponse(Line line) {
+        return new LineResponse(line.getId(), line.getName(), line.getColor(),
+                List.of(StationResponse.toResponse(line.getUpStation()), StationResponse.toResponse(line.getDownStation()))
+                );
     }
-
-    public void setUpStation(Station upStation) {
-        this.upStation = upStation;
-    }
-
 }

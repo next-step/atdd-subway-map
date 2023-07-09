@@ -16,4 +16,8 @@ public class StationResponse {
     public String getName() {
         return name;
     }
+
+    public static StationResponse toResponse(Station station) {
+        return new StationResponse(station.getId(), station.getName());
+    }
 }

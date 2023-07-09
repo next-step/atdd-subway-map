@@ -7,8 +7,6 @@ import lombok.Setter;
 import subway.station.Station;
 
 import javax.persistence.*;
-import java.util.Arrays;
-import java.util.List;
 
 @Getter
 @Setter
@@ -25,9 +23,11 @@ public class Line {
     private String color;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "up_station_id")
     private Station upStation;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "down_station_id")
     private Station downStation;
 
     @Column
