@@ -8,6 +8,8 @@ import subway.controller.dto.line.LineResponse;
 import subway.controller.dto.line.LineSaveRequest;
 import subway.model.line.Line;
 import subway.model.line.LineRepository;
+import subway.model.section.Section;
+import subway.model.section.SectionRepository;
 import subway.model.station.Station;
 import subway.model.station.StationRepository;
 
@@ -20,10 +22,12 @@ public class LineService {
 
     private final LineRepository lineRepository;
     private final StationRepository stationRepository;
+    private final SectionRepository sectionRepository;
 
-    public LineService(LineRepository lineRepository, StationRepository stationRepository) {
+    public LineService(LineRepository lineRepository, StationRepository stationRepository, SectionRepository sectionRepository) {
         this.lineRepository = lineRepository;
         this.stationRepository = stationRepository;
+        this.sectionRepository = sectionRepository;
     }
 
     @Transactional
@@ -33,13 +37,20 @@ public class LineService {
         Station downStation = stationRepository.findById(lineSaveRequest.getDownStationId())
                                                .orElseThrow(() -> new IllegalArgumentException("station id doesn't exist"));
 
+        Section section = Section.builder()
+                                 .upStation(upStation)
+                                 .downStation(downStation)
+                                 .distance(lineSaveRequest.getDistance())
+                                 .build();
+
         Line newLine = Line.builder()
                            .name(lineSaveRequest.getName())
                            .color(lineSaveRequest.getColor())
-                           .upStation(upStation)
-                           .downStation(downStation)
+                           .sections(List.of(section))
                            .distance(lineSaveRequest.getDistance())
                            .build();
+
+        section.setLine(newLine);
 
         Line savedLine = lineRepository.save(newLine);
 
@@ -63,7 +74,10 @@ public class LineService {
     }
 
     public List<LineResponse> findAllLines() {
-        return lineRepository.findAll().stream().map(LineResponse::from).collect(Collectors.toList());
+        return lineRepository.findAll()
+                             .stream()
+                             .map(LineResponse::from)
+                             .collect(Collectors.toList());
     }
 
     @Transactional

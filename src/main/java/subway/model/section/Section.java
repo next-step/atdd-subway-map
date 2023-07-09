@@ -20,19 +20,22 @@ public class Section {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "downStationId", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Station downStation;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "upStationId", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Station upStation;
 
     @Column(nullable = false)
     private Long distance;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "lineId", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Line line;
 
+    public void setLine(Line line) {
+        this.line = line;
+    }
 }

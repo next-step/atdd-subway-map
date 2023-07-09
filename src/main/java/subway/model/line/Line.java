@@ -1,9 +1,12 @@
 package subway.model.line;
 
 import lombok.*;
+import subway.model.section.Section;
 import subway.model.station.Station;
 
 import javax.persistence.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Getter
@@ -22,13 +25,8 @@ public class Line {
     @Column(length = 20, nullable = false)
     private String color;
 
-    @OneToOne
-    @JoinColumn(name = "upStationId", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private Station upStation;
-
-    @OneToOne
-    @JoinColumn(name = "downStationId", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private Station downStation;
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "line", cascade = CascadeType.ALL) // TODO: lazy vs eager. TODO: N+1문제 확인
+    List<Section> sections;
 
     @Column(nullable = false)
     private Long distance;
@@ -41,7 +39,18 @@ public class Line {
         this.color = color;
     }
 
-    public void setDownStation(Station downStation) {
-        this.downStation = downStation;
+    public List<Station> getStations() {
+
+        List<Station> stations = this.sections.stream()
+                                             .map(Section::getUpStation)
+                                             .collect(Collectors.toList());
+        stations.add(getLastStation());
+
+        return stations;
+    }
+
+    public Station getLastStation() {
+        return this.sections.get(this.sections.size() - 1)
+                            .getDownStation();
     }
 }

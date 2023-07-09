@@ -42,7 +42,7 @@ public class SectionService {
         Station downStation = stationRepository.findById(sectionSaveRequest.getDownStationId())
                                                .orElseThrow(() -> new IllegalArgumentException("station id doesn't exist"));
 
-        if (!Objects.equals(line.getDownStation().getId(), upStation.getId())) {
+        if (!Objects.equals(line.getLastStation().getId(), upStation.getId())) {
             throw new IllegalArgumentException("라인의 하행지하철역이 구간의 상행역이 아닙니다.");
         }
 
@@ -53,10 +53,10 @@ public class SectionService {
                                     .line(line)
                                     .build();
 
-        Section savedSection = sectionRepository.save(newSection);
 
-        line.setDownStation(downStation);
+        line.getSections().add(newSection);
         lineRepository.save(line);
+        Section savedSection = sectionRepository.save(newSection);
 
         return SectionResponse.from(savedSection);
     }
@@ -81,7 +81,7 @@ public class SectionService {
         Line line = lineRepository.findById(lineId)
                                   .orElseThrow(() -> new IllegalArgumentException("line id doesn't exist"));
 
-        line.setDownStation(targetSection.getUpStation());
+        line.getSections().remove(targetSection);
         lineRepository.save(line);
 
         sectionRepository.deleteById(targetSection.getId());

@@ -14,12 +14,12 @@ public class SectionResponse {
     private StationResponse downStation;
     private Long distance;
 
-    public static SectionResponse from(Section line) {
+    public static SectionResponse from(Section section) {
         return SectionResponse.builder()
-                              .id(line.getId())
-                              .upStation(StationResponse.from(line.getUpStation()))
-                              .downStation(StationResponse.from(line.getDownStation()))
-                              .distance(line.getDistance())
+                              .id(section.getId())
+                              .upStation(StationResponse.from(section.getUpStation()))
+                              .downStation(StationResponse.from(section.getDownStation()))
+                              .distance(section.getDistance())
                               .build();
     }
 }
