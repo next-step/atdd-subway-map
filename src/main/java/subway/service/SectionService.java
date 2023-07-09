@@ -83,8 +83,7 @@ public class SectionService {
         Line line = lineRepository.findById(lineId)
                                   .orElseThrow(() -> new IllegalArgumentException("line id doesn't exist"));
 
-        line.getSections()
-            .remove(targetSection);
+        line.getSections().remove(targetSection);
 
         sectionRepository.deleteById(targetSection.getId());
     }
