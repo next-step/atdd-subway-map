@@ -26,7 +26,7 @@ public class LineSectionService {
   }
 
   @Transactional
-  public LineSectionResponse createSection(Long lineId, LineSectionRequest request) {
+  public LineSection createSection(Long lineId, LineSectionRequest request) {
 
     SubwayLine line = subwayLineService.getLineOrThrowIfNotExist(lineId);
 
@@ -34,8 +34,7 @@ public class LineSectionService {
     Station downStation = stationService.getStationOrThrowIfNotExist(request.getUpStationId());
 
     LineSection newSection = request.toEntity(line, upStation, downStation);
-    sectionRepository.save(newSection);
 
-    return LineSectionResponse.fromEntity(newSection);
+    return sectionRepository.save(newSection);
   }
 }

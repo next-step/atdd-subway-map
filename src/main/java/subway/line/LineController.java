@@ -2,6 +2,7 @@ package subway.line;
 
 import java.net.URI;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,13 +13,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class SubwayLineController {
+@RequiredArgsConstructor
+public class LineController {
 
   private final SubwayLineService subwayLineService;
-
-  public SubwayLineController(SubwayLineService subwayLineService) {
-    this.subwayLineService = subwayLineService;
-  }
+  private final LineService lineService;
 
   @GetMapping("/lines")
   ResponseEntity<List<SubwayLineResponse>> getAllLine() {
@@ -31,8 +30,8 @@ public class SubwayLineController {
   }
 
   @PostMapping("/lines")
-  ResponseEntity<SubwayLineResponse> createLine (@RequestBody SubwayLineRequest request) {
-    SubwayLineResponse response = subwayLineService.createLine(request);
+  ResponseEntity<SubwayLineResponse> createLine (@RequestBody LineRequest request) {
+    SubwayLineResponse response = lineService.createLine(request);
     final String uri = String.format("/lines/%s", response.getId());
     return ResponseEntity.created(URI.create(uri))
         .body(response);

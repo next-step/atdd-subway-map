@@ -8,6 +8,11 @@ public class StationResponse {
   public StationResponse() {
   }
 
+  public StationResponse(Station station) {
+    this.id = station.getStationId();
+    this.name = station.getName();
+  }
+
   public StationResponse(Long stationId, String name) {
     this.id = stationId;
     this.name = name;

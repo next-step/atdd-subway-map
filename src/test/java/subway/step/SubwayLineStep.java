@@ -7,7 +7,7 @@ import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import subway.line.SubwayLineEditRequest;
-import subway.line.SubwayLineRequest;
+import subway.line.LineRequest;
 import subway.line.SubwayLineResponse;
 
 public class SubwayLineStep {
@@ -25,7 +25,7 @@ public class SubwayLineStep {
         .get("$");
   }
 
-  public static SubwayLineResponse 지하철_노선_생성(SubwayLineRequest 신규노선) {
+  public static SubwayLineResponse 지하철_노선_생성(LineRequest 신규노선) {
     return RestAssured.given()
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(신규노선)

@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.test.context.jdbc.Sql;
 import subway.config.IntegrationTest;
 import subway.line.SubwayLineEditRequest;
-import subway.line.SubwayLineRequest;
+import subway.line.LineRequest;
 import subway.line.SubwayLineResponse;
 import subway.step.SubwayLineStep;
 
@@ -24,12 +24,12 @@ public class SubwayLineAcceptanceTest extends IntegrationTest{
   void 지하철_노선_생성() {
 
     // given
-    SubwayLineRequest 신규노선 = SubwayLineRequest.builder()
+    LineRequest 신규노선 = LineRequest.builder()
         .name("신분당선")
         .color("bg-red-600")
         .upStationId(1L)
         .downStationId(2L)
-        .distance(10)
+        .distance(10L)
         .build();
 
     // when
@@ -51,22 +51,22 @@ public class SubwayLineAcceptanceTest extends IntegrationTest{
   void 지하철노선_목록_조회() {
     // given
     SubwayLineResponse 노선_1 = SubwayLineStep.지하철_노선_생성(
-        SubwayLineRequest.builder()
+        LineRequest.builder()
             .name("1호선")
             .color("bg-red-500")
-            .upStationId(4L)
-            .downStationId(5L)
-            .distance(10)
+            .upStationId(1L)
+            .downStationId(2L)
+            .distance(10L)
             .build()
     );
 
     SubwayLineResponse 노선_2 = SubwayLineStep.지하철_노선_생성(
-        SubwayLineRequest.builder()
+        LineRequest.builder()
             .name("2호선")
             .color("bg-red-400")
-            .upStationId(6L)
-            .downStationId(7L)
-            .distance(10)
+            .upStationId(1L)
+            .downStationId(2L)
+            .distance(10L)
             .build()
     );
 
@@ -89,12 +89,12 @@ public class SubwayLineAcceptanceTest extends IntegrationTest{
   @Test
   void 지하철노선_조회() {
     // given
-    SubwayLineRequest 신규노선 = SubwayLineRequest.builder()
+    LineRequest 신규노선 = LineRequest.builder()
         .name("3호선")
         .color("bg-red-500")
-        .upStationId(4L)
-        .downStationId(5L)
-        .distance(10)
+        .upStationId(1L)
+        .downStationId(2L)
+        .distance(10L)
         .build();
 
     SubwayLineResponse 노선 = SubwayLineStep.지하철_노선_생성(신규노선);
@@ -120,12 +120,12 @@ public class SubwayLineAcceptanceTest extends IntegrationTest{
     final String 기존_노선명 = "4호선";
     final String 변경된_노선명 = "5호선";
 
-    SubwayLineRequest 신규노선 = SubwayLineRequest.builder()
+    LineRequest 신규노선 = LineRequest.builder()
         .name(기존_노선명)
         .color("bg-red-500")
-        .upStationId(4L)
-        .downStationId(5L)
-        .distance(10)
+        .upStationId(1L)
+        .downStationId(2L)
+        .distance(10L)
         .build();
 
     SubwayLineResponse 노선 = SubwayLineStep.지하철_노선_생성(신규노선);
@@ -153,12 +153,12 @@ public class SubwayLineAcceptanceTest extends IntegrationTest{
   @Test
   void 지하철노선_삭제() {
     // given
-    SubwayLineRequest 신규노선 = SubwayLineRequest.builder()
+    LineRequest 신규노선 = LineRequest.builder()
         .name("6호선")
         .color("bg-red-500")
         .upStationId(4L)
         .downStationId(5L)
-        .distance(10)
+        .distance(10L)
         .build();
 
     SubwayLineResponse 노선 = SubwayLineStep.지하철_노선_생성(신규노선);

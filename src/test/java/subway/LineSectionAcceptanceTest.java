@@ -7,11 +7,14 @@ import java.util.Map;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.context.jdbc.Sql;
 import subway.config.IntegrationTest;
 import subway.step.LineSectionStep;
 import subway.step.StationStep;
 import subway.step.SubwayLineStep;
 
+
+@Sql(value = "/truncate-section.sql")
 public class LineSectionAcceptanceTest extends IntegrationTest {
 
   /**
