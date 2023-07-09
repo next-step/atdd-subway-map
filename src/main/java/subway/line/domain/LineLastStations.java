@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import javax.persistence.Embeddable;
 import javax.persistence.ManyToOne;
+import subway.section.domain.SectionStations;
 import subway.station.domain.Station;
 
 @Embeddable
@@ -43,5 +44,17 @@ public class LineLastStations {
 
     public Station getDownLastStation() {
         return downLastStation;
+    }
+
+    public boolean checkCanAddSection(SectionStations sectionStations) {
+        if (!downLastStation.equals(sectionStations.getUpStation())) {
+            return false;
+        }
+
+        if (upLastStation.equals(sectionStations.getDownStation())) {
+            return false;
+        }
+
+        return true;
     }
 }

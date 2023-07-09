@@ -35,6 +35,7 @@ public class LineService {
         List<Station> stations = stationService.findStationsByIdList(stationIds);
         LineLastStations lastStations = LineLastStations.createLineLastStation(stations);
         Line savedLine = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor(), lastStations));
+        savedLine.addBaseSection(lineRequest.getDistance());
 
         return createLineResponse(savedLine);
     }
@@ -61,7 +62,7 @@ public class LineService {
         lineRepository.deleteById(lineId);
     }
 
-    private Line getLine(Long lineId) {
+    public Line getLine(Long lineId) {
         return lineRepository.findById(lineId).orElseThrow();
     }
 
