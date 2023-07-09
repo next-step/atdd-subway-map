@@ -1,7 +1,12 @@
 package subway.station.view;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import subway.station.domain.Station;
 
+@Getter
+@NoArgsConstructor
 public class StationResponse {
     private Long id;
     private String name;
