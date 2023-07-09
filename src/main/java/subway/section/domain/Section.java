@@ -39,4 +39,8 @@ public class Section {
     public SectionStations getStations() {
         return stations;
     }
+
+    public boolean checkStationInSection(Station station) {
+        return stations.checkStationInSection(station);
+    }
 }

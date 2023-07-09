@@ -27,18 +27,10 @@ public class SectionService {
     @Transactional
     public void addSection(Long lineId, SectionRequest sectionRequest) {
         Line line = lineService.getLine(lineId);
-        List<Station> stations = getStationList(sectionRequest.getUpStationId(), sectionRequest.getDownStationId());
-        Section section = createSection(line, stations, sectionRequest.getDistance());
+        Station upwardStation = stationService.getStation(sectionRequest.getUpStationId());
+        Station downwardStation = stationService.getStation(sectionRequest.getDownStationId());
+        SectionStations sectionStations = new SectionStations(upwardStation, downwardStation);
+        Section section = new Section(line, sectionStations, sectionRequest.getDistance());
         line.addSection(section);
-    }
-
-    private List<Station> getStationList(Long upwardId, Long downwardId) {
-        List<Long> stationId = Arrays.asList(upwardId, downwardId);
-        return stationService.findStationsByIdList(stationId);
-    }
-
-    private Section createSection(Line line, List<Station> stations, Integer distance) {
-        SectionStations sectionStations = SectionStations.createSectionStations(stations);
-        return new Section(line, sectionStations, distance);
     }
 }

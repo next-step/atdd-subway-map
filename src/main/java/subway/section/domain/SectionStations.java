@@ -1,6 +1,5 @@
 package subway.section.domain;
 
-import java.util.List;
 import javax.persistence.Embeddable;
 import javax.persistence.ManyToOne;
 import subway.line.domain.LineLastStations;
@@ -18,7 +17,7 @@ public class SectionStations {
     protected SectionStations() {}
 
     public SectionStations(Station upStation, Station downStation) {
-        if (upStation.equals(downStation)) {
+        if (upStation == null || downStation == null ||upStation.equals(downStation)) {
             throw new IllegalArgumentException();
         }
         this.upStation = upStation;
@@ -30,18 +29,15 @@ public class SectionStations {
                 lineLastStations.getDownLastStation());
     }
 
-    public static SectionStations createSectionStations(List<Station> stations) {
-        if (stations.size() != 2) {
-            throw new IllegalArgumentException();
-        }
-        return new SectionStations(stations.get(0), stations.get(1));
-    }
-
     public Station getUpStation() {
         return upStation;
     }
 
     public Station getDownStation() {
         return downStation;
+    }
+
+    public boolean checkStationInSection(Station st) {
+        return upStation.equals(st) || downStation.equals(st);
     }
 }

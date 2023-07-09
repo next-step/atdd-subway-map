@@ -26,14 +26,6 @@ public class LineLastStations {
         this.downLastStation = downLastStation;
     }
 
-    public static LineLastStations createLineLastStation(List<Station> stations) {
-        if (stations.size() != 2) {
-            throw new IllegalArgumentException();
-        }
-
-        return new LineLastStations(stations.get(0), stations.get(1));
-    }
-
     public List<Station> getStations() {
         return Arrays.asList(upLastStation, downLastStation);
     }

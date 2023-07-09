@@ -88,7 +88,7 @@ class SectionAcceptanceTest {
         지하철_노선도_등록("7호선", "bg-1234", 1L, 2L, 5);
 
         //when
-        ExtractableResponse<Response> response = 지하철_구간_등록(1L, 4L, 1L, 7);
+        ExtractableResponse<Response> response = 지하철_구간_등록(1L, 2L, 1L, 7);
 
         //then
         응답코드_검증(response, HttpStatus.BAD_REQUEST);
@@ -96,5 +96,28 @@ class SectionAcceptanceTest {
         StationResponse downwardLastStation = line7.getStations().get(1);
         assertThat(downwardLastStation.getId()).isEqualTo(2L);
         assertThat(downwardLastStation.getName()).isEqualTo("두번째역");
+    }
+
+    /**
+     * Given 노선을 생성한다
+     * When 구간의 하행이 이미 노선에 등록되어 있다면, 다른 구간 내에 등록 되어있을 때
+     * Then 에러 상태 값을 리턴한다
+     */
+    @DisplayName("지하철 구간을 생성한다. 구간의 하행이 이미 노선에 등록되어 있다면 에러 반환, 다른 구간이랑 겹칠 때")
+    @Test
+    void createSectionExceptionWhenAlreadyDownwardStationRegisteredInOtherSection() {
+        //given
+        지하철_노선도_등록("7호선", "bg-1234", 1L, 2L, 5);
+
+        //when
+        지하철_구간_등록(1L, 2L, 3L, 7);
+        ExtractableResponse<Response> response = 지하철_구간_등록(1L, 3L, 2L, 7);
+
+        //then
+        응답코드_검증(response, HttpStatus.BAD_REQUEST);
+        LineResponse line7 = 지하철_노선_조회_응답값_반환(1L);
+        StationResponse downwardLastStation = line7.getStations().get(1);
+        assertThat(downwardLastStation.getId()).isEqualTo(3L);
+        assertThat(downwardLastStation.getName()).isEqualTo("세번째역");
     }
 }

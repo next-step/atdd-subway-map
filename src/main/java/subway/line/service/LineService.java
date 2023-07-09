@@ -31,9 +31,9 @@ public class LineService {
     public LineResponse saveLine(LineRequest lineRequest) {
 
 
-        List<Long> stationIds = Arrays.asList(lineRequest.getUpStationId(), lineRequest.getDownStationId());
-        List<Station> stations = stationService.findStationsByIdList(stationIds);
-        LineLastStations lastStations = LineLastStations.createLineLastStation(stations);
+        Station upwardStation = stationService.getStation(lineRequest.getUpStationId());
+        Station downwardStation = stationService.getStation(lineRequest.getDownStationId());
+        LineLastStations lastStations = new LineLastStations(upwardStation, downwardStation);
         Line savedLine = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor(), lastStations));
         savedLine.addBaseSection(lineRequest.getDistance());
 

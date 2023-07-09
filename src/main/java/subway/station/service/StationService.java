@@ -34,6 +34,10 @@ public class StationService {
         return stationRepository.findAllById(ids);
     }
 
+    public Station getStation(Long id) {
+        return stationRepository.findById(id).orElseThrow();
+    }
+
     @Transactional
     public void deleteStationById(Long id) {
         stationRepository.deleteById(id);

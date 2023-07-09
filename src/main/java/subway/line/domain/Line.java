@@ -13,6 +13,7 @@ import javax.persistence.OneToMany;
 import org.springframework.util.StringUtils;
 import subway.section.domain.Section;
 import subway.section.domain.SectionStations;
+import subway.station.domain.Station;
 
 @Entity
 public class Line {
@@ -92,7 +93,21 @@ public class Line {
         if (!lastStations.checkCanAddSection(section.getStations())) {
             throw new IllegalArgumentException();
         }
+
+        if (isAlreadyInLineStation(section.getDownwardStation())) {
+            throw new IllegalArgumentException();
+        }
+
         sections.add(section);
         lastStations.updateDownLastStation(section.getDownwardStation());
+    }
+
+    private boolean isAlreadyInLineStation(Station downwardStation) {
+        for (Section section : sections) {
+            if (section.checkStationInSection(downwardStation)){
+                return true;
+            }
+        }
+        return false;
     }
 }
