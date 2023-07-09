@@ -1,14 +1,30 @@
 package subway;
 
+import io.restassured.RestAssured;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 인수 테스트")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class SubwayLineAcceptanceTest {
 
     private final static int PORT = 8080;
+
+    @BeforeEach
+    void setUp() {
+        RestAssured.port = PORT;
+    }
 
     /**
      * When 지하철 노선을 생성하면
@@ -18,7 +34,17 @@ public class SubwayLineAcceptanceTest {
     @DisplayName("지하철 노선 생성")
     @Test
     void createLine() {
+        //when
+        Map<String, String> params = new HashMap<>();
+        ExtractableResponse<Response> extract = RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/line")
+                .then().log().all()
+                .extract();
 
+        //then
+        assertThat(extract.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
 
     /**
@@ -30,7 +56,19 @@ public class SubwayLineAcceptanceTest {
     @DisplayName("지하철 노선 목록 조회")
     @Test
     void findLines() {
+        //given
+        long firstLineId = beforeTestCreateLine();
+        long secondLineId = beforeTestCreateLine();
 
+        //when
+        ExtractableResponse<Response> extract = RestAssured.given().log().all()
+                .when().post("/line/list")
+                .then().log().all()
+                .extract();
+        assertThat(extract.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        //then
+        extract.body().jsonPath().get("$.list.*");
     }
 
     /**
@@ -42,10 +80,24 @@ public class SubwayLineAcceptanceTest {
     @DisplayName("지하철 노선 단일 조회")
     @Test
     void findLine() {
+        //given
+        long id = beforeTestCreateLine();
+        Map<String, String> params = new HashMap<>();
+
+        //when
+        ExtractableResponse<Response> extract = RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/line/{id}", id)
+                .then().log().all()
+                .extract();
+
+        //then
+        assertThat(extract.statusCode()).isEqualTo(HttpStatus.OK.value());
 
     }
     /**
-     * Given 지하철 노선을 생성하고
+     *Given 지하철 노선을 생성하고
      * When 생성한 지하철 노선을 수정하면
      * Then 해당 지하철 노선 정보는 수정된다
      */
@@ -53,7 +105,20 @@ public class SubwayLineAcceptanceTest {
     @DisplayName("지하철 노선 수정")
     @Test
     void updateLine() {
+        //given
+        Long id = beforeTestCreateLine();
+        Map<String, String> params = new HashMap<>();
 
+        //when
+        ExtractableResponse<Response> extract = RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().put("/line/{id}", id)
+                .then().log().all()
+                .extract();
+
+        //then
+        assertThat(extract.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
     /**
@@ -65,6 +130,22 @@ public class SubwayLineAcceptanceTest {
     @DisplayName("지하철 노선 삭제")
     @Test
     void deleteLine() {
+        //given
+        Long id = beforeTestCreateLine();
+        //when
+        ExtractableResponse<Response> extract = RestAssured.given().log().all()
+                .when().delete("/line/{id}", id)
+                .then().log().all()
+                .extract();
+        //then
+        assertThat(extract.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
 
+    private long beforeTestCreateLine() {
+        ExtractableResponse<Response> extract = RestAssured.given().log().all()
+                .when().post("/line")
+                .then().log().all()
+                .extract();
+        return extract.body().jsonPath().getLong("id");
     }
 }
