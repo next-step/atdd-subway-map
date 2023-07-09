@@ -165,7 +165,8 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     }
 
     /**
-     * Given : 지하철 노선을 1개 등록하고
+     * Given : 지하철역을 3개 생성하고
+     * And : 지하철 노선을 1개 생성하고
      * And : 새로운 구간을 1개 등록한 후
      * When : 하행 종점역(마지막 구간)이 아닌 구간을 제거하면
      * Then : 예외가 발생한다.
@@ -209,13 +210,24 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     }
 
     /**
-     * Given : 지하철 노선을 1개 등록하고
+     * Given : 지하철역을 2개 생성하고
+     * And : 지하철 노선을 1개 생성한 후
      * When : 하행 종점역을 제거하면
      * Then : 예외가 발생한다.
      */
     @DisplayName("지하철 구간 삭제 예외 케이스 : 구간이 1개일 때 하행 종점역을 제거")
     @Test
     void deleteSectionFailCase3() {
+        // given
+        long 노선_상행_Id = 응답_결과에서_Id를_추출한다(StationStep.지하철역을_생성한다("강남역"));
+        long 노선_하행_Id = 응답_결과에서_Id를_추출한다(StationStep.지하철역을_생성한다("양재역"));
 
+        long lineId = 응답_결과에서_Id를_추출한다(LineStep.지하철_노선을_생성한다(노선_상행_Id, 노선_하행_Id, "신분당선"));
+
+        // when
+        ExtractableResponse<Response> deleteSectionResponse = SectionStep.지하철_구간을_삭제한다(lineId, 노선_하행_Id);
+        
+        // then
+        assertThat(deleteSectionResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 }

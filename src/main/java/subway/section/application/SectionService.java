@@ -10,6 +10,7 @@ import subway.section.domain.SectionRepository;
 import subway.section.dto.SectionRequest;
 import subway.section.dto.SectionResponse;
 import subway.section.exception.AlreadyRegisteredStationException;
+import subway.section.exception.CanNotDeleteOnlyOneSectionException;
 import subway.section.exception.DeleteOnlyTerminusStationException;
 import subway.section.exception.InvalidSectionRegistrationException;
 import subway.station.domain.Station;
@@ -71,11 +72,18 @@ public class SectionService {
     @Transactional
     public void deleteSection(Long lineId, Long stationId) {
         Line line = getLine(lineId);
-        Section lastSection = line.getLastSection();
+        validateLineHasOnlyOneSection(line);
 
+        Section lastSection = line.getLastSection();
         validateStationIsDownStationOfLastSection(stationId, lastSection);
 
         sectionRepository.delete(lastSection);
+    }
+
+    private void validateLineHasOnlyOneSection(Line line) {
+        if (line.hasOnlyOneSection()) {
+            throw new CanNotDeleteOnlyOneSectionException();
+        }
     }
 
     private void validateStationIsDownStationOfLastSection(Long stationId, Section lastSection) {

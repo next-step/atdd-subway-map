@@ -75,4 +75,8 @@ public class Line {
         return sections.stream()
                 .anyMatch(section -> section.hasStation(downStation));
     }
+
+    public boolean hasOnlyOneSection() {
+        return sections.size() == 1;
+    }
 }
