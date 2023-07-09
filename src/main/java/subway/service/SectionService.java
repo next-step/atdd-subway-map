@@ -85,7 +85,6 @@ public class SectionService {
 
         line.getSections()
             .remove(targetSection);
-        lineRepository.save(line);
 
         sectionRepository.deleteById(targetSection.getId());
     }
