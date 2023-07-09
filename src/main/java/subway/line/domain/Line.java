@@ -61,7 +61,7 @@ public class Line {
 
     public void deleteSection(Long stationId) {
         if (sections.possibleToDeleteSection(stationId)) {
-            sections.deleteLastSection();
+            sections.deleteSectionByStationId(stationId);
         }
     }
 

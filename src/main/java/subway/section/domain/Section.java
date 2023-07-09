@@ -52,10 +52,6 @@ public class Section {
         this.line = line;
     }
 
-    public void detractFromLine() {
-        this.line = null;
-    }
-
     public boolean isUpstation(Long stationId) {
         return Objects.equals(upStation.getId(), stationId);
     }
@@ -63,7 +59,6 @@ public class Section {
     public boolean isDownstation(Long stationId) {
         return Objects.equals(downStation.getId(), stationId);
     }
-
 
     public boolean isMe(Long upStationId, Long downStationId) {
         return isUpstation(upStationId) && isDownstation(downStationId);

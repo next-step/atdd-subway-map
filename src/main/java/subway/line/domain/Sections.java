@@ -3,6 +3,7 @@ package subway.line.domain;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
@@ -91,8 +92,14 @@ public class Sections {
         return true;
     }
 
-    public void deleteLastSection() {
-        sections.remove(sections.size() -1);
+    public void deleteSectionByStationId(Long stationId) {
+        findSectionByStationId(stationId).ifPresent(section -> sections.remove(section));
+    }
+
+    private Optional<Section> findSectionByStationId(Long stationId) {
+        return sections.stream()
+                       .filter(section -> section.containStation(stationId))
+                       .findAny();
     }
 
     private boolean alreadyRegistered(Long stationId) {

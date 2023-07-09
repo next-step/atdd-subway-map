@@ -104,7 +104,7 @@ public class SectionDeleteAcceptanceTest {
 
             @DisplayName("구간이 제거된다")
             @Test
-            void shouldThrowError() {
+            void deleteSection() {
                 section = sectionFixture.구간생성(lineAB.getId(), lineDownstationB.getId(), lineUpstationC.getId(), 4).as(SectionCreateResponse.class);
 
                 ExtractableResponse<Response> response = RestAssured.given().log().all()
