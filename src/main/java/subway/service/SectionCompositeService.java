@@ -7,6 +7,7 @@ import subway.controller.dto.section.SectionResponse;
 import subway.controller.dto.section.SectionSaveRequest;
 import subway.model.line.Line;
 import subway.model.line.LineRepository;
+import subway.model.line.LineService;
 import subway.model.section.Section;
 import subway.model.section.SectionRepository;
 import subway.model.station.Station;
@@ -20,20 +21,19 @@ import java.util.stream.Collectors;
 public class SectionCompositeService {
 
     private final SectionRepository sectionRepository;
-    private final LineRepository lineRepository;
+    private final LineService lineService;
     private final StationRepository stationRepository;
 
-    public SectionCompositeService(SectionRepository sectionRepository, LineRepository lineRepository, StationRepository stationRepository) {
+    public SectionCompositeService(SectionRepository sectionRepository, LineService lineService, StationRepository stationRepository) {
         this.sectionRepository = sectionRepository;
-        this.lineRepository = lineRepository;
+        this.lineService = lineService;
         this.stationRepository = stationRepository;
     }
 
     @Transactional
     public SectionResponse saveSection(Long lineId, SectionSaveRequest sectionSaveRequest) {
 
-        Line line = lineRepository.findById(lineId)
-                                  .orElseThrow(() -> new IllegalArgumentException("line id doesn't exist"));
+        Line line = lineService.findById(lineId);
 
         Section newSection = makeSection(sectionSaveRequest, line);
 
@@ -63,8 +63,8 @@ public class SectionCompositeService {
 
     public List<SectionResponse> findSectionsByLine(Long lineId) {
 
-        Line line = lineRepository.findById(lineId)
-                                  .orElseThrow(() -> new IllegalArgumentException("line id doesn't exist"));
+        Line line = lineService.findById(lineId);
+
         return sectionRepository.findByLine(line)
                                 .stream()
                                 .map(SectionResponse::from)
@@ -80,8 +80,7 @@ public class SectionCompositeService {
         Section targetSection = sectionRepository.findByDownStation(targetStation)
                                                  .orElseThrow(() -> new IllegalArgumentException("section doesn't exist"));
 
-        Line line = lineRepository.findById(lineId)
-                                  .orElseThrow(() -> new IllegalArgumentException("line id doesn't exist"));
+        Line line = lineService.findById(lineId);
 
         if (!line.isDeletableStation(targetStation)) {
             throw new IllegalArgumentException("삭제할 수 없는 정거장입니다.");
