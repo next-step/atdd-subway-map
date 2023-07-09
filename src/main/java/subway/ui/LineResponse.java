@@ -1,6 +1,9 @@
 package subway.ui;
 
+import subway.domain.Line;
+
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class LineResponse {
 
@@ -18,6 +21,18 @@ public class LineResponse {
 
     public LineResponse(Long id, String name) {
         this(id, name, null, null);
+    }
+
+    public static LineResponse from(Line line) {
+        return new LineResponse(
+                line.getId(),
+                line.getName(),
+                line.getColor(),
+                line.getStations()
+                        .stream()
+                        .map(StationResponse::from)
+                        .collect(Collectors.toList())
+        );
     }
 
     public LineResponse() {

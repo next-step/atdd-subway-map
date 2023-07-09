@@ -2,7 +2,6 @@ package subway.ui;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import subway.domain.Station;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -37,6 +36,13 @@ public class LineSteps {
 
     public static LineResponse 지하철_노선_조회_요청(Long lineId) {
         return get("/lines/{id}", lineId).as(LineResponse.class);
+    }
+
+    public static List<String> 지하철_노선_조회_요청_노선에_속한_역_반환(Long lineId) {
+        return get("/lines/{id}", lineId).as(LineResponse.class)
+                .getStations().stream()
+                .map(StationResponse::getName)
+                .collect(Collectors.toList());
     }
 
     public static LineResponse 지하철_노선_수정_요청(Long lineId, LineUpdateRequest request) {
