@@ -48,4 +48,13 @@ class LineLastStationsTest {
         assertThat(stations.checkCanAddSection(sectionStationsB)).isFalse();
         assertThat(stations.checkCanAddSection(sectionStationsC)).isFalse();
     }
+
+    @Test
+    void updateDownStation() {
+        LineLastStations stations = new LineLastStations(stationA, stationB);
+
+        stations.updateDownLastStation(stationC);
+
+        assertThat(stations.getDownLastStation()).isEqualTo(stationC);
+    }
 }

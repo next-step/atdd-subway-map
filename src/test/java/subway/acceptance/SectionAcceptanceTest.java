@@ -47,7 +47,7 @@ class SectionAcceptanceTest {
         ExtractableResponse<Response> response = 지하철_구간_등록(1L, 2L, 3L, 7);
 
         //then
-        응답코드_검증(response, HttpStatus.CREATED);
+        응답코드_검증(response, HttpStatus.OK);
         LineResponse line7 = 지하철_노선_조회_응답값_반환(1L);
         StationResponse downwardLastStation = line7.getStations().get(1);
         assertThat(downwardLastStation.getId()).isEqualTo(3L);

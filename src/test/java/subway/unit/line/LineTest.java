@@ -68,7 +68,9 @@ class LineTest {
         line.addSection(section);
 
         List<Section> sections = line.getSections();
+        LineLastStations stations = line.getLastStations();
         assertThat(sections).hasSize(1);
+        assertThat(stations.getDownLastStation().getName()).isEqualTo(stationC.getName());
     }
 
     @Test

@@ -13,5 +13,4 @@ class SectionStationsTest {
         Station a = new Station("a");
         assertThrows(IllegalArgumentException.class, ()-> new SectionStations(a, a));
     }
-
 }

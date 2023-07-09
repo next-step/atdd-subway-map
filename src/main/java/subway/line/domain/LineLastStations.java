@@ -46,6 +46,10 @@ public class LineLastStations {
         return downLastStation;
     }
 
+    public void updateDownLastStation(Station station) {
+        this.downLastStation = station;
+    }
+
     public boolean checkCanAddSection(SectionStations sectionStations) {
         if (!downLastStation.equals(sectionStations.getUpStation())) {
             return false;

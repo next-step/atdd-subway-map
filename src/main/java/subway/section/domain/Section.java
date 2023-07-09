@@ -32,8 +32,8 @@ public class Section {
         this.distance = distance;
     }
 
-    public Station getUpwardStation() {
-        return stations.getUpStation();
+    public Station getDownwardStation() {
+        return stations.getDownStation();
     }
 
     public SectionStations getStations() {

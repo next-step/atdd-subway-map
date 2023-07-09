@@ -93,5 +93,6 @@ public class Line {
             throw new IllegalArgumentException();
         }
         sections.add(section);
+        lastStations.updateDownLastStation(section.getDownwardStation());
     }
 }
