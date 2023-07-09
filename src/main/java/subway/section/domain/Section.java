@@ -60,10 +60,6 @@ public class Section {
         return Objects.equals(downStation.getId(), stationId);
     }
 
-    public boolean isMe(Long upStationId, Long downStationId) {
-        return isUpstation(upStationId) && isDownstation(downStationId);
-    }
-
     public boolean equalsDownStation(Long stationId) {
         return Objects.equals(downStation.getId(), stationId);
     }

@@ -64,8 +64,4 @@ public class Line {
             sections.deleteSectionByStationId(stationId);
         }
     }
-
-    public Section getSection(Long downStationId, Long upStationId) {
-        return sections.get(downStationId, upStationId);
-    }
 }

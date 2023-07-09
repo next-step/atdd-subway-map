@@ -11,6 +11,7 @@ import subway.line.service.LineManageService;
 import subway.line.service.LineReadService;
 import subway.section.domain.Section;
 import subway.section.model.SectionCreateRequest;
+import subway.section.repository.SectionRepository;
 import subway.station.service.StationService;
 
 @Service
@@ -21,6 +22,7 @@ public class SectionManageService {
     private final StationService stationService;
     private final LineManageService lineManageService;
     private final LineReadService lineReadService;
+    private final SectionRepository sectionRepository;
 
     public Section create(Long lineId, SectionCreateRequest request) {
         Line line = lineReadService.getLine(lineId);
@@ -33,9 +35,7 @@ public class SectionManageService {
 
         line.addSection(section);
 
-        Line createdLine = lineManageService.save(line);
-
-        return createdLine.getSection(request.getDownStationId(), request.getUpStationId());
+        return sectionRepository.save(section);
     }
 
     public void delete(Long lineId, Long stationId) {

@@ -18,7 +18,6 @@ import org.springframework.util.CollectionUtils;
 import subway.section.domain.Section;
 import subway.section.exception.InvalidSectionCreateException;
 import subway.section.exception.InvalidSectionDeleteException;
-import subway.section.exception.SectionNotFoundException;
 import subway.support.ErrorCode;
 
 @Getter
@@ -48,13 +47,6 @@ public class Sections {
 
     public void appendSection(Section section) {
         this.sections.add(section);
-    }
-
-    public Section get(Long downStationId, Long upStationId) {
-        return sections.stream()
-                       .filter(section -> section.isMe(upStationId, downStationId))
-                       .findFirst()
-                       .orElseThrow(SectionNotFoundException::new);
     }
 
     public boolean isEmpty() {
