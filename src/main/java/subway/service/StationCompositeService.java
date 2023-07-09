@@ -5,7 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 import subway.controller.dto.station.StationRequest;
 import subway.controller.dto.station.StationResponse;
 import subway.model.station.Station;
-import subway.model.station.StationRepository;
+import subway.model.station.StationService;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -13,27 +13,27 @@ import java.util.stream.Collectors;
 @Service
 @Transactional(readOnly = true)
 public class StationCompositeService {
-    private final StationRepository stationRepository;
+    private final StationService stationService;
 
-    public StationCompositeService(StationRepository stationRepository) {
-        this.stationRepository = stationRepository;
+    public StationCompositeService(StationService stationService) {
+        this.stationService = stationService;
     }
 
     @Transactional
     public StationResponse saveStation(StationRequest stationRequest) {
-        Station station = stationRepository.save(new Station(stationRequest.getName()));
+        Station station = stationService.save(new Station(stationRequest.getName()));
         return createStationResponse(station);
     }
 
     public List<StationResponse> findAllStations() {
-        return stationRepository.findAll().stream()
-                .map(this::createStationResponse)
-                .collect(Collectors.toList());
+        return stationService.findAll().stream()
+                             .map(this::createStationResponse)
+                             .collect(Collectors.toList());
     }
 
     @Transactional
     public void deleteStationById(Long id) {
-        stationRepository.deleteById(id);
+        stationService.deleteById(id);
     }
 
     private StationResponse createStationResponse(Station station) {

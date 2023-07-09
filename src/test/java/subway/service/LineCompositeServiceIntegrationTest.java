@@ -10,7 +10,7 @@ import subway.controller.dto.line.LineSaveRequest;
 import subway.model.line.Line;
 import subway.model.line.LineService;
 import subway.model.station.Station;
-import subway.model.station.StationRepository;
+import subway.model.station.StationService;
 
 @SpringBootTest
 class LineCompositeServiceIntegrationTest {
@@ -19,7 +19,7 @@ class LineCompositeServiceIntegrationTest {
     private LineCompositeService lineCompositeService;
 
     @Autowired
-    private StationRepository stationRepository;
+    private StationService stationService;
 
     @Autowired
     private LineService lineService;
@@ -57,8 +57,8 @@ class LineCompositeServiceIntegrationTest {
     }
 
     private Station Station_생성(String stationName) {
-        return stationRepository.save(Station.builder()
-                                             .name(stationName)
-                                             .build());
+        return stationService.save(Station.builder()
+                                          .name(stationName)
+                                          .build());
     }
 }

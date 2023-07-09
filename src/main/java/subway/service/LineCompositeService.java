@@ -10,7 +10,7 @@ import subway.model.line.Line;
 import subway.model.line.LineService;
 import subway.model.section.Section;
 import subway.model.station.Station;
-import subway.model.station.StationRepository;
+import subway.model.station.StationService;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,20 +20,18 @@ import java.util.stream.Collectors;
 public class LineCompositeService {
 
     private final LineService lineService;
-    private final StationRepository stationRepository;
+    private final StationService stationService;
 
-    public LineCompositeService(LineService lineService, StationRepository stationRepository) {
+    public LineCompositeService(LineService lineService, StationService stationService) {
         this.lineService = lineService;
-        this.stationRepository = stationRepository;
+        this.stationService = stationService;
     }
 
     @Transactional
     public LineResponse saveLine(LineSaveRequest lineSaveRequest) {
 
-        Station upStation = stationRepository.findById(lineSaveRequest.getUpStationId())
-                                             .orElseThrow(() -> new IllegalArgumentException("station id doesn't exist"));
-        Station downStation = stationRepository.findById(lineSaveRequest.getDownStationId())
-                                               .orElseThrow(() -> new IllegalArgumentException("station id doesn't exist"));
+        Station upStation = stationService.findById(lineSaveRequest.getUpStationId());
+        Station downStation = stationService.findById(lineSaveRequest.getDownStationId());
 
         Section section = Section.builder()
                                  .upStation(upStation)

@@ -10,7 +10,7 @@ import subway.model.line.LineService;
 import subway.model.section.Section;
 import subway.model.section.SectionService;
 import subway.model.station.Station;
-import subway.model.station.StationRepository;
+import subway.model.station.StationService;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,12 +21,12 @@ public class SectionCompositeService {
 
     private final SectionService sectionService;
     private final LineService lineService;
-    private final StationRepository stationRepository;
+    private final StationService stationService;
 
-    public SectionCompositeService(SectionService sectionService, LineService lineService, StationRepository stationRepository) {
+    public SectionCompositeService(SectionService sectionService, LineService lineService, StationService stationService) {
         this.sectionService = sectionService;
         this.lineService = lineService;
-        this.stationRepository = stationRepository;
+        this.stationService = stationService;
     }
 
     @Transactional
@@ -47,10 +47,8 @@ public class SectionCompositeService {
     }
 
     private Section makeSection(SectionSaveRequest sectionSaveRequest, Line line) {
-        Station upStation = stationRepository.findById(sectionSaveRequest.getUpStationId())
-                                             .orElseThrow(() -> new IllegalArgumentException("station id doesn't exist"));
-        Station downStation = stationRepository.findById(sectionSaveRequest.getDownStationId())
-                                               .orElseThrow(() -> new IllegalArgumentException("station id doesn't exist"));
+        Station upStation = stationService.findById(sectionSaveRequest.getUpStationId());
+        Station downStation = stationService.findById(sectionSaveRequest.getDownStationId());
 
         return Section.builder()
                       .upStation(upStation)
@@ -73,8 +71,7 @@ public class SectionCompositeService {
     @Transactional
     public void deleteSectionByStationId(Long lineId, Long stationId) {
 
-        Station targetStation = stationRepository.findById(stationId)
-                                                 .orElseThrow(() -> new IllegalArgumentException("station id doesn't exist"));
+        Station targetStation = stationService.findById(stationId);
 
         Section targetSection = sectionService.findByDownStation(targetStation);
 
