@@ -60,4 +60,8 @@ public class Line {
     public void addSection(Section section) {
         this.sections.addSection(section);
     }
+
+    public void deleteSectionByStationId(Long stationId) {
+        this.sections.deleteSectionByStationId(stationId);
+    }
 }

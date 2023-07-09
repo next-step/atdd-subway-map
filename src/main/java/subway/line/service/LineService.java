@@ -71,4 +71,10 @@ public class LineService {
 
         return LineResponseDto.of(targetLine);
     }
+
+    @Transactional
+    public void deleteLineSectionByStationId(Long lineId, Long stationId) {
+        Line targetLine = lineJpaAdapter.findById(lineId);
+        targetLine.deleteSectionByStationId(stationId);
+    }
 }
