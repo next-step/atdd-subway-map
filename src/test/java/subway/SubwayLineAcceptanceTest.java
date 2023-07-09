@@ -3,7 +3,6 @@ package subway;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,39 +13,17 @@ import org.springframework.http.MediaType;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.jayway.jsonpath.JsonPath.read;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 인수 테스트")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class SubwayLineAcceptanceTest {
-
     private final static int PORT = 8080;
-    private Map<String, Object> SINSA = new HashMap<>();
-    private Map<String, Object> GWANGGO = new HashMap<>();
+
     @BeforeEach
     void setUp() {
         RestAssured.port = PORT;
-    }
-
-    @BeforeAll
-    void createStation() {
-        SINSA.put("name", "신사역");
-        long id = RestAssured.given().log().all()
-                .body(SINSA)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract().body().jsonPath().getLong("id");
-        System.out.println("아이디:::::" + id);
-        GWANGGO.put("name", "광교중앙역");
-        ExtractableResponse<Response> extractGwanggyo =
-                RestAssured.given().log().all()
-                        .body(GWANGGO)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/stations")
-                        .then().log().all()
-                        .extract();
-
     }
     /**
      * When 지하철 노선을 생성하면
@@ -56,11 +33,11 @@ public class SubwayLineAcceptanceTest {
     @DisplayName("지하철 노선 생성")
     @Test
     void createLine() {
+        long upStationId = createStation("신사역");
+        long downStationId = createStation("광교역");
         //when
         String name = "신분당선";
         String color = "bg-red-600";
-        Long upStationId = 1L;
-        Long downStationId = 2L;
         int distance = 10;
         Map<String, Object> params = new HashMap<>();
         params.put("name", name);
@@ -71,15 +48,15 @@ public class SubwayLineAcceptanceTest {
         ExtractableResponse<Response> extract = RestAssured.given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/line")
+                .when().post("/lines")
                 .then().log().all()
                 .extract();
 
         //then
         assertThat(extract.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(extract.body().jsonPath().getString("name")).isEqualTo(name);
-        assertThat(extract.body().jsonPath().getString("color")).isEqualTo(name);
-        assertThat(extract.body().jsonPath().getList("stations").size()).isEqualTo(2);
+        assertThat(extract.body().jsonPath().getString("color")).isEqualTo(color);
+        assertThat(extract.body().jsonPath().getList("stationResponseList").size()).isEqualTo(2);
     }
 
     /**
@@ -91,18 +68,25 @@ public class SubwayLineAcceptanceTest {
     @DisplayName("지하철 노선 목록 조회")
     @Test
     void findLines() {
+        long upStationId = createStation("신사역");
+        long downStationId = createStation("광교역");
         //given
-        long firstLineId = beforeTestCreateLine("5호선", "bg-purple-600", (Long) SINSA.get("id"), (Long) GWANGGO.get("id"), 10);
-        long secondLineId = beforeTestCreateLine("4호선", "bg-aqua-600", (Long) SINSA.get("id"), (Long) GWANGGO.get("id"), 10);
+        long firstLineId = beforeTestCreateLine("5호선", "bg-purple-600", upStationId, downStationId, 10);
+        long secondLineId = beforeTestCreateLine("4호선", "bg-aqua-600", upStationId, downStationId, 20);
 
         //when
         ExtractableResponse<Response> extract = RestAssured.given().log().all()
-                .when().post("/line/list")
+                .when().get("/lines")
                 .then().log().all()
                 .extract();
         //then
+        System.out.println(extract.jsonPath());
+        String prettify = extract.body().jsonPath().prettify();
         assertThat(extract.statusCode()).isEqualTo(HttpStatus.OK.value());
-        extract.body().jsonPath().get("$.list.*");
+        assertThat((String) read(prettify, "$.[0].name")).isEqualTo("5호선");
+        assertThat((String) read(prettify, "$.[0].stationResponseList[0].name")).isEqualTo("신사역");
+        assertThat((String) read(prettify, "$.[0].stationResponseList[1].name")).isEqualTo("광교역");
+        assertThat((String) read(prettify, "$.[1].name")).isEqualTo("4호선");
     }
 
     /**
@@ -114,17 +98,19 @@ public class SubwayLineAcceptanceTest {
     @DisplayName("지하철 노선 단일 조회")
     @Test
     void findLine() {
+        long upStationId = createStation("신사역");
+        long downStationId = createStation("광교역");
         //given
         String name = "5호선";
         String color = "bg-purple-600";
-        long firstLineId = beforeTestCreateLine(name, color, (Long) SINSA.get("id"), (Long) GWANGGO.get("id"), 10);
+        long firstLineId = beforeTestCreateLine(name, color, upStationId, downStationId, 10);
         Map<String, String> params = new HashMap<>();
 
         //when
         ExtractableResponse<Response> extract = RestAssured.given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/line/{id}", firstLineId)
+                .when().post("/lines/{id}", firstLineId)
                 .then().log().all()
                 .extract();
 
@@ -143,18 +129,20 @@ public class SubwayLineAcceptanceTest {
     @DisplayName("지하철 노선 수정")
     @Test
     void updateLine() {
+        long upStationId = createStation("신사역");
+        long downStationId = createStation("광교역");
         //given
         String name = "5호선";
         String color = "bg-purple-600";
         String replaceColor = "bg-red-660";
-        long id = beforeTestCreateLine(name, color, (Long) SINSA.get("id"), (Long) GWANGGO.get("id"), 10);
+        long id = beforeTestCreateLine(name, color, upStationId, downStationId, 10);
         Map<String, String> params = new HashMap<>();
         params.put("color", replaceColor);
         //when
         ExtractableResponse<Response> extract = RestAssured.given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().put("/line/{id}", id)
+                .when().put("/lines/{id}", id)
                 .then().log().all()
                 .extract();
 
@@ -172,16 +160,30 @@ public class SubwayLineAcceptanceTest {
     @DisplayName("지하철 노선 삭제")
     @Test
     void deleteLine() {
+        long upStationId = createStation("신사역");
+        long downStationId = createStation("광교역");
         //given
         String name = "5호선";
-        long id = beforeTestCreateLine(name, "bg-purple-600", (Long) SINSA.get("id"), (Long) GWANGGO.get("id"), 10);
+        long id = beforeTestCreateLine(name, "bg-purple-600", upStationId, downStationId, 10);
         //when
         ExtractableResponse<Response> extract = RestAssured.given().log().all()
-                .when().delete("/line/{id}", id)
+                .when().delete("/lines/{id}", id)
                 .then().log().all()
                 .extract();
         //then
         assertThat(extract.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
+    // 지하철역 생성
+    private long createStation(String name) {
+        Map<String, String> param = new HashMap<>();
+        param.put("name", name);
+        return RestAssured.given().log().all()
+                .body(param)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all()
+                .extract().body().jsonPath().getLong("id");
     }
 
     private long beforeTestCreateLine(String name, String color, Long upStationId, Long downStationId, int distance) {
@@ -193,7 +195,7 @@ public class SubwayLineAcceptanceTest {
         params.put("distance", distance);
         ExtractableResponse<Response> extract = RestAssured.given().log().all()
                 .body(params).contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/line")
+                .when().post("/lines")
                 .then().log().all()
                 .extract();
         return extract.body().jsonPath().getLong("id");

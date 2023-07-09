@@ -1,6 +1,7 @@
 package subway;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 public class Station {
@@ -9,6 +10,9 @@ public class Station {
     private Long id;
     @Column(length = 20, nullable = false)
     private String name;
+
+    @OneToMany(mappedBy = "station")
+    private List<LineStation> lineStations;
 
     public Station() {
     }

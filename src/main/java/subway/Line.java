@@ -10,16 +10,12 @@ public class Line {
     private Long id;
     @Column(length = 255, nullable = false)
     private String name;
-
     @Column(nullable = false)
     private String color;
-
-    @Column(nullable = false)
-    @OneToMany(fetch = FetchType.LAZY)
-    private List<Station> stations;
-
     @Column(nullable = false)
     private Integer distance;
+    @OneToMany(mappedBy = "line")
+    private List<LineStation> lineStations;
 
     public Long getId() {
         return id;
@@ -33,11 +29,20 @@ public class Line {
         return color;
     }
 
-    public List<Station> getStations() {
-        return stations;
+    public List<LineStation> getLineStations() {
+        return lineStations;
     }
 
     public Integer getDistance() {
         return distance;
+    }
+
+    public Line() {
+    }
+
+    public Line(String name, String color, Integer distance) {
+        this.name = name;
+        this.color = color;
+        this.distance = distance;
     }
 }
