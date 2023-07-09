@@ -1,6 +1,7 @@
 package subway.acceptance;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static subway.utils.StationTestRequests.지하철_역_등록;
 import static subway.utils.StationTestRequests.지하철_역_등록_Id_획득;
 import static subway.utils.StationTestRequests.지하철_역_리스트_반환;
@@ -42,8 +43,10 @@ class StationAcceptanceTest {
         assertThat(stations).hasSize(1);
 
         StationResponse 강남역 = stations.get(0);
-        assertThat(강남역.getId()).isEqualTo(1L);
-        assertThat(강남역.getName()).isEqualTo("강남역");
+        assertAll(
+            () -> assertThat(강남역.getId()).isEqualTo(1L),
+            () -> assertThat(강남역.getName()).isEqualTo("강남역")
+        );
     }
 
     /**

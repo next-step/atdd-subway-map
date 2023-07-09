@@ -1,6 +1,7 @@
 package subway.acceptance;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static subway.utils.LineTestRequests.지하철_노선_목록_조회;
 import static subway.utils.LineTestRequests.지하철_노선_삭제;
 import static subway.utils.LineTestRequests.지하철_노선_수정;
@@ -47,11 +48,7 @@ class LineAcceptanceTest {
         //then
         List<LineResponse> lines = 지하철_노선_목록_조회();
         LineResponse 신분당선 = lines.get(0);
-        assertThat(lines).hasSize(1);
-        assertThat(신분당선.getId()).isEqualTo(1L);
-        assertThat(신분당선.getName()).isEqualTo("신분당선");
-        assertThat(신분당선.getColor()).isEqualTo("bg-red-600");
-        assertThat(신분당선.getStations()).hasSize(2);
+        노선도_기댓값_검증(신분당선, 1L, "신분당선", "bg-red-600");
     }
 
     /**
@@ -73,16 +70,10 @@ class LineAcceptanceTest {
         assertThat(lines).hasSize(2);
 
         LineResponse 신분당선 = lines.get(0);
-        assertThat(신분당선.getId()).isEqualTo(1L);
-        assertThat(신분당선.getName()).isEqualTo("신분당선");
-        assertThat(신분당선.getColor()).isEqualTo("bg-red-600");
-        assertThat(신분당선.getStations()).hasSize(2);
+        노선도_기댓값_검증(신분당선, 1L, "신분당선", "bg-red-600");
 
         LineResponse line7 = lines.get(1);
-        assertThat(line7.getId()).isEqualTo(2L);
-        assertThat(line7.getName()).isEqualTo("7호선");
-        assertThat(line7.getColor()).isEqualTo("bg-red-100");
-        assertThat(line7.getStations()).hasSize(2);
+        노선도_기댓값_검증(line7, 2L, "7호선", "bg-red-100");
     }
 
     /**
@@ -104,10 +95,7 @@ class LineAcceptanceTest {
         응답코드_검증(searchResponse, HttpStatus.OK);
 
         LineResponse 신분당선 = searchResponse.jsonPath().getObject("", LineResponse.class);
-        assertThat(신분당선.getId()).isEqualTo(savedId);
-        assertThat(신분당선.getName()).isEqualTo("신분당선");
-        assertThat(신분당선.getColor()).isEqualTo("bg-red-600");
-        assertThat(신분당선.getStations()).hasSize(2);
+        노선도_기댓값_검증(신분당선, savedId, "신분당선", "bg-red-600");
     }
 
     /**
@@ -129,9 +117,7 @@ class LineAcceptanceTest {
         응답코드_검증(updateResponse, HttpStatus.OK);
 
         LineResponse 신신분당선 = 지하철_노선_조회(savedId).jsonPath().getObject("", LineResponse.class);
-        assertThat(신신분당선.getId()).isEqualTo(savedId);
-        assertThat(신신분당선.getName()).isEqualTo("신신분당선");
-        assertThat(신신분당선.getColor()).isEqualTo("bg-blue-100");
+        노선도_기댓값_검증(신신분당선, savedId, "신신분당선", "bg-blue-100");
     }
 
     /**
@@ -154,6 +140,15 @@ class LineAcceptanceTest {
         응답코드_검증(deleteResponse, HttpStatus.NO_CONTENT);
         ExtractableResponse<Response> notFoundResponse = 지하철_노선_조회(savedId);
         응답코드_검증(notFoundResponse, HttpStatus.NOT_FOUND);
+    }
+
+    private void 노선도_기댓값_검증(LineResponse line, Long id, String name, String color) {
+        assertAll(
+                () -> assertThat(line.getId()).isEqualTo(id),
+                () -> assertThat(line.getName()).isEqualTo(name),
+                () -> assertThat(line.getColor()).isEqualTo(color),
+                () -> assertThat(line.getStations()).hasSize(2)
+        );
     }
 
 }

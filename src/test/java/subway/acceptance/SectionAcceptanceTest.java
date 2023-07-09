@@ -1,6 +1,7 @@
 package subway.acceptance;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static subway.utils.LineTestRequests.지하철_노선_조회_응답값_반환;
 import static subway.utils.LineTestRequests.지하철_노선도_등록;
 import static subway.utils.SectionTestRequests.지하철_구간_등록;
@@ -50,9 +51,7 @@ class SectionAcceptanceTest {
         //then
         응답코드_검증(response, HttpStatus.OK);
         LineResponse line7 = 지하철_노선_조회_응답값_반환(1L);
-        StationResponse downwardLastStation = line7.getStations().get(1);
-        assertThat(downwardLastStation.getId()).isEqualTo(3L);
-        assertThat(downwardLastStation.getName()).isEqualTo("세번째역");
+        하행선_기대값_검증(line7, 3L, "세번째역");
     }
 
     /**
@@ -72,9 +71,7 @@ class SectionAcceptanceTest {
         //then
         응답코드_검증(response, HttpStatus.BAD_REQUEST);
         LineResponse line7 = 지하철_노선_조회_응답값_반환(1L);
-        StationResponse downwardLastStation = line7.getStations().get(1);
-        assertThat(downwardLastStation.getId()).isEqualTo(2L);
-        assertThat(downwardLastStation.getName()).isEqualTo("두번째역");
+        하행선_기대값_검증(line7, 2L, "두번째역");
     }
 
     /**
@@ -94,9 +91,7 @@ class SectionAcceptanceTest {
         //then
         응답코드_검증(response, HttpStatus.BAD_REQUEST);
         LineResponse line7 = 지하철_노선_조회_응답값_반환(1L);
-        StationResponse downwardLastStation = line7.getStations().get(1);
-        assertThat(downwardLastStation.getId()).isEqualTo(2L);
-        assertThat(downwardLastStation.getName()).isEqualTo("두번째역");
+        하행선_기대값_검증(line7, 2L, "두번째역");
     }
 
     /**
@@ -117,9 +112,7 @@ class SectionAcceptanceTest {
         //then
         응답코드_검증(response, HttpStatus.BAD_REQUEST);
         LineResponse line7 = 지하철_노선_조회_응답값_반환(1L);
-        StationResponse downwardLastStation = line7.getStations().get(1);
-        assertThat(downwardLastStation.getId()).isEqualTo(3L);
-        assertThat(downwardLastStation.getName()).isEqualTo("세번째역");
+        하행선_기대값_검증(line7, 3L, "세번째역");
     }
 
     /**
@@ -140,9 +133,7 @@ class SectionAcceptanceTest {
         //then
         응답코드_검증(response, HttpStatus.NO_CONTENT);
         LineResponse line7 = 지하철_노선_조회_응답값_반환(1L);
-        StationResponse downwardLastStation = line7.getStations().get(1);
-        assertThat(downwardLastStation.getId()).isEqualTo(2L);
-        assertThat(downwardLastStation.getName()).isEqualTo("두번째역");
+        하행선_기대값_검증(line7, 2L, "두번째역");
     }
 
     /**
@@ -163,9 +154,7 @@ class SectionAcceptanceTest {
         //then
         응답코드_검증(response, HttpStatus.BAD_REQUEST);
         LineResponse line7 = 지하철_노선_조회_응답값_반환(1L);
-        StationResponse downwardLastStation = line7.getStations().get(1);
-        assertThat(downwardLastStation.getId()).isEqualTo(3L);
-        assertThat(downwardLastStation.getName()).isEqualTo("세번째역");
+        하행선_기대값_검증(line7, 3L, "세번째역");
     }
 
     /**
@@ -185,9 +174,7 @@ class SectionAcceptanceTest {
         //then
         응답코드_검증(response, HttpStatus.BAD_REQUEST);
         LineResponse line7 = 지하철_노선_조회_응답값_반환(1L);
-        StationResponse downwardLastStation = line7.getStations().get(1);
-        assertThat(downwardLastStation.getId()).isEqualTo(2L);
-        assertThat(downwardLastStation.getName()).isEqualTo("두번째역");
+        하행선_기대값_검증(line7, 2L, "두번째역");
     }
 
     /**
@@ -229,8 +216,14 @@ class SectionAcceptanceTest {
         //then
         응답코드_검증(response, HttpStatus.BAD_REQUEST);
         LineResponse line7 = 지하철_노선_조회_응답값_반환(1L);
-        StationResponse downwardLastStation = line7.getStations().get(1);
-        assertThat(downwardLastStation.getId()).isEqualTo(3L);
-        assertThat(downwardLastStation.getName()).isEqualTo("세번째역");
+        하행선_기대값_검증(line7, 3L, "세번째역");
+    }
+
+    private void 하행선_기대값_검증(LineResponse response, Long stationId, String stationName) {
+        StationResponse downwardLastStation = response.getStations().get(1);
+        assertAll(
+            () -> assertThat(downwardLastStation.getId()).isEqualTo(stationId),
+            () -> assertThat(downwardLastStation.getName()).isEqualTo(stationName)
+        );
     }
 }
