@@ -8,6 +8,7 @@ import subway.controller.dto.line.LineResponse;
 import subway.controller.dto.line.LineSaveRequest;
 import subway.model.line.Line;
 import subway.model.line.LineRepository;
+import subway.model.line.LineService;
 import subway.model.section.Section;
 import subway.model.section.SectionRepository;
 import subway.model.station.Station;
@@ -20,12 +21,12 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class LineCompositeService {
 
-    private final LineRepository lineRepository;
+    private final LineService lineService;
     private final StationRepository stationRepository;
     private final SectionRepository sectionRepository;
 
-    public LineCompositeService(LineRepository lineRepository, StationRepository stationRepository, SectionRepository sectionRepository) {
-        this.lineRepository = lineRepository;
+    public LineCompositeService(LineService lineService, StationRepository stationRepository, SectionRepository sectionRepository) {
+        this.lineService = lineService;
         this.stationRepository = stationRepository;
         this.sectionRepository = sectionRepository;
     }
@@ -53,15 +54,15 @@ public class LineCompositeService {
 
         section.setLine(newLine);
 
-        Line savedLine = lineRepository.save(newLine);
+        Line savedLine = lineService.save(newLine);
 
         return LineResponse.from(savedLine);
     }
 
     @Transactional
     public LineResponse modifyLine(Long lineId, LineModifyRequest lineModifyRequest) {
-        Line line = lineRepository.findById(lineId)
-                                  .orElseThrow(() -> new IllegalArgumentException("line id doesn't exist"));
+
+        Line line = lineService.findById(lineId);
 
         if (lineModifyRequest.getName() != null) {
             line.setName(lineModifyRequest.getName());
@@ -75,20 +76,19 @@ public class LineCompositeService {
     }
 
     public List<LineResponse> findAllLines() {
-        return lineRepository.findAll()
-                             .stream()
-                             .map(LineResponse::from)
-                             .collect(Collectors.toList());
+        return lineService.findAll()
+                          .stream()
+                          .map(LineResponse::from)
+                          .collect(Collectors.toList());
     }
 
     @Transactional
     public void deleteLineById(Long id) {
-        lineRepository.deleteById(id);
+        lineService.deleteById(id);
     }
 
     public LineResponse findById(Long id) {
-        Line line = lineRepository.findById(id)
-                                  .orElseThrow(() -> new IllegalArgumentException("line id doesn't exist"));
+        Line line = lineService.findById(id);
         return LineResponse.from(line);
     }
 }
