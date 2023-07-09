@@ -53,4 +53,13 @@ public class LineSectionAcceptanceTest extends IntegrationTest {
         .extracting("lineId")
         .contains(지하철_구간_생성.get("lineId"));
   }
+
+
+  /**
+   * given 지하철 역과 노선을 생성하고
+   * <p>
+   * when 구간의 기점이 하행 종점역이고, 하행역이 "해당 노선의 역 중 하나" 이면
+   * <p>
+   * then 구간을 생성 할 수 없다.
+   */
 }
