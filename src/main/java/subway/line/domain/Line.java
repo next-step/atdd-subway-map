@@ -110,4 +110,22 @@ public class Line {
         }
         return false;
     }
+
+    public void deleteStation(Station targetStation) {
+        if (sections.size() <= 1) {
+            throw new IllegalArgumentException();
+        }
+
+        if (!lastStations.isLastDownwardStation(targetStation)) {
+            throw new IllegalArgumentException();
+        }
+
+        for (Section section : sections) {
+            if (section.hasSameDownwardStation(targetStation)) {
+                lastStations.updateDownLastStation(section.getUpwardStation());
+                sections.remove(section);
+                break;
+            }
+        }
+    }
 }

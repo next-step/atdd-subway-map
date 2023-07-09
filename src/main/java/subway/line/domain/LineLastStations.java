@@ -53,4 +53,8 @@ public class LineLastStations {
 
         return true;
     }
+
+    public boolean isLastDownwardStation(Station station) {
+        return downLastStation.equals(station);
+    }
 }

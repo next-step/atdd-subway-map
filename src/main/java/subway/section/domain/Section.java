@@ -36,11 +36,20 @@ public class Section {
         return stations.getDownStation();
     }
 
+    public Station getUpwardStation() {
+        return stations.getUpStation();
+    }
+
     public SectionStations getStations() {
         return stations;
     }
 
     public boolean checkStationInSection(Station station) {
         return stations.checkStationInSection(station);
+    }
+
+    public boolean hasSameDownwardStation(Station station) {
+        Station currentDownwardStation = stations.getDownStation();
+        return currentDownwardStation.equals(station);
     }
 }

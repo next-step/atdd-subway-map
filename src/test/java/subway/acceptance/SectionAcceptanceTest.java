@@ -206,7 +206,7 @@ class SectionAcceptanceTest {
         ExtractableResponse<Response> response = 지하철_구간_삭제(2L, 3L);
 
         //then
-        응답코드_검증(response, HttpStatus.BAD_REQUEST);
+        응답코드_검증(response, HttpStatus.NOT_FOUND);
     }
 
 

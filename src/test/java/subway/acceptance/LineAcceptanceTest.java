@@ -153,7 +153,7 @@ class LineAcceptanceTest {
         //then
         응답코드_검증(deleteResponse, HttpStatus.NO_CONTENT);
         ExtractableResponse<Response> notFoundResponse = 지하철_노선_조회(savedId);
-        응답코드_검증(notFoundResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        응답코드_검증(notFoundResponse, HttpStatus.NOT_FOUND);
     }
 
 }

@@ -70,7 +70,7 @@ class LineTest {
         List<Section> sections = line.getSections();
         LineLastStations stations = line.getLastStations();
         assertThat(sections).hasSize(1);
-        assertThat(stations.getDownLastStation().getName()).isEqualTo(stationC.getName());
+        assertThat(stations.getDownLastStation()).isEqualTo(stationC);
     }
 
     @Test
@@ -82,5 +82,42 @@ class LineTest {
 
         assertThrows(IllegalArgumentException.class, () -> line.addSection(sectionA));
         assertThrows(IllegalArgumentException.class, () -> line.addSection(sectionB));
+    }
+
+    @Test
+    void deleteStation() {
+        //given
+        Line line = new Line("신분당선", "abc", lastStations);
+        line.addBaseSection(1);
+        Section section = new Section(line, new SectionStations(stationB, stationC), 3);
+        line.addSection(section);
+
+        //when
+        line.deleteStation(stationC);
+
+        //then
+        List<Section> sections = line.getSections();
+        LineLastStations stations = line.getLastStations();
+        assertThat(sections).hasSize(1);
+        assertThat(stations.getDownLastStation()).isEqualTo(stationB);
+    }
+
+    @Test
+    void deleteStationExceptionWhenOnlyOneSection() {
+        //given
+        Line line = new Line("신분당선", "abc", lastStations);
+        line.addBaseSection(1);
+
+        assertThrows(IllegalArgumentException.class, () -> line.deleteStation(stationB));
+    }
+
+    @Test
+    void deleteStationExceptionWhenNotLastDownwardStation() {
+        Line line = new Line("신분당선", "abc", lastStations);
+        line.addBaseSection(1);
+        Section section = new Section(line, new SectionStations(stationB, stationC), 3);
+        line.addSection(section);
+
+        assertThrows(IllegalArgumentException.class, ()->line.deleteStation(stationB));
     }
 }

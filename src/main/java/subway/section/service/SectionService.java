@@ -31,4 +31,11 @@ public class SectionService {
         Section section = new Section(line, sectionStations, sectionRequest.getDistance());
         line.addSection(section);
     }
+
+    @Transactional
+    public void deleteSection(Long lineId, Long stationId) {
+        Line line = lineService.getLine(lineId);
+        Station targetStation = stationService.getStation(stationId);
+        line.deleteStation(targetStation);
+    }
 }

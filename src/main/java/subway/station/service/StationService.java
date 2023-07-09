@@ -30,10 +30,6 @@ public class StationService {
                 .collect(Collectors.toList());
     }
 
-    public List<Station> findStationsByIdList(List<Long> ids) {
-        return stationRepository.findAllById(ids);
-    }
-
     public Station getStation(Long id) {
         return stationRepository.findById(id).orElseThrow();
     }
