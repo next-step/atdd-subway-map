@@ -46,8 +46,9 @@ public class Line {
     @JoinColumn
     private Station downStation;
 
+    @Builder.Default
     @Embedded
-    private LineSection lineSection;
+    private LineSection lineSection = new LineSection();
 
     public void updateLine(String name, String color) {
         this.name = name;
@@ -55,10 +56,7 @@ public class Line {
     }
 
     public void addSection(Section section) {
-        LineSection ls = new LineSection();
-        ls.add(section);
-        this.lineSection = ls;
-//        this.lineSection.add(section);
+        this.lineSection.add(section, this);
         this.downStation = section.getDownStation();
     }
 
@@ -69,20 +67,8 @@ public class Line {
         return stations;
     }
 
-    public Section deleteSectionByStation(Station station) {
-        if (this.lineSection.getStationsCount() < MINIMAL_SECTION_SIZE) {
-            throw new SubwayBadRequestException(LineMessage.DOWN_STATION_MINIMAL_VALID_MESSAGE.getCode(),
-                    LineMessage.DOWN_STATION_MINIMAL_VALID_MESSAGE.getFormatMessage(MINIMAL_SECTION_SIZE));
-        }
-        if (!this.downStation.equals(station)) {
-            throw new SubwayBadRequestException(LineMessage.SECTION_DELETE_LAST_STATION_VALID_MESSAGE.getCode(),
-                    LineMessage.SECTION_DELETE_LAST_STATION_VALID_MESSAGE.getMessage());
-        }
-
-        final int lastElementIndex = this.lineSection.getStationsCount() - 1;
-        Section lastSection = this.lineSection.get(lastElementIndex);
+    public void deleteSectionByStation(Station station) {
+        Section lastSection = lineSection.deleteSectionByStation(station, this.downStation);
         this.downStation = lastSection.getUpStation();
-        this.lineSection.remove(lastSection);
-        return lastSection;
     }
 }

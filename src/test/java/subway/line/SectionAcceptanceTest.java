@@ -75,6 +75,7 @@ public class SectionAcceptanceTest extends ApiTest {
         Map<String, String> sectionRequest = RequestGenerator.generateSectionCreateRequest(stationIds.get(1), stationIds.get(2), 10L);
         final String appendLocation = location + "/sections";
         ExtractableResponse<Response> response = LineApi.appendSectionInLine(appendLocation, sectionRequest);
+        LineApi.retrieveLineByLocation(location);
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
