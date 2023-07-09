@@ -2,6 +2,7 @@ package subway.subwayline.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.section.entity.Section;
 import subway.station.entity.Station;
 import subway.station.repository.StationRepository;
 import subway.subwayline.entity.SubwayLine;
@@ -29,7 +30,12 @@ public class SubwayLineService {
                 .orElseThrow(() -> new IllegalArgumentException("상행역이 존재하지 않습니다."));
         Station downStation = stationRepository.findById(dto.getDownStationId())
                 .orElseThrow(() -> new IllegalArgumentException("하행역 존재하지 않습니다."));
-        SubwayLine savedSubWayLine = subwayLineRepository.save(dto.toEntity(upStation, downStation));
+        Section section = Section.builder()
+                .upStation(upStation)
+                .downStation(downStation)
+                .distance(dto.getDistance())
+                .build();
+        SubwayLine savedSubWayLine = subwayLineRepository.save(dto.toEntity(upStation, downStation, section));
 
         return SubwayLineDto.of(savedSubWayLine);
     }

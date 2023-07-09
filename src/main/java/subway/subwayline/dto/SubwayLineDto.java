@@ -2,6 +2,7 @@ package subway.subwayline.dto;
 
 import lombok.Builder;
 import lombok.Getter;
+import subway.section.entity.Section;
 import subway.station.entity.Station;
 import subway.station.dto.StationDto;
 import subway.subwayline.entity.SubwayLine;
@@ -57,13 +58,14 @@ public class SubwayLineDto {
                 .build();
     }
 
-    public SubwayLine toEntity(Station upStation, Station downStation) {
+    public SubwayLine toEntity(Station upStation, Station downStation, Section section) {
         return SubwayLine.builder()
                 .name(name)
                 .color(color)
                 .upStationId(upStation)
                 .downStationId(downStation)
                 .distance(distance)
+                .section(section)
                 .build();
     }
 }
