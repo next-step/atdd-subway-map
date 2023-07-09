@@ -39,12 +39,12 @@ public class SectionApiHelper {
                           .extract();
     }
 
-    public static ExtractableResponse<Response> callApiToDeleteSection(Long lineId, Long sectionId) {
+    public static ExtractableResponse<Response> callApiToDeleteSection(Long lineId, Long stationId) {
         return RestAssured.given()
                           .log()
                           .all()
                           .pathParam("lineId", lineId)
-                          .queryParam("sectionId", sectionId)
+                          .queryParam("stationId", stationId)
                           .when()
                           .delete("/lines/{lineId}/sections")
                           .then()

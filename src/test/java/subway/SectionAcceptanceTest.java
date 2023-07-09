@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static subway.utils.SectionApiHelper.callApiToCreateSection;
+import static subway.utils.SectionApiHelper.callApiToDeleteSection;
 
 @Sql("truncate_tables.sql")
 @DisplayName("지하철 구간 관련 기능")
@@ -77,8 +78,7 @@ public class SectionAcceptanceTest {
     void createSection_성공__3개역_노선() {
 
         // given
-        Long lineId = LINE_생성(stationId_A, stationId_B);
-        Section_생성(lineId, stationId_B, stationId_C);
+        Long lineId = 노선_A_B_C_생성();
 
         // when
         ExtractableResponse<Response> creationResponse = Section_생성(lineId, stationId_C, stationId_D);
@@ -121,8 +121,7 @@ public class SectionAcceptanceTest {
     void createSection_에러__노선에_등록된_하행역() {
 
         // given
-        Long lineId = LINE_생성(stationId_A, stationId_B);
-        Section_생성(lineId, stationId_B, stationId_C);
+        Long lineId = 노선_A_B_C_생성();
 
         // when
         ExtractableResponse<Response> creationResponse = Section_생성(lineId, stationId_C, stationId_B);
@@ -130,6 +129,52 @@ public class SectionAcceptanceTest {
         // then
         HTTP_STATUS_검증(creationResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    /**
+     * Given 지하철 노선 A-B-C를 생성하고
+     * When 지하철역 B-C 구간을 삭제하면
+     * Then 노선이 A-B만 남는다.
+     */
+    @DisplayName("노선 A-B-C에서 B-C구간을 삭제한다.")
+    @Test
+    void deleteSection_성공() {
+
+        // given
+        Long lineId = 노선_A_B_C_생성();
+
+        // when
+        ExtractableResponse<Response> deletionResponse = 구간_삭제(lineId, stationId_C);
+
+        // then
+        HTTP_STATUS_검증(deletionResponse, HttpStatus.NO_CONTENT);
+
+        Long[] expectedStationIds = {stationId_A, stationId_B};
+        String[] expectedStationNames = {stationName_A, stationName_B};
+        LINE의_스테이션_전체_조회_및_검증(lineId, expectedStationIds, expectedStationNames);
+    }
+
+    /**
+     * Given 지하철 노선 A-B를 생성하고
+     * When 지하철 A-B 구간을 삭제하려고 하면
+     * Then 에러가 발생한다.
+     */
+    @DisplayName("[오류] 구간이 1개 뿐인 노선의 구간을 삭제한다.")
+    @Test
+    void deleteSection_에러__구간_1개_노선의_구간_삭제() {
+
+    }
+
+    /**
+     * Given 지하철 노선 A-B-C를 생성하고
+     * When 지하철 A-B 구간을 삭제하려고 하면
+     * Then 에러가 발생한다.
+     */
+    @DisplayName("[오류] 마지막 구간이 아닌 노선을 삭제한다.")
+    @Test
+    void deleteSection_에러__마지막_구간이_아닌_구간_삭제() {
+
+    }
+
 
     private ExtractableResponse<Response> Section_생성(Long lineId, Long upStationId, Long downStationId) {
         return callApiToCreateSection(lineId, SectionSaveRequest.builder()
@@ -175,4 +220,15 @@ public class SectionAcceptanceTest {
                            .map(StationResponse::getName)
                            .collect(Collectors.toList())).contains(expectedStationNames);
     }
+
+    private Long 노선_A_B_C_생성() {
+        Long lineId = LINE_생성(stationId_A, stationId_B);
+        Section_생성(lineId, stationId_B, stationId_C);
+        return lineId;
+    }
+
+    private ExtractableResponse<Response> 구간_삭제(Long lineId, Long stationId) {
+        return callApiToDeleteSection(lineId, stationId);
+    }
+
 }
