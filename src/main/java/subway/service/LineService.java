@@ -32,6 +32,7 @@ public class LineService {
 
     @Transactional
     public LineResponse saveLine(LineSaveRequest lineSaveRequest) {
+
         Station upStation = stationRepository.findById(lineSaveRequest.getUpStationId())
                                              .orElseThrow(() -> new IllegalArgumentException("station id doesn't exist"));
         Station downStation = stationRepository.findById(lineSaveRequest.getDownStationId())

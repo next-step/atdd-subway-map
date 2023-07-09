@@ -6,17 +6,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import subway.controller.dto.line.LineResponse;
 import subway.controller.dto.line.LineSaveRequest;
-import subway.controller.dto.station.StationResponse;
 import subway.model.line.Line;
 import subway.model.line.LineRepository;
-import subway.model.section.SectionRepository;
 import subway.model.station.Station;
 import subway.model.station.StationRepository;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 @SpringBootTest
-class LineServiceTest {
+class LineServiceIntegrationTest {
 
     @Autowired
     private LineService lineService;
