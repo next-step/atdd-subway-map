@@ -7,37 +7,36 @@ import subway.StationRepository;
 import subway.line.Line;
 import subway.line.LineNotFoundException;
 import subway.line.LineRepository;
+import subway.line.LineStationRepository;
 
 import javax.transaction.Transactional;
 
 @Service
 @Transactional
 public class SectionService {
-    private final SectionRepository sectionRepository;
     private final StationRepository stationRepository;
     private final LineRepository lineRepository;
+    private final LineStationRepository lineStationRepository;
 
-    private static final long MINIMUM_SECTION_COUNT = 1L;
+    private static final long MINIMUM_STATION_COUNT = 2L;
 
-    public SectionService(final SectionRepository sectionRepository, StationRepository stationRepository, LineRepository lineRepository) {
-      this.sectionRepository = sectionRepository;
+    public SectionService(StationRepository stationRepository, LineRepository lineRepository, LineStationRepository lineStationRepository) {
       this.stationRepository = stationRepository;
       this.lineRepository = lineRepository;
+        this.lineStationRepository = lineStationRepository;
     }
 
-    public SectionResponse createSection(final long lineId, final SectionRequest request) {
+    public void createSection(final long lineId, final SectionRequest request) {
       final var line = lineRepository.findById(lineId).orElseThrow(() -> new LineNotFoundException(lineId));
 
       final var upStation = getStationById(request.getUpStationId());
       final var downStation = getStationById(request.getDownStationId());
 
       if (!line.isLastStation(upStation)) {
-        throw new StationDoesNotMatchException();
+        throw new StationDoesNotMatchException(upStation.getName());
       }
 
-      final Section savedSection = sectionRepository.save(new Section(line, upStation, downStation, request.getDistance()));
-
-      return new SectionResponse(savedSection);
+      lineStationRepository.save(line.addSection(downStation, request.getDistance()));
     }
 
     private Station getStationById(final Long stationId) {
@@ -50,17 +49,17 @@ public class SectionService {
         final var station = getStationById(stationId);
 
         if (!line.isLastStation(station)) {
-          throw new StationDoesNotMatchException();
+          throw new StationDoesNotMatchException(station.getName());
         }
 
         if (hasMinimumSection(line)) {
           throw new IllegalArgumentException("구간은 최소 하나입니다");
         }
 
-        sectionRepository.delete(line.getLastSection());
+        lineStationRepository.delete(line.removeSection(station));
     }
 
     private static boolean hasMinimumSection(Line line) {
-        return line.getSections().size() == MINIMUM_SECTION_COUNT;
+        return line.countOfStations() == MINIMUM_STATION_COUNT;
     }
 }

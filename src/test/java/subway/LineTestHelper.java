@@ -10,7 +10,6 @@ import org.springframework.lang.Nullable;
 import subway.line.LineRequest;
 import subway.line.LineResponse;
 import subway.section.SectionRequest;
-import subway.section.SectionResponse;
 
 import java.util.List;
 
@@ -75,8 +74,8 @@ public class LineTestHelper {
     return response.body().as(LineResponse.class);
   }
 
-  public static SectionResponse createSection(Long lineId, Long upStationId, Long downStationId, long distance) {
-    ExtractableResponse<Response> response = RestAssured
+  public static ExtractableResponse<Response> createSection(Long lineId, Long upStationId, Long downStationId, long distance) {
+    return RestAssured
         .given()
           .log().all()
           .body(new SectionRequest(upStationId, downStationId, distance))
@@ -86,7 +85,16 @@ public class LineTestHelper {
         .then()
           .log().all()
           .extract();
+  }
 
-    return response.body().as(SectionResponse.class);
+  public static ExtractableResponse<Response> deleteSection(Long lineId, Long stationId) {
+    return RestAssured
+        .given()
+          .log().all()
+        .when()
+          .delete("/lines/{lineId}/sections/{stationId}", lineId, stationId)
+        .then()
+          .log().all()
+          .extract();
   }
 }

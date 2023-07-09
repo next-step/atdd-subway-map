@@ -1,14 +1,9 @@
 package subway.line;
 
 import subway.Station;
-import subway.StationNotFoundException;
-import subway.section.Section;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Entity
 public class Line {
@@ -26,24 +21,20 @@ public class Line {
         return distance;
     }
 
-    public List<Section> getSections() {
-        return sections;
-    }
-
     @Column(nullable = false)
     private Long distance = 0L;
 
-    @OneToMany(mappedBy = "line")
-    private List<Section> sections;
+    @Embedded
+    private LineStations lineStations;
 
     protected Line() {
     }
 
-    public Line(final String name, final String color, final Long distance, final List<Section> sections) {
+    public Line(final String name, final String color, final Long distance, final List<LineStation> lineStations) {
         this.name = name;
         this.color = color;
         this.distance = distance;
-        this.sections = sections;
+        this.lineStations = new LineStations(lineStations);
     }
 
     public Line(final String name, final String color, final Long distance) {
@@ -68,30 +59,22 @@ public class Line {
     }
 
     public boolean isLastStation(Station station) {
-        Optional<Section> optionalSection = this.sections
-                .stream()
-                .max(Comparator.naturalOrder());
-
-        return optionalSection.map(section -> section.getDownStation().equals(station)).orElse(true);
+        return lineStations.isLastStation(station);
     }
 
-    public Long getNextSequence() {
-        Optional<Section> optionalSection = this.sections
-                .stream()
-                .max(Comparator.naturalOrder());
-
-        return optionalSection.map(section -> section.getSequence() + 1).orElse(1L);
+    public LineStation addSection(Station downStation, Long distance) {
+        return lineStations.addSection(new LineStation(this, downStation, distance));
     }
 
-    public void addSection(Section section) {
-        this.sections.add(section);
+    public List<Station> getStations() {
+        return lineStations.getStations();
     }
 
-    public Section getLastSection() {
-        Optional<Section> optionalSection = this.sections
-                .stream()
-                .max(Comparator.naturalOrder());
+    public LineStation removeSection(Station station) {
+        return this.lineStations.removeSection(station);
+    }
 
-        return optionalSection.orElseThrow();
+    public long countOfStations() {
+        return lineStations.countOfStations();
     }
 }
