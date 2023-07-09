@@ -8,20 +8,19 @@ import subway.StationRepository;
 import subway.StationResponse;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @Transactional
 public class LineService {
     private final LineRepository lineRepository;
-    private final LineStationRepository lineStationRepository;
     private final StationRepository stationRepository;
+    private final LineStationRepository lineStationRepository;
 
-    public LineService(LineRepository lineRepository, LineStationRepository lineStationRepository, final StationRepository stationRepository) {
+    public LineService(LineRepository lineRepository, final StationRepository stationRepository, LineStationRepository lineStationRepository) {
         this.lineRepository = lineRepository;
-        this.lineStationRepository = lineStationRepository;
         this.stationRepository = stationRepository;
+        this.lineStationRepository = lineStationRepository;
     }
 
     @Transactional(readOnly = true)
@@ -42,11 +41,10 @@ public class LineService {
     }
 
   private static List<StationResponse> mapToStations(final Line line) {
-      return line.getLineStations()
-          .stream()
-          .map(LineStation::getStation)
-          .map(StationResponse::new)
-          .collect(Collectors.toList());
+      return line.getStations()
+              .stream()
+              .map(StationResponse::new)
+              .collect(Collectors.toList());
   }
 
   public LineResponse saveLine(LineRequest lineRequest) {
@@ -54,22 +52,20 @@ public class LineService {
           lineRequest.getColor(),
           lineRequest.getDistance()));
 
-      createLineStationIfNotNull(lineRequest.getUpStationId(), line);
-      createLineStationIfNotNull(lineRequest.getDownStationId(), line);
+      if (lineRequest.getUpStationId() != null && lineRequest.getDownStationId() != null) {
+          final Station upStation = getStationById(lineRequest.getUpStationId());
+          final Station downStation = getStationById(lineRequest.getDownStationId());
+          lineStationRepository.save(line.addSection(upStation, lineRequest.getDistance()));
+          lineStationRepository.save(line.addSection(downStation, lineRequest.getDistance()));
+      }
 
       return createLineResponse(line);
     }
 
-  private void createLineStationIfNotNull(final Long stationId, final Line line) {
-    if (stationId != null) {
-      stationRepository.findById(stationId)
-          .ifPresent(station -> lineStationRepository.save(new LineStation(line, station)));
-    }
-  }
-
-  @Transactional(readOnly = true)
+    @Transactional(readOnly = true)
     public LineResponse findLineById(Long id) {
-        return createLineResponse(lineRepository.findById(id).orElseThrow(IllegalArgumentException::new));
+        return createLineResponse(lineRepository.findById(id)
+                .orElseThrow(IllegalArgumentException::new));
     }
 
     public void updateLine(Long id, LineRequest lineRequest) {
@@ -79,5 +75,10 @@ public class LineService {
 
     public void deleteLine(Long id) {
         lineRepository.deleteById(id);
+    }
+
+    private Station getStationById(final Long stationId) {
+        return stationRepository.findById(stationId)
+                .orElseThrow(() -> new StationNotFoundException(stationId));
     }
 }

@@ -9,9 +9,9 @@ import org.springframework.http.MediaType;
 import org.springframework.lang.Nullable;
 import subway.line.LineRequest;
 import subway.line.LineResponse;
+import subway.section.SectionRequest;
 
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -72,5 +72,29 @@ public class LineTestHelper {
 
     assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     return response.body().as(LineResponse.class);
+  }
+
+  public static ExtractableResponse<Response> createSection(Long lineId, Long upStationId, Long downStationId, long distance) {
+    return RestAssured
+        .given()
+          .log().all()
+          .body(new SectionRequest(upStationId, downStationId, distance))
+          .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+          .post("/lines/{id}/sections", lineId)
+        .then()
+          .log().all()
+          .extract();
+  }
+
+  public static ExtractableResponse<Response> deleteSection(Long lineId, Long stationId) {
+    return RestAssured
+        .given()
+          .log().all()
+        .when()
+          .delete("/lines/{lineId}/sections/{stationId}", lineId, stationId)
+        .then()
+          .log().all()
+          .extract();
   }
 }

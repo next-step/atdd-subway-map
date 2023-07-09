@@ -1,11 +1,13 @@
 package subway.line;
 
+import subway.Station;
+
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Entity
 public class Line {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -19,15 +21,11 @@ public class Line {
         return distance;
     }
 
-    public List<LineStation> getLineStations() {
-        return lineStations;
-    }
-
     @Column(nullable = false)
     private Long distance = 0L;
 
-    @OneToMany(mappedBy = "line")
-    private List<LineStation> lineStations;
+    @Embedded
+    private LineStations lineStations;
 
     protected Line() {
     }
@@ -36,7 +34,7 @@ public class Line {
         this.name = name;
         this.color = color;
         this.distance = distance;
-        this.lineStations = lineStations;
+        this.lineStations = new LineStations(lineStations);
     }
 
     public Line(final String name, final String color, final Long distance) {
@@ -58,5 +56,25 @@ public class Line {
     public void update(String name, String color) {
         this.name = name;
         this.color = color;
+    }
+
+    public boolean isLastStation(Station station) {
+        return lineStations.isLastStation(station);
+    }
+
+    public LineStation addSection(Station downStation, Long distance) {
+        return lineStations.addSection(new LineStation(this, downStation, distance));
+    }
+
+    public List<Station> getStations() {
+        return lineStations.getStations();
+    }
+
+    public LineStation removeSection(Station station) {
+        return this.lineStations.removeSection(station);
+    }
+
+    public long countOfStations() {
+        return lineStations.countOfStations();
     }
 }
