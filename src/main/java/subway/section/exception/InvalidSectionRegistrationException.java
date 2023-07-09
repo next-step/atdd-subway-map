@@ -6,6 +6,6 @@ import subway.common.exception.ErrorCode;
 // TODO: 더 적절한 예외명이 없을까? 예외는 상세할수록 좋을 것 같은데.. 메세지로 충분할까?
 public class InvalidSectionRegistrationException extends BusinessException {
     public InvalidSectionRegistrationException() {
-        super(ErrorCode.INVALID_SECTION_REGISTRATION_EXCEPTION);
+        super(ErrorCode.INVALID_SECTION_REGISTRATION);
     }
 }

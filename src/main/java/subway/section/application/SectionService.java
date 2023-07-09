@@ -10,6 +10,7 @@ import subway.section.domain.SectionRepository;
 import subway.section.dto.SectionRequest;
 import subway.section.dto.SectionResponse;
 import subway.section.exception.AlreadyRegisteredStationException;
+import subway.section.exception.DeleteOnlyTerminusStationException;
 import subway.section.exception.InvalidSectionRegistrationException;
 import subway.station.domain.Station;
 import subway.station.domain.StationRepository;
@@ -72,6 +73,15 @@ public class SectionService {
         Line line = getLine(lineId);
         Section lastSection = line.getLastSection();
 
+        validateStationIsDownStationOfLastSection(stationId, lastSection);
+
         sectionRepository.delete(lastSection);
+    }
+
+    private void validateStationIsDownStationOfLastSection(Long stationId, Section lastSection) {
+        Station station = getStation(stationId);
+        if (!lastSection.downStationEqualsTo(station)) {
+            throw new DeleteOnlyTerminusStationException();
+        }
     }
 }

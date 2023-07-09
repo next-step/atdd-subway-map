@@ -85,8 +85,8 @@ public class Section {
         return downStation.getName();
     }
 
-    public boolean downStationEqualsTo(Station upStation) {
-        return downStation.equals(upStation);
+    public boolean downStationEqualsTo(Station station) {
+        return downStation.equals(station);
     }
 
     public boolean hasStation(Station downStation) {

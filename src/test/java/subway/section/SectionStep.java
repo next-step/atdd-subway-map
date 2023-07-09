@@ -26,7 +26,7 @@ public class SectionStep {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 하행_종점역을_가진_지하철_구간을_삭제한다(long lineId, long stationId) {
+    public static ExtractableResponse<Response> 지하철_구간을_삭제한다(long lineId, long stationId) {
         return RestAssured.given().log().all()
                 .pathParam("lineId", lineId)
                 .queryParam("stationId", stationId)
