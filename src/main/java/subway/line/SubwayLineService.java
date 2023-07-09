@@ -56,4 +56,9 @@ public class SubwayLineService {
 
     repository.delete(subwayLine);
   }
+
+  public SubwayLine getLineOrThrowIfNotExist(Long lineId) {
+    return repository.findById(lineId)
+        .orElseThrow();
+  }
 }

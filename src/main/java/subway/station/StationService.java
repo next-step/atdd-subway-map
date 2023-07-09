@@ -38,4 +38,9 @@ public class StationService {
                 station.getName()
         );
     }
+
+    public Station getStationOrThrowIfNotExist(Long stationId) {
+        return stationRepository.findById(stationId)
+            .orElseThrow();
+    }
 }
