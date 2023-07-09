@@ -17,7 +17,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import subway.section.domain.Section;
-import subway.section.exception.InvalidSectionCreateException;
 import subway.section.exception.InvalidSectionDeleteException;
 import subway.station.domain.Station;
 import subway.support.ErrorCode;
@@ -69,18 +68,10 @@ public class Line {
     }
 
     public void addSection(Section section) {
-        if (sections.isNotEmpty()) {
-            if (!section.isUpstation(downStation.getId())) {
-                throw new InvalidSectionCreateException(ErrorCode.SECTION_CREATE_FAIL_BY_UPSTATION);
-            }
-
-            if (section.isDownstation(downStation.getId()) || section.isDownstation(upStation.getId())) {
-                throw new InvalidSectionCreateException(ErrorCode.SECTION_CREATE_FAIL_BY_DOWNSTATION);
-            }
+        if (sections.possibleToAddSection(section)) {
+            section.attachToLine(this);
+            sections.appendSection(section);
         }
-
-        section.attachToLine(this);
-        sections.appendSection(section);
     }
 
     public void deleteSection(Long stationId) {

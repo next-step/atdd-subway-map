@@ -16,7 +16,9 @@ import lombok.NoArgsConstructor;
 import org.springframework.util.CollectionUtils;
 
 import subway.section.domain.Section;
+import subway.section.exception.InvalidSectionCreateException;
 import subway.section.exception.SectionNotFoundException;
+import subway.support.ErrorCode;
 
 @Getter
 @Embeddable
@@ -52,21 +54,6 @@ public class Sections {
         this.sections.add(section);
     }
 
-    public void deleteSection(Long stationId) {
-        for (Section section : sections) {
-            if (section.containStation(stationId)) {
-                section.detractFromLine();
-
-                remove(section);
-                break;
-            }
-        }
-    }
-
-    private void remove(Section section) {
-        this.sections.remove(section);
-    }
-
     public Section get(Long downStationId, Long upStationId) {
         return sections.stream()
                        .filter(section -> section.isMe(upStationId, downStationId))
@@ -81,4 +68,32 @@ public class Sections {
     public boolean isNotEmpty() {
         return !isEmpty();
     }
+
+    public boolean possibleToAddSection(Section section) {
+        if (isEmpty()) {
+            return true;
+        }
+
+        Section lastSection = getLastSection();
+
+        if (!section.isUpstation(lastSection.getDownStation().getId())) {
+            throw new InvalidSectionCreateException(ErrorCode.SECTION_CREATE_FAIL_BY_UPSTATION);
+        }
+
+        if (alreadyRegistered(section.getDownStation().getId())) {
+            throw new InvalidSectionCreateException(ErrorCode.SECTION_CREATE_FAIL_BY_DOWNSTATION);
+        }
+
+        return true;
+    }
+
+    private boolean alreadyRegistered(Long stationId) {
+        return sections.stream()
+                       .anyMatch(section -> section.containStation(stationId));
+    }
+
+    private Section getLastSection() {
+        return sections.get(sections.size()-1);
+    }
+
 }

@@ -27,6 +27,7 @@ public class StationFixture {
                                                          .when().post(CREATE_STATION_PATH)
                                                          .then().log().all()
                                                          .extract();
+
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         return response.as(StationResponse.class);
