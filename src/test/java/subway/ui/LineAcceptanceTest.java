@@ -218,7 +218,7 @@ public class LineAcceptanceTest extends AbstractAcceptanceTest {
         지하철_노선_구간_등록_요청(신분당선.getId(), new SectionRequest(논현역.getId(), 신논현역.getId(), 5L));
 
         //when
-        ExtractableResponse<Response> 지하철_노선_구간_삭제_응답 = 지하철_노선_구간_삭제_요청(신분당선.getId(), 신논현역.getId());
+        ExtractableResponse<Response> 지하철_노선_구간_삭제_응답 = 지하철_노선_구간_삭제_요청(신분당선.getId(), 논현역.getId());
 
         //then
         assertThat(지하철_노선_구간_삭제_응답.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());

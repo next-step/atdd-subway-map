@@ -15,6 +15,7 @@ public class Sections {
     private static final String ADD_ERROR_MESSAGE = "새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 합니다.";
     private static final String ADD_DUPLICATE_ERROR_MESSAGE = "새로운 구간의 하행역이 해당 노선에 등록되어있으면 안됩니다.";
     private static final String NOT_EQUALS_DOWN_END_SECTION_ERROR_MESSAGE = "하행 종점역 구간만 삭제 가능합니다.";
+    private static final String ILLEGAL_SIZE_DELETE_SECTION_ERROR_MESSAGE = "구간이 하나인 경우에는 삭제 불가능 합니다.";
 
     @OneToMany(mappedBy = "lineId", cascade = {CascadeType.ALL}, orphanRemoval = true)
     private List<Section> sections = new ArrayList<>();
@@ -38,10 +39,15 @@ public class Sections {
     }
 
     public void delete(Long stationId) {
+        if (sections.size() < 2) {
+            throw new IllegalArgumentException(ILLEGAL_SIZE_DELETE_SECTION_ERROR_MESSAGE);
+        }
+
         Section downEndSection = sections.get(sections.size() - 1);
         if (!downEndSection.getDownStation().matchId(stationId)) {
             throw new IllegalArgumentException(NOT_EQUALS_DOWN_END_SECTION_ERROR_MESSAGE);
         }
+
         sections.remove(downEndSection);
     }
 }
