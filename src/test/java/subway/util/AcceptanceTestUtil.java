@@ -19,6 +19,17 @@ public class AcceptanceTestUtil {
                 .extract();
     }
 
+    public static <T> ExtractableResponse<Response> post(String path, Long id, T request) {
+        return RestAssured
+                .given().log().all()
+                .pathParam("id", id)
+                .body(request)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post(path)
+                .then().log().all()
+                .extract();
+    }
+
     public static <T> List<T> get(String path, String key, Class<T> genericType) {
         return RestAssured.given().log().all()
                 .when().get(path)

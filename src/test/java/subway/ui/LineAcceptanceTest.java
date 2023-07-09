@@ -118,10 +118,17 @@ public class LineAcceptanceTest extends AbstractAcceptanceTest {
     @DisplayName("지하철 노선에 구간 등록")
     void createSection() {
         //given
+        StationResponse 신사역 = StationSteps.지하철역_생성_요청_Response_반환("신사역");
+        StationResponse 논현역 = StationSteps.지하철역_생성_요청_Response_반환("논현역");
+        LineResponse 신분당선 = 지하철_노선_생성_요청_Response_반환("신분당선", 신사역.getId(), 논현역.getId());
 
         //when
+        StationResponse 신논현역 = StationSteps.지하철역_생성_요청_Response_반환("신논현역");
+        지하철_노선_구간_등록_요청(신분당선.getId(), new SectionRequest(논현역.getId(), 신논현역.getId(), 5L));
 
         //then
+        LineResponse 신분당선_조회_응답 = 지하철_노선_조회_요청(신분당선.getId());
+        assertThat(신분당선_조회_응답.getStations()).contains(신논현역);
     }
 
     /**

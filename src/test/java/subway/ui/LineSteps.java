@@ -2,6 +2,7 @@ package subway.ui;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import subway.domain.Station;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -14,6 +15,11 @@ public class LineSteps {
     public static ExtractableResponse<Response> 지하철_노선_생성_요청(final String name) {
         LineCreateRequest request = createLineCreateRequest(name);
         return post("/lines", request);
+    }
+
+    public static LineResponse 지하철_노선_생성_요청_Response_반환(String name, Long upStationId, Long downStationId) {
+        LineCreateRequest request = new LineCreateRequest(name, "bg-red-600", upStationId, downStationId, 10L);
+        return post("/lines", request).as(LineResponse.class);
     }
 
     public static LineResponse 지하철_노선_생성_요청_Response_반환(final String name) {
@@ -39,6 +45,10 @@ public class LineSteps {
 
     public static ExtractableResponse<Response> 지하철_노선_삭제_요청(Long lineId) {
         return delete("/lines/{id}", lineId);
+    }
+
+    public static ExtractableResponse<Response> 지하철_노선_구간_등록_요청(Long lineId, SectionRequest request) {
+        return post("/lines/{id}/sections", lineId, request);
     }
 
     private static LineCreateRequest createLineCreateRequest(String name) {
