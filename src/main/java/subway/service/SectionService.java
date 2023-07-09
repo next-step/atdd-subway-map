@@ -13,8 +13,6 @@ import subway.model.station.Station;
 import subway.model.station.StationRepository;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,28 +35,30 @@ public class SectionService {
         Line line = lineRepository.findById(lineId)
                                   .orElseThrow(() -> new IllegalArgumentException("line id doesn't exist"));
 
+        Section newSection = makeSection(sectionSaveRequest, line);
+
+        if (!line.isAddableSection(newSection)) {
+            throw new IllegalArgumentException("추가할 수 없는 구간입니다.");
+        }
+
+        sectionRepository.save(newSection);
+        line.addSection(newSection);
+
+        return SectionResponse.from(newSection);
+    }
+
+    private Section makeSection(SectionSaveRequest sectionSaveRequest, Line line) {
         Station upStation = stationRepository.findById(sectionSaveRequest.getUpStationId())
                                              .orElseThrow(() -> new IllegalArgumentException("station id doesn't exist"));
         Station downStation = stationRepository.findById(sectionSaveRequest.getDownStationId())
                                                .orElseThrow(() -> new IllegalArgumentException("station id doesn't exist"));
 
-        if (!Objects.equals(line.getLastStation().getId(), upStation.getId())) {
-            throw new IllegalArgumentException("라인의 하행지하철역이 구간의 상행역이 아닙니다.");
-        }
-
-        Section newSection = Section.builder()
-                                    .upStation(upStation)
-                                    .downStation(downStation)
-                                    .distance(sectionSaveRequest.getDistance())
-                                    .line(line)
-                                    .build();
-
-
-        line.getSections().add(newSection);
-        lineRepository.save(line);
-        Section savedSection = sectionRepository.save(newSection);
-
-        return SectionResponse.from(savedSection);
+        return Section.builder()
+                      .upStation(upStation)
+                      .downStation(downStation)
+                      .distance(sectionSaveRequest.getDistance())
+                      .line(line)
+                      .build();
     }
 
     public List<SectionResponse> findSectionsByLine(Long lineId) {
@@ -74,21 +74,25 @@ public class SectionService {
     @Transactional
     public void deleteSectionByStationId(Long lineId, Long stationId) {
 
-        Station targetStation = stationRepository.findById(stationId).orElseThrow(() -> new IllegalArgumentException("station id doesn't exist"));
+        Station targetStation = stationRepository.findById(stationId)
+                                                 .orElseThrow(() -> new IllegalArgumentException("station id doesn't exist"));
 
-        Section targetSection = sectionRepository.findByDownStation(targetStation).orElseThrow(() -> new IllegalArgumentException("section doesn't exist"));
+        Section targetSection = sectionRepository.findByDownStation(targetStation)
+                                                 .orElseThrow(() -> new IllegalArgumentException("section doesn't exist"));
 
         Line line = lineRepository.findById(lineId)
                                   .orElseThrow(() -> new IllegalArgumentException("line id doesn't exist"));
 
-        line.getSections().remove(targetSection);
+        line.getSections()
+            .remove(targetSection);
         lineRepository.save(line);
 
         sectionRepository.deleteById(targetSection.getId());
     }
 
     public SectionResponse findById(Long sectionId) {
-        Section section = sectionRepository.findById(sectionId).orElseThrow(() -> new IllegalArgumentException("section doesn't exist"));
+        Section section = sectionRepository.findById(sectionId)
+                                           .orElseThrow(() -> new IllegalArgumentException("section doesn't exist"));
         return SectionResponse.from(section);
     }
 }

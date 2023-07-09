@@ -1,13 +1,18 @@
 package subway.model.line;
 
 import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 import subway.model.section.Section;
 import subway.model.station.Station;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
+
+@Slf4j
 @Entity
 @Getter
 @Builder
@@ -49,8 +54,35 @@ public class Line {
         return stations;
     }
 
-    public Station getLastStation() {
+    private Station getLastStation() {
+
+        if (sections.isEmpty()) {
+            throw new IllegalStateException("Line에 포함된 section이 없습니다.");
+        }
+
         return this.sections.get(this.sections.size() - 1)
                             .getDownStation();
+    }
+
+    public void addSection(Section newSection) {
+        ArrayList<Section> sections = new ArrayList<>(this.sections);
+        sections.add(newSection);
+
+        this.sections = sections;
+    }
+
+    public boolean isAddableSection(Section newSection) {
+
+        if (!Objects.equals(getLastStation().getId(), newSection.getUpStation().getId())) {
+            log.warn("상행역이 노선의 하행종착역과 다릅니다. upStationId: {}", newSection.getUpStation().getId());
+            return false;
+        }
+
+        if (getStations().stream().anyMatch(it -> Objects.equals(it.getId(), newSection.getDownStation().getId()))) {
+            log.warn("하행역이 이미 노선에 포함된 지하철역입니다. stationId: {}", newSection.getDownStation().getId());
+            return false;
+        }
+
+        return true;
     }
 }

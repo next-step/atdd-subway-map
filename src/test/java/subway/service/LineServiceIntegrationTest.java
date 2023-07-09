@@ -1,5 +1,6 @@
 package subway.service;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -27,27 +28,38 @@ class LineServiceIntegrationTest {
     @Transactional
     void saveLine() {
 
-        Station upStation = stationRepository.save(Station.builder()
-                                                      .name("정거장 A")
-                                                      .build());
-        Station downStations = stationRepository.save(Station.builder()
-                                                      .name("정거장 B")
-                                                      .build());
+        // given
+        Station upStation = Station_생성("정거장 A");
+        Station downStation = Station_생성("정거장 B");
 
+        // when
         LineResponse lineResponse = lineService.saveLine(LineSaveRequest.builder()
                                                                         .name("테스트 라인")
                                                                         .color("color")
                                                                         .distance(1L)
                                                                         .upStationId(upStation.getId())
-                                                                        .downStationId(downStations.getId())
+                                                                        .downStationId(downStation.getId())
                                                                         .build());
+
+        // then
+        생성된_LINE_조회(lineResponse);
+    }
+
+    private void 생성된_LINE_조회(LineResponse lineResponse, String... stationNames) {
 
         Line line = lineRepository.findById(lineResponse.getId())
                                   .orElseThrow(() -> new RuntimeException("no saved line"));
 
-        System.out.println(line.getName());
-        System.out.println(line.getStations().get(0).getName());
-        System.out.println(line.getStations().get(1).getName());
-        System.out.println(line.getSections().get(0).getId());
+        for (int i = 0; i < stationNames.length; i++) {
+            Assertions.assertThat(line.getStations()
+                                      .get(i)
+                                      .getName()).isEqualTo(stationNames[i]);
+        }
+    }
+
+    private Station Station_생성(String stationName) {
+        return stationRepository.save(Station.builder()
+                                             .name(stationName)
+                                             .build());
     }
 }
