@@ -8,7 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import subway.line.domain.Line;
 import subway.line.repository.LineRepository;
-import subway.line.service.LineService;
+import subway.line.service.LineManageService;
+import subway.line.service.LineReadService;
 import subway.section.domain.Section;
 import subway.section.model.SectionCreateRequest;
 import subway.station.service.StationService;
@@ -18,12 +19,12 @@ import subway.station.service.StationService;
 @RequiredArgsConstructor
 public class SectionCreateService {
     private final StationService stationService;
-    private final LineService lineService;
-    private final LineRepository lineRepository;
+    private final LineManageService lineManageService;
+    private final LineReadService lineReadService;
 
     @Transactional
     public Section create(Long lineId, SectionCreateRequest request) {
-        Line line = lineService.getLine(lineId);
+        Line line = lineReadService.getLine(lineId);
 
         Section section = Section.builder()
                                  .downStation(stationService.get(request.getDownStationId()))
@@ -33,7 +34,7 @@ public class SectionCreateService {
 
         line.addSection(section);
 
-        Line createdLine = lineRepository.save(line);
+        Line createdLine = lineManageService.save(line);
 
         return createdLine.getSection(request.getDownStationId(), request.getUpStationId());
     }

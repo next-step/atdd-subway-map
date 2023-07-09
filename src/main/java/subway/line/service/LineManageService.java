@@ -1,8 +1,6 @@
 package subway.line.service;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
 
@@ -11,7 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import subway.line.domain.Line;
 import subway.line.domain.Sections;
-import subway.line.exception.LineNotFoundException;
 import subway.line.repository.LineRepository;
 import subway.line.view.LineCreateRequest;
 import subway.line.view.LineModifyRequest;
@@ -22,12 +19,13 @@ import subway.station.service.StationService;
 
 @Service
 @RequiredArgsConstructor
-public class LineService {
+public class LineManageService {
     private final StationService stationService;
     private final LineRepository lineRepository;
+    private final LineReadService lineReadService;
 
     @Transactional
-    public LineResponse createStation(LineCreateRequest request) {
+    public LineResponse createLine(LineCreateRequest request) {
         Station upStation = stationService.get(request.getUpStationId());
         Station downStation = stationService.get(request.getDownStationId());
 
@@ -58,23 +56,9 @@ public class LineService {
         return line;
     }
 
-    @Transactional(readOnly = true)
-    public Line getLine(Long id) {
-        return lineRepository.findById(id)
-                             .orElseThrow(LineNotFoundException::new);
-    }
-
-    @Transactional(readOnly = true)
-    public List<LineResponse> getList() {
-        return lineRepository.findAll()
-                             .stream()
-                             .map(LineResponse::from)
-                             .collect(Collectors.toUnmodifiableList());
-    }
-
     @Transactional
     public void modifyLine(Long id, LineModifyRequest request) {
-        Line line = getLine(id);
+        Line line = lineReadService.getLine(id);
 
         line.changeNameAndColor(request.getName(), request.getColor());
 
@@ -84,5 +68,10 @@ public class LineService {
     @Transactional
     public void deleteLine(Long id) {
         lineRepository.deleteById(id);
+    }
+
+    @Transactional
+    public Line save(Line line) {
+        return lineRepository.save(line);
     }
 }

@@ -69,7 +69,7 @@ public class SectionDeleteAcceptanceTest {
                                                                     .extract();
 
                 assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-                assertThat(response.as(ErrorResponse.class).getErrorCode()).isEqualTo(ErrorCode.SECTION_DELETE_FAIL_BY_LAST_STATION_REMOVED);
+                assertThat(response.as(ErrorResponse.class).getErrorCode()).isEqualTo(ErrorCode.SECTION_DELETE_FAIL_BY_LAST_SECTION_CANNOT_DELETED);
             }
         }
     }
@@ -94,7 +94,7 @@ public class SectionDeleteAcceptanceTest {
                                                                     .extract();
 
                 assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-                assertThat(response.as(ErrorResponse.class).getErrorCode()).isEqualTo(ErrorCode.SECTION_DELETE_FAIL_BY_NOT_ALLOWED_STATION);
+                assertThat(response.as(ErrorResponse.class).getErrorCode()).isEqualTo(ErrorCode.ONLY_LAST_DOWNSTATION_CAN_DELETED);
             }
         }
 

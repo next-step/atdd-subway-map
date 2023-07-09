@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import subway.line.service.LineService;
 import subway.section.domain.Section;
 import subway.section.model.SectionCreateRequest;
 import subway.section.model.SectionCreateResponse;
@@ -26,7 +25,6 @@ import subway.section.service.SectionDeleteService;
 @RequiredArgsConstructor
 public class SectionController {
     private final SectionCreateService sectionCreateService;
-    private final LineService lineService;
     private final SectionDeleteService sectionDeleteService;
 
     @PostMapping("/{lineId}/sections")

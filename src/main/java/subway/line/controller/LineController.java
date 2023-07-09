@@ -15,7 +15,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import subway.line.service.LineService;
+import subway.line.service.LineManageService;
+import subway.line.service.LineReadService;
 import subway.line.view.LineCreateRequest;
 import subway.line.view.LineModifyRequest;
 import subway.line.view.LineResponse;
@@ -24,35 +25,36 @@ import subway.line.view.LineResponse;
 @RestController
 @RequiredArgsConstructor
 public class LineController {
-    private final LineService lineService;
+    private final LineManageService lineManageService;
+    private final LineReadService lineReadService;
 
     @PostMapping
     public ResponseEntity<LineResponse> createLines(@RequestBody LineCreateRequest request) {
-        LineResponse lineResponse = lineService.createStation(request);
+        LineResponse lineResponse = lineManageService.createLine(request);
 
         return ResponseEntity.created(URI.create("/lines/" + lineResponse.getId())).body(lineResponse);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<LineResponse> getLine(@PathVariable Long id) {
-        return ResponseEntity.ok(LineResponse.from(lineService.getLine(id)));
+        return ResponseEntity.ok(LineResponse.from(lineReadService.getLine(id)));
     }
 
     @GetMapping
     public ResponseEntity<List<LineResponse>> getLines() {
-        return ResponseEntity.ok(lineService.getList());
+        return ResponseEntity.ok(lineReadService.getList());
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Void> modifyLine(@PathVariable Long id, @RequestBody LineModifyRequest request) {
-        lineService.modifyLine(id, request);
+        lineManageService.modifyLine(id, request);
 
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteLine(@PathVariable Long id) {
-        lineService.deleteLine(id);
+        lineManageService.deleteLine(id);
 
         return ResponseEntity.noContent().build();
     }

@@ -17,6 +17,7 @@ import org.springframework.util.CollectionUtils;
 
 import subway.section.domain.Section;
 import subway.section.exception.InvalidSectionCreateException;
+import subway.section.exception.InvalidSectionDeleteException;
 import subway.section.exception.SectionNotFoundException;
 import subway.support.ErrorCode;
 
@@ -37,17 +38,12 @@ public class Sections {
         return Objects.equals(sections.get(sections.size()-1).getDownStation().getId(), stationId);
     }
 
-    public boolean isLastSection() {
+    public boolean hasOneSection() {
         if (CollectionUtils.isEmpty(this.sections)) {
             return false;
         }
 
         return this.sections.size() == 1;
-    }
-
-    public boolean isLastStation(Long stationId) {
-        return Objects.equals(this.sections.get(0).getUpStation().getId(), stationId) ||
-                Objects.equals(this.sections.get(0).getDownStation().getId(), stationId);
     }
 
     public void appendSection(Section section) {
@@ -63,10 +59,6 @@ public class Sections {
 
     public boolean isEmpty() {
         return this.sections.isEmpty();
-    }
-
-    public boolean isNotEmpty() {
-        return !isEmpty();
     }
 
     public boolean possibleToAddSection(Section section) {
@@ -85,6 +77,22 @@ public class Sections {
         }
 
         return true;
+    }
+
+    public boolean possibleToDeleteSection(Long stationId) {
+        if (hasOneSection()) {
+            throw new InvalidSectionDeleteException(ErrorCode.SECTION_DELETE_FAIL_BY_LAST_SECTION_CANNOT_DELETED);
+        }
+
+        if (!isLastDownStation(stationId)) {
+            throw new InvalidSectionDeleteException(ErrorCode.ONLY_LAST_DOWNSTATION_CAN_DELETED);
+        }
+
+        return true;
+    }
+
+    public void deleteLastSection() {
+        sections.remove(sections.size() -1);
     }
 
     private boolean alreadyRegistered(Long stationId) {

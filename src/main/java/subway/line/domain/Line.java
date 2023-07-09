@@ -17,9 +17,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import subway.section.domain.Section;
-import subway.section.exception.InvalidSectionDeleteException;
 import subway.station.domain.Station;
-import subway.support.ErrorCode;
 
 @Getter
 @Entity
@@ -54,19 +52,6 @@ public class Line {
         this.color = color;
     }
 
-    public boolean isLastStation(Long stationId) {
-        if (!sections.isLastSection()) {
-            return false;
-        }
-
-        return sections.isLastStation(stationId);
-    }
-
-    // TODO:
-    public boolean isLastDownStation(Long stationId) {
-        return sections.isLastDownStation(stationId);
-    }
-
     public void addSection(Section section) {
         if (sections.possibleToAddSection(section)) {
             section.attachToLine(this);
@@ -75,13 +60,8 @@ public class Line {
     }
 
     public void deleteSection(Long stationId) {
-        if (isLastStation(stationId)) {
-
-            throw new InvalidSectionDeleteException(ErrorCode.SECTION_DELETE_FAIL_BY_LAST_STATION_REMOVED);
-        }
-
-        if (!isLastDownStation(stationId)) {
-            throw new InvalidSectionDeleteException(ErrorCode.SECTION_DELETE_FAIL_BY_NOT_ALLOWED_STATION);
+        if (sections.possibleToDeleteSection(stationId)) {
+            sections.deleteLastSection();
         }
     }
 
