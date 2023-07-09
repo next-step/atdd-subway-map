@@ -37,16 +37,21 @@ public class LineService {
 
     public List<LineResponse> findLines() {
         List<Line> lines = lineRepository.findAll();
+        return lines.stream().map(this::createLineResponse).collect(Collectors.toList());
+    }
 
-        return lines.stream().map(line -> {
-            LineStation up = lineStationRepository.findFirstByLineIdOrderBySequence(line.getId());
-            LineStation down = lineStationRepository.findFirstByLineIdOrderBySequenceDesc(line.getId());
-
-            return new LineResponse(line.getId(), line.getName(), line.getColor(), List.of(createStationResponse(up), createStationResponse(down)));
-        }).collect(Collectors.toList());
+    public LineResponse findLine(Long id) {
+        Line line = lineRepository.findById(id).orElseThrow(() -> new RuntimeException("해당 아이디의 지하철 노선이 없습니다."));
+        return createLineResponse(line);
     }
 
     private StationResponse createStationResponse(LineStation lineStation) {
         return new StationResponse(lineStation.getStation().getId(), lineStation.getStation().getName());
+    }
+
+    private LineResponse createLineResponse(Line line) {
+        LineStation up = lineStationRepository.findFirstByLineIdOrderBySequence(line.getId());
+        LineStation down = lineStationRepository.findFirstByLineIdOrderBySequenceDesc(line.getId());
+        return new LineResponse(line.getId(), line.getName(), line.getColor(), List.of(createStationResponse(up), createStationResponse(down)));
     }
 }

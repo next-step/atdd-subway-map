@@ -118,7 +118,7 @@ public class SubwayLineAcceptanceTest {
         assertThat(extract.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(extract.body().jsonPath().getString("name")).isEqualTo(name);
         assertThat(extract.body().jsonPath().getString("color")).isEqualTo(color);
-        assertThat(extract.body().jsonPath().getList("stations").size()).isEqualTo(2);
+        assertThat(extract.body().jsonPath().getList("stationResponseList").size()).isEqualTo(2);
     }
     /**
      *Given 지하철 노선을 생성하고
