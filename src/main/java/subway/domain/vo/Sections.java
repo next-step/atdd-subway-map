@@ -7,6 +7,7 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Predicate;
 
 @Embeddable
 public class Sections {
@@ -46,8 +47,12 @@ public class Sections {
 
     public boolean contains(Station targetStation) {
         return this.sections.stream()
-                .anyMatch(section -> Objects.equals(section.getUpStation(), targetStation)
-                        || Objects.equals(section.getDownStation(), targetStation));
+                .anyMatch(isIncludeInSection(targetStation));
+    }
+
+    private Predicate<Section> isIncludeInSection(Station targetStation) {
+        return section -> Objects.equals(section.getUpStation(), targetStation)
+                || Objects.equals(section.getDownStation(), targetStation);
     }
 
     public Long sumOfDistance() {
