@@ -4,11 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.station.StationRepository;
-import subway.station.StationResponse;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -18,8 +15,8 @@ class LineService {
     private final StationRepository stationRepository;
 
     @Transactional
-    public LineResponse saveLine(CreateLineRequest request) {
-        Line line = lineRepository.save(
+    public Line saveLine(CreateLineRequest request) {
+        return lineRepository.save(
                 Line.builder()
                         .name(request.getName())
                         .color(request.getColor())
@@ -27,19 +24,14 @@ class LineService {
                         .downStation(stationRepository.getReferenceById(request.getDownStationId()))
                         .build()
         );
-
-        return createLineResponse(line);
     }
 
-    public List<LineResponse> findAllLines() {
-        return lineRepository.findAll().stream()
-                .map(this::createLineResponse)
-                .collect(Collectors.toList());
+    public List<Line> findAllLines() {
+        return lineRepository.findAll();
     }
 
-    public LineResponse findLineById(Long id) {
-        Line line = lineRepository.findById(id).orElseThrow(() -> new RuntimeException("Not Exist Line"));
-        return createLineResponse(line);
+    public Line findLineById(Long id) {
+        return lineRepository.findById(id).orElseThrow(() -> new RuntimeException("Not Exist Line"));
     }
 
     @Transactional
@@ -52,16 +44,5 @@ class LineService {
     @Transactional
     public void deleteLineById(Long id) {
         lineRepository.deleteById(id);
-    }
-
-    private LineResponse createLineResponse(Line line) {
-        return new LineResponse(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                Arrays.asList(
-                        new StationResponse(line.getUpStation().getId(), line.getUpStation().getName()),
-                        new StationResponse(line.getDownStation().getId(), line.getDownStation().getName())
-                ));
     }
 }
