@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static subway.RestAssuredWrapper.*;
 
 @DisplayName("지하철역 관련 기능")
-public class StationAcceptanceTest extends AcceptanceTestBase {
+class StationAcceptanceTest extends AcceptanceTestBase {
     private static final int STATION_NAME_MAX_LENGTH = 20;
 
     @DisplayName("지하철역을 생성한다.")
