@@ -1,9 +1,9 @@
-package fixture;
+package fixture.given;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class StationModifyRequestFixture {
+public abstract class StationModifyRequestFixture {
 
     public static final String 지하철역이름 = "지하철역이름";
     public static final String 새로운지하철역이름 = "새로운지하철역이름";

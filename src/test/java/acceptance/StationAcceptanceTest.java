@@ -1,24 +1,26 @@
 package acceptance;
 
-import static api.StationApiRequest.지하철역_리스트_조회;
-import static api.StationApiRequest.지하철역_삭제;
-import static api.StationApiRequest.지하철역_생성_요청;
-import static fixture.StationModifyRequestFixture.강남역;
-import static fixture.StationModifyRequestFixture.또다른지하철역이;
-import static fixture.StationModifyRequestFixture.새로운지하철역이름;
-import static fixture.StationModifyRequestFixture.지하철역이름;
-import static fixture.StationRequestFixture.지하철역_등록_요청_데이터_생성;
-import static org.assertj.core.api.Assertions.assertThat;
+import static fixture.given.StationModifyRequestFixture.강남역;
+import static fixture.given.StationModifyRequestFixture.새로운지하철역이름;
+import static fixture.given.StationModifyRequestFixture.지하철역이름;
+import static fixture.then.ApiStatusFixture.API_삭제_응답코드_검사;
+import static fixture.then.ApiStatusFixture.API_생성_응답코드_검사;
+import static fixture.then.ApiStatusFixture.API_요청성공_응답코드_검사;
+import static fixture.then.StationThenFixture.지하철역_목록_리스트_크기_검사;
+import static fixture.then.StationThenFixture.지하철역_목록_조회_두번째_지하철역_이름_검사;
+import static fixture.then.StationThenFixture.지하철역_목록_조회_첫번째_지하철역_이름_검사;
+import static fixture.then.StationThenFixture.지하철역_목록_조회시_생성한역을_포함하는지_검사;
+import static fixture.then.StationThenFixture.지하철역_목록_조회시_아무런값도_조회되지않음_검사;
+import static fixture.when.StationApiFixture.지하철역_리스트_조회;
+import static fixture.when.StationApiFixture.지하철역_삭제;
+import static fixture.when.StationApiFixture.지하철역_생성_요청;
 
 import config.AcceptanceTestConfig;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
-import subway.service.response.StationResponse;
 
 @DisplayName("지하철역 관련 기능")
 class StationAcceptanceTest extends AcceptanceTestConfig {
@@ -32,17 +34,11 @@ class StationAcceptanceTest extends AcceptanceTestConfig {
     @Test
     void createStation() {
         // when
-        ExtractableResponse<Response> response = 지하철역_생성_요청(지하철역_등록_요청_데이터_생성(강남역));
+        ExtractableResponse<Response> 응답결과 = 지하철역_생성_요청(강남역);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-        // then
-        List<String> stationNames = 지하철역_리스트_조회()
-                .jsonPath()
-                .getList("name", String.class);
-
-        assertThat(stationNames).containsAnyOf(강남역);
+        API_생성_응답코드_검사(응답결과);
+        지하철역_목록_조회시_생성한역을_포함하는지_검사(강남역);
     }
 
     /**
@@ -55,20 +51,18 @@ class StationAcceptanceTest extends AcceptanceTestConfig {
     void showStations() {
 
         //given
-        지하철역_생성_요청(지하철역_등록_요청_데이터_생성(지하철역이름));
-        지하철역_생성_요청(지하철역_등록_요청_데이터_생성(새로운지하철역이름));
-        지하철역_생성_요청(지하철역_등록_요청_데이터_생성(또다른지하철역이));
+        지하철역_생성_요청(지하철역이름);
+        지하철역_생성_요청(새로운지하철역이름);
 
         //when
-        ExtractableResponse<Response> response = 지하철역_리스트_조회();
+        ExtractableResponse<Response> 응답결과 = 지하철역_리스트_조회();
 
         //then
         Assertions.assertAll(
-            () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
-            () -> assertThat(response.jsonPath().getList("", StationResponse.class)).hasSize(3),
-            () -> assertThat(response.jsonPath().getString("[0].name")).isEqualTo(지하철역이름),
-            () -> assertThat(response.jsonPath().getString("[1].name")).isEqualTo(새로운지하철역이름),
-            () -> assertThat(response.jsonPath().getString("[2].name")).isEqualTo(또다른지하철역이)
+            () -> API_요청성공_응답코드_검사(응답결과),
+            () -> 지하철역_목록_리스트_크기_검사(응답결과, 2),
+            () -> 지하철역_목록_조회_첫번째_지하철역_이름_검사(응답결과, 지하철역이름),
+            () -> 지하철역_목록_조회_두번째_지하철역_이름_검사(응답결과, 새로운지하철역이름)
         );
     }
 
@@ -82,18 +76,15 @@ class StationAcceptanceTest extends AcceptanceTestConfig {
     void removeStation() {
 
         //given
-        long 신규생성_지하철역_id = 지하철역_생성_요청(지하철역_등록_요청_데이터_생성(새로운지하철역이름))
+        long 신규생성_지하철역_id = 지하철역_생성_요청(새로운지하철역이름)
                 .jsonPath().getLong("id");
 
         //when
-        ExtractableResponse<Response> response = 지하철역_삭제(신규생성_지하철역_id);
+        ExtractableResponse<Response> 응답결과 = 지하철역_삭제(신규생성_지하철역_id);
 
         //then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-
-        //then
-        ExtractableResponse<Response> stationsList = 지하철역_리스트_조회();
-        assertThat(stationsList.jsonPath().getList("")).isEmpty();
+        API_삭제_응답코드_검사(응답결과);
+        지하철역_목록_조회시_아무런값도_조회되지않음_검사();
 
     }
 }

@@ -1,17 +1,19 @@
-package api;
+package fixture.when;
+
+import static fixture.given.StationRequestFixture.*;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-import java.util.HashMap;
 import java.util.Map;
 
-public class StationApiRequest {
+public abstract class StationApiFixture {
 
-    public static ExtractableResponse<Response> 지하철역_생성_요청(Map<String, String> params) {
+    public static ExtractableResponse<Response> 지하철역_생성_요청(String name) {
+
+        Map<String, String> params = 지하철역_등록_요청_데이터_생성(name);
 
         return RestAssured.given().log().all()
                 .body(params)
