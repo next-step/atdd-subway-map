@@ -54,7 +54,7 @@ git rebase upstream/songteaheon
 - [X] 새로운 구간 제거시 위 조건에 부합하지 않는 경우 에러 처리한다.
 
 - 리뷰 반영
-- [ ] SectionController 메서드 네임 수정
+- [X] SectionController 메서드 네임 수정
 - [ ] SectionController와 LineController 합치기
 - [ ] JPA를 사용하다보니 @NoArgsContructor 대신, 가시성을 protected로 선언하기
 - [ ] Section은 line과 라이프사이클을 함께 하는데, 고아 객체에 대한 처리를 고민해보면 좋을 것 같아요.
