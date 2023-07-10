@@ -61,7 +61,7 @@ class SectionCompositeServiceIntegrationTest {
 
         List<Station> stations = line.getStations();
 
-        assertThat(stations.size()).isEqualTo(stationNames.length);
+        assertThat(stations).hasSize(stationNames.length);
 
         for (int i = 0; i < stationNames.length; i++) {
             assertThat(stations.get(i)

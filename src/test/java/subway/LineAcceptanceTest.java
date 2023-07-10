@@ -56,7 +56,7 @@ public class LineAcceptanceTest {
 
         List<String> names = callApiToGetLines().jsonPath()
                                                 .getList("name", String.class);
-        assertThat(names.size()).isEqualTo(1);
+        assertThat(names).hasSize(1);
         assertThat(names.get(0)).contains(lineName);
     }
 
@@ -83,7 +83,7 @@ public class LineAcceptanceTest {
 
         List<String> names = linesResponse.jsonPath()
                                           .getList("name", String.class); // 2개의 노선을 조회할 수 있다.
-        assertThat(names.size()).isEqualTo(2);
+        assertThat(names).hasSize(2);
         assertThat(names).contains(lineName1, lineName2);
     }
 
@@ -172,7 +172,7 @@ public class LineAcceptanceTest {
         // then
         assertThat(deletionResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
         ExtractableResponse<Response> lineResponse = callApiToGetSingleLine(lineId);
-        assertThat(lineResponse.jsonPath().getList("id", Long.class).size()).isEqualTo(0);
+        assertThat(lineResponse.jsonPath().getList("id", Long.class)).hasSize(0);
     }
 
     private static long saveStationAndGetId(String stationName) {

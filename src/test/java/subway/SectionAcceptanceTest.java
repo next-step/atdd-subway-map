@@ -240,7 +240,7 @@ public class SectionAcceptanceTest {
         List<StationResponse> stations = LineApiHelper.callApiToGetSingleLine(lineId)
                                                       .jsonPath()
                                                       .getList("stations", StationResponse.class);
-        assertThat(stations.size()).isEqualTo(expectedStationIds.length);
+        assertThat(stations).hasSize(expectedStationIds.length);
         assertThat(stations.stream()
                            .map(StationResponse::getId)
                            .collect(Collectors.toList())).contains(expectedStationIds);

@@ -62,7 +62,7 @@ public class StationAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         List<String> stationNames = response.jsonPath().getList("name", String.class);
-        assertThat(stationNames.size()).isEqualTo(2);
+        assertThat(stationNames).hasSize(2);
         assertThat(stationNames).containsAll(List.of(stationName1, stationName2));
     }
 
@@ -90,7 +90,7 @@ public class StationAcceptanceTest {
         assertThat(deletionResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         List<Long> ids = callApiToGetStations().jsonPath().getList("id", Long.class);
-        assertThat(ids.size()).isEqualTo(1);
+        assertThat(ids).hasSize(1);
         assertThat(ids).doesNotContain(deletionTargetId);
     }
 }
