@@ -18,26 +18,26 @@ public class SectionController {
     }
 
     @GetMapping(value = "/lines/{lineId}/sections")
-    public ResponseEntity<List<SectionResponse>> showSections(@PathVariable("lineId") Long lineId) {
+    public ResponseEntity<List<SectionResponse>> getSections(@PathVariable("lineId") Long lineId) {
         return ResponseEntity.ok()
                              .body(sectionCompositeService.findSectionsByLine(lineId));
     }
 
     @GetMapping("/sections/{sectionId}")
-    public ResponseEntity<SectionResponse> getLine(@PathVariable("sectionId") Long sectionId) {
+    public ResponseEntity<SectionResponse> getSection(@PathVariable("sectionId") Long sectionId) {
         return ResponseEntity.ok()
                              .body(sectionCompositeService.findById(sectionId));
     }
 
     @PostMapping("/lines/{lineId}/sections")
-    public ResponseEntity<SectionResponse> createLine(@PathVariable("lineId") Long lineId, @RequestBody SectionSaveRequest sectionSaveRequest) {
+    public ResponseEntity<SectionResponse> createSection(@PathVariable("lineId") Long lineId, @RequestBody SectionSaveRequest sectionSaveRequest) {
         SectionResponse section = sectionCompositeService.saveSection(lineId, sectionSaveRequest);
         return ResponseEntity.created(URI.create("/sections/" + section.getId()))
                              .body(section);
     }
 
     @DeleteMapping("/lines/{lineId}/sections")
-    public ResponseEntity<Void> deleteLine(@PathVariable("lineId") Long lineId, @RequestParam("stationId") Long stationId) {
+    public ResponseEntity<Void> deleteSection(@PathVariable("lineId") Long lineId, @RequestParam("stationId") Long stationId) {
         sectionCompositeService.deleteSectionByStationId(lineId, stationId);
         return ResponseEntity.noContent()
                              .build();
