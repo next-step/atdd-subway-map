@@ -33,6 +33,15 @@ public class Section {
     protected Section() {
     }
 
+    public Section(Station upStation, Station downStation, Integer distance) {
+        validateStation(upStation, downStation);
+        validateDistance(distance);
+
+        this.upStation = upStation;
+        this.downStation = downStation;
+        this.distance = distance;
+    }
+
     public Section(Line line, Station upStation, Station downStation, Integer distance) {
         validateStation(upStation, downStation);
         validateDistance(distance);
@@ -91,5 +100,9 @@ public class Section {
 
     public boolean hasStation(Station downStation) {
         return downStation.equals(upStation) || downStation.equals(this.downStation);
+    }
+
+    public void assignLine(Line line) {
+        this.line = line;
     }
 }

@@ -34,12 +34,11 @@ public class LineService {
         Station upStation = getStation(lineCreateRequest.getUpStationId());
         Station downStation = getStation(lineCreateRequest.getDownStationId());
 
-        Line line = new Line(lineCreateRequest.getName(), lineCreateRequest.getColor());
-        lineRepository.save(line);
-
-        //TODO: 지하철 노선을 처음 등록할 때, 굳이 Section이 한 개 등록될 필요가 있을까?
-        Section section = new Section(line, upStation, downStation, lineCreateRequest.getDistance());
+        Section section = new Section(upStation, downStation, lineCreateRequest.getDistance());
         sectionRepository.save(section);
+
+        Line line = new Line(lineCreateRequest.getName(), lineCreateRequest.getColor(), section);
+        lineRepository.save(line);
 
         return LineResponse.of(line);
     }
