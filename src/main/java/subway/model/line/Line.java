@@ -73,12 +73,12 @@ public class Line {
 
     public boolean isAddableSection(Section newSection) {
 
-        if (!Objects.equals(getLastStation().getId(), newSection.getUpStation().getId())) {
+        if (!Objects.equals(getLastStation(), newSection.getUpStation())) {
             log.warn("상행역이 노선의 하행종착역과 다릅니다. upStationId: {}", newSection.getUpStation().getId());
             return false;
         }
 
-        if (getStations().stream().anyMatch(it -> Objects.equals(it.getId(), newSection.getDownStation().getId()))) {
+        if (getStations().stream().anyMatch(it -> Objects.equals(it, newSection.getDownStation()))) {
             log.warn("하행역이 이미 노선에 포함된 지하철역입니다. stationId: {}", newSection.getDownStation().getId());
             return false;
         }
