@@ -11,7 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+
 
 public class LineRequestFixture {
 
@@ -86,4 +87,20 @@ public class LineRequestFixture {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
+    public static void 지하철_구간_등록(Long lineId, Long upStationId, Long downStationId, Long distance) {
+        Map<String, String> params = new HashMap<>();
+        params.put("upStationId", upStationId.toString());
+        params.put("downStationId", downStationId.toString());
+        params.put("distance", distance.toString());
+        ExtractableResponse<Response> response =
+                RestAssured.given().log().all()
+                        .pathParam("id", lineId)
+                        .body(params)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .when().post("/lines/{id}/sections")
+                        .then().log().all()
+                        .extract();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+    }
 }

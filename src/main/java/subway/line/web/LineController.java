@@ -41,4 +41,11 @@ public class LineController {
     void deleteLine(@PathVariable Long id) {
         lineService.deleteLine(id);
     }
+
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping("/lines/{id}/sections")
+    void addSection(@PathVariable Long id, @RequestBody AddSectionRequest request) {
+        lineService.addSection(id, request);
+    }
+
 }
