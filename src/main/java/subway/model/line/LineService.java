@@ -17,6 +17,7 @@ public class LineService {
         this.lineRepository = lineRepository;
     }
 
+    @Transactional
     public Line save(Line newLine) {
         return lineRepository.save(newLine);
     }
@@ -30,6 +31,7 @@ public class LineService {
         return lineRepository.findAll();
     }
 
+    @Transactional
     public void deleteById(Long lineId) {
         lineRepository.deleteById(lineId);
     }

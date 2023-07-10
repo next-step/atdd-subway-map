@@ -16,6 +16,7 @@ public class StationService {
         this.stationRepository = stationRepository;
     }
 
+    @Transactional
     public Station save(Station newStation) {
         return stationRepository.save(newStation);
     }
@@ -25,6 +26,7 @@ public class StationService {
                                 .orElseThrow(() -> new IllegalArgumentException("station id doesn't exist"));
     }
 
+    @Transactional
     public void deleteById(Long stationId) {
         stationRepository.deleteById(stationId);
     }

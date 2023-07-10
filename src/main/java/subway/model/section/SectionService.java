@@ -17,15 +17,12 @@ public class SectionService {
         this.sectionRepository = sectionRepository;
     }
 
+    @Transactional
     public Section save(Section newSection) {
         return sectionRepository.save(newSection);
     }
 
-    public Section findById(Long lineId) {
-        return sectionRepository.findById(lineId)
-                                .orElseThrow(() -> new IllegalArgumentException("section id doesn't exist"));
-    }
-
+    @Transactional
     public void deleteById(Long sectionId) {
         sectionRepository.deleteById(sectionId);
     }
