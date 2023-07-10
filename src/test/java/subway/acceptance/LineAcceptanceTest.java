@@ -3,7 +3,6 @@ package subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -202,6 +201,38 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고 새로운 구간이 등록 되었을 때
+     * When 마지막 구간을 삭제하면
+     * Then 지하철 노선 목록 조회 시 삭제한 노선을 찾을 수 없다
+     *
+     */
+    @Test
+    void removeSection() {
+        // given
+        Long 신분당선 = 지하철_노선_생성("신분당선", "강남역", "양재역", "양재시민의숲역");
+
+        // when
+        ExtractableResponse<Response> response =
+                RestAssured.given().log().all()
+                        .pathParam("id", 신분당선)
+                        .queryParam("sectionId", 2)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .when().delete("/lines/{id}/sections")
+                        .then().log().all()
+                        .extract();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        // then
+        List<String> lineNames = 지하철_노선_목록_조회().stream()
+                .map(LineResponse::getStations)
+                .flatMap(Collection::stream)
+                .map(StationResponse::getName)
+                .collect(Collectors.toList());
+        assertThat(lineNames).doesNotContain("양재시민의숲역");
     }
 
 }
