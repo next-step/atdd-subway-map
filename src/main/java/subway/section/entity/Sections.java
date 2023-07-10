@@ -26,6 +26,8 @@ public class Sections {
     @CollectionTable(name = "section", joinColumns = @JoinColumn(name = "line_id"))
     private List<Section> sections = new ArrayList<>();
 
+    private Integer totalDistance;
+
     public void addSection(Section section) {
         if (!getLastStation().equals(section.getUpStation())) {
             throw new InvalidLineSectionException(ErrorCode.INVALID_UP_STATION);
@@ -35,15 +37,17 @@ public class Sections {
             throw new InvalidLineSectionException(ErrorCode.ALREADY_REGISTERED_STATION);
         }
 
-        sections.add(section);
+        this.sections.add(section);
+        this.totalDistance += section.getDistance();
     }
 
     public void deleteSectionByStationId(Long stationId) {
-        if (!getAllStations()
+        List<Long> allStationIds = getAllStations()
                 .stream()
                 .map(Station::getId)
-                .collect(Collectors.toList())
-                .contains(stationId)) {
+                .collect(Collectors.toList());
+
+        if (!allStationIds.contains(stationId)) {
             throw new InvalidLineSectionException(ErrorCode.UNREGISTERED_STATION);
         }
 
@@ -56,7 +60,14 @@ public class Sections {
         }
 
         this.sections = sections.stream()
-                .filter(section -> !section.getDownStation().getId().equals(stationId))
+                .filter(section -> {
+                    boolean isDeleteTarget = section.getDownStation().getId().equals(stationId);
+                    if (isDeleteTarget) {
+                        this.totalDistance -= section.getDistance();
+                    }
+
+                    return !isDeleteTarget;
+                })
                 .collect(Collectors.toList());
     }
 

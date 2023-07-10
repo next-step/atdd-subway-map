@@ -1,16 +1,13 @@
 package subway.line.entity;
 
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import subway.section.entity.Section;
 import subway.section.entity.Sections;
 import subway.station.entity.Station;
 
 import javax.persistence.*;
 import java.util.Collections;
-import java.util.LinkedList;
+
 
 @Entity
 @Getter
@@ -41,14 +38,12 @@ public class Line {
         this.name = name;
         this.color = color;
         this.sections = new Sections(
-                new LinkedList<>(Collections.singletonList(
-                        Section.builder()
-                                .upStation(upStation)
-                                .downStation(downStation)
-                                .distance(distance)
-                                .build()
-                        )
-                )
+                Collections.singletonList(Section.builder()
+                        .upStation(upStation)
+                        .downStation(downStation)
+                        .distance(distance)
+                        .build()),
+                distance
         );
     }
 
