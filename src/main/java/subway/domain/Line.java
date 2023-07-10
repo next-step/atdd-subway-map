@@ -10,7 +10,7 @@ import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
-public class SubwayLine {
+public class Line {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,10 +28,10 @@ public class SubwayLine {
     @Embedded
     private Sections sections = new Sections();
 
-    protected SubwayLine() {
+    protected Line() {
     }
 
-    private SubwayLine(String name, String color, Station upStation, Station downStation, Long distance) {
+    private Line(String name, String color, Station upStation, Station downStation, Long distance) {
         this.name = name;
         this.color = color;
         this.sections.add(Section.of(upStation, downStation, distance));
@@ -118,8 +118,8 @@ public class SubwayLine {
             return this;
         }
 
-        public SubwayLine build() {
-            return new SubwayLine(this.name, this.color, upStation, downStation, distance);
+        public Line build() {
+            return new Line(this.name, this.color, upStation, downStation, distance);
         }
 
 
@@ -146,7 +146,7 @@ public class SubwayLine {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        SubwayLine that = (SubwayLine) o;
+        Line that = (Line) o;
         return id.equals(that.id);
     }
 

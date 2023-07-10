@@ -2,7 +2,7 @@ package subway.controller.resonse;
 
 import java.util.List;
 
-public class SubwayLineResponse {
+public class LineResponse {
 
     private long id;
     private String name;
@@ -10,10 +10,10 @@ public class SubwayLineResponse {
     private List<StationResponse> stations;
     private long distance;
 
-    private SubwayLineResponse() {
+    private LineResponse() {
     }
 
-    public SubwayLineResponse(long id, String name, String color, List<StationResponse> stations, long distance) {
+    public LineResponse(long id, String name, String color, List<StationResponse> stations, long distance) {
         this.id = id;
         this.name = name;
         this.color = color;

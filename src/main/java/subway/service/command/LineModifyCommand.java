@@ -1,6 +1,6 @@
 package subway.service.command;
 
-public interface SubwayLineModifyCommand {
+public interface LineModifyCommand {
     String getName();
 
     String getColor();

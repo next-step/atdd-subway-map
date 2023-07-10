@@ -4,8 +4,8 @@ import io.restassured.response.ValidatableResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
+import subway.controller.resonse.LineResponse;
 import subway.controller.resonse.StationResponse;
-import subway.controller.resonse.SubwayLineResponse;
 import subway.marker.AcceptanceTest;
 
 import java.util.HashMap;
@@ -17,7 +17,7 @@ import static subway.utils.AcceptanceTestUtils.*;
 
 @DisplayName("지하철 노선 관련 기능")
 @AcceptanceTest
-class SubwayLineAcceptanceTest {
+class LineAcceptanceTest {
 
     private static final String STATIONS_RESOURCE_URL = "/stations";
     private static final String LINES_RESOURCE_URL = "/lines";
@@ -49,12 +49,12 @@ class SubwayLineAcceptanceTest {
         int distance = 10;
 
         //when
-        ValidatableResponse subwayLineCratedResponse = createSubwayLines(lineName, color, upStationId, downStationId, distance);
+        ValidatableResponse lineCratedResponse = createLines(lineName, color, upStationId, downStationId, distance);
 
         //then
-        verifyResponseStatus(subwayLineCratedResponse, HttpStatus.CREATED);
+        verifyResponseStatus(lineCratedResponse, HttpStatus.CREATED);
 
-        subwayLineCratedResponse
+        lineCratedResponse
                 .body("name", equalTo(lineName))
                 .body("color", equalTo(color))
                 .body("stations", hasSize(2))
@@ -63,10 +63,10 @@ class SubwayLineAcceptanceTest {
                 .body("stations[1].id", equalTo(downStationId))
                 .body("stations[1].name", equalTo(downStationName));
 
-        ValidatableResponse foundSubwayLineResponse = getResource(LINES_RESOURCE_URL);
-        verifyResponseStatus(foundSubwayLineResponse, HttpStatus.OK);
+        ValidatableResponse foundLineResponse = getResource(LINES_RESOURCE_URL);
+        verifyResponseStatus(foundLineResponse, HttpStatus.OK);
 
-        foundSubwayLineResponse
+        foundLineResponse
                 .body("", hasSize(1))
                 .body("[0].name", equalTo(lineName))
                 .body("[0].color", equalTo(color))
@@ -110,16 +110,16 @@ class SubwayLineAcceptanceTest {
 
         int distance = 10;
 
-        createSubwayLines(firstLineName, firstColor, firstUpStationId, firstDownStationId, distance);
-        createSubwayLines(secondLineName, secondColor, secondUpStationId, secondDownStationId, distance);
+        createLines(firstLineName, firstColor, firstUpStationId, firstDownStationId, distance);
+        createLines(secondLineName, secondColor, secondUpStationId, secondDownStationId, distance);
 
         //when
-        ValidatableResponse foundSubwayLineResponse = getResource(LINES_RESOURCE_URL);
+        ValidatableResponse foundLineResponse = getResource(LINES_RESOURCE_URL);
 
         //then
-        verifyResponseStatus(foundSubwayLineResponse, HttpStatus.OK);
+        verifyResponseStatus(foundLineResponse, HttpStatus.OK);
 
-        foundSubwayLineResponse
+        foundLineResponse
                 .body("", hasSize(2))
                 .body("[0].name", equalTo(firstLineName))
                 .body("[0].color", equalTo(firstColor))
@@ -160,15 +160,15 @@ class SubwayLineAcceptanceTest {
 
         int distance = 10;
 
-        ValidatableResponse subwayLineCratedResponse = createSubwayLines(lineName, color, upStationId, downStationId, distance);
+        ValidatableResponse lineCratedResponse = createLines(lineName, color, upStationId, downStationId, distance);
 
         //when
-        ValidatableResponse foundSubwayLineResponse = getResource(getLocation(subwayLineCratedResponse));
+        ValidatableResponse foundLineResponse = getResource(getLocation(lineCratedResponse));
 
         //then
-        verifyResponseStatus(foundSubwayLineResponse, HttpStatus.OK);
+        verifyResponseStatus(foundLineResponse, HttpStatus.OK);
 
-        foundSubwayLineResponse
+        foundLineResponse
                 .body("name", equalTo(lineName))
                 .body("color", equalTo(color))
                 .body("stations", hasSize(2))
@@ -204,18 +204,18 @@ class SubwayLineAcceptanceTest {
         String newLineName = "바뀐 분당선";
         String newColor = "bg-green-600";
 
-        ValidatableResponse subwayLineCratedResponse = createSubwayLines(lineName, color, upStationId, downStationId, distance);
+        ValidatableResponse lineCratedResponse = createLines(lineName, color, upStationId, downStationId, distance);
 
         //when
-        ValidatableResponse modifiedSubwayLineResponse = modifySubwayLine(newLineName, newColor, getLocation(subwayLineCratedResponse));
+        ValidatableResponse modifiedLineResponse = modifyLine(newLineName, newColor, getLocation(lineCratedResponse));
 
         //then
-        verifyResponseStatus(modifiedSubwayLineResponse, HttpStatus.OK);
+        verifyResponseStatus(modifiedLineResponse, HttpStatus.OK);
 
-        ValidatableResponse foundSubwayLineResponse = getResource(getLocation(subwayLineCratedResponse));
-        verifyResponseStatus(foundSubwayLineResponse, HttpStatus.OK);
+        ValidatableResponse foundLineResponse = getResource(getLocation(lineCratedResponse));
+        verifyResponseStatus(foundLineResponse, HttpStatus.OK);
 
-        foundSubwayLineResponse
+        foundLineResponse
                 .body("name", equalTo(newLineName))
                 .body("color", equalTo(newColor))
                 .body("stations", hasSize(2))
@@ -248,16 +248,16 @@ class SubwayLineAcceptanceTest {
 
         int distance = 10;
 
-        ValidatableResponse subwayLineCratedResponse = createSubwayLines(lineName, color, upStationId, downStationId, distance);
+        ValidatableResponse lineCratedResponse = createLines(lineName, color, upStationId, downStationId, distance);
 
         //when
-        ValidatableResponse deletedSubwayLineResponse = deleteResource(getLocation(subwayLineCratedResponse));
+        ValidatableResponse deletedLineResponse = deleteResource(getLocation(lineCratedResponse));
 
         //then
-        verifyResponseStatus(deletedSubwayLineResponse, HttpStatus.NO_CONTENT);
+        verifyResponseStatus(deletedLineResponse, HttpStatus.NO_CONTENT);
 
-        ValidatableResponse foundSubwayLineResponse = getResource(getLocation(subwayLineCratedResponse));
-        verifyResponseStatus(foundSubwayLineResponse, HttpStatus.NOT_FOUND);
+        ValidatableResponse foundLineResponse = getResource(getLocation(lineCratedResponse));
+        verifyResponseStatus(foundLineResponse, HttpStatus.NOT_FOUND);
     }
 
 
@@ -284,18 +284,18 @@ class SubwayLineAcceptanceTest {
 
         int distance = 10;
 
-        ValidatableResponse subwayLineCratedResponse = createSubwayLines(lineName, color, upStationId, downStationId, distance);
-        long createdLineId = subwayLineCratedResponse.extract().as(SubwayLineResponse.class).getId();
+        ValidatableResponse lineCratedResponse = createLines(lineName, color, upStationId, downStationId, distance);
+        long createdLineId = lineCratedResponse.extract().as(LineResponse.class).getId();
 
         int sectionDownStationId = 3;
         String sectionDownStationName = "길음역";
         createStation(sectionDownStationName);
 
         //when
-        ValidatableResponse subwayLineSectionCreatedResponse = createSubwayLineSection(createdLineId, sectionDownStationId, downStationId, distance);
+        ValidatableResponse sectionCreatedResponse = createSection(createdLineId, sectionDownStationId, downStationId, distance);
 
         //then
-        verifyResponseStatus(subwayLineSectionCreatedResponse, HttpStatus.BAD_REQUEST);
+        verifyResponseStatus(sectionCreatedResponse, HttpStatus.BAD_REQUEST);
     }
 
     /**
@@ -321,14 +321,14 @@ class SubwayLineAcceptanceTest {
 
         int distance = 10;
 
-        ValidatableResponse subwayLineCratedResponse = createSubwayLines(lineName, color, upStationId, downStationId, distance);
-        long createdLineId = subwayLineCratedResponse.extract().as(SubwayLineResponse.class).getId();
+        ValidatableResponse lineCratedResponse = createLines(lineName, color, upStationId, downStationId, distance);
+        long createdLineId = lineCratedResponse.extract().as(LineResponse.class).getId();
 
         //when
-        ValidatableResponse subwayLineSectionCreatedResponse = createSubwayLineSection(createdLineId, downStationId, upStationId, distance);
+        ValidatableResponse sectionCreatedResponse = createSection(createdLineId, downStationId, upStationId, distance);
 
         //then
-        verifyResponseStatus(subwayLineSectionCreatedResponse, HttpStatus.BAD_REQUEST);
+        verifyResponseStatus(sectionCreatedResponse, HttpStatus.BAD_REQUEST);
     }
 
 
@@ -356,8 +356,8 @@ class SubwayLineAcceptanceTest {
 
         int distance = 10;
 
-        ValidatableResponse subwayLineCratedResponse = createSubwayLines(lineName, color, upStationId, downStationId, distance);
-        long createdLineId = subwayLineCratedResponse.extract().as(SubwayLineResponse.class).getId();
+        ValidatableResponse lineCratedResponse = createLines(lineName, color, upStationId, downStationId, distance);
+        long createdLineId = lineCratedResponse.extract().as(LineResponse.class).getId();
 
         int sectionDownStationId = 3;
         String sectionDownStationName = "길음역";
@@ -365,15 +365,15 @@ class SubwayLineAcceptanceTest {
         int sectionDistance = 3;
 
         //when
-        ValidatableResponse subwayLineSectionCreatedResponse = createSubwayLineSection(createdLineId, downStationId, sectionDownStationId, sectionDistance);
+        ValidatableResponse sectionCreatedResponse = createSection(createdLineId, downStationId, sectionDownStationId, sectionDistance);
 
         //then
-        verifyResponseStatus(subwayLineSectionCreatedResponse, HttpStatus.CREATED);
+        verifyResponseStatus(sectionCreatedResponse, HttpStatus.CREATED);
 
-        ValidatableResponse createdSubwayLineSectionResponse = getResource(getLocation(subwayLineCratedResponse));
-        verifyResponseStatus(createdSubwayLineSectionResponse, HttpStatus.OK);
+        ValidatableResponse createdSectionResponse = getResource(getLocation(lineCratedResponse));
+        verifyResponseStatus(createdSectionResponse, HttpStatus.OK);
 
-        createdSubwayLineSectionResponse
+        createdSectionResponse
                 .body("name", equalTo(lineName))
                 .body("color", equalTo(color))
                 .body("stations", hasSize(2))
@@ -408,21 +408,21 @@ class SubwayLineAcceptanceTest {
 
         int distance = 10;
 
-        ValidatableResponse subwayLineCratedResponse = createSubwayLines(lineName, color, upStationId, downStationId, distance);
-        long createdLineId = subwayLineCratedResponse.extract().as(SubwayLineResponse.class).getId();
+        ValidatableResponse lineCratedResponse = createLines(lineName, color, upStationId, downStationId, distance);
+        long createdLineId = lineCratedResponse.extract().as(LineResponse.class).getId();
 
         int sectionDownStationId = 3;
         String sectionDownStationName = "길음역";
         createStation(sectionDownStationName);
         int sectionDistance = 3;
 
-        createSubwayLineSection(createdLineId, downStationId, sectionDownStationId, sectionDistance);
+        createSection(createdLineId, downStationId, sectionDownStationId, sectionDistance);
 
         //when
-        ValidatableResponse subwayLineSectionDeletedResponse = deleteResource(getLocation(subwayLineCratedResponse) + SECTION_RESOURCE_URL + "?stationId=" + stationResponse.getId());
+        ValidatableResponse sectionDeletedResponse = deleteResource(getLocation(lineCratedResponse) + SECTION_RESOURCE_URL + "?stationId=" + stationResponse.getId());
 
         //then
-        verifyResponseStatus(subwayLineSectionDeletedResponse, HttpStatus.BAD_REQUEST);
+        verifyResponseStatus(sectionDeletedResponse, HttpStatus.BAD_REQUEST);
     }
 
     /**
@@ -449,13 +449,13 @@ class SubwayLineAcceptanceTest {
 
         int distance = 10;
 
-        ValidatableResponse subwayLineCratedResponse = createSubwayLines(lineName, color, upStationId, downStationId, distance);
+        ValidatableResponse lineCratedResponse = createLines(lineName, color, upStationId, downStationId, distance);
 
         //when
-        ValidatableResponse subwayLineSectionDeletedResponse = deleteResource(getLocation(subwayLineCratedResponse) + SECTION_RESOURCE_URL + "?stationId=" + stationResponse.getId());
+        ValidatableResponse sectionDeletedResponse = deleteResource(getLocation(lineCratedResponse) + SECTION_RESOURCE_URL + "?stationId=" + stationResponse.getId());
 
         //then
-        verifyResponseStatus(subwayLineSectionDeletedResponse, HttpStatus.BAD_REQUEST);
+        verifyResponseStatus(sectionDeletedResponse, HttpStatus.BAD_REQUEST);
     }
 
     /**
@@ -481,8 +481,8 @@ class SubwayLineAcceptanceTest {
 
         int distance = 10;
 
-        ValidatableResponse subwayLineCratedResponse = createSubwayLines(lineName, color, upStationId, downStationId, distance);
-        long createdLineId = subwayLineCratedResponse.extract().as(SubwayLineResponse.class).getId();
+        ValidatableResponse lineCratedResponse = createLines(lineName, color, upStationId, downStationId, distance);
+        long createdLineId = lineCratedResponse.extract().as(LineResponse.class).getId();
 
         int sectionDownStationId = 3;
         String sectionDownStationName = "길음역";
@@ -490,18 +490,18 @@ class SubwayLineAcceptanceTest {
         StationResponse stationResponse = stationCreatedResponse.extract().as(StationResponse.class);
         int sectionDistance = 3;
 
-        createSubwayLineSection(createdLineId, downStationId, sectionDownStationId, sectionDistance);
+        createSection(createdLineId, downStationId, sectionDownStationId, sectionDistance);
 
         //when
-        ValidatableResponse subwayLineSectionDeletedResponse = deleteResource(getLocation(subwayLineCratedResponse) + SECTION_RESOURCE_URL + "?stationId=" + stationResponse.getId());
+        ValidatableResponse sectionDeletedResponse = deleteResource(getLocation(lineCratedResponse) + SECTION_RESOURCE_URL + "?stationId=" + stationResponse.getId());
 
         //then
-        verifyResponseStatus(subwayLineSectionDeletedResponse, HttpStatus.NO_CONTENT);
+        verifyResponseStatus(sectionDeletedResponse, HttpStatus.NO_CONTENT);
 
-        ValidatableResponse foundSubwayLineResponse = getResource(LINES_RESOURCE_URL + "/" + createdLineId);
-        verifyResponseStatus(foundSubwayLineResponse, HttpStatus.OK);
+        ValidatableResponse foundLineResponse = getResource(LINES_RESOURCE_URL + "/" + createdLineId);
+        verifyResponseStatus(foundLineResponse, HttpStatus.OK);
 
-        foundSubwayLineResponse
+        foundLineResponse
                 .body("name", equalTo(lineName))
                 .body("color", equalTo(color))
                 .body("stations", hasSize(2))
@@ -513,7 +513,7 @@ class SubwayLineAcceptanceTest {
 
     }
 
-    private ValidatableResponse createSubwayLineSection(Long lineId, long upStationId, long downStationId, long distance) {
+    private ValidatableResponse createSection(Long lineId, long upStationId, long downStationId, long distance) {
         Map<String, Object> params = new HashMap<>();
         params.put("upStationId", upStationId);
         params.put("downStationId", downStationId);
@@ -522,7 +522,7 @@ class SubwayLineAcceptanceTest {
         return createResource(String.format("%s/%d%s", LINES_RESOURCE_URL, lineId, SECTION_RESOURCE_URL), params);
     }
 
-    private ValidatableResponse createSubwayLines(String lineName, String color, long upStationId, long downStationId, long distance) {
+    private ValidatableResponse createLines(String lineName, String color, long upStationId, long downStationId, long distance) {
         Map<String, Object> params = new HashMap<>();
         params.put("name", lineName);
         params.put("color", color);
@@ -540,7 +540,7 @@ class SubwayLineAcceptanceTest {
         return createResource(STATIONS_RESOURCE_URL, params);
     }
 
-    private ValidatableResponse modifySubwayLine(String lineName, String color, String url) {
+    private ValidatableResponse modifyLine(String lineName, String color, String url) {
         Map<String, String> params = new HashMap<>();
         params.put("name", lineName);
         params.put("color", color);

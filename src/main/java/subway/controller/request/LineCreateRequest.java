@@ -1,12 +1,23 @@
 package subway.controller.request;
 
-public class SubwayLineSectionAddRequest {
 
+import subway.service.command.LineCreateCommand;
+
+public class LineCreateRequest implements LineCreateCommand {
+
+    private String name;
+    private String color;
     private Long upStationId;
     private Long downStationId;
     private Long distance;
 
-    public SubwayLineSectionAddRequest() {
+
+    public String getName() {
+        return name;
+    }
+
+    public String getColor() {
+        return color;
     }
 
     public Long getUpStationId() {

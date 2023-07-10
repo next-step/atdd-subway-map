@@ -1,6 +1,6 @@
 package subway.service.command;
 
-public interface SubwayLineCreateCommand {
+public interface LineCreateCommand {
 
     String getName();
 
