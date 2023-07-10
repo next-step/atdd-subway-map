@@ -6,20 +6,21 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import subway.marker.AcceptanceTest;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static subway.utils.AcceptanceTestUtils.*;
 
 @DisplayName("지하철역 관련 기능")
 @AcceptanceTest
-class StationAcceptanceTest {
+class StationAcceptanceTest extends StationAcceptanceTestHelper{
 
     private static final String RESOURCE_URL = "/stations";
 
-
+    /**
+     * When 지하철역을 생성하면
+     * Then 지하철역이 생성된다
+     * Then 지하철역 목록 조회 시 생성한 역을 찾을 수 있다
+     */
     @Test
     void 지하철역을_생성한다() {
         // given
@@ -38,6 +39,11 @@ class StationAcceptanceTest {
                 .body("name", equalTo(stationName));
     }
 
+    /**
+     * Given 2개의 지하철역을 생성하고
+     * When 지하철역 목록을 조회하면
+     * Then 2개의 지하철역을 응답 받는다
+     */
     @Test
     void 지하철역을_전체_조회한다() {
         // given
@@ -59,6 +65,11 @@ class StationAcceptanceTest {
                 .body("[1].name", equalTo(secondStationName));
     }
 
+    /**
+     * Given 지하철역을 생성하고
+     * When 그 지하철역을 삭제하면
+     * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
+     */
     @Test
     void 지하철역을_삭제한다() {
         // given
@@ -75,12 +86,5 @@ class StationAcceptanceTest {
 
         ValidatableResponse foundStation = getResource(createdResourceLocation);
         verifyResponseStatus(foundStation, HttpStatus.NOT_FOUND);
-    }
-
-    private ValidatableResponse createStation(String stationName) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", stationName);
-
-        return createResource(RESOURCE_URL, params);
     }
 }

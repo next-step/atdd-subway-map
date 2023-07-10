@@ -1,6 +1,9 @@
 package subway.domain;
 
+import subway.service.command.StationCreateCommand;
+
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 public class Station {
@@ -10,11 +13,15 @@ public class Station {
     @Column(length = 20, nullable = false)
     private String name;
 
-    public Station() {
+    protected Station() {
     }
 
-    public Station(String name) {
+    private Station(String name) {
         this.name = name;
+    }
+
+    public static Station create(StationCreateCommand command) {
+        return new Station(command.getName());
     }
 
     public Long getId() {
@@ -23,5 +30,18 @@ public class Station {
 
     public String getName() {
         return name;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Station station = (Station) o;
+        return id.equals(station.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

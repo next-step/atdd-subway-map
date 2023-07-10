@@ -2,18 +2,23 @@ package subway.controller.resonse;
 
 import java.util.List;
 
-public class StationLineResponse {
+public class LineResponse {
 
     private long id;
     private String name;
     private String color;
     private List<StationResponse> stations;
+    private long distance;
 
-    public StationLineResponse(long id, String name, String color, List<StationResponse> stations) {
+    private LineResponse() {
+    }
+
+    public LineResponse(long id, String name, String color, List<StationResponse> stations, long distance) {
         this.id = id;
         this.name = name;
         this.color = color;
         this.stations = stations;
+        this.distance = distance;
     }
 
     public long getId() {
@@ -30,5 +35,9 @@ public class StationLineResponse {
 
     public List<StationResponse> getStations() {
         return stations;
+    }
+
+    public long getDistance() {
+        return distance;
     }
 }
