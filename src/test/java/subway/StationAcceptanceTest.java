@@ -6,16 +6,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import subway.marker.AcceptanceTest;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static subway.utils.AcceptanceTestUtils.*;
 
 @DisplayName("지하철역 관련 기능")
 @AcceptanceTest
-class StationAcceptanceTest {
+class StationAcceptanceTest extends StationAcceptanceTestHelper{
 
     private static final String RESOURCE_URL = "/stations";
 
@@ -89,12 +86,5 @@ class StationAcceptanceTest {
 
         ValidatableResponse foundStation = getResource(createdResourceLocation);
         verifyResponseStatus(foundStation, HttpStatus.NOT_FOUND);
-    }
-
-    private ValidatableResponse createStation(String stationName) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", stationName);
-
-        return createResource(RESOURCE_URL, params);
     }
 }

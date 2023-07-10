@@ -69,4 +69,11 @@ public final class AcceptanceTestUtils {
     public static String getLocation(ValidatableResponse response) {
         return response.extract().header(HttpHeaders.LOCATION);
     }
+    public static Long getId(ValidatableResponse response) {
+        return response.extract().jsonPath().getLong("id");
+    }
+
+    public static Long getLong(ValidatableResponse response, String path) {
+        return response.extract().jsonPath().getLong(path);
+    }
 }

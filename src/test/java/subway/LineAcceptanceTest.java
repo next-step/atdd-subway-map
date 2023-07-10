@@ -4,24 +4,14 @@ import io.restassured.response.ValidatableResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import subway.controller.resonse.LineResponse;
-import subway.controller.resonse.StationResponse;
 import subway.marker.AcceptanceTest;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
 import static subway.utils.AcceptanceTestUtils.*;
 
 @DisplayName("지하철 노선 관련 기능")
 @AcceptanceTest
-class LineAcceptanceTest {
+class LineAcceptanceTest extends LineAcceptanceTestHelper {
 
-    private static final String STATIONS_RESOURCE_URL = "/stations";
-    private static final String LINES_RESOURCE_URL = "/lines";
-    private static final String SECTION_RESOURCE_URL = "/sections";
 
     /**
      * 지하철노선 생성
@@ -34,47 +24,16 @@ class LineAcceptanceTest {
      */
     @Test
     void 지하철노선을_생성한다() {
-        //given
-        String lineName = "신분당선";
-        String color = "bg-red-600";
-
-        int upStationId = 1;
-        String upStationName = "강남역";
-        createStation(upStationName);
-
-        int downStationId = 2;
-        String downStationName = "언주역";
-        createStation(downStationName);
-
-        int distance = 10;
-
         //when
-        ValidatableResponse lineCratedResponse = createLines(lineName, color, upStationId, downStationId, distance);
+        ValidatableResponse lineCratedResponse = createLines("신분당선", "bg-red-600", "강남역", "언주역", 10);
 
         //then
         verifyResponseStatus(lineCratedResponse, HttpStatus.CREATED);
 
-        lineCratedResponse
-                .body("name", equalTo(lineName))
-                .body("color", equalTo(color))
-                .body("stations", hasSize(2))
-                .body("stations[0].id", equalTo(upStationId))
-                .body("stations[0].name", equalTo(upStationName))
-                .body("stations[1].id", equalTo(downStationId))
-                .body("stations[1].name", equalTo(downStationName));
-
-        ValidatableResponse foundLineResponse = getResource(LINES_RESOURCE_URL);
+        ValidatableResponse foundLineResponse = getResource(getLocation(lineCratedResponse));
         verifyResponseStatus(foundLineResponse, HttpStatus.OK);
 
-        foundLineResponse
-                .body("", hasSize(1))
-                .body("[0].name", equalTo(lineName))
-                .body("[0].color", equalTo(color))
-                .body("[0].stations", hasSize(2))
-                .body("[0].stations[0].id", equalTo(upStationId))
-                .body("[0].stations[0].name", equalTo(upStationName))
-                .body("[0].stations[1].id", equalTo(downStationId))
-                .body("[0].stations[1].name", equalTo(downStationName));
+        verifyFoundLine(foundLineResponse, "신분당선", "bg-red-600", "강남역", "언주역");
     }
 
     /**
@@ -86,32 +45,8 @@ class LineAcceptanceTest {
     @Test
     void 지하철노선_목록을_조회한다() {
         //given
-        String firstLineName = "신분당선";
-        String firstColor = "bg-red-600";
-
-        int firstUpStationId = 1;
-        String firstUpStationName = "강남역";
-        createStation(firstUpStationName);
-
-        int firstDownStationId = 2;
-        String firstDownStationName = "언주역";
-        createStation(firstDownStationName);
-
-        String secondLineName = "수인분당선";
-        String secondColor = "bg-green-600";
-
-        int secondUpStationId = 3;
-        String secondUpStationName = "수원역";
-        createStation(secondUpStationName);
-
-        int secondDownStationId = 4;
-        String secondDownStationName = "분당역";
-        createStation(secondDownStationName);
-
-        int distance = 10;
-
-        createLines(firstLineName, firstColor, firstUpStationId, firstDownStationId, distance);
-        createLines(secondLineName, secondColor, secondUpStationId, secondDownStationId, distance);
+        createLines("신분당선", "bg-red-600", "강남역", "언주역", 10);
+        createLines("수인분당선", "bg-green-600", "수원역", "분당역", 10);
 
         //when
         ValidatableResponse foundLineResponse = getResource(LINES_RESOURCE_URL);
@@ -119,23 +54,8 @@ class LineAcceptanceTest {
         //then
         verifyResponseStatus(foundLineResponse, HttpStatus.OK);
 
-        foundLineResponse
-                .body("", hasSize(2))
-                .body("[0].name", equalTo(firstLineName))
-                .body("[0].color", equalTo(firstColor))
-                .body("[0].stations", hasSize(2))
-                .body("[0].stations[0].id", equalTo(firstUpStationId))
-                .body("[0].stations[0].name", equalTo(firstUpStationName))
-                .body("[0].stations[1].id", equalTo(firstDownStationId))
-                .body("[0].stations[1].name", equalTo(firstDownStationName))
-                .body("[1].name", equalTo(secondLineName))
-                .body("[1].color", equalTo(secondColor))
-                .body("[1].stations", hasSize(2))
-                .body("[1].stations[0].id", equalTo(secondUpStationId))
-                .body("[1].stations[0].name", equalTo(secondUpStationName))
-                .body("[1].stations[1].id", equalTo(secondDownStationId))
-                .body("[1].stations[1].name", equalTo(secondDownStationName))
-        ;
+        verifyFoundLineWithPath("[0]", foundLineResponse, "신분당선", "bg-red-600", "강남역", "언주역");
+        verifyFoundLineWithPath("[1]", foundLineResponse, "수인분당선", "bg-green-600", "수원역", "분당역");
     }
 
     /**
@@ -147,20 +67,7 @@ class LineAcceptanceTest {
     @Test
     void 지하철노선을_조회한다() {
         //given
-        String lineName = "신분당선";
-        String color = "bg-red-600";
-
-        int upStationId = 1;
-        String upStationName = "강남역";
-        createStation(upStationName);
-
-        int downStationId = 2;
-        String downStationName = "언주역";
-        createStation(downStationName);
-
-        int distance = 10;
-
-        ValidatableResponse lineCratedResponse = createLines(lineName, color, upStationId, downStationId, distance);
+        ValidatableResponse lineCratedResponse = createLines("신분당선", "bg-red-600", "강남역", "언주역", 10);
 
         //when
         ValidatableResponse foundLineResponse = getResource(getLocation(lineCratedResponse));
@@ -168,15 +75,7 @@ class LineAcceptanceTest {
         //then
         verifyResponseStatus(foundLineResponse, HttpStatus.OK);
 
-        foundLineResponse
-                .body("name", equalTo(lineName))
-                .body("color", equalTo(color))
-                .body("stations", hasSize(2))
-                .body("stations[0].id", equalTo(upStationId))
-                .body("stations[0].name", equalTo(upStationName))
-                .body("stations[1].id", equalTo(downStationId))
-                .body("stations[1].name", equalTo(downStationName))
-        ;
+        verifyFoundLine(foundLineResponse, "신분당선", "bg-red-600", "강남역", "언주역");
     }
 
     /**
@@ -188,43 +87,19 @@ class LineAcceptanceTest {
     @Test
     void 지하철_노선을_수정한다() {
         //given
-        String lineName = "신분당선";
-        String color = "bg-red-600";
-
-        int upStationId = 1;
-        String upStationName = "강남역";
-        createStation(upStationName);
-
-        int downStationId = 2;
-        String downStationName = "언주역";
-        createStation(downStationName);
-
-        int distance = 10;
-
-        String newLineName = "바뀐 분당선";
-        String newColor = "bg-green-600";
-
-        ValidatableResponse lineCratedResponse = createLines(lineName, color, upStationId, downStationId, distance);
+        ValidatableResponse lineCratedResponse = createLines("신분당선", "bg-red-600", "강남역", "언주역", 10);
 
         //when
-        ValidatableResponse modifiedLineResponse = modifyLine(newLineName, newColor, getLocation(lineCratedResponse));
+        ValidatableResponse modifiedLineResponse = modifyLine("바뀐 분당선", "bg-green-600", getLocation(lineCratedResponse));
 
         //then
         verifyResponseStatus(modifiedLineResponse, HttpStatus.OK);
 
         ValidatableResponse foundLineResponse = getResource(getLocation(lineCratedResponse));
         verifyResponseStatus(foundLineResponse, HttpStatus.OK);
-
-        foundLineResponse
-                .body("name", equalTo(newLineName))
-                .body("color", equalTo(newColor))
-                .body("stations", hasSize(2))
-                .body("stations[0].id", equalTo(upStationId))
-                .body("stations[0].name", equalTo(upStationName))
-                .body("stations[1].id", equalTo(downStationId))
-                .body("stations[1].name", equalTo(downStationName))
-        ;
+        verifyFoundLine(foundLineResponse, "바뀐 분당선", "bg-green-600", "강남역", "언주역");
     }
+
 
     /**
      * 지하철노선 삭제
@@ -235,20 +110,7 @@ class LineAcceptanceTest {
     @Test
     void 지하철_노선을_제거한다() {
         //given
-        String lineName = "신분당선";
-        String color = "bg-red-600";
-
-        int upStationId = 1;
-        String upStationName = "강남역";
-        createStation(upStationName);
-
-        int downStationId = 2;
-        String downStationName = "언주역";
-        createStation(downStationName);
-
-        int distance = 10;
-
-        ValidatableResponse lineCratedResponse = createLines(lineName, color, upStationId, downStationId, distance);
+        ValidatableResponse lineCratedResponse = createLines("신분당선", "bg-red-600", "강남역", "언주역", 10);
 
         //when
         ValidatableResponse deletedLineResponse = deleteResource(getLocation(lineCratedResponse));
@@ -260,291 +122,4 @@ class LineAcceptanceTest {
         verifyResponseStatus(foundLineResponse, HttpStatus.NOT_FOUND);
     }
 
-
-    /**
-     * 지하철노선 구간 등록
-     * Given 지하철 노선을 생성하고
-     * When 생성한 지하철 노선에 추가로 구간을 등록할때
-     * 새로운 노선의 상행역이 기존 노선의 하행역이 아니면
-     * Then InvalidSectionUpStationException 이 발생한다
-     */
-    @Test
-    void 신규_구간_상행역_불일치_등록_실패() {
-        //given
-        String lineName = "신분당선";
-        String color = "bg-red-600";
-
-        int upStationId = 1;
-        String upStationName = "강남역";
-        createStation(upStationName);
-
-        int downStationId = 2;
-        String downStationName = "언주역";
-        createStation(downStationName);
-
-        int distance = 10;
-
-        ValidatableResponse lineCratedResponse = createLines(lineName, color, upStationId, downStationId, distance);
-        long createdLineId = lineCratedResponse.extract().as(LineResponse.class).getId();
-
-        int sectionDownStationId = 3;
-        String sectionDownStationName = "길음역";
-        createStation(sectionDownStationName);
-
-        //when
-        ValidatableResponse sectionCreatedResponse = createSection(createdLineId, sectionDownStationId, downStationId, distance);
-
-        //then
-        verifyResponseStatus(sectionCreatedResponse, HttpStatus.BAD_REQUEST);
-    }
-
-    /**
-     * 지하철노선 구간 등록
-     * Given 지하철 노선을 생성하고
-     * When 생성한 지하철 노선에 추가로 구간을 등록할때
-     * 새로운 노선의 하행역이 기존 노선에 등록되어 있는 역이면
-     * Then InvalidSectionDownStationException 이 발생한다
-     */
-    @Test
-    void 신규_구간_하행역_기등록_실패() {
-        //given
-        String lineName = "신분당선";
-        String color = "bg-red-600";
-
-        int upStationId = 1;
-        String upStationName = "강남역";
-        createStation(upStationName);
-
-        int downStationId = 2;
-        String downStationName = "언주역";
-        createStation(downStationName);
-
-        int distance = 10;
-
-        ValidatableResponse lineCratedResponse = createLines(lineName, color, upStationId, downStationId, distance);
-        long createdLineId = lineCratedResponse.extract().as(LineResponse.class).getId();
-
-        //when
-        ValidatableResponse sectionCreatedResponse = createSection(createdLineId, downStationId, upStationId, distance);
-
-        //then
-        verifyResponseStatus(sectionCreatedResponse, HttpStatus.BAD_REQUEST);
-    }
-
-
-    /**
-     * /**
-     * 지하철노선 구간 등록
-     * Given 지하철 노선을 생성하고
-     * When 생성한 지하철 노선에 추가로 구간을 등록할때
-     * 새로운 노선의 상행역이 기존 노선의 하행역이라면
-     * Then 새로운 구간이 노선에 추가되고 조회 시 하행역이 변경되고 거리가 추가 된다.
-     */
-    @Test
-    void 신규_구간_등록_성공() {
-        //given
-        String lineName = "신분당선";
-        String color = "bg-red-600";
-
-        int upStationId = 1;
-        String upStationName = "강남역";
-        createStation(upStationName);
-
-        int downStationId = 2;
-        String downStationName = "언주역";
-        createStation(downStationName);
-
-        int distance = 10;
-
-        ValidatableResponse lineCratedResponse = createLines(lineName, color, upStationId, downStationId, distance);
-        long createdLineId = lineCratedResponse.extract().as(LineResponse.class).getId();
-
-        int sectionDownStationId = 3;
-        String sectionDownStationName = "길음역";
-        createStation(sectionDownStationName);
-        int sectionDistance = 3;
-
-        //when
-        ValidatableResponse sectionCreatedResponse = createSection(createdLineId, downStationId, sectionDownStationId, sectionDistance);
-
-        //then
-        verifyResponseStatus(sectionCreatedResponse, HttpStatus.CREATED);
-
-        ValidatableResponse createdSectionResponse = getResource(getLocation(lineCratedResponse));
-        verifyResponseStatus(createdSectionResponse, HttpStatus.OK);
-
-        createdSectionResponse
-                .body("name", equalTo(lineName))
-                .body("color", equalTo(color))
-                .body("stations", hasSize(2))
-                .body("stations[0].id", equalTo(upStationId))
-                .body("stations[0].name", equalTo(upStationName))
-                .body("stations[1].id", equalTo(sectionDownStationId))
-                .body("stations[1].name", equalTo(sectionDownStationName))
-                .body("distance", equalTo(distance + sectionDistance));
-    }
-
-    /**
-     * /**
-     * 지하철노선 구간 제거
-     * Given 지하철 노선을 생성하고 생성한 지하철 노선에 추가로 구간을 등록한뒤
-     * When 중간에 있는 역을 제거하려 하면
-     * Then 예외가 발생하고 실패한다.
-     */
-    @Test
-    void 지하철노선_구간_제거시_하행_종점역이_아니면_실패() {
-        //given
-        String lineName = "신분당선";
-        String color = "bg-red-600";
-
-        int upStationId = 1;
-        String upStationName = "강남역";
-        createStation(upStationName);
-
-        int downStationId = 2;
-        String downStationName = "언주역";
-        ValidatableResponse stationCreatedResponse = createStation(downStationName);
-        StationResponse stationResponse = stationCreatedResponse.extract().as(StationResponse.class);
-
-        int distance = 10;
-
-        ValidatableResponse lineCratedResponse = createLines(lineName, color, upStationId, downStationId, distance);
-        long createdLineId = lineCratedResponse.extract().as(LineResponse.class).getId();
-
-        int sectionDownStationId = 3;
-        String sectionDownStationName = "길음역";
-        createStation(sectionDownStationName);
-        int sectionDistance = 3;
-
-        createSection(createdLineId, downStationId, sectionDownStationId, sectionDistance);
-
-        //when
-        ValidatableResponse sectionDeletedResponse = deleteResource(getLocation(lineCratedResponse) + SECTION_RESOURCE_URL + "?stationId=" + stationResponse.getId());
-
-        //then
-        verifyResponseStatus(sectionDeletedResponse, HttpStatus.BAD_REQUEST);
-    }
-
-    /**
-     * /**
-     * 지하철노선 구간 제거
-     * Given 지하철 노선을 생성하고
-     * When 하행역을 제거하려 하면
-     * Then 예외가 발생하고 실패한다.
-     */
-    @Test
-    void 지하철노선_구간_제거시_구간이_한개인_경우_실패() {
-        //given
-        String lineName = "신분당선";
-        String color = "bg-red-600";
-
-        int upStationId = 1;
-        String upStationName = "강남역";
-        createStation(upStationName);
-
-        int downStationId = 2;
-        String downStationName = "언주역";
-        ValidatableResponse stationCreatedResponse = createStation(downStationName);
-        StationResponse stationResponse = stationCreatedResponse.extract().as(StationResponse.class);
-
-        int distance = 10;
-
-        ValidatableResponse lineCratedResponse = createLines(lineName, color, upStationId, downStationId, distance);
-
-        //when
-        ValidatableResponse sectionDeletedResponse = deleteResource(getLocation(lineCratedResponse) + SECTION_RESOURCE_URL + "?stationId=" + stationResponse.getId());
-
-        //then
-        verifyResponseStatus(sectionDeletedResponse, HttpStatus.BAD_REQUEST);
-    }
-
-    /**
-     * /**
-     * 지하철노선 구간 제거
-     * Given 지하철 노선을 생성하고 생성한 지하철 노선에 추가로 구간을 등록한뒤
-     * When 하행 종점역을 제거한뒤
-     * Then 다시 조회하면 제거된 역을 제외한 상행역과 하행역이 조회되고 거리도 줄어든다
-     */
-    @Test
-    void 지하철노선_구간_제거_성공() {
-        //given
-        String lineName = "신분당선";
-        String color = "bg-red-600";
-
-        int upStationId = 1;
-        String upStationName = "강남역";
-        createStation(upStationName);
-
-        int downStationId = 2;
-        String downStationName = "언주역";
-        createStation(downStationName);
-
-        int distance = 10;
-
-        ValidatableResponse lineCratedResponse = createLines(lineName, color, upStationId, downStationId, distance);
-        long createdLineId = lineCratedResponse.extract().as(LineResponse.class).getId();
-
-        int sectionDownStationId = 3;
-        String sectionDownStationName = "길음역";
-        ValidatableResponse stationCreatedResponse = createStation(sectionDownStationName);
-        StationResponse stationResponse = stationCreatedResponse.extract().as(StationResponse.class);
-        int sectionDistance = 3;
-
-        createSection(createdLineId, downStationId, sectionDownStationId, sectionDistance);
-
-        //when
-        ValidatableResponse sectionDeletedResponse = deleteResource(getLocation(lineCratedResponse) + SECTION_RESOURCE_URL + "?stationId=" + stationResponse.getId());
-
-        //then
-        verifyResponseStatus(sectionDeletedResponse, HttpStatus.NO_CONTENT);
-
-        ValidatableResponse foundLineResponse = getResource(LINES_RESOURCE_URL + "/" + createdLineId);
-        verifyResponseStatus(foundLineResponse, HttpStatus.OK);
-
-        foundLineResponse
-                .body("name", equalTo(lineName))
-                .body("color", equalTo(color))
-                .body("stations", hasSize(2))
-                .body("stations[0].id", equalTo(upStationId))
-                .body("stations[0].name", equalTo(upStationName))
-                .body("stations[1].id", equalTo(downStationId))
-                .body("stations[1].name", equalTo(downStationName))
-                .body("distance", equalTo(distance));
-
-    }
-
-    private ValidatableResponse createSection(Long lineId, long upStationId, long downStationId, long distance) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("upStationId", upStationId);
-        params.put("downStationId", downStationId);
-        params.put("distance", distance);
-
-        return createResource(String.format("%s/%d%s", LINES_RESOURCE_URL, lineId, SECTION_RESOURCE_URL), params);
-    }
-
-    private ValidatableResponse createLines(String lineName, String color, long upStationId, long downStationId, long distance) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("name", lineName);
-        params.put("color", color);
-        params.put("upStationId", upStationId);
-        params.put("downStationId", downStationId);
-        params.put("distance", distance);
-
-        return createResource(LINES_RESOURCE_URL, params);
-    }
-
-    private ValidatableResponse createStation(String stationName) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", stationName);
-
-        return createResource(STATIONS_RESOURCE_URL, params);
-    }
-
-    private ValidatableResponse modifyLine(String lineName, String color, String url) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", lineName);
-        params.put("color", color);
-
-        return modifyResource(url, params);
-    }
 }
