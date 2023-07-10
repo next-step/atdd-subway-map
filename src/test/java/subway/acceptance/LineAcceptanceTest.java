@@ -1,10 +1,8 @@
 package subway.acceptance;
 
 import io.restassured.RestAssured;
-import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.assertj.core.api.Assertions;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -162,20 +160,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         Long 신분당선 = 지하철_노선_생성("신분당선", "bg-red-600", 강남역, 양재역, 10L);
 
         // when
-        Map<String, String> params = new HashMap<>();
-        params.put("upStationId", 양재역.toString());
-        params.put("downStationId", 양재시민의숲역.toString());
-        params.put("distance", "10");
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .pathParam("id", 신분당선)
-                        .body(params)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/lines/{id}/sections")
-                        .then().log().all()
-                        .extract();
-
-        AssertionsForClassTypes.assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        지하철_구간_등록(신분당선, 양재역, 양재시민의숲역, 10L);
 
         // then
         List<String> lineNames = 지하철_노선_목록_조회().stream()
@@ -185,4 +170,5 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 .collect(Collectors.toList());
         assertThat(lineNames).containsAnyOf("양재시민의숲역");
     }
+
 }
