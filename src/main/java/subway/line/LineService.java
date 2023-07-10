@@ -36,11 +36,13 @@ public class LineService {
         return new LineResponse(findLineById(id));
     }
 
+    @Transactional
     public void update(final Long id, final LineUpdateRequest lineUpdateRequest) {
         Line line = findLineById(id);
         line.update(lineUpdateRequest.getName(), lineUpdateRequest.getColor());
     }
 
+    @Transactional
     public void deleteLineById(final Long id) {
         lineRepository.deleteById(id);
     }
