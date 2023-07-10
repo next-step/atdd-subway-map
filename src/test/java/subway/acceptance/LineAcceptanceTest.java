@@ -187,7 +187,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
         Long 신분당선 = 지하철_노선_생성("신분당선", "bg-red-600", 강남역, 양재역, 10L);
 
         // when
-        지하철_구간_등록(신분당선, 판교역, 양재시민의숲역, 10L);
         Map<String, String> params = new HashMap<>();
         params.put("upStationId", 판교역.toString());
         params.put("downStationId", 양재시민의숲역.toString());

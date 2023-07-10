@@ -1,6 +1,7 @@
 package subway.line.web;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import subway.line.service.LineService;
 
@@ -42,10 +43,14 @@ public class LineController {
         lineService.deleteLine(id);
     }
 
-    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/lines/{id}/sections")
-    void addSection(@PathVariable Long id, @RequestBody AddSectionRequest request) {
-        lineService.addSection(id, request);
+    ResponseEntity<?> addSection(@PathVariable Long id, @RequestBody AddSectionRequest request) {
+        try {
+            lineService.addSection(id, request);
+            return ResponseEntity.status(HttpStatus.CREATED).build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
     }
 
 }

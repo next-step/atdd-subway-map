@@ -71,7 +71,7 @@ public class Line {
         Section lastSection = lastSection();
 
         if (!lastSection.getDownStation().equals(section.getUpStation())) {
-            throw new RuntimeException();
+            throw new IllegalArgumentException();
         }
 
         sections.add(section);
