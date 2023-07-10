@@ -7,14 +7,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import subway.line.web.LineResponse;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.acceptance.StationRequestFixture.지하철_역_생성;
 
 
 public class LineRequestFixture {
@@ -38,21 +35,6 @@ public class LineRequestFixture {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         return response.jsonPath().getLong("id");
-    }
-
-    public static Long 지하철_노선_생성(String name, String ...stationNames) {
-        List<Long> stationIds = Arrays.stream(stationNames)
-                .map(StationRequestFixture::지하철_역_생성)
-                .collect(Collectors.toList());
-
-        Long lineId = 지하철_노선_생성(name, "default-color", stationIds.get(0), stationIds.get(1), 10L);
-        if (stationIds.size() > 2) {
-            for (int i = 1; i <= stationIds.size() - 2; i++) {
-                지하철_구간_등록(lineId, stationIds.get(i), stationIds.get(i + 1), 10L);
-            }
-        }
-
-        return lineId;
     }
 
     public static List<LineResponse> 지하철_노선_목록_조회() {
@@ -105,7 +87,7 @@ public class LineRequestFixture {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
-    public static void 지하철_구간_등록(Long lineId, Long upStationId, Long downStationId, Long distance) {
+    public static Long 지하철_구간_등록(Long lineId, Long upStationId, Long downStationId, Long distance) {
         Map<String, String> params = new HashMap<>();
         params.put("upStationId", upStationId.toString());
         params.put("downStationId", downStationId.toString());
@@ -120,5 +102,20 @@ public class LineRequestFixture {
                         .extract();
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        return response.as(Long.class);
+    }
+
+    public static void 지하철_구간_삭제(Long lineId, Long sectionId) {
+        ExtractableResponse<Response> response =
+                RestAssured.given().log().all()
+                        .pathParam("id", lineId)
+                        .queryParam("sectionId", sectionId)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .when().delete("/lines/{id}/sections")
+                        .then().log().all()
+                        .extract();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 }

@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static subway.acceptance.LineRequestFixture.*;
+import static subway.acceptance.LineRequestFixture.지하철_구간_등록;
 import static subway.acceptance.StationRequestFixture.지하철_역_생성;
 
 @DisplayName("지하철 노선 관련 기능")
@@ -212,19 +213,15 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void removeSection() {
         // given
-        Long 신분당선 = 지하철_노선_생성("신분당선", "강남역", "양재역", "양재시민의숲역");
+        Long 강남역 = 지하철_역_생성("강남역");
+        Long 양재역 = 지하철_역_생성("양재역");
+        Long 양재시민의숲역 = 지하철_역_생성("양재시민의숲역");
+
+        Long 신분당선 = 지하철_노선_생성("신분당선", "bg-red-600", 강남역, 양재역, 10L);
+        Long sectionId = 지하철_구간_등록(신분당선, 양재역, 양재시민의숲역, 10L);
 
         // when
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .pathParam("id", 신분당선)
-                        .queryParam("sectionId", 2)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().delete("/lines/{id}/sections")
-                        .then().log().all()
-                        .extract();
-
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        지하철_구간_삭제(신분당선, sectionId);
 
         // then
         List<String> lineNames = 지하철_노선_목록_조회().stream()
