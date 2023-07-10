@@ -9,10 +9,8 @@ import subway.section.domain.Section;
 import subway.section.domain.SectionRepository;
 import subway.section.dto.SectionRequest;
 import subway.section.dto.SectionResponse;
-import subway.section.exception.AlreadyRegisteredStationException;
 import subway.section.exception.CanNotDeleteOnlyOneSectionException;
 import subway.section.exception.DeleteOnlyTerminusStationException;
-import subway.section.exception.InvalidSectionRegistrationException;
 import subway.station.domain.Station;
 import subway.station.domain.StationRepository;
 import subway.station.exception.StationNotFoundException;
@@ -32,17 +30,14 @@ public class SectionService {
 
     @Transactional
     public SectionResponse registerSection(Long lineId, SectionRequest sectionRequest) {
-        Line line = getLine(lineId);
-        Section lastSection = line.getLastSection();
-
         Station upStation = getStation(sectionRequest.getUpStationId());
-        validateLastStationEqualToNewUpStation(lastSection, upStation);
-
         Station downStation = getStation(sectionRequest.getDownStationId());
-        validateDuplicationOfStationInLine(line, downStation);
 
-        Section section = new Section(line, upStation, downStation, sectionRequest.getDistance());
+        Section section = new Section(upStation, downStation, sectionRequest.getDistance());
         sectionRepository.save(section);
+
+        Line line = getLine(lineId);
+        line.addSection(section);
 
         return SectionResponse.of(section);
     }
@@ -55,18 +50,6 @@ public class SectionService {
     private Station getStation(Long stationId) {
         return stationRepository.findById(stationId)
                 .orElseThrow(StationNotFoundException::new);
-    }
-
-    private void validateLastStationEqualToNewUpStation(Section lastSection, Station upStation) {
-        if (!lastSection.downStationEqualsTo(upStation)) {
-            throw new InvalidSectionRegistrationException();
-        }
-    }
-
-    private void validateDuplicationOfStationInLine(Line line, Station downStation) {
-        if (line.hasStation(downStation)) {
-            throw new AlreadyRegisteredStationException();
-        }
     }
 
     @Transactional

@@ -9,6 +9,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import subway.section.domain.Section;
+import subway.section.exception.AlreadyRegisteredStationException;
+import subway.section.exception.InvalidSectionRegistrationException;
 import subway.station.domain.Station;
 
 @Entity
@@ -35,8 +37,25 @@ public class Line {
         section.assignLine(this);
     }
 
-    public void addSection(Section section) {
-        sections.add(section);
+    public void addSection(Section newSection) {
+        Section lastSection = getLastSection();
+        validateLastStationEqualToNewUpStation(lastSection, newSection);
+        validateDuplicationOfStationInLine(newSection);
+
+        sections.add(newSection);
+        newSection.assignLine(this);
+    }
+
+    private void validateLastStationEqualToNewUpStation(Section lastSection, Section newSection) {
+        if (!lastSection.downStationEqualsToUpStationOf(newSection)) {
+            throw new InvalidSectionRegistrationException();
+        }
+    }
+
+    private void validateDuplicationOfStationInLine(Section newSection) {
+        if (hasStation(newSection.getDownStation())) {
+            throw new AlreadyRegisteredStationException();
+        }
     }
 
     public void update(String name, String color) {

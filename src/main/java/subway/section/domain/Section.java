@@ -42,18 +42,6 @@ public class Section {
         this.distance = distance;
     }
 
-    public Section(Line line, Station upStation, Station downStation, Integer distance) {
-        validateStation(upStation, downStation);
-        validateDistance(distance);
-
-        this.line = line;
-        this.upStation = upStation;
-        this.downStation = downStation;
-        this.distance = distance;
-
-        line.addSection(this);
-    }
-
     private void validateStation(Station upStation, Station downStation) {
         if (upStation.equals(downStation)) {
             throw new IllegalArgumentException("upStation과 downStation은 같을 수 없습니다.");
@@ -86,6 +74,10 @@ public class Section {
         return upStation.getName();
     }
 
+    public Station getDownStation() {
+        return downStation;
+    }
+
     public Long getDownStationId() {
         return downStation.getId();
     }
@@ -104,5 +96,9 @@ public class Section {
 
     public void assignLine(Line line) {
         this.line = line;
+    }
+
+    public boolean downStationEqualsToUpStationOf(Section newSection) {
+        return downStation.equals(newSection.upStation);
     }
 }
