@@ -85,9 +85,4 @@ public class SectionCompositeService {
 
         sectionService.deleteById(targetSection.getId());
     }
-
-    public SectionResponse findById(Long sectionId) {
-        Section section = sectionService.findById(sectionId);
-        return SectionResponse.from(section);
-    }
 }
