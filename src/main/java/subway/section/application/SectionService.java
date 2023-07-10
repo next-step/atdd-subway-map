@@ -57,8 +57,9 @@ public class SectionService {
         Line line = getLine(lineId);
         validateLineHasOnlyOneSection(line);
 
+        Station station = getStation(stationId);
         Section lastSection = line.getLastSection();
-        validateStationIsDownStationOfLastSection(stationId, lastSection);
+        validateStationIsDownStationOfLastSection(station, lastSection);
 
         sectionRepository.delete(lastSection);
     }
@@ -69,8 +70,7 @@ public class SectionService {
         }
     }
 
-    private void validateStationIsDownStationOfLastSection(Long stationId, Section lastSection) {
-        Station station = getStation(stationId);
+    private void validateStationIsDownStationOfLastSection(Station station, Section lastSection) {
         if (!lastSection.downStationEqualsTo(station)) {
             throw new DeleteOnlyTerminusStationException();
         }

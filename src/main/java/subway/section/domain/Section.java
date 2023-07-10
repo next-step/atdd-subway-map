@@ -86,16 +86,16 @@ public class Section {
         return downStation.getName();
     }
 
-    public boolean downStationEqualsTo(Station station) {
-        return downStation.equals(station);
-    }
-
     public boolean hasStation(Station downStation) {
         return downStation.equals(upStation) || downStation.equals(this.downStation);
     }
 
     public void assignLine(Line line) {
         this.line = line;
+    }
+
+    public boolean downStationEqualsTo(Station station) {
+        return downStation.equals(station);
     }
 
     public boolean downStationEqualsToUpStationOf(Section newSection) {
