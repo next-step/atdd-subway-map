@@ -9,16 +9,16 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
-import subway.helper.SubwayLineHelper;
 import subway.helper.SubwayStationHelper;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD;
+import static subway.helper.SubwayLineHelper.*;
+import static subway.helper.SubwayLineHelper.지하철_노선_생성_요청;
 
 @DisplayName("지하철 노선 관련 기능")
 @DirtiesContext(classMode = BEFORE_EACH_TEST_METHOD)
@@ -40,13 +40,10 @@ public class SubwayLineAcceptanceTest {
     @Test
     void createSubwayLine() {
         // when
-        SubwayLineHelper.지하철_노선_생성_요청(SubwayLineHelper.SUBWAY_LIEN_PARAMETERS_1);
+        지하철_노선_생성_요청(신분당선);
 
         // then
-        String actualSubwayLineName = SubwayLineHelper.지하철_노선_목록_조회_요청()
-                .jsonPath().getString("name");
-
-        Assertions.assertThat(actualSubwayLineName).contains("신분당선");
+        생성된_지하철_노선_조회됨("신분당선");
     }
 
     /**
@@ -58,20 +55,14 @@ public class SubwayLineAcceptanceTest {
     @Test
     void showSubwayLines() {
         // given
-        List<Map<String, Object>> parametersList = new ArrayList<>();
-        parametersList.add(SubwayLineHelper.SUBWAY_LIEN_PARAMETERS_1);
-        parametersList.add(SubwayLineHelper.SUBWAY_LIEN_PARAMETERS_2);
-
-        for (Map<String, Object> parameters : parametersList) {
-            SubwayLineHelper.지하철_노선_생성_요청(parameters);
-        }
+        지하철_노선_생성_요청(신분당선);
+        지하철_노선_생성_요청(분당선);
 
         // when
-        List<String> subwayLineNames = SubwayLineHelper.지하철_노선_목록_조회_요청()
-                    .jsonPath().getList("name", String.class);
+        List<String> 생성된_지하철_노선_목록_이름 = 지하철_노선_목록_이름_조회();
 
         // then
-        Assertions.assertThat(subwayLineNames).contains("신분당선", "분당선");
+        Assertions.assertThat(생성된_지하철_노선_목록_이름).contains("신분당선", "분당선");
     }
 
     /**
@@ -83,22 +74,14 @@ public class SubwayLineAcceptanceTest {
     @Test
     void showSubwayLine() {
         // given
-        ExtractableResponse<Response> createSubwayLineApiResponse = SubwayLineHelper
-                .지하철_노선_생성_요청(SubwayLineHelper.SUBWAY_LIEN_PARAMETERS_1);
-        String createSubwayLineApiResponseUrl = createSubwayLineApiResponse
-                .response().getHeaders().getValue("Location");
+        ExtractableResponse<Response> 지하철_노선_생성_결과 = 지하철_노선_생성_요청(신분당선);
+        String 생성된_지하철_노선_URL = 생성된_지하철_노선_URL(지하철_노선_생성_결과);
 
         // when
-        ExtractableResponse<Response> response = SubwayLineHelper.지하철_노선_정보_조회_요청(createSubwayLineApiResponseUrl);
-
-        long actualId = response.jsonPath().getLong("id");
-        String actualName = response.jsonPath().getString("name");
-        String actualColor = response.jsonPath().getString("color");
+        ExtractableResponse<Response> 지하철_노선_정보_조회_요청_결과 = 지하철_노선_정보_조회_요청(생성된_지하철_노선_URL);
 
         // then
-        Assertions.assertThat(actualId).isEqualTo(1L);
-        Assertions.assertThat(actualName).contains("신분당선");
-        Assertions.assertThat(actualColor).contains("bg-red-600");
+        지하철_노선_정보_조회됨(지하철_노선_정보_조회_요청_결과, 신분당선);
     }
 
     /**
@@ -110,40 +93,76 @@ public class SubwayLineAcceptanceTest {
     @Test
     void updateSubwayLine() {
         // given
-        ExtractableResponse<Response> createSubwayLineApiResponse = SubwayLineHelper
-                .지하철_노선_생성_요청(SubwayLineHelper.SUBWAY_LIEN_PARAMETERS_1);
-        String createSubwayLineApiResponseUrl = createSubwayLineApiResponse
-                .response().getHeaders().getValue("Location");
+        ExtractableResponse<Response> 지하철_노선_생성_결과 = 지하철_노선_생성_요청(신분당선);
+        String 생성된_지하철_노선_URL = 생성된_지하철_노선_URL(지하철_노선_생성_결과);
 
         // when
-        Map<String, Object> updateLineRequest = Map.of("name", "다른분당선", "color", "bg-red-600");
+        Map<String, Object> 지하철_노선_수정_값 = Map.of("name", "다른분당선", "color", "bg-red-600");
 
-        ExtractableResponse<Response> updateSubwayLineApiResponse = SubwayLineHelper
-                .지하철_노선_정보_수정_요청(createSubwayLineApiResponseUrl, updateLineRequest);
+        ExtractableResponse<Response> 지하철_노선_정보_수정_결과 =
+                지하철_노선_정보_수정_요청(생성된_지하철_노선_URL, 지하철_노선_수정_값);
 
         // then
-        assertThat(updateSubwayLineApiResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+        지하철_노선_정보_수정됨(지하철_노선_정보_수정_결과);
     }
 
     /**
      * Given 지하철 노션을 생성하고
      * When 생성한 지하철 노션을 삭제하면
-     * Then 해당 지하철 노션 장보는 삭제된다.
+     * Then 해당 지하철 노션 정보는 삭제된다.
      */
     @DisplayName("지하철 노션을 삭제한다.")
     @Test
     void deleteSubwayLine() {
         // given
-        ExtractableResponse<Response> createSubwayLineApiResponse = SubwayLineHelper
-                .지하철_노선_생성_요청(SubwayLineHelper.SUBWAY_LIEN_PARAMETERS_1);
+        ExtractableResponse<Response> 지하철_노선_생성_결과 = 지하철_노선_생성_요청(신분당선);
+        String 생성된_지하철_노선_URL = 생성된_지하철_노선_URL(지하철_노선_생성_결과);
+
+        // when
+        ExtractableResponse<Response> 지하철_노선_삭제_결과 = 지하철_노선_삭제_요청(생성된_지하철_노선_URL);
+
+        // then
+        지하철_노선_삭제됨(지하철_노선_삭제_결과);
+    }
+
+    private String 생성된_지하철_노선_URL(ExtractableResponse<Response> createSubwayLineApiResponse) {
         String createSubwayLineApiResponseUrl = createSubwayLineApiResponse
                 .response().getHeaders().getValue("Location");
 
-        // when
-        ExtractableResponse<Response> deleteSubwayLineApiResponse = SubwayLineHelper
-                .지하철_노선_삭제_요청(createSubwayLineApiResponseUrl);
+        return createSubwayLineApiResponseUrl;
+    }
+
+    private List 지하철_노선_목록_이름_조회() {
+        List<String> subwayLineNames = 지하철_노선_목록_조회_요청()
+                .jsonPath().getList("name", String.class);
+
+        return subwayLineNames;
+    }
+
+    private void 생성된_지하철_노선_조회됨(String subwayLineName) {
+        List<String> subwayLineNames = 지하철_노선_목록_조회_요청()
+                .jsonPath().getList("name", String.class);
 
         // then
+        Assertions.assertThat(subwayLineNames).contains(subwayLineName);
+    }
+
+    private void 지하철_노선_정보_조회됨(ExtractableResponse<Response> showSubwayLineApiResponse
+            , Map<String, Object> subwayLine) {
+        long actualId = showSubwayLineApiResponse.jsonPath().getLong("id");
+        String actualName = showSubwayLineApiResponse.jsonPath().getString("name");
+        String actualColor = showSubwayLineApiResponse.jsonPath().getString("color");
+
+        Assertions.assertThat(actualId).isEqualTo(subwayLine.get("upStationId"));
+        Assertions.assertThat(actualName).isEqualTo(subwayLine.get("name"));
+        Assertions.assertThat(actualColor).isEqualTo(subwayLine.get("color"));
+    }
+
+    private void 지하철_노선_정보_수정됨(ExtractableResponse<Response> updateSubwayLineApiResponse) {
+        assertThat(updateSubwayLineApiResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
+    private void 지하철_노선_삭제됨(ExtractableResponse<Response> deleteSubwayLineApiResponse) {
         assertThat(deleteSubwayLineApiResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 }

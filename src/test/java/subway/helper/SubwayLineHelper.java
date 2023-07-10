@@ -10,14 +10,14 @@ import java.util.Map;
 public class SubwayLineHelper {
 
     public static final String SUBWAY_LINE_API_URL = "/subway-lines";
-    public static final Map<String, Object> SUBWAY_LIEN_PARAMETERS_1 = Map.of("name", "신분당선"
+    public static final Map<String, Object> 신분당선 = Map.of("name", "신분당선"
             , "color", "bg-red-600"
-            , "upStationId", 1, "downStationId", 2
+            , "upStationId", 1L, "downStationId", 2L
             , "distance", 10);
-    public static final Map<String, Object> SUBWAY_LIEN_PARAMETERS_2 = Map.of("name", "분당선"
+    public static final Map<String, Object> 분당선 = Map.of("name", "분당선"
             , "color", "bg-green-600"
-            , "upStationId", 3, "downStationId"
-            , 4, "distance", 10);
+            , "upStationId", 3L, "downStationId"
+            , 4L, "distance", 10);
 
     public static ExtractableResponse<Response> 지하철_노선_생성_요청(Map<String, Object> parameters) {
         ExtractableResponse<Response> createSubwayLineApiResponse = RestAssured
