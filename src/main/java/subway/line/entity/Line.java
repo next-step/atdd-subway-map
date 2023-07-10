@@ -1,12 +1,13 @@
 package subway.line.entity;
 
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import subway.section.entity.Section;
+import subway.section.entity.Sections;
 import subway.station.entity.Station;
 
 import javax.persistence.*;
+import java.util.Collections;
+
 
 @Entity
 @Getter
@@ -23,16 +24,8 @@ public class Line {
     @Column(length = 20, nullable = false)
     private String color;
 
-    @OneToOne
-    @JoinColumn
-    private Station upStation;
-
-    @OneToOne
-    @JoinColumn
-    private Station downStation;
-
-    @Column(nullable = false)
-    private Integer distance;
+    @Embedded
+    private Sections sections;
 
     @Builder
     public Line(
@@ -44,13 +37,26 @@ public class Line {
     ) {
         this.name = name;
         this.color = color;
-        this.upStation = upStation;
-        this.downStation = downStation;
-        this.distance = distance;
+        this.sections = new Sections(
+                Collections.singletonList(Section.builder()
+                        .upStation(upStation)
+                        .downStation(downStation)
+                        .distance(distance)
+                        .build()),
+                distance
+        );
     }
 
     public void updateLine(Line updateLine) {
         this.name = updateLine.name;
         this.color = updateLine.color;
+    }
+
+    public void addSection(Section section) {
+        this.sections.addSection(section);
+    }
+
+    public void deleteSectionByStationId(Long stationId) {
+        this.sections.deleteSectionByStationId(stationId);
     }
 }

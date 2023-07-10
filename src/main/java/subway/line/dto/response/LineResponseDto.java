@@ -7,7 +7,6 @@ import subway.station.dto.response.StationResponseDto;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Builder
 @Getter
@@ -26,11 +25,12 @@ public class LineResponseDto {
                 .id(line.getId())
                 .name(line.getName())
                 .color(line.getColor())
-                .stations(
-                        Stream.of(line.getUpStation(), line.getDownStation())
-                                .map(StationResponseDto::of)
-                                .collect(Collectors.toList())
-                )
+                .stations(line
+                        .getSections()
+                        .getAllStations()
+                        .stream()
+                        .map(StationResponseDto::of)
+                        .collect(Collectors.toList()))
                 .build();
     }
 

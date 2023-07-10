@@ -1,10 +1,10 @@
 package subway.line.dto.request;
 
 import lombok.*;
-import lombok.experimental.Accessors;
 import subway.line.entity.Line;
 import subway.station.entity.Station;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -13,7 +13,6 @@ import javax.validation.constraints.Size;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-@Accessors(chain = true)
 public class SaveLineRequestDto {
 
     @NotBlank(message = "지하철 노선 이름은 빈칸일 수 없습니다.")
@@ -24,15 +23,14 @@ public class SaveLineRequestDto {
     @Size(max = 7, message = "지하철 노선 색깔은 7자 이내여야 합니다.")
     private String color;
 
-    @Setter
     @NotNull
     private Long upStationId;
 
-    @Setter
     @NotNull
     private Long downStationId;
 
     @NotNull
+    @Min(value = 1, message = "구간 거리는 1 이상이어야 합니다.")
     private Integer distance;
 
     public Line toEntity(Station upStation, Station downStation) {

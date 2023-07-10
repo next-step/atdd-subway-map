@@ -10,8 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import subway.constants.Endpoint;
-import subway.fixture.LineFixture;
-import subway.fixture.StationFixture;
+import subway.station.StationFixture;
 import subway.line.dto.request.SaveLineRequestDto;
 import subway.line.dto.request.UpdateLineRequestDto;
 import subway.station.dto.request.SaveStationRequestDto;
@@ -39,13 +38,13 @@ public class LineAcceptanceTest {
 
     private static final String LINE_NAME_KEY = "name";
 
-    private Long gangnamStationId;
+    private Long 신사역_아이디;
 
-    private Long gwanggyoStationId;
+    private Long 광교역_아이디;
 
-    private Long cheongnyangniStationId;
+    private Long 청량리역_아이디;
 
-    private Long chuncheonStation;
+    private Long 춘천역_아이디;
 
     @Autowired
     private DatabaseCleanUp databaseCleanUp;
@@ -57,10 +56,10 @@ public class LineAcceptanceTest {
         }
         databaseCleanUp.execute();
 
-        this.gangnamStationId = saveStation(StationFixture.GANGNAM_STATION);
-        this.gwanggyoStationId = saveStation(StationFixture.GWANGGYO_STATION);
-        this.cheongnyangniStationId = saveStation(StationFixture.CHEONGNYANGNI_STATION);
-        this.chuncheonStation = saveStation(StationFixture.CHUNCHEONSTATION_STATION);
+        this.신사역_아이디 = saveStation(StationFixture.신사역);
+        this.광교역_아이디 = saveStation(StationFixture.광교역);
+        this.청량리역_아이디 = saveStation(StationFixture.청량리역);
+        this.춘천역_아이디 = saveStation(StationFixture.춘천역);
     }
 
     /**
@@ -73,11 +72,8 @@ public class LineAcceptanceTest {
     @Test
     void createLine() {
         // when
-        SaveLineRequestDto sinbundangLine = LineFixture.SINBUNDANG_LINE;
-        sinbundangLine
-                .setUpStationId(gangnamStationId)
-                .setDownStationId(gwanggyoStationId);
-        saveLine(sinbundangLine);
+        SaveLineRequestDto 신분당선 = 신분당선을_생성한다(신사역_아이디, 광교역_아이디);
+        saveLine(신분당선);
 
         // then
         List<String> lineNames = findLinesAll()
@@ -86,7 +82,7 @@ public class LineAcceptanceTest {
 
         assertAll(
                 () -> assertThat(lineNames.size()).isEqualTo(1),
-                () -> assertThat(lineNames).containsAnyOf(sinbundangLine.getName())
+                () -> assertThat(lineNames).containsAnyOf(신분당선.getName())
         );
     }
 
@@ -101,17 +97,9 @@ public class LineAcceptanceTest {
     @Test
     void readLines() {
         // given
-        SaveLineRequestDto sinbundangLine = LineFixture.SINBUNDANG_LINE;
-        sinbundangLine
-                .setUpStationId(gangnamStationId)
-                .setDownStationId(gwanggyoStationId);
-
-        SaveLineRequestDto gyeongchunLine = LineFixture.GYEONGCHUN_LINE;
-        gyeongchunLine
-                .setUpStationId(cheongnyangniStationId)
-                .setDownStationId(chuncheonStation);
-
-        Stream.of(sinbundangLine, gyeongchunLine)
+        SaveLineRequestDto 신분당선 = 신분당선을_생성한다(신사역_아이디, 광교역_아이디);
+        SaveLineRequestDto 경춘선 = 경춘선을_생성한다(청량리역_아이디, 춘천역_아이디);
+        Stream.of(신분당선, 경춘선)
                 .forEach(this::saveLine);
 
         // when
@@ -122,7 +110,7 @@ public class LineAcceptanceTest {
 
         // then
         assertThat(lineNames)
-                .containsOnly(sinbundangLine.getName(), gyeongchunLine.getName());
+                .containsOnly(신분당선.getName(), 경춘선.getName());
     }
 
     /**
@@ -136,11 +124,8 @@ public class LineAcceptanceTest {
     @Test
     void readLine() {
         // given
-        SaveLineRequestDto gyeongchunLine = LineFixture.GYEONGCHUN_LINE;
-        gyeongchunLine
-                .setUpStationId(cheongnyangniStationId)
-                .setDownStationId(chuncheonStation);
-        Long savedLineId = saveLine(gyeongchunLine)
+        SaveLineRequestDto 경춘선 = 경춘선을_생성한다(청량리역_아이디, 춘천역_아이디);
+        Long savedLineId = saveLine(경춘선)
                 .jsonPath()
                 .getLong(LINE_ID_KEY);
 
@@ -150,7 +135,7 @@ public class LineAcceptanceTest {
                 .getString(LINE_NAME_KEY);
 
         // then
-        assertThat(foundStationName).isEqualTo(gyeongchunLine.getName());
+        assertThat(foundStationName).isEqualTo(경춘선.getName());
     }
 
     /**
@@ -164,18 +149,14 @@ public class LineAcceptanceTest {
     @Test
     void updateLine() {
         // given
-        SaveLineRequestDto sinbundangLine = LineFixture.SINBUNDANG_LINE;
-        sinbundangLine
-                .setUpStationId(gangnamStationId)
-                .setDownStationId(gwanggyoStationId);
-        Long savedLineId = saveLine(sinbundangLine)
+        SaveLineRequestDto 신분당선 = 신분당선을_생성한다(신사역_아이디, 광교역_아이디);
+        Long savedLineId = saveLine(신분당선)
                 .jsonPath()
                 .getLong(LINE_ID_KEY);
 
         // when
-        UpdateLineRequestDto updateSinbundangLine = LineFixture.UPDATE_SINBUNDANG_LINE;
         String path = String.format("%s/%d", LINE_BASE_URL, savedLineId);
-        ExtractableResponse<Response> updateStationResponse = RestAssuredClient.put(path, updateSinbundangLine);
+        ExtractableResponse<Response> updateStationResponse = RestAssuredClient.put(path, 수정한_신분당선);
 
         // then
         assertAll(
@@ -185,7 +166,7 @@ public class LineAcceptanceTest {
                             .jsonPath()
                             .getString(LINE_NAME_KEY);
 
-                    assertThat(updatedLine).isEqualTo(updateSinbundangLine.getName());
+                    assertThat(updatedLine).isEqualTo(수정한_신분당선.getName());
                 }
         );
     }
@@ -201,11 +182,8 @@ public class LineAcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        SaveLineRequestDto gyeongchunLine = LineFixture.GYEONGCHUN_LINE;
-        gyeongchunLine
-                .setUpStationId(cheongnyangniStationId)
-                .setDownStationId(chuncheonStation);
-        Long savedLineId = saveLine(gyeongchunLine)
+        SaveLineRequestDto 경춘선 = 경춘선을_생성한다(청량리역_아이디, 춘천역_아이디);
+        Long savedLineId = saveLine(경춘선)
                 .jsonPath()
                 .getLong(LINE_ID_KEY);
 
@@ -221,7 +199,7 @@ public class LineAcceptanceTest {
                             .jsonPath()
                             .getList(LINE_NAME_KEY, String.class);
 
-                    assertThat(LineNames).doesNotContain(gyeongchunLine.getName());
+                    assertThat(LineNames).doesNotContain(경춘선.getName());
                 }
         );
     }
@@ -286,5 +264,30 @@ public class LineAcceptanceTest {
 
         return findStationByIdResponse;
     }
+
+    private SaveLineRequestDto 신분당선을_생성한다(Long upStationId, Long downStationId) {
+        return SaveLineRequestDto.builder()
+                .name("신분당선")
+                .color("#f5222d")
+                .distance(15)
+                .upStationId(upStationId)
+                .downStationId(downStationId)
+                .build();
+    }
+
+    private SaveLineRequestDto 경춘선을_생성한다(Long upStationId, Long downStationId) {
+        return SaveLineRequestDto.builder()
+                .name("경춘선")
+                .color("#13c2c2")
+                .distance(25)
+                .upStationId(upStationId)
+                .downStationId(downStationId)
+                .build();
+    }
+
+    private final UpdateLineRequestDto 수정한_신분당선 = UpdateLineRequestDto.builder()
+                    .name("수정한 신분당선")
+                    .color("#cf1322")
+                    .build();
 
 }
