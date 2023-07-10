@@ -1,10 +1,10 @@
-package subway.service;
+package subway.station.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import subway.dto.StationDto;
-import subway.jpa.Station;
-import subway.jpa.StationRepository;
+import subway.station.dto.StationDto;
+import subway.station.jpa.Station;
+import subway.station.jpa.StationRepository;
 
 import java.util.List;
 import java.util.Optional;

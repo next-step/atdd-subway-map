@@ -1,14 +1,15 @@
-package subway;
+package subway.line;
 
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import subway.dto.StationResponse;
+import subway.AcceptanceTest;
+import subway.station.dto.StationResponse;
 
 import static org.assertj.core.api.Assertions.*;
-import static subway.service.LineTestUtils.*;
-import static subway.service.SectionUtils.*;
-import static subway.service.StationTestUtils.*;
+import static subway.line.LineTestUtils.*;
+import static subway.line.SectionUtils.*;
+import static subway.station.StationTestUtils.*;
 
 @DisplayName("지하철 구간 관련 기능")
 public class SectionAcceptanceTest extends AcceptanceTest {

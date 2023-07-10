@@ -1,21 +1,21 @@
-package subway;
+package subway.line;
 
 import com.jayway.jsonpath.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import subway.dto.StationResponse;
+import subway.AcceptanceTest;
+import subway.station.dto.StationResponse;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.*;
-import static subway.service.LineTestUtils.*;
-import static subway.service.StationTestUtils.*;
+import static subway.line.LineTestUtils.*;
+import static subway.station.StationTestUtils.*;
 
 @DisplayName("지하철 노선 관련 기능")
 public class LineAcceptanceTest extends AcceptanceTest {

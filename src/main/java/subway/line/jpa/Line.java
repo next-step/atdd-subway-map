@@ -1,8 +1,11 @@
-package subway.jpa;
+package subway.line.jpa;
 
 import lombok.Getter;
+import subway.station.jpa.Station;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -18,15 +21,16 @@ public class Line {
     @Column(length = 20, nullable = false)
     private String color;
 
-//    @Column(name = "up_station_id", nullable = false)
     @ManyToOne
     @JoinColumn(name = "up_station_id")
     private Station upStation;
 
-//    @Column(name = "down_station_id", nullable = false)
     @ManyToOne
     @JoinColumn(name = "down_station_id")
     private Station downStation;
+
+    @OneToMany(mappedBy = "line")
+    private List<Section> sections = new ArrayList<>();
 
     @Column(nullable = false)
     private Integer distance;
@@ -44,18 +48,5 @@ public class Line {
     public void update(String name, String color) {
         this.name = name;
         this.color = color;
-    }
-
-
-    @Override
-    public String toString() {
-        return "Line{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", color='" + color + '\'' +
-                ", upStation=" + upStation +
-                ", downStation=" + downStation +
-                ", distance=" + distance +
-                '}';
     }
 }

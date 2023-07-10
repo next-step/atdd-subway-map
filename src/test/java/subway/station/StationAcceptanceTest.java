@@ -1,18 +1,19 @@
-package subway;
+package subway.station;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import subway.AcceptanceTest;
 
 import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.service.StationTestUtils.*;
+import static subway.station.StationTestUtils.*;
 
 @DisplayName("지하철역 관련 기능")
-public class StationAcceptanceTest extends AcceptanceTest{
+public class StationAcceptanceTest extends AcceptanceTest {
 
 
     /**

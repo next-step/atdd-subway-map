@@ -1,4 +1,4 @@
-package subway.dto;
+package subway.station.dto;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

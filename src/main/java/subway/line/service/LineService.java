@@ -1,12 +1,12 @@
-package subway.service;
+package subway.line.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import subway.dto.*;
-import subway.jpa.Line;
-import subway.jpa.LineRepository;
-import subway.jpa.Station;
-import subway.jpa.StationRepository;
+import subway.line.dto.LineDto;
+import subway.line.jpa.Line;
+import subway.line.jpa.LineRepository;
+import subway.station.jpa.Station;
+import subway.station.jpa.StationRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;

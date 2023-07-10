@@ -1,6 +1,7 @@
-package subway.jpa;
+package subway.station.jpa;
 
 import lombok.Getter;
+import subway.line.jpa.Line;
 
 import javax.persistence.*;
 
@@ -15,6 +16,10 @@ public class Station {
 
     @Column(length = 20)
     private String lineName;
+
+    @ManyToOne
+    @JoinColumn(name = "line_id")
+    private Line line;
 
     public Station() {
     }

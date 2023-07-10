@@ -1,4 +1,4 @@
-package subway.jpa;
+package subway.line.jpa;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

@@ -1,10 +1,11 @@
-package subway.service;
+package subway.line;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import subway.station.StationTestUtils;
 
 import java.util.HashMap;
 import java.util.Map;

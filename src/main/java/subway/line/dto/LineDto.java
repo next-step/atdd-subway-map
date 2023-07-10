@@ -1,8 +1,9 @@
-package subway.dto;
+package subway.line.dto;
 
 import lombok.Getter;
-import subway.jpa.Line;
-import subway.jpa.Station;
+import subway.line.jpa.Line;
+import subway.station.dto.StationDto;
+import subway.station.jpa.Station;
 
 import java.util.List;
 
