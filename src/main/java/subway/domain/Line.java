@@ -1,13 +1,12 @@
 package subway.domain;
 
-import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import subway.dto.LineRequest;
 
 @Entity
@@ -26,8 +25,13 @@ public class Line {
     @Column(length = 20, nullable = false)
     private Long distance;
 
-    @OneToMany(mappedBy = "line", fetch = FetchType.LAZY)
-    List<Station> stations;
+    @OneToOne
+    @JoinColumn(name = "up_station_id")
+    private Station upStation;
+
+    @OneToOne
+    @JoinColumn(name = "down_station_id")
+    private Station downStation;
 
     public Line() {
 
@@ -37,7 +41,8 @@ public class Line {
         this.name = lineRequest.getName();
         this.color = lineRequest.getColor();
         this.distance = lineRequest.getDistance();
-        this.stations = List.of(upStation, downStation);
+        this.upStation = upStation;
+        this.downStation = downStation;
     }
 
     public void updateLine(LineRequest lineRequest) {
@@ -62,7 +67,13 @@ public class Line {
         return distance;
     }
 
-    public List<Station> getStations() {
-        return stations;
+    public Station getUpStation() {
+        return upStation;
     }
+
+    public Station getDownStation() {
+        return downStation;
+    }
+
+
 }
