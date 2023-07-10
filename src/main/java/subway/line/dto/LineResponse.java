@@ -1,15 +1,17 @@
-package subway.line;
+package subway.line.dto;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Value;
-import subway.station.StationResponse;
+import subway.line.repository.Line;
+import subway.station.dto.StationResponse;
 
 import java.util.Arrays;
 import java.util.List;
 
 @Value
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+public
 class LineResponse {
     Long id;
     String name;

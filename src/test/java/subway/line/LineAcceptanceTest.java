@@ -10,6 +10,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
+import subway.line.dto.CreateLineRequest;
+import subway.line.dto.LineResponse;
+import subway.line.dto.UpdateLineRequest;
 
 import java.util.List;
 

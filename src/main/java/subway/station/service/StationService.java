@@ -1,13 +1,18 @@
-package subway.station;
+package subway.station.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.station.dto.StationRequest;
+import subway.station.repository.Station;
+import subway.station.repository.StationRepository;
+import subway.station.dto.StationResponse;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
+public
 class StationService {
     private final StationRepository stationRepository;
 
@@ -16,19 +21,19 @@ class StationService {
     }
 
     @Transactional
-    StationResponse saveStation(StationRequest stationRequest) {
+    public StationResponse saveStation(StationRequest stationRequest) {
         Station station = stationRepository.save(new Station(stationRequest.getName()));
         return createStationResponse(station);
     }
 
-    List<StationResponse> findAllStations() {
+    public List<StationResponse> findAllStations() {
         return stationRepository.findAll().stream()
                 .map(this::createStationResponse)
                 .collect(Collectors.toList());
     }
 
     @Transactional
-    void deleteStationById(Long id) {
+    public void deleteStationById(Long id) {
         stationRepository.deleteById(id);
     }
 

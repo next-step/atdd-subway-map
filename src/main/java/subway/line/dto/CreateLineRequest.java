@@ -1,7 +1,8 @@
-package subway.line;
+package subway.line.dto;
 import lombok.Value;
 
 @Value
+public
 class CreateLineRequest {
     String name;
     String color;

@@ -1,13 +1,14 @@
-package subway.line;
+package subway.line.repository;
 
 import lombok.*;
-import subway.station.Station;
+import subway.station.repository.Station;
 
 import javax.persistence.*;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+public
 class Line {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,11 +32,11 @@ class Line {
         this.downStation = downStation;
     }
 
-    void changeName(String name) {
+    public void changeName(String name) {
         this.name = name;
     }
 
-    void changeColor(String color) {
+    public void changeColor(String color) {
         this.color = color;
     }
 }
