@@ -35,11 +35,13 @@ public class LineService {
                 List.of(new StationResponse(upStation.getId(), upStation.getName()), new StationResponse(downStation.getId(), downStation.getName())));
     }
 
+    @Transactional(readOnly = true)
     public List<LineResponse> findLines() {
         List<Line> lines = lineRepository.findAll();
         return lines.stream().map(this::createLineResponse).collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public LineResponse findLine(Long id) {
         Line line = lineRepository.findById(id).orElseThrow(() -> new RuntimeException("해당 아이디의 지하철 노선이 없습니다."));
         return createLineResponse(line);
@@ -55,11 +57,13 @@ public class LineService {
         return new LineResponse(line.getId(), line.getName(), line.getColor(), List.of(createStationResponse(up), createStationResponse(down)));
     }
 
+    @Transactional
     public void updateLine(Long id, LineRequest request) {
         Line line = lineRepository.findById(id).orElseThrow(() -> new RuntimeException("해당 아이디의 지하철 노선이 없습니다."));
         line.updateLine(request.getName(), request.getColor());
     }
 
+    @Transactional
     public void deleteLine(Long id) {
         lineRepository.deleteById(id);
     }

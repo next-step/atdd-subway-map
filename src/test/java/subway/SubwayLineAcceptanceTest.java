@@ -22,10 +22,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class SubwayLineAcceptanceTest {
     private final static int PORT = 8080;
+    private Long upStationId;
+    private Long downStationId;
 
     @BeforeEach
     void setUp() {
         RestAssured.port = PORT;
+        this.upStationId = createStation("신사역");
+        this.downStationId = createStation("광교역");
     }
     /**
      * When 지하철 노선을 생성하면
@@ -35,8 +39,6 @@ public class SubwayLineAcceptanceTest {
     @DisplayName("지하철 노선 생성")
     @Test
     void createLine() {
-        long upStationId = createStation("신사역");
-        long downStationId = createStation("광교역");
         //when
         String name = "신분당선";
         String color = "bg-red-600";
@@ -70,8 +72,6 @@ public class SubwayLineAcceptanceTest {
     @DisplayName("지하철 노선 목록 조회")
     @Test
     void findLines() {
-        long upStationId = createStation("신사역");
-        long downStationId = createStation("광교역");
         //given
         long firstLineId = beforeTestCreateLine("5호선", "bg-purple-600", upStationId, downStationId, 10);
         long secondLineId = beforeTestCreateLine("4호선", "bg-aqua-600", upStationId, downStationId, 20);
@@ -100,8 +100,6 @@ public class SubwayLineAcceptanceTest {
     @DisplayName("지하철 노선 단일 조회")
     @Test
     void findLine() {
-        long upStationId = createStation("신사역");
-        long downStationId = createStation("광교역");
         //given
         String name = "5호선";
         String color = "bg-purple-600";
@@ -131,14 +129,13 @@ public class SubwayLineAcceptanceTest {
     @DisplayName("지하철 노선 수정")
     @Test
     void updateLine() {
-        long upStationId = createStation("신사역");
-        long downStationId = createStation("광교역");
         //given
         String name = "5호선";
         String color = "bg-purple-600";
         String replaceColor = "bg-red-660";
         long id = beforeTestCreateLine(name, color, upStationId, downStationId, 10);
         Map<String, String> params = new HashMap<>();
+        params.put("name", name);
         params.put("color", replaceColor);
         //when
         ExtractableResponse<Response> extract = RestAssured.given().log().all()
@@ -161,8 +158,6 @@ public class SubwayLineAcceptanceTest {
     @DisplayName("지하철 노선 삭제")
     @Test
     void deleteLine() {
-        long upStationId = createStation("신사역");
-        long downStationId = createStation("광교역");
         //given
         String name = "5호선";
         long id = beforeTestCreateLine(name, "bg-purple-600", upStationId, downStationId, 10);
