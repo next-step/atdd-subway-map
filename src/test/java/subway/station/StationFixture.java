@@ -9,8 +9,8 @@ import org.springframework.http.MediaType;
 import java.util.HashMap;
 import java.util.Map;
 
-public class StationHelper {
-    private StationHelper() {
+public class StationFixture {
+    private StationFixture() {
     }
 
     public static ExtractableResponse<Response> 지하철역_목록_조회() {
