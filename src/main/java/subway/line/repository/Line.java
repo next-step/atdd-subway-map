@@ -19,7 +19,7 @@ public class Line {
 
     private String color;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "line", cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "line", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Section> sections = new ArrayList<>();
 
     public Line() {}
@@ -95,5 +95,13 @@ public class Line {
         return lastSection().getDownStation();
     }
 
+    public void removeSection(Long sectionId) {
+        Section lastSection = lastSection();
+        if (!lastSection.getId().equals(sectionId)) {
+            throw new RuntimeException();
+        }
+
+        sections.removeIf(it -> it.getId().equals(sectionId));
+    }
 }
 

@@ -3,6 +3,7 @@ package subway.line.web;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import subway.line.repository.Line;
 import subway.line.service.LineService;
 
 import java.util.List;
@@ -46,11 +47,17 @@ public class LineController {
     @PostMapping("/lines/{id}/sections")
     ResponseEntity<?> addSection(@PathVariable Long id, @RequestBody AddSectionRequest request) {
         try {
-            lineService.addSection(id, request);
-            return ResponseEntity.status(HttpStatus.CREATED).build();
+            Long sectionId = lineService.addSection(id, request);
+            return ResponseEntity.status(HttpStatus.CREATED).body(sectionId);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
+    }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping("/lines/{id}/sections")
+    void removeSection(@PathVariable Long id, @RequestParam Long sectionId) {
+        lineService.removeSection(id, sectionId);
     }
 
 }
