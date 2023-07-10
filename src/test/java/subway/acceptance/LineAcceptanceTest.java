@@ -1,14 +1,19 @@
 package subway.acceptance;
 
+import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.assertj.core.api.Assertions;
+import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import subway.line.web.LineResponse;
 import subway.station.web.StationResponse;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -140,5 +145,44 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 .map(LineResponse::getName)
                 .collect(Collectors.toList());
         assertThat(lineNames).doesNotContain("신분당선");
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 새로운 구간을 등록하면
+     * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
+     */
+    @Test
+    void addSection() {
+        // given
+        Long 강남역 = 지하철_역_생성("강남역");
+        Long 양재역 = 지하철_역_생성("양재역");
+        Long 양재시민의숲역 = 지하철_역_생성("양재시민의숲역");
+
+        Long 신분당선 = 지하철_노선_생성("신분당선", "bg-red-600", 강남역, 양재역, 10L);
+
+        // when
+        Map<String, String> params = new HashMap<>();
+        params.put("upStationId", 양재역.toString());
+        params.put("downStationId", 양재시민의숲역.toString());
+        params.put("distance", "10");
+        ExtractableResponse<Response> response =
+                RestAssured.given().log().all()
+                        .pathParam("id", 신분당선)
+                        .body(params)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .when().post("/lines/{id}/sections")
+                        .then().log().all()
+                        .extract();
+
+        AssertionsForClassTypes.assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        // then
+        List<String> lineNames = 지하철_노선_목록_조회().stream()
+                .map(LineResponse::getStations)
+                .flatMap(Collection::stream)
+                .map(StationResponse::getName)
+                .collect(Collectors.toList());
+        assertThat(lineNames).containsAnyOf("양재시민의숲역");
     }
 }
