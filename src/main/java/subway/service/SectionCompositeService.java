@@ -40,7 +40,6 @@ public class SectionCompositeService {
             throw new IllegalArgumentException("추가할 수 없는 구간입니다.");
         }
 
-        sectionService.save(newSection);
         line.addSection(newSection);
 
         return SectionResponse.from(newSection);
