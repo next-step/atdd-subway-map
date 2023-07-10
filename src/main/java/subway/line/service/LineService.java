@@ -3,17 +3,17 @@ package subway.line.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import subway.constants.LineConstant;
+import subway.exception.SubwayNotFoundException;
+import subway.line.constant.LineMessage;
 import subway.line.dto.LineCreateRequest;
 import subway.line.dto.LineModifyRequest;
 import subway.line.dto.LineResponse;
 import subway.line.model.Line;
-import subway.line.model.LineStation;
 import subway.line.repository.LineRepository;
-import subway.line.repository.LineStationRepository;
 import subway.station.model.Station;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -22,26 +22,20 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class LineService {
 
+
     private final LineRepository lineRepository;
 
-    private final LineStationRepository lineStationRepository;
-
     @Transactional
-    public LineResponse saveLine(LineCreateRequest createRequest,
+    public Line saveLine(LineCreateRequest createRequest,
                                  Station upStation,
                                  Station downStation) {
         Line request = LineCreateRequest.to(createRequest, upStation, downStation);
-        Line line = lineRepository.save(request);
-        line.addLineStation(generateLineStation(line, upStation));
-        line.addLineStation(generateLineStation(line, downStation));
-        return LineResponse.from(line);
+        return lineRepository.save(request);
     }
 
-    private LineStation generateLineStation(Line line, Station station) {
-        return LineStation.builder()
-                .station(station)
-                .line(line)
-                .build();
+    @Transactional
+    public Line saveLine(Line line) {
+        return lineRepository.save(line);
     }
 
     @Transactional
@@ -59,18 +53,21 @@ public class LineService {
     public LineResponse findLineResponseById(Long id) {
         return lineRepository.findById(id)
                 .map(LineResponse::from)
-                .orElseThrow(() -> new IllegalArgumentException(LineConstant.NOT_FOUND));
+                .orElseThrow(() -> new SubwayNotFoundException(LineMessage.NOT_FOUND_MESSAGE.getCode(),
+                        LineMessage.NOT_FOUND_MESSAGE.getMessage()));
     }
 
-    private Line findLineById(Long id) {
+    public Line findLineById(Long id) {
         return lineRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(LineConstant.NOT_FOUND));
+                .orElseThrow(() -> new SubwayNotFoundException(LineMessage.NOT_FOUND_MESSAGE.getCode(),
+                        LineMessage.NOT_FOUND_MESSAGE.getMessage()));
     }
 
     @Transactional
     public void deleteLineById(Long id) {
-        Line line = lineRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(LineConstant.NOT_FOUND));
-        lineStationRepository.deleteByLine(line);
+        lineRepository.findById(id)
+                .orElseThrow(() -> new SubwayNotFoundException(LineMessage.NOT_FOUND_MESSAGE.getCode(),
+                        LineMessage.NOT_FOUND_MESSAGE.getMessage()));
         lineRepository.deleteById(id);
     }
 }

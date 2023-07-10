@@ -3,7 +3,8 @@ package subway.station.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import subway.constants.StationConstant;
+import subway.exception.SubwayNotFoundException;
+import subway.line.constant.StationMessage;
 import subway.station.dto.StationRequest;
 import subway.station.dto.StationResponse;
 import subway.station.model.Station;
@@ -16,14 +17,11 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class StationService {
+
     private final StationRepository stationRepository;
 
     @Transactional
     public StationResponse saveStation(StationRequest stationRequest) {
-        stationRepository.findByName(stationRequest.getName())
-                .ifPresent(e -> {
-
-                    throw new IllegalArgumentException(StationConstant.ALREADY_EXISTED_MESSAGE);});
         Station station = Station.builder()
                 .name(stationRequest.getName())
                 .build();
@@ -41,8 +39,9 @@ public class StationService {
         stationRepository.deleteById(id);
     }
 
-    public Station findEntityById(Long id) {
+    public Station findStationById(Long id) {
         return stationRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(StationConstant.NOT_FOUND_MESSAGE));
+                .orElseThrow(() -> new SubwayNotFoundException(StationMessage.NOT_FOUND_MESSAGE.getCode(),
+                        StationMessage.NOT_FOUND_MESSAGE.getMessage()));
     }
 }

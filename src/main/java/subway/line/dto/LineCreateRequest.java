@@ -2,7 +2,6 @@ package subway.line.dto;
 
 import lombok.Builder;
 import lombok.Getter;
-import subway.constants.LineConstant;
 import subway.line.model.Line;
 import subway.station.model.Station;
 
@@ -12,6 +11,8 @@ import javax.validation.constraints.NotBlank;
 @Getter
 @Builder
 public class LineCreateRequest {
+
+    private final String DISTANCE_MIN_MESSAGE = "구간의 최소 거리는 1 이상이어야 합니다.";
 
     @NotBlank
     private String name;
@@ -26,7 +27,7 @@ public class LineCreateRequest {
     private Long downStationId;
 
     @NotBlank
-    @Min(value = 1L, message = LineConstant.DISTANCE_MIN_MESSAGE)
+    @Min(value = 1L, message = DISTANCE_MIN_MESSAGE)
     private Long distance;
 
     public static Line to(LineCreateRequest request,
@@ -37,7 +38,6 @@ public class LineCreateRequest {
                 .color(request.getColor())
                 .upStation(upStation)
                 .downStation(downStation)
-                .distance(request.getDistance())
                 .build();
     }
 }

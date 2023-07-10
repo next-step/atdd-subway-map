@@ -9,12 +9,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import subway.line.dto.LineCreateRequest;
 import subway.line.dto.LineModifyRequest;
 import subway.line.dto.LineResponse;
+import subway.line.dto.SectionCreateRequest;
+import subway.line.dto.SectionDeleteRequest;
+import subway.line.service.LineComponent;
 import subway.line.service.LineService;
-import subway.line.service.LineStationService;
 
 import java.net.URI;
 import java.util.List;
@@ -25,11 +28,11 @@ import java.util.List;
 public class LineController {
 
     private final LineService lineService;
-    private final LineStationService lineStationService;
+    private final LineComponent lineComponent;
 
     @PostMapping
     public ResponseEntity<LineResponse> createLine(@RequestBody LineCreateRequest lineRequest) {
-        LineResponse line = lineStationService.saveLine(lineRequest);
+        LineResponse line = lineComponent.createLine(lineRequest);
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
 
@@ -55,4 +58,22 @@ public class LineController {
         lineService.deleteLineById(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/{id}/sections")
+    public ResponseEntity<Void> appendSection(@PathVariable(name = "id") Long lineId, @RequestBody SectionCreateRequest request) {
+        lineComponent.appendSection(lineId, request);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{id}/sections")
+    public ResponseEntity<Void> deleteSection(@PathVariable(name = "id") Long lineId, @RequestParam(name = "stationId") Long stationId) {
+        SectionDeleteRequest request = SectionDeleteRequest.builder()
+                .stationId(stationId)
+                .lineId(lineId)
+                .build();
+        lineComponent.deleteSectionByStationId(request);
+        return ResponseEntity.noContent().build();
+    }
+
+
 }

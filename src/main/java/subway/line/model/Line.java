@@ -4,17 +4,18 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import subway.exception.SubwayBadRequestException;
+import subway.line.constant.LineMessage;
 import subway.station.model.Station;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToOne;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +25,9 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Line {
+
+    private static final long MINIMAL_SECTION_SIZE = 2L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -34,28 +38,37 @@ public class Line {
     @Column(nullable = false)
     private String color;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn
     private Station upStation;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn
     private Station downStation;
 
-    @Column(nullable = false)
-    private Long distance;
-
     @Builder.Default
-    @OneToMany(mappedBy = "line", cascade = CascadeType.ALL)
-    private List<LineStation> lineStations = new ArrayList<>();
-
-    public void addLineStation(LineStation lineStation) {
-        lineStations.add(lineStation);
-        lineStation.setLine(this);
-    }
+    @Embedded
+    private LineSection lineSection = new LineSection();
 
     public void updateLine(String name, String color) {
         this.name = name;
         this.color = color;
+    }
+
+    public void addSection(Section section) {
+        this.lineSection.add(section, this);
+        this.downStation = section.getDownStation();
+    }
+
+    public List<Station> getStationsInSections() {
+        List<Station> stations = new ArrayList<>();
+        stations.add(this.upStation);
+        stations.addAll(lineSection.getDownStations());
+        return stations;
+    }
+
+    public void deleteSectionByStation(Station station) {
+        Section lastSection = lineSection.deleteSectionByStation(station, this.downStation);
+        this.downStation = lastSection.getUpStation();
     }
 }
