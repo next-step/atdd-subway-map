@@ -37,7 +37,29 @@ public class StationLineSection {
         this.distance = distance;
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public Long getStationLineId() {
+        return stationLineId;
+    }
+
+    public Long getUpStationId() {
+        return upStationId;
+    }
+
+    public Long getDownStationId() {
+        return downStationId;
+    }
+
+    public int getDistance() {
+        return distance;
+    }
+
     public List<Long> getStationIdList() {
         return List.of(upStationId, downStationId);
     }
+
+
 }

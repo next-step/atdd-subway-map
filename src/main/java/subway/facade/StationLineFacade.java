@@ -33,8 +33,12 @@ public class StationLineFacade {
     public StationLineResponse lineCreate(StationLineRequest request) {
 
         final StationLine stationLine = stationLineService.create(request);
-        final StationLineSection stationLineSection = stationLineSectionService.create(request,
-            stationLine.getId());
+        final StationLineSection stationLineSection = stationLineSectionService.create(
+            stationLine.getId(),
+            request.getUpStationId(),
+            request.getDownStationId(),
+            request.getDistance()
+        );
 
         final List<StationResponse> stationResponses = stationService.findAllIn(
             stationLineSection.getStationIdList());

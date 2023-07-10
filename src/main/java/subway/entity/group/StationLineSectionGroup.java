@@ -1,6 +1,7 @@
 package subway.entity.group;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import subway.entity.StationLineSection;
@@ -24,5 +25,22 @@ public class StationLineSectionGroup {
             .flatMap(Collection::stream)
             .distinct()
             .collect(Collectors.toList());
+    }
+
+    public boolean isEqualDownEndStation(long addUpStationId) {
+
+        return sections.stream()
+            .sorted(Comparator.comparing(StationLineSection::getId).reversed())
+            .limit(1)
+            .anyMatch(
+                stationLineSection -> stationLineSection.getDownStationId().equals(addUpStationId)
+            );
+    }
+
+    public boolean isExistDownEndStation(long downStationId) {
+        return sections.stream()
+            .anyMatch(
+                stationLineSection -> stationLineSection.getDownStationId().equals(downStationId)
+            );
     }
 }
