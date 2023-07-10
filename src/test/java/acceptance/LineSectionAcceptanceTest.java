@@ -15,6 +15,7 @@ import static fixture.when.StationLineApiFixture.지하철역_노선_등록_요�
 import static fixture.when.StationLineSectionApiFixture.지하철_노선_구간_추가_등록;
 
 import config.AcceptanceTestConfig;
+import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
@@ -104,7 +105,19 @@ class LineSectionAcceptanceTest extends AcceptanceTestConfig {
     @Test
     void deleteRemove() {
 
+        //given
+        long 상행역_id = 지하철역_생성_요청(지하철역이름).jsonPath().getLong("id");
+        long 하행역_id = 지하철역_생성_요청(새로운지하철역이름).jsonPath().getLong("id");
+        long 지하철역_노선_id = 지하철역_노선_등록_요청_후_id_추출(신분당선, red, 상행역_id, 하행역_id, distance);
+        long 추가_하행역_id = 지하철역_생성_요청(또다른지하철역이름).jsonPath().getLong("id");
+        지하철_노선_구간_추가_등록(지하철역_노선_id, 추가_하행역_id, 하행역_id, 구간거리);
 
+        //when
+        RestAssured
+            .given().log().all()
+            .when().delete()
+            .then().log().all()
+            .extract();
     }
 
     /**

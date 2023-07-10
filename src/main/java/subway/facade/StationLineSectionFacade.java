@@ -26,4 +26,8 @@ public class StationLineSectionFacade {
             request.getDistance()
         );
     }
+
+    public void deleteSection(long lineId, long sectionId) {
+
+    }
 }

@@ -1,7 +1,9 @@
 package subway.controller;
 
+import javax.websocket.server.PathParam;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,7 +21,7 @@ public class StationLineSectionController {
     }
 
     @PostMapping("/lines/{id}/sections")
-    public ResponseEntity<Object> createStationLine(
+    public ResponseEntity<Object> createStationLineSection(
         @PathVariable long id,
         @RequestBody SectionRequest request) {
 
@@ -27,4 +29,12 @@ public class StationLineSectionController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    @DeleteMapping("/lines/{id}/sections")
+    public ResponseEntity<Object> deleteStationLineSection(
+        @PathVariable(name = "id") long lineId,
+        @PathParam("stationId") long sectionId) {
+
+        facade.deleteSection(lineId, sectionId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
 }
