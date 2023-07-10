@@ -54,10 +54,14 @@ public class LineController {
         }
     }
 
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/lines/{id}/sections")
-    void removeSection(@PathVariable Long id, @RequestParam Long sectionId) {
-        lineService.removeSection(id, sectionId);
+    ResponseEntity<?> removeSection(@PathVariable Long id, @RequestParam Long sectionId) {
+        try {
+            lineService.removeSection(id, sectionId);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
     }
 
 }

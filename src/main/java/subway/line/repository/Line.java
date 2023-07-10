@@ -98,7 +98,7 @@ public class Line {
     public void removeSection(Long sectionId) {
         Section lastSection = lastSection();
         if (!lastSection.getId().equals(sectionId)) {
-            throw new RuntimeException();
+            throw new IllegalArgumentException();
         }
 
         sections.removeIf(it -> it.getId().equals(sectionId));
