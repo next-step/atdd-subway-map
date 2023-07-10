@@ -14,6 +14,8 @@ import org.springframework.test.context.jdbc.Sql;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
 
 @DisplayName("지하철 노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -139,7 +141,7 @@ class LineAcceptanceTest {
     }
 
     private static void 생성한_갯수의_지하철_노선_목록을_응답한다(List<String> lineNames, int createdCount) {
-        assertThat(lineNames.size()).isEqualTo(createdCount);
+        assertThat(lineNames, hasSize(createdCount));
     }
 
     private static void 생성된_노선이_노선_목록에_포함된다(List<String> lineNames, String createdLineName) {
