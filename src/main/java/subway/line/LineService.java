@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.common.exception.ResourceNotFoundException;
 import subway.station.Station;
 import subway.station.StationRepository;
 
@@ -57,11 +58,11 @@ public class LineService {
 
     private Line findLineById(final Long id) {
         return lineRepository.findById(id)
-            .orElseThrow(() -> new IllegalStateException(String.format("존재하지 않는 노선입니다. 요청한 노선 Id : ", id)));
+            .orElseThrow(() -> new ResourceNotFoundException(Line.class, id));
     }
 
     private Station findStationById(final Long id) {
         return stationRepository.findById(id)
-            .orElseThrow(() -> new IllegalStateException(String.format("존재하지 않는 역입니다. 요청한 역 Id : ", id)));
+            .orElseThrow(() -> new ResourceNotFoundException(Line.class, id));
     }
 }
