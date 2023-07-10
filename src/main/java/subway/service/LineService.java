@@ -32,22 +32,19 @@ public class LineService {
             .orElseThrow(IllegalArgumentException::new);
 
         Line line = new Line(lineRequest, upStation, downStation);
-        upStation.setLine(line);
-        downStation.setLine(line);
-
         Line savedLine = lineRepository.save(line);
-        return createLineResponse(savedLine);
+        return LineResponse.from(savedLine);
     }
 
     public List<LineResponse> findAllLines() {
         return lineRepository.findAll().stream()
-            .map(this::createLineResponse)
+            .map(LineResponse::from)
             .collect(Collectors.toList());
     }
 
     public LineResponse findLine(Long id) {
         Line line = lineRepository.findById(id).orElseThrow(IllegalArgumentException::new);
-        return createLineResponse(line);
+        return LineResponse.from(line);
     }
 
     public LineResponse updateLine(Long id, LineRequest request) {
@@ -55,15 +52,11 @@ public class LineService {
         line.updateLine(request);
 
         Line updateLine = lineRepository.save(line);
-        return createLineResponse(updateLine);
+        return LineResponse.from(updateLine);
     }
 
     public void deleteLineById(Long id) {
         lineRepository.deleteById(id);
-    }
-
-    private LineResponse createLineResponse(Line line) {
-        return new LineResponse(line);
     }
 
 }

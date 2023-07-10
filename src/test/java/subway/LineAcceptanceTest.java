@@ -1,6 +1,14 @@
 package subway;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static subway.factory.SubwayNameFactory.강남역;
+import static subway.factory.SubwayNameFactory.광교역;
+import static subway.factory.SubwayNameFactory.논현역;
+import static subway.factory.SubwayNameFactory.수인분당선;
+import static subway.factory.SubwayNameFactory.신논현역;
+import static subway.factory.SubwayNameFactory.신분당선;
+import static subway.factory.SubwayNameFactory.양재역;
+import static subway.factory.SubwayNameFactory.우이신설선;
 
 import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
@@ -15,7 +23,8 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
-import subway.factory.LineFactory;
+import subway.dto.StationRequest;
+import subway.factory.LineRequestFactory;
 import subway.utils.RestAssuredClient;
 
 @DisplayName("노선 관련 기능")
@@ -29,9 +38,10 @@ class LineAcceptanceTest {
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
+        saveStations(); // 노선 생성에 필요한 지하철역 추가
     }
 
-    private static final String urlPath = "/lines";
+    private static final String linePath = "/lines";
 
     /**
      * When 지하철 노선을 생성하면
@@ -41,18 +51,18 @@ class LineAcceptanceTest {
     @Test
     void createLine() {
         // when
-        RestAssuredClient.requestPost(urlPath, LineFactory.create(LineFactory.신분당선))
+        RestAssuredClient.requestPost(linePath, LineRequestFactory.create(신분당선))
             .statusCode(HttpStatus.CREATED.value());
 
         // then
-        ExtractableResponse<Response> response = RestAssuredClient.requestGet(urlPath)
+        ExtractableResponse<Response> response = RestAssuredClient.requestGet(linePath)
             .extract();
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         List<String> lineNames = response.jsonPath().getList("name", String.class);
         assertThat(lineNames.size()).isEqualTo(1);
-        assertThat(lineNames).contains(LineFactory.신분당선);
+        assertThat(lineNames).contains(신분당선);
     }
 
     /**
@@ -64,13 +74,14 @@ class LineAcceptanceTest {
     @Test
     void getLines() {
         // given
-        RestAssuredClient.requestPost(urlPath, LineFactory.create(LineFactory.신분당선))
+        RestAssuredClient.requestPost(linePath, LineRequestFactory.create(신분당선))
             .statusCode(HttpStatus.CREATED.value());
-        RestAssuredClient.requestPost(urlPath, LineFactory.create(LineFactory.우이신설선))
+
+        RestAssuredClient.requestPost(linePath, LineRequestFactory.create(우이신설선))
             .statusCode(HttpStatus.CREATED.value());
 
         // when
-        ExtractableResponse<Response> response = RestAssuredClient.requestGet(urlPath)
+        ExtractableResponse<Response> response = RestAssuredClient.requestGet(linePath)
             .extract();
 
         // then
@@ -78,7 +89,7 @@ class LineAcceptanceTest {
 
         List<String> lineNames = response.jsonPath().getList("name", String.class);
         assertThat(lineNames.size()).isEqualTo(2);
-        assertThat(lineNames).contains(LineFactory.신분당선, LineFactory.우이신설선);
+        assertThat(lineNames).contains(신분당선, 우이신설선);
     }
 
     /**
@@ -90,8 +101,8 @@ class LineAcceptanceTest {
     @Test
     void getLine() {
         // given
-        ExtractableResponse<Response> creationResponse = RestAssuredClient.requestPost(urlPath,
-                LineFactory.create(LineFactory.신분당선))
+        ExtractableResponse<Response> creationResponse = RestAssuredClient.requestPost(linePath,
+                LineRequestFactory.create(신분당선))
             .statusCode(HttpStatus.CREATED.value()).extract();
 
         // when
@@ -102,7 +113,7 @@ class LineAcceptanceTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat((String) response.jsonPath().get("name")).isEqualTo(LineFactory.신분당선);
+        assertThat((String) response.jsonPath().get("name")).isEqualTo(신분당선);
     }
 
     /**
@@ -114,19 +125,19 @@ class LineAcceptanceTest {
     @Test
     void updateLine() {
         // given
-        ExtractableResponse<Response> creationResponse = RestAssuredClient.requestPost(urlPath,
-                LineFactory.create(LineFactory.신분당선))
+        ExtractableResponse<Response> creationResponse = RestAssuredClient.requestPost(linePath,
+                LineRequestFactory.create(신분당선))
             .statusCode(HttpStatus.CREATED.value()).extract();
 
         // when
         long lineId = creationResponse.jsonPath().getLong("id");
         String path = generatePathForId(lineId);
 
-        String updatedLineName = LineFactory.수인분당선;
+        String updatedLineName = 수인분당선;
         String updatedLineColor = "bg-yellow-600";
         ExtractableResponse<Response> response =
             RestAssuredClient.requestPut(path,
-                    LineFactory.createNameAndColorUpdateParams(updatedLineName, updatedLineColor))
+                    LineRequestFactory.createNameAndColorUpdateParams(updatedLineName, updatedLineColor))
                 .extract();
 
         // then
@@ -146,8 +157,8 @@ class LineAcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        ExtractableResponse<Response> creationResponse = RestAssuredClient.requestPost(urlPath,
-                LineFactory.create(LineFactory.신분당선))
+        ExtractableResponse<Response> creationResponse = RestAssuredClient.requestPost(linePath,
+                LineRequestFactory.create(신분당선))
             .statusCode(HttpStatus.CREATED.value()).extract();
 
         // when
@@ -163,9 +174,18 @@ class LineAcceptanceTest {
 
     private String generatePathForId(long id) {
         return new StringBuilder()
-            .append(urlPath)
+            .append(linePath)
             .append("/")
             .append(id)
             .toString();
+    }
+
+    private void saveStations() {
+        String stationPath = "/stations";
+        RestAssuredClient.requestPost(stationPath, StationRequest.builder().name(강남역).build());
+        RestAssuredClient.requestPost(stationPath, StationRequest.builder().name(광교역).build());
+        RestAssuredClient.requestPost(stationPath, StationRequest.builder().name(양재역).build());
+        RestAssuredClient.requestPost(stationPath, StationRequest.builder().name(논현역).build());
+        RestAssuredClient.requestPost(stationPath, StationRequest.builder().name(신논현역).build());
     }
 }
