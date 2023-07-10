@@ -43,8 +43,8 @@ public class LineTestUtils {
     private LineTestUtils() {}
 
     public static String 지하철_노선_생성(Map<String, String> 노선_생성_요청_정보, String 상행역_URL, String 하행역_URL) {
-        노선_생성_요청_정보.put("upStationId", 상행역_URL.substring(상행역_URL.lastIndexOf('/') + 1));
-        노선_생성_요청_정보.put("downStationId", 하행역_URL.substring(하행역_URL.lastIndexOf('/') + 1));
+        노선_생성_요청_정보.put("upStationId", String.valueOf(StationTestUtils.지하철_아이디_획득(상행역_URL)));
+        노선_생성_요청_정보.put("downStationId", String.valueOf(StationTestUtils.지하철_아이디_획득(하행역_URL)));
 
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()

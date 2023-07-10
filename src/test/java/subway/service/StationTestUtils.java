@@ -26,7 +26,7 @@ public class StationTestUtils {
         return map;
     }
 
-    public static Long 아이디_획득(String url) {
+    public static Long 지하철_아이디_획득(String url) {
         return Long.parseLong(url.substring(url.lastIndexOf('/') + 1));
     }
 

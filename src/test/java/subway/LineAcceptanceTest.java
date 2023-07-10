@@ -37,8 +37,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // then
         ExtractableResponse<Response> 노선_목록_조회_결과 = 지하철_노선_목록_조회();
 
-        Map<String, String> 강남역_저장_정보 = 역_저장_정보(강남역_정보, 아이디_획득(강남역_URL));
-        Map<String, String> 판교역_저장_정보 = 역_저장_정보(판교역_정보, 아이디_획득(판교역_URL));
+        Map<String, String> 강남역_저장_정보 = 역_저장_정보(강남역_정보, 지하철_아이디_획득(강남역_URL));
+        Map<String, String> 판교역_저장_정보 = 역_저장_정보(판교역_정보, 지하철_아이디_획득(판교역_URL));
 
         지하철_노선_생성_여부_검증(노선_목록_조회_결과, 신분당선_생성_요청, 강남역_저장_정보, 판교역_저장_정보);
     }
@@ -63,9 +63,9 @@ public class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> 노선_목록_조회_결과 = 지하철_노선_목록_조회();
 
         // then
-        Map<String, String> 강남역_저장_정보 = 역_저장_정보(강남역_정보, 아이디_획득(강남역_URL));
-        Map<String, String> 판교역_저장_정보 = 역_저장_정보(판교역_정보, 아이디_획득(판교역_URL));
-        Map<String, String> 삼성역_저장_정보 = 역_저장_정보(삼성역_정보, 아이디_획득(삼성역_URL));
+        Map<String, String> 강남역_저장_정보 = 역_저장_정보(강남역_정보, 지하철_아이디_획득(강남역_URL));
+        Map<String, String> 판교역_저장_정보 = 역_저장_정보(판교역_정보, 지하철_아이디_획득(판교역_URL));
+        Map<String, String> 삼성역_저장_정보 = 역_저장_정보(삼성역_정보, 지하철_아이디_획득(삼성역_URL));
 
         지하철_노선_생성_여부_검증(노선_목록_조회_결과, 신분당선_생성_요청, 강남역_저장_정보, 판교역_저장_정보);
         지하철_노선_생성_여부_검증(노선_목록_조회_결과, 이호선_생성_요청, 강남역_저장_정보, 삼성역_저장_정보);
