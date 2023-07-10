@@ -232,4 +232,35 @@ public class LineAcceptanceTest extends AcceptanceTest {
         assertThat(lineNames).doesNotContain("양재시민의숲역");
     }
 
+    /**
+     * Given 지하철 노선을 생성하고 2개의 구간을 추가로 등록 했을 때
+     * When 마지막 구간이 아닌 구간을 삭제 요청 하면
+     * Then 요청이 실패 한다.
+     *
+     */
+    @Test
+    void removeSectionFail() {
+        // given
+        Long 강남역 = 지하철_역_생성("강남역");
+        Long 양재역 = 지하철_역_생성("양재역");
+        Long 양재시민의숲역 = 지하철_역_생성("양재시민의숲역");
+        Long 청계산입구역 = 지하철_역_생성("청계산입구역");
+
+        Long 신분당선 = 지하철_노선_생성("신분당선", "bg-red-600", 강남역, 양재역, 10L);
+        Long 양재_양재시민의숲 = 지하철_구간_등록(신분당선, 양재역, 양재시민의숲역, 10L);
+        Long 양재시민의숲_청계산입구 = 지하철_구간_등록(신분당선, 양재시민의숲역, 청계산입구역, 10L);
+
+        // when
+        ExtractableResponse<Response> response =
+                RestAssured.given().log().all()
+                        .pathParam("id", 신분당선)
+                        .queryParam("sectionId", 양재_양재시민의숲)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .when().delete("/lines/{id}/sections")
+                        .then().log().all()
+                        .extract();
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
 }
