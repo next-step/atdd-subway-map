@@ -16,8 +16,8 @@ import java.util.stream.Collectors;
 @Entity
 @Getter
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Line {
 
     @Id

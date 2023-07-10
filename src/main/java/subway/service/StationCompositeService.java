@@ -21,12 +21,15 @@ public class StationCompositeService {
 
     @Transactional
     public StationResponse saveStation(StationRequest stationRequest) {
-        Station station = stationService.save(new Station(stationRequest.getName()));
+        Station station = stationService.save(Station.builder()
+                                                     .name(stationRequest.getName())
+                                                     .build());
         return createStationResponse(station);
     }
 
     public List<StationResponse> findAllStations() {
-        return stationService.findAll().stream()
+        return stationService.findAll()
+                             .stream()
                              .map(this::createStationResponse)
                              .collect(Collectors.toList());
     }
