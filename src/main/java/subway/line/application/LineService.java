@@ -12,6 +12,10 @@ import subway.line.dto.LineUpdateRequest;
 import subway.line.exception.LineNotFoundException;
 import subway.section.domain.Section;
 import subway.section.domain.SectionRepository;
+import subway.section.dto.SectionRequest;
+import subway.section.dto.SectionResponse;
+import subway.section.exception.CanNotDeleteOnlyOneSectionException;
+import subway.section.exception.DeleteOnlyTerminusStationException;
 import subway.station.domain.Station;
 import subway.station.domain.StationRepository;
 import subway.station.exception.StationNotFoundException;
@@ -77,5 +81,43 @@ public class LineService {
 
         sectionRepository.deleteAll(sections);
         lineRepository.delete(line);
+    }
+
+    @Transactional
+    public SectionResponse registerSection(Long lineId, SectionRequest sectionRequest) {
+        Station upStation = getStation(sectionRequest.getUpStationId());
+        Station downStation = getStation(sectionRequest.getDownStationId());
+
+        Section section = new Section(upStation, downStation, sectionRequest.getDistance());
+        sectionRepository.save(section);
+
+        Line line = getLine(lineId);
+        line.addSection(section);
+
+        return SectionResponse.of(section);
+    }
+
+    @Transactional
+    public void deleteSection(Long lineId, Long stationId) {
+        Line line = getLine(lineId);
+        validateLineHasOnlyOneSection(line);
+
+        Station station = getStation(stationId);
+        Section lastSection = line.getLastSection();
+        validateStationIsDownStationOfLastSection(station, lastSection);
+
+        sectionRepository.delete(lastSection);
+    }
+
+    private void validateLineHasOnlyOneSection(Line line) {
+        if (line.hasOnlyOneSection()) {
+            throw new CanNotDeleteOnlyOneSectionException();
+        }
+    }
+
+    private void validateStationIsDownStationOfLastSection(Station station, Section lastSection) {
+        if (!lastSection.downStationEqualsTo(station)) {
+            throw new DeleteOnlyTerminusStationException();
+        }
     }
 }

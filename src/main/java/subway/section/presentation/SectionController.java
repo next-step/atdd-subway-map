@@ -8,27 +8,28 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import subway.line.application.LineService;
 import subway.section.application.SectionService;
 import subway.section.dto.SectionRequest;
 import subway.section.dto.SectionResponse;
 
 @RequestMapping("/lines/{lineId}")
 @RestController
-public class SectionController {  //TODO 해당 API는 lines의 하위에 있다고 볼 수 있는데, 이렇게 분리하는게 맞는지, LineController에서 하는게 맞는지
-    private final SectionService sectionService;
+public class SectionController {
+    private final LineService lineService;
 
-    public SectionController(SectionService sectionService) {
-        this.sectionService = sectionService;
+    public SectionController(LineService lineService) {
+        this.lineService = lineService;
     }
 
     @PostMapping("/sections")
     public ResponseEntity<SectionResponse> registerSection(@PathVariable Long lineId, @RequestBody SectionRequest sectionRequest) {
-        return ResponseEntity.ok().body(sectionService.registerSection(lineId, sectionRequest));
+        return ResponseEntity.ok().body(lineService.registerSection(lineId, sectionRequest));
     }
 
     @DeleteMapping("/sections")
     public ResponseEntity<Void> deleteSection(@PathVariable Long lineId, @RequestParam Long stationId) {
-        sectionService.deleteSection(lineId, stationId);
+        lineService.deleteSection(lineId, stationId);
         return ResponseEntity.noContent().build();
     }
 }
