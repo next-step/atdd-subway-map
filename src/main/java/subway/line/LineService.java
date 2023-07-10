@@ -19,12 +19,14 @@ class LineService {
 
     @Transactional
     public LineResponse saveLine(CreateLineRequest request) {
-        Line line = lineRepository.save(new Line(
-                request.getName(),
-                request.getColor(),
-                stationRepository.getReferenceById(request.getUpStationId()),
-                stationRepository.getReferenceById(request.getDownStationId())
-        ));
+        Line line = lineRepository.save(
+                Line.builder()
+                        .name(request.getName())
+                        .color(request.getColor())
+                        .upStation(stationRepository.getReferenceById(request.getUpStationId()))
+                        .downStation(stationRepository.getReferenceById(request.getDownStationId()))
+                        .build()
+        );
 
         return createLineResponse(line);
     }

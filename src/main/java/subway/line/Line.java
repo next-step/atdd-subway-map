@@ -1,9 +1,6 @@
 package subway.line;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import subway.station.Station;
 
 import javax.persistence.*;
@@ -28,6 +25,7 @@ class Line {
     @JoinColumn(name = "down_station_id")
     private Station downStation;
 
+    @Builder
     Line(String name, String color, Station upStation, Station downStation) {
         this.name = name;
         this.color = color;
