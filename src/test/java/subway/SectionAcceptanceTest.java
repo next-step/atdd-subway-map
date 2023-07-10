@@ -2,10 +2,7 @@ package subway;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.jdbc.Sql;
@@ -240,13 +237,15 @@ public class SectionAcceptanceTest {
         List<StationResponse> stations = LineApiHelper.callApiToGetSingleLine(lineId)
                                                       .jsonPath()
                                                       .getList("stations", StationResponse.class);
-        assertThat(stations).hasSize(expectedStationIds.length);
-        assertThat(stations.stream()
-                           .map(StationResponse::getId)
-                           .collect(Collectors.toList())).contains(expectedStationIds);
-        assertThat(stations.stream()
-                           .map(StationResponse::getName)
-                           .collect(Collectors.toList())).contains(expectedStationNames);
+        Assertions.assertAll(
+                () -> assertThat(stations).hasSize(expectedStationIds.length),
+                () -> assertThat(stations.stream()
+                               .map(StationResponse::getId)
+                               .collect(Collectors.toList())).contains(expectedStationIds),
+                () -> assertThat(stations.stream()
+                               .map(StationResponse::getName)
+                               .collect(Collectors.toList())).contains(expectedStationNames)
+        );
     }
 
     private Long 노선_A_B_C_생성() {
