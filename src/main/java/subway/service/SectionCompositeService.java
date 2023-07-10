@@ -81,7 +81,7 @@ public class SectionCompositeService {
             throw new IllegalArgumentException("삭제할 수 없는 정거장입니다.");
         }
 
-        line.getSections().remove(targetSection);
+        line.removeSection(targetSection);
 
         sectionService.deleteById(targetSection.getId());
     }

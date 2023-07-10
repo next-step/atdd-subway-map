@@ -100,4 +100,8 @@ public class Line {
 
         return true;
     }
+
+    public void removeSection(Section targetSection) {
+        this.sections.remove(targetSection);
+    }
 }
