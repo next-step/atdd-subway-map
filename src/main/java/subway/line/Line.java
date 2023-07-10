@@ -13,10 +13,8 @@ class Line {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false)
-    @Setter
     private String name;
     @Column(nullable = false)
-    @Setter
     private String color;
     @OneToOne
     @JoinColumn(name = "up_station_id")
@@ -31,5 +29,13 @@ class Line {
         this.color = color;
         this.upStation = upStation;
         this.downStation = downStation;
+    }
+
+    void changeName(String name) {
+        this.name = name;
+    }
+
+    void changeColor(String color) {
+        this.color = color;
     }
 }

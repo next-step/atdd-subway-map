@@ -37,8 +37,8 @@ class LineService {
     @Transactional
     public void updateLineById(Long id, UpdateLineRequest request) {
         Line line = lineRepository.findById(id).orElseThrow(() -> new RuntimeException("Not Exist Line"));
-        line.setName(request.getName());
-        line.setColor(request.getColor());
+        line.changeName(request.getName());
+        line.changeColor(request.getColor());
     }
 
     @Transactional
