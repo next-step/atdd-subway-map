@@ -1,23 +1,19 @@
 package subway.line;
 
 import common.AcceptanceTest;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
 import subway.station.Station;
 import subway.station.StationResponse;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static common.Constants.*;
-import static subway.station.StationTestFixture.*;
-import static subway.line.LineTestFixture.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static subway.station.StationTestStepDefinition.*;
+import static subway.line.LineTestStepDefinition.*;
 
-@DisplayName("지하철 노선도 관련 기능")
+@DisplayName("지하철 노선 관련 기능")
 @AcceptanceTest
 public class LineAcceptanceTest {
 
@@ -26,26 +22,16 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선을 생성한다.")
     @Test
     void createLine() {
-        // TODO: 인수테스트 작성하면 stations 등 연관되어 있는 것 매번 만드는지?
-        // TODO: 성공하는 케이스만 인수테스트를 작성하는지?
-        // TODO: 비즈니스 실패 케이스는 작성할 수도 있겠지만 4XX 5XX 에러는 어떻게 테스트하는지?
-        // TODO: 뭔가 코드가 많이 지저분해졌는데 시나리오에 방해되는 메서드들을 private 메서드로 빼는게 좋을지? -> ~TestFixture에 RestAssured 관련 메서드만 넣을 필요는 없으니까?
-        // TODO: 매 역 생성마다 status code를 확인하는게 좋을지?
-        // given
-        StationResponse someStationResponse = 지하철_역_생성_요청_역_정보_반환(지하철역);
-        StationResponse newStationResponse = 지하철_역_생성_요청_역_정보_반환(새로운지하철역);
-        LineRequest lineRequest = new LineRequest(신분당선, "bg-red-600", someStationResponse.getId(),
-            newStationResponse.getId(), 10);
-        List<Station> stations = toStationList(someStationResponse, newStationResponse);
-
         // when
-        var response = 지하철_노선_생성_요청(lineRequest);
-        LineResponse lineResponse = toLineResponse(response);
+        var response = 지하철_노선_생성_요청(신분당선, "bg-red-600", 지하철역, 새로운지하철역, 10);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(lineResponse).isEqualTo(
-            new LineResponse(lineResponse.getId(), 신분당선, "bg-red-600", stations));
+        assertAll(
+            () -> assertThat(response.getId()).isNotNull(),
+            () -> assertThat(response.getName()).isEqualTo(신분당선),
+            () -> assertThat(response.getColor()).isEqualTo("bg-red-600"),
+            () -> assertThat(getStationNames(response)).containsExactly(지하철역, 새로운지하철역)
+        );
     }
 
     // Given 2개의 지하철 노선을 생성하고
@@ -54,24 +40,20 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선 목록을 조회한다.")
     @Test
     void getLineList() {
-        // TODO: equals와 hashCode를 Override해서 비교하는 것 외에도 비교할 수 있는 방법이 없을까?
-        // TODO: 서로 바라보고 있는 객체들 간 관계에서 equals와 hashCode는 어떻게 Override해야 할까? (무한루프 대비)
         // given
-        StationResponse someStationResponse = 지하철_역_생성_요청_역_정보_반환(지하철역);
-        StationResponse newStationResponse = 지하철_역_생성_요청_역_정보_반환(새로운지하철역);
-        StationResponse anotherStationResponse = 지하철_역_생성_요청_역_정보_반환(또다른지하철역);
+        StationResponse someStationResponse = 지하철_역_생성_요청(지하철역);
+        StationResponse newStationResponse = 지하철_역_생성_요청(새로운지하철역);
+        StationResponse anotherStationResponse = 지하철_역_생성_요청(또다른지하철역);
 
-        LineRequest sinBundangLineRequest = new LineRequest(신분당선, "bg-red-600",
+        var sinBundangLineResponse = 지하철_노선_생성_요청(신분당선, "bg-red-600",
             someStationResponse.getId(),
             newStationResponse.getId(), 10);
-        LineRequest bundangLineRequest = new LineRequest(분당선, "bg-green-600",
+        var bundangLineResponse = 지하철_노선_생성_요청(분당선, "bg-green-600",
             someStationResponse.getId(),
             anotherStationResponse.getId(), 10);
-        LineResponse sinBundangLineResponse = 지하철_노선_생성_요청_노선_정보_반환(sinBundangLineRequest);
-        LineResponse bundangLineResponse = 지하철_노선_생성_요청_노선_정보_반환(bundangLineRequest);
 
         // when
-        var response = 지하철_노선_목록_조회_요청_노선_목록_반환();
+        var response = 지하철_노선_목록_조회_요청();
 
         // then
         assertThat(response).containsExactly(sinBundangLineResponse, bundangLineResponse);
@@ -83,19 +65,16 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선을 조회한다.")
     @Test
     void getLine() {
-        // given
-        StationResponse someStationResponse = 지하철_역_생성_요청_역_정보_반환(지하철역);
-        StationResponse newStationResponse = 지하철_역_생성_요청_역_정보_반환(새로운지하철역);
-        List<Station> stations = toStationList(someStationResponse, newStationResponse);
-        LineRequest lineRequest = new LineRequest(신분당선, "bg-red-600", someStationResponse.getId(),
-            newStationResponse.getId(), 10);
-
-        // when
-        LineResponse lineResponse = 지하철_노선_생성_요청_노선_정보_반환(lineRequest);
+        // given & when
+        var response = 지하철_노선_생성_요청(신분당선, "bg-red-600", 지하철역, 새로운지하철역, 10);
 
         // then
-        assertThat(lineResponse).isEqualTo(
-            new LineResponse(lineResponse.getId(), 신분당선, "bg-red-600", stations));
+        assertAll(
+            () -> assertThat(response.getId()).isNotNull(),
+            () -> assertThat(response.getName()).isEqualTo(신분당선),
+            () -> assertThat(response.getColor()).isEqualTo("bg-red-600"),
+            () -> assertThat(getStationNames(response)).containsExactly(지하철역, 새로운지하철역)
+        );
     }
 
     // Given 지하철 노선을 생성하고
@@ -105,18 +84,16 @@ public class LineAcceptanceTest {
     @Test
     void updateLine() {
         // given
-        StationResponse someStationResponse = 지하철_역_생성_요청_역_정보_반환(지하철역);
-        StationResponse newStationResponse = 지하철_역_생성_요청_역_정보_반환(새로운지하철역);
-        LineRequest lineRequest = new LineRequest(신분당선, "bg-red-600", someStationResponse.getId(),
-            newStationResponse.getId(), 10);
-        LineResponse lineResponse = 지하철_노선_생성_요청_노선_정보_반환(lineRequest);
+        var lineResponse = 지하철_노선_생성_요청(신분당선, "bg-red-600", 지하철역, 새로운지하철역, 10);
 
         // when
-        LineUpdateRequest lineUpdateRequest = new LineUpdateRequest("다른분당선", "bg-red-600");
-        int statusCode = 지하철_노선_수정_요청_상태_코드_반환(lineResponse.getId(), lineUpdateRequest);
+        지하철_노선_수정_요청(lineResponse.getId(), "다른분당선", "bg-red-600");
 
         // then
-        assertThat(statusCode).isEqualTo(HttpStatus.OK.value());
+        var updateResponse = 지하철_노선_조회_요청(lineResponse.getId());
+        assertAll(
+            () -> assertThat(updateResponse.getName()).isEqualTo("다른분당선"),
+            () -> assertThat(updateResponse.getColor()).isEqualTo("bg-red-600"));
     }
 
     // Given 지하철 노선을 생성하고
@@ -126,26 +103,16 @@ public class LineAcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        StationResponse someStationResponse = 지하철_역_생성_요청_역_정보_반환(지하철역);
-        StationResponse newStationResponse = 지하철_역_생성_요청_역_정보_반환(새로운지하철역);
-        LineRequest lineRequest = new LineRequest(신분당선, "bg-red-600", someStationResponse.getId(),
-            newStationResponse.getId(), 10);
-        LineResponse lineResponse = 지하철_노선_생성_요청_노선_정보_반환(lineRequest);
+        var lineResponse = 지하철_노선_생성_요청(신분당선, "bg-red-600", 지하철역, 새로운지하철역, 10);
 
         // when
-        int statusCode = 지하철_노선_삭제_요청_상태_코드_반환(lineResponse.getId());
+        지하철_노선_삭제_요청(lineResponse.getId());
 
         // then
-        assertThat(statusCode).isEqualTo(HttpStatus.NO_CONTENT.value());
+        없는_지하철_노선_조회_요청(lineResponse.getId());
     }
 
-    private List<Station> toStationList(StationResponse... stationResponse) {
-        return Arrays.stream(stationResponse)
-            .map(it -> new Station(it.getId(), it.getName()))
-            .collect(Collectors.toList());
-    }
-
-    private LineResponse toLineResponse(ExtractableResponse<Response> response) {
-        return response.as(LineResponse.class);
+    private static Stream<String> getStationNames(LineResponse response) {
+        return response.getStations().stream().map(Station::getName);
     }
 }

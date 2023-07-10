@@ -29,10 +29,6 @@ public class StationTestStepDefinition {
         return response.as(StationResponse.class);
     }
 
-    public static StationResponse 지하철_역_생성_요청_역_정보_반환(String name) {
-        return 지하철_역_생성_요청(name);
-    }
-
     public static List<StationResponse> 지하철_역_목록_조회_요청() {
         ExtractableResponse<Response> response = RestAssured.given().log().all()
             .contentType(MediaType.APPLICATION_JSON_VALUE)
