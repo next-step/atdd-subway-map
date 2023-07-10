@@ -1,23 +1,18 @@
 package subway.station;
 
 import common.AcceptanceTest;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
 
-import java.util.List;
 
+import static common.Constants.강남역;
+import static common.Constants.신논현역;
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.station.StationTestFixture.*;
+import static subway.station.StationTestStepDefinition.*;
 
 @DisplayName("지하철역 관련 기능")
 @AcceptanceTest
 public class StationAcceptanceTest {
-
-    private static final String 강남역 = "강남역";
-    private static final String 신논현역 = "신논현역";
 
     /**
      * When 지하철역을 생성하면
@@ -28,13 +23,10 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        int statusCode = 지하철_역_생성_요청_상태_코드_반환(강남역);
+        지하철_역_생성_요청(강남역);
 
         // then
-        assertThat(statusCode).isEqualTo(HttpStatus.CREATED.value());
-
-        // then
-        List<String> stationNames = 지하철_역_목록_조회_요청_역_이름_목록_반환();
+        var stationNames = 지하철_역_이름_목록_조회_요청();
 
         assertThat(stationNames).containsAnyOf(강남역);
     }
@@ -52,7 +44,7 @@ public class StationAcceptanceTest {
         지하철_역_생성_요청(신논현역);
 
         // given
-        List<String> stationNames = 지하철_역_목록_조회_요청_역_이름_목록_반환();
+        var stationNames = 지하철_역_이름_목록_조회_요청();
 
         // then
         assertThat(stationNames).containsExactly(강남역, 신논현역);
@@ -67,13 +59,13 @@ public class StationAcceptanceTest {
     @Test
     void deleteStation() {
         // when
-        ExtractableResponse<Response> stationCreateResponse = 지하철_역_생성_요청(강남역);
+        var response = 지하철_역_생성_요청(강남역);
 
         // given
-        지하철_역_삭제_요청(stationCreateResponse.jsonPath().getInt("id"));
+        지하철_역_삭제_요청(response.getId());
 
         // then
-        List<String> stationNames = 지하철_역_목록_조회_요청_역_이름_목록_반환();
+        var stationNames = 지하철_역_목록_조회_요청();
 
         assertThat(stationNames).isEmpty();
     }
