@@ -2,12 +2,11 @@ package subway.utils;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ValidatableResponse;
-import java.util.Map;
 import org.springframework.http.MediaType;
 
 public class RestAssuredClient {
 
-    public static ValidatableResponse requestPost(String path, Map<String, String> params) {
+    public static <T> ValidatableResponse requestPost(String path, T params) {
         return RestAssured.given().log().all()
             .body(params)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -21,7 +20,7 @@ public class RestAssuredClient {
             .then().log().all();
     }
 
-    public static ValidatableResponse requestPut(String path, Map<String, String> params) {
+    public static <T> ValidatableResponse requestPut(String path, T params) {
         return RestAssured.given().log().all()
             .body(params)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
