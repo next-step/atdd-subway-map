@@ -20,49 +20,6 @@ import static subway.service.StationTestUtils.*;
 @DisplayName("지하철 노선 관련 기능")
 public class LineAcceptanceTest extends AcceptanceTest {
 
-    static Map<String, String> 강남역_정보 = Map.of(
-            "id", "1",
-           "name", "kangnam"
-    );
-
-    static Map<String, String> 판교역_정보 = Map.of(
-            "id", "2",
-            "name", "pankyo"
-    );
-
-    static Map<String, String> 삼성역_정보 = Map.of(
-            "id", "3",
-            "name", "samsung"
-    );
-
-    // when
-    static Map<String, String> 신분당선_생성_요청 = new HashMap<>();
-
-    static Map<String, String> 이호선_생성_요청 = new HashMap<>();
-
-    static {
-        신분당선_생성_요청.putAll(
-                Map.of(
-                        "name", "신분당선",
-                        "color", "bg-red-600",
-                        "upStationId", "",
-                        "downStationId", "",
-                        "distance", "10"
-                )
-        );
-
-        이호선_생성_요청.putAll(
-                Map.of(
-                        "name", "이호선",
-                        "color", "bg-green-600",
-                        "upStationId", "",
-                        "downStationId", "",
-                        "distance", "20"
-                )
-        );
-    }
-
-
     /**
      * When 지하철 노선을 생성하면
      * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
@@ -71,16 +28,19 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine() {
         // given
-        지하철역_생성(강남역_정보);
-        지하철역_생성(판교역_정보);
+        String 강남역_URL = 지하철역_생성(강남역_정보);
+        String 판교역_URL = 지하철역_생성(판교역_정보);
 
         // when
-        지하철_노선_생성(신분당선_생성_요청, 강남역_정보, 판교역_정보);
+        지하철_노선_생성(신분당선_생성_요청, 강남역_URL, 판교역_URL);
 
         // then
         ExtractableResponse<Response> 노선_목록_조회_결과 = 지하철_노선_목록_조회();
 
-        지하철_노선_생성_여부_검증(노선_목록_조회_결과, 신분당선_생성_요청, 강남역_정보, 판교역_정보);
+        Map<String, String> 강남역_저장_정보 = 역_저장_정보(강남역_정보, 아이디_획득(강남역_URL));
+        Map<String, String> 판교역_저장_정보 = 역_저장_정보(판교역_정보, 아이디_획득(판교역_URL));
+
+        지하철_노선_생성_여부_검증(노선_목록_조회_결과, 신분당선_생성_요청, 강남역_저장_정보, 판교역_저장_정보);
     }
 
     /**
@@ -92,16 +52,23 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         // given
-        지하철역_생성(강남역_정보);
-        지하철역_생성(판교역_정보);
-        지하철역_생성(삼성역_정보);
+        String 강남역_URL = 지하철역_생성(강남역_정보);
+        String 판교역_URL = 지하철역_생성(판교역_정보);
+        String 삼성역_URL = 지하철역_생성(삼성역_정보);
 
-        지하철_노선_생성(신분당선_생성_요청, 강남역_정보, 판교역_정보);
-        지하철_노선_생성(이호선_생성_요청, 강남역_정보, 삼성역_정보);
+        지하철_노선_생성(신분당선_생성_요청, 강남역_URL, 판교역_URL);
+        지하철_노선_생성(이호선_생성_요청, 강남역_URL, 삼성역_URL);
 
         // when
+        ExtractableResponse<Response> 노선_목록_조회_결과 = 지하철_노선_목록_조회();
+
         // then
-        지하철_노선_목록_검증(지하철_노선_목록_조회());
+        Map<String, String> 강남역_저장_정보 = 역_저장_정보(강남역_정보, 아이디_획득(강남역_URL));
+        Map<String, String> 판교역_저장_정보 = 역_저장_정보(판교역_정보, 아이디_획득(판교역_URL));
+        Map<String, String> 삼성역_저장_정보 = 역_저장_정보(삼성역_정보, 아이디_획득(삼성역_URL));
+
+        지하철_노선_생성_여부_검증(노선_목록_조회_결과, 신분당선_생성_요청, 강남역_저장_정보, 판교역_저장_정보);
+        지하철_노선_생성_여부_검증(노선_목록_조회_결과, 이호선_생성_요청, 강남역_저장_정보, 삼성역_저장_정보);
     }
 
     /**
@@ -112,11 +79,12 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선을 조회한다")
     @Test
     void getLine() {
-        지하철역_생성(강남역_정보);
-        지하철역_생성(판교역_정보);
+        String 강남역_URL = 지하철역_생성(강남역_정보);
+        String 판교역_URL = 지하철역_생성(판교역_정보);
+
 
         // Given
-        String lineUrl = 지하철_노선_생성(신분당선_생성_요청, 강남역_정보, 판교역_정보);
+        String lineUrl = 지하철_노선_생성(신분당선_생성_요청, 강남역_URL, 판교역_URL);
 
         // when
         ExtractableResponse<Response> 노선_조회_결과 = 지하철_노선_조회(lineUrl);
@@ -134,14 +102,14 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void changeLine() {
         // given
-        지하철역_생성(강남역_정보);
-        지하철역_생성(판교역_정보);
+        String 강남역_URL = 지하철역_생성(강남역_정보);
+        String 판교역_URL = 지하철역_생성(판교역_정보);
 
         Map<String, String> 노선_수정_요청_정보 = Map.of(
                 "name", "다른분당선",
                 "color", "bg-red-700"
         );
-        String lineUrl = 지하철_노선_생성(신분당선_생성_요청, 강남역_정보, 판교역_정보);
+        String lineUrl = 지하철_노선_생성(신분당선_생성_요청, 강남역_URL, 판교역_URL);
 
         // when
         지하철_노선_수정_요청(lineUrl, 노선_수정_요청_정보);
@@ -160,9 +128,9 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void deleteLine() {
 
         // given
-        지하철역_생성(강남역_정보);
-        지하철역_생성(판교역_정보);
-        String lineUrl = 지하철_노선_생성(신분당선_생성_요청, 강남역_정보, 판교역_정보);
+        String 강남역_URL = 지하철역_생성(강남역_정보);
+        String 판교역_URL = 지하철역_생성(판교역_정보);
+        String lineUrl = 지하철_노선_생성(신분당선_생성_요청, 강남역_URL, 판교역_URL);
 
         // when
         지하철_노선_삭제(lineUrl);
@@ -172,7 +140,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     }
 
     private static void 지하철_노선_생성_여부_검증(ExtractableResponse<Response> 노선_목록_조회_결과, Map<String, String> 노선_생성_요청_정보,
-                                        Map<String, String>... 역_정보들) {
+                                        Map<String, String>... 역_저장_정보들) {
         assertThat(노선_목록_조회_결과.jsonPath().getList("id")).isNotEmpty();
         assertThat(노선_목록_조회_결과.jsonPath().getList("name", String.class)).contains(노선_생성_요청_정보.get("name"));
         assertThat(노선_목록_조회_결과.jsonPath().getList("color", String.class)).contains(노선_생성_요청_정보.get("color"));
@@ -180,13 +148,13 @@ public class LineAcceptanceTest extends AcceptanceTest {
         List<Object> ids = JsonPath.parse(노선_목록_조회_결과.body().asString()).read("$.[*].stations[*].id");
         List<Object> names = JsonPath.parse(노선_목록_조회_결과.body().asString()).read("$.[*].stations[*].name");
         assertThat(ids).containsAll(
-                Arrays.stream(역_정보들)
+                Arrays.stream(역_저장_정보들)
                         .map(m -> m.get("id"))
                         .map(Integer::valueOf)
                         .collect(Collectors.toList())
         );
         assertThat(names).containsAll(
-                Arrays.stream(역_정보들)
+                Arrays.stream(역_저장_정보들)
                         .map(m -> m.get("name"))
                         .collect(Collectors.toList())
         );

@@ -5,13 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import subway.jpa.Station;
-
 @ExtendWith(MockitoExtension.class)
 class LineServiceTest {
-
-    static Station 강남역 = new Station(1L, "강남역");
-    static Station 판교역 = new Station(2L, "판교역");
 
     /**
      * Input = LineRequest
