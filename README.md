@@ -64,7 +64,7 @@ git rebase upstream/songteaheon
 - [X] save인데 클래스 선언부에 정의된 ReadOnly=true 지우기
 - [ ] line에 section이 종속되기 때문. sectionService의 save를 따로 호출하지 않도록 변경하기
 - [ ] line에 section이 종속되기 때문. section을 따로 조회하지 않도록 수정. 또 sectionService의 delete를 따로 호출하지 않도록 변경 - 질문하기
-- [ ] @nested사용해서 테스트 코드 리팩토링 
+- [X] @nested사용해서 테스트 코드 리팩토링 
 - [ ] 이렇게 assertThat을 여러 개 써야 한다면, assertAll을 사용하는 걸로 변경하기.
 - [ ] 생성된_LINE_조회(lineResponse); 코드 확인하기
 - [ ] 이름으로 비교하기 보다는, JPA Entity니 생성한 객체를 담고있는지로 비교하기. 그리고 이런 경우는 ContainsAll를 사용하기

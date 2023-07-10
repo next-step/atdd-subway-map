@@ -4,6 +4,7 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
@@ -43,154 +44,164 @@ public class SectionAcceptanceTest {
         stationId_D = Station_생성(stationName_D);
     }
 
-    /**
-     * Given 상행종점역이 A이고, 하행종점역이 B인 지하철 노선을 생성하고
-     * When 지하철역 B와 C를 연결하는 구간을 생성하면
-     * Then 해당 노선이 A-B-C로 연결되고,
-     * Then 지하철 노선의 하행역이 C로 바뀐다.
-     */
-    @DisplayName("2개역이 있는 노선에 지하철 구간을 추가한다.")
-    @Test
-    void createSection_성공__2개역_노선() {
+    @DisplayName("노선 생성 테스트")
+    @Nested
+    public class 노선_생성_테스트 {
+        /**
+         * Given 상행종점역이 A이고, 하행종점역이 B인 지하철 노선을 생성하고
+         * When 지하철역 B와 C를 연결하는 구간을 생성하면
+         * Then 해당 노선이 A-B-C로 연결되고,
+         * Then 지하철 노선의 하행역이 C로 바뀐다.
+         */
+        @DisplayName("2개역이 있는 노선에 지하철 구간을 추가한다.")
+        @Test
+        void createSection_성공__2개역_노선() {
 
-        // given
-        Long lineId = LINE_생성(stationId_A, stationId_B);
+            // given
+            Long lineId = LINE_생성(stationId_A, stationId_B);
 
-        // when
-        ExtractableResponse<Response> creationResponse = Section_생성(lineId, stationId_B, stationId_C);
+            // when
+            ExtractableResponse<Response> creationResponse = Section_생성(lineId, stationId_B, stationId_C);
 
-        // then
-        HTTP_STATUS_검증(creationResponse, HttpStatus.CREATED);
+            // then
+            HTTP_STATUS_검증(creationResponse, HttpStatus.CREATED);
 
-        Long[] expectedStationIds = {stationId_A, stationId_B, stationId_C};
-        String[] expectedStationNames = {stationName_A, stationName_B, stationName_C};
-        LINE의_스테이션_전체_조회_및_검증(lineId, expectedStationIds, expectedStationNames);
+            Long[] expectedStationIds = {stationId_A, stationId_B, stationId_C};
+            String[] expectedStationNames = {stationName_A, stationName_B, stationName_C};
+            LINE의_스테이션_전체_조회_및_검증(lineId, expectedStationIds, expectedStationNames);
+        }
+
+        /**
+         * Given 상행종점역이 A이고, 하행종점역이 C인 지하철 노선 A-B-C를 생성하고
+         * When 지하철역 C와 D를 연결하는 구간을 생성하면
+         * Then 해당 노선이 A-B-C-D로 연결되고,
+         * Then 지하철 노선의 하행역이 D로 바뀐다.
+         */
+        @DisplayName("3개역이 있는 노선에 지하철 구간을 추가한다.")
+        @Test
+        void createSection_성공__3개역_노선() {
+
+            // given
+            Long lineId = 노선_A_B_C_생성();
+
+            // when
+            ExtractableResponse<Response> creationResponse = Section_생성(lineId, stationId_C, stationId_D);
+
+            // then
+            HTTP_STATUS_검증(creationResponse, HttpStatus.CREATED);
+
+            Long[] expectedStationIds = {stationId_A, stationId_B, stationId_C, stationId_D};
+            String[] expectedStationsNames = {stationName_A, stationName_B, stationName_C, stationName_D};
+            LINE의_스테이션_전체_조회_및_검증(lineId, expectedStationIds, expectedStationsNames);
+        }
+
+        /**
+         * Given 상행종점역이 A이고, 하행종점역이 B인 지하철 노선 A-B를 생성하고
+         * When 지하철역 C와 하행종점역이 아닌 지하철역 A를 연결하는 구간을 생성하면
+         * Then 에러를 응답한다.
+         */
+        @DisplayName("[오류] 노선의 하행 종점역이 아닌 지하철역을 상행역으로 하는 구간을 추가한다.")
+        @Test
+        void createSection_에러__하행종점역이_아닌_상행역_구간() {
+
+            // given
+            Long lineId = LINE_생성(stationId_A, stationId_B);
+
+            // when
+            ExtractableResponse<Response> creationResponse = Section_생성(lineId, stationId_C, stationId_A);
+
+            // then
+            HTTP_STATUS_검증(creationResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+
+        }
+
+        /**
+         * Given 상행종점역이 A이고, 하행종점역이 C인 지하철 노선 A-B-C를 생성하고
+         * When 지하철역 C와 이미 노선에 존재하는 B를 연결하는 구간을 생성하면
+         * Then 에러를 응답한다.
+         */
+        @DisplayName("[오류] 이미 노선에 등록된 지하철역을 하행역으로 하는 지하철 구간을 추가한다.")
+        @Test
+        void createSection_에러__노선에_등록된_하행역() {
+
+            // given
+            Long lineId = 노선_A_B_C_생성();
+
+            // when
+            ExtractableResponse<Response> creationResponse = Section_생성(lineId, stationId_C, stationId_B);
+
+            // then
+            HTTP_STATUS_검증(creationResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
-    /**
-     * Given 상행종점역이 A이고, 하행종점역이 C인 지하철 노선 A-B-C를 생성하고
-     * When 지하철역 C와 D를 연결하는 구간을 생성하면
-     * Then 해당 노선이 A-B-C-D로 연결되고,
-     * Then 지하철 노선의 하행역이 D로 바뀐다.
-     */
-    @DisplayName("3개역이 있는 노선에 지하철 구간을 추가한다.")
-    @Test
-    void createSection_성공__3개역_노선() {
+    @DisplayName("노선 삭제 테스트")
+    @Nested
+    public class 노선_삭제_테스트 {
+        /**
+         * Given 지하철 노선 A-B-C를 생성하고
+         * When 지하철역 B-C 구간을 삭제하면
+         * Then 노선이 A-B만 남는다.
+         */
+        @DisplayName("노선 A-B-C에서 B-C구간을 삭제한다.")
+        @Test
+        void deleteSection_성공() {
 
-        // given
-        Long lineId = 노선_A_B_C_생성();
+            // given
+            Long lineId = 노선_A_B_C_생성();
 
-        // when
-        ExtractableResponse<Response> creationResponse = Section_생성(lineId, stationId_C, stationId_D);
+            // when
+            ExtractableResponse<Response> deletionResponse = 구간_삭제(lineId, stationId_C);
 
-        // then
-        HTTP_STATUS_검증(creationResponse, HttpStatus.CREATED);
+            // then
+            HTTP_STATUS_검증(deletionResponse, HttpStatus.NO_CONTENT);
 
-        Long[] expectedStationIds = {stationId_A, stationId_B, stationId_C, stationId_D};
-        String[] expectedStationsNames = {stationName_A, stationName_B, stationName_C, stationName_D};
-        LINE의_스테이션_전체_조회_및_검증(lineId, expectedStationIds, expectedStationsNames);
+            Long[] expectedStationIds = {stationId_A, stationId_B};
+            String[] expectedStationNames = {stationName_A, stationName_B};
+            LINE의_스테이션_전체_조회_및_검증(lineId, expectedStationIds, expectedStationNames);
+        }
+
+        /**
+         * Given 지하철 노선 A-B를 생성하고
+         * When 지하철 A-B 구간을 삭제하려고 하면
+         * Then 에러가 발생한다.
+         */
+        @DisplayName("[오류] 구간이 1개 뿐인 노선의 구간을 삭제한다.")
+        @Test
+        void deleteSection_에러__구간_1개_노선의_구간_삭제() {
+
+            // given
+            Long lineId = LINE_생성(stationId_A, stationId_B);
+
+            // when
+            ExtractableResponse<Response> deletionResponse = 구간_삭제(lineId, stationId_B);
+
+            // then
+            HTTP_STATUS_검증(deletionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        /**
+         * Given 지하철 노선 A-B-C를 생성하고
+         * When 지하철 A-B 구간을 삭제하려고 하면
+         * Then 에러가 발생한다.
+         */
+        @DisplayName("[오류] 마지막 구간이 아닌 노선을 삭제한다.")
+        @Test
+        void deleteSection_에러__마지막_구간이_아닌_구간_삭제() {
+
+            // given
+            Long lineId = 노선_A_B_C_생성();
+
+            // when
+            ExtractableResponse<Response> deletionResponse = 구간_삭제(lineId, stationId_B);
+
+            // then
+            HTTP_STATUS_검증(deletionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+
+        }
     }
 
-    /**
-     * Given 상행종점역이 A이고, 하행종점역이 B인 지하철 노선 A-B를 생성하고
-     * When 지하철역 C와 하행종점역이 아닌 지하철역 A를 연결하는 구간을 생성하면
-     * Then 에러를 응답한다.
-     */
-    @DisplayName("[오류] 노선의 하행 종점역이 아닌 지하철역을 상행역으로 하는 구간을 추가한다.")
-    @Test
-    void createSection_에러__하행종점역이_아닌_상행역_구간() {
 
-        // given
-        Long lineId = LINE_생성(stationId_A, stationId_B);
-
-        // when
-        ExtractableResponse<Response> creationResponse = Section_생성(lineId, stationId_C, stationId_A);
-
-        // then
-        HTTP_STATUS_검증(creationResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-
-    }
-
-    /**
-     * Given 상행종점역이 A이고, 하행종점역이 C인 지하철 노선 A-B-C를 생성하고
-     * When 지하철역 C와 이미 노선에 존재하는 B를 연결하는 구간을 생성하면
-     * Then 에러를 응답한다.
-     */
-    @DisplayName("[오류] 이미 노선에 등록된 지하철역을 하행역으로 하는 지하철 구간을 추가한다.")
-    @Test
-    void createSection_에러__노선에_등록된_하행역() {
-
-        // given
-        Long lineId = 노선_A_B_C_생성();
-
-        // when
-        ExtractableResponse<Response> creationResponse = Section_생성(lineId, stationId_C, stationId_B);
-
-        // then
-        HTTP_STATUS_검증(creationResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    /**
-     * Given 지하철 노선 A-B-C를 생성하고
-     * When 지하철역 B-C 구간을 삭제하면
-     * Then 노선이 A-B만 남는다.
-     */
-    @DisplayName("노선 A-B-C에서 B-C구간을 삭제한다.")
-    @Test
-    void deleteSection_성공() {
-
-        // given
-        Long lineId = 노선_A_B_C_생성();
-
-        // when
-        ExtractableResponse<Response> deletionResponse = 구간_삭제(lineId, stationId_C);
-
-        // then
-        HTTP_STATUS_검증(deletionResponse, HttpStatus.NO_CONTENT);
-
-        Long[] expectedStationIds = {stationId_A, stationId_B};
-        String[] expectedStationNames = {stationName_A, stationName_B};
-        LINE의_스테이션_전체_조회_및_검증(lineId, expectedStationIds, expectedStationNames);
-    }
-
-    /**
-     * Given 지하철 노선 A-B를 생성하고
-     * When 지하철 A-B 구간을 삭제하려고 하면
-     * Then 에러가 발생한다.
-     */
-    @DisplayName("[오류] 구간이 1개 뿐인 노선의 구간을 삭제한다.")
-    @Test
-    void deleteSection_에러__구간_1개_노선의_구간_삭제() {
-
-        // given
-        Long lineId = LINE_생성(stationId_A, stationId_B);
-
-        // when
-        ExtractableResponse<Response> deletionResponse = 구간_삭제(lineId, stationId_B);
-
-        // then
-        HTTP_STATUS_검증(deletionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    /**
-     * Given 지하철 노선 A-B-C를 생성하고
-     * When 지하철 A-B 구간을 삭제하려고 하면
-     * Then 에러가 발생한다.
-     */
-    @DisplayName("[오류] 마지막 구간이 아닌 노선을 삭제한다.")
-    @Test
-    void deleteSection_에러__마지막_구간이_아닌_구간_삭제() {
-
-        // given
-        Long lineId = 노선_A_B_C_생성();
-
-        // when
-        ExtractableResponse<Response> deletionResponse = 구간_삭제(lineId, stationId_B);
-
-        // then
-        HTTP_STATUS_검증(deletionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-
-    }
 
 
     private ExtractableResponse<Response> Section_생성(Long lineId, Long upStationId, Long downStationId) {
