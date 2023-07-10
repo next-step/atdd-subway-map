@@ -170,6 +170,33 @@ public class SubwayLineAcceptanceTest {
         assertThat(extract.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
+    /**
+     * Given 지하철 노선을 생성한다.
+     * When 새로운 지하철 노선을 생성한다.
+     * Then 생성된 노선을 조회할 수 있다.
+     */
+    @DisplayName("지하철 노선 구간 등록")
+    @Test
+    void addSection() {
+        //given
+        String name = "5호선";
+        long firstLineId = beforeTestCreateLine(name, "bg-purple-600", upStationId, downStationId, 10);
+        long yongSanStationId = createStation("용산역");
+        Map<String, String> param = new HashMap<>();
+        param.put("downStationId", String.valueOf(yongSanStationId));
+        param.put("upStationId", String.valueOf(upStationId));
+        param.put("distance", String.valueOf(10));
+        //when
+        ExtractableResponse<Response> extract = RestAssured.given().log().all()
+                .body(param).contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines/{id}/sections", firstLineId)
+                .then().log().all()
+                .extract();
+        assertThat(extract.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(extract.body().jsonPath().getLong("/upStationId")).isEqualTo(downStationId);
+        assertThat(extract.body().jsonPath().getLong("/downStationId")).isEqualTo(yongSanStationId);
+    }
+
     // 지하철역 생성
     private long createStation(String name) {
         Map<String, String> param = new HashMap<>();
