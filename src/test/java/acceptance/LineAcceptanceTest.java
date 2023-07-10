@@ -3,14 +3,15 @@ package acceptance;
 import static fixture.given.StationLineRequestFixture.distance;
 import static fixture.given.StationLineRequestFixture.green;
 import static fixture.given.StationLineRequestFixture.red;
-import static fixture.given.StationLineRequestFixture.노선등록요청_데이터_생성;
 import static fixture.given.StationLineRequestFixture.다른분당선;
-import static fixture.given.StationLineRequestFixture.또다른지하철역_id;
 import static fixture.given.StationLineRequestFixture.분당선;
 import static fixture.given.StationLineRequestFixture.새로운지하철역_id;
 import static fixture.given.StationLineRequestFixture.신분당선;
 import static fixture.given.StationLineRequestFixture.지하철역_id;
 import static fixture.given.StationModifyRequestFixture.노선수정요청_데이터_생성;
+import static fixture.given.StationModifyRequestFixture.또다른지하철역이름;
+import static fixture.given.StationModifyRequestFixture.새로운지하철역이름;
+import static fixture.given.StationModifyRequestFixture.지하철역이름;
 import static fixture.then.ApiStatusFixture.API_생성_응답코드_검사;
 import static fixture.then.ApiStatusFixture.API_요청성공_응답코드_검사;
 import static fixture.then.ApiStatusFixture.API_잘못된요청_응답코드_검사;
@@ -23,6 +24,7 @@ import static fixture.then.StationLineThenFixture.노선목록_노선이름_포�
 import static fixture.then.StationLineThenFixture.노선목록_조회시_생성한노선_id_포함_검사;
 import static fixture.then.StationLineThenFixture.노선목록_크기_검사;
 import static fixture.then.StationLineThenFixture.없는노선조회_에러표출_검사;
+import static fixture.when.StationApiFixture.지하철역_생성_요청;
 import static fixture.when.StationLineApiFixture.지하철역_노선_단건_조회;
 import static fixture.when.StationLineApiFixture.지하철역_노선_등록_요청;
 import static fixture.when.StationLineApiFixture.지하철역_노선_등록_요청_후_id_추출;
@@ -48,10 +50,12 @@ class LineAcceptanceTest extends AcceptanceTestConfig {
     @Test
     void createLine() {
 
+        //given
+        long 지하철역_id = 지하철역_생성_요청(지하철역이름).jsonPath().getLong("id");
+        long 새로운지하철역_id = 지하철역_생성_요청(새로운지하철역이름).jsonPath().getLong("id");
+
         //when
-        ExtractableResponse<Response> 노선등록응답값 = 지하철역_노선_등록_요청(
-            노선등록요청_데이터_생성(신분당선, red, 지하철역_id, 새로운지하철역_id, distance)
-        );
+        ExtractableResponse<Response> 노선등록응답값 = 지하철역_노선_등록_요청(신분당선, red, 지하철역_id, 새로운지하철역_id, distance);
 
         //then
         Assertions.assertAll(
@@ -74,8 +78,12 @@ class LineAcceptanceTest extends AcceptanceTestConfig {
     void getStationLines() {
 
         //given
-        지하철역_노선_등록_요청(노선등록요청_데이터_생성(신분당선, red, 지하철역_id, 새로운지하철역_id, distance));
-        지하철역_노선_등록_요청(노선등록요청_데이터_생성(분당선, green, 지하철역_id, 또다른지하철역_id, distance));
+        long 지하철역_id = 지하철역_생성_요청(지하철역이름).jsonPath().getLong("id");
+        long 새로운지하철역_id = 지하철역_생성_요청(새로운지하철역이름).jsonPath().getLong("id");
+        long 또다른지하철역_id = 지하철역_생성_요청(또다른지하철역이름).jsonPath().getLong("id");
+
+        지하철역_노선_등록_요청(신분당선, red, 지하철역_id, 새로운지하철역_id, distance);
+        지하철역_노선_등록_요청(분당선, green, 지하철역_id, 또다른지하철역_id, distance);
 
         //when
         ExtractableResponse<Response> 노선목록조회결과_응답값 = 지하철역_노선_목록_조회_요청();
@@ -97,6 +105,9 @@ class LineAcceptanceTest extends AcceptanceTestConfig {
     void getStationLine() {
 
         //given
+        long 지하철역_id = 지하철역_생성_요청(지하철역이름).jsonPath().getLong("id");
+        long 새로운지하철역_id = 지하철역_생성_요청(새로운지하철역이름).jsonPath().getLong("id");
+
         long 신규등록_노선_id = 지하철역_노선_등록_요청_후_id_추출(신분당선, red, 지하철역_id, 새로운지하철역_id, distance);
 
         //when

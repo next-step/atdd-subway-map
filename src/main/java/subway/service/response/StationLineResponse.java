@@ -20,15 +20,12 @@ public class StationLineResponse {
         this.stations = stations;
     }
 
-    public static StationLineResponse of(final StationLine entity) {
+    public static StationLineResponse of(final StationLine entity, final List<StationResponse> stations) {
         return new StationLineResponse(
             entity.getId(),
             entity.getName(),
             entity.getColor(),
-            List.of(
-                new StationResponse(entity.getUpStationId(), "상행 종점"),
-                new StationResponse(entity.getDownStationId(), "하행 종점")
-            )
+            stations
         );
     }
 

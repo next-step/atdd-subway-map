@@ -1,14 +1,11 @@
 package subway.service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.entity.StationLine;
 import subway.repository.StationLineRepository;
-import subway.service.request.StationLineModifyRequest;
 import subway.service.request.StationLineRequest;
-import subway.service.response.StationLineResponse;
 
 @Service
 @Transactional
@@ -20,41 +17,32 @@ public class StationLineService {
         this.repository = repository;
     }
 
-    public StationLineResponse create(StationLineRequest request) {
+    public StationLine create(StationLineRequest request) {
 
-        return StationLineResponse.of(repository.save(
+        return repository.save(
             new StationLine(
                 request.getName(),
-                request.getColor(),
-                request.getUpStationId(),
-                request.getDownStationId(),
-                request.getDistance()
+                request.getColor()
             )
-        ));
+        );
     }
 
-    public List<StationLineResponse> findAllStationLines() {
+    public List<StationLine> findAllLine() {
 
-        return repository.findAll().stream()
-            .map(StationLineResponse::of)
-            .collect(Collectors.toList());
+        return repository.findAll();
     }
 
-    public StationLineResponse findById(long id) {
-        return StationLineResponse.of(findEntityById(id));
-    }
-
-    private StationLine findEntityById(long id) {
+    public StationLine findById(long id) {
         return repository.findById(id).orElseThrow(
             () -> new IllegalArgumentException("해당하는 id 에 맞는 지하철 노선이 존재하지 않습니다.")
         );
     }
 
-    public void modify(long id, StationLineModifyRequest request) {
+    public void modify(long id, String name, String color) {
 
-        StationLine stationLine = findEntityById(id);
-        stationLine.updateName(request.getName());
-        stationLine.updateColor(request.getColor());
+        StationLine stationLine = findById(id);
+        stationLine.updateName(name);
+        stationLine.updateColor(color);
 
         repository.save(stationLine);
     }

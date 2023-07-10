@@ -13,7 +13,7 @@ import subway.service.response.StationResponse;
 @Service
 @Transactional(readOnly = true)
 public class StationService {
-    private StationRepository stationRepository;
+    private final StationRepository stationRepository;
 
     public StationService(StationRepository stationRepository) {
         this.stationRepository = stationRepository;
@@ -22,12 +22,12 @@ public class StationService {
     @Transactional
     public StationResponse saveStation(StationRequest stationRequest) {
         Station station = stationRepository.save(new Station(stationRequest.getName()));
-        return createStationResponse(station);
+        return StationResponse.of(station);
     }
 
     public List<StationResponse> findAllStations() {
         return stationRepository.findAll().stream()
-                .map(this::createStationResponse)
+                .map(StationResponse::of)
                 .collect(Collectors.toList());
     }
 
@@ -36,10 +36,11 @@ public class StationService {
         stationRepository.deleteById(id);
     }
 
-    private StationResponse createStationResponse(Station station) {
-        return new StationResponse(
-                station.getId(),
-                station.getName()
-        );
+    public List<StationResponse> findAllIn(List<Long> idList) {
+        return stationRepository.findAllByIdIn(idList)
+            .stream()
+            .map(StationResponse::of)
+            .collect(Collectors.toList());
     }
+
 }

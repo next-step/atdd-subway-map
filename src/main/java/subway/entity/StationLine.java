@@ -19,24 +19,11 @@ public class StationLine {
     @Column(length = 20, nullable = false)
     private String color;
 
-    @Column(nullable = false)
-    private Long upStationId;
-
-    @Column(nullable = false)
-    private Long downStationId;
-
-    @Column(nullable = false)
-    private int distance;
-
     public StationLine() {}
 
-    public StationLine(String name, String color, Long upStationId, Long downStationId,
-        int distance) {
+    public StationLine(String name, String color) {
         this.name = name;
         this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
-        this.distance = distance;
     }
 
     public Long getId() {
@@ -49,18 +36,6 @@ public class StationLine {
 
     public String getColor() {
         return color;
-    }
-
-    public Long getUpStationId() {
-        return upStationId;
-    }
-
-    public Long getDownStationId() {
-        return downStationId;
-    }
-
-    public int getDistance() {
-        return distance;
     }
 
     public void updateName(String name) {
