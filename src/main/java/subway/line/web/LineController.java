@@ -44,24 +44,16 @@ public class LineController {
         lineService.deleteLine(id);
     }
 
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/lines/{id}/sections")
-    ResponseEntity<?> addSection(@PathVariable Long id, @RequestBody AddSectionRequest request) {
-        try {
-            Long sectionId = lineService.addSection(id, request);
-            return ResponseEntity.status(HttpStatus.CREATED).body(sectionId);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
+    Long addSection(@PathVariable Long id, @RequestBody AddSectionRequest request) {
+        return lineService.addSection(id, request);
     }
 
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/lines/{id}/sections")
-    ResponseEntity<?> removeSection(@PathVariable Long id, @RequestParam Long sectionId) {
-        try {
-            lineService.removeSection(id, sectionId);
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
+    void removeSection(@PathVariable Long id, @RequestParam Long sectionId) {
+        lineService.removeSection(id, sectionId);
     }
 
 }
