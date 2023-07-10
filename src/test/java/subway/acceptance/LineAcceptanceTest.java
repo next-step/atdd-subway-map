@@ -1,24 +1,19 @@
 package subway.acceptance;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import subway.line.web.LineResponse;
 import subway.station.web.StationResponse;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static subway.acceptance.LineRequestFixture.*;
-import static subway.acceptance.LineRequestFixture.지하철_구간_등록;
 import static subway.acceptance.StationRequestFixture.지하철_역_생성;
 
 @DisplayName("지하철 노선 관련 기능")
@@ -187,18 +182,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         Long 신분당선 = 지하철_노선_생성("신분당선", "bg-red-600", 강남역, 양재역, 10L);
 
         // when
-        Map<String, String> params = new HashMap<>();
-        params.put("upStationId", 판교역.toString());
-        params.put("downStationId", 양재시민의숲역.toString());
-        params.put("distance", "10");
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .pathParam("id", 신분당선)
-                        .body(params)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/lines/{id}/sections")
-                        .then().log().all()
-                        .extract();
+        ExtractableResponse<Response> response = 지하철_구간_등록_요청(신분당선, 판교역, 양재시민의숲역, 10L);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -251,14 +235,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
         Long 양재시민의숲_청계산입구 = 지하철_구간_등록(신분당선, 양재시민의숲역, 청계산입구역, 10L);
 
         // when
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .pathParam("id", 신분당선)
-                        .queryParam("sectionId", 양재_양재시민의숲)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().delete("/lines/{id}/sections")
-                        .then().log().all()
-                        .extract();
+        ExtractableResponse<Response> response = 지하철_구간_삭제_요청(신분당선, 양재_양재시민의숲);
+
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
