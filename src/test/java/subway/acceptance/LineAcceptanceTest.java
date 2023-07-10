@@ -171,4 +171,38 @@ public class LineAcceptanceTest extends AcceptanceTest {
         assertThat(lineNames).containsAnyOf("양재시민의숲역");
     }
 
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 하행 종점이 아닌 역으로 새로운 구간을 등록하면
+     * Then 요청이 실패 한다.
+     */
+    @Test
+    void addSectionFail() {
+        // given
+        Long 강남역 = 지하철_역_생성("강남역");
+        Long 양재역 = 지하철_역_생성("양재역");
+        Long 판교역 = 지하철_역_생성("판교역");
+        Long 양재시민의숲역 = 지하철_역_생성("양재시민의숲역");
+
+        Long 신분당선 = 지하철_노선_생성("신분당선", "bg-red-600", 강남역, 양재역, 10L);
+
+        // when
+        지하철_구간_등록(신분당선, 판교역, 양재시민의숲역, 10L);
+        Map<String, String> params = new HashMap<>();
+        params.put("upStationId", 판교역.toString());
+        params.put("downStationId", 양재시민의숲역.toString());
+        params.put("distance", "10");
+        ExtractableResponse<Response> response =
+                RestAssured.given().log().all()
+                        .pathParam("id", 신분당선)
+                        .body(params)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .when().post("/lines/{id}/sections")
+                        .then().log().all()
+                        .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
 }
