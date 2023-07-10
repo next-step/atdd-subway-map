@@ -1,4 +1,4 @@
-package subway;
+package google;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -11,7 +11,7 @@ import org.springframework.http.HttpStatus;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class RestAssuredTest {
+public class GoogleRestAssuredTest {
 
     @DisplayName("구글 페이지 접근 테스트 - Assertions.assertThat() 을 사용하여 검증")
     @Test
