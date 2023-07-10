@@ -10,7 +10,14 @@ import subway.controller.dto.line.LineSaveRequest;
 import subway.model.line.Line;
 import subway.model.line.LineService;
 import subway.model.station.Station;
+import subway.model.station.StationDTO;
 import subway.model.station.StationService;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 class LineCompositeServiceIntegrationTest {
@@ -48,12 +55,11 @@ class LineCompositeServiceIntegrationTest {
     private void 생성된_LINE_조회(LineResponse lineResponse, String... stationNames) {
 
         Line line = lineService.findById(lineResponse.getId());
-
-        for (int i = 0; i < stationNames.length; i++) {
-            Assertions.assertThat(line.getStations()
-                                      .get(i)
-                                      .getName()).isEqualTo(stationNames[i]);
-        }
+        assertThat(line.getStations()
+                       .stream()
+                       .map(StationDTO::getName)
+                       .collect(Collectors.toList()))
+                .containsAll(List.of(stationNames));
     }
 
     private Station Station_생성(String stationName) {

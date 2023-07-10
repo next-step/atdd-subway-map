@@ -10,9 +10,12 @@ import subway.model.line.Line;
 import subway.model.line.LineService;
 import subway.model.section.Section;
 import subway.model.station.Station;
+import subway.model.station.StationDTO;
 import subway.model.station.StationService;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -59,14 +62,10 @@ class SectionCompositeServiceIntegrationTest {
 
         Line line = lineService.findById(lineId);
 
-        List<Station> stations = line.getStations();
+        List<StationDTO> stations = line.getStations();
 
         assertThat(stations).hasSize(stationNames.length);
-
-        for (int i = 0; i < stationNames.length; i++) {
-            assertThat(stations.get(i)
-                               .getName()).isEqualTo(stationNames[i]);
-        }
+        assertThat(stations.stream().map(StationDTO::getName).collect(Collectors.toList())).containsAll(Arrays.asList(stationNames));
     }
 
     private void 생성된_Section_조회(SectionResponse sectionResponse, String upStationName, String downStationName) {

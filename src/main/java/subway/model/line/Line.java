@@ -4,6 +4,7 @@ import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import subway.model.section.Section;
 import subway.model.station.Station;
+import subway.model.station.StationDTO;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -44,11 +45,15 @@ public class Line {
         this.color = color;
     }
 
-    public List<Station> getStations() {
+    public List<StationDTO> getStations() {
+        return getInternalStations().stream().map(StationDTO::from).collect(Collectors.toList());
+    }
+
+    private List<Station> getInternalStations() {
 
         List<Station> stations = this.sections.stream()
-                                             .map(Section::getUpStation)
-                                             .collect(Collectors.toList());
+                                              .map(Section::getUpStation)
+                                              .collect(Collectors.toList());
         stations.add(getLastStation());
 
         return stations;
@@ -74,12 +79,15 @@ public class Line {
     public boolean isAddableSection(Section newSection) {
 
         if (!Objects.equals(getLastStation(), newSection.getUpStation())) {
-            log.warn("상행역이 노선의 하행종착역과 다릅니다. upStationId: {}", newSection.getUpStation().getId());
+            log.warn("상행역이 노선의 하행종착역과 다릅니다. upStationId: {}", newSection.getUpStation()
+                                                                        .getId());
             return false;
         }
 
-        if (getStations().stream().anyMatch(it -> Objects.equals(it, newSection.getDownStation()))) {
-            log.warn("하행역이 이미 노선에 포함된 지하철역입니다. stationId: {}", newSection.getDownStation().getId());
+        if (getInternalStations().stream()
+                         .anyMatch(it -> Objects.equals(it, newSection.getDownStation()))) {
+            log.warn("하행역이 이미 노선에 포함된 지하철역입니다. stationId: {}", newSection.getDownStation()
+                                                                         .getId());
             return false;
         }
 
