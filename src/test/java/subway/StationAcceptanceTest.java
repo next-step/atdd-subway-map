@@ -58,7 +58,7 @@ public class StationAcceptanceTest {
     // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
     @DisplayName("지하철역 목록을 조회한다")
     @Test
-    void findAllStation() {
+    void showStations() {
         // when
         String station1 = "강남역";
         String station2 = "잠실역";
