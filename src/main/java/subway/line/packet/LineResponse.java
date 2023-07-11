@@ -1,39 +1,22 @@
 package subway.line.packet;
 
 import subway.line.domain.Line;
+import subway.station.packet.StationResponse;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class LineResponse {
-
-    public static class Station{
-        private Long id;
-        private String name;
-
-        public Long getId() {
-            return id;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public Station(Long id, String name) {
-            this.id = id;
-            this.name = name;
-        }
-    }
     private Long id;
     private String name;
     private String color;
-    private List<Station> stations;
+    private List<StationResponse> stations;
 
     private LineResponse(Long id, String name, String color, List<subway.station.domain.Station> stations) {
         this.id = id;
         this.name = name;
         this.color = color;
-        this.stations = stations.stream().map(o -> new Station(o.getId(), o.getName())).collect(Collectors.toList());
+        this.stations = stations.stream().map(o -> new StationResponse(o.getId(), o.getName())).collect(Collectors.toList());
     }
 
     public static LineResponse fromEntity(Line line){
@@ -52,7 +35,7 @@ public class LineResponse {
         return color;
     }
 
-    public List<Station> getStations() {
+    public List<StationResponse> getStations() {
         return stations;
     }
 }
