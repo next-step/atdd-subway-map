@@ -24,6 +24,6 @@ public class StationListQueryPersistenceAdapter implements StationListQueryPort 
     @Override
     public List<StationResponse> findAll() {
         List<StationJpa> stationJpas = stationRepository.findAll();
-        return stationJpas.stream().map(stationJpaMapper::mapStationResponseFrom).collect(Collectors.toList());
+        return stationJpas.stream().map(stationJpaMapper::toStationResponse).collect(Collectors.toList());
     }
 }

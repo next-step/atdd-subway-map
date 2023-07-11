@@ -9,7 +9,6 @@ import subway.subway.application.query.SubwayLineResponse;
 import subway.subway.domain.SubwayLine;
 
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 @Component
 public class SubwayLineDetailQueryPersistenceAdapter implements SubwayLineDetailQueryPort {
@@ -26,6 +25,6 @@ public class SubwayLineDetailQueryPersistenceAdapter implements SubwayLineDetail
     public SubwayLineResponse findOne(SubwayLine.Id id) {
         SubwayLineJpa subwayLineJpa = subwayLineRepository.findById(id.getValue())
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 지하철 노선입니다."));
-        return subwayLineJpaMapper.mapFrom(subwayLineJpa);
+        return subwayLineJpaMapper.toSubwayLineResponse(subwayLineJpa);
     }
 }

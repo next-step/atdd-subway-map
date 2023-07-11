@@ -24,6 +24,6 @@ public class StationRegisterPersistenceAdapter implements StationRegisterPort {
         StationJpa stationJpa = stationJpaMapper.mapFrom(station);
         stationRepository.save(stationJpa);
 
-        return stationJpaMapper.mapStationResponseFrom(stationJpa);
+        return stationJpaMapper.toStationResponse(stationJpa);
     }
 }

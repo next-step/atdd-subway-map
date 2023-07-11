@@ -31,7 +31,7 @@ public class StationListLoadByIdInPersistenceAdapter implements StationListLoadB
         if (stationJpas.size() != stationIds.size()) {
             throw new IllegalStateException("역이 존재하지 않습니다.");
         }
-        return stationJpas.stream().map(stationJpaMapper::mapStationFrom).collect(Collectors.toList());
+        return stationJpas.stream().map(stationJpaMapper::toStation).collect(Collectors.toList());
 
     }
 }

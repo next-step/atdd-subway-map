@@ -19,7 +19,7 @@ class SubwayLineUpdatePersistenceAdapter implements SubwayLineUpdatePort {
     }
     @Override
     public void update(SubwayLine subwayLine) {
-        SubwayLineJpa subwayLineJpa = subwayLineJpaMapper.mapFrom(subwayLine);
+        SubwayLineJpa subwayLineJpa = subwayLineJpaMapper.toSubwayLineJpa(subwayLine);
         subwayLineJpaRepository.save(subwayLineJpa);
     }
 }

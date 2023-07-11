@@ -21,9 +21,9 @@ class SubwayLineRegisterPersistenceAdapter implements SubwayLineRegisterPort {
 
     @Override
     public SubwayLineResponse register(SubwayLine subwayLine) {
-        SubwayLineJpa subwayLineJpa = subwayLineJpaMapper.mapFrom(subwayLine);
+        SubwayLineJpa subwayLineJpa = subwayLineJpaMapper.toSubwayLineJpa(subwayLine);
 
         subwayLineRepository.save(subwayLineJpa);
-        return subwayLineJpaMapper.mapFrom(subwayLineJpa);
+        return subwayLineJpaMapper.toSubwayLineResponse(subwayLineJpa);
     }
 }

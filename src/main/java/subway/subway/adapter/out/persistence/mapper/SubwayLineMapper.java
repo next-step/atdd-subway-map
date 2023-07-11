@@ -11,18 +11,18 @@ import java.util.stream.Collectors;
 @Component
 public class SubwayLineMapper {
 
-    public SubwayLine mapFrom(SubwayLineJpa subwayLineJpa) {
+    public SubwayLine toSubwayLine(SubwayLineJpa subwayLineJpa) {
         return SubwayLine.of(
                 new SubwayLine.Id(Objects.requireNonNull(subwayLineJpa.getId())),
                 subwayLineJpa.getName(),
                 subwayLineJpa.getColor(),
                 subwayLineJpa.getSubwaySections()
                         .stream()
-                        .map(this::mapFrom)
+                        .map(this::toSubwaySection)
                         .collect(Collectors.toList()));
     }
 
-    private SubwaySection mapFrom(SubwaySectionJpa sectionJpa) {
+    private SubwaySection toSubwaySection(SubwaySectionJpa sectionJpa) {
         return SubwaySection.of(
                 new SubwaySection.Id(Objects.requireNonNull(sectionJpa.getId())),
                 new SubwaySectionStation(new Station.Id(sectionJpa.getStartStationId()), sectionJpa.getStartStationName()),

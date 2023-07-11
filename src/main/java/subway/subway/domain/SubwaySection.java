@@ -4,14 +4,14 @@ import java.math.BigDecimal;
 
 public class SubwaySection {
 
-    private SubwaySection.Id id;
+    private final SubwaySection.Id id;
     private final SubwaySectionStation startStation;
     private final SubwaySectionStation endStation;
     private final Kilometer distance;
 
     public static SubwaySection register(Station startStation, Station endStation, Kilometer kilometer) {
-        SubwaySectionStation startSectionStation = new SubwaySectionStation(startStation);
-        SubwaySectionStation endSectionStation = new SubwaySectionStation(endStation);
+        SubwaySectionStation startSectionStation = SubwaySectionStation.from(startStation);
+        SubwaySectionStation endSectionStation = SubwaySectionStation.from(endStation);
         return new SubwaySection(startSectionStation, endSectionStation, kilometer);
     }
 
@@ -20,6 +20,7 @@ public class SubwaySection {
     }
 
     private SubwaySection(SubwaySectionStation startStation, SubwaySectionStation endStation, Kilometer distance) {
+        this.id = new SubwaySection.Id();
         this.startStation = startStation;
         this.endStation = endStation;
         this.distance = distance;
@@ -50,7 +51,7 @@ public class SubwaySection {
     }
 
     public SubwaySection.Id getId() {
-        if (isNew()) {
+        if (id.isNew()) {
             throw new IllegalArgumentException("아직 저장되지 않은 지하철 역입니다.");
         }
         return id;
@@ -61,18 +62,25 @@ public class SubwaySection {
     }
 
     public boolean isNew() {
-        return id == null;
+        return id.isNew();
     }
 
     public static class Id {
-        private final Long id;
+        private Long id;
 
         public Id(Long id) {
             this.id = id;
         }
 
+        public Id() {
+        }
+
         public Long getValue() {
             return id;
+        }
+
+        public boolean isNew() {
+            return id == null;
         }
     }
 }

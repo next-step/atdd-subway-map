@@ -1,6 +1,5 @@
 package subway.subway.adapter.out.persistence;
 
-import org.checkerframework.checker.units.qual.C;
 import org.springframework.stereotype.Component;
 import subway.rds_module.entity.SubwayLineJpa;
 import subway.subway.adapter.out.persistence.mapper.SubwayLineJpaMapper;
@@ -25,6 +24,6 @@ public class SubwayLineListQueryPersistenceAdapter implements SubwayLineListQuer
     @Override
     public List<SubwayLineResponse> findAll() {
         List<SubwayLineJpa> subwayLineJpas = subwayLineRepository.findAllWithSections();
-        return subwayLineJpas.stream().map(subwayLineJpaMapper::mapFrom).collect(Collectors.toList());
+        return subwayLineJpas.stream().map(subwayLineJpaMapper::toSubwayLineResponse).collect(Collectors.toList());
     }
 }

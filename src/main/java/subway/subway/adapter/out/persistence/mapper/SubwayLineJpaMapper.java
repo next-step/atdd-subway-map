@@ -13,18 +13,18 @@ import java.util.stream.Collectors;
 @Component
 public class SubwayLineJpaMapper {
 
-    public SubwayLineJpa mapFrom(SubwayLine subwayLine) {
+    public SubwayLineJpa toSubwayLineJpa(SubwayLine subwayLine) {
         return new SubwayLineJpa(
                 subwayLine.isNew() ? null : subwayLine.getId().getValue(),
                 subwayLine.getName(),
                 subwayLine.getColor(),
                 subwayLine.getSectionList()
                         .stream()
-                        .map(this::mapFrom)
+                        .map(this::toSubwaySectionJpa)
                         .collect(Collectors.toList()));
     }
 
-    private SubwaySectionJpa mapFrom(SubwaySection subwaySection) {
+    private SubwaySectionJpa toSubwaySectionJpa(SubwaySection subwaySection) {
         return new SubwaySectionJpa(
                 subwaySection.isNew() ? null : subwaySection.getId().getValue(),
                 subwaySection.getStartStationId().getValue(),
@@ -34,7 +34,7 @@ public class SubwayLineJpaMapper {
                 subwaySection.getDistance().getValue());
     }
 
-    public SubwayLineResponse mapFrom(SubwayLineJpa subwayLineJpa) {
+    public SubwayLineResponse toSubwayLineResponse(SubwayLineJpa subwayLineJpa) {
         return new SubwayLineResponse(
                 subwayLineJpa.getId(),
                 subwayLineJpa.getName(),
@@ -42,15 +42,15 @@ public class SubwayLineJpaMapper {
                 subwayLineJpa
                         .getSubwaySections()
                         .stream()
-                        .flatMap(section -> mapFrom(section).stream()).collect(Collectors.toList()));
+                        .flatMap(section -> toStationResponseList(section).stream()).collect(Collectors.toList()));
     }
 
-    private List<SubwayLineResponse.StationResponse> mapFrom(SubwaySectionJpa subwaySectionJpa) {
-        return List.of(mapFrom(subwaySectionJpa.getStartStationId(), subwaySectionJpa.getStartStationName()),
-                mapFrom(subwaySectionJpa.getEndStationId(), subwaySectionJpa.getEndStationName()));
+    private List<SubwayLineResponse.StationResponse> toStationResponseList(SubwaySectionJpa subwaySectionJpa) {
+        return List.of(toStationResponse(subwaySectionJpa.getStartStationId(), subwaySectionJpa.getStartStationName()),
+                toStationResponse(subwaySectionJpa.getEndStationId(), subwaySectionJpa.getEndStationName()));
     }
 
-    private SubwayLineResponse.StationResponse mapFrom(Long id, String name) {
+    private SubwayLineResponse.StationResponse toStationResponse(Long id, String name) {
         return new SubwayLineResponse.StationResponse(id, name);
     }
 }
