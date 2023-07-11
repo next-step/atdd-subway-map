@@ -5,6 +5,6 @@ import subway.common.exception.ErrorCode;
 
 public class StationNotFoundException extends BusinessException {
     public StationNotFoundException() {
-        super(ErrorCode.STATION_NOT_FOUND_EXCEPTION);
+        super(ErrorCode.STATION_NOT_FOUND);
     }
 }

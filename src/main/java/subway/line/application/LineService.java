@@ -10,6 +10,10 @@ import subway.line.dto.LineCreateRequest;
 import subway.line.dto.LineResponse;
 import subway.line.dto.LineUpdateRequest;
 import subway.line.exception.LineNotFoundException;
+import subway.section.domain.Section;
+import subway.section.domain.SectionRepository;
+import subway.section.dto.SectionRequest;
+import subway.section.dto.SectionResponse;
 import subway.station.domain.Station;
 import subway.station.domain.StationRepository;
 import subway.station.exception.StationNotFoundException;
@@ -19,10 +23,12 @@ import subway.station.exception.StationNotFoundException;
 public class LineService {
     private final LineRepository lineRepository;
     private final StationRepository stationRepository;
+    private final SectionRepository sectionRepository;
 
-    public LineService(LineRepository lineRepository, StationRepository stationRepository) {
+    public LineService(LineRepository lineRepository, StationRepository stationRepository, SectionRepository sectionRepository) {
         this.lineRepository = lineRepository;
         this.stationRepository = stationRepository;
+        this.sectionRepository = sectionRepository;
     }
 
     @Transactional
@@ -30,7 +36,10 @@ public class LineService {
         Station upStation = getStation(lineCreateRequest.getUpStationId());
         Station downStation = getStation(lineCreateRequest.getDownStationId());
 
-        Line line = new Line(lineCreateRequest.getName(), lineCreateRequest.getColor(), upStation, downStation, lineCreateRequest.getDistance());
+        Section section = new Section(upStation, downStation, lineCreateRequest.getDistance());
+        sectionRepository.save(section);
+
+        Line line = new Line(lineCreateRequest.getName(), lineCreateRequest.getColor(), section);
         lineRepository.save(line);
 
         return LineResponse.of(line);
@@ -66,6 +75,30 @@ public class LineService {
     @Transactional
     public void deleteLine(Long id) {
         Line line = getLine(id);
+        List<Section> sections = line.getSections();
+
+        sectionRepository.deleteAll(sections);
         lineRepository.delete(line);
+    }
+
+    @Transactional
+    public SectionResponse registerSection(Long lineId, SectionRequest sectionRequest) {
+        Station upStation = getStation(sectionRequest.getUpStationId());
+        Station downStation = getStation(sectionRequest.getDownStationId());
+
+        Section section = new Section(upStation, downStation, sectionRequest.getDistance());
+
+        Line line = getLine(lineId);
+        line.addSection(section);
+
+        return SectionResponse.of(section);
+    }
+
+    @Transactional
+    public void deleteSection(Long lineId, Long stationId) {
+        Line line = getLine(lineId);
+        Station station = getStation(stationId);
+
+        line.deleteSection(station);
     }
 }

@@ -6,8 +6,8 @@ import io.restassured.response.Response;
 import java.util.Map;
 import org.springframework.http.MediaType;
 
-public class StationRequest {
-    private StationRequest() {
+public class StationStep {
+    private StationStep() {
     }
 
     public static ExtractableResponse<Response> 지하철역을_생성한다(String stationName) {
