@@ -20,6 +20,9 @@ import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFOR
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @DirtiesContext(classMode = BEFORE_EACH_TEST_METHOD)
 public class StationAcceptanceTest {
+    static final String GN_STATION = "강남역";
+    static final String YS_STATION = "역삼역";
+
     /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다
@@ -29,14 +32,14 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        Response response = this.requestCreateStation("강남역");
+        Response response = this.requestCreateStation(GN_STATION);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
         List<String> stationNames = this.requestSearchStation().jsonPath().getList("name", String.class);
-        assertThat(stationNames).containsAnyOf("강남역");
+        assertThat(stationNames).containsAnyOf(GN_STATION);
     }
 
     /**
@@ -48,14 +51,14 @@ public class StationAcceptanceTest {
     @Test
     void searchStation() {
         // given
-        String firstCratedStationName = this.requestCreateStation("강남역").jsonPath().getString("name");
-        String secondCratedStationName = this.requestCreateStation("역삼역").jsonPath().getString("name");
+        this.requestCreateStation(GN_STATION);
+        this.requestCreateStation(YS_STATION);
 
         // when
         List<String> stationNames = this.requestSearchStation().jsonPath().getList("name", String.class);
 
         // then
-        assertThat(stationNames).containsAnyOf(firstCratedStationName, secondCratedStationName);
+        assertThat(stationNames).containsAnyOf(GN_STATION, YS_STATION);
     }
 
     /**
@@ -68,14 +71,13 @@ public class StationAcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        Response response = this.requestCreateStation("강남역");
-        String createdId = response.jsonPath().getString("id");
+        String createdId = this.requestCreateStation(GN_STATION).jsonPath().getString("id");
 
         // when
-        Response deleteResponse = requestDeleteStation(createdId);
+        Response response = requestDeleteStation(createdId);
 
         // then
-        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         // then
         List<String> stationNames = this.requestSearchStation().jsonPath().getList("name", String.class);

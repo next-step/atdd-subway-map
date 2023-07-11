@@ -24,13 +24,16 @@ public class Section {
     @JoinColumn(name = "down_station_id", nullable = false)
     private Station downStation;
 
+    private Long distance;
+
     public Section() {
     }
 
     @Builder
-    public Section(Station upStation, Station downStation) {
+    public Section(Station upStation, Station downStation, Long distance) {
         this.upStation = upStation;
         this.downStation = downStation;
+        this.distance = distance;
     }
 
     public Station getUpStation() {

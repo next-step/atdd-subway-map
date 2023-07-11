@@ -20,7 +20,7 @@ public class CreateLineRequest {
     }
 
     public Line toEntity() {
-        Section section = Section.builder().upStation(Station.saveId(upStationId)).downStation(Station.saveId(downStationId)).build();
+        Section section = Section.builder().upStation(Station.saveId(upStationId)).downStation(Station.saveId(downStationId)).distance(distance).build();
         Line line = new Line(name, color);
         line.addSection(section);
         return line;

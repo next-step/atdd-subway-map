@@ -23,9 +23,14 @@ import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFOR
 @DirtiesContext(classMode = BEFORE_EACH_TEST_METHOD)
 @Sql(scripts = {"classpath:SQLScripts/01.station-data.sql"})
 public class LineAcceptanceTest {
-    static final Long stationId1 = 1L;
-    static final Long stationId2 = 2L;
-    static final Long stationId3 = 3L;
+    static final String SBD_LINE_NAME = "신분당선";
+    static final String BD_LINE_NAME = "분당선";
+    static final String RED_LINE_COLOR = "bg-red-600";
+    static final String GREEN_LINE_COLOR = "bg-green-600";
+    static final Long STATION_ID_1 = 1L;
+    static final Long STATION_ID_2 = 2L;
+    static final Long STATION_ID_3 = 3L;
+    static final Long DISTANCE_10 = 10L;
 
     /**
      * When 지하철 노선을 생성하면
@@ -35,23 +40,15 @@ public class LineAcceptanceTest {
     @DisplayName("지하철노선을 생성한다.")
     @Test
     void createLine() {
-        // given
-        Map<String, Object> params = new HashMap<>();
-        params.put("name", "신분당선");
-        params.put("color", "bg-red-600");
-        params.put("upStationId", stationId1);
-        params.put("downStationId", stationId2);
-        params.put("distance", 10);
-
         // when
-        Response response = this.requestCreateLine(params);
+        Response response = this.requestCreateLine(SBD_LINE_NAME, RED_LINE_COLOR, STATION_ID_1, STATION_ID_2, DISTANCE_10);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
         List<String> lineNames = this.requestSearchLines().jsonPath().getList("name", String.class);
-        assertThat(lineNames).containsAnyOf("신분당선");
+        assertThat(lineNames).containsAnyOf(SBD_LINE_NAME);
     }
 
 
@@ -64,28 +61,14 @@ public class LineAcceptanceTest {
     @Test
     void searchLines() {
         // given
-        Map<String, Object> params1 = new HashMap<>();
-        params1.put("name", "신분당선");
-        params1.put("color", "bg-red-600");
-        params1.put("upStationId", stationId1);
-        params1.put("downStationId", stationId2);
-        params1.put("distance", 10);
-
-        Map<String, Object> params2 = new HashMap<>();
-        params2.put("name", "분당선");
-        params2.put("color", "bg-green-600");
-        params2.put("upStationId", stationId1);
-        params2.put("downStationId", stationId3);
-        params2.put("distance", 20);
-
-        this.requestCreateLine(params1);
-        this.requestCreateLine(params2);
+        this.requestCreateLine(SBD_LINE_NAME, RED_LINE_COLOR, STATION_ID_1, STATION_ID_2, DISTANCE_10);
+        this.requestCreateLine(BD_LINE_NAME, GREEN_LINE_COLOR, STATION_ID_1, STATION_ID_3, DISTANCE_10);
 
         // when
         List<String> lineNames = this.requestSearchLines().jsonPath().getList("name", String.class);
 
         // then
-        assertThat(lineNames).containsAnyOf("신분당선", "분당선");
+        assertThat(lineNames).containsAnyOf(SBD_LINE_NAME, BD_LINE_NAME);
     }
 
     /**
@@ -97,20 +80,14 @@ public class LineAcceptanceTest {
     @Test
     void searchLine() {
         // given
-        Map<String, Object> params = new HashMap<>();
-        params.put("name", "신분당선");
-        params.put("color", "bg-red-600");
-        params.put("upStationId", stationId1);
-        params.put("downStationId", stationId2);
-        params.put("distance", 10);
-
-        String createdId = this.requestCreateLine(params).jsonPath().getString("id");
+        String createdId = this.requestCreateLine(SBD_LINE_NAME, RED_LINE_COLOR, STATION_ID_1, STATION_ID_2, DISTANCE_10)
+                .jsonPath().getString("id");
 
         // when
         String lineName = this.requestSearchLine(createdId).jsonPath().getString("name");
 
         // then
-        assertThat(lineName).isEqualTo("신분당선");
+        assertThat(lineName).isEqualTo(SBD_LINE_NAME);
     }
 
 
@@ -123,24 +100,15 @@ public class LineAcceptanceTest {
     @Test
     void updateLine() {
         // given
-        Map<String, Object> createParam = new HashMap<>();
-        createParam.put("name", "신분당선");
-        createParam.put("color", "bg-red-600");
-        createParam.put("upStationId", stationId1);
-        createParam.put("downStationId", stationId2);
-        createParam.put("distance", 10);
-
-        String createdId = this.requestCreateLine(createParam).jsonPath().getString("id");
+        String createdId = this.requestCreateLine(SBD_LINE_NAME, RED_LINE_COLOR, STATION_ID_1, STATION_ID_2, DISTANCE_10)
+                .jsonPath().getString("id");
 
         // when
-        Map<String, Object> updateParam = new HashMap<>();
-        updateParam.put("name", "다른분당선");
-        updateParam.put("color", "bg-red-600");
-        this.requestUpdateLine(createdId, updateParam);
+        this.requestUpdateLine(createdId, BD_LINE_NAME, GREEN_LINE_COLOR);
 
         //then
         String updatedLineName = this.requestSearchLine(createdId).jsonPath().getString("name");
-        assertThat(updatedLineName).isEqualTo("다른분당선");
+        assertThat(updatedLineName).isEqualTo(BD_LINE_NAME);
     }
 
 
@@ -154,15 +122,8 @@ public class LineAcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        Map<String, Object> createParam = new HashMap<>();
-        createParam.put("name", "신분당선");
-        createParam.put("color", "bg-red-600");
-        createParam.put("upStationId", stationId1);
-        createParam.put("downStationId", stationId2);
-        createParam.put("distance", 10);
-
-        String createdId = this.requestCreateLine(createParam).jsonPath().getString("id");
-
+        String createdId = this.requestCreateLine(SBD_LINE_NAME, RED_LINE_COLOR, STATION_ID_1, STATION_ID_2, DISTANCE_10)
+                .jsonPath().getString("id");
         // when
         assertThat(this.requestDeleteLine(createdId).statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
@@ -172,39 +133,32 @@ public class LineAcceptanceTest {
     }
 
 
-    private Response requestCreateLine(Map<String, Object> params) {
-        return RestAssured.given().log().all().body(params).contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().log().all()
-                .extract().response();
+    private Response requestCreateLine(String name, String color, Long upStationId, Long downStationId, Long distance) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("name", name);
+        params.put("color", color);
+        params.put("upStationId", upStationId);
+        params.put("downStationId", downStationId);
+        params.put("distance", distance);
+        return RestAssured.given().log().all().body(params).contentType(MediaType.APPLICATION_JSON_VALUE).when().post("/lines").then().log().all().extract().response();
     }
 
     private Response requestSearchLines() {
-        return RestAssured.given().log().all()
-                .when().get("/lines")
-                .then().log().all()
-                .extract().response();
+        return RestAssured.given().log().all().when().get("/lines").then().log().all().extract().response();
     }
 
     private Response requestSearchLine(String id) {
-        return RestAssured.given().log().all()
-                .when().get("/lines/" + id)
-                .then().log().all()
-                .extract().response();
+        return RestAssured.given().log().all().when().get("/lines/" + id).then().log().all().extract().response();
     }
 
-    private Response requestUpdateLine(String id, Map<String, Object> params) {
-        return RestAssured.given().body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().put("/lines/" + id)
-                .then().log().all()
-                .extract().response();
+    private Response requestUpdateLine(String id, String name, String color) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("name", name);
+        params.put("color", color);
+        return RestAssured.given().body(params).contentType(MediaType.APPLICATION_JSON_VALUE).when().put("/lines/" + id).then().log().all().extract().response();
     }
 
     private Response requestDeleteLine(String id) {
-        return RestAssured.given().log().all()
-                .when().delete("/lines/" + id)
-                .then().log().all()
-                .extract().response();
+        return RestAssured.given().log().all().when().delete("/lines/" + id).then().log().all().extract().response();
     }
 }
