@@ -1,12 +1,16 @@
 package subway.line.domain;
 
+import java.util.List;
 import subway.line.dto.LineRequest;
+import subway.line.dto.SectionRequest;
 
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import subway.station.domain.Station;
 
 @Entity
 public class Line {
@@ -21,11 +25,17 @@ public class Line {
     @Column(length = 20, nullable = false)
     private String color;
 
-    public Line() {}
+    @Embedded
+    private Sections sections;
+
+    public Line() {
+        this.sections = new Sections();
+    }
 
     public Line(String name, String color) {
         this.name = name;
         this.color = color;
+        this.sections = new Sections();
     }
 
     public Long getId() {
@@ -43,5 +53,17 @@ public class Line {
     public void update(LineRequest lineRequest) {
         this.name = lineRequest.getName();
         this.color = lineRequest.getColor();
+    }
+
+    public void addSection(Section section) {
+        this.sections.addSection(section);
+    }
+
+    public List<Station> getStations() {
+        return sections.getStations();
+    }
+
+    public void deleteSection(Station station) {
+        sections.deleteSection(station);
     }
 }
