@@ -12,20 +12,12 @@ public class Station {
     @Column(length = 20, nullable = false)
     private String name;
 
-    @ManyToOne
-    @JoinColumn(name = "LINE_ID")
-    private Line line;
-
     public Station() {
 
     }
 
     public Station(String name) {
         this.name = name;
-    }
-    public Station(Long id, Line line) {
-        this.id = id;
-        this.line = line;
     }
 
     public Long getId() {
@@ -36,7 +28,4 @@ public class Station {
         return name;
     }
 
-    public Line getLine() {
-        return line;
-    }
 }

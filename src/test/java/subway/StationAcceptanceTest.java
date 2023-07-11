@@ -36,13 +36,6 @@ public class StationAcceptanceTest {
         assertThat(stationNames).containsAnyOf(name);
     }
 
-    String createStationByName(String name) {
-        this.name = name;
-        createStation();
-        List<String> stations = 지하철_역_조회();
-        return stations.get(stations.size() - 1 );
-    }
-
     /**
      * Given 2개의 지하철역을 생성하고
      * When 지하철역 목록을 조회하면
@@ -82,7 +75,7 @@ public class StationAcceptanceTest {
         assertThat(list.size()).isEqualTo(1);
     }
 
-    private ExtractableResponse<Response> 지하철_역_추가_요청(String name) {
+    public ExtractableResponse<Response> 지하철_역_추가_요청(String name) {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
 
@@ -95,14 +88,14 @@ public class StationAcceptanceTest {
 
     }
 
-    private List<String> 지하철_역_조회() {
+    public List<String> 지하철_역_조회() {
         return RestAssured.given().log().all()
                 .when().get("/stations")
                 .then().log().all()
                 .extract().jsonPath().getList("name", String.class);
     }
 
-    private ExtractableResponse<Response> 지하철_역_삭제_요청(String location) {
+    public ExtractableResponse<Response> 지하철_역_삭제_요청(String location) {
         return RestAssured.given().log().all()
                 .when().delete(location)
                 .then().log().all()

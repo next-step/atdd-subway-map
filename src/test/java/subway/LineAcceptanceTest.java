@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import subway.line.Line;
 import subway.station.StationRepository;
 
 import java.util.HashMap;
@@ -30,14 +31,64 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선을 생성한다.")
     @Test
     void createLine() {
-        stationAcceptanceTest.createStationByName("사당역");
-        stationAcceptanceTest.createStationByName("이수역");
+        stationAcceptanceTest.지하철_역_추가_요청("사당역");
+        stationAcceptanceTest.지하철_역_추가_요청("이수역");
 
         ExtractableResponse<Response> response = 노선_추가_요청("4호선", "skyblue", 1, 2, 10);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
-        List<String> lineNames = 노선_조회();
-        assertThat(lineNames).containsAnyOf("4호선");
+        HashMap<String, Object> line = 노선_조회(Long.valueOf("1"));
+        assertThat(line.get("name")).isEqualTo("4호선");
+    }
+
+    @DisplayName("지하철 노선을 전체 조회한다.")
+    @Test
+    void showLines() {
+        //given
+        stationAcceptanceTest.지하철_역_추가_요청("사당역");
+        stationAcceptanceTest.지하철_역_추가_요청("이수역");
+
+        노선_추가_요청("4호선", "skyblue", 1, 2, 10);
+
+        stationAcceptanceTest.지하철_역_추가_요청("강남역");
+        stationAcceptanceTest.지하철_역_추가_요청("역삼역");
+
+        노선_추가_요청("2호선", "green", 3, 4, 7);
+        //when
+        List<HashMap<String, Object>> lines = 노선_전체_조회();
+        //then
+        assertThat(lines.size()).isEqualTo(2);
+    }
+
+    @DisplayName("지하철 노선을 조회한다")
+    @Test
+    void showLine() {
+        //given
+        stationAcceptanceTest.지하철_역_추가_요청("사당역");
+        stationAcceptanceTest.지하철_역_추가_요청("이수역");
+
+        노선_추가_요청("4호선", "skyblue", 1, 2, 10);
+
+        //when
+        HashMap<String, Object> line = 노선_조회(Long.valueOf("1"));
+
+        //then
+        assertThat(line.get("name")).isEqualTo("4호선");
+    }
+
+    @DisplayName("지하철 노선을 삭제한다")
+    @Test
+    void deleteLine() {
+        //given
+        ExtractableResponse<Response> response_sadang = stationAcceptanceTest.지하철_역_추가_요청("사당역");
+        ExtractableResponse<Response> response_isu = stationAcceptanceTest.지하철_역_추가_요청("이수역");
+
+        노선_추가_요청("4호선", "skyblue", 1, 2, 10);
+
+        //when
+        ExtractableResponse<Response> response = stationAcceptanceTest.지하철_역_삭제_요청(((Response)response_sadang).getHeader("location"));
+        //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
     private ExtractableResponse<Response> 노선_추가_요청(String name, String color, Integer upStationId, Integer downStationId, Integer distance) {
@@ -56,10 +107,24 @@ public class LineAcceptanceTest {
                 .extract();
     }
 
-    private List<String> 노선_조회() {
+    private HashMap<String, Object> 노선_조회(Long id) {
+        return RestAssured.given().log().all()
+                .when().get("/lines/" + id)
+                .then().log().all()
+                .extract().jsonPath().get();
+    }
+
+    private List<HashMap<String, Object>> 노선_전체_조회() {
         return RestAssured.given().log().all()
                 .when().get("/lines")
                 .then().log().all()
-                .extract().jsonPath().getList("name", String.class);
+                .extract().jsonPath().getList(".");
+    }
+
+    private ExtractableResponse<Response> 노선_삭제_요청(String location) {
+        return RestAssured.given().log().all()
+                .when().delete(location)
+                .then().log().all()
+                .extract();
     }
 }

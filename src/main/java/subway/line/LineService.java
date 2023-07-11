@@ -22,7 +22,7 @@ public class LineService {
 
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
-        Line line = lineRepository.save(new Line(lineRequest));
+        Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor(), lineRequest.getUpStationId(), lineRequest.getDownStationId(), lineRequest.getDistance()));
         return createLineResponse(line);
     }
 
@@ -32,14 +32,19 @@ public class LineService {
                 .collect(Collectors.toList());
     }
 
+    public LineResponse findLineById(Long id) {
+        Line line = lineRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("존재하는 노선이 없음 : " + id));
+        return createLineResponse(line);
+    }
+
     @Transactional
     public void deleteLineById(Long id) {
         lineRepository.deleteById(id);
     }
 
     private LineResponse createLineResponse(Line line) {
-        Station up = stationRepository.getOne(line.getUpStationId());
-        Station down = stationRepository.getReferenceById(line.getDownStationId());
+        Station up = stationRepository.findById(line.getUpStationId()).orElseThrow(() -> new IllegalArgumentException("역이 존재하지 않음 : " + line.getUpStationId()));
+        Station down = stationRepository.findById(line.getDownStationId()).orElseThrow(() -> new IllegalArgumentException("역이 존재하지 않음 : " + line.getDownStationId()));
         return new LineResponse(
                 line.getId(),
                 line.getName(),
