@@ -2,8 +2,6 @@ package subway.line.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import subway.line.domain.Line;
-import subway.line.LineService;
 import subway.line.packet.LineRequest;
 import subway.line.packet.LineResponse;
 import subway.line.packet.LineUpdateRequest;
@@ -24,22 +22,19 @@ public class LineController {
 
     @PostMapping("/lines")
     public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest){
-        Line line = lineService.saveStationLine(lineRequest.getUpStationId(), lineRequest.getDownStationId(), lineRequest.toEntity());
-        LineResponse lineResponse = LineResponse.fromEntity(line);
-        return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(lineResponse);
+        LineResponse lineResponse = lineService.saveStationLine(lineRequest.getUpStationId(), lineRequest.getDownStationId(), lineRequest.toEntity());
+        return ResponseEntity.created(URI.create("/lines/" + lineResponse.getId())).body(lineResponse);
     }
 
     @GetMapping("/lines/{id}")
     public ResponseEntity<LineResponse> getLine(@PathVariable Long id){
-        Line line = lineService.getStationLine(id);
-        LineResponse lineResponse = LineResponse.fromEntity(line);
-        return ResponseEntity.ok(lineResponse);
+        LineResponse response = lineService.getStationLine(id);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/lines")
     public ResponseEntity<List<LineResponse>> getLines(){
-        List<Line> stationLines = lineService.getStationLines();
-        List<LineResponse> response = stationLines.stream().map(LineResponse::fromEntity).collect(Collectors.toList());
+        List<LineResponse> response = lineService.getStationLines();
         return ResponseEntity.ok(response);
     }
 

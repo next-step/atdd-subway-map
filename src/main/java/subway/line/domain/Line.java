@@ -16,13 +16,9 @@ public class Line {
 
     private String color;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "up_station_id")
-    private Station upStation;
+    private Long upStationId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "down_station_id")
-    private Station downStation;
+    private Long downStationId;
     private Integer distance;
 
     protected Line() {}
@@ -33,9 +29,9 @@ public class Line {
         this.distance = distance;
     }
 
-    public void changeStations(Station upStation, Station downStation){
-        this.upStation = upStation;
-        this.downStation = downStation;
+    public void changeStations(Long upStationId, Long downStationId){
+        this.upStationId = upStationId;
+        this.downStationId = downStationId;
     }
 
     public void changeLine(String name, String color){
@@ -55,12 +51,12 @@ public class Line {
         return color;
     }
 
-    public Station getUpStation() {
-        return upStation;
+    public Long getUpStationId() {
+        return upStationId;
     }
 
-    public Station getDownStation() {
-        return downStation;
+    public Long getDownStationId() {
+        return downStationId;
     }
 
     public Integer getDistance() {
