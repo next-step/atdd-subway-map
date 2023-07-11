@@ -19,9 +19,9 @@ public class LineTestAssuredHelper {
         assertThat(getResponse.jsonPath().getList("color", String.class)).containsAnyOf(color);
     }
 
-    public static void 지하철노선_수정_검증(String changeResponse, String 수내역, String changeResponse1, String 파란색) {
-        assertThat(changeResponse).isEqualTo(수내역);
-        assertThat(changeResponse1).isEqualTo(파란색);
+    public static void 지하철노선_수정_검증(String changeResponse, String station, String changeResponse1, String color) {
+        assertThat(changeResponse).isEqualTo(station);
+        assertThat(changeResponse1).isEqualTo(color);
     }
 
     public static void 지하철노선_삭제_검증하기(ExtractableResponse<Response> getResponse, String name, String color) {
