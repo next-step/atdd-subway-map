@@ -129,7 +129,6 @@ public class LineAcceptanceTest {
         assertThat(searchLines).isEmpty();
     }
 
-
     private Response requestCreateLine(String name, String color, Long upStationId, Long downStationId, Long distance) {
         Map<String, Object> params = new HashMap<>();
         params.put("name", name);
