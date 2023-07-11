@@ -1,7 +1,5 @@
 package subway;
 
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -35,7 +33,7 @@ public class LineAcceptanceTest {
         //when
         지하철노선_생성(신분당선, 빨간색, 청계산입구역_ID, 판교역_ID, 10);
         //then
-        ExtractableResponse<Response> getResponse = 지하철노선_조회();
+        var getResponse = 지하철노선_조회();
         지하철노선_검증하기(getResponse, 신분당선, 빨간색);
     }
 
@@ -52,7 +50,7 @@ public class LineAcceptanceTest {
         지하철노선_생성(분당선, 노란색, 청계산입구역_ID, 선릉역_ID, 10);
 
         //when
-        ExtractableResponse<Response> getResponse = 지하철노선_조회();
+        var getResponse = 지하철노선_조회();
 
         //then
         지하철노선_검증하기(getResponse, 신분당선, 빨간색);
@@ -68,10 +66,10 @@ public class LineAcceptanceTest {
     @Test
     public void viewSingleStationLine(){
         //given
-        ExtractableResponse<Response> createResponse = 지하철노선_생성(신분당선, 빨간색, 청계산입구역_ID, 판교역_ID, 10);
+        var createResponse = 지하철노선_생성(신분당선, 빨간색, 청계산입구역_ID, 판교역_ID, 10);
 
         //when
-        ExtractableResponse<Response> getResponse = 지하철노선_단건_조회(createResponse);
+        var getResponse = 지하철노선_단건_조회(createResponse);
 
         //then
         지하철노선_검증하기(createResponse, getResponse);
@@ -86,7 +84,7 @@ public class LineAcceptanceTest {
     @Test
     public void updateStationLine(){
         //given
-        ExtractableResponse<Response> createResponse = 지하철노선_생성(신분당선, 빨간색, 청계산입구역_ID, 판교역_ID, 10);
+        var createResponse = 지하철노선_생성(신분당선, 빨간색, 청계산입구역_ID, 판교역_ID, 10);
 
         //when
         final String 수내역 = "수내역";
@@ -94,7 +92,7 @@ public class LineAcceptanceTest {
         지하철노선_수정(createResponse, 수내역, 파란색);
 
         //then
-        ExtractableResponse<Response> changeResponse = 지하철노선_단건_조회(createResponse);
+        var changeResponse = 지하철노선_단건_조회(createResponse);
         지하철노선_수정_검증(changeResponse.jsonPath().getString("name"), 수내역, changeResponse.jsonPath().getString("color"), 파란색);
     }
 
@@ -107,13 +105,13 @@ public class LineAcceptanceTest {
     @Test
     public void removeStationLine(){
         //given
-        ExtractableResponse<Response> createResponse = 지하철노선_생성(신분당선, 빨간색, 청계산입구역_ID, 판교역_ID, 10);
+        var createResponse = 지하철노선_생성(신분당선, 빨간색, 청계산입구역_ID, 판교역_ID, 10);
 
         //when
         지하철노선_삭제(createResponse);
 
         //then
-        ExtractableResponse<Response> getResponse = 지하철노선_조회();
+        var getResponse = 지하철노선_조회();
         지하철노선_삭제_검증하기(getResponse, 신분당선, 빨간색);
     }
 }
