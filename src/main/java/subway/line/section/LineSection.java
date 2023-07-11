@@ -1,5 +1,6 @@
 package subway.line.section;
 
+import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.ConstraintMode;
 import javax.persistence.Entity;
@@ -35,15 +36,7 @@ public class LineSection {
   @Column(name = "down_station_id", nullable = false, insertable = false, updatable = false)
   private Long downStationId;
 
-  public LineSection(SubwayLine line, Station upStation, Station downStation) {
-    this.line = line;
-    this.lineId= line.getLineId();
-    this.upStation = upStation;
-    this.upStationId = upStation.getStationId();
-    this.downStation = downStation;
-    this.downStationId = downStation.getStationId();
-  }
-
+  // relations
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "line_id", foreignKey = @ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT))
   private SubwayLine line;
@@ -55,4 +48,17 @@ public class LineSection {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "down_station_id", foreignKey = @ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT))
   private Station downStation;
+
+  @Column(name = "reg_date_time", nullable = false)
+  private LocalDateTime regDateTime;
+
+  public LineSection(SubwayLine line, Station upStation, Station downStation) {
+    this.line = line;
+    this.lineId= line.getLineId();
+    this.upStation = upStation;
+    this.upStationId = upStation.getStationId();
+    this.downStation = downStation;
+    this.downStationId = downStation.getStationId();
+    this.regDateTime = LocalDateTime.now();
+  }
 }

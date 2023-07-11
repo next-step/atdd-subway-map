@@ -20,7 +20,9 @@ import subway.step.StationStep;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
+@Sql(value = "/truncate-subwayline.sql")
 @Sql(value = "/truncate-station.sql")
+@Sql(value = "/truncate-section.sql")
 public class StationAcceptanceTest extends IntegrationTest {
     /**
      * When 지하철역을 생성하면

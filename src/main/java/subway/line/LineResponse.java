@@ -6,21 +6,21 @@ import java.util.stream.Collectors;
 import subway.station.Station;
 import subway.station.StationResponse;
 
-public class SubwayLineResponse {
+public class LineResponse {
   private Long id;
   private String color;
   private String name;
   private List<StationResponse> stations = Collections.emptyList();
 
-  public SubwayLineResponse() {}
+  public LineResponse() {}
 
-  public SubwayLineResponse (SubwayLine subwayLine) {
+  public LineResponse(SubwayLine subwayLine) {
     this.id = subwayLine.getLineId();
     this.color = subwayLine.getColor();
     this.name = subwayLine.getName();
   }
 
-  public SubwayLineResponse (SubwayLine subwayLine, List<Station> stations) {
+  public LineResponse(SubwayLine subwayLine, List<Station> stations) {
     this(subwayLine);
     this.stations = stations.stream()
         .map(StationResponse::new)

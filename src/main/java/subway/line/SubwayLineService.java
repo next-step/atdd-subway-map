@@ -15,34 +15,34 @@ public class SubwayLineService {
   private final SubwayLineRepository lineRepository;
 
   @Transactional(readOnly = true)
-  public List<SubwayLineResponse> getAllSubwayLine() {
+  public List<LineResponse> getAllSubwayLine() {
     return lineRepository.findAll().stream()
-        .map(SubwayLineResponse::new)
+        .map(LineResponse::new)
         .collect(Collectors.toUnmodifiableList());
   }
 
   @Transactional(readOnly = true)
-  public SubwayLineResponse getSubwayLine(Long lineId) {
+  public SubwayLine getSubwayLine(Long lineId) {
     SubwayLine subwayLine = lineRepository.findById(lineId)
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-    return new SubwayLineResponse(subwayLine);
+    return subwayLine;
   }
 
   @Transactional
-  public SubwayLine createLine(LineRequest request) {
+  public SubwayLine createLine(SubwayLineRequest request) {
     SubwayLine subwayLine = request.toEntity();
     return lineRepository.save(subwayLine);
   }
 
   @Transactional
-  public SubwayLineResponse editSubwayLine(Long id, SubwayLineEditRequest request) {
+  public LineResponse editSubwayLine(Long id, SubwayLineEditRequest request) {
     SubwayLine subwayLine = lineRepository.findById(id)
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
     subwayLine.editLine(request);
 
-    return new SubwayLineResponse(subwayLine);
+    return new LineResponse(subwayLine);
   }
 
   @Transactional

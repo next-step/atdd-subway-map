@@ -21,7 +21,7 @@ public class LineSectionController {
 
   @GetMapping
   public ResponseEntity<List<LineSectionResponse>> showSections(@PathVariable Long lineId) {
-    return ResponseEntity.ok(lineSectionService.getAllSectionsOfLine(lineId));
+    return ResponseEntity.ok(lineSectionService.getAllSectionsOfLineAsResponse(lineId));
   }
 
   @PostMapping

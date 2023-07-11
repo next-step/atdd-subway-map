@@ -7,7 +7,7 @@ import lombok.Builder;
 
 @Builder
 @AllArgsConstructor
-public class LineRequest {
+public class SubwayLineRequest {
 
   private String name;
   private String color;
@@ -15,7 +15,7 @@ public class LineRequest {
   private Long downStationId;
   private Long distance;
 
-  public LineRequest() {}
+  public SubwayLineRequest() {}
 
   public String getName() {
     return name;

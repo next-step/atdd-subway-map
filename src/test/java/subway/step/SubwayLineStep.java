@@ -7,8 +7,8 @@ import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import subway.line.SubwayLineEditRequest;
-import subway.line.LineRequest;
-import subway.line.SubwayLineResponse;
+import subway.line.SubwayLineRequest;
+import subway.line.LineResponse;
 
 public class SubwayLineStep {
 
@@ -25,7 +25,7 @@ public class SubwayLineStep {
         .get("$");
   }
 
-  public static SubwayLineResponse 지하철_노선_생성(LineRequest 신규노선) {
+  public static LineResponse 지하철_노선_생성(SubwayLineRequest 신규노선) {
     return RestAssured.given()
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(신규노선)
@@ -34,10 +34,10 @@ public class SubwayLineStep {
         .assertThat()
         .statusCode(HttpStatus.CREATED.value())
         .extract()
-        .as(SubwayLineResponse.class);
+        .as(LineResponse.class);
   }
 
-  public static SubwayLineResponse 노선조회(Long 역_ID) {
+  public static LineResponse 노선조회(Long 역_ID) {
     return RestAssured.given()
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", 역_ID)
@@ -45,7 +45,7 @@ public class SubwayLineStep {
         .then()
         .assertThat()
         .extract()
-        .as(SubwayLineResponse.class);
+        .as(LineResponse.class);
   }
 
   public static void 노선이_존재하지_않음(Long 역_ID) {
@@ -58,7 +58,7 @@ public class SubwayLineStep {
         .statusCode(HttpStatus.NOT_FOUND.value());
   }
 
-  public static List<SubwayLineResponse> 전체_노선조회() {
+  public static List<LineResponse> 전체_노선조회() {
     return Arrays.asList(
         RestAssured.given()
             .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -66,7 +66,7 @@ public class SubwayLineStep {
             .then()
             .assertThat()
             .extract()
-            .as(SubwayLineResponse[].class)
+            .as(LineResponse[].class)
     );
   }
 

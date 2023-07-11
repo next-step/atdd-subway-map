@@ -22,6 +22,20 @@ public class LineSectionStep {
         .get("$");
   }
 
+  public static Map 지하철_구간_생성에_실패한다(Long id, Map<String, Object> 신규_구간_정보) {
+    return RestAssured.given()
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("lineId", id)
+        .body(신규_구간_정보)
+        .post("/lines/{lineId}/sections")
+        .then().log().all()
+        .assertThat()
+        .statusCode(HttpStatus.BAD_REQUEST.value())
+        .extract()
+        .jsonPath()
+        .get("$");
+  }
+
   public static List<Map> 지하철_구간_목록_조회(Long id) {
     return RestAssured.given()
         .contentType(MediaType.APPLICATION_JSON_VALUE)

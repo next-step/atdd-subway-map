@@ -5,7 +5,7 @@ import javax.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.NumberFormat;
-import subway.line.LineRequest;
+import subway.line.SubwayLineRequest;
 import subway.line.SubwayLine;
 import subway.station.Station;
 
@@ -24,10 +24,10 @@ public class LineSectionRequest {
   @NotNull
   private Long distance;
 
-  public LineSectionRequest(LineRequest lineRequest) {
-    this.distance = lineRequest.getDistance();
-    this.upStationId = String.valueOf(lineRequest.getUpStationId());
-    this.downStationId = String.valueOf(lineRequest.getDownStationId());
+  public LineSectionRequest(SubwayLineRequest subwayLineRequest) {
+    this.distance = subwayLineRequest.getDistance();
+    this.upStationId = String.valueOf(subwayLineRequest.getUpStationId());
+    this.downStationId = String.valueOf(subwayLineRequest.getDownStationId());
   }
 
   public LineSection toEntity(SubwayLine line, Station upStation, Station downStation) {
