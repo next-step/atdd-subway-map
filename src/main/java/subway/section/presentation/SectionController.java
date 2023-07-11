@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import subway.line.application.LineService;
-import subway.section.application.SectionService;
 import subway.section.dto.SectionRequest;
 import subway.section.dto.SectionResponse;
 

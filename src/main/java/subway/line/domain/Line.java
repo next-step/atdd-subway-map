@@ -3,6 +3,7 @@ package subway.line.domain;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -10,6 +11,8 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import subway.section.domain.Section;
 import subway.section.exception.AlreadyRegisteredStationException;
+import subway.section.exception.CanNotDeleteOnlyOneSectionException;
+import subway.section.exception.DeleteOnlyTerminusStationException;
 import subway.section.exception.InvalidSectionRegistrationException;
 import subway.station.domain.Station;
 
@@ -23,7 +26,7 @@ public class Line {
 
     private String color;
 
-    @OneToMany(mappedBy = "line")
+    @OneToMany(mappedBy = "line", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Section> sections = new ArrayList<>();
 
     protected Line() {
@@ -79,17 +82,36 @@ public class Line {
         return sections;
     }
 
-    public Section getLastSection() {
-        sections.sort(Comparator.comparing(Section::getId));
-        return sections.get(sections.size() - 1);
-    }
-
     public boolean hasStation(Station downStation) {
         return sections.stream()
                 .anyMatch(section -> section.hasStation(downStation));
     }
 
-    public boolean hasOnlyOneSection() {
+    public void deleteSection(Station station) {
+        validateLineHasOnlyOneSection();
+        validateStationIsDownStationOfLastSection(station);
+
+        sections.remove(getLastSection());
+    }
+
+    private void validateLineHasOnlyOneSection() {
+        if (hasOnlyOneSection()) {
+            throw new CanNotDeleteOnlyOneSectionException();
+        }
+    }
+
+    private boolean hasOnlyOneSection() {
         return sections.size() == 1;
+    }
+
+    private void validateStationIsDownStationOfLastSection(Station station) {
+        if (!getLastSection().downStationEqualsTo(station)) {
+            throw new DeleteOnlyTerminusStationException();
+        }
+    }
+
+    private Section getLastSection() {
+        sections.sort(Comparator.comparing(Section::getId));
+        return sections.get(sections.size() - 1);
     }
 }
