@@ -27,16 +27,8 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .body(params)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/stations")
-                        .then().log().all()
-                        .extract();
+        String stationName = "강남역";
+        ExtractableResponse<Response> response = create(stationName);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -76,7 +68,9 @@ public class StationAcceptanceTest {
     void deleteStation() {
         // given
         String stationName = "강남역";
-        Long stationId = create(stationName);
+        Long stationId = create(stationName)
+                .jsonPath()
+                .getLong("id");
 
         // when
         RestAssured.given().log().all()
@@ -90,7 +84,7 @@ public class StationAcceptanceTest {
         assertThat(showStationNames()).doesNotContain(stationName);
     }
 
-    private Long create(String name) {
+    private ExtractableResponse<Response> create(String name) {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
 
@@ -99,7 +93,7 @@ public class StationAcceptanceTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/stations")
                 .then().log().all()
-                .extract().jsonPath().getLong("id");
+                .extract();
     }
 
     private List<String> showStationNames() {
