@@ -4,10 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import subway.section.Section;
 import subway.station.Station;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -26,11 +28,17 @@ public class Line implements Serializable {
     @Column(nullable = false)
     private String color;
 
-    @OneToMany
-    private List<Station> stations;
+    @OneToMany(mappedBy = "line")
+    @Builder.Default
+    private List<Section> sections = new ArrayList<>();
 
     @Column
     private int distance;
+
+    public void addSection(Section section) {
+        this.sections.add(section);
+        this.distance += section.getDistance();
+    }
 
     public void updateName(String name) {
         this.name = name;

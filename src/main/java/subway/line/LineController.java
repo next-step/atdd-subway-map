@@ -3,6 +3,8 @@ package subway.line;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import subway.section.Section;
+import subway.section.SectionCreateRequest;
 
 import javax.validation.Valid;
 import java.net.URI;
@@ -46,5 +48,13 @@ public class LineController {
         lineService.deleteLine(id);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/lines/{id}/sections")
+    public ResponseEntity<Section> createSection(@PathVariable Long id, @RequestBody SectionCreateRequest sectionCreateRequest) {
+        Section result = lineService.createSection(id, sectionCreateRequest);
+        return ResponseEntity
+                .created(URI.create(format("/sections/%s", result.getId())))
+                .body(result);
     }
 }
