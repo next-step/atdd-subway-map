@@ -1,7 +1,6 @@
 package subway.subway.application.query;
 
 import org.springframework.stereotype.Component;
-import subway.subway.application.query.SubwayLineResponse;
 import subway.subway.domain.SubwayLine;
 import subway.subway.domain.SubwaySection;
 
@@ -19,16 +18,16 @@ class SubwayLineResponseMapper {
                 mapFrom(subwayLine.getSectionList()));
     }
 
-    private List<SubwayLineResponse.StationResponse> mapFrom(List<SubwaySection> sections) {
+    private List<SubwayLineResponse.StationInfo> mapFrom(List<SubwaySection> sections) {
         return sections.stream().flatMap(section -> mapFrom(section).stream()).collect(Collectors.toList());
     }
 
-    private List<SubwayLineResponse.StationResponse> mapFrom(SubwaySection section) {
+    private List<SubwayLineResponse.StationInfo> mapFrom(SubwaySection section) {
         return List.of(
-                new SubwayLineResponse.StationResponse(
+                new SubwayLineResponse.StationInfo(
                         section.getStartStationId(),
                         section.getStartStationName()),
-                new SubwayLineResponse.StationResponse(
+                new SubwayLineResponse.StationInfo(
                         section.getEndStationId(),
                         section.getEndStationName()));
     }

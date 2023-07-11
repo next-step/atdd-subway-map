@@ -45,12 +45,12 @@ public class SubwayLineJpaMapper {
                         .flatMap(section -> toStationResponseList(section).stream()).collect(Collectors.toList()));
     }
 
-    private List<SubwayLineResponse.StationResponse> toStationResponseList(SubwaySectionJpa subwaySectionJpa) {
+    private List<SubwayLineResponse.StationInfo> toStationResponseList(SubwaySectionJpa subwaySectionJpa) {
         return List.of(toStationResponse(subwaySectionJpa.getStartStationId(), subwaySectionJpa.getStartStationName()),
                 toStationResponse(subwaySectionJpa.getEndStationId(), subwaySectionJpa.getEndStationName()));
     }
 
-    private SubwayLineResponse.StationResponse toStationResponse(Long id, String name) {
-        return new SubwayLineResponse.StationResponse(id, name);
+    private SubwayLineResponse.StationInfo toStationResponse(Long id, String name) {
+        return new SubwayLineResponse.StationInfo(id, name);
     }
 }

@@ -10,16 +10,16 @@ public class SubwayLineResponse {
     private String name;
     private String color;
 
-    private List<SubwayLineResponse.StationResponse> stations;
+    private List<StationInfo> stations;
 
-    public SubwayLineResponse(SubwayLine.Id id, String name, String color, List<StationResponse> stations) {
+    public SubwayLineResponse(SubwayLine.Id id, String name, String color, List<StationInfo> stations) {
         this.id = id.getValue();
         this.name = name;
         this.color = color;
         this.stations = stations;
     }
 
-    public SubwayLineResponse(Long id, String name, String color, List<StationResponse> stations) {
+    public SubwayLineResponse(Long id, String name, String color, List<StationInfo> stations) {
         this.id = id;
         this.name = name;
         this.color = color;
@@ -41,25 +41,25 @@ public class SubwayLineResponse {
         return color;
     }
 
-    public List<StationResponse> getStations() {
+    public List<StationInfo> getStations() {
         return stations;
     }
 
-    public static class StationResponse {
+    public static class StationInfo {
         private Long id;
         private String name;
 
-        public StationResponse(Station.Id id, String name) {
+        public StationInfo(Station.Id id, String name) {
             this.id = id.getValue();
             this.name = name;
         }
 
-        public StationResponse(Long id, String name) {
+        public StationInfo(Long id, String name) {
             this.id = id;
             this.name = name;
         }
 
-        private StationResponse() {
+        private StationInfo() {
         }
 
         public Long getId() {

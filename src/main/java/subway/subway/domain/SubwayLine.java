@@ -1,17 +1,20 @@
 package subway.subway.domain;
 
 import java.util.List;
+import java.util.Objects;
 
 public class SubwayLine {
-    private SubwayLine.Id id;
+    private final SubwayLine.Id id;
 
     private String name;
 
     private String color;
     private final SubwaySectionList sectionList;
 
-    public static SubwayLine register(String name, String color, SubwaySection... sections) {
-        return new SubwayLine(name, color, new SubwaySectionList(sections));
+    public static SubwayLine register(String name, String color, Station upStation, Station downStation, Kilometer kilometer) {
+        SubwaySection subwaySection = SubwaySection.register(upStation, downStation, kilometer);
+
+        return new SubwayLine(name, color, subwaySection);
     }
 
     public static SubwayLine of(SubwayLine.Id id, String name, String color, List<SubwaySection> sectionList) {
@@ -25,10 +28,11 @@ public class SubwayLine {
         this.sectionList = sectionList;
     }
 
-    private SubwayLine(String name, String color, SubwaySectionList sectionList) {
+    private SubwayLine(String name, String color, SubwaySection section) {
+        this.id = new SubwayLine.Id();
         this.name = name;
         this.color = color;
-        this.sectionList = sectionList;
+        this.sectionList = new SubwaySectionList(section);
     }
 
     public SubwayLine.Id getId() {
@@ -51,7 +55,7 @@ public class SubwayLine {
     }
 
     public boolean isNew() {
-        return id == null;
+        return id.isNew();
     }
 
     public void update(String name, String color) {
@@ -60,14 +64,34 @@ public class SubwayLine {
     }
 
     public static class Id {
-        private final Long id;
+        private Long id;
 
         public Id(Long id) {
             this.id = id;
         }
 
+        public Id() {
+        }
+
         public Long getValue() {
             return id;
+        }
+
+        public boolean isNew() {
+            return id == null;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            SubwayLine.Id idObject = (SubwayLine.Id) o;
+            return Objects.equals(id, idObject.id);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(id);
         }
     }
 }

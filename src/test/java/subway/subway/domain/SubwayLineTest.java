@@ -45,11 +45,9 @@ public class SubwayLineTest extends ParentTest {
         BigDecimal number = BigDecimal.TEN;
         Kilometer kilometer = Kilometer.of(number);
 
-        SubwaySection subwaySection = SubwaySection.register(station1, station2, kilometer);
-
         //when
 
-        SubwayLine subwayLine = SubwayLine.register(name, color, subwaySection);
+        SubwayLine subwayLine = SubwayLine.register(name, color, station1, station2, kilometer);
 
         //then
 
