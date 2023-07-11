@@ -5,7 +5,6 @@ import org.springframework.transaction.annotation.Transactional;
 import subway.line.dto.CreateLineRequest;
 import subway.line.dto.LineResponse;
 import subway.line.dto.UpdateLineRequest;
-import subway.line_station.LineStationRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -14,11 +13,9 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class LineService {
     private LineRepository lineRepository;
-    private LineStationRepository lineStationRepository;
 
-    public LineService(LineRepository lineRepository, LineStationRepository lineStationRepository) {
+    public LineService(LineRepository lineRepository) {
         this.lineRepository = lineRepository;
-        this.lineStationRepository = lineStationRepository;
     }
 
     @Transactional

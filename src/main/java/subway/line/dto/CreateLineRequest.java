@@ -1,7 +1,7 @@
 package subway.line.dto;
 
 import subway.line.Line;
-import subway.line_station.LineStation;
+import subway.section.Section;
 import subway.station.Station;
 
 public class CreateLineRequest {
@@ -20,18 +20,9 @@ public class CreateLineRequest {
     }
 
     public Line toEntity() {
-        LineStation upLineStation = LineStation.builder()
-                .station(Station.saveId(upStationId))
-                .stationOrder(1L).nextDistance(distance)
-                .build();
-        LineStation downLineStation = LineStation.builder()
-                .station(Station.saveId(downStationId))
-                .stationOrder(2L).nextDistance(LineStation.lastDistance)
-                .build();
-
+        Section section = Section.builder().upStation(Station.saveId(upStationId)).downStation(Station.saveId(downStationId)).build();
         Line line = new Line(name, color);
-        line.addLineStation(upLineStation);
-        line.addLineStation(downLineStation);
+        line.addSection(section);
         return line;
     }
 }
