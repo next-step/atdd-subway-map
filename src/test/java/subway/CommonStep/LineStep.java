@@ -13,16 +13,13 @@ import java.util.Map;
 
 public class LineStep {
 
-    public static ExtractableResponse<Response> 지하철_노선_생성(String stationName1,String stationName2,String lineName,String color,Long distance){
-        Long stationId1 = StationStep.지하철역_생성( stationName1).body().as(StationResponse.class).getId();
-        Long stationId2  = StationStep.지하철역_생성( stationName2).body().as(StationResponse.class).getId();
+    public static ExtractableResponse<Response> 지하철_노선_생성(String lineName,String color){
+
 
         Map<String, String> params = new HashMap<>();
         params.put("name",lineName);
         params.put("color",color);
-        params.put("upStationId",String.valueOf(stationId1));
-        params.put("downStationId",String.valueOf(stationId2));
-        params.put("distance",String.valueOf(distance));
+
 
         ExtractableResponse<Response> response =
                 RestAssured.given().log().all()

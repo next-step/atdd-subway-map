@@ -26,11 +26,7 @@ public class LineService {
 
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
-        Station upStation = stationRepository.findById(lineRequest.getUpStationId())
-                .orElseThrow(() -> new EntityNotFoundException("upStation not found"));
-        Station downStation = stationRepository.findById(lineRequest.getDownStationId())
-                .orElseThrow(() -> new EntityNotFoundException("downStation not found"));
-        Line line = lineRepository.save(lineRequest.toEntity(upStation,downStation));
+        Line line = lineRepository.save(lineRequest.toEntity());
         return LineResponse.fromEntity(line);
     }
 

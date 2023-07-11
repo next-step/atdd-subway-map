@@ -47,7 +47,7 @@ public class LineAcceptanceTest {
     void createLine() {
 
         // when
-        LineStep.지하철_노선_생성("강남역", "역삼역", "2호선", "green", 10L);
+        LineStep.지하철_노선_생성( "2호선", "green");
 
         //then
         List<String> lineNames = LineStep.지하철노선_목록_전체조회();
@@ -63,8 +63,8 @@ public class LineAcceptanceTest {
     @Test
     void createLines() {
         //given
-        LineStep.지하철_노선_생성("강남역", "역삼역", "2호선","green", 10L);
-        LineStep.지하철_노선_생성("흑석역", "노량진역", "9호선","brown", 20L);
+        LineStep.지하철_노선_생성( "2호선", "green");
+        LineStep.지하철_노선_생성( "9호선", "brown");
 
         //when
         List<String> lineNames = LineStep.지하철노선_목록_전체조회();
@@ -82,16 +82,14 @@ public class LineAcceptanceTest {
     @Test
     void getLine(){
         //given
-        Long lineId =  LineStep.지하철_노선_생성("강남역", "역삼역", "2호선", "grean",10L).jsonPath().getLong("id");
+        Long lineId =  LineStep.지하철_노선_생성( "2호선", "green").jsonPath().getLong("id");
 
         //when
         JsonPath jsonPath = LineStep.지하철_노선_조회(lineId);
 
         //then
-        assertThat("강남역").isEqualTo(jsonPath.getString("stations[0].name"));
-        assertThat("역삼역").isEqualTo(jsonPath.getString("stations[1].name"));
         assertThat("2호선").isEqualTo(jsonPath.getString("name"));
-        assertThat("grean").isEqualTo(jsonPath.getString("color"));
+        assertThat("green").isEqualTo(jsonPath.getString("color"));
 
     }
 
@@ -107,7 +105,7 @@ public class LineAcceptanceTest {
     @Test
     void updateLine(){
         //given
-        Long lineId =  LineStep.지하철_노선_생성("강남역", "역삼역", "2호선", "grean",10L).jsonPath().getLong("id");
+        Long lineId =  LineStep.지하철_노선_생성( "2호선", "green").jsonPath().getLong("id");
 
         //when
         Map<String, String> params = new HashMap<>();
@@ -136,7 +134,7 @@ public class LineAcceptanceTest {
     @Test
     void deleteLine(){
         //given
-        Long lineId =  LineStep.지하철_노선_생성("강남역", "역삼역", "2호선", "grean",10L).jsonPath().getLong("id");
+        Long lineId = LineStep.지하철_노선_생성( "2호선", "green").jsonPath().getLong("id");
 
         //when
         ExtractableResponse<Response> response =
@@ -151,4 +149,40 @@ public class LineAcceptanceTest {
         assertThat(lineNames).doesNotContain("2호선");
 
     }
+
+    /**
+     * Given 지하철 역과 노선을 생성하고
+     * When 해당 노선에 구간을 추가하면
+     * Then 해당 노선 조회 시 추가된 구간을 확인할 수 있다
+     */
+
+    /**
+     * Given 지하철 역과 노선을 생성하고
+     * When  해당 노선에 등록되어있는 하행 종점역이 아닌 상행역을 가진 구간을 추가하면
+     * Then Bad Request 400 error가 발생한다
+     */
+
+    /**
+     * Given 지하철 역과 노선을 생성하고
+     * When  해당 노선에 등록되어있는 역과 동일한 하행역을 가진 구간을 추가하면
+     * Then Bad Request 400 error가 발생한다
+     */
+
+    /**
+     * Given 지하철 역,노선, 구간을 생성하고
+     * When 생성한 구간을 삭제하면
+     * Then 해당 노선 조회 시 삭제된 노선을 조회할 수 없다
+     */
+
+    /**
+     * Given 지하철 역,노선, 구간을 생성하고
+     * When 지하철 노선에 등록된 마지막 구간이 아닌 구간을 삭제시도할 경우
+     * Then  Bad Request 400 error가 발생한다
+     */
+
+    /**
+     * Given 지하철 역,노선, 구간을 생성하고
+     * When 지하철 노선에 등록된 구간이 1개인 경우에 구간을 삭제시도할 경우
+     * Then  Bad Request 400 error가 발생한다
+     */
 }
