@@ -23,4 +23,15 @@ public abstract class StationLineSectionApiFixture {
             .then().log().all()
             .extract();
     }
+
+    public static ExtractableResponse<Response> 지하철_노선_구간_삭제(long 지하철역_노선_id,
+        long 추가_하행역_id) {
+
+        return RestAssured
+            .given().log().all()
+            .queryParam("stationId", 추가_하행역_id)
+            .when().delete("/lines/{id}/sections", 지하철역_노선_id)
+            .then().log().all()
+            .extract();
+    }
 }

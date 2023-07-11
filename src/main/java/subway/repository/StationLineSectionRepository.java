@@ -6,6 +6,6 @@ import subway.entity.StationLineSection;
 
 public interface StationLineSectionRepository extends JpaRepository<StationLineSection, Long> {
 
-    List<StationLineSection> findAllByStationLineId(Long stationLineId);
+    List<StationLineSection> findAllByStationLineId(long stationLineId);
 
 }

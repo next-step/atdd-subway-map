@@ -46,4 +46,22 @@ public class StationLineSectionService {
             throw new IllegalArgumentException("추가하고자 하는 구간의 하행역이 이미 구간에 존재합니다.");
         }
     }
+
+    public void delete(long lineId, long stationId) {
+
+        StationLineSectionGroup group = StationLineSectionGroup.of(
+            stationLineSectionRepository.findAllByStationLineId(lineId));
+
+        if (group.isSectionSizeOne()) {
+            throw new IllegalArgumentException("구간이 1개인 경우 삭제할 수 없습니다.");
+        }
+
+        StationLineSection endDownStation = group.getEndDownStation();
+
+        if (!endDownStation.isEqualsDownStation(stationId)) {
+            throw new IllegalArgumentException("하행 종점역이 아니면 삭제할 수 없습니다.");
+        }
+
+        stationLineSectionRepository.delete(endDownStation);
+    }
 }

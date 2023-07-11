@@ -43,4 +43,16 @@ public class StationLineSectionGroup {
                 stationLineSection -> stationLineSection.getDownStationId().equals(downStationId)
             );
     }
+
+    public StationLineSection getEndDownStation() {
+        return sections.stream()
+            .sorted(Comparator.comparing(StationLineSection::getId).reversed())
+            .limit(1)
+            .collect(Collectors.toList())
+            .get(0);
+    }
+
+    public boolean isSectionSizeOne() {
+        return sections.size() <= 1;
+    }
 }

@@ -27,7 +27,7 @@ public class StationLineSectionFacade {
         );
     }
 
-    public void deleteSection(long lineId, long sectionId) {
-
+    public void deleteSection(long lineId, long stationId) {
+        sectionService.delete(lineId, stationId);
     }
 }

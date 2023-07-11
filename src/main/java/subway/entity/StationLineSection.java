@@ -61,5 +61,7 @@ public class StationLineSection {
         return List.of(upStationId, downStationId);
     }
 
-
+    public boolean isEqualsDownStation(long downStationId) {
+        return this.downStationId.equals(downStationId);
+    }
 }

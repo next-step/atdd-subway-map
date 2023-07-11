@@ -32,9 +32,9 @@ public class StationLineSectionController {
     @DeleteMapping("/lines/{id}/sections")
     public ResponseEntity<Object> deleteStationLineSection(
         @PathVariable(name = "id") long lineId,
-        @PathParam("stationId") long sectionId) {
+        @PathParam("stationId") long stationId) {
 
-        facade.deleteSection(lineId, sectionId);
+        facade.deleteSection(lineId, stationId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
