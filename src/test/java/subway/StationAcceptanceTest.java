@@ -65,12 +65,13 @@ public class StationAcceptanceTest {
         create(station1);
         create(station2);
 
-        // then
         List<String> stationNames =
                 RestAssured.given().log().all()
                         .when().get("stations")
                         .then().log().all()
                         .extract().jsonPath().getList("name", String.class);
+
+        // then
         assertThat(stationNames).contains(station1, station2);
     }
 
@@ -87,11 +88,20 @@ public class StationAcceptanceTest {
         String stationName = "강남역";
         Long stationId = create(stationName);
 
-        Map<String, String> params = new HashMap<>();
-        params.put("name", stationName);
+        RestAssured.given().log().all()
+                .pathParam("id", stationId)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().delete("/stations/{id}")
+                .then().log().all()
+                .extract();
 
-
-
+        // then
+        List<String> stations =
+                RestAssured.given().log().all()
+                        .when().get("/stations")
+                        .then().log().all()
+                        .extract().jsonPath().getList("name");
+        assertThat(stations).doesNotContain(stationName);
     }
 
     private Long create(String name) {
