@@ -15,16 +15,14 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static subway.station.StationStep.강남역;
+import static subway.station.StationStep.역삼역;
+import static subway.util.Extractor.getId;
 
-@Sql("/sql/table-station-truncate.sql")
+@Sql("/sql/all-table-truncate.sql")
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class StationAcceptanceTest {
-
-    private static final String 강남역 = "강남역";
-    private static final String 역삼역 = "약삼역";
-
-    private static final String STATION_URL = "/stations";
 
     /**
      * When 지하철역을 생성하면
@@ -35,13 +33,13 @@ class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        ExtractableResponse<Response> response = saveStation(강남역);
+        ExtractableResponse<Response> response = StationStep.지하철역을_저장(강남역);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        assertThat(getStationName()).containsAnyOf(강남역);
+        assertThat(StationStep.전체_지하철역의_이름을_조회()).containsAnyOf(강남역);
     }
 
     /**
@@ -52,12 +50,12 @@ class StationAcceptanceTest {
     @DisplayName("지하철역을 조회한다.")
     @Test
     void searchStation() {
-        //given
         List<String> list = Arrays.asList(강남역, 역삼역);
-        list.forEach(this::saveStation);
+        //given
+        list.forEach(StationStep::지하철역을_저장);
 
         //when
-        List<String> stations = getStationName();
+        List<String> stations = StationStep.전체_지하철역의_이름을_조회();
 
         //then
         assertThat(stations).hasSize(list.size());
@@ -72,27 +70,12 @@ class StationAcceptanceTest {
     @Test
     void removeStation() {
         //given
-        ExtractableResponse<Response> response = saveStation(강남역);
-        Long id = response.jsonPath().getObject("id", Long.class);
+        Long id = getId(StationStep.지하철역을_저장(강남역));
 
         //when
-        Extractor.delete(STATION_URL + "/" + id);
+        StationStep.지하철역을_삭제(id);
 
         //then
-        assertThat(getStationName()).doesNotContain(강남역);
-    }
-
-    private ExtractableResponse<Response> saveStation(String name) {
-
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-
-       return Extractor.post(STATION_URL, params);
-    }
-
-    private List<String> getStationName() {
-
-        return Extractor.get(STATION_URL)
-            .jsonPath().getList("name", String.class);
+        assertThat(StationStep.전체_지하철역의_이름을_조회()).doesNotContain(강남역);
     }
 }

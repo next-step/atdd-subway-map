@@ -49,4 +49,9 @@ public class Extractor
 
         return response.then().extract();
     }
+
+    public static Long getId(ExtractableResponse<Response> response) {
+
+        return response.jsonPath().getLong("id");
+    }
 }
