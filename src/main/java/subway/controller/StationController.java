@@ -5,14 +5,16 @@ import org.springframework.web.bind.annotation.*;
 import subway.dto.StationRequest;
 import subway.dto.StationResponse;
 import subway.service.StationService;
+import subway.util.Mapper;
 
 import java.net.URI;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = "/stations")
 public class StationController {
-    private StationService stationService;
+    private final StationService stationService;
 
     public StationController(StationService stationService) {
         this.stationService = stationService;
@@ -20,13 +22,16 @@ public class StationController {
 
     @PostMapping
     public ResponseEntity<StationResponse> createStation(@RequestBody StationRequest stationRequest) {
-        StationResponse station = stationService.saveStation(stationRequest);
-        return ResponseEntity.created(URI.create("/stations/" + station.getId())).body(station);
+        StationResponse response = Mapper.toResponse(stationService.saveStation(stationRequest));
+        return ResponseEntity.created(URI.create("/stations/" + response.getId())).body(response);
     }
 
     @GetMapping
     public ResponseEntity<List<StationResponse>> showStations() {
-        return ResponseEntity.ok().body(stationService.findAllStations());
+        List<StationResponse> responses = stationService.findAllStations().stream()
+                .map(Mapper::toResponse)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok().body(responses);
     }
 
     @DeleteMapping("/{id}")

@@ -25,7 +25,7 @@ public class Line {
     @Column(nullable = false)
     private Long distance;
 
-    public Line() {
+    protected Line() {
     }
 
     public Line(String name, String color, Station upStation, Station downStation, Long distance) {
@@ -59,5 +59,45 @@ public class Line {
     public void update(String name, String color) {
         this.name = name;
         this.color = color;
+    }
+
+    public static class Builder {
+        private String name;
+        private String color;
+        private Station upStation;
+        private Station downStation;
+        private Long distance;
+
+        public Builder() {
+        }
+
+        public Builder name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Builder color(String color) {
+            this.color = color;
+            return this;
+        }
+
+        public Builder upStation(Station upStation) {
+            this.upStation = upStation;
+            return this;
+        }
+
+        public Builder downStation(Station downStation) {
+            this.downStation = downStation;
+            return this;
+        }
+
+        public Builder distance(Long distance) {
+            this.distance = distance;
+            return this;
+        }
+
+        public Line build() {
+            return new Line(name, color, upStation, downStation, distance);
+        }
     }
 }

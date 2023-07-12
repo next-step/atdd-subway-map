@@ -2,8 +2,8 @@ package subway.service;
 
 import org.springframework.stereotype.Service;
 import subway.dto.LineRequest;
-import subway.dto.LineResponse;
 import subway.dto.LineUpdateRequest;
+import subway.exception.ErrorMessage;
 import subway.exception.SubwayException;
 import subway.model.Line;
 import subway.model.Station;
@@ -11,7 +11,6 @@ import subway.repository.LineRepository;
 
 import javax.transaction.Transactional;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class LineService {
@@ -25,34 +24,32 @@ public class LineService {
     }
 
     @Transactional
-    public LineResponse create(LineRequest lineRequest) {
+    public Line create(LineRequest lineRequest) {
         Station upStation = stationService.findStationById(lineRequest.getUpStationId());
         Station downStation = stationService.findStationById(lineRequest.getDownStationId());
-        Line line = new Line(lineRequest.getName(), lineRequest.getColor(), upStation, downStation, lineRequest.getDistance());
-        return createLineResponse(lineRepository.save(line));
+        Line line = new Line.Builder()
+                .name(lineRequest.getName())
+                .color(lineRequest.getColor())
+                .upStation(upStation)
+                .downStation(downStation)
+                .distance(lineRequest.getDistance())
+                .build();
+        return lineRepository.save(line);
     }
 
-    public List<LineResponse> findAllLines() {
-        return lineRepository.findAll().stream()
-                .map(this::createLineResponse)
-                .collect(Collectors.toList());
+    public List<Line> findAllLines() {
+        return lineRepository.findAll();
     }
 
-    public LineResponse findLineById(Long id) {
-        return createLineResponse(
-                lineRepository.findById(id)
-                        .orElseThrow(() -> new SubwayException("존재하지 않는 지하철 노선 ID 입니다."))
-        );
-    }
-
-    private LineResponse createLineResponse(Line line) {
-        return new LineResponse(line.getId(), line.getName(), line.getColor(), line.getUpStation(), line.getDownStation());
+    public Line findLineById(Long id) {
+        return lineRepository.findById(id)
+                .orElseThrow(() -> new SubwayException(ErrorMessage.NOT_FOUND_SUBWAY_LINE_ID));
     }
 
     @Transactional
     public void update(Long id, LineUpdateRequest lineRequest) {
         Line line = lineRepository.findById(id)
-                .orElseThrow(() -> new SubwayException("존재하지 않는 지하철 노선 ID 입니다."));
+                .orElseThrow(() -> new SubwayException(ErrorMessage.NOT_FOUND_SUBWAY_LINE_ID));
         line.update(lineRequest.getName(), lineRequest.getColor());
         lineRepository.save(line);
     }
