@@ -9,9 +9,7 @@ import subway.section.SectionRepository;
 import subway.station.Station;
 import subway.station.StationRepository;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -67,6 +65,20 @@ public class LineService {
 
     public void deleteLine(Long id) {
         lineRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void deleteSection(Long lineId, Long stationId) {
+        Line line = lineRepository.findById(lineId)
+                .orElseThrow(NoSuchElementException::new);
+        List<Section> sections = line.getSections();
+        Section lastSection = sections.get(sections.size() - 1);
+
+        if(lastSection.getDownStation().getId() != stationId) {
+            throw new IllegalArgumentException();
+        }
+
+        sectionRepository.delete(lastSection);
     }
 
     @Transactional
