@@ -20,14 +20,9 @@ public abstract class StationThenFixture {
         return assertThat(stationNames).containsAnyOf(stationName);
     }
 
-    public static AbstractStringAssert<?> 지하철역_목록_조회_첫번째_지하철역_이름_검사(
-        ExtractableResponse<Response> 응답결과, String stationName) {
-        return assertThat(응답결과.jsonPath().getString("[0].name")).isEqualTo(stationName);
-    }
-
-    public static AbstractStringAssert<?> 지하철역_목록_조회_두번째_지하철역_이름_검사(
-        ExtractableResponse<Response> 응답결과, String stationName) {
-        return assertThat(응답결과.jsonPath().getString("[1].name")).isEqualTo(stationName);
+    public static AbstractStringAssert<?> 지하철역_목록_조회_지하철역_이름_검사(
+        ExtractableResponse<Response> 응답결과, String stationName, int index) {
+        return assertThat(응답결과.jsonPath().getString("[" + index+ " ].name")).isEqualTo(stationName);
     }
 
     public static ListAssert<StationResponse> 지하철역_목록_리스트_크기_검사(

@@ -49,7 +49,7 @@ public abstract class StationLineThenFixture {
         return assertThat(response.jsonPath().getList("")).hasSize(size);
     }
 
-    public static AbstractStringAssert<?> 없는노선조회_에러표출_검사(ExtractableResponse<Response> response) {
+    public static AbstractStringAssert<?> 없는노선조회시_에러표출_검사(ExtractableResponse<Response> response) {
         return assertThat(response.jsonPath().getString("message")).isEqualTo(
             "해당하는 id 에 맞는 지하철 노선이 존재하지 않습니다.");
     }
