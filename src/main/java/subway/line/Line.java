@@ -1,11 +1,15 @@
 package subway.line;
 
 import lombok.Builder;
+import subway.common.exception.BusinessException;
 import subway.section.Section;
+import subway.station.Station;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Entity
 public class Line {
@@ -49,6 +53,10 @@ public class Line {
     }
 
     public void addSection(Section section) {
+        this.existsStation(section.getUpStation());
+        this.existsStation(section.getDownStation());
+        this.isEndStation(section.getUpStation());
+        this.isEndStation(section.getDownStation());
         section.setLine(this);
         this.sections.add(section);
     }
@@ -58,9 +66,22 @@ public class Line {
         this.color = color;
     }
 
-    public static Line saveId(Long id) {
-        Line line = new Line();
-        line.id = id;
-        return line;
+    private List<Station> getAllStations() {
+        return this.sections.stream()
+                .flatMap(section -> Stream.of(section.getUpStation(), section.getDownStation()))
+                .collect(Collectors.toList());
+    }
+
+    private void existsStation(Station station) {
+        if (getAllStations().contains(station)) {
+            throw new BusinessException("이미 존재하는 역입니다.");
+        }
+    }
+
+    private void isEndStation(Station station) {
+        List<Station> stations = this.getAllStations();
+        if (stations.indexOf(station) != (stations.size() - 1)) {
+            throw new BusinessException("하행 종점역이 아닙니다.");
+        }
     }
 }

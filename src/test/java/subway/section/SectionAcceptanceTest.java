@@ -23,6 +23,7 @@ public class SectionAcceptanceTest {
     static final Long STATION_ID_1 = 1L;
     static final Long STATION_ID_2 = 2L;
     static final Long STATION_ID_3 = 3L;
+    static final Long STATION_ID_4 = 4L;
     static final Long DISTANCE_10 = 10L;
 
     /**
@@ -30,7 +31,6 @@ public class SectionAcceptanceTest {
      * When 하행 종점역을 상행역으로 구간을 등록한다
      * Then 지하철 노선등록에 성공한다
      */
-    //TODO: 구간을 등록한다.
     @DisplayName("구간을 생성한다.")
     @Test
     void createSection() {
@@ -50,13 +50,37 @@ public class SectionAcceptanceTest {
      * When 등록이 된 역을 다시 등록한다
      * Then 지하철 노선등록에 실패한다
      */
-    //TODO: 등록이 된 역을 다시 등록하면 실패한다.
+    @DisplayName("등록이 된 역으로 구간을 생성하면 실패한다.")
+    @Test
+    void createSectionExistsStation() {
+        // given
+        this.requestCreateSections(LINE_ID_1, STATION_ID_1, STATION_ID_2, DISTANCE_10);
+
+        // when
+        Response response = this.requestCreateSections(LINE_ID_1, STATION_ID_1, STATION_ID_2, DISTANCE_10);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
 
     /**
      * Given 지하철 노선을 생성하고
-     * When 하행 종점역이 아닌 상행역으로 구간을 등록한다
+     * When 하행 종점역이 아닌 역으로 구간을 등록한다
      * Then 지하철 노선등록에 실패한다
      */
+    @DisplayName("하행 종점역이 아닌 역으로 구간을 생성하면 실패한다.")
+    @Test
+    void createSectionNotEndStation() {
+        // given
+        this.requestCreateSections(LINE_ID_1, STATION_ID_1, STATION_ID_2, DISTANCE_10);
+
+        // when
+        Response response = this.requestCreateSections(LINE_ID_1, STATION_ID_3, STATION_ID_4, DISTANCE_10);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
 
     /**
      * Given 지하철 노선을 생성하고
