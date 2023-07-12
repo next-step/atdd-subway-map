@@ -16,8 +16,6 @@ import java.util.stream.Collectors;
 @Slf4j
 @Entity
 @Getter
-@Builder
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Line {
 
@@ -32,10 +30,17 @@ public class Line {
     private String color;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "line", cascade = CascadeType.ALL)
-    List<Section> sections;
+    List<Section> sections = new ArrayList<>();
 
     @Column(nullable = false)
     private Long distance;
+
+    @Builder
+    public Line(String name, String color, Long distance) {
+        this.name = name;
+        this.color = color;
+        this.distance = distance;
+    }
 
     public void setName(String name) {
         this.name = name;
@@ -70,10 +75,7 @@ public class Line {
     }
 
     public void addSection(Section newSection) {
-        ArrayList<Section> sections = new ArrayList<>(this.sections);
-        sections.add(newSection);
-
-        this.sections = sections;
+        this.sections.add(newSection);
     }
 
     public boolean isAddableSection(Section newSection) {

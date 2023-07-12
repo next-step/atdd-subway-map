@@ -13,6 +13,7 @@ import subway.model.station.Station;
 import subway.model.station.StationDTO;
 import subway.model.station.StationService;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -77,16 +78,19 @@ class SectionCompositeServiceIntegrationTest {
 
     private Line LINE_생성(Station upStation, Station downStation) {
         long distance = 10L;
-        return lineService.save(Line.builder()
-                                    .name("라인1")
-                                    .color("color")
-                                    .sections(List.of(Section.builder()
-                                                                .upStation(upStation)
-                                                                .downStation(downStation)
-                                                                .distance(distance)
-                                                                .build()))
-                                    .distance(distance)
-                                    .build());
+        Line line = Line.builder()
+                         .name("라인1")
+                         .color("color")
+                         .distance(distance)
+                         .build();
+
+        line.addSection(Section.builder()
+                               .upStation(upStation)
+                               .downStation(downStation)
+                               .distance(distance)
+                               .build());
+
+        return lineService.save(line);
     }
 
     private Station Station_생성(String stationName) {

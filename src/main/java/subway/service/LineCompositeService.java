@@ -12,6 +12,9 @@ import subway.model.section.Section;
 import subway.model.station.Station;
 import subway.model.station.StationService;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -42,11 +45,12 @@ public class LineCompositeService {
         Line newLine = Line.builder()
                            .name(lineSaveRequest.getName())
                            .color(lineSaveRequest.getColor())
-                           .sections(List.of(section))
                            .distance(lineSaveRequest.getDistance())
                            .build();
 
-        section.setLine(newLine);
+        newLine.addSection(section);
+
+        section.setLine(newLine); // TODO: 삭제
 
         Line savedLine = lineService.save(newLine);
 
