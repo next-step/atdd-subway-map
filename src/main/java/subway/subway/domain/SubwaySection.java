@@ -1,12 +1,10 @@
 package subway.subway.domain;
 
-import java.math.BigDecimal;
-
 public class SubwaySection {
 
     private final SubwaySection.Id id;
-    private final SubwaySectionStation startStation;
-    private final SubwaySectionStation endStation;
+    private final SubwaySectionStation upStation;
+    private final SubwaySectionStation downStation;
     private final Kilometer distance;
 
     public static SubwaySection register(Station startStation, Station endStation, Kilometer kilometer) {
@@ -19,35 +17,35 @@ public class SubwaySection {
         return new SubwaySection(id, startStation, endStation, kilometer);
     }
 
-    private SubwaySection(SubwaySectionStation startStation, SubwaySectionStation endStation, Kilometer distance) {
+    private SubwaySection(SubwaySectionStation upStation, SubwaySectionStation downStation, Kilometer distance) {
         this.id = new SubwaySection.Id();
-        this.startStation = startStation;
-        this.endStation = endStation;
+        this.upStation = upStation;
+        this.downStation = downStation;
         this.distance = distance;
     }
 
-    private SubwaySection(SubwaySection.Id id, SubwaySectionStation startStation, SubwaySectionStation endStation, Kilometer distance) {
+    private SubwaySection(SubwaySection.Id id, SubwaySectionStation upStation, SubwaySectionStation downStation, Kilometer distance) {
         this.id = id;
-        this.startStation = startStation;
-        this.endStation = endStation;
+        this.upStation = upStation;
+        this.downStation = downStation;
         this.distance = distance;
     }
 
-    public Station.Id getStartStationId() {
-        return startStation.getId();
+    public Station.Id getUpStationId() {
+        return upStation.getId();
     }
 
-    public String getStartStationName() {
-        return startStation.getName();
+    public String getUpStationName() {
+        return upStation.getName();
     }
 
-    public Station.Id getEndStationId() {
-        return endStation.getId();
+    public Station.Id getDownStationId() {
+        return downStation.getId();
     }
 
 
-    public String getEndStationName() {
-        return endStation.getName();
+    public String getDownStationName() {
+        return downStation.getName();
     }
 
     public SubwaySection.Id getId() {

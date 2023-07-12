@@ -16,6 +16,10 @@ public class SubwayLineJpa {
     private String name;
     @Column(length = 20, nullable = false)
     private String color;
+
+    @Column(nullable = false)
+    private Long startSectionId;
+
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name="subway_section_id")
     private List<SubwaySectionJpa> subwaySections = new ArrayList<>();
@@ -23,10 +27,11 @@ public class SubwayLineJpa {
     public SubwayLineJpa() {
     }
 
-    public SubwayLineJpa(Long id, String name, String color, List<SubwaySectionJpa> subwaySections) {
+    public SubwayLineJpa(Long id, String name, String color, Long startSectionId, List<SubwaySectionJpa> subwaySections) {
         this.id = id;
         this.name = name;
         this.color = color;
+        this.startSectionId = startSectionId;
         this.subwaySections = subwaySections;
     }
 

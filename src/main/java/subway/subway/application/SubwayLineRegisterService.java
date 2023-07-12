@@ -30,7 +30,9 @@ class SubwayLineRegisterService implements SubwayLineRegisterUsecase {
         Station upStation = this.getStationBy(stations, command.getUpStationId());
         Station downStation = this.getStationBy(stations, command.getDownStationId());
 
-        SubwayLine subwayLine = SubwayLine.register(command.getName(), command.getColor(), upStation, downStation, command.getDistance());
+        SubwaySection subwaySection = SubwaySection.register(upStation, downStation, command.getDistance());
+
+        SubwayLine subwayLine = SubwayLine.register(command.getName(), command.getColor(), subwaySection);
 
         return subwayLineRegisterPort.register(subwayLine);
     }

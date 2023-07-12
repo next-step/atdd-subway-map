@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 import subway.rds_module.entity.SubwayLineJpa;
 import subway.rds_module.entity.SubwaySectionJpa;
 import subway.subway.application.query.SubwayLineResponse;
+import subway.subway.domain.Station;
 import subway.subway.domain.SubwayLine;
 import subway.subway.domain.SubwaySection;
 
@@ -18,20 +19,19 @@ public class SubwayLineJpaMapper {
                 subwayLine.isNew() ? null : subwayLine.getId().getValue(),
                 subwayLine.getName(),
                 subwayLine.getColor(),
-                subwayLine.getSectionList()
-                        .stream()
-                        .map(this::toSubwaySectionJpa)
-                        .collect(Collectors.toList()));
+                subwayLine.getStartStationId().getValue(),
+                List.of(toSubwaySectionJpa(subwayLine)));
     }
 
-    private SubwaySectionJpa toSubwaySectionJpa(SubwaySection subwaySection) {
+    private SubwaySectionJpa toSubwaySectionJpa(SubwayLine subwayLine) {
+        Station.Id startStationId = subwayLine.getStartStationId();
+
         return new SubwaySectionJpa(
-                subwaySection.isNew() ? null : subwaySection.getId().getValue(),
-                subwaySection.getStartStationId().getValue(),
-                subwaySection.getStartStationName(),
-                subwaySection.getEndStationId().getValue(),
-                subwaySection.getEndStationName(),
-                subwaySection.getDistance().getValue());
+                startStationId.getValue(),
+                subwayLine.getUpStationName(startStationId),
+                subwayLine.getDownStationId(startStationId).getValue(),
+                subwayLine.getDownStationName(startStationId),
+                subwayLine.getSectionDistance(startStationId).getValue());
     }
 
     public SubwayLineResponse toSubwayLineResponse(SubwayLineJpa subwayLineJpa) {

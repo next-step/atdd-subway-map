@@ -30,6 +30,15 @@ public class SubwaySectionJpa {
     public SubwaySectionJpa() {
     }
 
+
+    public SubwaySectionJpa(Long startStationId, String startStationName, Long endStationId, String endStationName, BigDecimal distance) {
+        this.startStationId = startStationId;
+        this.startStationName = startStationName;
+        this.endStationId = endStationId;
+        this.endStationName = endStationName;
+        this.distance = distance;
+    }
+
     public SubwaySectionJpa(Long id, Long startStationId, String startStationName, Long endStationId, String endStationName, BigDecimal distance) {
         this.id = id;
         this.startStationId = startStationId;

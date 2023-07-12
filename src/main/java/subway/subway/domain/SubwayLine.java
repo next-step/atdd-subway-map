@@ -9,30 +9,35 @@ public class SubwayLine {
     private String name;
 
     private String color;
-    private final SubwaySectionList sectionList;
+    private Station.Id startStationId;
+    private final SubwaySections sections;
 
-    public static SubwayLine register(String name, String color, Station upStation, Station downStation, Kilometer kilometer) {
-        SubwaySection subwaySection = SubwaySection.register(upStation, downStation, kilometer);
+    public static SubwayLine register(String name, String color, SubwaySection subwaySection) {
 
         return new SubwayLine(name, color, subwaySection);
     }
 
     public static SubwayLine of(SubwayLine.Id id, String name, String color, List<SubwaySection> sectionList) {
-        return new SubwayLine(id, name, color, new SubwaySectionList(sectionList));
+        return new SubwayLine(id, name, color, new SubwaySections(sectionList));
     }
 
-    private SubwayLine(Id id, String name, String color, SubwaySectionList sectionList) {
+    private SubwayLine(Id id, String name, String color, SubwaySections sections) {
         this.id = id;
         this.name = name;
         this.color = color;
-        this.sectionList = sectionList;
+        this.sections = sections;
     }
 
     private SubwayLine(String name, String color, SubwaySection section) {
         this.id = new SubwayLine.Id();
         this.name = name;
         this.color = color;
-        this.sectionList = new SubwaySectionList(section);
+        this.startStationId = section.getUpStationId();
+        this.sections = new SubwaySections(section);
+    }
+
+    public void validate() {
+        sections.validate();
     }
 
     public SubwayLine.Id getId() {
@@ -50,8 +55,24 @@ public class SubwayLine {
         return color;
     }
 
-    public List<SubwaySection> getSectionList() {
-        return sectionList.getSections();
+    public String getUpStationName(Station.Id upStationId) {
+        return sections.getSection(upStationId).getUpStationName();
+    }
+
+    public String getDownStationName(Station.Id upStationId) {
+        return sections.getSection(upStationId).getDownStationName();
+    }
+
+    public Station.Id getDownStationId(Station.Id upStationId) {
+        return sections.getSection(upStationId).getDownStationId();
+    }
+
+    public Kilometer getSectionDistance(Station.Id upStationId) {
+        return sections.getSection(upStationId).getDistance();
+    }
+
+    public Station.Id getStartStationId() {
+        return startStationId;
     }
 
     public boolean isNew() {
@@ -61,6 +82,19 @@ public class SubwayLine {
     public void update(String name, String color) {
         this.name = name;
         this.color = color;
+    }
+
+    public void addSection(Station upStation, Station downStation, Kilometer kilometer) {
+        SubwaySection subwaySection = SubwaySection.register(upStation, downStation, kilometer);
+        sections.add(subwaySection);
+    }
+
+    public boolean containsSection(SubwaySection subwaySection) {
+        return sections.contains(subwaySection);
+    }
+
+    public int getSectionSize() {
+        return sections.size();
     }
 
     public static class Id {

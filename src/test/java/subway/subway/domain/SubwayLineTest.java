@@ -47,19 +47,15 @@ public class SubwayLineTest extends ParentTest {
 
         //when
 
-        SubwayLine subwayLine = SubwayLine.register(name, color, station1, station2, kilometer);
+        SubwaySection subwaySection = SubwaySection.register(station1, station2, kilometer);
+        SubwayLine subwayLine = SubwayLine.register(name, color, subwaySection);
 
         //then
 
         Assertions.assertThat(subwayLine.getName()).isEqualTo(name);
         Assertions.assertThat(subwayLine.getColor()).isEqualTo(color);
-        Assertions.assertThat(subwayLine.getSectionList().size()).isEqualTo(1);
-        Assertions.assertThat(subwayLine.getSectionList().stream().map(SubwaySection::getDistance).collect(Collectors.toList()))
-                .containsOnly(kilometer);
-        Assertions.assertThat(subwayLine.getSectionList().stream().map(SubwaySection::getStartStationId).collect(Collectors.toList()))
-                .containsOnly(id);
-        Assertions.assertThat(subwayLine.getSectionList().stream().map(SubwaySection::getEndStationId).collect(Collectors.toList()))
-                .containsOnly(id2);
+        Assertions.assertThat(subwayLine.getSectionSize()).isEqualTo(1);
+        Assertions.assertThat(subwayLine.containsSection(subwaySection)).isTrue();
 
     }
 
