@@ -1,6 +1,5 @@
 package subway.line;
 
-import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -42,20 +41,9 @@ public class LineService {
   public LineResponse getSubwayLine(Long lineId) {
     SubwayLine subwayLine = subwayLineService.getSubwayLine(lineId);
     List<LineSection> sections = lineSectionService.getAllSectionsOfLineWithStationInOrder(lineId);
-    List<Station> stations = extractStationsFromSections(sections);
+    List<Station> stations = lineSectionService.stationsInOrder(subwayLine, sections);
 
     return new LineResponse(subwayLine, stations);
-  }
-
-  private List<Station> extractStationsFromSections(List<LineSection> sections) {
-    List<Station> stations = new ArrayList<>(sections.size() * 2);
-
-    stations.add(sections.get(0).getUpStation());
-    for (LineSection section : sections) {
-      stations.add(section.getDownStation());
-    }
-
-    return stations;
   }
 
   @Transactional
