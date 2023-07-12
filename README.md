@@ -57,15 +57,16 @@ git rebase upstream/songteaheon
 - [X] SectionController 메서드 네임 수정
 - [X] SectionController와 LineController 합치기
 - [X] JPA를 사용하다보니 @NoArgsContructor 대신, 가시성을 protected로 선언하기
-- [ ] Section은 line과 라이프사이클을 함께 하는데, 고아 객체에 대한 처리를 고민해보면 좋을 것 같아요. - 질문하기
+- [X] Section은 line과 라이프사이클을 함께 하는데, 고아 객체에 대한 처리를 고민해보면 좋을 것 같아요.
 - [X] line.getStations() 메서드의 Stations를 불변객체로 변경하기 - 질문하기
-- [ ] 이 방법으로 섹션이 추가되면, line에서 갖고 있던 섹션은 사라지지 않을까요?  -> 질문하기
+- [X] 이 방법으로 섹션이 추가되면, line에서 갖고 있던 섹션은 사라지지 않을까요?
 - [X] id 비교하는 부분 객체 비교로 변경하기
 - [X] save인데 클래스 선언부에 정의된 ReadOnly=true 지우기
-- [ ] line에 section이 종속되기 때문. sectionService의 save를 따로 호출하지 않도록 변경하기
-- [ ] line에 section이 종속되기 때문. section을 따로 조회하지 않도록 수정. 또 sectionService의 delete를 따로 호출하지 않도록 변경 - 질문하기
+- [X] line에 section이 종속되기 때문. sectionService의 save를 따로 호출하지 않도록 변경하기
+- [X] line에 section이 종속되기 때문. section을 따로 조회하지 않도록 수정. 또 sectionService의 delete를 따로 호출하지 않도록 변경 - 질문하기
 - [X] @nested사용해서 테스트 코드 리팩토링 
 - [X] 이렇게 assertThat을 여러 개 써야 한다면, assertAll을 사용하는 걸로 변경하기.
-- [ ] 생성된_LINE_조회(lineResponse); 코드 확인하기
-- [ ] 이름으로 비교하기 보다는, JPA Entity니 생성한 객체를 담고있는지로 비교하기. 그리고 이런 경우는 ContainsAll를 사용하기
+- [X] 생성된_LINE_조회(lineResponse); 코드 확인하기
+- [X] 이름으로 비교하기 보다는, JPA Entity니 생성한 객체를 담고있는지로 비교하기. 그리고 이런 경우는 ContainsAll를 사용하기
 - [X] assertion hasSize로 사용하기
+- [ ] 불변객체 수정

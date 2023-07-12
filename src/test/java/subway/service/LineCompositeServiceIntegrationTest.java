@@ -1,6 +1,5 @@
 package subway.service;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -10,10 +9,8 @@ import subway.controller.dto.line.LineSaveRequest;
 import subway.model.line.Line;
 import subway.model.line.LineService;
 import subway.model.station.Station;
-import subway.model.station.StationDTO;
 import subway.model.station.StationService;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -61,7 +58,7 @@ class LineCompositeServiceIntegrationTest {
         assertThat(lineResponse.getStations()).hasSize(stationNames.length);
         assertThat(line.getStations()
                        .stream()
-                       .map(StationDTO::getName)
+                       .map(Station::getName)
                        .collect(Collectors.toList()))
                 .containsAll(List.of(stationNames));
     }

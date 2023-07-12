@@ -4,10 +4,10 @@ import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import subway.model.section.Section;
 import subway.model.station.Station;
-import subway.model.station.StationDTO;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -50,18 +50,14 @@ public class Line {
         this.color = color;
     }
 
-    public List<StationDTO> getStations() {
-        return getInternalStations().stream().map(StationDTO::from).collect(Collectors.toList());
-    }
-
-    private List<Station> getInternalStations() {
+    public List<Station> getStations() {
 
         List<Station> stations = this.sections.stream()
                                               .map(Section::getUpStation)
                                               .collect(Collectors.toList());
         stations.add(getLastStation());
 
-        return stations;
+        return Collections.unmodifiableList(stations);
     }
 
     private Station getLastStation() {
@@ -86,7 +82,7 @@ public class Line {
             return false;
         }
 
-        if (getInternalStations().stream()
+        if (getStations().stream()
                          .anyMatch(it -> Objects.equals(it, newSection.getDownStation()))) {
             log.warn("하행역이 이미 노선에 포함된 지하철역입니다. stationId: {}", newSection.getDownStation()
                                                                          .getId());

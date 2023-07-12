@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import subway.model.station.Station;
-import subway.model.station.StationDTO;
 
 @Getter
 @Builder
@@ -16,13 +15,6 @@ public class StationResponse {
     private String name;
 
     public static StationResponse from(Station station) {
-        return StationResponse.builder()
-                              .id(station.getId())
-                              .name(station.getName())
-                              .build();
-    }
-
-    public static StationResponse from(StationDTO station) {
         return StationResponse.builder()
                               .id(station.getId())
                               .name(station.getName())
