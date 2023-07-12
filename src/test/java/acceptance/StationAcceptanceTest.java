@@ -7,8 +7,7 @@ import static fixture.then.ApiStatusFixture.API_삭제_응답코드_검사;
 import static fixture.then.ApiStatusFixture.API_생성_응답코드_검사;
 import static fixture.then.ApiStatusFixture.API_요청성공_응답코드_검사;
 import static fixture.then.StationThenFixture.지하철역_목록_리스트_크기_검사;
-import static fixture.then.StationThenFixture.지하철역_목록_조회_두번째_지하철역_이름_검사;
-import static fixture.then.StationThenFixture.지하철역_목록_조회_첫번째_지하철역_이름_검사;
+import static fixture.then.StationThenFixture.지하철역_목록_조회_지하철역_이름_검사;
 import static fixture.then.StationThenFixture.지하철역_목록_조회시_생성한역을_포함하는지_검사;
 import static fixture.then.StationThenFixture.지하철역_목록_조회시_아무런값도_조회되지않음_검사;
 import static fixture.when.StationApiFixture.지하철역_리스트_조회;
@@ -25,11 +24,9 @@ import org.junit.jupiter.api.Test;
 @DisplayName("지하철역 관련 기능")
 class StationAcceptanceTest extends AcceptanceTestConfig {
 
-    /**
-     * When 지하철역을 생성하면 <br>
-     * Then 지하철역이 생성된다 <br>
-     * Then 지하철역 목록 조회 시 생성한 역을 찾을 수 있다
-     */
+    private static final int 첫번째 = 0;
+    private static final int 두번째 = 1;
+
     @DisplayName("지하철역을 생성한다.")
     @Test
     void createStation() {
@@ -41,11 +38,6 @@ class StationAcceptanceTest extends AcceptanceTestConfig {
         지하철역_목록_조회시_생성한역을_포함하는지_검사(강남역);
     }
 
-    /**
-     * Given 2개의 지하철역을 생성하고 <br>
-     * When 지하철역 목록을 조회하면 <br>
-     * Then 2개의 지하철역을 응답 받는다
-     */
     @Test
     @DisplayName("지하철역 목록을 조회한다.")
     void showStations() {
@@ -61,16 +53,11 @@ class StationAcceptanceTest extends AcceptanceTestConfig {
         Assertions.assertAll(
             () -> API_요청성공_응답코드_검사(응답결과),
             () -> 지하철역_목록_리스트_크기_검사(응답결과, 2),
-            () -> 지하철역_목록_조회_첫번째_지하철역_이름_검사(응답결과, 지하철역이름),
-            () -> 지하철역_목록_조회_두번째_지하철역_이름_검사(응답결과, 새로운지하철역이름)
+            () -> 지하철역_목록_조회_지하철역_이름_검사(응답결과, 지하철역이름, 첫번째),
+            () -> 지하철역_목록_조회_지하철역_이름_검사(응답결과, 새로운지하철역이름, 두번째)
         );
     }
 
-    /**
-     * Given 지하철역을 생성하고 <br>
-     * When 그 지하철역을 삭제하면 <br>
-     * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
-     */
     @Test
     @DisplayName("지하철역 삭제")
     void removeStation() {

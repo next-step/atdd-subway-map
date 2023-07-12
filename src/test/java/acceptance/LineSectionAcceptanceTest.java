@@ -30,11 +30,6 @@ import org.junit.jupiter.api.Test;
 @DisplayName("지하철 노선 구간 관련 기능")
 class LineSectionAcceptanceTest extends AcceptanceTestConfig {
 
-    /**
-     * Given 지하철역과 노선을 생성하고 <br>
-     * When 지하철 구간을 추가하면 <br>
-     * Then 지하철 노선 조회시 추가된 구간을 확인할 수 있다. <br>
-     */
     @DisplayName("지하철 노선 구간 등록 (성공)")
     @Test
     void createSection() {
@@ -56,12 +51,6 @@ class LineSectionAcceptanceTest extends AcceptanceTestConfig {
 
     }
 
-
-    /**
-     * Given 지하철역과 노선을 생성하고 <br>
-     * When 지하철 구간을 추가할때 <br>
-     * Then 새로운 구간의 상행역이 노선의 하행 종점이여야한다. <br>
-     */
     @DisplayName("지하철 노선 구간 등록 시 추가 구간 상행역이, 노선 하행역이 아니면 등록되지 않아야한다.")
     @Test
     void createSection_NotValidEndStation() {
@@ -82,11 +71,6 @@ class LineSectionAcceptanceTest extends AcceptanceTestConfig {
         노선구간추가_상행역설정_오류_검사(response);
     }
 
-    /**
-     *  Given 지하철역과 노선을 생성하고 <br>
-     *  When 지하철 구간을 추가할때 <br>
-     *  Then 새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없다. <br>
-     */
     @DisplayName("지하철 노선 구간 등록 시 추가 구간 하행역이 구간에 존재하는 하행역이면 에러")
     @Test
     void createSection_existEndStation() {
@@ -106,11 +90,6 @@ class LineSectionAcceptanceTest extends AcceptanceTestConfig {
         노선구간추가_하행역이_이미존재할떄_오류_검사(response);
     }
 
-    /**
-     * Given 지하철역과 노선을 생성하고 지하철 구간을 추가한 후 <br>
-     * When 지하철 구간을 삭제하면 <br>
-     * Then 지하철 노선 조회시 삭제한 구간을 확인할 수 없다. <br>
-     */
     @DisplayName("지하철 구간 삭제 (성공)")
     @Test
     void deleteRemove() {
@@ -130,11 +109,6 @@ class LineSectionAcceptanceTest extends AcceptanceTestConfig {
         지하철_노선_조회시_해당구간_불포함_확인(지하철역_노선_id, 추가_하행역_id);
     }
 
-    /**
-     * Given 지하철역과 노선을 생성하고 지하철 구간을 추가한 후 <br>
-     * When 지하철 구간을 삭제할 때 <br>
-     * Then 하행 종점역이 아니면 삭제할 수 없다.<br>
-     */
     @DisplayName("지하철 구간 삭제 시 하행 종점역이 아니면 삭제할 수 없다.")
     @Test
     void doesNotDeleteSectionWhenDownEndStation() {
@@ -155,11 +129,6 @@ class LineSectionAcceptanceTest extends AcceptanceTestConfig {
 
     }
 
-    /**
-     * Given 지하철역과 노선을 생성하고 <br>
-     * When 지하철 구간을 삭제할 때 <br>
-     * Then 구간이 1개인 경우 역을 삭제할 수 없다. <br>
-     */
     @DisplayName("지하철 구간 삭제 시  구간이 1개인 경우 역을 삭제할 수 없다.")
     @Test
     void doesNotDeleteSectionWhenSectionOnlyOne() {

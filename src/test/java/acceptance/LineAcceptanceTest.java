@@ -23,7 +23,7 @@ import static fixture.then.StationLineThenFixture.노선_응답값_포함된지�
 import static fixture.then.StationLineThenFixture.노선목록_노선이름_포함_검사;
 import static fixture.then.StationLineThenFixture.노선목록_조회시_생성한노선_id_포함_검사;
 import static fixture.then.StationLineThenFixture.노선목록_크기_검사;
-import static fixture.then.StationLineThenFixture.없는노선조회_에러표출_검사;
+import static fixture.then.StationLineThenFixture.없는노선조회시_에러표출_검사;
 import static fixture.when.StationApiFixture.지하철역_생성_요청;
 import static fixture.when.StationLineApiFixture.지하철역_노선_단건_조회;
 import static fixture.when.StationLineApiFixture.지하철역_노선_등록_요청;
@@ -43,9 +43,6 @@ import org.junit.jupiter.api.Test;
 @DisplayName("지하철 노선 관련 기능")
 class LineAcceptanceTest extends AcceptanceTestConfig {
 
-    /**
-     * When 지하철 노선을 생성하면 <br> Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
-     */
     @DisplayName("지하철 노선을 생성한다.")
     @Test
     void createLine() {
@@ -70,9 +67,6 @@ class LineAcceptanceTest extends AcceptanceTestConfig {
 
     }
 
-    /**
-     * Given 2개의 지하철 노선을 생성하고 <br> When 지하철 노선 목록을 조회하면 <br> Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
-     */
     @DisplayName("지하철 노선 목록 조회")
     @Test
     void getStationLines() {
@@ -96,10 +90,6 @@ class LineAcceptanceTest extends AcceptanceTestConfig {
         );
     }
 
-    /**
-     * Given 지하철 노선을 생성하고 <br> When 생성한 지하철 노선을 조회하면
-     * <br> Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
-     */
     @DisplayName("지하철 노선 조회")
     @Test
     void getStationLine() {
@@ -125,9 +115,6 @@ class LineAcceptanceTest extends AcceptanceTestConfig {
 
     }
 
-    /**
-     * Given 지하철 노선을 생성하고 <br> When 생성한 지하철 노선을 수정하면 <br> Then 해당 지하철 노선 정보는 수정된다 <br>
-     */
     @DisplayName("지하철 노선 수정")
     @Test
     void modifyStationLine() {
@@ -148,9 +135,6 @@ class LineAcceptanceTest extends AcceptanceTestConfig {
         );
     }
 
-    /**
-     * Given 지하철 노선을 생성하고 <br> When 생성한 지하철 노선을 삭제하면 <br> Then 해당 지하철 노선 정보는 삭제된다 <br>
-     */
     @DisplayName("지하철 노선 삭제")
     @Test
     void deleteStationLine() {
@@ -166,7 +150,7 @@ class LineAcceptanceTest extends AcceptanceTestConfig {
 
         Assertions.assertAll(
             () -> API_잘못된요청_응답코드_검사(response),
-            () -> 없는노선조회_에러표출_검사(response)
+            () -> 없는노선조회시_에러표출_검사(response)
         );
     }
 
