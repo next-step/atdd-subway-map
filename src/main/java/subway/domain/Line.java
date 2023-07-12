@@ -1,15 +1,14 @@
 package subway.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import subway.exception.BadRequestSectionsException;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter
 public class Line {
 
     @Id
@@ -23,62 +22,63 @@ public class Line {
     @Column(name = "NAME")
     private String name;
 
-    @Column(name = "UP_STATION_ID")
-    private Long upStationId;
-
-    @Column(name = "DOWN_STATION_ID")
-    private Long downStationId;
-
     @Column(name = "DISTANCE")
     private int distance;
 
-    public Long getId() {
-        return id;
+    @OneToMany(mappedBy = "line" , cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
+    private List<Section> sections = new ArrayList<>();;
+
+    public Line() {
     }
 
-    public String getColor() {
-        return color;
+    public Line(String color, String name) {
+        this.color = color;
+        this.name = name;
     }
 
-    public void setColor(String color) {
+    public Line(Long id, String color, String name, int distance, List<Section> sections) {
+        this.id = id;
+        this.color = color;
+        this.name = name;
+        this.distance = distance;
+        this.sections = sections;
+    }
+
+    public void changeColor(String color) {
         if(color != null ){
             this.color = color;
         }
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public Long getUpStationId() {
-        return upStationId;
-    }
-
-    public Long getDownStationId() {
-        return downStationId;
-    }
-
-    public void setName(String name) {
+    public void changeName(String name) {
         if(name != null) {
             this.name = name;
         }
     }
 
-    public void setUpStationId(Long upStationId) {
-        this.upStationId = upStationId;
+    public void addSections(Section sections) {
+        isAddableSections(sections);
+        this.getSections().add(sections);
     }
 
-    public void setDownStationId(Long downStationId) {
-        this.downStationId = downStationId;
+    private void isAddableSections(Section newSection) {
+        List<Section> sections = this.getSections();
+        Station lastStation = sections.get(sections.size() - 1).getDownStation();
+        if(!newSection.getUpStation().equals(lastStation)){
+            throw new BadRequestSectionsException("구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야합니다.");
+        }
+        if(sections.stream().anyMatch(section->section.getDownStation().equals(newSection))){
+            throw new BadRequestSectionsException("이미 해당 노선에 등록되어있는 역입니다.");
+        }
     }
 
-
-    public int getDistance() {
-        return distance;
+    public void removeSections(Station station) {
+        int count = this.getSections().size();
+        if (count <= 1) {
+            throw new BadRequestSectionsException("노선에는 하나 이상의 구간이 존재해야합니다.");
+        }
+        if (!this.getSections().get(count- 1).getDownStation().equals(station)) {
+            throw new BadRequestSectionsException("해당 노선의 마지막 하행 종점역이 아닙니다.");
+        }
     }
-
-    public void setDistance(int distance) {
-        this.distance = distance;
-    }
-
 }

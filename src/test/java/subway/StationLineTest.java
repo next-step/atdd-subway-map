@@ -10,8 +10,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
-import subway.dto.LineResponse;
-import subway.dto.StationResponse;
+import subway.dto.response.LineResponse;
+import subway.dto.response.StationResponse;
 
 import java.util.HashMap;
 import java.util.List;
@@ -61,8 +61,6 @@ public class StationLineTest {
 
         assertThat(line.getName()).isEqualTo("신분당선");
         assertThat(line.getColor()).isEqualTo(COLOR_RED);
-        assertThat(line.getUpStationId()).isEqualTo(신사역.getId());
-        assertThat(line.getDownStationId()).isEqualTo(광교역.getId());
     }
 
 
@@ -108,8 +106,6 @@ public class StationLineTest {
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(line.getName()).isEqualTo("신분당선");
-        assertThat(line.getUpStationId()).isEqualTo(신사역.getId());
-        assertThat(line.getDownStationId()).isEqualTo(광교역.getId());
     }
 
     /**
