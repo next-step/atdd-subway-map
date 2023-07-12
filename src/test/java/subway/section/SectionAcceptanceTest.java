@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -89,6 +90,24 @@ public class SectionAcceptanceTest {
      * Then 구간이 삭제된다.
      */
     //TODO: 구간을 삭제한다.
+    @DisplayName("구간을 삭제한다.")
+    @Test
+    void deleteSection() {
+        // given
+        this.requestCreateSections(LINE_ID_1, STATION_ID_1, STATION_ID_2, DISTANCE_10);
+        this.requestCreateSections(LINE_ID_1, STATION_ID_2, STATION_ID_3, DISTANCE_10);
+
+        // when
+        Response response = this.requestDeleteSections(LINE_ID_1, STATION_ID_3);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        // then
+        List<Long> stationNames = this.requestSearchLine(LINE_ID_1).jsonPath().getList("stations.id", Long.class);
+        assertThat(stationNames).containsAnyOf(STATION_ID_1, STATION_ID_2);
+    }
+
 
     /**
      * Given 지하철 노선을 생성하고
@@ -121,7 +140,11 @@ public class SectionAcceptanceTest {
         return RestAssured.given().log().all().body(params).contentType(MediaType.APPLICATION_JSON_VALUE).when().post("/lines/{lineId}/sections", lineId).then().log().all().extract().response();
     }
 
-    private Response requestDeleteSections(Long lineId, String stationId) {
+    private Response requestDeleteSections(Long lineId, Long stationId) {
         return RestAssured.given().log().all().when().delete("/lines/{lineId}/sections?stationId={stationId}", lineId, stationId).then().log().all().extract().response();
+    }
+
+    private Response requestSearchLine(Long id) {
+        return RestAssured.given().log().all().when().get("/lines/{id}", id).then().log().all().extract().response();
     }
 }

@@ -61,6 +61,10 @@ public class Line {
         this.sections.add(section);
     }
 
+    public void deleteSection(Station station) {
+        this.sections.remove(this.sections.size() - 1);
+    }
+
     public void update(String name, String color) {
         this.name = name;
         this.color = color;
