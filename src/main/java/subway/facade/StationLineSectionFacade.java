@@ -17,9 +17,7 @@ public class StationLineSectionFacade {
 
     public void addStationLineSection(long id, SectionRequest request) {
 
-        sectionService.validAddSection(id, request.getUpStationId(), request.getDownStationId());
-
-        sectionService.create(
+        sectionService.add(
             id,
             request.getUpStationId(),
             request.getDownStationId(),

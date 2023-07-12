@@ -1,6 +1,7 @@
 package subway.service;
 
 import java.util.List;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.entity.StationLineSection;
@@ -17,12 +18,17 @@ public class StationLineSectionService {
         this.stationLineSectionRepository = stationLineSectionRepository;
     }
 
-    public StationLineSection create(Long stationLineId, long upStationId, long downStationId,
+    public StationLineSection create(long lineId, long upStationId, long downStationId,
         int distance) {
 
+        return save(lineId, upStationId, downStationId, distance);
+    }
+
+    private StationLineSection save(long lineId, long upStationId, long downStationId,
+        int distance) {
         return stationLineSectionRepository.save(
             new StationLineSection(
-                stationLineId,
+                lineId,
                 upStationId,
                 downStationId,
                 distance
@@ -30,38 +36,38 @@ public class StationLineSectionService {
         );
     }
 
-    public List<StationLineSection> findAllByLineId(Long lineId) {
-        return stationLineSectionRepository.findAllByStationLineId(lineId);
+    public StationLineSection add(long lineId, long upStationId, long downStationId,
+        int distance) {
+
+        validAddSection(lineId, upStationId, downStationId);
+
+        return save(lineId, upStationId, downStationId, distance);
     }
 
-    public void validAddSection(long lineId, long upStationId, long downStationId) {
+    private void validAddSection(long lineId, long upStationId, long downStationId) {
 
         StationLineSectionGroup group = StationLineSectionGroup.of(findAllByLineId(lineId));
 
-        if (!group.isEqualDownEndStation(upStationId)) {
-            throw new IllegalArgumentException("추가하고자 하는 구간의 상행역이, 노선의 하행종점역이 아닙니다.");
-        }
-
-        if (group.isExistDownEndStation(downStationId)) {
-            throw new IllegalArgumentException("추가하고자 하는 구간의 하행역이 이미 구간에 존재합니다.");
-        }
+        group.validateAdd(upStationId, downStationId);
     }
 
-    public void delete(long lineId, long stationId) {
+    public List<StationLineSection> findAllByLineId(Long lineId) {
+        Optional<List<StationLineSection>> list = stationLineSectionRepository.findAllByStationLineId(
+            lineId);
 
-        StationLineSectionGroup group = StationLineSectionGroup.of(
-            stationLineSectionRepository.findAllByStationLineId(lineId));
-
-        if (group.isSectionSizeOne()) {
-            throw new IllegalArgumentException("구간이 1개인 경우 삭제할 수 없습니다.");
+        if (list.isEmpty()) {
+            throw new IllegalArgumentException(lineId + " id 값을 가지는 노선 구간이 존재하지 않습니다.");
         }
 
-        StationLineSection endDownStation = group.getEndDownStation();
+        return list.get();
+    }
 
-        if (!endDownStation.isEqualsDownStation(stationId)) {
-            throw new IllegalArgumentException("하행 종점역이 아니면 삭제할 수 없습니다.");
-        }
+    public void delete(long lineId, long deleteStationId) {
 
-        stationLineSectionRepository.delete(endDownStation);
+        StationLineSectionGroup group = StationLineSectionGroup.of(findAllByLineId(lineId));
+
+        group.validateDelete(deleteStationId);
+
+        stationLineSectionRepository.delete(group.getEndDownStation());
     }
 }
