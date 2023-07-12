@@ -7,6 +7,8 @@ import subway.line.dto.CreateLineRequest;
 import subway.line.dto.UpdateLineRequest;
 import subway.line.repository.Line;
 import subway.line.repository.LineRepository;
+import subway.section.dto.CreateSectionRequest;
+import subway.section.policy.SectionPolicy;
 import subway.section.repository.Section;
 import subway.section.repository.SectionRepository;
 import subway.station.repository.StationRepository;
@@ -24,11 +26,7 @@ class LineService {
 
     @Transactional
     public Line saveLine(CreateLineRequest request) {
-        Section initSection = sectionRepository.save(Section.builder()
-                .upStation(stationRepository.getReferenceById(request.getUpStationId()))
-                .downStation(stationRepository.getReferenceById(request.getDownStationId()))
-                .distance(request.getDistance())
-                .build());
+        Section initSection = createSection(request.getUpStationId(), request.getDownStationId(), request.getDistance());
 
         return lineRepository.save(Line.builder()
                 .name(request.getName())
@@ -55,5 +53,21 @@ class LineService {
     @Transactional
     public void deleteLineById(Long id) {
         lineRepository.deleteById(id);
+    }
+
+    @Transactional
+    public Line addSection(Long id, CreateSectionRequest request) {
+        Line line = lineRepository.findById(id).orElseThrow(() -> new RuntimeException("Not Exist Line"));
+        SectionPolicy.validate(line, request.getUpStationId(), request.getDownStationId());
+        line.addSection(createSection(request.getUpStationId(), request.getDownStationId(), request.getDistance()));
+        return line;
+    }
+
+    private Section createSection(Long upStationId, Long downStationId, Long distance) {
+        return sectionRepository.save(Section.builder()
+                .upStation(stationRepository.getReferenceById(upStationId))
+                .downStation(stationRepository.getReferenceById(downStationId))
+                .distance(distance)
+                .build());
     }
 }

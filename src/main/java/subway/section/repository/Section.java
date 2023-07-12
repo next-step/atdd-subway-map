@@ -24,6 +24,7 @@ public class Section {
     @JoinColumn(name = "down_station_id")
     private Station downStation;
 
+    @Column(nullable = false)
     private Long distance;
 
     @Builder

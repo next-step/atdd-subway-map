@@ -3,6 +3,7 @@ package subway.section;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -10,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
+import subway.line.dto.CreateLineRequest;
 import subway.line.dto.LineResponse;
 import subway.section.dto.CreateSectionRequest;
 
@@ -20,6 +22,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @Sql("/station-setup.sql")
 public class SectionAcceptanceTest {
+    private static String CREATE_LINE_URL;
+    @BeforeEach
+    void init() {
+        ExtractableResponse<Response> createdResponse = 지하철_노선을_생성한다("신분당선", "bg-red-600", 1L, 2L, 10L);
+        CREATE_LINE_URL = createdResponse.header("Location");
+    }
     /**
      * When 지하철 구간을 추가하면
      * Then 지하철 노선 조회시, 추가된 구간을 확인할 수 있다
@@ -30,6 +38,9 @@ public class SectionAcceptanceTest {
         ExtractableResponse<Response> createdResponse = 지하철_구간을_추가한다(2L, 3L, 5L);
 
         ExtractableResponse<Response> selectedResponse = 지하철_노선을_조회한다();
+
+        System.out.println("createdResponse: " + createdResponse.as(LineResponse.class));
+        System.out.println("selectedResponse: " + selectedResponse.as(LineResponse.class));
 
         추가한_구간이_노선에_포함된다(createdResponse.as(LineResponse.class), selectedResponse.as(LineResponse.class));
     }
@@ -77,7 +88,7 @@ public class SectionAcceptanceTest {
         RestAssured.given().log().all()
                 .body(request)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines/1/section")
+                .when().post(CREATE_LINE_URL + "/sections")
                 .then().log().all()
                 .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .extract();
@@ -101,7 +112,7 @@ public class SectionAcceptanceTest {
 
     private static ExtractableResponse<Response> 지하철_노선을_조회한다() {
         return RestAssured.given().log().all()
-                .when().get("/lines/1")
+                .when().get(CREATE_LINE_URL)
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
                 .extract();
@@ -113,7 +124,25 @@ public class SectionAcceptanceTest {
         return RestAssured.given().log().all()
                 .body(request)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines/1/section")
+                .when().post(CREATE_LINE_URL + "/sections")
+                .then().log().all()
+                .statusCode(HttpStatus.CREATED.value())
+                .extract();
+    }
+
+    private static ExtractableResponse<Response> 지하철_노선을_생성한다(String name, String color, Long upStationId, Long downStationId, Long distance) {
+        CreateLineRequest request = new CreateLineRequest(
+                name,
+                color,
+                upStationId,
+                downStationId,
+                distance
+        );
+
+        return RestAssured.given().log().all()
+                .body(request)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines")
                 .then().log().all()
                 .statusCode(HttpStatus.CREATED.value())
                 .extract();

@@ -24,6 +24,7 @@ class Line {
     @OneToMany
     @JoinColumn(name = "line_id")
     private List<Section> sections = new ArrayList<>();
+    @Column(name = "total_distance", nullable = false)
     private Long totalDistance;
 
     @Builder
@@ -44,7 +45,16 @@ class Line {
 
     public List<Station> getAllStation() {
         List<Station> totalStation = this.sections.stream().map(Section::getUpStation).collect(Collectors.toList());
-        totalStation.add(sections.get(sections.size() -1).getDownStation());
+        totalStation.add(this.sections.get(this.sections.size() -1).getDownStation());
         return totalStation;
+    }
+
+    public void addSection(Section section) {
+        this.sections.add(section);
+        this.totalDistance += section.getDistance();
+    }
+
+    public Station getDownEndStation() {
+        return this.sections.get(this.sections.size() -1).getDownStation();
     }
 }
