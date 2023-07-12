@@ -3,11 +3,13 @@ package subway;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
+import subway.dto.LineRequest;
 
 import java.util.List;
 
@@ -21,6 +23,29 @@ import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFOR
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class LineAcceptanceTest {
 
+    private final LineRequest LINE_1 = new LineRequest.Builder()
+            .name("신분당선")
+            .color("bg-red-600")
+            .upStationId(1L)
+            .downStationId(2L)
+            .distance(10L)
+            .build();
+
+    private final LineRequest LINE_2 = new LineRequest.Builder()
+            .name("분당선")
+            .color("bg-red-600")
+            .upStationId(1L)
+            .downStationId(3L)
+            .distance(10L)
+            .build();
+
+    @BeforeEach
+    void createStations() {
+        지하철역을_생성한다("지하철역");
+        지하철역을_생성한다("새로운지하철역");
+        지하철역을_생성한다("또다른지하철역");
+    }
+
     /**
      * When 지하철 노선을 생성하면
      * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
@@ -29,10 +54,7 @@ class LineAcceptanceTest {
     @Test
     void createLine() {
         // when
-        지하철역을_생성한다("지하철역");
-        지하철역을_생성한다("새로운지하철역");
-
-        String lineId = 지하철노선을_생성한다("신분당선", "bg-red-600", 1L, 2L, 10L)
+        String lineId = 지하철노선을_생성한다(LINE_1)
                 .jsonPath()
                 .get("id")
                 .toString();
@@ -51,12 +73,8 @@ class LineAcceptanceTest {
     @Test
     void showLines() {
         // given
-        지하철역을_생성한다("지하철역");
-        지하철역을_생성한다("새로운지하철역");
-        지하철역을_생성한다("또다른지하철역");
-
-        지하철노선을_생성한다("신분당선", "bg-red-600", 1L, 2L, 10L);
-        지하철노선을_생성한다("분당선", "bg-red-600", 1L, 3L, 10L);
+        지하철노선을_생성한다(LINE_1);
+        지하철노선을_생성한다(LINE_2);
 
         // when
         List<String> lines = 지하철노선_목록을_조회한다();
@@ -74,10 +92,7 @@ class LineAcceptanceTest {
     @Test
     void searchLine() {
         // given
-        지하철역을_생성한다("지하철역");
-        지하철역을_생성한다("새로운지하철역");
-
-        String lineId = 지하철노선을_생성한다("신분당선", "bg-red-600", 1L, 2L, 10L)
+        String lineId = 지하철노선을_생성한다(LINE_1)
                 .jsonPath()
                 .get("id")
                 .toString();
@@ -98,10 +113,7 @@ class LineAcceptanceTest {
     @Test
     void updateLine() {
         // given
-        지하철역을_생성한다("지하철역");
-        지하철역을_생성한다("새로운지하철역");
-
-        String lineId = 지하철노선을_생성한다("신분당선", "bg-red-600", 1L, 2L, 10L)
+        String lineId = 지하철노선을_생성한다(LINE_1)
                 .jsonPath()
                 .get("id")
                 .toString();
@@ -122,10 +134,7 @@ class LineAcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        지하철역을_생성한다("지하철역");
-        지하철역을_생성한다("새로운지하철역");
-
-        String lineId = 지하철노선을_생성한다("신분당선", "bg-red-600", 1L, 2L, 10L)
+        String lineId = 지하철노선을_생성한다(LINE_1)
                 .jsonPath()
                 .get("id")
                 .toString();
