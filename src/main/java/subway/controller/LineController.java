@@ -10,24 +10,24 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import subway.service.request.StationLineModifyRequest;
-import subway.service.request.StationLineRequest;
-import subway.service.response.StationLineResponse;
-import subway.service.StationLineService;
+import subway.facade.LineFacade;
+import subway.service.request.LineModifyRequest;
+import subway.service.request.LineRequest;
+import subway.service.response.LineResponse;
 
 @RestController
-public class StationLineController {
+public class LineController {
 
-    private final StationLineService stationLineService;
+    private final LineFacade lineFacade;
 
-    public StationLineController(final StationLineService stationLineService) {
-        this.stationLineService = stationLineService;
+    public LineController(LineFacade lineFacade) {
+        this.lineFacade = lineFacade;
     }
 
     @PostMapping("/lines")
-    ResponseEntity<StationLineResponse> createStationLine(@RequestBody StationLineRequest request) {
+    ResponseEntity<LineResponse> createStationLine(@RequestBody LineRequest request) {
 
-        StationLineResponse response = stationLineService.create(request);
+        LineResponse response = lineFacade.lineCreate(request);
 
         return ResponseEntity
             .status(HttpStatus.CREATED)
@@ -35,31 +35,31 @@ public class StationLineController {
     }
 
     @GetMapping("/lines")
-    ResponseEntity<List<StationLineResponse>> getStationLineList() {
+    ResponseEntity<List<LineResponse>> getStationLineList() {
 
-        return ResponseEntity.ok(stationLineService.findAllStationLines());
+        return ResponseEntity.ok(lineFacade.findAllStationLines());
     }
 
     @GetMapping("/lines/{id}")
-    ResponseEntity<StationLineResponse> getStationLine(@PathVariable long id) {
+    ResponseEntity<LineResponse> getStationLine(@PathVariable long id) {
 
-        return ResponseEntity.ok(stationLineService.findById(id));
+        return ResponseEntity.ok(lineFacade.lineFindById(id));
     }
 
     @PutMapping("/lines/{id}")
     ResponseEntity<Object> modifyStationLine(
         @PathVariable long id,
-        @RequestBody StationLineModifyRequest request
+        @RequestBody LineModifyRequest request
     ) {
 
-        stationLineService.modify(id, request);
+        lineFacade.modifyLine(id, request);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/lines/{id}")
     ResponseEntity<Object> modifyStationLine(@PathVariable long id) {
 
-        stationLineService.delete(id);
+        lineFacade.deleteLine(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

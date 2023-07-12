@@ -1,5 +1,6 @@
 package subway.entity;
 
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -7,17 +8,14 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 @Entity
-public class StationLine {
+public class Section {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 20, nullable = false)
-    private String name;
-
-    @Column(length = 20, nullable = false)
-    private String color;
+    @Column(nullable = false)
+    private Long stationLineId;
 
     @Column(nullable = false)
     private Long upStationId;
@@ -28,12 +26,12 @@ public class StationLine {
     @Column(nullable = false)
     private int distance;
 
-    public StationLine() {}
+    public Section() {
+    }
 
-    public StationLine(String name, String color, Long upStationId, Long downStationId,
+    public Section(Long stationLineId, Long upStationId, Long downStationId,
         int distance) {
-        this.name = name;
-        this.color = color;
+        this.stationLineId = stationLineId;
         this.upStationId = upStationId;
         this.downStationId = downStationId;
         this.distance = distance;
@@ -43,31 +41,15 @@ public class StationLine {
         return id;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public String getColor() {
-        return color;
-    }
-
-    public Long getUpStationId() {
-        return upStationId;
-    }
-
     public Long getDownStationId() {
         return downStationId;
     }
 
-    public int getDistance() {
-        return distance;
+    public List<Long> getStationIdList() {
+        return List.of(upStationId, downStationId);
     }
 
-    public void updateName(String name) {
-        this.name = name;
-    }
-
-    public void updateColor(String color) {
-        this.color = color;
+    public boolean isEqualsDownStation(long downStationId) {
+        return this.downStationId.equals(downStationId);
     }
 }

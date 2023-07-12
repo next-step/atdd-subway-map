@@ -1,16 +1,19 @@
-package api;
+package fixture.when;
+
+import static fixture.given.LineRequestFixture.노선등록요청_데이터_생성;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-import java.util.Map;
+public abstract class LineApiFixture {
 
-public class StationLineApiRequest {
+    public static ExtractableResponse<Response> 지하철역_노선_등록_요청(String name, String color, long upStationId, long downStationId, int distance) {
 
-    public static ExtractableResponse<Response> 지하철역_노선_등록_요청(Map<String, Object> params) {
+        Map<String, Object> params = 노선등록요청_데이터_생성(name, color, upStationId, downStationId, distance);
 
         return RestAssured
                 .given().log().all()
@@ -21,7 +24,9 @@ public class StationLineApiRequest {
                 .extract();
     }
 
-    public static long 지하철역_노선_등록_요청_후_id_추출(Map<String, Object> params) {
+    public static long 지하철역_노선_등록_요청_후_id_추출(String name, String color, long upStationId, long downStationId, int distance) {
+
+        Map<String, Object> params = 노선등록요청_데이터_생성(name, color, upStationId, downStationId, distance);
 
         return RestAssured
                 .given().log().all()

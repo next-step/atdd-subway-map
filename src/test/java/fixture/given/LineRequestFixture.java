@@ -1,9 +1,9 @@
-package fixture;
+package fixture.given;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class StationLineRequestFixture {
+public abstract class LineRequestFixture {
 
     public final static String 신분당선 = "신분당선";
     public final static String 분당선 = "분당선";
