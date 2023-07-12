@@ -1,9 +1,13 @@
 package subway.line.repository;
 
 import lombok.*;
+import subway.section.repository.Section;
 import subway.station.repository.Station;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Getter
@@ -17,19 +21,17 @@ class Line {
     private String name;
     @Column(nullable = false)
     private String color;
-    @OneToOne
-    @JoinColumn(name = "up_station_id")
-    private Station upStation;
-    @OneToOne
-    @JoinColumn(name = "down_station_id")
-    private Station downStation;
+    @OneToMany
+    @JoinColumn(name = "line_id")
+    private List<Section> sections = new ArrayList<>();
+    private Long totalDistance;
 
     @Builder
-    Line(String name, String color, Station upStation, Station downStation) {
+    Line(String name, String color, Section initSection) {
         this.name = name;
         this.color = color;
-        this.upStation = upStation;
-        this.downStation = downStation;
+        this.sections.add(initSection);
+        this.totalDistance = initSection.getDistance();
     }
 
     public void changeName(String name) {
@@ -38,5 +40,11 @@ class Line {
 
     public void changeColor(String color) {
         this.color = color;
+    }
+
+    public List<Station> getAllStation() {
+        List<Station> totalStation = this.sections.stream().map(Section::getUpStation).collect(Collectors.toList());
+        totalStation.add(sections.get(sections.size() -1).getDownStation());
+        return totalStation;
     }
 }

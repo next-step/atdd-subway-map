@@ -7,6 +7,8 @@ import subway.line.dto.CreateLineRequest;
 import subway.line.dto.UpdateLineRequest;
 import subway.line.repository.Line;
 import subway.line.repository.LineRepository;
+import subway.section.repository.Section;
+import subway.section.repository.SectionRepository;
 import subway.station.repository.StationRepository;
 
 import java.util.List;
@@ -18,17 +20,21 @@ public
 class LineService {
     private final LineRepository lineRepository;
     private final StationRepository stationRepository;
+    private final SectionRepository sectionRepository;
 
     @Transactional
     public Line saveLine(CreateLineRequest request) {
-        return lineRepository.save(
-                Line.builder()
-                        .name(request.getName())
-                        .color(request.getColor())
-                        .upStation(stationRepository.getReferenceById(request.getUpStationId()))
-                        .downStation(stationRepository.getReferenceById(request.getDownStationId()))
-                        .build()
-        );
+        Section initSection = sectionRepository.save(Section.builder()
+                .upStation(stationRepository.getReferenceById(request.getUpStationId()))
+                .downStation(stationRepository.getReferenceById(request.getDownStationId()))
+                .distance(request.getDistance())
+                .build());
+
+        return lineRepository.save(Line.builder()
+                .name(request.getName())
+                .color(request.getColor())
+                .initSection(initSection)
+                .build());
     }
 
     public List<Line> findAllLines() {
