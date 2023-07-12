@@ -3,6 +3,7 @@ package subway.route.controller;
 import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import subway.route.code.RouteValidateTypeCode;
 import subway.route.dto.RouteRequest;
 import subway.route.dto.RouteResponse;
 import subway.route.service.RouteService;
@@ -22,7 +23,7 @@ public class RouteController {
 
     @PostMapping()
     public ResponseEntity<RouteResponse> createRoute(@RequestBody RouteRequest routeRequest) {
-        RouteResponse route = routeService.saveRoute(routeRequest);
+        RouteResponse route = routeService.saveRoute(RouteValidateTypeCode.SAVE, routeRequest);
         return ResponseEntity.created(URI.create("/api/routes/" + route.getId())).body(route);
     }
 
@@ -41,7 +42,7 @@ public class RouteController {
     @PutMapping("/{id}")
     public ResponseEntity<RouteResponse> updateRoute(@PathVariable Long id, @RequestBody RouteRequest routeRequest) {
         routeRequest.saveId(id);
-        RouteResponse route = routeService.updateRoute(routeRequest);
+        RouteResponse route = routeService.saveRoute(RouteValidateTypeCode.UPDATE, routeRequest);
         return ResponseEntity.ok().body(route);
     }
 
