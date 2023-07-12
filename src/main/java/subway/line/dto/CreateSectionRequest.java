@@ -1,4 +1,4 @@
-package subway.section.dto;
+package subway.line.dto;
 
 public class CreateSectionRequest {
 
