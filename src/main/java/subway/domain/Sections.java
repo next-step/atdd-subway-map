@@ -60,4 +60,8 @@ public class Sections {
             throw new IllegalArgumentException(ADD_DUPLICATE_ERROR_MESSAGE);
         }
     }
+
+    public Long getDistance() {
+        return sections.stream().mapToLong(Section::getDistance).sum();
+    }
 }

@@ -60,6 +60,7 @@ public class Line {
 
     public void addSection(Section section) {
         sections.add(section);
+        this.distance = sections.getDistance();
     }
 
     public Set<Station> getStations() {
