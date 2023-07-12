@@ -36,8 +36,10 @@ class LineCompositeServiceIntegrationTest {
     void saveLine() {
 
         // given
-        Station upStation = Station_생성("정거장 A");
-        Station downStation = Station_생성("정거장 B");
+        String stationA = "정거장 A";
+        String stationB = "정거장 B";
+        Station upStation = Station_생성(stationA);
+        Station downStation = Station_생성(stationB);
 
         // when
         LineResponse lineResponse = lineCompositeService.saveLine(LineSaveRequest.builder()
@@ -49,12 +51,14 @@ class LineCompositeServiceIntegrationTest {
                                                                                  .build());
 
         // then
-        생성된_LINE_조회(lineResponse);
+        생성된_LINE_조회(lineResponse, stationA, stationB);
     }
 
     private void 생성된_LINE_조회(LineResponse lineResponse, String... stationNames) {
 
         Line line = lineService.findById(lineResponse.getId());
+
+        assertThat(lineResponse.getStations()).hasSize(stationNames.length);
         assertThat(line.getStations()
                        .stream()
                        .map(StationDTO::getName)
