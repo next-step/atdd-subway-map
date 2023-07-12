@@ -27,7 +27,7 @@ public class StationLineSectionController {
         @RequestBody SectionRequest request) {
 
         facade.addStationLineSection(id, request);
-        return ResponseEntity.created(URI.create("/lines/{id}" + id)).build();
+        return ResponseEntity.created(URI.create("/lines/" + id)).build();
     }
 
     @DeleteMapping("/lines/{id}/sections")
