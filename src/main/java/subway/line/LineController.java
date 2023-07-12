@@ -5,7 +5,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import subway.section.Section;
 import subway.section.SectionCreateRequest;
-
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
@@ -64,4 +63,5 @@ public class LineController {
 
         return ResponseEntity.noContent().build();
     }
+
 }
