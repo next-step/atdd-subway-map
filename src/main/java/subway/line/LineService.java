@@ -26,7 +26,15 @@ public class LineService {
 
     @Transactional
     public LineResponse saveLine(CreateLineRequest request) {
-        Line line = lineRepository.save(request.toEntity());
+        Line line = lineRepository.save(Line.builder().name(request.getName()).color(request.getColor()).build());
+        Station upStation = stationRepository.findById(request.getUpStationId()).orElseThrow();
+        Station downStation = stationRepository.findById(request.getDownStationId()).orElseThrow();
+        Section section = Section.builder()
+                .upStation(upStation)
+                .downStation(downStation)
+                .distance(request.getDistance())
+                .build();
+        line.addSection(section);
 
         return LineResponse.from(line);
     }
@@ -45,7 +53,6 @@ public class LineService {
     public void updateLineById(Long id, UpdateLineRequest request) {
         Line line = lineRepository.findById(id).orElseThrow();
         line.update(request.getName(), request.getColor());
-        lineRepository.save(line);
     }
 
     @Transactional

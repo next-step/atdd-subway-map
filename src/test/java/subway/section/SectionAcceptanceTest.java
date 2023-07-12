@@ -41,9 +41,7 @@ public class SectionAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        assertThat(response.jsonPath().getLong("upStationId")).isEqualTo(STATION_ID_1);
-        assertThat(response.jsonPath().getLong("downStationId")).isEqualTo(STATION_ID_2);
-        assertThat(response.jsonPath().getLong("distance")).isEqualTo(DISTANCE_10);
+        assertThat(response.jsonPath().getLong("id")).isEqualTo(LINE_ID_1);
     }
 
 

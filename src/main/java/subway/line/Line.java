@@ -1,5 +1,6 @@
 package subway.line;
 
+import lombok.Builder;
 import subway.section.Section;
 
 import javax.persistence.*;
@@ -24,11 +25,11 @@ public class Line {
     public Line() {
     }
 
+    @Builder
     public Line(String name, String color) {
         this.name = name;
         this.color = color;
     }
-
 
     public Long getId() {
         return id;

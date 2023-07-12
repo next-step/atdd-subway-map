@@ -1,9 +1,5 @@
 package subway.line.dto;
 
-import subway.line.Line;
-import subway.section.Section;
-import subway.station.Station;
-
 public class CreateLineRequest {
     private String name;
     private String color;
@@ -19,10 +15,23 @@ public class CreateLineRequest {
         this.distance = distance;
     }
 
-    public Line toEntity() {
-        Section section = Section.builder().upStation(Station.saveId(upStationId)).downStation(Station.saveId(downStationId)).distance(distance).build();
-        Line line = new Line(name, color);
-        line.addSection(section);
-        return line;
+    public String getName() {
+        return name;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public Long getUpStationId() {
+        return upStationId;
+    }
+
+    public Long getDownStationId() {
+        return downStationId;
+    }
+
+    public Long getDistance() {
+        return distance;
     }
 }
