@@ -7,7 +7,9 @@ import subway.dto.LineRequest;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -34,6 +36,22 @@ public class Line {
     public void update(String name, String color) {
         this.name = name;
         this.color = color;
+    }
+
+    public List<Station> getStationList(){
+        if(this.getSections().isEmpty()){
+            return Collections.emptyList();
+        }
+        else{
+            List<Station> stations = this.getSections().stream()
+                    .map(Section::getDownStation)
+                    .collect(Collectors.toList());
+
+            stations.add(0, this.getSections().get(0).getUpStation());
+
+            return stations;
+        }
+
     }
 
 }

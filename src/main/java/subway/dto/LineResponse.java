@@ -7,6 +7,7 @@ import subway.domain.Station;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 public class LineResponse {
@@ -14,17 +15,14 @@ public class LineResponse {
     private Long id;
     private String name;
     private String color;
-    List<Section> sections;
+    List<Station> stations;
 
     public static LineResponse fromEntity(Line line) {
-        List<Station> stations = new ArrayList<>();
-
-
         LineResponse lineResponse = new LineResponse();
         lineResponse.id = line.getId();
         lineResponse.name = line.getName();
         lineResponse.color = line.getColor();
-        lineResponse.sections = line.getSections();
+        lineResponse.stations = line.getStationList();
 
         return lineResponse;
     }

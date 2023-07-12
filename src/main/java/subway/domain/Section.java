@@ -1,8 +1,16 @@
 package subway.domain;
 
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public class Section {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,34 +30,13 @@ public class Section {
 
     private int distance;
 
-    public Section() {
 
-    }
-
+    @Builder
     public Section(Line line, Station upStation, Station downStation, int distance) {
-        this.line = line;
-        this.upStation = upStation;
-        this.downStation = downStation;
-        this.distance = distance;
+        this.line = Objects.requireNonNull(line);
+        this.upStation = Objects.requireNonNull(upStation);
+        this.downStation = Objects.requireNonNull(downStation);
+        this.distance = Objects.requireNonNull(distance);
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public Line getLine() {
-        return line;
-    }
-
-    public Station getUpStation() {
-        return upStation;
-    }
-
-    public Station getDownStation() {
-        return downStation;
-    }
-
-    public int getDistance() {
-        return distance;
-    }
 }

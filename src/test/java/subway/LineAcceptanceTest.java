@@ -149,40 +149,4 @@ public class LineAcceptanceTest {
         assertThat(lineNames).doesNotContain("2호선");
 
     }
-
-    /**
-     * Given 지하철 역과 노선을 생성하고
-     * When 해당 노선에 구간을 추가하면
-     * Then 해당 노선 조회 시 추가된 구간을 확인할 수 있다
-     */
-
-    /**
-     * Given 지하철 역과 노선을 생성하고
-     * When  해당 노선에 등록되어있는 하행 종점역이 아닌 상행역을 가진 구간을 추가하면
-     * Then Bad Request 400 error가 발생한다
-     */
-
-    /**
-     * Given 지하철 역과 노선을 생성하고
-     * When  해당 노선에 등록되어있는 역과 동일한 하행역을 가진 구간을 추가하면
-     * Then Bad Request 400 error가 발생한다
-     */
-
-    /**
-     * Given 지하철 역,노선, 구간을 생성하고
-     * When 생성한 구간을 삭제하면
-     * Then 해당 노선 조회 시 삭제된 노선을 조회할 수 없다
-     */
-
-    /**
-     * Given 지하철 역,노선, 구간을 생성하고
-     * When 지하철 노선에 등록된 마지막 구간이 아닌 구간을 삭제시도할 경우
-     * Then  Bad Request 400 error가 발생한다
-     */
-
-    /**
-     * Given 지하철 역,노선, 구간을 생성하고
-     * When 지하철 노선에 등록된 구간이 1개인 경우에 구간을 삭제시도할 경우
-     * Then  Bad Request 400 error가 발생한다
-     */
 }
