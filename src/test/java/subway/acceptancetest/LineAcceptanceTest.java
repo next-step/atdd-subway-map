@@ -1,37 +1,30 @@
-package subway;
+package subway.acceptancetest;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.jdbc.Sql;
 import subway.dto.LineResponse;
+import subway.util.DatabaseCleanup;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.AcceptanceTestHelper.*;
+import static subway.acceptancetest.AcceptanceTestHelper.*;
 
 @DisplayName("지하철노선 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@DirtiesContext
-@Sql("/truncateLine.sql")
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class LineAcceptanceTest {
+public class LineAcceptanceTest extends AcceptanceTest {
     private Long stationId1;
     private Long stationId2;
     private Long stationId3;
 
-    @BeforeAll
-    void beforeAll() {
-        stationId1 = 지하철역_등록("지하철역").body().jsonPath().getLong("id");
-        stationId2 = 지하철역_등록("새로운지하철역").body().jsonPath().getLong("id");
-        stationId3 = 지하철역_등록("또다른지하철역").body().jsonPath().getLong("id");
+    @BeforeEach
+    void beforeEach() {
+        stationId1 = 지하철역_생성("지하철역").body().jsonPath().getLong("id");
+        stationId2 = 지하철역_생성("새로운지하철역").body().jsonPath().getLong("id");
+        stationId3 = 지하철역_생성("또다른지하철역").body().jsonPath().getLong("id");
     }
 
     /**
@@ -48,7 +41,7 @@ public class LineAcceptanceTest {
         final ExtractableResponse<Response> response = 지하철노선_생성(name, "bg-red-600", stationId1, stationId2, 10);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        상태_코드_확인(response, HttpStatus.CREATED.value());
         final List<String> lineNames = 지하철노선_목록_조회().jsonPath().getList("name", String.class);
         assertThat(lineNames).containsAnyOf(name);
     }
@@ -71,7 +64,7 @@ public class LineAcceptanceTest {
         final ExtractableResponse<Response> response = 지하철노선_목록_조회();
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        상태_코드_확인(response, HttpStatus.OK.value());
         final List<String> lineNames = 지하철노선_목록_조회().jsonPath().getList("name", String.class);
         assertThat(lineNames).containsAnyOf(name1, name2);
     }
@@ -92,7 +85,7 @@ public class LineAcceptanceTest {
         final ExtractableResponse<Response> response = 지하철노선_조회(id);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        상태_코드_확인(response, HttpStatus.OK.value());
         assertThat(response.body().jsonPath().getString("name")).isEqualTo(name);
     }
 
@@ -113,7 +106,7 @@ public class LineAcceptanceTest {
         final ExtractableResponse<Response> response = 지하철노선_수정(id, newName, newColor);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        상태_코드_확인(response, HttpStatus.OK.value());
         final LineResponse lineResponse = 지하철노선_조회(id).jsonPath().getObject(".", LineResponse.class);
         assertThat(lineResponse.getName()).isEqualTo(newName);
         assertThat(lineResponse.getColor()).isEqualTo(newColor);
@@ -135,7 +128,7 @@ public class LineAcceptanceTest {
         final ExtractableResponse<Response> response = 지하철노선_삭제(id);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        상태_코드_확인(response, HttpStatus.NO_CONTENT.value());
         final List<String> lineNames = 지하철노선_목록_조회().jsonPath().getList("name", String.class);
         assertThat(lineNames).doesNotContain(name);
     }

@@ -5,9 +5,11 @@ import org.springframework.transaction.annotation.Transactional;
 import subway.dto.StationRequest;
 import subway.dto.StationResponse;
 import subway.entity.Station;
+import subway.exception.NotFoundStationException;
 import subway.repository.StationRepository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,9 +33,13 @@ public class StationService {
                 .collect(Collectors.toList());
     }
 
-    public StationResponse findStationById(final Long id) {
-        final Station station = stationRepository.findById(id).orElse(Station.EMPTY);
-        return createStationResponse(station);
+    public Station getStationById(final Long id) {
+        final Optional<Station> station = stationRepository.findById(id);
+        if (station.isPresent()) {
+            return station.get();
+        } else {
+            throw new NotFoundStationException("id : " + id);
+        }
     }
 
     @Transactional
@@ -41,7 +47,7 @@ public class StationService {
         stationRepository.deleteById(id);
     }
 
-    private StationResponse createStationResponse(Station station) {
+    public StationResponse createStationResponse(Station station) {
         return new StationResponse(
                 station.getId(),
                 station.getName()

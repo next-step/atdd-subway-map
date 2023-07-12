@@ -1,4 +1,4 @@
-package subway;
+package subway.acceptancetest;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -8,8 +8,10 @@ import org.springframework.http.MediaType;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class AcceptanceTestHelper {
-    static ExtractableResponse<Response> 지하철역_등록(final String name) {
+    static ExtractableResponse<Response> 지하철역_생성(final String name) {
         final Map<String, String> params = new HashMap<>();
         params.put("name", name);
 
@@ -86,5 +88,36 @@ public class AcceptanceTestHelper {
                 .when().delete("/lines/" + id)
                 .then().log().all()
                 .extract();
+    }
+
+    static ExtractableResponse<Response> 지하철구간_생성(final Long lineId, final Long upStationId,
+                                                  final Long downStationId, final int distance) {
+        final Map<String, Object> params = new HashMap<>();
+        params.put("upStationId", upStationId);
+        params.put("downStationId", downStationId);
+        params.put("distance", distance);
+        return RestAssured
+                .given().log().all().body(params).contentType(MediaType.APPLICATION_JSON_VALUE + "; charset=UTF-8")
+                .when().post("/lines/" + lineId + "/sections")
+                .then().log().all()
+                .extract();
+    }
+
+    static ExtractableResponse<Response> 지하철구간_삭제(final Long lineId, final Long stationId) {
+        final Map<String, Object> params = new HashMap<>();
+        params.put("stationId", stationId);
+        return RestAssured
+                .given().log().all().params(params)
+                .when().delete("/lines/" + lineId + "/sections")
+                .then().log().all()
+                .extract();
+    }
+
+    static Long 아이디_추출(final ExtractableResponse<Response> response) {
+        return response.body().jsonPath().getLong("id");
+    }
+
+    static void 상태_코드_확인(final ExtractableResponse<Response> response, final int statusCode) {
+        assertThat(response.statusCode()).isEqualTo(statusCode);
     }
 }
