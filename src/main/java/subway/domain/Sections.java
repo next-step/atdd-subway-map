@@ -21,14 +21,11 @@ public class Sections {
     private List<Section> sections = new ArrayList<>();
 
     public void add(Section section) {
-        if (!sections.isEmpty()) {
-            if (!sections.get(sections.size() - 1).isDownStation(section.getUpStation())) {
-                throw new IllegalArgumentException(ADD_ERROR_MESSAGE);
-            }
-            if (getStations().contains(section.getDownStation())) {
-                throw new IllegalArgumentException(ADD_DUPLICATE_ERROR_MESSAGE);
-            }
+        if (sections.isEmpty()) {
+            sections.add(section);
+            return;
         }
+        validateNewSection(section);
         sections.add(section);
     }
 
@@ -49,5 +46,18 @@ public class Sections {
         }
 
         sections.remove(downEndSection);
+    }
+
+    private Station getDownEndStation() {
+        return sections.get(sections.size() - 1).getDownStation();
+    }
+
+    private void validateNewSection(Section section) {
+        if (!getDownEndStation().equals(section.getUpStation())) {
+            throw new IllegalArgumentException(ADD_ERROR_MESSAGE);
+        }
+        if (getStations().contains(section.getDownStation())) {
+            throw new IllegalArgumentException(ADD_DUPLICATE_ERROR_MESSAGE);
+        }
     }
 }
