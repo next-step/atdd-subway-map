@@ -17,10 +17,6 @@ public class SectionService {
         this.sectionRepository = sectionRepository;
     }
 
-    public List<Section> findByLine(Line line) {
-        return sectionRepository.findByLine(line);
-    }
-
     public Section findByDownStation(Station targetStation) {
         return sectionRepository.findByDownStation(targetStation)
                                 .orElseThrow(() -> new IllegalArgumentException("section doesn't exist"));

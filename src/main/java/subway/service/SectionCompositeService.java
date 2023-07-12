@@ -61,10 +61,10 @@ public class SectionCompositeService {
 
         Line line = lineService.findById(lineId);
 
-        return sectionService.findByLine(line)
-                             .stream()
-                             .map(SectionResponse::from)
-                             .collect(Collectors.toList());
+        return line.getSections()
+                   .stream()
+                   .map(SectionResponse::from)
+                   .collect(Collectors.toList());
     }
 
     @Transactional
