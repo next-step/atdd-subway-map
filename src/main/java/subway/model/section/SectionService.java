@@ -17,16 +17,6 @@ public class SectionService {
         this.sectionRepository = sectionRepository;
     }
 
-    @Transactional
-    public Section save(Section newSection) {
-        return sectionRepository.save(newSection);
-    }
-
-    @Transactional
-    public void deleteById(Long sectionId) {
-        sectionRepository.deleteById(sectionId);
-    }
-
     public List<Section> findByLine(Line line) {
         return sectionRepository.findByLine(line);
     }
