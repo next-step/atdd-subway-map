@@ -3,7 +3,7 @@ package subway.line;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.station.Station;
-import subway.station.StationRepository;
+import subway.station.StationService;
 
 import java.util.Arrays;
 import java.util.List;
@@ -14,19 +14,17 @@ import java.util.stream.Collectors;
 public class SubwayLineService {
 
     private SubwayLineRepository subwayLineRepository;
-    private StationRepository stationRepository;
+    private StationService stationService;
 
-    public SubwayLineService(SubwayLineRepository subwayLineRepository, StationRepository stationRepository) {
+    public SubwayLineService(SubwayLineRepository subwayLineRepository, StationService stationService) {
         this.subwayLineRepository = subwayLineRepository;
-        this.stationRepository = stationRepository;
+        this.stationService = stationService;
     }
 
     @Transactional
     public SubwayLineResponse createLine(SubwayLineRequest subwayLineRequest) {
-        Station upStation = stationRepository.findById(subwayLineRequest.getUpStationId())
-                .orElseThrow();
-        Station downStation = stationRepository.findById(subwayLineRequest.getDownStationId())
-                .orElseThrow();
+        Station upStation = stationService.findStationById(subwayLineRequest.getUpStationId());
+        Station downStation = stationService.findStationById(subwayLineRequest.getDownStationId());
 
         List<Station> stations = Arrays.asList(upStation, downStation);
         SubwayLine subwayLine = subwayLineRepository.save(new SubwayLine(subwayLineRequest.getName()
