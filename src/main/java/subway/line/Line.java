@@ -29,6 +29,7 @@ public class Line {
     public Line(String name, String color) {
         this.name = name;
         this.color = color;
+        this.sections = new ArrayList<>();
     }
 
     public Long getId() {
