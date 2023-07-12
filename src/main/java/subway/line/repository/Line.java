@@ -54,6 +54,11 @@ class Line {
         this.totalDistance += section.getDistance();
     }
 
+    public Section getLastSection() {
+        return this.sections.get(this.sections.size() -1);
+    }
+
+
     public Station getDownEndStation() {
         return this.sections.get(this.sections.size() -1).getDownStation();
     }

@@ -81,7 +81,7 @@ public class SectionAcceptanceTest {
     void deleteSection() {
         ExtractableResponse<Response> createdResponse = 지하철_구간을_추가한다(2L, 3L, 5L);
 
-        지하철_구간을_삭제한다(createdResponse.header("Location") + "/sections" + 3L);
+        지하철_구간을_삭제한다(createdResponse.header("Location") + "/sections?stationId=" + 3L);
 
         삭제한_구간의_역이_노선에서_제외된다();
     }
