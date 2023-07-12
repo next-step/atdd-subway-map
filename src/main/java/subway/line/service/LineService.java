@@ -38,12 +38,6 @@ public class LineService {
         return LineDto.from(savedLineEntity, stations.stream().map(StationDto::from).collect(Collectors.toList()));
     }
 
-    private Station getStation(Long lineDto) {
-        Station upStation = stationRepository.findById(lineDto)
-                .orElseThrow(() -> new IllegalArgumentException(String.format("역이 존재하지 않습니다. id:%s", lineDto)));
-        return upStation;
-    }
-
     public List<LineDto> getLines() {
         return lineRepository.findAll().stream()
                 .map(line -> LineDto.from(line, getRelatedStations(line).stream()
@@ -72,6 +66,12 @@ public class LineService {
     @Transactional
     public void deleteLine(Long id) {
         lineRepository.deleteById(id);
+    }
+
+    private Station getStation(Long lineDto) {
+        Station upStation = stationRepository.findById(lineDto)
+                .orElseThrow(() -> new IllegalArgumentException(String.format("역이 존재하지 않습니다. id:%s", lineDto)));
+        return upStation;
     }
 
     public List<Station> getRelatedStations(Line line) {
