@@ -16,7 +16,7 @@ public class RestAssuredUtils {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> inquriy(RestAssuredCondition condition) {
+    public static ExtractableResponse<Response> inquiry(RestAssuredCondition condition) {
         return RestAssured.given().log().all()
                 .when().get(condition.getPath())
                 .then().log().all()

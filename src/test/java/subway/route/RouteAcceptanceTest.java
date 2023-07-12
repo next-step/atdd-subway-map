@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.annotation.DirtiesContext;
 import subway.common.RestAssuredUtils;
 import subway.common.RestAssuredCondition;
 import subway.route.domain.Route;
@@ -54,7 +53,7 @@ public class RouteAcceptanceTest {
 
         ExtractableResponse<Response> inquiryStationsResponse =
                 RestAssuredUtils
-                        .inquriy(new RestAssuredCondition(ROUTE_API_URI + SLASH + route.getId()));
+                        .inquiry(new RestAssuredCondition(ROUTE_API_URI + SLASH + route.getId()));
 
         assertThat(inquiryStationsResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(inquiryStationsResponse.body().jsonPath().getObject(".", Route.class)).isEqualTo(route);
@@ -76,7 +75,7 @@ public class RouteAcceptanceTest {
 
         ExtractableResponse<Response> response =
                 RestAssuredUtils
-                        .inquriy(new RestAssuredCondition(ROUTE_API_URI));
+                        .inquiry(new RestAssuredCondition(ROUTE_API_URI));
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.body().jsonPath().getList("name", String.class).size()).isEqualTo(2);

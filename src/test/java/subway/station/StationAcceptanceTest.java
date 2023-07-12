@@ -53,7 +53,7 @@ public class StationAcceptanceTest {
 
         // then
         List<String> stationNames = RestAssuredUtils
-                .inquriy(new RestAssuredCondition(STATION_API_URI))
+                .inquiry(new RestAssuredCondition(STATION_API_URI))
                 .jsonPath()
                 .getList("name", String.class);
         assertThat(stationNames).containsAnyOf("강남역");
@@ -78,7 +78,7 @@ public class StationAcceptanceTest {
 
         // when
         ExtractableResponse<Response> response =
-                RestAssuredUtils.inquriy(new RestAssuredCondition(STATION_API_URI));
+                RestAssuredUtils.inquiry(new RestAssuredCondition(STATION_API_URI));
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -109,7 +109,7 @@ public class StationAcceptanceTest {
 
         // then
         List<String> stationNames = RestAssuredUtils
-                .inquriy(new RestAssuredCondition(STATION_API_URI))
+                .inquiry(new RestAssuredCondition(STATION_API_URI))
                 .jsonPath()
                 .getList("name", String.class);
         assertThat(stationNames).doesNotContain("삼성역");
