@@ -24,6 +24,52 @@ import static subway.utils.StationTestUtils.주어진_이름으로_지하철역�
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class SectionAcceptanceTest extends RestAssuredTest {
     /**
+     * given 노선에 등록된 하행종점역에 대해
+     * when 구간을 삭제할 경우
+     * then 정상적으로 삭제할 수 있다
+     */
+    @DisplayName("삭제하려는 구간이 노선에 등록된 하행 종점역 포함인 경우 삭제에 성공한다")
+    @Test
+    public void deleteSectionTest() {
+        //given
+        //상행역, 하행역 생성
+        Long upStationId = 주어진_이름으로_지하철역을_생성한다("강남역");
+        Long downStationId = 주어진_이름으로_지하철역을_생성한다("판교역");
+
+        //노선 생성
+        LineCreateRequest lineCreateRequest
+                = new LineCreateRequest("신분당선", "bg-red-600", upStationId, downStationId, 10);
+        Long createdLineId = 지하철_노선을_등록한다(lineCreateRequest);
+
+        //구간 생성
+        Long newSectionUpStationId = downStationId;
+        Long newSectionDownStationId = 주어진_이름으로_지하철역을_생성한다("정자역");
+
+        SectionCreateRequest sectionCreateRequest = SectionCreateRequest.builder()
+                .downStationId(newSectionDownStationId)
+                .upStationId(newSectionUpStationId)
+                .distance(10)
+                .build();
+
+        ExtractableResponse<Response> response = 지하철_노선에_구간을_등록한다(createdLineId, sectionCreateRequest);
+
+        //when
+        지하철_노선의_구간을_삭제한다(createdLineId, newSectionDownStationId);
+
+        //then
+        List<Long> sectionIds = 지하철_노선의_구간들을_조회한다(createdLineId);
+        assertThat(sectionIds).doesNotContain(response.jsonPath().getLong("id"));
+    }
+
+    void 지하철_노선의_구간을_삭제한다(Long lineId, Long stationId) {
+        RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().delete("/lines/{lineId}/sections?stationId={stat}", lineId, stationId)
+                .then().log().all();
+    }
+
+
+    /**
      * given 등록하려는 구간의 상행역이 노선의 종착역이 아닌 경우에
      * when 구간을 등록할 경우
      * then 정상적으로 등록되지 못한다
