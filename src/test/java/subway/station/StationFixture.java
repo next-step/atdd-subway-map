@@ -33,4 +33,10 @@ public class StationFixture {
                 .statusCode(HttpStatus.CREATED.value())
                 .extract();
     }
+
+    public static long 지하철역_생성_ID(String name) {
+        return 지하철역_생성(name)
+                .jsonPath()
+                .getLong("id");
+    }
 }

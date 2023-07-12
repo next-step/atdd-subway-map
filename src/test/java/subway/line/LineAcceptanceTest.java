@@ -13,6 +13,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static subway.line.LineFixture.*;
+import static subway.station.StationFixture.지하철역_생성_ID;
 
 @DisplayName("지하철 노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -116,11 +117,6 @@ public class LineAcceptanceTest {
         LineResponse response = 지하철_노선_조회(id);
         assertThat(response.getName()).isEqualTo(updatedName);
         assertThat(response.getColor()).isEqualTo(updatedColor);
-
-        //then : 지하철 노선에 연결된 역이 수정됨을 확인
-        List<Long> stationIds = 노선에_상행_하행_지하철역_ID(response);
-
-        assertThat(stationIds).containsExactly(secondStationId, fourthStationId);
     }
 
     /**

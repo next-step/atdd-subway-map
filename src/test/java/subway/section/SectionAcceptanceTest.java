@@ -8,17 +8,47 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import subway.line.LineRequest;
+import subway.line.LineResponse;
+import subway.linesection.LineSectionRequest;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static subway.line.LineFixture.지하철_노선_목록_조회;
+import static subway.line.LineFixture.지하철_노선_생성_ID;
+import static subway.station.StationFixture.지하철역_생성_ID;
 
 @DisplayName("지하철 구간 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class SectionAcceptanceTest {
 
     @LocalServerPort
     int port;
+
+    private Long firstStationId;
+    private Long secondStationId;
+    private Long thirdStationId;
+    private Long fourthStationId;
+
+
+    private Long fistLineId;
+
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
+        firstStationId = 지하철역_생성_ID("노원역");
+        secondStationId = 지하철역_생성_ID("창동역");
+        thirdStationId = 지하철역_생성_ID("강남역");
+        fourthStationId = 지하철역_생성_ID("사당역");
 
+        fistLineId = 지하철_노선_생성_ID(LineRequest.builder()
+                .name("4호선")
+                .color("light-blue")
+                .upStationId(firstStationId)
+                .downStationId(secondStationId)
+                .distance(10)
+                .build());
     }
 
     /**
@@ -30,14 +60,19 @@ public class SectionAcceptanceTest {
      */
 
 
-
     @DisplayName("지하찰_구간_등록")
     @Test
     void createStation() {
-        지하철_구간_생성(1L, new SectionRequest());
+        //given
+        LineSectionRequest request = new LineSectionRequest(secondStationId, thirdStationId,20);
+        //when
+        지하철_구간_생성(1L, request);
+        //then
+        List<LineResponse> response = 지하철_노선_목록_조회();
+        assertThat(response.get(0).getStations().size()).isEqualTo(3);
     }
 
-    private static void 지하철_구간_생성(Long lineId, SectionRequest reqeust) {
+    private void 지하철_구간_생성(Long lineId, LineSectionRequest reqeust) {
         RestAssured.given().log().all()
                 .when()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)

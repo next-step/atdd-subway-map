@@ -39,12 +39,6 @@ public class LineFixture {
                 .getObject(".", LineResponse.class);
     }
 
-    public static long 지하철역_생성_ID(String name) {
-        return 지하철역_생성(name)
-                .jsonPath()
-                .getLong("id");
-    }
-
     public static List<Long> 노선에_상행_하행_지하철역_ID(LineResponse response) {
         List<Long> stationIds = response.getStations()
                 .stream()
