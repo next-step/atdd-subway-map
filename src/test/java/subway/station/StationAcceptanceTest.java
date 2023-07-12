@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 import subway.common.RestAssuredUtils;
 import subway.common.RestAssuredCondition;
 import subway.station.domain.Station;
@@ -19,19 +20,14 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class StationAcceptanceTest {
 
     private final String STATION_API_URI = "/api/stations";
     private final String SLASH = "/";
 
-    @Autowired
-    StationRepository stationRepository;
-
-    @BeforeEach
-    void setUp() {
-        stationRepository.deleteAll();
-    }
 
     /**
      * When 지하철역을 생성하면

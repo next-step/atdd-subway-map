@@ -2,16 +2,14 @@ package subway.route;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 import subway.common.RestAssuredUtils;
 import subway.common.RestAssuredCondition;
 import subway.route.domain.Route;
-import subway.route.repository.RouteRepository;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,19 +17,12 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class RouteAcceptanceTest {
 
-    @Autowired
-    RouteRepository routeRepository;
-
     private final String ROUTE_API_URI = "/api/routes";
     private final String SLASH = "/";
-
-    @BeforeEach
-    void setUp() {
-        routeRepository.deleteAll();
-    }
 
     /**
      * When 지하철 노선을 생성하면
