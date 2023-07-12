@@ -18,7 +18,7 @@ public class Line {
     @Column(length = 100, nullable = false)
     private String color;
 
-    @OneToMany(mappedBy = "line", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private List<Section> sections = new ArrayList<>();
 
     public Line() {
@@ -54,5 +54,11 @@ public class Line {
     public void update(String name, String color) {
         this.name = name;
         this.color = color;
+    }
+
+    public static Line saveId(Long id) {
+        Line line = new Line();
+        line.id = id;
+        return line;
     }
 }
