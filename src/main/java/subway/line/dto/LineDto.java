@@ -3,7 +3,6 @@ package subway.line.dto;
 import lombok.Getter;
 import subway.line.jpa.Line;
 import subway.station.dto.StationDto;
-import subway.station.jpa.Station;
 
 import java.util.List;
 
@@ -38,21 +37,19 @@ public class LineDto {
         this.distance = distance;
     }
 
-    public static LineDto from(Line lineEntity) {
+    public static LineDto from(Line lineEntity, List<StationDto> stationDtos) {
         return new LineDto(
                 lineEntity.getId(),
                 lineEntity.getName(),
                 lineEntity.getColor(),
-                List.of(StationDto.from(lineEntity.getUpStation()), StationDto.from(lineEntity.getDownStation()))
+                stationDtos
         );
     }
 
-    public Line toEntity(Station upStation, Station downStation) {
+    public Line toEntity() {
         return new Line(
                 name,
                 color,
-                upStation,
-                downStation,
                 distance
         );
     }

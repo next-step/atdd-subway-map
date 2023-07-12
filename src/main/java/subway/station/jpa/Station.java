@@ -1,12 +1,15 @@
 package subway.station.jpa;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import subway.line.jpa.Line;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Getter
+@AllArgsConstructor
 public class Station {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -14,11 +17,8 @@ public class Station {
     @Column(length = 20, nullable = false)
     private String name;
 
-    @Column(length = 20)
-    private String lineName;
-
     @ManyToOne
-    @JoinColumn(name = "line_id")
+    @JoinColumn(name = "line_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Line line;
 
     public Station() {
@@ -33,11 +33,15 @@ public class Station {
     }
 
     @Override
-    public String toString() {
-        return "Station{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", lineName='" + lineName + '\'' +
-                '}';
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Station station = (Station) o;
+        return Objects.equals(id, station.id) && Objects.equals(name, station.name) && Objects.equals(line, station.line);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, line);
     }
 }

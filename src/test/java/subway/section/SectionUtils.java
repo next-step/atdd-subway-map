@@ -1,4 +1,4 @@
-package subway.line;
+package subway.section;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -28,7 +28,7 @@ public class SectionUtils {
 
     private SectionUtils() {}
 
-    public static String 지하철_구간_등록(String 노선_url, Map<String, String> 구간_등록_요청, String 새구간_하행역_url, String 새구간_상행역_url) {
+    public static String 지하철_구간_등록(String 노선_url, Map<String, String> 구간_등록_요청, String 새구간_상행역_url, String 새구간_하행역_url) {
 
         구간_등록_요청.put("downStationId", String.valueOf(StationTestUtils.지하철_아이디_획득(새구간_하행역_url)));
         구간_등록_요청.put("upStationId", String.valueOf(StationTestUtils.지하철_아이디_획득(새구간_상행역_url)));
@@ -47,7 +47,7 @@ public class SectionUtils {
         return response.header("Location");
     }
 
-    public static void 지하철_구간_등록_실패(String 노선_url, Map<String, String> 구간_등록_요청, String 새구간_하행역_url, String 새구간_상행역_url) {
+    public static void 지하철_구간_등록_실패(String 노선_url, Map<String, String> 구간_등록_요청, String 새구간_상행역_url, String 새구간_하행역_url) {
 
         구간_등록_요청.put("downStationId", String.valueOf(StationTestUtils.지하철_아이디_획득(새구간_하행역_url)));
         구간_등록_요청.put("upStationId", String.valueOf(StationTestUtils.지하철_아이디_획득(새구간_상행역_url)));

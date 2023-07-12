@@ -1,45 +1,54 @@
 package subway.line.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.line.dto.LineDto;
 import subway.line.jpa.Line;
 import subway.line.jpa.LineRepository;
+import subway.section.jpa.Section;
+import subway.section.jpa.SectionRepository;
+import subway.station.dto.StationDto;
 import subway.station.jpa.Station;
 import subway.station.jpa.StationRepository;
 
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class LineService {
 
     private final LineRepository lineRepository;
     private final StationRepository stationRepository;
-
-
-    public LineService(LineRepository lineRepository, StationRepository stationRepository) {
-        this.lineRepository = lineRepository;
-        this.stationRepository = stationRepository;
-    }
+    private final SectionRepository sectionRepository;
 
     @Transactional
     public LineDto saveLine(LineDto lineDto) {
-        Station upStation = stationRepository.findById(lineDto.getUpStationId())
-                .orElseThrow(() -> new IllegalArgumentException(String.format("상행역이 존재하지 않습니다. id:%s", lineDto.getUpStationId())));
-        Station downStation = stationRepository.findById(lineDto.getDownStationId())
-                .orElseThrow(() -> new IllegalArgumentException(String.format("하행역 존재하지 않습니다. id:%s", lineDto.getDownStationId())));
-        Line lineEntity = lineDto.toEntity(upStation, downStation);
+        Station upStation = getStation(lineDto.getUpStationId());
+        Station downStation = getStation(lineDto.getDownStationId());
 
-        Line savedLineEntity = lineRepository.save(lineEntity);
+        Line savedLineEntity = lineRepository.save(lineDto.toEntity());
 
-        return LineDto.from(savedLineEntity);
+        sectionRepository.save(new Section(savedLineEntity, upStation, downStation, lineDto.getDistance()));
+
+        List<Station> stations = getRelatedStations(savedLineEntity);
+
+        return LineDto.from(savedLineEntity, stations.stream().map(StationDto::from).collect(Collectors.toList()));
+    }
+
+    private Station getStation(Long lineDto) {
+        Station upStation = stationRepository.findById(lineDto)
+                .orElseThrow(() -> new IllegalArgumentException(String.format("역이 존재하지 않습니다. id:%s", lineDto)));
+        return upStation;
     }
 
     public List<LineDto> getLines() {
         return lineRepository.findAll().stream()
-                .map(LineDto::from)
+                .map(line -> LineDto.from(line, getRelatedStations(line).stream()
+                                                  .map(StationDto::from)
+                                                  .collect(Collectors.toList())))
                 .collect(Collectors.toList());
     }
 
@@ -47,7 +56,9 @@ public class LineService {
         Line line = lineRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException(String.format("노선이 존재하지 않습니다. id:%s", id)));
 
-        return LineDto.from(line);
+        return LineDto.from(line, getRelatedStations(line).stream()
+                                    .map(StationDto::from)
+                                    .collect(Collectors.toList()));
     }
 
     @Transactional
@@ -61,5 +72,56 @@ public class LineService {
     @Transactional
     public void deleteLine(Long id) {
         lineRepository.deleteById(id);
+    }
+
+    public List<Station> getRelatedStations(Line line) {
+        Set<Station> stationSet = new HashSet<>();
+        sectionRepository.findAllByLine(line).stream()
+                .forEach(s -> {
+                    stationSet.add(s.getUpStation());
+                    stationSet.add(s.getDownStation());
+                });
+        return stationSet.stream().collect(Collectors.toList());
+    }
+
+    private List<Station> getRelatedStationsInOrder(Line line) {
+
+        List<Section> sectionList = sectionRepository.findAllByLine(line);
+        Map<Station, Station> stationMap = new HashMap<>();
+        Set<Station> downStations = new HashSet<>();
+
+        sectionList.stream()
+                .forEach(s -> {
+                    stationMap.put(s.getUpStation(), s.getDownStation());
+                    downStations.add(s.getDownStation());
+                });
+
+        // 시작 노드 찾기
+        Station startStation = null;
+        for (Station station : stationMap.keySet()) {
+            if (!downStations.contains(station)) {
+                startStation = station;
+                break;
+            }
+        }
+
+        if (startStation == null) {
+            throw new IllegalArgumentException(String.format("호선 내 시작 노드가 없습니다. line id:%s", line.getId()));
+        }
+
+        // 시작노드부터 끝 노드까지 찾기
+        List<Station> orderedStations = new ArrayList<>();
+        Station currentStation = startStation;
+        while (currentStation != null) {
+            orderedStations.add(currentStation);
+            currentStation = stationMap.get(currentStation);
+        }
+
+        return orderedStations;
+    }
+
+    public Station getDownStation(Line line) {
+        List<Station> stationList = getRelatedStationsInOrder(line);
+        return stationList.get(stationList.size() - 1);
     }
 }

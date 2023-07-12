@@ -1,4 +1,4 @@
-package subway.line;
+package subway.section;
 
 
 import org.junit.jupiter.api.DisplayName;
@@ -8,7 +8,7 @@ import subway.station.dto.StationResponse;
 
 import static org.assertj.core.api.Assertions.*;
 import static subway.line.LineTestUtils.*;
-import static subway.line.SectionUtils.*;
+import static subway.section.SectionUtils.*;
 import static subway.station.StationTestUtils.*;
 
 @DisplayName("지하철 구간 관련 기능")
@@ -31,7 +31,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         String 이호선_URL = 지하철_노선_생성(이호선_생성_요청, 상행종착역_URL, 하행종착역_URL);
 
         // when
-        지하철_구간_등록(이호선_URL, 구간_등록_요청, 새로운_하행역_URL, 하행종착역_URL);
+        지하철_구간_등록(이호선_URL, 구간_등록_요청, 하행종착역_URL, 새로운_하행역_URL);
 
         // then
         지하철_구간_등록_검증(이호선_URL);
@@ -55,7 +55,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         String 이호선_URL = 지하철_노선_생성(이호선_생성_요청, 상행종착역_URL, 하행종착역_URL);
 
         // when
-        지하철_구간_등록_실패(이호선_URL, 구간_등록_요청, 새로운_하행역_URL, 하행종착역_URL);
+        지하철_구간_등록_실패(이호선_URL, 구간_등록_요청, 새로운_하행역_URL, 새로운_하행역_URL);
 
         // then
         지하철_구간_미등록_검증(이호선_URL);
@@ -75,11 +75,10 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         // given
         String 상행종착역_URL = 지하철역_생성(강남역_정보);
         String 하행종착역_URL = 지하철역_생성(역삼역_정보);
-        String 새로운_하행역_URL = 지하철역_생성(삼성역_정보);
         String 이호선_URL = 지하철_노선_생성(이호선_생성_요청, 상행종착역_URL, 하행종착역_URL);
 
         // when
-        지하철_구간_등록_실패(이호선_URL, 구간_등록_요청, 새로운_하행역_URL, 하행종착역_URL);
+        지하철_구간_등록_실패(이호선_URL, 구간_등록_요청, 하행종착역_URL, 상행종착역_URL);
         // then
         지하철_구간_미등록_검증(이호선_URL);
     }
@@ -100,13 +99,13 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         String 하행종착역_URL = 지하철역_생성(역삼역_정보);
         String 새로운_하행역_URL = 지하철역_생성(삼성역_정보);
         String 이호선_URL = 지하철_노선_생성(이호선_생성_요청, 상행종착역_URL, 하행종착역_URL);
-        지하철_구간_등록(이호선_URL, 구간_등록_요청, 새로운_하행역_URL, 하행종착역_URL);
+        지하철_구간_등록(이호선_URL, 구간_등록_요청, 하행종착역_URL, 새로운_하행역_URL);
 
         // when
         지하철_구간_삭제(이호선_URL + "/sections?stationId=" + 지하철_아이디_획득(새로운_하행역_URL));
 
         // then
-        지하철_구간_삭제_검증(이호선_URL);
+        노선의역_개수_검증(이호선_URL, 2);
     }
 
     /**
@@ -125,13 +124,13 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         String 하행종착역_URL = 지하철역_생성(역삼역_정보);
         String 새로운_하행역_URL = 지하철역_생성(삼성역_정보);
         String 이호선_URL = 지하철_노선_생성(이호선_생성_요청, 상행종착역_URL, 하행종착역_URL);
-        지하철_구간_등록(이호선_URL, 구간_등록_요청, 새로운_하행역_URL, 하행종착역_URL);
+        지하철_구간_등록(이호선_URL, 구간_등록_요청, 하행종착역_URL, 새로운_하행역_URL);
 
         // when
         지하철_구간_삭제_실패(이호선_URL + "/sections?stationId=" + 지하철_아이디_획득(상행종착역_URL));
 
         // then
-        지하철_구간_미삭제_검증(이호선_URL);
+        노선의역_개수_검증(이호선_URL, 3);
     }
 
     /**
@@ -142,7 +141,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
      * Then 요청은 에러 처리된다.
      * Then 지하철 노선 조회 시, 전체 역 개수는 3개다.
      */
-    @DisplayName("구간을 제거 에러, 마지막 구간 아닌 구간 제거")
+    @DisplayName("구간을 제거 에러, 상행 종점역과 하행 종점역만 있는 경우")
     @Test
     void removeSectionErrorByOnlyOneSectionLeft() {
         // given
@@ -154,7 +153,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         지하철_구간_삭제_실패(이호선_URL + "/sections?stationId=" + 지하철_아이디_획득(하행종착역_URL));
 
         // then
-        지하철_구간_미삭제_검증(이호선_URL);
+        노선의역_개수_검증(이호선_URL, 2);
     }
 
     private void 지하철_구간_등록_검증(String 노선_url) {
@@ -167,13 +166,8 @@ public class SectionAcceptanceTest extends AcceptanceTest {
                 .hasSize(2);
     }
 
-    private void 지하철_구간_삭제_검증(String 노선_url) {
+    private void 노선의역_개수_검증(String 노선_url, int 역_개수) {
         assertThat(지하철_노선_조회(노선_url).jsonPath().getList("stations", StationResponse.class))
-                .hasSize(2);
-    }
-
-    private void 지하철_구간_미삭제_검증(String 노선_url) {
-        assertThat(지하철_노선_조회(노선_url).jsonPath().getList("stations", StationResponse.class))
-                .hasSize(3);
+                .hasSize(역_개수);
     }
 }
