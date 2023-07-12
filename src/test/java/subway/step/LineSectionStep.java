@@ -48,4 +48,26 @@ public class LineSectionStep {
         .jsonPath()
         .getList("$");
   }
+
+  public static void 지하철_구간_제거(Long 노선_ID, Long 역_ID) {
+    RestAssured.given()
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("lineId", 노선_ID)
+        .param("stationId", 역_ID)
+        .delete("/lines/{lineId}/sections")
+        .then().log().all()
+        .assertThat()
+        .statusCode(HttpStatus.NO_CONTENT.value());
+  }
+
+  public static void 지하철_구간_제거_실패(Long 노선_ID, Long 역_ID) {
+    RestAssured.given()
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("lineId", 노선_ID)
+        .param("stationId", 역_ID)
+        .delete("/lines/{lineId}/sections")
+        .then().log().all()
+        .assertThat()
+        .statusCode(HttpStatus.BAD_REQUEST.value());
+  }
 }

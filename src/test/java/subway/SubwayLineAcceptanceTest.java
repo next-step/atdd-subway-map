@@ -15,9 +15,7 @@ import subway.step.StationStep;
 import subway.step.SubwayLineStep;
 
 @DisplayName("지하철 노선도 관련 기능")
-@Sql(value = "/truncate-subwayline.sql")
-@Sql(value = "/truncate-station.sql")
-@Sql(value = "/truncate-section.sql")
+@Sql(value = "/truncate-line.sql")
 public class SubwayLineAcceptanceTest extends IntegrationTest{
 
   /**

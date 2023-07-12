@@ -3,6 +3,7 @@ package subway.line;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import subway.station.Station;
 
 
 @Builder
@@ -38,10 +39,11 @@ public class SubwayLineRequest {
   }
 
   @JsonIgnore
-  public SubwayLine toEntity() {
+  public SubwayLine toEntity(Station startStation) {
     return SubwayLine.builder()
         .color(this.color)
         .name(this.name)
+        .startStation(startStation)
         .build();
   }
 }

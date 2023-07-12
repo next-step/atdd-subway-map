@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+import subway.station.Station;
 
 @Service
 @RequiredArgsConstructor
@@ -30,8 +31,8 @@ public class SubwayLineService {
   }
 
   @Transactional
-  public SubwayLine createLine(SubwayLineRequest request) {
-    SubwayLine subwayLine = request.toEntity();
+  public SubwayLine createLine(SubwayLineRequest request, Station startStation) {
+    SubwayLine subwayLine = request.toEntity(startStation);
     return lineRepository.save(subwayLine);
   }
 
@@ -56,6 +57,6 @@ public class SubwayLineService {
   @Transactional(readOnly = true)
   public SubwayLine getLineOrThrowIfNotExist(Long lineId) {
     return lineRepository.findById(lineId)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 노선이 없습니다."));
   }
 }

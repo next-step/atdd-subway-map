@@ -49,19 +49,4 @@ public class StationService {
         return stationRepository.findById(stationId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
-
-    @Transactional
-    public List<Station> stationsOfSections(List<LineSection> sections) {
-        List<Station> stations = new ArrayList<>(sections.size() * 2);
-        if (CollectionUtils.isEmpty(sections)) {
-            return Collections.emptyList();
-        }
-
-        stations.add(sections.get(0).getUpStation());
-        for (LineSection section : sections) {
-            stations.add(section.getDownStation());
-        }
-
-        return stations;
-    }
 }

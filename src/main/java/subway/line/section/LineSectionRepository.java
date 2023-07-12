@@ -8,7 +8,6 @@ import org.springframework.data.repository.query.Param;
 public interface LineSectionRepository extends JpaRepository<LineSection, Long> {
   List<LineSection> findByLineId(Long lineId);
 
-
   @Query(
       "SELECT ls, up_s, down_s " +
       "FROM LineSection ls " +
@@ -16,8 +15,7 @@ public interface LineSectionRepository extends JpaRepository<LineSection, Long> 
       "    ON ls.upStationId = up_s.stationId " +
       "  JOIN fetch Station down_s " +
       "    ON ls.downStationId = down_s.stationId " +
-      "WHERE ls.lineId = :lineId " +
-      "ORDER BY ls.regDateTime ASC"
+      "WHERE ls.lineId = :lineId "
   )
-  List<LineSection> findByLineIdWithStationOrderByRegDateTime(@Param("lineId") Long lineId);
+  List<LineSection> findByLineIdWithStation(@Param("lineId") Long lineId);
 }

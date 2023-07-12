@@ -37,10 +37,10 @@ public class SubwayLineStep {
         .as(LineResponse.class);
   }
 
-  public static LineResponse 노선조회(Long 역_ID) {
+  public static LineResponse 노선조회(Long 노선_ID) {
     return RestAssured.given()
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .pathParam("id", 역_ID)
+        .pathParam("id", 노선_ID)
         .get("/lines/{id}")
         .then()
         .assertThat()
@@ -48,10 +48,10 @@ public class SubwayLineStep {
         .as(LineResponse.class);
   }
 
-  public static void 노선이_존재하지_않음(Long 역_ID) {
+  public static void 노선이_존재하지_않음(Long 노선_ID) {
     RestAssured.given()
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .pathParam("id", 역_ID)
+        .pathParam("id", 노선_ID)
         .get("/lines/{id}")
         .then()
         .assertThat()

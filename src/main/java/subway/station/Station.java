@@ -25,4 +25,12 @@ public class Station {
     public String getName() {
         return name;
     }
+
+    public boolean isEqual(Station station) {
+        return this.stationId.equals(station.getStationId());
+    }
+
+    public boolean isNotEqual(Station station) {
+        return !this.stationId.equals(station.getStationId());
+    }
 }

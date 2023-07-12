@@ -14,15 +14,12 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.test.context.jdbc.Sql;
 import subway.config.IntegrationTest;
-import subway.station.StationResponse;
 import subway.step.StationStep;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
-@Sql(value = "/truncate-subwayline.sql")
-@Sql(value = "/truncate-station.sql")
-@Sql(value = "/truncate-section.sql")
+@Sql(value = "/truncate-line.sql")
 public class StationAcceptanceTest extends IntegrationTest {
     /**
      * When 지하철역을 생성하면
