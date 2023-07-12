@@ -1,5 +1,6 @@
 package subway.controller;
 
+import java.net.URI;
 import javax.websocket.server.PathParam;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +27,7 @@ public class StationLineSectionController {
         @RequestBody SectionRequest request) {
 
         facade.addStationLineSection(id, request);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity.created(URI.create("/lines/{id}" + id)).build();
     }
 
     @DeleteMapping("/lines/{id}/sections")
