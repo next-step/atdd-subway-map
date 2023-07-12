@@ -8,7 +8,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import subway.helper.SubwayStationHelper;
 
@@ -17,6 +16,7 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD;
+import static subway.helper.SubwayStationHelper.지하철_역_생성_요청;
 
 @DisplayName("지하철역 관련 기능")
 @DirtiesContext(classMode = BEFORE_EACH_TEST_METHOD)
@@ -34,21 +34,10 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        final String DEFAULT_STATION_NAME = "강남역";
-        Map<String, String> parameter = new HashMap<>();
-        parameter.put("name", DEFAULT_STATION_NAME);
-
-        ExtractableResponse<Response> response = RestAssured
-                        .given().log().all()
-                            .body(parameter)
-                            .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when()
-                            .post(STATION_API_URL)
-                        .then().log().all()
-                        .extract();
+        ExtractableResponse<Response> 지하철_역_생성_결과 = 지하철_역_생성_요청("강남역");
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        지하철_역_생성됨(지하철_역_생성_결과);
 
         // then
         List<String> stationNames = RestAssured
@@ -59,7 +48,7 @@ public class StationAcceptanceTest {
                         .extract()
                             .jsonPath().getList("name", String.class);
 
-        assertThat(stationNames).containsAnyOf(DEFAULT_STATION_NAME);
+        assertThat(stationNames).containsAnyOf("강남역");
     }
 
     /**
@@ -96,7 +85,7 @@ public class StationAcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        ExtractableResponse<Response> createStationApiResponse = SubwayStationHelper.지하철_역_생성_요청("봉천역");
+        ExtractableResponse<Response> createStationApiResponse = 지하철_역_생성_요청("봉천역");
         String createStationApiResponseUrl = createStationApiResponse
                 .response().getHeaders().getValue("Location");
 
@@ -110,5 +99,9 @@ public class StationAcceptanceTest {
 
         // then
         assertThat(deleteStationApiResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    private void 지하철_역_생성됨(ExtractableResponse<Response> createSubwayStationApiResponse) {
+        assertThat(createSubwayStationApiResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
 }
