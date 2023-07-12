@@ -81,7 +81,5 @@ public class SectionCompositeService {
         }
 
         line.removeSection(targetSection);
-
-        sectionService.deleteById(targetSection.getId());
     }
 }

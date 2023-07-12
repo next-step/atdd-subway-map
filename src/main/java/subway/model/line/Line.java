@@ -29,7 +29,7 @@ public class Line {
     @Column(length = 20, nullable = false)
     private String color;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "line", cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "line", cascade = CascadeType.ALL, orphanRemoval = true)
     List<Section> sections = new ArrayList<>();
 
     @Column(nullable = false)
