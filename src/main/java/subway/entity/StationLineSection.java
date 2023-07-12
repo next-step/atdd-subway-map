@@ -41,20 +41,8 @@ public class StationLineSection {
         return id;
     }
 
-    public Long getStationLineId() {
-        return stationLineId;
-    }
-
-    public Long getUpStationId() {
-        return upStationId;
-    }
-
     public Long getDownStationId() {
         return downStationId;
-    }
-
-    public int getDistance() {
-        return distance;
     }
 
     public List<Long> getStationIdList() {
