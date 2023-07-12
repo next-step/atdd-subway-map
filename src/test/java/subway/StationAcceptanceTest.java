@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import subway.station.Station;
+import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.HashMap;
 import java.util.List;
@@ -28,6 +28,7 @@ public class StationAcceptanceTest {
      */
     @DisplayName("지하철역을 생성한다.")
     @Test
+    @DirtiesContext
     void createStation() {
         ExtractableResponse<Response> response = 지하철_역_추가_요청(name);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -43,6 +44,7 @@ public class StationAcceptanceTest {
      */
     @DisplayName("지하철역 목록을 조회한다.")
     @Test
+    @DirtiesContext
     void showStations() {
         ExtractableResponse<Response> response_gangnam = 지하철_역_추가_요청("강남역");
         assertThat(response_gangnam.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -61,6 +63,7 @@ public class StationAcceptanceTest {
      */
     @DisplayName("지하철역을 삭제한다.")
     @Test
+    @DirtiesContext
     void deleteStation() {
         ExtractableResponse<Response> response_gangnam = 지하철_역_추가_요청("강남역");
         assertThat(response_gangnam.statusCode()).isEqualTo(HttpStatus.CREATED.value());
