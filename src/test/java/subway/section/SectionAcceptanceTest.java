@@ -20,7 +20,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Sql(scripts = {"classpath:SQLScripts/00.clear-database.sql", "classpath:SQLScripts/01.station-data.sql", "classpath:SQLScripts/02.section-data.sql"})
 public class SectionAcceptanceTest {
     static final Long LINE_ID_1 = 1L;
-    static final Long LINE_ID_2 = 2L;
     static final Long STATION_ID_1 = 1L;
     static final Long STATION_ID_2 = 2L;
     static final Long STATION_ID_3 = 3L;
@@ -89,7 +88,6 @@ public class SectionAcceptanceTest {
      * When 마지막 구간을 삭제한다
      * Then 구간이 삭제된다.
      */
-    //TODO: 구간을 삭제한다.
     @DisplayName("구간을 삭제한다.")
     @Test
     void deleteSection() {
@@ -108,22 +106,27 @@ public class SectionAcceptanceTest {
         assertThat(stationNames).containsAnyOf(STATION_ID_1, STATION_ID_2);
     }
 
-
-    /**
-     * Given 지하철 노선을 생성하고
-     * Given 구간을 등록한다
-     * When 등록되지 않은 역을 삭제한다
-     * Then 구간 삭제에 실패한다
-     */
-    //TODO: 하행 종점역이 아닌 구간을 삭제하면 실패한다.
-
-
     /**
      * Given 지하철 노선을 생성하고
      * When 구간이 한개인 노선의 구간을 삭제한다
      * Then 구간 삭제에 실패한다.
      */
-    //TODO: 구간이 한개일 때 삭제하면 실패한다.
+    @DisplayName("구간이 한개일 때 구간을 삭제하면 실패한다.")
+    @Test
+    void deleteSectionOneSection() {
+        // given
+        this.requestCreateSections(LINE_ID_1, STATION_ID_1, STATION_ID_2, DISTANCE_10);
+
+        // when
+        Response response = this.requestDeleteSections(LINE_ID_1, STATION_ID_2);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+
+        // then
+        List<Long> stationNames = this.requestSearchLine(LINE_ID_1).jsonPath().getList("stations.id", Long.class);
+        assertThat(stationNames).containsAnyOf(STATION_ID_1, STATION_ID_2);
+    }
 
     /**
      * Given 지하철 노선을 생성하고
@@ -131,7 +134,24 @@ public class SectionAcceptanceTest {
      * When 하행 종점역이 아닌 구간을 삭제한다
      * Then 구간 삭제에 실패한다
      */
-    //TODO: 하행 종점역이 아닌 구간을 삭제하면 실패한다.
+    @DisplayName("하행 종점역이 아닌 구간을 삭제하면 실패한다.")
+    @Test
+    void deleteSectionNotEndStation() {
+        // given
+        this.requestCreateSections(LINE_ID_1, STATION_ID_1, STATION_ID_2, DISTANCE_10);
+        this.requestCreateSections(LINE_ID_1, STATION_ID_2, STATION_ID_3, DISTANCE_10);
+
+        // when
+        Response response = this.requestDeleteSections(LINE_ID_1, STATION_ID_2);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+
+        // then
+        List<Long> stationNames = this.requestSearchLine(LINE_ID_1).jsonPath().getList("stations.id", Long.class);
+        assertThat(stationNames).containsAnyOf(STATION_ID_2, STATION_ID_3);
+    }
+
     private Response requestCreateSections(Long lineId, Long upStationId, Long downStationId, Long distance) {
         Map<String, Object> params = new HashMap<>();
         params.put("upStationId", upStationId);

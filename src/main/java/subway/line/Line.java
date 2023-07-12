@@ -53,15 +53,13 @@ public class Line {
     }
 
     public void addSection(Section section) {
-        this.existsStation(section.getUpStation());
-        this.existsStation(section.getDownStation());
-        this.isEndStation(section.getUpStation());
-        this.isEndStation(section.getDownStation());
+        this.validateCreateSection(section);
         section.setLine(this);
         this.sections.add(section);
     }
 
     public void deleteSection(Station station) {
+        this.validateDeleteSection(station);
         this.sections.remove(this.sections.size() - 1);
     }
 
@@ -76,16 +74,37 @@ public class Line {
                 .collect(Collectors.toList());
     }
 
-    private void existsStation(Station station) {
-        if (getAllStations().contains(station)) {
-            throw new BusinessException("이미 존재하는 역입니다.");
+    private boolean existsStation(Station station) {
+        return getAllStations().contains(station);
+
+    }
+
+    private boolean isEndStation(Station station) {
+        List<Station> stations = this.getAllStations();
+        return stations.indexOf(station) == (stations.size() - 1);
+    }
+
+    private boolean hasOnlyOneSection() {
+        return this.sections.size() == 1;
+    }
+
+    private void validateCreateSection(Section section) {
+        if (existsStation(section.getUpStation()) || existsStation(section.getDownStation())) {
+            if(!isEndStation(section.getUpStation())){
+                throw new BusinessException("이미 존재하는 역입니다.");
+            }
+        }
+        if (!isEndStation(section.getUpStation())) {
+            throw new BusinessException("시작역이 하행 종점역이 아닙니다.");
         }
     }
 
-    private void isEndStation(Station station) {
-        List<Station> stations = this.getAllStations();
-        if (stations.indexOf(station) != (stations.size() - 1)) {
-            throw new BusinessException("하행 종점역이 아닙니다.");
+    private void validateDeleteSection(Station station) {
+        if (!isEndStation(station)) {
+            throw new BusinessException("삭제요청 역이 하행 종점역이 아닙니다.");
+        }
+        if (hasOnlyOneSection()) {
+            throw new BusinessException("역의 구간이 한개입니다.");
         }
     }
 }
