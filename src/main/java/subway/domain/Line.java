@@ -69,5 +69,6 @@ public class Line {
 
     public void deleteSection(Long stationId) {
         sections.delete(stationId);
+        this.distance = sections.getDistance();
     }
 }
