@@ -1,6 +1,6 @@
 package fixture.then;
 
-import static fixture.when.StationLineApiFixture.지하철역_노선_목록_조회_요청;
+import static fixture.when.LineApiFixture.지하철역_노선_목록_조회_요청;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.restassured.response.ExtractableResponse;
@@ -10,7 +10,7 @@ import org.assertj.core.api.AbstractLongAssert;
 import org.assertj.core.api.AbstractStringAssert;
 import org.assertj.core.api.ListAssert;
 
-public abstract class StationLineThenFixture {
+public abstract class LineThenFixture {
 
     public static AbstractLongAssert<?> 노선_응답값_id_검사(
         ExtractableResponse<Response> response, Long id) {

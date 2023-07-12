@@ -1,25 +1,25 @@
 package acceptance;
 
-import static fixture.given.StationLineRequestFixture.distance;
-import static fixture.given.StationLineRequestFixture.red;
-import static fixture.given.StationLineRequestFixture.신분당선;
-import static fixture.given.StationLineSectionRequestFixture.구간거리;
+import static fixture.given.LineRequestFixture.distance;
+import static fixture.given.LineRequestFixture.red;
+import static fixture.given.LineRequestFixture.신분당선;
+import static fixture.given.SectionRequestFixture.구간거리;
 import static fixture.given.StationModifyRequestFixture.또다른지하철역이름;
 import static fixture.given.StationModifyRequestFixture.새로운지하철역이름;
 import static fixture.given.StationModifyRequestFixture.지하철역이름;
 import static fixture.then.ApiStatusFixture.API_삭제_응답코드_검사;
 import static fixture.then.ApiStatusFixture.API_생성_응답코드_검사;
 import static fixture.then.ApiStatusFixture.API_잘못된요청_응답코드_검사;
-import static fixture.then.StationLineSectionThenFixture.노선구간추가_상행역설정_오류_검사;
-import static fixture.then.StationLineSectionThenFixture.노선구간추가_하행역이_이미존재할떄_오류_검사;
-import static fixture.then.StationLineSectionThenFixture.삭제할_노선_구간_1개인경우_에러;
-import static fixture.then.StationLineSectionThenFixture.삭제할_노선_구간이_하행종점역이_아닐경우_에러;
-import static fixture.then.StationLineSectionThenFixture.지하철_노선_조회시_구간포함_확인;
-import static fixture.then.StationLineSectionThenFixture.지하철_노선_조회시_해당구간_불포함_확인;
+import static fixture.then.SectionThenFixture.노선구간추가_상행역설정_오류_검사;
+import static fixture.then.SectionThenFixture.노선구간추가_하행역이_이미존재할떄_오류_검사;
+import static fixture.then.SectionThenFixture.삭제할_노선_구간_1개인경우_에러;
+import static fixture.then.SectionThenFixture.삭제할_노선_구간이_하행종점역이_아닐경우_에러;
+import static fixture.then.SectionThenFixture.지하철_노선_조회시_구간포함_확인;
+import static fixture.then.SectionThenFixture.지하철_노선_조회시_해당구간_불포함_확인;
 import static fixture.when.StationApiFixture.지하철역_생성_요청;
-import static fixture.when.StationLineApiFixture.지하철역_노선_등록_요청_후_id_추출;
-import static fixture.when.StationLineSectionApiFixture.지하철_노선_구간_삭제;
-import static fixture.when.StationLineSectionApiFixture.지하철_노선_구간_추가_등록;
+import static fixture.when.LineApiFixture.지하철역_노선_등록_요청_후_id_추출;
+import static fixture.when.SectionApiFixture.지하철_노선_구간_삭제;
+import static fixture.when.SectionApiFixture.지하철_노선_구간_추가_등록;
 
 import config.AcceptanceTestConfig;
 import io.restassured.response.ExtractableResponse;
@@ -28,7 +28,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 @DisplayName("지하철 노선 구간 관련 기능")
-class LineSectionAcceptanceTest extends AcceptanceTestConfig {
+class SectionAcceptanceTest extends AcceptanceTestConfig {
 
     @DisplayName("지하철 노선 구간 등록 (성공)")
     @Test

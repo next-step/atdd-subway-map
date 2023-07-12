@@ -9,15 +9,15 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import subway.facade.StationLineSectionFacade;
+import subway.facade.SectionFacade;
 import subway.service.request.SectionRequest;
 
 @RestController
-public class StationLineSectionController {
+public class SectionController {
 
-    private final StationLineSectionFacade facade;
+    private final SectionFacade facade;
 
-    public StationLineSectionController(StationLineSectionFacade facade) {
+    public SectionController(SectionFacade facade) {
         this.facade = facade;
     }
 

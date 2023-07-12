@@ -3,36 +3,36 @@ package subway.service;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import subway.entity.StationLine;
-import subway.repository.StationLineRepository;
-import subway.service.request.StationLineRequest;
+import subway.entity.Line;
+import subway.repository.LineRepository;
+import subway.service.request.LineRequest;
 
 @Service
 @Transactional
-public class StationLineService {
+public class LineService {
 
-    private final StationLineRepository repository;
+    private final LineRepository repository;
 
-    public StationLineService(StationLineRepository repository) {
+    public LineService(LineRepository repository) {
         this.repository = repository;
     }
 
-    public StationLine create(StationLineRequest request) {
+    public Line create(LineRequest request) {
 
         return repository.save(
-            new StationLine(
+            new Line(
                 request.getName(),
                 request.getColor()
             )
         );
     }
 
-    public List<StationLine> findAllLine() {
+    public List<Line> findAllLine() {
 
         return repository.findAll();
     }
 
-    public StationLine findById(long id) {
+    public Line findById(long id) {
         return repository.findById(id).orElseThrow(
             () -> new IllegalArgumentException("해당하는 id 에 맞는 지하철 노선이 존재하지 않습니다.")
         );
@@ -40,11 +40,11 @@ public class StationLineService {
 
     public void modify(long id, String name, String color) {
 
-        StationLine stationLine = findById(id);
-        stationLine.updateName(name);
-        stationLine.updateColor(color);
+        Line line = findById(id);
+        line.updateName(name);
+        line.updateColor(color);
 
-        repository.save(stationLine);
+        repository.save(line);
     }
 
     public void delete(long id) {

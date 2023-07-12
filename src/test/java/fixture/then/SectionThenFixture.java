@@ -1,6 +1,6 @@
 package fixture.then;
 
-import static fixture.when.StationLineApiFixture.지하철역_노선_단건_조회;
+import static fixture.when.LineApiFixture.지하철역_노선_단건_조회;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.restassured.response.ExtractableResponse;
@@ -9,7 +9,7 @@ import org.assertj.core.api.AbstractStringAssert;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.ListAssert;
 
-public abstract class StationLineSectionThenFixture {
+public abstract class SectionThenFixture {
 
     public static AbstractStringAssert<?> 노선구간추가_상행역설정_오류_검사(ExtractableResponse<Response> response) {
         return assertThat(response.jsonPath().getString("message")).isEqualTo(

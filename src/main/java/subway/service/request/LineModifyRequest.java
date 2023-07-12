@@ -1,13 +1,13 @@
 package subway.service.request;
 
-public class StationLineModifyRequest {
+public class LineModifyRequest {
 
     private String name;
     private String color;
 
-    public StationLineModifyRequest() {}
+    public LineModifyRequest() {}
 
-    public StationLineModifyRequest(String name, String color) {
+    public LineModifyRequest(String name, String color) {
         this.name = name;
         this.color = color;
     }

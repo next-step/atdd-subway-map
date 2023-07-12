@@ -7,7 +7,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 @Entity
-public class StationLine {
+public class Line {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,9 +19,9 @@ public class StationLine {
     @Column(length = 20, nullable = false)
     private String color;
 
-    public StationLine() {}
+    public Line() {}
 
-    public StationLine(String name, String color) {
+    public Line(String name, String color) {
         this.name = name;
         this.color = color;
     }

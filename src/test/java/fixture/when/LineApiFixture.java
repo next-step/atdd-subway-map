@@ -1,6 +1,6 @@
 package fixture.when;
 
-import static fixture.given.StationLineRequestFixture.노선등록요청_데이터_생성;
+import static fixture.given.LineRequestFixture.노선등록요청_데이터_생성;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -9,7 +9,7 @@ import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-public abstract class StationLineApiFixture {
+public abstract class LineApiFixture {
 
     public static ExtractableResponse<Response> 지하철역_노선_등록_요청(String name, String color, long upStationId, long downStationId, int distance) {
 

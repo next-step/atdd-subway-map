@@ -4,32 +4,32 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
-import subway.entity.StationLineSection;
+import subway.entity.Section;
 
-public class StationLineSectionGroup {
+public class SectionGroup {
 
-    private final List<StationLineSection> sections;
+    private final List<Section> sections;
 
-    private StationLineSectionGroup(List<StationLineSection> sections) {
+    private SectionGroup(List<Section> sections) {
         this.sections = sections;
     }
 
-    public static StationLineSectionGroup of(final List<StationLineSection> sections) {
-        return new StationLineSectionGroup(sections);
+    public static SectionGroup of(final List<Section> sections) {
+        return new SectionGroup(sections);
     }
 
     public List<Long> getStationsId() {
 
         return sections.stream()
-            .map(StationLineSection::getStationIdList)
+            .map(Section::getStationIdList)
             .flatMap(Collection::stream)
             .distinct()
             .collect(Collectors.toList());
     }
 
-    public StationLineSection getEndDownStation() {
+    public Section getEndDownStation() {
         return sections.stream()
-            .sorted(Comparator.comparing(StationLineSection::getId).reversed())
+            .sorted(Comparator.comparing(Section::getId).reversed())
             .limit(1)
             .collect(Collectors.toList())
             .get(0);
@@ -56,17 +56,17 @@ public class StationLineSectionGroup {
     public boolean isEqualDownEndStation(long addUpStationId) {
 
         return sections.stream()
-            .sorted(Comparator.comparing(StationLineSection::getId).reversed())
+            .sorted(Comparator.comparing(Section::getId).reversed())
             .limit(1)
             .anyMatch(
-                stationLineSection -> stationLineSection.getDownStationId().equals(addUpStationId)
+                section -> section.getDownStationId().equals(addUpStationId)
             );
     }
 
     public boolean isExistDownEndStation(long downStationId) {
         return sections.stream()
             .anyMatch(
-                stationLineSection -> stationLineSection.getDownStationId().equals(downStationId)
+                section -> section.getDownStationId().equals(downStationId)
             );
     }
 

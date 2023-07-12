@@ -3,7 +3,7 @@ package fixture.given;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class StationLineSectionRequestFixture {
+public abstract class SectionRequestFixture {
 
     public static final int 구간거리 = 10;
 

@@ -1,6 +1,6 @@
 package subway.service.request;
 
-public class StationLineRequest {
+public class LineRequest {
 
     private String name;
     private String color;
@@ -8,7 +8,7 @@ public class StationLineRequest {
     private long downStationId;
     private int distance;
 
-    public StationLineRequest() {}
+    public LineRequest() {}
 
     public String getName() {
         return name;

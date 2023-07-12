@@ -2,16 +2,16 @@ package subway.facade;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import subway.service.StationLineSectionService;
+import subway.service.SectionService;
 import subway.service.request.SectionRequest;
 
 @Service
 @Transactional
-public class StationLineSectionFacade {
+public class SectionFacade {
 
-    private final StationLineSectionService sectionService;
+    private final SectionService sectionService;
 
-    public StationLineSectionFacade(StationLineSectionService sectionService) {
+    public SectionFacade(SectionService sectionService) {
         this.sectionService = sectionService;
     }
 

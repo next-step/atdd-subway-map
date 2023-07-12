@@ -8,7 +8,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 @Entity
-public class StationLineSection {
+public class Section {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,10 +26,10 @@ public class StationLineSection {
     @Column(nullable = false)
     private int distance;
 
-    public StationLineSection() {
+    public Section() {
     }
 
-    public StationLineSection(Long stationLineId, Long upStationId, Long downStationId,
+    public Section(Long stationLineId, Long upStationId, Long downStationId,
         int distance) {
         this.stationLineId = stationLineId;
         this.upStationId = upStationId;
