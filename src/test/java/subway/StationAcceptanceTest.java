@@ -28,6 +28,9 @@ public class StationAcceptanceTest {
         RestAssured.port = port;
     }
 
+    private final String 강남역 = "강남역";
+    private final String 잠실역 = "잠실역";
+
     /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다
@@ -38,7 +41,7 @@ public class StationAcceptanceTest {
     void createStation() {
         // when
         Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
+        params.put("name", 강남역);
 
         ExtractableResponse<Response> response =
                 RestAssured.given().log().all()
@@ -57,7 +60,7 @@ public class StationAcceptanceTest {
                         .when().get("/stations")
                         .then().log().all()
                         .extract().jsonPath().getList("name", String.class);
-        assertThat(stationNames).containsAnyOf("강남역");
+        assertThat(stationNames).containsAnyOf(강남역);
     }
 
     /**
@@ -94,7 +97,7 @@ public class StationAcceptanceTest {
                 .extract().jsonPath().getList("name", String.class);
 
         // then
-        assertThat(stationNames).containsExactly("강남역", "잠실역");
+        assertThat(stationNames).containsExactly(강남역, 잠실역);
     }
 
     /**
@@ -106,7 +109,7 @@ public class StationAcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        Map<String, String> station = new HashMap<>() {{ put("name", "강남역"); }};
+        Map<String, String> station = new HashMap<>() {{ put("name", 강남역); }};
 
         ExtractableResponse<Response> stationCreateResponse =
             RestAssured.given().log().all()
@@ -133,7 +136,7 @@ public class StationAcceptanceTest {
                 .then().log().all()
                 .extract().jsonPath().getList("name", String.class);
 
-        assertThat(stationNames).doesNotContainSequence("강남역");
+        assertThat(stationNames).doesNotContain(강남역);
     }
 
 }
