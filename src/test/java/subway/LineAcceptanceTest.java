@@ -21,7 +21,7 @@ class LineAcceptanceTest extends AcceptanceTestBase {
 
         // Then: 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
         ExtractableResponse<Response> getResponse = get("/lines");
-        List<String> lineNames = getResponse.jsonPath().getList("name", String.class);
+        List<String> lineNames = getLineNames(getResponse);
         assertThat(lineNames).containsAnyOf("신분당선");
     }
 
@@ -38,7 +38,7 @@ class LineAcceptanceTest extends AcceptanceTestBase {
         ExtractableResponse<Response> getResponse = get("/lines");
 
         // Then: 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다
-        List<String> lineNames = getResponse.jsonPath().getList("name", String.class);
+        List<String> lineNames = getLineNames(getResponse);
         assertThat(lineNames).containsExactly(sinBundangLine.getName(), incheonSubwayLine1.getName());
     }
 
@@ -76,6 +76,7 @@ class LineAcceptanceTest extends AcceptanceTestBase {
     }
 
     @DisplayName("지하철 노선 삭제")
+    @Test
     void deleteLine() {
         // Given: 지하철 노선을 생성하고
         LineRequest line = new LineRequest("신분당선");
@@ -88,7 +89,11 @@ class LineAcceptanceTest extends AcceptanceTestBase {
 
         // Then: 해당 지하철 노선 정보는 삭제된다
         ExtractableResponse<Response> getResponse = get("/lines");
-        List<String> lineNames = getResponse.jsonPath().getList("name", String.class);
+        List<String> lineNames = getLineNames(getResponse);
         assertThat(lineNames).doesNotContain("신분당선");
+    }
+
+    private static List<String> getLineNames(ExtractableResponse<Response> response) {
+        return response.jsonPath().getList("name", String.class);
     }
 }
