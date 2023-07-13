@@ -10,7 +10,6 @@ import subway.entity.Station;
 import subway.exception.BadRequestSectionException;
 import subway.exception.NotFoundLineException;
 import subway.repository.LineRepository;
-import subway.repository.SectionRepository;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -22,13 +21,10 @@ import static subway.exception.BadRequestSectionException.*;
 public class LineService {
     private LineRepository lineRepository;
     private StationService stationService;
-    private SectionRepository sectionRepository;
 
-    public LineService(LineRepository lineRepository, StationService stationService,
-                       SectionRepository sectionRepository) {
+    public LineService(LineRepository lineRepository, StationService stationService) {
         this.lineRepository = lineRepository;
         this.stationService = stationService;
-        this.sectionRepository = sectionRepository;
     }
 
     @Transactional
@@ -36,7 +32,7 @@ public class LineService {
         final Line line = lineRepository.save(toLine(request));
         final Station upStation = stationService.getStationById(request.getUpStationId());
         final Station downStation = stationService.getStationById(request.getDownStationId());
-        sectionRepository.save(new Section(line, upStation, downStation, request.getDistance()));
+        line.getSections().add(new Section(line, upStation, downStation, request.getDistance()));
         return toLineResponse(line);
     }
 
@@ -71,25 +67,23 @@ public class LineService {
 
     @Transactional
     public void deleteLineById(final Long id) {
-        final List<Section> sections = sectionRepository.findByLineId(id);
-        sections.forEach(s -> sectionRepository.deleteById(s.getId()));
         lineRepository.deleteById(id);
     }
 
     public SectionResponse saveSection(final SectionRequest request, final Long lineId) {
-        validateSaveSection(request, lineId);
         final Line line = findLineById(lineId);
+        validateSaveSection(request, line.getSections());
         final Station upStation = stationService.getStationById(request.getUpStationId());
         final Station downStation = stationService.getStationById(request.getDownStationId());
-        final Section section = sectionRepository.save(new Section(line, upStation, downStation,
-                request.getDistance()));
+        final Section section = new Section(line, upStation, downStation, request.getDistance());
+        line.getSections().add(section);
         return toSectionResponse(section);
     }
 
     public void deleteSection(final Long lineId, final Long stationId) {
-        validateDeleteSection(lineId, stationId);
-        final Section section = sectionRepository.findByLineIdAndDownStationId(lineId, stationId);
-        sectionRepository.delete(section);
+        final Line line = findLineById(lineId);
+        validateDeleteSection(line.getSections(), stationId);
+        line.getSections().remove(line.getSections().size() - 1);
     }
 
     private Line toLine(final LineRequest request) {
@@ -97,7 +91,7 @@ public class LineService {
     }
 
     private LineResponse toLineResponse(final Line line) {
-        final List<Section> sections = sectionRepository.findByLineId(line.getId());
+        final List<Section> sections = line.getSections();
         final Set<Station> stations = new HashSet<>();
         for (Section section : sections) {
             stations.add(section.getUpStation());
@@ -117,8 +111,7 @@ public class LineService {
                 section.getDistance());
     }
 
-    private void validateSaveSection(final SectionRequest request, final Long lineId) {
-        final List<Section> sections = sectionRepository.findByLineId(lineId);
+    private void validateSaveSection(final SectionRequest request, final List<Section> sections) {
         if (!isPossibleRegisterAtLast(sections, request)) {
             throw new BadRequestSectionException(UP_STATION_ID_NOT_EQUALS_DOWN_STATION_ID_OF_LAST_SECTION);
         }
@@ -143,8 +136,7 @@ public class LineService {
         return false;
     }
 
-    private void validateDeleteSection(final Long lineId, final Long stationId) {
-        final List<Section> sections = sectionRepository.findByLineId(lineId);
+    private void validateDeleteSection(final List<Section> sections, final Long stationId) {
         if (isLast(sections)) {
             throw new BadRequestSectionException(SECTION_IS_LAST);
         }

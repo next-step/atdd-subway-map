@@ -1,6 +1,8 @@
 package subway.entity;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Entity
@@ -12,6 +14,9 @@ public class Line {
     private String name;
     @Column(length = 20, nullable = false)
     private String color;
+
+    @OneToMany(mappedBy = "line")
+    private List<Section> sections = new ArrayList<>();
 
     public Line() {
     }
@@ -37,5 +42,9 @@ public class Line {
 
     public String getColor() {
         return color;
+    }
+
+    public List<Section> getSections() {
+        return sections;
     }
 }
