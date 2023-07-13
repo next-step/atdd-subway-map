@@ -15,6 +15,8 @@ import subway.repository.SectionRepository;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static subway.exception.BadRequestSectionException.*;
+
 @Service
 @Transactional(readOnly = true)
 public class LineService {
@@ -118,10 +120,10 @@ public class LineService {
     private void validateSaveSection(final SectionRequest request, final Long lineId) {
         final List<Section> sections = sectionRepository.findByLineId(lineId);
         if (!isPossibleRegisterAtLast(sections, request)) {
-            throw new BadRequestSectionException("UpStationId not equals downStationId of last section");
+            throw new BadRequestSectionException(UP_STATION_ID_NOT_EQUALS_DOWN_STATION_ID_OF_LAST_SECTION);
         }
         if (isAlreadyRegistered(sections, request.getDownStationId())) {
-            throw new BadRequestSectionException("DownStationId is already registered");
+            throw new BadRequestSectionException(DOWN_STATION_ID_IS_ALREADY_REGISTERED);
         }
     }
 
@@ -144,10 +146,10 @@ public class LineService {
     private void validateDeleteSection(final Long lineId, final Long stationId) {
         final List<Section> sections = sectionRepository.findByLineId(lineId);
         if (isLast(sections)) {
-            throw new BadRequestSectionException("Section is last");
+            throw new BadRequestSectionException(SECTION_IS_LAST);
         }
         if (!isLastStation(sections, stationId)) {
-            throw new BadRequestSectionException("StationId is not last");
+            throw new BadRequestSectionException(STATION_ID_IS_NOT_LAST);
         }
     }
 
