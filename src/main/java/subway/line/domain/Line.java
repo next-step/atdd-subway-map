@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import subway.common.BaseEntity;
 import subway.station.domain.Station;
 
 import javax.persistence.*;
@@ -13,11 +14,7 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Line {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+public class Line extends BaseEntity {
     @Setter
     @Column(length = 20, nullable = false)
     private String name;
