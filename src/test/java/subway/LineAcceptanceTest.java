@@ -14,7 +14,7 @@ import static subway.RestAssuredWrapper.*;
 class LineAcceptanceTest extends AcceptanceTestBase {
     @DisplayName("지하철 노선 생성")
     @Test
-    void createLine(String lineName) {
+    void createLine() {
         // When: 지하철 노선을 생성하면
         ExtractableResponse<Response> postResponse = post("/lines", new LineRequest("신분당선"));
         assertThat(postResponse.statusCode()).isEqualTo(HttpStatus.SC_CREATED);
