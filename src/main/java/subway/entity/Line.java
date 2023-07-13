@@ -1,8 +1,11 @@
 package subway.entity;
 
+import org.springframework.util.CollectionUtils;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 
 @Entity
@@ -46,5 +49,28 @@ public class Line {
 
     public List<Section> getSections() {
         return sections;
+    }
+
+    public boolean isLastStation(final Long stationId) {
+        if (sections.isEmpty() || Objects.isNull(stationId)) {
+            return false;
+        } else {
+            return Objects.requireNonNull(CollectionUtils.lastElement(sections)).getId().equals(stationId);
+        }
+    }
+
+    public boolean isExistsStation(final Long stationId) {
+        for (Section section : sections) {
+            if (section.getUpStation().getId().equals(stationId) ||
+                    section.getDownStation().getId().equals(stationId)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public boolean isLastOne() {
+        return sections.size() == 1;
     }
 }

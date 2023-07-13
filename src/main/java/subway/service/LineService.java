@@ -72,7 +72,7 @@ public class LineService {
 
     public SectionResponse saveSection(final SectionRequest request, final Long lineId) {
         final Line line = findLineById(lineId);
-        validateSaveSection(request, line.getSections());
+        validateSaveSection(request, line);
         final Station upStation = stationService.getStationById(request.getUpStationId());
         final Station downStation = stationService.getStationById(request.getDownStationId());
         final Section section = new Section(line, upStation, downStation, request.getDistance());
@@ -82,7 +82,7 @@ public class LineService {
 
     public void deleteSection(final Long lineId, final Long stationId) {
         final Line line = findLineById(lineId);
-        validateDeleteSection(line.getSections(), stationId);
+        validateDeleteSection(line, stationId);
         line.getSections().remove(line.getSections().size() - 1);
     }
 
@@ -111,46 +111,21 @@ public class LineService {
                 section.getDistance());
     }
 
-    private void validateSaveSection(final SectionRequest request, final List<Section> sections) {
-        if (!isPossibleRegisterAtLast(sections, request)) {
+    private void validateSaveSection(final SectionRequest request, final Line line) {
+        if (!line.isLastStation(request.getUpStationId())) {
             throw new BadRequestSectionException(UP_STATION_ID_NOT_EQUALS_DOWN_STATION_ID_OF_LAST_SECTION);
         }
-        if (isAlreadyRegistered(sections, request.getDownStationId())) {
+        if (line.isExistsStation(request.getDownStationId())) {
             throw new BadRequestSectionException(DOWN_STATION_ID_IS_ALREADY_REGISTERED);
         }
     }
 
-    private boolean isPossibleRegisterAtLast(final List<Section> sections, final SectionRequest request) {
-        final Section lastSection = Objects.requireNonNull(CollectionUtils.lastElement(sections));
-        return Objects.equals(lastSection.getDownStation().getId(), request.getUpStationId());
-    }
-
-    private boolean isAlreadyRegistered(final List<Section> sections, final Long stationId) {
-        for (Section section : sections) {
-            if (section.getUpStation().getId().equals(stationId) ||
-                    section.getDownStation().getId().equals(stationId)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private void validateDeleteSection(final List<Section> sections, final Long stationId) {
-        if (isLast(sections)) {
+    private void validateDeleteSection(final Line line, final Long stationId) {
+        if (line.isLastOne()) {
             throw new BadRequestSectionException(SECTION_IS_LAST);
         }
-        if (!isLastStation(sections, stationId)) {
+        if (!line.isLastStation(stationId)) {
             throw new BadRequestSectionException(STATION_ID_IS_NOT_LAST);
         }
-    }
-
-    private boolean isLast(final List<Section> sections) {
-        return sections.size() == 1;
-    }
-
-    private boolean isLastStation(final List<Section> sections, final Long stationId) {
-        final Section lastSection = Objects.requireNonNull(CollectionUtils.lastElement(sections));
-        return lastSection.getDownStation().getId().equals(stationId);
     }
 }
