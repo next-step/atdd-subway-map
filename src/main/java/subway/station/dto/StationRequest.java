@@ -1,4 +1,4 @@
-package subway;
+package subway.station.dto;
 
 import lombok.Getter;
 import lombok.Setter;

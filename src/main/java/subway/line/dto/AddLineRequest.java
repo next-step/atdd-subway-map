@@ -1,12 +1,12 @@
-package subway;
+package subway.line.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor
 @AllArgsConstructor
-public class ModifyLineRequest {
+@NoArgsConstructor
+public class AddLineRequest {
     private String name;
 }

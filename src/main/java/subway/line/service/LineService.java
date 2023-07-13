@@ -1,13 +1,20 @@
-package subway;
+package subway.line.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import subway.NotFoundException;
+import subway.line.repository.LineRepository;
+import subway.line.dto.ModifyLineRequest;
+import subway.line.dto.ModifyLineResponse;
+import subway.line.domain.Line;
+import subway.line.dto.AddLineRequest;
+import subway.line.dto.LineResponse;
 
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static subway.LineMapper.LINE_MAPPER;
+import static subway.line.mapper.LineMapper.LINE_MAPPER;
 
 @Service
 @Transactional
@@ -42,12 +49,12 @@ public class LineService {
 
     public void deleteLine(Long id) {
         if (!lineRepository.existsById(id)) {
-            throw new LineNotFoundException(id);
+            throw new NotFoundException(id);
         }
         lineRepository.deleteById(id);
     }
 
     private Line findLineById(Long id) {
-        return lineRepository.findById(id).orElseThrow(() -> new LineNotFoundException(id));
+        return lineRepository.findById(id).orElseThrow(() -> new NotFoundException(id));
     }
 }
