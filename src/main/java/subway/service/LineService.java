@@ -40,8 +40,7 @@ public class LineService {
     }
 
     public LineResponse showLine(Long lineId) {
-        return lineRepository.findById(lineId).map(LineResponse::from)
-                .orElseThrow(LineNotFoundException::new);
+        return LineResponse.from(findLineById(lineId));
     }
 
     @Transactional
