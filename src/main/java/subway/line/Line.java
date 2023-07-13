@@ -1,11 +1,13 @@
 package subway.line;
 
+import java.util.List;
+import javax.annotation.PostConstruct;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import subway.line.section.Section;
 import subway.station.Station;
 
 @Entity
@@ -16,32 +18,31 @@ public class Line {
     private Long id;
     private String name;
     private String color;
-    @ManyToOne
-    @JoinColumn(name = "up_station_id")
-    private Station upStation;
-    @ManyToOne
-    @JoinColumn(name = "down_station_id")
-    private Station downStation;
+    @Embedded
+    private Stations stations;
     private int distance;
 
     public Line() {}
 
-    public Line(String name, String color, Station upStation, Station downStation, int distance) {
-        this(null, name, color, upStation, downStation, distance);
+    public Line(String name, String color, int distance) {
+        this(null, name, color, null, distance);
     }
 
-    public Line(Long id, String name, String color, Station upStation, Station downStation, int distance) {
+    public Line(Long id, String name, String color, Stations stations, int distance) {
         this.id = id;
         this.name = name;
         this.color = color;
-        this.upStation = upStation;
-        this.downStation = downStation;
+        this.stations = stations;
         this.distance = distance;
     }
 
     public void update(String name, String color) {
         this.name = name;
         this.color = color;
+    }
+
+    public void initStations(Station upStation, Station downStation) {
+        this.stations = new Stations(this, upStation, downStation);
     }
 
     public Long getId() {
@@ -56,12 +57,12 @@ public class Line {
         return color;
     }
 
-    public Station getUpStation() {
-        return upStation;
+    public List<Station> getStations() {
+        return this.stations.getStations();
     }
 
-    public Station getDownStation() {
-        return downStation;
+    public List<Section> getSections() {
+        return this.stations.getSections();
     }
 
     public int getDistance() {

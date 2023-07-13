@@ -15,8 +15,7 @@ public class LineResponse {
     }
 
     public LineResponse(Line line) {
-        this(line.getId(), line.getName(), line.getColor(),
-            List.of(line.getUpStation(), line.getDownStation()));
+        this(line.getId(), line.getName(), line.getColor(), line.getStations());
     }
 
     public LineResponse(Long id, String name, String color, List<Station> stations) {

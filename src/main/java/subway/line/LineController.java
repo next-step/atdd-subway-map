@@ -39,6 +39,7 @@ public class LineController {
         return ResponseEntity.ok().body(lineService.findLine(id));
     }
 
+    // TODO: PUT으로 변경
     @PatchMapping("/lines/{id}")
     public ResponseEntity<Void> updateLineInfo(@PathVariable Long id, @RequestBody LineUpdateRequest lineUpdateRequest) {
         lineService.update(id, lineUpdateRequest);
