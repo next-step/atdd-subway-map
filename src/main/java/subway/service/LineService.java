@@ -7,8 +7,9 @@ import subway.ui.LineCreateRequest;
 import subway.ui.LineResponse;
 import subway.ui.LineUpdateRequest;
 import subway.ui.SectionRequest;
+import subway.ui.exception.LineNotFoundException;
+import subway.ui.exception.StationNotFoundException;
 
-import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -40,7 +41,7 @@ public class LineService {
 
     public LineResponse showLine(Long lineId) {
         return lineRepository.findById(lineId).map(LineResponse::from)
-                .orElseThrow(EntityNotFoundException::new);
+                .orElseThrow(LineNotFoundException::new);
     }
 
     @Transactional
@@ -70,10 +71,10 @@ public class LineService {
     }
 
     private Station findStationById(Long stationId) {
-        return stationRepository.findById(stationId).orElseThrow(EntityNotFoundException::new);
+        return stationRepository.findById(stationId).orElseThrow(StationNotFoundException::new);
     }
 
     private Line findLineById(Long lineId) {
-        return lineRepository.findById(lineId).orElseThrow(EntityNotFoundException::new);
+        return lineRepository.findById(lineId).orElseThrow(LineNotFoundException::new);
     }
 }
