@@ -5,12 +5,9 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import subway.line.Line;
-import subway.station.StationRepository;
 
 import java.util.HashMap;
 import java.util.List;
@@ -22,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {
 
-    StationAcceptanceTest stationAcceptanceTest = new StationAcceptanceTest();
+//    StationAcceptanceTest stationAcceptanceTest = new StationAcceptanceTest();
 
     /**
      * When 지하철 노선을 생성하면
@@ -31,13 +28,13 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선을 생성한다.")
     @Test
     void createLine() {
-        stationAcceptanceTest.지하철_역_추가_요청("사당역");
-        stationAcceptanceTest.지하철_역_추가_요청("이수역");
+        StationAcceptanceTest.지하철_역_추가_요청("사당역");
+        StationAcceptanceTest.지하철_역_추가_요청("이수역");
 
         ExtractableResponse<Response> response = 노선_추가_요청("4호선", "skyblue", 1, 2, 10);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
-        HashMap<String, Object> line = 노선_조회(Long.valueOf("1"));
+        Map<String, Object> line = 노선_조회(Long.valueOf("1"));
         assertThat(line.get("name")).isEqualTo("4호선");
     }
 
@@ -45,13 +42,13 @@ public class LineAcceptanceTest {
     @Test
     void showLines() {
         //given
-        stationAcceptanceTest.지하철_역_추가_요청("사당역");
-        stationAcceptanceTest.지하철_역_추가_요청("이수역");
+        StationAcceptanceTest.지하철_역_추가_요청("사당역");
+        StationAcceptanceTest.지하철_역_추가_요청("이수역");
 
         노선_추가_요청("4호선", "skyblue", 1, 2, 10);
 
-        stationAcceptanceTest.지하철_역_추가_요청("강남역");
-        stationAcceptanceTest.지하철_역_추가_요청("역삼역");
+        StationAcceptanceTest.지하철_역_추가_요청("강남역");
+        StationAcceptanceTest.지하철_역_추가_요청("역삼역");
 
         노선_추가_요청("2호선", "green", 3, 4, 7);
         //when
@@ -64,13 +61,13 @@ public class LineAcceptanceTest {
     @Test
     void showLine() {
         //given
-        stationAcceptanceTest.지하철_역_추가_요청("사당역");
-        stationAcceptanceTest.지하철_역_추가_요청("이수역");
+        StationAcceptanceTest.지하철_역_추가_요청("사당역");
+        StationAcceptanceTest.지하철_역_추가_요청("이수역");
 
         노선_추가_요청("4호선", "skyblue", 1, 2, 10);
 
         //when
-        HashMap<String, Object> line = 노선_조회(Long.valueOf("1"));
+        Map<String, Object> line = 노선_조회(Long.valueOf("1"));
 
         //then
         assertThat(line.get("name")).isEqualTo("4호선");
@@ -80,13 +77,13 @@ public class LineAcceptanceTest {
     @Test
     void deleteLine() {
         //given
-        ExtractableResponse<Response> response_sadang = stationAcceptanceTest.지하철_역_추가_요청("사당역");
-        ExtractableResponse<Response> response_isu = stationAcceptanceTest.지하철_역_추가_요청("이수역");
+        ExtractableResponse<Response> response_sadang = StationAcceptanceTest.지하철_역_추가_요청("사당역");
+        ExtractableResponse<Response> response_isu = StationAcceptanceTest.지하철_역_추가_요청("이수역");
 
         노선_추가_요청("4호선", "skyblue", 1, 2, 10);
 
         //when
-        ExtractableResponse<Response> response = stationAcceptanceTest.지하철_역_삭제_요청(((Response)response_sadang).getHeader("location"));
+        ExtractableResponse<Response> response = StationAcceptanceTest.지하철_역_삭제_요청(response_sadang.response().getHeader("location"));
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
@@ -107,7 +104,7 @@ public class LineAcceptanceTest {
                 .extract();
     }
 
-    private HashMap<String, Object> 노선_조회(Long id) {
+    private Map<String, Object> 노선_조회(Long id) {
         return RestAssured.given().log().all()
                 .when().get("/lines/" + id)
                 .then().log().all()

@@ -5,7 +5,6 @@ import org.springframework.transaction.annotation.Transactional;
 import subway.station.Station;
 import subway.station.StationRepository;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,7 +21,9 @@ public class LineService {
 
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
-        Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor(), lineRequest.getUpStationId(), lineRequest.getDownStationId(), lineRequest.getDistance()));
+        Station up = createStationById(lineRequest.getUpStationId());
+        Station down = createStationById(lineRequest.getDownStationId());
+        Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor(), up.getId(), down.getId(), lineRequest.getDistance()));
         return createLineResponse(line);
     }
 
@@ -43,13 +44,16 @@ public class LineService {
     }
 
     private LineResponse createLineResponse(Line line) {
-        Station up = stationRepository.findById(line.getUpStationId()).orElseThrow(() -> new IllegalArgumentException("역이 존재하지 않음 : " + line.getUpStationId()));
-        Station down = stationRepository.findById(line.getDownStationId()).orElseThrow(() -> new IllegalArgumentException("역이 존재하지 않음 : " + line.getDownStationId()));
         return new LineResponse(
                 line.getId(),
                 line.getName(),
                 line.getColor(),
-                List.of(up, down)
+                List.of(createStationById(line.getUpStationId()), createStationById(line.getDownStationId()))
         );
+    }
+
+    private Station createStationById(Long id) {
+        Station station = stationRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("역이 존재하지 않음 : " + id));
+        return station;
     }
 }

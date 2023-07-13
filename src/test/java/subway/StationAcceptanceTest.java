@@ -78,7 +78,7 @@ public class StationAcceptanceTest {
         assertThat(list.size()).isEqualTo(1);
     }
 
-    public ExtractableResponse<Response> 지하철_역_추가_요청(String name) {
+    public static ExtractableResponse<Response> 지하철_역_추가_요청(String name) {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
 
@@ -91,14 +91,14 @@ public class StationAcceptanceTest {
 
     }
 
-    public List<String> 지하철_역_조회() {
+    public static List<String> 지하철_역_조회() {
         return RestAssured.given().log().all()
                 .when().get("/stations")
                 .then().log().all()
                 .extract().jsonPath().getList("name", String.class);
     }
 
-    public ExtractableResponse<Response> 지하철_역_삭제_요청(String location) {
+    public static ExtractableResponse<Response> 지하철_역_삭제_요청(String location) {
         return RestAssured.given().log().all()
                 .when().delete(location)
                 .then().log().all()
