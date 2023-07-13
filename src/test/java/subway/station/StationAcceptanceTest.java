@@ -1,4 +1,4 @@
-package subway;
+package subway.station;
 
 import static io.restassured.RestAssured.*;
 import static org.assertj.core.api.Assertions.*;
@@ -16,11 +16,11 @@ import org.springframework.test.annotation.DirtiesContext;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import subway.fixture.SubwayFixtures;
+import subway.station.fixture.StationFixtures;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class StationAcceptanceTest {
+class StationAcceptanceTest {
     /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다
@@ -67,7 +67,7 @@ public class StationAcceptanceTest {
         // given
         List<String> stations = List.of("강남역", "판교역");
         for (String station : stations) {
-            SubwayFixtures.createSubwayStation(station);
+            StationFixtures.createSubwayStation(station);
         }
 
         // when
@@ -101,7 +101,7 @@ public class StationAcceptanceTest {
         // given
         List<String> stations = List.of("강남역", "판교역");
         for (String station : stations) {
-            SubwayFixtures.createSubwayStation(station);
+            StationFixtures.createSubwayStation(station);
         }
 
         // when
