@@ -26,7 +26,7 @@ import static subway.common.StationFixture.createStationAndGetInfo;
 @DisplayName("노선 관련 기능")
 @DirtiesContext(classMode = BEFORE_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class StationLineTest {
+public class LineAcceptanceTest {
 
     private final String COLOR_RED = "bg-red-600";
 
@@ -129,7 +129,7 @@ public class StationLineTest {
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .body(param)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().patch("/lines")
+                .when().put("/lines")
                 .then().log().all()
                 .extract();
 
