@@ -22,7 +22,7 @@ public class SubwayLineLoadPersistenceAdapter implements SubwayLineLoadPort {
 
     @Override
     public SubwayLine findOne(SubwayLine.Id id) {
-        SubwayLineJpa subwayLineJpa = subwayLineRepository.findById(id.getValue()).orElseThrow(() -> new NoSuchElementException("해당하는 지하철 노선이 없습니다."));
+        SubwayLineJpa subwayLineJpa = subwayLineRepository.findOneWithSectionsById(id.getValue()).orElseThrow(() -> new NoSuchElementException("해당하는 지하철 노선이 없습니다."));
         return subwayLineMapper.toSubwayLine(subwayLineJpa);
     }
 }

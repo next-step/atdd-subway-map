@@ -1,5 +1,7 @@
 package subway.subway.domain;
 
+import java.util.Objects;
+
 public class SubwaySection {
 
     private final SubwaySection.Id id;
@@ -61,6 +63,19 @@ public class SubwaySection {
 
     public boolean isNew() {
         return id.isNew();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SubwaySection that = (SubwaySection) o;
+        return Objects.equals(upStation.getId(), that.upStation.getId()) && Objects.equals(downStation.getId(), that.downStation.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(upStation.getId(), downStation.getId());
     }
 
     public static class Id {

@@ -3,7 +3,7 @@ package subway.subway.adapter.in.web;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-import subway.subway.application.in.StationListQuery;
+import subway.subway.application.in.query.StationListQuery;
 import subway.subway.application.query.StationResponse;
 
 import java.util.List;

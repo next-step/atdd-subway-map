@@ -5,6 +5,7 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.assertj.core.api.Assertions;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import subway.subway.application.query.StationResponse;
 import subway.subway.application.query.SubwayLineResponse;
@@ -26,7 +27,9 @@ public class SubwaySectionAddApiTester extends ApiTester{
         return RestAssured
                 .given().log().all()
                 .body(param.build())
-                .when().put(URL, subwayLineId)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .when().post(URL, subwayLineId)
                 .then().log().all()
                 .extract();
     }

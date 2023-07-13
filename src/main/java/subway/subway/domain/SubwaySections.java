@@ -19,8 +19,7 @@ public class SubwaySections {
                         .stream()
                         .collect(Collectors.toMap(SubwaySection::getUpStationId, Function.identity()));
     }
-
-    public void add(SubwaySection station) {
+    void add(SubwaySection station) {
         subwaySections.put(station.getUpStationId(), station);
     }
 
@@ -28,11 +27,7 @@ public class SubwaySections {
         return subwaySections.size();
     }
 
-    public boolean contains(SubwaySection subwaySection) {
-        return getSection(subwaySection.getUpStationId()).equals(subwaySection);
-    }
-
-    public boolean isEmpty() {
+    boolean isEmpty() {
         return subwaySections.isEmpty();
     }
 
@@ -41,26 +36,26 @@ public class SubwaySections {
         return Objects.requireNonNull(subwaySection, String.format("%d 역은 현재 노선에 존재하지 않은 역입니다.", stationId.getValue()));
     }
 
-    private boolean exists(Station.Id stationId) {
+    boolean existsUpStation(Station.Id stationId) {
         return subwaySections.containsKey(stationId);
     }
 
-    public void validate(Station.Id startStationId) {
+    void validate(Station.Id startStationId) {
         if (isEmpty()) {
             throw new IllegalArgumentException("구간이 비어있습니다.");
         }
-        if (isConnected(startStationId)) {
+        if (!isConnected(startStationId)) {
             throw new IllegalArgumentException("구간이 연결되어있지 않습니다.");
         }
-        if (!isDuplicated()) {
+        if (isDuplicated()) {
             throw new IllegalArgumentException("구간이 중복되어있습니다.");
         }
-        if (!isCircular(startStationId)) {
+        if (isCircular(startStationId)) {
             throw new IllegalArgumentException("구간이 순환되어있습니다.");
         }
     }
 
-    private boolean isCircular(Station.Id startStationId) {
+    boolean isCircular(Station.Id startStationId) {
         return subwaySections
                 .values()
                 .stream()
@@ -68,38 +63,31 @@ public class SubwaySections {
                 .anyMatch(downStationId -> downStationId.equals(startStationId));
     }
 
-    private boolean isDuplicated() {
+    boolean isDuplicated() {
         return subwaySections
                 .values()
                 .stream()
                 .map(SubwaySection::getDownStationId)
                 .distinct()
-                .count() == this.size();
+                .count() != this.size();
     }
 
-    private boolean isConnected(Station.Id startStationId) {
+    boolean isConnected(Station.Id startStationId) {
         Station.Id stationId = startStationId;
         int count = 0;
-        while (count < size() && exists(stationId)) {
-            stationId = getDownStationId(stationId);
+        while (count < size() && existsUpStation(stationId)) {
+            stationId = getSection(stationId).getDownStationId();
             count++;
         }
         return count == this.size();
     }
 
-    public Station.Id getDownStationId(Station.Id upStationId) {
-        return getSection(upStationId).getDownStationId();
+    void update(SubwaySection subwaySection, SectionOperateManager manager) {
+        SectionOperator operator = manager.getOperator(this);
+        operator.apply(this, subwaySection);
     }
 
-    public String getDownStationName(Station.Id upStationId) {
-        return getSection(upStationId).getDownStationName();
-    }
-
-    public String getUpStationName(Station.Id upStationId) {
-        return getSection(upStationId).getUpStationName();
-    }
-
-    public Kilometer getDistance(Station.Id upStationId) {
-        return getSection(upStationId).getDistance();
+    public List<SubwaySection> getSections() {
+        return new ArrayList<>(subwaySections.values());
     }
 }

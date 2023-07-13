@@ -2,9 +2,8 @@ package subway.subway.adapter.in.web;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import subway.subway.application.in.SubwayLineListQuery;
+import subway.subway.application.in.query.SubwayLineListQuery;
 import subway.subway.application.query.SubwayLineResponse;
 
 import java.util.List;

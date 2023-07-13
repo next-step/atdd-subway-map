@@ -19,14 +19,15 @@ public class SubwayLine {
         return subwayLine;
     }
 
-    public static SubwayLine of(SubwayLine.Id id, String name, String color, List<SubwaySection> sectionList) {
-        return new SubwayLine(id, name, color, new SubwaySections(sectionList));
+    public static SubwayLine of(SubwayLine.Id id, String name, String color, Station.Id startStationId, List<SubwaySection> sectionList) {
+        return new SubwayLine(id, name, color, startStationId, new SubwaySections(sectionList));
     }
 
-    private SubwayLine(Id id, String name, String color, SubwaySections sections) {
+    private SubwayLine(Id id, String name, String color, Station.Id startStationId, SubwaySections sections) {
         this.id = id;
         this.name = name;
         this.color = color;
+        this.startStationId = startStationId;
         this.sections = sections;
     }
 
@@ -57,22 +58,6 @@ public class SubwayLine {
         return color;
     }
 
-    public String getUpStationName(Station.Id upStationId) {
-        return sections.getUpStationName(upStationId);
-    }
-
-    public String getDownStationName(Station.Id upStationId) {
-        return sections.getDownStationName(upStationId);
-    }
-
-    public Station.Id getDownStationId(Station.Id upStationId) {
-
-        return sections.getDownStationId(upStationId);
-    }
-
-    public Kilometer getSectionDistance(Station.Id upStationId) {
-        return sections.getDistance(upStationId);
-    }
 
     public Station.Id getStartStationId() {
         return startStationId;
@@ -87,13 +72,17 @@ public class SubwayLine {
         this.color = color;
     }
 
-    public void addSection(SubwaySection subwaySection) {
-        sections.add(subwaySection);
-        sections.validate(startStationId);
+    public void addSection(SubwaySection subwaySection, SectionOperateManager manager) {
+        sections.update(subwaySection, manager);
+        validate();
     }
 
-    public boolean containsSection(SubwaySection subwaySection) {
-        return sections.contains(subwaySection);
+    public boolean existsUpStation(Station.Id stationId) {
+        return sections.existsUpStation(stationId);
+    }
+
+    public List<SubwaySection> getSections() {
+        return sections.getSections();
     }
 
     public int getSectionSize() {
@@ -107,7 +96,7 @@ public class SubwayLine {
             this.id = id;
         }
 
-        public Id() {
+        private Id() {
         }
 
         public Long getValue() {

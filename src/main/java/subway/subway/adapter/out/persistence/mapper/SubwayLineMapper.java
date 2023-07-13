@@ -16,6 +16,7 @@ public class SubwayLineMapper {
                 new SubwayLine.Id(Objects.requireNonNull(subwayLineJpa.getId())),
                 subwayLineJpa.getName(),
                 subwayLineJpa.getColor(),
+                new Station.Id(subwayLineJpa.getStartSectionId()),
                 subwayLineJpa.getSubwaySections()
                         .stream()
                         .map(this::toSubwaySection)
@@ -25,8 +26,8 @@ public class SubwayLineMapper {
     private SubwaySection toSubwaySection(SubwaySectionJpa sectionJpa) {
         return SubwaySection.of(
                 new SubwaySection.Id(Objects.requireNonNull(sectionJpa.getId())),
-                new SubwaySectionStation(new Station.Id(sectionJpa.getStartStationId()), sectionJpa.getStartStationName()),
-                new SubwaySectionStation(new Station.Id(sectionJpa.getEndStationId()), sectionJpa.getEndStationName()),
+                new SubwaySectionStation(new Station.Id(sectionJpa.getUpStationId()), sectionJpa.getUpStationName()),
+                new SubwaySectionStation(new Station.Id(sectionJpa.getDownStationId()), sectionJpa.getDownStationName()),
                 Kilometer.of(sectionJpa.getDistance()));
     }
 }

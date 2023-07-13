@@ -7,7 +7,6 @@ import org.mockito.Mockito;
 import subway.ParentTest;
 
 import java.math.BigDecimal;
-import java.util.stream.Collectors;
 
 import static org.mockito.BDDMockito.*;
 
@@ -55,7 +54,7 @@ public class SubwayLineTest extends ParentTest {
         Assertions.assertThat(subwayLine.getName()).isEqualTo(name);
         Assertions.assertThat(subwayLine.getColor()).isEqualTo(color);
         Assertions.assertThat(subwayLine.getSectionSize()).isEqualTo(1);
-        Assertions.assertThat(subwayLine.containsSection(subwaySection)).isTrue();
+        Assertions.assertThat(subwayLine.existsUpStation(subwaySection.getUpStationId())).isTrue();
 
     }
 

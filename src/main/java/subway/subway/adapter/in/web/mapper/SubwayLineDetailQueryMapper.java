@@ -1,7 +1,7 @@
 package subway.subway.adapter.in.web.mapper;
 
 import org.springframework.stereotype.Component;
-import subway.subway.application.in.SubwayLineDetailQuery;
+import subway.subway.application.in.query.SubwayLineDetailQuery;
 import subway.subway.domain.SubwayLine;
 
 @Component

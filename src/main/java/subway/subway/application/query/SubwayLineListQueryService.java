@@ -1,11 +1,10 @@
-package subway.subway.application;
+package subway.subway.application.query;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import subway.subway.application.in.SubwayLineListQuery;
-import subway.subway.application.out.SubwayLineListQueryPort;
+import subway.subway.application.in.query.SubwayLineListQuery;
+import subway.subway.application.out.query.SubwayLineListQueryPort;
 import subway.subway.application.query.SubwayLineResponse;
-import subway.subway.domain.SubwayLine;
 
 import java.util.List;
 
