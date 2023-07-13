@@ -113,9 +113,11 @@ public class SectionAcceptanceTest {
             stationResponse.getId());
 
         // when
-        지하철_구간_제거_요청(lineCreateResponse.getId(), getUpEndStationId(lineCreateResponse));
+        var statusCode = 지하철_구간_제거_요청_상태_코드_반환(lineCreateResponse.getId(),
+            getUpEndStationId(lineCreateResponse));
 
         // then
+        assertThat(statusCode).isEqualTo(HttpStatus.BAD_REQUEST.value());
         var lineResponse = 지하철_노선_조회_요청(lineCreateResponse.getId());
         assertThat(getStationNames(lineResponse)).containsExactly(지하철역, 새로운지하철역, 또다른지하철역);
     }

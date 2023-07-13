@@ -1,5 +1,6 @@
 package subway.line.section;
 
+import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.common.exception.ResourceNotFoundException;
@@ -32,6 +33,12 @@ public class SectionService {
         Section section = line.getLastSection();
 
         return new SectionResponse(section);
+    }
+
+    public void deleteSection(final Long lineId, final Long stationId) {
+        Line line = findLineById(lineId);
+
+        line.deleteSection(findStationById(stationId));
     }
 
     private Line findLineById(final Long id) {

@@ -45,6 +45,18 @@ public class Sections {
         }
     }
 
+    public void delete(Station station) {
+        if (!getLastSection().getDownStation().getId().equals(station.getId())) {
+            throw new BusinessException("하행 종점이 아닌 역을 삭제할 수 없습니다. 역ID: " + station.getId());
+        }
+
+        if (sections.size() == 1) {
+            throw new BusinessException("상행 종점역과 하행 종점역만 있는 노선의 구간은 삭제할 수 없습니다.");
+        }
+
+        sections.remove(getLastSection());
+    }
+
     public List<Station> getStations() {
         return toStations();
     }

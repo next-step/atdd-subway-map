@@ -65,6 +65,10 @@ public class Line {
         this.sections.validate(upStation, downStation);
     }
 
+    public void deleteSection(Station station) {
+        this.sections.delete(station);
+    }
+
     public Long getId() {
         return id;
     }

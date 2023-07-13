@@ -10,4 +10,8 @@ public class ResourceNotFoundException extends IllegalStateException {
     public ResourceNotFoundException(Class entityClass, Long id) {
         super(String.format("존재하지 않는 리소스입니다. 요청한 리소스 : %s, id : %d", entityClass.getName(), id));
     }
+
+    public ResourceNotFoundException(Class entityClass, String message) {
+        super(String.format("존재하지 않는 리소스입니다. 요청한 리소스 : %s, %s", entityClass.getName(), message));
+    }
 }
