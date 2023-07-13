@@ -3,7 +3,7 @@ package subway.line.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import subway.NotFoundException;
+import subway.common.error.NotFoundException;
 import subway.line.domain.Line;
 import subway.line.dto.AddLineRequest;
 import subway.line.dto.LineResponse;
