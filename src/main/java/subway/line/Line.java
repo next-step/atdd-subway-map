@@ -10,6 +10,13 @@ import javax.persistence.Id;
 import subway.line.section.Section;
 import subway.station.Station;
 
+/**
+ * 지하철 노선을 의미하는 객체
+ * Line을 생성하면 바로 initStations()를 실행해 Stations를 초기화할 수 있도록 한다.
+ *
+ * @author JerryK026
+ * @date 2023-07-13
+ */
 @Entity
 public class Line {
 
@@ -41,6 +48,7 @@ public class Line {
         this.color = color;
     }
 
+    // line이 생성되고 나서 stations를 주입받는다. Section이 내부에 Line을 가지기 때문에 양방향 관계를 가지기 위한 조치
     public void initStations(Station upStation, Station downStation) {
         this.stations = new Stations(this, upStation, downStation);
     }
