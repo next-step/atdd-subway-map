@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import subway.common.exception.CustomException;
 import subway.line.domain.Line;
 import subway.line.domain.LineLastStations;
 import subway.section.domain.Section;
@@ -13,14 +14,14 @@ import subway.station.domain.Station;
 
 class LineTest {
 
-    private final Station stationA = new Station("a");
-    private final Station stationB = new Station("b");
-    private final Station stationC = new Station("c");
+    private final Station stationA = new Station(1L, "a");
+    private final Station stationB = new Station(2L, "b");
+    private final Station stationC = new Station(3L, "c");
     private final LineLastStations lastStations = new LineLastStations(stationA, stationB);
 
     @Test
     void updateName() {
-        Line line = new Line("신분당선", "abc", lastStations);
+        Line line = new Line("신분당선", "abc", lastStations, 1);
 
         line.updateName("신신분당선");
 
@@ -29,14 +30,14 @@ class LineTest {
 
     @Test
     void updateNameException() {
-        Line line = new Line("신분당선", "abc", lastStations);
-        assertThrows(IllegalArgumentException.class, () -> line.updateName(""));
-        assertThrows(IllegalArgumentException.class, () -> line.updateName(null));
+        Line line = new Line("신분당선", "abc", lastStations,1);
+        assertThrows(CustomException.class, () -> line.updateName(""));
+        assertThrows(CustomException.class, () -> line.updateName(null));
     }
 
     @Test
     void updateColor() {
-        Line line = new Line("신분당선", "abc", lastStations);
+        Line line = new Line("신분당선", "abc", lastStations, 1);
 
         line.updateColor("abcd");
 
@@ -45,16 +46,14 @@ class LineTest {
 
     @Test
     void updateColorException() {
-        Line line = new Line("신분당선", "abc", lastStations);
-        assertThrows(IllegalArgumentException.class, () -> line.updateColor(""));
-        assertThrows(IllegalArgumentException.class, () -> line.updateColor(null));
+        Line line = new Line("신분당선", "abc", lastStations, 1);
+        assertThrows(CustomException.class, () -> line.updateColor(""));
+        assertThrows(CustomException.class, () -> line.updateColor(null));
     }
 
     @Test
     void addBaseSection() {
-        Line line = new Line("신분당선", "abc", lastStations);
-
-        line.addBaseSection(5);
+        Line line = new Line("신분당선", "abc", lastStations, 5);
 
         List<Section> sectionList = line.getSections();
         assertThat(sectionList).hasSize(1);
@@ -62,33 +61,32 @@ class LineTest {
 
     @Test
     void addSection() {
-        Line line = new Line("신분당선", "abc", lastStations);
+        Line line = new Line("신분당선", "abc", lastStations,3);
 
         Section section = new Section(line, new SectionStations(stationB, stationC), 3);
         line.addSection(section);
 
         List<Section> sections = line.getSections();
         LineLastStations stations = line.getLastStations();
-        assertThat(sections).hasSize(1);
+        assertThat(sections).hasSize(2);
         assertThat(stations.getDownLastStation()).isEqualTo(stationC);
     }
 
     @Test
     void addSectionThrowException() {
-        Line line = new Line("신분당선", "abc", lastStations);
+        Line line = new Line("신분당선", "abc", lastStations,1);
 
         Section sectionA = new Section(line, new SectionStations(stationC, stationB), 3);
         Section sectionB = new Section(line, new SectionStations(stationB, stationA), 3);
 
-        assertThrows(IllegalArgumentException.class, () -> line.addSection(sectionA));
-        assertThrows(IllegalArgumentException.class, () -> line.addSection(sectionB));
+        assertThrows(CustomException.class, () -> line.addSection(sectionA));
+        assertThrows(CustomException.class, () -> line.addSection(sectionB));
     }
 
     @Test
     void deleteStation() {
         //given
-        Line line = new Line("신분당선", "abc", lastStations);
-        line.addBaseSection(1);
+        Line line = new Line("신분당선", "abc", lastStations, 1);
         Section section = new Section(line, new SectionStations(stationB, stationC), 3);
         line.addSection(section);
 
@@ -105,19 +103,17 @@ class LineTest {
     @Test
     void deleteStationExceptionWhenOnlyOneSection() {
         //given
-        Line line = new Line("신분당선", "abc", lastStations);
-        line.addBaseSection(1);
+        Line line = new Line("신분당선", "abc", lastStations, 1);
 
-        assertThrows(IllegalArgumentException.class, () -> line.deleteStation(stationB));
+        assertThrows(CustomException.class, () -> line.deleteStation(stationB));
     }
 
     @Test
     void deleteStationExceptionWhenNotLastDownwardStation() {
-        Line line = new Line("신분당선", "abc", lastStations);
-        line.addBaseSection(1);
+        Line line = new Line("신분당선", "abc", lastStations, 1);
         Section section = new Section(line, new SectionStations(stationB, stationC), 3);
         line.addSection(section);
 
-        assertThrows(IllegalArgumentException.class, ()->line.deleteStation(stationB));
+        assertThrows(CustomException.class, ()->line.deleteStation(stationB));
     }
 }

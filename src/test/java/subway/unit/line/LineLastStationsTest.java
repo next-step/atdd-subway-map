@@ -20,9 +20,9 @@ class LineLastStationsTest {
         SectionStations sectionStationsB = new SectionStations(stationA, stationC);
         SectionStations sectionStationsC = new SectionStations(stationB, stationA);
 
-        assertThat(stations.checkCanAddSection(sectionStationsA)).isTrue();
-        assertThat(stations.checkCanAddSection(sectionStationsB)).isFalse();
-        assertThat(stations.checkCanAddSection(sectionStationsC)).isFalse();
+        assertThat(stations.isLastDownwardIsSameWithSectionUpwardStation(sectionStationsA)).isTrue();
+        assertThat(stations.isLastDownwardIsSameWithSectionUpwardStation(sectionStationsB)).isFalse();
+        assertThat(stations.isLastDownwardIsSameWithSectionUpwardStation(sectionStationsC)).isTrue();
     }
 
     @Test

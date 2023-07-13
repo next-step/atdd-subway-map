@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
+import subway.common.exception.CustomException;
 import subway.section.domain.SectionStations;
 import subway.station.domain.Station;
 
@@ -12,7 +13,7 @@ class SectionStationsTest {
     @Test
     void create() {
         Station a = new Station("a");
-        assertThrows(IllegalArgumentException.class, ()-> new SectionStations(a, a));
+        assertThrows(CustomException.class, ()-> new SectionStations(a, a));
     }
 
     @Test

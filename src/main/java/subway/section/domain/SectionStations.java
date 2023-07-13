@@ -2,6 +2,8 @@ package subway.section.domain;
 
 import javax.persistence.Embeddable;
 import javax.persistence.ManyToOne;
+import subway.common.exception.CustomException;
+import subway.common.exception.ErrorCode;
 import subway.line.domain.LineLastStations;
 import subway.station.domain.Station;
 
@@ -17,8 +19,8 @@ public class SectionStations {
     protected SectionStations() {}
 
     public SectionStations(Station upStation, Station downStation) {
-        if (upStation == null || downStation == null ||upStation.equals(downStation)) {
-            throw new IllegalArgumentException();
+        if (upStation == null || downStation == null || upStation.equals(downStation)) {
+            throw new CustomException(ErrorCode.INVALID_PARAM);
         }
         this.upStation = upStation;
         this.downStation = downStation;

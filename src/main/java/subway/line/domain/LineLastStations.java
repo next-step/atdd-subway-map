@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.List;
 import javax.persistence.Embeddable;
 import javax.persistence.ManyToOne;
+import subway.common.exception.CustomException;
+import subway.common.exception.ErrorCode;
 import subway.section.domain.SectionStations;
 import subway.station.domain.Station;
 
@@ -19,7 +21,7 @@ public class LineLastStations {
 
     public LineLastStations(Station upLastStation, Station downLastStation) {
         if (upLastStation.equals(downLastStation)) {
-            throw new IllegalArgumentException();
+            throw new CustomException(ErrorCode.INVALID_PARAM);
         }
 
         this.upLastStation = upLastStation;
@@ -42,16 +44,8 @@ public class LineLastStations {
         this.downLastStation = station;
     }
 
-    public boolean checkCanAddSection(SectionStations sectionStations) {
-        if (!downLastStation.equals(sectionStations.getUpStation())) {
-            return false;
-        }
-
-        if (upLastStation.equals(sectionStations.getDownStation())) {
-            return false;
-        }
-
-        return true;
+    public boolean isLastDownwardIsSameWithSectionUpwardStation(SectionStations sectionStations) {
+        return downLastStation.equals(sectionStations.getUpStation());
     }
 
     public boolean isLastDownwardStation(Station station) {

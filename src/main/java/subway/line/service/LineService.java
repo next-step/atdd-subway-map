@@ -33,8 +33,7 @@ public class LineService {
         Station upwardStation = stationService.getStation(lineRequest.getUpStationId());
         Station downwardStation = stationService.getStation(lineRequest.getDownStationId());
         LineLastStations lastStations = new LineLastStations(upwardStation, downwardStation);
-        Line savedLine = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor(), lastStations));
-        savedLine.addBaseSection(lineRequest.getDistance());
+        Line savedLine = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor(), lastStations, lineRequest.getDistance()));
 
         return createLineResponse(savedLine);
     }

@@ -52,4 +52,8 @@ public class Section {
         Station currentDownwardStation = stations.getDownStation();
         return currentDownwardStation.equals(station);
     }
+
+    public Integer getDistance() {
+        return distance;
+    }
 }

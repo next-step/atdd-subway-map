@@ -7,6 +7,7 @@ import static subway.utils.LineTestRequests.지하철_노선도_등록;
 import static subway.utils.SectionTestRequests.지하철_구간_등록;
 import static subway.utils.SectionTestRequests.지하철_구간_삭제;
 import static subway.utils.StationTestRequests.지하철_역_등록;
+import static subway.utils.StatusCodeAssertions.에러코드_검증;
 import static subway.utils.StatusCodeAssertions.응답코드_검증;
 
 import io.restassured.response.ExtractableResponse;
@@ -18,6 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
+import subway.common.exception.ErrorCode;
 import subway.line.controller.dto.LineResponse;
 import subway.station.controller.dto.StationResponse;
 
@@ -69,7 +71,8 @@ class SectionAcceptanceTest {
         ExtractableResponse<Response> response = 지하철_구간_등록(1L, 4L, 3L, 7);
 
         //then
-        응답코드_검증(response, HttpStatus.BAD_REQUEST);
+        응답코드_검증(response, HttpStatus.OK);
+        에러코드_검증(response, ErrorCode.ONLY_DOWNWARD_CAN_BE_ADDED_TO_LINE);
         LineResponse line7 = 지하철_노선_조회_응답값_반환(1L);
         하행선_기대값_검증(line7, 2L, "두번째역");
     }
@@ -89,7 +92,8 @@ class SectionAcceptanceTest {
         ExtractableResponse<Response> response = 지하철_구간_등록(1L, 2L, 1L, 7);
 
         //then
-        응답코드_검증(response, HttpStatus.BAD_REQUEST);
+        응답코드_검증(response, HttpStatus.OK);
+        에러코드_검증(response, ErrorCode.ALREADY_IN_LINE);
         LineResponse line7 = 지하철_노선_조회_응답값_반환(1L);
         하행선_기대값_검증(line7, 2L, "두번째역");
     }
@@ -110,7 +114,8 @@ class SectionAcceptanceTest {
         ExtractableResponse<Response> response = 지하철_구간_등록(1L, 3L, 2L, 7);
 
         //then
-        응답코드_검증(response, HttpStatus.BAD_REQUEST);
+        응답코드_검증(response, HttpStatus.OK);
+        에러코드_검증(response, ErrorCode.ALREADY_IN_LINE);
         LineResponse line7 = 지하철_노선_조회_응답값_반환(1L);
         하행선_기대값_검증(line7, 3L, "세번째역");
     }
@@ -152,7 +157,8 @@ class SectionAcceptanceTest {
         ExtractableResponse<Response> response = 지하철_구간_삭제(1L, 2L);
 
         //then
-        응답코드_검증(response, HttpStatus.BAD_REQUEST);
+        응답코드_검증(response, HttpStatus.OK);
+        에러코드_검증(response, ErrorCode.CAN_NOT_REMOVE_STATION);
         LineResponse line7 = 지하철_노선_조회_응답값_반환(1L);
         하행선_기대값_검증(line7, 3L, "세번째역");
     }
@@ -172,7 +178,9 @@ class SectionAcceptanceTest {
         ExtractableResponse<Response> response = 지하철_구간_삭제(1L, 2L);
 
         //then
-        응답코드_검증(response, HttpStatus.BAD_REQUEST);
+        응답코드_검증(response, HttpStatus.OK);
+
+
         LineResponse line7 = 지하철_노선_조회_응답값_반환(1L);
         하행선_기대값_검증(line7, 2L, "두번째역");
     }
@@ -214,7 +222,8 @@ class SectionAcceptanceTest {
         ExtractableResponse<Response> response = 지하철_구간_삭제(1L, 4L);
 
         //then
-        응답코드_검증(response, HttpStatus.BAD_REQUEST);
+        응답코드_검증(response, HttpStatus.OK);
+        에러코드_검증(response, ErrorCode.CAN_NOT_REMOVE_STATION);
         LineResponse line7 = 지하철_노선_조회_응답값_반환(1L);
         하행선_기대값_검증(line7, 3L, "세번째역");
     }
