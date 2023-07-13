@@ -48,7 +48,8 @@ class StationAcceptanceTest extends AcceptanceTestBase {
 
         // Then: 2개의 지하철역을 응답 받는다
         List<String> stationNames = getStationNames(getResponse);
-        assertThat(stationNames).containsExactlyElementsOf(stationRequests.stream().map(StationRequest::getName).collect(Collectors.toList()));
+        assertThat(stationNames).containsExactlyElementsOf(stationRequests.stream()
+                .map(StationRequest::getName).collect(Collectors.toList()));
     }
 
     @DisplayName("지하철역을 삭제한다.")
