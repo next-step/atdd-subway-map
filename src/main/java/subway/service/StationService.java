@@ -9,7 +9,6 @@ import subway.exception.NotFoundStationException;
 import subway.repository.StationRepository;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,12 +33,7 @@ public class StationService {
     }
 
     public Station getStationById(final Long id) {
-        final Optional<Station> station = stationRepository.findById(id);
-        if (station.isPresent()) {
-            return station.get();
-        } else {
-            throw new NotFoundStationException("id : " + id);
-        }
+        return stationRepository.findById(id).orElseThrow(() -> new NotFoundStationException("id : " + id));
     }
 
     @Transactional
