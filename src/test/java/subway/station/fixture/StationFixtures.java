@@ -1,4 +1,4 @@
-package subway.fixture;
+package subway.station.fixture;
 
 import static io.restassured.RestAssured.*;
 
@@ -8,7 +8,7 @@ import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-public class SubwayFixtures {
+public class StationFixtures {
 
     public static void createSubwayStation(String name) {
         Map<String, String> params = new HashMap<>();

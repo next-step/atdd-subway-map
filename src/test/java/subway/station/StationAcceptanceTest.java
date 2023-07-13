@@ -1,4 +1,4 @@
-package subway;
+package subway.station;
 
 import static io.restassured.RestAssured.*;
 import static org.assertj.core.api.Assertions.*;
@@ -12,18 +12,21 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import subway.station.fixture.StationFixtures;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class StationAcceptanceTest {
+class StationAcceptanceTest {
     /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다
      * Then 지하철역 목록 조회 시 생성한 역을 찾을 수 있다
      */
+    @DirtiesContext
     @DisplayName("지하철역을 생성한다.")
     @Test
     void createStation() {
@@ -57,22 +60,14 @@ public class StationAcceptanceTest {
      * Then 2개의 지하철역을 응답 받는다
      */
     // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
+    @DirtiesContext
     @DisplayName("지하철역 목록을 조회한다.")
     @Test
     void getStationList() {
         // given
-        Map<String, String> params = new HashMap<>();
         List<String> stations = List.of("강남역", "판교역");
         for (String station : stations) {
-            params.put("name", station);
-
-            given()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(params)
-                .when().post("/stations")
-                .then().statusCode(HttpStatus.CREATED.value());
-
-            params.clear();
+            StationFixtures.createSubwayStation(station);
         }
 
         // when
@@ -99,22 +94,14 @@ public class StationAcceptanceTest {
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
     // TODO: 지하철역 제거 인수 테스트 메서드 생성
+    @DirtiesContext
     @DisplayName("지하철역을 제거한다.")
     @Test
     void removeStation() {
         // given
-        Map<String, String> params = new HashMap<>();
         List<String> stations = List.of("강남역", "판교역");
         for (String station : stations) {
-            params.put("name", station);
-
-            given()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(params)
-                .when().post("/stations")
-                .then().statusCode(HttpStatus.CREATED.value());
-
-            params.clear();
+            StationFixtures.createSubwayStation(station);
         }
 
         // when
@@ -130,7 +117,6 @@ public class StationAcceptanceTest {
             .then().log().all().extract();
 
         List<String> stationList = response.body().jsonPath().getList("name", String.class);
-        assertThat(stationList.contains("강남역")).isFalse();
-        assertThat(stationList.contains("판교역")).isTrue();
+        assertThat(stationList).containsOnly("판교역");
     }
 }
