@@ -79,6 +79,7 @@ public class StationAcceptanceTest {
     }
 
     public static ExtractableResponse<Response> 지하철_역_추가_요청(String name) {
+
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
 
