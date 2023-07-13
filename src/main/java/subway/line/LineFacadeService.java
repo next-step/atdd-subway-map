@@ -1,4 +1,4 @@
-package subway.facade;
+package subway.line;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,14 +13,14 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
-public class LineFacade {
+public class LineFacadeService {
 
     private final LineService lineService;
     private final LineSectionService lineSectionService;
     private final StationService stationService;
     private final LineConverter lineConverter;
 
-    public LineFacade(LineService lineService, LineSectionService lineSectionService, StationService stationService, LineConverter lineConverter) {
+    public LineFacadeService(LineService lineService, LineSectionService lineSectionService, StationService stationService, LineConverter lineConverter) {
         this.lineService = lineService;
         this.lineSectionService = lineSectionService;
         this.stationService = stationService;

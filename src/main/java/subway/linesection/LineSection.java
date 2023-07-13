@@ -7,16 +7,24 @@ import javax.persistence.*;
 public class LineSection {
     @Id
     private Long lineId;
-    @Column(nullable = true)
     private Long previousStationId;
     @Id
     private Long currentStationId;
-    @Column(nullable = true)
     private Long nextStationId;
 
     @Column(nullable = false)
     private Integer distance;
 
+    @Override
+    public String toString() {
+        return "LineSection{" +
+                "lineId=" + lineId +
+                ", previousStationId=" + previousStationId +
+                ", currentStationId=" + currentStationId +
+                ", nextStationId=" + nextStationId +
+                ", distance=" + distance +
+                '}';
+    }
 
     public static LineSection ofFirst(Long lineId, Long upStationId, Long downStationId, Integer distance) {
         LineSection lineSection = new LineSection();
@@ -36,7 +44,7 @@ public class LineSection {
         return lineSection;
     }
 
-    public void lineNextLineSection(LineSection nextLineSection) {
+    public void linkLineSection(LineSection nextLineSection) {
         this.nextStationId = nextLineSection.getCurrentStationId();
         nextLineSection.previousStationId = this.currentStationId;
     }
@@ -49,4 +57,7 @@ public class LineSection {
         return currentStationId;
     }
 
+    public Long getPreviousStationId() {
+        return previousStationId;
+    }
 }

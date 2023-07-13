@@ -2,7 +2,6 @@ package subway.line;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import subway.facade.LineFacade;
 
 import java.net.URI;
 import java.util.List;
@@ -10,15 +9,15 @@ import java.util.List;
 @RestController
 @RequestMapping("lines")
 public class LineController {
-    private final LineFacade lineFacade;
-    public LineController(LineFacade lineFacade) {
-        this.lineFacade = lineFacade;
+    private final LineFacadeService lineFacadeService;
+    public LineController(LineFacadeService lineFacadeService) {
+        this.lineFacadeService = lineFacadeService;
     }
 
 
     @PostMapping
     public ResponseEntity<LineResponse> create(@RequestBody LineRequest request) {
-        LineResponse line = lineFacade.create(request);
+        LineResponse line = lineFacadeService.create(request);
         return ResponseEntity.created(URI.create("/lines/" + line.getId()))
                 .body(line);
     }
@@ -26,24 +25,24 @@ public class LineController {
     @GetMapping
     public ResponseEntity<List<LineResponse>> getList() {
         return ResponseEntity.ok()
-                .body(lineFacade.getList());
+                .body(lineFacadeService.getList());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<LineResponse> get(@PathVariable Long id) {
         return ResponseEntity.ok()
-                .body(lineFacade.getById(id));
+                .body(lineFacadeService.getById(id));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<LineResponse> update(@PathVariable Long id, @RequestBody LineRequest request) {
-        lineFacade.update(id, request);
+        lineFacadeService.update(id, request);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteSubwayLine(@PathVariable Long id) {
-        lineFacade.delete(id);
+        lineFacadeService.delete(id);
         return ResponseEntity.noContent().build();
     }
 }
