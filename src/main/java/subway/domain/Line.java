@@ -5,8 +5,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
 import subway.dto.LineRequest;
 
 @Entity
@@ -25,24 +23,22 @@ public class Line {
     @Column(length = 20, nullable = false)
     private Long distance;
 
-    @OneToOne
-    @JoinColumn(name = "up_station_id")
-    private Station upStation;
+    @Column(nullable = false)
+    private Long upStationId;
 
-    @OneToOne
-    @JoinColumn(name = "down_station_id")
-    private Station downStation;
+    @Column(nullable = false)
+    private Long downStationId;
 
     public Line() {
 
     }
 
-    public Line(LineRequest lineRequest, Station upStation, Station downStation) {
+    public Line(LineRequest lineRequest, Long upStationId, Long downStationId) {
         this.name = lineRequest.getName();
         this.color = lineRequest.getColor();
         this.distance = lineRequest.getDistance();
-        this.upStation = upStation;
-        this.downStation = downStation;
+        this.upStationId = upStationId;
+        this.downStationId = downStationId;
     }
 
     public void updateLine(LineRequest lineRequest) {
@@ -67,12 +63,12 @@ public class Line {
         return distance;
     }
 
-    public Station getUpStation() {
-        return upStation;
+    public Long getUpStationId() {
+        return upStationId;
     }
 
-    public Station getDownStation() {
-        return downStation;
+    public Long getDownStationId() {
+        return downStationId;
     }
 
 

@@ -26,25 +26,33 @@ public class LineService {
 
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
-        Station upStation = stationRepository.findById(lineRequest.getUpStationId())
-            .orElseThrow(IllegalArgumentException::new);
-        Station downStation = stationRepository.findById(lineRequest.getDownStationId())
-            .orElseThrow(IllegalArgumentException::new);
-
-        Line line = new Line(lineRequest, upStation, downStation);
+        Line line = new Line(lineRequest, lineRequest.getUpStationId(), lineRequest.getDownStationId());
         Line savedLine = lineRepository.save(line);
-        return LineResponse.from(savedLine);
+
+        Station upStation = stationRepository.findById(savedLine.getUpStationId()).orElseThrow(IllegalArgumentException::new);
+        Station downStation = stationRepository.findById(savedLine.getDownStationId()).orElseThrow(IllegalArgumentException::new);
+
+        return LineResponse.from(savedLine, upStation, downStation);
     }
 
     public List<LineResponse> findAllLines() {
         return lineRepository.findAll().stream()
-            .map(LineResponse::from)
-            .collect(Collectors.toList());
+            .map(line -> {
+                Station upStation = stationRepository.findById(line.getUpStationId())
+                    .orElseThrow(IllegalArgumentException::new);
+                Station downStation = stationRepository.findById(line.getDownStationId())
+                    .orElseThrow(IllegalArgumentException::new);
+
+                return LineResponse.from(line, upStation, downStation);
+            }).collect(Collectors.toList());
     }
 
     public LineResponse findLine(Long id) {
         Line line = lineRepository.findById(id).orElseThrow(IllegalArgumentException::new);
-        return LineResponse.from(line);
+        Station upStation = stationRepository.findById(line.getUpStationId()).orElseThrow(IllegalArgumentException::new);
+        Station downStation = stationRepository.findById(line.getDownStationId()).orElseThrow(IllegalArgumentException::new);
+
+        return LineResponse.from(line, upStation, downStation);
     }
 
     public LineResponse updateLine(Long id, LineRequest request) {
@@ -52,7 +60,10 @@ public class LineService {
         line.updateLine(request);
 
         Line updateLine = lineRepository.save(line);
-        return LineResponse.from(updateLine);
+        Station upStation = stationRepository.findById(updateLine.getUpStationId()).orElseThrow(IllegalArgumentException::new);
+        Station downStation = stationRepository.findById(updateLine.getDownStationId()).orElseThrow(IllegalArgumentException::new);
+
+        return LineResponse.from(updateLine, upStation, downStation);
     }
 
     public void deleteLineById(Long id) {
