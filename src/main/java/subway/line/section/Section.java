@@ -28,6 +28,10 @@ public class Section {
     public Section() {
     }
 
+    public Section(Line line, Station upStation, Station downStation) {
+        this(null, line, upStation, downStation, 1);
+    }
+
     public Section(Line line, Station upStation, Station downStation, int sequence) {
         this(null, line, upStation, downStation, sequence);
     }

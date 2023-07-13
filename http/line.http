@@ -1,5 +1,5 @@
 ### 강남역 생성
-POST http://localhost:8080/stations
+POST http://localhost:8080/sections
 Content-Type: application/json
 
 {
@@ -7,7 +7,7 @@ Content-Type: application/json
 }
 
 ### 신논현역 생성
-POST http://localhost:8080/stations
+POST http://localhost:8080/sections
 Content-Type: application/json
 
 {

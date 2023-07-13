@@ -13,6 +13,7 @@ import static subway.line.section.SectionTestStepDefinition.지하철_구간_제
 import static subway.line.section.SectionTestStepDefinition.지하철_구간_제거_요청_상태_코드_반환;
 import static subway.station.StationTestStepDefinition.지하철_역_생성_요청;
 
+import common.AcceptanceTest;
 import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
@@ -21,6 +22,8 @@ import org.springframework.http.HttpStatus;
 import subway.line.LineResponse;
 import subway.station.Station;
 
+@DisplayName("지하철 구간 관련 기능")
+@AcceptanceTest
 public class SectionAcceptanceTest {
     // Given 지하철 노선을 생성하고
     // When 지하철 노선에 구간을 추가하면
@@ -37,7 +40,7 @@ public class SectionAcceptanceTest {
             stationResponse.getId());
 
         // then
-        var lineResponse = 지하철_노선_조회_요청(stationResponse.getId());
+        var lineResponse = 지하철_노선_조회_요청(lineCreateResponse.getId());
         assertThat(getStationNames(lineResponse)).containsExactly(지하철역, 새로운지하철역, 또다른지하철역);
     }
 
@@ -52,17 +55,18 @@ public class SectionAcceptanceTest {
         var stationResponse = 지하철_역_생성_요청(또다른지하철역);
 
         // when
-        지하철_구간_생성_요청(lineCreateResponse.getId(), getUpEndStationId(lineCreateResponse),
+        var statusCode = 지하철_구간_생성_요청_상태_코드_반환(lineCreateResponse.getId(), getUpEndStationId(lineCreateResponse),
             stationResponse.getId());
 
         // then
-        var lineResponse = 지하철_노선_조회_요청(stationResponse.getId());
+        assertThat(statusCode).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        var lineResponse = 지하철_노선_조회_요청(lineCreateResponse.getId());
         assertThat(getStationNames(lineResponse)).containsExactly(지하철역, 새로운지하철역);
     }
 
     // Given 지하철 노선을 생성하고
     // When 해당 노선에 이미 등록된 역을 하행선으로 가지는 구간을 추가하면
-    // Then 응답에서 409 Conflict 상태코드를 받는다
+    // Then 응답에서 400 BAD_REQUEST 상태코드를 받는다
     @DisplayName("지하철 노선에 구간 추가시 해당 노선에 이미 등록된 역을 하행선으로 가지면 실패한다.")
     @Test
     void createSection_fail_anyStationOfSectionDoesNotMatchWithDownEndStationOfLine() {
@@ -73,7 +77,7 @@ public class SectionAcceptanceTest {
         var statusCode = 지하철_구간_생성_요청_상태_코드_반환(lineCreateResponse.getId(), getDownEndStationId(lineCreateResponse), getUpEndStationId(lineCreateResponse));
 
         // then
-        assertThat(statusCode).isEqualTo(HttpStatus.CONFLICT.value());
+        assertThat(statusCode).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     // Given 지하철 노선에 구간을 추가하고
