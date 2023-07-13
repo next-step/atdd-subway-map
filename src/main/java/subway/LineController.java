@@ -13,8 +13,8 @@ public class LineController {
     private final LineService lineService;
 
     @PostMapping("/lines")
-    public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
-        LineResponse createdLine = lineService.createLine(lineRequest);
+    public ResponseEntity<LineResponse> createLine(@RequestBody AddLineRequest addLineRequest) {
+        LineResponse createdLine = lineService.createLine(addLineRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdLine);
     }
 

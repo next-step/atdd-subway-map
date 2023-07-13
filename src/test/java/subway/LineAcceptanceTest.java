@@ -16,7 +16,7 @@ class LineAcceptanceTest extends AcceptanceTestBase {
     @Test
     void createLine() {
         // When: 지하철 노선을 생성하면
-        ExtractableResponse<Response> postResponse = post("/lines", new LineRequest("신분당선"));
+        ExtractableResponse<Response> postResponse = post("/lines", new AddLineRequest("신분당선"));
         assertThat(postResponse.statusCode()).isEqualTo(HttpStatus.SC_CREATED);
 
         // Then: 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
@@ -29,9 +29,9 @@ class LineAcceptanceTest extends AcceptanceTestBase {
     @Test
     void getLines() {
         // Given: 2개의 지하철 노선을 생성하고
-        LineRequest sinBundangLine = new LineRequest("신분당선");
+        AddLineRequest sinBundangLine = new AddLineRequest("신분당선");
         post("/lines", sinBundangLine);
-        LineRequest incheonSubwayLine1 = new LineRequest("인천지하철 1호선");
+        AddLineRequest incheonSubwayLine1 = new AddLineRequest("인천지하철 1호선");
         post("/lines", incheonSubwayLine1);
 
         // When: 지하철 노선 목록을 조회하면
@@ -46,7 +46,7 @@ class LineAcceptanceTest extends AcceptanceTestBase {
     @Test
     void getLine() {
         // Given: 지하철 노선을 생성하고
-        LineRequest line = new LineRequest("신분당선");
+        AddLineRequest line = new AddLineRequest("신분당선");
         ExtractableResponse<Response> postResponse = post("/lines", line);
 
         // When: 생성한 지하철 노선을 조회하면
@@ -62,7 +62,7 @@ class LineAcceptanceTest extends AcceptanceTestBase {
     @Test
     void modifyLine() {
         // Given: 지하철 노선을 생성하고
-        LineRequest line = new LineRequest("신분당선");
+        AddLineRequest line = new AddLineRequest("신분당선");
         ExtractableResponse<Response> postResponse = post("/lines", line);
 
         // When: 생성한 지하철 노선을 수정하면
@@ -79,7 +79,7 @@ class LineAcceptanceTest extends AcceptanceTestBase {
     @Test
     void deleteLine() {
         // Given: 지하철 노선을 생성하고
-        LineRequest line = new LineRequest("신분당선");
+        AddLineRequest line = new AddLineRequest("신분당선");
         ExtractableResponse<Response> postResponse = post("/lines", line);
 
         // When: 생성한 지하철 노선을 삭제하면

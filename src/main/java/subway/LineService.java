@@ -5,8 +5,9 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static subway.LineMapper.LINE_MAPPER;
 
 @Service
 @Transactional
@@ -14,31 +15,29 @@ import java.util.stream.Collectors;
 public class LineService {
     private final LineRepository lineRepository;
 
-    public LineResponse createLine(LineRequest lineRequest) {
-        Line line = new Line(lineRequest.getName());
+    public LineResponse createLine(AddLineRequest addLineRequest) {
+        Line line = LINE_MAPPER.mapToLine(addLineRequest);
         Line savedLine = lineRepository.save(line);
-        return new LineResponse(savedLine.getId(), savedLine.getName());
+        return LINE_MAPPER.mapToLineResponse(savedLine);
     }
 
     public List<LineResponse> getLines() {
         List<Line> lines = lineRepository.findAll();
         return lines.stream()
-                .map(line -> new LineResponse(line.getId(), line.getName()))
+                .map(LINE_MAPPER::mapToLineResponse)
                 .collect(Collectors.toList());
     }
 
     public LineResponse getLine(Long id) {
-        Optional<Line> lineOptional = lineRepository.findById(id);
-        Line line = lineOptional.orElseThrow(() -> new LineNotFoundException(id));
-        return new LineResponse(line.getId(), line.getName());
+        Line line = findLineById(id);
+        return LINE_MAPPER.mapToLineResponse(line);
     }
 
     public ModifyLineResponse modifyLine(Long id, ModifyLineRequest modifyLineRequest) {
-        Optional<Line> lineOptional = lineRepository.findById(id);
-        Line line = lineOptional.orElseThrow(() -> new LineNotFoundException(id));
+        Line line = findLineById(id);
         line.setName(modifyLineRequest.getName());
         Line modifiedLine = lineRepository.save(line);
-        return new ModifyLineResponse(modifiedLine.getName());
+        return LINE_MAPPER.mapToModifyLineResponse(modifiedLine);
     }
 
     public void deleteLine(Long id) {
@@ -46,5 +45,9 @@ public class LineService {
             throw new LineNotFoundException(id);
         }
         lineRepository.deleteById(id);
+    }
+
+    private Line findLineById(Long id) {
+        return lineRepository.findById(id).orElseThrow(() -> new LineNotFoundException(id));
     }
 }
