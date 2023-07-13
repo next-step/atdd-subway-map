@@ -11,4 +11,5 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ModifyLineResponse {
     private String name;
+    private String color;
 }

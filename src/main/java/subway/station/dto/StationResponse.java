@@ -1,19 +1,13 @@
 package subway.station.dto;
 
+import lombok.Builder;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
+@Getter
+@Builder
 public class StationResponse {
-    private Long id;
-    private String name;
-
-    public StationResponse(Long id, String name) {
-        this.id = id;
-        this.name = name;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
+    private final Long id;
+    private final String name;
 }

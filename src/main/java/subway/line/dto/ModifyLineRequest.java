@@ -9,4 +9,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ModifyLineRequest {
     private String name;
+    private String color;
 }
