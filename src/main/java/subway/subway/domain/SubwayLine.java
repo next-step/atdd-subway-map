@@ -14,7 +14,9 @@ public class SubwayLine {
 
     public static SubwayLine register(String name, String color, SubwaySection subwaySection) {
 
-        return new SubwayLine(name, color, subwaySection);
+        SubwayLine subwayLine = new SubwayLine(name, color, subwaySection);
+        subwayLine.validate();
+        return subwayLine;
     }
 
     public static SubwayLine of(SubwayLine.Id id, String name, String color, List<SubwaySection> sectionList) {
@@ -36,8 +38,8 @@ public class SubwayLine {
         this.sections = new SubwaySections(section);
     }
 
-    public void validate() {
-        sections.validate();
+    private void validate() {
+        sections.validate(startStationId);
     }
 
     public SubwayLine.Id getId() {
@@ -56,19 +58,20 @@ public class SubwayLine {
     }
 
     public String getUpStationName(Station.Id upStationId) {
-        return sections.getSection(upStationId).getUpStationName();
+        return sections.getUpStationName(upStationId);
     }
 
     public String getDownStationName(Station.Id upStationId) {
-        return sections.getSection(upStationId).getDownStationName();
+        return sections.getDownStationName(upStationId);
     }
 
     public Station.Id getDownStationId(Station.Id upStationId) {
-        return sections.getSection(upStationId).getDownStationId();
+
+        return sections.getDownStationId(upStationId);
     }
 
     public Kilometer getSectionDistance(Station.Id upStationId) {
-        return sections.getSection(upStationId).getDistance();
+        return sections.getDistance(upStationId);
     }
 
     public Station.Id getStartStationId() {
@@ -84,9 +87,9 @@ public class SubwayLine {
         this.color = color;
     }
 
-    public void addSection(Station upStation, Station downStation, Kilometer kilometer) {
-        SubwaySection subwaySection = SubwaySection.register(upStation, downStation, kilometer);
+    public void addSection(SubwaySection subwaySection) {
         sections.add(subwaySection);
+        sections.validate(startStationId);
     }
 
     public boolean containsSection(SubwaySection subwaySection) {
