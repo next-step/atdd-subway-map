@@ -27,21 +27,18 @@ public class LineController {
         this.lineService = lineService;
     }
 
-    @PostMapping()
+    @PostMapping
     public ResponseEntity<LineResponse> createLine(@RequestBody LineCreateRequest lineCreateRequest) {
         LineResponse line = lineService.saveLine(lineCreateRequest);
         return ResponseEntity.created(URI.create("/line/" + line.getId())).body(line);
     }
 
-    @GetMapping()
+    @GetMapping
     public ResponseEntity<List<LineResponse>> showLines(){
-        List<LineResponse> temp = lineService.findAllLines();
-        LineResponse lineResponse = temp.get(0);
-
-        return ResponseEntity.ok().body(lineService.findAllLines());
+        return ResponseEntity.ok().body(lineService.findAllLineResponse());
     }
 
-    @PutMapping()
+    @PutMapping
     public ResponseEntity<LineResponse> updateLine(@RequestBody LineUpdateRequest lineUpdateRequest){
 
         LineResponse line = lineService.updateLine(lineUpdateRequest);

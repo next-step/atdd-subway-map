@@ -16,15 +16,15 @@ public class SectionController {
         this.sectionService = serctionService;
     }
 
-    @PostMapping()
+    @PostMapping
     public ResponseEntity<LineResponse> createSection(@PathVariable Long lineId, @RequestBody SectionRequest sectionRequest) {
         sectionService.saveSection(lineId, sectionRequest);
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping()
+    @DeleteMapping
     public ResponseEntity<Void> deleteSection(@PathVariable Long lineId, @RequestParam Long stationId){
         sectionService.removeSection(lineId,stationId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 }

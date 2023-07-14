@@ -10,8 +10,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class StationFixture {
-
-
     public static ExtractableResponse<Response> createStation(String name) {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
@@ -28,12 +26,10 @@ public class StationFixture {
         return createStation(name).jsonPath().getObject("", StationResponse.class);
     }
 
-
     public static ExtractableResponse<Response> getStations() {
         return RestAssured.given().log().all()
                 .when().get("/stations")
                 .then().log().all()
                 .extract();
     }
-
 }

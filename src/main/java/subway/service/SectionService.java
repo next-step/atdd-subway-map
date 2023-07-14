@@ -10,7 +10,6 @@ import subway.repository.SectionRepository;
 import subway.repository.StationRepository;
 
 import javax.transaction.Transactional;
-import java.util.List;
 
 @Service
 public class SectionService {
@@ -28,8 +27,8 @@ public class SectionService {
     @Transactional
     public void saveSection(Long lineId, SectionRequest sectionRequest) {
         Line line = lineRepository.findById(lineId).orElseThrow(IllegalArgumentException::new);
-        Station upStation = stationRepository.findById(sectionRequest.getUpStationId()).get();
-        Station downStation = stationRepository.findById(sectionRequest.getDownStationId()).get();
+        Station upStation = stationRepository.findById(sectionRequest.getUpStationId()).orElseThrow(IllegalArgumentException::new);
+        Station downStation = stationRepository.findById(sectionRequest.getDownStationId()).orElseThrow(IllegalArgumentException::new);
 
         line.addSections(Section.builder()
                 .line(line)
@@ -45,10 +44,5 @@ public class SectionService {
         Station station = stationRepository.findById(stationId).get();
 
         line.removeSections(station);
-        if (!line.getSections().get(line.getSections().size() - 1).getDownStation().equals(station)) {
-            throw new IllegalArgumentException();
-        }
-
-        line.getSections().remove(line.getSections().size() - 1);
     }
 }

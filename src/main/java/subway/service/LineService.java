@@ -6,14 +6,11 @@ import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Station;
 import subway.dto.request.LineCreateRequest;
-import subway.dto.response.LineResponse;
 import subway.dto.request.LineUpdateRequest;
-import subway.dto.response.StationResponse;
+import subway.dto.response.LineResponse;
 import subway.repository.LineRepository;
 import subway.repository.StationRepository;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,9 +45,9 @@ public class LineService {
         return new LineResponse(line);
     }
 
-    public List<LineResponse> findAllLines() {
+    public List<LineResponse> findAllLineResponse() {
         return lineRepository.findAll().stream()
-                .map(this::createLineResponse)
+                .map(LineResponse::createLineResponse)
                 .collect(Collectors.toList());
     }
 
@@ -61,32 +58,11 @@ public class LineService {
         line.changeName(lineCreateRequest.getName());
         line.changeColor(lineCreateRequest.getColor());
 
-        return createLineResponse(line);
+        return LineResponse.createLineResponse(line);
     }
 
     @Transactional
     public void deleteLineById(Long id) {
         lineRepository.deleteById(id);
-    }
-
-    private LineResponse createLineResponse(Line line){
-        return new LineResponse(line, createStationResponses(line.getSections()));
-    }
-
-    private List<StationResponse> createStationResponses(List<Section> sections) {
-        if (sections.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        List<StationResponse> stationResponses = new ArrayList<>();
-        for(Section section : sections){
-            StationResponse stationResponse = new StationResponse(section.getUpStation());
-            stationResponses.add(stationResponse);
-        }
-
-        Station lastStation = sections.get(stationResponses.size() - 1).getDownStation();
-        stationResponses.add(new StationResponse(lastStation));
-
-        return stationResponses;
     }
 }
