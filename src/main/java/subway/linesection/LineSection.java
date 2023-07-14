@@ -11,20 +11,8 @@ public class LineSection {
     @Id
     private Long currentStationId;
     private Long nextStationId;
-
     @Column(nullable = false)
     private Integer distance;
-
-    @Override
-    public String toString() {
-        return "LineSection{" +
-                "lineId=" + lineId +
-                ", previousStationId=" + previousStationId +
-                ", currentStationId=" + currentStationId +
-                ", nextStationId=" + nextStationId +
-                ", distance=" + distance +
-                '}';
-    }
 
     public static LineSection ofFirst(Long lineId, Long upStationId, Long downStationId, Integer distance) {
         LineSection lineSection = new LineSection();
@@ -44,9 +32,21 @@ public class LineSection {
         return lineSection;
     }
 
-    public void linkLineSection(LineSection nextLineSection) {
+    public void linkSection(LineSection nextLineSection) {
         this.nextStationId = nextLineSection.getCurrentStationId();
         nextLineSection.previousStationId = this.currentStationId;
+    }
+
+    public void updateToLastSection() {
+        this.nextStationId = null;
+    }
+
+    public boolean isStartSection() {
+        return this.previousStationId == null;
+    }
+
+    public boolean isEndSection() {
+        return this.nextStationId == null;
     }
 
     public Long getLineId() {
@@ -60,4 +60,5 @@ public class LineSection {
     public Long getPreviousStationId() {
         return previousStationId;
     }
+
 }

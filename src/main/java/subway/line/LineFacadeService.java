@@ -38,7 +38,11 @@ public class LineFacadeService {
 
     public LineResponse getById(Long id) {
         Line line = lineService.getLine(id);
-        List<Long> stationIds = findStationIdsByLineId(id);
+        // 노선에 있는 역들을 모두 가져오기 위해 section을 조회
+        List<Long> stationIds = lineSectionService.findByLineId(id)
+                .stream()
+                .map(LineSection::getCurrentStationId)
+                .collect(Collectors.toList());
         List<Station> stations = stationService.findByIds(stationIds);
         return lineConverter.convert(line, stations);
     }
@@ -58,16 +62,17 @@ public class LineFacadeService {
     public List<LineResponse> getList() {
         List<Line> list = lineService.getList();
 
+        // 노선과 역들간의 관계를 만들어둔다.
         Map<Long, List<Long>> lineStationMap = list.stream()
-                .map(e -> getLineSectionsByLineId(e.getId()))
+                .map(line -> lineSectionService.findByLineId(line.getId()))
                 .flatMap(Collection::stream)
                 .collect(Collectors.groupingBy(
                         LineSection::getLineId,
                         Collectors.mapping(LineSection::getCurrentStationId, Collectors.toList())
                 ));
-
+        // 역들에 대한 정보를 한번에 가져오기 위해 id값만 추출한다.
         List<Long> stationIds = list.stream()
-                .map(e -> lineStationMap.get(e.getId()))
+                .map(line -> lineStationMap.get(line.getId()))
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList());
 
@@ -84,17 +89,5 @@ public class LineFacadeService {
                     return lineConverter.convert(line, collect);
                 })
                 .collect(Collectors.toList());
-    }
-
-    private List<Long> findStationIdsByLineId(Long lindId) {
-        return getLineSectionsByLineId(lindId)
-                .stream()
-                .map(LineSection::getCurrentStationId)
-                .collect(Collectors.toList());
-    }
-
-    private List<LineSection> getLineSectionsByLineId(Long lindId) {
-        List<LineSection> lineSections = lineSectionService.findByLineId(lindId);
-        return lineSections;
     }
 }

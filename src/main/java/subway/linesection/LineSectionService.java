@@ -6,7 +6,6 @@ import subway.exception.BadRequestException;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class LineSectionService {
@@ -29,21 +28,21 @@ public class LineSectionService {
         LineSection endLineSection = getEndLineSectionById(lineId);
         LineSection newLineSection = LineSection.of(lineId, upStationId, downStationId, distance);
         validate(lineId, endLineSection, newLineSection);
-        endLineSection.linkLineSection(newLineSection);
+        endLineSection.linkSection(newLineSection);
         lineSectionRepository.saveAll(Arrays.asList(endLineSection, newLineSection));
     }
 
-    private void validate(Long lindId, LineSection endLineSection, LineSection newLineSection) {
-        if (endLineSection.getCurrentStationId() != newLineSection.getPreviousStationId())
-            throw new BadRequestException(String.format("line's endStationId > %d must be equal to lineSectionRequest's upStationId > %d", endLineSection.getCurrentStationId(), newLineSection.getPreviousStationId()));
-
-        boolean hasStation = lineSectionRepository.findByLineId(lindId)
-                .stream()
-                .map(e -> e.getCurrentStationId())
-                .anyMatch(e -> e.equals(newLineSection.getCurrentStationId()));
-
-        if (hasStation)
-            throw new BadRequestException(String.format("line's already has the station. stationId > %d", newLineSection.getCurrentStationId()));
+    @Transactional
+    public void deleteSection(Long lineId, Long stationId) {
+        LineSection section = getLineSection(lineId, stationId);
+        if (section.isStartSection() || !section.isEndSection())
+            throw new BadRequestException(String.format("LineSection can delete only the last lineSection."));
+        LineSection previousSection = getLineSection(lineId, section.getPreviousStationId());
+        if (previousSection.isStartSection())
+            throw new BadRequestException(String.format("The route has at least one section."));
+        lineSectionRepository.delete(section);
+        previousSection.updateToLastSection();
+        lineSectionRepository.save(previousSection);
     }
 
     private LineSection getEndLineSectionById(Long lineId) {
@@ -52,5 +51,23 @@ public class LineSectionService {
 
     public List<LineSection> findByLineId(Long lineId) {
         return lineSectionRepository.findByLineId(lineId);
+    }
+
+    private LineSection getLineSection(Long lineId, Long stationId) {
+        return lineSectionRepository.findById(LineSectionPK.of(lineId, stationId))
+                .orElseThrow(() -> new BadRequestException(String.format("line station is not exist in line. lineId > %d", lineId)));
+    }
+
+    private void validate(Long lindId, LineSection endLineSection, LineSection newLineSection) {
+        if (endLineSection.getCurrentStationId() != newLineSection.getPreviousStationId())
+            throw new BadRequestException(String.format("line's endStationId > %d must be equal to lineSectionRequest's upStationId > %d", endLineSection.getCurrentStationId(), newLineSection.getPreviousStationId()));
+
+        boolean hasStation = lineSectionRepository.findByLineId(lindId)
+                .stream()
+                .map(LineSection::getCurrentStationId)
+                .anyMatch(e -> e.equals(newLineSection.getCurrentStationId()));
+
+        if (hasStation)
+            throw new BadRequestException(String.format("line's already has the station. stationId > %d", newLineSection.getCurrentStationId()));
     }
 }
