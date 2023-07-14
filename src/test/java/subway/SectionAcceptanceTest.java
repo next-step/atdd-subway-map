@@ -7,27 +7,16 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import subway.CommonStep.DatabaseCleanup;
-import subway.CommonStep.LineStep;
-import subway.CommonStep.SectionStep;
-import subway.CommonStep.StationStep;
+import subway.CommonStep.*;
 
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 구간 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class SectionAcceptanceTest {
-
-    @LocalServerPort
-    int port;
-
-    @Autowired
-    private DatabaseCleanup databaseCleanup;
+public class SectionAcceptanceTest extends AcceptanceTest {
 
     private Long 이호선;
     private Long 강남역;
@@ -36,9 +25,7 @@ public class SectionAcceptanceTest {
     private Long 삼성역;
 
     @BeforeEach
-    public void setUp() {
-        RestAssured.port = port;
-        databaseCleanup.execute();
+    public void setGivenData() {
 
         이호선 =  LineStep.지하철_노선_생성( "2호선", "green").jsonPath().getLong("id");
         강남역 =  StationStep.지하철역_생성("강남역").jsonPath().getLong("id");
@@ -105,6 +92,21 @@ public class SectionAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
+    @DisplayName("존재하지 않는 역을 가진 구간을 생성한다.")
+    @Test
+    void createInvalidSectionNotExistsStation() {
+        //given
+        SectionStep.지하철구간_생성(이호선,강남역,역삼역,10L);
+        List<Long> stationIds = StationStep.지하철역_목록_전체조회().getList("id", Long.class);
+        Long 존재하지_않는_역의_PK = stationIds.get(stationIds.size() - 1) + 1L;
+
+        // when
+        ExtractableResponse<Response> response = SectionStep.지하철구간_생성(이호선,역삼역,존재하지_않는_역의_PK,20L);
+
+        //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
     /**
      * Given 지하철 역,노선, 구간을 생성하고
      * When 생성한 구간을 삭제하면
@@ -116,7 +118,6 @@ public class SectionAcceptanceTest {
         //given
         SectionStep.지하철구간_생성(이호선,강남역,역삼역,10L);
         SectionStep.지하철구간_생성(이호선,역삼역,선릉역,20L);
-        JsonPath lineJsonPathBefore = LineStep.지하철_노선_조회(이호선);
 
         // when
         ExtractableResponse<Response> response = SectionStep.지하철구간_삭제(이호선, 역삼역);
@@ -161,5 +162,22 @@ public class SectionAcceptanceTest {
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @DisplayName("존재하지 않는 역을 가진 구간을 삭제한다.")
+    @Test
+    void InvalidDeleteSectionNotExistsStation() {
+
+        //given
+        SectionStep.지하철구간_생성(이호선,강남역,역삼역,10L);
+        List<Long> stationIds = StationStep.지하철역_목록_전체조회().getList("id", Long.class);
+        Long 존재하지_않는_역의_PK = stationIds.get(stationIds.size() - 1) + 1L;
+
+        // when
+        ExtractableResponse<Response> response = SectionStep.지하철구간_삭제(이호선, 존재하지_않는_역의_PK);
+
+        //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+
     }
 }
