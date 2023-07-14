@@ -1,6 +1,10 @@
 package subway.entity;
 
+import org.springframework.util.CollectionUtils;
+
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 
@@ -13,25 +17,22 @@ public class Line {
     private String name;
     @Column(length = 20, nullable = false)
     private String color;
-    private Long upStationId;
-    private Long downStationId;
+
+    @OneToMany(mappedBy = "line")
+    private List<Section> sections = new ArrayList<>();
 
     public Line() {
     }
 
-    public Line(String name, String color, Long upStationId, Long downStationId) {
+    public Line(String name, String color) {
         this.name = name;
         this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
     }
 
-    public Line(Long id, String name, String color, Long upStationId, Long downStationId) {
+    public Line(Long id, String name, String color) {
         this.id = id;
         this.name = name;
         this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
     }
 
     public Long getId() {
@@ -46,26 +47,30 @@ public class Line {
         return color;
     }
 
-    public Long getUpStationId() {
-        return upStationId;
+    public List<Section> getSections() {
+        return sections;
     }
 
-    public Long getDownStationId() {
-        return downStationId;
+    public boolean isLastStation(final Long stationId) {
+        if (sections.isEmpty() || Objects.isNull(stationId)) {
+            return false;
+        } else {
+            return Objects.requireNonNull(CollectionUtils.lastElement(sections)).getId().equals(stationId);
+        }
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Line)) return false;
-        Line line = (Line) o;
-        return Objects.equals(getId(), line.getId()) && Objects.equals(getName(), line.getName()) && Objects.equals(color, line.color) && Objects.equals(upStationId, line.upStationId) && Objects.equals(downStationId, line.downStationId);
+    public boolean isExistsStation(final Long stationId) {
+        for (Section section : sections) {
+            if (section.getUpStation().getId().equals(stationId) ||
+                    section.getDownStation().getId().equals(stationId)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(getId(), getName(), color, upStationId, downStationId);
+    public boolean isLastOne() {
+        return sections.size() == 1;
     }
-
-    public static Line EMPTY = new Line();
 }
