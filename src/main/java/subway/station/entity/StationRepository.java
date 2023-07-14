@@ -1,7 +1,7 @@
-package subway.station.jpa;
+package subway.station.entity;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import subway.line.jpa.Line;
+import subway.line.entity.Line;
 
 import java.util.List;
 import java.util.Optional;

@@ -3,14 +3,14 @@ package subway.section.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.line.entity.Line;
+import subway.line.entity.LineRepository;
 import subway.line.service.LineService;
 import subway.section.dto.SectionDto;
-import subway.line.jpa.Line;
-import subway.line.jpa.LineRepository;
-import subway.section.jpa.Section;
-import subway.section.jpa.SectionRepository;
-import subway.station.jpa.Station;
-import subway.station.jpa.StationRepository;
+import subway.section.entity.Section;
+import subway.section.entity.SectionRepository;
+import subway.station.entity.Station;
+import subway.station.entity.StationRepository;
 
 @Service
 @Transactional(readOnly = true)

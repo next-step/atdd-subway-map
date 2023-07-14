@@ -3,6 +3,7 @@ package subway.line;
 import com.jayway.jsonpath.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import subway.AcceptanceTest;
@@ -20,17 +21,20 @@ import static subway.station.StationTestUtils.*;
 @DisplayName("지하철 노선 관련 기능")
 public class LineAcceptanceTest extends AcceptanceTest {
 
-    /**
-     * When 지하철 노선을 생성하면
-     * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
-     */
+    String 강남역_URL;
+    String 판교역_URL;
+    String 삼성역_URL;
+    @BeforeEach
+    void setUp() {
+        // given
+        강남역_URL = 지하철역_생성(강남역_정보);
+        판교역_URL = 지하철역_생성(판교역_정보);
+        삼성역_URL = 지하철역_생성(삼성역_정보);
+    }
+
     @DisplayName("지하철 노선을 생성한다")
     @Test
     void createLine() {
-        // given
-        String 강남역_URL = 지하철역_생성(강남역_정보);
-        String 판교역_URL = 지하철역_생성(판교역_정보);
-
         // when
         지하철_노선_생성(신분당선_생성_요청, 강남역_URL, 판교역_URL);
 
@@ -43,19 +47,10 @@ public class LineAcceptanceTest extends AcceptanceTest {
         지하철_노선_생성_여부_검증(노선_목록_조회_결과, 신분당선_생성_요청, 강남역_저장_정보, 판교역_저장_정보);
     }
 
-    /**
-     * Given 2개의 지하철 노선을 생성하고
-     * When 지하철 노선 목록을 조회하면
-     * Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다
-     */
     @DisplayName("지하철 노선 목록을 조회한다")
     @Test
     void getLines() {
         // given
-        String 강남역_URL = 지하철역_생성(강남역_정보);
-        String 판교역_URL = 지하철역_생성(판교역_정보);
-        String 삼성역_URL = 지하철역_생성(삼성역_정보);
-
         지하철_노선_생성(신분당선_생성_요청, 강남역_URL, 판교역_URL);
         지하철_노선_생성(이호선_생성_요청, 강남역_URL, 삼성역_URL);
 
@@ -71,18 +66,9 @@ public class LineAcceptanceTest extends AcceptanceTest {
         지하철_노선_생성_여부_검증(노선_목록_조회_결과, 이호선_생성_요청, 강남역_저장_정보, 삼성역_저장_정보);
     }
 
-    /**
-     * Given 지하철 노선을 생성하고
-     * When 생성한 지하철 노선을 조회하면
-     * Then 생성한 지하철의 노선 정보를 응답받을 수 있다
-     */
     @DisplayName("지하철 노선을 조회한다")
     @Test
     void getLine() {
-        String 강남역_URL = 지하철역_생성(강남역_정보);
-        String 판교역_URL = 지하철역_생성(판교역_정보);
-
-
         // Given
         String lineUrl = 지하철_노선_생성(신분당선_생성_요청, 강남역_URL, 판교역_URL);
 
@@ -93,18 +79,10 @@ public class LineAcceptanceTest extends AcceptanceTest {
         지하철_노선_조회_검증(노선_조회_결과, 신분당선_생성_요청);
     }
 
-    /**
-     * Given 지하철 노선을 생성하고
-     * When 생성한 지하철 노선을 수정하면
-     * Then 해당 지하철 노선 정보는 수정된다
-     */
     @DisplayName("지하철 노선을 수정한다")
     @Test
     void changeLine() {
         // given
-        String 강남역_URL = 지하철역_생성(강남역_정보);
-        String 판교역_URL = 지하철역_생성(판교역_정보);
-
         Map<String, String> 노선_수정_요청_정보 = Map.of(
                 "name", "다른분당선",
                 "color", "bg-red-700"
@@ -118,18 +96,10 @@ public class LineAcceptanceTest extends AcceptanceTest {
         지하철_노선_수정_검증(lineUrl, 노선_수정_요청_정보);
     }
 
-    /**
-     * Given 지하철 노선을 생성하고
-     * When 생성한 지하철 노선을 삭제하면
-     * Then 해당 지하철 노선 정보는 삭제된다
-     */
     @DisplayName("지하철 노선을 삭제한다")
     @Test
     void deleteLine() {
-
         // given
-        String 강남역_URL = 지하철역_생성(강남역_정보);
-        String 판교역_URL = 지하철역_생성(판교역_정보);
         String lineUrl = 지하철_노선_생성(신분당선_생성_요청, 강남역_URL, 판교역_URL);
 
         // when
@@ -158,11 +128,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
                         .map(m -> m.get("name"))
                         .collect(Collectors.toList())
         );
-    }
-
-    private static void 지하철_노선_목록_검증(ExtractableResponse<Response> 노선_목록_조회_결과) {
-        지하철_노선_생성_여부_검증(노선_목록_조회_결과, 신분당선_생성_요청, 강남역_정보, 판교역_정보);
-        지하철_노선_생성_여부_검증(노선_목록_조회_결과, 이호선_생성_요청, 강남역_정보, 삼성역_정보);
     }
 
     private void 지하철_노선_조회_검증(ExtractableResponse<Response> 노선_조회_결과, Map<String, String> 노선_생성_요청_정보) {

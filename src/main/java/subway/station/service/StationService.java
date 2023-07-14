@@ -3,11 +3,10 @@ package subway.station.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.station.dto.StationDto;
-import subway.station.jpa.Station;
-import subway.station.jpa.StationRepository;
+import subway.station.entity.Station;
+import subway.station.entity.StationRepository;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,10 +20,10 @@ public class StationService {
 
     @Transactional
     public StationDto saveStation(StationDto stationDto) {
-        Optional<Station> name = stationRepository.findByName(stationDto.getName());
-        if (name.isPresent()) {
+        if (stationRepository.findByName(stationDto.getName()).isPresent()) {
             throw new IllegalArgumentException(String.format("이미 존재하는 역 이름입니다. 역 이름:%s", stationDto.getName()));
         }
+
         Station station = stationRepository.save(new Station(stationDto.getName()));
         return StationDto.from(station);
     }

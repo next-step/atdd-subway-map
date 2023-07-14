@@ -1,7 +1,7 @@
 package subway.station.dto;
 
 import lombok.Getter;
-import subway.station.jpa.Station;
+import subway.station.entity.Station;
 
 @Getter
 public class StationDto {

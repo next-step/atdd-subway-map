@@ -1,9 +1,9 @@
-package subway.section.jpa;
+package subway.section.entity;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import subway.line.jpa.Line;
-import subway.station.jpa.Station;
+import subway.line.entity.Line;
+import subway.station.entity.Station;
 
 import javax.persistence.*;
 

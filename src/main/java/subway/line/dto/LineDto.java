@@ -1,7 +1,7 @@
 package subway.line.dto;
 
 import lombok.Getter;
-import subway.line.jpa.Line;
+import subway.line.entity.Line;
 import subway.station.dto.StationDto;
 
 import java.util.List;

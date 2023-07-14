@@ -2,9 +2,9 @@ package subway.section.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import subway.line.jpa.Line;
-import subway.section.jpa.Section;
-import subway.station.jpa.Station;
+import subway.line.entity.Line;
+import subway.section.entity.Section;
+import subway.station.entity.Station;
 
 @Getter
 @AllArgsConstructor
