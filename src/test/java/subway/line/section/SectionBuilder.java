@@ -25,13 +25,8 @@ public class SectionBuilder {
         return this;
     }
 
-    public SectionBuilder withUpStation(Station upStation) {
+    public SectionBuilder withStations(Station upStation, Station downStation) {
         this.upStation = upStation;
-
-        return this;
-    }
-
-    public SectionBuilder withDownStation(Station downStation) {
         this.downStation = downStation;
 
         return this;
