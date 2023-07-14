@@ -7,7 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 import subway.station.controller.dto.StationRequest;
 import subway.station.controller.dto.StationResponse;
 import subway.station.domain.Station;
-import subway.station.domain.StationList;
 import subway.station.infra.StationRepository;
 
 @Service
@@ -31,8 +30,8 @@ public class StationService {
                 .collect(Collectors.toList());
     }
 
-    public StationList findStationsByIdList(List<Long> ids) {
-        return new StationList(stationRepository.findAllById(ids));
+    public Station getStation(Long id) {
+        return stationRepository.findById(id).orElseThrow();
     }
 
     @Transactional
