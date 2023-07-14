@@ -12,6 +12,10 @@ repositories {
     mavenCentral()
 }
 
+ext {
+    set('mapstructVersion', "1.5.5.Final")
+}
+
 dependencies {
     // spring
     implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -27,6 +31,12 @@ dependencies {
     testImplementation 'io.rest-assured:rest-assured:4.5.1'
     testImplementation 'com.navercorp.fixturemonkey:fixture-monkey-starter:0.5.8'
     testImplementation 'com.google.guava:guava:16+'
+
+    // mapstruct
+    implementation 'org.mapstruct:mapstruct' + ":$mapstructVersion"
+    annotationProcessor 'org.mapstruct:mapstruct-processor' + ":$mapstructVersion"
+
+    // lombok
     testCompileOnly 'org.projectlombok:lombok'
     testAnnotationProcessor 'org.projectlombok:lombok'
 

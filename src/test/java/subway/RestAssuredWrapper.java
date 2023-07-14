@@ -25,6 +25,10 @@ public class RestAssuredWrapper {
         return request(path, body, null, HttpMethod.POST);
     }
 
+    public static ExtractableResponse<Response> put(String path, Object body) {
+        return request(path, body, null, HttpMethod.PUT);
+    }
+
     public static ExtractableResponse<Response> delete(String path) {
         return request(path, null, null, HttpMethod.DELETE);
     }
