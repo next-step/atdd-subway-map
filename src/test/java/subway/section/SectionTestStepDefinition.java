@@ -1,4 +1,4 @@
-package subway.line.section;
+package subway.section;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -8,6 +8,8 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import subway.section.SectionRequest;
+import subway.section.SectionResponse;
 
 public class SectionTestStepDefinition {
     public static SectionResponse 지하철_구간_생성_요청(Long lineId, Long upStationId, Long downStationId) {

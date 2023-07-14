@@ -1,4 +1,4 @@
-package subway.line.section;
+package subway.section;
 
 import static common.Constants.강남역;
 import static common.Constants.신논현역;

@@ -1,4 +1,4 @@
-package subway.line.section;
+package subway.section;
 
 import java.net.URI;
 import org.springframework.http.ResponseEntity;

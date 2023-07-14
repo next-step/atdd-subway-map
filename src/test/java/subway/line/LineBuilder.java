@@ -2,7 +2,7 @@ package subway.line;
 
 import static common.Constants.신분당선;
 
-import subway.line.section.Sections;
+import subway.section.Sections;
 
 public class LineBuilder {
 

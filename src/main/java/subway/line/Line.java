@@ -6,8 +6,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import subway.line.section.Section;
-import subway.line.section.Sections;
+import subway.section.Section;
+import subway.section.Sections;
 import subway.station.Station;
 
 @Entity

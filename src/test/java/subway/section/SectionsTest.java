@@ -1,4 +1,4 @@
-package subway.line.section;
+package subway.section;
 
 import static common.Constants.새로운지하철역;
 import static common.Constants.신논현역;
@@ -6,7 +6,6 @@ import static common.Constants.지하철역;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static subway.line.section.SectionBuilder.aSection;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +20,7 @@ public class SectionsTest {
     @DisplayName("마지막 순서의 구간을 만든다")
     @Test
     void createLastSection() {
-        Section section = aSection().build();
+        Section section = SectionBuilder.aSection().build();
         Sections sections = new Sections(new ArrayList<>(List.of(section)));
         sections.add(section.getLine(), new Station(2L, 신논현역), new Station(3L, 지하철역));
         Section newSection = sections.getLastSection();
@@ -37,7 +36,7 @@ public class SectionsTest {
     @Test
     void validateSection() {
         // given
-        Sections sections = new Sections(List.of(aSection().build()));
+        Sections sections = new Sections(List.of(SectionBuilder.aSection().build()));
 
         // when & then
         sections.validate(new Station(2L, 신논현역), new Station(3L, 지하철역));
@@ -47,7 +46,7 @@ public class SectionsTest {
     @Test
     void validateSection_fail_duplicatedDownStation() {
         // given
-        Sections sections = new Sections(List.of(aSection().build()));
+        Sections sections = new Sections(List.of(SectionBuilder.aSection().build()));
 
         // when & then
         assertThatThrownBy(() -> sections.validate(new Station(3L, 지하철역), new Station(2L, 신논현역)))
@@ -58,8 +57,8 @@ public class SectionsTest {
     @Test
     void validateSection_fail_upStationDoesNotMatchWithDownEndStation() {
         // given
-        Section firstSection = aSection().build();
-        Section midSection = aSection().withStations(new Station(2L, 신논현역), new Station(3L, 지하철역)).withSequence(2).build();
+        Section firstSection = SectionBuilder.aSection().build();
+        Section midSection = SectionBuilder.aSection().withStations(new Station(2L, 신논현역), new Station(3L, 지하철역)).withSequence(2).build();
         Sections sections = new Sections(List.of(firstSection, midSection));
 
         // when & then
@@ -71,8 +70,8 @@ public class SectionsTest {
     @Test
     void deleteSection() {
         // given
-        Section firstSection = aSection().build();
-        Section secondSection = aSection().withStations(new Station(2L, 신논현역), new Station(3L, 지하철역)).withSequence(2).build();
+        Section firstSection = SectionBuilder.aSection().build();
+        Section secondSection = SectionBuilder.aSection().withStations(new Station(2L, 신논현역), new Station(3L, 지하철역)).withSequence(2).build();
         Sections sections = new Sections(new ArrayList<>(List.of(firstSection, secondSection)));
 
         // when
@@ -86,8 +85,8 @@ public class SectionsTest {
     @Test
     void deleteSection_fail_notDownEndStation() {
         // given
-        Section firstSection = aSection().build();
-        Section secondSection = aSection().withStations(new Station(2L, 신논현역), new Station(3L, 지하철역)).withSequence(2).build();
+        Section firstSection = SectionBuilder.aSection().build();
+        Section secondSection = SectionBuilder.aSection().withStations(new Station(2L, 신논현역), new Station(3L, 지하철역)).withSequence(2).build();
         Sections sections = new Sections(new ArrayList<>(List.of(firstSection, secondSection)));
 
         // when
@@ -101,7 +100,7 @@ public class SectionsTest {
     @Test
     void deleteSection_fail_onlyOneSection() {
         // given
-        Section firstSection = aSection().build();
+        Section firstSection = SectionBuilder.aSection().build();
         Sections sections = new Sections(new ArrayList<>(List.of(firstSection)));
 
         // when & then

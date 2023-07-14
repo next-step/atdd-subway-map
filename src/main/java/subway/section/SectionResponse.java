@@ -1,4 +1,4 @@
-package subway.line.section;
+package subway.section;
 
 public class SectionResponse {
     private Long id;

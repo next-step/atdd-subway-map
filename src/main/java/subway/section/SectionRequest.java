@@ -1,4 +1,4 @@
-package subway.line.section;
+package subway.section;
 
 public class SectionRequest {
     private Long lineId;

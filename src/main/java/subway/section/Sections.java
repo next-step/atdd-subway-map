@@ -1,4 +1,4 @@
-package subway.line.section;
+package subway.section;
 
 import java.util.ArrayList;
 import java.util.Comparator;
