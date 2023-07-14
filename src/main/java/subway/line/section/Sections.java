@@ -25,10 +25,6 @@ public class Sections {
         this.sections = new ArrayList<>(sections);
     }
 
-    public Sections(Line line, Station upStationId, Station downStationId) {
-        this(List.of(new Section(line, upStationId, downStationId, 1)));
-    }
-
     public void add(Line line, Station upStation, Station downStation) {
         Section section = new Section(line, upStation, downStation, decideSequence());
         sections.add(section);
@@ -36,16 +32,18 @@ public class Sections {
 
     public void validate(Station upStation, Station downStation) {
         if (isAlreadyRegisteredDownStation(downStation)) {
-            throw new BusinessException("이미 등록된 역을 하행역으로 가지면 구간을 추가할 수 없습니다. 하행역ID: " + downStation.getId());
+            throw new BusinessException(
+                "이미 등록된 역을 하행역으로 가지면 구간을 추가할 수 없습니다. 하행역ID: " + downStation.getId());
         }
 
-        if (!DoesMatchUpStationWithDownEndStation(upStation)) {
-            throw new BusinessException("하행 종점이 아닌 역을 상행역으로 가지면 구간을 추가할 수 없습니다. 상행역ID: " + upStation.getId());
+        if (!getLastSection().getDownStation().equals(upStation)) {
+            throw new BusinessException(
+                "하행 종점이 아닌 역을 상행역으로 가지면 구간을 추가할 수 없습니다. 상행역ID: " + upStation.getId());
         }
     }
 
     public void delete(Station station) {
-        if (!getLastSection().getDownStation().getId().equals(station.getId())) {
+        if (!getLastSection().getDownStation().equals(station)) {
             throw new BusinessException("하행 종점이 아닌 역을 삭제할 수 없습니다. 역ID: " + station.getId());
         }
 
@@ -84,18 +82,12 @@ public class Sections {
         }
 
         return this.sections.stream()
-            .anyMatch(localSection -> localSection.getDownStation().getId()
-                .equals(downStation.getId()));
+            .anyMatch(localSection -> localSection.getDownStation().equals(downStation));
     }
 
     private boolean isAlreadyRegisteredInFirstUpStation(Station downStation) {
-        return this.sections.stream().findFirst().orElseThrow().getUpStation().getId()
-            .equals(downStation.getId());
-    }
-
-    private boolean DoesMatchUpStationWithDownEndStation(Station upStation) {
-        return getLastSection().getDownStation().getId()
-            .equals(upStation.getId());
+        return this.sections.stream().findFirst().orElseThrow()
+            .getUpStation().equals(downStation);
     }
 
     public Section getLastSection() {
