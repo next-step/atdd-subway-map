@@ -1,8 +1,7 @@
-package subway.section.entity;
+package subway.line.entity;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import subway.line.entity.Line;
 import subway.station.entity.Station;
 
 import javax.persistence.*;

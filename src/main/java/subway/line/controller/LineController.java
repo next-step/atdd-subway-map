@@ -1,5 +1,6 @@
 package subway.line.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -8,19 +9,17 @@ import subway.line.dto.ModifyLineRequest;
 import subway.line.service.LineService;
 import subway.line.dto.LineRequest;
 import subway.line.dto.LineResponse;
+import subway.line.dto.SectionRequest;
 
 import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
+@RequiredArgsConstructor
 public class LineController {
 
     private final LineService lineService;
-
-    public LineController(LineService lineService) {
-        this.lineService = lineService;
-    }
 
     @PostMapping("/lines")
     public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
@@ -53,6 +52,18 @@ public class LineController {
     @DeleteMapping("/lines/{id}")
     public ResponseEntity deleteLine(@PathVariable long id) {
         lineService.deleteLine(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @PostMapping("/lines/{id}/sections")
+    public ResponseEntity enrollSection(@PathVariable long id, @RequestBody SectionRequest sectionRequest) {
+        lineService.enroll(id, sectionRequest.toDto());
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @DeleteMapping("/lines/{lineId}/sections")
+    public ResponseEntity deleteSection(@PathVariable long lineId, @RequestParam(value = "stationId") long stationId) {
+        lineService.deleteSection(lineId, stationId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

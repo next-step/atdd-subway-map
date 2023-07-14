@@ -106,6 +106,11 @@ public class SectionAcceptanceTest extends AcceptanceTest {
                 .hasSize(2);
     }
 
+//    private void 노선_구간_개수_검증(String 노선_url, int 개수) {
+//        assertThat(지하철_노선_조회(노선_url).jsonPath().getList("stations", StationResponse.class))
+//                .hasSize(역_개수);
+//    }
+
     private void 노선의역_개수_검증(String 노선_url, int 역_개수) {
         assertThat(지하철_노선_조회(노선_url).jsonPath().getList("stations", StationResponse.class))
                 .hasSize(역_개수);

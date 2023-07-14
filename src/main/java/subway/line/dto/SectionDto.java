@@ -1,9 +1,9 @@
-package subway.section.dto;
+package subway.line.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import subway.line.entity.Line;
-import subway.section.entity.Section;
+import subway.line.entity.Section;
 import subway.station.entity.Station;
 
 @Getter
