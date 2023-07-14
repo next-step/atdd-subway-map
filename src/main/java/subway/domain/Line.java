@@ -1,9 +1,13 @@
 package subway.domain;
 
-import subway.ui.LineCreateRequest;
 import subway.ui.LineUpdateRequest;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Entity
 public class Line {
@@ -19,33 +23,18 @@ public class Line {
     private String color;
 
     @Column(nullable = false)
-    private Long upStationId;
-
-    @Column(nullable = false)
-    private Long downStationId;
-
-    @Column(nullable = false)
     private Long distance;
+
+    @Embedded
+    private Sections sections = new Sections();
 
     public Line() {
     }
 
-    public Line(String name, String color, Long upStationId, Long downStationId, Long distance) {
+    public Line(String name, String color, Long distance) {
         this.name = name;
         this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
         this.distance = distance;
-    }
-
-    public static Line create(LineCreateRequest request) {
-        return new Line(
-                request.getName(),
-                request.getColor(),
-                request.getUpStationId(),
-                request.getDownStationId(),
-                request.getDistance()
-        );
     }
 
     public Long getId() {
@@ -60,14 +49,6 @@ public class Line {
         return color;
     }
 
-    public Long getUpStationId() {
-        return upStationId;
-    }
-
-    public Long getDownStationId() {
-        return downStationId;
-    }
-
     public Long getDistance() {
         return distance;
     }
@@ -75,5 +56,19 @@ public class Line {
     public void update(LineUpdateRequest request) {
         this.name = request.getName();
         this.color = request.getColor();
+    }
+
+    public void addSection(Section section) {
+        sections.add(section);
+        this.distance = sections.getDistance();
+    }
+
+    public Set<Station> getStations() {
+        return sections.getStations();
+    }
+
+    public void deleteSection(Long stationId) {
+        sections.delete(stationId);
+        this.distance = sections.getDistance();
     }
 }

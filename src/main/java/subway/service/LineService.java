@@ -2,13 +2,14 @@ package subway.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import subway.domain.Line;
-import subway.domain.LineRepository;
+import subway.domain.*;
 import subway.ui.LineCreateRequest;
 import subway.ui.LineResponse;
 import subway.ui.LineUpdateRequest;
+import subway.ui.SectionRequest;
+import subway.ui.exception.LineNotFoundException;
+import subway.ui.exception.StationNotFoundException;
 
-import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,37 +18,62 @@ import java.util.stream.Collectors;
 public class LineService {
 
     private final LineRepository lineRepository;
-    private final LineMapper lineMapper;
+    private final StationRepository stationRepository;
 
-    public LineService(LineRepository lineRepository, LineMapper lineMapper) {
+    public LineService(LineRepository lineRepository, StationRepository stationRepository) {
         this.lineRepository = lineRepository;
-        this.lineMapper = lineMapper;
+        this.stationRepository = stationRepository;
     }
 
     @Transactional
     public LineResponse createLine(LineCreateRequest request) {
-        Line line = lineRepository.save(Line.create(request));
+        Station upStation = findStationById(request.getUpStationId());
+        Station downStation = findStationById(request.getDownStationId());
+        Line line = lineRepository.save(new Line(request.getName(), request.getColor(), request.getDistance()));
+        line.addSection(new Section(line.getId(), upStation, downStation, line.getDistance()));
         return new LineResponse(line.getId(), line.getName());
     }
 
     public List<LineResponse> showLines() {
         List<Line> lines = lineRepository.findAll();
-        return lines.stream().map(lineMapper::toLineResponse).collect(Collectors.toList());
+        return lines.stream().map(LineResponse::from).collect(Collectors.toList());
     }
 
     public LineResponse showLine(Long lineId) {
-        return lineRepository.findById(lineId).map(lineMapper::toLineResponse)
-                .orElseThrow(EntityNotFoundException::new);
+        return LineResponse.from(findLineById(lineId));
     }
 
     @Transactional
     public LineResponse updateLine(Long lineId, LineUpdateRequest request) {
-        Line line = lineRepository.findById(lineId).orElseThrow(EntityNotFoundException::new);
+        Line line = findLineById(lineId);
         line.update(request);
-        return lineMapper.toLineResponse(line);
+        return LineResponse.from(line);
     }
 
     public void deleteLine(Long lineId) {
         lineRepository.deleteById(lineId);
+    }
+
+    @Transactional
+    public void addSection(Long lineId, SectionRequest request) {
+        Line line = findLineById(lineId);
+        Station upStation = findStationById(request.getUpStationId());
+        Station downStation = findStationById(request.getDownStationId());
+        Section section = new Section(lineId, upStation, downStation, request.getDistance());
+        line.addSection(section);
+    }
+
+    @Transactional
+    public void deleteSection(Long lineId, Long stationId) {
+        Line line = findLineById(lineId);
+        line.deleteSection(stationId);
+    }
+
+    private Station findStationById(Long stationId) {
+        return stationRepository.findById(stationId).orElseThrow(StationNotFoundException::new);
+    }
+
+    private Line findLineById(Long lineId) {
+        return lineRepository.findById(lineId).orElseThrow(LineNotFoundException::new);
     }
 }

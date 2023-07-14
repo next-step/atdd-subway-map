@@ -1,25 +1,19 @@
 package subway.ui;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
+import subway.util.AbstractAcceptanceTest;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.ui.AcceptanceTestUtil.create;
-import static subway.ui.AcceptanceTestUtil.get;
+import static subway.ui.LineSteps.*;
 
 @DisplayName("지하철 노선 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-public class LineAcceptanceTest {
+public class LineAcceptanceTest extends AbstractAcceptanceTest {
 
     /**
      * When 지하철 노선을 생성하면
@@ -30,10 +24,10 @@ public class LineAcceptanceTest {
     void createLine() {
         //when
         final String 신분당선 = "신분당선";
-        지하철_노선_생성(신분당선);
+        지하철_노선_생성_요청(신분당선);
 
         //then
-        assertThat(get("/lines", "name", String.class)).containsExactly(신분당선);
+        assertThat(지하철_노선_목록_조회_요청()).containsExactly(신분당선);
     }
 
     /**
@@ -47,10 +41,10 @@ public class LineAcceptanceTest {
         //given
         final String 신분당선 = "신분당선";
         final String 분당선 = "분당선";
-        지하철_노선_여러개_생성(List.of(신분당선, 분당선));
+        지하철_노선_여러개_생성_요청(List.of(신분당선, 분당선));
 
         //when
-        List<String> subwayLines = get("/lines", "name", String.class);
+        List<String> subwayLines = 지하철_노선_목록_조회_요청();
 
         //then
         assertThat(subwayLines).containsOnly(분당선, 신분당선);
@@ -66,14 +60,13 @@ public class LineAcceptanceTest {
     void showLine() {
         //given
         final String 신분당선 = "신분당선";
-        ExtractableResponse<Response> 신분당선_생성_응답 = 지하철_노선_생성(신분당선);
+        LineResponse 신분당선_생성_응답 = 지하철_노선_생성_요청_Response_반환(신분당선);
 
         //when
-        ExtractableResponse<Response> 신분당선_조회_응답 = getSubwayLine(getIdFromResponse(신분당선_생성_응답));
-        LineResponse lineResponse = 신분당선_조회_응답.as(LineResponse.class);
+        LineResponse 신분당선_조회_응답 = 지하철_노선_조회_요청(신분당선_생성_응답.getId());
 
         //then
-        assertThat(lineResponse.getName()).isEqualTo(신분당선);
+        assertThat(신분당선_조회_응답.getName()).isEqualTo(신분당선);
     }
 
     /**
@@ -86,16 +79,15 @@ public class LineAcceptanceTest {
     void updateLine() {
         //given
         final String 신분당선 = "신분당선";
-        ExtractableResponse<Response> 신분당선_생성_응답 = 지하철_노선_생성(신분당선);
+        LineResponse 신분당선_생성_응답 = 지하철_노선_생성_요청_Response_반환(신분당선);
 
         //when
         final String 다른분당선 = "다른분당선";
         LineUpdateRequest request = new LineUpdateRequest(다른분당선, "bg-red-600");
-        ExtractableResponse<Response> 다른분당선_수정_응답 = updateSubwayLine(getIdFromResponse(신분당선_생성_응답), request);
-        LineResponse lineResponse = 다른분당선_수정_응답.as(LineResponse.class);
+        LineResponse 다른분당선_수정_응답 = 지하철_노선_수정_요청(신분당선_생성_응답.getId(), request);
 
         //then
-        assertThat(lineResponse.getName()).isEqualTo(다른분당선);
+        assertThat(다른분당선_수정_응답.getName()).isEqualTo(다른분당선);
     }
 
     /**
@@ -108,64 +100,147 @@ public class LineAcceptanceTest {
     void deleteLine() {
         //given
         final String 신분당선 = "신분당선";
-        ExtractableResponse<Response> 신분당선_생성_응답 = 지하철_노선_생성(신분당선);
+        LineResponse 신분당선_생성_응답 = 지하철_노선_생성_요청_Response_반환(신분당선);
 
         //when
-        ExtractableResponse<Response> 신분당선_삭제_응답 = deleteSubwayLine(getIdFromResponse(신분당선_생성_응답));
+        ExtractableResponse<Response> 신분당선_삭제_응답 = 지하철_노선_삭제_요청(신분당선_생성_응답.getId());
 
         //then
         assertThat(신분당선_삭제_응답.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
-    private ExtractableResponse<Response> deleteSubwayLine(Long lineId) {
-        return RestAssured
-                .given().log().all()
-                .pathParam("id", lineId)
-                .when().delete("/lines/{id}")
-                .then().log().all()
-                .extract();
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선에 구간 등록을 하면
+     * Then 지하철 노선 조회 시 새로운 구간의 하행역이 조회된다
+     */
+    @Test
+    @DisplayName("지하철 노선에 구간 등록")
+    void createSection() {
+        //given
+        StationResponse 신사역 = StationSteps.지하철역_생성_요청_Response_반환("신사역");
+        StationResponse 논현역 = StationSteps.지하철역_생성_요청_Response_반환("논현역");
+        LineResponse 신분당선 = 지하철_노선_생성_요청_Response_반환("신분당선", 신사역.getId(), 논현역.getId());
+
+        //when
+        final String 신논현역명 = "신논현역";
+        StationResponse 신논현역 = StationSteps.지하철역_생성_요청_Response_반환(신논현역명);
+        지하철_노선_구간_등록_요청(신분당선.getId(), new SectionRequest(논현역.getId(), 신논현역.getId(), 5L));
+
+        //then
+        List<String> stationNames = 지하철_노선_조회_요청_노선에_속한_역_반환(신분당선.getId());
+        assertThat(stationNames).contains(신논현역명);
     }
 
-    private ExtractableResponse<Response> updateSubwayLine(Long lineId, LineUpdateRequest request) {
-        return RestAssured
-                .given().log().all()
-                .body(request)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .pathParam("id", lineId)
-                .when().put("/lines/{id}")
-                .then().log().all()
-                .extract();
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 노선의 하행 종점역이 아닌 상행역을 가진 구간을 등록하면
+     * Then 예외를 발생한다.
+     */
+    @Test
+    @DisplayName("새로운 구간의 상행역이 해당 노선에 등록되어있는 하행 종점역이 아닌 경우")
+    void 새로운_구간의_상행역이_해당_노선에_등록되어있는_하행_종점역이_아닌_경우() {
+        //given
+        StationResponse 신사역 = StationSteps.지하철역_생성_요청_Response_반환("신사역");
+        StationResponse 논현역 = StationSteps.지하철역_생성_요청_Response_반환("논현역");
+        LineResponse 신분당선 = 지하철_노선_생성_요청_Response_반환("신분당선", 신사역.getId(), 논현역.getId());
+
+        //when
+        final String 신논현역명 = "신논현역";
+        StationResponse 신논현역 = StationSteps.지하철역_생성_요청_Response_반환(신논현역명);
+        ExtractableResponse<Response> 지하철_노선_구간_등록_응답 =
+                지하철_노선_구간_등록_요청(신분당선.getId(), new SectionRequest(신사역.getId(), 신논현역.getId(), 5L));
+
+        //then
+        assertThat(지하철_노선_구간_등록_응답.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
-    private ExtractableResponse<Response> getSubwayLine(Long lineId) {
-        return RestAssured
-                .given().log().all()
-                .pathParam("id", lineId)
-                .when().get("/lines/{id}")
-                .then().log().all()
-                .extract();
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 노선에 등록되어있는 역이 하행역인 구간을 등록하면
+     * Then 예외를 발생한다.
+     */
+    @Test
+    @DisplayName("새로운 구간의 하행역이 해당 노선에 등록되어있는 역인 경우")
+    void 새로운_구간의_하행역이_해당_노선에_등록되어있는_역인_경우() {
+        //given
+        StationResponse 신사역 = StationSteps.지하철역_생성_요청_Response_반환("신사역");
+        StationResponse 논현역 = StationSteps.지하철역_생성_요청_Response_반환("논현역");
+        LineResponse 신분당선 = 지하철_노선_생성_요청_Response_반환("신분당선", 신사역.getId(), 논현역.getId());
+
+        //when
+        ExtractableResponse<Response> 지하철_노선_구간_등록_응답 =
+                지하철_노선_구간_등록_요청(신분당선.getId(), new SectionRequest(논현역.getId(), 신사역.getId(), 5L));
+
+        //then
+        assertThat(지하철_노선_구간_등록_응답.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
-    private ExtractableResponse<Response> 지하철_노선_생성(final String name) {
-        final String 상행종점역 = "상행좀점역";
-        final String 하행종점역 = "하행종점역";
+    /**
+     * Given 3개의 역을 가지는 지하철 노선을 생성하고
+     * When 지하철 노선에 등록된 하행 종점역을 제거하면
+     * Then 지하철 노선 조회 시 제거한 종점역은 존재하지 않는다.
+     */
+    @Test
+    @DisplayName("지하철 노선에 구간 제거")
+    void deleteSection() {
+        //given
+        StationResponse 신사역 = StationSteps.지하철역_생성_요청_Response_반환("신사역");
+        StationResponse 논현역 = StationSteps.지하철역_생성_요청_Response_반환("논현역");
+        LineResponse 신분당선 = 지하철_노선_생성_요청_Response_반환("신분당선", 신사역.getId(), 논현역.getId());
 
-        LineCreateRequest request = new LineCreateRequest(
-                name,
-                "bg-red-600",
-                getIdFromResponse(create("/stations", new StationRequest(상행종점역))),
-                getIdFromResponse(create("/stations", new StationRequest(하행종점역))),
-                10L
-        );
-        return create("/lines", request);
+        final String 신논현역명 = "신논현역";
+        StationResponse 신논현역 = StationSteps.지하철역_생성_요청_Response_반환(신논현역명);
+        지하철_노선_구간_등록_요청(신분당선.getId(), new SectionRequest(논현역.getId(), 신논현역.getId(), 5L));
+
+        //when
+        지하철_노선_구간_삭제_요청(신분당선.getId(), 신논현역.getId());
+
+        //then
+        assertThat(지하철_노선_조회_요청_노선에_속한_역_반환(신분당선.getId())).doesNotContain(신논현역명);
     }
 
-    private void 지하철_노선_여러개_생성(final List<String> names) {
-        names.forEach(name -> 지하철_노선_생성(name));
+    /**
+     * Given 3개의 역을 가지는 지하철 노선을 생성하고
+     * When 지하철 노선의 하행 종점역이 아닌 역을 제거하면
+     * Then 예외를 발생한다.
+     */
+    @Test
+    @DisplayName("지하철 노선의 하행 종점역이 아닌 역을 제거하는 경우")
+    void 지하철_노선의_하행_종점역이_아닌_역을_제거하는_경우() {
+        //given
+        StationResponse 신사역 = StationSteps.지하철역_생성_요청_Response_반환("신사역");
+        StationResponse 논현역 = StationSteps.지하철역_생성_요청_Response_반환("논현역");
+        LineResponse 신분당선 = 지하철_노선_생성_요청_Response_반환("신분당선", 신사역.getId(), 논현역.getId());
+
+        final String 신논현역명 = "신논현역";
+        StationResponse 신논현역 = StationSteps.지하철역_생성_요청_Response_반환(신논현역명);
+        지하철_노선_구간_등록_요청(신분당선.getId(), new SectionRequest(논현역.getId(), 신논현역.getId(), 5L));
+
+        //when
+        ExtractableResponse<Response> 지하철_노선_구간_삭제_응답 = 지하철_노선_구간_삭제_요청(신분당선.getId(), 논현역.getId());
+
+        //then
+        assertThat(지하철_노선_구간_삭제_응답.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
-    private Long getIdFromResponse(ExtractableResponse<Response> response) {
-        return response.jsonPath().getObject("id", Long.class);
-    }
+    /**
+     * Given 상행 종점역과 하행 종점역만 등록된 노선을 생성하고
+     * When 지하철 노선의 하행 종점역을 제거하면
+     * Then 예외를 발생한다.
+     */
+    @Test
+    @DisplayName("상행 종점역과 하행 종점역만 등록된 지하철 노선의 하행 종점역을 제거하는 경우")
+    void 상행_종점역과_하행_종점역만_등록된_지하철_노선의_하행_종점역을_제거하는_경우() {
+        //given
+        StationResponse 신사역 = StationSteps.지하철역_생성_요청_Response_반환("신사역");
+        StationResponse 논현역 = StationSteps.지하철역_생성_요청_Response_반환("논현역");
+        LineResponse 신분당선 = 지하철_노선_생성_요청_Response_반환("신분당선", 신사역.getId(), 논현역.getId());
 
+        //when
+        ExtractableResponse<Response> 지하철_노선_구간_삭제_응답 = 지하철_노선_구간_삭제_요청(신분당선.getId(), 논현역.getId());
+
+        //then
+        assertThat(지하철_노선_구간_삭제_응답.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
 }

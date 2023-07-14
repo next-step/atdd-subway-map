@@ -24,4 +24,8 @@ public class Station {
     public String getName() {
         return name;
     }
+
+    public boolean matchId(Long stationId) {
+        return id.equals(stationId);
+    }
 }
