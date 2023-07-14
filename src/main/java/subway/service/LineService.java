@@ -3,34 +3,32 @@ package subway.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.domain.Line;
+import subway.domain.Section;
 import subway.domain.Station;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
+import subway.dto.SectionRequest;
 import subway.repository.LineRepository;
-import subway.repository.StationRepository;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
 public class LineService {
     private LineRepository lineRepository;
-    private StationRepository stationRepository;
+    private StationService stationService;
 
-    public LineService(LineRepository lineRepository,StationRepository stationRepository) {
+    public LineService(StationService stationService,LineRepository lineRepository) {
         this.lineRepository = lineRepository;
-        this.stationRepository = stationRepository;
+        this.stationService = stationService;
     }
 
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
-        Station upStation = stationRepository.findById(lineRequest.getUpStationId())
-                .orElseThrow(() -> new EntityNotFoundException("upStation not found"));
-        Station downStation = stationRepository.findById(lineRequest.getDownStationId())
-                .orElseThrow(() -> new EntityNotFoundException("downStation not found"));
-        Line line = lineRepository.save(lineRequest.toEntity(upStation,downStation));
+        Line line = lineRepository.save(lineRequest.toEntity());
         return LineResponse.fromEntity(line);
     }
 
@@ -42,27 +40,60 @@ public class LineService {
     }
 
     @Transactional(readOnly = true)
-    public LineResponse getLine(Long lineId) {
+    public LineResponse getLineResponse(Long lineId) {
         return lineRepository.findById(lineId)
                 .map(LineResponse::fromEntity)
                 .orElseThrow(() -> new EntityNotFoundException("line not found"));
     }
 
+    public Line findLine(Long lineId){
+        Line line = lineRepository.findById(lineId)
+                .orElseThrow(() -> new EntityNotFoundException("line not found"));
+        return line;
+    }
+
     @Transactional
     public void updateLine(Long lineId, LineRequest lineRequest) {
-        final Line line = lineRepository.findById(lineId)
-                .orElseThrow(() -> new EntityNotFoundException("line not found"));
-
+        final Line line = this.findLine(lineId);
         line.update(lineRequest.getName(), lineRequest.getColor());
     }
 
     @Transactional
     public void deleteLine(Long lineId) {
-        Line line = lineRepository.findById(lineId)
-                .orElseThrow(() -> new EntityNotFoundException("line not found"));
+        Line line = this.findLine(lineId);
 
         lineRepository.delete(line);
     }
+
+    @Transactional
+    public void saveSection(Long lineId,SectionRequest sectionRequest) {
+        Station upStation = stationService.findStation(sectionRequest.getUpStationId());
+        Station downStation = stationService.findStation(sectionRequest.getDownStationId());
+        Line line = this.findLine(lineId);
+        line.validateCreateSectionRequest(upStation.getId(), downStation.getId());
+
+        Section section = Section.builder()
+                .line(line)
+                .upStation(upStation)
+                .downStation(downStation)
+                .distance(sectionRequest.getDistance())
+                .build();
+
+        line.getSections().add(section);
+    }
+
+
+
+    @Transactional
+    public void deleteSection(Long lineId, Long stationId) {
+        Line line = this.findLine(lineId);
+        Station station = stationService.findStation(stationId);
+
+        line.validateDeleteSectionRequest(station);
+
+        line.getSections().remove(line.getSections().size() - 1);
+    }
+
 
 
 

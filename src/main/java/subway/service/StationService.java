@@ -7,6 +7,7 @@ import subway.repository.StationRepository;
 import subway.dto.StationRequest;
 import subway.dto.StationResponse;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,6 +30,11 @@ public class StationService {
         return stationRepository.findAll().stream()
                 .map(this::createStationResponse)
                 .collect(Collectors.toList());
+    }
+
+    public Station findStation(Long stationId){
+       return stationRepository.findById(stationId)
+                .orElseThrow(() -> new EntityNotFoundException("upStation not found"));
     }
 
     @Transactional

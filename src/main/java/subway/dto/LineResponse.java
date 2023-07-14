@@ -2,10 +2,12 @@ package subway.dto;
 
 import lombok.Getter;
 import subway.domain.Line;
+import subway.domain.Section;
 import subway.domain.Station;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 public class LineResponse {
@@ -16,15 +18,11 @@ public class LineResponse {
     List<Station> stations;
 
     public static LineResponse fromEntity(Line line) {
-        List<Station> stations = new ArrayList<>();
-        stations.add(line.getUpStation());
-        stations.add(line.getDownStation());
-
         LineResponse lineResponse = new LineResponse();
         lineResponse.id = line.getId();
         lineResponse.name = line.getName();
         lineResponse.color = line.getColor();
-        lineResponse.stations = stations;
+        lineResponse.stations = line.getStationList();
 
         return lineResponse;
     }

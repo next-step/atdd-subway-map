@@ -1,6 +1,7 @@
 package subway.CommonStep;
 
 import io.restassured.RestAssured;
+import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.MediaType;
@@ -27,14 +28,13 @@ public class StationStep {
         return response;
     }
 
-    public static List<String> 지하철역_목록_전체조회() {
+    public static JsonPath 지하철역_목록_전체조회() {
 
-        List<String> stationNames =
+        JsonPath result =
                 RestAssured.given()
                         .when().get("/stations")
                         .then()
-                        .extract().jsonPath().getList("name", String.class);
-
-        return stationNames;
+                        .extract().jsonPath();
+        return result;
     }
 }
