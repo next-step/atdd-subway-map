@@ -3,7 +3,6 @@ package subway.line;
 import static common.Constants.신분당선;
 
 import subway.line.section.Sections;
-import subway.station.Station;
 
 public class LineBuilder {
 
@@ -49,32 +48,8 @@ public class LineBuilder {
         return this;
     }
 
-    /**
-     * withSections를 사용했을 때 사용한다
-     *
-     * @return Line
-     *
-     * @author JerryK026
-     * @date 2023-07-13
-     */
     public Line build() {
         return new Line(id, name, color, sections, distance);
     }
 
-    /**
-     * withSections를 사용하지 않았을 때 사용한다
-     *
-     * @param upStation
-     * @param downStation
-     * @return Line
-     *
-     * @author JerryK026
-     * @date 2023-07-13
-     */
-    public Line build(Station upStation, Station downStation) {
-        Line line = new Line(id, name, color, sections, distance);
-        line.initStations(upStation, downStation);
-
-        return line;
-    }
 }

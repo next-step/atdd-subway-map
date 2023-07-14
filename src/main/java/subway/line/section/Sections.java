@@ -22,7 +22,7 @@ public class Sections {
     }
 
     public Sections(List<Section> sections) {
-        this.sections = sections;
+        this.sections = new ArrayList<>(sections);
     }
 
     public Sections(Line line, Station upStationId, Station downStationId) {
@@ -30,8 +30,7 @@ public class Sections {
     }
 
     public void add(Line line, Station upStation, Station downStation) {
-        int sequence = getLastSection().getSequence() + 1;
-        Section section = new Section(line, upStation, downStation, sequence);
+        Section section = new Section(line, upStation, downStation, decideSequence());
         sections.add(section);
     }
 
@@ -63,6 +62,14 @@ public class Sections {
 
     public List<Section> getSections() {
         return this.sections;
+    }
+
+    private int decideSequence() {
+        if (this.sections.size() == 0) {
+            return 1;
+        }
+
+        return getLastSection().getSequence() + 1;
     }
 
     private List<Station> toStations() {
