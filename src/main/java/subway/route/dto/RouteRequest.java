@@ -6,9 +6,13 @@ public class RouteRequest {
 
     private Long id;
     private String name;
+    private String color;
+    private Long upStationId;
+    private Long downStationId;
+    private Integer distance;
 
     public Route toEntity() {
-        return new Route(id, name);
+        return Route.of(id, name, color, distance);
     }
 
     public void saveId(Long id) {
@@ -23,4 +27,19 @@ public class RouteRequest {
         return name;
     }
 
+    public String getColor() {
+        return color;
+    }
+
+    public Long getUpStationId() {
+        return upStationId;
+    }
+
+    public Long getDownStationId() {
+        return downStationId;
+    }
+
+    public Integer getDistance() {
+        return distance;
+    }
 }
