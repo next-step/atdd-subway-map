@@ -9,10 +9,11 @@ import org.springframework.test.context.jdbc.Sql;
 
 import java.util.List;
 
-import static common.fixture.StationFixture.*;
+import static common.fixture.subway.StationFixture.*;
+import static common.utils.CustomAssertions.상태코드_확인;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DisplayName("지하철역 관련 기능")
+@DisplayName("지하철역 관련 인수테스트")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @Sql(scripts = {"classpath:SQLScripts/00.clear-database.sql"})
 public class StationAcceptanceTest {
@@ -29,10 +30,10 @@ public class StationAcceptanceTest {
         Response response = 역_생성_요청(GN_STATION);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        상태코드_확인(response, HttpStatus.CREATED);
 
         // then
-        List<String> stationNames = 역_검색_요청().jsonPath().getList("name", String.class);
+        List<String> stationNames = 역_이름_목록_반환(역_목록_조회_요청());
         assertThat(stationNames).containsAnyOf(GN_STATION);
     }
 
@@ -49,7 +50,7 @@ public class StationAcceptanceTest {
         역_생성_요청(YS_STATION);
 
         // when
-        List<String> stationNames = 역_검색_요청().jsonPath().getList("name", String.class);
+        List<String> stationNames = 역_이름_목록_반환(역_목록_조회_요청());
 
         // then
         assertThat(stationNames).containsAnyOf(GN_STATION, YS_STATION);
@@ -65,16 +66,16 @@ public class StationAcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        Long createdId = 역_생성_요청(GN_STATION).jsonPath().getLong("id");
+        Long createdId = 역_생성_ID_반환(역_생성_요청(GN_STATION));
 
         // when
         Response response = 역_삭제_요청(createdId);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        상태코드_확인(response, HttpStatus.NO_CONTENT);
 
         // then
-        List<String> stationNames = 역_검색_요청().jsonPath().getList("name", String.class);
+        List<String> stationNames = 역_이름_목록_반환(역_목록_조회_요청());
         assertThat(stationNames).isEmpty();
     }
 
