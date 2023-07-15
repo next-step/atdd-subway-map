@@ -1,5 +1,8 @@
 package subway.model;
 
+import subway.exception.AddSectionException;
+import subway.exception.ErrorMessage;
+
 import javax.persistence.*;
 
 @Entity
@@ -8,7 +11,9 @@ public class Section {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long lineId;
+    @ManyToOne
+    @JoinColumn(name = "line_id")
+    private Line line;
 
     @ManyToOne
     @JoinColumn(name = "up_station_id")
@@ -24,8 +29,8 @@ public class Section {
 
     }
 
-    public Section(Long lineId, Station upStation, Station downStation, Long distance) {
-        this.lineId = lineId;
+    public Section(Line line, Station upStation, Station downStation, Long distance) {
+        this.line = line;
         this.upStation = upStation;
         this.downStation = downStation;
         this.distance = distance;
@@ -47,8 +52,17 @@ public class Section {
         return distance;
     }
 
+    public void validate(Line line) {
+        if (!line.equalToDownStation(upStation)) {
+            throw new AddSectionException(ErrorMessage.WRONG_UPSTATION_ID);
+        }
+        if (line.includes(downStation)) {
+            throw new AddSectionException(ErrorMessage.WRONG_DOWNSTATION_ID);
+        }
+    }
+
     public static class Builder {
-        private Long lineId;
+        private Line line;
         private Station upStation;
         private Station downStation;
         private Long distance;
@@ -56,8 +70,8 @@ public class Section {
         public Builder() {
         }
 
-        public Builder lineId(Long lineId) {
-            this.lineId = lineId;
+        public Builder line(Line line) {
+            this.line = line;
             return this;
         }
 
@@ -77,7 +91,7 @@ public class Section {
         }
 
         public Section build() {
-            return new Section(lineId, upStation, downStation, distance);
+            return new Section(line, upStation, downStation, distance);
         }
     }
 }

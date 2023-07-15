@@ -15,11 +15,11 @@ public class LineResponse {
 
     private Long distance;
 
-    public LineResponse(Long id, String name, String color, Station upStation, Station downStation, Long distance) {
+    public LineResponse(Long id, String name, String color, List<Station> stations, Long distance) {
         this.id = id;
         this.name = name;
         this.color = color;
-        this.stations = List.of(upStation, downStation);
+        this.stations = stations;
         this.distance = distance;
     }
 

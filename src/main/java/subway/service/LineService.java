@@ -21,7 +21,7 @@ public class LineService {
     private final StationService stationService;
     private final SectionRepository sectionRepository;
 
-    public LineService(LineRepository lineRepository, StationService stationService, StationService sectionService, SectionRepository sectionRepository) {
+    public LineService(LineRepository lineRepository, StationService stationService, SectionRepository sectionRepository) {
         this.lineRepository = lineRepository;
         this.stationService = stationService;
         this.sectionRepository = sectionRepository;
@@ -41,7 +41,7 @@ public class LineService {
         Line line = lineRepository.save(newLine);
 
         Section section = new Section.Builder()
-                .lineId(line.getId())
+                .line(line)
                 .upStation(upStation)
                 .downStation(downStation)
                 .distance(lineRequest.getDistance())
@@ -74,13 +74,6 @@ public class LineService {
 
     @Transactional
     public void save(Line line) {
-        lineRepository.save(line);
-    }
-
-    @Transactional
-    public void addSectionAndSave(Long lineId, Section section) {
-        Line line = findLineById(lineId);
-        line.addSection(section);
         lineRepository.save(line);
     }
 }

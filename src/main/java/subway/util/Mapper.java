@@ -16,7 +16,7 @@ public class Mapper {
     }
 
     public static LineResponse toResponse(Line line) {
-        return new LineResponse(line.getId(), line.getName(), line.getColor(), line.getUpStation(), line.getDownStation(), line.getDistance());
+        return new LineResponse(line.getId(), line.getName(), line.getColor(), line.getStations(), line.getDistance());
     }
 
     public static SectionResponse toResponse(Section section) {

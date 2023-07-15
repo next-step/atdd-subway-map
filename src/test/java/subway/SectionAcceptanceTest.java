@@ -7,6 +7,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 import subway.dto.LineRequest;
 import subway.model.Station;
 
@@ -17,7 +19,9 @@ import static helper.LineTestHelper.지하철노선을_생성한다;
 import static helper.LineTestHelper.지하철노선을_조회한다;
 import static helper.StationTestHelper.지하철역을_생성한다;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD;
 
+@DirtiesContext(classMode = BEFORE_EACH_TEST_METHOD)
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class SectionAcceptanceTest {
@@ -85,7 +89,7 @@ class SectionAcceptanceTest {
                 "downStationId", 3,
                 "distance", 10
         );
-        String sectionId = RequestApiHelper.post("/lines/" + lineId + "/sections", params)
+        String sectionId = 지하철구간을_생성한다(lineId, params)
                 .jsonPath()
                 .get("id")
                 .toString();
@@ -93,11 +97,43 @@ class SectionAcceptanceTest {
         // when
         List<Long> sections = 지하철구간목록을_조회한다(lineId);
         ExtractableResponse<Response> line = 지하철노선을_조회한다(lineId);
+        List<Station> stations = line.jsonPath().getList("stations", Station.class);
+        Long downStationId = stations.get(stations.size() - 1).getId();
 
         // then
         assertThat(sections).contains(Long.valueOf(sectionId));
-        Long downStationId = line.jsonPath().getList("stations", Station.class).get(1).getId();
         assertThat(downStationId).isEqualTo(3);
         assertThat(line.jsonPath().getObject("distance", Long.class)).isEqualTo(20);
+    }
+
+    private static ExtractableResponse<Response> 지하철구간을_생성한다(String lineId, Map<String, Object> params) {
+        return RequestApiHelper.post("/lines/" + lineId + "/sections", params);
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 상행역이 해당 노선의 하행 종점역이 아닌 구간을 등록하면
+     * Then 구간이 생성되지 않는다.
+     */
+    @DisplayName("상행역을 잘못 지정한 구간 등록")
+    @Test
+    void addSectionWithWrongUpStation() {
+        // given
+        String lineId = 지하철노선을_생성한다(LINE_1)
+                .jsonPath()
+                .get("id")
+                .toString();
+
+        Map<String, Object> params = Map.of(
+                "upStationId", 1,
+                "downStationId", 3,
+                "distance", 10
+        );
+
+        // when
+        ExtractableResponse<Response> response = 지하철구간을_생성한다(lineId, params);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 }

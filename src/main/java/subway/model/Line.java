@@ -1,6 +1,8 @@
 package subway.model;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Line {
@@ -14,13 +16,16 @@ public class Line {
     @Column(length = 20, nullable = false)
     private String color;
 
-    @ManyToOne
-    @JoinColumn(name = "up_station_id")
-    private Station upStation;
+    @ManyToMany
+    @JoinTable(
+            name = "line_station",
+            joinColumns = @JoinColumn(name = "line_id"),
+            inverseJoinColumns = @JoinColumn(name = "station_id")
+    )
+    private List<Station> stations = new ArrayList<>();
 
-    @ManyToOne
-    @JoinColumn(name = "down_station_id")
-    private Station downStation;
+    @OneToMany(mappedBy = "id", fetch = FetchType.LAZY)
+    private List<Section> sections = new ArrayList<>();
 
     @Column(nullable = false)
     private Long distance;
@@ -31,8 +36,8 @@ public class Line {
     public Line(String name, String color, Station upStation, Station downStation, Long distance) {
         this.name = name;
         this.color = color;
-        this.upStation = upStation;
-        this.downStation = downStation;
+        stations.add(upStation);
+        stations.add(downStation);
         this.distance = distance;
     }
 
@@ -48,12 +53,8 @@ public class Line {
         return color;
     }
 
-    public Station getUpStation() {
-        return upStation;
-    }
-
-    public Station getDownStation() {
-        return downStation;
+    public List<Station> getStations() {
+        return stations;
     }
 
     public Long getDistance() {
@@ -65,9 +66,17 @@ public class Line {
         this.color = color;
     }
 
-    public void addSection(Section section) {
-        this.downStation = section.getDownStation();
-        this.distance += section.getDistance();
+    public boolean equalToDownStation(Station upStation) {
+        return stations.get(stations.size() - 1).equals(upStation);
+    }
+
+    public void update(Station downStation, Long distance) {
+        this.stations.add(downStation);
+        this.distance += distance;
+    }
+
+    public boolean includes(Station downStation) {
+        return stations.contains(downStation);
     }
 
     public static class Builder {
