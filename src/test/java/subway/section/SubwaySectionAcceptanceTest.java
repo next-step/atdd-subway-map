@@ -1,6 +1,5 @@
 package subway.section;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
@@ -8,7 +7,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import subway.helper.SubwayLineHelper;
 
@@ -16,12 +14,19 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD;
+import static subway.helper.SubwaySectionHelper.지하철_구간_생성_요청;
 import static subway.helper.SubwayStationHelper.지하철_역_생성_요청;
 
 @DisplayName("지하철 구간 관련 기능")
 @DirtiesContext(classMode = BEFORE_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class SubwaySectionAcceptanceTest {
+
+    private final Map<String, Object> 구간_A역_C역 = Map.of(
+            "upStationId" , 1L,
+            "downStationId", 4L,
+            "distance", 7
+    );
 
     @DisplayName("4개의 지하철 역을 생성합니다.")
     @BeforeEach
@@ -38,17 +43,10 @@ public class SubwaySectionAcceptanceTest {
     @Test
     void createSubwaySection() {
         // when
-        ExtractableResponse<Response> 지하철_구간_생성_결과 = RestAssured
-                .given().log().all()
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                    .body("temp")
-                .when().log().all()
-                    .post("/subway-sections")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> 지하철_구간_생성_결과 = 지하철_구간_생성_요청(구간_A역_C역);
 
         // then
-        assertThat(지하철_구간_생성_결과.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        지하철_구간_생성됨(지하철_구간_생성_결과);
     }
 
     /**
@@ -92,5 +90,9 @@ public class SubwaySectionAcceptanceTest {
                 , "distance", 7);
 
         SubwayLineHelper.지하철_노선_생성_요청(지하철_노선);
+    }
+
+    private void 지하철_구간_생성됨(ExtractableResponse<Response> createSectionApiResponse) {
+        assertThat(createSectionApiResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
 }
