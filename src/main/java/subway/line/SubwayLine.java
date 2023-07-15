@@ -19,6 +19,7 @@ public class SubwayLine {
     private String color;
 
     @OneToMany
+    @JoinColumn(name = "subway_line_id")
     private List<Station> stations;
 
     public SubwayLine() {}
