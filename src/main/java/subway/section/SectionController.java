@@ -19,4 +19,9 @@ public class SectionController {
         Long sectionId = sectionService.saveSection(id, request);
         return ResponseEntity.created(URI.create("/lines/" + id + "/sections/" + sectionId)).build();
     }
+
+    @GetMapping(value = "/sections/{id}")
+    public ResponseEntity<SectionResponse> showSection(@PathVariable Long id) {
+        return ResponseEntity.ok().body(sectionService.findSection(id));
+    }
 }

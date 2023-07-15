@@ -34,7 +34,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     /**
      * Given 지하철 노선과 노선에 속하지 않은 새로운 지하철역을 생성하고
      * When 지하철 노선의 하행역과 새로운 지하철역을 구간으로 등록하면
-     * Then 새로운 지하철 구간이 생성되고, 지하철 노선의 하행역이 새로운 지하철역으로 바뀌고, 지하철 노선의 거리가 바뀐다
+     * Then 생성한 구간의 정보를 응답 받을 수 있고, 지하철 노선의 하행역이 새로운 지하철역으로 바뀌고, 지하철 노선의 거리가 바뀐다
      */
     @Test
     void 지하철_구간_생성() throws JsonProcessingException {
@@ -42,20 +42,30 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         LineRequest request = 지하철역_생성_및_지하철_노선_요청_객체_생성(SINBUNDANG_LINE_NAME, SINBUNDANG_LINE_COLOR, SINBUNDANG_UP_STATION_NAME, SINBUNDANG_DOWN_STATION_NAME, SINBUNDANG_LINE_DISTANCE);
         ExtractableResponse<Response> createLineResponse = 지하철_노선_생성_요청(request);
         LineResponse lineResponse = ObjectMapperHolder.instance.readValue(createLineResponse.response().body().asString(), LineResponse.class);
+        Long downStationId = lineResponse.getStations().get(1).getId();
         Long newDownStationId = 지하철역_생성_요청_및_아이디_추출(SINBUNDANG_NEW_DOWN_STATION_NAME);
 
         // when
-        ExtractableResponse<Response> createSectionResponse = 지하철_구간_생성_요청(lineResponse.getId(), new SectionRequest(newDownStationId, SINBUNDANG_NEW_DISTANCE));
+        ExtractableResponse<Response> createSectionResponse = 지하철_구간_생성_요청(lineResponse.getId(), new SectionRequest(downStationId, newDownStationId, SINBUNDANG_NEW_DISTANCE));
 
         // then
         assertThat(createSectionResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
-        ExtractableResponse<Response> showResponse = 지하철_노선_요청(lineResponse.getId());
-        LineResponse showLineResponse = ObjectMapperHolder.instance.readValue(showResponse.response().body().asString(), LineResponse.class);
+        String sectionId = createSectionResponse.response().getHeaders().get("location").getValue().split("/sections/")[1];
+        ExtractableResponse<Response> showSectionResponse = 지하철_구간_요청(sectionId);
+        SectionResponse sectionResponse = ObjectMapperHolder.instance.readValue(showSectionResponse.response().body().asString(), SectionResponse.class);
+
+        assertThat(sectionResponse.getId()).isEqualTo(2L);
+        assertThat(sectionResponse.getUpStation().getId()).isEqualTo(downStationId);
+        assertThat(sectionResponse.getDownStation().getId()).isEqualTo(newDownStationId);
+
+        // then
+        ExtractableResponse<Response> showLineResponse = 지하철_노선_요청(lineResponse.getId());
+        LineResponse changedLineResponse = ObjectMapperHolder.instance.readValue(showLineResponse.response().body().asString(), LineResponse.class);
 
         Long sumOfDistance = SINBUNDANG_LINE_DISTANCE + SINBUNDANG_NEW_DISTANCE;
         List<StationResponse> stationsOfResponse = List.of(new StationResponse(1L, SINBUNDANG_UP_STATION_NAME), new StationResponse(3L, SINBUNDANG_NEW_DOWN_STATION_NAME));
-        assertThat(showLineResponse).isEqualTo(new LineResponse(lineResponse.getId(), SINBUNDANG_LINE_NAME, SINBUNDANG_LINE_COLOR, stationsOfResponse, sumOfDistance));
+        assertThat(changedLineResponse).isEqualTo(new LineResponse(changedLineResponse.getId(), SINBUNDANG_LINE_NAME, SINBUNDANG_LINE_COLOR, stationsOfResponse, sumOfDistance));
     }
 
     /**
@@ -85,6 +95,15 @@ public class SectionAcceptanceTest extends AcceptanceTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post("/lines/" + lineId + "/sections")
+                .then().log().all()
+                .extract();
+    }
+
+    public static ExtractableResponse<Response> 지하철_구간_요청(String sectionId) {
+        return RestAssured
+                .given().log().all()
+                .when()
+                .get("/sections/" + sectionId)
                 .then().log().all()
                 .extract();
     }
