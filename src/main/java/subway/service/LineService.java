@@ -71,4 +71,16 @@ public class LineService {
     public void delete(Long id) {
         lineRepository.deleteById(id);
     }
+
+    @Transactional
+    public void save(Line line) {
+        lineRepository.save(line);
+    }
+
+    @Transactional
+    public void addSectionAndSave(Long lineId, Section section) {
+        Line line = findLineById(lineId);
+        line.addSection(section);
+        lineRepository.save(line);
+    }
 }

@@ -1,8 +1,7 @@
 package subway.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import subway.dto.SectionRequest;
 import subway.dto.SectionResponse;
 import subway.service.SectionService;
 import subway.util.Mapper;
@@ -16,6 +15,11 @@ public class SectionController {
 
     public SectionController(SectionService sectionService) {
         this.sectionService = sectionService;
+    }
+
+    @PostMapping(path = "/lines/{id}/sections")
+    public SectionResponse createSection(@PathVariable Long id, @RequestBody SectionRequest sectionRequest) {
+        return Mapper.toResponse(sectionService.createSection(id, sectionRequest));
     }
 
     @GetMapping(path = "/lines/{id}/sections")

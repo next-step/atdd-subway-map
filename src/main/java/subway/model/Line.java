@@ -56,9 +56,18 @@ public class Line {
         return downStation;
     }
 
+    public Long getDistance() {
+        return distance;
+    }
+
     public void update(String name, String color) {
         this.name = name;
         this.color = color;
+    }
+
+    public void addSection(Section section) {
+        this.downStation = section.getDownStation();
+        this.distance += section.getDistance();
     }
 
     public static class Builder {
