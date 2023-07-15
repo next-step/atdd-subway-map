@@ -33,12 +33,12 @@ public class Sections {
     }
 
     public void addSection(Section section) {
-        validateEnrollment(section);
+        Validator.validateEnrollment(this, section);
         sections.add(section);
     }
 
     public void remove(Station station) {
-        validateDeletion(station);
+        Validator.validateDeletion(this, station);
         sections.remove(getLastSection());
     }
 
@@ -54,23 +54,43 @@ public class Sections {
         return getLastSection().getDownStation();
     }
 
-    private void validateEnrollment(Section section) {
-        if (!section.getUpStation().equalsId(this.getLastStation())) {
-            throw new IllegalArgumentException("새로운 구간의 상행 역이 해당 노선에 등록되어있는 하행 종착역이 아님.");
-        }
-
-        if (this.getStations().contains(section.getDownStation())) {
-            throw new IllegalArgumentException("새로운 구간의 하행역이 해당 노선에 등록되어있는 역임.");
-        }
+    private int size() {
+        return sections.size();
     }
 
-    private void validateDeletion(Station station) {
-        if (!this.getLastStation().equalsId(station)) {
-            throw new IllegalArgumentException(String.format("노선의 마지막 역이 아닙니다. 역id:%s", station.getId()));
+    private static class Validator {
+        static void validateEnrollment(Sections sections, Section section) {
+            validateNewSectionUpStationEqualsLineDownStation(sections, section);
+            validateNewSectionDownStationIsNewcomer(sections, section);
         }
 
-        if (this.sections.size() == 1) {
-            throw new IllegalArgumentException("상행 종점역과 하행 종점역만 존재합니다.");
+        private static void validateDeletion(Sections sections, Station Station) {
+            validateDeletionEqualsLineDownStation(sections, Station);
+            validateTwoMoreSectionExists(sections);
+        }
+
+        private static void validateNewSectionDownStationIsNewcomer(Sections sections, Section section) {
+            if (sections.getStations().contains(section.getDownStation())) {
+                throw new IllegalArgumentException("새로운 구간의 하행역이 해당 노선에 등록되어있는 역임.");
+            }
+        }
+
+        private static void validateNewSectionUpStationEqualsLineDownStation(Sections sections, Section section) {
+            if (!section.getUpStation().equalsId(sections.getLastStation())) {
+                throw new IllegalArgumentException("새로운 구간의 상행 역이 해당 노선에 등록되어있는 하행 종착역이 아님.");
+            }
+        }
+
+        private static void validateTwoMoreSectionExists(Sections sections) {
+            if (sections.size() == 1) {
+                throw new IllegalArgumentException("상행 종점역과 하행 종점역만 존재합니다.");
+            }
+        }
+
+        private static void validateDeletionEqualsLineDownStation(Sections sections, Station station) {
+            if (!sections.getLastStation().equalsId(station)) {
+                throw new IllegalArgumentException(String.format("노선의 마지막 역이 아닙니다. 역id:%s", station.getId()));
+            }
         }
     }
 }
