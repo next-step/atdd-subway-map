@@ -6,8 +6,10 @@ import subway.dto.LineUpdateRequest;
 import subway.exception.ErrorMessage;
 import subway.exception.SubwayException;
 import subway.model.Line;
+import subway.model.Section;
 import subway.model.Station;
 import subway.repository.LineRepository;
+import subway.repository.SectionRepository;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -17,24 +19,35 @@ public class LineService {
 
     private final LineRepository lineRepository;
     private final StationService stationService;
+    private final SectionRepository sectionRepository;
 
-    public LineService(LineRepository lineRepository, StationService stationService) {
+    public LineService(LineRepository lineRepository, StationService stationService, StationService sectionService, SectionRepository sectionRepository) {
         this.lineRepository = lineRepository;
         this.stationService = stationService;
+        this.sectionRepository = sectionRepository;
     }
 
     @Transactional
     public Line create(LineRequest lineRequest) {
         Station upStation = stationService.findStationById(lineRequest.getUpStationId());
         Station downStation = stationService.findStationById(lineRequest.getDownStationId());
-        Line line = new Line.Builder()
+        Line newLine = new Line.Builder()
                 .name(lineRequest.getName())
                 .color(lineRequest.getColor())
                 .upStation(upStation)
                 .downStation(downStation)
                 .distance(lineRequest.getDistance())
                 .build();
-        return lineRepository.save(line);
+        Line line = lineRepository.save(newLine);
+
+        Section section = new Section.Builder()
+                .lineId(line.getId())
+                .upStation(upStation)
+                .downStation(downStation)
+                .distance(lineRequest.getDistance())
+                .build();
+        sectionRepository.save(section);
+        return line;
     }
 
     public List<Line> findAllLines() {
