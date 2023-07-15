@@ -1,5 +1,6 @@
 package subway.line;
 
+import subway.section.Sections;
 import subway.station.Station;
 
 import javax.persistence.*;
@@ -30,6 +31,9 @@ public class Line {
 
     @Column(nullable = false)
     private Long distance;
+
+    @Embedded
+    private Sections sections;
 
     public Line(String name, String color, Station upStation, Station downStation, Long distance) {
         validate(name, color, upStation.getId(), downStation.getId(), distance);
@@ -112,5 +116,9 @@ public class Line {
         if (distance == null || distance <= MIN_DISTANCE) {
             throw new IllegalArgumentException(String.format("지하철 거리는 0 이상의 숫자여야 합니다. (distance: %d)", distance));
         }
+    }
+
+    public boolean contains(Station station) {
+        return sections.contains(station);
     }
 }

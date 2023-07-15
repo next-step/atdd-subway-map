@@ -49,4 +49,9 @@ public class Section {
     public Station getDownStation() {
         return downStation;
     }
+
+    public boolean contains(Station station) {
+        Long stationId = station.getId();
+        return upStation.getId().equals(stationId) || downStation.getId().equals(stationId);
+    }
 }
