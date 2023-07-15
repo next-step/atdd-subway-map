@@ -107,7 +107,7 @@ public class SectionAcceptanceTest {
 
         // then
         List<Long> stationIds = 노선_단일_조회_요청(LINE_ID_1).jsonPath().getList("stations.id", Long.class);
-        assertThat(stationIds).containsAnyOf(STATION_ID_1, STATION_ID_2);
+        assertThat(stationIds).containsExactly(STATION_ID_1, STATION_ID_2);
     }
 
     /**
@@ -126,7 +126,7 @@ public class SectionAcceptanceTest {
 
         // then
         List<Long> stationIds = 노선_단일_조회_요청(LINE_ID_1).jsonPath().getList("stations.id", Long.class);
-        assertThat(stationIds).containsAnyOf(STATION_ID_1, STATION_ID_2);
+        assertThat(stationIds).containsExactly(STATION_ID_1, STATION_ID_2);
     }
 
     /**
@@ -149,6 +149,6 @@ public class SectionAcceptanceTest {
 
         // then
         List<Long> stationIds = 노선_단일_조회_요청(LINE_ID_1).jsonPath().getList("stations.id", Long.class);
-        assertThat(stationIds).containsAnyOf(STATION_ID_2, STATION_ID_3);
+        assertThat(stationIds).containsExactly(STATION_ID_1, STATION_ID_2, STATION_ID_3);
     }
 }

@@ -9,7 +9,6 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Entity
 public class Line {
@@ -68,31 +67,30 @@ public class Line {
         this.color = color;
     }
 
-    private List<Station> getAllStations() {
-        return this.sections.stream()
-                .flatMap(section -> Stream.of(section.getUpStation(), section.getDownStation()))
-                .collect(Collectors.toList());
+    public List<Station> getAllStations() {
+        if (this.sections.isEmpty()) {
+            return new ArrayList<>();
+        }
+        List<Station> stations = this.getSections().stream().map(Section::getDownStation).collect(Collectors.toList());
+        stations.add(0, this.getSections().get(0).getUpStation());
+        return stations;
     }
 
     private boolean existsStation(Station station) {
         return getAllStations().contains(station);
-
     }
 
     private boolean isEndStation(Station station) {
-        List<Station> stations = this.getAllStations();
-        return stations.indexOf(station) == (stations.size() - 1);
-    }
-
-    private boolean hasOnlyOneSection() {
-        return this.sections.size() == 1;
+        List<Station> stations = getAllStations();
+        return stations.indexOf(station) == stations.size() - 1;
     }
 
     private void validateCreateSection(Section section) {
-        if (existsStation(section.getUpStation()) || existsStation(section.getDownStation())) {
-            if(!isEndStation(section.getUpStation())){
-                throw new BusinessException("이미 존재하는 역입니다.");
-            }
+        if (existsStation(section.getUpStation()) && !isEndStation(section.getUpStation())) {
+            throw new BusinessException("이미 존재하는 역입니다.");
+        }
+        if (existsStation(section.getDownStation())) {
+            throw new BusinessException("이미 존재하는 역입니다.");
         }
         if (!isEndStation(section.getUpStation())) {
             throw new BusinessException("시작역이 하행 종점역이 아닙니다.");
@@ -103,7 +101,7 @@ public class Line {
         if (!isEndStation(station)) {
             throw new BusinessException("삭제요청 역이 하행 종점역이 아닙니다.");
         }
-        if (hasOnlyOneSection()) {
+        if (sections.size() == 1) {
             throw new BusinessException("역의 구간이 한개입니다.");
         }
     }

@@ -2,12 +2,9 @@ package subway.line.dto;
 
 import lombok.Builder;
 import subway.line.Line;
-import subway.section.Section;
 import subway.station.Station;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class LineResponse {
     private Long id;
@@ -24,11 +21,7 @@ public class LineResponse {
     }
 
     public static LineResponse from(Line line) {
-        List<Station> upStations = line.getSections().stream().map(Section::getUpStation).collect(Collectors.toList());
-        List<Station> downStations = line.getSections().stream().map(Section::getDownStation).collect(Collectors.toList());
-        List<Station> stations = new ArrayList<>();
-        stations.addAll(upStations);
-        stations.addAll(downStations);
+        List<Station> stations = line.getAllStations();
 
         return LineResponse.builder().id(line.getId()).name(line.getName()).color(line.getColor())
                 .stations(stations)
