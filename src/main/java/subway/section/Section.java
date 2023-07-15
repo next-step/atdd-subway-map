@@ -29,15 +29,15 @@ public class Section {
     public Section() {
     }
 
-    public Section(Line line, Station upStation, Station downStation, int distance) {
+    public Section(final Line line, final Station upStation, final Station downStation, final int distance) {
         this(null, line, upStation, downStation, distance, 1);
     }
 
-    public Section(Line line, Station upStation, Station downStation, int distance, int sequence) {
+    public Section(final Line line, final Station upStation, final Station downStation, final int distance, final int sequence) {
         this(null, line, upStation, downStation, distance, sequence);
     }
 
-    public Section(Long id, Line line, Station upStation, Station downStation, int distance, int sequence) {
+    public Section(final Long id, final Line line, final Station upStation, final Station downStation, final int distance, final int sequence) {
         this.id = id;
         this.line = line;
         this.upStation = upStation;

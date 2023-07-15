@@ -12,12 +12,10 @@ import subway.station.StationRepository;
 @Transactional
 public class SectionService {
 
-    private final SectionRepository sectionRepository;
     private final LineRepository lineRepository;
     private final StationRepository stationRepository;
 
-    public SectionService(final SectionRepository sectionRepository, final LineRepository lineRepository, final StationRepository stationRepository) {
-        this.sectionRepository = sectionRepository;
+    public SectionService(final LineRepository lineRepository, final StationRepository stationRepository) {
         this.lineRepository = lineRepository;
         this.stationRepository = stationRepository;
     }

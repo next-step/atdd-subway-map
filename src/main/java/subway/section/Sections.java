@@ -21,16 +21,17 @@ public class Sections {
     public Sections() {
     }
 
-    public Sections(List<Section> sections) {
+    public Sections(final List<Section> sections) {
         this.sections = new ArrayList<>(sections);
     }
 
-    public void add(Line line, Station upStation, Station downStation, int distance) {
+    public void add(final Line line, final Station upStation, final Station downStation,
+        final int distance) {
         Section section = new Section(line, upStation, downStation, distance, decideSequence());
         sections.add(section);
     }
 
-    public void validate(Station upStation, Station downStation) {
+    public void validate(final Station upStation, final Station downStation) {
         if (isAlreadyRegisteredDownStation(downStation)) {
             throw new BusinessException(
                 "이미 등록된 역을 하행역으로 가지면 구간을 추가할 수 없습니다. 하행역ID: " + downStation.getId());
@@ -42,7 +43,7 @@ public class Sections {
         }
     }
 
-    public void delete(Station station) {
+    public void delete(final Station station) {
         if (!getLastSection().getDownStation().equals(station)) {
             throw new BusinessException("하행 종점이 아닌 역을 삭제할 수 없습니다. 역ID: " + station.getId());
         }
@@ -76,7 +77,7 @@ public class Sections {
             .collect(Collectors.toList());
     }
 
-    private boolean isAlreadyRegisteredDownStation(Station downStation) {
+    private boolean isAlreadyRegisteredDownStation(final Station downStation) {
         if (isAlreadyRegisteredInFirstUpStation(downStation)) {
             return true;
         }
@@ -85,7 +86,7 @@ public class Sections {
             .anyMatch(localSection -> localSection.getDownStation().equals(downStation));
     }
 
-    private boolean isAlreadyRegisteredInFirstUpStation(Station downStation) {
+    private boolean isAlreadyRegisteredInFirstUpStation(final Station downStation) {
         return this.sections.stream().findFirst().orElseThrow()
             .getUpStation().equals(downStation);
     }

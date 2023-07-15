@@ -8,7 +8,7 @@ public class LineUpdateRequest {
 
     public LineUpdateRequest() {}
 
-    public LineUpdateRequest(String name, String color) {
+    public LineUpdateRequest(final String name, final String color) {
         this.name = name;
         this.color = color;
     }
