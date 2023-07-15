@@ -12,8 +12,8 @@ import subway.section.SectionRequest;
 import subway.section.SectionResponse;
 
 public class SectionTestStepDefinition {
-    public static SectionResponse 지하철_구간_생성_요청(Long lineId, Long upStationId, Long downStationId) {
-        SectionRequest sectionRequest = new SectionRequest(lineId, upStationId, downStationId);
+    public static SectionResponse 지하철_구간_생성_요청(Long lineId, Long upStationId, Long downStationId, Integer distance) {
+        SectionRequest sectionRequest = new SectionRequest(upStationId, downStationId, distance);
 
         ExtractableResponse<Response> response = RestAssured.given().log().all()
             .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -27,8 +27,8 @@ public class SectionTestStepDefinition {
         return response.as(SectionResponse.class);
     }
 
-    public static int 지하철_구간_생성_요청_상태_코드_반환(Long lineId, Long upStationId, Long downStationId) {
-        SectionRequest sectionRequest = new SectionRequest(lineId, upStationId, downStationId);
+    public static int 지하철_구간_생성_요청_상태_코드_반환(Long lineId, Long upStationId, Long downStationId, Integer distance) {
+        SectionRequest sectionRequest = new SectionRequest(upStationId, downStationId, distance);
 
         ExtractableResponse<Response> response = RestAssured.given().log().all()
             .contentType(MediaType.APPLICATION_JSON_VALUE)

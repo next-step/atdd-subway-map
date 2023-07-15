@@ -22,7 +22,7 @@ public class SectionsTest {
     void createLastSection() {
         Section section = SectionBuilder.aSection().build();
         Sections sections = new Sections(new ArrayList<>(List.of(section)));
-        sections.add(section.getLine(), new Station(2L, 신논현역), new Station(3L, 지하철역));
+        sections.add(section.getLine(), new Station(2L, 신논현역), new Station(3L, 지하철역), 10);
         Section newSection = sections.getLastSection();
 
         assertAll(

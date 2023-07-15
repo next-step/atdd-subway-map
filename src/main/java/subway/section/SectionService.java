@@ -28,7 +28,7 @@ public class SectionService {
         Station downStation = findStationById(request.getDownStationId());
 
         line.validateSection(upStation, downStation);
-        line.addSection(upStation, downStation);
+        line.addSection(upStation, downStation, request.getDistance());
         Section section = line.getLastSection();
 
         return new SectionResponse(section);

@@ -1,22 +1,19 @@
 package subway.section;
 
 public class SectionRequest {
-    private Long lineId;
     private Long upStationId;
     private Long downStationId;
+    private Integer distance;
 
     public SectionRequest() {
     }
 
-    public SectionRequest(Long lineId, Long upStationId, Long downStationId) {
-        this.lineId = lineId;
+    public SectionRequest(final Long upStationId, final Long downStationId, final Integer distance) {
         this.upStationId = upStationId;
         this.downStationId = downStationId;
+        this.distance = distance;
     }
 
-    public Long getLineId() {
-        return lineId;
-    }
 
     public Long getUpStationId() {
         return upStationId;
@@ -24,5 +21,9 @@ public class SectionRequest {
 
     public Long getDownStationId() {
         return downStationId;
+    }
+
+    public Integer getDistance() {
+        return distance;
     }
 }

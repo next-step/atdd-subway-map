@@ -25,8 +25,8 @@ public class Sections {
         this.sections = new ArrayList<>(sections);
     }
 
-    public void add(Line line, Station upStation, Station downStation) {
-        Section section = new Section(line, upStation, downStation, decideSequence());
+    public void add(Line line, Station upStation, Station downStation, int distance) {
+        Section section = new Section(line, upStation, downStation, distance, decideSequence());
         sections.add(section);
     }
 

@@ -7,6 +7,7 @@ import static common.Constants.지하철역;
 import static org.assertj.core.api.Assertions.assertThat;
 import static subway.line.LineTestStepDefinition.지하철_노선_생성_요청;
 import static subway.line.LineTestStepDefinition.지하철_노선_조회_요청;
+import static subway.section.SectionTestStepDefinition.*;
 import static subway.station.StationTestStepDefinition.지하철_역_생성_요청;
 
 import common.AcceptanceTest;
@@ -21,6 +22,7 @@ import subway.station.Station;
 @DisplayName("지하철 구간 관련 기능")
 @AcceptanceTest
 public class SectionAcceptanceTest {
+
     // Given 지하철 노선을 생성하고
     // When 지하철 노선에 구간을 추가하면
     // Then 지하철 노선 조회시 추가한 구간이 포함되어있다.
@@ -32,8 +34,8 @@ public class SectionAcceptanceTest {
         var stationResponse = 지하철_역_생성_요청(또다른지하철역);
 
         // when
-        SectionTestStepDefinition.지하철_구간_생성_요청(lineCreateResponse.getId(), getDownEndStationId(lineCreateResponse),
-            stationResponse.getId());
+        지하철_구간_생성_요청(lineCreateResponse.getId(), getDownEndStationId(lineCreateResponse),
+            stationResponse.getId(), 10);
 
         // then
         var lineResponse = 지하철_노선_조회_요청(lineCreateResponse.getId());
@@ -51,8 +53,9 @@ public class SectionAcceptanceTest {
         var stationResponse = 지하철_역_생성_요청(또다른지하철역);
 
         // when
-        var statusCode = SectionTestStepDefinition.지하철_구간_생성_요청_상태_코드_반환(lineCreateResponse.getId(), getUpEndStationId(lineCreateResponse),
-            stationResponse.getId());
+        var statusCode = 지하철_구간_생성_요청_상태_코드_반환(lineCreateResponse.getId(),
+            getUpEndStationId(lineCreateResponse),
+            stationResponse.getId(), 10);
 
         // then
         assertThat(statusCode).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -70,7 +73,8 @@ public class SectionAcceptanceTest {
         var lineCreateResponse = 지하철_노선_생성_요청(신분당선, "bg-red-600", 지하철역, 새로운지하철역, 10);
 
         // when
-        var statusCode = SectionTestStepDefinition.지하철_구간_생성_요청_상태_코드_반환(lineCreateResponse.getId(), getDownEndStationId(lineCreateResponse), getUpEndStationId(lineCreateResponse));
+        var statusCode = 지하철_구간_생성_요청_상태_코드_반환(lineCreateResponse.getId(),
+            getDownEndStationId(lineCreateResponse), getUpEndStationId(lineCreateResponse), 10);
 
         // then
         assertThat(statusCode).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -85,11 +89,11 @@ public class SectionAcceptanceTest {
         // given
         var lineCreateResponse = 지하철_노선_생성_요청(신분당선, "bg-red-600", 지하철역, 새로운지하철역, 10);
         var stationResponse = 지하철_역_생성_요청(또다른지하철역);
-        SectionTestStepDefinition.지하철_구간_생성_요청(lineCreateResponse.getId(), getDownEndStationId(lineCreateResponse),
-            stationResponse.getId());
+        지하철_구간_생성_요청(lineCreateResponse.getId(), getDownEndStationId(lineCreateResponse),
+            stationResponse.getId(), 10);
 
         // when
-        SectionTestStepDefinition.지하철_구간_제거_요청(lineCreateResponse.getId(), stationResponse.getId());
+        지하철_구간_제거_요청(lineCreateResponse.getId(), stationResponse.getId());
 
         // then
         var lineResponse = 지하철_노선_조회_요청(lineCreateResponse.getId());
@@ -105,11 +109,11 @@ public class SectionAcceptanceTest {
         // given
         var lineCreateResponse = 지하철_노선_생성_요청(신분당선, "bg-red-600", 지하철역, 새로운지하철역, 10);
         var stationResponse = 지하철_역_생성_요청(또다른지하철역);
-        SectionTestStepDefinition.지하철_구간_생성_요청(lineCreateResponse.getId(), getDownEndStationId(lineCreateResponse),
-            stationResponse.getId());
+        지하철_구간_생성_요청(lineCreateResponse.getId(), getDownEndStationId(lineCreateResponse),
+            stationResponse.getId(), 10);
 
         // when
-        var statusCode = SectionTestStepDefinition.지하철_구간_제거_요청_상태_코드_반환(lineCreateResponse.getId(),
+        var statusCode = 지하철_구간_제거_요청_상태_코드_반환(lineCreateResponse.getId(),
             getUpEndStationId(lineCreateResponse));
 
         // then
@@ -128,7 +132,8 @@ public class SectionAcceptanceTest {
         var lineCreateResponse = 지하철_노선_생성_요청(신분당선, "bg-red-600", 지하철역, 새로운지하철역, 10);
 
         // when
-        var statusCode = SectionTestStepDefinition.지하철_구간_제거_요청_상태_코드_반환(lineCreateResponse.getId(), getUpEndStationId(lineCreateResponse));
+        var statusCode = 지하철_구간_제거_요청_상태_코드_반환(lineCreateResponse.getId(),
+            getUpEndStationId(lineCreateResponse));
 
         // then
         var lineResponse = 지하철_노선_조회_요청(lineCreateResponse.getId());

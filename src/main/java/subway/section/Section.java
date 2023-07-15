@@ -23,24 +23,26 @@ public class Section {
     @ManyToOne
     @JoinColumn(name = "down_station_id")
     private Station downStation;
+    private int distance;
     private int sequence;
 
     public Section() {
     }
 
-    public Section(Line line, Station upStation, Station downStation) {
-        this(null, line, upStation, downStation, 1);
+    public Section(Line line, Station upStation, Station downStation, int distance) {
+        this(null, line, upStation, downStation, distance, 1);
     }
 
-    public Section(Line line, Station upStation, Station downStation, int sequence) {
-        this(null, line, upStation, downStation, sequence);
+    public Section(Line line, Station upStation, Station downStation, int distance, int sequence) {
+        this(null, line, upStation, downStation, distance, sequence);
     }
 
-    public Section(Long id, Line line, Station upStation, Station downStation, int sequence) {
+    public Section(Long id, Line line, Station upStation, Station downStation, int distance, int sequence) {
         this.id = id;
         this.line = line;
         this.upStation = upStation;
         this.downStation = downStation;
+        this.distance = distance;
         this.sequence = sequence;
     }
 
@@ -58,6 +60,10 @@ public class Section {
 
     public Station getDownStation() {
         return downStation;
+    }
+
+    public int getDistance() {
+        return distance;
     }
 
     public int getSequence() {

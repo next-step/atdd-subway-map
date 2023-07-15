@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface SectionRepository extends JpaRepository<Section, Long> {
 
-    List<Section> findAllByLineId(Long lineId);
+    List<Section> findAllByLineId(final Long lineId);
 }

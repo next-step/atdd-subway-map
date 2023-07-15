@@ -11,6 +11,7 @@ public class SectionBuilder {
     private Station upStation = new Station(1L, 강남역);
     private Station downStation = new Station(2L, 신논현역);
     private Line line = null;
+    private int distance = 10;
     private int sequence = 1;
 
     private SectionBuilder() {}
@@ -38,6 +39,12 @@ public class SectionBuilder {
         return this;
     }
 
+    public SectionBuilder withDistance(int distance) {
+        this.distance = distance;
+
+        return this;
+    }
+
     public SectionBuilder withSequence(int sequence) {
         this.sequence = sequence;
 
@@ -45,6 +52,6 @@ public class SectionBuilder {
     }
 
     public Section build() {
-        return new Section(id, line, upStation, downStation, sequence);
+        return new Section(id, line, upStation, downStation, distance, sequence);
     }
 }

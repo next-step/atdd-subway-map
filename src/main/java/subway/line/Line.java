@@ -20,41 +20,39 @@ public class Line {
     private String color;
     @Embedded
     private Sections sections;
-    private int distance;
 
     public Line() {}
 
-    public Line(String name, String color, Station upStation, Station downStation, int distance) {
-        this(null, name, color, new Sections(), distance);
-        this.sections.add(this, upStation, downStation);
+    public Line(final String name, final String color, final Station upStation, final Station downStation, final int distance) {
+        this(null, name, color, new Sections());
+        this.sections.add(this, upStation, downStation, distance);
     }
 
-    public Line(Long id, String name, String color, Sections sections, int distance) {
+    public Line(final Long id,final String name,final String color,final Sections sections) {
         this.id = id;
         this.name = name;
         this.color = color;
         this.sections = sections;
-        this.distance = distance;
     }
 
-    public void update(String name, String color) {
+    public void update(final String name, final String color) {
         this.name = name;
         this.color = color;
     }
 
-    public void addSection(Station upStation, Station downStation) {
-        this.sections.add(this, upStation, downStation);
+    public void addSection(final Station upStation, final Station downStation, final int distance) {
+        this.sections.add(this, upStation, downStation, distance);
     }
 
     public Section getLastSection() {
         return this.sections.getLastSection();
     }
 
-    public void validateSection(Station upStation, Station downStation) {
+    public void validateSection(final Station upStation, final Station downStation) {
         this.sections.validate(upStation, downStation);
     }
 
-    public void deleteSection(Station station) {
+    public void deleteSection(final Station station) {
         this.sections.delete(station);
     }
 
@@ -76,9 +74,5 @@ public class Line {
 
     public List<Section> getSections() {
         return this.sections.getSections();
-    }
-
-    public int getDistance() {
-        return distance;
     }
 }

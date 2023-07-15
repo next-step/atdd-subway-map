@@ -42,14 +42,8 @@ public class LineBuilder {
         return this;
     }
 
-    public LineBuilder withDistance(int distance) {
-        this.distance = distance;
-
-        return this;
-    }
-
     public Line build() {
-        return new Line(id, name, color, sections, distance);
+        return new Line(id, name, color, sections);
     }
 
 }

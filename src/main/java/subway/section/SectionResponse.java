@@ -9,12 +9,12 @@ public class SectionResponse {
 
     public SectionResponse() {}
 
-    public SectionResponse(Section section) {
+    public SectionResponse(final Section section) {
         this(section.getId(), section.getLine().getId(), section.getUpStation().getId(),
             section.getDownStation().getId(), section.getSequence());
     }
 
-    public SectionResponse(Long id, Long lineId, Long upStationId, Long downStationId,
+    public SectionResponse(final Long id, final Long lineId, final Long upStationId, final Long downStationId,
         int sequence) {
         this.id = id;
         this.lineId = lineId;
