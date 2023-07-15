@@ -3,6 +3,7 @@ package subway.line;
 import subway.section.SubwaySection;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -18,16 +19,15 @@ public class SubwayLine {
     @Column(length = 20, nullable = false)
     private String color;
 
-    @OneToMany
-    @JoinColumn(name = "subway_section_id")
+    @OneToMany(fetch = FetchType.LAZY)
     private List<SubwaySection> sections;
 
     public SubwayLine() {}
 
-    public SubwayLine(String name, String color, List<SubwaySection> sections) {
+    public SubwayLine(String name, String color) {
         this.name = name;
         this.color = color;
-        this.sections = sections;
+        this.sections = new ArrayList<>();
     }
 
     public void updateName(String name) {

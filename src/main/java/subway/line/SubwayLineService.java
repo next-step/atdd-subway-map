@@ -3,11 +3,6 @@ package subway.line;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.section.SubwaySection;
-import subway.section.SubwaySectionService;
-import subway.station.Station;
-import subway.station.StationService;
-
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -15,28 +10,16 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class SubwayLineService {
 
-    private SubwayLineRepository subwayLineRepository;
-    private StationService stationService;
-    private SubwaySectionService subwaySectionService;
+    private final SubwayLineRepository subwayLineRepository;
 
-    public SubwayLineService(SubwayLineRepository subwayLineRepository,
-            StationService stationService, SubwaySectionService subwaySectionService) {
+    public SubwayLineService(SubwayLineRepository subwayLineRepository) {
         this.subwayLineRepository = subwayLineRepository;
-        this.stationService = stationService;
-        this.subwaySectionService = subwaySectionService;
     }
 
     @Transactional
     public SubwayLineResponse createLine(SubwayLineRequest subwayLineRequest) {
-        Station upStation = stationService.findStationById(subwayLineRequest.getUpStationId());
-        Station downStation = stationService.findStationById(subwayLineRequest.getDownStationId());
-        SubwaySection section = subwaySectionService.saveSubwaySection(upStation, downStation);
-
-        List<SubwaySection> sections = new ArrayList<>();
-        sections.add(section);
-
         SubwayLine subwayLine = subwayLineRepository.save(new SubwayLine(subwayLineRequest.getName()
-                , subwayLineRequest.getColor(), sections));
+                , subwayLineRequest.getColor()));
 
         return createLineResponse(subwayLine);
     }
@@ -50,22 +33,35 @@ public class SubwayLineService {
 
     public SubwayLineResponse findSubwayLine(Long id) {
         SubwayLine subwayLine = subwayLineRepository.findById(id)
-                .orElseThrow();
+                .orElseThrow(() -> new IllegalArgumentException());
         return createLineResponse(subwayLine);
+    }
+
+    public SubwayLine findSubwayLineEntity(Long id) {
+        return subwayLineRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException());
     }
 
     @Transactional
     public void updateSubwayLine(Long id, SubwayLineUpdateRequest subwayLineUpdateRequest) {
         SubwayLine subwayLine = subwayLineRepository.findById(id)
-                .orElseThrow();
+                .orElseThrow(() -> new IllegalArgumentException());
 
         subwayLine.updateName(subwayLineUpdateRequest.getName());
         subwayLine.updateColor(subwayLineUpdateRequest.getColor());
     }
 
-
     @Transactional
     public void delete(Long id) { subwayLineRepository.deleteById(id); }
+
+    @Transactional
+    public void updateSections(Long id, SubwaySection section) {
+        SubwayLine line = subwayLineRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException());
+
+        List<SubwaySection> sections = line.getSections();
+        sections.add(section);
+    }
 
     private SubwayLineResponse createLineResponse(SubwayLine subwayLine) {
         return new SubwayLineResponse(

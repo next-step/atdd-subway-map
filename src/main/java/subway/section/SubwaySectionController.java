@@ -1,11 +1,10 @@
 package subway.section;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.net.URI;
 
 @RestController
 public class SubwaySectionController {
@@ -16,12 +15,20 @@ public class SubwaySectionController {
         this.subwaySectionService = subwaySectionService;
     }
 
-    @PostMapping("/subway-sections")
-    public ResponseEntity<SubwaySectionResponse> createSubwaySection(
-            @RequestBody SubwaySectionRequest subwaySectionRequest) {
-        SubwaySectionResponse subwaySectionResponse = subwaySectionService.createSubwaySection(subwaySectionRequest);
+    @PostMapping("/subway-sections/{lineId}")
+    public ResponseEntity<SubwaySectionResponse> createSubwaySection(@PathVariable Long lineId,
+            @RequestBody SubwaySectionRequest sectionRequest) {
+        SubwaySectionResponse subwaySectionResponse = subwaySectionService.createSubwaySection(lineId, sectionRequest);
 
-        return ResponseEntity.created(URI.create("/subway-sections/" + subwaySectionResponse.getId()))
-                .body(subwaySectionResponse);
+        return ResponseEntity.ok().body(subwaySectionResponse);
     }
+
+    @PostMapping("/subway-sections/register")
+    public ResponseEntity<SubwaySectionResponse> registerSubwaySection(
+            @RequestBody SubwaySectionRequest sectionRequest) {
+        SubwaySectionResponse subwaySectionResponse = subwaySectionService.registerSubwaySection(sectionRequest);
+
+        return ResponseEntity.ok(subwaySectionResponse);
+    }
+
 }
