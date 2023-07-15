@@ -21,15 +21,27 @@ public class CustomRequest {
                 .extract().response();
     }
 
-    public static Response requestPost(String path, Map<String, ?> params) {
-        return RestAssured.given().log().all().body(params).contentType(MediaType.APPLICATION_JSON_VALUE)
+    public static Response requestPost(String path, Map<String, ?> bodyParams) {
+        return RestAssured.given().log().all().body(bodyParams).contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post(path)
                 .then().log().all().extract().response();
     }
 
-    public static Response requestPost(String path, Map<String, ?> pathParams, Map<String, ?> params) {
-        return RestAssured.given().log().all().body(params).contentType(MediaType.APPLICATION_JSON_VALUE)
+    public static Response requestPost(String path, Map<String, ?> pathParams, Map<String, ?> bodyParams) {
+        return RestAssured.given().log().all().body(bodyParams).contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post(path, pathParams)
+                .then().log().all().extract().response();
+    }
+
+    public static Response requestPut(String path, Map<String, ?> bodyParams) {
+        return RestAssured.given().log().all().body(bodyParams).contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().put(path)
+                .then().log().all().extract().response();
+    }
+
+    public static Response requestPut(String path, Map<String, ?> pathParams, Map<String, ?> bodyParams) {
+        return RestAssured.given().log().all().body(bodyParams).contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().put(path, pathParams)
                 .then().log().all().extract().response();
     }
 

@@ -12,6 +12,7 @@ public class StationFixture {
 
     public static final String GN_STATION = "강남역";
     public static final String YS_STATION = "역삼역";
+    public static final String SS_STATION = "삼성역";
 
     public static Response 역_목록_조회_요청() {
         return CustomRequest.requestGet("/stations");
