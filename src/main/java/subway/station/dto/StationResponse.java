@@ -3,8 +3,7 @@ package subway.station.dto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.Objects;
+import subway.station.entity.Station;
 
 @Getter
 @Setter
@@ -18,23 +17,10 @@ public class StationResponse {
         this.name = name;
     }
 
-    public static StationResponse from(StationDto stationDto) {
+    public static StationResponse from(Station station) {
         return new StationResponse(
-                stationDto.getId(),
-                stationDto.getName()
+                station.getId(),
+                station.getName()
         );
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StationResponse that = (StationResponse) o;
-        return Objects.equals(id, that.id) && Objects.equals(name, that.name);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name);
     }
 }

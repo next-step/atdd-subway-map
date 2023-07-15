@@ -2,10 +2,10 @@ package subway.line.dto;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import subway.line.entity.Line;
 import subway.station.dto.StationResponse;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Getter
@@ -24,27 +24,14 @@ public class LineResponse {
         this.stations = stations;
     }
 
-    public static LineResponse from(LineDto lineDto) {
+    public static LineResponse from(Line line) {
         return new LineResponse(
-                lineDto.getId(),
-                lineDto.getName(),
-                lineDto.getColor(),
-                lineDto.getStationDtos().stream()
+                line.getId(),
+                line.getName(),
+                line.getColor(),
+                line.getStations().stream()
                         .map(StationResponse::from)
                         .collect(Collectors.toList())
         );
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        LineResponse that = (LineResponse) o;
-        return Objects.equals(id, that.id) && Objects.equals(name, that.name) && Objects.equals(color, that.color) && Objects.equals(stations, that.stations);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, color, stations);
     }
 }

@@ -2,7 +2,8 @@ package subway.station.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import subway.station.dto.StationDto;
+import subway.station.dto.StationRequest;
+import subway.station.dto.StationResponse;
 import subway.station.entity.Station;
 import subway.station.entity.StationRepository;
 
@@ -19,18 +20,18 @@ public class StationService {
     }
 
     @Transactional
-    public StationDto saveStation(StationDto stationDto) {
-        if (stationRepository.findByName(stationDto.getName()).isPresent()) {
-            throw new IllegalArgumentException(String.format("이미 존재하는 역 이름입니다. 역 이름:%s", stationDto.getName()));
+    public StationResponse saveStation(StationRequest request) {
+        if (stationRepository.findByName(request.getName()).isPresent()) {
+            throw new IllegalArgumentException(String.format("이미 존재하는 역 이름입니다. 역 이름:%s", request.getName()));
         }
 
-        Station station = stationRepository.save(new Station(stationDto.getName()));
-        return StationDto.from(station);
+        Station station = stationRepository.save(new Station(request.getName()));
+        return StationResponse.from(station);
     }
 
-    public List<StationDto> findAllStations() {
+    public List<StationResponse> findAllStations() {
         return stationRepository.findAll().stream()
-                .map(StationDto::from)
+                .map(StationResponse::from)
                 .collect(Collectors.toList());
     }
 
