@@ -1,30 +1,41 @@
 package subway.section;
 
-import io.restassured.RestAssured;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+import static common.fixture.subway.LineFixture.*;
+import static common.fixture.subway.SectionFixture.구간_삭제_요청;
+import static common.fixture.subway.SectionFixture.구간_생성_요청;
+import static common.fixture.subway.StationFixture.*;
+import static common.utils.CustomAssertions.상태코드_확인;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("구간 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@Sql(scripts = {"classpath:SQLScripts/00.clear-database.sql", "classpath:SQLScripts/01.station-data.sql", "classpath:SQLScripts/02.section-data.sql"})
+@Sql(scripts = {"classpath:SQLScripts/00.clear-database.sql"})
 public class SectionAcceptanceTest {
-    static final Long LINE_ID_1 = 1L;
-    static final Long STATION_ID_1 = 1L;
-    static final Long STATION_ID_2 = 2L;
-    static final Long STATION_ID_3 = 3L;
-    static final Long STATION_ID_4 = 4L;
-    static final Long DISTANCE_10 = 10L;
+    Long LINE_ID_1;
+    Long STATION_ID_1;
+    Long STATION_ID_2;
+    Long STATION_ID_3;
+    Long STATION_ID_4;
+
+    @BeforeEach
+    void setup() {
+        STATION_ID_1 = 역_생성_ID_반환(역_생성_요청(GN_STATION));
+        STATION_ID_2 = 역_생성_ID_반환(역_생성_요청(YS_STATION));
+        STATION_ID_3 = 역_생성_ID_반환(역_생성_요청(SL_STATION));
+        STATION_ID_4 = 역_생성_ID_반환(역_생성_요청(SS_STATION));
+
+        LINE_ID_1 = 노선_생성_ID_반환(노선_생성_요청(SBD_LINE_NAME, RED_LINE_COLOR, STATION_ID_1, STATION_ID_2, DISTANCE_10));
+    }
 
     /**
      * Given 지하철 노선을 생성하고
@@ -35,10 +46,10 @@ public class SectionAcceptanceTest {
     @Test
     void createSection() {
         // when
-        Response response = this.requestCreateSections(LINE_ID_1, STATION_ID_1, STATION_ID_2, DISTANCE_10);
+        Response response = 구간_생성_요청(LINE_ID_1, STATION_ID_2, STATION_ID_3, DISTANCE_10);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        상태코드_확인(response, HttpStatus.CREATED);
 
         // then
         assertThat(response.jsonPath().getLong("id")).isEqualTo(LINE_ID_1);
@@ -53,14 +64,11 @@ public class SectionAcceptanceTest {
     @DisplayName("등록이 된 역으로 구간을 생성하면 실패한다.")
     @Test
     void createSectionExistsStation() {
-        // given
-        this.requestCreateSections(LINE_ID_1, STATION_ID_1, STATION_ID_2, DISTANCE_10);
-
         // when
-        Response response = this.requestCreateSections(LINE_ID_1, STATION_ID_1, STATION_ID_2, DISTANCE_10);
+        Response response = 구간_생성_요청(LINE_ID_1, STATION_ID_1, STATION_ID_2, DISTANCE_10);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        상태코드_확인(response, HttpStatus.BAD_REQUEST);
     }
 
 
@@ -72,11 +80,8 @@ public class SectionAcceptanceTest {
     @DisplayName("하행 종점역이 아닌 역으로 구간을 생성하면 실패한다.")
     @Test
     void createSectionNotEndStation() {
-        // given
-        this.requestCreateSections(LINE_ID_1, STATION_ID_1, STATION_ID_2, DISTANCE_10);
-
         // when
-        Response response = this.requestCreateSections(LINE_ID_1, STATION_ID_3, STATION_ID_4, DISTANCE_10);
+        Response response = 구간_생성_요청(LINE_ID_1, STATION_ID_3, STATION_ID_4, DISTANCE_10);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -92,18 +97,17 @@ public class SectionAcceptanceTest {
     @Test
     void deleteSection() {
         // given
-        this.requestCreateSections(LINE_ID_1, STATION_ID_1, STATION_ID_2, DISTANCE_10);
-        this.requestCreateSections(LINE_ID_1, STATION_ID_2, STATION_ID_3, DISTANCE_10);
+        구간_생성_요청(LINE_ID_1, STATION_ID_2, STATION_ID_3, DISTANCE_10);
 
         // when
-        Response response = this.requestDeleteSections(LINE_ID_1, STATION_ID_3);
+        Response response = 구간_삭제_요청(LINE_ID_1, STATION_ID_3);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        상태코드_확인(response, HttpStatus.NO_CONTENT);
 
         // then
-        List<Long> stationNames = this.requestSearchLine(LINE_ID_1).jsonPath().getList("stations.id", Long.class);
-        assertThat(stationNames).containsAnyOf(STATION_ID_1, STATION_ID_2);
+        List<Long> stationIds = 노선_단일_조회_요청(LINE_ID_1).jsonPath().getList("stations.id", Long.class);
+        assertThat(stationIds).containsAnyOf(STATION_ID_1, STATION_ID_2);
     }
 
     /**
@@ -114,18 +118,15 @@ public class SectionAcceptanceTest {
     @DisplayName("구간이 한개일 때 구간을 삭제하면 실패한다.")
     @Test
     void deleteSectionOneSection() {
-        // given
-        this.requestCreateSections(LINE_ID_1, STATION_ID_1, STATION_ID_2, DISTANCE_10);
-
         // when
-        Response response = this.requestDeleteSections(LINE_ID_1, STATION_ID_2);
+        Response response = 구간_삭제_요청(LINE_ID_1, STATION_ID_2);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        상태코드_확인(response, HttpStatus.BAD_REQUEST);
 
         // then
-        List<Long> stationNames = this.requestSearchLine(LINE_ID_1).jsonPath().getList("stations.id", Long.class);
-        assertThat(stationNames).containsAnyOf(STATION_ID_1, STATION_ID_2);
+        List<Long> stationIds = 노선_단일_조회_요청(LINE_ID_1).jsonPath().getList("stations.id", Long.class);
+        assertThat(stationIds).containsAnyOf(STATION_ID_1, STATION_ID_2);
     }
 
     /**
@@ -138,33 +139,16 @@ public class SectionAcceptanceTest {
     @Test
     void deleteSectionNotEndStation() {
         // given
-        this.requestCreateSections(LINE_ID_1, STATION_ID_1, STATION_ID_2, DISTANCE_10);
-        this.requestCreateSections(LINE_ID_1, STATION_ID_2, STATION_ID_3, DISTANCE_10);
+        구간_생성_요청(LINE_ID_1, STATION_ID_2, STATION_ID_3, DISTANCE_10);
 
         // when
-        Response response = this.requestDeleteSections(LINE_ID_1, STATION_ID_2);
+        Response response = 구간_삭제_요청(LINE_ID_1, STATION_ID_2);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        상태코드_확인(response, HttpStatus.BAD_REQUEST);
 
         // then
-        List<Long> stationNames = this.requestSearchLine(LINE_ID_1).jsonPath().getList("stations.id", Long.class);
-        assertThat(stationNames).containsAnyOf(STATION_ID_2, STATION_ID_3);
-    }
-
-    private Response requestCreateSections(Long lineId, Long upStationId, Long downStationId, Long distance) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("upStationId", upStationId);
-        params.put("downStationId", downStationId);
-        params.put("distance", distance);
-        return RestAssured.given().log().all().body(params).contentType(MediaType.APPLICATION_JSON_VALUE).when().post("/lines/{lineId}/sections", lineId).then().log().all().extract().response();
-    }
-
-    private Response requestDeleteSections(Long lineId, Long stationId) {
-        return RestAssured.given().log().all().when().delete("/lines/{lineId}/sections?stationId={stationId}", lineId, stationId).then().log().all().extract().response();
-    }
-
-    private Response requestSearchLine(Long id) {
-        return RestAssured.given().log().all().when().get("/lines/{id}", id).then().log().all().extract().response();
+        List<Long> stationIds = 노선_단일_조회_요청(LINE_ID_1).jsonPath().getList("stations.id", Long.class);
+        assertThat(stationIds).containsAnyOf(STATION_ID_2, STATION_ID_3);
     }
 }
