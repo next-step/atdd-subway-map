@@ -12,7 +12,7 @@ public class Section {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "line_id")
+    @JoinColumn(name = "line_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Line line;
 
     @ManyToOne
