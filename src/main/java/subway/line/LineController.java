@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -39,8 +40,7 @@ public class LineController {
         return ResponseEntity.ok().body(lineService.findLine(id));
     }
 
-    // TODO: PUT으로 변경
-    @PatchMapping("/lines/{id}")
+    @PutMapping("/lines/{id}")
     public ResponseEntity<Void> updateLineInfo(@PathVariable Long id, @RequestBody LineUpdateRequest lineUpdateRequest) {
         lineService.update(id, lineUpdateRequest);
         return ResponseEntity.ok().build();

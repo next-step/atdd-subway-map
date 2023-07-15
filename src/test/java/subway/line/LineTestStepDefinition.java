@@ -73,12 +73,12 @@ public class LineTestStepDefinition {
     }
 
     public static void 지하철_노선_수정_요청(Long id, String name, String color) {
-        LineUpdateRequest request = new LineUpdateRequest("다른분당선", "bg-red-600");
+        LineUpdateRequest request = new LineUpdateRequest(name, color);
 
         ExtractableResponse<Response> response = RestAssured.given().log().all()
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .body(request)
-            .when().patch("/lines/" + id)
+            .when().put("/lines/" + id)
             .then().log().all()
             .extract();
 
