@@ -44,4 +44,13 @@ public class SectionService {
         lineService.save(line);
         return section;
     }
+
+    @Transactional
+    public void deleteLastSection(Long lineId, Long upStationId) {
+        Section lastSection = sectionRepository.findByLineIdAndUpStationId(lineId, upStationId);
+        Line line = lineService.findLineById(lineId);
+        line.deleteLastSection(lastSection);
+        lineService.save(line);
+        sectionRepository.delete(lastSection);
+    }
 }

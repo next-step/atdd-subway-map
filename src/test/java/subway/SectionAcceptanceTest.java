@@ -136,4 +136,37 @@ class SectionAcceptanceTest {
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
+
+
+    /**
+     * Given 지하철 노선과 구간을 생성하고,
+     * When 노선의 마지막 구간을 제거하면
+     * Then 구간 목록 조회 시 해당 구간을 확인할 수 없다.
+     */
+    @DisplayName("구간 제거 기능")
+    @Test
+    void deleteSection() {
+        // given
+        String lineId = 지하철노선을_생성한다(LINE_1)
+                .jsonPath()
+                .get("id")
+                .toString();
+
+        Map<String, Object> params = Map.of(
+                "upStationId", 2,
+                "downStationId", 3,
+                "distance", 10
+        );
+        String sectionId = 지하철구간을_생성한다(lineId, params)
+                .jsonPath()
+                .get("id")
+                .toString();
+
+        // when
+        RequestApiHelper.delete("/lines/" + lineId + "/sections?stationId=2");
+
+        // then
+        List<Long> sections = 지하철구간목록을_조회한다(lineId);
+        assertThat(sections).doesNotContain(Long.parseLong(sectionId));
+    }
 }

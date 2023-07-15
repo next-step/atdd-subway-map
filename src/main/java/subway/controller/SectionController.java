@@ -1,5 +1,6 @@
 package subway.controller;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import subway.dto.SectionRequest;
 import subway.dto.SectionResponse;
@@ -28,5 +29,11 @@ public class SectionController {
                 .stream()
                 .map(Mapper::toResponse)
                 .collect(Collectors.toList());
+    }
+
+    @DeleteMapping(path = "/lines/{id}/sections")
+    public ResponseEntity<Void> deleteSection(@PathVariable Long id, @RequestParam Long stationId) {
+        sectionService.deleteLastSection(id, stationId);
+        return ResponseEntity.noContent().build();
     }
 }

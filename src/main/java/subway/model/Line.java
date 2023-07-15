@@ -79,6 +79,13 @@ public class Line {
         return stations.contains(downStation);
     }
 
+    public void deleteLastSection(Section section) {
+        int lastIndex = sections.size() - 1;
+        if (sections.get(lastIndex).equals(section)) {
+            sections.remove(lastIndex);
+        }
+    }
+
     public static class Builder {
         private String name;
         private String color;

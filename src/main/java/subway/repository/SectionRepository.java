@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface SectionRepository extends JpaRepository<Section, Long> {
     public List<Section> findByLineId(Long lineId);
+
+    Section findByLineIdAndUpStationId(Long lineId, Long upStationId);
 }
