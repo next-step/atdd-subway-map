@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -71,11 +72,22 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     /**
      * Given 지하철 노선과 노선에 속하지 않은 새로운 지하철역을 생성하고
      * When 지하철 노선의 하행역이 아닌 다른 역과 새로운 지하철역을 구간으로 등록하면
-     * Then 예외가 발생한다
+     * Then 500 에러가 발생한다
      */
     @Test
-    void 지하철_구간_생성시_하행역이_아닌_역을_구간으로_등록하면_예외_발생() {
+    void 지하철_구간_생성시_노선의_하행역이_아닌_역을_구간의_상행역으로_등록하면_예외_발생() throws JsonProcessingException {
+        // given
+        LineRequest request = 지하철역_생성_및_지하철_노선_요청_객체_생성(SINBUNDANG_LINE_NAME, SINBUNDANG_LINE_COLOR, SINBUNDANG_UP_STATION_NAME, SINBUNDANG_DOWN_STATION_NAME, SINBUNDANG_LINE_DISTANCE);
+        ExtractableResponse<Response> createLineResponse = 지하철_노선_생성_요청(request);
+        LineResponse lineResponse = ObjectMapperHolder.instance.readValue(createLineResponse.response().body().asString(), LineResponse.class);
+        Long upStationId = lineResponse.getStations().get(0).getId();
+        Long newDownStationId = 지하철역_생성_요청_및_아이디_추출(SINBUNDANG_NEW_DOWN_STATION_NAME);
 
+        // when
+        ExtractableResponse<Response> createSectionResponse = 지하철_구간_생성_요청(lineResponse.getId(), new SectionRequest(upStationId, newDownStationId, SINBUNDANG_NEW_DISTANCE));
+
+        // then
+        assertThat(createSectionResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
     /**
