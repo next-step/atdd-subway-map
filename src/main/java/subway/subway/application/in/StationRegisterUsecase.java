@@ -3,7 +3,7 @@ package subway.subway.application.in;
 import subway.subway.application.query.StationResponse;
 
 public interface StationRegisterUsecase {
-    StationResponse saveStation(Command command);
+    StationResponse saveStation(StationRegisterUsecase.Command command);
 
     class Command {
         private final String name;

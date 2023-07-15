@@ -2,6 +2,7 @@ package subway.subway.domain;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class SubwaySections {
@@ -19,6 +20,7 @@ public class SubwaySections {
                         .stream()
                         .collect(Collectors.toMap(SubwaySection::getUpStationId, Function.identity()));
     }
+
     void add(SubwaySection station) {
         subwaySections.put(station.getUpStationId(), station);
     }
@@ -31,7 +33,7 @@ public class SubwaySections {
         return subwaySections.isEmpty();
     }
 
-    private SubwaySection getSection(Station.Id stationId) {
+    public SubwaySection getSection(Station.Id stationId) {
         SubwaySection subwaySection = subwaySections.get(stationId);
         return Objects.requireNonNull(subwaySection, String.format("%d 역은 현재 노선에 존재하지 않은 역입니다.", stationId.getValue()));
     }
@@ -82,12 +84,31 @@ public class SubwaySections {
         return count == this.size();
     }
 
-    void update(SubwaySection subwaySection, SectionOperateManager manager) {
-        SectionOperator operator = manager.getOperator(this);
-        operator.apply(this, subwaySection);
-    }
-
     public List<SubwaySection> getSections() {
         return new ArrayList<>(subwaySections.values());
+    }
+
+    void close(Station station) {
+        SubwaySection subwaySection = getSectionByDownStation(station);
+        close(subwaySection);
+    }
+
+    private void close(SubwaySection subwaySection) {
+        subwaySections.remove(subwaySection.getUpStationId());
+    }
+
+    private SubwaySection getSectionByDownStation(Station station) {
+        return getSection(
+                section -> section.matchesDownStation(station),
+                String.format("%s 역은 현재 노선에 존재하지 않은 역입니다.", station.getName()));
+    }
+
+    private SubwaySection getSection(Predicate<SubwaySection> predicate, String message) {
+        return subwaySections
+                .values()
+                .stream()
+                .filter(predicate)
+                .findAny()
+                .orElseThrow(() -> new IllegalArgumentException(message));
     }
 }

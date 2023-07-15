@@ -11,10 +11,7 @@ public interface SubwaySectionAddUsecase {
     class Command {
 
         private SubwayLine.Id subwayLineId;
-        private Command.SubwaySection subwaySection;
-
-        public Command() {
-        }
+        private SubwaySectionAddUsecase.Command.SubwaySection subwaySection;
 
         public Command(SubwayLine.Id subwayLineId, SubwaySection subwaySection) {
             this.subwayLineId = subwayLineId;

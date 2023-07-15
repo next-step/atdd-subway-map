@@ -7,7 +7,7 @@ import subway.subway.application.in.SubwaySectionAddUsecase;
 import subway.subway.application.out.StationListLoadByIdInPort;
 import subway.subway.application.out.SubwayLineLoadPort;
 import subway.subway.application.out.SubwaySectionAddPort;
-import subway.subway.domain.SectionOperateManager;
+import subway.subway.domain.SectionUpdateManager;
 import subway.subway.domain.Station;
 import subway.subway.domain.SubwayLine;
 import subway.subway.domain.SubwaySection;
@@ -20,14 +20,14 @@ public class SubwaySectionAddService implements SubwaySectionAddUsecase {
 
     private final StationListLoadByIdInPort stationListLoadByIdInPort;
     private final SubwayLineLoadPort subwayLineLoadPort;
-    private final SectionOperateManager sectionOperateManager;
+    private final SectionUpdateManager sectionUpdateManager;
     private final SubwaySectionAddPort subwaySectionAddPort;
 
     @Autowired
-    public SubwaySectionAddService(StationListLoadByIdInPort stationListLoadByIdInPort, SubwayLineLoadPort subwayLineLoadPort, SectionOperateManager sectionOperateManager, SubwaySectionAddPort subwaySectionAddPort) {
+    public SubwaySectionAddService(StationListLoadByIdInPort stationListLoadByIdInPort, SubwayLineLoadPort subwayLineLoadPort, SectionUpdateManager sectionUpdateManager, SubwaySectionAddPort subwaySectionAddPort) {
         this.stationListLoadByIdInPort = stationListLoadByIdInPort;
         this.subwayLineLoadPort = subwayLineLoadPort;
-        this.sectionOperateManager = sectionOperateManager;
+        this.sectionUpdateManager = sectionUpdateManager;
         this.subwaySectionAddPort = subwaySectionAddPort;
     }
 
@@ -39,7 +39,7 @@ public class SubwaySectionAddService implements SubwaySectionAddUsecase {
 
         SubwaySection subwaySection = SubwaySection.register(upStation, downStation, command.getDistance());
         SubwayLine subwayLine = subwayLineLoadPort.findOne(command.getSubwayLineId());
-        subwayLine.addSection(subwaySection, sectionOperateManager);
+        subwayLine.updateSection(subwaySection, sectionUpdateManager);
         subwaySectionAddPort.addSubwaySection(subwayLine);
     }
 

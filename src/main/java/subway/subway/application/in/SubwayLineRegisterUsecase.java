@@ -5,7 +5,7 @@ import subway.subway.domain.Kilometer;
 import subway.subway.domain.Station;
 
 public interface SubwayLineRegisterUsecase {
-    SubwayLineResponse registerSubwayLine(Command command);
+    SubwayLineResponse registerSubwayLine(SubwayLineRegisterUsecase.Command command);
 
     class Command {
         private final String name;

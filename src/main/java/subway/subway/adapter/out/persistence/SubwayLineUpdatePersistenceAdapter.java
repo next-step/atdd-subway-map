@@ -2,8 +2,7 @@ package subway.subway.adapter.out.persistence;
 
 import org.springframework.stereotype.Component;
 import subway.rds_module.entity.SubwayLineJpa;
-import subway.subway.adapter.out.persistence.mapper.SubwayLineJpaMapper;
-import subway.subway.adapter.out.persistence.repository.SubwayLineRepository;
+import subway.subway.adapter.out.persistence.repository.SubwayLineJpaRepository;
 import subway.subway.application.out.SubwayLineUpdatePort;
 import subway.subway.domain.SubwayLine;
 
@@ -12,9 +11,9 @@ import java.util.NoSuchElementException;
 @Component
 class SubwayLineUpdatePersistenceAdapter implements SubwayLineUpdatePort {
 
-    private final SubwayLineRepository subwayLineJpaRepository;
+    private final SubwayLineJpaRepository subwayLineJpaRepository;
 
-    public SubwayLineUpdatePersistenceAdapter(SubwayLineRepository subwayLineJpaRepository) {
+    public SubwayLineUpdatePersistenceAdapter(SubwayLineJpaRepository subwayLineJpaRepository) {
         this.subwayLineJpaRepository = subwayLineJpaRepository;
     }
     @Override

@@ -4,7 +4,7 @@ import subway.subway.domain.SubwayLine;
 
 public interface SubwayLineCloseUsecase {
 
-    void closeSubwayLine(Command command);
+    void closeSubwayLine(SubwayLineCloseUsecase.Command command);
 
     class Command {
         private final SubwayLine.Id id;

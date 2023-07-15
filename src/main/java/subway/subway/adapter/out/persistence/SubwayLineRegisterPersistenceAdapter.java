@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 import subway.rds_module.entity.SubwayLineJpa;
 import subway.subway.adapter.out.persistence.mapper.SubwayLineJpaMapper;
 import subway.subway.adapter.out.persistence.mapper.SubwayLineResponseMapper;
-import subway.subway.adapter.out.persistence.repository.SubwayLineRepository;
+import subway.subway.adapter.out.persistence.repository.SubwayLineJpaRepository;
 import subway.subway.application.out.SubwayLineRegisterPort;
 import subway.subway.application.query.SubwayLineResponse;
 import subway.subway.domain.SubwayLine;
@@ -12,12 +12,12 @@ import subway.subway.domain.SubwayLine;
 @Component
 class SubwayLineRegisterPersistenceAdapter implements SubwayLineRegisterPort {
 
-    private final SubwayLineRepository subwayLineRepository;
+    private final SubwayLineJpaRepository subwayLineJpaRepository;
     private final SubwayLineResponseMapper subwayLineResponseMapper;
     private final SubwayLineJpaMapper subwayLineJpaMapper;
 
-    public SubwayLineRegisterPersistenceAdapter(SubwayLineRepository subwayLineRepository, SubwayLineResponseMapper subwayLineResponseMapper, SubwayLineJpaMapper subwayLineJpaMapper) {
-        this.subwayLineRepository = subwayLineRepository;
+    public SubwayLineRegisterPersistenceAdapter(SubwayLineJpaRepository subwayLineJpaRepository, SubwayLineResponseMapper subwayLineResponseMapper, SubwayLineJpaMapper subwayLineJpaMapper) {
+        this.subwayLineJpaRepository = subwayLineJpaRepository;
         this.subwayLineResponseMapper = subwayLineResponseMapper;
         this.subwayLineJpaMapper = subwayLineJpaMapper;
     }
@@ -26,7 +26,7 @@ class SubwayLineRegisterPersistenceAdapter implements SubwayLineRegisterPort {
     public SubwayLineResponse register(SubwayLine subwayLine) {
         SubwayLineJpa subwayLineJpa = subwayLineJpaMapper.from(subwayLine);
 
-        subwayLineRepository.save(subwayLineJpa);
+        subwayLineJpaRepository.save(subwayLineJpa);
         return subwayLineResponseMapper.from(subwayLineJpa);
     }
 }

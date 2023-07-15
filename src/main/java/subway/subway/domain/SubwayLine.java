@@ -63,6 +63,10 @@ public class SubwayLine {
         return startStationId;
     }
 
+    public SubwaySection getSection(Station.Id stationId) {
+        return sections.getSection(stationId);
+    }
+
     public boolean isNew() {
         return id.isNew();
     }
@@ -72,9 +76,21 @@ public class SubwayLine {
         this.color = color;
     }
 
-    public void addSection(SubwaySection subwaySection, SectionOperateManager manager) {
-        sections.update(subwaySection, manager);
+    public void updateSection(SubwaySection subwaySection, SectionUpdateManager manager) {
+        SectionUpdater updater = manager.getUpdater(this);
+        updater.apply(this, subwaySection);
+
         validate();
+    }
+
+    public void closeSection(Station station, SectionCloseManager manager) {
+        SectionCloser closer = manager.getOperator(this);
+        closer.apply(this, station);
+        validate();
+    }
+
+    void addSection(SubwaySection subwaySection) {
+        sections.add(subwaySection);
     }
 
     public boolean existsUpStation(Station.Id stationId) {
@@ -87,6 +103,10 @@ public class SubwayLine {
 
     public int getSectionSize() {
         return sections.size();
+    }
+
+    void closeSection(Station station) {
+        sections.close(station);
     }
 
     public static class Id {

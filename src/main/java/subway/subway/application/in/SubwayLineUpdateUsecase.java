@@ -4,18 +4,15 @@ import subway.subway.domain.SubwayLine;
 
 public interface SubwayLineUpdateUsecase {
 
-    void updateSubwayLine(Command command);
+    void updateSubwayLine(SubwayLineUpdateUsecase.Command command);
     class Command {
 
         private SubwayLine.Id id;
-        private UpdateContents updateContents;
+        private SubwayLineUpdateUsecase.Command.UpdateContents updateContents;
 
         public Command(SubwayLine.Id id, UpdateContents updateContents) {
             this.id = id;
             this.updateContents = updateContents;
-        }
-
-        private Command() {
         }
 
         public SubwayLine.Id getId() {
@@ -39,8 +36,6 @@ public interface SubwayLineUpdateUsecase {
                 this.color = color;
             }
 
-            private UpdateContents() {
-            }
 
             public String getName() {
                 return name;

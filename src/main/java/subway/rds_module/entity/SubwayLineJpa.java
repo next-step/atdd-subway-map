@@ -6,6 +6,7 @@ import subway.subway.domain.SubwaySection;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -27,7 +28,7 @@ public class SubwayLineJpa {
     @Column(nullable = false)
     private Long startSectionId;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     @JoinColumn(name="subway_line_id")
     private List<SubwaySectionJpa> subwaySections = new ArrayList<>();
 
@@ -91,6 +92,27 @@ public class SubwayLineJpa {
                         section.getDownStationId().getValue(),
                         section.getDownStationName(),
                         section.getDistance().getValue());
+            }
+        }
+    }
+
+
+    public void deleteSections(SubwayLine subwayLine) {
+        Iterator<SubwaySectionJpa> fruitsIterator = subwaySections.iterator();
+
+        while (fruitsIterator.hasNext()) {
+            SubwaySectionJpa subwaySectionJpa = fruitsIterator.next();
+            Station.Id id = new Station.Id(subwaySectionJpa.getUpStationId());
+            if (subwayLine.existsUpStation(id)) {
+                SubwaySection section = subwayLine.getSection(new Station.Id(subwaySectionJpa.getId()));
+                subwaySectionJpa.update(
+                        section.getUpStationId().getValue(),
+                        section.getUpStationName(),
+                        section.getDownStationId().getValue(),
+                        section.getDownStationName(),
+                        section.getDistance().getValue());
+            } else {
+                fruitsIterator.remove();
             }
         }
     }

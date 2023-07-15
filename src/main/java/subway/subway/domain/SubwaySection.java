@@ -65,6 +65,10 @@ public class SubwaySection {
         return id.isNew();
     }
 
+    boolean matchesDownStation(Station station) {
+        return downStation.getId().equals(station.getId());
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

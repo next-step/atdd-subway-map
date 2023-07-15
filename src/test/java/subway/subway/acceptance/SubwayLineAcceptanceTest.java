@@ -110,6 +110,20 @@ public abstract class SubwayLineAcceptanceTest extends StationAcceptanceTest{
         Assertions.assertThat(stationIds).isEqualTo(stations.stream().map(StationResponse::getId).collect(Collectors.toList()));
     }
 
+    protected void 지하철_노선_구간_미포함_확인(SubwayLineResponse subwayLine, StationResponse... stations) {
+        String[] stationNames = Arrays.stream(stations).map(StationResponse::getName).toArray(String[]::new);
+
+        SubwayLineResponse subwayLineResponse = RestAssured
+                .given().log().all()
+                .when().get("/subway-lines/{subway-line-id}", subwayLine.getId())
+                .then().log().all()
+                .extract().as(SubwayLineResponse.class);
+
+        Assertions.assertThat(subwayLineResponse.getStations())
+                .extracting(SubwayLineResponse.StationInfo::getName)
+                .doesNotContain(stationNames);
+    }
+
     protected void 지하철_노선_상세_조회_응답_비교(ExtractableResponse<Response> response, String name, String color, String upStationName, String downStationName) {
         SubwayLineResponse subwayLineResponse = response.body().as(SubwayLineResponse.class);
         assertSoftly(soft -> {
