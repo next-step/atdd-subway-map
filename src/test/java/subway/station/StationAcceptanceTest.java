@@ -1,20 +1,19 @@
-package subway;
+package subway.station;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import subway.AcceptanceTest;
+
 import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.service.StationTestUtils.*;
+import static subway.station.StationTestUtils.*;
 
 @DisplayName("지하철역 관련 기능")
-public class StationAcceptanceTest extends AcceptanceTest{
-
-    private final Map<String, String> 강남역_정보 = Map.of("name", "강남역");
-    private final Map<String, String> 역삼역_정보 = Map.of("name", "역삼역");
+public class StationAcceptanceTest extends AcceptanceTest {
 
 
     /**
@@ -49,7 +48,7 @@ public class StationAcceptanceTest extends AcceptanceTest{
         ExtractableResponse<Response> response = 지하철역_조회();
 
         // then
-        지하철_역_개수_검증(response, 2);
+        역_개수_검증(response, 2);
     }
 
     /**
@@ -61,10 +60,8 @@ public class StationAcceptanceTest extends AcceptanceTest{
     @Test
     void deleteStation() {
         // given
-        ExtractableResponse<Response> gangnamStationCreationRes = 지하철역_생성(강남역_정보);
+        String stationUrl = 지하철역_생성(강남역_정보);
         지하철역_생성(역삼역_정보);
-
-        String stationUrl = gangnamStationCreationRes.response().getHeader("Location");
 
         // when
         지하철역_삭제(stationUrl);
@@ -73,7 +70,7 @@ public class StationAcceptanceTest extends AcceptanceTest{
         역_삭제_여부_검증(지하철역_조회(), 강남역_정보);
     }
 
-    private static void 지하철_역_개수_검증(ExtractableResponse<Response> response, int targetCount) {
+    private static void 역_개수_검증(ExtractableResponse<Response> response, int targetCount) {
         List<String> stationNames = response.jsonPath().getList("name", String.class);
 
         assertThat(stationNames.size()).isEqualTo(targetCount);

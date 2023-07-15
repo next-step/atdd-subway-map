@@ -1,15 +1,13 @@
-package subway.controller;
+package subway.station.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import subway.dto.StationDto;
-import subway.service.StationService;
-import subway.dto.StationRequest;
-import subway.dto.StationResponse;
+import subway.station.service.StationService;
+import subway.station.dto.StationRequest;
+import subway.station.dto.StationResponse;
 
 import java.net.URI;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 public class StationController {
@@ -21,15 +19,13 @@ public class StationController {
 
     @PostMapping("/stations")
     public ResponseEntity<StationResponse> createStation(@RequestBody StationRequest stationRequest) {
-        StationDto stationDto = stationService.saveStation(stationRequest.toDto());
-        return ResponseEntity.created(URI.create("/stations/" + stationDto.getId())).body(StationResponse.from(stationDto));
+        StationResponse response = stationService.saveStation(stationRequest);
+        return ResponseEntity.created(URI.create("/stations/" + response.getId())).body(response);
     }
 
     @GetMapping(value = "/stations")
     public ResponseEntity<List<StationResponse>> showStations() {
-        List<StationResponse> responses = stationService.findAllStations().stream()
-                .map(StationResponse::from)
-                .collect(Collectors.toList());
+        List<StationResponse> responses = stationService.findAllStations();
         return ResponseEntity.ok().body(responses);
     }
 
