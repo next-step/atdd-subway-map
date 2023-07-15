@@ -23,4 +23,17 @@ public class SubwaySectionHelper {
 
         return createSectionResponse;
     }
+
+    public static ExtractableResponse<Response> 지하철_구간_등록_요청(String url) {
+        ExtractableResponse<Response> registerSectionResponse = RestAssured
+                .given().log().all()
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                    .body(url)
+                .when().log().all()
+                    .post(url)
+                .then().log().all()
+                .extract();
+
+        return registerSectionResponse;
+    }
 }

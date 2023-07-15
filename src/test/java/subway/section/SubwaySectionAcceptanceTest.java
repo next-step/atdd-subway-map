@@ -14,6 +14,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD;
+import static subway.helper.SubwaySectionHelper.지하철_구간_등록_요청;
 import static subway.helper.SubwaySectionHelper.지하철_구간_생성_요청;
 import static subway.helper.SubwayStationHelper.지하철_역_생성_요청;
 
@@ -58,10 +59,14 @@ public class SubwaySectionAcceptanceTest {
     @Test
     void registerSubwaySection() {
         // given
+        ExtractableResponse<Response> 지하철_구간_생성_결과 = 지하철_구간_생성_요청(구간_A역_C역);
+        String 생성된_지하철_노선_URL = 생성된_지하철_노선_URL_조회(지하철_구간_생성_결과);
 
         // when
+        ExtractableResponse<Response> 지하철_구간_등록_결과 = 지하철_구간_등록_요청(생성된_지하철_노선_URL);
 
         // then
+        지하철_구간_등록_됨(지하철_구간_등록_결과);
     }
 
     /**
@@ -94,5 +99,16 @@ public class SubwaySectionAcceptanceTest {
 
     private void 지하철_구간_생성됨(ExtractableResponse<Response> createSectionApiResponse) {
         assertThat(createSectionApiResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+    }
+
+    private String 생성된_지하철_노선_URL_조회(ExtractableResponse<Response> createSectionApiResponse) {
+        String createSectionApiResponseUrl = createSectionApiResponse
+                .response().getHeaders().getValue("Location");
+
+        return createSectionApiResponseUrl;
+    }
+
+    private void 지하철_구간_등록_됨(ExtractableResponse<Response> registerSectionApiResponse) {
+        assertThat(registerSectionApiResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 }
