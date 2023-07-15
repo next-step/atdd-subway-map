@@ -1,10 +1,7 @@
 package subway.section;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class SubwaySectionController {
@@ -31,4 +28,10 @@ public class SubwaySectionController {
         return ResponseEntity.ok(subwaySectionResponse);
     }
 
+    @DeleteMapping("/subway-sections/{lineId}")
+    public ResponseEntity<SubwaySectionResponse> deleteSubwaySection(@PathVariable Long lineId) {
+        SubwaySectionResponse subwaySectionResponse = subwaySectionService.deleteSection(lineId);
+
+        return ResponseEntity.ok(subwaySectionResponse);
+    }
 }

@@ -7,6 +7,8 @@ import subway.line.SubwayLineService;
 import subway.station.Station;
 import subway.station.StationService;
 
+import java.util.List;
+
 @Service
 @Transactional(readOnly = true)
 public class SubwaySectionService {
@@ -25,10 +27,15 @@ public class SubwaySectionService {
     @Transactional
     public SubwaySectionResponse createSubwaySection(Long lineId, SubwaySectionRequest sectionRequest) {
         SubwayLine line = subwayLineService.findSubwayLineEntity(lineId);
+        List<SubwaySection> sections = line.getSections();
         Station upStation = stationService.findStationById(sectionRequest.getUpStationId());
         Station downStation = stationService.findStationById(sectionRequest.getDownStationId());
-
         SubwaySection section = new SubwaySection(upStation, downStation, line);
+
+        if (sections.size() == 0) {
+            subwayLineService.updateSections(lineId, section);
+        }
+
         subwaySectionRepository.save(section);
 
         return createSectionResponse(section);
@@ -44,9 +51,6 @@ public class SubwaySectionService {
         SubwaySection newSection = subwaySectionRepository.findById(createNewSectionResponse.getId())
                 .orElseThrow(() -> new IllegalArgumentException());
 
-        System.out.println("savedSectionId : " + savedUpSection.getId());
-        System.out.println("sectionRequest.getUpStationId() : " + sectionRequest.getUpStationId());
-
         if (savedUpSection.getId() != sectionRequest.getUpStationId()) {
             System.out.println("기존 하행 종점 역과 요청 상행 종점역이 맞지 않습니다.");
         }
@@ -54,6 +58,20 @@ public class SubwaySectionService {
         SubwayLine line = savedUpSection.getLine();
         subwayLineService.updateSections(line.getId(), newSection);
         return createSectionResponse(newSection);
+    }
+
+    @Transactional
+    public SubwaySectionResponse deleteSection(Long lineId) {
+        SubwayLine line = subwayLineService.findSubwayLineEntity(lineId);
+
+        List<SubwaySection> sections = line.getSections();
+        if (sections.size() < 2) {
+            System.out.println("구간의 개수가 1개이기에 삭제할 수 없습니다.");
+            System.out.println("size : " + sections.size());
+        }
+
+        sections.remove(sections.size() - 1);
+        return createSectionResponse(sections.get(sections.size() - 1));
     }
 
     private SubwaySectionResponse createSectionResponse(SubwaySection section) {
