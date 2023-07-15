@@ -1,6 +1,5 @@
 package subway;
 
-import helper.RequestApiHelper;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,6 +16,7 @@ import java.util.Map;
 
 import static helper.LineTestHelper.지하철노선을_생성한다;
 import static helper.LineTestHelper.지하철노선을_조회한다;
+import static helper.SectionTestHelper.*;
 import static helper.StationTestHelper.지하철역을_생성한다;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD;
@@ -26,7 +26,12 @@ import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFOR
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class SectionAcceptanceTest {
 
-    private final LineRequest LINE_1 = new LineRequest.Builder()
+    public static final Map<String, Object> PARAMS = Map.of(
+            "upStationId", 2,
+            "downStationId", 3,
+            "distance", 10
+    );
+    private final LineRequest LINE = new LineRequest.Builder()
             .name("신분당선")
             .color("bg-red-600")
             .upStationId(1L)
@@ -51,7 +56,7 @@ class SectionAcceptanceTest {
     @Test
     void createDefaultSection() {
         // given
-        String lineId = 지하철노선을_생성한다(LINE_1)
+        String lineId = 지하철노선을_생성한다(LINE)
                 .jsonPath()
                 .get("id")
                 .toString();
@@ -63,11 +68,6 @@ class SectionAcceptanceTest {
         assertThat(sections).hasSize(1);
     }
 
-    private static List<Long> 지하철구간목록을_조회한다(String lineId) {
-        return RequestApiHelper.get("/lines/" + lineId + "/sections")
-                .jsonPath()
-                .getList("id", Long.class);
-    }
 
 
     /**
@@ -80,17 +80,12 @@ class SectionAcceptanceTest {
     @Test
     void addSection() {
         // given
-        String lineId = 지하철노선을_생성한다(LINE_1)
+        String lineId = 지하철노선을_생성한다(LINE)
                 .jsonPath()
                 .get("id")
                 .toString();
 
-        Map<String, Object> params = Map.of(
-                "upStationId", 2,
-                "downStationId", 3,
-                "distance", 10
-        );
-        String sectionId = 지하철구간을_생성한다(lineId, params)
+        String sectionId = 지하철구간을_생성한다(lineId, PARAMS)
                 .jsonPath()
                 .get("id")
                 .toString();
@@ -107,10 +102,6 @@ class SectionAcceptanceTest {
         assertThat(line.jsonPath().getObject("distance", Long.class)).isEqualTo(20);
     }
 
-    private static ExtractableResponse<Response> 지하철구간을_생성한다(String lineId, Map<String, Object> params) {
-        return RequestApiHelper.post("/lines/" + lineId + "/sections", params);
-    }
-
     /**
      * Given 지하철 노선을 생성하고
      * When 상행역이 해당 노선의 하행 종점역이 아닌 구간을 등록하면
@@ -120,7 +111,7 @@ class SectionAcceptanceTest {
     @Test
     void addSectionWithWrongUpStation() {
         // given
-        String lineId = 지하철노선을_생성한다(LINE_1)
+        String lineId = 지하철노선을_생성한다(LINE)
                 .jsonPath()
                 .get("id")
                 .toString();
@@ -148,23 +139,18 @@ class SectionAcceptanceTest {
     @Test
     void deleteSection() {
         // given
-        String lineId = 지하철노선을_생성한다(LINE_1)
+        String lineId = 지하철노선을_생성한다(LINE)
                 .jsonPath()
                 .get("id")
                 .toString();
 
-        Map<String, Object> params = Map.of(
-                "upStationId", 2,
-                "downStationId", 3,
-                "distance", 10
-        );
-        String sectionId = 지하철구간을_생성한다(lineId, params)
+        String sectionId = 지하철구간을_생성한다(lineId, PARAMS)
                 .jsonPath()
                 .get("id")
                 .toString();
 
         // when
-        RequestApiHelper.delete("/lines/" + lineId + "/sections?stationId=2");
+        지하철구간을_삭제한다(lineId, "2");
 
         // then
         List<Long> sections = 지하철구간목록을_조회한다(lineId);
@@ -180,27 +166,21 @@ class SectionAcceptanceTest {
     @Test
     void cannotDeleteMiddleSection() {
         // given
-        String lineId = 지하철노선을_생성한다(LINE_1)
+        String lineId = 지하철노선을_생성한다(LINE)
                 .jsonPath()
                 .get("id")
                 .toString();
-
-        Map<String, Object> params1 = Map.of(
-                "upStationId", 2,
-                "downStationId", 3,
-                "distance", 10
-        );
 
         Map<String, Object> params2 = Map.of(
                 "upStationId", 3,
                 "downStationId", 4,
                 "distance", 10
         );
-        지하철구간을_생성한다(lineId, params1);
+        지하철구간을_생성한다(lineId, PARAMS);
         지하철구간을_생성한다(lineId, params2);
 
         // when
-        ExtractableResponse<Response> response = RequestApiHelper.delete("/lines/" + lineId + "/sections?stationId=2");
+        ExtractableResponse<Response> response = 지하철구간을_삭제한다(lineId, "2");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -215,13 +195,13 @@ class SectionAcceptanceTest {
     @Test
     void cannotDeleteOneSection() {
         // given
-        String lineId = 지하철노선을_생성한다(LINE_1)
+        String lineId = 지하철노선을_생성한다(LINE)
                 .jsonPath()
                 .get("id")
                 .toString();
 
         // when
-        ExtractableResponse<Response> response = RequestApiHelper.delete("/lines/" + lineId + "/sections?stationId=1");
+        ExtractableResponse<Response> response = 지하철구간을_삭제한다(lineId, "1");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
