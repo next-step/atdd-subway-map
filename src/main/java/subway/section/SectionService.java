@@ -29,6 +29,10 @@ public class SectionService {
         Station upStation = stationRepository.findById(request.getUpStationId())
                 .orElseThrow(() -> new IllegalStateException(String.format("하행종점역을 찾을 수 없습니다. (downStationId: %d)", request.getUpStationId())));
 
+        if (!line.getDownStationId().equals(upStation.getId())) {
+            throw new IllegalStateException(String.format("새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이 아닙니다. (구간의 upStationId: %d)", request.getUpStationId()));
+        }
+
         Station downStation = stationRepository.findById(request.getDownStationId())
                 .orElseThrow(() -> new IllegalStateException(String.format("새로운 하행종점역을 찾을 수 없습니다. (downStationId: %d)", request.getDownStationId())));
 

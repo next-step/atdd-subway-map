@@ -60,6 +60,10 @@ public class Line {
         return upStation;
     }
 
+    public Long getDownStationId() {
+        return downStation.getId();
+    }
+
     public Station getDownStation() {
         return downStation;
     }
