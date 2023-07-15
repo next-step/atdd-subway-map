@@ -1,5 +1,8 @@
 package subway.model;
 
+import subway.exception.DeleteSectionException;
+import subway.exception.ErrorMessage;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,20 +27,16 @@ public class Line {
     )
     private List<Station> stations = new ArrayList<>();
 
-    @OneToMany(mappedBy = "id", fetch = FetchType.LAZY)
-    private List<Section> sections = new ArrayList<>();
-
     @Column(nullable = false)
     private Long distance;
 
     protected Line() {
     }
 
-    public Line(String name, String color, Station upStation, Station downStation, Long distance) {
+    public Line(String name, String color, List<Station> stations, Long distance) {
         this.name = name;
         this.color = color;
-        stations.add(upStation);
-        stations.add(downStation);
+        this.stations = stations;
         this.distance = distance;
     }
 
@@ -70,8 +69,8 @@ public class Line {
         return stations.get(stations.size() - 1).equals(upStation);
     }
 
-    public void update(Station downStation, Long distance) {
-        this.stations.add(downStation);
+    public void addSection(Section section) {
+        this.stations.add(section.getDownStation());
         this.distance += distance;
     }
 
@@ -79,18 +78,23 @@ public class Line {
         return stations.contains(downStation);
     }
 
-    public void deleteLastSection(Section section) {
-        int lastIndex = sections.size() - 1;
-        if (sections.get(lastIndex).equals(section)) {
-            sections.remove(lastIndex);
+    public void deleteLastSection(Section lastSection) {
+        if (stations.size() == 2) {
+            throw new DeleteSectionException(ErrorMessage.CANNOT_REMOVE_ONLY_ONE_SECTION);
         }
+        Station upStation = stations.get(stations.size() - 2);
+        Station downStation = stations.get(stations.size() - 1);
+        if (!lastSection.equals(upStation, downStation)) {
+            throw new DeleteSectionException(ErrorMessage.IS_NOT_LAST_SECTION);
+        }
+        stations.remove(downStation);
+        distance -= lastSection.getDistance();
     }
 
     public static class Builder {
         private String name;
         private String color;
-        private Station upStation;
-        private Station downStation;
+        private List<Station> stations;
         private Long distance;
 
         public Builder() {
@@ -106,23 +110,18 @@ public class Line {
             return this;
         }
 
-        public Builder upStation(Station upStation) {
-            this.upStation = upStation;
-            return this;
-        }
-
-        public Builder downStation(Station downStation) {
-            this.downStation = downStation;
-            return this;
-        }
-
         public Builder distance(Long distance) {
             this.distance = distance;
             return this;
         }
 
+        public Builder stations(List<Station> stations) {
+            this.stations = stations;
+            return this;
+        }
+
         public Line build() {
-            return new Line(name, color, upStation, downStation, distance);
+            return new Line(name, color, stations, distance);
         }
     }
 }

@@ -31,23 +31,22 @@ public class LineService {
     public Line create(LineRequest lineRequest) {
         Station upStation = stationService.findStationById(lineRequest.getUpStationId());
         Station downStation = stationService.findStationById(lineRequest.getDownStationId());
-        Line newLine = new Line.Builder()
+        Line line = new Line.Builder()
                 .name(lineRequest.getName())
                 .color(lineRequest.getColor())
-                .upStation(upStation)
-                .downStation(downStation)
+                .stations(List.of(upStation, downStation))
                 .distance(lineRequest.getDistance())
                 .build();
-        Line line = lineRepository.save(newLine);
+        Line savedLine = lineRepository.save(line);
 
         Section section = new Section.Builder()
-                .line(line)
+                .line(savedLine)
                 .upStation(upStation)
                 .downStation(downStation)
                 .distance(lineRequest.getDistance())
                 .build();
         sectionRepository.save(section);
-        return line;
+        return savedLine;
     }
 
     public List<Line> findAllLines() {

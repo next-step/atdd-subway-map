@@ -39,6 +39,7 @@ class SectionAcceptanceTest {
         지하철역을_생성한다("지하철역");
         지하철역을_생성한다("새로운지하철역");
         지하철역을_생성한다("또다른지하철역");
+        지하철역을_생성한다("또다른지하철역2");
     }
 
     /**
@@ -168,5 +169,61 @@ class SectionAcceptanceTest {
         // then
         List<Long> sections = 지하철구간목록을_조회한다(lineId);
         assertThat(sections).doesNotContain(Long.parseLong(sectionId));
+    }
+
+    /**
+     * Given 지하철 노선과 구간을 2개 생성하고,
+     * When 지하철 노선의 중간 구간을 지우면
+     * Then 구간을 삭제할 수 없다.
+     */
+    @DisplayName("중간 구간 제거 불가")
+    @Test
+    void cannotDeleteMiddleSection() {
+        // given
+        String lineId = 지하철노선을_생성한다(LINE_1)
+                .jsonPath()
+                .get("id")
+                .toString();
+
+        Map<String, Object> params1 = Map.of(
+                "upStationId", 2,
+                "downStationId", 3,
+                "distance", 10
+        );
+
+        Map<String, Object> params2 = Map.of(
+                "upStationId", 3,
+                "downStationId", 4,
+                "distance", 10
+        );
+        지하철구간을_생성한다(lineId, params1);
+        지하철구간을_생성한다(lineId, params2);
+
+        // when
+        ExtractableResponse<Response> response = RequestApiHelper.delete("/lines/" + lineId + "/sections?stationId=2");
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고,
+     * When 지하철 노선의 구간을 삭제하면
+     * Then 구간을 삭제할 수 없다.
+     */
+    @DisplayName("구간이 하나인 경우 제거 불가")
+    @Test
+    void cannotDeleteOneSection() {
+        // given
+        String lineId = 지하철노선을_생성한다(LINE_1)
+                .jsonPath()
+                .get("id")
+                .toString();
+
+        // when
+        ExtractableResponse<Response> response = RequestApiHelper.delete("/lines/" + lineId + "/sections?stationId=1");
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 }

@@ -4,7 +4,6 @@ import subway.exception.AddSectionException;
 import subway.exception.ErrorMessage;
 
 import javax.persistence.*;
-import java.util.Objects;
 
 @Entity
 public class Section {
@@ -62,17 +61,8 @@ public class Section {
         }
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Section section = (Section) o;
-        return Objects.equals(id, section.id) && Objects.equals(line, section.line) && Objects.equals(upStation, section.upStation) && Objects.equals(downStation, section.downStation) && Objects.equals(distance, section.distance);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, line, upStation, downStation, distance);
+    public boolean equals(Station upStation, Station downStation) {
+        return this.upStation.equals(upStation) && this.downStation.equals(downStation);
     }
 
     public static class Builder {
@@ -82,11 +72,6 @@ public class Section {
         private Long distance;
 
         public Builder() {
-        }
-
-        public Builder line(Line line) {
-            this.line = line;
-            return this;
         }
 
         public Builder upStation(Station upStation) {
@@ -106,6 +91,11 @@ public class Section {
 
         public Section build() {
             return new Section(line, upStation, downStation, distance);
+        }
+
+        public Builder line(Line savedLine) {
+            this.line = savedLine;
+            return this;
         }
     }
 }

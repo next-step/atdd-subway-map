@@ -5,7 +5,6 @@ import subway.dto.SectionRequest;
 import subway.model.Line;
 import subway.model.Section;
 import subway.model.Station;
-import subway.repository.LineRepository;
 import subway.repository.SectionRepository;
 
 import javax.transaction.Transactional;
@@ -17,7 +16,7 @@ public class SectionService {
     private final StationService stationService;
     private final LineService lineService;
 
-    public SectionService(SectionRepository sectionRepository, StationService stationService, LineRepository lineRepository, LineService lineService) {
+    public SectionService(SectionRepository sectionRepository, StationService stationService, LineService lineService) {
         this.sectionRepository = sectionRepository;
         this.stationService = stationService;
         this.lineService = lineService;
@@ -40,7 +39,7 @@ public class SectionService {
                 .build();
         newSection.validate(line);
         Section section = sectionRepository.save(newSection);
-        line.update(downStation, sectionRequest.getDistance());
+        line.addSection(section);
         lineService.save(line);
         return section;
     }
