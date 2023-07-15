@@ -1,26 +1,21 @@
 package subway.station;
 
-import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+import static common.fixture.StationFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @Sql(scripts = {"classpath:SQLScripts/00.clear-database.sql"})
 public class StationAcceptanceTest {
-    static final String GN_STATION = "강남역";
-    static final String YS_STATION = "역삼역";
 
     /**
      * When 지하철역을 생성하면
@@ -31,13 +26,13 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        Response response = this.requestCreateStation(GN_STATION);
+        Response response = 역_생성_요청(GN_STATION);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames = this.requestSearchStation().jsonPath().getList("name", String.class);
+        List<String> stationNames = 역_검색_요청().jsonPath().getList("name", String.class);
         assertThat(stationNames).containsAnyOf(GN_STATION);
     }
 
@@ -50,11 +45,11 @@ public class StationAcceptanceTest {
     @Test
     void searchStation() {
         // given
-        this.requestCreateStation(GN_STATION);
-        this.requestCreateStation(YS_STATION);
+        역_생성_요청(GN_STATION);
+        역_생성_요청(YS_STATION);
 
         // when
-        List<String> stationNames = this.requestSearchStation().jsonPath().getList("name", String.class);
+        List<String> stationNames = 역_검색_요청().jsonPath().getList("name", String.class);
 
         // then
         assertThat(stationNames).containsAnyOf(GN_STATION, YS_STATION);
@@ -70,40 +65,17 @@ public class StationAcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        String createdId = this.requestCreateStation(GN_STATION).jsonPath().getString("id");
+        Long createdId = 역_생성_요청(GN_STATION).jsonPath().getLong("id");
 
         // when
-        Response response = requestDeleteStation(createdId);
+        Response response = 역_삭제_요청(createdId);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         // then
-        List<String> stationNames = this.requestSearchStation().jsonPath().getList("name", String.class);
+        List<String> stationNames = 역_검색_요청().jsonPath().getList("name", String.class);
         assertThat(stationNames).isEmpty();
     }
 
-    private Response requestCreateStation(String stationName) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", stationName);
-        return RestAssured.given().body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract().response();
-    }
-
-    private Response requestSearchStation() {
-        return RestAssured.given().log().all()
-                .when().get("/stations")
-                .then().log().all()
-                .extract().response();
-    }
-
-    private Response requestDeleteStation(String createdId) {
-        return RestAssured.given().log().all()
-                .when().delete("/stations/" + createdId)
-                .then().log().all()
-                .extract().response();
-    }
 }
