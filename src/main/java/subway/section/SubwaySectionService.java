@@ -20,6 +20,8 @@ public class SubwaySectionService {
 
     @Transactional
     public SubwaySectionResponse createSubwaySection(@RequestBody SubwaySectionRequest subwaySectionRequest) {
+        System.out.println("getUpStationId : " + subwaySectionRequest.getUpStationId());
+
         Station upStation = stationService.findStationById(subwaySectionRequest.getUpStationId());
         Station downStation = stationService.findStationById(subwaySectionRequest.getDownStationId());
 

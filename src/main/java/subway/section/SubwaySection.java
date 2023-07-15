@@ -22,7 +22,5 @@ public class SubwaySection {
         this.downStation = downStation;
     }
 
-    public Long getId() {
-        return id;
-    }
+    public Long getId() { return id; }
 }
