@@ -79,7 +79,6 @@ public class LineAcceptanceTest {
         );
     }
 
-    // TODO: PATCH인데 PUT으로 변경해야 함
     // Given 지하철 노선을 생성하고
     // When 생성한 지하철 노선을 수정하면
     // Then 해당 지하철 노선 정보는 수정된다
