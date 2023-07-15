@@ -1,6 +1,6 @@
 package subway.line;
 
-import subway.station.Station;
+import subway.section.SubwaySection;
 
 import javax.persistence.*;
 import java.util.List;
@@ -19,15 +19,15 @@ public class SubwayLine {
     private String color;
 
     @OneToMany
-    @JoinColumn(name = "subway_line_id")
-    private List<Station> stations;
+    @JoinColumn(name = "subway_section_id")
+    private List<SubwaySection> sections;
 
     public SubwayLine() {}
 
-    public SubwayLine(String name, String color, List<Station> stations) {
+    public SubwayLine(String name, String color, List<SubwaySection> sections) {
         this.name = name;
         this.color = color;
-        this.stations = stations;
+        this.sections = sections;
     }
 
     public void updateName(String name) {
@@ -44,5 +44,5 @@ public class SubwayLine {
 
     public String getColor() { return color; }
 
-    public List<Station> getStations() { return stations; }
+    public List<SubwaySection> getSections() { return sections; }
 }

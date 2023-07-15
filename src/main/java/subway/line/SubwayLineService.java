@@ -2,10 +2,12 @@ package subway.line;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.section.SubwaySection;
+import subway.section.SubwaySectionService;
 import subway.station.Station;
 import subway.station.StationService;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -15,20 +17,26 @@ public class SubwayLineService {
 
     private SubwayLineRepository subwayLineRepository;
     private StationService stationService;
+    private SubwaySectionService subwaySectionService;
 
-    public SubwayLineService(SubwayLineRepository subwayLineRepository, StationService stationService) {
+    public SubwayLineService(SubwayLineRepository subwayLineRepository,
+            StationService stationService, SubwaySectionService subwaySectionService) {
         this.subwayLineRepository = subwayLineRepository;
         this.stationService = stationService;
+        this.subwaySectionService = subwaySectionService;
     }
 
     @Transactional
     public SubwayLineResponse createLine(SubwayLineRequest subwayLineRequest) {
         Station upStation = stationService.findStationById(subwayLineRequest.getUpStationId());
         Station downStation = stationService.findStationById(subwayLineRequest.getDownStationId());
+        SubwaySection section = subwaySectionService.saveSubwaySection(upStation, downStation);
 
-        List<Station> stations = Arrays.asList(upStation, downStation);
+        List<SubwaySection> sections = new ArrayList<>();
+        sections.add(section);
+
         SubwayLine subwayLine = subwayLineRepository.save(new SubwayLine(subwayLineRequest.getName()
-                , subwayLineRequest.getColor(), stations));
+                , subwayLineRequest.getColor(), sections));
 
         return createLineResponse(subwayLine);
     }
@@ -64,7 +72,7 @@ public class SubwayLineService {
                 subwayLine.getId(),
                 subwayLine.getName(),
                 subwayLine.getColor(),
-                subwayLine.getStations()
+                subwayLine.getSections()
         );
     }
 }
