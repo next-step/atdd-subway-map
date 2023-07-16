@@ -23,7 +23,9 @@ import subway.dto.LineResponse;
 import subway.dto.SectionRequest;
 import subway.dto.SectionResponse;
 import subway.dto.StationRequest;
+import subway.exception.AlreadyExistDownStation;
 import subway.exception.NoMatchUpStationException;
+import subway.exception.NonLastStationDeleteNotAllowedException;
 import subway.exception.error.SectionErrorCode;
 import subway.factory.LineRequestFactory;
 import subway.utils.RestAssuredClient;
@@ -136,7 +138,7 @@ public class SectionAcceptanceTest {
                         sectionRequest)
                     .statusCode(HttpStatus.BAD_REQUEST.value());
             })
-            .isInstanceOf(NoMatchUpStationException.class)
+            .isInstanceOf(AlreadyExistDownStation.class)
             .hasMessage(SectionErrorCode.ALREADY_EXIST_DOWN_STATION.getMessage());
     }
 
@@ -153,20 +155,19 @@ public class SectionAcceptanceTest {
         // Given
         long lastStationId = 4L;
 
-        SectionRequest sectionRequest1 = SectionRequest.builder()
+        SectionRequest secondSectionRequest = SectionRequest.builder()
             .upStationId(2L)
             .downStationId(3L)
             .distance(20L)
             .build();
+        createSection(secondSectionRequest);
 
-        SectionRequest sectionRequest2 = SectionRequest.builder()
+        SectionRequest thirdSectionRequest = SectionRequest.builder()
             .upStationId(3L)
             .downStationId(lastStationId)
             .distance(20L)
             .build();
-
-        createSection(sectionRequest1);
-        createSection(sectionRequest2);
+        createSection(thirdSectionRequest);
 
         // When
         ExtractableResponse<Response> response = RestAssuredClient.requestDelete(
@@ -175,6 +176,38 @@ public class SectionAcceptanceTest {
 
         // Then
         Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
+    /**
+     * Given: 3개의 지하철역이 등록되어 있다.
+     * And: 1개의 지하철 노선이 등록되어 있다.
+     * And: 2개의 구간이 등록되어 있다.
+     * When: 첫 번째 구간(상행 종점역)을 삭제한다.
+     * Then: 실패(400 Bad Request) 응답을 받는다.
+     * And: '마지막 구간만 삭제할 수 있습니다.' 메시지를 응답받는다.
+     */
+    @Test
+    @DisplayName("첫 번째 구간을 삭제한다.")
+    void deleteFirstSection() {
+        // Given
+        long firstStationId = lineResponse.getStations().get(0).getId();
+        SectionRequest secondSectionRequest = SectionRequest.builder()
+            .upStationId(2L)
+            .downStationId(3L)
+            .distance(20L)
+            .build();
+        createSection(secondSectionRequest);
+
+        // Then
+        Assertions.assertThatThrownBy(() -> {
+                RestAssuredClient.requestDelete(
+                        generatePathWithLineIdAndStationId(lineResponse.getId(), firstStationId))
+                    .statusCode(HttpStatus.BAD_REQUEST.value());
+            }
+        )
+            .isInstanceOf(NonLastStationDeleteNotAllowedException.class)
+            .hasMessage(SectionErrorCode.NON_LAST_STATION_DELETE_NOT_ALLOWED.getMessage());
+
     }
 
 
