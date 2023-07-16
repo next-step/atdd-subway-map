@@ -29,7 +29,7 @@ public class SubwayLineJpa {
     private Long startSectionId;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    @JoinColumn(name="subway_line_id")
+    @JoinColumn(name = "subway_line_id")
     private List<SubwaySectionJpa> subwaySections = new ArrayList<>();
 
     public SubwayLineJpa() {
@@ -73,19 +73,10 @@ public class SubwayLineJpa {
     }
 
     public void updateSections(SubwayLine subwayLine) {
-        Map<Long, SubwaySectionJpa> subwaySectionMap = subwaySections.stream().collect(Collectors.toMap(SubwaySectionJpa::getId, Function.identity()));
-
-        for (SubwaySection section : subwayLine.getSections()) {
-            if (section.isNew()) {
-                subwaySections.add(
-                        new SubwaySectionJpa(
-                                section.getUpStationId().getValue(),
-                                section.getUpStationName(),
-                                section.getDownStationId().getValue(),
-                                section.getDownStationName(),
-                                section.getDistance().getValue()));
-            } else {
-                SubwaySectionJpa subwaySectionJpa = subwaySectionMap.get(section.getId().getValue());
+        for (SubwaySectionJpa subwaySectionJpa : subwaySections) {
+            Station.Id id = new Station.Id(subwaySectionJpa.getUpStationId());
+            if (subwayLine.existsUpStation(id)) {
+                SubwaySection section = subwayLine.getSection(id);
                 subwaySectionJpa.update(
                         section.getUpStationId().getValue(),
                         section.getUpStationName(),
@@ -96,24 +87,26 @@ public class SubwayLineJpa {
         }
     }
 
+    public void addSections(SubwayLine subwayLine) {
+
+        subwayLine.getSections()
+                .stream()
+                .filter(SubwaySection::isNew)
+                .map(subwaySection ->
+                        new SubwaySectionJpa(
+                                subwaySection.getUpStationId().getValue(),
+                                subwaySection.getUpStationName(),
+                                subwaySection.getDownStationId().getValue(),
+                                subwaySection.getDownStationName(),
+                                subwaySection.getDistance().getValue()))
+                .forEach(subwaySection ->
+                        subwaySections.add(subwaySection));
+    }
+
 
     public void deleteSections(SubwayLine subwayLine) {
-        Iterator<SubwaySectionJpa> fruitsIterator = subwaySections.iterator();
-
-        while (fruitsIterator.hasNext()) {
-            SubwaySectionJpa subwaySectionJpa = fruitsIterator.next();
-            Station.Id id = new Station.Id(subwaySectionJpa.getUpStationId());
-            if (subwayLine.existsUpStation(id)) {
-                SubwaySection section = subwayLine.getSection(new Station.Id(subwaySectionJpa.getId()));
-                subwaySectionJpa.update(
-                        section.getUpStationId().getValue(),
-                        section.getUpStationName(),
-                        section.getDownStationId().getValue(),
-                        section.getDownStationName(),
-                        section.getDistance().getValue());
-            } else {
-                fruitsIterator.remove();
-            }
-        }
+        subwaySections
+                .removeIf(subwaySectionJpa ->
+                        !subwayLine.existsUpStation(new Station.Id(subwaySectionJpa.getUpStationId())));
     }
 }

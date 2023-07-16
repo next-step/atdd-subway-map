@@ -21,6 +21,7 @@ public class SubwaySectionAddPersistenceAdapter implements SubwaySectionAddPort 
     public void addSubwaySection(SubwayLine subwayLine) {
         SubwayLineJpa subwayLineJpa = subwayLineJpaRepository.findOneWithSectionsById(subwayLine.getId().getValue()).orElseThrow(() -> new NoSuchElementException("해당하는 지하철 노선이 없습니다."));
         subwayLineJpa.updateSections(subwayLine);
+        subwayLineJpa.addSections(subwayLine);
         subwayLineJpaRepository.save(subwayLineJpa);
     }
 }
