@@ -53,4 +53,13 @@ public class SectionService {
 
         return SectionResponse.of(section);
     }
+
+    @Transactional
+    public void deleteSection(Long lineId, Long stationId) {
+        Line line = lineRepository.findById(lineId)
+                .orElseThrow(() -> new IllegalStateException(String.format("지하철 노선을 찾을 수 없습니다. (id: %d)", lineId)));
+
+        Section section = line.deleteSectionByDownStationId(stationId);
+        sectionRepository.delete(section);
+    }
 }

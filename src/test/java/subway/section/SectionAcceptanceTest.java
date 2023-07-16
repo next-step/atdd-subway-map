@@ -52,7 +52,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         assertThat(createSectionResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         String sectionId = createSectionResponse.response().getHeaders().get("location").getValue().split("/sections/")[1];
-        ExtractableResponse<Response> showSectionResponse = 지하철_구간_요청(sectionId);
+        ExtractableResponse<Response> showSectionResponse = 지하철_구간_조회_요청(sectionId);
         SectionResponse sectionResponse = ObjectMapperHolder.instance.readValue(showSectionResponse.response().body().asString(), SectionResponse.class);
 
         assertThat(sectionResponse.getId()).isEqualTo(2L);
@@ -110,6 +110,40 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         assertThat(createSectionResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
+    /**
+     * Given 지하철 노선과 노선에 속하지 않은 새로운 지하철역을 생성 후, 지하철 노선의 하행역과 새로운 지하철역을 구간으로 등록하고
+     * When 지하철 노선의 하행 종점역을 제거하면
+     * Then 구간이 정상적으로 제거되고, 지하철 노선의 하행 종점역과 거리가 바뀌고, 제거된 구간 조회시 에러가 발생한다
+     */
+    @Test
+    void 지하철_구간_제거() throws JsonProcessingException {
+        // given
+        LineRequest request = 지하철역_생성_및_지하철_노선_요청_객체_생성(SINBUNDANG_LINE_NAME, SINBUNDANG_LINE_COLOR, SINBUNDANG_UP_STATION_NAME, SINBUNDANG_DOWN_STATION_NAME, SINBUNDANG_LINE_DISTANCE);
+        ExtractableResponse<Response> createLineResponse = 지하철_노선_생성_요청(request);
+        LineResponse lineResponse = ObjectMapperHolder.instance.readValue(createLineResponse.response().body().asString(), LineResponse.class);
+        Long downStationId = lineResponse.getStations().get(1).getId();
+        Long newDownStationId = 지하철역_생성_요청_및_아이디_추출(SINBUNDANG_NEW_DOWN_STATION_NAME);
+
+        ExtractableResponse<Response> createSectionResponse = 지하철_구간_생성_요청(lineResponse.getId(), new SectionRequest(downStationId, newDownStationId, SINBUNDANG_NEW_DISTANCE));
+
+        // when
+        ExtractableResponse<Response> deleteResponse = 지하철_구간_제거_요청(lineResponse.getId(), newDownStationId);
+
+        // then
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        // then
+        ExtractableResponse<Response> showLineResponse = 지하철_노선_요청(lineResponse.getId());
+        LineResponse changedLineResponse = ObjectMapperHolder.instance.readValue(showLineResponse.response().body().asString(), LineResponse.class);
+        List<StationResponse> stationsOfResponse = List.of(new StationResponse(1L, SINBUNDANG_UP_STATION_NAME), new StationResponse(2L, SINBUNDANG_DOWN_STATION_NAME));
+        assertThat(changedLineResponse).isEqualTo(new LineResponse(changedLineResponse.getId(), SINBUNDANG_LINE_NAME, SINBUNDANG_LINE_COLOR, stationsOfResponse, SINBUNDANG_LINE_DISTANCE));
+
+        // then
+        String sectionId = createSectionResponse.response().getHeaders().get("location").getValue().split("/sections/")[1];
+        ExtractableResponse<Response> showSectionResponse = 지하철_구간_조회_요청(sectionId);
+        assertThat(showSectionResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    }
+
     private ExtractableResponse<Response> 지하철_구간_생성_요청(Long lineId, SectionRequest request) {
         return RestAssured
                 .given().log().all()
@@ -121,11 +155,20 @@ public class SectionAcceptanceTest extends AcceptanceTest {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 지하철_구간_요청(String sectionId) {
+    public static ExtractableResponse<Response> 지하철_구간_조회_요청(String sectionId) {
         return RestAssured
                 .given().log().all()
                 .when()
                 .get("/sections/" + sectionId)
+                .then().log().all()
+                .extract();
+    }
+
+    public static ExtractableResponse<Response> 지하철_구간_제거_요청(Long lineId, Long stationId) {
+        return RestAssured
+                .given().log().all()
+                .when()
+                .delete("/lines/" + lineId + "/sections?stationId=" + stationId)
                 .then().log().all()
                 .extract();
     }

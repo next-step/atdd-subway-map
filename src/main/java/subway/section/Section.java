@@ -50,6 +50,14 @@ public class Section {
         return downStation;
     }
 
+    public Long getDownStationId() {
+        return downStation.getId();
+    }
+
+    public Long getDistance() {
+        return distance;
+    }
+
     public boolean contains(Station station) {
         Long stationId = station.getId();
         return upStation.getId().equals(stationId) || downStation.getId().equals(stationId);

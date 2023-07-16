@@ -1,10 +1,12 @@
 package subway.line;
 
+import subway.section.Section;
 import subway.section.Sections;
 import subway.station.Station;
 
 import javax.persistence.*;
 import java.util.Objects;
+import java.util.Optional;
 
 @Entity
 public class Line {
@@ -120,5 +122,23 @@ public class Line {
 
     public boolean contains(Station station) {
         return sections.contains(station);
+    }
+
+    public Section deleteSectionByDownStationId(Long downStationId) {
+        if (!downStation.getId().equals(downStationId)) {
+            throw new IllegalArgumentException(String.format("하행 종점역이 아니면 구간을 제거할 수 없습니다. (stationId: %d)", downStationId));
+        }
+
+        Optional<Section> optionalSection = sections.findByDownStationId(downStationId);
+        if (optionalSection.isEmpty()) {
+            throw new IllegalArgumentException(String.format("구간을 찾을 수 없습니다. (downStationId: %d)", downStationId));
+        }
+
+        Section section = optionalSection.get();
+        sections.delete(section);
+        downStation = section.getUpStation();
+        distance -= section.getDistance();
+
+        return section;
     }
 }
