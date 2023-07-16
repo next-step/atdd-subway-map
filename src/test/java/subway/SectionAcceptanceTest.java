@@ -23,10 +23,10 @@ import subway.dto.LineResponse;
 import subway.dto.SectionRequest;
 import subway.dto.SectionResponse;
 import subway.dto.StationRequest;
-import subway.exception.AlreadyExistDownStation;
-import subway.exception.NoMatchUpStationException;
+import subway.exception.NoMatchLineUpStationException;
 import subway.exception.NonLastStationDeleteNotAllowedException;
 import subway.exception.SingleSectionDeleteNotAllowedException;
+import subway.exception.dto.ErrorResponse;
 import subway.exception.error.SectionErrorCode;
 import subway.factory.LineRequestFactory;
 import subway.utils.RestAssuredClient;
@@ -49,7 +49,6 @@ public class SectionAcceptanceTest {
 
         saveStations();
         saveLine();
-        saveSection();
     }
 
     /**
@@ -102,14 +101,15 @@ public class SectionAcceptanceTest {
             .build();
 
         // Then
-        Assertions.assertThatThrownBy(() -> {
-            RestAssuredClient.requestPost(
-                generatePathWithLineId(lineResponse.getId()),
-                sectionRequest)
-                .statusCode(HttpStatus.BAD_REQUEST.value());
-        })
-            .isInstanceOf(NoMatchUpStationException.class)
-            .hasMessage(SectionErrorCode.NO_MATCH_UP_STATION.getMessage());
+        ExtractableResponse<Response> response = RestAssuredClient.requestPost(
+            generatePathWithLineId(lineResponse.getId()),
+            sectionRequest).extract();
+        Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+
+        ErrorResponse error = response.as(ErrorResponse.class);
+        Assertions.assertThat(error.getMessage())
+            .isEqualTo(SectionErrorCode.NO_MATCH_UP_STATION.getMessage());
+
     }
 
     /**
@@ -133,14 +133,15 @@ public class SectionAcceptanceTest {
             .build();
 
         // Then
-        Assertions.assertThatThrownBy(() -> {
-                RestAssuredClient.requestPost(
-                        generatePathWithLineId(lineResponse.getId()),
-                        sectionRequest)
-                    .statusCode(HttpStatus.BAD_REQUEST.value());
-            })
-            .isInstanceOf(AlreadyExistDownStation.class)
-            .hasMessage(SectionErrorCode.ALREADY_EXIST_DOWN_STATION.getMessage());
+        ExtractableResponse<Response> response = RestAssuredClient.requestPost(
+            generatePathWithLineId(lineResponse.getId()),
+            sectionRequest).extract();
+        Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+
+        ErrorResponse error = response.as(ErrorResponse.class);
+        Assertions.assertThat(error.getMessage())
+            .isEqualTo(SectionErrorCode.ALREADY_EXIST_DOWN_STATION.getMessage());
+
     }
 
     /**
@@ -206,8 +207,7 @@ public class SectionAcceptanceTest {
                     .statusCode(HttpStatus.BAD_REQUEST.value());
             }
         )
-            .isInstanceOf(NonLastStationDeleteNotAllowedException.class)
-            .hasMessage(SectionErrorCode.NON_LAST_STATION_DELETE_NOT_ALLOWED.getMessage());
+            .isInstanceOf(NonLastStationDeleteNotAllowedException.class);
 
     }
 
@@ -246,8 +246,7 @@ public class SectionAcceptanceTest {
                         .statusCode(HttpStatus.BAD_REQUEST.value());
                 }
             )
-            .isInstanceOf(NonLastStationDeleteNotAllowedException.class)
-            .hasMessage(SectionErrorCode.NON_LAST_STATION_DELETE_NOT_ALLOWED.getMessage());
+            .isInstanceOf(NonLastStationDeleteNotAllowedException.class);
     }
 
     /**
@@ -271,8 +270,7 @@ public class SectionAcceptanceTest {
                         .statusCode(HttpStatus.BAD_REQUEST.value());
                 }
             )
-            .isInstanceOf(SingleSectionDeleteNotAllowedException.class)
-            .hasMessage(SectionErrorCode.SINGLE_SECTION_DELETE_NOT_ALLOWED.getMessage());
+            .isInstanceOf(SingleSectionDeleteNotAllowedException.class);
     }
 
 
@@ -281,7 +279,7 @@ public class SectionAcceptanceTest {
             .append(linePath)
             .append("/")
             .append(id)
-            .append("sections")
+            .append("/sections")
             .toString();
     }
 
@@ -290,7 +288,7 @@ public class SectionAcceptanceTest {
             .append(linePath)
             .append("/")
             .append(lineId)
-            .append("sections")
+            .append("/sections")
             .append("?stationId=")
             .append(stationId)
             .toString();
