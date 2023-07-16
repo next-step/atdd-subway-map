@@ -1,7 +1,11 @@
 package subway.exception;
 
-public class NoMatchUpStationException extends RuntimeException {
+import subway.exception.error.SectionErrorCode;
 
+public class NoMatchUpStationException extends SectionException {
 
+    public NoMatchUpStationException() {
+        super(SectionErrorCode.NO_MATCH_UP_STATION);
+    }
 
 }
