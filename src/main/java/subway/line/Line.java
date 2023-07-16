@@ -102,20 +102,6 @@ public class Line {
             throw new IllegalArgumentException(String.format("상행종점역과 하행종점역이 같을 수 업습니다. (stationId: %d)", upStationId));
         }
 
-        validateDistance(distance);
-    }
-
-    public void setDownStation(Station downStation) {
-        this.downStation = downStation;
-    }
-
-    public void plusDistance(Long distance) {
-        validateDistance(distance);
-
-        this.distance += distance;
-    }
-
-    private void validateDistance(Long distance) {
         if (distance == null || distance <= MIN_DISTANCE) {
             throw new IllegalArgumentException(String.format("지하철 거리는 0 이상의 숫자여야 합니다. (distance: %d)", distance));
         }
@@ -123,6 +109,12 @@ public class Line {
 
     public boolean contains(Station station) {
         return sections.contains(station);
+    }
+
+    public void addTerminalSection(Section section) {
+        downStation = section.getDownStation();
+        sections.add(section);
+        distance += section.getDistance();
     }
 
     public Section deleteSectionByDownStationId(Long downStationId) {

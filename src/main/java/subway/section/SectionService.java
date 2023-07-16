@@ -40,10 +40,9 @@ public class SectionService {
             throw new IllegalStateException(String.format("새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없습니다. (downStationId: %d)", downStation.getId()));
         }
 
-        line.setDownStation(downStation);
-        line.plusDistance(request.getDistance());
-
         Section section = sectionRepository.save(new Section(line, upStation, downStation, request.getDistance()));
+        line.addTerminalSection(section);
+
         return section.getId();
     }
 

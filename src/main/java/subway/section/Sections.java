@@ -23,6 +23,10 @@ public class Sections {
                 .findFirst();
     }
 
+    public void add(Section section) {
+        sections.add(section);
+    }
+
     public void delete(Section section) {
         sections.remove(section);
     }
