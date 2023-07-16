@@ -14,6 +14,10 @@ public class LineResponse {
 
     private List<StationResponse> stations;
 
+    public LineResponse() {
+
+    }
+
     public LineResponse(Line line, Station upStation, Station downStation) {
         this.id = line.getId();
         this.name = line.getName();

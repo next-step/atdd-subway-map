@@ -7,6 +7,10 @@ public class SectionResponse {
     private Long upStationId;
     private Long downStationId;
 
+    public SectionResponse() {
+
+    }
+
     public Long getId() {
         return id;
     }
