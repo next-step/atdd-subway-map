@@ -20,11 +20,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철 노선 관련 기능")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class RouteAcceptanceTest {
+public class LineAcceptanceTest {
 
-    private final String ROUTE_API_URI = "/api/routes";
+    private final String ROUTE_API_URI = "/lines";
 
-    private final String STATION_API_URI = "/api/stations";
+    private final String STATION_API_URI = "/stations";
 
     private final String SLASH = "/";
 

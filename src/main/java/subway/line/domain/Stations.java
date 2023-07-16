@@ -1,6 +1,5 @@
-package subway.route.domain;
+package subway.line.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import subway.station.domain.Station;
 
 import javax.persistence.Embeddable;

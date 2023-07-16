@@ -25,7 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class StationAcceptanceTest {
 
-    private final String STATION_API_URI = "/api/stations";
+    private final String STATION_API_URI = "/stations";
     private final String SLASH = "/";
 
 
