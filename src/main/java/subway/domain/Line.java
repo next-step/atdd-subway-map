@@ -1,15 +1,12 @@
 package subway.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter
 public class Line {
 
     @Id
@@ -23,62 +20,41 @@ public class Line {
     @Column(name = "NAME")
     private String name;
 
-    @Column(name = "UP_STATION_ID")
-    private Long upStationId;
-
-    @Column(name = "DOWN_STATION_ID")
-    private Long downStationId;
-
     @Column(name = "DISTANCE")
     private int distance;
 
-    public Long getId() {
-        return id;
+    @Embedded
+    private LineSections sections = new LineSections();
+
+    public Line() {
     }
 
-    public String getColor() {
-        return color;
+    public Line(String color, String name) {
+        this.color = color;
+        this.name = name;
     }
 
-    public void setColor(String color) {
+    public void changeColor(String color) {
         if(color != null ){
             this.color = color;
         }
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public Long getUpStationId() {
-        return upStationId;
-    }
-
-    public Long getDownStationId() {
-        return downStationId;
-    }
-
-    public void setName(String name) {
+    public void changeName(String name) {
         if(name != null) {
             this.name = name;
         }
     }
 
-    public void setUpStationId(Long upStationId) {
-        this.upStationId = upStationId;
+    public void addSections(Section sections) {
+        this.sections.add(sections);
     }
 
-    public void setDownStationId(Long downStationId) {
-        this.downStationId = downStationId;
+    public void removeSections(Station station) {
+        this.sections.remove(station);
     }
 
-
-    public int getDistance() {
-        return distance;
+    public List<Station> getStations() {
+        return this.sections.getStations();
     }
-
-    public void setDistance(int distance) {
-        this.distance = distance;
-    }
-
 }
