@@ -1,11 +1,13 @@
 package subway.domain;
 
+import java.util.Set;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import subway.dto.LineRequest;
+import subway.dto.SectionRequest;
 
 @Entity
 public class Line {
@@ -20,7 +22,7 @@ public class Line {
     @Column(length = 20, nullable = false)
     private String color;
 
-    @Column(length = 20, nullable = false)
+    @Column(nullable = false)
     private Long distance;
 
     @Column(nullable = false)
@@ -45,6 +47,10 @@ public class Line {
         this.name = lineRequest.getName().isBlank() ? this.name : lineRequest.getName();
         this.color = lineRequest.getColor().isBlank() ? this.color : lineRequest.getColor();
         this.distance = lineRequest.getDistance() == null ? this.distance : lineRequest.getDistance();
+    }
+
+    public void updateLineStation(Section section) {
+        this.downStationId = section.getDownStationId();
     }
 
     public Long getId() {

@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
+import subway.dto.SectionRequest;
+import subway.dto.SectionResponse;
 import subway.service.LineService;
 
 @RestController
@@ -50,6 +52,13 @@ public class LineController {
     public ResponseEntity<Void> deleteLine(@PathVariable Long id) {
         lineService.deleteLineById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/sections")
+    public ResponseEntity<SectionResponse> createSection(@PathVariable Long id, @RequestBody
+        SectionRequest request) {
+        return ResponseEntity.ok().body(lineService.createSection(id, request));
+
     }
 
 }
