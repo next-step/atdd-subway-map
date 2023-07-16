@@ -202,7 +202,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         return RestAssured
                 .given().log().all()
                 .when()
-                .get("/sections/" + sectionId)
+                .get("lines" + "/sections/" + sectionId)
                 .then().log().all()
                 .extract();
     }

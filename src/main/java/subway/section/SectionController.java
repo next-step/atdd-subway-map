@@ -21,7 +21,7 @@ public class SectionController {
         return ResponseEntity.created(URI.create("/lines/" + id + "/sections/" + sectionId)).build();
     }
 
-    @GetMapping(value = "/sections/{id}")
+    @GetMapping(value = "/lines/sections/{id}")
     public ResponseEntity<SectionResponse> showSection(@PathVariable Long id) {
         return ResponseEntity.ok().body(sectionService.findSection(id));
     }
