@@ -13,4 +13,6 @@ public class SubwaySectionRequest {
     public Long getDownStationId() {
         return downStationId;
     }
+
+    public Integer getDistance() { return distance; }
 }

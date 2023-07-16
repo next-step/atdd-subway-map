@@ -4,6 +4,7 @@ import subway.line.SubwayLine;
 import subway.station.Station;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 public class SubwaySection {
@@ -17,6 +18,9 @@ public class SubwaySection {
 
     @OneToOne
     private Station downStation;
+
+    @Column
+    private Integer distance;
 
     @ManyToOne
     @JoinColumn(name = "subway_line_id")
@@ -32,9 +36,21 @@ public class SubwaySection {
 
     public Long getId() { return id; }
 
-    public Station getUpStation() { return upStation; }
-
-    public Station getDownStation() { return downStation; }
+    public Integer getDistance() { return distance; }
 
     public SubwayLine getLine() { return line; }
+
+    public void calculateAndInsertDistance(Integer totalDistance) {
+        Integer remainingDistance = totalDistance;
+        List<SubwaySection> sections = this.line.getSections();
+
+        if (sections.size() != 1) {
+            remainingDistance = sections.stream()
+                    .mapToInt(SubwaySection::getDistance)
+                    .reduce(totalDistance, (subtotal, distance) -> subtotal - distance);
+        }
+
+        System.out.println("remainingDistance : " + remainingDistance);
+        this.distance = remainingDistance;
+    }
 }

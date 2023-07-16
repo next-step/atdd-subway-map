@@ -36,6 +36,11 @@ public class SubwaySectionService {
             subwayLineService.updateSections(lineId, section);
         }
 
+        /**
+         * FIX - 42 line
+         * section 객체에 담기는 distance 거리 값이 정상적이지 않은 상태
+         */
+        section.calculateAndInsertDistance(sectionRequest.getDistance());
         subwaySectionRepository.save(section);
 
         return createSectionResponse(section);

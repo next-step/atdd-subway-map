@@ -25,7 +25,7 @@ public class SubwaySectionAcceptanceTest {
     private final Map<String, Object> 구간_A역_C역 = Map.of(
             "downStationId", 4L,
             "upStationId", 1L,
-            "distance", 10
+            "distance", 7
     );
 
     private final Map<String, Object> 구간_C역_B역 = Map.of(
