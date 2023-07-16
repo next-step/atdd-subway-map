@@ -8,6 +8,7 @@ public class SubwayNameFactory {
     public static final String 양재역 = "양재역";
     public static final String 논현역 = "논현역";
     public static final String 신논현역 = "신논현역";
+    public static final String 수서역 = "수서역";
 
     /* 노선 이름 */
     public static final String 신분당선 = "신분당선";
