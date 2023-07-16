@@ -210,6 +210,45 @@ public class SectionAcceptanceTest {
 
     }
 
+    /**
+     * Given: 4개의 지하철역이 등록되어 있다.
+     * And: 1개의 지하철 노선이 등록되어 있다.
+     * And: 3개의 구간이 등록되어 있다.
+     * When: 두 번째 구간(상행 종점역 & 하행 종점역 둘 중 하나라도 속하지 않은 구간)을 삭제한다.
+     * Then: 실패(400 Bad Request) 응답을 받는다.
+     * And: '마지막 구간만 삭제할 수 있습니다.' 메시지를 응답받는다.
+     */
+    @Test
+    @DisplayName("중간 구간을 삭제한다.")
+    void deleteMiddleSection() {
+        // Given
+        long secondSectionUpStationId = 2L;
+
+        SectionRequest secondSectionRequest = SectionRequest.builder()
+            .upStationId(secondSectionUpStationId)
+            .downStationId(3L)
+            .distance(20L)
+            .build();
+        createSection(secondSectionRequest);
+
+        SectionRequest thirdSectionRequest = SectionRequest.builder()
+            .upStationId(3L)
+            .downStationId(4L)
+            .distance(20L)
+            .build();
+        createSection(thirdSectionRequest);
+
+        // Then
+        Assertions.assertThatThrownBy(() -> {
+                    RestAssuredClient.requestDelete(
+                            generatePathWithLineIdAndStationId(lineResponse.getId(), secondSectionUpStationId))
+                        .statusCode(HttpStatus.BAD_REQUEST.value());
+                }
+            )
+            .isInstanceOf(NonLastStationDeleteNotAllowedException.class)
+            .hasMessage(SectionErrorCode.NON_LAST_STATION_DELETE_NOT_ALLOWED.getMessage());
+    }
+
 
     private String generatePathWithLineId(long id) {
         return new StringBuilder()
