@@ -26,6 +26,7 @@ import subway.dto.StationRequest;
 import subway.exception.AlreadyExistDownStation;
 import subway.exception.NoMatchUpStationException;
 import subway.exception.NonLastStationDeleteNotAllowedException;
+import subway.exception.SingleSectionDeleteNotAllowed;
 import subway.exception.error.SectionErrorCode;
 import subway.factory.LineRequestFactory;
 import subway.utils.RestAssuredClient;
@@ -249,6 +250,31 @@ public class SectionAcceptanceTest {
             .hasMessage(SectionErrorCode.NON_LAST_STATION_DELETE_NOT_ALLOWED.getMessage());
     }
 
+    /**
+     * Given: 2개의 지하철역이 등록되어 있다.
+     * And: 1개의 노선이 등록되어 있다.
+     * And: 1개의 구간이 등록되어 있다.
+     * When: 구간을 삭제한다.
+     * Then: 실패(400 Bad Request) 응답을 받는다.
+     * And: '단일 구간 노선의 구간은 삭제할 수 없습니다.' 메시지를 응답받는다.
+     */
+    @Test
+    @DisplayName("단일 구간으로 이루어진 노선에서 구간을 삭제한다.")
+    void deleteSingleSection() {
+        // Given
+        long secondStationId = lineResponse.getStations().get(1).getId();
+
+        // Then
+        Assertions.assertThatThrownBy(() -> {
+                    RestAssuredClient.requestDelete(
+                            generatePathWithLineIdAndStationId(lineResponse.getId(), secondStationId))
+                        .statusCode(HttpStatus.BAD_REQUEST.value());
+                }
+            )
+            .isInstanceOf(SingleSectionDeleteNotAllowed.class)
+            .hasMessage(SectionErrorCode.SINGLE_SECTION_DELETE_NOT_ALLOWED.getMessage());
+    }
+
 
     private String generatePathWithLineId(long id) {
         return new StringBuilder()
@@ -297,8 +323,8 @@ public class SectionAcceptanceTest {
             .as(SectionResponse.class);
     }
 
-    private SectionResponse createSection(SectionRequest sectionRequest) {
-        return RestAssuredClient.requestPost(
+    private void createSection(SectionRequest sectionRequest) {
+        RestAssuredClient.requestPost(
                 generatePathWithLineId(lineResponse.getId()), sectionRequest)
             .extract()
             .as(SectionResponse.class);
