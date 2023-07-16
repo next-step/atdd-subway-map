@@ -1,17 +1,30 @@
 package subway.line;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import subway.station.Station;
+
+import javax.persistence.*;
 
 @Entity
 public class Line {
     @Id
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     private String name;
     private String color;
+    @OneToOne
+    private Station upStation;
+    @OneToOne
+    private Station downStation;
+    private int distance;
 
+    public Long getId() {
+        return id;
+    }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;
@@ -27,5 +40,29 @@ public class Line {
 
     public void setColor(String color) {
         this.color = color;
+    }
+
+    public Station getUpStation() {
+        return upStation;
+    }
+
+    public void setUpStation(Station upStation) {
+        this.upStation = upStation;
+    }
+
+    public Station getDownStation() {
+        return downStation;
+    }
+
+    public void setDownStation(Station downStation) {
+        this.downStation = downStation;
+    }
+
+    public int getDistance() {
+        return distance;
+    }
+
+    public void setDistance(int distance) {
+        this.distance = distance;
     }
 }

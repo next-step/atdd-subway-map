@@ -4,6 +4,7 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -15,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("지하철노선 관련 기능")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -30,7 +31,6 @@ public class LineAcceptanceTest {
         for (String name : stationNames) {
             stationIdMap.put(name, 지하철역_생성(name).jsonPath().get("id"));
         }
-
     }
 
     //    지하철노선 생성
@@ -42,19 +42,20 @@ public class LineAcceptanceTest {
         // given 지하철 노선
         String name = "1호선";
         String color = "RED";
-        int upStationId = 1;
-        int downStationId = 2;
+        Long upStationId = 1l;
+        Long downStationId = 2l;
         int distance = 10;
 
         //when
-        LineResponse result = 라인생성(name, color, 1, 1, distance);
+        LineResponse result = 라인생성(name, color, upStationId, downStationId, distance);
 
         //then
         assertThat(result.getName()).isEqualTo(name);
         assertThat(result.getColor()).isEqualTo(color);
-        assertThat(result.getUpstationId()).isEqualTo(upStationId);
-        assertThat(result.getDownStationId()).isEqualTo(downStationId);
-        assertThat(result.getDistance()).isEqualTo(distance);
+        List<StationResponse> stations = result.getStations();
+
+        assertThat(stations.get(0).getId()).isEqualTo(upStationId);
+        assertThat(stations.get(1).getId()).isEqualTo(downStationId);
     }
 
 
@@ -69,22 +70,22 @@ public class LineAcceptanceTest {
     void searchLines() {
         String name = "1호선";
         String color = "RED";
-        int upStationId = 1;
-        int downStationId = 2;
+        Long upStationId = 1l;
+        Long downStationId = 2l;
         int distance = 10;
 
         //when
 
         String name2 = "2호선";
         String color2 = "YELLOW";
-        int upStationId2 = 1;
-        int downStationId2 = 2;
+        Long upStationId2 = 1l;
+        Long downStationId2 = 2l;
         int distance2 = 10;
 
         라인생성(name, color, upStationId, downStationId, distance);
         라인생성(name2, color2, upStationId2, downStationId2, distance2);
 
-        List<LineResponse> list = 전체라인조회().jsonPath().getList("*", LineResponse.class);
+        List<LineResponse> list = 전체라인조회().jsonPath().getList("", LineResponse.class);
 
         assertThat(list.size()).isEqualTo(2);
     }
@@ -100,23 +101,26 @@ public class LineAcceptanceTest {
     void searchStationDetail(){
         String name = "1호선";
         String color = "RED";
-        int upStationId = 1;
-        int downStationId = 2;
+        Long upStationId = 1l;
+        Long downStationId = 2l;
         int distance = 10;
 
-        int id = 라인생성(name, color, upStationId, downStationId, distance).getId();
+        Long id = 라인생성(name, color, upStationId, downStationId, distance).getId();
 
-        LineRequest result = 라인조회(id);
+        LineResponse result = 라인조회(id).jsonPath().getObject("", LineResponse.class);
 
         assertThat(result.getName()).isEqualTo(name);
         assertThat(result.getColor()).isEqualTo(color);
-        assertThat(result.getDistance()).isEqualTo(distance);
+        StationResponse upStation = result.getStations().get(0);
+        StationResponse downStation = result.getStations().get(1);
+        assertThat(upStation.getName()).isEqualTo(stationNames[0]);
+        assertThat(downStation.getName()).isEqualTo(stationNames[1]);
     }
 
     private ExtractableResponse<Response> 라인조회(long id){
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/line/{id}", id)
+                .when().get("/lines/{id}", id)
                 .then().log().all()
                 .extract();
     }
@@ -131,11 +135,11 @@ public class LineAcceptanceTest {
     void modifyStation(){
         String name = "1호선";
         String color = "RED";
-        int upStationId = 1;
-        int downStationId = 2;
+        Long upStationId = 1l;
+        Long downStationId = 2l;
         int distance = 10;
 
-        int id = 라인생성(name, color, upStationId, downStationId, distance).getId();
+        Long id = 라인생성(name, color, upStationId, downStationId, distance).getId();
 
         String modifyName = "2호선";
         String modifyColor = "YELLOW";
@@ -143,16 +147,15 @@ public class LineAcceptanceTest {
         params.put("name", modifyName);
         params.put("color", modifyColor);
 
-        LineRequest result = 라인수정(id, params);
+        LineResponse result = 라인수정(id, params).jsonPath().getObject("", LineResponse.class);
 
-        assertThat(result.getName()).isEqualTo(name);
-        assertThat(result.getColor()).isEqualTo(color);
-        assertThat(result.getDistance()).isEqualTo(distance);
+        assertThat(result.getName()).isEqualTo(modifyName);
+        assertThat(result.getColor()).isEqualTo(modifyColor);
     }
 
 
 
-    private LineRequest 라인수정(int id, Map<String, String> params) {
+    private ExtractableResponse<Response> 라인수정(Long id, Map<String, String> params) {
         return RestAssured.given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -171,23 +174,33 @@ public class LineAcceptanceTest {
     void deleteStation(){
         String name = "1호선";
         String color = "RED";
-        int upStationId = 1;
-        int downStationId = 2;
+        Long upStationId = 1l;
+        Long downStationId = 2l;
         int distance = 10;
 
-        int id = 라인생성(name, color, upStationId, downStationId, distance).getId();
+        Long id = 라인생성(name, color, upStationId, downStationId, distance).getId();
 
-        ExtractableResponse<Response> result = 라인조회(id);
+        ExtractableResponse<Response> result = 라인삭제(id);
 
-        assertThat(result.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+        assertThat(result.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        assertThatThrownBy(()  -> 라인조회(id)).hasMessageContaining("없는 라인정보 입니다.");
     }
 
-    private LineResponse 라인생성(String name, String color, int upStationId, int downStationId, int distance){
-        LineRequest lineRequest = new LineReqeust(name, color, upStationId, downStationId, distance);
-        return 라인생성(lineRequest).jsonPath().get("*", LineResponse.class);
+    private LineResponse 라인생성(String name, String color, Long upStationId, Long downStationId, int distance){
+        LineRequest lineRequest = new LineRequest(name, color, upStationId, downStationId, distance);
+        return 라인생성(lineRequest).jsonPath().getObject("", LineResponse.class);
+    }
+    private ExtractableResponse<Response> 라인삭제(Long id) {
+        return RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().delete("/lines/{id}", id)
+                .then().log().all()
+                .extract();
     }
     private ExtractableResponse<Response> 라인생성(LineRequest req) {
-        Map<String, String> params = req.getParams();
+        Map<String, Object> params = req.getParams();
+
         return RestAssured.given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -199,7 +212,7 @@ public class LineAcceptanceTest {
     private ExtractableResponse<Response> 전체라인조회() {
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/stations")
+                .when().get("/lines")
                 .then().log().all()
                 .extract();
     }
