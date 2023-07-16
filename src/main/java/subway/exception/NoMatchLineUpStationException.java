@@ -2,9 +2,9 @@ package subway.exception;
 
 import subway.exception.error.SectionErrorCode;
 
-public class NoMatchUpStationException extends SectionException {
+public class NoMatchLineUpStationException extends SectionException {
 
-    public NoMatchUpStationException() {
+    public NoMatchLineUpStationException() {
         super(SectionErrorCode.NO_MATCH_UP_STATION);
     }
 

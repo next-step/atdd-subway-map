@@ -1,13 +1,13 @@
 package subway.exception;
 
 import org.springframework.http.HttpStatus;
-import subway.exception.error.SectionErrorCode;
+import subway.exception.error.LineErrorCode;
 
-public class SectionException extends RuntimeException {
+public class LineException extends RuntimeException {
 
-    private final HttpStatus statusCode;
+    private HttpStatus statusCode;
 
-    public SectionException(SectionErrorCode errorCode) {
+    public LineException(LineErrorCode errorCode) {
         super(errorCode.getMessage());
         this.statusCode = errorCode.getStatusCode();
     }
@@ -15,4 +15,5 @@ public class SectionException extends RuntimeException {
     public HttpStatus getStatusCode() {
         return statusCode;
     }
+
 }
