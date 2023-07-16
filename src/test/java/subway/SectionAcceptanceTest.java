@@ -26,7 +26,7 @@ import subway.dto.StationRequest;
 import subway.exception.AlreadyExistDownStation;
 import subway.exception.NoMatchUpStationException;
 import subway.exception.NonLastStationDeleteNotAllowedException;
-import subway.exception.SingleSectionDeleteNotAllowed;
+import subway.exception.SingleSectionDeleteNotAllowedException;
 import subway.exception.error.SectionErrorCode;
 import subway.factory.LineRequestFactory;
 import subway.utils.RestAssuredClient;
@@ -271,7 +271,7 @@ public class SectionAcceptanceTest {
                         .statusCode(HttpStatus.BAD_REQUEST.value());
                 }
             )
-            .isInstanceOf(SingleSectionDeleteNotAllowed.class)
+            .isInstanceOf(SingleSectionDeleteNotAllowedException.class)
             .hasMessage(SectionErrorCode.SINGLE_SECTION_DELETE_NOT_ALLOWED.getMessage());
     }
 

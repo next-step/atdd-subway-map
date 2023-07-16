@@ -2,9 +2,9 @@ package subway.exception;
 
 import subway.exception.error.SectionErrorCode;
 
-public class SingleSectionDeleteNotAllowed extends SectionException {
+public class SingleSectionDeleteNotAllowedException extends SectionException {
 
-    public SingleSectionDeleteNotAllowed() {
+    public SingleSectionDeleteNotAllowedException() {
         super(SectionErrorCode.SINGLE_SECTION_DELETE_NOT_ALLOWED);
     }
 }
