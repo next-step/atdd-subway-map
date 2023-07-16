@@ -2,6 +2,9 @@ package subway;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import subway.dto.AddLineRequest;
+import subway.dto.LineRequest;
+import subway.dto.LineResponse;
 
 import java.net.URI;
 import java.util.List;
@@ -42,4 +45,14 @@ public class LineController {
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/{id}/sections")
+    public ResponseEntity<LineResponse> addLine(@PathVariable Long id, @RequestBody AddLineRequest dto) {
+        LineResponse line = lineService.addLine(id, dto);
+        return ResponseEntity.created(URI.create("/line/" + line.getId() + "/stations")).body(line);
+    }
+
+    @DeleteMapping("/{id}/stations")
+    public void deleteLineDownStation(@PathVariable Long id, @RequestParam("stationId")Long stationId) {
+        lineService.deleteLineDownStation(id, stationId);
+    }
 }

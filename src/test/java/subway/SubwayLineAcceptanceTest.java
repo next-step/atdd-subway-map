@@ -197,6 +197,30 @@ public class SubwayLineAcceptanceTest {
         assertThat(extract.body().jsonPath().getLong("/downStationId")).isEqualTo(yongSanStationId);
     }
 
+    /**
+     * Given 상행 종점역, 하생 종점역, 중간역이 있는 노선을 생성한다.
+     * When 하행 종점역을 제거한다.
+     * Then 제거한 결과를 본다.
+     */
+    @DisplayName("노선 구간 제거")
+    @Test
+    void deleteSection() {
+        long Line = beforeTestCreateLine("신분당선", "bg-red-100", upStationId, downStationId, 10);
+
+    }
+
+    /**
+     * Given 상행 종점역, 하생 종점역 있는 노선을 생성한다.
+     * When 하행 종점역을 제거한다.
+     * Then 제거 시 오류 발생을 테스트한다.
+     */
+    @DisplayName("상행 종점역, 하행 종점역만 있는 노선 구간 제거 테스트")
+    @Test
+    void deleteSectionException() {
+        long Line = beforeTestCreateLine("신분당선", "bg-red-100", upStationId, downStationId, 10);
+    }
+
+
     // 지하철역 생성
     private long createStation(String name) {
         Map<String, String> param = new HashMap<>();
