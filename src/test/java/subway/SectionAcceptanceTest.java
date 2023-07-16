@@ -46,6 +46,7 @@ public class SectionAcceptanceTest {
 
         saveStations();
         saveLine();
+        saveSection();
     }
 
     /**
@@ -66,7 +67,7 @@ public class SectionAcceptanceTest {
             .distance(20L)
             .build();
         ExtractableResponse<Response> response = RestAssuredClient.requestPost(
-            generateSectionPathForLineId(lineResponse.getId()),
+            generatePathWithLineId(lineResponse.getId()),
             sectionRequest).extract();
 
         // Then
@@ -100,7 +101,7 @@ public class SectionAcceptanceTest {
         // Then
         Assertions.assertThatThrownBy(() -> {
             RestAssuredClient.requestPost(
-                generateSectionPathForLineId(lineResponse.getId()),
+                generatePathWithLineId(lineResponse.getId()),
                 sectionRequest)
                 .statusCode(HttpStatus.BAD_REQUEST.value());
         })
@@ -131,7 +132,7 @@ public class SectionAcceptanceTest {
         // Then
         Assertions.assertThatThrownBy(() -> {
                 RestAssuredClient.requestPost(
-                        generateSectionPathForLineId(lineResponse.getId()),
+                        generatePathWithLineId(lineResponse.getId()),
                         sectionRequest)
                     .statusCode(HttpStatus.BAD_REQUEST.value());
             })
@@ -139,12 +140,61 @@ public class SectionAcceptanceTest {
             .hasMessage(SectionErrorCode.ALREADY_EXIST_DOWN_STATION.getMessage());
     }
 
-    private String generateSectionPathForLineId(long id) {
+    /**
+     * Given: 3개의 지하철역이 등록되어 있다.
+     * And: 1개의 노선이 등록되어 있다.
+     * And: 2개의 구간이 등록되어 있다.
+     * When: 구간을 제거한다.
+     * Then: 성공(200 OK) 응답을 받는다.
+     */
+    @Test
+    @DisplayName("구간을 제거한다.")
+    void deleteSection() {
+        // Given
+        long lastStationId = 4L;
+
+        SectionRequest sectionRequest1 = SectionRequest.builder()
+            .upStationId(2L)
+            .downStationId(3L)
+            .distance(20L)
+            .build();
+
+        SectionRequest sectionRequest2 = SectionRequest.builder()
+            .upStationId(3L)
+            .downStationId(lastStationId)
+            .distance(20L)
+            .build();
+
+        createSection(sectionRequest1);
+        createSection(sectionRequest2);
+
+        // When
+        ExtractableResponse<Response> response = RestAssuredClient.requestDelete(
+            generatePathWithLineIdAndStationId(lineResponse.getId(), lastStationId))
+            .extract();
+
+        // Then
+        Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
+
+    private String generatePathWithLineId(long id) {
         return new StringBuilder()
             .append(linePath)
             .append("/")
             .append(id)
             .append("sections")
+            .toString();
+    }
+
+    private String generatePathWithLineIdAndStationId(long lineId, long stationId) {
+        return new StringBuilder()
+            .append(linePath)
+            .append("/")
+            .append(lineId)
+            .append("sections")
+            .append("?stationId=")
+            .append(stationId)
             .toString();
     }
 
@@ -160,5 +210,25 @@ public class SectionAcceptanceTest {
     private void saveLine() {
         this.lineResponse = RestAssuredClient.requestPost("/lines",
             LineRequestFactory.create(신분당선)).extract().as(LineResponse.class);
+    }
+
+    private void saveSection() {
+        SectionRequest params = SectionRequest.builder()
+            .upStationId(1L)
+            .downStationId(2L)
+            .distance(10L)
+            .build();
+
+        RestAssuredClient.requestPost(
+            generatePathWithLineId(lineResponse.getId()), params)
+            .extract()
+            .as(SectionResponse.class);
+    }
+
+    private SectionResponse createSection(SectionRequest sectionRequest) {
+        return RestAssuredClient.requestPost(
+                generatePathWithLineId(lineResponse.getId()), sectionRequest)
+            .extract()
+            .as(SectionResponse.class);
     }
 }
