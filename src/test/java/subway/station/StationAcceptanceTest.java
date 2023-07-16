@@ -1,22 +1,23 @@
 package subway.station;
 
-import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+import org.springframework.test.context.jdbc.Sql;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+import static common.fixture.subway.StationFixture.*;
+import static common.utils.CustomAssertions.상태코드_확인;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DisplayName("지하철역 관련 기능")
+@DisplayName("지하철역 관련 인수테스트")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@Sql(scripts = {"classpath:SQLScripts/00.clear-database.sql"})
 public class StationAcceptanceTest {
+
     /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다
@@ -26,14 +27,14 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        Response response = this.requestCreateStation("강남역");
+        Response response = 역_생성_요청(GN_STATION);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        상태코드_확인(response, HttpStatus.CREATED);
 
         // then
-        List<String> stationNames = this.requestSearchStation().jsonPath().getList("name", String.class);
-        assertThat(stationNames).containsAnyOf("강남역");
+        List<String> stationNames = 역_이름_목록_반환(역_목록_조회_요청());
+        assertThat(stationNames).containsAnyOf(GN_STATION);
     }
 
     /**
@@ -45,14 +46,14 @@ public class StationAcceptanceTest {
     @Test
     void searchStation() {
         // given
-        String firstCratedStationName = this.requestCreateStation("강남역").jsonPath().getString("name");
-        String secondCratedStationName = this.requestCreateStation("역삼역").jsonPath().getString("name");
+        역_생성_요청(GN_STATION);
+        역_생성_요청(YS_STATION);
 
         // when
-        List<String> stationNames = this.requestSearchStation().jsonPath().getList("name", String.class);
+        List<String> stationNames = 역_이름_목록_반환(역_목록_조회_요청());
 
         // then
-        assertThat(stationNames).containsAnyOf(firstCratedStationName, secondCratedStationName);
+        assertThat(stationNames).containsAnyOf(GN_STATION, YS_STATION);
     }
 
     /**
@@ -65,41 +66,17 @@ public class StationAcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        Response response = this.requestCreateStation("강남역");
-        String createdId = response.jsonPath().getString("id");
+        Long createdId = 역_생성_ID_반환(역_생성_요청(GN_STATION));
 
         // when
-        Response deleteResponse = requestDeleteStation(createdId);
+        Response response = 역_삭제_요청(createdId);
 
         // then
-        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        상태코드_확인(response, HttpStatus.NO_CONTENT);
 
         // then
-        List<String> stationNames = this.requestSearchStation().jsonPath().getList("name", String.class);
+        List<String> stationNames = 역_이름_목록_반환(역_목록_조회_요청());
         assertThat(stationNames).isEmpty();
     }
 
-    private Response requestCreateStation(String stationName) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", stationName);
-        return RestAssured.given().body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract().response();
-    }
-
-    private Response requestSearchStation() {
-        return RestAssured.given().log().all()
-                .when().get("/stations")
-                .then().log().all()
-                .extract().response();
-    }
-
-    private Response requestDeleteStation(String createdId) {
-        return RestAssured.given().log().all()
-                .when().delete("/stations/" + createdId)
-                .then().log().all()
-                .extract().response();
-    }
 }

@@ -1,31 +1,35 @@
 package subway.line;
 
 
-import io.restassured.RestAssured;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+import static common.fixture.subway.LineFixture.*;
+import static common.fixture.subway.StationFixture.*;
+import static common.utils.CustomAssertions.상태코드_확인;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD;
 
 @DisplayName("노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@DirtiesContext(classMode = BEFORE_EACH_TEST_METHOD)
-@Sql(scripts = {"classpath:SQLScripts/01.station-data.sql"})
+@Sql(scripts = {"classpath:SQLScripts/00.clear-database.sql"})
 public class LineAcceptanceTest {
-    static final Long stationId1 = 1L;
-    static final Long stationId2 = 2L;
-    static final Long stationId3 = 3L;
+    Long STATION_ID_1;
+    Long STATION_ID_2;
+    Long STATION_ID_3;
+
+    @BeforeEach
+    void setup() {
+        STATION_ID_1 = 역_생성_ID_반환(역_생성_요청(GN_STATION));
+        STATION_ID_2 = 역_생성_ID_반환(역_생성_요청(YS_STATION));
+        STATION_ID_3 = 역_생성_ID_반환(역_생성_요청(SL_STATION));
+    }
 
     /**
      * When 지하철 노선을 생성하면
@@ -35,23 +39,15 @@ public class LineAcceptanceTest {
     @DisplayName("지하철노선을 생성한다.")
     @Test
     void createLine() {
-        // given
-        Map<String, Object> params = new HashMap<>();
-        params.put("name", "신분당선");
-        params.put("color", "bg-red-600");
-        params.put("upStationId", stationId1);
-        params.put("downStationId", stationId2);
-        params.put("distance", 10);
-
         // when
-        Response response = this.requestCreateLine(params);
+        Response response = 노선_생성_요청(SBD_LINE_NAME, RED_LINE_COLOR, STATION_ID_1, STATION_ID_2, DISTANCE_10);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        상태코드_확인(response, HttpStatus.CREATED);
 
         // then
-        List<String> lineNames = this.requestSearchLines().jsonPath().getList("name", String.class);
-        assertThat(lineNames).containsAnyOf("신분당선");
+        List<String> lineNames = 노선_이름_목록_반환(노선_목록_조회_요청());
+        assertThat(lineNames).containsAnyOf(SBD_LINE_NAME);
     }
 
 
@@ -64,28 +60,14 @@ public class LineAcceptanceTest {
     @Test
     void searchLines() {
         // given
-        Map<String, Object> params1 = new HashMap<>();
-        params1.put("name", "신분당선");
-        params1.put("color", "bg-red-600");
-        params1.put("upStationId", stationId1);
-        params1.put("downStationId", stationId2);
-        params1.put("distance", 10);
-
-        Map<String, Object> params2 = new HashMap<>();
-        params2.put("name", "분당선");
-        params2.put("color", "bg-green-600");
-        params2.put("upStationId", stationId1);
-        params2.put("downStationId", stationId3);
-        params2.put("distance", 20);
-
-        this.requestCreateLine(params1);
-        this.requestCreateLine(params2);
+        노선_생성_요청(SBD_LINE_NAME, RED_LINE_COLOR, STATION_ID_1, STATION_ID_2, DISTANCE_10);
+        노선_생성_요청(BD_LINE_NAME, GREEN_LINE_COLOR, STATION_ID_1, STATION_ID_3, DISTANCE_10);
 
         // when
-        List<String> lineNames = this.requestSearchLines().jsonPath().getList("name", String.class);
+        List<String> lineNames = 노선_이름_목록_반환(노선_목록_조회_요청());
 
         // then
-        assertThat(lineNames).containsAnyOf("신분당선", "분당선");
+        assertThat(lineNames).containsAnyOf(SBD_LINE_NAME, BD_LINE_NAME);
     }
 
     /**
@@ -97,20 +79,13 @@ public class LineAcceptanceTest {
     @Test
     void searchLine() {
         // given
-        Map<String, Object> params = new HashMap<>();
-        params.put("name", "신분당선");
-        params.put("color", "bg-red-600");
-        params.put("upStationId", stationId1);
-        params.put("downStationId", stationId2);
-        params.put("distance", 10);
-
-        String createdId = this.requestCreateLine(params).jsonPath().getString("id");
+        Long createdId = 노선_생성_ID_반환(노선_생성_요청(SBD_LINE_NAME, RED_LINE_COLOR, STATION_ID_1, STATION_ID_2, DISTANCE_10));
 
         // when
-        String lineName = this.requestSearchLine(createdId).jsonPath().getString("name");
+        String lineName = 노선_단일_조회_요청(createdId).jsonPath().getString("name");
 
         // then
-        assertThat(lineName).isEqualTo("신분당선");
+        assertThat(lineName).isEqualTo(SBD_LINE_NAME);
     }
 
 
@@ -123,24 +98,14 @@ public class LineAcceptanceTest {
     @Test
     void updateLine() {
         // given
-        Map<String, Object> createParam = new HashMap<>();
-        createParam.put("name", "신분당선");
-        createParam.put("color", "bg-red-600");
-        createParam.put("upStationId", stationId1);
-        createParam.put("downStationId", stationId2);
-        createParam.put("distance", 10);
-
-        String createdId = this.requestCreateLine(createParam).jsonPath().getString("id");
+        Long createdId = 노선_생성_ID_반환(노선_생성_요청(SBD_LINE_NAME, RED_LINE_COLOR, STATION_ID_1, STATION_ID_2, DISTANCE_10));
 
         // when
-        Map<String, Object> updateParam = new HashMap<>();
-        updateParam.put("name", "다른분당선");
-        updateParam.put("color", "bg-red-600");
-        this.requestUpdateLine(createdId, updateParam);
+        노선_수정_요청(createdId, BD_LINE_NAME, GREEN_LINE_COLOR);
 
         //then
-        String updatedLineName = this.requestSearchLine(createdId).jsonPath().getString("name");
-        assertThat(updatedLineName).isEqualTo("다른분당선");
+        String updatedLineName = 노선_단일_조회_요청(createdId).jsonPath().getString("name");
+        assertThat(updatedLineName).isEqualTo(BD_LINE_NAME);
     }
 
 
@@ -154,57 +119,14 @@ public class LineAcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        Map<String, Object> createParam = new HashMap<>();
-        createParam.put("name", "신분당선");
-        createParam.put("color", "bg-red-600");
-        createParam.put("upStationId", stationId1);
-        createParam.put("downStationId", stationId2);
-        createParam.put("distance", 10);
-
-        String createdId = this.requestCreateLine(createParam).jsonPath().getString("id");
+        Long createdId = 노선_생성_ID_반환(노선_생성_요청(SBD_LINE_NAME, RED_LINE_COLOR, STATION_ID_1, STATION_ID_2, DISTANCE_10));
 
         // when
-        assertThat(this.requestDeleteLine(createdId).statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        상태코드_확인(노선_삭제_요청(createdId), HttpStatus.NO_CONTENT);
 
         //then
-        List<String> searchLines = this.requestSearchLines().jsonPath().getList("name", String.class);
-        assertThat(searchLines).isEmpty();
+        List<String> lineNames = 노선_이름_목록_반환(노선_목록_조회_요청());
+        assertThat(lineNames).isEmpty();
     }
 
-
-    private Response requestCreateLine(Map<String, Object> params) {
-        return RestAssured.given().log().all().body(params).contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().log().all()
-                .extract().response();
-    }
-
-    private Response requestSearchLines() {
-        return RestAssured.given().log().all()
-                .when().get("/lines")
-                .then().log().all()
-                .extract().response();
-    }
-
-    private Response requestSearchLine(String id) {
-        return RestAssured.given().log().all()
-                .when().get("/lines/" + id)
-                .then().log().all()
-                .extract().response();
-    }
-
-    private Response requestUpdateLine(String id, Map<String, Object> params) {
-        return RestAssured.given().body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().put("/lines/" + id)
-                .then().log().all()
-                .extract().response();
-    }
-
-    private Response requestDeleteLine(String id) {
-        return RestAssured.given().log().all()
-                .when().delete("/lines/" + id)
-                .then().log().all()
-                .extract().response();
-    }
 }

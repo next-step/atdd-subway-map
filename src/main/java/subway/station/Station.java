@@ -25,9 +25,4 @@ public class Station {
         return name;
     }
 
-    public static Station saveId(Long id) {
-        Station station = new Station();
-        station.id = id;
-        return station;
-    }
 }

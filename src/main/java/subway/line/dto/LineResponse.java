@@ -5,7 +5,6 @@ import subway.line.Line;
 import subway.station.Station;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class LineResponse {
     private Long id;
@@ -22,7 +21,8 @@ public class LineResponse {
     }
 
     public static LineResponse from(Line line) {
-        List<Station> stations = line.getLineStations().stream().map(lineStation -> lineStation.getStation()).collect(Collectors.toList());
+        List<Station> stations = line.getAllStations();
+
         return LineResponse.builder().id(line.getId()).name(line.getName()).color(line.getColor())
                 .stations(stations)
                 .build();

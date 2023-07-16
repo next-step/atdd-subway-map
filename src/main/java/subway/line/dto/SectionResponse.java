@@ -1,26 +1,28 @@
 package subway.line.dto;
 
-public class CreateLineRequest {
-    private String name;
-    private String color;
+import subway.section.Section;
+
+public class SectionResponse {
+
+    private Long id;
     private Long upStationId;
     private Long downStationId;
     private Long distance;
 
-    public CreateLineRequest(String name, String color, Long upStationId, Long downStationId, Long distance) {
-        this.name = name;
-        this.color = color;
+    public SectionResponse(Long id, Long upStationId, Long downStationId, Long distance) {
+        this.id = id;
         this.upStationId = upStationId;
         this.downStationId = downStationId;
         this.distance = distance;
     }
 
-    public String getName() {
-        return name;
+    public static SectionResponse from(Section section) {
+        return new SectionResponse(section.getId(), section.getUpStation().getId(),
+                section.getDownStation().getId(), section.getDistance());
     }
 
-    public String getColor() {
-        return color;
+    public Long getId() {
+        return id;
     }
 
     public Long getUpStationId() {
