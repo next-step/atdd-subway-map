@@ -19,12 +19,12 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
-import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 import subway.dto.SectionRequest;
 import subway.dto.SectionResponse;
 import subway.dto.StationRequest;
-import subway.dto.StationResponse;
+import subway.exception.NoMatchUpStationException;
+import subway.exception.error.SectionErrorCode;
 import subway.factory.LineRequestFactory;
 import subway.utils.RestAssuredClient;
 
@@ -75,6 +75,68 @@ public class SectionAcceptanceTest {
         SectionResponse sectionResponse = response.as(SectionResponse.class);
         Assertions.assertThat(sectionResponse.getId()).isNotNull();
         Assertions.assertThat(sectionResponse.getLineId()).isEqualTo(this.lineResponse.getId());
+    }
+
+    /**
+     * Given: 2개의 지하철역이 등록되어 있다.
+     * And: 1개의 노선이 등록되어 있다.
+     * When: 상행역이 노선의 하행 종점역이 아닌 구간을 등록한다.
+     * Then: 실패(400 Bad Request) 응답을 받는다.
+     * And: '구간의 상행역과 노선의 하행 종점역이 일치하지 않습니다.' 메시지를 응답받는다.
+     */
+    @Test
+    @DisplayName("상행역이 노선의 하행 종점역이 아닌 구간을 등록한다.")
+    void createSectionWithNoMatchesUpStation() {
+        // Given (Fixture)
+        // When
+        SectionRequest sectionRequest = SectionRequest.builder()
+            // 노선은 상행(1) 하행(2) 으로 종점이 등록되어있는 상태이며,
+            // 새로운 구간은 상행(3) 으로 등록하고자 함
+            .upStationId(3L)
+            .downStationId(4L)
+            .distance(20L)
+            .build();
+
+        // Then
+        Assertions.assertThatThrownBy(() -> {
+            RestAssuredClient.requestPost(
+                generateSectionPathForLineId(lineResponse.getId()),
+                sectionRequest)
+                .statusCode(HttpStatus.BAD_REQUEST.value());
+        })
+            .isInstanceOf(NoMatchUpStationException.class)
+            .hasMessage(SectionErrorCode.NO_MATCH_UP_STATION.getMessage());
+    }
+
+    /**
+     * Given: 2개의 지하철역이 등록되어 있다.
+     * And: 1개의 노선이 등록되어 있다.
+     * When: 하행역이 노선에 등록되어있는 구간을 등록한다.
+     * Then: 실패(400 Bad Request) 응답을 받는다.
+     * And: '구간의 하행역이 노선에 이미 등록되어있습니다.' 메시지를 응답받는다.
+     */
+    @Test
+    @DisplayName("하행역이 노선에 등록되어 있는 구간을 등록한다.")
+    void createSectionWithAlreadyExistDownStation() {
+        // Given (Fixture)
+        // When
+        SectionRequest sectionRequest = SectionRequest.builder()
+            // 노선은 상행(1) 하행(2) 으로 종점이 등록되어있는 상태이며,
+            // 새로운 구간의 하행(1) 으로 등록하고자 함
+            .upStationId(2L)
+            .downStationId(1L)
+            .distance(20L)
+            .build();
+
+        // Then
+        Assertions.assertThatThrownBy(() -> {
+                RestAssuredClient.requestPost(
+                        generateSectionPathForLineId(lineResponse.getId()),
+                        sectionRequest)
+                    .statusCode(HttpStatus.BAD_REQUEST.value());
+            })
+            .isInstanceOf(NoMatchUpStationException.class)
+            .hasMessage(SectionErrorCode.ALREADY_EXIST_DOWN_STATION.getMessage());
     }
 
     private String generateSectionPathForLineId(long id) {
