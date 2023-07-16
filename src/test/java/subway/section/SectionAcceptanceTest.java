@@ -144,6 +144,29 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         assertThat(showSectionResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
+    /**
+     * Given 지하철 노선과 노선에 속하지 않은 새로운 지하철역을 생성 후, 지하철 노선의 하행역과 새로운 지하철역을 구간으로 등록하고
+     * When 지하철 노선의 하행 종점역이 아닌 역을 제거하면
+     * Then 에러가 발생한다
+     */
+    @Test
+    void 지하철_구간_제거시_하행_종점역이_아니면_에러_발생() throws JsonProcessingException {
+        // given
+        LineRequest request = 지하철역_생성_및_지하철_노선_요청_객체_생성(SINBUNDANG_LINE_NAME, SINBUNDANG_LINE_COLOR, SINBUNDANG_UP_STATION_NAME, SINBUNDANG_DOWN_STATION_NAME, SINBUNDANG_LINE_DISTANCE);
+        ExtractableResponse<Response> createLineResponse = 지하철_노선_생성_요청(request);
+        LineResponse lineResponse = ObjectMapperHolder.instance.readValue(createLineResponse.response().body().asString(), LineResponse.class);
+        Long downStationId = lineResponse.getStations().get(1).getId();
+        Long newDownStationId = 지하철역_생성_요청_및_아이디_추출(SINBUNDANG_NEW_DOWN_STATION_NAME);
+
+        지하철_구간_생성_요청(lineResponse.getId(), new SectionRequest(downStationId, newDownStationId, SINBUNDANG_NEW_DISTANCE));
+
+        // when
+        ExtractableResponse<Response> deleteResponse = 지하철_구간_제거_요청(lineResponse.getId(), downStationId);
+
+        // then
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    }
+
     private ExtractableResponse<Response> 지하철_구간_생성_요청(Long lineId, SectionRequest request) {
         return RestAssured
                 .given().log().all()
