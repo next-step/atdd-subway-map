@@ -1,40 +1,46 @@
 package subway.subway.application;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import subway.subway.application.in.SubwayLineRegisterUsecase;
+import subway.subway.application.in.SubwaySectionAddUsecase;
 import subway.subway.application.out.StationListLoadByIdInPort;
-import subway.subway.application.out.SubwayLineRegisterPort;
-import subway.subway.application.query.SubwayLineResponse;
+import subway.subway.application.out.SubwayLineLoadPort;
+import subway.subway.application.out.SubwaySectionAddPort;
+import subway.subway.domain.SectionUpdateManager;
 import subway.subway.domain.Station;
 import subway.subway.domain.SubwayLine;
 import subway.subway.domain.SubwaySection;
 
 import java.util.List;
 
-@Service
 @Transactional
-class SubwayLineRegisterService implements SubwayLineRegisterUsecase {
+@Service
+public class SubwaySectionAddService implements SubwaySectionAddUsecase {
 
-    private final SubwayLineRegisterPort subwayLineRegisterPort;
     private final StationListLoadByIdInPort stationListLoadByIdInPort;
+    private final SubwayLineLoadPort subwayLineLoadPort;
+    private final SectionUpdateManager sectionUpdateManager;
+    private final SubwaySectionAddPort subwaySectionAddPort;
 
-    public SubwayLineRegisterService(SubwayLineRegisterPort subwayLineRegisterPort, StationListLoadByIdInPort stationListLoadByIdInPort) {
-        this.subwayLineRegisterPort = subwayLineRegisterPort;
+    @Autowired
+    public SubwaySectionAddService(StationListLoadByIdInPort stationListLoadByIdInPort, SubwayLineLoadPort subwayLineLoadPort, SectionUpdateManager sectionUpdateManager, SubwaySectionAddPort subwaySectionAddPort) {
         this.stationListLoadByIdInPort = stationListLoadByIdInPort;
+        this.subwayLineLoadPort = subwayLineLoadPort;
+        this.sectionUpdateManager = sectionUpdateManager;
+        this.subwaySectionAddPort = subwaySectionAddPort;
     }
 
     @Override
-    public SubwayLineResponse registerSubwayLine(Command command) {
+    public void addSubwaySection(Command command) {
         List<Station> stations = stationListLoadByIdInPort.findAllIn(List.of(command.getUpStationId(), command.getDownStationId()));
         Station upStation = this.getStationBy(stations, command.getUpStationId());
         Station downStation = this.getStationBy(stations, command.getDownStationId());
 
         SubwaySection subwaySection = SubwaySection.register(upStation, downStation, command.getDistance());
-
-        SubwayLine subwayLine = SubwayLine.register(command.getName(), command.getColor(), subwaySection);
-
-        return subwayLineRegisterPort.register(subwayLine);
+        SubwayLine subwayLine = subwayLineLoadPort.findOne(command.getSubwayLineId());
+        subwayLine.updateSection(subwaySection, sectionUpdateManager);
+        subwaySectionAddPort.addSubwaySection(subwayLine);
     }
 
     private Station getStationBy(List<Station> stations, Station.Id id) {

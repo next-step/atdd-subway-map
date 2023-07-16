@@ -1,10 +1,5 @@
 package subway.rds_module.entity;
 
-import subway.subway.domain.Kilometer;
-import subway.subway.domain.Station;
-import subway.subway.domain.SubwaySection;
-import subway.subway.domain.SubwaySectionStation;
-
 import javax.persistence.*;
 import java.math.BigDecimal;
 
@@ -17,25 +12,34 @@ public class SubwaySectionJpa {
     @Column(name = "subway_section_id")
     private Long id;
     @Column(nullable = false)
-    private Long startStationId;
+    private Long upStationId;
     @Column(nullable = false)
-    private String startStationName;
+    private String upStationName;
     @Column(nullable = false)
-    private Long endStationId;
+    private Long downStationId;
     @Column(nullable = false)
-    private String endStationName;
+    private String downStationName;
     @Column(nullable = false)
     private BigDecimal distance;
 
     public SubwaySectionJpa() {
     }
 
-    public SubwaySectionJpa(Long id, Long startStationId, String startStationName, Long endStationId, String endStationName, BigDecimal distance) {
+
+    public SubwaySectionJpa(Long upStationId, String upStationName, Long downStationId, String downStationName, BigDecimal distance) {
+        this.upStationId = upStationId;
+        this.upStationName = upStationName;
+        this.downStationId = downStationId;
+        this.downStationName = downStationName;
+        this.distance = distance;
+    }
+
+    public SubwaySectionJpa(Long id, Long upStationId, String upStationName, Long downStationId, String downStationName, BigDecimal distance) {
         this.id = id;
-        this.startStationId = startStationId;
-        this.startStationName = startStationName;
-        this.endStationId = endStationId;
-        this.endStationName = endStationName;
+        this.upStationId = upStationId;
+        this.upStationName = upStationName;
+        this.downStationId = downStationId;
+        this.downStationName = downStationName;
         this.distance = distance;
     }
 
@@ -43,20 +47,20 @@ public class SubwaySectionJpa {
         return id;
     }
 
-    public Long getStartStationId() {
-        return startStationId;
+    public Long getUpStationId() {
+        return upStationId;
     }
 
-    public String getStartStationName() {
-        return startStationName;
+    public String getUpStationName() {
+        return upStationName;
     }
 
-    public Long getEndStationId() {
-        return endStationId;
+    public Long getDownStationId() {
+        return downStationId;
     }
 
-    public String getEndStationName() {
-        return endStationName;
+    public String getDownStationName() {
+        return downStationName;
     }
 
     public BigDecimal getDistance() {
@@ -65,5 +69,13 @@ public class SubwaySectionJpa {
 
     public boolean isNew() {
         return id == null;
+    }
+
+    public void update(Long upStationId, String upStationName, Long downStationId, String downStationName, BigDecimal distance) {
+        this.upStationId = upStationId;
+        this.upStationName = upStationName;
+        this.downStationId = downStationId;
+        this.downStationName = downStationName;
+        this.distance = distance;
     }
 }

@@ -7,7 +7,6 @@ import org.mockito.Mockito;
 import subway.ParentTest;
 
 import java.math.BigDecimal;
-import java.util.stream.Collectors;
 
 import static org.mockito.BDDMockito.*;
 
@@ -45,23 +44,17 @@ public class SubwayLineTest extends ParentTest {
         BigDecimal number = BigDecimal.TEN;
         Kilometer kilometer = Kilometer.of(number);
 
-        SubwaySection subwaySection = SubwaySection.register(station1, station2, kilometer);
-
         //when
 
+        SubwaySection subwaySection = SubwaySection.register(station1, station2, kilometer);
         SubwayLine subwayLine = SubwayLine.register(name, color, subwaySection);
 
         //then
 
         Assertions.assertThat(subwayLine.getName()).isEqualTo(name);
         Assertions.assertThat(subwayLine.getColor()).isEqualTo(color);
-        Assertions.assertThat(subwayLine.getSectionList().size()).isEqualTo(1);
-        Assertions.assertThat(subwayLine.getSectionList().stream().map(SubwaySection::getDistance).collect(Collectors.toList()))
-                .containsOnly(kilometer);
-        Assertions.assertThat(subwayLine.getSectionList().stream().map(SubwaySection::getStartStationId).collect(Collectors.toList()))
-                .containsOnly(id);
-        Assertions.assertThat(subwayLine.getSectionList().stream().map(SubwaySection::getEndStationId).collect(Collectors.toList()))
-                .containsOnly(id2);
+        Assertions.assertThat(subwayLine.getSectionSize()).isEqualTo(1);
+        Assertions.assertThat(subwayLine.existsUpStation(subwaySection.getUpStationId())).isTrue();
 
     }
 

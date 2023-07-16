@@ -17,7 +17,7 @@ public class SubwayLineUpdateController {
     }
 
     @PutMapping("/subway-lines/{id}")
-    public ResponseEntity<Void> updateSubwayLine(@PathVariable Long id,  @RequestBody Request request) {
+    public ResponseEntity<Void> updateSubwayLine(@PathVariable Long id, @RequestBody Request request) {
         SubwayLineUpdateUsecase.Command command = mapper.mapFrom(id, request);
         subwayLineUpdateUsecase.updateSubwayLine(command);
         return ResponseEntity.ok().build();

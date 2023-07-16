@@ -5,7 +5,11 @@ public class SubwaySectionStation {
     private final Station.Id id;
     private final String name;
 
-    public SubwaySectionStation(Station station) {
+    public static SubwaySectionStation from(Station station) {
+        return new SubwaySectionStation(station);
+    }
+
+    private SubwaySectionStation(Station station) {
         this.id = station.getId();
         this.name = station.getName();
     }

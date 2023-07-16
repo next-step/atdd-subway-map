@@ -12,13 +12,13 @@ public class StationJpaMapper {
         return new StationJpa(station.getName());
     }
 
-    public StationResponse mapStationResponseFrom(StationJpa station) {
+    public StationResponse toStationResponse(StationJpa station) {
         return new StationResponse(
                 station.getId(),
                 station.getName()
         );
     }
-    public Station mapStationFrom(StationJpa station) {
+    public Station toStation(StationJpa station) {
         return Station.of(
                 new Station.Id(station.getId()),
                 station.getName()

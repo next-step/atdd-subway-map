@@ -1,4 +1,4 @@
-package subway.subway.application.in;
+package subway.subway.application.in.query;
 
 import subway.subway.application.query.SubwayLineResponse;
 import subway.subway.domain.SubwayLine;

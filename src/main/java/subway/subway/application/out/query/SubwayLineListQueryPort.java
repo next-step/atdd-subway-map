@@ -1,11 +1,12 @@
-package subway.subway.application.in;
+package subway.subway.application.out.query;
 
 import subway.subway.application.query.SubwayLineResponse;
-import subway.subway.domain.SubwayLine;
 
 import java.util.List;
 
-public interface SubwayLineListQuery {
+public interface SubwayLineListQueryPort {
 
     List<SubwayLineResponse> findAll();
+
+
 }

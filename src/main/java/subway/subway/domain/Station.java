@@ -3,7 +3,7 @@ package subway.subway.domain;
 import java.util.Objects;
 
 public class Station {
-    private Id id;
+    private final Id id;
     private final String name;
 
     public static Station register(String name) {
@@ -16,6 +16,7 @@ public class Station {
 
 
     private Station(String name) {
+        this.id = new Station.Id();
         this.name = name;
     }
 
@@ -25,7 +26,7 @@ public class Station {
     }
 
     public Id getId() {
-        if (isNew()) {
+        if (this.isNew()) {
             throw new IllegalArgumentException("아직 저장되지 않은 역입니다.");
         }
         return id;
@@ -36,7 +37,7 @@ public class Station {
     }
 
     public boolean isNew() {
-        return id == null;
+        return id.isNew();
     }
 
     @Override
@@ -53,7 +54,10 @@ public class Station {
     }
 
     public static class Id {
-        private final Long id;
+        private Long id;
+
+        public Id() {
+        }
 
         public Id(Long id) {
             this.id = id;
@@ -63,12 +67,16 @@ public class Station {
             return id;
         }
 
+        public boolean isNew() {
+            return id == null;
+        }
+
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
-            Id id1 = (Id) o;
-            return Objects.equals(id, id1.id);
+            Id idObject = (Id) o;
+            return Objects.equals(id, idObject.id);
         }
 
         @Override

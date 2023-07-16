@@ -5,11 +5,14 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.assertj.core.api.Assertions;
 import org.springframework.http.MediaType;
+import subway.subway.application.query.StationResponse;
 import subway.subway.application.query.SubwayLineResponse;
 
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
+
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 public abstract class SubwayLineAcceptanceTest extends StationAcceptanceTest{
 
@@ -28,6 +31,27 @@ public abstract class SubwayLineAcceptanceTest extends StationAcceptanceTest{
 
         long upStationId = super.지하철_역_식별자_조회(upStationName);
         long downStationId = super.지하철_역_식별자_조회(downStationName);
+
+        RequestBuilder params = new RequestBuilder()
+                .add("name", name)
+                .add("color", color)
+                .add("upStationId", upStationId)
+                .add("downStationId", downStationId)
+                .add("distance", distance);
+
+        return RestAssured
+                .given().log().all()
+                .body(params.build())
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/subway-lines")
+                .then().log().all()
+                .extract();
+    }
+
+    protected ExtractableResponse<Response> 지하철_노선_생성(String name, String color, StationResponse upStation, StationResponse downStation, int distance) {
+
+        long upStationId = upStation.getId();
+        long downStationId = downStation.getId();
 
         RequestBuilder params = new RequestBuilder()
                 .add("name", name)
@@ -74,12 +98,40 @@ public abstract class SubwayLineAcceptanceTest extends StationAcceptanceTest{
                 .extract();
     }
 
+    protected void 지하철_노선_구간_확인(SubwayLineResponse subwayLine, List<StationResponse> stations) {
+
+        SubwayLineResponse subwayLineResponse = RestAssured
+                .given().log().all()
+                .when().get("/subway-lines/{subway-line-id}", subwayLine.getId())
+                .then().log().all()
+                .extract().as(SubwayLineResponse.class);
+
+        List<Long> stationIds = subwayLineResponse.getStations().stream().map(SubwayLineResponse.StationInfo::getId).distinct().collect(Collectors.toList());
+        Assertions.assertThat(stationIds).isEqualTo(stations.stream().map(StationResponse::getId).collect(Collectors.toList()));
+    }
+
+    protected void 지하철_노선_구간_미포함_확인(SubwayLineResponse subwayLine, StationResponse... stations) {
+        String[] stationNames = Arrays.stream(stations).map(StationResponse::getName).toArray(String[]::new);
+
+        SubwayLineResponse subwayLineResponse = RestAssured
+                .given().log().all()
+                .when().get("/subway-lines/{subway-line-id}", subwayLine.getId())
+                .then().log().all()
+                .extract().as(SubwayLineResponse.class);
+
+        Assertions.assertThat(subwayLineResponse.getStations())
+                .extracting(SubwayLineResponse.StationInfo::getName)
+                .doesNotContain(stationNames);
+    }
+
     protected void 지하철_노선_상세_조회_응답_비교(ExtractableResponse<Response> response, String name, String color, String upStationName, String downStationName) {
         SubwayLineResponse subwayLineResponse = response.body().as(SubwayLineResponse.class);
-        Assertions.assertThat(subwayLineResponse.getName()).isEqualTo(name);
-        Assertions.assertThat(subwayLineResponse.getColor()).isEqualTo(color);
-        Assertions.assertThat(subwayLineResponse.getStations().stream()
-                .map(SubwayLineResponse.StationResponse::getName).collect(Collectors.toList())).containsOnly(upStationName, downStationName);
+        assertSoftly(soft -> {
+            soft.assertThat(subwayLineResponse.getName()).isEqualTo(name);
+            soft.assertThat(subwayLineResponse.getColor()).isEqualTo(color);
+            soft.assertThat(subwayLineResponse.getStations().stream()
+                    .map(SubwayLineResponse.StationInfo::getName).collect(Collectors.toList())).containsOnly(upStationName, downStationName);
+        });
 
     }
 

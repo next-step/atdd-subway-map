@@ -1,9 +1,9 @@
-package subway.subway.application;
+package subway.subway.application.query;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import subway.subway.application.in.StationListQuery;
-import subway.subway.application.out.StationListQueryPort;
+import subway.subway.application.in.query.StationListQuery;
+import subway.subway.application.out.query.StationListQueryPort;
 import subway.subway.application.query.StationResponse;
 
 import java.util.List;

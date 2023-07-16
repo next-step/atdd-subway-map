@@ -4,7 +4,7 @@ import subway.subway.domain.Station;
 import subway.subway.domain.SubwayLine;
 
 public interface StationCloseUsecase {
-    void closeStation(Command command);
+    void closeStation(StationCloseUsecase.Command command);
 
     class Command {
         private final Station.Id id;
