@@ -26,4 +26,8 @@ public class Sections {
     public void delete(Section section) {
         sections.remove(section);
     }
+
+    public long count() {
+        return sections.stream().count();
+    }
 }

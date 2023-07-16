@@ -12,6 +12,7 @@ import java.util.Optional;
 public class Line {
 
     private static final Long MIN_DISTANCE = 0L;
+    private static final long MIN_SECTION_COUNT = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -127,6 +128,10 @@ public class Line {
     public Section deleteSectionByDownStationId(Long downStationId) {
         if (!downStation.getId().equals(downStationId)) {
             throw new IllegalArgumentException(String.format("하행 종점역이 아니면 구간을 제거할 수 없습니다. (stationId: %d)", downStationId));
+        }
+
+        if (sections.count() <= MIN_SECTION_COUNT) {
+            throw new IllegalArgumentException(String.format("구간은 최소 %d개 이상이야 합니다.", MIN_SECTION_COUNT));
         }
 
         Optional<Section> optionalSection = sections.findByDownStationId(downStationId);

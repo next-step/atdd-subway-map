@@ -167,6 +167,26 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
+    /**
+     * Given 구간이 1개인 지하철 노선을 생성 후
+     * When 지하철 노선의 하행 종점역을 제거하면
+     * Then 에러가 발생한다
+     */
+    @Test
+    void 지하철_구간_제거시_노선에_상행_종점역과_하행_종점역만_있는_경우_에러_발생() throws JsonProcessingException {
+        // given
+        LineRequest request = 지하철역_생성_및_지하철_노선_요청_객체_생성(SINBUNDANG_LINE_NAME, SINBUNDANG_LINE_COLOR, SINBUNDANG_UP_STATION_NAME, SINBUNDANG_DOWN_STATION_NAME, SINBUNDANG_LINE_DISTANCE);
+        ExtractableResponse<Response> createLineResponse = 지하철_노선_생성_요청(request);
+        LineResponse lineResponse = ObjectMapperHolder.instance.readValue(createLineResponse.response().body().asString(), LineResponse.class);
+        Long downStationId = lineResponse.getStations().get(1).getId();
+
+        // when
+        ExtractableResponse<Response> deleteResponse = 지하철_구간_제거_요청(lineResponse.getId(), downStationId);
+
+        // then
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    }
+
     private ExtractableResponse<Response> 지하철_구간_생성_요청(Long lineId, SectionRequest request) {
         return RestAssured
                 .given().log().all()
