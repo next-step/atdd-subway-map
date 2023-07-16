@@ -57,7 +57,7 @@ public class SectionAcceptanceTest {
      */
     @Test
     @DisplayName("새로운 구간을 등록한다.")
-    void 새로운_구간_등록() {
+    void createSection() {
         // Given (Fixture)
         // When
         SectionRequest sectionRequest = SectionRequest.builder()
