@@ -3,6 +3,7 @@ package subway.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.domain.Line;
+import subway.domain.Section;
 import subway.domain.Station;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
@@ -61,13 +62,20 @@ public class LineService {
     }
     @Transactional
     public LineResponse saveSection(Long lineId, SectionRequest sectionRequest){
-        Line line = lineRepository.findById(lineId).orElseThrow(NoSuchElementException::new);
-        line.addSection(sectionRequest.getUpStationId(), sectionRequest.getDownStationId());
+        Line line = lineRepository.findById(lineId).orElseThrow(() -> new NoSuchElementException("해당 line 값이 없습니다."));
+        Station upStation = stationRepository.findById(sectionRequest.getUpStationId()).orElseThrow(() -> new NoSuchElementException("해당 station 값이 없습니다."));
+        Station downStation = stationRepository.findById(sectionRequest.getDownStationId()).orElseThrow(() -> new NoSuchElementException("해당 station 값이 없습니다."));
+        Long distance = sectionRequest.getDistance();
+
+        Section section = Section.of(line, distance, upStation, downStation);
+        line.addSection(section);
+
         return createLineResponse(line);
     }
     @Transactional
     public void deleteSection(Long lineId, Long stationId){
         Line line = lineRepository.findById(lineId).orElseThrow(NoSuchElementException::new);
-        line.deleteSection(stationId);
+        Station downStation = stationRepository.findById(stationId).orElseThrow(NoSuchElementException::new);
+        line.deleteSection(downStation);
     }
 }

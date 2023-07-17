@@ -14,6 +14,6 @@ public class LineRequest {
     private Long distance;
 
     public Line toEntity(Station upStation, Station downStation){
-        return new Line(name, color, upStation, downStation, distance);
+        return Line.of(name, color, upStation, downStation, distance);
     }
 }

@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.jdbc.Sql;
 
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +22,7 @@ import static subway.LineAcceptanceTest.아이디_노선_조회;
 import static subway.StationAcceptanceTest.역_만들기;
 
 @DisplayName("지하철 구간 관련 기능")
+@Sql("/teardown.sql")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class SectionAcceptanceTest {
     public static final String 신분당선 = "신분당선";
@@ -44,12 +46,12 @@ public class SectionAcceptanceTest {
     private ExtractableResponse<Response> 네번째지하철역;
     private ExtractableResponse<Response> 첫번째노선;
     private ExtractableResponse<Response> 두번째노선;
-    private String 첫째지하철역_아이디;
-    private String 두번째지하철역_아이디;
-    private String 세번째지하철역_아이디;
-    private String 네번째지하철역_아이디;
-    private String 첫째노선_아이디;
-    private String 둘째노선_아이디;
+    private static String 첫째지하철역_아이디;
+    private static String 두번째지하철역_아이디;
+    private static String 세번째지하철역_아이디;
+    private static String 네번째지하철역_아이디;
+    private static String 첫째노선_아이디;
+    private static String 둘째노선_아이디;
 
     private static ExtractableResponse<Response> 구간_추가(String lineId, String upStationId, String downStationId, String distance) {
         Map<String, String> params = new HashMap<>();
@@ -109,13 +111,14 @@ public class SectionAcceptanceTest {
         첫째노선_아이디 = 첫번째노선.jsonPath().getString("id");
 
         // WHEN
-        ExtractableResponse<Response> response = 구간_추가(첫째노선_아이디, 네번째지하철역_아이디, 두번째지하철역_아이디, "10");
+        ExtractableResponse<Response> response = 구간_추가(첫째노선_아이디, 첫째지하철역_아이디, 세번째지하철역_아이디, "10");
 
         // THEN
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // THEN
-        List<String> stations = response.jsonPath().getList("name", String.class);
+        ExtractableResponse<Response> getLineResponse = 아이디_노선_조회(첫째노선_아이디);
+        List<String> stations = getLineResponse.jsonPath().getList("stations.name");
         assertThat(stations).containsAnyOf(세번째지하철역이름);
     }
 
@@ -130,7 +133,7 @@ public class SectionAcceptanceTest {
         // GIVEN
 
         // WHEN
-        ExtractableResponse<Response> response = 구간_추가(첫째노선_아이디, 네번째지하철역_아이디, 두번째지하철역_아이디, "10");
+        ExtractableResponse<Response> response = 구간_추가("1", 네번째지하철역_아이디, 두번째지하철역_아이디, "10");
 
         // THEN
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
@@ -191,7 +194,7 @@ public class SectionAcceptanceTest {
 
         // THEN
         ExtractableResponse<Response> response = 아이디_노선_조회(첫째노선_아이디);
-        assertThat(response.jsonPath().getList("stations.name")).contains(첫째지하철역, 두번째지하철역, 네번째지하철역);
+        assertThat(response.jsonPath().getList("stations.name")).contains(첫째지하철역이름, 두번째지하철역이름);
 
     }
 
@@ -206,19 +209,19 @@ public class SectionAcceptanceTest {
         // GIVEN
         첫번째노선 = 노선_만들기(신분당선, BG_RED_600, 두번째지하철역_아이디, 첫째지하철역_아이디, 거리);
         첫째노선_아이디 = 첫번째노선.jsonPath().getString("id");
-        구간_추가(첫째노선_아이디, 네번째지하철역_아이디, 두번째지하철역_아이디, "10");
+        구간_추가(첫째노선_아이디, 첫째지하철역_아이디, 세번째지하철역_아이디, "10");
         // WHEN
-        ExtractableResponse<Response> response = 구간_제거(첫째노선_아이디, 두번째지하철역_아이디);
+        ExtractableResponse<Response> response = 구간_제거(첫째노선_아이디, 첫째지하철역_아이디);
 
         // THEN
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
-    }
+   }
 
     /**
      * Given 1개의 지하철 노선을 생성하고
      * When 지하철 구간을 제거할때 제거 구간이 하나만 있을 때를 등록한다
      * Then 에러를 노출한다
-     */
+* +  */
     @DisplayName("구간을 제거 할때, 제거 구간이 하나만 있을때 에러를 표기한다")
     @Test
     void deleteSectionFromLineThrowOnlyElementError() {
