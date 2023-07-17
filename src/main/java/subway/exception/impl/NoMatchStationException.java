@@ -3,9 +3,9 @@ package subway.exception.impl;
 import subway.exception.SubwayException;
 import subway.exception.error.SubwayErrorCode;
 
-public class NoMatchLineUpStationException extends SubwayException {
+public class NoMatchStationException extends SubwayException {
 
-    public NoMatchLineUpStationException() {
+    public NoMatchStationException() {
         super(SubwayErrorCode.NO_MATCH_UP_STATION);
     }
 

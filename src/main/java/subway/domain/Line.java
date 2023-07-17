@@ -1,5 +1,6 @@
 package subway.domain;
 
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -53,9 +54,18 @@ public class Line {
         this.color = request.getColor().isBlank() ? this.color : request.getColor();
         this.distance = request.getDistance() == null ? this.distance : request.getDistance();
     }
+    public boolean isNotLastStation(Long stationId) {
+        return !Objects.equals(this.downStationId, stationId);
+    }
 
-    public void updateDownStation(Section section) {
+    public void updateByAddingSection(Section section) {
         this.downStationId = section.getDownStationId();
+        this.distance += section.getDistance();
+    }
+
+    public void updateByRemovingSection(Section removeSection, Section prevSection) {
+        this.downStationId = prevSection.getDownStationId();
+        this.distance -= removeSection.getDistance();
     }
 
 }

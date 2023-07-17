@@ -16,8 +16,10 @@ import subway.dto.SectionRequest;
 import subway.dto.SectionResponse;
 import subway.exception.impl.AlreadyExistDownStation;
 import subway.exception.impl.CannotCreateSectionException;
-import subway.exception.impl.SubwayNotFoundException;
-import subway.exception.impl.NoMatchLineUpStationException;
+import subway.exception.impl.LineNotFoundException;
+import subway.exception.impl.NoMatchStationException;
+import subway.exception.impl.NonLastStationDeleteNotAllowedException;
+import subway.exception.impl.SingleSectionDeleteNotAllowedException;
 import subway.exception.impl.StationNotFoundException;
 import subway.repository.LineRepository;
 import subway.repository.SectionRepository;
@@ -68,7 +70,7 @@ public class LineService {
     }
 
     public LineResponse findLine(Long id) {
-        Line line = lineRepository.findById(id).orElseThrow(SubwayNotFoundException::new);
+        Line line = lineRepository.findById(id).orElseThrow(LineNotFoundException::new);
         Station upStation = stationRepository.findById(line.getUpStationId())
             .orElseThrow(StationNotFoundException::new);
         Station downStation = stationRepository.findById(line.getDownStationId())
@@ -77,8 +79,9 @@ public class LineService {
         return LineResponse.from(line, upStation, downStation);
     }
 
+    @Transactional
     public LineResponse updateLine(Long id, LineRequest request) {
-        Line line = lineRepository.findById(id).orElseThrow(SubwayNotFoundException::new);
+        Line line = lineRepository.findById(id).orElseThrow(LineNotFoundException::new);
         line.update(request);
 
         Line updateLine = lineRepository.save(line);
@@ -94,13 +97,14 @@ public class LineService {
         lineRepository.deleteById(id);
     }
 
+    @Transactional
     public SectionResponse createSection(Long id, SectionRequest request) {
-        Line line = lineRepository.findById(id).orElseThrow(SubwayNotFoundException::new);
+        Line line = lineRepository.findById(id).orElseThrow(LineNotFoundException::new);
 
         if (canCreateSection(line, request)) {
             Section section = sectionRepository.save(Section.from(id, request));
 
-            line.updateDownStation(section);
+            line.updateByAddingSection(section);
             lineRepository.save(line);
 
             return SectionResponse.from(section);
@@ -111,7 +115,7 @@ public class LineService {
 
     private boolean canCreateSection(Line line, SectionRequest request) {
         if (noMatchLineDownStationAndSectionUpStation(line.getDownStationId(), request.getUpStationId())) {
-            throw new NoMatchLineUpStationException();
+            throw new NoMatchStationException();
         }
 
         List<Section> sections = sectionRepository.findAllByLineId(line.getId());
@@ -142,4 +146,32 @@ public class LineService {
     private boolean alreadyExistStation(Set<Long> lineStationIds, Long sectionDownStationId) {
         return lineStationIds.contains(sectionDownStationId);
     }
+
+    @Transactional
+    public void deleteSection(Long id, Long stationId) {
+        Line line = lineRepository.findById(id).orElseThrow(LineNotFoundException::new);
+        List<Section> sections = sectionRepository.findAllByLineId(id);
+
+        if (hasSingleSection(sections)) {
+            throw new SingleSectionDeleteNotAllowedException();
+        }
+
+        if (line.isNotLastStation(stationId)) {
+            throw new NonLastStationDeleteNotAllowedException();
+        }
+
+        Section removeSection = sections.remove(getLastIndex(sections));
+        Section prevSection = sections.get(getLastIndex(sections));
+        line.updateByRemovingSection(removeSection, prevSection);
+    }
+
+    private boolean hasSingleSection(List<Section> sections) {
+        return sections.size() == 1;
+    }
+
+
+    private int getLastIndex(List<Section> sections) {
+        return sections.size() - 1;
+    }
+
 }
