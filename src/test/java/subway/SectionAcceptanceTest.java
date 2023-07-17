@@ -148,13 +148,13 @@ public class SectionAcceptanceTest {
      * And: 1개의 노선이 등록되어 있다.
      * And: 2개의 구간이 등록되어 있다.
      * When: 구간을 제거한다.
-     * Then: 성공(200 OK) 응답을 받는다.
+     * Then: 성공(204 NO CONTENT) 응답을 받는다.
      */
     @Test
     @DisplayName("구간을 제거한다.")
     void deleteSection() {
         // Given
-        long lastStationId = 4L;
+        long lastStationId = 3L;
 
         SectionRequest secondSectionRequest = SectionRequest.builder()
             .upStationId(2L)
@@ -163,20 +163,13 @@ public class SectionAcceptanceTest {
             .build();
         createSection(secondSectionRequest);
 
-        SectionRequest thirdSectionRequest = SectionRequest.builder()
-            .upStationId(3L)
-            .downStationId(lastStationId)
-            .distance(20L)
-            .build();
-        createSection(thirdSectionRequest);
-
         // When
         ExtractableResponse<Response> response = RestAssuredClient.requestDelete(
             generatePathWithLineIdAndStationId(lineResponse.getId(), lastStationId))
             .extract();
 
         // Then
-        Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
     /**
@@ -200,14 +193,13 @@ public class SectionAcceptanceTest {
         createSection(secondSectionRequest);
 
         // Then
-        Assertions.assertThatThrownBy(() -> {
-                RestAssuredClient.requestDelete(
-                        generatePathWithLineIdAndStationId(lineResponse.getId(), firstStationId))
-                    .statusCode(HttpStatus.BAD_REQUEST.value());
-            }
-        )
-            .isInstanceOf(NonLastStationDeleteNotAllowedException.class);
+        ExtractableResponse<Response> response = RestAssuredClient.requestDelete(
+            generatePathWithLineIdAndStationId(lineResponse.getId(), firstStationId)).extract();
+        Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
 
+        ErrorResponse error = response.as(ErrorResponse.class);
+        Assertions.assertThat(error.getMessage())
+            .isEqualTo(SubwayErrorCode.NON_LAST_STATION_DELETE_NOT_ALLOWED.getMessage());
     }
 
     /**
@@ -239,13 +231,15 @@ public class SectionAcceptanceTest {
         createSection(thirdSectionRequest);
 
         // Then
-        Assertions.assertThatThrownBy(() -> {
-                    RestAssuredClient.requestDelete(
-                            generatePathWithLineIdAndStationId(lineResponse.getId(), secondSectionUpStationId))
-                        .statusCode(HttpStatus.BAD_REQUEST.value());
-                }
-            )
-            .isInstanceOf(NonLastStationDeleteNotAllowedException.class);
+
+        ExtractableResponse<Response> response = RestAssuredClient.requestDelete(
+                generatePathWithLineIdAndStationId(lineResponse.getId(), secondSectionUpStationId))
+            .extract();
+        Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+
+        ErrorResponse error = response.as(ErrorResponse.class);
+        Assertions.assertThat(error.getMessage())
+            .isEqualTo(SubwayErrorCode.NON_LAST_STATION_DELETE_NOT_ALLOWED.getMessage());
     }
 
     /**
@@ -263,13 +257,14 @@ public class SectionAcceptanceTest {
         long secondStationId = lineResponse.getStations().get(1).getId();
 
         // Then
-        Assertions.assertThatThrownBy(() -> {
-                    RestAssuredClient.requestDelete(
-                            generatePathWithLineIdAndStationId(lineResponse.getId(), secondStationId))
-                        .statusCode(HttpStatus.BAD_REQUEST.value());
-                }
-            )
-            .isInstanceOf(SingleSectionDeleteNotAllowedException.class);
+        ExtractableResponse<Response> response = RestAssuredClient.requestDelete(
+                generatePathWithLineIdAndStationId(lineResponse.getId(), secondStationId))
+            .extract();
+        Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+
+        ErrorResponse error = response.as(ErrorResponse.class);
+        Assertions.assertThat(error.getMessage())
+            .isEqualTo(SubwayErrorCode.SINGLE_SECTION_DELETE_NOT_ALLOWED.getMessage());
     }
 
 
