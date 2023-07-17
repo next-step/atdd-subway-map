@@ -4,6 +4,7 @@ import org.apache.coyote.Response;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.common.exception.ErrorMessage;
 import subway.station.Station;
 import subway.station.StationRepository;
 
@@ -27,8 +28,11 @@ public class LineService {
 
         line.setName(request.getName());
         line.setColor(request.getColor());
-        Station upStation = stationRepository.getReferenceById(request.getUpStationId());
-        Station downStation = stationRepository.getReferenceById(request.getDownStationId());
+        Station upStation = stationRepository.findById(request.getUpStationId())
+                .orElseThrow(() -> new NoSuchElementException(ErrorMessage.NOT_FOUND_STATION.getMessage()));
+        Station downStation = stationRepository.findById(request.getDownStationId())
+                .orElseThrow(() -> new NoSuchElementException(ErrorMessage.NOT_FOUND_STATION.getMessage()));
+
         Line save = lineRepository.save(line);
 
         save.setUpStation(upStation);
@@ -44,10 +48,8 @@ public class LineService {
     }
 
     public LineResponse getLine(Long id) {
-        Line line = lineRepository.getReferenceById(id);
-        if(line == null){
-            throw new NoSuchElementException("없는 라인정보 입니다.");
-        }
+        Line line = lineRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException(ErrorMessage.NOT_FOUND_LINE.getMessage()));
         return new LineResponse(line, line.getUpStation(), line.getDownStation());
     }
     @Transactional
