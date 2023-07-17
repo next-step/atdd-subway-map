@@ -66,4 +66,9 @@ public class LineService {
 
         lineRepository.save(line);
     }
+
+    public LineResponse findLine(Long id) {
+        Line line = lineRepository.findById(id).orElseThrow(NoSuchElementException::new);
+        return LineResponse.toResponse(line);
+    }
 }
