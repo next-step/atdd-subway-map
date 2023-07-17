@@ -1,7 +1,16 @@
 package subway.dto;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import subway.domain.Section;
 
+@Builder
+@Getter
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class SectionResponse {
 
     private Long id;
@@ -10,29 +19,14 @@ public class SectionResponse {
     private Long downStationId;
     private Long distance;
 
-    public SectionResponse() {
-
-    }
-
-    public SectionResponse(Long id, Long lineId, Long upStationId, Long downStationId, Long distance) {
-        this.id = id;
-        this.lineId = lineId;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
-        this.distance = distance;
-    }
-
     public static SectionResponse from(Section section) {
-        return new SectionResponse(section.getId(), section.getLineId(), section.getUpStationId(),
-            section.getDownStationId(), section.getDistance());
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public Long getLineId() {
-        return lineId;
+        return SectionResponse.builder()
+            .id(section.getId())
+            .lineId(section.getLineId())
+            .upStationId(section.getUpStationId())
+            .downStationId(section.getDownStationId())
+            .distance(section.getDistance())
+            .build();
     }
 
 }

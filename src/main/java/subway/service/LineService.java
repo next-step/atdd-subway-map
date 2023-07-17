@@ -1,6 +1,5 @@
 package subway.service;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -15,10 +14,11 @@ import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 import subway.dto.SectionRequest;
 import subway.dto.SectionResponse;
-import subway.exception.AlreadyExistDownStation;
-import subway.exception.CannotCreateSectionException;
-import subway.exception.LineNotFoundException;
-import subway.exception.NoMatchLineUpStationException;
+import subway.exception.impl.AlreadyExistDownStation;
+import subway.exception.impl.CannotCreateSectionException;
+import subway.exception.impl.SubwayNotFoundException;
+import subway.exception.impl.NoMatchLineUpStationException;
+import subway.exception.impl.StationNotFoundException;
 import subway.repository.LineRepository;
 import subway.repository.SectionRepository;
 import subway.repository.StationRepository;
@@ -40,16 +40,17 @@ public class LineService {
 
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
-        Line line = new Line(lineRequest, lineRequest.getUpStationId(), lineRequest.getDownStationId());
+        Line line = Line.from(lineRequest);
         Line savedLine = lineRepository.save(line);
 
         if (isSectionNotRegistered(savedLine)) {
-            sectionRepository.save(new Section(savedLine.getId(), savedLine.getUpStationId(),
-                savedLine.getDownStationId(), savedLine.getDistance()));
+            sectionRepository.save(Section.from(savedLine));
         }
 
-        Station upStation = stationRepository.findById(savedLine.getUpStationId()).orElseThrow(IllegalArgumentException::new);
-        Station downStation = stationRepository.findById(savedLine.getDownStationId()).orElseThrow(IllegalArgumentException::new);
+        Station upStation = stationRepository.findById(savedLine.getUpStationId()).orElseThrow(
+            StationNotFoundException::new);
+        Station downStation = stationRepository.findById(savedLine.getDownStationId())
+            .orElseThrow(StationNotFoundException::new);
 
         return LineResponse.from(savedLine, upStation, downStation);
     }
@@ -58,29 +59,33 @@ public class LineService {
         return lineRepository.findAll().stream()
             .map(line -> {
                 Station upStation = stationRepository.findById(line.getUpStationId())
-                    .orElseThrow(IllegalArgumentException::new);
+                    .orElseThrow(StationNotFoundException::new);
                 Station downStation = stationRepository.findById(line.getDownStationId())
-                    .orElseThrow(IllegalArgumentException::new);
+                    .orElseThrow(StationNotFoundException::new);
 
                 return LineResponse.from(line, upStation, downStation);
             }).collect(Collectors.toList());
     }
 
     public LineResponse findLine(Long id) {
-        Line line = lineRepository.findById(id).orElseThrow(IllegalArgumentException::new);
-        Station upStation = stationRepository.findById(line.getUpStationId()).orElseThrow(IllegalArgumentException::new);
-        Station downStation = stationRepository.findById(line.getDownStationId()).orElseThrow(IllegalArgumentException::new);
+        Line line = lineRepository.findById(id).orElseThrow(SubwayNotFoundException::new);
+        Station upStation = stationRepository.findById(line.getUpStationId())
+            .orElseThrow(StationNotFoundException::new);
+        Station downStation = stationRepository.findById(line.getDownStationId())
+            .orElseThrow(StationNotFoundException::new);
 
         return LineResponse.from(line, upStation, downStation);
     }
 
     public LineResponse updateLine(Long id, LineRequest request) {
-        Line line = lineRepository.findById(id).orElseThrow(IllegalArgumentException::new);
-        line.updateLine(request);
+        Line line = lineRepository.findById(id).orElseThrow(SubwayNotFoundException::new);
+        line.update(request);
 
         Line updateLine = lineRepository.save(line);
-        Station upStation = stationRepository.findById(updateLine.getUpStationId()).orElseThrow(IllegalArgumentException::new);
-        Station downStation = stationRepository.findById(updateLine.getDownStationId()).orElseThrow(IllegalArgumentException::new);
+        Station upStation = stationRepository.findById(updateLine.getUpStationId())
+            .orElseThrow(StationNotFoundException::new);
+        Station downStation = stationRepository.findById(updateLine.getDownStationId())
+            .orElseThrow(StationNotFoundException::new);
 
         return LineResponse.from(updateLine, upStation, downStation);
     }
@@ -90,12 +95,12 @@ public class LineService {
     }
 
     public SectionResponse createSection(Long id, SectionRequest request) {
-        Line line = lineRepository.findById(id).orElseThrow(LineNotFoundException::new);
+        Line line = lineRepository.findById(id).orElseThrow(SubwayNotFoundException::new);
 
         if (canCreateSection(line, request)) {
-            Section section = sectionRepository.save(new Section(id, request));
+            Section section = sectionRepository.save(Section.from(id, request));
 
-            line.updateLineStation(section);
+            line.updateDownStation(section);
             lineRepository.save(line);
 
             return SectionResponse.from(section);

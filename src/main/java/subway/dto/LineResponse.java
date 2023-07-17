@@ -1,9 +1,18 @@
 package subway.dto;
 
 import java.util.List;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import subway.domain.Line;
 import subway.domain.Station;
 
+@Builder
+@Getter
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class LineResponse {
 
     private Long id;
@@ -14,37 +23,13 @@ public class LineResponse {
 
     private List<StationResponse> stations;
 
-    public LineResponse() {
-
-    }
-
-    public LineResponse(Line line, Station upStation, Station downStation) {
-        this.id = line.getId();
-        this.name = line.getName();
-        this.color = line.getColor();
-        this.stations = List.of(
-            StationResponse.from(upStation),
-            StationResponse.from(downStation)
-        );
-    }
-
     public static LineResponse from(Line line, Station upStation, Station downStation) {
-        return new LineResponse(line, upStation, downStation);
+        return LineResponse.builder()
+            .id(line.getId())
+            .name(line.getName())
+            .color(line.getColor())
+            .stations(List.of(StationResponse.from(upStation), StationResponse.from(downStation)))
+            .build();
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getColor() {
-        return color;
-    }
-
-    public List<StationResponse> getStations() {
-        return stations;
-    }
 }

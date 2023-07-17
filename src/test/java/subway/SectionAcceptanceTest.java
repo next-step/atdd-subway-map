@@ -23,11 +23,10 @@ import subway.dto.LineResponse;
 import subway.dto.SectionRequest;
 import subway.dto.SectionResponse;
 import subway.dto.StationRequest;
-import subway.exception.NoMatchLineUpStationException;
-import subway.exception.NonLastStationDeleteNotAllowedException;
-import subway.exception.SingleSectionDeleteNotAllowedException;
+import subway.exception.impl.NonLastStationDeleteNotAllowedException;
+import subway.exception.impl.SingleSectionDeleteNotAllowedException;
 import subway.exception.dto.ErrorResponse;
-import subway.exception.error.SectionErrorCode;
+import subway.exception.error.SubwayErrorCode;
 import subway.factory.LineRequestFactory;
 import subway.utils.RestAssuredClient;
 
@@ -108,7 +107,7 @@ public class SectionAcceptanceTest {
 
         ErrorResponse error = response.as(ErrorResponse.class);
         Assertions.assertThat(error.getMessage())
-            .isEqualTo(SectionErrorCode.NO_MATCH_UP_STATION.getMessage());
+            .isEqualTo(SubwayErrorCode.NO_MATCH_UP_STATION.getMessage());
 
     }
 
@@ -140,7 +139,7 @@ public class SectionAcceptanceTest {
 
         ErrorResponse error = response.as(ErrorResponse.class);
         Assertions.assertThat(error.getMessage())
-            .isEqualTo(SectionErrorCode.ALREADY_EXIST_DOWN_STATION.getMessage());
+            .isEqualTo(SubwayErrorCode.ALREADY_EXIST_DOWN_STATION.getMessage());
 
     }
 

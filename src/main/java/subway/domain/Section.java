@@ -5,9 +5,18 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import subway.dto.SectionRequest;
 
 @Entity
+@Builder
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Section {
 
     @Id
@@ -26,41 +35,22 @@ public class Section {
     @Column(nullable = false)
     private Long distance;
 
-    public Section(Long lineId, Long upStationId, Long downStationId, Long distance) {
-        this.lineId = lineId;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
-        this.distance = distance;
+
+    public static Section from(Line line) {
+        return Section.builder()
+            .lineId(line.getId())
+            .upStationId(line.getUpStationId())
+            .downStationId(line.getDownStationId())
+            .distance(line.getDistance())
+            .build();
     }
 
-    public Section(Long lineId, SectionRequest request) {
-        this.lineId = lineId;
-        this.upStationId = request.getUpStationId();
-        this.downStationId = request.getDownStationId();
-        this.distance = request.getDistance();
-    }
-
-    public Section() {
-
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public Long getLineId() {
-        return lineId;
-    }
-
-    public Long getUpStationId() {
-        return upStationId;
-    }
-
-    public Long getDownStationId() {
-        return downStationId;
-    }
-
-    public Long getDistance() {
-        return distance;
+    public static Section from(Long lineId, SectionRequest request) {
+        return Section.builder()
+            .lineId(lineId)
+            .upStationId(request.getUpStationId())
+            .downStationId(request.getDownStationId())
+            .distance(request.getDistance())
+            .build();
     }
 }
