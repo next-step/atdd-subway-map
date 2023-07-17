@@ -1,4 +1,4 @@
-package subway.line.dto;
+package subway.line.dto.request;
 
 import subway.line.domain.Line;
 

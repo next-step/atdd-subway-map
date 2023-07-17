@@ -10,7 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import subway.common.RestAssuredUtils;
 import subway.common.RestAssuredCondition;
-import subway.line.dto.LineResponse;
+import subway.line.dto.response.LineResponse;
 
 import java.util.HashMap;
 import java.util.Map;

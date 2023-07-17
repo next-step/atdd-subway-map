@@ -5,6 +5,9 @@ import subway.station.domain.Station;
 import javax.persistence.*;
 
 @Entity
+@Table(indexes = {
+        @Index(name = "idx_line_id_station_id", columnList = "line_id")
+})
 public class Section {
 
     @Id
@@ -14,6 +17,9 @@ public class Section {
     @OneToOne
     @JoinColumn(name = "line_id", nullable = false)
     private Line line;
+
+    @Column(name = "line_section_id")
+    private Long lineSectionId;
 
     @OneToOne
     @JoinColumn(name = "station_id", nullable = false)

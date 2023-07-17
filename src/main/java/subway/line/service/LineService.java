@@ -4,8 +4,8 @@ import org.springframework.stereotype.Service;
 import subway.line.code.LineValidateTypeCode;
 import subway.line.domain.Line;
 import subway.line.domain.Stations;
-import subway.line.dto.LineRequest;
-import subway.line.dto.LineResponse;
+import subway.line.dto.request.LineRequest;
+import subway.line.dto.response.LineResponse;
 import subway.line.repository.LineRepository;
 import subway.station.repository.StationRepository;
 
