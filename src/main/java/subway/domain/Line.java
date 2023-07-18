@@ -32,7 +32,7 @@ public class Line {
     public static Line of(String name, String color, Station upStation, Station downStation, Long distance) {
         Line line = new Line(name, color);
         Section section = Section.of(line, distance, upStation, downStation);
-        line.getSections().firstAddSection(section);
+        line.addSection(section);
         return line;
     }
 
@@ -45,9 +45,9 @@ public class Line {
         return sections.getStations();
     }
 
-    public void firstAddSection(Section section) {
-        sections.firstAddSection(section);
-    }
+//    public void firstAddSection(Section section) {
+//        sections.firstAddSection(section);
+//    }
 
     public void addSection(Section section) {
         sections.addSection(section);

@@ -14,6 +14,10 @@ public class Sections {
     private final List<Section> sections = new ArrayList<>();
 
     public void addSection(Section section) {
+        if (sections.isEmpty()) {
+            sections.add(section);
+            return;
+        }
         Section lastSection = sections.get(sections.size() - 1);
 
         if (getStations().contains(section.getDownStation())) {
@@ -21,7 +25,7 @@ public class Sections {
         }
 
         if (!lastSection.getDownStation().equals(section.getUpStation())) {
-            throw new IllegalStateException("Section에 삭제할 수 있는 Station이 없습니다.");
+            throw new IllegalStateException("Section에 추가할 수 있는 Station이 없습니다.");
         }
 
         sections.add(section);
@@ -50,9 +54,9 @@ public class Sections {
         return stationList;
     }
 
-    public void firstAddSection(Section section) {
-        sections.add(section);
-    }
+//    public void firstAddSection(Section section) {
+//        sections.add(section);
+//    }
 
     private Section getLastSection() {
         if (sections.size() <= 1) {
