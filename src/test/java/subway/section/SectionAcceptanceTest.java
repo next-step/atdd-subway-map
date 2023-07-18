@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -31,6 +32,19 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     private static final String SINBUNDANG_NEW_DOWN_STATION_NAME = "새로운 하행역";
     private static final Long SINBUNDANG_NEW_DISTANCE = 3L;
 
+    private LineResponse lineResponse;
+    private Long downStationId;
+    private Long newDownStationId;
+
+    @BeforeEach
+    void setUpLineAndStation() throws JsonProcessingException {
+        LineRequest request = 지하철역_생성_및_지하철_노선_요청_객체_생성(SINBUNDANG_LINE_NAME, SINBUNDANG_LINE_COLOR, SINBUNDANG_UP_STATION_NAME, SINBUNDANG_DOWN_STATION_NAME, SINBUNDANG_LINE_DISTANCE);
+        ExtractableResponse<Response> createLineResponse = 지하철_노선_생성_요청(request);
+        lineResponse = ObjectMapperHolder.instance.readValue(createLineResponse.response().body().asString(), LineResponse.class);
+        downStationId = lineResponse.getStations().get(1).getId();
+        newDownStationId = 지하철역_생성_요청_및_아이디_추출(SINBUNDANG_NEW_DOWN_STATION_NAME);
+    }
+
     /**
      * Given 지하철 노선과 노선에 속하지 않은 새로운 지하철역을 생성하고
      * When 지하철 노선의 하행역과 새로운 지하철역을 구간으로 등록하면
@@ -38,13 +52,6 @@ public class SectionAcceptanceTest extends AcceptanceTest {
      */
     @Test
     void 지하철_구간_생성() throws JsonProcessingException {
-        // given
-        LineRequest request = 지하철역_생성_및_지하철_노선_요청_객체_생성(SINBUNDANG_LINE_NAME, SINBUNDANG_LINE_COLOR, SINBUNDANG_UP_STATION_NAME, SINBUNDANG_DOWN_STATION_NAME, SINBUNDANG_LINE_DISTANCE);
-        ExtractableResponse<Response> createLineResponse = 지하철_노선_생성_요청(request);
-        LineResponse lineResponse = ObjectMapperHolder.instance.readValue(createLineResponse.response().body().asString(), LineResponse.class);
-        Long downStationId = lineResponse.getStations().get(1).getId();
-        Long newDownStationId = 지하철역_생성_요청_및_아이디_추출(SINBUNDANG_NEW_DOWN_STATION_NAME);
-
         // when
         ExtractableResponse<Response> createSectionResponse = 지하철_구간_생성_요청(lineResponse.getId(), new SectionRequest(downStationId, newDownStationId, SINBUNDANG_NEW_DISTANCE));
 
@@ -74,13 +81,9 @@ public class SectionAcceptanceTest extends AcceptanceTest {
      * Then 에러가 발생한다
      */
     @Test
-    void 지하철_구간_생성시_노선의_하행역이_아닌_역을_구간의_상행역으로_등록하면_예러_발생() throws JsonProcessingException {
+    void 지하철_구간_생성시_노선의_하행역이_아닌_역을_구간의_상행역으로_등록하면_예러_발생() {
         // given
-        LineRequest request = 지하철역_생성_및_지하철_노선_요청_객체_생성(SINBUNDANG_LINE_NAME, SINBUNDANG_LINE_COLOR, SINBUNDANG_UP_STATION_NAME, SINBUNDANG_DOWN_STATION_NAME, SINBUNDANG_LINE_DISTANCE);
-        ExtractableResponse<Response> createLineResponse = 지하철_노선_생성_요청(request);
-        LineResponse lineResponse = ObjectMapperHolder.instance.readValue(createLineResponse.response().body().asString(), LineResponse.class);
-        Long downStationId = lineResponse.getStations().get(0).getId();
-        Long newDownStationId = 지하철역_생성_요청_및_아이디_추출(SINBUNDANG_NEW_DOWN_STATION_NAME);
+        downStationId = lineResponse.getStations().get(0).getId();
 
         // when
         ExtractableResponse<Response> createSectionResponse = 지하철_구간_생성_요청(lineResponse.getId(), new SectionRequest(downStationId, newDownStationId, SINBUNDANG_NEW_DISTANCE));
@@ -95,13 +98,9 @@ public class SectionAcceptanceTest extends AcceptanceTest {
      * Then 예러가 발생한다
      */
     @Test
-    void 지하철_구간_생성시_노선에_속한_역을_구간으로_등록하면_에러_발생() throws JsonProcessingException {
+    void 지하철_구간_생성시_노선에_속한_역을_구간으로_등록하면_에러_발생() {
         // given
-        LineRequest request = 지하철역_생성_및_지하철_노선_요청_객체_생성(SINBUNDANG_LINE_NAME, SINBUNDANG_LINE_COLOR, SINBUNDANG_UP_STATION_NAME, SINBUNDANG_DOWN_STATION_NAME, SINBUNDANG_LINE_DISTANCE);
-        ExtractableResponse<Response> createLineResponse = 지하철_노선_생성_요청(request);
-        LineResponse lineResponse = ObjectMapperHolder.instance.readValue(createLineResponse.response().body().asString(), LineResponse.class);
-        Long downStationId = lineResponse.getStations().get(1).getId();
-        Long newDownStationId = lineResponse.getStations().get(0).getId();
+        newDownStationId = lineResponse.getStations().get(0).getId();
 
         // when
         ExtractableResponse<Response> createSectionResponse = 지하철_구간_생성_요청(lineResponse.getId(), new SectionRequest(downStationId, newDownStationId, SINBUNDANG_NEW_DISTANCE));
@@ -118,12 +117,6 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_구간_제거() throws JsonProcessingException {
         // given
-        LineRequest request = 지하철역_생성_및_지하철_노선_요청_객체_생성(SINBUNDANG_LINE_NAME, SINBUNDANG_LINE_COLOR, SINBUNDANG_UP_STATION_NAME, SINBUNDANG_DOWN_STATION_NAME, SINBUNDANG_LINE_DISTANCE);
-        ExtractableResponse<Response> createLineResponse = 지하철_노선_생성_요청(request);
-        LineResponse lineResponse = ObjectMapperHolder.instance.readValue(createLineResponse.response().body().asString(), LineResponse.class);
-        Long downStationId = lineResponse.getStations().get(1).getId();
-        Long newDownStationId = 지하철역_생성_요청_및_아이디_추출(SINBUNDANG_NEW_DOWN_STATION_NAME);
-
         ExtractableResponse<Response> createSectionResponse = 지하철_구간_생성_요청(lineResponse.getId(), new SectionRequest(downStationId, newDownStationId, SINBUNDANG_NEW_DISTANCE));
 
         // when
@@ -150,14 +143,8 @@ public class SectionAcceptanceTest extends AcceptanceTest {
      * Then 에러가 발생한다
      */
     @Test
-    void 지하철_구간_제거시_하행_종점역이_아니면_에러_발생() throws JsonProcessingException {
+    void 지하철_구간_제거시_하행_종점역이_아니면_에러_발생() {
         // given
-        LineRequest request = 지하철역_생성_및_지하철_노선_요청_객체_생성(SINBUNDANG_LINE_NAME, SINBUNDANG_LINE_COLOR, SINBUNDANG_UP_STATION_NAME, SINBUNDANG_DOWN_STATION_NAME, SINBUNDANG_LINE_DISTANCE);
-        ExtractableResponse<Response> createLineResponse = 지하철_노선_생성_요청(request);
-        LineResponse lineResponse = ObjectMapperHolder.instance.readValue(createLineResponse.response().body().asString(), LineResponse.class);
-        Long downStationId = lineResponse.getStations().get(1).getId();
-        Long newDownStationId = 지하철역_생성_요청_및_아이디_추출(SINBUNDANG_NEW_DOWN_STATION_NAME);
-
         지하철_구간_생성_요청(lineResponse.getId(), new SectionRequest(downStationId, newDownStationId, SINBUNDANG_NEW_DISTANCE));
 
         // when
@@ -173,13 +160,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
      * Then 에러가 발생한다
      */
     @Test
-    void 지하철_구간_제거시_노선에_상행_종점역과_하행_종점역만_있는_경우_에러_발생() throws JsonProcessingException {
-        // given
-        LineRequest request = 지하철역_생성_및_지하철_노선_요청_객체_생성(SINBUNDANG_LINE_NAME, SINBUNDANG_LINE_COLOR, SINBUNDANG_UP_STATION_NAME, SINBUNDANG_DOWN_STATION_NAME, SINBUNDANG_LINE_DISTANCE);
-        ExtractableResponse<Response> createLineResponse = 지하철_노선_생성_요청(request);
-        LineResponse lineResponse = ObjectMapperHolder.instance.readValue(createLineResponse.response().body().asString(), LineResponse.class);
-        Long downStationId = lineResponse.getStations().get(1).getId();
-
+    void 지하철_구간_제거시_노선에_상행_종점역과_하행_종점역만_있는_경우_에러_발생() {
         // when
         ExtractableResponse<Response> deleteResponse = 지하철_구간_제거_요청(lineResponse.getId(), downStationId);
 
