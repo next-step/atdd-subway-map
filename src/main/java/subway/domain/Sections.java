@@ -54,10 +54,6 @@ public class Sections {
         return stationList;
     }
 
-//    public void firstAddSection(Section section) {
-//        sections.add(section);
-//    }
-
     private Section getLastSection() {
         if (sections.size() <= 1) {
             throw new IllegalStateException("마지막 section이 존재하지 않습니다.");

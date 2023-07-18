@@ -38,7 +38,6 @@ public class Section {
         this.line = line;
     }
 
-
     public static Section of(Line line, Long distance, Station upStation, Station downStation) {
         return Section.builder().distance(distance).line(line).upStation(upStation).downStation(downStation).build();
     }

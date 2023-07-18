@@ -45,10 +45,6 @@ public class Line {
         return sections.getStations();
     }
 
-//    public void firstAddSection(Section section) {
-//        sections.firstAddSection(section);
-//    }
-
     public void addSection(Section section) {
         sections.addSection(section);
     }
