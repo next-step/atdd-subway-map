@@ -7,7 +7,7 @@ public class BaseExceptionResponse {
     public BaseExceptionResponse() {
     }
 
-    public BaseExceptionResponse(String message) {
+    public BaseExceptionResponse(final String message) {
         this.message = message;
     }
 

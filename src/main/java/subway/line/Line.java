@@ -1,11 +1,13 @@
 package subway.line;
 
+import java.util.List;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import subway.section.Section;
+import subway.section.Sections;
 import subway.station.Station;
 
 @Entity
@@ -16,32 +18,39 @@ public class Line {
     private Long id;
     private String name;
     private String color;
-    @ManyToOne
-    @JoinColumn(name = "up_station_id")
-    private Station upStation;
-    @ManyToOne
-    @JoinColumn(name = "down_station_id")
-    private Station downStation;
-    private int distance;
+    @Embedded
+    private Sections sections;
 
     public Line() {}
 
-    public Line(String name, String color, Station upStation, Station downStation, int distance) {
-        this(null, name, color, upStation, downStation, distance);
+    public Line(final String name, final String color, final Section section) {
+        this(null, name, color, new Sections(List.of(section)));
+        this.sections.updateLine(this);
     }
 
-    public Line(Long id, String name, String color, Station upStation, Station downStation, int distance) {
+    public Line(final Long id,final String name,final String color,final Sections sections) {
         this.id = id;
         this.name = name;
         this.color = color;
-        this.upStation = upStation;
-        this.downStation = downStation;
-        this.distance = distance;
+        this.sections = sections;
     }
 
-    public void update(String name, String color) {
+    public void update(final String name, final String color) {
         this.name = name;
         this.color = color;
+    }
+
+    public void addSection(final Station upStation, final Station downStation, final int distance) {
+        validateSection(upStation, downStation);
+        this.sections.add(this, upStation, downStation, distance);
+    }
+
+    public Section getLastSection() {
+        return this.sections.getLastSection();
+    }
+
+    public void deleteSection(final Station station) {
+        this.sections.delete(station);
     }
 
     public Long getId() {
@@ -56,15 +65,15 @@ public class Line {
         return color;
     }
 
-    public Station getUpStation() {
-        return upStation;
+    public List<Station> getStations() {
+        return this.sections.getStations();
     }
 
-    public Station getDownStation() {
-        return downStation;
+    public List<Section> getSections() {
+        return this.sections.getSections();
     }
 
-    public int getDistance() {
-        return distance;
+    private void validateSection(final Station upStation, final Station downStation) {
+        this.sections.validate(upStation, downStation);
     }
 }

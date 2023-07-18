@@ -1,9 +1,11 @@
 package subway.line;
 
 import common.AcceptanceTest;
+import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 import subway.station.Station;
 import subway.station.StationResponse;
 
@@ -112,7 +114,7 @@ public class LineAcceptanceTest {
         없는_지하철_노선_조회_요청(lineResponse.getId());
     }
 
-    private static Stream<String> getStationNames(LineResponse response) {
+    private Stream<String> getStationNames(LineResponse response) {
         return response.getStations().stream().map(Station::getName);
     }
 }

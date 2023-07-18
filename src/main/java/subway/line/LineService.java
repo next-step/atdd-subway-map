@@ -5,6 +5,8 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.common.exception.ResourceNotFoundException;
+import subway.section.Section;
+import subway.section.SectionRepository;
 import subway.station.Station;
 import subway.station.StationRepository;
 
@@ -23,7 +25,15 @@ public class LineService {
 
     @Transactional
     public LineResponse saveLine(final LineRequest lineRequest) {
-        Line line = lineRepository.save(toLine(lineRequest));
+        Line line = new Line(lineRequest.getName(),
+            lineRequest.getColor(),
+            new Section(findStationById(lineRequest.getUpStationId()),
+                findStationById(lineRequest.getDownStationId()),
+                lineRequest.getDistance())
+        );
+
+        lineRepository.save(line);
+
         return new LineResponse(line);
     }
 
@@ -46,14 +56,6 @@ public class LineService {
     @Transactional
     public void deleteLineById(final Long id) {
         lineRepository.deleteById(id);
-    }
-
-    private Line toLine(final LineRequest lineRequest) {
-        Station upStation = findStationById(lineRequest.getUpStationId());
-        Station downStation = findStationById(lineRequest.getDownStationId());
-
-        return new Line(lineRequest.getName(), lineRequest.getColor(), upStation, downStation,
-            lineRequest.getDistance());
     }
 
     private Line findLineById(final Long id) {

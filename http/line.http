@@ -1,0 +1,31 @@
+### 강남역 생성
+POST http://localhost:8080/sections
+Content-Type: application/json
+
+{
+  "name": "강남역"
+}
+
+### 신논현역 생성
+POST http://localhost:8080/sections
+Content-Type: application/json
+
+{
+  "name": "신논현역"
+}
+
+### 신분당선 생성
+POST http://localhost:8080/lines
+Content-Type: application/json
+
+{
+  "name": "신분당선",
+  "color": "bg-red-600",
+  "upStationId": 1,
+  "downStationId": 2,
+  "distance": 10
+}
+
+### 신분당선 조회
+GET http://localhost:8080/lines/1
+Content-Type: application/json
