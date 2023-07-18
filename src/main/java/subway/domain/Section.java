@@ -1,10 +1,13 @@
 package subway.domain;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,7 +16,6 @@ import lombok.NoArgsConstructor;
 import subway.dto.SectionRequest;
 
 @Entity
-@Builder
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -23,34 +25,26 @@ public class Section {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private Long lineId;
+    @ManyToOne(cascade = { CascadeType.PERSIST })
+    @JoinColumn(name = "line_id")
+    private Line line;
 
-    @Column(nullable = false)
-    private Long upStationId;
+    @ManyToOne(cascade = { CascadeType.PERSIST })
+    @JoinColumn(name = "up_station_id")
+    private Station upStation;
 
-    @Column(nullable = false)
-    private Long downStationId;
+    @ManyToOne(cascade = { CascadeType.PERSIST })
+    @JoinColumn(name = "down_station_id")
+    private Station downStation;
 
     @Column(nullable = false)
     private Long distance;
 
-
-    public static Section from(Line line) {
-        return Section.builder()
-            .lineId(line.getId())
-            .upStationId(line.getUpStationId())
-            .downStationId(line.getDownStationId())
-            .distance(line.getDistance())
-            .build();
-    }
-
-    public static Section from(Long lineId, SectionRequest request) {
-        return Section.builder()
-            .lineId(lineId)
-            .upStationId(request.getUpStationId())
-            .downStationId(request.getDownStationId())
-            .distance(request.getDistance())
-            .build();
+    @Builder
+    public Section(Line line, Station upStation, Station downStation, Long distance) {
+        this.line = line;
+        this.upStation = upStation;
+        this.downStation = downStation;
+        this.distance = distance;
     }
 }

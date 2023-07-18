@@ -22,9 +22,9 @@ public class SectionResponse {
     public static SectionResponse from(Section section) {
         return SectionResponse.builder()
             .id(section.getId())
-            .lineId(section.getLineId())
-            .upStationId(section.getUpStationId())
-            .downStationId(section.getDownStationId())
+            .lineId(section.getLine().getId())
+            .upStationId(section.getUpStation().getId())
+            .downStationId(section.getDownStation().getId())
             .distance(section.getDistance())
             .build();
     }

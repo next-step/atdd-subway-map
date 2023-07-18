@@ -1,13 +1,13 @@
 package subway.dto;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import subway.domain.Line;
-import subway.domain.Station;
 
 @Builder
 @Getter
@@ -23,12 +23,15 @@ public class LineResponse {
 
     private List<StationResponse> stations;
 
-    public static LineResponse from(Line line, Station upStation, Station downStation) {
+    public static LineResponse from(Line line) {
         return LineResponse.builder()
             .id(line.getId())
             .name(line.getName())
             .color(line.getColor())
-            .stations(List.of(StationResponse.from(upStation), StationResponse.from(downStation)))
+            .stations(line.getSections().getAllStations().stream()
+                .map(StationResponse::from)
+                .collect(Collectors.toList())
+            )
             .build();
     }
 

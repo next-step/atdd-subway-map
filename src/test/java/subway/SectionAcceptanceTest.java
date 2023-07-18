@@ -23,8 +23,6 @@ import subway.dto.LineResponse;
 import subway.dto.SectionRequest;
 import subway.dto.SectionResponse;
 import subway.dto.StationRequest;
-import subway.exception.impl.NonLastStationDeleteNotAllowedException;
-import subway.exception.impl.SingleSectionDeleteNotAllowedException;
 import subway.exception.dto.ErrorResponse;
 import subway.exception.error.SubwayErrorCode;
 import subway.factory.LineRequestFactory;

@@ -1,7 +1,9 @@
 package subway.domain;
 
+import java.util.List;
 import java.util.Objects;
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -14,7 +16,6 @@ import lombok.NoArgsConstructor;
 import subway.dto.LineRequest;
 
 @Entity
-@Builder
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -30,42 +31,27 @@ public class Line {
     @Column(length = 20, nullable = false)
     private String color;
 
-    @Column(nullable = false)
-    private Long distance;
+    @Embedded
+    private Sections sections;
 
-    @Column(nullable = false)
-    private Long upStationId;
-
-    @Column(nullable = false)
-    private Long downStationId;
-
-    public static Line from(LineRequest request) {
-        return Line.builder()
-            .name(request.getName())
-            .color(request.getColor())
-            .distance(request.getDistance())
-            .upStationId(request.getUpStationId())
-            .downStationId(request.getDownStationId())
-            .build();
+    @Builder
+    public Line(String name, String color, Long distance, Station upStation, Station downStation) {
+        this.name = name;
+        this.color = color;
+        this.sections = new Sections(List.of(
+            Section.builder()
+                .line(this)
+                .upStation(upStation)
+                .downStation(downStation)
+                .distance(distance)
+                .build()
+        ));
     }
 
-    public void update(LineRequest request) {
+    public Line update(LineRequest request) {
         this.name = request.getName().isBlank() ? this.name : request.getName();
         this.color = request.getColor().isBlank() ? this.color : request.getColor();
-        this.distance = request.getDistance() == null ? this.distance : request.getDistance();
-    }
-    public boolean isNotLastStation(Long stationId) {
-        return !Objects.equals(this.downStationId, stationId);
-    }
-
-    public void updateByAddingSection(Section section) {
-        this.downStationId = section.getDownStationId();
-        this.distance += section.getDistance();
-    }
-
-    public void updateByRemovingSection(Section removeSection, Section prevSection) {
-        this.downStationId = prevSection.getDownStationId();
-        this.distance -= removeSection.getDistance();
+        return this;
     }
 
 }
