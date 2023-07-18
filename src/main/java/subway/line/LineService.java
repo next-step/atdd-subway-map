@@ -2,8 +2,6 @@ package subway.line;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import subway.section.Section;
-import subway.section.SectionRepository;
 import subway.station.Station;
 import subway.station.StationRepository;
 
@@ -15,12 +13,10 @@ public class LineService {
 
     private final LineRepository lineRepository;
     private final StationRepository stationRepository;
-    private final SectionRepository sectionRepository;
 
-    public LineService(LineRepository lineRepository, StationRepository stationRepository, SectionRepository sectionRepository) {
+    public LineService(LineRepository lineRepository, StationRepository stationRepository) {
         this.lineRepository = lineRepository;
         this.stationRepository = stationRepository;
-        this.sectionRepository = sectionRepository;
     }
 
     @Transactional
@@ -32,7 +28,6 @@ public class LineService {
                 .orElseThrow(() -> new IllegalStateException(String.format("하행종점역을 찾을 수 없습니다. (downStationId: %d)", request.getDownStationId())));
 
         Line line = lineRepository.save(new Line(request.getName(), request.getColor(), upStation, downStation, request.getDistance()));
-        sectionRepository.save(new Section(line, upStation, downStation, request.getDistance()));
 
         return LineResponse.of(line);
     }
@@ -64,7 +59,6 @@ public class LineService {
 
     @Transactional
     public void deleteLine(Long id) {
-        sectionRepository.deleteAllByLineId(id);
         lineRepository.deleteById(id);
     }
 }

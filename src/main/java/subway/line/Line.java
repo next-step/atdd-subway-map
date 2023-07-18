@@ -5,6 +5,7 @@ import subway.section.Sections;
 import subway.station.Station;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -46,6 +47,9 @@ public class Line {
         this.upStation = upStation;
         this.downStation = downStation;
         this.distance = distance;
+
+        Section section = new Section(this, upStation, downStation, distance);
+        sections = new Sections(List.of(section));
     }
 
     public Line() {

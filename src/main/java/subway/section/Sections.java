@@ -8,10 +8,15 @@ import java.util.Optional;
 
 @Embeddable
 public class Sections {
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "line")
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "line", cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
     private List<Section> sections;
 
     public Sections() {}
+
+    public Sections(List<Section> section) {
+        this.sections = section;
+    }
 
     public boolean contains(Station station) {
         return sections.stream().anyMatch(section -> section.contains(station));
