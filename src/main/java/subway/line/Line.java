@@ -69,10 +69,6 @@ public class Line {
         return upStation;
     }
 
-    public Long getDownStationId() {
-        return downStation.getId();
-    }
-
     public Station getDownStation() {
         return downStation;
     }
@@ -109,14 +105,18 @@ public class Line {
         }
     }
 
-    public boolean contains(Station station) {
-        return sections.contains(station);
-    }
-
     public void addTerminalSection(Section section) {
+        if (!downStation.getId().equals(section.getUpStationId())) {
+            throw new IllegalArgumentException(String.format("새로운 구간의 상행역이 해당 노선에 등록되어있는 하행 종점역이 아닙니다. (구간의 upStationId: %d)", section.getUpStationId()));
+        }
+
+        if (sections.contains(section.getDownStation())) {
+            throw new IllegalArgumentException(String.format("새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없습니다. (downStationId: %d)", section.getDownStationId()));
+        }
+
         downStation = section.getDownStation();
-        sections.add(section);
         distance += section.getDistance();
+        sections.add(section);
     }
 
     public Section deleteSectionByDownStationId(Long downStationId) {

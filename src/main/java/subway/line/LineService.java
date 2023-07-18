@@ -34,7 +34,7 @@ public class LineService {
 
     public LineResponse findLine(Long id) {
         Line line = lineRepository.findById(id)
-                .orElseThrow(() -> new IllegalStateException(String.format("지하철 노선을 찾을 수 없습니다. (id: %d)", id)));
+                .orElseThrow(() -> new IllegalArgumentException(String.format("지하철 노선을 찾을 수 없습니다. (id: %d)", id)));
 
         return LineResponse.of(line);
     }
@@ -42,7 +42,7 @@ public class LineService {
     @Transactional
     public void updateLine(Long id, LineRequest request) {
         Line line = lineRepository.findById(id)
-                .orElseThrow(() -> new IllegalStateException(String.format("지하철 노선을 찾을 수 없습니다. (id: %d)", id)));
+                .orElseThrow(() -> new IllegalArgumentException(String.format("지하철 노선을 찾을 수 없습니다. (id: %d)", id)));
 
         Station upStation = findStation(request.getUpStationId());
         Station downStation = findStation(request.getDownStationId());
@@ -58,19 +58,10 @@ public class LineService {
     @Transactional
     public Long saveSection(Long lineId, SectionRequest request) {
         Line line = lineRepository.findById(lineId)
-                .orElseThrow(() -> new IllegalStateException(String.format("지하철 노선을 찾을 수 없습니다. (id: %d)", lineId)));
+                .orElseThrow(() -> new IllegalArgumentException(String.format("지하철 노선을 찾을 수 없습니다. (id: %d)", lineId)));
 
         Station upStation = findStation(request.getUpStationId());
-
-        if (!line.getDownStationId().equals(upStation.getId())) {
-            throw new IllegalStateException(String.format("새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이 아닙니다. (구간의 upStationId: %d)", request.getUpStationId()));
-        }
-
         Station downStation = findStation(request.getDownStationId());
-
-        if (line.contains(downStation)) {
-            throw new IllegalStateException(String.format("새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없습니다. (downStationId: %d)", downStation.getId()));
-        }
 
         Section section = new Section(line, upStation, downStation, request.getDistance());
         line.addTerminalSection(section);
@@ -81,13 +72,13 @@ public class LineService {
     @Transactional
     public void deleteSection(Long lineId, Long stationId) {
         Line line = lineRepository.findById(lineId)
-                .orElseThrow(() -> new IllegalStateException(String.format("지하철 노선을 찾을 수 없습니다. (id: %d)", lineId)));
+                .orElseThrow(() -> new IllegalArgumentException(String.format("지하철 노선을 찾을 수 없습니다. (id: %d)", lineId)));
 
         line.deleteSectionByDownStationId(stationId);
     }
 
     private Station findStation(Long stationId) {
         return stationRepository.findById(stationId)
-                .orElseThrow(() -> new IllegalStateException(String.format("역을 찾을 수 없습니다. (stationId: %d)", stationId)));
+                .orElseThrow(() -> new IllegalArgumentException(String.format("역을 찾을 수 없습니다. (stationId: %d)", stationId)));
     }
 }
