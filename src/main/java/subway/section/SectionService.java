@@ -46,13 +46,6 @@ public class SectionService {
         return section.getId();
     }
 
-    public SectionResponse findSection(Long id) {
-        Section section = sectionRepository.findById(id)
-                .orElseThrow(() -> new IllegalStateException(String.format("지하철 구간을 찾을 수 없습니다. (id: %d)", id)));
-
-        return SectionResponse.of(section);
-    }
-
     @Transactional
     public void deleteSection(Long lineId, Long stationId) {
         Line line = lineRepository.findById(lineId)

@@ -58,14 +58,6 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         // then
         assertThat(createSectionResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
-        String sectionId = createSectionResponse.response().getHeaders().get("location").getValue().split("/sections/")[1];
-        ExtractableResponse<Response> showSectionResponse = 지하철_구간_조회_요청(sectionId);
-        SectionResponse sectionResponse = ObjectMapperHolder.instance.readValue(showSectionResponse.response().body().asString(), SectionResponse.class);
-
-        assertThat(sectionResponse.getId()).isEqualTo(2L);
-        assertThat(sectionResponse.getUpStation().getId()).isEqualTo(downStationId);
-        assertThat(sectionResponse.getDownStation().getId()).isEqualTo(newDownStationId);
-
         // then
         ExtractableResponse<Response> showLineResponse = 지하철_노선_요청(lineResponse.getId());
         LineResponse changedLineResponse = ObjectMapperHolder.instance.readValue(showLineResponse.response().body().asString(), LineResponse.class);
@@ -130,11 +122,6 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         LineResponse changedLineResponse = ObjectMapperHolder.instance.readValue(showLineResponse.response().body().asString(), LineResponse.class);
         List<StationResponse> stationsOfResponse = List.of(new StationResponse(1L, SINBUNDANG_UP_STATION_NAME), new StationResponse(2L, SINBUNDANG_DOWN_STATION_NAME));
         assertThat(changedLineResponse).isEqualTo(new LineResponse(changedLineResponse.getId(), SINBUNDANG_LINE_NAME, SINBUNDANG_LINE_COLOR, stationsOfResponse, SINBUNDANG_LINE_DISTANCE));
-
-        // then
-        String sectionId = createSectionResponse.response().getHeaders().get("location").getValue().split("/sections/")[1];
-        ExtractableResponse<Response> showSectionResponse = 지하철_구간_조회_요청(sectionId);
-        assertThat(showSectionResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
     /**
@@ -175,15 +162,6 @@ public class SectionAcceptanceTest extends AcceptanceTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post("/lines/" + lineId + "/sections")
-                .then().log().all()
-                .extract();
-    }
-
-    public static ExtractableResponse<Response> 지하철_구간_조회_요청(String sectionId) {
-        return RestAssured
-                .given().log().all()
-                .when()
-                .get("lines" + "/sections/" + sectionId)
                 .then().log().all()
                 .extract();
     }
