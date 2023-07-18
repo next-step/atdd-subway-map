@@ -2,6 +2,7 @@ package subway.station.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.line.domain.Stations;
 import subway.station.repository.StationRepository;
 import subway.station.domain.Station;
 import subway.station.dto.StationRequest;
@@ -13,6 +14,9 @@ import java.util.stream.Collectors;
 @Service
 @Transactional(readOnly = true)
 public class StationService {
+
+    private static final String STATION_DOES_NOT_EXIST = "존재하지 않는 역입니다.";
+
     private StationRepository stationRepository;
 
     public StationService(StationRepository stationRepository) {
@@ -46,4 +50,18 @@ public class StationService {
                 station.getName()
         );
     }
+
+    @Transactional(readOnly = true)
+    public Stations getStations(Long upStationId, Long downStationId) {
+        return new Stations(
+                getStation(upStationId),
+                getStation(downStationId)
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public Station getStation(Long stationId) {
+        return stationRepository.findById(stationId).orElseThrow(() -> new IllegalArgumentException(STATION_DOES_NOT_EXIST));
+    }
+
 }

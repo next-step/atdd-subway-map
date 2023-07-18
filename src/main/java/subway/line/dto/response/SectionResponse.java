@@ -2,22 +2,20 @@ package subway.line.dto.response;
 
 public class SectionResponse {
 
-    private final long lineId;
+    private final boolean isSuccess = true;
 
-    private final long sectionId;
+    public SectionResponse() {
+    }
 
-    private final int distance;
+    public static SectionResponse of() {
+        return new SectionResponse();
+    }
 
-    private final long upStationId;
-
-    private final long downStationId;
-
-    public SectionResponse(long lineId, long sectionId, int distance, long upStationId, long downStationId) {
-        this.lineId = lineId;
-        this.sectionId = sectionId;
-        this.distance = distance;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
+    @Override
+    public String toString() {
+        return "SectionResponse{" +
+                "isSuccess=" + isSuccess +
+                '}';
     }
 
 }

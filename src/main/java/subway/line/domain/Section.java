@@ -6,7 +6,7 @@ import javax.persistence.*;
 
 @Entity
 @Table(indexes = {
-        @Index(name = "idx_line_id_station_id", columnList = "line_id")
+        @Index(name = "idx_line_id_station_id", columnList = "line_section_id")
 })
 public class Section {
 
@@ -14,12 +14,12 @@ public class Section {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "line_section_id")
+    private Long lineSectionId;
+
     @OneToOne
     @JoinColumn(name = "line_id", nullable = false)
     private Line line;
-
-    @Column(name = "line_section_id")
-    private Long lineSectionId;
 
     @OneToOne
     @JoinColumn(name = "station_id", nullable = false)
@@ -28,10 +28,13 @@ public class Section {
     public Section() {
     }
 
-    public Section(Long id, Line line, Station station) {
-        this.id = id;
+    public Section(Line line, Station station) {
         this.line = line;
         this.station = station;
+    }
+
+    public Long getLineSectionId() {
+        return lineSectionId;
     }
 
     public Long getId() {

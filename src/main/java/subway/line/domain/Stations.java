@@ -12,32 +12,32 @@ public class Stations implements Serializable {
 
     @OneToOne
     @JoinColumn(name = "up_station_id", nullable = false)
-    private Station upStationId;
+    private Station upStation;
 
     @OneToOne
     @JoinColumn(name = "down_station_id", nullable = false)
-    private Station downStationId;
+    private Station downStation;
 
     public Stations() {}
 
-    public Stations(Station upStationId, Station downStationId) {
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
+    public Stations(Station upStation, Station downStation) {
+        this.upStation = upStation;
+        this.downStation = downStation;
     }
 
-    public Station getUpStationId() {
-        return upStationId;
+    public Station getUpStation() {
+        return upStation;
     }
 
-    public Station getDownStationId() {
-        return downStationId;
+    public Station getDownStation() {
+        return downStation;
     }
 
     @Override
     public String toString() {
         return "Stations{" +
-                "upStationId=" + upStationId +
-                ", downStationId=" + downStationId +
+                "upStation=" + upStation +
+                ", downStation=" + downStation +
                 '}';
     }
 }

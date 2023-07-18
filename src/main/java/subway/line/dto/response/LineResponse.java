@@ -29,7 +29,7 @@ public class LineResponse {
         this.id = route.getId();
         this.name = route.getName();
         this.color = route.getColor();
-        stations = List.of(route.getStations().getUpStationId(), route.getStations().getDownStationId());
+        stations = List.of(route.getStations().getUpStation(), route.getStations().getDownStation());
     }
 
     public Long getId() {
