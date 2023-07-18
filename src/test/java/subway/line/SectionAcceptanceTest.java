@@ -1,4 +1,4 @@
-package subway.section;
+package subway.line;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.restassured.RestAssured;
@@ -12,6 +12,7 @@ import org.springframework.http.MediaType;
 import subway.AcceptanceTest;
 import subway.line.LineRequest;
 import subway.line.LineResponse;
+import subway.line.SectionRequest;
 import subway.station.StationResponse;
 import subway.util.ObjectMapperHolder;
 

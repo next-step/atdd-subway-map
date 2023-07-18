@@ -1,4 +1,4 @@
-package subway.section;
+package subway.line;
 
 import subway.station.Station;
 
