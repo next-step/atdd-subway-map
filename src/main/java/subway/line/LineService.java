@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.common.exception.ResourceNotFoundException;
+import subway.section.Section;
 import subway.section.SectionRepository;
 import subway.station.Station;
 import subway.station.StationRepository;
@@ -15,22 +16,21 @@ public class LineService {
 
     private final LineRepository lineRepository;
     private final StationRepository stationRepository;
-    private final SectionRepository sectionRepository;
 
     public LineService(final LineRepository lineRepository,
-        final StationRepository stationRepository, final SectionRepository sectionRepository) {
+        final StationRepository stationRepository) {
         this.lineRepository = lineRepository;
         this.stationRepository = stationRepository;
-        this.sectionRepository = sectionRepository;
     }
 
     @Transactional
     public LineResponse saveLine(final LineRequest lineRequest) {
         Line line = new Line(lineRequest.getName(),
             lineRequest.getColor(),
-            findStationById(lineRequest.getUpStationId()),
-            findStationById(lineRequest.getDownStationId()),
-            lineRequest.getDistance());
+            new Section(findStationById(lineRequest.getUpStationId()),
+                findStationById(lineRequest.getDownStationId()),
+                lineRequest.getDistance())
+        );
 
         lineRepository.save(line);
 

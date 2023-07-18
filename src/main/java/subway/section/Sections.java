@@ -25,6 +25,10 @@ public class Sections {
         this.sections = new ArrayList<>(sections);
     }
 
+    public void updateLine(Line line) {
+        this.sections.get(0).updateLine(line);
+    }
+
     public void add(final Line line, final Station upStation, final Station downStation,
         final int distance) {
         Section section = new Section(line, upStation, downStation, distance, decideSequence());

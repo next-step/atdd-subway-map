@@ -23,9 +23,9 @@ public class Line {
 
     public Line() {}
 
-    public Line(final String name, final String color, final Station upStation, final Station downStation, final int distance) {
-        this(null, name, color, new Sections());
-        this.sections.add(this, upStation, downStation, distance);
+    public Line(final String name, final String color, final Section section) {
+        this(null, name, color, new Sections(List.of(section)));
+        this.sections.updateLine(this);
     }
 
     public Line(final Long id,final String name,final String color,final Sections sections) {

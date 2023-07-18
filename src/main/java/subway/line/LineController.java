@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-// TODO: validation 추가하기
 @RestController
 @RequestMapping("/lines")
 public class LineController {
@@ -30,7 +29,6 @@ public class LineController {
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
 
-    // TODO: [{}] 형태가 아닌 {[]} 형태로 response할 수 있도록 리팩토링
     @GetMapping
     public ResponseEntity<List<LineResponse>> showLines() {
         return ResponseEntity.ok().body(lineService.findAllLines());

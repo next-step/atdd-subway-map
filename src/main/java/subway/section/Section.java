@@ -29,8 +29,8 @@ public class Section {
     public Section() {
     }
 
-    public Section(final Line line, final Station upStation, final Station downStation, final int distance) {
-        this(null, line, upStation, downStation, distance, 1);
+    public Section(final Station upStation, final Station downStation, final int distance) {
+        this(null, null, upStation, downStation, distance, 1);
     }
 
     public Section(final Line line, final Station upStation, final Station downStation, final int distance, final int sequence) {
@@ -68,5 +68,9 @@ public class Section {
 
     public int getSequence() {
         return sequence;
+    }
+
+    public void updateLine(Line line) {
+        this.line = line;
     }
 }
