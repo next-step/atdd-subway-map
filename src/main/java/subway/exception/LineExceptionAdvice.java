@@ -12,10 +12,9 @@ import java.util.NoSuchElementException;
 public class LineExceptionAdvice {
     @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler({NoSuchElementException.class, IllegalStateException.class})
-    ResponseEntity<ExceptionResponse> handleLineNotFound(Exception exception){
+    ResponseEntity<ExceptionResponse> handleLineNotFound(Exception exception) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(ExceptionResponse.from(exception));
     }
-
 
 
 }

@@ -13,18 +13,18 @@ public class SectionController {
 
     private LineService lineService;
 
-    public SectionController(LineService lineService){
+    public SectionController(LineService lineService) {
         this.lineService = lineService;
     }
-    //Content-Location: /lines/{lineId}/sections
+
     @PostMapping("/lines/{lineId}/sections")
-    public ResponseEntity<LineResponse> createSection(@PathVariable Long lineId, @RequestBody SectionRequest sectionRequest){
+    public ResponseEntity<LineResponse> createSection(@PathVariable Long lineId, @RequestBody SectionRequest sectionRequest) {
         LineResponse lineResponse = lineService.saveSection(lineId, sectionRequest);
         return ResponseEntity.created(URI.create("/lines/" + lineId + "/sections")).body(lineResponse);
     }
 
     @DeleteMapping("/lines/{lineId}/sections")
-    public ResponseEntity<Void> deleteSection(@PathVariable Long lineId, @RequestParam Long stationId){
+    public ResponseEntity<Void> deleteSection(@PathVariable Long lineId, @RequestParam Long stationId) {
         lineService.deleteSection(lineId, stationId);
         return ResponseEntity.noContent().build();
     }

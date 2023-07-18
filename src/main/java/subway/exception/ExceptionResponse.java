@@ -8,12 +8,12 @@ import lombok.Getter;
 public class ExceptionResponse {
     private String message;
 
-    public ExceptionResponse(Exception exception){
+    public ExceptionResponse(Exception exception) {
         this.message = exception.getMessage();
     }
 
 
-    public static ExceptionResponse from (Exception exception){
+    public static ExceptionResponse from(Exception exception) {
         return new ExceptionResponse(exception);
     }
 }

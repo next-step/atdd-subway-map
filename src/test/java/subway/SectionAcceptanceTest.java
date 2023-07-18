@@ -38,6 +38,12 @@ public class SectionAcceptanceTest {
     public static final String 세번째지하철역이름 = "세번째지하철역";
     public static final String 두번째지하철역이름 = "두번째지하철역";
     public static final String 네번째지하철역이름 = "네번째지하철역";
+    private static String 첫째지하철역_아이디;
+    private static String 두번째지하철역_아이디;
+    private static String 세번째지하철역_아이디;
+    private static String 네번째지하철역_아이디;
+    private static String 첫째노선_아이디;
+    private static String 둘째노선_아이디;
     @LocalServerPort
     int port;
     private ExtractableResponse<Response> 첫째지하철역;
@@ -46,12 +52,6 @@ public class SectionAcceptanceTest {
     private ExtractableResponse<Response> 네번째지하철역;
     private ExtractableResponse<Response> 첫번째노선;
     private ExtractableResponse<Response> 두번째노선;
-    private static String 첫째지하철역_아이디;
-    private static String 두번째지하철역_아이디;
-    private static String 세번째지하철역_아이디;
-    private static String 네번째지하철역_아이디;
-    private static String 첫째노선_아이디;
-    private static String 둘째노선_아이디;
 
     private static ExtractableResponse<Response> 구간_추가(String lineId, String upStationId, String downStationId, String distance) {
         Map<String, String> params = new HashMap<>();
@@ -86,6 +86,7 @@ public class SectionAcceptanceTest {
         네개의_역_생성();
 
     }
+
     public void 네개의_역_생성() {
         첫째지하철역 = 역_만들기(첫째지하철역이름);
         두번째지하철역 = 역_만들기(두번째지하철역이름);
@@ -119,13 +120,13 @@ public class SectionAcceptanceTest {
         // THEN
         ExtractableResponse<Response> getLineResponse = 아이디_노선_조회(첫째노선_아이디);
         List<String> stations = getLineResponse.jsonPath().getList("stations.name");
-        assertThat(stations).containsAnyOf(세번째지하철역이름);
+        assertThat(stations).containsExactly(두번째지하철역이름, 첫째지하철역이름, 세번째지하철역이름);
     }
 
     /**
      * Given 0개의 지하철 노선을 생성하고
      * When 지하철 구간을 추가할때
-     * Then 에러를 노출한다
+     * Then 구간 등록에 실패한다.
      */
     @DisplayName("노선에 대한 구간을 생성 할때, 구간이 존재 하지 않을 경우")
     @Test
@@ -142,7 +143,7 @@ public class SectionAcceptanceTest {
     /**
      * Given 1개의 지하철 노선을 생성하고 1개의 중복되지 않은 지하철 구간을 등록하고
      * When 지하철 구간 중 등록되어있는 하행역을 등록한다.
-     * Then 에러를 노출한다
+     * Then 구간 등록에 실패한다.
      */
     @DisplayName("1개의 구간을 등록하고 등록되어있는 역을 등록한다.")
     @Test
@@ -161,7 +162,7 @@ public class SectionAcceptanceTest {
     /**
      * Given 1개의 지하철 노선을 생성하고
      * When 지하철 구간을 등록할때 등록 구간의 상행역이 하행 종점역이 아닐때를 등록한다
-     * Then 에러를 노출한다
+     * Then 구간 등록에 실패한다.
      */
     @DisplayName("1개의 구간을 등록하고 하행 종점역이 아닌 노선을 등록한다. ")
     @Test
@@ -201,7 +202,7 @@ public class SectionAcceptanceTest {
     /**
      * Given 1개의 지하철 노선을 생성하고
      * When 지하철 구간을 제거할때 제거 구간이 하행 종점역이 아닐 때를 등록한다
-     * Then 에러를 노출한다
+     * Then 구간 등록에 실패한다.
      */
     @DisplayName("구간을 제거할때 제거 구간이 하행 종점역이 아닐때 에러를 표기한다.")
     @Test
@@ -215,13 +216,14 @@ public class SectionAcceptanceTest {
 
         // THEN
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
-   }
+    }
 
     /**
      * Given 1개의 지하철 노선을 생성하고
      * When 지하철 구간을 제거할때 제거 구간이 하나만 있을 때를 등록한다
-     * Then 에러를 노출한다
-* +  */
+     * Then 구간 등록에 실패한다.
+     * +
+     */
     @DisplayName("구간을 제거 할때, 제거 구간이 하나만 있을때 에러를 표기한다")
     @Test
     void deleteSectionFromLineThrowOnlyElementError() {
@@ -238,7 +240,7 @@ public class SectionAcceptanceTest {
     /**
      * Given 0개의 지하철 노선을 생성하고
      * When 지하철 구간을 제거할때
-     * Then 에러를 노출한다
+     * Then 구간 제거에 실패한다.
      */
     @DisplayName("노선에 대한 구간을 제거 할때, 구간이 존재 하지 않을 경우")
     @Test

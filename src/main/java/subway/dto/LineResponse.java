@@ -15,7 +15,7 @@ public class LineResponse {
     private String color;
     private List<StationResponse> stations;
 
-    public static LineResponse from(Line line){
+    public static LineResponse from(Line line) {
         return new LineResponse(line.getId(), line.getName(), line.getColor(), line.getStations().stream().map(StationResponse::from).collect(Collectors.toList()));
     }
 }
