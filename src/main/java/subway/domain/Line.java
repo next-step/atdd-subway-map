@@ -1,7 +1,6 @@
 package subway.domain;
 
 import java.util.List;
-import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -31,13 +30,16 @@ public class Line {
     @Column(length = 20, nullable = false)
     private String color;
 
+    private Long distance;
+
     @Embedded
-    private Sections sections;
+    private Sections sections = new Sections();
 
     @Builder
     public Line(String name, String color, Long distance, Station upStation, Station downStation) {
         this.name = name;
         this.color = color;
+        this.distance = distance;
         this.sections = new Sections(List.of(
             Section.builder()
                 .line(this)
@@ -48,10 +50,18 @@ public class Line {
         ));
     }
 
-    public Line update(LineRequest request) {
+    public void update(LineRequest request) {
         this.name = request.getName().isBlank() ? this.name : request.getName();
         this.color = request.getColor().isBlank() ? this.color : request.getColor();
-        return this;
     }
 
+    public void addSection(Section section) {
+        this.sections.add(section);
+        this.distance += section.getDistance();
+    }
+
+    public void removeSection() {
+        this.distance -= sections.getLastSection().getDistance();
+        this.sections.remove();
+    }
 }

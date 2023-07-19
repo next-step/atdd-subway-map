@@ -31,12 +31,20 @@ public class Sections {
         return stations;
     }
 
-    public Station getLastStation() {
-        return sections.get(getLastIndex()).getDownStation();
+    public void remove() {
+        sections.remove(getLastIndex());
+    }
+
+    public Section getLastSection() {
+        return sections.get(getLastIndex());
     }
 
     private int getLastIndex() {
         return sections.size() - 1;
+    }
+
+    public Station getLastStation() {
+        return sections.get(getLastIndex()).getDownStation();
     }
 
     public boolean noMatchDownStation(Long sectionUpStationId) {
@@ -62,7 +70,5 @@ public class Sections {
         return !getLastStationId().equals(stationId);
     }
 
-    public void removeLastSection() {
-        sections.remove(getLastIndex());
-    }
+
 }

@@ -72,7 +72,7 @@ public class LineService {
     }
 
     @Transactional
-    public SectionResponse createSection(Long id, SectionRequest request) {
+    public LineResponse createSection(Long id, SectionRequest request) {
         Line line = lineRepository.findById(id).orElseThrow(LineNotFoundException::new);
         Sections sections = line.getSections();
         if (sections.noMatchDownStation(request.getUpStationId())) {
@@ -89,8 +89,9 @@ public class LineService {
             .orElseThrow(StationNotFoundException::new);
 
         Section section = request.toSection(line, upStation, downStation);
-        sections.add(section);
-        return SectionResponse.from(section);
+        line.addSection(section);
+
+        return LineResponse.from(line);
     }
 
     @Transactional
@@ -106,6 +107,6 @@ public class LineService {
             throw new NonLastStationDeleteNotAllowedException();
         }
 
-        sections.removeLastSection();
+        line.removeSection();
     }
 }
