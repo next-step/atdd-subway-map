@@ -1,10 +1,7 @@
 package subway.line;
 
-import subway.station.Station;
-
 import javax.persistence.*;
 import java.util.List;
-import java.util.Optional;
 
 @Embeddable
 public class Sections {
@@ -21,10 +18,6 @@ public class Sections {
         this.sections = section;
     }
 
-    public boolean contains(Station station) {
-        return sections.stream().anyMatch(section -> section.contains(station));
-    }
-
     public Section findByDownStationId(Long downStationId) {
         return sections.stream()
                 .filter(section -> section.getDownStationId().equals(downStationId))
@@ -35,7 +28,7 @@ public class Sections {
     public void add(Section section) {
         boolean containsDownStation = sections.stream().anyMatch(storedSection -> storedSection.contains(section.getDownStation()));
         if (containsDownStation) {
-            throw new IllegalArgumentException(String.format("새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없습니다. (downStationId: %d)", section.getDownStationId()));
+            throw new IllegalArgumentException(String.format("새로운 구간의 하행역은 이미 노선에 등록되어있는 역일 수 없습니다. (downStationId: %d)", section.getDownStationId()));
         }
 
         sections.add(section);

@@ -62,7 +62,6 @@ public class Section {
     }
 
     public boolean contains(Station station) {
-        Long stationId = station.getId();
-        return upStation.getId().equals(stationId) || downStation.getId().equals(stationId);
+        return upStation.equals(station) || downStation.equals(station);
     }
 }
