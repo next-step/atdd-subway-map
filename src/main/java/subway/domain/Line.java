@@ -1,20 +1,20 @@
 package subway.domain;
 
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 
 @Entity
-@AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class Line {
+    @Embedded
+    private final Sections sections = new Sections();
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -22,26 +22,35 @@ public class Line {
     private String name;
     @Column(length = 25, nullable = false)
     private String color;
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Station upStation;
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Station downStation;
-    private Long distance;
 
-    public Line(String name, String color, Station upStation, Station downStation, Long distance) {
+    @Builder
+    public Line(String name, String color) {
         this.name = name;
         this.color = color;
-        this.upStation = upStation;
-        this.downStation = downStation;
-        this.distance = distance;
     }
 
-    public void updateNameAndColor(String name, String color){
+    public static Line of(String name, String color, Station upStation, Station downStation, Long distance) {
+        Line line = new Line(name, color);
+        Section section = Section.of(line, distance, upStation, downStation);
+        line.addSection(section);
+        return line;
+    }
+
+    public void updateNameAndColor(String name, String color) {
         this.name = name;
         this.color = color;
     }
 
     public List<Station> getStations() {
-        return Arrays.asList(this.upStation, this.downStation);
+        return sections.getStations();
     }
+
+    public void addSection(Section section) {
+        sections.addSection(section);
+    }
+
+    public void deleteSection(Station station) {
+        sections.deleteSection(station);
+    }
+
 }

@@ -13,7 +13,7 @@ public class LineRequest {
     private Long downStationId;
     private Long distance;
 
-    public Line toEntity(Station upStation, Station downStation){
-        return new Line(name, color, upStation, downStation, distance);
+    public Line toEntity(Station upStation, Station downStation) {
+        return Line.of(name, color, upStation, downStation, distance);
     }
 }

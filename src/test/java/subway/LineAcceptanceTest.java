@@ -10,8 +10,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext.ClassMode;
+import org.springframework.test.context.jdbc.Sql;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,17 +20,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static subway.StationAcceptanceTest.역_만들기;
 
 @DisplayName("지하철노선 관련 기능")
-@DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
+@Sql("/teardown.sql")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {
 
     public static final String 신분당선 = "신분당선";
+    public static final String 분당선 = "분당선";
+    public static final String 경인선 = "경인선";
+
+    public static final String BG_YELLOW_600 = "BG_YELLOW_600";
     public static final String BG_RED_600 = "bg-red-600";
     public static final String BG_GREEN_600 = "BG_GREEN_600";
-    public static final String 분당선 = "분당선";
+
     public static final String 거리 = "10";
-    public static final String BG_YELLOW_600 = "BG_YELLOW_600";
-    public static final String 경인선 = "경인선";
     public static final String 첫째지하철역1 = "첫째지하철역";
     public static final String 세번째지하철역1 = "세번째지하철역";
     public static final String 두번째지하철역1 = "두번째지하철역";
@@ -48,10 +50,10 @@ public class LineAcceptanceTest {
     void setUp() {
         RestAssured.port = port;
         // 공통 GIVEN
-        세개의_역_만들기();
+        세개의_역_생성();
     }
 
-    void 세개의_역_만들기() {
+    public void 세개의_역_생성() {
         첫째지하철역 = 역_만들기(첫째지하철역1);
         두번째지하철역 = 역_만들기(두번째지하철역1);
         세번째지하철역 = 역_만들기(세번째지하철역1);
@@ -197,7 +199,7 @@ public class LineAcceptanceTest {
         return lineNames;
     }
 
-    private static ExtractableResponse<Response> 노선_만들기(String name, String color, String upStationId, String downStationId, String distance) {
+    static ExtractableResponse<Response> 노선_만들기(String name, String color, String upStationId, String downStationId, String distance) {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
         params.put("color", color);
@@ -216,7 +218,7 @@ public class LineAcceptanceTest {
         return response;
     }
 
-    private static ExtractableResponse<Response> 아이디_노선_조회(String id) {
+    static ExtractableResponse<Response> 아이디_노선_조회(String id) {
         ExtractableResponse<Response> response =
                 RestAssured.given().log().all()
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
