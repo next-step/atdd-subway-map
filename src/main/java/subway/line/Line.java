@@ -3,6 +3,7 @@ package subway.line;
 import subway.station.Station;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -20,16 +21,19 @@ public class Line {
     @Column(nullable = false)
     private String color;
 
-    @OneToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "up_station_id", nullable = false)
     private Station upStation;
 
-    @OneToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "down_station_id", nullable = false)
     private Station downStation;
 
     @Column(nullable = false)
     private Long distance;
+
+    @Embedded
+    private Sections sections;
 
     public Line(String name, String color, Station upStation, Station downStation, Long distance) {
         validate(name, color, upStation.getId(), downStation.getId(), distance);
@@ -39,6 +43,9 @@ public class Line {
         this.upStation = upStation;
         this.downStation = downStation;
         this.distance = distance;
+
+        Section section = new Section(this, upStation, downStation, distance);
+        sections = new Sections(List.of(section));
     }
 
     public Line() {
@@ -94,5 +101,27 @@ public class Line {
         if (distance == null || distance <= MIN_DISTANCE) {
             throw new IllegalArgumentException(String.format("지하철 거리는 0 이상의 숫자여야 합니다. (distance: %d)", distance));
         }
+    }
+
+    public void addTerminalSection(Section terminalSection) {
+        if (!downStation.getId().equals(terminalSection.getUpStationId())) {
+            throw new IllegalArgumentException(String.format("새로운 구간의 상행역이 해당 노선에 등록되어있는 하행 종점역이 아닙니다. (구간의 upStationId: %d)", terminalSection.getUpStationId()));
+        }
+
+        sections.add(terminalSection);
+        downStation = terminalSection.getDownStation();
+        distance += terminalSection.getDistance();
+    }
+
+    public void deleteSectionByDownStationId(Long downStationId) {
+        if (!downStation.getId().equals(downStationId)) {
+            throw new IllegalArgumentException(String.format("하행 종점역이 아니면 구간을 제거할 수 없습니다. (stationId: %d)", downStationId));
+        }
+
+        Section section = sections.findByDownStationId(downStationId);
+
+        sections.delete(section);
+        downStation = section.getUpStation();
+        distance -= section.getDistance();
     }
 }
