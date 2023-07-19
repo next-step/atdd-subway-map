@@ -8,6 +8,7 @@ import subway.station.repository.Station;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,7 +49,7 @@ class Line {
     public List<Station> getAllStation() {
         List<Station> totalStation = this.sections.stream().map(Section::getUpStation).collect(Collectors.toList());
         totalStation.add(this.sections.get(this.sections.size() -1).getDownStation());
-        return totalStation;
+        return Collections.unmodifiableList(totalStation);
     }
 
     public void addSection(Section section) {
