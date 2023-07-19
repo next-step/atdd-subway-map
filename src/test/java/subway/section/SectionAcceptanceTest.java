@@ -25,6 +25,9 @@ import static subway.SubwayTestUtil.toSpecificResponse;
 @Sql("/station-setup.sql")
 public class SectionAcceptanceTest {
     private static String CREATE_LINE_URL;
+    private static final Long UP_STATION_ID = 2L;
+    private static final Long DOWN_STATION_ID = 3L;
+    private static final Long DISTANCE = 5L;
 
     @BeforeEach
     void init() {
@@ -39,7 +42,7 @@ public class SectionAcceptanceTest {
     @DisplayName("지하철 구간을 추가한다.")
     @Test
     void createSection() {
-        ExtractableResponse<Response> createdResponse = 지하철_구간을_추가한다(2L, 3L, 5L);
+        ExtractableResponse<Response> createdResponse = 지하철_구간을_추가한다(UP_STATION_ID, DOWN_STATION_ID, DISTANCE);
 
         ExtractableResponse<Response> selectedResponse = 지하철_노선을_조회한다();
 
@@ -80,9 +83,9 @@ public class SectionAcceptanceTest {
     @DisplayName("지하철 구간을 삭제한다.")
     @Test
     void deleteSection() {
-        ExtractableResponse<Response> createdResponse = 지하철_구간을_추가한다(2L, 3L, 5L);
+        ExtractableResponse<Response> createdResponse = 지하철_구간을_추가한다(UP_STATION_ID, DOWN_STATION_ID, DISTANCE);
 
-        지하철_구간을_삭제한다(createdResponse.header("Location") + "/sections?stationId=" + 3L);
+        지하철_구간을_삭제한다(createdResponse.header("Location") + "/sections?stationId=" + DOWN_STATION_ID);
 
         삭제한_구간의_역이_노선에서_제외된다();
     }
@@ -100,7 +103,7 @@ public class SectionAcceptanceTest {
         구간을_삭제하면_에러가_발생한다(
                 CREATE_LINE_URL +
                         "/sections?stationId=" +
-                        selectedResponse.as(LineResponse.class)
+                        toSpecificResponse(selectedResponse, LineResponse.class)
                                 .getStations()
                                 .get(1)
                                 .getId());
@@ -114,7 +117,7 @@ public class SectionAcceptanceTest {
     @DisplayName("노선의 마지막 구간이 아닌 구간을 제거하면 에러가 발생한다.")
     @Test
     void deleteSection_not_down_end_station() {
-        ExtractableResponse<Response> createdResponse = 지하철_구간을_추가한다(2L, 3L, 5L);
+        ExtractableResponse<Response> createdResponse = 지하철_구간을_추가한다(UP_STATION_ID, DOWN_STATION_ID, DISTANCE);
 
         Long stationId = 노선의_마지막_구간이_아닌_구간의_하행역_Id이다(createdResponse);
 
@@ -140,7 +143,7 @@ public class SectionAcceptanceTest {
 
     private static void 삭제한_구간의_역이_노선에서_제외된다() {
         ExtractableResponse<Response> selectedResponse = 지하철_노선을_조회한다();
-        assertThat(new StationResponse(3L, "또 다른 지하철역"))
+        assertThat(new StationResponse(DOWN_STATION_ID, "또 다른 지하철역"))
                 .isNotIn(toSpecificResponse(selectedResponse, LineResponse.class).getStations());
     }
 
@@ -163,13 +166,13 @@ public class SectionAcceptanceTest {
     private static CreateSectionRequest 상행역이_노선의_하행_종점역이_아닌_구간에_대한_요청이_존재한다() {
         ExtractableResponse<Response> selectedResponse = 지하철_노선을_조회한다();
         Long lineUpStationId = toSpecificResponse(selectedResponse, LineResponse.class).getStations().get(0).getId();
-        return new CreateSectionRequest(lineUpStationId, 3L, 5L);
+        return new CreateSectionRequest(lineUpStationId, DOWN_STATION_ID, DISTANCE);
     }
 
     private static CreateSectionRequest 하행역이_지하철_노선에_등록된_구간에_대한_요청이_존재한다() {
         ExtractableResponse<Response> selectedResponse = 지하철_노선을_조회한다();
         Long alreadyRegisteredStationId = toSpecificResponse(selectedResponse, LineResponse.class).getStations().get(0).getId();
-        return new CreateSectionRequest(2L, alreadyRegisteredStationId, 5L);
+        return new CreateSectionRequest(UP_STATION_ID, alreadyRegisteredStationId, DISTANCE);
     }
 
     private static void 추가한_구간이_노선에_포함된다(ExtractableResponse<Response> createdResponse, ExtractableResponse<Response> selectedResponse) {
