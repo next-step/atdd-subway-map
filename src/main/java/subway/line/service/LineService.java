@@ -14,6 +14,7 @@ import subway.section.repository.Section;
 import subway.section.repository.SectionRepository;
 import subway.station.repository.Station;
 import subway.station.repository.StationRepository;
+import subway.station.service.StationService;
 
 import java.util.List;
 
@@ -24,6 +25,7 @@ public
 class LineService {
     private final LineRepository lineRepository;
     private final StationRepository stationRepository;
+    private final StationService stationService;
     private final SectionRepository sectionRepository;
 
     @Transactional
@@ -60,8 +62,10 @@ class LineService {
     @Transactional
     public Line addSection(Long id, CreateSectionRequest request) {
         Line line = lineRepository.findById(id).orElseThrow(() -> new RuntimeException("Not Exist Line"));
-        AddSectionPolicy.validate(line, request.getUpStationId(), request.getDownStationId());
-        line.addSection(createSection(request.getUpStationId(), request.getDownStationId(), request.getDistance()));
+        Station upStation = stationService.findStationById(request.getUpStationId());
+        Station downStation = stationService.findStationById(request.getDownStationId());
+        AddSectionPolicy.validate(line, upStation, downStation);
+        line.addSection(createSection(upStation.getId(), downStation.getId(), request.getDistance()));
         return line;
     }
 
@@ -69,9 +73,9 @@ class LineService {
     public void deleteSectionByStationId(Long lineId, Long stationId) {
         Line line = lineRepository.findById(lineId).orElseThrow(() -> new RuntimeException("Not Exist Line"));
         Section section = line.getLastSection();
-        Station station = stationRepository.findById(stationId).orElseThrow(() -> new RuntimeException("Not Exist Station"));
+        Station station = stationService.findStationById(stationId);
 
-        DeleteSectionPolicy.validate(line, station.getId());
+        DeleteSectionPolicy.validate(line, station);
 
         stationRepository.delete(station);
         sectionRepository.delete(section);

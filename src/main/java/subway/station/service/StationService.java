@@ -26,6 +26,10 @@ class StationService {
         return createStationResponse(station);
     }
 
+    public Station findStationById(Long stationId) {
+        return stationRepository.findById(stationId).orElseThrow(() -> new RuntimeException("Not Exist Station"));
+    }
+
     public List<StationResponse> findAllStations() {
         return stationRepository.findAll().stream()
                 .map(this::createStationResponse)
