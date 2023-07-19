@@ -59,7 +59,7 @@ class LineService {
         Line line = lineRepository.findById(id).orElseThrow(() -> new RuntimeException("Not Exist Line"));
         Station upStation = stationService.findStationById(request.getUpStationId());
         Station downStation = stationService.findStationById(request.getDownStationId());
-        line.addSection(createSection(upStation.getId(), downStation.getId(), request.getDistance()));
+        line.getSections().addSection(createSection(upStation.getId(), downStation.getId(), request.getDistance()));
         return line;
     }
 
@@ -67,7 +67,7 @@ class LineService {
     public void deleteSectionByStationId(Long lineId, Long stationId) {
         Line line = lineRepository.findById(lineId).orElseThrow(() -> new RuntimeException("Not Exist Line"));
         Station station = stationService.findStationById(stationId);
-        line.deleteSectionByLastStation(station);
+        line.getSections().deleteSectionByLastStation(station);
     }
 
     private Section createSection(Long upStationId, Long downStationId, Long distance) {
