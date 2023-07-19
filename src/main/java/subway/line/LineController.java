@@ -9,15 +9,15 @@ import java.util.List;
 @RestController
 @RequestMapping("lines")
 public class LineController {
-    private final LineFacadeService lineFacadeService;
-    public LineController(LineFacadeService lineFacadeService) {
-        this.lineFacadeService = lineFacadeService;
-    }
+    private final LineService lineService;
 
+    public LineController(LineService lineService) {
+        this.lineService = lineService;
+    }
 
     @PostMapping
     public ResponseEntity<LineResponse> create(@RequestBody LineRequest request) {
-        LineResponse line = lineFacadeService.create(request);
+        LineResponse line = lineService.create(request);
         return ResponseEntity.created(URI.create("/lines/" + line.getId()))
                 .body(line);
     }
@@ -25,24 +25,24 @@ public class LineController {
     @GetMapping
     public ResponseEntity<List<LineResponse>> getList() {
         return ResponseEntity.ok()
-                .body(lineFacadeService.getList());
+                .body(lineService.getList());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<LineResponse> get(@PathVariable Long id) {
         return ResponseEntity.ok()
-                .body(lineFacadeService.getById(id));
+                .body(lineService.getById(id));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<LineResponse> update(@PathVariable Long id, @RequestBody LineRequest request) {
-        lineFacadeService.update(id, request);
+        lineService.update(id, request);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteSubwayLine(@PathVariable Long id) {
-        lineFacadeService.delete(id);
+        lineService.delete(id);
         return ResponseEntity.noContent().build();
     }
 }

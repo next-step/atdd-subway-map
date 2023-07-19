@@ -1,7 +1,6 @@
 package subway.section;
 
 import io.restassured.RestAssured;
-import io.restassured.response.ValidatableResponse;
 import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -16,11 +15,9 @@ import subway.line.LineResponse;
 import subway.linesection.LineSectionRepository;
 import subway.linesection.LineSectionRequest;
 
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static subway.line.LineFixture.*;
+import static subway.line.LineFixture.지하철_노선_생성_ID;
+import static subway.line.LineFixture.지하철_노선_조회;
 import static subway.station.StationFixture.지하철역_생성_ID;
 
 @DisplayName("지하철 구간 관련 기능")

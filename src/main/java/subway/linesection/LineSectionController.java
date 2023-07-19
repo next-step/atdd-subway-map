@@ -16,10 +16,9 @@ public class LineSectionController {
 
 
     @PostMapping
-    public ResponseEntity<LineSectionResponse> addSection(@PathVariable Long lineId, @RequestBody LineSectionRequest request) {
+    public ResponseEntity addSection(@PathVariable Long lineId, @RequestBody LineSectionRequest request) {
         lineSectionService.addSection(lineId, request.getUpStationId(), request.getDownStationId(), request.getDistance());
-        return ResponseEntity.created(URI.create("/lines/" + lineId + "/sections"))
-                .body(null);
+        return ResponseEntity.created(URI.create("/lines/" + lineId + "/sections")).build();
     }
 
     @DeleteMapping
