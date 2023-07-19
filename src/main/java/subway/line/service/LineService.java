@@ -9,7 +9,9 @@ import subway.line.web.AddSectionRequest;
 import subway.line.web.CreateLineRequest;
 import subway.line.web.LineResponse;
 import subway.line.web.UpdateLineRequest;
-import subway.section.Section;
+import subway.section.repository.Section;
+import subway.section.repository.SectionRepository;
+import subway.section.service.SectionService;
 import subway.station.repository.Station;
 import subway.station.service.StationService;
 
@@ -21,10 +23,11 @@ import java.util.stream.Collectors;
 public class LineService {
     private final LineRepository lineRepository;
     private final StationService stationService;
-
-    public LineService(LineRepository lineRepository, StationService stationService) {
+    private final SectionService sectionService;
+    public LineService(LineRepository lineRepository, StationService stationService, SectionService sectionService) {
         this.lineRepository = lineRepository;
         this.stationService = stationService;
+        this.sectionService = sectionService;
     }
 
     @Transactional
@@ -79,13 +82,14 @@ public class LineService {
         Section section = new Section(line.lastSection().getSequence(), request.getDistance(), upStation, downStation);
         line.appendSection(section);
 
-        lineRepository.saveAndFlush(line);
+        lineRepository.save(line);
         return line.lastSection().getId();
     }
 
     @Transactional
     public void removeSection(Long id, Long sectionId) {
         Line line = findLine(id);
-        line.removeSection(sectionId);
+        Section section = sectionService.findSection(sectionId);
+        line.removeSection(section);
     }
 }

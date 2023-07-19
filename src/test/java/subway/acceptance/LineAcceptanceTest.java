@@ -2,6 +2,7 @@ package subway.acceptance;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,21 @@ import static subway.acceptance.StationRequestFixture.지하철_역_생성;
 @DisplayName("지하철 노선 관련 기능")
 public class LineAcceptanceTest extends AcceptanceTest {
 
+    Long 강남역;
+    Long 양재역;
+    Long 양재시민의숲역;
+    Long 청계산입구역;
+    Long 판교역;
+
+    @BeforeEach
+    void beforeEach() {
+        강남역 = 지하철_역_생성("강남역");
+        양재역 = 지하철_역_생성("양재역");
+        양재시민의숲역 = 지하철_역_생성("양재시민의숲역");
+        청계산입구역 = 지하철_역_생성("청계산입구역");
+        판교역 = 지하철_역_생성("판교역");
+    }
+
     /**
      * Given 2개의 지하철 역을 생성하고
      * When (해당 지하철 역을 포함하는) 지하철 노선을 생성하면
@@ -27,10 +43,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선을 생성 한다.")
     @Test
     void createLine() {
-        // given
-        Long 강남역 = 지하철_역_생성("강남역");
-        Long 양재역 = 지하철_역_생성("양재역");
-
         // when
         지하철_노선_생성("신분당선", "bg-red-600", 강남역, 양재역, 10L);
 
@@ -50,13 +62,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         // given
-        Long 강남역 = 지하철_역_생성("강남역");
-        Long 양재역 = 지하철_역_생성("양재역");
-        Long 역삼역 = 지하철_역_생성("역삼역");
-        Long 선릉역 = 지하철_역_생성("선릉역");
-
         지하철_노선_생성("신분당선", "bg-red-600", 강남역, 양재역, 10L);
-        지하철_노선_생성("2호선", "bg-green-600", 역삼역, 선릉역, 10L);
+        지하철_노선_생성("2호선", "bg-green-600", 양재시민의숲역, 청계산입구역, 10L);
 
         // when & then
         List<String> lineNames = 지하철_노선_목록_조회().stream()
@@ -74,9 +81,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         // given
-        Long 강남역 = 지하철_역_생성("강남역");
-        Long 양재역 = 지하철_역_생성("양재역");
-
         Long 신분당선 = 지하철_노선_생성("신분당선", "bg-red-600", 강남역, 양재역, 10L);
 
         // when
@@ -101,10 +105,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
-        Long 강남역 = 지하철_역_생성("강남역");
-        Long 역삼역 = 지하철_역_생성("역삼역");
-
-        Long 신분당선 = 지하철_노선_생성("신분당선", "bg-red-600", 강남역, 역삼역, 10L);
+        Long 신분당선 = 지하철_노선_생성("신분당선", "bg-red-600", 강남역, 양재역, 10L);
 
         // when
         지하철_노선_수정(신분당선, "2호선", "bg-green-600");
@@ -125,9 +126,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLIne() {
         // given
-        Long 강남역 = 지하철_역_생성("강남역");
-        Long 양재역 = 지하철_역_생성("양재역");
-
         Long 신분당선 = 지하철_노선_생성("신분당선", "bg-red-600", 강남역, 양재역, 10L);
 
         // when
@@ -148,10 +146,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void addSection() {
         // given
-        Long 강남역 = 지하철_역_생성("강남역");
-        Long 양재역 = 지하철_역_생성("양재역");
-        Long 양재시민의숲역 = 지하철_역_생성("양재시민의숲역");
-
         Long 신분당선 = 지하철_노선_생성("신분당선", "bg-red-600", 강남역, 양재역, 10L);
 
         // when
@@ -174,11 +168,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void addSectionFail() {
         // given
-        Long 강남역 = 지하철_역_생성("강남역");
-        Long 양재역 = 지하철_역_생성("양재역");
-        Long 판교역 = 지하철_역_생성("판교역");
-        Long 양재시민의숲역 = 지하철_역_생성("양재시민의숲역");
-
         Long 신분당선 = 지하철_노선_생성("신분당선", "bg-red-600", 강남역, 양재역, 10L);
 
         // when
@@ -197,10 +186,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void removeSection() {
         // given
-        Long 강남역 = 지하철_역_생성("강남역");
-        Long 양재역 = 지하철_역_생성("양재역");
-        Long 양재시민의숲역 = 지하철_역_생성("양재시민의숲역");
-
         Long 신분당선 = 지하철_노선_생성("신분당선", "bg-red-600", 강남역, 양재역, 10L);
         Long sectionId = 지하철_구간_등록(신분당선, 양재역, 양재시민의숲역, 10L);
 
@@ -225,11 +210,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void removeSectionFail() {
         // given
-        Long 강남역 = 지하철_역_생성("강남역");
-        Long 양재역 = 지하철_역_생성("양재역");
-        Long 양재시민의숲역 = 지하철_역_생성("양재시민의숲역");
-        Long 청계산입구역 = 지하철_역_생성("청계산입구역");
-
         Long 신분당선 = 지하철_노선_생성("신분당선", "bg-red-600", 강남역, 양재역, 10L);
         Long 양재_양재시민의숲 = 지하철_구간_등록(신분당선, 양재역, 양재시민의숲역, 10L);
         Long 양재시민의숲_청계산입구 = 지하철_구간_등록(신분당선, 양재시민의숲역, 청계산입구역, 10L);

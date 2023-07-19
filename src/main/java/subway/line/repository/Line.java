@@ -1,12 +1,13 @@
 package subway.line.repository;
 
-import subway.section.Section;
+import subway.section.repository.Section;
 import subway.station.repository.Station;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Entity
@@ -95,13 +96,18 @@ public class Line {
         return lastSection().getDownStation();
     }
 
-    public void removeSection(Long sectionId) {
+    public void removeSection(Section section) {
         Section lastSection = lastSection();
-        if (!lastSection.getId().equals(sectionId)) {
-            throw new IllegalArgumentException();
+        if (!lastSection.equals(section)) {
+            throw new IllegalArgumentException("마지막 구간만 제거할 수 있습니다.");
         }
+        sections.remove(section);
+    }
 
-        sections.removeIf(it -> it.getId().equals(sectionId));
+    public Optional<Section> findSectionById(Long sectionId) {
+        return sections.stream()
+                .filter(it -> it.getId().equals(sectionId))
+                .findFirst();
     }
 }
 
