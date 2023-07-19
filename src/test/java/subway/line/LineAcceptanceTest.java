@@ -1,16 +1,17 @@
 package subway.line;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import subway.AcceptanceTest;
 import subway.station.StationResponse;
-import subway.util.ObjectMapperHolder;
 
 import java.util.List;
 
@@ -32,6 +33,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
     private static final String SUINBUNDANG_DOWN_STATION_NAME = "인천역";
     private static final Long SUINBUNDANG_LINE_DISTANCE = 20L;
 
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Test
     void 지하철_노선_생성() {
@@ -93,7 +96,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // then
         assertThat(showResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
-        LineResponse response = ObjectMapperHolder.instance.readValue(showResponse.response().body().asString(), LineResponse.class);
+        LineResponse response = objectMapper.readValue(showResponse.response().body().asString(), LineResponse.class);
         List<StationResponse> stationsOfResponse = List.of(new StationResponse(1L, SINBUNDANG_UP_STATION_NAME), new StationResponse(2L, SINBUNDANG_DOWN_STATION_NAME));
         assertThat(response).isEqualTo(new LineResponse(Long.valueOf(lineId), SINBUNDANG_LINE_NAME, SINBUNDANG_LINE_COLOR, stationsOfResponse, SINBUNDANG_LINE_DISTANCE));
     }

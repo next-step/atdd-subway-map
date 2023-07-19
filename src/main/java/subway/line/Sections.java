@@ -9,10 +9,13 @@ import java.util.Optional;
 @Embeddable
 public class Sections {
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "line", cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+    private static final long MIN_SECTION_COUNT = 1L;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     private List<Section> sections;
 
-    public Sections() {}
+    public Sections() {
+    }
 
     public Sections(List<Section> section) {
         this.sections = section;
@@ -22,21 +25,27 @@ public class Sections {
         return sections.stream().anyMatch(section -> section.contains(station));
     }
 
-    public Optional<Section> findByDownStationId(Long downStationId) {
+    public Section findByDownStationId(Long downStationId) {
         return sections.stream()
                 .filter(section -> section.getDownStationId().equals(downStationId))
-                .findFirst();
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException(String.format("구간을 찾을 수 없습니다. (downStationId: %d)", downStationId)));
     }
 
     public void add(Section section) {
+        boolean containsDownStation = sections.stream().anyMatch(storedSection -> storedSection.contains(section.getDownStation()));
+        if (containsDownStation) {
+            throw new IllegalArgumentException(String.format("새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없습니다. (downStationId: %d)", section.getDownStationId()));
+        }
+
         sections.add(section);
     }
 
     public void delete(Section section) {
-        sections.remove(section);
-    }
+        if (sections.size() <= MIN_SECTION_COUNT) {
+            throw new IllegalArgumentException(String.format("구간은 최소 %d개 이상이야 합니다.", MIN_SECTION_COUNT));
+        }
 
-    public long count() {
-        return sections.stream().count();
+        sections.remove(section);
     }
 }

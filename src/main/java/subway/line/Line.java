@@ -5,13 +5,11 @@ import subway.station.Station;
 import javax.persistence.*;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 @Entity
 public class Line {
 
     private static final Long MIN_DISTANCE = 0L;
-    private static final long MIN_SECTION_COUNT = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -105,39 +103,25 @@ public class Line {
         }
     }
 
-    public void addTerminalSection(Section section) {
-        if (!downStation.getId().equals(section.getUpStationId())) {
-            throw new IllegalArgumentException(String.format("새로운 구간의 상행역이 해당 노선에 등록되어있는 하행 종점역이 아닙니다. (구간의 upStationId: %d)", section.getUpStationId()));
+    public void addTerminalSection(Section terminalSection) {
+        if (!downStation.getId().equals(terminalSection.getUpStationId())) {
+            throw new IllegalArgumentException(String.format("새로운 구간의 상행역이 해당 노선에 등록되어있는 하행 종점역이 아닙니다. (구간의 upStationId: %d)", terminalSection.getUpStationId()));
         }
 
-        if (sections.contains(section.getDownStation())) {
-            throw new IllegalArgumentException(String.format("새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없습니다. (downStationId: %d)", section.getDownStationId()));
-        }
-
-        downStation = section.getDownStation();
-        distance += section.getDistance();
-        sections.add(section);
+        sections.add(terminalSection);
+        downStation = terminalSection.getDownStation();
+        distance += terminalSection.getDistance();
     }
 
-    public Section deleteSectionByDownStationId(Long downStationId) {
+    public void deleteSectionByDownStationId(Long downStationId) {
         if (!downStation.getId().equals(downStationId)) {
             throw new IllegalArgumentException(String.format("하행 종점역이 아니면 구간을 제거할 수 없습니다. (stationId: %d)", downStationId));
         }
 
-        if (sections.count() <= MIN_SECTION_COUNT) {
-            throw new IllegalArgumentException(String.format("구간은 최소 %d개 이상이야 합니다.", MIN_SECTION_COUNT));
-        }
+        Section section = sections.findByDownStationId(downStationId);
 
-        Optional<Section> optionalSection = sections.findByDownStationId(downStationId);
-        if (optionalSection.isEmpty()) {
-            throw new IllegalArgumentException(String.format("구간을 찾을 수 없습니다. (downStationId: %d)", downStationId));
-        }
-
-        Section section = optionalSection.get();
         sections.delete(section);
         downStation = section.getUpStation();
         distance -= section.getDistance();
-
-        return section;
     }
 }

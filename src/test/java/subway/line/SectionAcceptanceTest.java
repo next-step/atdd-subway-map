@@ -1,20 +1,18 @@
 package subway.line;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import subway.AcceptanceTest;
-import subway.line.LineRequest;
-import subway.line.LineResponse;
-import subway.line.SectionRequest;
 import subway.station.StationResponse;
-import subway.util.ObjectMapperHolder;
 
 import java.util.List;
 
@@ -33,6 +31,9 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     private static final String SINBUNDANG_NEW_DOWN_STATION_NAME = "새로운 하행역";
     private static final Long SINBUNDANG_NEW_DISTANCE = 3L;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     private LineResponse lineResponse;
     private Long downStationId;
     private Long newDownStationId;
@@ -41,7 +42,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     void setUpLineAndStation() throws JsonProcessingException {
         LineRequest request = 지하철역_생성_및_지하철_노선_요청_객체_생성(SINBUNDANG_LINE_NAME, SINBUNDANG_LINE_COLOR, SINBUNDANG_UP_STATION_NAME, SINBUNDANG_DOWN_STATION_NAME, SINBUNDANG_LINE_DISTANCE);
         ExtractableResponse<Response> createLineResponse = 지하철_노선_생성_요청(request);
-        lineResponse = ObjectMapperHolder.instance.readValue(createLineResponse.response().body().asString(), LineResponse.class);
+        lineResponse = objectMapper.readValue(createLineResponse.response().body().asString(), LineResponse.class);
         downStationId = lineResponse.getStations().get(1).getId();
         newDownStationId = 지하철역_생성_요청_및_아이디_추출(SINBUNDANG_NEW_DOWN_STATION_NAME);
     }
@@ -61,7 +62,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 
         // then
         ExtractableResponse<Response> showLineResponse = 지하철_노선_요청(lineResponse.getId());
-        LineResponse changedLineResponse = ObjectMapperHolder.instance.readValue(showLineResponse.response().body().asString(), LineResponse.class);
+        LineResponse changedLineResponse = objectMapper.readValue(showLineResponse.response().body().asString(), LineResponse.class);
 
         Long sumOfDistance = SINBUNDANG_LINE_DISTANCE + SINBUNDANG_NEW_DISTANCE;
         List<StationResponse> stationsOfResponse = List.of(new StationResponse(1L, SINBUNDANG_UP_STATION_NAME), new StationResponse(3L, SINBUNDANG_NEW_DOWN_STATION_NAME));
@@ -120,7 +121,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 
         // then
         ExtractableResponse<Response> showLineResponse = 지하철_노선_요청(lineResponse.getId());
-        LineResponse changedLineResponse = ObjectMapperHolder.instance.readValue(showLineResponse.response().body().asString(), LineResponse.class);
+        LineResponse changedLineResponse = objectMapper.readValue(showLineResponse.response().body().asString(), LineResponse.class);
         List<StationResponse> stationsOfResponse = List.of(new StationResponse(1L, SINBUNDANG_UP_STATION_NAME), new StationResponse(2L, SINBUNDANG_DOWN_STATION_NAME));
         assertThat(changedLineResponse).isEqualTo(new LineResponse(changedLineResponse.getId(), SINBUNDANG_LINE_NAME, SINBUNDANG_LINE_COLOR, stationsOfResponse, SINBUNDANG_LINE_DISTANCE));
     }
