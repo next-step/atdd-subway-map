@@ -1,6 +1,8 @@
 package subway.line.repository;
 
 import lombok.*;
+import subway.section.policy.AddSectionPolicy;
+import subway.section.policy.DeleteSectionPolicy;
 import subway.section.repository.Section;
 import subway.station.repository.Station;
 
@@ -21,7 +23,7 @@ class Line {
     private String name;
     @Column(nullable = false)
     private String color;
-    @OneToMany
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     @JoinColumn(name = "line_id")
     private List<Section> sections = new ArrayList<>();
     @Column(name = "total_distance", nullable = false)
@@ -50,8 +52,15 @@ class Line {
     }
 
     public void addSection(Section section) {
-        this.sections.add(section);
+        AddSectionPolicy.validate(this, section);
         this.totalDistance += section.getDistance();
+        this.sections.add(section);
+    }
+
+    public void deleteSectionByLastStation(Station station) {
+        DeleteSectionPolicy.validate(this, station);
+        this.totalDistance -= getLastSection().getDistance();
+        this.sections.remove(getLastSection());
     }
 
     public Section getLastSection() {

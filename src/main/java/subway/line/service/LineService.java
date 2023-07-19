@@ -8,12 +8,9 @@ import subway.line.dto.UpdateLineRequest;
 import subway.line.repository.Line;
 import subway.line.repository.LineRepository;
 import subway.section.dto.CreateSectionRequest;
-import subway.section.policy.AddSectionPolicy;
-import subway.section.policy.DeleteSectionPolicy;
 import subway.section.repository.Section;
 import subway.section.repository.SectionRepository;
 import subway.station.repository.Station;
-import subway.station.repository.StationRepository;
 import subway.station.service.StationService;
 
 import java.util.List;
@@ -24,9 +21,7 @@ import java.util.List;
 public
 class LineService {
     private final LineRepository lineRepository;
-    private final StationRepository stationRepository;
     private final StationService stationService;
-    private final SectionRepository sectionRepository;
 
     @Transactional
     public Line saveLine(CreateLineRequest request) {
@@ -49,7 +44,7 @@ class LineService {
 
     @Transactional
     public void updateLineById(Long id, UpdateLineRequest request) {
-        Line line = lineRepository.findById(id).orElseThrow(() -> new RuntimeException("Not Exist Line"));
+        Line line = findLineById(id);
         line.changeName(request.getName());
         line.changeColor(request.getColor());
     }
@@ -64,7 +59,6 @@ class LineService {
         Line line = lineRepository.findById(id).orElseThrow(() -> new RuntimeException("Not Exist Line"));
         Station upStation = stationService.findStationById(request.getUpStationId());
         Station downStation = stationService.findStationById(request.getDownStationId());
-        AddSectionPolicy.validate(line, upStation, downStation);
         line.addSection(createSection(upStation.getId(), downStation.getId(), request.getDistance()));
         return line;
     }
@@ -72,20 +66,15 @@ class LineService {
     @Transactional
     public void deleteSectionByStationId(Long lineId, Long stationId) {
         Line line = lineRepository.findById(lineId).orElseThrow(() -> new RuntimeException("Not Exist Line"));
-        Section section = line.getLastSection();
         Station station = stationService.findStationById(stationId);
-
-        DeleteSectionPolicy.validate(line, station);
-
-        stationRepository.delete(station);
-        sectionRepository.delete(section);
+        line.deleteSectionByLastStation(station);
     }
 
     private Section createSection(Long upStationId, Long downStationId, Long distance) {
-        return sectionRepository.save(Section.builder()
-                .upStation(stationRepository.getReferenceById(upStationId))
-                .downStation(stationRepository.getReferenceById(downStationId))
+        return Section.builder()
+                .upStation(stationService.findStationById(upStationId))
+                .downStation(stationService.findStationById(downStationId))
                 .distance(distance)
-                .build());
+                .build();
     }
 }

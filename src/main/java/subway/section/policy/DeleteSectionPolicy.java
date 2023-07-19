@@ -3,8 +3,6 @@ package subway.section.policy;
 import subway.line.repository.Line;
 import subway.station.repository.Station;
 
-import java.util.Objects;
-
 public class DeleteSectionPolicy {
     public static void validate(Line line, Station station) {
         if (line.getSections().size() == 1) {

@@ -83,6 +83,7 @@ public class SectionAcceptanceTest {
     @DisplayName("지하철 구간을 삭제한다.")
     @Test
     void deleteSection() {
+        ExtractableResponse<Response> selectedResponse = 지하철_노선을_조회한다();
         ExtractableResponse<Response> createdResponse = 지하철_구간을_추가한다(UP_STATION_ID, DOWN_STATION_ID, DISTANCE);
 
         지하철_구간을_삭제한다(createdResponse.header("Location") + "/sections?stationId=" + DOWN_STATION_ID);
