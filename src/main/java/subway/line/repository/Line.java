@@ -25,15 +25,12 @@ class Line {
 
     @Embedded
     private Sections sections;
-    @Column(name = "total_distance", nullable = false)
-    private Long totalDistance;
 
     @Builder
     Line(String name, String color, Section initSection) {
         this.name = name;
         this.color = color;
         this.sections = new Sections(List.of(initSection));
-        this.totalDistance = initSection.getDistance();
     }
 
     public void changeName(String name) {
