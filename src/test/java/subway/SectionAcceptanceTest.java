@@ -1,5 +1,6 @@
 package subway;
 
+import static org.assertj.core.api.Assertions.*;
 import static subway.factory.SubwayNameFactory.강남역;
 import static subway.factory.SubwayNameFactory.광교역;
 import static subway.factory.SubwayNameFactory.논현역;
@@ -10,6 +11,7 @@ import static subway.factory.SubwayNameFactory.양재역;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import java.util.List;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -19,10 +21,11 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
+import subway.domain.Station;
 import subway.dto.LineResponse;
 import subway.dto.SectionRequest;
-import subway.dto.SectionResponse;
 import subway.dto.StationRequest;
+import subway.dto.StationResponse;
 import subway.exception.dto.ErrorResponse;
 import subway.exception.error.SubwayErrorCode;
 import subway.factory.LineRequestFactory;
@@ -53,7 +56,8 @@ public class SectionAcceptanceTest {
      * And: 1개의 노선이 등록되어 있다.
      * When: 구간을 생성한다.
      * Then: 성공(200 OK) 응답을 받는다.
-     * And: 새롭게 등록된 지하철 구간 정보를 응답받는다.
+     * And: 노선 정보를 응답 받는다.
+     * And: 새롭게 추가된 마지막 지하철역(하행종점) 아이디를 비교한다.
      */
     @Test
     @DisplayName("새로운 구간을 등록한다.")
@@ -70,11 +74,15 @@ public class SectionAcceptanceTest {
             sectionRequest).extract();
 
         // Then
-        Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
-        SectionResponse sectionResponse = response.as(SectionResponse.class);
-        Assertions.assertThat(sectionResponse.getId()).isNotNull();
-        Assertions.assertThat(sectionResponse.getLineId()).isEqualTo(this.lineResponse.getId());
+        LineResponse lineResponse = response.as(LineResponse.class);
+        assertThat(lineResponse.getDistance()).isEqualTo(30L);
+
+        List<StationResponse> lineStations = lineResponse.getStations();
+        int stationCount = lineStations.size();
+        assertThat(stationCount).isEqualTo(3);
+        assertThat(lineStations.get(stationCount - 1).getId()).isEqualTo(3L);
     }
 
     /**
@@ -101,10 +109,10 @@ public class SectionAcceptanceTest {
         ExtractableResponse<Response> response = RestAssuredClient.requestPost(
             generatePathWithLineId(lineResponse.getId()),
             sectionRequest).extract();
-        Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
 
         ErrorResponse error = response.as(ErrorResponse.class);
-        Assertions.assertThat(error.getMessage())
+        assertThat(error.getMessage())
             .isEqualTo(SubwayErrorCode.NO_MATCH_UP_STATION.getMessage());
 
     }
@@ -133,10 +141,10 @@ public class SectionAcceptanceTest {
         ExtractableResponse<Response> response = RestAssuredClient.requestPost(
             generatePathWithLineId(lineResponse.getId()),
             sectionRequest).extract();
-        Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
 
         ErrorResponse error = response.as(ErrorResponse.class);
-        Assertions.assertThat(error.getMessage())
+        assertThat(error.getMessage())
             .isEqualTo(SubwayErrorCode.ALREADY_EXIST_DOWN_STATION.getMessage());
 
     }
@@ -167,7 +175,7 @@ public class SectionAcceptanceTest {
             .extract();
 
         // Then
-        Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
     /**
@@ -193,10 +201,10 @@ public class SectionAcceptanceTest {
         // Then
         ExtractableResponse<Response> response = RestAssuredClient.requestDelete(
             generatePathWithLineIdAndStationId(lineResponse.getId(), firstStationId)).extract();
-        Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
 
         ErrorResponse error = response.as(ErrorResponse.class);
-        Assertions.assertThat(error.getMessage())
+        assertThat(error.getMessage())
             .isEqualTo(SubwayErrorCode.NON_LAST_STATION_DELETE_NOT_ALLOWED.getMessage());
     }
 
@@ -233,10 +241,10 @@ public class SectionAcceptanceTest {
         ExtractableResponse<Response> response = RestAssuredClient.requestDelete(
                 generatePathWithLineIdAndStationId(lineResponse.getId(), secondSectionUpStationId))
             .extract();
-        Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
 
         ErrorResponse error = response.as(ErrorResponse.class);
-        Assertions.assertThat(error.getMessage())
+        assertThat(error.getMessage())
             .isEqualTo(SubwayErrorCode.NON_LAST_STATION_DELETE_NOT_ALLOWED.getMessage());
     }
 
@@ -258,10 +266,10 @@ public class SectionAcceptanceTest {
         ExtractableResponse<Response> response = RestAssuredClient.requestDelete(
                 generatePathWithLineIdAndStationId(lineResponse.getId(), secondStationId))
             .extract();
-        Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
 
         ErrorResponse error = response.as(ErrorResponse.class);
-        Assertions.assertThat(error.getMessage())
+        assertThat(error.getMessage())
             .isEqualTo(SubwayErrorCode.SINGLE_SECTION_DELETE_NOT_ALLOWED.getMessage());
     }
 
@@ -300,23 +308,10 @@ public class SectionAcceptanceTest {
             LineRequestFactory.create(신분당선)).extract().as(LineResponse.class);
     }
 
-    private void saveSection() {
-        SectionRequest params = SectionRequest.builder()
-            .upStationId(1L)
-            .downStationId(2L)
-            .distance(10L)
-            .build();
-
-        RestAssuredClient.requestPost(
-            generatePathWithLineId(lineResponse.getId()), params)
-            .extract()
-            .as(SectionResponse.class);
-    }
-
     private void createSection(SectionRequest sectionRequest) {
         RestAssuredClient.requestPost(
                 generatePathWithLineId(lineResponse.getId()), sectionRequest)
             .extract()
-            .as(SectionResponse.class);
+            .as(LineResponse.class);
     }
 }
