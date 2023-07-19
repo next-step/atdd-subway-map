@@ -11,7 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+
 
 public class LineRequestFixture {
 
@@ -86,4 +87,36 @@ public class LineRequestFixture {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
+    public static ExtractableResponse<Response> 지하철_구간_등록_요청(Long lineId, Long upStationId, Long downStationId, Long distance) {
+        Map<String, String> params = new HashMap<>();
+        params.put("upStationId", upStationId.toString());
+        params.put("downStationId", downStationId.toString());
+        params.put("distance", distance.toString());
+        return RestAssured.given().log().all()
+                        .pathParam("id", lineId)
+                        .body(params)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .when().post("/lines/{id}/sections")
+                        .then().log().all()
+                        .extract();
+    }
+    public static Long 지하철_구간_등록(Long lineId, Long upStationId, Long downStationId, Long distance) {
+        ExtractableResponse<Response> response = 지하철_구간_등록_요청(lineId, upStationId, downStationId, distance);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        return response.as(Long.class);
+    }
+
+    public static ExtractableResponse<Response> 지하철_구간_삭제_요청(Long lineId, Long sectionId) {
+        return RestAssured.given().log().all()
+                        .pathParam("id", lineId)
+                        .queryParam("sectionId", sectionId)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .when().delete("/lines/{id}/sections")
+                        .then().log().all()
+                        .extract();
+    }
+    public static void 지하철_구간_삭제(Long lineId, Long sectionId) {
+        ExtractableResponse<Response> response = 지하철_구간_삭제_요청(lineId, sectionId);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
 }
