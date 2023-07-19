@@ -21,6 +21,8 @@ public class LineResponse {
 
     private String color;
 
+    private Long distance;
+
     private List<StationResponse> stations;
 
     public static LineResponse from(Line line) {
@@ -28,6 +30,7 @@ public class LineResponse {
             .id(line.getId())
             .name(line.getName())
             .color(line.getColor())
+            .distance(line.getDistance())
             .stations(line.getSections().getAllStations().stream()
                 .map(StationResponse::from)
                 .collect(Collectors.toList())
