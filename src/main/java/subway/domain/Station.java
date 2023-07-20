@@ -1,8 +1,18 @@
 package subway.domain;
 
 import javax.persistence.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import subway.dto.StationRequest;
 
 @Entity
+@Builder
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Station {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -10,23 +20,9 @@ public class Station {
     @Column(length = 20, nullable = false)
     private String name;
 
-    public Station() {
-    }
-
-    public Station(Long id, String name) {
-        this.id = id;
-        this.name = name;
-    }
-
-    public Station(String name) {
-        this.name = name;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
+    public static Station from(StationRequest request) {
+        return Station.builder()
+            .name(request.getName())
+            .build();
     }
 }

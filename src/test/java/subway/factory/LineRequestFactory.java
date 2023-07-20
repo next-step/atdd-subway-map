@@ -20,15 +20,15 @@ public class LineRequestFactory {
         put(우이신설선, LineRequest.builder()
             .name(우이신설선)
             .color("bg-green-600")
-            .upStationId(2L)
-            .downStationId(3L)
+            .upStationId(3L)
+            .downStationId(4L)
             .distance(20L)
             .build());
         put(공항철도선, LineRequest.builder()
             .name(공항철도선)
             .color("bg-blue-600")
-            .upStationId(4L)
-            .downStationId(5L)
+            .upStationId(5L)
+            .downStationId(6L)
             .distance(30L)
             .build());
 

@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static subway.factory.SubwayNameFactory.강남역;
 import static subway.factory.SubwayNameFactory.광교역;
 import static subway.factory.SubwayNameFactory.논현역;
+import static subway.factory.SubwayNameFactory.수서역;
 import static subway.factory.SubwayNameFactory.수인분당선;
 import static subway.factory.SubwayNameFactory.신논현역;
 import static subway.factory.SubwayNameFactory.신분당선;
@@ -187,5 +188,6 @@ class LineAcceptanceTest {
         RestAssuredClient.requestPost(stationPath, StationRequest.builder().name(양재역).build());
         RestAssuredClient.requestPost(stationPath, StationRequest.builder().name(논현역).build());
         RestAssuredClient.requestPost(stationPath, StationRequest.builder().name(신논현역).build());
+        RestAssuredClient.requestPost(stationPath, StationRequest.builder().name(수서역).build());
     }
 }
