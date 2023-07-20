@@ -31,7 +31,7 @@ public class LineService {
     public Line create(LineRequest lineRequest) {
         Station upStation = stationService.findStationById(lineRequest.getUpStationId());
         Station downStation = stationService.findStationById(lineRequest.getDownStationId());
-        Line line = new Line.Builder()
+        Line line = Line.builder()
                 .name(lineRequest.getName())
                 .color(lineRequest.getColor())
                 .stations(List.of(upStation, downStation))
@@ -39,7 +39,7 @@ public class LineService {
                 .build();
         Line savedLine = lineRepository.save(line);
 
-        Section section = new Section.Builder()
+        Section section = Section.builder()
                 .line(savedLine)
                 .upStation(upStation)
                 .downStation(downStation)

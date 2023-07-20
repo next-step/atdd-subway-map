@@ -31,7 +31,7 @@ public class SectionService {
         Line line = lineService.findLineById(lineId);
         Station upStation = stationService.findStationById(sectionRequest.getUpStationId());
         Station downStation = stationService.findStationById(sectionRequest.getDownStationId());
-        Section newSection = new Section.Builder()
+        Section newSection = Section.builder()
                 .line(line)
                 .upStation(upStation)
                 .downStation(downStation)

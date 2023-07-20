@@ -65,6 +65,10 @@ public class Section {
         return this.upStation.equals(upStation) && this.downStation.equals(downStation);
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public static class Builder {
         private Line line;
         private Station upStation;

@@ -40,6 +40,10 @@ public class Line {
         this.distance = distance;
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public Long getId() {
         return id;
     }
