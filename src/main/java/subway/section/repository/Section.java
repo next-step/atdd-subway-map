@@ -1,37 +1,36 @@
-package subway.line;
+package subway.section.repository;
 
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import subway.station.Station;
+import subway.station.repository.Station;
 
 import javax.persistence.*;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-class Line {
+public class Section {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false)
-    @Setter
-    private String name;
-    @Column(nullable = false)
-    @Setter
-    private String color;
-    @OneToOne
+
+    @ManyToOne
     @JoinColumn(name = "up_station_id")
     private Station upStation;
-    @OneToOne
+
+    @ManyToOne
     @JoinColumn(name = "down_station_id")
     private Station downStation;
 
-    Line(String name, String color, Station upStation, Station downStation) {
-        this.name = name;
-        this.color = color;
+    @Column(nullable = false)
+    private Long distance;
+
+    @Builder
+    public Section(Station upStation, Station downStation, Long distance) {
         this.upStation = upStation;
         this.downStation = downStation;
+        this.distance = distance;
     }
 }

@@ -10,10 +10,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
+import subway.line.dto.CreateLineRequest;
+import subway.line.dto.LineResponse;
+import subway.line.dto.UpdateLineRequest;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static subway.SubwayTestUtil.toSpecificResponse;
 
 @DisplayName("지하철 노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -64,7 +71,7 @@ class LineAcceptanceTest {
         ExtractableResponse<Response> selectedResponse = 지하철_노선을_조회한다(createdResponse.header("Location"));
 
         // then
-        생성한_노선의_정보를_응답한다(createdResponse.as(LineResponse.class), selectedResponse.as(LineResponse.class));
+        생성한_노선의_정보를_응답한다(createdResponse, selectedResponse);
     }
 
     //    Given 지하철 노선을 생성하고
@@ -81,7 +88,11 @@ class LineAcceptanceTest {
 
         // then
         ExtractableResponse<Response> selectedResponse = 지하철_노선을_조회한다(createdResponse.header("Location"));
-        조회한_노선은_요청한_정보로_수정된_상태이다(selectedResponse.as(LineResponse.class), "다른분당선", "bg-red-600");
+        조회한_노선은_요청한_정보로_수정된_상태이다(
+                selectedResponse,
+                "다른분당선",
+                "bg-red-600"
+        );
     }
 
     //    Given 지하철 노선을 생성하고
@@ -112,9 +123,11 @@ class LineAcceptanceTest {
                 .statusCode(HttpStatus.NO_CONTENT.value());
     }
 
-    private static void 조회한_노선은_요청한_정보로_수정된_상태이다(LineResponse selectedLineResponse, String updatedName, String updatedColor) {
-        assertThat(updatedName).isEqualTo(selectedLineResponse.getName());
-        assertThat(updatedColor).isEqualTo(selectedLineResponse.getColor());
+    private static void 조회한_노선은_요청한_정보로_수정된_상태이다(ExtractableResponse<Response> selectedResponse, String updatedName, String updatedColor) {
+        assertAll(
+                () -> assertThat(updatedName).isEqualTo(toSpecificResponse(selectedResponse, LineResponse.class).getName()),
+                () -> assertThat(updatedColor).isEqualTo(toSpecificResponse(selectedResponse, LineResponse.class).getColor())
+        );
     }
 
     private static void 지하철_노선을_수정한다(String createdResourceUrl, String name, String color) {
@@ -126,8 +139,8 @@ class LineAcceptanceTest {
                 .statusCode(HttpStatus.OK.value());
     }
 
-    private static void 생성한_노선의_정보를_응답한다(LineResponse createdLine, LineResponse selectedLine) {
-        assertThat(createdLine).isEqualTo(selectedLine);
+    private static void 생성한_노선의_정보를_응답한다(ExtractableResponse<Response> createdResponse, ExtractableResponse<Response> selectedResponse) {
+        assertThat(toSpecificResponse(createdResponse, LineResponse.class)).isEqualTo(toSpecificResponse(selectedResponse, LineResponse.class));
     }
 
     private ExtractableResponse<Response> 지하철_노선을_조회한다(String createdResourceUrl) {
@@ -139,7 +152,7 @@ class LineAcceptanceTest {
     }
 
     private static void 생성한_갯수의_지하철_노선_목록을_응답한다(List<String> lineNames, int createdCount) {
-        assertThat(lineNames.size()).isEqualTo(createdCount);
+        assertThat(lineNames, hasSize(createdCount));
     }
 
     private static void 생성된_노선이_노선_목록에_포함된다(List<String> lineNames, String createdLineName) {
