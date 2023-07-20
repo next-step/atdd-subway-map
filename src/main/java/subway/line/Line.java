@@ -16,32 +16,22 @@ public class Line {
     private String name;
     @Column(nullable = false)
     private String color;
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Station upStation;
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Station downStation;
     @Embedded
     private LineSections sections;
 
     protected Line() {
     }
-
-    public static Line of(Long id, String name, String color, Station upStation, Station downStation, Integer distance) {
-        Line line = Line.of(name, color, upStation, downStation, distance);
-        line.id = id;
-        return line;
-    }
-
     public static Line of(String name, String color, Station upStation, Station downStation, Integer distance) {
         Line line = new Line();
         line.name = name;
         line.color = color;
-        line.upStation = upStation;
-        line.downStation = downStation;
         line.sections = LineSections.of(line, upStation, downStation, distance);
         return line;
     }
-
+    public void update(String name, String color) {
+        this.name = name;
+        this.color = color;
+    }
 
     public Long getId() {
         return id;
@@ -61,16 +51,11 @@ public class Line {
 
     public void addSection(LineSection section) {
         this.sections.add(section);
-        this.downStation = section.getDownStation();
     }
 
     public void removeSection(Station toDeleteStation) {
         this.sections.remove(toDeleteStation);
-        this.downStation = this.sections.getLastLineSection().getDownStation();
     }
 
-    public void update(String name, String color) {
-        this.name = name;
-        this.color = color;
-    }
+
 }

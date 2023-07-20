@@ -38,7 +38,7 @@ public class LineSections {
     }
 
     private void validateRemovableSection(Station toDeleteStation) {
-        if (!getLastLineSection().getDownStation().getId().equals(toDeleteStation.getId()))
+        if (!getEndStation().equals(toDeleteStation))
             throw new BadRequestException("the section cannot be removed, because request station is not last station in the line.");
         if (this.sections.size() <= MINIMUM_SIZE) {
             throw new BadRequestException("the section cannot be removed because of minimum size.");
@@ -46,11 +46,8 @@ public class LineSections {
     }
 
     private void validateAddableSection(LineSection section) {
-        Long endStationId = getLastLineSection().getDownStation().getId();
-        Long requestUpStationId = section.getUpStation().getId();
-
-        if (!endStationId.equals(requestUpStationId))
-            throw new BadRequestException(String.format("line's endStationId > %d must be equal to lineSectionRequest's upStationId > %d", endStationId, requestUpStationId));
+        if (!getEndStation().equals(section.getUpStation()))
+            throw new BadRequestException(String.format("line's endStation must be equal to lineSectionRequest's upStation."));
 
         if (getStations().contains(section.getDownStation()))
             throw new BadRequestException(String.format("line's already has the station. stationId > %d", section.getDownStation().getId()));
@@ -67,6 +64,10 @@ public class LineSections {
     public LineSection getLastLineSection() {
         checkSectionsEmpty();
         return this.sections.get(this.sections.size() - 1);
+    }
+
+    public Station getEndStation() {
+        return getLastLineSection().getDownStation();
     }
 
 
