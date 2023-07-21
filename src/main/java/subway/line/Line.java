@@ -1,35 +1,36 @@
 package subway.line;
 
+import subway.linesection.LineSection;
+import subway.linesection.LineSections;
+import subway.station.Station;
+
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 public class Line {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(nullable = false)
     private String name;
+    @Column(nullable = false)
     private String color;
-    private Long upStationId;
-    private Long downStationId;
-    private Integer distance;
+    @Embedded
+    private LineSections sections;
 
     protected Line() {
     }
-
-    public static Line of(Long id, String name, String color, Long upStationId, Long downStationId, Integer distance) {
-        Line line = Line.of(name, color, upStationId, downStationId, distance);
-        line.id = id;
-        return line;
-    }
-
-    public static Line of(String name, String color, Long upStationId, Long downStationId, Integer distance) {
+    public static Line of(String name, String color, Station upStation, Station downStation, Integer distance) {
         Line line = new Line();
         line.name = name;
         line.color = color;
-        line.upStationId = upStationId;
-        line.downStationId = downStationId;
-        line.distance = distance;
+        line.sections = LineSections.of(line, upStation, downStation, distance);
         return line;
+    }
+    public void update(String name, String color) {
+        this.name = name;
+        this.color = color;
     }
 
     public Long getId() {
@@ -44,15 +45,17 @@ public class Line {
         return color;
     }
 
-    public Long getUpStationId() {
-        return upStationId;
+    public LineSections getSections() {
+        return sections;
     }
 
-    public Long getDownStationId() {
-        return downStationId;
+    public void addSection(LineSection section) {
+        this.sections.add(section);
     }
 
-    public Integer getDistance() {
-        return distance;
+    public void removeSection(Station toDeleteStation) {
+        this.sections.remove(toDeleteStation);
     }
+
+
 }

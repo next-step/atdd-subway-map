@@ -7,16 +7,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
-import subway.station.StationResponse;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.station.StationHelper.지하철역_생성;
+import static subway.line.LineFixture.*;
+import static subway.station.StationFixture.지하철역_생성_ID;
 
 @DisplayName("지하철 노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -120,11 +117,6 @@ public class LineAcceptanceTest {
         LineResponse response = 지하철_노선_조회(id);
         assertThat(response.getName()).isEqualTo(updatedName);
         assertThat(response.getColor()).isEqualTo(updatedColor);
-
-        //then : 지하철 노선에 연결된 역이 수정됨을 확인
-        List<Long> stationIds = 노선에_상행_하행_지하철역_ID(response);
-
-        assertThat(stationIds).containsExactly(secondStationId, fourthStationId);
     }
 
     /**
@@ -145,80 +137,9 @@ public class LineAcceptanceTest {
         assertThat(response.size()).isEqualTo(0);
     }
 
-    private static void 지하철_노선_삭제(Long id) {
-        RestAssured.given()
-                .when()
-                .delete("/lines/" + id)
-                .then()
-                .statusCode(HttpStatus.NO_CONTENT.value());
-    }
-
-    private static void 지하철_노선_수정(Long id, LineRequest request) {
-        RestAssured.given().log().all()
-                .body(request)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .put("/lines/" + id)
-                .then().log().all()
-                .statusCode(HttpStatus.OK.value());
-    }
-
-    private static List<LineResponse> 지하철_노선_목록_조회() {
-        return RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .get("/lines")
-                .then().log().all()
-                .statusCode(HttpStatus.OK.value())
-                .extract()
-                .jsonPath()
-                .getList(".", LineResponse.class);
-    }
-
-    private long 지하철_노선_생성_ID(LineRequest request) {
-        return 지하철_노선_생성(request).getId();
-    }
-
-    private static LineResponse 지하철_노선_생성(LineRequest request) {
-        return RestAssured.given().log().all()
-                .body(request)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines")
-                .then().log().all()
-                .statusCode(HttpStatus.CREATED.value())
-                .extract().jsonPath().getObject(".", LineResponse.class);
-    }
-
-
-    private static LineResponse 지하철_노선_조회(Long id) {
-        return RestAssured.given().log().all()
-                .when()
-                .get("/lines/" + id)
-                .then().log().all()
-                .statusCode(HttpStatus.OK.value())
-                .extract()
-                .jsonPath()
-                .getObject(".", LineResponse.class);
-    }
-
-    private long 지하철역_생성_ID(String name) {
-        return 지하철역_생성(name)
-                .jsonPath()
-                .getLong("id");
-    }
-
-    private static List<Long> 노선에_상행_하행_지하철역_ID(LineResponse response) {
-        List<Long> stationIds = response.getStations()
-                .stream()
-                .map(StationResponse::getId)
-                .collect(Collectors.toList());
-        return stationIds;
-    }
     private void 테스트용_포트_설정() {
         RestAssured.port = port;
     }
-
     private LineRequest makeRequest(String name, String color, Long upStationId, Long downStationId) {
         return LineRequest.builder()
                 .name(name)
