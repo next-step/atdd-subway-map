@@ -6,13 +6,28 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.Map;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 
 @SpringBootTest
 public class SectionAcceptanceTest {
+
+    @LocalServerPort
+    private int port;
+
+    @Autowired
+    private RestAssuredUtil restAssuredUtil;
+
+    @BeforeEach
+    void setup() {
+        restAssuredUtil.cleanup();
+        restAssuredUtil.initializePort(port);
+    }
 
     /**
      * given 하행역ID, 상행역ID, 구간거리를 입력하고
@@ -39,8 +54,7 @@ public class SectionAcceptanceTest {
         );
 
         // and
-        ExtractableResponse<Response> line = RestAssuredUtil.createWithCreated("/lines",
-            map);
+        ExtractableResponse<Response> line = RestAssuredUtil.createWithCreated("/lines", map);
 
         // and
         Long sectionUpStationId = 3L;
@@ -89,8 +103,7 @@ public class SectionAcceptanceTest {
         );
 
         // and
-        ExtractableResponse<Response> line = RestAssuredUtil.createWithCreated("/lines",
-            map);
+        ExtractableResponse<Response> line = RestAssuredUtil.createWithCreated("/lines", map);
 
         // and
         Long sectionUpStationId = 3L;
@@ -100,9 +113,9 @@ public class SectionAcceptanceTest {
             "upStationId", sectionUpStationId,
             "distance", sectionDistance);
 
-        assertThat(line.isContains(downStationId)).isTrue();
+        assertThat(line.jsonPath().getList("stations.id", Long.class).contains(downStationId)).isTrue();
 
-        //when then
+        //when
         ExtractableResponse<Response> response = RestAssuredUtil.createWithBadRequest(
             "/lines/" + line.jsonPath().getLong("id") + "/sections"
             , param);
@@ -117,11 +130,12 @@ public class SectionAcceptanceTest {
     /**
      * given 하행역ID, 상행역ID, 구간거리를 입력하고
      * and 등록하려는 노선이 있고
-     * and 입력 구간의 하행역이 등록하려는 노선에 존재하는 역이면
+     * and 입력 구간의 상행역이 노선의 하행 종점역이고
+     * and 입력 구간의 하행역이 등록하려는 노선에 존재하는 역이 아니면
      * when 노선에 입력 구간을 등록하려고 할 때
-     * then 등록 불가 합니다.
+     * then 정상 등록 됩니다.
      */
-    @DisplayName("구간 등록")
+    @DisplayName("구간 등록 정상")
     @Test
     void createSection() {
         //given
@@ -153,7 +167,7 @@ public class SectionAcceptanceTest {
         assertThat(sectionUpStationId).isEqualTo(downStationId);
 
         // and
-        assertThat(line.isContains(downStationId)).isFalse();
+        assertThat(line.jsonPath().getList("stations.id", Long.class).contains(downStationId)).isFalse();
 
         //when
         ExtractableResponse<Response> response = RestAssuredUtil.createWithCreated(
@@ -208,7 +222,7 @@ public class SectionAcceptanceTest {
         Long deleteStationId = 4L;
 
         // and
-        assertThat(line.isContains(deleteStationId)).isFalse();
+        assertThat(line.jsonPath().getList("stations.id", Long.class).contains(downStationId)).isFalse();
 
         //when
         ExtractableResponse<Response> response = RestAssuredUtil.deleteWithBadRequest(
@@ -259,7 +273,7 @@ public class SectionAcceptanceTest {
         Long deleteStationId = 4L;
 
         // and
-        assertThat(deleteStationId).isNotEqualTo(line.downEndStation().id());
+        assertThat(deleteStationId).isNotEqualTo(line.jsonPath().getLong("stations.downStation.id"));
 
         //when
         ExtractableResponse<Response> response = RestAssuredUtil.deleteWithBadRequest(
@@ -295,8 +309,7 @@ public class SectionAcceptanceTest {
             "color", color,
             "distance", distance
         );
-        ExtractableResponse<Response> line = RestAssuredUtil.createWithCreated("/lines",
-            map);
+        ExtractableResponse<Response> line = RestAssuredUtil.createWithCreated("/lines", map);
 
         Long newSectionUpStationId = downStationId;
         Long newSectionDownStationId = 3L;
@@ -305,16 +318,15 @@ public class SectionAcceptanceTest {
             "upStationId", newSectionUpStationId,
             "distance", newSectionDistance);
 
-        RestAssuredUtil.createWithCreated("/lines/" + line.jsonPath().getLong("id") + "/sections"
-            , param);
+        RestAssuredUtil.createWithCreated("/lines/" + line.jsonPath().getLong("id") + "/sections", param);
 
         Long deleteStationId = 4L;
 
         // and
-        assertThat(line.isContains(deleteStationId)).isTrue();
+        assertThat(line.jsonPath().getList("stations.id").contains(deleteStationId)).isTrue();
 
         // and
-        assertThat(line.isContainingOnlyOneSection()).isTrue();
+        assertThat(line.jsonPath().getList("sections")).hasSize(1);
 
         //when
         ExtractableResponse<Response> response = RestAssuredUtil.deleteWithBadRequest(
@@ -334,7 +346,7 @@ public class SectionAcceptanceTest {
      * when 노선에서 구간을 삭제하려 할때
      * then 정상 삭제됩니다.
      */
-    @DisplayName("구간 제거")
+    @DisplayName("구간 제거 정상")
     @Test
     void deleteSectionFromLine() {
         //given
@@ -350,8 +362,7 @@ public class SectionAcceptanceTest {
             "color", color,
             "distance", distance
         );
-        ExtractableResponse<Response> line = RestAssuredUtil.createWithCreated("/lines",
-            map);
+        ExtractableResponse<Response> line = RestAssuredUtil.createWithCreated("/lines", map);
 
         Long newSectionUpStationId = downStationId;
         Long newSectionDownStationId = 3L;
@@ -367,10 +378,10 @@ public class SectionAcceptanceTest {
         Long deleteStationId = newSectionDownStationId;
 
         // and
-        assertThat(deleteStationId).isEqualTo(line.downEndStation().id());
+        assertThat(deleteStationId).isEqualTo(line.jsonPath().get("stations.downEndStation.id"));
 
         // and
-        assertThat(line.hasMoreThanTwoSections()).isTrue();
+        assertThat(line.jsonPath().getList("sections")).hasSizeGreaterThan(1);
 
         //when
         ExtractableResponse<Response> response = RestAssuredUtil.deleteWithNoContent(
