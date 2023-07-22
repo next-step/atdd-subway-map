@@ -28,4 +28,11 @@ public class GlobalExceptionHandler {
     public ExceptionResponse checkBusinessException(BusinessException exception){
         return new ExceptionResponse(exception.getMessage());
     }
+
+    @ExceptionHandler(TargetNotFound.class)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ExceptionResponse checkBusinessException(TargetNotFound exception){
+        return new ExceptionResponse(exception.getMessage());
+    }
 }

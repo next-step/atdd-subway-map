@@ -2,6 +2,7 @@ package subway.section.service;
 
 import org.springframework.stereotype.Service;
 import subway.global.exception.BusinessException;
+import subway.global.exception.TargetNotFound;
 import subway.line.domain.Line;
 import subway.line.repository.LineRepository;
 import subway.section.domain.Section;
@@ -30,7 +31,7 @@ public class SectionCreationService {
     }
 
     public Section getSection(Long sectionId){
-        return sectionRepository.findById(sectionId).orElseThrow(IllegalArgumentException::new);
+        return sectionRepository.findById(sectionId).orElseThrow(TargetNotFound::new);
     }
 
     // 새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종착역이어야 한다
