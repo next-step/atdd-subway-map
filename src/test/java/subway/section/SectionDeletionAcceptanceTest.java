@@ -1,8 +1,6 @@
 package subway.section;
 
 import io.restassured.RestAssured;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,6 +22,12 @@ public class SectionDeletionAcceptanceTest {
     @LocalServerPort
     private int port;
 
+    final Long 신분당선 = 1L;
+    final Long 판교역 = 2L;
+    final Long 정자역 = 6L;
+    final Long 미금역 = 11L;
+
+
     @BeforeEach
     public void initPort(){
         RestAssured.port = port;
@@ -39,10 +43,10 @@ public class SectionDeletionAcceptanceTest {
     @Test
     void deleteSection(){
         //given
-        var createSectionResponse = 지하철구간_등록();
+        var createSectionResponse = 지하철구간_등록(신분당선, 판교역, 정자역);
 
         //when
-        지하철구간_삭제(createSectionResponse);
+        지하철구간_삭제(신분당선, createSectionResponse);
 
         //when
         var getResponse = 지하철구간_조회(createSectionResponse);
@@ -60,11 +64,11 @@ public class SectionDeletionAcceptanceTest {
     @Test
     void throwExceptionWhenDeletingNotLastSection(){
         //given
-        final long 노선의_첫번째_노선 = 2L;
-        var createSectionResponse = 지하철구간_등록();
+        var firstSection = 지하철구간_등록(신분당선, 판교역, 정자역);
+        var secondSection = 지하철구간_등록(신분당선, 정자역, 미금역);
 
         //when
-        var deleteResponse = 지하철구간_삭제(노선의_첫번째_노선);
+        var deleteResponse = 지하철구간_삭제(신분당선, firstSection);
 
         //then
         예외_검증(deleteResponse, "제거하는 지하철 구간이 노선의 마지막 구간이 아닐 경우 삭제할 수 없습니다.");
@@ -78,8 +82,7 @@ public class SectionDeletionAcceptanceTest {
     @Test
     void throwExceptionWhenLineHasOnlyOneSection(){
         //when
-        final long 노선의_첫번째_노선 = 2L;
-        var deleteResponse = 지하철구간_삭제(노선의_첫번째_노선);
+        var deleteResponse = 지하철구간_삭제(신분당선, 판교역);
 
         //then
         예외_검증(deleteResponse, "제거하려는 지하철 노선의 구간이 1개인 경우 삭제할 수 없습니다.");

@@ -17,14 +17,7 @@ public class SectionRequestFixture {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 지하철구간_등록(){
-        final Long 새로운_하행역 = 9L;
-        final Long 새로운_상행역 = 10L;
-        return 지하철구간_등록(새로운_상행역, 새로운_하행역);
-    }
-
-    public static ExtractableResponse<Response> 지하철구간_등록(Long upStationId, Long downStationId) {
-        final long lineId = 1L;
+    public static ExtractableResponse<Response> 지하철구간_등록(Long lineId, Long upStationId, Long downStationId) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("downStationId", downStationId);
         params.put("upStationId", upStationId);
@@ -36,15 +29,14 @@ public class SectionRequestFixture {
                 .then().log().all().extract();
     }
 
-    public static void 지하철구간_삭제(ExtractableResponse<Response> response){
-        final long sectionId = response.jsonPath().getLong("id");
-        지하철구간_삭제(sectionId);
+    public static ExtractableResponse<Response> 지하철구간_삭제(long lineId, ExtractableResponse<Response> response) {
+        final long stationId = response.jsonPath().getLong("downStationId");
+        return 지하철구간_삭제(lineId, stationId);
     }
 
-    public static ExtractableResponse<Response> 지하철구간_삭제(long sectionId) {
-        final long lineId = 1L;
+    public static ExtractableResponse<Response> 지하철구간_삭제(long lineId, long stationId) {
         return RestAssured.given().log().all()
-            .when().delete("/lines/" + lineId + "/sections?stationId=" + sectionId)
-            .then().log().all().extract();
+                .when().delete("/lines/" + lineId + "/sections?stationId=" + stationId)
+                .then().log().all().extract();
     }
 }
