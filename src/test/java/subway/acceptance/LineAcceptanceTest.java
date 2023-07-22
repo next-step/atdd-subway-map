@@ -44,6 +44,20 @@ public class LineAcceptanceTest {
         지하철_역을_생성합니다("강남역", "양재역", "신사역", "논현역");
     }
 
+    public static ExtractableResponse<Response> 지하철_노선_목록을_조회합니다() {
+        return selectAll();
+    }
+
+    public static ExtractableResponse<Response> 지하철_노선을_ID로_조회합니다(Long id) {
+        return selectLine(id);
+    }
+
+    public static ExtractableResponse<Response> 지하철_노선을_생성합니다(Long upStationId, Long downStationId,
+        String name, String color, Long distance) {
+        return createLineResult(
+            requestBodyOf(upStationId, downStationId, name, color, distance));
+    }
+
     private void 데이터베이스를_초기화합니다() {
         restAssuredUtil.cleanup();
     }
@@ -73,7 +87,7 @@ public class LineAcceptanceTest {
         Long distance = 10L;
 
         // when
-        ExtractableResponse<Response> saved = 지하철_노선_정보를_생성합니다(upStationId, downStationId, name, color, distance);
+        ExtractableResponse<Response> saved = 지하철_노선을_생성합니다(upStationId, downStationId, name, color, distance);
 
         // then
         지하철_노선이_정상_생성되었습니다(saved);
@@ -114,12 +128,6 @@ public class LineAcceptanceTest {
 
     private AbstractIntegerAssert<?> 지하철_노선이_정상_생성되었습니다(ExtractableResponse<Response> saved) {
         return assertThat(saved.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-    }
-
-    private ExtractableResponse<Response> 지하철_노선_정보를_생성합니다(Long upStationId, Long downStationId,
-        String name, String color, Long distance) {
-        return createLineResult(
-            requestBodyOf(upStationId, downStationId, name, color, distance));
     }
 
     /** given 지하철 노선을 2개 생성하고
@@ -193,10 +201,6 @@ public class LineAcceptanceTest {
             .mapToLong(Long::valueOf)
             .boxed()
             .collect(Collectors.toSet());
-    }
-
-    private ExtractableResponse<Response> 지하철_노선_목록을_조회합니다() {
-        return selectAll();
     }
 
     private ExtractableResponse<Response> 입력_정보로_지하철_노선을_생성합니다(Long upStationId,
@@ -358,7 +362,8 @@ public class LineAcceptanceTest {
         return deleteLineResult(saved.jsonPath().getLong("id"));
     }
 
-    private Map<String, Object> requestBodyOf(Long upStationId, Long downStationId, String name,
+    private static Map<String, Object> requestBodyOf(Long upStationId, Long downStationId,
+        String name,
         String color, Long distance) {
         return Map.of(
             "upStationId", upStationId,
@@ -369,15 +374,15 @@ public class LineAcceptanceTest {
         );
     }
 
-    private ExtractableResponse<Response> createLineResult(Map<String, Object> requestBody) {
+    private static ExtractableResponse<Response> createLineResult(Map<String, Object> requestBody) {
         return RestAssuredUtil.createWithCreated("/lines", requestBody);
     }
 
-    private ExtractableResponse<Response> selectAll() {
+    private static ExtractableResponse<Response> selectAll() {
         return RestAssuredUtil.findAllWithOk("/lines");
     }
 
-    private ExtractableResponse<Response> selectLine(Long id) {
+    private static ExtractableResponse<Response> selectLine(Long id) {
         return RestAssuredUtil.findByIdWithOk("/lines/{id}", id);
     }
 

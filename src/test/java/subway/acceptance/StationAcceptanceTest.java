@@ -44,6 +44,14 @@ public class StationAcceptanceTest {
         restAssuredUtil.cleanup();
     }
 
+    public static ExtractableResponse<Response> 지하철_역_생성(String name) {
+        return RestAssuredUtil.createWithCreated(STATION_BASE_URL, Map.of(STATION_NAME_KEY, name));
+    }
+
+    public static ExtractableResponse<Response> 지하철_역_목록을_조회합니다() {
+        return RestAssuredUtil.findAllWithOk(STATION_BASE_URL);
+    }
+
     /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다
@@ -171,14 +179,6 @@ public class StationAcceptanceTest {
 
     private long 생성한_지하철_역_ID() {
         return 지하철_역_생성("강남역").jsonPath().getLong(STATION_ID_KEY);
-    }
-
-    public static ExtractableResponse<Response> 지하철_역_생성(String name) {
-        return RestAssuredUtil.createWithCreated(STATION_BASE_URL, Map.of(STATION_NAME_KEY, name));
-    }
-
-    private ExtractableResponse<Response> 지하철_역_목록을_조회합니다() {
-        return RestAssuredUtil.findAllWithOk(STATION_BASE_URL);
     }
 
     private ExtractableResponse<Response> deleteStation(Long id) {
