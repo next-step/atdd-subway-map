@@ -37,6 +37,10 @@ public class Line {
         this.color = color;
     }
 
+    public void changeDownStation(Long newDownStationId){
+        this.downStationId = newDownStationId;
+    }
+
     public Long getId() {
         return id;
     }

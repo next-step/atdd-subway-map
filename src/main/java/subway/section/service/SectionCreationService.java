@@ -9,6 +9,7 @@ import subway.section.domain.Section;
 import subway.section.dto.SectionRequest;
 import subway.section.repository.SectionRepository;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 @Service
@@ -22,11 +23,13 @@ public class SectionCreationService {
         this.sectionRepository = sectionRepository;
     }
 
+    @Transactional
     public Section createSection(Long lineId, SectionRequest request){
         Line foundLine = lineRepository.findById(lineId).orElseThrow(IllegalArgumentException::new);
         checkUpStationId(foundLine, request.getUpStationId());
         checkDownStationId(lineId, request.getDownStationId());
         Section section = new Section(request.getDownStationId(), request.getUpStationId(), request.getDistance(), lineId);
+        foundLine.changeDownStation(section.getDownStationId());
         return sectionRepository.save(section);
     }
 
