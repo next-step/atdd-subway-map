@@ -289,7 +289,7 @@ public class SectionAcceptanceTest {
 
         // and
         Long sectionUpStationId = 1L;
-        Long sectionDownStationId = 4L;
+        Long sectionDownStationId = 2L;
         Long sectionDistance = 5L;
         Map<String, Object> param = Map.of(
             "downStationId", sectionDownStationId,

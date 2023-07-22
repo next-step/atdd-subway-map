@@ -36,7 +36,7 @@ public class Sections {
                 getDownEndStation().getId(), destinationStation.getId()));
         }
         if (containsStation(section.getStartStation())) {
-            throw new LineNotConnectableException("신규 구간의 하행역이 기존 노선에 포함되어 있습니다: " + section.getId());
+            throw new LineNotConnectableException("신규 구간의 하행역이 기존 노선에 포함되어 있습니다: " + section.getStartStation().getId());
         }
         sections.add(section);
     }
