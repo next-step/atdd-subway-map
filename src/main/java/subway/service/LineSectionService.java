@@ -3,6 +3,7 @@ package subway.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.controller.dto.LineSectionCreateResponse;
+import subway.controller.dto.LineSectionDeleteResponse;
 import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Station;
@@ -48,5 +49,11 @@ public class LineSectionService {
         line.connectNewSection(upStation, new Section(downStation, distance));
 
         return LineSectionCreateResponse.responseFrom(line);
+    }
+
+    public LineSectionDeleteResponse disconnectSection(Long lineId, Long stationsId) {
+        Line line = lineRepository.findById(lineId)
+            .orElseThrow(() -> new LineNotFoundException("입력된 ID에 해당하는 노선이 존재하지 않습니다: " + lineId));
+        return null;
     }
 }

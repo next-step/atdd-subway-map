@@ -391,6 +391,86 @@ public class SectionAcceptanceTest {
     }
 
     /**
+     * given 삭제하려는 노선ID와 역ID가 있을때
+     * and 입력된 ID에 해당하는 노선이 존재하지 않으면
+     * when 노선에서 구간을 삭제하려 할때
+     * then 삭제 불가합니다.
+     */
+    @DisplayName("구간 제거_미존재 노선")
+    @Test
+    void deleteWithNotExistsLine() {
+        //given
+        Long deleteStationId = 1L;
+        Long lineId = 1L;
+
+        // and
+        ExtractableResponse<Response> lineList = RestAssuredUtil.findAllWithOk("/lines");
+        assertThat(lineList.jsonPath().getList("id", Long.class)).doesNotContain(lineId);
+
+        //when
+        ExtractableResponse<Response> response = RestAssuredUtil.deleteWithBadRequest(
+            String.format("/lines/%d/sections?stationId={stationId}", lineId),
+            deleteStationId);
+
+        // then
+        assertAll(
+            () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
+            () -> assertThat(response.jsonPath().getString("message")).isEqualTo("입력된 ID에 해당하는 노선이 존재하지 않습니다: " + lineId)
+        );
+    }
+
+    /**
+     * given 2개 이상의 구간을 포함하는 노선과 삭제하려는 역ID가 있을때
+     * and 입력된 ID에 해당하는 역이 존재하지 않으면
+     * when 노선에서 구간을 삭제하려 할때
+     * then 삭제 불가합니다.
+     */
+    @DisplayName("구간 제거_미존재 역")
+    @Test
+    void deleteWithNotExistsStation() {
+        //given
+        Long downStationId = 1L;
+        Long upStationId = 2L;
+        Long distance = 10L;
+        String name = "신분당선";
+        String color = "bg-red-600";
+        Map<String, Object> map = Map.of(
+            "upStationId", upStationId,
+            "downStationId", downStationId,
+            "name", name,
+            "color", color,
+            "distance", distance
+        );
+        ExtractableResponse<Response> line = RestAssuredUtil.createWithCreated("/lines",
+            map);
+
+        Long sectionUpStationId = downStationId;
+        Long sectionDownStationId = 3L;
+        Long sectionDistance = 5L;
+        Map<String, Object> param = Map.of("downStationId", sectionDownStationId,
+            "upStationId", sectionUpStationId,
+            "distance", sectionDistance);
+
+        RestAssuredUtil.createWithCreated("/lines/" + line.jsonPath().getLong("id") + "/sections",
+            param);
+
+        Long deleteStationId = 4L;
+
+        // and
+        assertThat(line.jsonPath().getList("stations.id", Long.class).contains(downStationId)).isFalse();
+
+        //when
+        ExtractableResponse<Response> response = RestAssuredUtil.deleteWithBadRequest(
+            "/lines/" + line.jsonPath().getLong("id") + "/sections?stationsId=", deleteStationId);
+
+        // then
+        assertAll(
+            () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
+            () -> assertThat(response.jsonPath().getString("error.message")).isEqualTo("구간에 포함되지 않는 역은 삭제할 수 없습니다.")
+        );
+    }
+
+    /**
      * given 2개 이상의 구간을 포함하는 노선과 삭제하려는 역ID가 있을때
      * and 삭제하려는 역이 해당 노선에 존재하는 역이 아니면
      * when 노선에서 구간을 삭제하려 할때
