@@ -15,6 +15,7 @@ import subway.controller.dto.LineSectionCreateRequest;
 import subway.controller.dto.LineSectionCreateResponse;
 import subway.controller.dto.LineSectionDeleteResponse;
 import subway.exception.LineNotConnectableException;
+import subway.exception.LineNotDisConnectableException;
 import subway.exception.LineNotFoundException;
 import subway.exception.StationNotFoundException;
 import subway.service.LineSectionService;
@@ -47,7 +48,8 @@ public class LineSectionController {
         LineNotFoundException.class,
         StationNotFoundException.class,
         LineNotFoundException.class,
-        LineNotConnectableException.class})
+        LineNotConnectableException.class,
+        LineNotDisConnectableException.class})
     public ResponseEntity<ErrorResponse> error(RuntimeException e) {
         return new ResponseEntity<>(new ErrorResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
     }

@@ -6,6 +6,7 @@ import static subway.acceptance.StationAcceptanceTest.지하철_역_생성;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import java.security.InvalidParameterException;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,6 +17,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
+import subway.domain.Line;
+import subway.domain.Station;
+import subway.repository.LineRepository;
+import subway.repository.StationRepository;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class SectionAcceptanceTest {
@@ -25,6 +30,12 @@ public class SectionAcceptanceTest {
 
     @Autowired
     private RestAssuredUtil restAssuredUtil;
+
+    @Autowired
+    private LineRepository lineRepository;
+
+    @Autowired
+    private StationRepository stationRepository;
 
     @BeforeEach
     void setup() {
@@ -468,15 +479,21 @@ public class SectionAcceptanceTest {
     }
 
     /**
-     * given 2개 이상의 구간을 포함하는 노선과 삭제하려는 역ID가 있을때
-     * and 삭제하려는 역이 해당 노선에 존재하는 역이 아니면
+     * given 삭제하려는 노선ID와 역ID가 있을때
+     * and 입력된 ID에 해당하는 노선이 존재하고
+     * and 입력된 ID에 해당하는 역이 존재하고
+     * and 삭제하려는 역이 해당 노선에 포함되는 역이 아니면
      * when 노선에서 구간을 삭제하려 할때
      * then 삭제 불가합니다.
      */
-    @DisplayName("구간 제거_미존재 역")
+    @DisplayName("구간 제거_미포함 역")
     @Test
     void deleteWithNotContainedStation() {
         //given
+        Long deleteStationId = 3L;
+        Long lineId = 1L;
+        지하철_역_생성("양재역");
+
         Long downStationId = 1L;
         Long upStationId = 2L;
         Long distance = 10L;
@@ -489,32 +506,32 @@ public class SectionAcceptanceTest {
             "color", color,
             "distance", distance
         );
-        ExtractableResponse<Response> line = RestAssuredUtil.createWithCreated("/lines",
-            map);
-
-        Long sectionUpStationId = downStationId;
-        Long sectionDownStationId = 3L;
-        Long sectionDistance = 5L;
-        Map<String, Object> param = Map.of("downStationId", sectionDownStationId,
-            "upStationId", sectionUpStationId,
-            "distance", sectionDistance);
-
-        RestAssuredUtil.createWithCreated("/lines/" + line.jsonPath().getLong("id") + "/sections"
-            , param);
-
-        Long deleteStationId = 4L;
+        RestAssuredUtil.createWithCreated("/lines", map);
 
         // and
-        assertThat(line.jsonPath().getList("stations.id", Long.class).contains(downStationId)).isFalse();
+        ExtractableResponse<Response> lineList = RestAssuredUtil.findAllWithOk("/lines");
+        assertThat(lineList.jsonPath().getList("lines.id", Long.class)).contains(lineId);
+
+        // and
+        ExtractableResponse<Response> stationList = RestAssuredUtil.findAllWithOk("/stations");
+        assertThat(stationList.jsonPath().getList("id", Long.class)).contains(deleteStationId);
+
+        // and
+        Line line = lineRepository.findById(1L)
+            .orElseThrow(() -> new InvalidParameterException("테스트_노선 조회 결과 없음"));
+        Station deleteStation = stationRepository.findById(deleteStationId)
+            .orElseThrow(() -> new InvalidParameterException("테스트_역 조회 결과 없음"));
+        assertThat(line.containsStation(deleteStation)).isFalse();
 
         //when
         ExtractableResponse<Response> response = RestAssuredUtil.deleteWithBadRequest(
-            "/lines/" + line.jsonPath().getLong("id") + "/sections?stationsId=", deleteStationId);
+            String.format("/lines/%d/sections?stationId={stationId}", lineId),
+            deleteStationId);
 
         // then
         assertAll(
             () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
-            () -> assertThat(response.jsonPath().getString("error.message")).isEqualTo("구간에 포함되지 않는 역은 삭제할 수 없습니다.")
+            () -> assertThat(response.jsonPath().getString("message")).isEqualTo("입력된 ID에 해당하는 역이 노선에 포함되지 않습니다: " + deleteStationId)
         );
     }
 

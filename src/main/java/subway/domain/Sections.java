@@ -8,6 +8,7 @@ import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import subway.exception.LineNotConnectableException;
+import subway.exception.LineNotDisConnectableException;
 
 @Embeddable
 public class Sections {
@@ -65,5 +66,11 @@ public class Sections {
         this.startStation = sections.startStation;
         this.sections.clear();
         this.sections.addAll(sections.sections);
+    }
+
+    public void disconnectStation(Station deleteStation) {
+        if (!sections.contains(deleteStation)) {
+            throw new LineNotDisConnectableException("입력된 ID에 해당하는 역이 노선에 포함되지 않습니다: " + deleteStation.getId());
+        }
     }
 }

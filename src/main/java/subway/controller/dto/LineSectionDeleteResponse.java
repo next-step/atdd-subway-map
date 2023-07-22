@@ -1,5 +1,7 @@
 package subway.controller.dto;
 
+import subway.domain.Line;
+
 public class LineSectionDeleteResponse {
 
     private Long upStationId;
@@ -12,6 +14,14 @@ public class LineSectionDeleteResponse {
         this.upStationId = upStationId;
         this.downStationId = downStationId;
         this.distance = distance;
+    }
+
+    public static LineSectionDeleteResponse responseFrom(Line line) {
+        return new LineSectionDeleteResponse(
+            line.getUpEndStation().getId(),
+            line.getDownEndStation().getId(),
+            line.getDistance()
+        );
     }
 
     public Long getUpStationId() {

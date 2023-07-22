@@ -115,6 +115,15 @@ public class Line {
         return sections.getDownEndStation();
     }
 
+    public boolean containsStation(Station station) {
+        return false;
+    }
+
+    public void disconnectSection(Station deleteStation) {
+        sections.disconnectStation(deleteStation);
+        updateDistance(sections.getDistance());
+    }
+
     public static class Builder {
         private Long id;
 
