@@ -46,6 +46,20 @@ public class EndStations {
             .orElseThrow(() -> new EndStationNotFoundException("하행종착역이 존재하지 않습니다."));
     }
 
+    public void update(EndStations endStations) {
+        this.endStations.clear();
+        this.endStations.addAll(endStations.endStations);
+    }
+
+    public boolean isDownStation(Station station) {
+        return endStations.stream()
+            .filter(s -> s.getDirectionType().equals(DirectionType.DOWN))
+            .findAny()
+            .orElseThrow(() -> new EndStationNotFoundException("하행종착역이 존재하지 않습니다."))
+            .getStation()
+            .equals(station);
+    }
+
     private Set<EndStation> paired(Set<EndStation> endStations) {
         if (isNotValidSize(endStations) || isUniDirectional(endStations)) {
             throw new EndStationsNotPairedException("라인의 종착역은 상행종착역과 하행종착역의 짝으로 이루어져야 합니다: " + endStations);
@@ -64,10 +78,5 @@ public class EndStations {
 
     private boolean isNotValidSize(Set<EndStation> endStations) {
         return endStations.size() != END_STATIONS_VALID_SIZE;
-    }
-
-    public void update(EndStations endStations) {
-        this.endStations.clear();
-        this.endStations.addAll(endStations.endStations);
     }
 }

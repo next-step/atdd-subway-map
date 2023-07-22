@@ -5,6 +5,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 
 @Entity
 public class Section {
@@ -15,10 +16,18 @@ public class Section {
 
     private Long distance;
 
+    @ManyToOne
+    private Station upStation;
+
+    @ManyToOne
+    private Station downStation;
+
     public Section() {}
 
-    public Section(Long distance) {
+    public Section(Station upStation, Station downStation, Long distance) {
         this.distance = distance;
+        this.upStation = upStation;
+        this.downStation = downStation;
     }
 
     public Long getId() {
@@ -27,6 +36,14 @@ public class Section {
 
     public Long getDistance() {
         return distance;
+    }
+
+    public Station getUpStation() {
+        return upStation;
+    }
+
+    public Station getDownStation() {
+        return downStation;
     }
 
     @Override

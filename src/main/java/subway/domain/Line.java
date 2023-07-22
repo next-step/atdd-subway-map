@@ -117,6 +117,10 @@ public class Line {
         return distance != null && distance > 0L;
     }
 
+    public boolean isDownEndStation(Station station) {
+        return endStations.isDownStation(station);
+    }
+
     public static class Builder {
         private Long id;
 

@@ -35,6 +35,14 @@ public class RestAssuredUtil {
             .extract();
     }
 
+    public static ExtractableResponse<Response> findById(String url, Long id) {
+        return RestAssured.given().log().all()
+            .when()
+            .get(url, id)
+            .then().log().all()
+            .extract();
+    }
+
     public static ExtractableResponse<Response> findAllWithOk(String url) {
         return RestAssured.given().log().all()
             .when()
