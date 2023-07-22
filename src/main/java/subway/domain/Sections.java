@@ -80,6 +80,7 @@ public class Sections {
         if (sections.size() == 1) {
             throw new LineNotDisConnectableException("단일 구간 노선은 구간 제거가 불가합니다.");
         }
+        sections.remove(sections.size() - 1);
     }
 
     private boolean contains(Station station) {

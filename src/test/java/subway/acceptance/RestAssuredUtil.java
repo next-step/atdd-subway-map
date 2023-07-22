@@ -102,6 +102,11 @@ public class RestAssuredUtil {
             .statusCode(HttpStatus.BAD_REQUEST.value())
             .extract();
     }
-
-
+    public static ExtractableResponse<Response> delete(String url, Long id) {
+        return RestAssured.given().log().all()
+            .when()
+            .delete(url, id)
+            .then().log().all()
+            .extract();
+    }
 }

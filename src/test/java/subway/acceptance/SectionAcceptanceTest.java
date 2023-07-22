@@ -655,8 +655,9 @@ public class SectionAcceptanceTest {
     @Test
     void deleteSectionFromLine() {
         //given
-        Long deleteStationId = 1L;
+        Long deleteStationId = 3L;
         Long lineId = 1L;
+        지하철_역_생성("양재역");
 
         Long downStationId = 1L;
         Long upStationId = 2L;
@@ -671,6 +672,13 @@ public class SectionAcceptanceTest {
             "distance", distance
         );
         RestAssuredUtil.createWithCreated("/lines", map);
+        Long nextDownStationId = 3L;
+        Long nextDistance = 30L;
+        RestAssuredUtil.createWithCreated("/lines/1/sections", Map.of(
+            "upStationId", downStationId,
+            "downStationId", nextDownStationId,
+            "distance", nextDistance
+        ));
 
         // and
         ExtractableResponse<Response> lineList = RestAssuredUtil.findAllWithOk("/lines");
@@ -681,25 +689,27 @@ public class SectionAcceptanceTest {
         assertThat(stationList.jsonPath().getList("id", Long.class)).contains(deleteStationId);
 
         // and
-        assertThat(List.of(downStationId, upStationId)).contains(deleteStationId);
+        assertThat(List.of(downStationId, upStationId, nextDownStationId)).contains(deleteStationId);
 
         // and
-        assertThat(deleteStationId).isEqualTo(downStationId);
+        assertThat(deleteStationId).isEqualTo(nextDownStationId);
 
         // and
-        Set<Long> stations = new HashSet<>(Set.of(upStationId, downStationId));
+        Set<Long> stations = new HashSet<>(Set.of(upStationId, downStationId, nextDownStationId));
         stations.remove(deleteStationId);
-        assertThat(stations).hasSize(1);
+        assertThat(stations).hasSizeGreaterThan(1);
 
         //when
-        ExtractableResponse<Response> response = RestAssuredUtil.deleteWithBadRequest(
+        ExtractableResponse<Response> response = RestAssuredUtil.delete(
             String.format("/lines/%d/sections?stationId={stationId}", lineId),
             deleteStationId);
 
         // then
         assertAll(
-            () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
-            () -> assertThat(response.jsonPath().getString("message")).isEqualTo("단일 구간 노선은 구간 제거가 불가합니다.")
+            () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
+            () -> assertThat(response.jsonPath().getLong("upStationId")).isEqualTo(upStationId),
+            () -> assertThat(response.jsonPath().getLong("downStationId")).isEqualTo(downStationId),
+            () -> assertThat(response.jsonPath().getLong("distance")).isEqualTo(10L)
         );
     }
 }
