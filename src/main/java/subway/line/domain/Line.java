@@ -1,7 +1,5 @@
 package subway.line.domain;
 
-import subway.station.domain.Station;
-
 import javax.persistence.*;
 
 @Entity
