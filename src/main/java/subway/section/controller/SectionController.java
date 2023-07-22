@@ -5,16 +5,16 @@ import org.springframework.web.bind.annotation.*;
 import subway.section.domain.Section;
 import subway.section.dto.SectionRequest;
 import subway.section.dto.SectionResponse;
-import subway.section.service.SectionService;
+import subway.section.service.SectionCreationService;
 
 import java.net.URI;
 
 @RestController
 public class SectionController {
 
-    private final SectionService sectionService;
+    private final SectionCreationService sectionService;
 
-    public SectionController(SectionService sectionService) {
+    public SectionController(SectionCreationService sectionService) {
         this.sectionService = sectionService;
     }
 

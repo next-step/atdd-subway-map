@@ -11,12 +11,12 @@ import subway.section.repository.SectionRepository;
 import java.util.List;
 
 @Service
-public class SectionService {
+public class SectionCreationService {
 
     private final LineRepository lineRepository;
     private final SectionRepository sectionRepository;
 
-    public SectionService(LineRepository lineRepository, SectionRepository sectionRepository) {
+    public SectionCreationService(LineRepository lineRepository, SectionRepository sectionRepository) {
         this.lineRepository = lineRepository;
         this.sectionRepository = sectionRepository;
     }
