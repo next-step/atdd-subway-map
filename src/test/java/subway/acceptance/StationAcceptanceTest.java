@@ -41,6 +41,7 @@ public class StationAcceptanceTest {
     @BeforeEach
     void setup() {
         restAssuredUtil.initializePort(port);
+        restAssuredUtil.cleanup();
     }
 
     /**

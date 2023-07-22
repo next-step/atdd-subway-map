@@ -41,7 +41,7 @@ public class SectionAcceptanceTest {
      * when 노선에 입력 구간을 등록하려고 할 때
      * then 등록 불가 합니다.
      */
-    @DisplayName("구간 등록시 노선 미존재 오류")
+    @DisplayName("구간 등록_노선 미존재 오류")
     @Test
     void createSectionWithLineNotFoundException() {
         //given
@@ -91,7 +91,7 @@ public class SectionAcceptanceTest {
      * when 노선에 입력 구간을 등록하려고 할 때
      * then 등록 불가 합니다.
      */
-    @DisplayName("구간 등록시 하행역 미존재 오류")
+    @DisplayName("구간 등록_하행역 미존재 오류")
     @Test
     void createSectionWithDownStationNotFoundException() {
         //given
@@ -143,7 +143,7 @@ public class SectionAcceptanceTest {
      * when 노선에 입력 구간을 등록하려고 할 때
      * then 등록 불가 합니다.
      */
-    @DisplayName("구간 등록시 상행역 미존재 오류")
+    @DisplayName("구간 등록_상행역 미존재 오류")
     @Test
     void createSectionWithUpStationNotFoundException() {
         //given
@@ -201,9 +201,9 @@ public class SectionAcceptanceTest {
      * when 노선에 입력 구간을 등록하려고 할 때
      * then 등록 불가 합니다.
      */
-    @DisplayName("구간 등록시 상행선 오류")
+    @DisplayName("구간 등록_상행역 노선 하행 종착역 불일치 오류")
     @Test
-    void createSectionWithUpStationException() {
+    void createSectionWithUpStationNotEqualToLineDownEndStationException() {
         //given
         Long downStationId = 1L;
         Long upStationId = 2L;
@@ -227,12 +227,14 @@ public class SectionAcceptanceTest {
         Long sectionUpStationId = 3L;
         Long sectionDownStationId = 4L;
         Long sectionDistance = 5L;
-        Map<String, Object> param = Map.of("downStationId", sectionDownStationId,
+        Map<String, Object> param = Map.of(
+            "downStationId", sectionDownStationId,
             "upStationId", sectionUpStationId,
             "distance", sectionDistance);
 
         // and
-        List<Long> stationIdList = RestAssuredUtil.findAllWithOk("/stations").jsonPath()
+        List<Long> stationIdList = RestAssuredUtil.findAllWithOk("/stations")
+            .jsonPath()
             .getList("id", Long.class);
         assertThat(stationIdList).contains(sectionDownStationId);
 
@@ -250,7 +252,8 @@ public class SectionAcceptanceTest {
         // then
         assertAll(
             () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
-            () -> assertThat(response.jsonPath().getString("message")).isEqualTo("새로운 노선은 라인의 하행종착역을 상행역으로 설정해야 합니다: " + downStationId)
+            () -> assertThat(response.jsonPath().getString("message"))
+                .isEqualTo("새로운 구간은 노선의 하행종착역을 상행역으로 설정해야 합니다: " + downStationId + " <> " + sectionUpStationId)
         );
     }
 
@@ -264,9 +267,9 @@ public class SectionAcceptanceTest {
      * when 노선에 입력 구간을 등록하려고 할 때
      * then 등록 불가 합니다.
      */
-    @DisplayName("구간 등록시 하행선 오류")
+    @DisplayName("구간 등록_하행역 노선 기존재 오류")
     @Test
-    void createSectionWithDownStationException() {
+    void createSectionWithDownStationAlreadyExistsInLineException() {
         //given
         Long downStationId = 1L;
         Long upStationId = 2L;
@@ -280,41 +283,57 @@ public class SectionAcceptanceTest {
             "color", color,
             "distance", distance
         );
+        지하철_역_생성("판교역");
+        지하철_역_생성("양재역");
+        RestAssuredUtil.createWithCreated("/lines", map);
 
         // and
-        ExtractableResponse<Response> line = RestAssuredUtil.createWithCreated("/lines", map);
-
-        // and
-        Long sectionUpStationId = 3L;
+        Long sectionUpStationId = 1L;
         Long sectionDownStationId = 4L;
         Long sectionDistance = 5L;
-        Map<String, Object> param = Map.of("downStationId", sectionDownStationId,
+        Map<String, Object> param = Map.of(
+            "downStationId", sectionDownStationId,
             "upStationId", sectionUpStationId,
             "distance", sectionDistance);
 
-        assertThat(line.jsonPath().getList("stations.id", Long.class).contains(downStationId)).isTrue();
+        // and
+        List<Long> stationIdList = RestAssuredUtil.findAllWithOk("/stations")
+            .jsonPath()
+            .getList("id", Long.class);
+        assertThat(stationIdList).contains(sectionDownStationId);
+
+        // and
+        assertThat(stationIdList).contains(sectionUpStationId);
+
+        // and
+        assertThat(sectionUpStationId).isEqualTo(downStationId);
+
+        // and
+        ExtractableResponse<Response> line = RestAssuredUtil.findByIdWithOk("/lines/{id}", 1L);
+        assertThat(List.of(line.jsonPath().getLong("upStation.id"), line.jsonPath().getLong("downStation.id"))).contains(downStationId);
 
         //when
-        ExtractableResponse<Response> response = RestAssuredUtil.createWithBadRequest(
-            "/lines/" + line.jsonPath().getLong("id") + "/sections"
-            , param);
+        ExtractableResponse<Response> response = RestAssuredUtil
+            .createWithBadRequest("/lines/" + line.jsonPath().getLong("id") + "/sections", param);
 
         // then
         assertAll(
             () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
-            () -> assertThat(response.jsonPath().getString("error.message")).isEqualTo("신규 구간의 하행역은 기존 노선에 포함되면 안됩니다.")
+            () -> assertThat(response.jsonPath().getString("message")).isEqualTo("신규 구간의 하행역이 기존 노선에 포함되어 있습니다: " + sectionDownStationId)
         );
     }
 
     /**
      * given 하행역ID, 상행역ID, 구간거리를 입력하고
      * and 등록하려는 노선이 있고
-     * and 입력 구간의 상행역이 노선의 하행 종점역이고
-     * and 입력 구간의 하행역이 등록하려는 노선에 존재하는 역이 아니면
+     * and 하행역ID에 해당하는 역정보가 존재하고
+     * and 상행역ID에 해당하는 역정보가 존재하고
+     * and 입력 구간의 상행역이 등록하려는 노선의 하행 종점역이고
+     * and 입력 구간의 하행역이 등록하려는 노선에 존재하지 않는 역이면
      * when 노선에 입력 구간을 등록하려고 할 때
      * then 정상 등록 됩니다.
      */
-    @DisplayName("구간 등록 정상")
+    @DisplayName("구간 등록_정상")
     @Test
     void createSection() {
         //given

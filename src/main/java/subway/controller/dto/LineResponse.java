@@ -30,8 +30,8 @@ public class LineResponse {
         return new LineResponse(line.getId()
             , line.getName()
             , line.getColor()
-            , line.getEndStations().upEndStation().getStation()
-            , line.getEndStations().downEndStation().getStation()
+            , line.getUpEndStation()
+            , line.getDownEndStation()
             , line.getDistance());
     }
 

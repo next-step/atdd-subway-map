@@ -1,15 +1,15 @@
 package subway.service;
 
+import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.controller.dto.LineCreateRequest;
 import subway.controller.dto.LineResponse;
 import subway.controller.dto.LineUpdateRequest;
 import subway.controller.dto.LinesResponse;
-import subway.domain.DirectionType;
-import subway.domain.EndStation;
-import subway.domain.EndStations;
 import subway.domain.Line;
+import subway.domain.Section;
+import subway.domain.Sections;
 import subway.domain.Station;
 import subway.exception.LineNotFoundException;
 import subway.exception.StationNotFoundException;
@@ -36,10 +36,12 @@ public class LineService {
             .name(request.getName())
             .color(request.getColor())
             .distance(request.getDistance())
-            .stations(EndStations.of(
-                new EndStation(stationOfId(request.getUpStationId()), DirectionType.UP),
-                new EndStation(stationOfId(request.getDownStationId()), DirectionType.DOWN))
-            ).build()));
+            .sections(Sections.of(
+                stationOfId(request.getUpStationId()),
+                List.of(new Section(
+                    stationOfId(request.getDownStationId()),
+                    request.getDistance()))))
+            .build()));
     }
 
     public LineResponse lineResponseFoundById(Long id) {
@@ -56,10 +58,12 @@ public class LineService {
 
         line.modifyTheLine(request.getName()
             , request.getColor()
-            , EndStations.of(
-                new EndStation(stationOfId(request.getUpStationId()), DirectionType.UP),
-                new EndStation(stationOfId(request.getDownStationId()), DirectionType.DOWN))
-            , request.getDistance());
+            , request.getDistance()
+            , Sections.of(
+                stationOfId(request.getUpStationId()),
+                List.of(new Section(
+                    stationOfId(request.getDownStationId()),
+                    request.getDistance()))));
 
         lineRepository.save(line);
     }

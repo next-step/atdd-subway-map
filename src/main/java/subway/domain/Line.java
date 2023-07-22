@@ -19,19 +19,19 @@ public class Line {
 
     private String color;
 
-    @Embedded
-    private EndStations endStations;
-
     private Long distance;
+
+    @Embedded
+    private Sections sections;
 
     public Line() {}
 
-    public Line(Long id, String name, String color, EndStations stations, Long distance) {
+    public Line(Long id, String name, String color, Long distance, Sections sections) {
         this.id = id;
         this.name = name;
         this.color = color;
-        this.endStations = stations;
         this.distance = distance;
+        this.sections = sections;
     }
 
     public Long getId() {
@@ -46,42 +46,20 @@ public class Line {
         return color;
     }
 
-    public EndStations getEndStations() {
-        return endStations.clone();
-    }
-
     public Long getDistance() {
         return distance;
     }
 
-    public void modifyTheLine(String name, String color, EndStations endStations, Long distance) {
+    public void modifyTheLine(String name, String color, Long distance, Sections sections) {
         updateName(name);
         updateColor(color);
-        updateEndStations(endStations);
         updateDistance(distance);
+        updateSections(sections);
     }
 
-    private void updateName(String name) {
-        if (StringUtils.hasText(name)) {
-            this.name = name;
-        }
-    }
-
-    private void updateColor(String color) {
-        if (StringUtils.hasText(color)) {
-            this.color = color;
-        }
-    }
-
-    private void updateEndStations(EndStations endStations) {
-        if (Objects.nonNull(endStations)) {
-            this.endStations.update(endStations);
-        }
-    }
-
-    private void updateDistance(Long distance) {
-        if (isGreaterThanZero(distance)) {
-            this.distance = distance;
+    private void updateSections(Sections sections) {
+        if (sections != null) {
+            this.sections.update(sections);
         }
     }
 
@@ -102,23 +80,39 @@ public class Line {
         return Objects.hash(id);
     }
 
-    @Override
-    public String toString() {
-        return "Line{" +
-            "id=" + id +
-            ", name='" + name + '\'' +
-            ", color='" + color + '\'' +
-            ", endStations=" + endStations +
-            ", distance=" + distance +
-            '}';
+    private void updateName(String name) {
+        if (StringUtils.hasText(name)) {
+            this.name = name;
+        }
+    }
+
+    private void updateColor(String color) {
+        if (StringUtils.hasText(color)) {
+            this.color = color;
+        }
+    }
+
+    private void updateDistance(Long distance) {
+        if (isGreaterThanZero(distance)) {
+            this.distance = distance;
+        }
     }
 
     private boolean isGreaterThanZero(Long distance) {
         return distance != null && distance > 0L;
     }
 
-    public boolean isDownEndStation(Station station) {
-        return endStations.isDownStation(station);
+    public void connectNewSection(Station destinationStation, Section section) {
+        sections.connect(destinationStation, section);
+        updateDistance(sections.getDistance());
+    }
+
+    public Station getUpEndStation() {
+        return sections.startStation;
+    }
+
+    public Station getDownEndStation() {
+        return sections.getDownEndStation();
     }
 
     public static class Builder {
@@ -128,9 +122,9 @@ public class Line {
 
         private String color;
 
-        private EndStations endStations;
-
         private Long distance;
+
+        private Sections sections;
 
         public Builder id(Long id) {
             this.id = id;
@@ -147,18 +141,18 @@ public class Line {
             return this;
         }
 
-        public Builder stations(EndStations stations) {
-            this.endStations = stations.clone();
-            return this;
-        }
-
         public Builder distance(Long distance) {
             this.distance = distance;
             return this;
         }
 
+        public Builder sections(Sections sections) {
+            this.sections = sections;
+            return this;
+        }
+
         public Line build() {
-            return new Line(id, name, color, endStations, distance);
+            return new Line(id, name, color, distance, sections);
         }
     }
 }

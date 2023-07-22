@@ -1,26 +1,27 @@
 package subway.controller.dto;
 
-import subway.domain.LineSection;
+import subway.domain.Line;
 
 public class LineSectionCreateResponse {
-    private Long downStationId;
 
     private Long upStationId;
 
+    private Long downStationId;
+
     private Long distance;
 
-    public LineSectionCreateResponse() {}
-
-    public LineSectionCreateResponse(Long downStationId, Long upStationId, Long distance) {
-        this.downStationId = downStationId;
+    public LineSectionCreateResponse(Long upStationId, Long downStationId, Long distance) {
         this.upStationId = upStationId;
+        this.downStationId = downStationId;
         this.distance = distance;
     }
 
-    public static LineSectionCreateResponse responseFrom(LineSection lineSection) {
-        return new LineSectionCreateResponse(lineSection.getSection().getDownStation().getId(),
-            lineSection.getSection().getUpStation().getId(),
-            lineSection.getSection().getDistance());
+    public static LineSectionCreateResponse responseFrom(Line line) {
+        return new LineSectionCreateResponse(
+            line.getUpEndStation().getId(),
+            line.getDownEndStation().getId(),
+            line.getDistance()
+        );
     }
 
     public Long getDownStationId() {
