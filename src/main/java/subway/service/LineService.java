@@ -1,15 +1,13 @@
 package subway.service;
 
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.controller.dto.LineCreateRequest;
 import subway.controller.dto.LineResponse;
 import subway.controller.dto.LineUpdateRequest;
 import subway.controller.dto.LinesResponse;
+import subway.domain.DirectionType;
+import subway.domain.EndStation;
 import subway.domain.EndStations;
 import subway.domain.Line;
 import subway.domain.Station;
@@ -26,7 +24,8 @@ public class LineService {
 
     private final StationRepository stationRepository;
 
-    public LineService(LineRepository lineRepository, StationRepository stationRepository) {
+    public LineService(LineRepository lineRepository,
+        StationRepository stationRepository) {
         this.lineRepository = lineRepository;
         this.stationRepository = stationRepository;
     }
@@ -37,12 +36,14 @@ public class LineService {
             .name(request.getName())
             .color(request.getColor())
             .distance(request.getDistance())
-            .stations(EndStations.of(distinctStationsGetByIdOf(request.getUpStationId(), request.getDownStationId())))
-            .build()));
+            .stations(EndStations.of(
+                new EndStation(stationOfId(request.getUpStationId()), DirectionType.UP),
+                new EndStation(stationOfId(request.getDownStationId()), DirectionType.DOWN))
+            ).build()));
     }
 
     public LineResponse lineResponseFoundById(Long id) {
-        return LineResponse.from(lineFoundById(id));
+        return LineResponse.from(lineOfId(id));
     }
 
     public LinesResponse allLines() {
@@ -51,33 +52,28 @@ public class LineService {
 
     @Transactional
     public void updatedLineBy(Long id, LineUpdateRequest request) {
-        Line line = lineFoundById(id);
+        Line line = lineOfId(id);
 
         line.modifyTheLine(request.getName()
             , request.getColor()
-            , EndStations.of(distinctStationsGetByIdOf(request.getUpStationId(), request.getDownStationId()))
+            , EndStations.of(
+                new EndStation(stationOfId(request.getUpStationId()), DirectionType.UP),
+                new EndStation(stationOfId(request.getDownStationId()), DirectionType.DOWN))
             , request.getDistance());
 
         lineRepository.save(line);
     }
 
     public void deleteLineBy(Long id) {
-        lineRepository.delete(lineFoundById(id));
+        lineRepository.delete(lineOfId(id));
     }
 
-    private Line lineFoundById(Long id) {
+    private Line lineOfId(Long id) {
         return lineRepository.findById(id)
             .orElseThrow(() -> new LineNotFoundException("일치하는 지하철 노선 정보가 존재하지 않습니다: " + id));
     }
 
-    private Set<Station> distinctStationsGetByIdOf(Long upStationId, Long downStationId) {
-        return Stream.of(upStationId, downStationId)
-            .filter(Objects::nonNull)
-            .map(this::stationGetById)
-            .collect(Collectors.toSet());
-    }
-
-    private Station stationGetById(Long id) {
+    private Station stationOfId(Long id) {
         return stationRepository.findById(id)
             .orElseThrow(() -> new StationNotFoundException("일치하는 지하철 역 정보가 존재하지 않습니다: " + id));
     }

@@ -1,37 +1,32 @@
 package subway.domain;
 
 import java.util.Objects;
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
 @Entity
-public class Station {
+public class Section {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 20, nullable = false)
-    private String name;
+    private Long distance;
 
-    public Station() {}
+    public Section() {}
 
-    public Station(String name) {
-        this.name = name;
+    public Section(Long distance) {
+        this.distance = distance;
     }
 
     public Long getId() {
         return id;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public String toString() {
-        return "Station{" +
-            "id=" + id +
-            ", name='" + name + '\'' +
-            '}';
+    public Long getDistance() {
+        return distance;
     }
 
     @Override
@@ -42,8 +37,8 @@ public class Station {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        Station station = (Station) o;
-        return Objects.equals(id, station.id);
+        Section section = (Section) o;
+        return Objects.equals(id, section.id);
     }
 
     @Override

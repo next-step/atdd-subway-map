@@ -1,62 +1,73 @@
 package subway.domain;
 
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import java.util.stream.Collectors;
+import javax.persistence.CascadeType;
+import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
-import subway.exception.EndStationNotValidStationCountException;
-import subway.exception.LineNotEstablishedBySameEndStationException;
+import subway.exception.EndStationNotFoundException;
+import subway.exception.EndStationsNotPairedException;
+import subway.exception.EndStationsSameEndStationsException;
 
-@Entity
+@Embeddable
 public class EndStations {
+    public static final int END_STATIONS_VALID_SIZE = 2;
 
-    public static final int VALID_END_STATIONS_COUNT = 2;
-    public static final int SAME_END_STATION_CRITERIA = 1;
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @OneToMany
-    private Set<Station> stations;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    Set<EndStation> endStations;
 
     public EndStations() {}
 
-    public EndStations(Set<Station> stations) {
-        this.stations = valid(stations);
+    public EndStations(Set<EndStation> endStations) {
+        this.endStations = paired(endStations);
+    }
+
+    public static EndStations of(EndStation upStation, EndStation downStation) {
+        return new EndStations(new HashSet<>(Set.of(upStation, downStation)));
     }
 
     public EndStations clone() {
-        return new EndStations(stations);
+        return new EndStations(new HashSet<>(endStations));
     }
 
-    public static EndStations of(Set<Station> endStations) {
-        return new EndStations(endStations);
+    public EndStation upEndStation() {
+        return endStations.stream()
+            .filter(s -> s.getDirectionType().equals(DirectionType.UP))
+            .findFirst()
+            .orElseThrow(() -> new EndStationNotFoundException("상행종착역이 존재하지 않습니다."));
     }
 
-    public Set<Station> getStations() {
-        return stations;
+    public EndStation downEndStation() {
+        return endStations.stream()
+            .filter(s -> s.getDirectionType().equals(DirectionType.DOWN))
+            .findFirst()
+            .orElseThrow(() -> new EndStationNotFoundException("하행종착역이 존재하지 않습니다."));
     }
 
-    private Set<Station> valid(Set<Station> stations) {
-        if (isSameEndStation(stations)) {
-            throw new LineNotEstablishedBySameEndStationException("노선의 두 종착역은 동일할 수 없습니다.");
+    private Set<EndStation> paired(Set<EndStation> endStations) {
+        if (isNotValidSize(endStations) || isUniDirectional(endStations)) {
+            throw new EndStationsNotPairedException("라인의 종착역은 상행종착역과 하행종착역의 짝으로 이루어져야 합니다: " + endStations);
         }
-        if (isCountNotValid(stations)) {
-            throw new EndStationNotValidStationCountException(
-                String.format("노선의 종착역은 항상 2개의 역으로만 구성가능합니다: %d 개", stations.size()));
+        if (endStations.stream().map(EndStation::getStation).collect(Collectors.toSet()).size() == 1) {
+            throw new EndStationsSameEndStationsException("라인의 종착역은 동일한 역으로 설정할 수 없습니다: " + endStations);
         }
-        return stations;
+        return endStations;
     }
 
-    private boolean isSameEndStation(Set<Station> stations) {
-        return stations.size() == SAME_END_STATION_CRITERIA;
+    private boolean isUniDirectional(Set<EndStation> endStations) {
+        return !endStations.stream()
+            .map(EndStation::getDirectionType)
+            .collect(Collectors.toSet()).containsAll(List.of(DirectionType.values()));
     }
 
-    private boolean isCountNotValid(Set<Station> stations) {
-        return stations.size() != VALID_END_STATIONS_COUNT;
+    private boolean isNotValidSize(Set<EndStation> endStations) {
+        return endStations.size() != END_STATIONS_VALID_SIZE;
     }
 
+    public void update(EndStations endStations) {
+        this.endStations.clear();
+        this.endStations.addAll(endStations.endStations);
+    }
 }

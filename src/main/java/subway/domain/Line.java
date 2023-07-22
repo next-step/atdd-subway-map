@@ -1,12 +1,11 @@
 package subway.domain;
 
 import java.util.Objects;
-import javax.persistence.CascadeType;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToOne;
 import org.springframework.util.StringUtils;
 
 @Entity
@@ -20,7 +19,7 @@ public class Line {
 
     private String color;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @Embedded
     private EndStations endStations;
 
     private Long distance;
@@ -76,7 +75,7 @@ public class Line {
 
     private void updateEndStations(EndStations endStations) {
         if (Objects.nonNull(endStations)) {
-            this.endStations = endStations;
+            this.endStations.update(endStations);
         }
     }
 
@@ -87,12 +86,29 @@ public class Line {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Line line = (Line) o;
+        return Objects.equals(id, line.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Override
     public String toString() {
         return "Line{" +
             "id=" + id +
             ", name='" + name + '\'' +
             ", color='" + color + '\'' +
-            ", stations=" + endStations +
+            ", endStations=" + endStations +
             ", distance=" + distance +
             '}';
     }

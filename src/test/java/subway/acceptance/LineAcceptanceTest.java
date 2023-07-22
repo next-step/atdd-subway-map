@@ -93,7 +93,7 @@ public class LineAcceptanceTest {
     }
 
     private ListAssert<Long> 응답_노선의_지하철_역_목록에_입력한_지하철_역이_포함됩니다(ExtractableResponse<Response> found, Long[] id) {
-        return assertThat(found.jsonPath().getList("stations.id", Long.class)).contains(id);
+        return assertThat(List.of(found.jsonPath().getLong("upStation.id"), found.jsonPath().getLong("downStation.id"))).contains(id);
     }
 
     private AbstractStringAssert<?> 응답_노선의_색상이_입력_색상과_동일합니다(String color, ExtractableResponse<Response> found) {
@@ -149,8 +149,7 @@ public class LineAcceptanceTest {
         ExtractableResponse<Response> found = 지하철_노선_목록을_조회합니다();
 
         // then
-        List<List<Integer>> list = 지하철_노선_목록에서_지하철_역_ID_조회합니다(found);
-        Set<Long> stationIdSet = 지하철_역_ID_목록으로_변환합니다(list);
+        Set<Long> stationIdSet = 지하철_역_ID_목록으로_변환합니다(지하철_노선_목록에서_지하철_역_ID_조회합니다(found));
 
         생성한_지하철_노선들이_응답_지하철_노선_목록에_포함됩니다(found, stationIdSet, upStationId, downStationId, upStationId2, downStationId2, name, color, name2, color2);
     }
@@ -185,7 +184,7 @@ public class LineAcceptanceTest {
     }
 
     private List<List<Integer>> 지하철_노선_목록에서_지하철_역_ID_조회합니다(ExtractableResponse<Response> found) {
-        return found.jsonPath().getList("lines.stations.id");
+        return List.of(found.jsonPath().get("lines.upStation.id"), found.jsonPath().get("lines.downStation.id"));
     }
 
     private Set<Long> 지하철_역_ID_목록으로_변환합니다(List<List<Integer>> list) {
@@ -200,7 +199,10 @@ public class LineAcceptanceTest {
         return selectAll();
     }
 
-    private ExtractableResponse<Response> 입력_정보로_지하철_노선을_생성합니다(Long upStationId, Long downStationId, String name, String color,
+    private ExtractableResponse<Response> 입력_정보로_지하철_노선을_생성합니다(Long upStationId,
+        Long downStationId,
+        String name,
+        String color,
         Long distance) {
         return createLineResult(
             requestBodyOf(upStationId, downStationId, name, color, distance));
@@ -242,7 +244,7 @@ public class LineAcceptanceTest {
 
     private ListAssert<Long> 응답_노선의_지하철_역_ID_에_입력_지하철_역_ID_가_포함됩니다(Long upStationId, Long downStationId,
         ExtractableResponse<Response> found) {
-        return assertThat(found.jsonPath().getList("stations.id", Long.class)).contains(
+        return assertThat(List.of(found.jsonPath().getLong("upStation.id"), found.jsonPath().getLong("downStation.id"))).contains(
             upStationId, downStationId);
     }
 
