@@ -24,6 +24,11 @@ public class SectionCreationAcceptanceTest {
     @LocalServerPort
     private int port;
 
+    final Long 신분당선 = 1L;
+    final Long 판교역 = 2L;
+    final Long 정자역 = 6L;
+    final Long 미금역 = 11L;
+    final Long 청계산입구역 = 4L;
     @BeforeEach
     public void initPort(){
         RestAssured.port = port;
@@ -37,13 +42,11 @@ public class SectionCreationAcceptanceTest {
     @Test
     void createSection(){
         //when
-        final Long 노선_하행역 = 2L;
-        final Long 새로운_역 = 9L;
-        var createResponse = 지하철구간_등록(노선_하행역, 새로운_역);
+        var createResponse = 지하철구간_등록(신분당선, 판교역, 정자역);
 
         //then
         var getResponse = 지하철구간_조회(createResponse);
-        지하철구간_검증(getResponse, 노선_하행역, 새로운_역);
+        지하철구간_검증(getResponse, 판교역, 정자역);
     }
 
     /**
@@ -54,9 +57,7 @@ public class SectionCreationAcceptanceTest {
     @Test
     void throwExceptionIfUpStationOfNewSectionIsNotDownStationOfLine(){
         //when
-        final Long 새로운_하행역 = 9L;
-        final Long 새로운_상행역 = 10L;
-        var createSectionResponse = 지하철구간_등록(새로운_상행역, 새로운_하행역);
+        var createSectionResponse = 지하철구간_등록(신분당선, 정자역, 미금역);
 
         //then
         예외_검증(createSectionResponse, "새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종착역이어야 한다");
@@ -70,9 +71,7 @@ public class SectionCreationAcceptanceTest {
     @Test
     void throwExceptionIfDownStationOfSectionIsAlreadyEnrolled(){
         //when
-        final Long 노선_하행역 = 2L;
-        final Long 이미_등록된_역 = 4L;
-        var createSectionResponse = 지하철구간_등록(노선_하행역, 이미_등록된_역);
+        var createSectionResponse = 지하철구간_등록(신분당선, 판교역, 청계산입구역);
 
         //then
         예외_검증(createSectionResponse, "새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없다");
