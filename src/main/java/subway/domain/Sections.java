@@ -77,6 +77,9 @@ public class Sections {
                 "노선의 하행종착역만 삭제 가능합니다: %d <> %d",
                 getDownEndStation().getId(), deleteStation.getId()));
         }
+        if (sections.size() == 1) {
+            throw new LineNotDisConnectableException("단일 구간 노선은 구간 제거가 불가합니다.");
+        }
     }
 
     private boolean contains(Station station) {
