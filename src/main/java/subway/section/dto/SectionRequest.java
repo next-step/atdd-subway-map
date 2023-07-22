@@ -7,6 +7,18 @@ public class SectionRequest {
     private Long upStationId;
     private Integer distance;
 
+    public static class StationIdParams{
+        private final Long stationId;
+
+        public StationIdParams(Long stationId) {
+            this.stationId = stationId;
+        }
+
+        public Long getStationId() {
+            return stationId;
+        }
+    }
+
     public SectionRequest(Long downStationId, Long upStationId, Integer distance) {
         this.downStationId = downStationId;
         this.upStationId = upStationId;

@@ -6,6 +6,7 @@ import subway.section.domain.Section;
 import subway.section.dto.SectionRequest;
 import subway.section.dto.SectionResponse;
 import subway.section.service.SectionCreationService;
+import subway.section.service.SectionDeletionService;
 
 import java.net.URI;
 
@@ -13,9 +14,11 @@ import java.net.URI;
 public class SectionController {
 
     private final SectionCreationService sectionService;
+    private final SectionDeletionService sectionDeletionService;
 
-    public SectionController(SectionCreationService sectionService) {
+    public SectionController(SectionCreationService sectionService, SectionDeletionService sectionDeletionService) {
         this.sectionService = sectionService;
+        this.sectionDeletionService = sectionDeletionService;
     }
 
     @PostMapping("/lines/{lineId}/sections")
@@ -30,5 +33,11 @@ public class SectionController {
         Section savedSection = sectionService.getSection(id);
         SectionResponse sectionResponse = SectionResponse.fromEntity(savedSection);
         return ResponseEntity.ok(sectionResponse);
+    }
+
+    @DeleteMapping("/lines/{lineId}/sections")
+    public ResponseEntity<?> deleteSection(@PathVariable Long lineId, SectionRequest.StationIdParams queryParams){
+        sectionDeletionService.deleteSection(lineId, queryParams.getStationId());
+        return ResponseEntity.noContent().build();
     }
 }
