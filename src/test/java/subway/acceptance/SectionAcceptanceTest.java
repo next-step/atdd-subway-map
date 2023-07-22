@@ -420,7 +420,8 @@ public class SectionAcceptanceTest {
     }
 
     /**
-     * given 2개 이상의 구간을 포함하는 노선과 삭제하려는 역ID가 있을때
+     * given 삭제하려는 노선ID와 역ID가 있을때
+     * and 입력된 ID에 해당하는 노선이 존재하고
      * and 입력된 ID에 해당하는 역이 존재하지 않으면
      * when 노선에서 구간을 삭제하려 할때
      * then 삭제 불가합니다.
@@ -429,6 +430,9 @@ public class SectionAcceptanceTest {
     @Test
     void deleteWithNotExistsStation() {
         //given
+        Long deleteStationId = 3L;
+        Long lineId = 1L;
+
         Long downStationId = 1L;
         Long upStationId = 2L;
         Long distance = 10L;
@@ -441,32 +445,25 @@ public class SectionAcceptanceTest {
             "color", color,
             "distance", distance
         );
-        ExtractableResponse<Response> line = RestAssuredUtil.createWithCreated("/lines",
-            map);
-
-        Long sectionUpStationId = downStationId;
-        Long sectionDownStationId = 3L;
-        Long sectionDistance = 5L;
-        Map<String, Object> param = Map.of("downStationId", sectionDownStationId,
-            "upStationId", sectionUpStationId,
-            "distance", sectionDistance);
-
-        RestAssuredUtil.createWithCreated("/lines/" + line.jsonPath().getLong("id") + "/sections",
-            param);
-
-        Long deleteStationId = 4L;
+        RestAssuredUtil.createWithCreated("/lines", map);
 
         // and
-        assertThat(line.jsonPath().getList("stations.id", Long.class).contains(downStationId)).isFalse();
+        ExtractableResponse<Response> lineList = RestAssuredUtil.findAllWithOk("/lines");
+        assertThat(lineList.jsonPath().getList("lines.id", Long.class)).contains(lineId);
+
+        // and
+        ExtractableResponse<Response> stationList = RestAssuredUtil.findAllWithOk("/stations");
+        assertThat(stationList.jsonPath().getList("id", Long.class)).doesNotContain(deleteStationId);
 
         //when
         ExtractableResponse<Response> response = RestAssuredUtil.deleteWithBadRequest(
-            "/lines/" + line.jsonPath().getLong("id") + "/sections?stationsId=", deleteStationId);
+            String.format("/lines/%d/sections?stationId={stationId}", lineId),
+            deleteStationId);
 
         // then
         assertAll(
             () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
-            () -> assertThat(response.jsonPath().getString("error.message")).isEqualTo("구간에 포함되지 않는 역은 삭제할 수 없습니다.")
+            () -> assertThat(response.jsonPath().getString("message")).isEqualTo("입력된 ID에 해당하는 역이 존재하지 않습니다: " + deleteStationId)
         );
     }
 

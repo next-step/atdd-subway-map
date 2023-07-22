@@ -54,6 +54,10 @@ public class LineSectionService {
     public LineSectionDeleteResponse disconnectSection(Long lineId, Long stationsId) {
         Line line = lineRepository.findById(lineId)
             .orElseThrow(() -> new LineNotFoundException("입력된 ID에 해당하는 노선이 존재하지 않습니다: " + lineId));
+
+        Station deleteStation = stationRepository.findById(stationsId)
+            .orElseThrow(() -> new StationNotFoundException(
+                "입력된 ID에 해당하는 역이 존재하지 않습니다: " + stationsId));
         return null;
     }
 }
