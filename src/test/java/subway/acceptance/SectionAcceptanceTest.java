@@ -310,7 +310,7 @@ public class SectionAcceptanceTest {
 
         // and
         ExtractableResponse<Response> line = RestAssuredUtil.findByIdWithOk("/lines/{id}", 1L);
-        assertThat(List.of(line.jsonPath().getLong("upStation.id"), line.jsonPath().getLong("downStation.id"))).contains(downStationId);
+        assertThat(List.of(line.jsonPath().getLong("upStation.id"), line.jsonPath().getLong("downStation.id"))).contains(sectionDownStationId);
 
         //when
         ExtractableResponse<Response> response = RestAssuredUtil
@@ -349,36 +349,44 @@ public class SectionAcceptanceTest {
             "color", color,
             "distance", distance
         );
-
-        // and
-        ExtractableResponse<Response> line = RestAssuredUtil.createWithCreated("/lines",
-            map);
+        지하철_역_생성("판교역");
+        RestAssuredUtil.createWithCreated("/lines", map);
 
         // and
         Long sectionUpStationId = 1L;
-        Long sectionDownStationId = 4L;
+        Long sectionDownStationId = 3L;
         Long sectionDistance = 5L;
-        Map<String, Object> param = Map.of("downStationId", sectionDownStationId,
+        Map<String, Object> param = Map.of(
+            "downStationId", sectionDownStationId,
             "upStationId", sectionUpStationId,
             "distance", sectionDistance);
 
+        // and
+        List<Long> stationIdList = RestAssuredUtil.findAllWithOk("/stations")
+            .jsonPath()
+            .getList("id", Long.class);
+        assertThat(stationIdList).contains(sectionDownStationId);
+
+        // and
+        assertThat(stationIdList).contains(sectionUpStationId);
+
+        // and
         assertThat(sectionUpStationId).isEqualTo(downStationId);
 
         // and
-        assertThat(line.jsonPath().getList("stations.id", Long.class).contains(downStationId)).isFalse();
+        ExtractableResponse<Response> line = RestAssuredUtil.findByIdWithOk("/lines/{id}", 1L);
+        assertThat(List.of(line.jsonPath().getLong("upStation.id"), line.jsonPath().getLong("downStation.id"))).doesNotContain(sectionDownStationId);
 
         //when
-        ExtractableResponse<Response> response = RestAssuredUtil.createWithCreated(
-            "/lines/" + line.jsonPath().getLong("id") + "/sections"
-            , param);
+        ExtractableResponse<Response> response = RestAssuredUtil
+            .createWithCreated("/lines/" + line.jsonPath().getLong("id") + "/sections", param);
 
         // then
         assertAll(
             () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
-            () -> assertThat(response.jsonPath().getLong("id")).isNotNull(),
-            () -> assertThat(response.jsonPath().getLong("downStation.id")).isEqualTo(sectionDownStationId),
-            () -> assertThat(response.jsonPath().getLong("upStation.id")).isEqualTo(sectionUpStationId),
-            () -> assertThat(response.jsonPath().getLong("distance")).isEqualTo(sectionDistance)
+            () -> assertThat(response.jsonPath().getLong("downStationId")).isEqualTo(sectionDownStationId),
+            () -> assertThat(response.jsonPath().getLong("upStationId")).isEqualTo(upStationId),
+            () -> assertThat(response.jsonPath().getLong("distance")).isEqualTo(15L)
         );
     }
 
