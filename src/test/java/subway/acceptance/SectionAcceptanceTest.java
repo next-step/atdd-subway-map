@@ -6,7 +6,6 @@ import static subway.acceptance.StationAcceptanceTest.지하철_역_생성;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.security.InvalidParameterException;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,8 +16,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import subway.domain.Line;
-import subway.domain.Station;
 import subway.repository.LineRepository;
 import subway.repository.StationRepository;
 
@@ -517,11 +514,7 @@ public class SectionAcceptanceTest {
         assertThat(stationList.jsonPath().getList("id", Long.class)).contains(deleteStationId);
 
         // and
-        Line line = lineRepository.findById(1L)
-            .orElseThrow(() -> new InvalidParameterException("테스트_노선 조회 결과 없음"));
-        Station deleteStation = stationRepository.findById(deleteStationId)
-            .orElseThrow(() -> new InvalidParameterException("테스트_역 조회 결과 없음"));
-        assertThat(line.containsStation(deleteStation)).isFalse();
+        assertThat(List.of(downStationId, upStationId)).doesNotContain(deleteStationId);
 
         //when
         ExtractableResponse<Response> response = RestAssuredUtil.deleteWithBadRequest(
@@ -536,7 +529,10 @@ public class SectionAcceptanceTest {
     }
 
     /**
-     * given 2개 이상의 구간을 포함하는 노선과 삭제하려는 역ID가 있을때
+     * given 삭제하려는 노선ID와 역ID가 있을때
+     * and 입력된 ID에 해당하는 노선이 존재하고
+     * and 입력된 ID에 해당하는 역이 존재하고
+     * and 삭제하려는 역이 해당 노선에 포함되는 역이고
      * and 삭제하려는 역이 해당 노선의 하행종착역이 아니면
      * when 노선에서 구간을 삭제하려 할때
      * then 삭제 불가합니다.
@@ -545,6 +541,10 @@ public class SectionAcceptanceTest {
     @Test
     void deleteWithNotDownEndStation() {
         //given
+        Long deleteStationId = 2L;
+        Long lineId = 1L;
+        지하철_역_생성("양재역");
+
         Long downStationId = 1L;
         Long upStationId = 2L;
         Long distance = 10L;
@@ -557,32 +557,31 @@ public class SectionAcceptanceTest {
             "color", color,
             "distance", distance
         );
-        ExtractableResponse<Response> line = RestAssuredUtil.createWithCreated("/lines",
-            map);
-
-        Long newSectionUpStationId = downStationId;
-        Long newSectionDownStationId = 3L;
-        Long newSectionDistance = 5L;
-        Map<String, Object> param = Map.of("downStationId", newSectionDownStationId,
-            "upStationId", newSectionUpStationId,
-            "distance", newSectionDistance);
-
-        RestAssuredUtil.createWithCreated("/lines/" + line.jsonPath().getLong("id") + "/sections"
-            , param);
-
-        Long deleteStationId = 4L;
+        RestAssuredUtil.createWithCreated("/lines", map);
 
         // and
-        assertThat(deleteStationId).isNotEqualTo(line.jsonPath().getLong("stations.downStation.id"));
+        ExtractableResponse<Response> lineList = RestAssuredUtil.findAllWithOk("/lines");
+        assertThat(lineList.jsonPath().getList("lines.id", Long.class)).contains(lineId);
+
+        // and
+        ExtractableResponse<Response> stationList = RestAssuredUtil.findAllWithOk("/stations");
+        assertThat(stationList.jsonPath().getList("id", Long.class)).contains(deleteStationId);
+
+        // and
+        assertThat(List.of(downStationId, upStationId)).contains(deleteStationId);
+
+        // and
+        assertThat(deleteStationId).isNotEqualTo(downStationId);
 
         //when
         ExtractableResponse<Response> response = RestAssuredUtil.deleteWithBadRequest(
-            "/lines/" + line.jsonPath().getLong("id") + "/sections?stationsId=", deleteStationId);
+            String.format("/lines/%d/sections?stationId={stationId}", lineId),
+            deleteStationId);
 
         // then
         assertAll(
             () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
-            () -> assertThat(response.jsonPath().getString("error.message")).isEqualTo("노선의 하행 종착역만 삭제 가능합니다.")
+            () -> assertThat(response.jsonPath().getString("message")).isEqualTo("노선의 하행종착역만 삭제 가능합니다: " + downStationId + " <> " + deleteStationId)
         );
     }
 
@@ -593,7 +592,7 @@ public class SectionAcceptanceTest {
      * when 노선에서 구간을 삭제하려 할때
      * then 삭제 불가합니다.
      */
-    @DisplayName("구간 제거_하행 종착역 아님")
+    @DisplayName("구간 제거_단일 구간 노선")
     @Test
     void deleteStationFromLineContainingOnlyOneSection() {
         //given

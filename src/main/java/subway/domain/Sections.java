@@ -69,8 +69,19 @@ public class Sections {
     }
 
     public void disconnectStation(Station deleteStation) {
-        if (!sections.contains(deleteStation)) {
+        if (!contains(deleteStation)) {
             throw new LineNotDisConnectableException("입력된 ID에 해당하는 역이 노선에 포함되지 않습니다: " + deleteStation.getId());
         }
+        if (!Objects.equals(getDownEndStation(), deleteStation)) {
+            throw new LineNotDisConnectableException(String.format(
+                "노선의 하행종착역만 삭제 가능합니다: %d <> %d",
+                getDownEndStation().getId(), deleteStation.getId()));
+        }
+    }
+
+    private boolean contains(Station station) {
+        return Objects.equals(startStation, station) || sections.stream()
+            .map(Section::getStartStation)
+            .anyMatch(s -> Objects.equals(s, station));
     }
 }
