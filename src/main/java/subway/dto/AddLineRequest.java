@@ -6,6 +6,12 @@ public class AddLineRequest {
     private Long upStationId;
     private int distance;
 
+    public AddLineRequest(Long upStationId, Long downStationId, int distance) {
+        this.upStationId = upStationId;
+        this.downStationId = downStationId;
+        this.distance = distance;
+    }
+
     public Long getDownStationId() {
         return downStationId;
     }
