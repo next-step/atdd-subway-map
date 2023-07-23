@@ -31,6 +31,7 @@ dependencies {
     testImplementation 'io.rest-assured:rest-assured:4.5.1'
     testImplementation 'com.navercorp.fixturemonkey:fixture-monkey-starter:0.5.8'
     testImplementation 'com.google.guava:guava:16+'
+    testImplementation 'org.mockito:mockito-core'
 
     // mapstruct
     implementation 'org.mapstruct:mapstruct' + ":$mapstructVersion"
