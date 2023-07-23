@@ -43,5 +43,4 @@ public class LineStation {
         this.line = line;
         this.station = station;
     }
-
 }

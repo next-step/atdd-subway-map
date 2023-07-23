@@ -7,7 +7,6 @@ import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 import subway.dto.StationResponse;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,16 +28,10 @@ public class LineService {
         Station upStation = stationRepository.findById(request.getUpStationId()).orElseThrow(() -> new NoSuchFieldError("해당 지하철역이 없습니다."));
         Station downStation = stationRepository.findById(request.getDownStationId()).orElseThrow(() -> new NoSuchFieldError("해당 지하철역이 없습니다."));
         lineStationRepository.save(new LineStation(0, line, upStation));
-        lineStationRepository.save(new LineStation(request.getDistance() - 1, line, downStation));
+        lineStationRepository.save(new LineStation(1, line, downStation));
         return createLineResponse(line, upStation, downStation);
     }
 
-    private LineResponse createLineResponse(Line line, Station upStation , Station downStation) {
-        return new LineResponse(line.getId(),
-                line.getName(),
-                line.getColor(),
-                List.of(new StationResponse(upStation.getId(), upStation.getName()), new StationResponse(downStation.getId(), downStation.getName())));
-    }
 
     @Transactional(readOnly = true)
     public List<LineResponse> findLines() {
@@ -65,20 +58,18 @@ public class LineService {
 
     @Transactional
     public LineResponse addLine(Long id, AddLineRequest dto) {
-        Station downStation = stationRepository.findById(dto.getDownStationId()).orElseThrow(() -> new RuntimeException("상행선역 지하철을 먼저 등록해주세요"));
-        LineStation prevDownLineStation = lineStationRepository.findFirstByLineIdOrderBySequenceDesc(id);
-        Station prevDownStation = prevDownLineStation.getStation();
-        System.out.println(prevDownStation.getId());
-        LineStation save = lineStationRepository.save(new LineStation(prevDownLineStation.getSequence() + dto.getDistance() - 1,
-                prevDownLineStation.getLine(),
-                downStation));
-        return createLineResponse(save.getLine());
+        // 새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이여야한다.
+        Station upStation = stationRepository.findById(dto.getUpStationId()).orElseThrow(() -> new RuntimeException("상행선역 지하철을 먼저 등록해주세요"));
+        Station downStation = stationRepository.findById(dto.getDownStationId()).orElseThrow(() -> new RuntimeException("하행선역 지하철을 먼저 등록해주세요"));
+        Line line = lineRepository.findById(id).orElseThrow(() -> new RuntimeException("기존에 등록되어 있는 지하철 노선이 아닙니다. 다시 확인해주세요."));
+        line.isAddableLine(upStation, downStation);
+        lineStationRepository.save(new LineStation(line.getLineStations().size(), line, downStation));
+        return createLineResponse(line);
     }
 
     @Transactional
     public void deleteLineDownStation(Long id, Long stationId) {
         List<LineStation> lineStations = lineStationRepository.findAllByLineIdOrderBySequenceDesc(id);
-        isAbleDelete(lineStations, stationId);
         lineStationRepository.deleteByLineIdAndStationId(id, stationId);
     }
 
@@ -92,14 +83,12 @@ public class LineService {
         return new LineResponse(line.getId(), line.getName(), line.getColor(), List.of(createStationResponse(up), createStationResponse(down)));
     }
 
-    private void isAbleDelete(List<LineStation> lineStations, Long requestId) {
-        if(lineStations.size() == 2) {
-            throw new RuntimeException("구간이 1개인 경우 역을 삭제할 수 없습니다.");
-        }
 
-        LineStation lineStation = lineStations.stream().max(Comparator.comparing(LineStation::getSequence)).get();
-        if(!requestId.equals(lineStation.getStation().getId())) {
-            throw new RuntimeException("지하철 노선의 하행 종점역만 제거할 수 있습니다.");
-        }
+    private LineResponse createLineResponse(Line line, Station upStation , Station downStation) {
+        return new LineResponse(line.getId(),
+                line.getName(),
+                line.getColor(),
+                List.of(new StationResponse(upStation.getId(), upStation.getName()), new StationResponse(downStation.getId(), downStation.getName())));
     }
+
 }

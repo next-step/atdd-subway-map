@@ -1,6 +1,7 @@
 package subway;
 
 import javax.persistence.*;
+import java.util.Comparator;
 import java.util.List;
 
 @Entity
@@ -53,5 +54,17 @@ public class Line {
 
     public void updateStations(List<LineStation> lineStations) {
         this.lineStations = lineStations;
+    }
+
+    public void isAddableLine(Station upStation, Station downStation) {
+        //새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이여야 한다.
+        LineStation prevDownStation = lineStations.stream().max(Comparator.comparing(LineStation::getSequence)).get();
+        if(!prevDownStation.getStation().equals(upStation)) {
+            throw new RuntimeException("새로운 구간의 상행역은 해당 노선에 등록되어 있는 하행 종점역이어야 한다.");
+        }
+        //새로운 구간 하행역은 해당 노선에 등록되어있는 역일 수 없다.
+        if(lineStations.stream().anyMatch(item -> item.getStation().equals(downStation))) {
+            throw new RuntimeException("새로운 구간 하행역은 해당 노선에 등록되어있는 역일 수 없다.");
+        }
     }
 }
