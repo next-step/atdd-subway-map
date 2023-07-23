@@ -121,14 +121,14 @@ class LineAcceptanceTest extends AcceptanceTestBase {
     }
 
     private Long createStation(String stationName) {
-        return post("/stations", StationRequest.from(stationName)).as(StationResponse.class).getId();
+        return post("/stations", StationRequest.from(stationName)).as(StationResponse.class).id();
     }
 
     private ExtractableResponse<Response> createLine(String lineName, Long upStationId, Long downStationId) {
         AddLineRequest line = AddLineRequest.builder()
                 .name(lineName)
                 .color(TEST_COLOR)
-                .distance(10L)
+                .distance(10)
                 .upStationId(upStationId)
                 .downStationId(downStationId)
                 .build();

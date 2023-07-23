@@ -14,5 +14,5 @@ public class AddLineRequest {
     private String color;
     private Long upStationId;
     private Long downStationId;
-    private Long distance;
+    private int distance;
 }
