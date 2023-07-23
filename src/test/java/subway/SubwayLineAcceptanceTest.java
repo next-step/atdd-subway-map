@@ -28,8 +28,8 @@ public class SubwayLineAcceptanceTest {
     @BeforeEach
     void setUp() {
         RestAssured.port = PORT;
-        this.upStationId = createStation("신사역");
-        this.downStationId = createStation("광교역");
+        this.upStationId = beforeTestCreateStation("신사역");
+        this.downStationId = beforeTestCreateStation("광교역");
     }
     /**
      * When 지하철 노선을 생성하면
@@ -100,9 +100,7 @@ public class SubwayLineAcceptanceTest {
     @Test
     void findLine() {
         //given
-        String name = "5호선";
-        String color = "bg-purple-600";
-        long firstLineId = beforeTestCreateLine(name, color, upStationId, downStationId, 10);
+        long firstLineId = beforeTestCreateLine("5호선", "bg-purple-600", upStationId, downStationId, 10);
         Map<String, String> params = new HashMap<>();
 
         //when
@@ -115,12 +113,12 @@ public class SubwayLineAcceptanceTest {
 
         //then
         assertThat(extract.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(extract.body().jsonPath().getString("name")).isEqualTo(name);
-        assertThat(extract.body().jsonPath().getString("color")).isEqualTo(color);
+        assertThat(extract.body().jsonPath().getString("name")).isEqualTo("5호선");
+        assertThat(extract.body().jsonPath().getString("color")).isEqualTo("bg-purple-600");
         assertThat(extract.body().jsonPath().getList("stationResponseList").size()).isEqualTo(2);
     }
     /**
-     *Given 지하철 노선을 생성하고
+     * Given 지하철 노선을 생성하고
      * When 생성한 지하철 노선을 수정하면
      * Then 해당 지하철 노선 정보는 수정된다
      */
@@ -129,13 +127,10 @@ public class SubwayLineAcceptanceTest {
     @Test
     void updateLine() {
         //given
-        String name = "5호선";
-        String color = "bg-purple-600";
-        String replaceColor = "bg-red-660";
-        long id = beforeTestCreateLine(name, color, upStationId, downStationId, 10);
+        long id = beforeTestCreateLine("5호선", "bg-purple-600", upStationId, downStationId, 10);
         Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-        params.put("color", replaceColor);
+        params.put("name", "5호선");
+        params.put("color", "bg-red-660");
         //when
         ExtractableResponse<Response> extract = RestAssured.given().log().all()
                 .body(params)
@@ -171,8 +166,8 @@ public class SubwayLineAcceptanceTest {
 
     /**
      * Given 지하철 노선을 생성한다.
-     * When 새로운 지하철 노선을 생성한다.
-     * Then 생성된 노선을 조회할 수 있다.
+     * When 지하철 노선 구간을 등록한다.
+     * Then 새롭게 구성된 노선을 조회할 수 있다.
      */
     @DisplayName("지하철 노선 구간 등록")
     @Test
@@ -180,7 +175,7 @@ public class SubwayLineAcceptanceTest {
         //given
         String name = "5호선";
         long firstLineId = beforeTestCreateLine(name, "bg-purple-600", upStationId, downStationId, 10);
-        long suwonStationid = createStation("수원역");
+        long suwonStationid = beforeTestCreateStation("수원역");
         Map<String, String> param = new HashMap<>();
         param.put("upStationId", String.valueOf(downStationId));
         param.put("downStationId", String.valueOf(suwonStationid));
@@ -191,6 +186,7 @@ public class SubwayLineAcceptanceTest {
                 .when().post("/lines/{id}/sections", firstLineId)
                 .then().log().all()
                 .extract();
+        //Then
         String prettify = extract.body().jsonPath().prettify();
         assertThat(extract.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat((String) read(prettify, "$.stationResponseList[0].name")).isEqualTo("신사역");
@@ -209,7 +205,7 @@ public class SubwayLineAcceptanceTest {
     void deleteSection() {
         // given
         long lineId = beforeTestCreateLine("신분당선", "bg-red-100", upStationId, downStationId, 10);
-        long suwonStationId = createStation("수원역");
+        long suwonStationId = beforeTestCreateStation("수원역");
         long lineId2 = beforeTestAddLine(lineId, downStationId, suwonStationId);
 
         //when
@@ -251,7 +247,7 @@ public class SubwayLineAcceptanceTest {
     void deleteUpStation() {
         // given
         long lineId = beforeTestCreateLine("신분당선", "bg-red-100", upStationId, downStationId, 10);
-        long suwonStationId = createStation("수원역");
+        long suwonStationId = beforeTestCreateStation("수원역");
         long lineId2 = beforeTestAddLine(lineId, downStationId, suwonStationId);
 
         //when
@@ -265,7 +261,7 @@ public class SubwayLineAcceptanceTest {
 
 
     // 지하철역 생성
-    private long createStation(String name) {
+    private long beforeTestCreateStation(String name) {
         Map<String, String> param = new HashMap<>();
         param.put("name", name);
         return RestAssured.given().log().all()
