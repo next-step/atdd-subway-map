@@ -60,7 +60,7 @@ class StationAcceptanceTest extends AcceptanceTestBase {
         ExtractableResponse<Response> postResponse = post("/stations", stationRequest);
 
         // When: 그 지하철역을 삭제하면
-        Long id = postResponse.as(StationResponse.class).getId();
+        Long id = postResponse.as(StationResponse.class).id();
         delete(String.format("/stations/%s", id));
 
         // Then: 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
