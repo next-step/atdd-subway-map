@@ -1,27 +1,23 @@
 package subway.line;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import subway.line.section.SubwayLineSection;
+import subway.station.Station;
 
 
 @Builder
+@AllArgsConstructor
 public class SubwayLineRequest {
 
   private String name;
   private String color;
   private Long upStationId;
   private Long downStationId;
-  private int distance;
+  private Long distance;
 
   public SubwayLineRequest() {}
-
-  public SubwayLineRequest(String name, String color, Long upStationId, Long downStationId, int distance) {
-    this.name = name;
-    this.color = color;
-    this.upStationId = upStationId;
-    this.downStationId = downStationId;
-    this.distance = distance;
-  }
 
   public String getName() {
     return name;
@@ -39,18 +35,17 @@ public class SubwayLineRequest {
     return downStationId;
   }
 
-  public int getDistance() {
+  public Long getDistance() {
     return distance;
   }
 
   @JsonIgnore
-  public SubwayLine toEntity() {
+  public SubwayLine toEntity(Station startStation) {
     return SubwayLine.builder()
         .color(this.color)
         .name(this.name)
-        .upStationId(this.upStationId)
-        .downStationId(this.downStationId)
-        .distance(this.distance)
+        .startStation(startStation)
+        .sections(new SubwayLineSection())
         .build();
   }
 }

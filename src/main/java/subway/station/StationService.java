@@ -1,10 +1,16 @@
 package subway.station;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.util.CollectionUtils;
+import org.springframework.web.server.ResponseStatusException;
+import subway.line.section.LineSection;
 
 @Service
 @Transactional(readOnly = true)
@@ -37,5 +43,10 @@ public class StationService {
                 station.getStationId(),
                 station.getName()
         );
+    }
+
+    public Station getStationOrThrowIfNotExist(Long stationId) {
+        return stationRepository.findById(stationId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 }

@@ -1,17 +1,33 @@
 package subway.line;
 
+import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.ConstraintMode;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.util.StringUtils;
+import subway.line.section.LineSection;
+import subway.line.section.SubwayLineSection;
+import subway.station.Station;
 
 @Entity
 @Table(name = "subway_line")
 @Builder
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class SubwayLine {
 
   @Id
@@ -24,49 +40,12 @@ public class SubwayLine {
   @Column(nullable = false)
   private String name;
 
-  @Column(nullable = false)
-  private Long upStationId;
+  @ManyToOne(cascade = CascadeType.PERSIST)
+  @JoinColumn(name = "start_station_id", foreignKey = @ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT))
+  private Station startStation;
 
-  @Column(nullable = false)
-  private Long downStationId;
-
-  @Column(nullable = false)
-  private int distance;
-
-  protected SubwayLine() {}
-
-  private SubwayLine(Long id, String color, String name, Long upStationId, Long downStationId, int distance) {
-    this.lineId = id;
-    this.color = color;
-    this.name = name;
-    this.upStationId = upStationId;
-    this.downStationId = downStationId;
-    this.distance = distance;
-  }
-
-  public Long getLineId() {
-    return lineId;
-  }
-
-  public String getColor() {
-    return color;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public Long getUpStationId() {
-    return upStationId;
-  }
-
-  public Long getDownStationId() {
-    return downStationId;
-  }
-
-  public int getDistance() {
-    return distance;
-  }
+  @Embedded
+  private SubwayLineSection sections;
 
   public void editLine(SubwayLineEditRequest request) {
     if (StringUtils.hasText(request.getName())) {
@@ -76,18 +55,18 @@ public class SubwayLine {
     if (StringUtils.hasText(request.getColor())) {
       this.color = request.getColor();
     }
+  }
 
-    if (request.getDistance() != null) {
-      this.distance = request.getDistance();
-    }
+  public List<Station> getStationsInOrder() {
+    return sections.getStationsInOrder();
+  }
 
-    if (request.getDownStationId() != null) {
-      this.downStationId = request.getDownStationId();
-    }
+  public LineSection addSections(LineSection newSection) {
+    return sections.addSection(newSection);
+  }
 
-    if (request.getUpStationId() != null) {
-      this.upStationId = request.getUpStationId();
-    }
+  public void deleteSectionsInLastStation(Station station) {
+    sections.deleteStation(station);
   }
 }
 
