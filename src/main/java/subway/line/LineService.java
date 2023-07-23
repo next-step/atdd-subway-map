@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.line.section.LineSection;
 import subway.line.section.LineSectionRequest;
-import subway.line.section.LineSectionService;
 import subway.station.Station;
 import subway.station.StationService;
 
@@ -15,7 +14,6 @@ import subway.station.StationService;
 public class LineService {
 
   private final SubwayLineService subwayLineService;
-  private final LineSectionService lineSectionService;
   private final StationService stationService;
 
   @Transactional
@@ -23,9 +21,12 @@ public class LineService {
     Station upStation = stationService.getStationOrThrowIfNotExist(request.getUpStationId());
     Station downStation = stationService.getStationOrThrowIfNotExist(request.getDownStationId());
 
-    SubwayLine line = subwayLineService.createLine(request, upStation);
+    LineSectionRequest lineSectionRequest = new LineSectionRequest(request);
 
-    LineSection section = lineSectionService.createSection(line, upStation, downStation, new LineSectionRequest(request));
+    SubwayLine line = subwayLineService.createLine(request, upStation);
+    LineSection section = lineSectionRequest.toEntity(line, upStation, downStation);
+    line.addSections(section);
+
     List<Station> stations = List.of(section.getUpStation(), section.getDownStation());
 
     return new LineResponse(line, stations);
@@ -33,15 +34,14 @@ public class LineService {
 
   @Transactional
   public void deleteLine(Long lineId) {
-    lineSectionService.deleteAllSectionInLine(lineId);
-    subwayLineService.deleteSubwayLine(lineId);
+    SubwayLine subwayLine = subwayLineService.getLineOrThrowIfNotExist(lineId);
+    subwayLineService.deleteSubwayLine(subwayLine);
   }
 
   @Transactional
   public LineResponse getSubwayLine(Long lineId) {
     SubwayLine subwayLine = subwayLineService.getSubwayLine(lineId);
-    List<LineSection> sections = lineSectionService.getAllSectionsOfLineWithStationInOrder(lineId);
-    List<Station> stations = lineSectionService.stationsInOrder(subwayLine, sections);
+    List<Station> stations = subwayLine.getStationsInOrder();
 
     return new LineResponse(subwayLine, stations);
   }
@@ -52,14 +52,16 @@ public class LineService {
     Station downStation = stationService.getStationOrThrowIfNotExist(request.getDownStationId());
 
     SubwayLine line = subwayLineService.getLineOrThrowIfNotExist(lineId);
+    LineSection newSection = request.toEntity(line, upStation, downStation);
 
-    return lineSectionService.appendSection(line, upStation, downStation, request);
+    return line.addSections(newSection);
   }
 
   @Transactional
   public void deleteStationInSection(Long lineId, Long stationId) {
     SubwayLine line = subwayLineService.getLineOrThrowIfNotExist(lineId);
     Station station = stationService.getStationOrThrowIfNotExist(stationId);
-    lineSectionService.deleteSection(line, station);
+
+    line.deleteSectionsInLastStation(station);
   }
 }

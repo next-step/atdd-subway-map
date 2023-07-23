@@ -24,10 +24,8 @@ public class SubwayLineService {
 
   @Transactional(readOnly = true)
   public SubwayLine getSubwayLine(Long lineId) {
-    SubwayLine subwayLine = lineRepository.findById(lineId)
+    return lineRepository.findById(lineId)
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-
-    return subwayLine;
   }
 
   @Transactional
@@ -47,14 +45,11 @@ public class SubwayLineService {
   }
 
   @Transactional
-  public void deleteSubwayLine(Long id) {
-    SubwayLine subwayLine = lineRepository.findById(id)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-
-    lineRepository.delete(subwayLine);
+  public void deleteSubwayLine(SubwayLine subwayLine) {
+    lineRepository.deleteById(subwayLine.getLineId());
   }
 
-  @Transactional(readOnly = true)
+  @Transactional
   public SubwayLine getLineOrThrowIfNotExist(Long lineId) {
     return lineRepository.findById(lineId)
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 노선이 없습니다."));
