@@ -1,6 +1,8 @@
 package subway.line.domain;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -21,6 +23,9 @@ public class Line {
     @Column(length = 10, nullable = false)
     private Integer distance;
 
+    @OneToMany(mappedBy = "line", fetch = FetchType.EAGER)
+    private List<Section> sections = new ArrayList<>();
+
     public Line() {
     }
 
@@ -39,6 +44,9 @@ public class Line {
         this.stations = stations;
     }
 
+    public void saveSections(List<Section> sections) {
+        this.sections = sections;
+    }
     public Long getId() {
         return id;
     }
@@ -57,6 +65,10 @@ public class Line {
 
     public Integer getDistance() {
         return distance;
+    }
+
+    public List<Section> getSections() {
+        return sections;
     }
 
     @Override

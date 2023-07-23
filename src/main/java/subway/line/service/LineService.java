@@ -1,6 +1,7 @@
 package subway.line.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import subway.line.code.LineValidateTypeCode;
 import subway.line.domain.Line;
 import subway.line.domain.Section;
@@ -13,13 +14,12 @@ import subway.line.repository.LineRepository;
 import subway.station.domain.Station;
 import subway.station.service.StationService;
 
-import javax.transaction.Transactional;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional
 public class LineService {
 
     private static final String NAME_ALREADY_EXISTS = "이미 존재하는 노선 이름입니다.";
@@ -62,9 +62,7 @@ public class LineService {
     }
 
     public void deleteLine(Long id) {
-        lineRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(LINE_DOES_NOT_EXIST));
-        lineRepository.deleteById(id);
+        lineRepository.delete(getLine(id));
     }
 
     private void validateLine(LineValidateTypeCode lineValidateTypeCode, LineRequest LineRequest) {
@@ -101,22 +99,59 @@ public class LineService {
     }
 
     public SectionResponse updateSection(Long lineId, SectionRequest sectionRequest) {
-        Line line = lineRepository.findById(lineId).orElseThrow(() -> new IllegalArgumentException(LINE_DOES_NOT_EXIST));
-        validateSectionStation(sectionRequest.getDownStationId(), line.getStations().getDownStation().getId());
-        Station station = stationService.getStation(sectionRequest.getUpStationId());
+        Line line = getLine(lineId);
+        validateSectionStation(sectionRequest.getUpStationId(), line.getStations().getDownStation().getId());
+        Station station = stationService.getStation(sectionRequest.getDownStationId());
         sectionService.validateSection(line, station);
         Section section = sectionService.createSection(line, station);
-        return SectionResponse.of();
+//        line.saveStations(new Stations(line.getStations().getUpStation(), station));
+//        lineRepository.save(line);
+        return SectionResponse.of(section);
     }
 
-    private void validateSectionStation(long sectionUpStationId, long lineDownStationId) {
-        if (sectionUpStationId == lineDownStationId) {
+    private void validateSectionStation(Long sectionUpStationId, Long lineDownStationId) {
+        if (!sectionUpStationId.equals(lineDownStationId)) {
             throw new IllegalArgumentException(STATION_NOT_MATCHED);
         }
     }
 
     private void validateSection(List<Section> sections, Section section) {
 
+    }
+
+    @Transactional
+    public void deleteSection(Long lineId, Long stationId) {
+        Line line = getLine(lineId);
+        Station station = stationService.getStation(stationId);
+        Section section = sectionService.getSection(line, station);
+        sectionService.deleteSection(section);
+        updateSectionAfterDeleteSection(line, section);
+    }
+
+    @Transactional
+    public void updateSectionAfterDeleteSection(Line line, Section deleteSection) {
+        List<Section> sections = line.getSections().stream()
+                .filter(section -> section.getId() != deleteSection.getId())
+                .collect(Collectors.toList());
+        line.saveStations(new Stations(line.getStations().getUpStation(), sectionService.getLastSection(sections).getStation()));
+        line.saveSections(sections);
+        lineRepository.save(line);
+    }
+
+    public List<SectionResponse> inquirySection(Long id) {
+        Line line = lineRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(LINE_DOES_NOT_EXIST));
+        return sectionService.getSections(line)
+                .stream()
+                .sorted(Comparator.comparing(Section::getId))
+                .map(section -> {
+                    return SectionResponse.of(section);
+                })
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public Line getLine(Long id) {
+        return lineRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(LINE_DOES_NOT_EXIST));
     }
 
 }

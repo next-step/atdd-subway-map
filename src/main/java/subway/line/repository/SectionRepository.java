@@ -16,4 +16,6 @@ public interface SectionRepository extends JpaRepository<Section, Long> {
 
     List<Section> findAllByLine(Line line);
 
+    Optional<Section> findTopByLineOrderByIdDesc(Line line);
+
 }

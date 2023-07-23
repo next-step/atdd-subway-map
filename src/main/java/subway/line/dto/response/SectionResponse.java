@@ -1,20 +1,34 @@
 package subway.line.dto.response;
 
+import subway.line.domain.Section;
+
 public class SectionResponse {
 
-    private final boolean isSuccess = true;
+    private final Long id;
+    private final Long stationId;
 
-    public SectionResponse() {
+    public SectionResponse(Long id, Long stationId) {
+        this.id = id;
+        this.stationId = stationId;
     }
 
-    public static SectionResponse of() {
-        return new SectionResponse();
+    public static SectionResponse of(Section section) {
+        return new SectionResponse(section.getId(), section.getStation().getId());
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public Long getStationId() {
+        return stationId;
     }
 
     @Override
     public String toString() {
         return "SectionResponse{" +
-                "isSuccess=" + isSuccess +
+                "id=" + id +
+                ", stationId=" + stationId +
                 '}';
     }
 

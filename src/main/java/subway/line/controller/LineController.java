@@ -3,6 +3,7 @@ package subway.line.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import subway.line.code.LineValidateTypeCode;
+import subway.line.domain.Line;
 import subway.line.dto.request.LineRequest;
 import subway.line.dto.request.SectionRequest;
 import subway.line.dto.response.LineResponse;
@@ -57,6 +58,17 @@ public class LineController {
     @PostMapping("/{id}/sections")
     public ResponseEntity<SectionResponse> createSection(@PathVariable Long id, @RequestBody SectionRequest sectionRequest) {
         return ResponseEntity.created(URI.create("/lines/" + id + "/sections")).body(lineService.updateSection(id, sectionRequest));
+    }
+
+    @GetMapping("/{id}/sections")
+    public ResponseEntity<List<SectionResponse>> inquirySection(@PathVariable Long id) {
+        return ResponseEntity.ok().body(lineService.inquirySection(id));
+    }
+
+    @DeleteMapping("/{id}/sections")
+    public ResponseEntity<SectionResponse> deleteSection(@PathVariable Long id, @RequestParam Long stationId) {
+        lineService.deleteSection(id, stationId);
+        return ResponseEntity.noContent().build();
     }
 
 
