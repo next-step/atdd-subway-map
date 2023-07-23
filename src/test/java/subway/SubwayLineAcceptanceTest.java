@@ -166,7 +166,7 @@ public class SubwayLineAcceptanceTest {
 
     /**
      * Given 지하철 노선을 생성한다.
-     * When 지하철 노선 구간을 등록한다.
+     * When 지하철 노선 구간을 만들어서 기존 노선에 추가한다.
      * Then 새롭게 구성된 노선을 조회할 수 있다.
      */
     @DisplayName("지하철 노선 구간 등록")
