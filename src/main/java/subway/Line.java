@@ -67,4 +67,14 @@ public class Line {
             throw new RuntimeException("새로운 구간 하행역은 해당 노선에 등록되어있는 역일 수 없다.");
         }
     }
+
+    public void isDeletableLine(Long downStationId) {
+        if(lineStations.size() == 2) {
+            throw new RuntimeException("구간이 1개인 경우 역을 삭제할 수 없다.");
+        }
+
+        if(!lineStations.stream().max(Comparator.comparing(LineStation::getSequence)).get().getStation().getId().equals(downStationId)) {
+            throw new RuntimeException("지하철 노선에 등록된 역(하행 종점역)만 제거할 수 있다. ");
+        }
+    }
 }

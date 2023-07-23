@@ -227,7 +227,6 @@ public class SubwayLineAcceptanceTest {
     void deleteSectionException() {
         // given
         long lineId = beforeTestCreateLine("신분당선", "bg-red-100", upStationId, downStationId, 10);
-
         //when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .param("stationId", downStationId)

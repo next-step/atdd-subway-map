@@ -69,7 +69,8 @@ public class LineService {
 
     @Transactional
     public void deleteLineDownStation(Long id, Long stationId) {
-        List<LineStation> lineStations = lineStationRepository.findAllByLineIdOrderBySequenceDesc(id);
+        Line line = lineRepository.findById(id).orElseThrow(() -> new RuntimeException("해당 노선은 등록되어 있지 않습니다."));
+        line.isDeletableLine(stationId);
         lineStationRepository.deleteByLineIdAndStationId(id, stationId);
     }
 
