@@ -9,5 +9,4 @@ public class LineServiceTest {
     @Mock
     private StationRepository stationRepository;
 
-
 }

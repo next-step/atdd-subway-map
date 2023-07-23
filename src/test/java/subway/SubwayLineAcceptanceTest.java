@@ -82,7 +82,6 @@ public class SubwayLineAcceptanceTest {
                 .then().log().all()
                 .extract();
         //then
-        System.out.println(extract.jsonPath());
         String prettify = extract.body().jsonPath().prettify();
         assertThat(extract.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat((String) read(prettify, "$.[0].name")).isEqualTo("5호선");
@@ -181,10 +180,10 @@ public class SubwayLineAcceptanceTest {
         //given
         String name = "5호선";
         long firstLineId = beforeTestCreateLine(name, "bg-purple-600", upStationId, downStationId, 10);
-        long yongSanStationId = createStation("용산역");
+        long suwonStationid = createStation("수원역");
         Map<String, String> param = new HashMap<>();
-        param.put("downStationId", String.valueOf(yongSanStationId));
-        param.put("upStationId", String.valueOf(upStationId));
+        param.put("upStationId", String.valueOf(downStationId));
+        param.put("downStationId", String.valueOf(suwonStationid));
         param.put("distance", String.valueOf(10));
         //when
         ExtractableResponse<Response> extract = RestAssured.given().log().all()
@@ -192,9 +191,12 @@ public class SubwayLineAcceptanceTest {
                 .when().post("/lines/{id}/sections", firstLineId)
                 .then().log().all()
                 .extract();
-        assertThat(extract.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(extract.body().jsonPath().getLong("/upStationId")).isEqualTo(downStationId);
-        assertThat(extract.body().jsonPath().getLong("/downStationId")).isEqualTo(yongSanStationId);
+        String prettify = extract.body().jsonPath().prettify();
+        assertThat(extract.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat((String) read(prettify, "$.stationResponseList[0].name")).isEqualTo("신사역");
+        assertThat((String) read(prettify, "$.stationResponseList[1].name")).isEqualTo("수원역");
+        assertThat(read(prettify, "$.stationResponseList[0].id").toString()).isEqualTo(String.valueOf(upStationId));
+        assertThat(read(prettify, "$.stationResponseList[1].id").toString()).isEqualTo(String.valueOf(suwonStationid));
     }
 
     /**
@@ -202,11 +204,21 @@ public class SubwayLineAcceptanceTest {
      * When 하행 종점역을 제거한다.
      * Then 제거한 결과를 본다.
      */
-    @DisplayName("노선 구간 제거")
+    @DisplayName("단일 누선 구간 제거")
     @Test
     void deleteSection() {
-        long Line = beforeTestCreateLine("신분당선", "bg-red-100", upStationId, downStationId, 10);
+        // given
+        long lineId = beforeTestCreateLine("신분당선", "bg-red-100", upStationId, downStationId, 10);
+        long suwonStationId = createStation("수원역");
+        long lineId2 = beforeTestAddLine(lineId, downStationId, suwonStationId);
 
+        //when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .param("stationId", suwonStationId)
+                .when().delete("/lines/{id}/sections", lineId2)
+                .then().log().all()
+                .extract();
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
     /**
@@ -217,7 +229,38 @@ public class SubwayLineAcceptanceTest {
     @DisplayName("상행 종점역, 하행 종점역만 있는 노선 구간 제거 테스트")
     @Test
     void deleteSectionException() {
-        long Line = beforeTestCreateLine("신분당선", "bg-red-100", upStationId, downStationId, 10);
+        // given
+        long lineId = beforeTestCreateLine("신분당선", "bg-red-100", upStationId, downStationId, 10);
+
+        //when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .param("stationId", downStationId)
+                .when().delete("/lines/{id}/sections", lineId)
+                .then().log().all()
+                .extract();
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    }
+
+    /**
+     * Given 상행 종점역, 하생 종점역, 중간역이 있는 노선을 생성한다.
+     * When 상행 종점역을 제거한다.
+     * Then 500 에러를 뱉는다.
+     */
+    @DisplayName("상행 종점역 제거시 에러를 뱉는다.")
+    @Test
+    void deleteUpStation() {
+        // given
+        long lineId = beforeTestCreateLine("신분당선", "bg-red-100", upStationId, downStationId, 10);
+        long suwonStationId = createStation("수원역");
+        long lineId2 = beforeTestAddLine(lineId, downStationId, suwonStationId);
+
+        //when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .param("stationId", upStationId)
+                .when().delete("/lines/{id}/sections", lineId2)
+                .then().log().all()
+                .extract();
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
 
@@ -243,6 +286,20 @@ public class SubwayLineAcceptanceTest {
         ExtractableResponse<Response> extract = RestAssured.given().log().all()
                 .body(params).contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/lines")
+                .then().log().all()
+                .extract();
+        return extract.body().jsonPath().getLong("id");
+    }
+
+    private long beforeTestAddLine(Long lineId, Long upStationId, Long downStationId) {
+        Map<String, String> param = new HashMap<>();
+        param.put("upStationId", String.valueOf(upStationId));
+        param.put("downStationId", String.valueOf(downStationId));
+        param.put("distance", String.valueOf(10));
+
+        ExtractableResponse<Response> extract = RestAssured.given().log().all()
+                .body(param).contentType(MediaType.APPLICATION_JSON_VALUE)
+                .post("/lines/{id}/sections", lineId)
                 .then().log().all()
                 .extract();
         return extract.body().jsonPath().getLong("id");

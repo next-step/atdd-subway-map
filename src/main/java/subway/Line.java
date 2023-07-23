@@ -50,4 +50,8 @@ public class Line {
         this.name = name;
         this.color = color;
     }
+
+    public void updateStations(List<LineStation> lineStations) {
+        this.lineStations = lineStations;
+    }
 }

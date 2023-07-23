@@ -65,19 +65,17 @@ public class LineService {
 
     @Transactional
     public LineResponse addLine(Long id, AddLineRequest dto) {
-        Station upStation = stationRepository.findById(dto.getUpStationId()).orElseThrow(() -> new RuntimeException("상행선역 지하철을 먼저 등록해주세요"));
-        List<LineStation> lines = lineStationRepository.findAllByLineIdOrderBySequenceDesc(id);
-        Station prevDownStation = lines.stream().findFirst().orElseThrow(() -> new RuntimeException("해당하는 지하철 노선 id가 없습니다.")).getStation();
-        dto.compareUpStationId(prevDownStation.getId());
-        LineStation lineStation = lines.stream()
-                .max(Comparator.comparing(LineStation::getSequence))
-                .orElseThrow(() -> new RuntimeException("해당하는 지하철 노선의 max sequence 값이 없습니다."));
-        LineStation save = lineStationRepository.save(new LineStation(lineStation.getSequence() + dto.getDistance() - 1,
-                lineStation.getLine(),
-                upStation));
+        Station downStation = stationRepository.findById(dto.getDownStationId()).orElseThrow(() -> new RuntimeException("상행선역 지하철을 먼저 등록해주세요"));
+        LineStation prevDownLineStation = lineStationRepository.findFirstByLineIdOrderBySequenceDesc(id);
+        Station prevDownStation = prevDownLineStation.getStation();
+        System.out.println(prevDownStation.getId());
+        LineStation save = lineStationRepository.save(new LineStation(prevDownLineStation.getSequence() + dto.getDistance() - 1,
+                prevDownLineStation.getLine(),
+                downStation));
         return createLineResponse(save.getLine());
     }
 
+    @Transactional
     public void deleteLineDownStation(Long id, Long stationId) {
         List<LineStation> lineStations = lineStationRepository.findAllByLineIdOrderBySequenceDesc(id);
         isAbleDelete(lineStations, stationId);
