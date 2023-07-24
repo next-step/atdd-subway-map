@@ -1,8 +1,11 @@
-package subway;
+package subway.station;
+
+import lombok.AllArgsConstructor;
 
 import javax.persistence.*;
 
 @Entity
+@AllArgsConstructor
 public class Station {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -10,7 +13,7 @@ public class Station {
     @Column(length = 20, nullable = false)
     private String name;
 
-    public Station() {
+    protected Station() {
     }
 
     public Station(String name) {

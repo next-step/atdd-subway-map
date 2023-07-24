@@ -13,7 +13,7 @@ import java.net.UnknownHostException;
 import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class RestAssuredTest {
+class RestAssuredTest {
 
     @DisplayName("구글 페이지 접근 테스트")
     @Test

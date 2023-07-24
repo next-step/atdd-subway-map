@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.HashMap;
 import java.util.List;
@@ -17,7 +18,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class StationAcceptanceTest {
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+class StationAcceptanceTest {
     /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다
@@ -38,14 +40,14 @@ public class StationAcceptanceTest {
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
-    private static List<String> getStationNames() {
+    private List<String> getStationNames() {
         return RestAssured.given().log().all()
                 .when().get("/stations")
                 .then().log().all()
                 .extract().jsonPath().getList("name", String.class);
     }
 
-    private static ExtractableResponse<Response> createStation(String stationName) {
+    private ExtractableResponse<Response> createStation(String stationName) {
         Map<String, String> params = new HashMap<>();
         params.put("name", stationName);
 
@@ -93,7 +95,7 @@ public class StationAcceptanceTest {
     @Test
     void deleteStationTest() {
         // given
-        final String station = "삼성역";
+        final String station = "강남역";
         ExtractableResponse<Response> createStation = createStation(station);
         assertThat(createStation.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         Long stationId = createStation.body().jsonPath().getObject("id", Long.class);
