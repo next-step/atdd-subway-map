@@ -34,8 +34,7 @@ public class SectionAcceptanceTest {
     @BeforeEach
     void setup() {
         restAssuredUtil.테스트_컨텍스트를_초기화합니다(port);
-        신규_역("강남역");
-        신규_역("신논현역");
+
     }
 
     public static ExtractableResponse<Response> 노선_구간_추가(Long 노선_ID, Long 노선_하행_종착역_ID, Long 추가_구간_역_ID, Long 추가_구간_길이) {
@@ -56,9 +55,9 @@ public class SectionAcceptanceTest {
     @Test
     void createSectionWithLineNotFoundException() {
         //given
-        Long 대상_노선 = 1L;
-        Long 구간_상행역 = 3L;
-        Long 구간_하행역 = 4L;
+        Long 대상_노선 = 미존재노선();
+        Long 구간_상행역 = 강남역();
+        Long 구간_하행역 = 신논현역();
         Long 구간_길이 = 5L;
         Map<String, Object> 구간_추가_요청 = 구간_추가_요청정보(구간_상행역, 구간_하행역, 구간_길이);
 
@@ -70,6 +69,18 @@ public class SectionAcceptanceTest {
 
         // then
         노선이_존재하지_않습니다(대상_노선, 구간_추가_응답);
+    }
+
+    private static long 미존재노선() {
+        return 1L;
+    }
+
+    private long 신논현역() {
+        return 신규_역("신논현역").jsonPath().getLong("id");
+    }
+
+    private long 강남역() {
+        return 신규_역("강남역").jsonPath().getLong("id");
     }
 
     private void 노선이_존재하지_않습니다(Long 대상_노선, ExtractableResponse<Response> 구간_추가_응답) {
@@ -94,15 +105,15 @@ public class SectionAcceptanceTest {
     @Test
     void createSectionWithDownStationNotFoundException() {
         //given
-        Long 구간_상행역 = 3L;
-        Long 구간_하행역 = 4L;
+        Long 구간_상행역 = 미존재역_1();
+        Long 구간_하행역 = 미존재역_2();
         Long 구간_길이 = 5L;
         Map<String, Object> 구간_추가_요청 = 구간_추가_요청정보(구간_상행역, 구간_하행역,
                 구간_길이);
 
         // and
-        Long 노선_하행종착역 = 1L;
-        Long 노선_상행종착역 = 2L;
+        Long 노선_하행종착역 = 강남역();
+        Long 노선_상행종착역 = 신논현역();
         Long 노선_길이 = 10L;
         String 노선_이름 = "신분당선";
         String 노선_색상 = "bg-red-600";
@@ -116,6 +127,14 @@ public class SectionAcceptanceTest {
 
         // then
         요청_역이_존재하지_않습니다(구간_하행역, 응답);
+    }
+
+    private static long 미존재역_2() {
+        return 4L;
+    }
+
+    private static long 미존재역_1() {
+        return 3L;
     }
 
     private static long 대상_노선(ExtractableResponse<Response> 신분당선) {
@@ -138,21 +157,20 @@ public class SectionAcceptanceTest {
     @Test
     void createSectionWithUpStationNotFoundException() {
         //given
-        Long 구간_하행역 = 3L;
-        Long 구간_상행역 = 4L;
+        Long 구간_하행역 = 판교역();
+        Long 구간_상행역 = 미존재역_2();
         Long 구간_길이 = 5L;
         Map<String, Object> 구간_추가_요청 = 구간_추가_요청정보(구간_상행역, 구간_하행역, 구간_길이);
 
         // and
-        Long 노선_하행종착역 = 1L;
-        Long 노선_상행종착역 = 2L;
+        Long 노선_하행종착역 = 강남역();
+        Long 노선_상행종착역 = 신논현역();
         Long 노선_길이 = 10L;
         String 노선명 = "신분당선";
         String 노선_색상 = "bg-red-600";
         ExtractableResponse<Response> 신분당선 = 신규_노선(노선_상행종착역, 노선_하행종착역, 노선명, 노선_색상, 노선_길이);
 
         // and
-        신규_역("판교역");
         assertThat(지하철_역_목록()).contains(구간_하행역);
 
         // and
@@ -163,6 +181,10 @@ public class SectionAcceptanceTest {
 
         // then
         요청_역이_존재하지_않습니다(구간_상행역, 응답);
+    }
+
+    private Long 판교역() {
+        return 신규_역("판교역").jsonPath().getLong("id");
     }
 
     private List<Long> 지하철_역_목록() {
@@ -182,22 +204,20 @@ public class SectionAcceptanceTest {
     @Test
     void createSectionWithUpStationNotEqualToLineDownEndStationException() {
         //given
-        Long 구간_상행역 = 3L;
-        Long 구간_하행역 = 4L;
+        Long 구간_상행역 = 판교역();
+        Long 구간_하행역 = 양재역();
         Long 구간_길이 = 5L;
         Map<String, Object> 구간_추가_요청 = 구간_추가_요청정보(구간_상행역, 구간_하행역, 구간_길이);
 
         // and
-        Long 노선_하행종착역 = 1L;
-        Long 노선_상행종착역 = 2L;
+        Long 노선_하행종착역 = 강남역();
+        Long 노선_상행종착역 = 신논현역();
         Long 노선_길이 = 10L;
         String 노선명 = "신분당선";
         String 노선_색상 = "bg-red-600";
         ExtractableResponse<Response> 신분당선 = 신규_노선(노선_상행종착역, 노선_하행종착역, 노선명, 노선_색상, 노선_길이);
 
         // and
-        신규_역("판교역");
-        신규_역("양재역");
         assertThat(지하철_역_목록()).contains(구간_하행역);
 
         // and
@@ -211,6 +231,10 @@ public class SectionAcceptanceTest {
 
         // then
         노선의_하행종착역에_이어지는_구간이_아닙니다(구간_상행역, 노선_하행종착역, 응답);
+    }
+
+    private long 양재역() {
+        return 신규_역("양재역").jsonPath().getLong("id");
     }
 
     private void 노선의_하행종착역에_이어지는_구간이_아닙니다(Long 구간_상행역, Long 노선_하행종착역, ExtractableResponse<Response> 응답) {
@@ -235,25 +259,26 @@ public class SectionAcceptanceTest {
     @Test
     void createSectionWithDownStationAlreadyExistsInLineException() {
         //given
-        Long 구간_상행역 = 1L;
-        Long 구간_하행역 = 2L;
+        Long 판교역 = 판교역();
+        Long 양재역 = 양재역();
+
+        Long 구간_상행역 = 판교역;
+        Long 구간_하행역 = 양재역;
         Long 구간_길이 = 5L;
         Map<String, Object> 구간_추가_요청 = 구간_추가_요청정보(구간_상행역, 구간_하행역, 구간_길이);
 
         // and
-        Long 노선_하행종착역 = 1L;
-        Long 노선_상행종착역 = 2L;
+        Long 노선_하행종착역 = 판교역;
+        Long 노선_상행종착역 = 양재역;
         Long 노선_길이 = 10L;
         String 노선명 = "신분당선";
         String 노선_색상 = "bg-red-600";
         신규_노선(노선_상행종착역, 노선_하행종착역, 노선명, 노선_색상, 노선_길이);
 
         // and
-        신규_역("판교역");
         assertThat(지하철_역_목록()).contains(구간_하행역);
 
         // and
-        신규_역("양재역");
         assertThat(지하철_역_목록()).contains(구간_상행역);
 
         // and
@@ -296,18 +321,19 @@ public class SectionAcceptanceTest {
     @Test
     void createSection() {
         //given
-        Long 구간_상행역_ID = 1L;
-        Long 구간_하행역_ID = 3L;
+        Long 강남역 = 강남역();
+        Long 구간_상행역_ID = 강남역;
+        Long 구간_하행역_ID = 양재역();
         Long 구간_길이 = 5L;
-        Map<String, Object> param = 구간_추가_요청정보(구간_상행역_ID, 구간_하행역_ID, 구간_길이);
+        Map<String, Object> 구간_추가_요청 = 구간_추가_요청정보(구간_상행역_ID, 구간_하행역_ID, 구간_길이);
 
         // and
-        Long 노선_하행종착역_ID = 1L;
-        Long 노선_상행종착역_ID = 2L;
+        Long 노선_하행종착역_ID = 강남역;
+        Long 노선_상행종착역_ID = 신논현역();
         Long 노선_최초길이 = 10L;
         String 노선명 = "신분당선";
         String 노선_색상 = "bg-red-600";
-        신규_노선(노선_상행종착역_ID, 노선_하행종착역_ID, 노선명, 노선_색상, 노선_최초길이);
+        ExtractableResponse<Response> 신분당선 = 신규_노선(노선_상행종착역_ID, 노선_하행종착역_ID, 노선명, 노선_색상, 노선_최초길이);
 
         // and
         신규_역("판교역");
@@ -320,11 +346,10 @@ public class SectionAcceptanceTest {
         assertThat(구간_상행역_ID).isEqualTo(노선_하행종착역_ID);
 
         // and
-        ExtractableResponse<Response> 신분당선 = 지하철_노선을_ID로_조회합니다(1L);
         assertThat(노선_역_목록(신분당선)).doesNotContain(구간_하행역_ID);
 
         //when
-        ExtractableResponse<Response> 응답 = 지하철_노선에_구간을_추가합니다(param, 신분당선);
+        ExtractableResponse<Response> 응답 = 지하철_노선에_구간을_추가합니다(구간_추가_요청, 신분당선);
 
         // then
         구간이_정상_생성되었습니다(구간_하행역_ID, 노선_상행종착역_ID, 응답);
@@ -363,8 +388,8 @@ public class SectionAcceptanceTest {
     @Test
     void deleteWithNotExistsLine() {
         //given
-        Long 제거_역 = 1L;
-        Long 제거_노선 = 1L;
+        Long 제거_역 = 미존재역_1();
+        Long 제거_노선 = 미존재노선();
 
         // and
         assertThat(지하철_노선_목록()).doesNotContain(제거_노선);
@@ -393,15 +418,15 @@ public class SectionAcceptanceTest {
     @Test
     void deleteWithNotExistsStation() {
         //given
-        Long 제거_역 = 3L;
-        Long 대상_노선 = 1L;
-
-        Long 노선_하행_종착역 = 1L;
-        Long 노선_상행_종착역 = 2L;
+        Long 노선_하행_종착역 = 강남역();
+        Long 노선_상행_종착역 = 신논현역();
         Long 노선_길이 = 10L;
         String 노선명 = "신분당선";
         String 노선_색상 = "bg-red-600";
-        신규_노선(노선_상행_종착역, 노선_하행_종착역, 노선명, 노선_색상, 노선_길이);
+        ExtractableResponse<Response> 신분당선 = 신규_노선(노선_상행_종착역, 노선_하행_종착역, 노선명, 노선_색상, 노선_길이);
+
+        Long 제거_역 = 미존재역_1();
+        Long 대상_노선 = 대상(신분당선);
 
         // and
         assertThat(지하철_노선_목록()).contains(대상_노선);
@@ -414,6 +439,10 @@ public class SectionAcceptanceTest {
 
         // then
         역이_존재하지_않습니다(제거_역, 응답);
+    }
+
+    private static long 대상(ExtractableResponse<Response> 신분당선) {
+        return 신분당선.jsonPath().getLong("id");
     }
 
     private void 역이_존재하지_않습니다(Long 제거_역, ExtractableResponse<Response> response) {
@@ -435,16 +464,15 @@ public class SectionAcceptanceTest {
     @Test
     void deleteWithNotContainedStation() {
         //given
-        Long 삭제_역 = 3L;
-        Long 대상_노선 = 1L;
-        신규_역("양재역");
-
-        Long 노선_하행_종착역 = 1L;
-        Long 노선_상행_종착역 = 2L;
+        Long 노선_하행_종착역 = 강남역();
+        Long 노선_상행_종착역 = 신논현역();
         Long 노선_길이 = 10L;
         String 노선명 = "신분당선";
         String 노선_색상 = "bg-red-600";
         ExtractableResponse<Response> 신분당선 = 신규_노선(노선_상행_종착역, 노선_하행_종착역, 노선명, 노선_색상, 노선_길이);
+
+        Long 삭제_역 = 양재역();
+        Long 대상_노선 = 대상(신분당선);
 
         // and
         assertThat(지하철_노선_목록()).contains(대상_노선);
@@ -482,16 +510,16 @@ public class SectionAcceptanceTest {
     @Test
     void deleteWithNotDownEndStation() {
         //given
-        Long 삭제_역 = 2L;
-        Long 대상_노선 = 1L;
-        신규_역("양재역");
-
-        Long 노선_하행_종착역 = 1L;
-        Long 노선_상행_종착역 = 2L;
+        Long 신논현역 = 신논현역();
+        Long 노선_하행_종착역 = 강남역();
+        Long 노선_상행_종착역 = 신논현역;
         Long 노선_길이 = 10L;
         String 노선명 = "신분당선";
         String 노선_색상 = "bg-red-600";
         ExtractableResponse<Response> 신분당선 = 신규_노선(노선_상행_종착역, 노선_하행_종착역, 노선명, 노선_색상, 노선_길이);
+
+        Long 삭제_역 = 신논현역;
+        Long 대상_노선 = 대상(신분당선);
 
         // and
         assertThat(지하철_노선_목록()).contains(대상_노선);
@@ -533,15 +561,17 @@ public class SectionAcceptanceTest {
     @Test
     void deleteStationFromLineContainingOnlyOneSection() {
         //given
-        Long 삭제_역 = 1L;
-        Long 대상_노선 = 1L;
+        Long 강남역 = 강남역();
 
-        Long 노선_하행_종착역 = 1L;
-        Long 노선_상행_종착역 = 2L;
+        Long 노선_하행_종착역 = 강남역;
+        Long 노선_상행_종착역 = 양재역();
         Long 노선_길이 = 10L;
         String 노선명 = "신분당선";
         String 노선_색상 = "bg-red-600";
         ExtractableResponse<Response> 신분당선 = 신규_노선(노선_상행_종착역, 노선_하행_종착역, 노선명, 노선_색상, 노선_길이);
+
+        Long 삭제_역 = 강남역;
+        Long 대상_노선 = 대상(신분당선);
 
         // and
         assertThat(지하철_노선_목록()).contains(대상_노선);
@@ -588,18 +618,18 @@ public class SectionAcceptanceTest {
     @Test
     void deleteSectionFromLine() {
         //given
-        Long 삭제_역 = 3L;
-        Long 대상_노선 = 1L;
-        신규_역("양재역");
-
-        Long 노선_하행_종착역 = 1L;
-        Long 노선_상행_종착역 = 2L;
+        Long 양재역 = 양재역();
+        Long 노선_하행_종착역 = 강남역();
+        Long 노선_상행_종착역 = 신논현역();
         Long 노선_길이 = 10L;
         String 노선명 = "신분당선";
         String 노선_색상 = "bg-red-600";
         ExtractableResponse<Response> 신분당선 = 신규_노선(노선_상행_종착역, 노선_하행_종착역, 노선명, 노선_색상, 노선_길이);
 
-        Long 추가_구간_역 = 3L;
+        Long 삭제_역 = 양재역;
+        Long 대상_노선 = 대상(신분당선);
+
+        Long 추가_구간_역 = 양재역;
         Long 추가_구간_길이 = 30L;
         노선_구간_추가(대상_노선, 노선_하행_종착역, 추가_구간_역, 추가_구간_길이);
 
