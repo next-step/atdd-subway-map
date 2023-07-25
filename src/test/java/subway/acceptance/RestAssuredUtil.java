@@ -17,6 +17,11 @@ public class RestAssuredUtil {
         this.databaseCleanup = databaseCleanup1;
     }
 
+    public void 테스트_컨텍스트를_초기화합니다(int port) {
+        initializePort(port);
+        cleanup();
+    }
+
     public void initializePort(int port) {
         RestAssured.port = port;
     }

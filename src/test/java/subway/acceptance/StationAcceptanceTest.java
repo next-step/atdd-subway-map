@@ -40,15 +40,14 @@ public class StationAcceptanceTest {
     @DisplayName("RestAssured 요청 포트 번호를 설정합니다.")
     @BeforeEach
     void setup() {
-        restAssuredUtil.initializePort(port);
-        restAssuredUtil.cleanup();
+        restAssuredUtil.테스트_컨텍스트를_초기화합니다(port);
     }
 
-    public static ExtractableResponse<Response> 지하철_역_생성(String name) {
+    public static ExtractableResponse<Response> 신규_역(String name) {
         return RestAssuredUtil.createWithCreated(STATION_BASE_URL, Map.of(STATION_NAME_KEY, name));
     }
 
-    public static ExtractableResponse<Response> 지하철_역_목록을_조회합니다() {
+    public static ExtractableResponse<Response> 역_목록_조회() {
         return RestAssuredUtil.findAllWithOk(STATION_BASE_URL);
     }
 
@@ -62,7 +61,7 @@ public class StationAcceptanceTest {
     void createStation() {
         // when
         String name = "강남역";
-        ExtractableResponse<Response> response = 지하철_역_생성(name);
+        ExtractableResponse<Response> response = 신규_역(name);
 
         // then
         지하철_역_정상_생성되었습니다(response);
@@ -77,7 +76,7 @@ public class StationAcceptanceTest {
     }
 
     private List<String> 지하철_역_목록_조회() {
-        return 지하철_역_목록을_조회합니다().jsonPath().getList(STATION_NAME_KEY, String.class);
+        return 역_목록_조회().jsonPath().getList(STATION_NAME_KEY, String.class);
     }
 
     private void 지하철_역_정상_생성되었습니다(ExtractableResponse<Response> response) {
@@ -99,7 +98,7 @@ public class StationAcceptanceTest {
         지하철_역_목록을_생성합니다(station1, station2);
 
         // when
-        ExtractableResponse<Response> response = 지하철_역_목록을_조회합니다();
+        ExtractableResponse<Response> response = 역_목록_조회();
 
         // then
         응답_지하철_역_목록에_이름들이_포함됩니다(response, station1, station2);
@@ -129,7 +128,7 @@ public class StationAcceptanceTest {
     }
 
     private void 지하철_역_목록을_생성합니다(String station1, String station2) {
-        Stream.of(station1, station2).forEach(StationAcceptanceTest::지하철_역_생성);
+        Stream.of(station1, station2).forEach(StationAcceptanceTest::신규_역);
     }
 
     /**
@@ -161,7 +160,7 @@ public class StationAcceptanceTest {
 
     private ListAssert<Long> 응답_지하철_역_목록에서_생성한_역을_찾을수_없습니다(Long savedStationId) {
         return assertThat(
-            지하철_역_목록을_조회합니다().jsonPath().getList(STATION_ID_KEY, Long.class)).doesNotContain(
+            역_목록_조회().jsonPath().getList(STATION_ID_KEY, Long.class)).doesNotContain(
             savedStationId);
     }
 
@@ -178,7 +177,7 @@ public class StationAcceptanceTest {
     }
 
     private long 생성한_지하철_역_ID() {
-        return 지하철_역_생성("강남역").jsonPath().getLong(STATION_ID_KEY);
+        return 신규_역("강남역").jsonPath().getLong(STATION_ID_KEY);
     }
 
     private ExtractableResponse<Response> deleteStation(Long id) {

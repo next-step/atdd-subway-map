@@ -3,6 +3,7 @@ package subway.acceptance;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
+import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.Collection;
@@ -39,8 +40,7 @@ public class LineAcceptanceTest {
     @BeforeEach
     @DisplayName("RestAssured 에서 요청 보낼 포트를 설정하고, 4개의 지하철 역 정보를 생성합니다.")
     void setup() {
-        포트번호를_설정합니다();
-        데이터베이스를_초기화합니다();
+        restAssuredUtil.테스트_컨텍스트를_초기화합니다(port);
         지하철_역을_생성합니다("강남역", "양재역", "신사역", "논현역");
     }
 
@@ -52,22 +52,14 @@ public class LineAcceptanceTest {
         return selectLine(id);
     }
 
-    public static ExtractableResponse<Response> 지하철_노선을_생성합니다(Long upStationId, Long downStationId,
-        String name, String color, Long distance) {
+    public static ExtractableResponse<Response> 신규_노선(Long upStationId, Long downStationId,
+                                                      String name, String color, Long distance) {
         return createLineResult(
             requestBodyOf(upStationId, downStationId, name, color, distance));
     }
 
-    private void 데이터베이스를_초기화합니다() {
-        restAssuredUtil.cleanup();
-    }
-
-    private void 포트번호를_설정합니다() {
-        restAssuredUtil.initializePort(port);
-    }
-
     private void 지하철_역을_생성합니다(String... name) {
-        Stream.of(name).forEach(StationAcceptanceTest::지하철_역_생성);
+        Stream.of(name).forEach(StationAcceptanceTest::신규_역);
     }
 
     /**
@@ -87,7 +79,7 @@ public class LineAcceptanceTest {
         Long distance = 10L;
 
         // when
-        ExtractableResponse<Response> saved = 지하철_노선을_생성합니다(upStationId, downStationId, name, color, distance);
+        ExtractableResponse<Response> saved = 신규_노선(upStationId, downStationId, name, color, distance);
 
         // then
         지하철_노선이_정상_생성되었습니다(saved);
