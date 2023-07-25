@@ -1,10 +1,9 @@
 package subway.model;
 
-import subway.exception.DeleteSectionException;
+import subway.exception.AddSectionException;
 import subway.exception.ErrorMessage;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -19,13 +18,8 @@ public class Line {
     @Column(length = 20, nullable = false)
     private String color;
 
-    @ManyToMany
-    @JoinTable(
-            name = "line_station",
-            joinColumns = @JoinColumn(name = "line_id"),
-            inverseJoinColumns = @JoinColumn(name = "station_id")
-    )
-    private List<Station> stations = new ArrayList<>();
+    @Embedded
+    private Sections sections = new Sections();
 
     @Column(nullable = false)
     private Long distance;
@@ -33,10 +27,10 @@ public class Line {
     protected Line() {
     }
 
-    public Line(String name, String color, List<Station> stations, Long distance) {
+    public Line(String name, String color, Sections sections, Long distance) {
         this.name = name;
         this.color = color;
-        this.stations = stations;
+        this.sections = sections;
         this.distance = distance;
     }
 
@@ -56,10 +50,6 @@ public class Line {
         return color;
     }
 
-    public List<Station> getStations() {
-        return stations;
-    }
-
     public Long getDistance() {
         return distance;
     }
@@ -69,36 +59,40 @@ public class Line {
         this.color = color;
     }
 
-    public boolean equalToDownStation(Station upStation) {
-        return stations.get(stations.size() - 1).equals(upStation);
-    }
-
     public void addSection(Section section) {
-        this.stations.add(section.getDownStation());
+        this.sections.add(section);
         this.distance += distance;
     }
 
-    public boolean includes(Station downStation) {
-        return stations.contains(downStation);
+    public void deleteLastSection(Station upStation) {
+        Long lastDistance = sections.findLastSectionDistance();
+        sections.deleteLastSection(upStation);
+        distance -= lastDistance;
     }
 
-    public void deleteLastSection(Section lastSection) {
-        if (stations.size() == 2) {
-            throw new DeleteSectionException(ErrorMessage.CANNOT_REMOVE_ONLY_ONE_SECTION);
+    public Section createSection(Station upStation, Station downStation, Long distance) {
+        if (!sections.equalToLastDownStation(upStation)) {
+            throw new AddSectionException(ErrorMessage.WRONG_UPSTATION_ID);
         }
-        Station upStation = stations.get(stations.size() - 2);
-        Station downStation = stations.get(stations.size() - 1);
-        if (!lastSection.equals(upStation, downStation)) {
-            throw new DeleteSectionException(ErrorMessage.IS_NOT_LAST_SECTION);
+        if (sections.includes(downStation)) {
+            throw new AddSectionException(ErrorMessage.WRONG_DOWNSTATION_ID);
         }
-        stations.remove(downStation);
-        distance -= lastSection.getDistance();
+
+        return Section.builder()
+                .upStation(upStation)
+                .downStation(downStation)
+                .distance(distance)
+                .build();
+    }
+
+    public List<Section> getSections() {
+        return this.sections.getSections();
     }
 
     public static class Builder {
         private String name;
         private String color;
-        private List<Station> stations;
+        private List<Section> sections;
         private Long distance;
 
         public Builder() {
@@ -119,13 +113,13 @@ public class Line {
             return this;
         }
 
-        public Builder stations(List<Station> stations) {
-            this.stations = stations;
+        public Builder sections(List<Section> sections) {
+            this.sections = sections;
             return this;
         }
 
         public Line build() {
-            return new Line(name, color, stations, distance);
+            return new Line(name, color, new Sections(sections), distance);
         }
     }
 }

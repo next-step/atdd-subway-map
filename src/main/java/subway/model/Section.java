@@ -1,8 +1,5 @@
 package subway.model;
 
-import subway.exception.AddSectionException;
-import subway.exception.ErrorMessage;
-
 import javax.persistence.*;
 
 @Entity
@@ -10,10 +7,6 @@ public class Section {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @ManyToOne
-    @JoinColumn(name = "line_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private Line line;
 
     @ManyToOne
     @JoinColumn(name = "up_station_id")
@@ -29,8 +22,7 @@ public class Section {
 
     }
 
-    public Section(Line line, Station upStation, Station downStation, Long distance) {
-        this.line = line;
+    public Section(Station upStation, Station downStation, Long distance) {
         this.upStation = upStation;
         this.downStation = downStation;
         this.distance = distance;
@@ -52,25 +44,27 @@ public class Section {
         return distance;
     }
 
-    public void validate(Line line) {
-        if (!line.equalToDownStation(upStation)) {
-            throw new AddSectionException(ErrorMessage.WRONG_UPSTATION_ID);
-        }
-        if (line.includes(downStation)) {
-            throw new AddSectionException(ErrorMessage.WRONG_DOWNSTATION_ID);
-        }
-    }
-
     public boolean equals(Station upStation, Station downStation) {
         return this.upStation.equals(upStation) && this.downStation.equals(downStation);
+    }
+
+    public boolean contains(Station station) {
+        return upStation.equals(station) || downStation.equals(station);
+    }
+
+    public boolean equalToDownStation(Station station) {
+        return this.downStation.equals(station);
     }
 
     public static Builder builder() {
         return new Builder();
     }
 
+    public boolean equalUpStation(Station station) {
+        return upStation.equals(station);
+    }
+
     public static class Builder {
-        private Line line;
         private Station upStation;
         private Station downStation;
         private Long distance;
@@ -94,12 +88,7 @@ public class Section {
         }
 
         public Section build() {
-            return new Section(line, upStation, downStation, distance);
-        }
-
-        public Builder line(Line savedLine) {
-            this.line = savedLine;
-            return this;
+            return new Section(upStation, downStation, distance);
         }
     }
 }

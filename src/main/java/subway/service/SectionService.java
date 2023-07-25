@@ -23,7 +23,8 @@ public class SectionService {
     }
 
     public List<Section> findAllSectionsByLineId(Long lineId) {
-        return sectionRepository.findByLineId(lineId);
+        return lineService.findLineById(lineId)
+                .getSections();
     }
 
     @Transactional
@@ -31,25 +32,16 @@ public class SectionService {
         Line line = lineService.findLineById(lineId);
         Station upStation = stationService.findStationById(sectionRequest.getUpStationId());
         Station downStation = stationService.findStationById(sectionRequest.getDownStationId());
-        Section newSection = Section.builder()
-                .line(line)
-                .upStation(upStation)
-                .downStation(downStation)
-                .distance(sectionRequest.getDistance())
-                .build();
-        newSection.validate(line);
+        Section newSection = line.createSection(upStation, downStation, sectionRequest.getDistance());
         Section section = sectionRepository.save(newSection);
         line.addSection(section);
-        lineService.save(line);
         return section;
     }
 
     @Transactional
     public void deleteLastSection(Long lineId, Long upStationId) {
-        Section lastSection = sectionRepository.findByLineIdAndUpStationId(lineId, upStationId);
         Line line = lineService.findLineById(lineId);
-        line.deleteLastSection(lastSection);
-        lineService.save(line);
-        sectionRepository.delete(lastSection);
+        Station upStation = stationService.findStationById(upStationId);
+        line.deleteLastSection(upStation);
     }
 }

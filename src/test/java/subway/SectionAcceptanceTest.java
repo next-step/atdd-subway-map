@@ -19,6 +19,7 @@ import static helper.LineTestHelper.지하철노선을_조회한다;
 import static helper.SectionTestHelper.*;
 import static helper.StationTestHelper.지하철역을_생성한다;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD;
 
 @DirtiesContext(classMode = BEFORE_EACH_TEST_METHOD)
@@ -69,7 +70,6 @@ class SectionAcceptanceTest {
     }
 
 
-
     /**
      * Given 지하철 노선에 새로운 구간을 등록하고,
      * When 해당 노선의 구간 목록과 노선을 조회하면
@@ -97,9 +97,11 @@ class SectionAcceptanceTest {
         Long downStationId = stations.get(stations.size() - 1).getId();
 
         // then
-        assertThat(sections).contains(Long.valueOf(sectionId));
-        assertThat(downStationId).isEqualTo(3);
-        assertThat(line.jsonPath().getObject("distance", Long.class)).isEqualTo(20);
+        assertAll(
+                () -> assertThat(sections).contains(Long.valueOf(sectionId)),
+                () -> assertThat(downStationId).isEqualTo(3),
+                () -> assertThat(line.jsonPath().getObject("distance", Long.class)).isEqualTo(20)
+        );
     }
 
     /**
