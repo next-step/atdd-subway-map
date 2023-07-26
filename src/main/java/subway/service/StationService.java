@@ -8,15 +8,20 @@ import java.util.stream.Collectors;
 import subway.controller.dto.StationRequest;
 import subway.controller.dto.StationResponse;
 import subway.domain.Station;
+import subway.repository.SectionRepository;
 import subway.repository.StationRepository;
 
 @Service
 @Transactional(readOnly = true)
 public class StationService {
-    private StationRepository stationRepository;
+    private final StationRepository stationRepository;
 
-    public StationService(StationRepository stationRepository) {
+    private final SectionRepository sectionRepository;
+
+    public StationService(StationRepository stationRepository,
+        SectionRepository sectionRepository) {
         this.stationRepository = stationRepository;
+        this.sectionRepository = sectionRepository;
     }
 
     @Transactional
@@ -33,6 +38,7 @@ public class StationService {
 
     @Transactional
     public void deleteStationById(Long id) {
+        sectionRepository.deleteAllByStartStationId(id);
         stationRepository.deleteById(id);
     }
 

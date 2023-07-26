@@ -35,27 +35,31 @@ public class LineAcceptanceTest {
     int port;
 
     @Autowired
-    DatabaseCleanup databaseCleanup;
+    RestAssuredUtil restAssuredUtil;
 
     @BeforeEach
     @DisplayName("RestAssured 에서 요청 보낼 포트를 설정하고, 4개의 지하철 역 정보를 생성합니다.")
     void setup() {
-        포트번호를_설정합니다();
-        데이터베이스를_초기화합니다();
+        restAssuredUtil.테스트_컨텍스트를_초기화합니다(port);
         지하철_역을_생성합니다("강남역", "양재역", "신사역", "논현역");
     }
 
-    private void 데이터베이스를_초기화합니다() {
-        databaseCleanup.afterPropertiesSet();
-        databaseCleanup.clean();
+    public static ExtractableResponse<Response> 지하철_노선_목록을_조회합니다() {
+        return selectAll();
     }
 
-    private void 포트번호를_설정합니다() {
-        RestAssured.port = port;
+    public static ExtractableResponse<Response> 지하철_노선을_ID로_조회합니다(Long id) {
+        return selectLine(id);
+    }
+
+    public static ExtractableResponse<Response> 신규_노선(Long upStationId, Long downStationId,
+                                                      String name, String color, Long distance) {
+        return createLineResult(
+            requestBodyOf(upStationId, downStationId, name, color, distance));
     }
 
     private void 지하철_역을_생성합니다(String... name) {
-        Stream.of(name).forEach(StationAcceptanceTest::지하철_역_생성);
+        Stream.of(name).forEach(StationAcceptanceTest::신규_역);
     }
 
     /**
@@ -75,7 +79,7 @@ public class LineAcceptanceTest {
         Long distance = 10L;
 
         // when
-        ExtractableResponse<Response> saved = 지하철_노선_정보를_생성합니다(upStationId, downStationId, name, color, distance);
+        ExtractableResponse<Response> saved = 신규_노선(upStationId, downStationId, name, color, distance);
 
         // then
         지하철_노선이_정상_생성되었습니다(saved);
@@ -95,7 +99,7 @@ public class LineAcceptanceTest {
     }
 
     private ListAssert<Long> 응답_노선의_지하철_역_목록에_입력한_지하철_역이_포함됩니다(ExtractableResponse<Response> found, Long[] id) {
-        return assertThat(found.jsonPath().getList("stations.id", Long.class)).contains(id);
+        return assertThat(List.of(found.jsonPath().getLong("upStation.id"), found.jsonPath().getLong("downStation.id"))).contains(id);
     }
 
     private AbstractStringAssert<?> 응답_노선의_색상이_입력_색상과_동일합니다(String color, ExtractableResponse<Response> found) {
@@ -116,12 +120,6 @@ public class LineAcceptanceTest {
 
     private AbstractIntegerAssert<?> 지하철_노선이_정상_생성되었습니다(ExtractableResponse<Response> saved) {
         return assertThat(saved.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-    }
-
-    private ExtractableResponse<Response> 지하철_노선_정보를_생성합니다(Long upStationId, Long downStationId,
-        String name, String color, Long distance) {
-        return createLineResult(
-            requestBodyOf(upStationId, downStationId, name, color, distance));
     }
 
     /** given 지하철 노선을 2개 생성하고
@@ -151,8 +149,7 @@ public class LineAcceptanceTest {
         ExtractableResponse<Response> found = 지하철_노선_목록을_조회합니다();
 
         // then
-        List<List<Integer>> list = 지하철_노선_목록에서_지하철_역_ID_조회합니다(found);
-        Set<Long> stationIdSet = 지하철_역_ID_목록으로_변환합니다(list);
+        Set<Long> stationIdSet = 지하철_역_ID_목록으로_변환합니다(지하철_노선_목록에서_지하철_역_ID_조회합니다(found));
 
         생성한_지하철_노선들이_응답_지하철_노선_목록에_포함됩니다(found, stationIdSet, upStationId, downStationId, upStationId2, downStationId2, name, color, name2, color2);
     }
@@ -187,7 +184,7 @@ public class LineAcceptanceTest {
     }
 
     private List<List<Integer>> 지하철_노선_목록에서_지하철_역_ID_조회합니다(ExtractableResponse<Response> found) {
-        return found.jsonPath().getList("lines.stations.id");
+        return List.of(found.jsonPath().get("lines.upStation.id"), found.jsonPath().get("lines.downStation.id"));
     }
 
     private Set<Long> 지하철_역_ID_목록으로_변환합니다(List<List<Integer>> list) {
@@ -198,11 +195,10 @@ public class LineAcceptanceTest {
             .collect(Collectors.toSet());
     }
 
-    private ExtractableResponse<Response> 지하철_노선_목록을_조회합니다() {
-        return selectAll();
-    }
-
-    private ExtractableResponse<Response> 입력_정보로_지하철_노선을_생성합니다(Long upStationId, Long downStationId, String name, String color,
+    private ExtractableResponse<Response> 입력_정보로_지하철_노선을_생성합니다(Long upStationId,
+        Long downStationId,
+        String name,
+        String color,
         Long distance) {
         return createLineResult(
             requestBodyOf(upStationId, downStationId, name, color, distance));
@@ -244,7 +240,7 @@ public class LineAcceptanceTest {
 
     private ListAssert<Long> 응답_노선의_지하철_역_ID_에_입력_지하철_역_ID_가_포함됩니다(Long upStationId, Long downStationId,
         ExtractableResponse<Response> found) {
-        return assertThat(found.jsonPath().getList("stations.id", Long.class)).contains(
+        return assertThat(List.of(found.jsonPath().getLong("upStation.id"), found.jsonPath().getLong("downStation.id"))).contains(
             upStationId, downStationId);
     }
 
@@ -358,7 +354,8 @@ public class LineAcceptanceTest {
         return deleteLineResult(saved.jsonPath().getLong("id"));
     }
 
-    private Map<String, Object> requestBodyOf(Long upStationId, Long downStationId, String name,
+    private static Map<String, Object> requestBodyOf(Long upStationId, Long downStationId,
+        String name,
         String color, Long distance) {
         return Map.of(
             "upStationId", upStationId,
@@ -369,15 +366,15 @@ public class LineAcceptanceTest {
         );
     }
 
-    private ExtractableResponse<Response> createLineResult(Map<String, Object> requestBody) {
+    private static ExtractableResponse<Response> createLineResult(Map<String, Object> requestBody) {
         return RestAssuredUtil.createWithCreated("/lines", requestBody);
     }
 
-    private ExtractableResponse<Response> selectAll() {
+    private static ExtractableResponse<Response> selectAll() {
         return RestAssuredUtil.findAllWithOk("/lines");
     }
 
-    private ExtractableResponse<Response> selectLine(Long id) {
+    private static ExtractableResponse<Response> selectLine(Long id) {
         return RestAssuredUtil.findByIdWithOk("/lines/{id}", id);
     }
 

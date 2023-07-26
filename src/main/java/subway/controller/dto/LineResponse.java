@@ -1,7 +1,5 @@
 package subway.controller.dto;
 
-import java.util.Set;
-import java.util.stream.Collectors;
 import subway.domain.Line;
 import subway.domain.Station;
 
@@ -13,27 +11,28 @@ public class LineResponse {
 
     private final String color;
 
-    private final Set<StationResponse> stations;
+    private final StationResponse upStation;
+
+    private final StationResponse downStation;
 
     private final Long distance;
 
-    public LineResponse(Long id, String name, String color, Set<Station> stations, Long distance) {
+    public LineResponse(Long id, String name, String color, Station upStation, Station downStation, Long distance) {
         this.id = id;
         this.name = name;
         this.color = color;
-        this.stations = responseOf(stations);
+        this.upStation = StationResponse.responseFrom(upStation);
+        this.downStation = StationResponse.responseFrom(downStation);
         this.distance = distance;
     }
 
-    private Set<StationResponse> responseOf(Set<Station> stations) {
-        return stations.stream()
-            .map(StationResponse::responseFrom)
-            .collect(Collectors.toSet());
-    }
-
     public static LineResponse from(Line line) {
-        return new LineResponse(line.getId(), line.getName(), line.getColor(), line.getEndStations().getStations(),
-            line.getDistance());
+        return new LineResponse(line.getId()
+            , line.getName()
+            , line.getColor()
+            , line.getUpEndStation()
+            , line.getDownEndStation()
+            , line.getDistance());
     }
 
     public Long getId() {
@@ -48,8 +47,12 @@ public class LineResponse {
         return color;
     }
 
-    public Set<StationResponse> getStations() {
-        return stations;
+    public StationResponse getUpStation() {
+        return upStation;
+    }
+
+    public StationResponse getDownStation() {
+        return downStation;
     }
 
     public Long getDistance() {
