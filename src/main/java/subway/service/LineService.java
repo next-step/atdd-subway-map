@@ -2,57 +2,64 @@ package subway.service;
 
 import org.springframework.stereotype.Service;
 import subway.dto.LineRequest;
-import subway.dto.LineResponse;
 import subway.dto.LineUpdateRequest;
+import subway.exception.ErrorMessage;
 import subway.exception.SubwayException;
 import subway.model.Line;
+import subway.model.Section;
 import subway.model.Station;
 import subway.repository.LineRepository;
+import subway.repository.SectionRepository;
 
 import javax.transaction.Transactional;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class LineService {
 
     private final LineRepository lineRepository;
     private final StationService stationService;
+    private final SectionRepository sectionRepository;
 
-    public LineService(LineRepository lineRepository, StationService stationService) {
+    public LineService(LineRepository lineRepository, StationService stationService, SectionRepository sectionRepository) {
         this.lineRepository = lineRepository;
         this.stationService = stationService;
+        this.sectionRepository = sectionRepository;
     }
 
     @Transactional
-    public LineResponse create(LineRequest lineRequest) {
+    public Line create(LineRequest lineRequest) {
         Station upStation = stationService.findStationById(lineRequest.getUpStationId());
         Station downStation = stationService.findStationById(lineRequest.getDownStationId());
-        Line line = new Line(lineRequest.getName(), lineRequest.getColor(), upStation, downStation, lineRequest.getDistance());
-        return createLineResponse(lineRepository.save(line));
+        Section newSection = Section.builder()
+                .upStation(upStation)
+                .downStation(downStation)
+                .distance(lineRequest.getDistance())
+                .build();
+        Section section = sectionRepository.save(newSection);
+
+        Line line = Line.builder()
+                .name(lineRequest.getName())
+                .color(lineRequest.getColor())
+                .sections(List.of(section))
+                .distance(lineRequest.getDistance())
+                .build();
+        return lineRepository.save(line);
     }
 
-    public List<LineResponse> findAllLines() {
-        return lineRepository.findAll().stream()
-                .map(this::createLineResponse)
-                .collect(Collectors.toList());
+    public List<Line> findAllLines() {
+        return lineRepository.findAll();
     }
 
-    public LineResponse findLineById(Long id) {
-        return createLineResponse(
-                lineRepository.findById(id)
-                        .orElseThrow(() -> new SubwayException("존재하지 않는 지하철 노선 ID 입니다."))
-        );
-    }
-
-    private LineResponse createLineResponse(Line line) {
-        return new LineResponse(line.getId(), line.getName(), line.getColor(), line.getUpStation(), line.getDownStation());
+    public Line findLineById(Long id) {
+        return lineRepository.findById(id)
+                .orElseThrow(() -> new SubwayException(ErrorMessage.NOT_FOUND_SUBWAY_LINE_ID));
     }
 
     @Transactional
     public void update(Long id, LineUpdateRequest lineRequest) {
         Line line = lineRepository.findById(id)
-                .orElseThrow(() -> new SubwayException("존재하지 않는 지하철 노선 ID 입니다."));
+                .orElseThrow(() -> new SubwayException(ErrorMessage.NOT_FOUND_SUBWAY_LINE_ID));
         line.update(lineRequest.getName(), lineRequest.getColor());
         lineRepository.save(line);
     }
@@ -60,5 +67,10 @@ public class LineService {
     @Transactional
     public void delete(Long id) {
         lineRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void save(Line line) {
+        lineRepository.save(line);
     }
 }

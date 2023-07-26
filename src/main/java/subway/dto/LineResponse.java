@@ -1,7 +1,5 @@
 package subway.dto;
 
-import subway.model.Station;
-
 import java.util.List;
 
 public class LineResponse {
@@ -11,16 +9,35 @@ public class LineResponse {
 
     private String color;
 
-    private List<Station> stations;
+    private List<StationDto> stations;
 
-    public LineResponse(Long id, String name, String color, Station upStation, Station downStation) {
+    private Long distance;
+
+    public LineResponse(Long id, String name, String color, List<StationDto> stations, Long distance) {
         this.id = id;
         this.name = name;
         this.color = color;
-        this.stations = List.of(upStation, downStation);
+        this.stations = stations;
+        this.distance = distance;
     }
 
     public Long getId() {
         return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public List<StationDto> getStations() {
+        return stations;
+    }
+
+    public Long getDistance() {
+        return distance;
     }
 }
