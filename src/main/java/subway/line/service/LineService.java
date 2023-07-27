@@ -104,8 +104,6 @@ public class LineService {
         Station station = stationService.getStation(sectionRequest.getDownStationId());
         sectionService.validateSection(line, station);
         Section section = sectionService.createSection(line, station);
-//        line.saveStations(new Stations(line.getStations().getUpStation(), station));
-//        lineRepository.save(line);
         return SectionResponse.of(section);
     }
 
@@ -113,10 +111,6 @@ public class LineService {
         if (!sectionUpStationId.equals(lineDownStationId)) {
             throw new IllegalArgumentException(STATION_NOT_MATCHED);
         }
-    }
-
-    private void validateSection(List<Section> sections, Section section) {
-
     }
 
     @Transactional
@@ -142,7 +136,6 @@ public class LineService {
         Line line = lineRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(LINE_DOES_NOT_EXIST));
         return sectionService.getSections(line)
                 .stream()
-                .sorted(Comparator.comparing(Section::getId))
                 .map(section -> {
                     return SectionResponse.of(section);
                 })
