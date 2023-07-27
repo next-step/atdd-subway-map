@@ -38,6 +38,7 @@ public class SectionAcceptanceTest {
     @DisplayName("구간 등록 기능")
     @Test
     void createSection() {
+        // given
         Map<String, String> params = new HashMap<>();
         params.put("upStationId", "1");
         params.put("downStationId", "2");
@@ -46,14 +47,15 @@ public class SectionAcceptanceTest {
         Long lineId = 1L;
 
         ExtractableResponse<Response> createSectionResponse = RestAssuredUtils.create(new RestAssuredCondition(String.format(LINE_SECTION_API_URI, lineId), params));
-        assertThat(createSectionResponse.statusCode()).isEqualTo(500);
+        assertThat(createSectionResponse.statusCode()).isEqualTo(400);
+        assertThat(createSectionResponse.body().jsonPath().getString("message")).isEqualTo("노선이 일치하지 않습니다.");
 
-
+        // when
         Map<String, String> stationParams = new HashMap<>();
         stationParams.put("name", "을지로역");
         RestAssuredUtils.create(new RestAssuredCondition(STATION_API_URI, stationParams));
 
-
+        // then
         params.put("upStationId", "2");
         params.put("downStationId", "3");
         params.put("distance", "10");
@@ -77,7 +79,8 @@ public class SectionAcceptanceTest {
         Long lineId = 1L;
 
         ExtractableResponse<Response> createSectionResponse = RestAssuredUtils.create(new RestAssuredCondition(String.format(LINE_SECTION_API_URI, lineId), params));
-        assertThat(createSectionResponse.statusCode()).isEqualTo(500);
+        assertThat(createSectionResponse.statusCode()).isEqualTo(400);
+        assertThat(createSectionResponse.body().jsonPath().getString("message")).isEqualTo("노선이 일치하지 않습니다.");
 
 
         Map<String, String> stationParams = new HashMap<>();

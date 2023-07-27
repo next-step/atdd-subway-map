@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 public class StationService {
 
     private static final String STATION_DOES_NOT_EXIST = "존재하지 않는 역입니다.";
+    private static final String ALREADY_EXIST = "이미 존재하는 역 이름입니다.";
 
     private StationRepository stationRepository;
 
@@ -27,7 +28,7 @@ public class StationService {
     public StationResponse saveStation(StationRequest stationRequest) {
         stationRepository.findByName(stationRequest.getName())
                 .ifPresent(station -> {
-                    throw new IllegalArgumentException("이미 존재하는 역 이름입니다.");
+                    throw new IllegalArgumentException(ALREADY_EXIST);
                 });
         Station station = stationRepository.save(new Station(stationRequest.getName()));
         return createStationResponse(station);
