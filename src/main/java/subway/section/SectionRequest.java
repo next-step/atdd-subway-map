@@ -1,6 +1,6 @@
 package subway.section;
 
-public class SubwaySectionRequest {
+public class SectionRequest {
 
     private Long upStationId;
     private Long downStationId;

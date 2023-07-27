@@ -1,5 +1,6 @@
 package subway.line;
 
+import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.assertj.core.api.Assertions;
@@ -7,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import subway.helper.SubwayStationHelper;
@@ -23,11 +25,15 @@ import static subway.helper.SubwayLineHelper.지하철_노선_생성_요청;
 @DisplayName("지하철 노선 관련 기능")
 @DirtiesContext(classMode = BEFORE_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class SubwayLineAcceptanceTest {
+public class LineAcceptanceTest {
+
+    @LocalServerPort
+    private int port;
 
     @DisplayName("4개의 지하철 역을 생성합니다.")
     @BeforeEach
     void setUp() {
+        RestAssured.port = port;
         Stream.of("지하철 역", "새로운 지하철 역", "또 다른 지하철 역", "또 다른 새로운 지하철 역")
                 .forEach(SubwayStationHelper::지하철_역_생성_요청);
     }

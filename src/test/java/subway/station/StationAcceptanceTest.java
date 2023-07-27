@@ -4,9 +4,11 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import subway.helper.SubwayStationHelper;
@@ -23,7 +25,14 @@ import static subway.helper.SubwayStationHelper.지하철_역_생성_요청;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationAcceptanceTest {
 
+    @LocalServerPort
+    private int port;
     private final String STATION_API_URL = "/stations";
+
+    @BeforeEach
+    void setUp() {
+        RestAssured.port = port;
+    }
 
     /**
      * When 지하철역을 생성하면

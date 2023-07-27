@@ -1,6 +1,6 @@
 package subway.line;
 
-public class SubwayLineUpdateRequest {
+public class LineUpdateRequest {
 
     private String name;
     private String color;

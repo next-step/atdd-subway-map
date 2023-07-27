@@ -1,13 +1,14 @@
 package subway.line;
 
-import subway.section.SubwaySection;
+import subway.section.Section;
+import subway.station.Station;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class SubwayLine {
+public class Line {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,14 +21,13 @@ public class SubwayLine {
     private String color;
 
     @OneToMany(fetch = FetchType.LAZY)
-    private List<SubwaySection> sections;
+    private List<Section> sections = new ArrayList<>();
 
-    public SubwayLine() {}
+    public Line() {}
 
-    public SubwayLine(String name, String color) {
+    public Line(String name, String color) {
         this.name = name;
         this.color = color;
-        this.sections = new ArrayList<>();
     }
 
     public void updateName(String name) {
@@ -44,5 +44,20 @@ public class SubwayLine {
 
     public String getColor() { return color; }
 
-    public List<SubwaySection> getSections() { return sections; }
+    public List<Section> getSections() { return this.sections; }
+
+    public void addSection(Section section) {
+        sections.add(section);
+    }
+
+    public boolean deleteSectionByStation(Station station) {
+        List<Section> sections = getSections();
+        Section lastSection = sections.get(sections.size() -1);
+
+        if (lastSection.getDownStation().getId().equals(station.getId())) {
+            sections.remove(lastSection);
+            return true;
+        }
+        return false;
+    }
 }

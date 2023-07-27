@@ -10,7 +10,9 @@ public class ExceptionController {
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity customExceptionHandler(IllegalArgumentException e) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+        e.printStackTrace();
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
                 .body(e.getMessage());
     }
 }

@@ -1,12 +1,12 @@
 package subway.line;
 
-public class SubwayLineRequest {
+public class LineRequest {
 
     private String name;
     private String color;
     private Long upStationId;
     private Long downStationId;
-    private Integer distance;
+    private int distance;
 
     public String getName() { return name; }
 
@@ -15,4 +15,6 @@ public class SubwayLineRequest {
     public Long getUpStationId() { return upStationId; }
 
     public Long getDownStationId() { return downStationId; }
+
+    public int getDistance() { return distance; }
 }

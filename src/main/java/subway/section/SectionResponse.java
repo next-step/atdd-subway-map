@@ -1,10 +1,10 @@
 package subway.section;
 
-public class SubwaySectionResponse {
+public class SectionResponse {
 
     private Long id;
 
-    public SubwaySectionResponse(Long id) {
+    public SectionResponse(Long id) {
         this.id = id;
     }
 

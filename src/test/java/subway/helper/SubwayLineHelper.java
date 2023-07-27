@@ -9,7 +9,7 @@ import java.util.Map;
 
 public class SubwayLineHelper {
 
-    public static final String SUBWAY_LINE_API_URL = "/subway-lines";
+    public static final String SUBWAY_LINE_API_URL = "/lines";
     public static final Map<String, Object> 신분당선 = Map.of("name", "신분당선"
             , "color", "bg-red-600"
             , "upStationId", 1L, "downStationId", 2L
@@ -35,6 +35,7 @@ public class SubwayLineHelper {
     public static ExtractableResponse<Response> 지하철_노선_목록_조회_요청() {
         ExtractableResponse<Response> showSubwayLinesApiResponse = RestAssured
                 .given().log().all()
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().log().all()
                     .get(SubwayLineHelper.SUBWAY_LINE_API_URL)
                 .then().log().all()

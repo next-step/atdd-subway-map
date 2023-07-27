@@ -1,6 +1,10 @@
 package subway.station;
 
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor
 public class StationResponse {
+
     private Long id;
     private String name;
 
