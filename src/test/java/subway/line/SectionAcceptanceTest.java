@@ -68,6 +68,7 @@ public class SectionAcceptanceTest {
     @Test
     void deleteSection() {
 
+        // given
         Map<String, String> params = new HashMap<>();
         params.put("upStationId", "1");
         params.put("downStationId", "2");
@@ -84,6 +85,7 @@ public class SectionAcceptanceTest {
         RestAssuredUtils.create(new RestAssuredCondition(STATION_API_URI, stationParams));
 
 
+        // when
         params.put("upStationId", "2");
         params.put("downStationId", "3");
         params.put("distance", "10");
@@ -93,6 +95,7 @@ public class SectionAcceptanceTest {
         ExtractableResponse<Response> deleteSectionResponse = RestAssuredUtils.delete(new RestAssuredCondition(String.format(LINE_SECTION_API_URI + "?stationId=%s", lineId, 3)));
         assertThat(deleteSectionResponse.statusCode()).isEqualTo(204);
 
+        // then
         ExtractableResponse<Response> getSectionResponse = RestAssuredUtils.inquiry(new RestAssuredCondition(String.format(LINE_SECTION_API_URI, lineId)));
 
         assertThat(getSectionResponse.statusCode()).isEqualTo(200);
