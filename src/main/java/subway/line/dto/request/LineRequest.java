@@ -1,8 +1,8 @@
-package subway.route.dto;
+package subway.line.dto.request;
 
-import subway.route.domain.Route;
+import subway.line.domain.Line;
 
-public class RouteRequest {
+public class LineRequest {
 
     private Long id;
     private String name;
@@ -11,8 +11,8 @@ public class RouteRequest {
     private Long downStationId;
     private Integer distance;
 
-    public Route toEntity() {
-        return Route.of(id, name, color, distance);
+    public Line toEntity() {
+        return Line.of(id, name, color, distance);
     }
 
     public void saveId(Long id) {

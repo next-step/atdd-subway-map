@@ -1,4 +1,4 @@
-package subway.route;
+package subway.line;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -10,7 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import subway.common.RestAssuredUtils;
 import subway.common.RestAssuredCondition;
-import subway.route.dto.RouteResponse;
+import subway.line.dto.response.LineResponse;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,11 +20,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철 노선 관련 기능")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class RouteAcceptanceTest {
+public class LineAcceptanceTest {
 
-    private final String ROUTE_API_URI = "/api/routes";
+    private final String ROUTE_API_URI = "/lines";
 
-    private final String STATION_API_URI = "/api/stations";
+    private final String STATION_API_URI = "/stations";
 
     private final String SLASH = "/";
 
@@ -51,7 +51,7 @@ public class RouteAcceptanceTest {
         ExtractableResponse<Response> response =
                 RestAssuredUtils
                         .create(new RestAssuredCondition(ROUTE_API_URI, params));
-        RouteResponse route = response.body().jsonPath().getObject(".", RouteResponse.class);
+        LineResponse route = response.body().jsonPath().getObject(".", LineResponse.class);
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
@@ -60,7 +60,7 @@ public class RouteAcceptanceTest {
                         .inquiry(new RestAssuredCondition(ROUTE_API_URI + SLASH + route.getId()));
 
         assertThat(inquiryStationsResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(inquiryStationsResponse.body().jsonPath().getObject(".", RouteResponse.class)).isEqualTo(route);
+        assertThat(inquiryStationsResponse.body().jsonPath().getObject(".", LineResponse.class)).isEqualTo(route);
 
     }
 
@@ -108,7 +108,7 @@ public class RouteAcceptanceTest {
         ExtractableResponse<Response> response =
                 RestAssuredUtils
                         .create(new RestAssuredCondition(ROUTE_API_URI, params));
-        RouteResponse route = response.body().jsonPath().getObject(".", RouteResponse.class);
+        LineResponse route = response.body().jsonPath().getObject(".", LineResponse.class);
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
@@ -123,7 +123,7 @@ public class RouteAcceptanceTest {
                         .update(new RestAssuredCondition(ROUTE_API_URI + SLASH + route.getId(), params));
 
         assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(updateResponse.body().jsonPath().getObject(".", RouteResponse.class).getName()).isEqualTo("2호선");
+        assertThat(updateResponse.body().jsonPath().getObject(".", LineResponse.class).getName()).isEqualTo("2호선");
 
     }
 
@@ -140,7 +140,7 @@ public class RouteAcceptanceTest {
         ExtractableResponse<Response> response =
                 RestAssuredUtils
                         .create(new RestAssuredCondition(ROUTE_API_URI, params));
-        RouteResponse route = response.body().jsonPath().getObject(".", RouteResponse.class);
+        LineResponse route = response.body().jsonPath().getObject(".", LineResponse.class);
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 

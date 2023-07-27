@@ -1,12 +1,12 @@
-package subway.route.dto;
+package subway.line.dto.response;
 
-import subway.route.domain.Route;
+import subway.line.domain.Line;
 import subway.station.domain.Station;
 
 import java.util.List;
 import java.util.Objects;
 
-public class RouteResponse {
+public class LineResponse {
 
     private final Long id;
 
@@ -14,22 +14,22 @@ public class RouteResponse {
     private final String color;
     private final List<Station> stations;
 
-    public RouteResponse(Long id, String name, String color, List<Station> stations) {
+    public LineResponse(Long id, String name, String color, List<Station> stations) {
         this.id = id;
         this.name = name;
         this.color = color;
         this.stations = stations;
     }
 
-    public static RouteResponse of(Route route) {
-        return new RouteResponse(route);
+    public static LineResponse of(Line route) {
+        return new LineResponse(route);
     }
 
-    private RouteResponse(Route route) {
+    private LineResponse(Line route) {
         this.id = route.getId();
         this.name = route.getName();
         this.color = route.getColor();
-        stations = List.of(route.getStations().getUpStationId(), route.getStations().getDownStationId());
+        stations = List.of(route.getStations().getUpStation(), route.getStations().getDownStation());
     }
 
     public Long getId() {
@@ -52,7 +52,7 @@ public class RouteResponse {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        RouteResponse that = (RouteResponse) o;
+        LineResponse that = (LineResponse) o;
         return Objects.equals(id, that.id) && Objects.equals(name, that.name) && Objects.equals(color, that.color) && Objects.equals(stations, that.stations);
     }
 

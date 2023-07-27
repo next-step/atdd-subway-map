@@ -1,14 +1,12 @@
-package subway.route.domain;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import subway.station.domain.Station;
+package subway.line.domain;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
-public class Route {
+public class Line {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,24 +23,30 @@ public class Route {
     @Column(length = 10, nullable = false)
     private Integer distance;
 
-    public Route() {
+    @OneToMany(mappedBy = "line", fetch = FetchType.EAGER)
+    private List<Section> sections = new ArrayList<>();
+
+    public Line() {
     }
 
-    public Route(Long id, String name, String color, Integer distance) {
+    public Line(Long id, String name, String color, Integer distance) {
         this.id = id;
         this.name = name;
         this.color = color;
         this.distance = distance;
     }
 
-    public static Route of(Long id, String name, String color, Integer distance) {
-        return new Route(id, name, color, distance);
+    public static Line of(Long id, String name, String color, Integer distance) {
+        return new Line(id, name, color, distance);
     }
 
     public void saveStations(Stations stations) {
         this.stations = stations;
     }
 
+    public void saveSections(List<Section> sections) {
+        this.sections = sections;
+    }
     public Long getId() {
         return id;
     }
@@ -63,12 +67,16 @@ public class Route {
         return distance;
     }
 
+    public List<Section> getSections() {
+        return sections;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Route route = (Route) o;
+        Line route = (Line) o;
 
         if (!Objects.equals(id, route.id)) return false;
         return Objects.equals(name, route.name);

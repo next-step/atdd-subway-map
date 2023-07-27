@@ -1,6 +1,6 @@
-package subway.route.code;
+package subway.line.code;
 
-public enum RouteValidateTypeCode {
+public enum LineValidateTypeCode {
 
     SAVE("이름"),
     UPDATE("아이디와 이름"),
@@ -9,7 +9,7 @@ public enum RouteValidateTypeCode {
 
     private final String description;
 
-    RouteValidateTypeCode(String description) {
+    LineValidateTypeCode(String description) {
         this.description = description;
     }
 
