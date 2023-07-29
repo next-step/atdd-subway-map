@@ -1,4 +1,4 @@
-package subway;
+package subway.acceptance;
 
 import com.navercorp.fixturemonkey.ArbitraryBuilder;
 import io.restassured.response.ExtractableResponse;
@@ -9,12 +9,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import subway.station.dto.StationRequest;
 import subway.station.dto.StationResponse;
+import subway.util.AcceptanceTestBase;
+import subway.util.FixtureMonkeyWrapper;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.RestAssuredWrapper.*;
+import static subway.util.RestAssuredWrapper.*;
 
 @DisplayName("지하철역 관련 기능")
 class StationAcceptanceTest extends AcceptanceTestBase {

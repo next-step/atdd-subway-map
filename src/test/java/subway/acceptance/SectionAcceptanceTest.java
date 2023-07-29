@@ -1,4 +1,4 @@
-package subway;
+package subway.acceptance;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -13,9 +13,10 @@ import subway.line.dto.LineResponse;
 import subway.section.dto.CreateSectionRequest;
 import subway.station.dto.StationRequest;
 import subway.station.dto.StationResponse;
+import subway.util.AcceptanceTestBase;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.RestAssuredWrapper.*;
+import static subway.util.RestAssuredWrapper.*;
 
 class SectionAcceptanceTest extends AcceptanceTestBase {
     private static final String TEST_COLOR = "bg-test-600";
