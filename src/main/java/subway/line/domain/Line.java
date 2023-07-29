@@ -5,10 +5,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import subway.common.BaseEntity;
+import subway.section.domain.Section;
 import subway.station.domain.Station;
 
-import javax.persistence.*;
-import java.util.ArrayList;
+import javax.persistence.Column;
+import javax.persistence.Embedded;
+import javax.persistence.Entity;
 import java.util.List;
 
 @Entity
@@ -22,30 +24,38 @@ public class Line extends BaseEntity {
     @Column(length = 20, nullable = false)
     private String color;
 
-    @Column(nullable = false)
-    private Long upStationId;
+    @Embedded
+    Sections sections = new Sections();
 
-    @Column(nullable = false)
-    private Long downStationId;
-
-    @Column(nullable = false)
-    private Long distance;
-
-    @OneToMany(mappedBy = "line", cascade = CascadeType.ALL)
-    private final List<Station> stations = new ArrayList<>();
-
-    public Line(String name, String color, Long upStationId, Long downStationId, Long distance) {
+    public Line(String name, String color) {
         this.name = name;
         this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
-        this.distance = distance;
     }
 
-    public void addStation(Station station) {
-        this.stations.add(station);
-        if (station.getLine() != this) {
-            station.setLine(this);
+    public Long getOriginStationId() {
+        return sections.getOriginSectionId();
+    }
+
+    public Long getTerminalStationId() {
+        return sections.getTerminalSectionId();
+    }
+
+    public List<Station> getStations() {
+        return sections.getStations();
+    }
+
+    public int getDistance() {
+        return sections.getTotalDistance();
+    }
+
+    public void addSection(Section section) {
+        this.sections.add(section);
+        if (section.getLine() != this) {
+            section.setLine(this);
         }
+    }
+
+    public boolean hasLessThanTwoSections() {
+        return sections.hasLessThanTwoSections();
     }
 }
