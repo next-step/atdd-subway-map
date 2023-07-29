@@ -42,7 +42,7 @@ class SectionAcceptanceTest extends AcceptanceTestBase {
         @Test
         @DisplayName("새로운 구간 등록 성공")
         void createSection() {
-            // When: 새로운 지하철역을 등록하고
+            // Given: 새로운 지하철역을 등록하고
             Long 신분당선_신규역_ID = createStation("신규역");
 
             // When: 노선의 하행종점역을 상행역으로 구간을 등록하면
@@ -63,7 +63,7 @@ class SectionAcceptanceTest extends AcceptanceTestBase {
             @Test
             @DisplayName("새로운 구간의 상행역이 해당 노선에 등록되어있는 하행 종점역이 아닐 때")
             void createSectionWithInvalidUpStation() {
-                // When: 새로운 지하철역을 등록하고
+                // Given: 새로운 지하철역을 등록하고
                 Long 신분당선_신규역_ID = createStation("신규역");
 
                 // When: 해당 노선의 하행종점역이 아닌 역을 상행역으로 구간을 등록하면
@@ -88,7 +88,7 @@ class SectionAcceptanceTest extends AcceptanceTestBase {
             @Test
             @DisplayName("존재하지 않는 노선에 구간을 등록할 때")
             void createSectionWithInvalidLine() {
-                // When: 새로운 지하철역을 등록하고
+                // Given: 새로운 지하철역을 등록하고
                 Long 신분당선_신규역_ID = createStation("신규역");
 
                 // When: 존재하지 않는 노선에 구간을 등록하면
