@@ -63,7 +63,11 @@ public class LineService {
     }
 
     @Transactional
-    public void delete(Long id) { lineRepository.deleteById(id); }
+    public void delete(Long id) {
+        Line line = findSubwayLineEntity(id);
+        sectionService.deleteAllSection(line);
+        lineRepository.deleteById(id);
+    }
 
     @Transactional
     public void addSection(Long lineId, SectionRequest sectionRequest) {

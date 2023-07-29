@@ -2,9 +2,9 @@ package subway.section;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.line.Line;
 import subway.station.Station;
 import subway.station.StationService;
-
 
 @Service
 @Transactional(readOnly = true)
@@ -37,6 +37,11 @@ public class SectionService {
     public Section findById(Long id) {
         return sectionRepository.findById(id)
                 .orElseThrow(IllegalArgumentException::new);
+    }
+
+    @Transactional
+    public void deleteAllSection(Line line) {
+        sectionRepository.deleteAll(line.getSections());
     }
 
     private SectionResponse createSectionResponse(Section section) {
