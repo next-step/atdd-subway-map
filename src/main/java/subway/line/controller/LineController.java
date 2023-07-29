@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import subway.line.dto.AddLineRequest;
+import subway.line.dto.CreateLineRequest;
 import subway.line.dto.LineResponse;
 import subway.line.dto.ModifyLineRequest;
 import subway.line.dto.ModifyLineResponse;
@@ -18,20 +18,20 @@ public class LineController {
     private final LineService lineService;
 
     @PostMapping("/lines")
-    public ResponseEntity<LineResponse> createLine(@RequestBody AddLineRequest addLineRequest) {
-        LineResponse createdLine = lineService.createLine(addLineRequest);
+    public ResponseEntity<LineResponse> createLine(@RequestBody CreateLineRequest createLineRequest) {
+        LineResponse createdLine = lineService.createLine(createLineRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdLine);
     }
 
     @GetMapping("/lines")
-    public ResponseEntity<List<LineResponse>> getLines() {
-        List<LineResponse> lines = lineService.getLines();
+    public ResponseEntity<List<LineResponse>> findLines() {
+        List<LineResponse> lines = lineService.findAllLines();
         return ResponseEntity.ok(lines);
     }
 
     @GetMapping("/lines/{id}")
-    public ResponseEntity<LineResponse> getLine(@PathVariable Long id) {
-        LineResponse line = lineService.getLine(id);
+    public ResponseEntity<LineResponse> findLine(@PathVariable Long id) {
+        LineResponse line = lineService.findLine(id);
         return ResponseEntity.ok(line);
     }
 

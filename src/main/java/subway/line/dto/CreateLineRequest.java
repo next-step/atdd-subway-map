@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class AddLineRequest {
+public class CreateLineRequest {
     private String name;
     private String color;
     private Long upStationId;

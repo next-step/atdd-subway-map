@@ -6,7 +6,7 @@ import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import subway.line.dto.AddLineRequest;
+import subway.line.dto.CreateLineRequest;
 import subway.line.dto.LineResponse;
 import subway.line.dto.ModifyLineRequest;
 import subway.line.dto.ModifyLineResponse;
@@ -125,7 +125,7 @@ class LineAcceptanceTest extends AcceptanceTestBase {
     }
 
     private ExtractableResponse<Response> createLine(String lineName, Long upStationId, Long downStationId) {
-        AddLineRequest line = AddLineRequest.builder()
+        CreateLineRequest line = CreateLineRequest.builder()
                 .name(lineName)
                 .color(TEST_COLOR)
                 .distance(10)
