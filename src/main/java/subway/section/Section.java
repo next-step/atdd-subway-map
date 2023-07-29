@@ -33,9 +33,10 @@ public class Section {
         this.distance = distance;
     }
 
-    public Section(Station upStation, Station downStation, Line line) {
+    public Section(Station upStation, Station downStation, int distance, Line line) {
         this.upStation = upStation;
         this.downStation = downStation;
+        this.distance = distance;
         this.line = line;
     }
 
@@ -51,5 +52,7 @@ public class Section {
 
     public Integer getDistance() { return distance; }
 
-    public Line getLine() { return line; }
+    public void setLine(Line line) {
+        this.line = line;
+    }
 }

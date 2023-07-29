@@ -22,16 +22,16 @@ public class SectionService {
     public SectionResponse saveSection(SectionRequest sectionRequest) {
         Station upStation = stationService.findStationById(sectionRequest.getUpStationId());
         Station downStation = stationService.findStationById(sectionRequest.getDownStationId());
-
         Section section = new Section(upStation, downStation, sectionRequest.getDistance());
-        return saveSectionByEntity(section);
-    }
-
-    @Transactional
-    public SectionResponse saveSectionByEntity(Section section) {
         Section savedSection = sectionRepository.save(section);
 
         return createSectionResponse(savedSection);
+    }
+
+    @Transactional
+    public Section saveSectionByEntity(Section section) {
+        Section savedSection = sectionRepository.save(section);
+        return savedSection;
     }
 
     public Section findById(Long id) {

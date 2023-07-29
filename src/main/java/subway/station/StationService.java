@@ -34,7 +34,7 @@ public class StationService {
 
     public Station findStationById(Long id) {
         Station station = stationRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException());
+                .orElseThrow(() -> new IllegalArgumentException("요청한 역의 id가 존재하지 않습니다."));
 
         return station;
     }

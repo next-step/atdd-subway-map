@@ -51,8 +51,8 @@ public class SectionAcceptanceTest {
         // given
         Long B역 = 지하철_역_생성_요청("B역").jsonPath().getLong("id");
         Map<String, Object> 구간_C역_B역 = Map.of(
-                "upStationId", 2L,
-                "downStationId", 3L,
+                "upStationId", C역,
+                "downStationId", B역,
                 "distance", 3);
 
         // when
@@ -73,13 +73,13 @@ public class SectionAcceptanceTest {
         // given
         Long B역 = 지하철_역_생성_요청("B역").jsonPath().getLong("id");
         Map<String, Object> 구간_C역_B역 = Map.of(
-                "upStationId", 2L,
-                "downStationId", 3L,
+                "upStationId", C역,
+                "downStationId", B역,
                 "distance", 3);
         지하철_구간_추가_요청_임시(지하철_노선, 구간_C역_B역);
 
         // when
-        ExtractableResponse<Response> 지하철_구간_삭제_결과 = 지하철_구간_삭제_요청(1L, 3L);
+        ExtractableResponse<Response> 지하철_구간_삭제_결과 = 지하철_구간_삭제_요청(1L, B역);
 
         // then
         지하철_구간_삭제_됨(지하철_구간_삭제_결과);
@@ -89,14 +89,14 @@ public class SectionAcceptanceTest {
      * When 새로운 구간의 상행역이 노선에 등록되어 있는 하행 종점역이 아니면
      * Then 400 에러가 발생한다.
      */
-    @DisplayName("요청한 구간의 상행역이 노선의 하행 종점역이 아니면 예외가 발생한다.")
+    @DisplayName("구간 요청 시 요청한 구간의 상행역이 노선의 하행 종점역이 아니면 예외가 발생한다.")
     @Test
     void newUpStationIsNotRegisteredLastDownStation() {
         // when
         Long B역 = 지하철_역_생성_요청("B역").jsonPath().getLong("id");
         Map<String, Object> 구간_A역_B역 = Map.of(
-                "upStationId", 1L,
-                "downStationId", 3L,
+                "upStationId", A역,
+                "downStationId", B역,
                 "distance", 3);
         ExtractableResponse<Response> 지하철_구간_추가_결과 = 지하철_구간_추가_요청_임시(지하철_노선, 구간_A역_B역);
 
@@ -113,8 +113,8 @@ public class SectionAcceptanceTest {
     void newDownStationIsRegistered() {
         // when
         Map<String, Object> 구간_A역_C역 = Map.of(
-                "upStationId", 1L,
-                "downStationId", 2L,
+                "upStationId", C역,
+                "downStationId", A역,
                 "distance", 3);
         ExtractableResponse<Response> 지하철_구간_추가_결과 = 지하철_구간_추가_요청_임시(지하철_노선, 구간_A역_C역);
 

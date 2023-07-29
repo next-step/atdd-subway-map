@@ -20,7 +20,7 @@ public class Line {
     @Column(length = 20, nullable = false)
     private String color;
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "line", fetch = FetchType.LAZY)
     private List<Section> sections = new ArrayList<>();
 
     public Line() {}
@@ -46,6 +46,10 @@ public class Line {
 
     public List<Section> getSections() { return this.sections; }
 
+    public void setLineInSection(Section section) {
+        section.setLine(this);
+    }
+
     public void addSection(Section section) {
         sections.add(section);
     }
@@ -59,5 +63,25 @@ public class Line {
             return true;
         }
         return false;
+    }
+
+    public void beforeAddSection(Section newSection) {
+        List<Section> sections = this.getSections();
+        Section lastSection = sections.get(sections.size()-1);
+        Station newUpStation = newSection.getUpStation();
+        Station newDownStation = newSection.getDownStation();
+
+        if (!newUpStation.getId().equals(lastSection.getDownStation().getId())) {
+            throw new IllegalArgumentException("새로운 구간의 상행역이 노선의 하행 종점역이 아닙니다.");
+        }
+
+        for (Section savedSection : sections) {
+            Station savedUpStation = savedSection.getUpStation();
+            Station savedDownStation = savedSection.getDownStation();
+            if (newDownStation.getId().equals(savedUpStation.getId()) ||
+                    newDownStation.getId().equals(savedDownStation.getId())) {
+                throw new IllegalArgumentException("요청한 하행역은 이미 등록되어 있는 역입니다.");
+            }
+        }
     }
 }
