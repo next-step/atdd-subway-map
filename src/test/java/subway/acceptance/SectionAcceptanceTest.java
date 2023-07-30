@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import subway.line.dto.CreateLineRequest;
 import subway.line.dto.LineResponse;
-import subway.section.dto.CreateSectionRequest;
+import subway.section.dto.AddSectionRequest;
 import subway.section.dto.SectionResponse;
 import subway.station.dto.StationRequest;
 import subway.station.dto.StationResponse;
@@ -39,16 +39,16 @@ class SectionAcceptanceTest extends AcceptanceTestBase {
 
     @Nested
     @DisplayName("지하철 구간 등록")
-    class CreateSection {
+    class AddSection {
         @Test
         @DisplayName("새로운 구간 등록 성공")
-        void createSection() {
+        void addSection() {
             // Given: 새로운 지하철역을 등록하고
             Long 신분당선_신규역_ID = createStation("신규역");
 
             // When: 노선의 하행종점역을 상행역으로 구간을 등록하면
-            CreateSectionRequest createSectionRequest = new CreateSectionRequest(신분당선_하행종점역_ID, 신분당선_신규역_ID, 5);
-            val postSectionResponse = post(String.format(BASE_PATH, 신분당선_ID), createSectionRequest);
+            AddSectionRequest addSectionRequest = new AddSectionRequest(신분당선_하행종점역_ID, 신분당선_신규역_ID, 5);
+            val postSectionResponse = post(String.format(BASE_PATH, 신분당선_ID), addSectionRequest);
             assertThat(postSectionResponse.statusCode()).isEqualTo(HttpStatus.SC_CREATED);
 
             // Then: 구간 목록 조회 시 생성한 구간을 찾을 수 있다
@@ -61,15 +61,15 @@ class SectionAcceptanceTest extends AcceptanceTestBase {
 
         @Nested
         @DisplayName("새로운 구간 등록 실패")
-        class CreateSectionWithInvalidRequest {
+        class AddSectionWithInvalidRequest {
             @Test
             @DisplayName("새로운 구간의 상행역이 해당 노선에 등록되어있는 하행 종점역이 아닐 때")
-            void createSectionWithInvalidUpStation() {
+            void addSectionWithInvalidUpStation() {
                 // Given: 새로운 지하철역을 등록하고
                 Long 신분당선_신규역_ID = createStation("신규역");
 
                 // When: 해당 노선의 하행종점역이 아닌 역을 상행역으로 구간을 등록하면
-                CreateSectionRequest invalidSectionRequest = new CreateSectionRequest(신분당선_상행종점역_ID, 신분당선_신규역_ID, 5);
+                AddSectionRequest invalidSectionRequest = new AddSectionRequest(신분당선_상행종점역_ID, 신분당선_신규역_ID, 5);
                 ExtractableResponse<Response> postResponse = post(String.format(BASE_PATH, 신분당선_ID), invalidSectionRequest);
 
                 // Then: 구간 등록에 실패한다.
@@ -78,9 +78,9 @@ class SectionAcceptanceTest extends AcceptanceTestBase {
 
             @Test
             @DisplayName("이미 노선에 등록된 역을 새로운 구간의 하행역으로 등록할 때")
-            void createSectionWithInvalidDownStation() {
+            void addSectionWithInvalidDownStation() {
                 // When: 이미 노선에 등록된 역을 하행역으로 구간을 등록하면
-                CreateSectionRequest invalidSectionRequest = new CreateSectionRequest(신분당선_하행종점역_ID, 신분당선_상행종점역_ID, 10);
+                AddSectionRequest invalidSectionRequest = new AddSectionRequest(신분당선_하행종점역_ID, 신분당선_상행종점역_ID, 10);
                 ExtractableResponse<Response> postResponse = post(String.format(BASE_PATH, 신분당선_ID), invalidSectionRequest);
 
                 // Then: 구간 등록에 실패한다.
@@ -89,12 +89,12 @@ class SectionAcceptanceTest extends AcceptanceTestBase {
 
             @Test
             @DisplayName("존재하지 않는 노선에 구간을 등록할 때")
-            void createSectionWithInvalidLine() {
+            void addSectionWithInvalidLine() {
                 // Given: 새로운 지하철역을 등록하고
                 Long 신분당선_신규역_ID = createStation("신규역");
 
                 // When: 존재하지 않는 노선에 구간을 등록하면
-                CreateSectionRequest invalidSectionRequest = new CreateSectionRequest(신분당선_하행종점역_ID, 신분당선_신규역_ID, 10);
+                AddSectionRequest invalidSectionRequest = new AddSectionRequest(신분당선_하행종점역_ID, 신분당선_신규역_ID, 10);
                 ExtractableResponse<Response> postResponse = post(String.format(BASE_PATH, NON_EXISTENT_SUBWAY_LINE_ID), invalidSectionRequest);
 
                 // Then: 구간 등록에 실패한다.
@@ -113,9 +113,9 @@ class SectionAcceptanceTest extends AcceptanceTestBase {
             Long 신분당선_신규역_ID = createStation("신규역");
             Long 신분당선_신규역2_ID = createStation("신규역2");
             Long 신분당선_신규역3_ID = createStation("신규역3");
-            post(String.format(BASE_PATH, 신분당선_ID), new CreateSectionRequest(신분당선_하행종점역_ID, 신분당선_신규역_ID, 5));
-            post(String.format(BASE_PATH, 신분당선_ID), new CreateSectionRequest(신분당선_신규역_ID, 신분당선_신규역2_ID, 5));
-            post(String.format(BASE_PATH, 신분당선_ID), new CreateSectionRequest(신분당선_신규역2_ID, 신분당선_신규역3_ID, 5));
+            post(String.format(BASE_PATH, 신분당선_ID), new AddSectionRequest(신분당선_하행종점역_ID, 신분당선_신규역_ID, 5));
+            post(String.format(BASE_PATH, 신분당선_ID), new AddSectionRequest(신분당선_신규역_ID, 신분당선_신규역2_ID, 5));
+            post(String.format(BASE_PATH, 신분당선_ID), new AddSectionRequest(신분당선_신규역2_ID, 신분당선_신규역3_ID, 5));
 
             // When: 마지막 구간을 삭제하면
             ExtractableResponse<Response> deleteSectionResponse = delete(String.format(DELETE_PATH, 신분당선_ID, 신분당선_신규역3_ID));
@@ -143,8 +143,8 @@ class SectionAcceptanceTest extends AcceptanceTestBase {
                 // Given: 여러개의 구간을 등록하고
                 Long 신분당선_신규역_ID = createStation("신규역");
                 Long 신분당선_신규역2_ID = createStation("신규역2");
-                post(String.format(BASE_PATH, 신분당선_ID), new CreateSectionRequest(신분당선_하행종점역_ID, 신분당선_신규역_ID, 5));
-                post(String.format(BASE_PATH, 신분당선_ID), new CreateSectionRequest(신분당선_신규역_ID, 신분당선_신규역2_ID, 5));
+                post(String.format(BASE_PATH, 신분당선_ID), new AddSectionRequest(신분당선_하행종점역_ID, 신분당선_신규역_ID, 5));
+                post(String.format(BASE_PATH, 신분당선_ID), new AddSectionRequest(신분당선_신규역_ID, 신분당선_신규역2_ID, 5));
 
                 // When: 마지막 구간이 아닌 구간을 삭제하면
                 ExtractableResponse<Response> deleteSectionResponse = delete(String.format(DELETE_PATH, 신분당선_ID, 신분당선_신규역_ID));
@@ -159,8 +159,8 @@ class SectionAcceptanceTest extends AcceptanceTestBase {
                 // Given: 여러개의 구간을 등록하고
                 Long 신분당선_신규역_ID = createStation("신규역");
                 Long 신분당선_신규역2_ID = createStation("신규역2");
-                post(String.format(BASE_PATH, 신분당선_ID), new CreateSectionRequest(신분당선_하행종점역_ID, 신분당선_신규역_ID, 5));
-                post(String.format(BASE_PATH, 신분당선_ID), new CreateSectionRequest(신분당선_신규역_ID, 신분당선_신규역2_ID, 5));
+                post(String.format(BASE_PATH, 신분당선_ID), new AddSectionRequest(신분당선_하행종점역_ID, 신분당선_신규역_ID, 5));
+                post(String.format(BASE_PATH, 신분당선_ID), new AddSectionRequest(신분당선_신규역_ID, 신분당선_신규역2_ID, 5));
 
                 // When: 등록되지 않은 구간을 삭제하면
                 ExtractableResponse<Response> deleteSectionResponse = delete(String.format(DELETE_PATH, 신분당선_ID, createStation("신규역3")));

@@ -36,6 +36,7 @@ public class Sections {
         if (!sections.isEmpty()) {
             validateUpStationId(section);
             validateDownStationId(section);
+            validateDistance(section);
         }
 
         sections.add(section);
@@ -81,6 +82,12 @@ public class Sections {
                             "upStationId", section.getUpStationId().toString(),
                             "downStationId", section.getDownStationId().toString()
                     ));
+        }
+    }
+
+    private void validateDistance(Section section) {
+        if (section.getDistance() < 1) {
+            throw new InvalidSectionRequestException("길이가 0인 구간은 등록할 수 없습니다.");
         }
     }
 }

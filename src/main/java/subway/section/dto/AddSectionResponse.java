@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class CreateSectionRequest {
+public class AddSectionResponse {
     private Long upStationId;
     private Long downStationId;
     private int distance;
