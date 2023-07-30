@@ -1,4 +1,4 @@
-package subway;
+package subway.dto;
 
 import java.util.List;
 public class LineResponse {
