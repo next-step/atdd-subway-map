@@ -37,8 +37,10 @@ public class LineServiceTest {
     @DisplayName("지하철 노선 생성")
     @Test
     void createLine() {
+        //when
         LineRequest lineRequest = new LineRequest("신분당선", "red", 10, 강남역.getId(), 광교역.getId());
         LineResponse line = lineService.createLine(lineRequest);
+        //then
         assertThat(line.getName()).isEqualTo("신분당선");
     }
 
@@ -46,8 +48,7 @@ public class LineServiceTest {
     @Test
     void addLine() {
         //given 지하철 노선을 생성한다. 새로운 지하철 역을 등록한다.
-        LineRequest lineRequest = new LineRequest("신분당선", "red", 10, 강남역.getId(), 광교역.getId());
-        LineResponse line = lineService.createLine(lineRequest);
+        LineResponse line = beforeTestCreateLine();
         StationResponse 수원역 = beforeTestCreateStation("수원역");
         // when 지하철 노선 구간을 만들어서 기존 노선에 추가한다.
         LineResponse lineResponse = lineService.addLineStation(line.getId(), new AddLineRequest(광교역.getId(), 수원역.getId(), 10));
@@ -60,8 +61,7 @@ public class LineServiceTest {
     @Test
     void deleteSection() {
         //given 단일 노선을 만든다. 노선 추가를 한다.
-        LineRequest lineRequest = new LineRequest("신분당선", "red", 10, 강남역.getId(), 광교역.getId());
-        LineResponse line = lineService.createLine(lineRequest);
+        LineResponse line = beforeTestCreateLine();
         StationResponse 수원역 = stationService.saveStation(new StationRequest("수원역"));
         lineService.addLineStation(line.getId(), new AddLineRequest(광교역.getId(), 수원역.getId(), 10));
         //when 상행선 구간 제거를 한다
@@ -78,16 +78,18 @@ public class LineServiceTest {
     @Test
     void deleteUpSection() {
         //given 단일 노선을 만든다.
-        LineRequest lineRequest = new LineRequest("신분당선", "red", 10, 강남역.getId(), 광교역.getId());
-        LineResponse line = lineService.createLine(lineRequest);
+        LineResponse line = beforeTestCreateLine();
         //when 상행선 구간 제거를 한다
-
         //then 익셉션을 확인한다.
-        assertThatThrownBy(()->lineService.deleteLineDownStation(line.getId(), lineRequest.getUpStationId()))
+        assertThatThrownBy(()->lineService.deleteLineDownStation(line.getId(), 강남역.getId()))
                 .isInstanceOf(RuntimeException.class);
     }
 
     private StationResponse beforeTestCreateStation(String name) {
        return stationService.saveStation(new StationRequest(name));
+    }
+
+    private LineResponse beforeTestCreateLine() {
+        return lineService.createLine(new LineRequest("5호선", "bg-purple-600", 10, 강남역.getId(), 광교역.getId()));
     }
 }
