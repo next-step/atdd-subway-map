@@ -13,12 +13,10 @@ import java.util.stream.Collectors;
 @Service
 public class LineService {
     private LineRepository lineRepository;
-    private LineStationRepository  lineStationRepository;
     private StationRepository stationRepository;
 
-    public LineService(LineRepository lineRepository, LineStationRepository lineStationRepository, StationRepository stationRepository) {
+    public LineService(LineRepository lineRepository, StationRepository stationRepository) {
         this.lineRepository = lineRepository;
-        this.lineStationRepository = lineStationRepository;
         this.stationRepository = stationRepository;
     }
 
@@ -71,7 +69,6 @@ public class LineService {
     public void deleteLineDownStation(Long id, Long stationId) {
         Line line = lineRepository.findById(id).orElseThrow(() -> new RuntimeException("해당 노선은 등록되어 있지 않습니다."));
         line.isDeletableLine(stationId);
-        lineStationRepository.deleteByLineIdAndStationId(id, stationId);
     }
 
     private StationResponse createStationResponse(Station station) {

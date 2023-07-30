@@ -14,7 +14,7 @@ public class Line {
     @Column(nullable = false)
     private String color;
 
-    @OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<LineStation> lineStations = new ArrayList<>();
 
     public Long getId() {
@@ -94,11 +94,11 @@ public class Line {
         if(lineStations.size() == 2) {
             throw new RuntimeException("구간이 1개인 경우 역을 삭제할 수 없다.");
         }
-
         LineStation lineStation = lineStations.get(lineStations.size() - 1);
         if(!lineStation.getStation().getId().equals(downStationId)) {
             throw new RuntimeException("지하철 노선에 등록된 역(하행 종점역)만 제거할 수 있다. ");
         }
+        lineStations.remove(lineStation);
     }
 
 

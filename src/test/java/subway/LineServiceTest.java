@@ -63,8 +63,8 @@ public class LineServiceTest {
         //given 단일 노선을 만든다. 노선 추가를 한다.
         LineResponse line = beforeTestCreateLine();
         StationResponse 수원역 = stationService.saveStation(new StationRequest("수원역"));
-        lineService.addLineStation(line.getId(), new AddLineRequest(광교역.getId(), 수원역.getId(), 10));
-        //when 상행선 구간 제거를 한다
+        lineService.addLineStation(line.getId(), new AddLineRequest(광교역.getId(), 수원역.getId(), 5));
+        //when 하행 종점역을 제거한다.
         lineService.deleteLineDownStation(line.getId(), 수원역.getId());
 
         //then 라인을 조회한다.
