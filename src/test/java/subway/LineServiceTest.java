@@ -50,7 +50,7 @@ public class LineServiceTest {
         LineResponse line = lineService.createLine(lineRequest);
         StationResponse 수원역 = beforeTestCreateStation("수원역");
         // when 지하철 노선 구간을 만들어서 기존 노선에 추가한다.
-        LineResponse lineResponse = lineService.addLine(line.getId(), new AddLineRequest(광교역.getId(), 수원역.getId(), 10));
+        LineResponse lineResponse = lineService.addLineStation(line.getId(), new AddLineRequest(광교역.getId(), 수원역.getId(), 10));
         // then 노선 추가 하행종점, 상행종점을 확인한다.
         assertThat(lineResponse.getStationResponseList().get(0).getId()).isEqualTo(강남역.getId());
         assertThat(lineResponse.getStationResponseList().get(1).getId()).isEqualTo(수원역.getId());
@@ -63,7 +63,7 @@ public class LineServiceTest {
         LineRequest lineRequest = new LineRequest("신분당선", "red", 10, 강남역.getId(), 광교역.getId());
         LineResponse line = lineService.createLine(lineRequest);
         StationResponse 수원역 = stationService.saveStation(new StationRequest("수원역"));
-        lineService.addLine(line.getId(), new AddLineRequest(광교역.getId(), 수원역.getId(), 10));
+        lineService.addLineStation(line.getId(), new AddLineRequest(광교역.getId(), 수원역.getId(), 10));
         //when 상행선 구간 제거를 한다
         lineService.deleteLineDownStation(line.getId(), 수원역.getId());
 

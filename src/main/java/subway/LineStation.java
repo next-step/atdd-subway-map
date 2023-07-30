@@ -8,9 +8,6 @@ public class LineStation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
-    private Integer sequence;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "line_id")
     private Line line;
@@ -19,12 +16,11 @@ public class LineStation {
     @JoinColumn(name = "station_id")
     private Station station;
 
+    @Column()
+    private Integer distance;
+
     public Long getId() {
         return id;
-    }
-
-    public Integer getSequence() {
-        return sequence;
     }
 
     public Line getLine() {
@@ -35,12 +31,14 @@ public class LineStation {
         return station;
     }
 
-    public LineStation() {
+    public Integer getDistance() {
+        return distance;
     }
 
-    public LineStation(Integer sequence, Line line, Station station) {
-        this.sequence = sequence;
+    public LineStation(Line line, Station station, Integer distance) {
         this.line = line;
         this.station = station;
+        this.distance = distance;
     }
+
 }

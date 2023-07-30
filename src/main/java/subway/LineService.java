@@ -24,11 +24,10 @@ public class LineService {
 
     @Transactional
     public LineResponse createLine(LineRequest request) {
-        Line line = lineRepository.save(new Line(request.getName(), request.getColor(), request.getDistance()));
+        Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
         Station upStation = stationRepository.findById(request.getUpStationId()).orElseThrow(() -> new NoSuchFieldError("해당 지하철역이 없습니다."));
         Station downStation = stationRepository.findById(request.getDownStationId()).orElseThrow(() -> new NoSuchFieldError("해당 지하철역이 없습니다."));
-        lineStationRepository.save(new LineStation(0, line, upStation));
-        lineStationRepository.save(new LineStation(1, line, downStation));
+        line.createLineStation(upStation, downStation, request.getDistance());
         return createLineResponse(line, upStation, downStation);
     }
 
@@ -57,13 +56,13 @@ public class LineService {
     }
 
     @Transactional
-    public LineResponse addLine(Long id, AddLineRequest dto) {
+    public LineResponse addLineStation(Long id, AddLineRequest dto) {
         // 새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이여야한다.
         Station upStation = stationRepository.findById(dto.getUpStationId()).orElseThrow(() -> new RuntimeException("상행선역 지하철을 먼저 등록해주세요"));
         Station downStation = stationRepository.findById(dto.getDownStationId()).orElseThrow(() -> new RuntimeException("하행선역 지하철을 먼저 등록해주세요"));
         Line line = lineRepository.findById(id).orElseThrow(() -> new RuntimeException("기존에 등록되어 있는 지하철 노선이 아닙니다. 다시 확인해주세요."));
         line.isAddableLine(upStation, downStation);
-        lineStationRepository.save(new LineStation(line.getLineStations().size(), line, downStation));
+        line.addLineStation(upStation, downStation, dto.getDistance());
         return createLineResponse(line);
     }
 
@@ -74,14 +73,14 @@ public class LineService {
         lineStationRepository.deleteByLineIdAndStationId(id, stationId);
     }
 
-    private StationResponse createStationResponse(LineStation lineStation) {
-        return new StationResponse(lineStation.getStation().getId(), lineStation.getStation().getName());
+    private StationResponse createStationResponse(Station station) {
+        return new StationResponse(station.getId(), station.getName());
     }
 
     private LineResponse createLineResponse(Line line) {
-        LineStation up = lineStationRepository.findFirstByLineIdOrderBySequence(line.getId());
-        LineStation down = lineStationRepository.findFirstByLineIdOrderBySequenceDesc(line.getId());
-        return new LineResponse(line.getId(), line.getName(), line.getColor(), List.of(createStationResponse(up), createStationResponse(down)));
+        Station upStation = line.getUpStation();
+        Station downStation = line.getDownStation();
+        return new LineResponse(line.getId(), line.getName(), line.getColor(), List.of(createStationResponse(upStation), createStationResponse(downStation)));
     }
 
 
