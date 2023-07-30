@@ -42,9 +42,6 @@ public class SectionService {
         Station upStation = findStation(createSectionRequest.getUpStationId());
         Station downStation = findStation(createSectionRequest.getDownStationId());
 
-        createSectionRequest.validateUpStationId(line);
-        createSectionRequest.validateDownStationId(line, downStation);
-
         Section section = Section.builder()
                 .line(line)
                 .upStation(upStation)
@@ -52,9 +49,8 @@ public class SectionService {
                 .distance(createSectionRequest.getDistance())
                 .build();
 
-        Section savedSection = sectionRepository.save(section);
-
-        return SECTION_MAPPER.mapToAddSectionResponse(savedSection);
+        line.addSection(section);
+        return SECTION_MAPPER.mapToCreateSectionResponse(section);
     }
 
     public void deleteSection(Long lineId, Long stationId) {
@@ -64,7 +60,7 @@ public class SectionService {
             throw new InvalidSectionRequestException("구간이 2개 이상일 때만 삭제할 수 있습니다.");
         }
 
-        if (!line.getTerminalStationId().equals(stationId)) {
+        if (!line.isTerminalStationId(stationId)) {
             throw new InvalidSectionRequestException("마지막 구간만 삭제할 수 있습니다.");
         }
 

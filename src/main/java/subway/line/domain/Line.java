@@ -58,4 +58,8 @@ public class Line extends BaseEntity {
     public boolean hasLessThanTwoSections() {
         return sections.hasLessThanTwoSections();
     }
+
+    public boolean isTerminalStationId(Long id) {
+        return getTerminalStationId().equals(id);
+    }
 }

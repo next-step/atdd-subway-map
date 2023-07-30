@@ -13,7 +13,7 @@ public interface SectionMapper {
 
     @Mapping(target = "upStationId", source = "upStation.id")
     @Mapping(target = "downStationId", source = "downStation.id")
-    CreateSectionResponse mapToAddSectionResponse(Section section);
+    CreateSectionResponse mapToCreateSectionResponse(Section section);
 
     @Mapping(target = "upStationId", source = "upStation.id")
     @Mapping(target = "downStationId", source = "downStation.id")
