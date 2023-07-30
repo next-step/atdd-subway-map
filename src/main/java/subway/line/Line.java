@@ -1,8 +1,13 @@
 package subway.line;
 
+import subway.section.Section;
 import subway.station.Station;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.LinkedList;
+import java.util.List;
 
 @Entity
 public class Line {
@@ -17,6 +22,8 @@ public class Line {
     @OneToOne
     private Station downStation;
     private int distance;
+    @OneToMany
+    private List<Section> sections = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -64,5 +71,17 @@ public class Line {
 
     public void setDistance(int distance) {
         this.distance = distance;
+    }
+
+    public void addDistance(int distance) {
+        this.distance += distance;
+    }
+
+    public List<Section> getSections() {
+        return sections;
+    }
+
+    public void addSections(Section section) {
+        this.sections.add(section);
     }
 }
