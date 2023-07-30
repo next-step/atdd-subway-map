@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import subway.line.dto.CreateLineRequest;
 import subway.line.dto.LineResponse;
 import subway.section.dto.CreateSectionRequest;
+import subway.section.dto.SectionResponse;
 import subway.station.dto.StationRequest;
 import subway.station.dto.StationResponse;
 import subway.util.AcceptanceTestBase;
@@ -52,9 +53,10 @@ class SectionAcceptanceTest extends AcceptanceTestBase {
 
             // Then: 구간 목록 조회 시 생성한 구간을 찾을 수 있다
             ExtractableResponse<Response> getResponse = get(String.format(BASE_PATH, 신분당선_ID));
-            assertThat(getResponse.jsonPath().getList("upStationId", Long.class)).containsAnyOf(신분당선_하행종점역_ID);
-            assertThat(getResponse.jsonPath().getList("downStationId", Long.class)).containsAnyOf(신분당선_신규역_ID);
-            assertThat(getResponse.jsonPath().getList("distance")).containsAnyOf(5);
+            SectionResponse sectionResponse = getResponse.jsonPath().getList(".", SectionResponse.class).get(1);
+            assertThat(sectionResponse.getUpStationId()).isEqualTo(신분당선_하행종점역_ID);
+            assertThat(sectionResponse.getDownStationId()).isEqualTo(신분당선_신규역_ID);
+            assertThat(sectionResponse.getDistance()).isEqualTo(5);
         }
 
         @Nested
