@@ -1,6 +1,7 @@
 package subway;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -13,8 +14,8 @@ public class Line {
     @Column(nullable = false)
     private String color;
 
-    @OneToMany(mappedBy = "line", cascade = CascadeType.REMOVE)
-    private List<LineStation> lineStations;
+    @OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, fetch = FetchType.LAZY)
+    private List<LineStation> lineStations = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -24,12 +25,24 @@ public class Line {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public String getColor() {
         return color;
     }
 
+    public void setColor(String color) {
+        this.color = color;
+    }
+
     public List<LineStation> getLineStations() {
         return lineStations;
+    }
+
+    public void setLineStations(List<LineStation> lineStations) {
+        this.lineStations = lineStations;
     }
 
     public Line() {
@@ -41,11 +54,11 @@ public class Line {
     }
 
     public Station getUpStation() {
-        return lineStations.get(0).getStation();
+        return this.lineStations.get(0).getStation();
     }
 
     public Station getDownStation() {
-        return lineStations.get(lineStations.size() - 1).getStation();
+        return this.lineStations.get(lineStations.size() - 1).getStation();
     }
     public void updateLine(String name, String color) {
         this.name = name;

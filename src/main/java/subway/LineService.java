@@ -28,13 +28,14 @@ public class LineService {
         Station upStation = stationRepository.findById(request.getUpStationId()).orElseThrow(() -> new NoSuchFieldError("해당 지하철역이 없습니다."));
         Station downStation = stationRepository.findById(request.getDownStationId()).orElseThrow(() -> new NoSuchFieldError("해당 지하철역이 없습니다."));
         line.createLineStation(upStation, downStation, request.getDistance());
-        return createLineResponse(line, upStation, downStation);
+        return createLineResponse(line);
     }
 
 
     @Transactional(readOnly = true)
     public List<LineResponse> findLines() {
         List<Line> lines = lineRepository.findAll();
+
         return lines.stream().map(this::createLineResponse).collect(Collectors.toList());
     }
 
@@ -83,12 +84,11 @@ public class LineService {
         return new LineResponse(line.getId(), line.getName(), line.getColor(), List.of(createStationResponse(upStation), createStationResponse(downStation)));
     }
 
-
-    private LineResponse createLineResponse(Line line, Station upStation , Station downStation) {
-        return new LineResponse(line.getId(),
-                line.getName(),
-                line.getColor(),
-                List.of(new StationResponse(upStation.getId(), upStation.getName()), new StationResponse(downStation.getId(), downStation.getName())));
+    private LineResponse createLineResponse(Line line, List<LineStation> lineStations) {
+        Station upStation = line.getUpStation();
+        Station downStation = line.getDownStation();
+        return new LineResponse(line.getId(), line.getName(), line.getColor(), List.of(createStationResponse(upStation), createStationResponse(downStation)));
     }
+
 
 }
