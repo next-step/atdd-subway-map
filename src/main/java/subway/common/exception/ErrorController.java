@@ -10,8 +10,14 @@ import java.util.NoSuchElementException;
 @RestControllerAdvice
 public class ErrorController {
     @ExceptionHandler(value = NoSuchElementException.class)
-    public ResponseEntity<ApiError> handleException(Exception e){
+    public ResponseEntity<ApiError> handleException(NoSuchElementException e){
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new ApiError(e.getMessage(), HttpStatus.NOT_FOUND.value()));
+    }
+
+    @ExceptionHandler(value = IllegalArgumentException.class)
+    public ResponseEntity<ApiError> handleException(IllegalArgumentException e){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ApiError(e.getMessage(), HttpStatus.BAD_REQUEST.value()));
     }
 }
