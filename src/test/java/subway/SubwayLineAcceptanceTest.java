@@ -24,12 +24,14 @@ public class SubwayLineAcceptanceTest {
     private final static int PORT = 8080;
     private Long upStationId;
     private Long downStationId;
+    private Long line5Id;
 
     @BeforeEach
     void setUp() {
         RestAssured.port = PORT;
         this.upStationId = beforeTestCreateStation("신사역");
         this.downStationId = beforeTestCreateStation("광교역");
+        this.line5Id = beforeTestCreateLine5();
     }
     /**
      * When 지하철 노선을 생성하면
@@ -73,8 +75,7 @@ public class SubwayLineAcceptanceTest {
     @Test
     void findLines() {
         //given
-        long firstLineId = beforeTestCreateLine("5호선", "bg-purple-600", upStationId, downStationId, 10);
-        long secondLineId = beforeTestCreateLine("4호선", "bg-aqua-600", upStationId, downStationId, 20);
+        long newLineId = beforeTestCreateLine();
 
         //when
         ExtractableResponse<Response> extract = RestAssured.given().log().all()
@@ -87,7 +88,7 @@ public class SubwayLineAcceptanceTest {
         assertThat((String) read(prettify, "$.[0].name")).isEqualTo("5호선");
         assertThat((String) read(prettify, "$.[0].stationResponseList[0].name")).isEqualTo("신사역");
         assertThat((String) read(prettify, "$.[0].stationResponseList[1].name")).isEqualTo("광교역");
-        assertThat((String) read(prettify, "$.[1].name")).isEqualTo("4호선");
+        assertThat((String) read(prettify, "$.[1].name")).isEqualTo("신분당선");
     }
 
     /**
@@ -100,14 +101,13 @@ public class SubwayLineAcceptanceTest {
     @Test
     void findLine() {
         //given
-        long firstLineId = beforeTestCreateLine("5호선", "bg-purple-600", upStationId, downStationId, 10);
-        Map<String, String> params = new HashMap<>();
-
+        //생성은 맨 처음
         //when
+        Map<String, String> params = new HashMap<>();
         ExtractableResponse<Response> extract = RestAssured.given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines/{id}", firstLineId)
+                .when().post("/lines/{id}", this.line5Id)
                 .then().log().all()
                 .extract();
 
@@ -127,7 +127,6 @@ public class SubwayLineAcceptanceTest {
     @Test
     void updateLine() {
         //given
-        long id = beforeTestCreateLine("5호선", "bg-purple-600", upStationId, downStationId, 10);
         Map<String, String> params = new HashMap<>();
         params.put("name", "5호선");
         params.put("color", "bg-red-660");
@@ -135,7 +134,7 @@ public class SubwayLineAcceptanceTest {
         ExtractableResponse<Response> extract = RestAssured.given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().put("/lines/{id}", id)
+                .when().put("/lines/{id}", line5Id)
                 .then().log().all()
                 .extract();
 
@@ -153,11 +152,10 @@ public class SubwayLineAcceptanceTest {
     @Test
     void deleteLine() {
         //given
-        String name = "5호선";
-        long id = beforeTestCreateLine(name, "bg-purple-600", upStationId, downStationId, 10);
+
         //when
         ExtractableResponse<Response> extract = RestAssured.given().log().all()
-                .when().delete("/lines/{id}", id)
+                .when().delete("/lines/{id}", line5Id)
                 .then().log().all()
                 .extract();
         //then
@@ -173,8 +171,6 @@ public class SubwayLineAcceptanceTest {
     @Test
     void addSection() {
         //given
-        String name = "5호선";
-        long firstLineId = beforeTestCreateLine(name, "bg-purple-600", upStationId, downStationId, 10);
         long suwonStationid = beforeTestCreateStation("수원역");
         Map<String, String> param = new HashMap<>();
         param.put("upStationId", String.valueOf(downStationId));
@@ -183,7 +179,7 @@ public class SubwayLineAcceptanceTest {
         //when
         ExtractableResponse<Response> extract = RestAssured.given().log().all()
                 .body(param).contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines/{id}/sections", firstLineId)
+                .when().post("/lines/{id}/sections", line5Id)
                 .then().log().all()
                 .extract();
         //Then
@@ -204,9 +200,8 @@ public class SubwayLineAcceptanceTest {
     @Test
     void deleteSection() {
         // given
-        long lineId = beforeTestCreateLine("신분당선", "bg-red-100", upStationId, downStationId, 10);
         long suwonStationId = beforeTestCreateStation("수원역");
-        long lineId2 = beforeTestAddLine(lineId, downStationId, suwonStationId);
+        long lineId2 = beforeTestAddLine(line5Id, downStationId, suwonStationId);
 
         //when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -226,11 +221,11 @@ public class SubwayLineAcceptanceTest {
     @Test
     void deleteSectionException() {
         // given
-        long lineId = beforeTestCreateLine("신분당선", "bg-red-100", upStationId, downStationId, 10);
+
         //when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .param("stationId", downStationId)
-                .when().delete("/lines/{id}/sections", lineId)
+                .when().delete("/lines/{id}/sections", line5Id)
                 .then().log().all()
                 .extract();
         assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
@@ -245,9 +240,8 @@ public class SubwayLineAcceptanceTest {
     @Test
     void deleteUpStation() {
         // given
-        long lineId = beforeTestCreateLine("신분당선", "bg-red-100", upStationId, downStationId, 10);
         long suwonStationId = beforeTestCreateStation("수원역");
-        long lineId2 = beforeTestAddLine(lineId, downStationId, suwonStationId);
+        long lineId2 = beforeTestAddLine(line5Id, downStationId, suwonStationId);
 
         //when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -271,13 +265,28 @@ public class SubwayLineAcceptanceTest {
                 .extract().body().jsonPath().getLong("id");
     }
 
-    private long beforeTestCreateLine(String name, String color, Long upStationId, Long downStationId, int distance) {
+    private long beforeTestCreateLine() {
         Map<String, Object> params = new HashMap<>();
-        params.put("name", name);
-        params.put("color", color);
-        params.put("upStationId", upStationId);
-        params.put("downStationId", downStationId);
-        params.put("distance", distance);
+        params.put("name", "신분당선");
+        params.put("color", "red-600");
+        params.put("upStationId", this.upStationId);
+        params.put("downStationId", this.downStationId);
+        params.put("distance", 10);
+        ExtractableResponse<Response> extract = RestAssured.given().log().all()
+                .body(params).contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines")
+                .then().log().all()
+                .extract();
+        return extract.body().jsonPath().getLong("id");
+    }
+
+    private long beforeTestCreateLine5() {
+        Map<String, Object> params = new HashMap<>();
+        params.put("name", "5호선");
+        params.put("color", "bg-purple-600");
+        params.put("upStationId", this.upStationId);
+        params.put("downStationId", this.downStationId);
+        params.put("distance", 10);
         ExtractableResponse<Response> extract = RestAssured.given().log().all()
                 .body(params).contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/lines")
