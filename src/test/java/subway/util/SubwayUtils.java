@@ -5,6 +5,8 @@ import io.restassured.response.Response;
 import org.springframework.http.MediaType;
 import subway.dto.LineModifyRequest;
 import subway.dto.LineRequest;
+import subway.dto.SectionAddRequest;
+import subway.dto.SectionDeleteRequest;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -49,5 +51,26 @@ public class SubwayUtils {
                 .body(req)
                 .put("/lines/"+id);
     }
-    
+    public static Response createSection(Long id, SectionAddRequest request){
+
+        return RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().body(request)
+                .post("/lines/"+id+"/sections");
+    }
+
+    public static Response getSections(Long id){
+
+        return RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .get("/lines/"+id+"/sections");
+    }
+
+    public static Response deleteSections(Long id, SectionDeleteRequest request){
+        return RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().body(request)
+                .delete("/lines/"+id+"/sections");
+    }
 }
