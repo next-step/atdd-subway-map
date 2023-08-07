@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 public class LineService {
     private final LineRepository lineRepository;
     private final StationRepository stationRepository;
-
+    private final StationService stationService;
 
     @Transactional
     public LineResponse saveLine(LineRequest req) throws Exception{
@@ -59,7 +59,7 @@ public class LineService {
                 line.getId(),
                 line.getName(),
                 line.getColor(),
-                line.getStations(),
+                line.getStations().stream().map(stationService::createStationResponse).collect(Collectors.toList()),
                 line.getDistance()
         );
     }

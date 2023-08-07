@@ -1,25 +1,19 @@
 package subway;
 
 import io.restassured.RestAssured;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
-import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import subway.dto.LineModifyRequest;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
-import subway.dto.StationRequest;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static subway.util.SubwayUtils.*;
 
 @DisplayName("지하철노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -31,7 +25,7 @@ public class LineAcceptanceTest {
     @DirtiesContext
     @DisplayName("지하철 노선 생성")
     @Test
-    void createLine() {
+    void createLineSuccess() {
         // given
         long upStationId = createStation("강남역").jsonPath().getLong("id");
         long downStationId = createStation("범계역").jsonPath().getLong("id");
@@ -64,8 +58,7 @@ public class LineAcceptanceTest {
         List<String> lines = getAllLines().jsonPath().getList("name", String.class);
 
         //then
-        assertThat(lines).containsAnyOf("분당선");
-        assertThat(lines).containsAnyOf("6호선");
+        assertThat(lines).containsExactlyInAnyOrder("분당선", "6호선");
 
     }
 
@@ -101,7 +94,7 @@ public class LineAcceptanceTest {
     @DirtiesContext
     @DisplayName("지하철 노선을 수정한다.")
     @Test
-    void modifyLine() {
+    void modifyLineSuccess() {
 
         //given
         long id = createSampleLine("강남역", "범계역", "분당선", "yellow", 10);
@@ -136,20 +129,7 @@ public class LineAcceptanceTest {
 
         //then
         assertThat(getAllLines().jsonPath().getList("name")).doesNotContain("분당선");
-//        Map<String, String> params = new HashMap<>();
-//        params.put("name", "명동역");
-//
-//        long id = getDefaultRestAssured()
-//                .body(params).post("/stations").jsonPath().getLong("id");
-//
-//        //when
-//        getDefaultRestAssured().delete("/stations/"+id).then().statusCode(HttpStatus.NO_CONTENT.value());
-//
-//        //then
-//        List<String> list = getDefaultRestAssured()
-//                .get("/stations").jsonPath().getList("name", String.class);
-//
-//        assertThat(list).doesNotContain("명동역");
+
     }
 
     private Long createSampleLine(String upStationName, String downStationName, String lineName, String lineColor, int distance){
@@ -158,44 +138,6 @@ public class LineAcceptanceTest {
         LineRequest req1 = new LineRequest(lineName, lineColor, upStationId1, downStationId1, distance);
         return createLine(req1).jsonPath().getLong("id");
 
-    }
-    private Response createLine(LineRequest lineRequest){
-
-        return RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().body(lineRequest)
-                .post("/lines");
-    }
-
-    private Response createStation(String name){
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-        return RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().body(params)
-                .post("/stations");
-    }
-
-    private Response getAllLines(){
-        return RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .get("/lines");
-    }
-
-    private Response getLine(Long id){
-        return RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .get("/lines/"+id);
-    }
-
-    private Response modifyLine(Long id, LineModifyRequest req){
-        return RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .body(req)
-                .put("/lines/"+id);
     }
 
 
