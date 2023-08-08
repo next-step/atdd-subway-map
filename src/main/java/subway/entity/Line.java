@@ -24,17 +24,18 @@ public class Line {
     private String name;
     private String color;
 
-    @OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
-    private List<Section> sections = new ArrayList<>();
+    @Embedded
+    private Sections sections = new Sections();
 
+    public List<Section> getSections() {
+        return sections.getSections();
+    }
     public Line(String name, String color) {
         this.name = name;
         this.color = color;
     }
     public List<Station> getStations() {
-        List<Station> list = sections.stream().map(Section::getDownStation).collect(Collectors.toList());
-        list.add(sections.get(0).getUpStation());
-        return list;
+        return sections.getStations();
     }
 
     public void modifyLine(String name, String color) {
@@ -43,25 +44,10 @@ public class Line {
     }
 
     public void addSection(Station upStation, Station downStation, int distance) {
-        if(!sections.get(sections.size()-1).getDownStation().equals(upStation)){
-            throw new SubwayException(SubwayMessage.NEW_SECTION_UP_STATION_ERROR);
-        }
-
-        if(getStations().stream().anyMatch(station -> station.equals(downStation))){
-            throw new SubwayException(SubwayMessage.NEW_SECTION_NEW_STATION_ERROR);
-        }
-
-        sections.add(new Section(this, upStation, downStation, distance));
+       sections.add(this, upStation, downStation, distance);
     }
 
     public void deleteSection(Station station) {
-        if(sections.size() == 1) {
-            throw new SubwayException(SubwayMessage.SECTION_MORE_THAN_TWO);
-        }
-        if(!sections.get(sections.size()-1).getDownStation().equals(station)){
-            throw new SubwayException(SubwayMessage.DELETE_STATION_MUST_END);
-        }
-
-        sections.remove(sections.size()-1);
+        sections.delete(station);
     }
 }

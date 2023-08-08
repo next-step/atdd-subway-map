@@ -6,9 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
-import subway.dto.LineModifyRequest;
-import subway.dto.LineRequest;
 import subway.dto.LineResponse;
+import subway.dto.StationResponse;
 
 import java.util.List;
 
@@ -31,8 +30,7 @@ public class LineAcceptanceTest {
         long downStationId = createStation("범계역").jsonPath().getLong("id");
 
         // when
-        LineRequest req = new LineRequest("분당선", "red", upStationId, downStationId, 10);
-        createLine(req);
+        createLine(createLineRequest("분당선", "red", upStationId, downStationId, 10));
 
         //then
         List<String> lines = getAllLines().jsonPath().getList("name", String.class);
@@ -81,7 +79,7 @@ public class LineAcceptanceTest {
         //then
         assertThat(response.getName()).isEqualTo("분당선");
         assertThat(response.getColor()).isEqualTo("yellow");
-        assertThat(response.getStations().get(0).getName()).isEqualTo("강남역");
+        assertThat(response.getStations().stream().map(StationResponse::getName)).containsExactlyInAnyOrder("강남역", "범계역");
 
 
     }
@@ -100,8 +98,7 @@ public class LineAcceptanceTest {
         long id = createSampleLine("강남역", "범계역", "분당선", "yellow", 10);
 
         //when
-        LineModifyRequest req2 = new LineModifyRequest("신분당선", "red");
-        LineResponse response = modifyLine(id, req2).jsonPath().getObject("", LineResponse.class);
+        LineResponse response = modifyLine(id, createModifyRequest("신분당선", "red")).jsonPath().getObject("", LineResponse.class);
 
         //then
         assertThat(response.getName()).isEqualTo("신분당선");
@@ -135,10 +132,8 @@ public class LineAcceptanceTest {
     private Long createSampleLine(String upStationName, String downStationName, String lineName, String lineColor, int distance){
         long upStationId1 = createStation(upStationName).jsonPath().getLong("id");
         long downStationId1 = createStation(downStationName).jsonPath().getLong("id");
-        LineRequest req1 = new LineRequest(lineName, lineColor, upStationId1, downStationId1, distance);
-        return createLine(req1).jsonPath().getLong("id");
+        return createLine(createLineRequest(lineName, lineColor, upStationId1, downStationId1, distance)).jsonPath().getLong("id");
 
     }
-
 
 }

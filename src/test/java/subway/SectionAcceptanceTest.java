@@ -6,13 +6,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
-import subway.dto.LineRequest;
-import subway.dto.SectionAddRequest;
-import subway.dto.SectionDeleteRequest;
 import subway.dto.SectionResponse;
 import subway.enums.SubwayMessage;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static subway.util.SubwayUtils.*;
@@ -32,8 +31,7 @@ public class SectionAcceptanceTest {
     void setUp() {
         upStationId = createStation("사당역").jsonPath().getLong("id");
         downStationId = createStation("범계역").jsonPath().getLong("id");
-        LineRequest req = new LineRequest("4호선", "파랑", upStationId, downStationId, 10);
-        lineId = createLine(req).jsonPath().getLong("id");
+        lineId = createLine(createLineRequest("4호선", "파랑", upStationId, downStationId, 10)).jsonPath().getLong("id");
     }
 
     /**
@@ -48,7 +46,7 @@ public class SectionAcceptanceTest {
         long newStationId = createStation("인덕원역").jsonPath().getLong("id");
 
         // when
-        Response section = createSection(lineId, new SectionAddRequest(downStationId, newStationId, 2));
+        createSection(lineId, createSectionAddRequest(downStationId, newStationId, 3));
 
         //then
         List<String> lines = getLine(lineId).jsonPath().getList("stations.name", String.class);
@@ -68,10 +66,10 @@ public class SectionAcceptanceTest {
 
         //given
         long newStationId = createStation("인덕원역").jsonPath().getLong("id");
-        createSection(lineId, new SectionAddRequest(downStationId, newStationId, 2));
+        createSection(lineId, createSectionAddRequest(downStationId, newStationId, 2));
 
         //when
-        Response response = createSection(lineId, new SectionAddRequest(newStationId, downStationId, 2));
+        Response response = createSection(lineId, createSectionAddRequest(newStationId, downStationId, 2));
 
 
         //then
@@ -93,7 +91,7 @@ public class SectionAcceptanceTest {
         long newStationId = createStation("인덕원역").jsonPath().getLong("id");
 
         //when
-        Response response = createSection(lineId, new SectionAddRequest(upStationId, newStationId, 2));
+        Response response = createSection(lineId, createSectionAddRequest(upStationId, newStationId, 2));
 
         //then
         assertThat(response.getBody().asString()).isEqualTo(SubwayMessage.NEW_SECTION_UP_STATION_ERROR);
@@ -112,10 +110,10 @@ public class SectionAcceptanceTest {
 
         //given
         long newStationId = createStation("인덕원역").jsonPath().getLong("id");
-        createSection(lineId, new SectionAddRequest(downStationId, newStationId, 2));
+        createSection(lineId, createSectionAddRequest(downStationId, newStationId, 3));
 
         //when
-        deleteSections(lineId, new SectionDeleteRequest(newStationId));
+        deleteSections(lineId, createSectionDeleteRequest(newStationId));
         List<SectionResponse> response = getSections(lineId).jsonPath().getList("");
 
         //then
@@ -136,7 +134,7 @@ public class SectionAcceptanceTest {
     void removeSectionOneSection() {
 
         //when
-        Response response = deleteSections(lineId, new SectionDeleteRequest(downStationId));
+        Response response = deleteSections(lineId, createSectionDeleteRequest(downStationId));
 
         //then
         assertThat(response.getBody().asString()).isEqualTo(SubwayMessage.SECTION_MORE_THAN_TWO);
@@ -155,13 +153,27 @@ public class SectionAcceptanceTest {
 
         //given
         long newStationId = createStation("인덕원역").jsonPath().getLong("id");
-        createSection(lineId, new SectionAddRequest(downStationId, newStationId, 2));
+        createSection(lineId, createSectionAddRequest(downStationId, newStationId, 2));
 
         //when
-        Response response = deleteSections(lineId, new SectionDeleteRequest(downStationId));
+        Response response = deleteSections(lineId, createSectionDeleteRequest(downStationId));
 
         //then
         assertThat(response.getBody().asString()).isEqualTo(SubwayMessage.DELETE_STATION_MUST_END);
 
+    }
+    private Map<String, String> createSectionAddRequest(Long upStationId, Long downStationId, int distance){
+        Map<String, String> map = new HashMap<>();
+        map.put("upStationId", String.valueOf(upStationId));
+        map.put("downStationId", String.valueOf(downStationId));
+        map.put("distance", String.valueOf(distance));
+
+        return map;
+    }
+    
+    private Map<String, String> createSectionDeleteRequest(Long stationId) {
+        Map<String, String> map = new HashMap<>();
+        map.put("stationId", String.valueOf(stationId));
+        return map;
     }
 }
