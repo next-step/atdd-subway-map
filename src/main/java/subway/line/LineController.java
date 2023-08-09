@@ -24,7 +24,7 @@ public class LineController {
         produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
-        LineResponse line = this.lineService.create(lineRequest);
+        LineResponse line = lineService.create(lineRequest);
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
 }

@@ -21,12 +21,12 @@ public class StationService implements SubwayService<StationRequest, StationResp
     @Transactional
     @Override
     public StationResponse create(StationRequest stationRequest) {
-        return this.saveStation(stationRequest);
+        return saveStation(stationRequest);
     }
 
     private StationResponse saveStation(StationRequest stationRequest) {
         Station station = stationRepository.save(new Station(stationRequest.getName()));
-        return this.createStationResponse(station);
+        return createStationResponse(station);
     }
 
     public List<StationResponse> findAllStations() {

@@ -24,23 +24,23 @@ public class LineService implements SubwayService<LineRequest, LineResponse> {
     @Transactional
     @Override
     public LineResponse create(LineRequest lineRequest) {
-        return this.saveLine(lineRequest);
+        return saveLine(lineRequest);
     }
 
     private LineResponse saveLine(LineRequest lineRequest) {
-        Line line = this.lineRepository.save(new Line(
+        Line line = lineRepository.save(new Line(
             lineRequest.getName(),
             lineRequest.getColor(),
             lineRequest.getUpStationId(),
             lineRequest.getDownStationId(),
             lineRequest.getDistance()
         ));
-        return this.createLineResponse(line);
+        return createLineResponse(line);
     }
 
     private LineResponse createLineResponse(Line line) {
-        Station upStation = this.getStation(line.getUpStationId());
-        Station downStation = this.getStation(line.getDownStationId());
+        Station upStation = getStation(line.getUpStationId());
+        Station downStation = getStation(line.getDownStationId());
 
         return LineResponse.builder()
             .id(line.getId())
@@ -51,7 +51,7 @@ public class LineService implements SubwayService<LineRequest, LineResponse> {
     }
 
     private Station getStation(Long id) {
-        return this.stationRepository.findById(id)
-            .orElseGet(() -> this.stationRepository.save(new Station("지하철역" + id)));
+        return stationRepository.findById(id)
+            .orElseGet(() -> stationRepository.save(new Station("지하철역" + id)));
     }
 }
