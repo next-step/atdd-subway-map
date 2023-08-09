@@ -3,24 +3,17 @@ package subway.station.domain;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import subway.line.domain.Line;
+import subway.common.BaseEntity;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Station {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Station extends BaseEntity {
     @Column(length = 20, nullable = false)
     private String name;
-
-    @Setter
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Line line;
 
     public Station(String name) {
         this.name = name;

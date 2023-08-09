@@ -1,4 +1,4 @@
-package subway;
+package subway.acceptance;
 
 import com.navercorp.fixturemonkey.ArbitraryBuilder;
 import io.restassured.response.ExtractableResponse;
@@ -9,12 +9,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import subway.station.dto.StationRequest;
 import subway.station.dto.StationResponse;
+import subway.util.AcceptanceTestBase;
+import subway.util.FixtureMonkeyWrapper;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.RestAssuredWrapper.*;
+import static subway.util.RestAssuredWrapper.*;
 
 @DisplayName("지하철역 관련 기능")
 class StationAcceptanceTest extends AcceptanceTestBase {
@@ -60,7 +62,7 @@ class StationAcceptanceTest extends AcceptanceTestBase {
         ExtractableResponse<Response> postResponse = post("/stations", stationRequest);
 
         // When: 그 지하철역을 삭제하면
-        Long id = postResponse.as(StationResponse.class).getId();
+        Long id = postResponse.as(StationResponse.class).id();
         delete(String.format("/stations/%s", id));
 
         // Then: 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다

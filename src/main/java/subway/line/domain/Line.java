@@ -4,51 +4,64 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import subway.common.BaseEntity;
+import subway.common.error.InvalidSectionRequestException;
+import subway.section.domain.Section;
 import subway.station.domain.Station;
 
-import javax.persistence.*;
-import java.util.ArrayList;
+import javax.persistence.Column;
+import javax.persistence.Embedded;
+import javax.persistence.Entity;
 import java.util.List;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Line {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+public class Line extends BaseEntity {
     @Setter
     @Column(length = 20, nullable = false)
     private String name;
 
+    @Setter
     @Column(length = 20, nullable = false)
     private String color;
 
-    @Column(nullable = false)
-    private Long upStationId;
+    @Embedded
+    Sections sections = new Sections();
 
-    @Column(nullable = false)
-    private Long downStationId;
-
-    @Column(nullable = false)
-    private Long distance;
-
-    @OneToMany(mappedBy = "line", cascade = CascadeType.ALL)
-    private final List<Station> stations = new ArrayList<>();
-
-    public Line(String name, String color, Long upStationId, Long downStationId, Long distance) {
+    public Line(String name, String color) {
         this.name = name;
         this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
-        this.distance = distance;
     }
 
-    public void addStation(Station station) {
-        this.stations.add(station);
-        if (station.getLine() != this) {
-            station.setLine(this);
+    public Long getOriginStationId() {
+        return sections.getOriginStationId();
+    }
+
+    public List<Station> getStations() {
+        return sections.getStations();
+    }
+
+    public int getDistance() {
+        return sections.getTotalDistance();
+    }
+
+    public void addSection(Section section) {
+        this.sections.add(section);
+        if (section.getLine() != this) {
+            section.setLine(this);
         }
+    }
+
+    public void removeSection(Long stationId) {
+        if (!sections.isTerminalStationId(stationId)) {
+            throw new InvalidSectionRequestException("마지막 구간만 삭제할 수 있습니다.");
+        }
+
+        if (sections.hasLessThanTwoSections()) {
+            throw new InvalidSectionRequestException("구간이 2개 이상일 때만 삭제할 수 있습니다.");
+        }
+
+        this.sections.removeLast();
     }
 }

@@ -9,10 +9,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class AddLineRequest {
+public class CreateLineRequest {
     private String name;
     private String color;
     private Long upStationId;
     private Long downStationId;
-    private Long distance;
+    private int distance;
 }

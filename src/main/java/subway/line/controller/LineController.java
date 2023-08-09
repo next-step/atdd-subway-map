@@ -4,11 +4,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import subway.line.dto.AddLineRequest;
+import subway.line.dto.CreateLineRequest;
 import subway.line.dto.LineResponse;
 import subway.line.dto.ModifyLineRequest;
 import subway.line.dto.ModifyLineResponse;
 import subway.line.service.LineService;
+import subway.section.dto.AddSectionRequest;
+import subway.section.dto.AddSectionResponse;
+import subway.section.dto.SectionResponse;
 
 import java.util.List;
 
@@ -18,20 +21,20 @@ public class LineController {
     private final LineService lineService;
 
     @PostMapping("/lines")
-    public ResponseEntity<LineResponse> createLine(@RequestBody AddLineRequest addLineRequest) {
-        LineResponse createdLine = lineService.createLine(addLineRequest);
+    public ResponseEntity<LineResponse> createLine(@RequestBody CreateLineRequest createLineRequest) {
+        LineResponse createdLine = lineService.createLine(createLineRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdLine);
     }
 
     @GetMapping("/lines")
-    public ResponseEntity<List<LineResponse>> getLines() {
-        List<LineResponse> lines = lineService.getLines();
+    public ResponseEntity<List<LineResponse>> findLines() {
+        List<LineResponse> lines = lineService.findAllLines();
         return ResponseEntity.ok(lines);
     }
 
     @GetMapping("/lines/{id}")
-    public ResponseEntity<LineResponse> getLine(@PathVariable Long id) {
-        LineResponse line = lineService.getLine(id);
+    public ResponseEntity<LineResponse> findLine(@PathVariable Long id) {
+        LineResponse line = lineService.findLine(id);
         return ResponseEntity.ok(line);
     }
 
@@ -44,6 +47,25 @@ public class LineController {
     @DeleteMapping("/lines/{id}")
     public ResponseEntity<Void> deleteLine(@PathVariable Long id) {
         lineService.deleteLine(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/lines/{lineId}/sections")
+    public ResponseEntity<AddSectionResponse> addSection(@PathVariable Long lineId, @RequestBody AddSectionRequest addSectionRequest
+    ) {
+        AddSectionResponse addSectionResponse = lineService.addSection(lineId, addSectionRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(addSectionResponse);
+    }
+
+    @GetMapping("/lines/{lineId}/sections")
+    public ResponseEntity<List<SectionResponse>> findSections(@PathVariable Long lineId) {
+        List<SectionResponse> sections = lineService.findSections(lineId);
+        return ResponseEntity.ok(sections);
+    }
+
+    @DeleteMapping("/lines/{lineId}/sections")
+    public ResponseEntity<Void> deleteSection(@PathVariable Long lineId, @RequestParam Long stationId) {
+        lineService.deleteSection(lineId, stationId);
         return ResponseEntity.noContent().build();
     }
 }

@@ -1,4 +1,4 @@
-package subway;
+package subway.util;
 
 import io.restassured.RestAssured;
 import org.junit.jupiter.api.BeforeEach;

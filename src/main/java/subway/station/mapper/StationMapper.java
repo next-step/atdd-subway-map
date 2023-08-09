@@ -8,9 +8,10 @@ import subway.station.dto.StationResponse;
 import java.util.List;
 
 @Mapper
-public interface  StationMapper {
+public interface StationMapper {
     StationMapper STATION_MAPPER = Mappers.getMapper(StationMapper.class);
 
-    List<StationResponse> toStationResponseList(List<Station> stations);
+    List<StationResponse> toStationResponses(List<Station> stations);
+
     StationResponse toStationResponse(Station station);
 }

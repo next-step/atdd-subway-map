@@ -1,4 +1,4 @@
-package subway;
+package subway.util;
 
 import com.navercorp.fixturemonkey.ArbitraryBuilder;
 import com.navercorp.fixturemonkey.FixtureMonkey;

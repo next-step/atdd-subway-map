@@ -1,4 +1,4 @@
-package subway;
+package subway.util;
 
 import com.google.common.base.CaseFormat;
 import org.springframework.stereotype.Service;

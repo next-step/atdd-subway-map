@@ -1,4 +1,4 @@
-package subway;
+package subway.acceptance;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -6,17 +6,18 @@ import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import subway.line.dto.AddLineRequest;
+import subway.line.dto.CreateLineRequest;
 import subway.line.dto.LineResponse;
 import subway.line.dto.ModifyLineRequest;
 import subway.line.dto.ModifyLineResponse;
 import subway.station.dto.StationRequest;
 import subway.station.dto.StationResponse;
+import subway.util.AcceptanceTestBase;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.RestAssuredWrapper.*;
+import static subway.util.RestAssuredWrapper.*;
 
 class LineAcceptanceTest extends AcceptanceTestBase {
     private static final String TEST_COLOR = "bg-test-600";
@@ -121,14 +122,14 @@ class LineAcceptanceTest extends AcceptanceTestBase {
     }
 
     private Long createStation(String stationName) {
-        return post("/stations", StationRequest.from(stationName)).as(StationResponse.class).getId();
+        return post("/stations", StationRequest.from(stationName)).as(StationResponse.class).id();
     }
 
     private ExtractableResponse<Response> createLine(String lineName, Long upStationId, Long downStationId) {
-        AddLineRequest line = AddLineRequest.builder()
+        CreateLineRequest line = CreateLineRequest.builder()
                 .name(lineName)
                 .color(TEST_COLOR)
-                .distance(10L)
+                .distance(10)
                 .upStationId(upStationId)
                 .downStationId(downStationId)
                 .build();
