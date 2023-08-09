@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import subway.common.BaseEntity;
+import subway.common.error.InvalidSectionRequestException;
 import subway.section.domain.Section;
 import subway.station.domain.Station;
 
@@ -34,11 +35,7 @@ public class Line extends BaseEntity {
     }
 
     public Long getOriginStationId() {
-        return sections.getOriginSectionId();
-    }
-
-    public Long getTerminalStationId() {
-        return sections.getTerminalSectionId();
+        return sections.getOriginStationId();
     }
 
     public List<Station> getStations() {
@@ -56,11 +53,15 @@ public class Line extends BaseEntity {
         }
     }
 
-    public boolean hasLessThanTwoSections() {
-        return sections.hasLessThanTwoSections();
-    }
+    public void removeSection(Long stationId) {
+        if (!sections.isTerminalStationId(stationId)) {
+            throw new InvalidSectionRequestException("마지막 구간만 삭제할 수 있습니다.");
+        }
 
-    public boolean isTerminalStationId(Long id) {
-        return getTerminalStationId().equals(id);
+        if (sections.hasLessThanTwoSections()) {
+            throw new InvalidSectionRequestException("구간이 2개 이상일 때만 삭제할 수 있습니다.");
+        }
+
+        this.sections.removeLast();
     }
 }

@@ -16,11 +16,11 @@ public class Sections {
     @OneToMany(mappedBy = "line", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<Section> sections = new ArrayList<>();
 
-    Long getOriginSectionId() {
+    public Long getOriginStationId() {
         return getFirst().getUpStationId();
     }
 
-    Long getTerminalSectionId() {
+    public Long getTerminalStationId() {
         return getLast().getDownStationId();
     }
 
@@ -40,6 +40,10 @@ public class Sections {
         }
 
         sections.add(section);
+    }
+
+    public void removeLast() {
+        sections.remove(getLast());
     }
 
     public List<Station> getStations() {
@@ -62,7 +66,7 @@ public class Sections {
         Line line = section.getLine();
         Long upStationId = section.getUpStationId();
 
-        if (!Objects.equals(upStationId, line.getTerminalStationId())) {
+        if (!Objects.equals(upStationId, getTerminalStationId())) {
             throw new InvalidSectionRequestException("해당 노선의 하행종점역이 아닌 역이 상행역으로 설정되었습니다.",
                     Map.of(
                             "lineId", line.getId().toString(),
@@ -89,5 +93,9 @@ public class Sections {
         if (section.getDistance() < 1) {
             throw new InvalidSectionRequestException("길이가 0인 구간은 등록할 수 없습니다.");
         }
+    }
+
+    public boolean isTerminalStationId(Long id) {
+        return getTerminalStationId().equals(id);
     }
 }

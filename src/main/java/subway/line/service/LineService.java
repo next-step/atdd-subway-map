@@ -3,7 +3,6 @@ package subway.line.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import subway.common.error.InvalidSectionRequestException;
 import subway.common.error.NotFoundException;
 import subway.line.domain.Line;
 import subway.line.dto.CreateLineRequest;
@@ -20,10 +19,9 @@ import subway.station.domain.Station;
 import subway.station.repository.StationRepository;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
-import static subway.common.Validation.*;
+import static subway.common.Validation.setIfNotNull;
 import static subway.line.mapper.LineMapper.LINE_MAPPER;
 import static subway.section.mapper.SectionMapper.SECTION_MAPPER;
 
@@ -98,25 +96,10 @@ public class LineService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public void deleteSection(Long lineId, Long stationId) {
         Line line = findLineById(lineId);
-
-        if (line.hasLessThanTwoSections()) {
-            throw new InvalidSectionRequestException("구간이 2개 이상일 때만 삭제할 수 있습니다.");
-        }
-
-        if (!line.isTerminalStationId(stationId)) {
-            throw new InvalidSectionRequestException("마지막 구간만 삭제할 수 있습니다.");
-        }
-
-        Section section = sectionRepository.findByLine_IdAndDownStation_Id(lineId, stationId)
-                .orElseThrow(() -> new NotFoundException(
-                        Map.of(
-                                "lineId", lineId.toString(),
-                                "stationId", stationId.toString()
-                        )));
-
-        sectionRepository.delete(section);
+        line.removeSection(stationId);
     }
 
     private Line findLineById(Long id) {
