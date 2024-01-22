@@ -17,8 +17,6 @@ public class RestAssuredTest {
     @Test
     void accessGoogle() {
         ExtractableResponse<Response> response = given()
-                .param("x", "y")
-                .when()
                 .get("https://google.com")
                 .then()
                 .statusCode(200)
