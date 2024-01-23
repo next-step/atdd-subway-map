@@ -28,12 +28,7 @@ public class StationLineAcceptanceTest {
     @Test
     void createStationLine() {
         // when
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "신분당선");
-        params.put("color", "bg-red-600");
-        params.put("upStationId", "1");
-        params.put("downStationId", "2");
-        params.put("distance", "10");
+        Map<String, String> params = getParamMap("신분당선", "bg-red-600", "1", "2");
 
         ExtractableResponse<Response> response =
             RestAssured.given().log().all()
@@ -56,6 +51,21 @@ public class StationLineAcceptanceTest {
         assertThat(lineNames).containsAnyOf("신분당선");
     }
 
+    private static Map<String, String> getParamMap(
+        String name,
+        String color,
+        String upStationId,
+        String downStationId
+    ) {
+        Map<String, String> params2 = new HashMap<>();
+        params2.put("name", name);
+        params2.put("color", color);
+        params2.put("upStationId", upStationId);
+        params2.put("downStationId", downStationId);
+        params2.put("distance", "10");
+        return params2;
+    }
+
     /**
      * Given 2개의 지하철 노선을 생성하고
      * When 지하철 노선 목록을 조회하면
@@ -65,19 +75,9 @@ public class StationLineAcceptanceTest {
     @Test
     void getStationLines() {
         // given
-        Map<String, String> params1 = new HashMap<>();
-        params1.put("name", "신분당선");
-        params1.put("color", "bg-red-600");
-        params1.put("upStationId", "1");
-        params1.put("downStationId", "2");
-        params1.put("distance", "10");
+        Map<String, String> params1 = getParamMap("신분당선", "bg-red-600", "1", "2");
 
-        Map<String, String> params2 = new HashMap<>();
-        params2.put("name", "2호선");
-        params2.put("color", "bg-green-600");
-        params2.put("upStationId", "1");
-        params2.put("downStationId", "3");
-        params2.put("distance", "10");
+        Map<String, String> params2 = getParamMap("2호선", "bg-green-600", "1", "3");
 
         RestAssured.given().log().all()
             .body(params1)
@@ -103,6 +103,7 @@ public class StationLineAcceptanceTest {
         assertThat(lineNames).containsAnyOf("신분당선", "2호선");
     }
 
+
     /**
      * Given 지하철 노선을 생성하고
      * When 생성한 지하철 노선을 조회하면
@@ -112,12 +113,7 @@ public class StationLineAcceptanceTest {
     @Test
     void getStationLine() {
         // given
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "신분당선");
-        params.put("color", "bg-red-600");
-        params.put("upStationId", "1");
-        params.put("downStationId", "2");
-        params.put("distance", "10");
+        Map<String, String> params = getParamMap("신분당선", "bg-red-600", "1", "2");
 
         ExtractableResponse<Response> response =
             RestAssured.given().log().all()
@@ -160,12 +156,7 @@ public class StationLineAcceptanceTest {
                 .extract().jsonPath().getLong("id");
 
         // when
-        Map<String, String> updateParams = new HashMap<>();
-        updateParams.put("name", "다른신분당선");
-        updateParams.put("color", "bg-red-600");
-        updateParams.put("upStationId", "1");
-        updateParams.put("downStationId", "2");
-        updateParams.put("distance", "10");
+        Map<String, String> updateParams = getParamMap("다른신분당선", "bg-red-600", "1", "2");
 
         ExtractableResponse<Response> response =
             RestAssured.given().log().all()
