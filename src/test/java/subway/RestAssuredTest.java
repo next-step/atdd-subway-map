@@ -18,10 +18,10 @@ public class RestAssuredTest {
     void accessGoogle() {
         ExtractableResponse<Response> response = null;
         response = RestAssured
-            .given().log().all()
+            .given()
             .when()
             .get("https://www.google.com")
-            .then().log().all()
+            .then()
             .extract();
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
