@@ -55,4 +55,18 @@ public class LineService {
             )).collect(Collectors.toList())
         )).collect(Collectors.toList());
     }
+
+    public LineResponse getLine(Long id) {
+        Line line = lineRepository.findById(id).orElseThrow(RuntimeException::new);
+        List<StationResponse> stations = stationRepository.findAllByLineId(id).stream().map(station -> new StationResponse(
+            station.getId(),
+            station.getName()
+        )).collect(Collectors.toList());
+        return new LineResponse(
+            line.getId(),
+            line.getName(),
+            line.getColor(),
+            stations
+        );
+    }
 }

@@ -102,4 +102,39 @@ public class StationLineAcceptanceTest {
         // then
         assertThat(lineNames).containsAnyOf("신분당선", "2호선");
     }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 조회하면
+     * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
+     */
+    @DisplayName("지하철 노선을 조회한다.")
+    @Test
+    void getStationLine() {
+        // given
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "신분당선");
+        params.put("color", "bg-red-600");
+        params.put("upStationId", "1");
+        params.put("downStationId", "2");
+        params.put("distance", "10");
+
+        ExtractableResponse<Response> response =
+            RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines")
+                .then().log().all()
+                .extract();
+        Long id = response.body().jsonPath().getLong("id");
+        // when
+        String name =
+            RestAssured.given().log().all()
+                .when().get("/lines/" + id)
+                .then().log().all()
+                .extract().body().jsonPath().getString("name");
+
+        // then
+        assertThat(name).isEqualTo("신분당선");
+    }
 }
