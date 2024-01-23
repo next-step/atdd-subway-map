@@ -101,7 +101,7 @@ public class StationAcceptanceTest {
             .delete("/stations/{id}", 1).then().statusCode(HttpStatus.NO_CONTENT.value()).log().all();
 
         //then
-        when().get("/station/{id}", 1).then().statusCode(HttpStatus.NO_CONTENT.value()).log().all();
+        when().get("/station/{id}", 1).then().statusCode(HttpStatus.NOT_FOUND.value()).log().all();
     }
 
 }
