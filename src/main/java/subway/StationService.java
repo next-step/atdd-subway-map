@@ -38,4 +38,11 @@ public class StationService {
                 station.getName()
         );
     }
+
+    public StationResponse findStationById(Long id) {
+        return stationRepository.findById(id)
+                                .map(station -> new StationResponse(station.getId(), station.getName()))
+                                .orElseThrow(() -> new NoStationException("지하철 역이 없습니다."));
+    }
+
 }
