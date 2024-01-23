@@ -1,8 +1,8 @@
 package subway.line;
 
 import java.util.List;
-import javax.transaction.Transactional;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import subway.Station;
 import subway.StationRepository;
 import subway.StationResponse;
@@ -40,5 +40,10 @@ public class LineService {
 
     private String newStationName(Long id) {
         return "지하철역" + id;
+    }
+
+    @Transactional(readOnly = true)
+    public LineResponse getLines() {
+        return null;
     }
 }
