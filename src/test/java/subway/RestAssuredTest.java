@@ -19,9 +19,9 @@ public class RestAssuredTest {
         ExtractableResponse<Response> response =
                 RestAssured.
                         when().
-                        get("https://google.com").
+                            get("https://google.com").
                         then().
-                        statusCode(200).
+                            statusCode(200).
                         extract();
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
