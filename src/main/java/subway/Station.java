@@ -10,7 +10,7 @@ public class Station {
     @Column(length = 20, nullable = false)
     private String name;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Long lineId;
 
     public Station() {
@@ -18,6 +18,11 @@ public class Station {
 
     public Station(String name) {
         this.name = name;
+    }
+
+    public Station(String name, Long lineId) {
+        this.name = name;
+        this.lineId = lineId;
     }
 
     public Long getId() {

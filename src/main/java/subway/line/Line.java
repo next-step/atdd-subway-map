@@ -5,9 +5,11 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import lombok.Getter;
 
 @Entity
-public class SubwayLine {
+@Getter
+public class Line {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,8 +24,15 @@ public class SubwayLine {
     @Column(nullable = false)
     private int distance;
 
-    public SubwayLine() {
+    public Line() {
     }
+
+    public Line(String name, String color, int distance) {
+        this.name = name;
+        this.color = color;
+        this.distance = distance;
+    }
+
 
 
 
