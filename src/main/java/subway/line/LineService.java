@@ -24,11 +24,10 @@ public class LineService {
         Station upStation = new Station(request.getUpStationId(),
             newStationName(request.getUpStationId()),
             createdLine.getId());
-        stationRepository.save(upStation);
         Station downStation = new Station(request.getDownStationId(),
             newStationName(request.getDownStationId()),
             createdLine.getId());
-        stationRepository.save(downStation);
+        stationRepository.saveAll(List.of(upStation, downStation));
         return new LineResponse(
             createdLine.getId(),
             createdLine.getName(),
