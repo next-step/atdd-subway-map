@@ -90,5 +90,18 @@ public class StationAcceptanceTest {
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
     // TODO: 지하철역 제거 인수 테스트 메서드 생성
+    @Test
+    void deleteStation() {
+        //given
+        Map<String, String> params = Map.of("name", "왕십리역");
+        given().body(params).contentType(MediaType.APPLICATION_JSON_VALUE).when().post("/stations").then().log().all();
+
+        //when
+        when()
+            .delete("/stations/{id}", 1).then().statusCode(HttpStatus.NO_CONTENT.value()).log().all();
+
+        //then
+        when().get("/station/{id}", 1).then().statusCode(HttpStatus.NO_CONTENT.value()).log().all();
+    }
 
 }
