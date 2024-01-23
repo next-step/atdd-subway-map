@@ -79,7 +79,7 @@ public class StationLineAcceptanceTest {
         // given
         Map<String, String> params1 = getParamMap("신분당선", "bg-red-600", "1", "2");
 
-        Map<String, String> params2 = getParamMap("2호선", "bg-green-600", "1", "3");
+        Map<String, String> params2 = getParamMap("2호선", "bg-green-600", "3", "4");
 
         RestAssured.given().log().all()
             .body(params1)

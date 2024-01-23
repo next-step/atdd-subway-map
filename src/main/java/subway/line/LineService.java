@@ -21,13 +21,24 @@ public class LineService {
     public LineResponse createLine(LineRequest request) {
         Line createdLine = new Line(request.getName(), request.getColor(), request.getDistance());
         lineRepository.save(createdLine);
-        Station upStation = new Station(request.getUpStationId(),
-            newStationName(request.getUpStationId()),
-            createdLine.getId());
-        Station downStation = new Station(request.getDownStationId(),
-            newStationName(request.getDownStationId()),
-            createdLine.getId());
-        stationRepository.saveAll(List.of(upStation, downStation));
+        Station upStation = stationRepository.findById(request.getUpStationId())
+            .orElseGet(() -> {
+                Station station = new Station(
+                    newStationName(request.getUpStationId()),
+                    createdLine.getId());
+                stationRepository.save(station);
+                return station;
+            });
+        Station downStation = stationRepository.findById(request.getDownStationId())
+            .orElseGet(() -> {
+                Station station = new Station(
+                    newStationName(request.getDownStationId()),
+                    createdLine.getId());
+                stationRepository.save(station);
+                return station;
+            });
+        upStation.updateLineId(createdLine.getId());
+        downStation.updateLineId(createdLine.getId());
         return new LineResponse(
             createdLine.getId(),
             createdLine.getName(),

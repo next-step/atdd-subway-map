@@ -5,20 +5,16 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.SequenceGenerator;
+import lombok.Getter;
 
 @Entity
+@Getter
 public class Station {
 
-    @SequenceGenerator(
-        name = "station_seq_id",
-        sequenceName = "station_seq_id",
-        initialValue = 1,
-        allocationSize = 1)
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "station_seq_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = true)
+    @Column
     private Long lineId;
     @Column(length = 20, nullable = false)
     private String name;
@@ -27,22 +23,18 @@ public class Station {
     public Station() {
     }
 
-    public Station(Long id, String name) {
+    public Station(String name) {
         this.id = id;
         this.name = name;
     }
 
-    public Station(Long id, String name, Long lineId) {
+    public Station(String name, Long lineId) {
         this.id = id;
         this.name = name;
         this.lineId = lineId;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
+    public void updateLineId(Long lineId) {
+        this.lineId = lineId;
     }
 }
