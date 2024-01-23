@@ -137,4 +137,78 @@ public class StationLineAcceptanceTest {
         // then
         assertThat(name).isEqualTo("신분당선");
     }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 수정하면
+     * Then 해당 지하철 노선 정보는 수정된다
+     */
+    @DisplayName("지하철 노선을 수정한다.")
+    @Test
+    void updateStationLine() {
+        // given
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "신분당선");
+        params.put("color", "bg-red-600");
+
+        Long id =
+            RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines")
+                .then().log().all()
+                .extract().jsonPath().getLong("id");
+
+        // when
+        Map<String, String> updateParams = new HashMap<>();
+        updateParams.put("name", "다른신분당선");
+        updateParams.put("color", "bg-red-600");
+        updateParams.put("upStationId", "1");
+        updateParams.put("downStationId", "2");
+        updateParams.put("distance", "10");
+
+        ExtractableResponse<Response> response =
+            RestAssured.given().log().all()
+                .body(updateParams)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().put("/lines/" + id)
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 삭제하면
+     * Then 해당 지하철 노선 정보는 삭제된다
+     */
+    @DisplayName("지하철 노선을 삭제한다.")
+    @Test
+    void deleteStationLine() {
+        // given
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "신분당선");
+        params.put("color", "bg-red-600");
+
+        Long id =
+            RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines")
+                .then().log().all()
+                .extract().jsonPath().getLong("id");
+
+        // when
+        ExtractableResponse<Response> response =
+            RestAssured.given().log().all()
+                .when().delete("/lines/" + id)
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
 }
+

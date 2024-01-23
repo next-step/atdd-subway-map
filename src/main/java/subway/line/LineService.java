@@ -14,7 +14,7 @@ public class LineService {
     private LineRepository lineRepository;
     private StationRepository stationRepository;
 
-    public LineService(LineRepository lineRepository, StationRepository stationRepository){
+    public LineService(LineRepository lineRepository, StationRepository stationRepository) {
         this.lineRepository = lineRepository;
         this.stationRepository = stationRepository;
     }
@@ -24,9 +24,11 @@ public class LineService {
         Line createdLine = new Line(request.getName(), request.getColor(), request.getDistance());
         lineRepository.save(createdLine);
         // 상행선, 하행선 생성
-        Station upStation = new Station(newStationName(request.getUpStationId()), createdLine.getId());
+        Station upStation = new Station(newStationName(request.getUpStationId()),
+            createdLine.getId());
         stationRepository.save(upStation);
-        Station downStation = new Station(newStationName(request.getDownStationId()), createdLine.getId());
+        Station downStation = new Station(newStationName(request.getDownStationId()),
+            createdLine.getId());
         stationRepository.save(downStation);
         return new LineResponse(
             createdLine.getId(),
@@ -49,24 +51,38 @@ public class LineService {
             line.getId(),
             line.getName(),
             line.getColor(),
-            stationRepository.findAllByLineId(line.getId()).stream().map(station -> new StationResponse(
-                station.getId(),
-                station.getName()
-            )).collect(Collectors.toList())
+            stationRepository.findAllByLineId(line.getId()).stream()
+                .map(station -> new StationResponse(
+                    station.getId(),
+                    station.getName()
+                )).collect(Collectors.toList())
         )).collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public LineResponse getLine(Long id) {
         Line line = lineRepository.findById(id).orElseThrow(RuntimeException::new);
-        List<StationResponse> stations = stationRepository.findAllByLineId(id).stream().map(station -> new StationResponse(
-            station.getId(),
-            station.getName()
-        )).collect(Collectors.toList());
+        List<StationResponse> stations = stationRepository.findAllByLineId(id).stream()
+            .map(station -> new StationResponse(
+                station.getId(),
+                station.getName()
+            )).collect(Collectors.toList());
         return new LineResponse(
             line.getId(),
             line.getName(),
             line.getColor(),
             stations
         );
+    }
+
+    @Transactional
+    public void updateLine(Long id, LineUpdateRequest request) {
+        Line line = lineRepository.findById(id).orElseThrow(RuntimeException::new);
+        line.update(request.getName(), request.getColor());
+    }
+
+    @Transactional
+    public void deleteLine(Long id) {
+        lineRepository.deleteById(id);
     }
 }
