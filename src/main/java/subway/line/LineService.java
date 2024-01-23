@@ -24,10 +24,12 @@ public class LineService {
         Line createdLine = new Line(request.getName(), request.getColor(), request.getDistance());
         lineRepository.save(createdLine);
         // 상행선, 하행선 생성
-        Station upStation = new Station(newStationName(request.getUpStationId()),
+        Station upStation = new Station(request.getUpStationId(),
+            newStationName(request.getUpStationId()),
             createdLine.getId());
         stationRepository.save(upStation);
-        Station downStation = new Station(newStationName(request.getDownStationId()),
+        Station downStation = new Station(request.getDownStationId(),
+            newStationName(request.getDownStationId()),
             createdLine.getId());
         stationRepository.save(downStation);
         return new LineResponse(

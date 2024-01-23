@@ -1,26 +1,39 @@
 package subway;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
 
 @Entity
 public class Station {
+
+    @SequenceGenerator(
+        name = "station_seq_id",
+        sequenceName = "station_seq_id",
+        initialValue = 1,
+        allocationSize = 1)
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "station_seq_id")
     private Long id;
+    @Column(nullable = true)
+    private Long lineId;
     @Column(length = 20, nullable = false)
     private String name;
 
-    @Column(nullable = true)
-    private Long lineId;
 
     public Station() {
     }
 
-    public Station(String name) {
+    public Station(Long id, String name) {
+        this.id = id;
         this.name = name;
     }
 
-    public Station(String name, Long lineId) {
+    public Station(Long id, String name, Long lineId) {
+        this.id = id;
         this.name = name;
         this.lineId = lineId;
     }
