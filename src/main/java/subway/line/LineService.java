@@ -21,7 +21,6 @@ public class LineService {
     public LineResponse createLine(LineRequest request) {
         Line createdLine = new Line(request.getName(), request.getColor(), request.getDistance());
         lineRepository.save(createdLine);
-        // 상행선, 하행선 생성
         Station upStation = new Station(request.getUpStationId(),
             newStationName(request.getUpStationId()),
             createdLine.getId());
