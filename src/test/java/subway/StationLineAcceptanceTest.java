@@ -5,14 +5,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import subway.line.LineResponse;
 
 @DisplayName("지하철 노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -45,12 +48,12 @@ public class StationLineAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames =
+        List<String> lineNames =
             RestAssured.given().log().all()
                 .when().get("/lines")
                 .then().log().all()
-                .extract().jsonPath().getList("신분당선", String.class);
-        assertThat(stationNames).containsAnyOf("신분당선");
+                .extract().body().jsonPath().getList(".", LineResponse.class).stream().map(
+                    LineResponse::getName).collect(Collectors.toList());
+        assertThat(lineNames).containsAnyOf("신분당선");
     }
-
 }
