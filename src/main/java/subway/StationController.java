@@ -25,6 +25,11 @@ public class StationController {
         return ResponseEntity.ok().body(stationService.findAllStations());
     }
 
+    @GetMapping(value = "/station/{id}")
+    public ResponseEntity<StationResponse> showStation(@PathVariable Long id) {
+        return ResponseEntity.ok().body(stationService.findStationById(id));
+    }
+
     @DeleteMapping("/stations/{id}")
     public ResponseEntity<Void> deleteStation(@PathVariable Long id) {
         stationService.deleteStationById(id);
