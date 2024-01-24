@@ -7,16 +7,21 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 
+import static io.restassured.RestAssured.when;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class RestAssuredTest {
 
-    @DisplayName("구글 페이지 접근 테스트")
+    @DisplayName("구글 페이지 접근에 성공하면 200 상태코드를 응답받는다")
     @Test
     void accessGoogle() {
-        // TODO: 구글 페이지 요청 구현
-        ExtractableResponse<Response> response = null;
+        String googleUrl = "https://google.com";
+
+        ExtractableResponse<Response> response = when()
+                .get(googleUrl)
+                .then()
+                .extract();
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
