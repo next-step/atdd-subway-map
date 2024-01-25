@@ -20,6 +20,32 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationAcceptanceTest {
 
+    @DisplayName("지하철 역을 2개 생성하고 등록된 역들을 조회한다.")
+    @Test
+    void test() {
+        // given
+        Map<String, String> params = new HashMap<>();
+
+        setStationName(params, "건대입구역");
+        createStation(params);
+
+        setStationName(params, "어린이대공원역");
+        createStation(params);
+
+        // when
+        List<String> stationNames = RestAssured.given().log().all()
+                .when().get("/stations")
+                .then().log().all()
+                .extract()
+                .response().jsonPath().getList("name", String.class);
+
+        // then
+        assertThat(stationNames.size()).isEqualTo(2);
+        assertThat(stationNames).containsAnyOf(
+                "건대입구역", "어린이대공원역"
+        );
+    }
+
     private String setStationName(Map<String, String> params, String stationName) {
         return params.put("name", stationName);
     }
