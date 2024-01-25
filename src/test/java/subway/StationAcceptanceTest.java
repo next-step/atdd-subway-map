@@ -68,7 +68,23 @@ public class StationAcceptanceTest {
      * When 그 지하철역을 삭제하면
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
-    // TODO: 지하철역 제거 인수 테스트 메서드 생성
+    @DisplayName("지하철역 제거")
+    @Test
+    void deleteStation() {
+        // given
+        String stationName = "을지로입구역";
+        createStation(stationName);
+
+        // when
+        RestAssured.given()
+                .when()
+                    .delete("/stations/{id}", 1)
+                .then()
+                    .statusCode(HttpStatus.NO_CONTENT.value());
+
+        // then
+        assertThat(getStation().jsonPath().getList("name")).doesNotContain(stationName);
+    }
 
     private ExtractableResponse<Response> createStation(String name) {
         return RestAssured.given()
