@@ -1,8 +1,6 @@
 package subway;
 
 import io.restassured.RestAssured;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -27,18 +25,12 @@ public class StationAcceptanceTest {
     void createStation() {
         // given
         String gasan = "가산디지털단지역";
-        
+
+        // when
         createStationRequest(gasan);
 
         // then
-        List<String> stationNames =
-                RestAssured.given()
-                        .when()
-                            .get("/stations")
-                        .then()
-                        .extract().jsonPath().getList("name", String.class);
-
-        assertThat(stationNames).containsAnyOf(gasan);
+        assertThat(requestListAndExtractStationInfo("name")).containsAnyOf(gasan);
     }
 
     /**
@@ -57,14 +49,7 @@ public class StationAcceptanceTest {
         createStationRequest(guro);
 
         // when
-        List<String> stationNames =
-                RestAssured
-                        .when()
-                            .get("/stations")
-                        .then()
-                            .statusCode(HttpStatus.OK.value())
-                        .extract()
-                            .jsonPath().getList("name", String.class);
+        List<String> stationNames = requestListAndExtractStationInfo("name");
 
         // then
         assertThat(stationNames).containsAnyOf(gasan);
@@ -92,24 +77,14 @@ public class StationAcceptanceTest {
                     .then()
                 .statusCode(HttpStatus.NO_CONTENT.value());
 
-        // when
-        List<String> stationNames =
-                RestAssured
-                        .when()
-                            .get("/stations")
-                        .then()
-                            .statusCode(HttpStatus.OK.value())
-                        .extract()
-                            .jsonPath().getList("name", String.class);
-
         // then
-        assertThat(stationNames).hasSize(0);
+        assertThat(requestListAndExtractStationInfo("name")).hasSize(0);
 
     }
 
     /**
      * 주어진 지하철역 이름으로 지하철역 생성 요청 및 상태 코드 검증
-     * 
+     *
      * @param stationName 지하철역 이름
      */
     private static void createStationRequest(String stationName) {
@@ -123,4 +98,18 @@ public class StationAcceptanceTest {
                     .statusCode(HttpStatus.CREATED.value());
     }
 
+
+    /**
+     * 지하철역 목록을 요청하고, 주어진 추출 대상 이름에 해당하는 값을 추출 후 리스트 반환
+     *
+     * @param extractionTargetName 추출 대상 이름
+     * @return 추출된 값들의 리스트
+     */
+    private static List<String> requestListAndExtractStationInfo(String extractionTargetName) {
+        return RestAssured.given()
+                .when()
+                    .get("/stations")
+                .then()
+                .extract().jsonPath().getList(extractionTargetName , String.class);
+    }
 }
