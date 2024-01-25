@@ -27,27 +27,17 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 생성한다.")
     @Test
     void createStation() {
-        // when
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
+        //given
+        String stationName = "강남역";
 
-        ExtractableResponse<Response> response =
-                given().log().all()
-                        .body(params)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/stations")
-                        .then().log().all()
-                        .extract();
+        // when
+        ExtractableResponse<Response> response = createStationsApiCall(stationName);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames =
-                given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
+        List<String> stationNames = showStationsApiCall().jsonPath().getList("name", String.class);
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
@@ -56,36 +46,17 @@ public class StationAcceptanceTest {
      * When 지하철역 목록을 조회하면
      * Then 2개의 지하철역을 응답 받는다
      */
-    // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
     @DisplayName("생성한 지하철역 목록 조회")
     @Test
     void showStations() {
         //given
-        Map<String, String> paramsA = new HashMap<>();
-        paramsA.put("name", "성수역");
-
-        given().log().all()
-                .body(paramsA)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
-
-        Map<String, String> paramsB = new HashMap<>();
-        paramsB.put("name", "잠실역");
-
-        given().log().all()
-                .body(paramsB)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
+        String stationNameA = "성수역";
+        createStationsApiCall(stationNameA);
+        String stationNameB = "잠실역";
+        createStationsApiCall(stationNameB);
 
         //when
-        ExtractableResponse<Response> response = given().log().all()
-                .when().get("/stations")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = showStationsApiCall();
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -98,5 +69,22 @@ public class StationAcceptanceTest {
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
     // TODO: 지하철역 제거 인수 테스트 메서드 생성
+    private ExtractableResponse<Response> createStationsApiCall(String name) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", name);
 
+        return given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> showStationsApiCall() {
+        return given().log().all()
+                .when().get("/stations")
+                .then().log().all()
+                .extract();
+    }
 }
