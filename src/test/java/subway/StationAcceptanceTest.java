@@ -24,5 +24,12 @@ public class StationAcceptanceTest {
         return params.put("name", stationName);
     }
 
-
+    private ExtractableResponse<Response> createStation(Map<String, String> params) {
+        return RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+    }
 }
