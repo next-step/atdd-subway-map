@@ -66,8 +66,8 @@ then().
     Vary: Access-Control-Request-Method
     Vary: Access-Control-Request-Header
     ```
-  - [ ] dummy data 를 넣는다.
-  - [ ] "/stations/1" 로 Delete 요청을 보낸다.
-  - [ ] statusCode 가 204 No Content 인지 확인한다.
-  - [ ] "/stations" 로 Get 요청을 보낸다.
-  - [ ] jsonPath 를 이용해 해당 지하철역이 삭제 되었는지 확인한다.
+  - [x] dummy data 를 넣는다.
+  - [x] "/stations/1" 로 Delete 요청을 보낸다.
+  - [x] statusCode 가 204 No Content 인지 확인한다.
+  - [x] "/stations" 로 Get 요청을 보낸다.
+  - [x] jsonPath 를 이용해 해당 지하철역이 삭제 되었는지 확인한다.
