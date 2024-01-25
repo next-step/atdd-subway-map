@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import subway.dto.StationRequest;
 
 import java.util.HashMap;
 import java.util.List;
@@ -59,22 +60,21 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역 2개를 생성하고, 목록을 조회한다.")
     void showStations() {
         //given
-        Map<String, String> params1 = new HashMap<>();
-        params1.put("name", "가산디지털단지역");
-            RestAssured
+        String gasan = "가산디지털단지역";
+        String guro = "구로디지털단지역";
+
+        RestAssured
                 .given()
-                    .body(params1)
+                    .body(new StationRequest(gasan))
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                     .post("/stations")
                 .then()
                     .statusCode(HttpStatus.CREATED.value());
 
-        Map<String, String> params2 = new HashMap<>();
-        params2.put("name", "구로디지털단지역");
         RestAssured
                 .given()
-                    .body(params2)
+                .body(new StationRequest(guro))
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                     .post("/stations")
@@ -92,8 +92,8 @@ public class StationAcceptanceTest {
                             .jsonPath().getList("name", String.class);
 
         // then
-        assertThat(stationNames).containsAnyOf("가산디지털단지역");
-        assertThat(stationNames).containsAnyOf("구로디지털단지역");
+        assertThat(stationNames).containsAnyOf(gasan);
+        assertThat(stationNames).containsAnyOf(guro);
 
     }
 
