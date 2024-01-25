@@ -27,18 +27,17 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        final String targetStationName = "강남역";
-        final ExtractableResponse<Response> response = createStation(targetStationName);
+        final ExtractableResponse<Response> response = createStation("강남역");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         final StationResponse stationResponse = response.as(StationResponse.class);
-        assertThat(stationResponse.getName()).isEqualTo(targetStationName);
+        assertThat(stationResponse.getName()).isEqualTo("강남역");
 
         // then
         final ExtractableResponse<Response> stationsResponse = getStationsResponse();
         final List<String> stationNames = stationsResponse.jsonPath().getList("name", String.class);
-        assertThat(stationNames).containsAnyOf(targetStationName);
+        assertThat(stationNames).containsAnyOf("강남역");
     }
 
     /**
@@ -60,7 +59,7 @@ public class StationAcceptanceTest {
         assertSoftly(softly -> {
             softly.assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
             final List<String> stationNames = response.jsonPath().getList("name", String.class);
-            softly.assertThat(stationNames).containsAll(targetStations);
+            softly.assertThat(stationNames).containsAll(List.of("지하철역이름", "새로운지하철역이름", "또다른지하철역이름"));
         });
     }
 
