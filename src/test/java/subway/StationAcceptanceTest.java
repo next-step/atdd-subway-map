@@ -94,7 +94,6 @@ public class StationAcceptanceTest {
         // then
         assertThat(stationNames).containsAnyOf(gasan);
         assertThat(stationNames).containsAnyOf(guro);
-
     }
 
     /**
@@ -103,5 +102,40 @@ public class StationAcceptanceTest {
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
     // TODO: 지하철역 제거 인수 테스트 메서드 생성
+    @Test
+    @DisplayName("지하철역이 생성되고, 삭제된다.")
+    void deleteStation() {
+        //given
+        String gasan = "가산디지털단지역";
+
+        RestAssured
+                .given()
+                    .body(new StationRequest(gasan))
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                    .post("/stations")
+                .then()
+                    .statusCode(HttpStatus.CREATED.value());
+        // when
+        RestAssured
+                .when()
+                .delete("/stations/" + 1)
+                    .then()
+                .statusCode(HttpStatus.NO_CONTENT.value());
+
+        // when
+        List<String> stationNames =
+                RestAssured
+                        .when()
+                            .get("/stations")
+                        .then()
+                            .statusCode(HttpStatus.OK.value())
+                        .extract()
+                            .jsonPath().getList("name", String.class);
+
+        // then
+        assertThat(stationNames).hasSize(0);
+
+    }
 
 }
