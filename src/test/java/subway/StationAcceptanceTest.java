@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static io.restassured.RestAssured.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
@@ -31,7 +32,7 @@ public class StationAcceptanceTest {
         params.put("name", "강남역");
 
         ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
+                given().log().all()
                         .body(params)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .when().post("/stations")
@@ -43,7 +44,7 @@ public class StationAcceptanceTest {
 
         // then
         List<String> stationNames =
-                RestAssured.given().log().all()
+                given().log().all()
                         .when().get("/stations")
                         .then().log().all()
                         .extract().jsonPath().getList("name", String.class);
@@ -56,6 +57,40 @@ public class StationAcceptanceTest {
      * Then 2개의 지하철역을 응답 받는다
      */
     // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
+    @DisplayName("생성한 지하철역 목록 조회")
+    @Test
+    void showStations() {
+        //given
+        Map<String, String> paramsA = new HashMap<>();
+        paramsA.put("name", "성수역");
+
+        given().log().all()
+                .body(paramsA)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+
+        Map<String, String> paramsB = new HashMap<>();
+        paramsB.put("name", "잠실역");
+
+        given().log().all()
+                .body(paramsB)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+
+        //when
+        ExtractableResponse<Response> response = given().log().all()
+                .when().get("/stations")
+                .then().log().all()
+                .extract();
+
+        //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.jsonPath().getList("name", String.class)).containsExactly("성수역", "잠실역");
+    }
 
     /**
      * Given 지하철역을 생성하고
