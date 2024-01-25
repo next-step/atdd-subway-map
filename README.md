@@ -22,7 +22,7 @@ then().
 
 ## 1단계 - 지하철역 인수 테스트 작성
 ### 요구사항
-- [ ] 지하철역 목록 인수 테스트 작성
+- [x] 지하철역 목록 인수 테스트 작성
   - API Request
     ```shell
     GET /stations HTTP/1.1
@@ -49,10 +49,10 @@ then().
       "name" : "또다른지하철역이름"
     } ]
     ```
-  - [ ] dummy data 를 넣는다.
-  - [ ] "/stations" 로 Get 요청을 보낸다.
-  - [ ] statusCode 가 200 OK 인지 확인한다.
-  - [ ] jsonPath 를 이용해 넣었던 dummy data 가 있는지 확인한다.
+  - [x] dummy data 를 넣는다.
+  - [x] "/stations" 로 Get 요청을 보낸다.
+  - [x] statusCode 가 200 OK 인지 확인한다.
+  - [x] jsonPath 를 이용해 넣었던 dummy data 가 있는지 확인한다.
 - [ ] 지하철역 삭제 인수 테스트 작성
   - API Request
       ```shell

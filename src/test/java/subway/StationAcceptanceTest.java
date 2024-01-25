@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -55,17 +56,50 @@ public class StationAcceptanceTest {
     }
 
     /**
-     * Given 2개의 지하철역을 생성하고
+     * Given 3개의 지하철역을 생성하고
      * When 지하철역 목록을 조회하면
      * Then 2개의 지하철역을 응답 받는다
      */
-    // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
+    @DisplayName("지하철역 목록을 조회한다.")
+    @Test
+    void fetchStationsTest() {
+        // given
+        final String 지하철역이름 = "지하철역이름";
+        final String 새로운지하철역이름 = "새로운지하철역이름";
+        final String 또다른지하철역이름 = "또다른지하철역이름";
+        createStation(지하철역이름);
+        createStation(새로운지하철역이름);
+        createStation(또다른지하철역이름);
 
+        // when
+        final ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .when().get("/stations")
+                .then().log().all()
+                .extract();
+
+        // then
+        assertSoftly(softly -> {
+            softly.assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+            final List<String> stationNames = response.jsonPath().getList("name", String.class);
+            softly.assertThat(stationNames).containsAll(List.of(지하철역이름, 새로운지하철역이름, 또다른지하철역이름));
+        });
+    }
+
+
+    // TODO: 지하철역 제거 인수 테스트 메서드 생성
     /**
      * Given 지하철역을 생성하고
      * When 그 지하철역을 삭제하면
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
-    // TODO: 지하철역 제거 인수 테스트 메서드 생성
+    private static ExtractableResponse<Response> createStation(final String stationName) {
+        return RestAssured.given()
+                .body(Map.of("name" ,stationName))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then()
+                .extract();
+    }
 
 }
