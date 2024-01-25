@@ -40,7 +40,20 @@ public class StationAcceptanceTest {
      * When 지하철역 목록을 조회하면
      * Then 2개의 지하철역을 응답 받는다
      */
-    // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
+    @DisplayName("지하철역 목록을 조회한다.")
+    @Test
+    void 지하철_목록을_조회() {
+        // given
+        createStationByStationName("강남역");
+        createStationByStationName("광화문역");
+
+        // when
+        List<String> stationNames =
+                selectStations().jsonPath().getList("name", String.class);
+
+        // then
+        assertThat(stationNames).containsOnlyOnce("강남역", "광화문역");
+    }
 
     /**
      * Given 지하철역을 생성하고
@@ -48,6 +61,7 @@ public class StationAcceptanceTest {
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
     // TODO: 지하철역 제거 인수 테스트 메서드 생성
+
     private ExtractableResponse<Response> createStationByStationName(String stationName) {
         Map<String, String> params = new HashMap<>();
         params.put("name", stationName);
