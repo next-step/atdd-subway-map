@@ -76,10 +76,7 @@ public class StationAcceptanceTest {
         targetStations.forEach(this::createStation);
 
         // when
-        final ExtractableResponse<Response> response = RestAssured
-                .given()
-                .when().delete("/stations/1")
-                .then().extract();
+        final ExtractableResponse<Response> response = deleteStationByIdResponse(1L);
 
         // then
         assertSoftly(softly -> {
@@ -103,6 +100,13 @@ public class StationAcceptanceTest {
                 .body(Map.of("name", stationName))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/stations")
+                .then().extract();
+    }
+
+    private ExtractableResponse<Response> deleteStationByIdResponse(final Long id) {
+        return RestAssured
+                .given().pathParam("id", id)
+                .when().delete("/stations/{id}")
                 .then().extract();
     }
 
