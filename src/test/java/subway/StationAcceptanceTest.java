@@ -27,19 +27,8 @@ public class StationAcceptanceTest {
     void createStation() {
         // given
         String gasan = "가산디지털단지역";
-
-        // when
-        ExtractableResponse<Response> response =
-                RestAssured.given()
-                            .body(new StationRequest(gasan))
-                            .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when()
-                            .post("/stations")
-                        .then()
-                            .extract();
-
-        // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        
+        createStationRequest(gasan);
 
         // then
         List<String> stationNames =
@@ -63,6 +52,7 @@ public class StationAcceptanceTest {
         //given
         String gasan = "가산디지털단지역";
         String guro = "구로디지털단지역";
+
         createStationRequest(gasan);
         createStationRequest(guro);
 
@@ -92,6 +82,7 @@ public class StationAcceptanceTest {
     void deleteStation() {
         //given
         String gasan = "가산디지털단지역";
+
         createStationRequest(gasan);
 
         // when
