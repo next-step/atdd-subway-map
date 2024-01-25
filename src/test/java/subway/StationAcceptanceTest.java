@@ -63,24 +63,8 @@ public class StationAcceptanceTest {
         //given
         String gasan = "가산디지털단지역";
         String guro = "구로디지털단지역";
-
-        RestAssured
-                .given()
-                    .body(new StationRequest(gasan))
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                    .post("/stations")
-                .then()
-                    .statusCode(HttpStatus.CREATED.value());
-
-        RestAssured
-                .given()
-                .body(new StationRequest(guro))
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                    .post("/stations")
-                .then()
-                    .statusCode(HttpStatus.CREATED.value());
+        createStationRequest(gasan);
+        createStationRequest(guro);
 
         // when
         List<String> stationNames =
@@ -108,15 +92,8 @@ public class StationAcceptanceTest {
     void deleteStation() {
         //given
         String gasan = "가산디지털단지역";
+        createStationRequest(gasan);
 
-        RestAssured
-                .given()
-                    .body(new StationRequest(gasan))
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                    .post("/stations")
-                .then()
-                    .statusCode(HttpStatus.CREATED.value());
         // when
         RestAssured
                 .when()
@@ -137,6 +114,22 @@ public class StationAcceptanceTest {
         // then
         assertThat(stationNames).hasSize(0);
 
+    }
+
+    /**
+     * 주어진 지하철역 이름으로 지하철역 생성 요청 및 상태 코드 검증
+     * 
+     * @param stationName 지하철역 이름
+     */
+    private static void createStationRequest(String stationName) {
+        RestAssured
+                .given()
+                    .body(new StationRequest(stationName))
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                    .post("/stations")
+                .then()
+                    .statusCode(HttpStatus.CREATED.value());
     }
 
 }
