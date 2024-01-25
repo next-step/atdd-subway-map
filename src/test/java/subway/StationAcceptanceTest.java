@@ -1,6 +1,5 @@
 package subway;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
@@ -19,6 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationAcceptanceTest {
+
     /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다
@@ -38,7 +38,7 @@ public class StationAcceptanceTest {
 
         // then
         List<String> stationNames = showStationsApiCall().jsonPath().getList("name", String.class);
-        assertThat(stationNames).containsAnyOf("강남역");
+        assertThat(stationNames).containsAnyOf(stationName);
     }
 
     /**
@@ -60,7 +60,8 @@ public class StationAcceptanceTest {
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.jsonPath().getList("name", String.class)).containsExactly("성수역", "잠실역");
+        assertThat(response.jsonPath().getList("name", String.class))
+                .containsExactly(stationNameA, stationNameB);
     }
 
     /**
