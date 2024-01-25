@@ -26,7 +26,7 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        final ExtractableResponse<Response> response = createStationResponse("강남역");
+        final ExtractableResponse<Response> response = createStation("강남역");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -51,8 +51,8 @@ public class StationAcceptanceTest {
     void findStation() {
         // Given
         String[] 지하철역_이름_리스트 = {"강남역", "역삼역"};
-        createStationResponse(지하철역_이름_리스트[0]);
-        createStationResponse(지하철역_이름_리스트[1]);
+        createStation(지하철역_이름_리스트[0]);
+        createStation(지하철역_이름_리스트[1]);
 
         // When
         final ExtractableResponse<Response> response = getStationList();
@@ -76,7 +76,7 @@ public class StationAcceptanceTest {
 
         // Given
         final String 지하철역_이름 = "강남역";
-        final ExtractableResponse<Response> createResponse = createStationResponse(지하철역_이름);
+        final ExtractableResponse<Response> createResponse = createStation(지하철역_이름);
         final StationResponse createdStation = createResponse.as(StationResponse.class);
 
         // When
@@ -105,7 +105,7 @@ public class StationAcceptanceTest {
             .extract();
     }
 
-    private static ExtractableResponse<Response> createStationResponse(String name) {
+    private static ExtractableResponse<Response> createStation(String name) {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
 
