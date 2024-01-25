@@ -17,12 +17,12 @@ public class RestAssuredTest {
     @Test
     void accessGoogle() {
         ExtractableResponse<Response> response =
-                RestAssured.
-                        when().
-                        get("https://google.com").
-                        then().
-                        statusCode(200).
-                        extract();
+                RestAssured
+                        .when()
+                        .get("https://google.com")
+                        .then()
+                        .statusCode(200)
+                        .extract();
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
