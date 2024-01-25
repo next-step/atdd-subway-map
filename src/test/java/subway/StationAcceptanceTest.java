@@ -35,7 +35,7 @@ public class StationAcceptanceTest {
         assertThat(stationResponse.getName()).isEqualTo("강남역");
 
         // then
-        final ExtractableResponse<Response> stationsResponse = getStationsResponse();
+        final ExtractableResponse<Response> stationsResponse = getStations();
         final List<String> stationNames = stationsResponse.jsonPath().getList("name", String.class);
         assertThat(stationNames).containsAnyOf("강남역");
     }
@@ -53,7 +53,7 @@ public class StationAcceptanceTest {
         targetStations.forEach(this::createStation);
 
         // when
-        final ExtractableResponse<Response> response = getStationsResponse();
+        final ExtractableResponse<Response> response = getStations();
 
         // then
         assertSoftly(softly -> {
@@ -76,18 +76,18 @@ public class StationAcceptanceTest {
         targetStations.forEach(this::createStation);
 
         // when
-        final ExtractableResponse<Response> response = deleteStationByIdResponse(1L);
+        final ExtractableResponse<Response> response = deleteStationById(1L);
 
         // then
         assertSoftly(softly -> {
             softly.assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-            final ExtractableResponse<Response> stationsResponse = getStationsResponse();
+            final ExtractableResponse<Response> stationsResponse = getStations();
             final List<String> stationNames = stationsResponse.jsonPath().getList("name", String.class);
             softly.assertThat(stationNames).doesNotContain("지하철역이름");
         });
     }
 
-    private ExtractableResponse<Response> getStationsResponse() {
+    private ExtractableResponse<Response> getStations() {
         return RestAssured
                 .given()
                 .when().get("/stations")
@@ -103,7 +103,7 @@ public class StationAcceptanceTest {
                 .then().extract();
     }
 
-    private ExtractableResponse<Response> deleteStationByIdResponse(final Long id) {
+    private ExtractableResponse<Response> deleteStationById(final Long id) {
         return RestAssured
                 .given().pathParam("id", id)
                 .when().delete("/stations/{id}")
