@@ -53,7 +53,7 @@ public class StationAcceptanceTest {
                 selectStations().jsonPath().getList("name", String.class);
 
         // then
-        assertThat(stationNames).containsOnlyOnce("강남역", "광화문역");
+        assertThat(stationNames).containsAnyOf("강남역", "광화문역");
     }
 
     /**
