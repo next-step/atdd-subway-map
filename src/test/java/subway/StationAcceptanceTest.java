@@ -50,9 +50,9 @@ public class StationAcceptanceTest {
     @Test
     void findStation() {
         // Given
-        String[] 지하철_이름 = {"강남역", "역삼역"};
-        createStationResponse(지하철_이름[0]);
-        createStationResponse(지하철_이름[1]);
+        String[] 지하철역_이름_리스트 = {"강남역", "역삼역"};
+        createStationResponse(지하철역_이름_리스트[0]);
+        createStationResponse(지하철역_이름_리스트[1]);
 
         // When
         final ExtractableResponse<Response> response = getStationList();
@@ -60,7 +60,7 @@ public class StationAcceptanceTest {
         // then
         final List<String> stationNameList = response.jsonPath().getList("name");
         assertThat(stationNameList.size()).isEqualTo(2);
-        assertThat(stationNameList).contains(지하철_이름);
+        assertThat(stationNameList).contains(지하철역_이름_리스트);
     }
 
 
