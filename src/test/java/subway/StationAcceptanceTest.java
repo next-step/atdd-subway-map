@@ -68,6 +68,28 @@ public class StationAcceptanceTest {
         assertThat(response.getStatusCode()).isEqualTo(204);
     }
 
+    @DisplayName("생성한 역이 아닌 역을 삭제하면 204 코드를 반환하지 않는다.")
+    @Test
+    void test3() {
+        // given
+        Map<String, String> params = new HashMap<>();
+
+        setStationName(params, "건대입구역");
+        ExtractableResponse<Response> station = createStation(params);
+        int stationId = station.response().jsonPath().getInt("id");
+        String id = String.valueOf(stationId + 1);
+
+        // when
+        Response response = RestAssured.given().log().all()
+                .when().delete("/stations/" + id)
+                .then().log().all()
+                .extract()
+                .response();
+
+        // then
+        assertThat(response.getStatusCode()).isNotEqualTo(204);
+    }
+
     private String setStationName(Map<String, String> params, String stationName) {
         return params.put("name", stationName);
     }
