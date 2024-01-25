@@ -18,3 +18,56 @@ then().
         statusCode(400).
         body("lotto.lottoId", equalTo(6));
 ```
+
+
+## 1단계 - 지하철역 인수 테스트 작성
+### 요구사항
+- [ ] 지하철역 목록 인수 테스트 작성
+  - API Request
+    ```shell
+    GET /stations HTTP/1.1
+    Accept: application/json
+    Host: localhost:8080
+    ```
+  - API Response
+    ```shell
+    HTTP/1.1 200 OK
+    Vary: Origin
+    Vary: Access-Control-Request-Method
+    Vary: Access-Control-Request-Header
+    Content-Type: application/json
+    Content-Length: 167
+    
+    [ {
+      "id" : 1,
+      "name" : "지하철역이름"
+    }, {
+      "id" : 2,
+      "name" : "새로운지하철역이름"
+    }, {
+      "id" : 3,
+      "name" : "또다른지하철역이름"
+    } ]
+    ```
+  - [ ] dummy data 를 넣는다.
+  - [ ] "/stations" 로 Get 요청을 보낸다.
+  - [ ] statusCode 가 200 OK 인지 확인한다.
+  - [ ] jsonPath 를 이용해 넣었던 dummy data 가 있는지 확인한다.
+- [ ] 지하철역 삭제 인수 테스트 작성
+  - API Request
+      ```shell
+      DELETE /stations/1 HTTP/1.1
+      Host: localhost:8080
+      ```
+  - API Response
+    ```shell
+    HTTP/1.1 204 No Content
+    Vary: Origin
+    Vary: Access-Control-Request-Method
+    Vary: Access-Control-Request-Header
+    ```
+  - [ ] dummy data 를 넣는다.
+  - [ ] "/stations/1" 로 Delete 요청을 보낸다.
+  - [ ] statusCode 가 204 No Content 인지 확인한다.
+  - [ ] "/stations" 로 Get 요청을 보낸다.
+  - [ ] jsonPath 를 이용해 해당 지하철역이 삭제 되었는지 확인한다.
