@@ -46,6 +46,28 @@ public class StationAcceptanceTest {
         );
     }
 
+    @DisplayName("생성한 역을 삭제하면 204 코드를 반환한다.")
+    @Test
+    void test2() {
+        // given
+        Map<String, String> params = new HashMap<>();
+
+        setStationName(params, "건대입구역");
+        ExtractableResponse<Response> station = createStation(params);
+        int stationId = station.response().jsonPath().getInt("id");
+        String id = String.valueOf(stationId);
+
+        // when
+        Response response = RestAssured.given().log().all()
+                .when().delete("/stations/" + id)
+                .then().log().all()
+                .extract()
+                .response();
+
+        // then
+        assertThat(response.getStatusCode()).isEqualTo(204);
+    }
+
     private String setStationName(Map<String, String> params, String stationName) {
         return params.put("name", stationName);
     }
