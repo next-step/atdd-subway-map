@@ -75,16 +75,16 @@ public class StationAcceptanceTest {
     void findStation() {
         // Given
         String 지하철역_이름 = "강남역";
-        createStation(지하철역_이름);
+        ExtractableResponse<Response> createResponse = createStation(지하철역_이름);
+        StationResponse createdStation = createResponse.as(StationResponse.class);
 
         // When
-        final ExtractableResponse<Response> response = getStation(지하철역_이름);
+        final ExtractableResponse<Response> response = getStation(createdStation.getId());
 
         // Then
         final String foundStation = response.jsonPath().getString("name");
         assertThat(foundStation).isEqualTo(지하철역_이름);
     }
-
 
     /**
      * Given 지하철역을 생성하고
@@ -138,6 +138,16 @@ public class StationAcceptanceTest {
             .body(params)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .when().post("/stations")
+            .then().log().all()
+            .extract();
+    }
+
+    private ExtractableResponse<Response> getStation(Long id) {
+        return RestAssured
+            .given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when()
+            .get("/stations/" + id)
             .then().log().all()
             .extract();
     }
