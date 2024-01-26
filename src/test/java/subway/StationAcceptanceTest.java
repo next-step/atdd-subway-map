@@ -80,17 +80,39 @@ public class StationAcceptanceTest {
 
     private void createStation(String name) {
         RestAssured
-                .given().log().all().body(new StationRequest(name)).contentType(MediaType.APPLICATION_JSON_VALUE)
+                .given().body(new StationRequest(name)).contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/stations")
-                .then().log().all()
-                .extract();
+                .then().statusCode(HttpStatus.CREATED.value());
     }
 
     /**
-     * Given 지하철역을 생성하고
-     * When 그 지하철역을 삭제하면
-     * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
+     * Given 지하철역을 생성하고 When 그 지하철역을 삭제하면 Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
     // TODO: 지하철역 제거 인수 테스트 메서드 생성
+    @Test
+    @DisplayName("원하는 지하철역을 제거을 제거한다.")
+    void delete_station() {
+        // given
+        String 수원역 = "수원역";
+        String 서울역 = "서울역";
+        long givenStationId = 1;
 
+        createStation(수원역);
+        createStation(서울역);
+
+        // when
+        RestAssured
+                .given().log().all()
+                .when().delete("/stations/" + givenStationId)
+                .then().log().all().statusCode(HttpStatus.NO_CONTENT.value());
+
+        // then
+        List<String> names = RestAssured
+                .given()
+                .when().get("/stations")
+                .then().extract().jsonPath().getList("name", String.class);
+
+        assertThat(names).hasSize(1);
+        assertThat(names).contains("서울역");
+    }
 }
