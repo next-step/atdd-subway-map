@@ -9,7 +9,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -27,16 +26,7 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .body(params)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/stations")
-                        .then().log().all()
-                        .extract();
+        ExtractableResponse<Response> response = createStation("강남역");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -46,7 +36,9 @@ public class StationAcceptanceTest {
                 RestAssured.given().log().all()
                         .when().get("/stations")
                         .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
+                        .extract().jsonPath().getList("name");
+
+
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
@@ -55,13 +47,59 @@ public class StationAcceptanceTest {
      * When 지하철역 목록을 조회하면
      * Then 2개의 지하철역을 응답 받는다
      */
-    // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
+    @DisplayName("지하철역 목록을 조회한다.")
+    @Test
+    void getStations() {
+        // given
+        List<String> stations = List.of("을지로입구역", "종각역");
+        stations.forEach(this::createStation);
+
+        // when
+        ExtractableResponse<Response> response = getStation();
+
+        //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.jsonPath().getList("name")).containsAll(stations);
+    }
 
     /**
      * Given 지하철역을 생성하고
      * When 그 지하철역을 삭제하면
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
-    // TODO: 지하철역 제거 인수 테스트 메서드 생성
+    @DisplayName("지하철역 제거")
+    @Test
+    void deleteStation() {
+        // given
+        String stationName = "을지로입구역";
+        createStation(stationName);
 
+        // when
+        RestAssured.given()
+                .when()
+                    .delete("/stations/{id}", 1)
+                .then()
+                    .statusCode(HttpStatus.NO_CONTENT.value());
+
+        // then
+        assertThat(getStation().jsonPath().getList("name")).doesNotContain(stationName);
+    }
+
+    private ExtractableResponse<Response> createStation(String name) {
+        return RestAssured.given()
+                    .body(Map.of("name", name))
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                    .post("/stations")
+                .then()
+                    .extract();
+    }
+
+    private ExtractableResponse<Response> getStation() {
+        return RestAssured.given()
+                .when()
+                    .get("/stations")
+                .then()
+                    .extract();
+    }
 }
