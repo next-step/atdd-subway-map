@@ -30,23 +30,19 @@ public class StationAcceptanceTest {
         Map<String, String> params = new HashMap<>();
         params.put("name", "강남역");
 
-        ExtractableResponse<Response> response = given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = createStationResponse(params);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames =
+        List<String> actual =
                 given().log().all()
                         .when().get("/stations")
                         .then().log().all()
                         .extract().jsonPath().getList("name", String.class);
-        assertThat(stationNames).containsAnyOf("강남역");
+        String expected = "강남역";
+        assertThat(actual).containsAnyOf(expected);
     }
 
     /**
@@ -59,31 +55,21 @@ public class StationAcceptanceTest {
     void findStations() {
         // given
         Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
 
-        ExtractableResponse<Response> response = given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
+        params.put("name", "강남역");
+        createStationResponse(params);
 
         params.put("name", "삼성역");
-        response = given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
+        createStationResponse(params);
 
         // when
         List<String> actual = given().log().all()
                 .when().get("/stations")
                 .then().log().all()
                 .extract().jsonPath().getList("name", String.class);
-        List<String> expected = List.of("강남역", "삼성역");
 
         // then
+        List<String> expected = List.of("강남역", "삼성역");
         assertThat(actual).containsAll(expected);
     }
 
@@ -93,5 +79,14 @@ public class StationAcceptanceTest {
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
     // TODO: 지하철역 제거 인수 테스트 메서드 생성
+
+    private static ExtractableResponse<Response> createStationResponse(Map<String, String> params) {
+        return given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+    }
 
 }
