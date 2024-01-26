@@ -25,4 +25,6 @@ public class RestAssuredTest {
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
+
+
 }
