@@ -54,7 +54,6 @@ public class StationAcceptanceTest {
      * When 지하철역 목록을 조회하면
      * Then 2개의 지하철역을 응답 받는다
      */
-    // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
     @DisplayName("지하철 목록을 조회한다.")
     @Test
     void getStationList() {
@@ -65,15 +64,7 @@ public class StationAcceptanceTest {
         this.createStation(stationName2);
 
         // when
-        ExtractableResponse<Response> response =
-                given()
-                    .log().all()
-                .when()
-                    .get("/stations")
-                .then()
-                    .statusCode(HttpStatus.OK.value())
-                    .log().all()
-                .extract();
+        ExtractableResponse<Response> response = this.getStationListResponse();
 
         // then
         JsonPath jsonPath = response.jsonPath();
@@ -83,12 +74,54 @@ public class StationAcceptanceTest {
         assertThat(stationNames).contains("교대역", "역삼역");
     }
 
-    // TODO: 지하철역 제거 인수 테스트 메서드 생성
+
     /**
      * Given 지하철역을 생성하고
      * When 그 지하철역을 삭제하면
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
+    @DisplayName("지하철역을 삭제한다.")
+    @Test
+    void deleteStation() {
+        // given
+        String stationName = "강남역";
+        this.createStation(stationName);
+
+        // when
+        ExtractableResponse<Response> responseAfterStationCreation = this.getStationListResponse();
+        JsonPath jsonPathAfterStationCreation = responseAfterStationCreation.jsonPath();
+        List<Long> stationIds = jsonPathAfterStationCreation.getList("id", Long.class);
+        Long stationId = stationIds.get(0);
+
+        given()
+        .when()
+            .delete("/stations/"+stationId)
+        .then()
+            .statusCode(HttpStatus.NO_CONTENT.value())
+            .log().all();
+
+        // then
+        ExtractableResponse<Response> responseAfterStationDeletion = this.getStationListResponse();
+        JsonPath jsonPathAfterStationDeletion = responseAfterStationDeletion.jsonPath();
+        List<String> stationNames = jsonPathAfterStationDeletion.getList("name", String.class);
+
+        assertThat(stationNames).hasSize(0);
+        assertThat(stationNames).doesNotContain("강남역");
+    }
+
+    private ExtractableResponse<Response> getStationListResponse() {
+        ExtractableResponse<Response> response =
+                given()
+                        .log().all()
+                        .when()
+                        .get("/stations")
+                        .then()
+                        .statusCode(HttpStatus.OK.value())
+                        .log().all()
+                        .extract();
+
+        return response;
+    }
 
     private ExtractableResponse<Response> createStation(String stationName) {
         Map<String, String> params = new HashMap<>();
@@ -107,4 +140,5 @@ public class StationAcceptanceTest {
 
         return response;
     }
+
 }
