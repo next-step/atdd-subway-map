@@ -90,8 +90,7 @@ public class StationAcceptanceTest {
             .body(param)
             .when().post("/stations")
             .then().log().all()
-            .extract()
-            .jsonPath().getLong("id");
+            .extract().jsonPath().getLong("id");
     }
 
     /**
