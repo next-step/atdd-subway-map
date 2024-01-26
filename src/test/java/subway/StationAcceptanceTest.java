@@ -20,7 +20,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationAcceptanceTest {
-    String[] 지하철역_이름_리스트 = {"강남역", "역삼역"};
+    String stationName1 = "강남역";
+    String stationName2 = "역삼역";
 
     /**
      * When 지하철역을 생성하면 Then 지하철역이 생성된다 Then 지하철역 목록 조회 시 생성한 역을 찾을 수 있다
@@ -29,7 +30,7 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        final ExtractableResponse<Response> response = createStation(지하철역_이름_리스트[0]);
+        final ExtractableResponse<Response> response = createStation(stationName1);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -41,7 +42,7 @@ public class StationAcceptanceTest {
                 .then().log().all()
                 .extract().jsonPath().getList("name", String.class);
 
-        assertThat(stationNames).containsAnyOf(지하철역_이름_리스트[0]);
+        assertThat(stationNames).containsAnyOf(stationName1);
     }
 
 
@@ -53,8 +54,8 @@ public class StationAcceptanceTest {
     @Test
     void findStationList() {
         // Given
-        createStation(지하철역_이름_리스트[0]);
-        createStation(지하철역_이름_리스트[1]);
+        createStation(stationName1);
+        createStation(stationName2);
 
         // When
         final ExtractableResponse<Response> response = getStationList();
@@ -62,7 +63,7 @@ public class StationAcceptanceTest {
         // then
         final List<String> stationNameList = response.jsonPath().getList("name");
         assertThat(stationNameList.size()).isEqualTo(2);
-        assertThat(stationNameList).contains(지하철역_이름_리스트);
+        assertThat(stationNameList).contains(stationName1, stationName2);
     }
 
     /**
@@ -74,7 +75,7 @@ public class StationAcceptanceTest {
     @Test
     void findStation() {
         // Given
-        ExtractableResponse<Response> createResponse = createStation(지하철역_이름_리스트[0]);
+        ExtractableResponse<Response> createResponse = createStation(stationName1);
         StationResponse createdStation = createResponse.as(StationResponse.class);
 
         // When
@@ -82,7 +83,7 @@ public class StationAcceptanceTest {
 
         // Then
         final String foundStation = response.jsonPath().getString("name");
-        assertThat(foundStation).isEqualTo(지하철역_이름_리스트[0]);
+        assertThat(foundStation).isEqualTo(stationName1);
     }
     
     /**
@@ -94,17 +95,18 @@ public class StationAcceptanceTest {
     @Test
     void updateStation() {
         // Given
-        ExtractableResponse<Response> createResponse = createStation(지하철역_이름_리스트[0]);
+        ExtractableResponse<Response> createResponse = createStation(stationName1);
         StationResponse createdStation = createResponse.as(StationResponse.class);
 
         // When
-        updateStation(createdStation.getId(), 지하철역_이름_리스트[1]);
+        updateStation(createdStation.getId(), stationName2);
 
         // Then
         ExtractableResponse<Response> getResponse = getStation(createdStation.getId());
         StationResponse foundStation = getResponse.as(StationResponse.class);
+
         assertThat(foundStation.getId()).isEqualTo(createdStation.getId());
-        assertThat(foundStation.getName()).isEqualTo(지하철역_이름_리스트[1]);
+        assertThat(foundStation.getName()).isEqualTo(stationName2);
     }
 
     /**
@@ -117,7 +119,7 @@ public class StationAcceptanceTest {
     void deleteStation() {
 
         // Given
-        final ExtractableResponse<Response> createResponse = createStation(지하철역_이름_리스트[0]);
+        final ExtractableResponse<Response> createResponse = createStation(stationName1);
         final StationResponse createdStation = createResponse.as(StationResponse.class);
 
         // When
@@ -125,7 +127,7 @@ public class StationAcceptanceTest {
 
         // Then
         ExtractableResponse<Response> stations = getStationList();
-        assertThat(stations.jsonPath().getList("name")).doesNotContain(지하철역_이름_리스트[0]);
+        assertThat(stations.jsonPath().getList("name")).doesNotContain(stationName1);
     }
 
     private void updateStation(Long id, String name) {
