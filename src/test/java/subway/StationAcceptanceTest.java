@@ -97,5 +97,34 @@ public class StationAcceptanceTest {
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
     // TODO: 지하철역 제거 인수 테스트 메서드 생성
+    @DisplayName("지하철역 제거")
+    @Test
+    void deleteStation() {
+        // given
+        Long id = RestAssured.given()
+                .body(Map.of("name", "gangnam"))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/stations")
+                .then().log().all()
+                .statusCode(HttpStatus.CREATED.value())
+                .extract().jsonPath().getLong("id");
 
+        // when
+        RestAssured.given()
+                .pathParam("id", id)
+                .when()
+                .delete("/stations/{id}")
+                .then()
+                .statusCode(HttpStatus.NO_CONTENT.value());
+
+        // then
+        List<Long> ids = RestAssured.given()
+                .when()
+                .get("/stations")
+                .then()
+                .extract().jsonPath().getList("id");
+
+        assertThat(ids).doesNotContain(id);
+    }
 }
