@@ -1,6 +1,7 @@
 package subway;
 
 import io.restassured.RestAssured;
+import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
@@ -18,50 +19,87 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationAcceptanceTest {
-    /**
-     * When 지하철역을 생성하면
-     * Then 지하철역이 생성된다
-     * Then 지하철역 목록 조회 시 생성한 역을 찾을 수 있다
-     */
-    @DisplayName("지하철역을 생성한다.")
+
+    @DisplayName("지하철 역을 2개 생성하고 등록된 역들을 조회한다.")
     @Test
-    void createStation() {
-        // when
+    void test() {
+        // given
         Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
 
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .body(params)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/stations")
-                        .then().log().all()
-                        .extract();
+        setStationName(params, "건대입구역");
+        createStation(params);
+
+        setStationName(params, "어린이대공원역");
+        createStation(params);
+
+        // when
+        List<String> stationNames = RestAssured.given().log().all()
+                .when().get("/stations")
+                .then().log().all()
+                .extract()
+                .response().jsonPath().getList("name", String.class);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-        // then
-        List<String> stationNames =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
-        assertThat(stationNames).containsAnyOf("강남역");
+        assertThat(stationNames.size()).isEqualTo(2);
+        assertThat(stationNames).containsAnyOf(
+                "건대입구역", "어린이대공원역"
+        );
     }
 
-    /**
-     * Given 2개의 지하철역을 생성하고
-     * When 지하철역 목록을 조회하면
-     * Then 2개의 지하철역을 응답 받는다
-     */
-    // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
+    @DisplayName("생성한 역을 삭제하면 204 코드를 반환한다.")
+    @Test
+    void test2() {
+        // given
+        Map<String, String> params = new HashMap<>();
 
-    /**
-     * Given 지하철역을 생성하고
-     * When 그 지하철역을 삭제하면
-     * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
-     */
-    // TODO: 지하철역 제거 인수 테스트 메서드 생성
+        setStationName(params, "건대입구역");
+        ExtractableResponse<Response> station = createStation(params);
+        int stationId = station.response().jsonPath().getInt("id");
+        String id = String.valueOf(stationId);
 
+        // when
+        Response response = RestAssured.given().log().all()
+                .when().delete("/stations/" + id)
+                .then().log().all()
+                .extract()
+                .response();
+
+        // then
+        assertThat(response.getStatusCode()).isEqualTo(204);
+    }
+
+    @DisplayName("생성한 역이 아닌 역을 삭제하면 204 코드를 반환하지 않는다.")
+    @Test
+    void test3() {
+        // given
+        Map<String, String> params = new HashMap<>();
+
+        setStationName(params, "건대입구역");
+        ExtractableResponse<Response> station = createStation(params);
+        int stationId = station.response().jsonPath().getInt("id");
+        String id = String.valueOf(stationId + 1);
+
+        // when
+        Response response = RestAssured.given().log().all()
+                .when().delete("/stations/" + id)
+                .then().log().all()
+                .extract()
+                .response();
+
+        // then
+        assertThat(response.getStatusCode()).isNotEqualTo(204);
+    }
+
+    private String setStationName(Map<String, String> params, String stationName) {
+        return params.put("name", stationName);
+    }
+
+    private ExtractableResponse<Response> createStation(Map<String, String> params) {
+        return RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+    }
 }
