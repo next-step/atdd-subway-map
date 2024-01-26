@@ -68,7 +68,7 @@ public class StationAcceptanceTest {
         JsonPath jsonPath = RestAssured
                 .given().log().all()
                 .when().get("/stations")
-                .then().log().all()
+                .then().log().all().statusCode(HttpStatus.OK.value())
                 .extract().jsonPath();
 
         List<String> stationNames = jsonPath.getList("name", String.class);
