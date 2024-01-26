@@ -1,6 +1,7 @@
 package subway;
 
 import java.util.Optional;
+import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,6 +29,15 @@ public class StationController {
     @GetMapping(value = "/stations/{id}")
     public ResponseEntity<Optional<StationResponse>> showStations(@PathVariable Long id) {
         return ResponseEntity.ok().body(stationService.findStation(id));
+    }
+
+    @PutMapping("/stations/{id}")
+    public ResponseEntity<StationResponse> createStation(
+        @PathVariable Long id,
+        @RequestBody StationRequest stationRequest
+    ) throws NotFoundException {
+        StationResponse station = stationService.updateStation(id, stationRequest);
+        return ResponseEntity.ok().body(station);
     }
 
     @DeleteMapping("/stations/{id}")

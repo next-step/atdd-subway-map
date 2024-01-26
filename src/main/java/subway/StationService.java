@@ -1,6 +1,7 @@
 package subway;
 
 import java.util.Optional;
+import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +21,23 @@ public class StationService {
     public StationResponse saveStation(StationRequest stationRequest) {
         Station station = stationRepository.save(new Station(stationRequest.getName()));
         return createStationResponse(station);
+    }
+
+    @Transactional
+    public StationResponse updateStation(
+        Long id,
+        StationRequest stationRequest
+    ) throws NotFoundException {
+        final Station foundStation = stationRepository.findById(id).orElse(null);
+        if(foundStation == null) {
+            throw new NotFoundException();
+        }
+
+        System.out.println(foundStation);
+
+        foundStation.setName(stationRequest.getName());
+
+        return createStationResponse(foundStation);
     }
 
     public List<StationResponse> findAllStations() {
