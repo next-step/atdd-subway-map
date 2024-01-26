@@ -58,13 +58,13 @@ public class StationService {
         );
     }
 
-    public Optional<StationResponse> findStation(Long id) {
+    public StationResponse findStation(Long id) {
         final Station foundStation = stationRepository.findById(id).orElse(null);
 
         if(foundStation == null) {
             return null;
         }
 
-        return Optional.of(createStationResponse(foundStation));
+        return createStationResponse(foundStation);
     }
 }

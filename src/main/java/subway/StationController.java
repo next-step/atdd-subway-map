@@ -27,7 +27,7 @@ public class StationController {
         return ResponseEntity.ok().body(stationService.findAllStations());
     }
     @GetMapping(value = "/stations/{id}")
-    public ResponseEntity<Optional<StationResponse>> showStations(@PathVariable Long id) {
+    public ResponseEntity<StationResponse> showStations(@PathVariable Long id) {
         return ResponseEntity.ok().body(stationService.findStation(id));
     }
 
