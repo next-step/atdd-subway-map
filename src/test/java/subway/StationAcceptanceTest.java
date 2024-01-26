@@ -65,14 +65,16 @@ public class StationAcceptanceTest {
     @Test
     void 지하철_역을_삭제() {
         // given
-        String stationName = "강남역";
+        String stationName = "신논현역";
         Long id = createStationByStationName(stationName).jsonPath().getLong("id");
 
         // when
         deleteStation(id);
 
         // then
-        assertThat(stationName).containsOnlyOnce(stationName);
+        List<String> stationNames =
+                selectStations().jsonPath().getList("name", String.class);
+        assertThat(stationNames).doesNotContain(stationName);
     }
 
 
