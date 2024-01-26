@@ -3,7 +3,7 @@ package subway.line;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import subway.StationResponse;
+import subway.station.StationResponse;
 
 @AllArgsConstructor
 @Getter
