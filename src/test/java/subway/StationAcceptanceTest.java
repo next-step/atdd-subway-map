@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.jdbc.Sql;
 
 import java.util.HashMap;
 import java.util.List;
@@ -17,8 +18,10 @@ import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
+@Sql(scripts = "/reset-db.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationAcceptanceTest {
+
     /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다
@@ -74,7 +77,6 @@ public class StationAcceptanceTest {
         assertThat(stationNames).contains("교대역", "역삼역");
     }
 
-
     /**
      * Given 지하철역을 생성하고
      * When 그 지하철역을 삭제하면
@@ -112,13 +114,13 @@ public class StationAcceptanceTest {
     private ExtractableResponse<Response> getStationList() {
         ExtractableResponse<Response> response =
                 given()
-                        .log().all()
-                        .when()
-                        .get("/stations")
-                        .then()
-                        .statusCode(HttpStatus.OK.value())
-                        .log().all()
-                        .extract();
+                    .log().all()
+                .when()
+                    .get("/stations")
+                .then()
+                    .statusCode(HttpStatus.OK.value())
+                    .log().all()
+                .extract();
 
         return response;
     }
