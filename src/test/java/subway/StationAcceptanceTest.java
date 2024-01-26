@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationAcceptanceTest {
+    String[] 지하철역_이름_리스트 = {"강남역", "역삼역"};
 
     /**
      * When 지하철역을 생성하면 Then 지하철역이 생성된다 Then 지하철역 목록 조회 시 생성한 역을 찾을 수 있다
@@ -28,7 +29,7 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        final ExtractableResponse<Response> response = createStation("강남역");
+        final ExtractableResponse<Response> response = createStation(지하철역_이름_리스트[0]);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -40,7 +41,7 @@ public class StationAcceptanceTest {
                 .then().log().all()
                 .extract().jsonPath().getList("name", String.class);
 
-        assertThat(stationNames).containsAnyOf("강남역");
+        assertThat(stationNames).containsAnyOf(지하철역_이름_리스트[0]);
     }
 
 
@@ -52,7 +53,6 @@ public class StationAcceptanceTest {
     @Test
     void findStationList() {
         // Given
-        String[] 지하철역_이름_리스트 = {"강남역", "역삼역"};
         createStation(지하철역_이름_리스트[0]);
         createStation(지하철역_이름_리스트[1]);
 
@@ -74,8 +74,7 @@ public class StationAcceptanceTest {
     @Test
     void findStation() {
         // Given
-        String 지하철역_이름 = "강남역";
-        ExtractableResponse<Response> createResponse = createStation(지하철역_이름);
+        ExtractableResponse<Response> createResponse = createStation(지하철역_이름_리스트[0]);
         StationResponse createdStation = createResponse.as(StationResponse.class);
 
         // When
@@ -83,7 +82,7 @@ public class StationAcceptanceTest {
 
         // Then
         final String foundStation = response.jsonPath().getString("name");
-        assertThat(foundStation).isEqualTo(지하철역_이름);
+        assertThat(foundStation).isEqualTo(지하철역_이름_리스트[0]);
     }
 
     /**
@@ -96,8 +95,7 @@ public class StationAcceptanceTest {
     void deleteStation() {
 
         // Given
-        final String 지하철역_이름 = "강남역";
-        final ExtractableResponse<Response> createResponse = createStation(지하철역_이름);
+        final ExtractableResponse<Response> createResponse = createStation(지하철역_이름_리스트[0]);
         final StationResponse createdStation = createResponse.as(StationResponse.class);
 
         // When
@@ -105,7 +103,7 @@ public class StationAcceptanceTest {
 
         // Then
         ExtractableResponse<Response> stations = getStationList();
-        assertThat(stations.jsonPath().getList("name")).doesNotContain(지하철역_이름);
+        assertThat(stations.jsonPath().getList("name")).doesNotContain(지하철역_이름_리스트[0]);
     }
 
     private static ExtractableResponse<Response> deleteStation(StationResponse createdStation) {
