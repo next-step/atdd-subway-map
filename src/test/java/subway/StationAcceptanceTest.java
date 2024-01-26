@@ -63,13 +63,13 @@ public class StationAcceptanceTest {
     @Test
     void getStationsSuccess() {
         // given
-        var createdStations = List.of(
+        final var createdStations = List.of(
             this.createStation("선릉역"),
             this.createStation("청계산입구역")
         );
 
         // when
-        var response = RestAssured
+        final var response = RestAssured
             .given().log().all()
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .when().get("/stations")
@@ -80,11 +80,12 @@ public class StationAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         // then
-        assertThat(response.jsonPath().getList("id", Long.class)).containsAll(
-            createdStations.stream()
-                .map(StationResponse::getId)
-                .collect(Collectors.toList())
-        );
+        assertThat(response.jsonPath().getList("id", Long.class))
+            .containsAll(
+                createdStations.stream()
+                    .map(StationResponse::getId)
+                    .collect(Collectors.toList())
+            );
     }
 
     /**
@@ -96,7 +97,7 @@ public class StationAcceptanceTest {
     @Test
     void deleteStationSuccess() {
         // given
-        var deletedStation = this.createStation("삼성역");
+        final var deletedStation = this.createStation("삼성역");
 
         // when
         RestAssured
@@ -106,7 +107,7 @@ public class StationAcceptanceTest {
             .then().log().all()
             .extract();
 
-        var responseStations = getStations();
+        final var responseStations = getStations();
 
         // then
         assertThat(responseStations.stream()
