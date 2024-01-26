@@ -113,6 +113,6 @@ public class StationAcceptanceTest {
                 .then().extract().jsonPath().getList("name", String.class);
 
         assertThat(names).hasSize(1);
-        assertThat(names).contains("서울역");
+        assertThat(names).contains(서울역);
     }
 }
