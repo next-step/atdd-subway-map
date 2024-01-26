@@ -12,9 +12,11 @@ import org.springframework.http.MediaType;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.springframework.test.annotation.DirtiesContext;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@DirtiesContext
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationAcceptanceTest {
@@ -48,7 +50,7 @@ public class StationAcceptanceTest {
      */
     @DisplayName("지하철역 목록 조회")
     @Test
-    void findStation() {
+    void findStationList() {
         // Given
         String[] 지하철역_이름_리스트 = {"강남역", "역삼역"};
         createStation(지하철역_이름_리스트[0]);
@@ -63,6 +65,25 @@ public class StationAcceptanceTest {
         assertThat(stationNameList).contains(지하철역_이름_리스트);
     }
 
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 조회하면
+     * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
+     */
+    @DisplayName("지하철 노선 조회")
+    @Test
+    void findStation() {
+        // Given
+        String 지하철역_이름 = "강남역";
+        createStation(지하철역_이름);
+
+        // When
+        final ExtractableResponse<Response> response = getStation(지하철역_이름);
+
+        // Then
+        final String foundStation = response.jsonPath().getString("name");
+        assertThat(foundStation).isEqualTo(지하철역_이름);
+    }
 
 
     /**
@@ -80,18 +101,22 @@ public class StationAcceptanceTest {
         final StationResponse createdStation = createResponse.as(StationResponse.class);
 
         // When
-        RestAssured
-            .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when()
-                .delete("/stations/"+ createdStation.getId())
-            .then().log().all()
-                .statusCode(HttpStatus.NO_CONTENT.value())
-            .extract();
+        deleteStation(createdStation);
 
         // Then
         ExtractableResponse<Response> stations = getStationList();
         assertThat(stations.jsonPath().getList("name")).doesNotContain(지하철역_이름);
+    }
+
+    private static ExtractableResponse<Response> deleteStation(StationResponse createdStation) {
+        return RestAssured
+            .given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when()
+            .delete("/stations/" + createdStation.getId())
+            .then().log().all()
+            .statusCode(HttpStatus.NO_CONTENT.value())
+            .extract();
     }
 
     private static ExtractableResponse<Response> getStationList() {
