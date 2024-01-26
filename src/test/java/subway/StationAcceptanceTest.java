@@ -8,6 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,11 +37,7 @@ public class StationAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> actual =
-                given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
+        List<String> actual = findStationNames();
         String expected = "강남역";
         assertThat(actual).containsAnyOf(expected);
     }
@@ -55,7 +52,6 @@ public class StationAcceptanceTest {
     void findStations() {
         // given
         Map<String, String> params = new HashMap<>();
-
         params.put("name", "강남역");
         createStationResponse(params);
 
@@ -63,10 +59,7 @@ public class StationAcceptanceTest {
         createStationResponse(params);
 
         // when
-        List<String> actual = given().log().all()
-                .when().get("/stations")
-                .then().log().all()
-                .extract().jsonPath().getList("name", String.class);
+        List<String> actual = findStationNames();
 
         // then
         List<String> expected = List.of("강남역", "삼성역");
@@ -78,7 +71,32 @@ public class StationAcceptanceTest {
      * When 그 지하철역을 삭제하면
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
-    // TODO: 지하철역 제거 인수 테스트 메서드 생성
+    @DisplayName("지하철역을 제거한다.")
+    @Test
+    void deleteStation() {
+        // given
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "강남역");
+        createStationResponse(params);
+
+        List<Long> stationIds = given().log().all()
+                .when().get("/stations")
+                .then().log().all()
+                .extract().jsonPath().getList("id", Long.class);
+        Long id = stationIds.get(0);
+
+        // when
+        given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().delete("/stations/{id}", id)
+                .then().log().all()
+                .extract();
+
+        // then
+        List<String> actual = findStationNames();
+        List<String> expected = Collections.emptyList();
+        assertThat(actual).containsAll(expected);
+    }
 
     private static ExtractableResponse<Response> createStationResponse(Map<String, String> params) {
         return given().log().all()
@@ -87,6 +105,13 @@ public class StationAcceptanceTest {
                 .when().post("/stations")
                 .then().log().all()
                 .extract();
+    }
+
+    private static List<String> findStationNames() {
+        return given().log().all()
+                .when().get("/stations")
+                .then().log().all()
+                .extract().jsonPath().getList("name", String.class);
     }
 
 }
