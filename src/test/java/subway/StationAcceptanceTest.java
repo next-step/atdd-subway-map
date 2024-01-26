@@ -84,6 +84,40 @@ public class StationAcceptanceTest {
         final String foundStation = response.jsonPath().getString("name");
         assertThat(foundStation).isEqualTo(지하철역_이름_리스트[0]);
     }
+    
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 수정하면
+     * Then 해당 지하철 노선 정보는 수정된다
+     */
+    @DisplayName("지하철역 수정 테스트")
+    @Test
+    void updateStation() {
+        // Given
+        ExtractableResponse<Response> createResponse = createStation(지하철역_이름_리스트[0]);
+        StationResponse createdStation = createResponse.as(StationResponse.class);
+
+        // When
+        updateStation(createdStation.getId(), 지하철역_이름_리스트[1]);
+
+        // Then
+        ExtractableResponse<Response> getResponse = getStation(createdStation.getId());
+        StationResponse foundStation = getResponse.as(StationResponse.class);
+        assertThat(foundStation.getId()).isEqualTo(createdStation.getId());
+        assertThat(foundStation.getName()).isEqualTo(지하철역_이름_리스트[1]);
+    }
+
+    private void updateStation(Long id, String name) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", name);
+
+        RestAssured.given().log().all()
+            .body(params)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().put("/stations/" + id)
+            .then().log().all()
+            .extract();
+    }
 
     /**
      * Given 지하철역을 생성하고
