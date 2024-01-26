@@ -1,5 +1,6 @@
 package subway;
 
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,5 +38,15 @@ public class StationService {
                 station.getId(),
                 station.getName()
         );
+    }
+
+    public Optional<StationResponse> findStation(Long id) {
+        final Station foundStation = stationRepository.findById(id).orElse(null);
+
+        if(foundStation == null) {
+            return null;
+        }
+
+        return Optional.of(createStationResponse(foundStation));
     }
 }
