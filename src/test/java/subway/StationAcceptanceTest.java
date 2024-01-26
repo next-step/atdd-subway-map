@@ -26,7 +26,7 @@ public class StationAcceptanceTest {
      */
     @DisplayName("지하철역을 생성한다.")
     @Test
-    void createStation() {
+    void 지하철역_생성() {
         // when
         String stationName = "강남역";
         ExtractableResponse<Response> response = this.createStation(stationName);
@@ -56,7 +56,7 @@ public class StationAcceptanceTest {
      */
     @DisplayName("지하철 목록을 조회한다.")
     @Test
-    void getStationList() {
+    void 지하철역_목록_조회() {
         // given
         String stationName1 = "교대역";
         this.createStation(stationName1);
@@ -64,7 +64,7 @@ public class StationAcceptanceTest {
         this.createStation(stationName2);
 
         // when
-        ExtractableResponse<Response> response = this.getStationListResponse();
+        ExtractableResponse<Response> response = this.getStationList();
 
         // then
         JsonPath jsonPath = response.jsonPath();
@@ -82,13 +82,13 @@ public class StationAcceptanceTest {
      */
     @DisplayName("지하철역을 삭제한다.")
     @Test
-    void deleteStation() {
+    void 지하철역_삭제() {
         // given
         String stationName = "강남역";
         this.createStation(stationName);
 
         // when
-        ExtractableResponse<Response> responseAfterStationCreation = this.getStationListResponse();
+        ExtractableResponse<Response> responseAfterStationCreation = this.getStationList();
         JsonPath jsonPathAfterStationCreation = responseAfterStationCreation.jsonPath();
         List<Long> stationIds = jsonPathAfterStationCreation.getList("id", Long.class);
         Long stationId = stationIds.get(0);
@@ -101,7 +101,7 @@ public class StationAcceptanceTest {
             .log().all();
 
         // then
-        ExtractableResponse<Response> responseAfterStationDeletion = this.getStationListResponse();
+        ExtractableResponse<Response> responseAfterStationDeletion = this.getStationList();
         JsonPath jsonPathAfterStationDeletion = responseAfterStationDeletion.jsonPath();
         List<String> stationNames = jsonPathAfterStationDeletion.getList("name", String.class);
 
@@ -109,7 +109,7 @@ public class StationAcceptanceTest {
         assertThat(stationNames).doesNotContain("강남역");
     }
 
-    private ExtractableResponse<Response> getStationListResponse() {
+    private ExtractableResponse<Response> getStationList() {
         ExtractableResponse<Response> response =
                 given()
                         .log().all()
