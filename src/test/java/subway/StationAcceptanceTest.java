@@ -107,18 +107,6 @@ public class StationAcceptanceTest {
         assertThat(foundStation.getName()).isEqualTo(지하철역_이름_리스트[1]);
     }
 
-    private void updateStation(Long id, String name) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-
-        RestAssured.given().log().all()
-            .body(params)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().put("/stations/" + id)
-            .then().log().all()
-            .extract();
-    }
-
     /**
      * Given 지하철역을 생성하고
      * When 그 지하철역을 삭제하면
@@ -138,6 +126,18 @@ public class StationAcceptanceTest {
         // Then
         ExtractableResponse<Response> stations = getStationList();
         assertThat(stations.jsonPath().getList("name")).doesNotContain(지하철역_이름_리스트[0]);
+    }
+
+    private void updateStation(Long id, String name) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", name);
+
+        RestAssured.given().log().all()
+            .body(params)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().put("/stations/" + id)
+            .then().log().all()
+            .extract();
     }
 
     private static ExtractableResponse<Response> deleteStation(StationResponse createdStation) {
