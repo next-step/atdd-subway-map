@@ -78,8 +78,7 @@ public class StationAcceptanceTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(stationNames).containsAnyOf(createStation1);
-        assertThat(stationNames).containsAnyOf(createStation2);
+        assertThat(stationNames).containsAnyOf(createStation1, createStation2);
     }
 
     private Long createStation(String stationName) {
