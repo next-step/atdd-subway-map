@@ -38,8 +38,7 @@ public class SubwayLinesAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // Then
-        final ExtractableResponse<Response> subwayLinesGetResponse =findSubwayLines();
-        final List<String> subwayLinesNameList = subwayLinesGetResponse.jsonPath().getList("name", String.class);
+        final List<String> subwayLinesNameList = findSubwayLines();
         assertThat(subwayLinesNameList).containsAnyOf(일호선);
     }
 
@@ -55,10 +54,9 @@ public class SubwayLinesAcceptanceTest {
         createSubwayLine(이호선);
 
         // When
-        final ExtractableResponse<Response> subwayLinesGetResponse = findSubwayLines();
+        final List<String> subwayLinesNameList = findSubwayLines();
 
         // Then
-        final List<String> subwayLinesNameList = subwayLinesGetResponse.jsonPath().getList("name", String.class);
         assertThat(subwayLinesNameList).contains(일호선, 이호선);
     }
 
@@ -120,8 +118,7 @@ public class SubwayLinesAcceptanceTest {
         deleteSubwayLine(createdLine);
 
         // Then
-        final ExtractableResponse<Response> subwayLinesGetResponse = findSubwayLines();
-        final List<String> subwayLinesNameList = subwayLinesGetResponse.jsonPath().getList("name", String.class);
+        final List<String> subwayLinesNameList = findSubwayLines();
         assertThat(subwayLinesNameList).doesNotContain(일호선);
     }
 
@@ -156,14 +153,13 @@ public class SubwayLinesAcceptanceTest {
             .extract();
     }
 
-    private static ExtractableResponse<Response> findSubwayLines() {
-        final ExtractableResponse<Response> subwayLinesGetResponse = RestAssured
+    private static List<String> findSubwayLines() {
+        return RestAssured
             .given().log().all()
             .when()
                 .get("/subwayLines")
             .then().log().all()
-            .extract();
-        return subwayLinesGetResponse;
+            .extract().jsonPath().getList("name", String.class);
     }
 
     private ExtractableResponse<Response> createSubwayLine(String name) {
