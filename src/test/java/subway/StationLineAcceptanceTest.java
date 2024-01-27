@@ -37,7 +37,8 @@ public class StationLineAcceptanceTest {
         map.put("downStationId", String.valueOf(StationLineMockData.downStationId1));
         map.put("distance", String.valueOf(StationLineMockData.distance1));
 
-        List<String> stationLineName = given().log().all()
+        List<String> stationLineName =
+                given().log().all()
                     .body(map)
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
@@ -190,10 +191,42 @@ public class StationLineAcceptanceTest {
     @Test
     void deleteStationLine() {
         // given
+        Map<String, String> map1 = new HashMap<>();
+        map1.put("name", StationLineMockData.stationLineName1);
+        map1.put("color", StationLineMockData.stationLineColor1);
+        map1.put("upStationId", String.valueOf(StationLineMockData.upStationId1));
+        map1.put("downStationId", String.valueOf(StationLineMockData.downStationId1));
+        map1.put("distance", String.valueOf(StationLineMockData.distance1));
+
+        ExtractableResponse<Response> createResponse =
+                given().log().all()
+                    .body(map1)
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                    .post("/lines")
+                .then().log().all()
+                    .statusCode(HttpStatus.CREATED.value())
+                    .extract();
 
         // when
+        given().log().all()
+            .body(map1)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+            .delete("/lines/" + getCreatedLocationId(createResponse))
+        .then().log().all()
+            .statusCode(HttpStatus.NO_CONTENT.value())
+            .extract().jsonPath().getList("name", String.class);
+
+        List<String> stationLineNames =
+                given().log().all()
+                .when()
+                    .get("/line" + getCreatedLocationId(createResponse))
+                .then().log().all()
+                    .extract().jsonPath().getList("name", String.class);
 
         // then
+        assertThat(stationLineNames).doesNotContain(StationLineMockData.stationLineName1);
     }
 
     /**
