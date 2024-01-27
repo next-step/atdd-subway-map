@@ -18,11 +18,11 @@ public class Line {
     private int distance;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "up_station_id")
+    @JoinColumn(name = "up_station_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Station upStation;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "down_station_id")
+    @JoinColumn(name = "down_station_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Station downStation;
 
     public Line() {
