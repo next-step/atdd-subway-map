@@ -10,10 +10,19 @@ public class Station {
     @Column(length = 20, nullable = false)
     private String name;
 
+
+    @ManyToOne()
+    @JoinColumn(name="subwayLineId")
+    private SubwayLine subwayLine;
+
     public Station(String name) {
         this.name = name;
     }
 
+    public Station(String name, SubwayLine subwayLine) {
+        this.name = name;
+        this.subwayLine = subwayLine;
+    }
     public Station() {
     }
 
@@ -27,5 +36,9 @@ public class Station {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public void setSubwayLine(SubwayLine subwayLine) {
+        this.subwayLine = subwayLine;
     }
 }

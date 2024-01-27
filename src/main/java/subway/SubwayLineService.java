@@ -1,5 +1,6 @@
 package subway;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.persistence.EntityNotFoundException;
@@ -11,14 +12,22 @@ import org.springframework.transaction.annotation.Transactional;
 public class SubwayLineService {
 
     private SubwayLineRepository subwayLineRepository;
+    private StationRepository stationRepository;
 
-    public SubwayLineService(SubwayLineRepository subwayLineRepository) {
+    public SubwayLineService(SubwayLineRepository subwayLineRepository, StationRepository stationRepository) {
         this.subwayLineRepository = subwayLineRepository;
+        this.stationRepository = stationRepository;
     }
 
     @Transactional
-    public SubwayLineResponse saveLine(SubwayLineRequest subwayLineRequest) {
-        SubwayLine line = subwayLineRepository.save(new SubwayLine(subwayLineRequest.getName()));
+    public SubwayLineResponse saveLine(SubwayLineCreateRequest subwayLineRequest) {
+        SubwayLine line = subwayLineRepository.save(new SubwayLine(subwayLineRequest.getName(), subwayLineRequest.getColor()));
+
+        List<Station> stations = stationRepository.findAllById(
+            Arrays.asList(subwayLineRequest.getUpStationId(),
+                subwayLineRequest.getDownStationId()));
+        System.out.println(stations);
+        stations.forEach(station -> station.setSubwayLine(line));
 
         return createSubwayLineResponse(line);
     }
@@ -57,7 +66,9 @@ public class SubwayLineService {
     private SubwayLineResponse createSubwayLineResponse(SubwayLine line) {
         return new SubwayLineResponse(
             line.getId(),
-            line.getName()
+            line.getName(),
+            line.getColor(),
+            line.getStations().stream().map(StationResponse::new).collect(Collectors.toList())
         );
     }
 }
