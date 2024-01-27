@@ -180,6 +180,31 @@ public class LineTest {
    * When 생성한 지하철 노선을 삭제하면
    * Then 해당 지하철 노선 정보는 삭제된다
    */
+  @DisplayName("지하철역을 삭제한다.")
+  @Test
+  void deleteLineSuccess() {
+    // given
+    final var deletedLine = createLine("신분당선", "bg-red-600", 1, 2, 10);
+
+    // when
+    final var response = RestAssured
+        .given().log().all()
+        .port(port)
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when().delete("/lines/{id}", deletedLine.getId())
+        .then().log().all()
+        .extract();
+
+    final var remainingLineIds = getLines().stream()
+        .map(LineResponse::getId)
+        .collect(Collectors.toList());
+
+    // then
+    assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+    // then
+    assertThat(deletedLine.getId()).isNotIn(remainingLineIds);
+  }
 
   private LineResponse createLine(
       final String name,

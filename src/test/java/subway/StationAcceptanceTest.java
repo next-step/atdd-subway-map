@@ -65,8 +65,8 @@ public class StationAcceptanceTest {
     void getStationsSuccess() {
         // given
         final var createdStations = List.of(
-            this.createStation("선릉역"),
-            this.createStation("청계산입구역")
+            createStation("선릉역"),
+            createStation("청계산입구역")
         );
 
         // when
@@ -98,7 +98,7 @@ public class StationAcceptanceTest {
     @Test
     void deleteStationSuccess() {
         // given
-        final var deletedStation = this.createStation("삼성역");
+        final var deletedStation = createStation("삼성역");
 
         // when
         final var response = RestAssured
