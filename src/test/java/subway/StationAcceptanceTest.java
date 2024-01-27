@@ -126,6 +126,7 @@ public class StationAcceptanceTest {
                 .when()
                     .post("/stations")
                 .then()
+                    .statusCode(HttpStatus.CREATED.value())
                     .log().all()
                 .extract();
 
