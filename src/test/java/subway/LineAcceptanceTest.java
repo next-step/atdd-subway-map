@@ -4,15 +4,9 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.transaction.annotation.Transactional;
 
-
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,8 +15,8 @@ import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철노선 관련 기능")
-@Sql({"/test-sql/station-insert.sql"})
-@DirtiesContext
+@Sql({"/test-sql/table-truncate.sql", "/test-sql/station-insert.sql"})
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {
 
     private Map<String, String> newBunDangLineParams;
