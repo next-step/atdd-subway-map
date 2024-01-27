@@ -1,6 +1,7 @@
 package subway;
 
 import io.restassured.RestAssured;
+import io.restassured.common.mapper.TypeRef;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
@@ -8,6 +9,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
+import java.lang.reflect.ParameterizedType;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -91,12 +94,23 @@ public class StationAcceptanceTest {
         final String 강남역 = "강남역";
         StationResponse gangnamResponse = createStation(new TestStationRequest(강남역));
 
+        // when
         RestAssured.given().log().all()
                 .when()
                     .delete(String.format(DELETE_STATIONS_URL, gangnamResponse.getId()))
                 .then()
                     .statusCode(HttpStatus.NO_CONTENT.value())
                     .log().all();
+
+        // then
+        List<String> acutal = RestAssured.given()
+                .when()
+                .get(GET_STATIONS_URL)
+                .then().log().all()
+                .extract()
+                .jsonPath().getList("name", String.class);
+
+        assertThat(acutal).isEqualTo(Collections.emptyList());
     }
 
     @TestFactory
