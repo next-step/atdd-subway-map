@@ -1,10 +1,12 @@
-package subway;
+package subway.lines;
 
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.station.Station;
+import subway.station.StationRepository;
 
 @Service
 @Transactional(readOnly = true)

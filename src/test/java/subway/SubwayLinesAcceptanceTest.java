@@ -22,7 +22,10 @@ import org.springframework.test.annotation.DirtiesContext;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
-import org.springframework.test.context.jdbc.Sql;
+import subway.lines.LinesResponse;
+import subway.station.Station;
+import subway.station.StationRepository;
+import subway.station.StationResponse;
 
 @DisplayName("지하철 노선 기능")
 @SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)

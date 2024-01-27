@@ -1,4 +1,4 @@
-package subway;
+package subway.lines;
 
 
 import javax.persistence.Entity;
@@ -6,6 +6,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import subway.station.Station;
 
 @Entity
 public class Lines {

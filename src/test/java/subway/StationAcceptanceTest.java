@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.test.annotation.DirtiesContext;
+import subway.station.StationResponse;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

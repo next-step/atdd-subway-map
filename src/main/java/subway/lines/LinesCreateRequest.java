@@ -1,4 +1,4 @@
-package subway;
+package subway.lines;
 
 public class LinesCreateRequest {
     private String name;
