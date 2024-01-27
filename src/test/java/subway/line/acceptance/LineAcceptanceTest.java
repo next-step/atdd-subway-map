@@ -65,6 +65,53 @@ public class LineAcceptanceTest {
         assertThat(lineNames).containsAnyOf("신분당선");
     }
 
+    /**
+     * Given 2개의 노선을 생성하고
+     * When 노선 목록을 조회하면
+     * Then 2개의 노선을 응답 받는다
+     */
+    @DisplayName("노선 목록을 조회한다.")
+    @Test
+    void fetchLinesTest() {
+        // given
+        final Long 지하철역_Id = createStation("지하철역");
+        final Long 새로운지하철역_Id = createStation("새로운지하철역");
+        final Long 또다른지하철역_Id = createStation("또다른지하철역");
+
+        final Map<String, Object> 신분당선_CreateRequestData = Map.of(
+                "name", "신분당선"
+                , "color", "bg-red-600"
+                , "upStationId", 지하철역_Id
+                , "downStationId", 새로운지하철역_Id
+                , "distance", 10
+        );
+        final ExtractableResponse<Response> 신분당선_response = lineRestAssured.post(신분당선_CreateRequestData);
+        final Map<String, Object> 분당선_CreateRequestData = Map.of(
+                "name", "분당선"
+                , "color", "bg-green-600"
+                , "upStationId", 지하철역_Id
+                , "downStationId", 또다른지하철역_Id
+                , "distance", 10
+        );
+        final ExtractableResponse<Response> 분당선_response = lineRestAssured.post(분당선_CreateRequestData);
+
+        // when
+        final ExtractableResponse<Response> response = lineRestAssured.get();
+
+        // then
+        assertSoftly(softly -> {
+            softly.assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+            final LineResponse 신분당선_LineResponse = response.jsonPath().getObject("find {it.id=="+신분당선_response.jsonPath().getLong("id")+"}", LineResponse.class);
+            softly.assertThat(신분당선_LineResponse.getName()).isEqualTo("신분당선");
+            softly.assertThat(신분당선_LineResponse.getStations())
+                    .extracting("id").containsExactly(1L, 2L);
+            final LineResponse 분당선_LineResponse = response.jsonPath().getObject("find {it.id=="+분당선_response.jsonPath().getLong("id")+"}", LineResponse.class);
+            softly.assertThat(분당선_LineResponse.getName()).isEqualTo("분당선");
+            softly.assertThat(분당선_LineResponse.getStations())
+                    .extracting("id").containsExactly(1L, 3L);
+        });
+    }
+
     private Long createStation(final String name) {
         return stationRestAssured.post(Map.of("name", name)).jsonPath().getLong("id");
     }
