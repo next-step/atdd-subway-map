@@ -35,10 +35,10 @@ public class StationRequestExecutor {
 			.extract();
 	}
 
-	public static List<String> executeGetStationRequest() {
+	public static ExtractableResponse<Response> executeGetStationRequest() {
 		return RestAssured.given().log().all()
 			.when().get("/stations")
 			.then().log().all()
-			.extract().jsonPath().getList("name", String.class);
+			.extract();
 	}
 }

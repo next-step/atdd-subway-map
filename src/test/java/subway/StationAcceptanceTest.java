@@ -26,13 +26,14 @@ public class StationAcceptanceTest {
 	@Test
 	void createStation() {
 		// when
-		ExtractableResponse<Response> response = executeCreateStationRequest("강남역");
+		ExtractableResponse<Response> request = executeCreateStationRequest("강남역");
 
 		// then
-		assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+		assertThat(request.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
 		// then
-		List<String> stationNames = executeGetStationRequest();
+		ExtractableResponse<Response> response = executeGetStationRequest();
+		List<String> stationNames = parseSubwayNames(response);
 		assertThat(stationNames).containsAnyOf("강남역");
 	}
 
@@ -49,8 +50,8 @@ public class StationAcceptanceTest {
 		executeCreateStationRequest("서초역");
 
 		// when
-		List<String> stationNames = executeGetStationRequest();
-
+		ExtractableResponse<Response> response = executeGetStationRequest();
+		List<String> stationNames = parseSubwayNames(response);
 		// then
 		assertThat(stationNames).containsAnyOf("신논현역", "서초역");
 	}
@@ -71,7 +72,12 @@ public class StationAcceptanceTest {
 		executeDeleteStationRequest(stationId);
 
 		// then
-		List<String> stationNames = executeGetStationRequest();
+		ExtractableResponse<Response> response = executeGetStationRequest();
+		List<String> stationNames = parseSubwayNames(response);
 		assertThat(stationNames).doesNotContain("신사역");
+	}
+
+	public List<String> parseSubwayNames(ExtractableResponse<Response> response){
+		return response.jsonPath().getList("name", String.class);
 	}
 }
