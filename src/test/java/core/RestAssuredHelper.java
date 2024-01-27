@@ -6,33 +6,37 @@ import io.restassured.response.Response;
 import org.springframework.http.MediaType;
 
 public class RestAssuredHelper {
+    private RestAssuredHelper() {}
 
-    private final String pathPrefix;
-
-    public RestAssuredHelper(final String pathPrefix) {
-        this.pathPrefix = pathPrefix;
-    }
-
-    public ExtractableResponse<Response> get() {
+    public static ExtractableResponse<Response> get(final String path) {
         return RestAssured
                 .given()
-                .when().get(pathPrefix)
+                .when().get(path)
                 .then().extract();
     }
 
-    public ExtractableResponse<Response> post(final Object body) {
+    public static ExtractableResponse<Response> post(final String path, final Object body) {
         return RestAssured
                 .given()
                 .body(body)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post(pathPrefix)
+                .when().post(path)
                 .then().extract();
     }
 
-    public ExtractableResponse<Response> deleteById(final Long id) {
+    public static ExtractableResponse<Response> deleteById(final String path, final Long id) {
         return RestAssured
                 .given().pathParam("id", id)
-                .when().delete(pathPrefix + "/{id}")
+                .when().delete(path + "/{id}")
                 .then().extract();
     }
+
+    public static Long getIdFrom(final ExtractableResponse<Response> response) {
+        return response.jsonPath().getLong("id");
+    }
+
+    public static  <T> T findObjectFrom(final ExtractableResponse<Response> response, final Long id, final Class<T> type) {
+        return response.jsonPath().getObject(String.format("find {it.id==%d}", id), type);
+    }
+
 }

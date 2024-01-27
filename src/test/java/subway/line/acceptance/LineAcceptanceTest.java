@@ -9,23 +9,28 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import subway.line.service.dto.LineResponse;
+import subway.station.acceptance.StationAcceptanceTest;
 
 import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {
-    private RestAssuredHelper lineRestAssured;
-    private RestAssuredHelper stationRestAssured;
+    public static final String LINE_API_PATH = "/lines";
+    private Long 지하철역_Id;
+    private Long 새로운지하철역_Id;
+    private Long 또다른지하철역_Id;
 
     @BeforeEach
     void setUp() {
-        lineRestAssured = new RestAssuredHelper("/lines");
-        stationRestAssured = new RestAssuredHelper("/stations");
+        지하철역_Id = createStation("지하철역");
+        새로운지하철역_Id = createStation("새로운지하철역");
+        또다른지하철역_Id = createStation("또다른지하철역");
     }
 
     /**
@@ -37,17 +42,7 @@ public class LineAcceptanceTest {
     @Test
     void createLineTest() {
         // when
-        final Long upStationId = createStation("지하철역");
-        final Long downStationId = createStation("새로운지하철역");
-
-        final Map<String, Object> lineCreateRequestData = Map.of(
-                "name", "신분당선"
-                , "color", "bg-red-600"
-                , "upStationId", upStationId
-                , "downStationId", downStationId
-                , "distance", 10
-        );
-        final ExtractableResponse<Response> response = lineRestAssured.post(lineCreateRequestData);
+        final ExtractableResponse<Response> response = requestCreateLine("신분당선", "bg-red-600", 지하철역_Id, 새로운지하철역_Id, 10);
 
         // then
         assertSoftly(softly -> {
@@ -56,11 +51,11 @@ public class LineAcceptanceTest {
             softly.assertThat(lineResponse.getName()).isEqualTo("신분당선");
             softly.assertThat(lineResponse.getColor()).isEqualTo("bg-red-600");
             softly.assertThat(lineResponse.getStations())
-                    .extracting("id").containsExactly(1L, 2L);
+                    .extracting("id").containsExactly(지하철역_Id, 새로운지하철역_Id);
         });
 
         // then
-        final ExtractableResponse<Response> linesResponse = lineRestAssured.get();
+        final ExtractableResponse<Response> linesResponse = RestAssuredHelper.get(LINE_API_PATH);
         final List<String> lineNames = linesResponse.jsonPath().getList("name", String.class);
         assertThat(lineNames).containsAnyOf("신분당선");
     }
@@ -74,46 +69,46 @@ public class LineAcceptanceTest {
     @Test
     void fetchLinesTest() {
         // given
-        final Long 지하철역_Id = createStation("지하철역");
-        final Long 새로운지하철역_Id = createStation("새로운지하철역");
-        final Long 또다른지하철역_Id = createStation("또다른지하철역");
-
-        final Map<String, Object> 신분당선_CreateRequestData = Map.of(
-                "name", "신분당선"
-                , "color", "bg-red-600"
-                , "upStationId", 지하철역_Id
-                , "downStationId", 새로운지하철역_Id
-                , "distance", 10
-        );
-        final ExtractableResponse<Response> 신분당선_response = lineRestAssured.post(신분당선_CreateRequestData);
-        final Map<String, Object> 분당선_CreateRequestData = Map.of(
-                "name", "분당선"
-                , "color", "bg-green-600"
-                , "upStationId", 지하철역_Id
-                , "downStationId", 또다른지하철역_Id
-                , "distance", 10
-        );
-        final ExtractableResponse<Response> 분당선_response = lineRestAssured.post(분당선_CreateRequestData);
+        final ExtractableResponse<Response> 신분당선_response = requestCreateLine("신분당선", "bg-red-600", 지하철역_Id, 새로운지하철역_Id, 10);
+        final ExtractableResponse<Response> 분당선_response = requestCreateLine("분당선", "bg-green-600", 지하철역_Id, 또다른지하철역_Id, 10);
 
         // when
-        final ExtractableResponse<Response> response = lineRestAssured.get();
+        final ExtractableResponse<Response> response = RestAssuredHelper.get(LINE_API_PATH);
 
         // then
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value())
+                , () -> assertResponseData(response, RestAssuredHelper.getIdFrom(신분당선_response), "신분당선", 지하철역_Id, 새로운지하철역_Id)
+                , () -> assertResponseData(response, RestAssuredHelper.getIdFrom(분당선_response), "분당선", 지하철역_Id, 또다른지하철역_Id)
+        );
+    }
+
+    private void assertResponseData(final ExtractableResponse<Response> response, final Long id, final String name, final Long upStationId, final Long downStationId) {
+        final LineResponse lineResponse = RestAssuredHelper.findObjectFrom(response, id, LineResponse.class);
         assertSoftly(softly -> {
-            softly.assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-            final LineResponse 신분당선_LineResponse = response.jsonPath().getObject("find {it.id=="+신분당선_response.jsonPath().getLong("id")+"}", LineResponse.class);
-            softly.assertThat(신분당선_LineResponse.getName()).isEqualTo("신분당선");
-            softly.assertThat(신분당선_LineResponse.getStations())
-                    .extracting("id").containsExactly(1L, 2L);
-            final LineResponse 분당선_LineResponse = response.jsonPath().getObject("find {it.id=="+분당선_response.jsonPath().getLong("id")+"}", LineResponse.class);
-            softly.assertThat(분당선_LineResponse.getName()).isEqualTo("분당선");
-            softly.assertThat(분당선_LineResponse.getStations())
-                    .extracting("id").containsExactly(1L, 3L);
+            softly.assertThat(lineResponse.getName()).isEqualTo(name);
+            softly.assertThat(lineResponse.getStations())
+                    .extracting("id").containsExactly(upStationId, downStationId);
         });
     }
 
     private Long createStation(final String name) {
-        return stationRestAssured.post(Map.of("name", name)).jsonPath().getLong("id");
+        return RestAssuredHelper.getIdFrom(RestAssuredHelper.post(StationAcceptanceTest.STATION_API_PATH, Map.of("name", name)));
+    }
+
+    private ExtractableResponse<Response> requestCreateLine(final String name, final String color, final Long upStationId, final Long downStationId, final int distance) {
+        final Map<String, Object> createLineRequest = createLineRequestFixture(name, color, upStationId, downStationId, distance);
+        return RestAssuredHelper.post(LINE_API_PATH, createLineRequest);
+    }
+
+    private Map<String, Object> createLineRequestFixture(final String name, final String color, final Long upStationId, final Long downStationId, final int distance) {
+        return Map.of(
+                "name", name
+                , "color", color
+                , "upStationId", upStationId
+                , "downStationId", downStationId
+                , "distance", distance
+        );
     }
 
 }
