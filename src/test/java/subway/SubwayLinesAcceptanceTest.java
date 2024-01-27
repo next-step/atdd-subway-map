@@ -29,19 +29,41 @@ public class SubwayLinesAcceptanceTest {
      * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
      */
     @Test
-    void 지하철노선_생성() {
-        final ExtractableResponse<Response> response = createSubwayLine();
+    void createSubwayLineTest() {
+        // When
+        final ExtractableResponse<Response> response = createSubwayLine(일호선);
 
         // Then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // Then
         final ExtractableResponse<Response> subwayLinesGetResponse =findSubwayLines();
-
-        // Then
         final List<String> subwayLinesNameList = subwayLinesGetResponse.jsonPath().getList("name", String.class);
         assertThat(subwayLinesNameList).containsAnyOf(일호선);
     }
+
+    /**
+     * Given 2개의 지하철 노선을 생성하고
+     * When 지하철 노선 목록을 조회하면
+     * Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
+     */
+    @Test
+    void 지하철노선_목록_조회() {
+        // Given
+        createSubwayLine(일호선);
+        createSubwayLine(이호선);
+
+        // When
+        final ExtractableResponse<Response> subwayLinesGetResponse = findSubwayLines();
+
+        // Then
+        final List<String> subwayLinesNameList = subwayLinesGetResponse.jsonPath().getList("name", String.class);
+        assertThat(subwayLinesNameList).contains(일호선, 이호선);
+    }
+
+
+
+
 
     private static ExtractableResponse<Response> findSubwayLines() {
         final ExtractableResponse<Response> subwayLinesGetResponse = RestAssured
@@ -53,9 +75,9 @@ public class SubwayLinesAcceptanceTest {
         return subwayLinesGetResponse;
     }
 
-    private ExtractableResponse<Response> createSubwayLine() {
+    private ExtractableResponse<Response> createSubwayLine(String name) {
         Map<String, String> params = new HashMap<>();
-        params.put("name", 일호선);
+        params.put("name", name);
 
         // when
         final ExtractableResponse<Response> response = RestAssured.given().log().all()
