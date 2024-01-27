@@ -38,16 +38,8 @@ public class StationAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames =
-                given()
-                    .log().all()
-                .when()
-                    .get("/stations")
-                .then()
-                    .log().all()
-                .extract()
-                    .jsonPath()
-                    .getList("name", String.class);
+        JsonPath jsonPath = this.getStationList();
+        List<String> stationNames = jsonPath.getList("name", String.class);
 
         assertThat(stationNames).containsAnyOf("강남역");
     }
@@ -67,10 +59,9 @@ public class StationAcceptanceTest {
         this.createStation(stationName2);
 
         // when
-        ExtractableResponse<Response> response = this.getStationList();
+        JsonPath jsonPath = this.getStationList();
 
         // then
-        JsonPath jsonPath = response.jsonPath();
         List<String> stationNames = jsonPath.getList("name", String.class);
 
         assertThat(stationNames).hasSize(2);
@@ -101,16 +92,15 @@ public class StationAcceptanceTest {
             .log().all();
 
         // then
-        ExtractableResponse<Response> responseAfterStationDeletion = this.getStationList();
-        JsonPath jsonPathAfterStationDeletion = responseAfterStationDeletion.jsonPath();
+        JsonPath jsonPathAfterStationDeletion = this.getStationList();
         List<String> stationNames = jsonPathAfterStationDeletion.getList("name", String.class);
 
         assertThat(stationNames).hasSize(0);
         assertThat(stationNames).doesNotContain("강남역");
     }
 
-    private ExtractableResponse<Response> getStationList() {
-        ExtractableResponse<Response> response =
+    private JsonPath getStationList() {
+        JsonPath response =
                 given()
                     .log().all()
                 .when()
@@ -118,7 +108,8 @@ public class StationAcceptanceTest {
                 .then()
                     .statusCode(HttpStatus.OK.value())
                     .log().all()
-                .extract();
+                .extract()
+                    .jsonPath();
 
         return response;
     }
