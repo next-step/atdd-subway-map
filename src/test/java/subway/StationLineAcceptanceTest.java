@@ -145,10 +145,40 @@ public class StationLineAcceptanceTest {
     @Test
     void updateStationLine() {
         // given
+        Map<String, String> map1 = new HashMap<>();
+        map1.put("name", StationLineMockData.stationLineName1);
+        map1.put("color", StationLineMockData.stationLineColor1);
+        map1.put("upStationId", String.valueOf(StationLineMockData.upStationId1));
+        map1.put("downStationId", String.valueOf(StationLineMockData.downStationId1));
+        map1.put("distance", String.valueOf(StationLineMockData.distance1));
+
+        ExtractableResponse<Response> createResponse =
+                given().log().all()
+                    .body(map1)
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                    .post("/lines")
+                .then().log().all()
+                    .statusCode(HttpStatus.CREATED.value())
+                    .extract();
+
+        Map<String, String> map2 = new HashMap<>();
+        map2.put("name", StationLineMockData.stationLineName2);
+        map2.put("color", StationLineMockData.stationLineColor2);
 
         // when
-
+        List<String> stationLineNames =
+                given().log().all()
+                    .body(map2)
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                    .patch("/lines/" + getCreatedLocationId(createResponse))
+                .then().log().all()
+                    .statusCode(HttpStatus.OK.value())
+                    .extract().jsonPath().getList("name", String.class);
         // then
+        assertThat(stationLineNames).containsAnyOf(StationLineMockData.stationLineName2);
+
     }
 
     /**
