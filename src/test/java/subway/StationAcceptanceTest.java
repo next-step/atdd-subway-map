@@ -31,15 +31,15 @@ public class StationAcceptanceTest {
     @Test
     void 지하철역_생성() {
         // when
-        String stationName = "강남역";
-        ExtractableResponse<Response> response = this.createStation(stationName);
+        final String stationName = "강남역";
+        final ExtractableResponse<Response> response = this.createStation(stationName);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        JsonPath jsonPath = this.getStationList();
-        List<String> stationNames = jsonPath.getList("name", String.class);
+        final JsonPath jsonPath = this.getStationList();
+        final List<String> stationNames = jsonPath.getList("name", String.class);
 
         assertThat(stationNames).containsAnyOf("강남역");
     }
@@ -53,16 +53,17 @@ public class StationAcceptanceTest {
     @Test
     void 지하철역_목록_조회() {
         // given
-        String stationName1 = "교대역";
+        final String stationName1 = "교대역";
         this.createStation(stationName1);
-        String stationName2 = "역삼역";
+
+        final String stationName2 = "역삼역";
         this.createStation(stationName2);
 
         // when
-        JsonPath jsonPath = this.getStationList();
+        final JsonPath jsonPath = this.getStationList();
 
         // then
-        List<String> stationNames = jsonPath.getList("name", String.class);
+        final List<String> stationNames = jsonPath.getList("name", String.class);
 
         assertThat(stationNames).hasSize(2);
         assertThat(stationNames).contains("역삼역", "교대역");
@@ -79,12 +80,12 @@ public class StationAcceptanceTest {
     @Test
     void 지하철역_삭제() {
         // given
-        String stationName = "강남역";
-        ExtractableResponse<Response> createStationResponse = this.createStation(stationName);
+        final String stationName = "강남역";
+        final ExtractableResponse<Response> createStationResponse = this.createStation(stationName);
 
         // when
-        String location = createStationResponse.header("Location");
-        String stationId = location.replaceAll(".*/(\\d+)$", "$1");
+        final String location = createStationResponse.header("Location");
+        final String stationId = location.replaceAll(".*/(\\d+)$", "$1");
 
         given()
         .when()
@@ -94,15 +95,15 @@ public class StationAcceptanceTest {
             .log().all();
 
         // then
-        JsonPath jsonPathAfterStationDeletion = this.getStationList();
-        List<String> stationNames = jsonPathAfterStationDeletion.getList("name", String.class);
+        final JsonPath jsonPathAfterStationDeletion = this.getStationList();
+        final List<String> stationNames = jsonPathAfterStationDeletion.getList("name", String.class);
 
         assertThat(stationNames).hasSize(0);
         assertThat(stationNames).doesNotContain("강남역");
     }
 
     private JsonPath getStationList() {
-        JsonPath response =
+        final JsonPath response =
                 given()
                     .log().all()
                 .when()
@@ -116,11 +117,11 @@ public class StationAcceptanceTest {
         return response;
     }
 
-    private ExtractableResponse<Response> createStation(String stationName) {
-        Map<String, String> params = new HashMap<>();
+    private ExtractableResponse<Response> createStation(final String stationName) {
+        final Map<String, String> params = new HashMap<>();
         params.put("name", stationName);
 
-        ExtractableResponse<Response> response =
+        final ExtractableResponse<Response> response =
                 given()
                     .log().all()
                     .body(params)
