@@ -140,6 +140,32 @@ public class LineAcceptanceTest {
         });
     }
 
+    /**
+     * Given 노선을 생성하고
+     * When 생성한 지하철 노선을 삭제하면
+     * Then 해당 지하철 노선 정보는 삭제된다
+     */
+    @DisplayName("특정 노선을 삭제한다.")
+    @Test
+    void deleteLineByIdTest() {
+        // given
+        final ExtractableResponse<Response> 신분당선_response = requestCreateLine("신분당선", "bg-red-600", 지하철역_Id, 새로운지하철역_Id, 10);
+        final Long 신분당선_id = RestAssuredHelper.getIdFrom(신분당선_response);
+
+        // when
+        final ExtractableResponse<Response> response = RestAssuredHelper.deleteById(LINE_API_PATH, 신분당선_id);
+
+        // then
+        assertSoftly(softly -> {
+            softly.assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+            final List<Long> lineIds = RestAssuredHelper
+                    .get(LINE_API_PATH)
+                    .jsonPath()
+                    .getList("id", Long.class);
+            softly.assertThat(lineIds).doesNotContain(신분당선_id);
+        });
+    }
+
     private void assertResponseData(final ExtractableResponse<Response> response, final Long id, final String name, final Long upStationId, final Long downStationId) {
         final LineResponse lineResponse = RestAssuredHelper.findObjectFrom(response, id, LineResponse.class);
         assertSoftly(softly -> {
