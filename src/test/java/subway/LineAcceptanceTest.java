@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.jdbc.Sql;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -16,6 +17,7 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
+@Sql(value = "/sql/truncate-all-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {
 
@@ -50,14 +52,15 @@ public class LineAcceptanceTest {
 
             assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
             assertThat(response.body().jsonPath().getString("name")).isEqualTo(lineName);
+
             long createdSubwayLineId = getSubwayLineId(response);
             assertThat(createdSubwayLineId).isNotNull();
 
             // then
-            ExtractableResponse<Response> getSubwayLinesResponse = getSubwayLines();
+            ExtractableResponse<Response> getSubwayLinesResponse = getSubwayLine(createdSubwayLineId);
 
             assertThat(getSubwayLinesResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
-            assertThat(getSubwayLinesResponse.body().jsonPath().getList("id")).containsExactly(createdSubwayLineId);
+            assertThat(getSubwayLineId(getSubwayLinesResponse)).isEqualTo(createdSubwayLineId);
         }
     }
 
@@ -111,7 +114,8 @@ public class LineAcceptanceTest {
             ExtractableResponse<Response> getSubwayLinesResponse = getSubwayLines();
 
             assertThat(getSubwayLinesResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
-            assertThat(getSubwayLinesResponse.body().jsonPath().getList("name")).containsExactly(firstLineName, secondLineName);
+            assertThat(getSubwayLinesResponse.body().jsonPath().getList("name"))
+                .containsExactly(firstLineName, secondLineName);
         }
     }
 
@@ -163,7 +167,7 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선 수정")
     @Nested
     class UpdateSubwayLine {
-
+       // TODO: 유효하지 않은 수정 데이터 검증
         @DisplayName("생성한 지하철 노선을 수정하면 해당 지하철 노선 정보는 수정된다")
         @Test
         void will_return_updated_subway_line_data() {
@@ -247,7 +251,7 @@ public class LineAcceptanceTest {
 
             // when
             ExtractableResponse<Response> deleteResponse = RestAssured.given().log().all()
-                .pathParam("lienId", createdSubwayLineId)
+                .pathParam("lineId", createdSubwayLineId)
                 .when().delete("/lines/{lineId}")
                 .then().log().all()
                 .extract();
