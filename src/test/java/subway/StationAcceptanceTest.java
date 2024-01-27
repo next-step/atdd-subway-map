@@ -87,17 +87,15 @@ public class StationAcceptanceTest {
     void 지하철역_삭제() {
         // given
         String stationName = "강남역";
-        this.createStation(stationName);
+        ExtractableResponse<Response> createStationResponse = this.createStation(stationName);
 
         // when
-        ExtractableResponse<Response> responseAfterStationCreation = this.getStationList();
-        JsonPath jsonPathAfterStationCreation = responseAfterStationCreation.jsonPath();
-        List<Long> stationIds = jsonPathAfterStationCreation.getList("id", Long.class);
-        Long stationId = stationIds.get(0);
+        String location = createStationResponse.header("Location");
+        String stationId = location.replaceAll(".*/(\\d+)$", "$1");
 
         given()
         .when()
-            .delete("/stations/"+stationId)
+            .delete("/stations/{id}", stationId)
         .then()
             .statusCode(HttpStatus.NO_CONTENT.value())
             .log().all();
