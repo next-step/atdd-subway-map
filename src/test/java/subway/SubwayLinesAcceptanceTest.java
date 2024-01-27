@@ -8,8 +8,11 @@ import io.restassured.response.Response;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.HttpStatus;
@@ -21,7 +24,6 @@ import java.util.Map;
 import java.util.List;
 import org.springframework.test.context.jdbc.Sql;
 
-@Sql(value="/db/subwayLine.sql")
 @DisplayName("지하철 노선 기능")
 @SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
 public class SubwayLinesAcceptanceTest {
@@ -31,11 +33,27 @@ public class SubwayLinesAcceptanceTest {
     private String 빨간색 = "bg-red-600";
     private String 파란색 = "bg-blue-600";
 
+    @Autowired
+    private StationRepository stationRepository;
+
+    @Autowired
+    private DatabaseCleaner databaseCleaner;
+
+    @BeforeEach
+    void setUp() {
+        stationRepository.save(new Station("강남역"));
+        stationRepository.save(new Station("역삼역"));
+    }
+
+    @AfterEach
+    void cleanUp() {
+        databaseCleaner.tableClear();
+    }
+
     /**
      * When 지하철 노선을 생성하면
      * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
      */
-    @DirtiesContext
     @Test
     void 지하철노선_생성() {
         // When
@@ -84,7 +102,6 @@ public class SubwayLinesAcceptanceTest {
      * When 생성한 지하철 노선을 조회하면
      * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
      */
-    @DirtiesContext
     @Test
     void 지하철노선_조회() {
         // Given
@@ -107,7 +124,6 @@ public class SubwayLinesAcceptanceTest {
      * When 생성한 지하철 노선을 수정하면
      * Then 해당 지하철 노선 정보는 수정된다
      */
-    @DirtiesContext
     @Test
     void 지하철노선_수정() {
         // Given
@@ -130,7 +146,6 @@ public class SubwayLinesAcceptanceTest {
      * When 생성한 지하철 노선을 삭제하면
      * Then 해당 지하철 노선 정보는 삭제된다
      */
-    @DirtiesContext
     @Test
     void 지하철노선_삭제() {
         // Given
