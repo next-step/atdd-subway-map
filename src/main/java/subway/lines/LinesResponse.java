@@ -23,8 +23,7 @@ public class LinesResponse {
         this.name = lines.getName();
         this.color = lines.getColor();
         this.stations = Arrays.stream(new Station[]{lines.getUpStation(), lines.getDownStation()})
-            .map(StationResponse::new)
-            .collect(Collectors.toList());
+            .map(StationResponse::new).collect(Collectors.toList());
     }
 
     public Long getId() {

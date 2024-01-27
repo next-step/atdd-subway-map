@@ -1,6 +1,7 @@
 package subway.lines;
 
 public class LinesCreateRequest {
+
     private String name;
     private String color;
     private Long upStationId;

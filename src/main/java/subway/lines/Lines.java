@@ -16,15 +16,14 @@ public class Lines {
     private String name;
     private String color;
     @ManyToOne()
-    @JoinColumn(name="upStationId")
+    @JoinColumn(name = "upStationId")
     private Station upStation;
     @ManyToOne()
-    @JoinColumn(name="downStationId")
+    @JoinColumn(name = "downStationId")
     private Station downStation;
     private Long distance;
 
-    public Lines(String name, String color, Station upStation, Station downStation,
-        Long distance) {
+    public Lines(String name, String color, Station upStation, Station downStation, Long distance) {
         this.name = name;
         this.color = color;
         this.upStation = upStation;

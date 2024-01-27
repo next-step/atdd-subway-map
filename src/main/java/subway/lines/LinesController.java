@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class LinesController {
+
     private LinesService linesService;
 
     public LinesController(LinesService linesService) {
@@ -21,7 +22,9 @@ public class LinesController {
     }
 
     @PostMapping("/lines")
-    public ResponseEntity<LinesResponse> createLines(@RequestBody LinesCreateRequest linesCreateRequest) {
+    public ResponseEntity<LinesResponse> createLines(
+        @RequestBody LinesCreateRequest linesCreateRequest
+    ) {
         LinesResponse lines = linesService.saveLines(linesCreateRequest);
 
         return ResponseEntity.created(URI.create("/lines/" + lines.getId())).body(lines);
@@ -38,7 +41,10 @@ public class LinesController {
     }
 
     @PutMapping("/lines/{id}")
-    public ResponseEntity<Void> updateLines(@PathVariable Long id, @RequestBody LinesUpdateRequest linesUpdateRequest) {
+    public ResponseEntity<Void> updateLines(
+        @PathVariable Long id,
+        @RequestBody LinesUpdateRequest linesUpdateRequest
+    ) {
         linesService.updateLines(id, linesUpdateRequest);
 
         return ResponseEntity.ok().build();

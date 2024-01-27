@@ -30,19 +30,26 @@ public class LinesService {
             .orElse(null);
 
         final Lines lines = linesRepository.save(
-            new Lines(linesCreateRequest.getName(), linesCreateRequest.getColor(), upStation,
-                downStation, linesCreateRequest.getDistance()));
+            new Lines(
+                linesCreateRequest.getName(),
+                linesCreateRequest.getColor(),
+                upStation,
+                downStation,
+                linesCreateRequest.getDistance()
+            )
+        );
 
         return new LinesResponse(lines);
     }
 
     public List<LinesResponse> getLinesList() {
-        return linesRepository.findAll().stream().map(LinesResponse::new).collect(Collectors.toList());
+        return linesRepository.findAll().stream().map(LinesResponse::new)
+            .collect(Collectors.toList());
     }
 
     public LinesResponse getLines(Long id) {
         final Lines lines = linesRepository.findById(id).orElse(null);
-        if(lines == null) {
+        if (lines == null) {
             return null;
         }
 
@@ -52,7 +59,7 @@ public class LinesService {
     @Transactional
     public void updateLines(Long id, LinesUpdateRequest linesUpdateRequest) {
         final Lines lines = linesRepository.findById(id).orElse(null);
-        if(lines == null) {
+        if (lines == null) {
             throw new EntityNotFoundException();
         }
 
