@@ -1,7 +1,9 @@
 package subway;
 
 import java.net.URI;
+import java.util.List;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,5 +21,10 @@ public class SubwayLineController {
         SubwayLineResponse line = subwayLineService.saveLine(subwayLineRequest);
 
         return ResponseEntity.created(URI.create("/subwayLines/" + line.getId())).body(line);
+    }
+
+    @GetMapping("/subwayLines")
+    public ResponseEntity<List<SubwayLineResponse>> getSubwayLine() {
+        return ResponseEntity.ok().body(subwayLineService.findAllLines());
     }
 }
