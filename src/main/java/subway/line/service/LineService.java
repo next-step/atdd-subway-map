@@ -2,6 +2,7 @@ package subway.line.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.line.exception.LineNotExistException;
 import subway.line.repository.LineRepository;
 import subway.line.repository.domain.Line;
 import subway.line.service.dto.LineCreateRequest;
@@ -40,14 +41,18 @@ public class LineService {
         return LineResponse.from(line);
     }
 
+    private Station findStation(final Long stationId) {
+        return stationRepository.findById(stationId).orElseThrow(() -> new StationNotExistException(stationId));
+    }
+
     public List<LineResponse> findAllLines() {
         return lineRepository.findAllWithLines().stream()
                 .map(LineResponse::from)
                 .collect(Collectors.toList());
     }
 
-    private Station findStation(final Long upStationId) {
-        return stationRepository.findById(upStationId).orElseThrow(() -> new StationNotExistException(upStationId));
+    public LineResponse findLineById(final Long id) {
+        final Line line = lineRepository.findByIdWithStation(id).orElseThrow(() -> new LineNotExistException(id));
+        return LineResponse.from(line);
     }
-
 }
