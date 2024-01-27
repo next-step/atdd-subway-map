@@ -142,7 +142,21 @@ public class SubwayLinesAcceptanceTest {
     @DirtiesContext
     @Test
     void 지하철노선_삭제() {
+        // Given
+        final LinesResponse createdLines = createLines(일호선, 빨간색, 1L, 2L, 10L)
+            .as(LinesResponse.class);
+
+        // When
+        final ExtractableResponse<Response> deleteResponse = deleteLines(createdLines.getId());
+
+        // Then
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        // Then
+        final List<Long> idList = getLinesList().jsonPath().getList("id", Long.class);
+        assertThat(idList).doesNotContain(createdLines.getId());
     }
+
 
     private static ExtractableResponse<Response> getLinesList() {
         return RestAssured
@@ -154,7 +168,7 @@ public class SubwayLinesAcceptanceTest {
     }
 
     private ExtractableResponse<Response> createLines(String name, String color, Long upStationId, Long downStationId, Long distance) {
-        Map<String, String> params = new HashMap<>();
+        final Map<String, String> params = new HashMap<>();
         params.put("name", name);
         params.put("color", color);
         params.put("upStationId", upStationId.toString());
@@ -163,20 +177,19 @@ public class SubwayLinesAcceptanceTest {
 
         return RestAssured
             .given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(params)
             .when()
-            .post("/lines")
+                .post("/lines")
             .then().log().all()
             .extract();
     }
 
-    private static ExtractableResponse<Response> getLines(
-        Long id) {
+    private static ExtractableResponse<Response> getLines(Long id) {
         return RestAssured
             .given().log().all()
             .when()
-            .get("/lines/" + id)
+                .get("/lines/" + id)
             .then().log().all()
             .extract();
     }
@@ -188,10 +201,19 @@ public class SubwayLinesAcceptanceTest {
 
         return RestAssured
             .given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(params)
             .when()
-            .put("/lines/" + id)
+                .put("/lines/" + id)
+            .then().log().all()
+            .extract();
+    }
+
+    private static ExtractableResponse<Response> deleteLines(Long id) {
+        return RestAssured
+            .given().log().all()
+            .when()
+                .delete("/lines/" + id)
             .then().log().all()
             .extract();
     }
