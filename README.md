@@ -75,7 +75,7 @@ then().
 
 ## 2단계 - 지하철 노선 관리
 ### 요구사항
-- [ ] 지하철 노선 생성 - "POST /lines"
+- [x] 지하철 노선 생성 - "POST /lines"
   > When 지하철 노선을 생성하면 <br>
   Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
   - Request Data
@@ -106,7 +106,7 @@ then().
       ]
     }
     ```
-  - [ ] "/lines" 로 Post 요청을 보낸다.
+  - [x] "/lines" 로 Post 요청을 보낸다.
   - [x] 요청 data validation
     - [x] name 이 없다면 Exception 을 던진다.
     - [x] color 가 없다면 Exception 을 던진다.
