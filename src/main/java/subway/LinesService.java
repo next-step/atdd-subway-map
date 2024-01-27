@@ -2,6 +2,7 @@ package subway;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,5 +45,15 @@ public class LinesService {
         }
 
         return new LinesResponse(lines);
+    }
+
+    public void updateLines(Long id, LinesUpdateRequest linesUpdateRequest) {
+        final Lines lines = linesRepository.findById(id).orElse(null);
+        if(lines== null) {
+            throw new EntityNotFoundException();
+        }
+
+        lines.setName(linesUpdateRequest.getName());
+        lines.setColor(linesUpdateRequest.getColor());
     }
 }
