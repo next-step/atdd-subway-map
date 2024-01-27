@@ -65,6 +65,7 @@ public class LineAcceptanceTest {
 	 * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
 	 */
 	@DisplayName("지하철 노선을 조회한다.")
+	@DirtiesContext
 	@Test
 	void getLineTest() {
 		// given

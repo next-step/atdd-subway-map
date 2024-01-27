@@ -34,6 +34,13 @@ public class LineService {
 		return lineRepository.findAll().stream()
 				.map(this::createLineResponse).collect(Collectors.toList());
 	}
+
+	public LineResponse findLineById(Long id) {
+		return lineRepository.findById(id)
+				.map(this::createLineResponse)
+				.orElseThrow(IllegalAccessError::new);
+	}
+
 	private LineResponse createLineResponse(Line line) {
 		Station upStation = stationRepository.findById(line.getUpStationId())
 				.orElseThrow(IllegalAccessError::new);
