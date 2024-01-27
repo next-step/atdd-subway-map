@@ -1,4 +1,4 @@
-package subway;
+package subway.station;
 
 import static testhelper.StationRequestExecutor.*;
 import static org.assertj.core.api.Assertions.*;
