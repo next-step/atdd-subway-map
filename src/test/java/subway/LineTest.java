@@ -112,6 +112,29 @@ public class LineTest {
    * When 생성한 지하철 노선을 조회하면
    * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
    */
+  @DisplayName("노선을 조회한다.")
+  @Test
+  void getLineSuccess() {
+    // when
+    final var createdLine = createLine("신분당선", "bg-red-600", 1, 2, 10);
+
+    // when
+    final var response = RestAssured
+        .given().log().all()
+        .port(port)
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when().get("/lines/{id}", createdLine.getId())
+        .then().log().all()
+        .extract();
+
+    final var line = response.as(LineResponse.class);
+
+    // then
+    assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+    // then
+    assertThat(createdLine.getId()).isEqualTo(line.getId());
+  }
 
   /**
    * Given 지하철 노선을 생성하고
