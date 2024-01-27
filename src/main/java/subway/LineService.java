@@ -44,7 +44,10 @@ public class LineService {
     }
 
     private LineResponse createLineResponse(Line line) {
-        return new LineResponse(line.getId(), line.getName(), line.getColor(), getStations(line));
+        return new LineResponse(line.getId(),
+                line.getName(),
+                line.getColor(),
+                getStations(line));
     }
 
     private List<StationResponse> getStations(Line line) {
