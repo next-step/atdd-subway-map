@@ -65,7 +65,9 @@ public class StationAcceptanceTest {
         List<String> stationNames = jsonPath.getList("name", String.class);
 
         assertThat(stationNames).hasSize(2);
-        assertThat(stationNames).contains("교대역", "역삼역");
+        assertThat(stationNames).contains("역삼역", "교대역");
+        assertThat(stationNames).doesNotContain("강남역");
+        assertThat(stationNames).containsExactly("교대역", "역삼역");
     }
 
     /**
