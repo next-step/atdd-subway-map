@@ -68,7 +68,10 @@ public class SimpleLineService implements LineService {
 	@Override
 	@Transactional
 	public void deleteLineById(Long id) {
-		lineFactory.deleteLine(fetchLineOrThrow(id));
+		Line line = fetchLineOrThrow(id);
+
+		linkFactory.deleteByLine(line);
+		lineFactory.deleteLine(line);
 	}
 
 	private Line fetchLineOrThrow(Long id) {

@@ -31,4 +31,9 @@ public class SimpleLinkFactory implements LinkFactory {
 
 		return linkRepository.save(link);
 	}
+
+	@Override
+	public void deleteByLine(Line line) {
+		linkRepository.deleteByLine(line);
+	}
 }

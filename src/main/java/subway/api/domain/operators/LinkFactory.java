@@ -10,4 +10,6 @@ import subway.api.interfaces.dto.LineCreateRequest;
  */
 public interface LinkFactory {
 	Link createLink(LineCreateRequest request, Line line);
+
+	void deleteByLine(Line line);
 }
