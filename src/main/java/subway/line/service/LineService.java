@@ -10,6 +10,9 @@ import subway.station.exception.StationNotExistException;
 import subway.station.repository.StationRepository;
 import subway.station.repository.domain.Station;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @Transactional(readOnly = true)
 public class LineService {
@@ -35,6 +38,12 @@ public class LineService {
                         , lineCreateRequest.getDistance()));
 
         return LineResponse.from(line);
+    }
+
+    public List<LineResponse> findAllLines() {
+        return lineRepository.findAllWithLines().stream()
+                .map(LineResponse::from)
+                .collect(Collectors.toList());
     }
 
     private Station findStation(final Long upStationId) {
