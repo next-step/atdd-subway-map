@@ -71,3 +71,78 @@ then().
   - [x] statusCode 가 204 No Content 인지 확인한다.
   - [x] "/stations" 로 Get 요청을 보낸다.
   - [x] jsonPath 를 이용해 해당 지하철역이 삭제 되었는지 확인한다.
+
+
+## 2단계 - 지하철 노선 관리
+### 요구사항
+- [ ] 지하철 노선 생성 - "POST /lines"
+  > When 지하철 노선을 생성하면 <br>
+  Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
+  - Request Data
+    ```json
+    {
+      "name" : "신분당선",
+      "color" : "bg-red-600",
+      "upStationId" : 1,
+      "downStationId" : 2,
+      "distance" : 10
+    }
+    ```
+  - Response Data
+    ```json
+    {
+      "id" : 1,
+      "name" : "신분당선",
+      "color" : "bg-red-600",
+      "stations" : [
+        {
+          "id": 1,
+          "name": "지하철역"
+        },
+        {
+          "id": 2,
+          "name": "새로운지하철역"
+        } 
+      ]
+    }
+    ```
+  - [ ] "/lines" 로 Post 요청을 보낸다.
+  - [ ] 요청 data validation
+    - [ ] name 이 없다면 Exception 을 던진다.
+    - [ ] color 가 없다면 Exception 을 던진다.
+    - [ ] 상행역, 하행역 없다면 Exception 을 던진다.
+    - [ ] distance 가 0 이하이면 Exception 을 던진다.
+  - [ ] Line 을 저장한다.
+    - [ ] 저장시 상행역, 하행역이 저장되어있지 않으면 Exception 을 던진다.
+  - [ ] 저장 후 응답 객체를 만든다.
+    - [ ] 응답 객체에 상행역, 하행역 정보를 이용해 응답 객체에 포힘시킨다.
+
+
+- [ ] 지하철 노선 목록 조회
+  > Given 2개의 지하철 노선을 생성하고<br>
+  When 지하철 노선 목록을 조회하면<br>
+  Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
+
+
+- [ ] 지하철 노선 조회
+  > Given 지하철 노선을 생성하고<br>
+  When 생성한 지하철 노선을 조회하면<br>
+  Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
+
+
+- [ ] 지하철 노선 수정
+  > Given 지하철 노선을 생성하고<br>
+  When 생성한 지하철 노선을 수정하면<br>
+  Then 해당 지하철 노선 정보는 수정된다
+
+
+- [ ] 지하철 노선 삭제
+  > Given 지하철 노선을 생성하고<br>
+  When 생성한 지하철 노선을 삭제하면<br>
+  Then 해당 지하철 노선 정보는 삭제된다
+
+
+- [ ] 인수 테스트 격리
+  - @DirtiesContext
+  - @Sql
+  - Table Truncate
