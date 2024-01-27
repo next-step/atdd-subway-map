@@ -38,7 +38,7 @@ public class StationAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> findResponse = findStation();
         List<String> stationsNames = findResponse.jsonPath().getList("name", String.class);
         assertThat(stationsNames).hasSize(1)
-                .containsOnly("강남역");
+                .containsExactly("강남역");
 
         // 테스트 찌꺼기 데이터 삭제
         StationResponse stationResponse = createResponse.as(StationResponse.class);
@@ -54,16 +54,16 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void selectStation() {
         // given
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-        ExtractableResponse<Response> createResponse = createStation(params);
-        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        Map<String, String> gangNamStationParams = new HashMap<>();
+        gangNamStationParams.put("name", "강남역");
+        ExtractableResponse<Response> gangnamStationCreateResponse = createStation(gangNamStationParams);
+        assertThat(gangnamStationCreateResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // given
-        Map<String, String> params2 = new HashMap<>();
-        params2.put("name", "선릉역");
-        ExtractableResponse<Response> createResponse2 = createStation(params2);
-        assertThat(createResponse2.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        Map<String, String> seollEungStationParams = new HashMap<>();
+        seollEungStationParams.put("name", "선릉역");
+        ExtractableResponse<Response> seollEungStationCreateResponse = createStation(seollEungStationParams);
+        assertThat(seollEungStationCreateResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // when
         ExtractableResponse<Response> findResponse = findStation();
@@ -71,12 +71,12 @@ public class StationAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(stationsNames).hasSize(2)
-                .containsOnly("강남역", "선릉역");
+                .containsExactly("강남역", "선릉역");
 
         // 테스트 찌꺼기 데이터 삭제
-        StationResponse stationResponse = createResponse.as(StationResponse.class);
+        StationResponse stationResponse = gangnamStationCreateResponse.as(StationResponse.class);
         deleteStation(stationResponse.getId());
-        StationResponse stationResponse2 = createResponse2.as(StationResponse.class);
+        StationResponse stationResponse2 = seollEungStationCreateResponse.as(StationResponse.class);
         deleteStation(stationResponse2.getId());
     }
 
@@ -101,7 +101,7 @@ public class StationAcceptanceTest extends AcceptanceTest {
         // then
         ExtractableResponse<Response> findResponse = findStation();
         List<String> stationsNames = findResponse.jsonPath().getList("name", String.class);
-        assertThat(stationsNames).hasSize(0);
+        assertThat(stationsNames).isEmpty();
     }
 
     private ExtractableResponse<Response> createStation(Map<String, String> params) {
@@ -112,7 +112,6 @@ public class StationAcceptanceTest extends AcceptanceTest {
                 .then().log().all()
                 .extract();
     }
-
 
     private ExtractableResponse<Response> findStation() {
         return RestAssured.given().log().all()
