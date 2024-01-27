@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlGroup;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -17,7 +18,10 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
-@Sql(value = "/sql/truncate-all-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@SqlGroup({
+    @Sql(value = "/sql/setup-station-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD),
+    @Sql(value = "/sql/truncate-all-data.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {
 
@@ -167,7 +171,7 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선 수정")
     @Nested
     class UpdateSubwayLine {
-       // TODO: 유효하지 않은 수정 데이터 검증
+        // TODO: 유효하지 않은 수정 데이터 검증
         @DisplayName("생성한 지하철 노선을 수정하면 해당 지하철 노선 정보는 수정된다")
         @Test
         void will_return_updated_subway_line_data() {

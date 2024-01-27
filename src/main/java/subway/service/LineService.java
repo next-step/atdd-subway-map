@@ -2,6 +2,7 @@ package subway.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.controller.dto.StationResponse;
 import subway.domain.Line;
 import subway.controller.dto.LineCreateRequest;
 import subway.domain.LineRepository;
@@ -13,14 +14,16 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /** 지하철 노선 관리 담당 서비스 */
-@Transactional
+@Transactional(readOnly = true)
 @Service
 public class LineService {
 
     private final LineRepository lineRepository;
+    private final StationService stationService;
 
-    public LineService(final LineRepository lineRepository) {
+    public LineService(LineRepository lineRepository, StationService stationService) {
         this.lineRepository = lineRepository;
+        this.stationService = stationService;
     }
 
     /**
@@ -29,8 +32,9 @@ public class LineService {
      * @param createRequest 지하철 노선 생성 데이터
      * @return 생성된 지하철 노선 정보
      */
+    @Transactional
     public LineResponse createLine(LineCreateRequest createRequest) {
-        // TODO: 주어진 상행종점역, 하행종점역이 존재하는지 검증 추가
+
         Line line = lineRepository.save(
             Line.of(
                 createRequest.getName(),
@@ -41,8 +45,7 @@ public class LineService {
             )
         );
 
-        // TODO: 실제 역 응답값에 추가
-        return LineResponse.of(line, List.of());
+        return LineResponse.of(line, getStations(line));
     }
 
     /**
@@ -50,10 +53,9 @@ public class LineService {
      *
      * @return 모든 지하철 노선 정보
      */
-    @Transactional(readOnly = true)
     public List<LineResponse> getLines() {
         return lineRepository.findAll()
-            .stream().map(line -> LineResponse.of(line, List.of()))
+            .stream().map(line -> LineResponse.of(line, getStations(line)))
             .collect(Collectors.toList());
     }
 
@@ -64,12 +66,10 @@ public class LineService {
      * @return 지하철 노선 정보
      * @throws EntityNotFoundException 식별자에 해당하는 지하철노선을 찾지 못한 경우 던짐
      */
-    @Transactional(readOnly = true)
     public LineResponse getLine(Long lineId) {
         Line line = findLineById(lineId);
 
-        // TODO: 실제 역 응답값에 추가
-        return LineResponse.of(line, List.of());
+        return LineResponse.of(line, getStations(line));
     }
 
     /**
@@ -80,6 +80,7 @@ public class LineService {
      * @param updateRequestDto 지하철 노선 변경 데이터
      * @throws EntityNotFoundException 식별자에 해당하는 지하철노선을 찾지 못한 경우 던짐
      */
+    @Transactional
     public void updateLine(Long lineId, LineUpdateRequest updateRequestDto) {
         Line line = findLineById(lineId);
 
@@ -94,6 +95,7 @@ public class LineService {
      * @param lineId 지하철 노선 식별자
      * @throws EntityNotFoundException 식별자에 해당하는 지하철노선을 찾지 못한 경우 던짐
      */
+    @Transactional
     public void deleteLine(Long lineId) {
         lineRepository.delete(findLineById(lineId));
     }
@@ -103,5 +105,12 @@ public class LineService {
         // TODO: 익셉션 정의?
         return lineRepository.findById(lineId)
             .orElseThrow(EntityNotFoundException::new);
+    }
+
+    private List<StationResponse> getStations(Line line) {
+        StationResponse upStation = stationService.findByStationId(line.getUpStationId());
+        StationResponse downStation = stationService.findByStationId(line.getDownStationId());
+
+        return List.of(upStation, downStation);
     }
 }
