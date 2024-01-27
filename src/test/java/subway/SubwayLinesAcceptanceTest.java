@@ -91,9 +91,30 @@ public class SubwayLinesAcceptanceTest {
     @Test
     void 지하철노선_수정() {
         // Given
-        createSubwayLine(일호선);
+        final ExtractableResponse<Response> createdLineResponse = createSubwayLine(일호선);
+        final SubwayLineResponse createdLine = createdLineResponse.as(SubwayLineResponse.class);
 
         // When
+        updateSubwayLine(createdLine, 이호선);
+
+        // Then
+        final ExtractableResponse<Response> updatedLineResponse = findSubwayLine(createdLine);
+        final SubwayLineResponse updatedResponse = updatedLineResponse.as(SubwayLineResponse.class);
+
+        assertThat(updatedResponse.getId()).isEqualTo(createdLine.getId());
+        assertThat(updatedResponse.getName()).isEqualTo(이호선);
+    }
+
+    private void updateSubwayLine(SubwayLineResponse createdLine, String name) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", name);
+
+        RestAssured
+            .given().log().all()
+            .when()
+            .put("/subwayLines/"+ createdLine.getId())
+            .then().log().all()
+            .extract();
     }
 
     private static ExtractableResponse<Response> findSubwayLine(SubwayLineResponse createdLine) {
