@@ -115,7 +115,7 @@ public class LineTest {
   @DisplayName("노선을 조회한다.")
   @Test
   void getLineSuccess() {
-    // when
+    // given
     final var createdLine = createLine("신분당선", "bg-red-600", 1, 2, 10);
 
     // when
@@ -141,6 +141,39 @@ public class LineTest {
    * When 생성한 지하철 노선을 수정하면
    * Then 해당 지하철 노선 정보는 수정된다
    */
+  @DisplayName("노선을 조회한다.")
+  @Test
+  void updateLineSuccess() {
+    // given
+    final var createdLine = createLine("신분당선", "bg-red-600", 1, 2, 10);
+    final var updateParam = new LineUpdateRequest("2호선", "bg-green-800");
+
+    // when
+    Map<String, Object> params = new HashMap<>();
+    params.put("name", updateParam.getName());
+    params.put("color", updateParam.getColor());
+
+    final var response = RestAssured
+        .given().log().all()
+        .body(params)
+        .port(port)
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when().put("/lines/{id}", createdLine.getId())
+        .then().log().all()
+        .extract();
+
+    final var line = getLines().stream()
+        .filter(it -> createdLine.getId().equals(it.getId()))
+        .findFirst();
+
+    // then
+    assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+    // then
+    assertThat(line.isPresent()).isTrue();
+    assertThat(line.get().getName()).isEqualTo(updateParam.getName());
+    assertThat(line.get().getColor()).isEqualTo(updateParam.getColor());
+  }
 
   /**
    * Given 지하철 노선을 생성하고
