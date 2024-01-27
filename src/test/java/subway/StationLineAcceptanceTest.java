@@ -37,15 +37,21 @@ public class StationLineAcceptanceTest {
         map.put("downStationId", String.valueOf(StationLineMockData.downStationId1));
         map.put("distance", String.valueOf(StationLineMockData.distance1));
 
+        given().log().all()
+            .body(map)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+            .post("/lines")
+        .then().log().all()
+            .statusCode(HttpStatus.CREATED.value());
+
         List<String> stationLineName =
                 given().log().all()
-                    .body(map)
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
-                    .post("/lines")
+                    .get("/lines")
                 .then().log().all()
-                    .statusCode(HttpStatus.CREATED.value())
-                .extract().jsonPath().getList("name", String.class);
+                    .statusCode(HttpStatus.OK.value())
+                    .extract().jsonPath().getList("name", String.class);
 
         // then
         assertThat(stationLineName).containsAnyOf(StationLineMockData.stationLineName1);
@@ -58,7 +64,7 @@ public class StationLineAcceptanceTest {
       */
     @DisplayName("지하철 노선 목록을 조회한다.")
     @Test
-    void findAllStationLine() {
+    void findAllStationLines() {
         // given
         Map<String, String> map1 = new HashMap<>();
         map1.put("name", StationLineMockData.stationLineName1);
