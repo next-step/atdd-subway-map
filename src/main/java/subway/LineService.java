@@ -36,6 +36,12 @@ public class LineService {
         return createLineResponse(line);
     }
 
+    @Transactional
+    public void updateLine(Long id, LineUpdateRequest lineUpdateRequest) {
+        Line line = lineRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 지하철라인 정보를 찾지 못했습니다."));
+        line.update(lineUpdateRequest.getName(), lineUpdateRequest.getColor());
+    }
+
     private Line createLine(LineRequest lineRequest) {
         return new Line(lineRequest.getName(),
                 lineRequest.getColor(),

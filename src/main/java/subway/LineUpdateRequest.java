@@ -9,4 +9,12 @@ public class LineUpdateRequest {
         this.name = name;
         this.color = color;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getColor() {
+        return color;
+    }
 }

@@ -105,30 +105,30 @@ public class LineAcceptanceTest {
      * When 생성한 지하철 노선을 수정하면
      * Then 해당 지하철 노선 정보는 수정된다
      */
-//    @DisplayName("지하철노선을 수정한다.")
-//    @Test
-//    void updateLine() {
-//        // given
-//        ExtractableResponse<Response> response = callApiCreateLines(newBunDangLineParams);
-//        String location = response.header("location");
-//
-//        // when
-//        LineUpdateRequest request = new LineUpdateRequest("다른분당선", "bg-red-600");
-//        ExtractableResponse<Response> updateResponse = given().log().all()
-//                .body(request)
-//                .contentType(MediaType.APPLICATION_JSON_VALUE)
-//                .when().put(location)
-//                .then().log().all()
-//                .extract();
-//
-//        // then
-//        LineResponse actual = callApiFindLines().jsonPath().getObject(".", LineResponse.class);
-//        LineResponse expected = new LineResponse(actual.getId(),
-//                "다른분당선",
-//                "bg-red-600",
-//                List.of(new StationResponse(1L, "강남역"), new StationResponse(2L, "삼성역")));
-//        assertThat(actual).isEqualTo(expected);
-//    }
+    @DisplayName("지하철노선을 수정한다.")
+    @Test
+    void updateLine() {
+        // given
+        ExtractableResponse<Response> response = callApiCreateLines(newBunDangLineParams);
+        String location = response.header("location");
+
+        // when
+        LineUpdateRequest request = new LineUpdateRequest("다른분당선", "bg-red-600");
+        ExtractableResponse<Response> updateResponse = given().log().all()
+                .body(request)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().put(location)
+                .then().log().all()
+                .extract();
+
+        // then
+        LineResponse actual = callApiFindLines().jsonPath().getObject(".", LineResponse.class);
+        LineResponse expected = new LineResponse(actual.getId(),
+                "다른분당선",
+                "bg-red-600",
+                List.of(new StationResponse(1L, "강남역"), new StationResponse(2L, "삼성역")));
+        assertThat(actual).isEqualTo(expected);
+    }
 
     /**
      * Given 지하철 노선을 생성하고
