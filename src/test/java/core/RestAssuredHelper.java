@@ -31,6 +31,15 @@ public class RestAssuredHelper {
                 .then().extract();
     }
 
+    public static ExtractableResponse<Response> put(final String path, final Long id, final Object body) {
+        return RestAssured
+                .given().pathParam("id", id)
+                .body(body)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().put(path + "/{id}")
+                .then().extract();
+    }
+
     public static ExtractableResponse<Response> deleteById(final String path, final Long id) {
         return RestAssured
                 .given().pathParam("id", id)

@@ -114,6 +114,32 @@ public class LineAcceptanceTest {
         });
     }
 
+    /**
+     * Given 노선을 생성하고
+     * When 생성한 지하철 노선을 수정하면
+     * Then 해당 지하철 노선 정보는 수정된다
+     */
+    @DisplayName("특정 노선을 수정한다.")
+    @Test
+    void updateLineByIdTest() {
+        // given
+        final ExtractableResponse<Response> 신분당선_response = requestCreateLine("신분당선", "bg-red-600", 지하철역_Id, 새로운지하철역_Id, 10);
+        final Long 신분당선_id = RestAssuredHelper.getIdFrom(신분당선_response);
+
+        // when
+        final ExtractableResponse<Response> response = RestAssuredHelper.put(LINE_API_PATH, 신분당선_id, createLineUpdateRequestFixture("다른분당선", "bg-red-600"));
+
+        // then
+        assertSoftly(softly -> {
+            assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+            final LineResponse lineResponse = RestAssuredHelper.getById(LINE_API_PATH, 신분당선_id).as(LineResponse.class);
+            softly.assertThat(lineResponse.getName()).isEqualTo("다른분당선");
+            softly.assertThat(lineResponse.getColor()).isEqualTo("bg-red-600");
+            softly.assertThat(lineResponse.getStations())
+                    .extracting("id").containsExactly(지하철역_Id, 새로운지하철역_Id);
+        });
+    }
+
     private void assertResponseData(final ExtractableResponse<Response> response, final Long id, final String name, final Long upStationId, final Long downStationId) {
         final LineResponse lineResponse = RestAssuredHelper.findObjectFrom(response, id, LineResponse.class);
         assertSoftly(softly -> {
@@ -139,6 +165,13 @@ public class LineAcceptanceTest {
                 , "upStationId", upStationId
                 , "downStationId", downStationId
                 , "distance", distance
+        );
+    }
+
+    private Map<String, Object> createLineUpdateRequestFixture(final String name, final String color) {
+        return Map.of(
+                "name", name
+                , "color", color
         );
     }
 
