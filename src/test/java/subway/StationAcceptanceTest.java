@@ -19,6 +19,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationAcceptanceTest {
+
+    private static final String GANGNAM_STATION = "강남역";
+    private static final String SAMSUNG_STATION = "삼성역";
+
     /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다
@@ -29,7 +33,7 @@ public class StationAcceptanceTest {
     void createStation() {
         // when
         Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
+        params.put("name", GANGNAM_STATION);
 
         ExtractableResponse<Response> response = createStationResponse(params);
 
@@ -38,7 +42,7 @@ public class StationAcceptanceTest {
 
         // then
         List<String> actual = findStationNames();
-        String expected = "강남역";
+        String expected = GANGNAM_STATION;
         assertThat(actual).containsAnyOf(expected);
     }
 
@@ -52,17 +56,17 @@ public class StationAcceptanceTest {
     void findStations() {
         // given
         Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
+        params.put("name", GANGNAM_STATION);
         createStationResponse(params);
 
-        params.put("name", "삼성역");
+        params.put("name", SAMSUNG_STATION);
         createStationResponse(params);
 
         // when
         List<String> actual = findStationNames();
 
         // then
-        List<String> expected = List.of("강남역", "삼성역");
+        List<String> expected = List.of(GANGNAM_STATION, SAMSUNG_STATION);
         assertThat(actual).containsAll(expected);
     }
 
@@ -76,7 +80,7 @@ public class StationAcceptanceTest {
     void deleteStation() {
         // given
         Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
+        params.put("name", GANGNAM_STATION);
         createStationResponse(params);
 
         List<Long> stationIds = given().log().all()
