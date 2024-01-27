@@ -2,6 +2,7 @@ package subway;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,6 +19,45 @@ import static org.assertj.core.api.Assertions.*;
 @DisplayName("지하철노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {
+
+    @BeforeEach
+    void setUp() {
+        Map<String, String> paramsA = new HashMap<>();
+        paramsA.put("name", "잠실역");
+        given().log().all()
+                .body(paramsA)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+
+        Map<String, String> paramsB = new HashMap<>();
+        paramsB.put("name", "용산역");
+        given().log().all()
+                .body(paramsB)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+
+        Map<String, String> paramsC = new HashMap<>();
+        paramsC.put("name", "건대입구역");
+        given().log().all()
+                .body(paramsC)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+
+        Map<String, String> paramsD = new HashMap<>();
+        paramsD.put("name", "성수역");
+        given().log().all()
+                .body(paramsD)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+    }
 
     /**
      * When 지하철 노선을 생성하면
@@ -145,6 +185,7 @@ public class LineAcceptanceTest {
      * Then 해당 지하철 노선 정보는 수정된다
      */
     @DisplayName("지하철 노선을 수정한다")
+    @Test
     void updateLine() {
         //given
         Map<String, String> params = new HashMap<>();
@@ -163,8 +204,8 @@ public class LineAcceptanceTest {
 
         //when
         Map<String, String> updateParams = new HashMap<>();
-        params.put("name", "1호선");
-        params.put("color", "blue");
+        updateParams.put("name", "1호선");
+        updateParams.put("color", "blue");
 
         ExtractableResponse<Response> response = given().log().all()
                 .pathParam("id", 1L)
@@ -194,6 +235,7 @@ public class LineAcceptanceTest {
      * Then 해당 지하철 노선 정보는 삭제된다
      */
     @DisplayName("지하철 노선을 삭제한다")
+    @Test
     void deleteLine() {
         //given
         Map<String, String> params = new HashMap<>();
