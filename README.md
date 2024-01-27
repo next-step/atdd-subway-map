@@ -107,11 +107,12 @@ then().
     }
     ```
   - [ ] "/lines" 로 Post 요청을 보낸다.
-  - [ ] 요청 data validation
-    - [ ] name 이 없다면 Exception 을 던진다.
-    - [ ] color 가 없다면 Exception 을 던진다.
-    - [ ] 상행역, 하행역 없다면 Exception 을 던진다.
-    - [ ] distance 가 0 이하이면 Exception 을 던진다.
+  - [x] 요청 data validation
+    - [x] name 이 없다면 Exception 을 던진다.
+    - [x] color 가 없다면 Exception 을 던진다.
+    - [x] 상행역, 하행역 없다면 Exception 을 던진다.
+    - [x] distance 가 0 이하이면 Exception 을 던진다.
+    - [x] 상행역, 하행역이 같다면 Exception 을 던진다.
   - [ ] Line 을 저장한다.
     - [ ] 저장시 상행역, 하행역이 저장되어있지 않으면 Exception 을 던진다.
   - [ ] 저장 후 응답 객체를 만든다.
