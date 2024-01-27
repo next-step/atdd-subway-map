@@ -36,4 +36,13 @@ public class LinesService {
     public List<LinesResponse> getLinesList() {
         return linesRepository.findAll().stream().map(LinesResponse::new).collect(Collectors.toList());
     }
+
+    public LinesResponse getLines(Long id) {
+        final Lines lines = linesRepository.findById(id).orElse(null);
+        if(lines == null) {
+            return null;
+        }
+
+        return new LinesResponse(lines);
+    }
 }
