@@ -15,6 +15,13 @@ public class RestAssuredHelper {
                 .then().extract();
     }
 
+    public static ExtractableResponse<Response> getById(final String path, final Long id) {
+        return RestAssured
+                .given().pathParam("id", id)
+                .when().get(path + "/{id}")
+                .then().extract();
+    }
+
     public static ExtractableResponse<Response> post(final String path, final Object body) {
         return RestAssured
                 .given()

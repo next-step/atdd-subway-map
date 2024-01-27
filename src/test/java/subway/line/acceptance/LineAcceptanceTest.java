@@ -89,6 +89,31 @@ public class LineAcceptanceTest {
         );
     }
 
+    /**
+     * Given 노선을 생성하고
+     * When 생성한 노선을 조회하면
+     * Then 생성한 노선을 응답 받는다
+     */
+    @DisplayName("특정 노선을 조회한다.")
+    @Test
+    void fetchLineByIdTest() {
+        // given
+        final ExtractableResponse<Response> 신분당선_response = requestCreateLine("신분당선", "bg-red-600", 지하철역_Id, 새로운지하철역_Id, 10);
+        final Long 신분당선_id = RestAssuredHelper.getIdFrom(신분당선_response);
+
+        // when
+        final ExtractableResponse<Response> response = RestAssuredHelper.getById(LINE_API_PATH, 신분당선_id);
+
+        // then
+        assertSoftly(softly -> {
+            assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+            final LineResponse lineResponse = response.as(LineResponse.class);
+            softly.assertThat(lineResponse.getName()).isEqualTo("신분당선");
+            softly.assertThat(lineResponse.getStations())
+                    .extracting("id").containsExactly(지하철역_Id, 새로운지하철역_Id);
+        });
+    }
+
     private void assertResponseData(final ExtractableResponse<Response> response, final Long id, final String name, final Long upStationId, final Long downStationId) {
         final LineResponse lineResponse = RestAssuredHelper.findObjectFrom(response, id, LineResponse.class);
         assertSoftly(softly -> {
