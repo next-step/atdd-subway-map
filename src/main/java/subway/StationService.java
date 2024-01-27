@@ -33,8 +33,6 @@ public class StationService {
             throw new NotFoundException();
         }
 
-        System.out.println(foundStation);
-
         foundStation.setName(stationRequest.getName());
 
         return createStationResponse(foundStation);
