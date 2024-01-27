@@ -2,11 +2,12 @@ package subway;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 @Entity
@@ -20,15 +21,32 @@ public class SubwayLine {
     @Column(length=20, nullable = false)
     private String name;
 
-    @OneToMany(mappedBy = "subwayLine")
-    private List<Station> stations = new ArrayList<>();
+    @ManyToOne()
+    @JoinColumn(name="upStationId")
+    private Station upStation;
 
-    public SubwayLine() {
-    }
 
-    public SubwayLine(String name, String color) {
+    @ManyToOne()
+    @JoinColumn(name="downStationId")
+    private Station downStation;
+    private Integer distance;
+
+    public SubwayLine(
+        String name,
+        String color,
+        Station upStation,
+        Station downStation,
+        Integer distance
+    ) {
         this.name = name;
         this.color = color;
+        this.upStation = upStation;
+        this.downStation = downStation;
+        this.distance = distance;
+    }
+
+    public SubwayLine() {
+
     }
 
     public Long getId() {
@@ -39,19 +57,23 @@ public class SubwayLine {
         return name;
     }
 
-    public List<Station> stations() {
-        return stations;
-    }
-
     public String getColor() {
         return color;
     }
 
-    public List<Station> getStations() {
-        return stations;
-    }
-
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Station getUpStation() {
+        return upStation;
+    }
+
+    public Station getDownStation() {
+        return downStation;
+    }
+
+    public Integer getDistance() {
+        return distance;
     }
 }

@@ -21,13 +21,17 @@ public class SubwayLineService {
 
     @Transactional
     public SubwayLineResponse saveLine(SubwayLineCreateRequest subwayLineRequest) {
-        SubwayLine line = subwayLineRepository.save(new SubwayLine(subwayLineRequest.getName(), subwayLineRequest.getColor()));
+        Station upStation = stationRepository.findById(subwayLineRequest.getUpStationId()).orElse(null);
+        Station downStation = stationRepository.findById(subwayLineRequest.getDownStationId()).orElse(null);
 
-        List<Station> stations = stationRepository.findAllById(
-            Arrays.asList(subwayLineRequest.getUpStationId(),
-                subwayLineRequest.getDownStationId()));
-        System.out.println(stations);
-        stations.forEach(station -> station.setSubwayLine(line));
+        SubwayLine line = subwayLineRepository.save(
+            new SubwayLine(
+                subwayLineRequest.getName(),
+                subwayLineRequest.getColor(),
+                upStation,
+                downStation,
+                subwayLineRequest.getDistance()
+            ));
 
         return createSubwayLineResponse(line);
     }
@@ -64,11 +68,15 @@ public class SubwayLineService {
     }
 
     private SubwayLineResponse createSubwayLineResponse(SubwayLine line) {
+        final List<StationResponse> stationList = Arrays.stream(
+            new Station[]{line.getUpStation(), line.getDownStation()}).map(StationResponse::new).collect(
+            Collectors.toList());
+
         return new SubwayLineResponse(
             line.getId(),
             line.getName(),
             line.getColor(),
-            line.getStations().stream().map(StationResponse::new).collect(Collectors.toList())
+            stationList
         );
     }
 }
