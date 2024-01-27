@@ -120,10 +120,9 @@ public class SubwayLinesAcceptanceTest {
         deleteSubwayLine(createdLine);
 
         // Then
-        final ExtractableResponse<Response> subwayLineGetResponse = findSubwayLine(
-            createdLine);
-        SubwayLineResponse foundLine = subwayLineGetResponse.as(SubwayLineResponse.class);
-        assertThat(foundLine).isNull();
+        final ExtractableResponse<Response> subwayLinesGetResponse = findSubwayLines();
+        final List<String> subwayLinesNameList = subwayLinesGetResponse.jsonPath().getList("name", String.class);
+        assertThat(subwayLinesNameList).doesNotContain(일호선);
     }
 
     private static void deleteSubwayLine(SubwayLineResponse createdLine) {
