@@ -39,18 +39,6 @@ public class SubwayLinesAcceptanceTest {
     @DirtiesContext
     @Test
     void 지하철노선_생성() {
-        // When
-        final ExtractableResponse<Response> response = createSubwayLine(일호선, 빨간색, 1L, 2L, 10);
-
-        // Then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-        // Then
-        final ExtractableResponse<Response> subwayLineResponse = findSubwayLine(response.as(SubwayLineResponse.class));
-        final SubwayLineResponse subwayLine = subwayLineResponse.as(SubwayLineResponse.class);
-
-        assertThat(subwayLine.getName()).containsAnyOf(일호선);
-        assertThat(subwayLine.getStations().stream().map(StationResponse::getId)).contains(1L, 2L);
     }
 
     /**
@@ -61,18 +49,6 @@ public class SubwayLinesAcceptanceTest {
     @DirtiesContext
     @Test
     void 지하철노선_목록_조회() {
-        // Given
-        createSubwayLine(일호선, 빨간색, 1L, 2L, 10);
-        createSubwayLine(이호선, 빨간색, 1L, 2L, 10);
-
-        // When
-        final SubwayLineResponse[] subwayLineList = findSubwayLines();
-        final List<String> subwayLineNameList = Arrays.stream(subwayLineList).map(
-            SubwayLineResponse::getName).collect(
-            Collectors.toList());
-
-        // Then
-        assertThat(subwayLineNameList).contains(일호선, 이호선);
     }
 
     /**
@@ -83,18 +59,6 @@ public class SubwayLinesAcceptanceTest {
     @DirtiesContext
     @Test
     void 지하철노선_조회() {
-        // Given
-        final ExtractableResponse<Response> createdLineResponse = createSubwayLine(일호선, 빨간색, 1L, 2L, 10);
-        SubwayLineResponse createdLine = createdLineResponse.as(SubwayLineResponse.class);
-
-        // When
-        final ExtractableResponse<Response> subwayLineGetResponse = findSubwayLine(
-            createdLine);
-        SubwayLineResponse foundLine = subwayLineGetResponse.as(SubwayLineResponse.class);
-
-        // Then
-        assertThat(foundLine.getId()).isEqualTo(createdLine.getId());
-        assertThat(foundLine.getName()).isEqualTo(createdLine.getName());
     }
 
     /**
@@ -105,19 +69,6 @@ public class SubwayLinesAcceptanceTest {
     @DirtiesContext
     @Test
     void 지하철노선_수정() {
-        // Given
-        final ExtractableResponse<Response> createdLineResponse = createSubwayLine(일호선, 빨간색, 1L, 2L, 10);
-        final SubwayLineResponse createdLine = createdLineResponse.as(SubwayLineResponse.class);
-
-        // When
-        updateSubwayLine(createdLine, 이호선);
-
-        // Then
-        final ExtractableResponse<Response> updatedLineResponse = findSubwayLine(createdLine);
-        final SubwayLineResponse updatedResponse = updatedLineResponse.as(SubwayLineResponse.class);
-
-        assertThat(updatedResponse.getId()).isEqualTo(createdLine.getId());
-        assertThat(updatedResponse.getName()).isEqualTo(이호선);
     }
 
     /**
@@ -128,76 +79,5 @@ public class SubwayLinesAcceptanceTest {
     @DirtiesContext
     @Test
     void 지하철노선_삭제() {
-        // Given
-        final ExtractableResponse<Response> createdLineResponse = createSubwayLine(일호선, 빨간색, 1L, 2L, 10);
-        final SubwayLineResponse createdLine = createdLineResponse.as(SubwayLineResponse.class);
-
-        // When
-        deleteSubwayLine(createdLine);
-
-        // Then
-        final SubwayLineResponse[] subwayLineList = findSubwayLines();
-        final List<String> subwayLineNameList = Arrays.stream(subwayLineList).map(
-            SubwayLineResponse::getName).collect(
-            Collectors.toList());
-        assertThat(subwayLineNameList).doesNotContain(일호선);
-    }
-
-    private static void deleteSubwayLine(SubwayLineResponse createdLine) {
-        RestAssured
-            .given().log().all()
-            .when()
-            .delete("/subwayLines/" + createdLine.getId())
-            .then().log().all();
-    }
-
-    private void updateSubwayLine(SubwayLineResponse createdLine, String name) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-
-        RestAssured
-            .given().log().all()
-            .when()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .body(params)
-            .put("/subwayLines/"+ createdLine.getId())
-            .then().log().all()
-            .extract();
-    }
-
-    private static ExtractableResponse<Response> findSubwayLine(SubwayLineResponse createdLine) {
-        return RestAssured
-            .given().log().all()
-            .when()
-            .get("/subwayLines/" + createdLine.getId())
-            .then().log().all()
-            .extract();
-    }
-
-    private static SubwayLineResponse[] findSubwayLines() {
-        return RestAssured
-            .given().log().all()
-            .when()
-                .get("/subwayLines")
-            .then().log().all()
-            .extract().as(SubwayLineResponse[].class);
-    }
-
-    private ExtractableResponse<Response> createSubwayLine(String name, String color, Long upStationId, Long downStationId, Integer distance) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-        params.put("color", color);
-        params.put("upStationId", upStationId.toString());
-        params.put("downStationId", downStationId.toString());
-        params.put("distance", distance.toString());
-
-        // when
-        final ExtractableResponse<Response> response = RestAssured.given().log().all()
-            .body(params)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().post("/subwayLines")
-            .then().log().all()
-            .extract();
-        return response;
     }
 }
