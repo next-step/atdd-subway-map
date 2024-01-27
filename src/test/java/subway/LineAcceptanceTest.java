@@ -114,6 +114,7 @@ public class LineAcceptanceTest {
 	 * Then 해당 지하철 노선 정보는 삭제된다
 	 */
 	@DisplayName("지하철 노선을 삭제한다.")
+	@DirtiesContext
 	@Test
 	void deleteLineTest() {
 		// given

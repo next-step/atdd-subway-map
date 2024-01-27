@@ -51,6 +51,11 @@ public class LineService {
 		lineRepository.save(line);
 	}
 
+	@Transactional
+	public void deleteLine(Long id) {
+		lineRepository.deleteById(id);
+	}
+
 	private LineResponse createLineResponse(Line line) {
 		Station upStation = stationRepository.findById(line.getUpStationId())
 				.orElseThrow(IllegalAccessError::new);
