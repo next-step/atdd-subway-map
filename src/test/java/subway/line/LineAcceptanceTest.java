@@ -12,7 +12,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.jdbc.Sql;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -25,14 +25,16 @@ import subway.api.interfaces.dto.LineResponse;
  */
 @DisplayName("지하철 노선도 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class LineAcceptanceTest {
+
 
 	/**
 	 * when 지하철 노선을 생성하면
 	 * then 지하철 노선 목록 조회시 생성한 노선을 찾을 수 있다
 	 */
 	@Test
+	@Sql(scripts = {"/cleanup.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+
 	@DisplayName("지하철노선 생성")
 	void createLine(){
 		// given
@@ -56,6 +58,8 @@ public class LineAcceptanceTest {
 	 * Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
 	 */
 	@Test
+	@Sql(scripts = {"/cleanup.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+
 	@DisplayName("지하철노선 목록 조회")
 	void fetchLines(){
 
@@ -83,6 +87,7 @@ public class LineAcceptanceTest {
 	 * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
 	 */
 	@Test
+	@Sql(scripts = {"/cleanup.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 	@DisplayName("지하철노선 조회")
 	void fetchLine() {
 		// given
@@ -114,6 +119,8 @@ public class LineAcceptanceTest {
 	 * Then 해당 지하철 노선 정보는 수정된다
 	 */
 	@Test
+	@Sql(scripts = {"/cleanup.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+
 	@DisplayName("지하철노선 수정")
 	void updateLine(){
 		// given
@@ -145,6 +152,8 @@ public class LineAcceptanceTest {
 	 * Then 해당 지하철 노선 정보는 삭제된다
 	 */
 	@Test
+	@Sql(scripts = {"/cleanup.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+
 	@DisplayName("지하철노선 삭제")
 	void deleteLine(){
 		// given
