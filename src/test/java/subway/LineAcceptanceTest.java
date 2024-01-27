@@ -2,6 +2,7 @@ package subway;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,11 +24,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {
 
-    private Map<String, String> newBunDangLineParams;
-    private Map<String, String> zeroLineParams;
+    private static Map<String, String> newBunDangLineParams;
+    private static Map<String, String> zeroLineParams;
 
-    @BeforeEach
-    void setUpClass() {
+    @BeforeAll
+    static void setUpClass() {
         newBunDangLineParams = new HashMap<>();
         newBunDangLineParams.put("name", "신분당선");
         newBunDangLineParams.put("color", "bg-red-600");
@@ -172,7 +173,7 @@ public class LineAcceptanceTest {
                 .extract();
     }
 
-    private static ExtractableResponse<Response> callApiFindLine(String location) {
+    private ExtractableResponse<Response> callApiFindLine(String location) {
         return given().log().all()
                 .when().get(location)
                 .then().log().all()
