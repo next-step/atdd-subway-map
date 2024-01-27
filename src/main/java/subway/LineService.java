@@ -10,9 +10,12 @@ import java.util.List;
 public class LineService {
 
     private final LineRepository lineRepository;
+    private final StationRepository stationRepository;
 
-    public LineService(LineRepository lineRepository) {
+    public LineService(LineRepository lineRepository,
+                       StationRepository stationRepository) {
         this.lineRepository = lineRepository;
+        this.stationRepository = stationRepository;
     }
 
     @Transactional
@@ -22,8 +25,14 @@ public class LineService {
     }
 
     private Line createLine(LineRequest lineRequest) {
-        return new Line(lineRequest.getName(), lineRequest.getColor(), lineRequest.getUpStationId(),
-                lineRequest.getDownStationId(), lineRequest.getDistance());
+        return new Line(lineRequest.getName(), lineRequest.getColor(),
+                getStation(lineRequest.getUpStationId()),
+                getStation(lineRequest.getDownStationId()),
+                lineRequest.getDistance());
+    }
+
+    private Station getStation(Long stationId) {
+        return stationRepository.findById(stationId).orElseThrow(() -> new IllegalArgumentException("해당 지하철역 정보를 찾지 못했습니다."));
     }
 
     private LineResponse createLineResponse(Line line) {

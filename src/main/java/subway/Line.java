@@ -21,12 +21,12 @@ public class Line {
 
     public Line(String name,
                 String color,
-                Long upStationId,
-                Long downStationId,
+                Station upStation,
+                Station downStation,
                 Long distance) {
         this.name = name;
         this.color = color;
-        this.stationLink = new StationLink(upStationId, downStationId);
+        this.stationLink = new StationLink(upStation, downStation);
         this.distance = distance;
     }
 

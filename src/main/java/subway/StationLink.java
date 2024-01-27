@@ -13,9 +13,9 @@ public class StationLink {
     public StationLink() {
     }
 
-    public StationLink(Long upStationId, Long downStationId) {
-        this.upStation = new Station(upStationId);
-        this.downStation = new Station(downStationId);
+    public StationLink(Station upStation, Station downStation) {
+        this.upStation = upStation;
+        this.downStation = downStation;
     }
 
     public Station getUpStation() {
