@@ -1,5 +1,7 @@
 package subway;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,5 +31,9 @@ public class LinesService {
                 downStation, linesCreateRequest.getDistance()));
 
         return new LinesResponse(lines);
+    }
+
+    public List<LinesResponse> getLinesList() {
+        return linesRepository.findAll().stream().map(LinesResponse::new).collect(Collectors.toList());
     }
 }

@@ -12,6 +12,10 @@ public class LinesResponse {
     private String color;
     private List<StationResponse> stations = new ArrayList<>();
 
+    public LinesResponse() {
+
+    }
+
     public LinesResponse(Lines lines) {
         this.id = lines.getId();
         this.name = lines.getName();
