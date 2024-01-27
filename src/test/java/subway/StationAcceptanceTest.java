@@ -81,8 +81,8 @@ public class StationAcceptanceTest {
         // given
         Map<String, String> params = new HashMap<>();
         params.put("name", GANGNAM_STATION);
-        final ExtractableResponse<Response> stationResponse = createStationResponse(params);
-        final String location = stationResponse.header("Location");
+        ExtractableResponse<Response> stationResponse = createStationResponse(params);
+        String location = stationResponse.header("Location");
 
         // when
         given().log().all()
