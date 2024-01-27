@@ -112,6 +112,8 @@ public class SubwayLinesAcceptanceTest {
         RestAssured
             .given().log().all()
             .when()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(params)
             .put("/subwayLines/"+ createdLine.getId())
             .then().log().all()
             .extract();
