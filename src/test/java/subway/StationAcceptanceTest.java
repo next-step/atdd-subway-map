@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import util.RestAssuredUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -59,41 +60,20 @@ public class StationAcceptanceTest {
      * When 지하철역 목록을 조회하면
      * Then 2개의 지하철역을 응답 받는다
      */
-    @DisplayName("지하철역을 조회한다.")
+    @DisplayName("지하철역 목록을 조회한다.")
     @Test
     void findAllStation() {
         // given
         Map<String, String> params1 = new HashMap<>();
         params1.put("name", "강남역");
-
-        ExtractableResponse<Response> response1 =
-                RestAssured.given().log().all()
-                        .body(params1)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/stations")
-                        .then().log().all()
-                        .statusCode(HttpStatus.CREATED.value())
-                        .extract();
+        RestAssuredUtil.post(params1, "/stations");
 
         Map<String, String> params2 = new HashMap<>();
         params2.put("name", "신논현역");
-        ExtractableResponse<Response> response2 =
-                RestAssured.given().log().all()
-                        .body(params2)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/stations")
-                        .then().log().all()
-                        .statusCode(HttpStatus.CREATED.value())
-                        .extract();
+        RestAssuredUtil.post(params2, "/stations");
 
         // when
-        List<String> stationNames = RestAssured.given().log().all()
-                .when().get("/stations")
-                .then().log().all()
-                .statusCode(HttpStatus.OK.value())
-                .body("name", hasSize(2))
-                .body("name", contains("강남역", "신논현역"))
-                .extract().jsonPath().getList("name", String.class);
+        List<String> stationNames = RestAssuredUtil.get("/stations").jsonPath().getList("name", String.class);
 
         // then
         assertThat(stationNames).containsAnyOf("강남역", "신논현역");
@@ -111,27 +91,14 @@ public class StationAcceptanceTest {
         // given
         Map<String, String> params = new HashMap<>();
         params.put("name", "강남역");
+        long id = RestAssuredUtil.post(params, "/stations").jsonPath().getLong("id");
 
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .body(params)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/stations")
-                        .then().log().all()
-                        .statusCode(HttpStatus.CREATED.value())
-                        .extract();
         // when
-        RestAssured.given().log().all()
-                .when().delete("/stations/" + response.jsonPath().getLong("id"))
-                .then().log().all()
-                .statusCode(HttpStatus.NO_CONTENT.value())
-                .extract();
+        RestAssuredUtil.delete("/stations/" + id);
+
         // then
-        List<String> stationNames = RestAssured.given().log().all()
-                .when().get("/stations")
-                .then().log().all()
-                .statusCode(HttpStatus.OK.value())
-                .extract().jsonPath().getList("name", String.class);
+        List<String> stationNames
+                = RestAssuredUtil.get("/stations").jsonPath().getList("name", String.class);
 
         assertThat(stationNames).doesNotContain("강남역");
     }
