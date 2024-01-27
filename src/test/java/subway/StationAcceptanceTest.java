@@ -64,9 +64,9 @@ public class StationAcceptanceTest {
      * When 지하철역 목록을 조회하면
      * Then 2개의 지하철역을 응답 받는다
      */
-    @DisplayName("2개의 지하철역을 생성하고 지하철역 목록을 조회해서 2개의 지하철역을 응답 받는다.")
+    @DisplayName("지하철역을 생성하고 생성한 지하철역 목록을 조회한다.")
     @Test
-    void findTwoStationsTest() {
+    void findStationsTest() {
         //given
         Map<String, String> params = new HashMap<>();
         params.put("name", "강남역");
@@ -115,6 +115,47 @@ public class StationAcceptanceTest {
      * When 그 지하철역을 삭제하면
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
-    // TODO: 지하철역 제거 인수 테스트 메서드 생성
+    @DisplayName("지하철역을 삭제한다.")
+    @Test
+    void deleteStationTest() {
+        //given
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "강남역");
 
+        ExtractableResponse<Response> createResponse = RestAssured
+                .given().log().all()
+                    .port(port)
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                    .body(params)
+                .when()
+                    .post("/stations")
+                .then().log().all()
+                .extract();
+
+        int deleteId = createResponse.body().jsonPath().getInt("id");
+
+        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        //when
+        ExtractableResponse<Response> deleteResponse = RestAssured
+                .given().log().all()
+                    .port(port)
+                .when()
+                    .delete("/stations/" + deleteId)
+                .then().log().all()
+                .extract();
+
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        //then
+        List<String> stationList = RestAssured
+                .given().log().all()
+                    .port(port)
+                .when()
+                    .get("/stations")
+                .then().log().all()
+                .extract().jsonPath().getList("name", String.class);
+
+        assertThat(stationList).isNotIn("강남역");
+    }
 }
