@@ -7,6 +7,7 @@ import subway.line.repository.LineRepository;
 import subway.line.repository.domain.Line;
 import subway.line.service.dto.LineCreateRequest;
 import subway.line.service.dto.LineResponse;
+import subway.line.service.dto.LineUpdateRequest;
 import subway.station.exception.StationNotExistException;
 import subway.station.repository.StationRepository;
 import subway.station.repository.domain.Station;
@@ -54,5 +55,13 @@ public class LineService {
     public LineResponse findLineById(final Long id) {
         final Line line = lineRepository.findByIdWithStation(id).orElseThrow(() -> new LineNotExistException(id));
         return LineResponse.from(line);
+    }
+
+    @Transactional
+    public void updateLine(final Long id, final LineUpdateRequest updateRequest) {
+        updateRequest.validate();
+        final Line line = lineRepository.findById(id).orElseThrow(() -> new LineNotExistException(id));
+        line.changeName(updateRequest.getName());
+        line.changeColor(updateRequest.getColor());
     }
 }

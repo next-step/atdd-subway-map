@@ -191,7 +191,7 @@ then().
     - [x] 응답 객체로 변환해 반환한다.
 
 
-- [ ] 지하철 노선 수정 - "Put /lines/{id}"
+- [x] 지하철 노선 수정 - "PUT /lines/{id}"
   > Given 지하철 노선을 생성하고<br>
   When 생성한 지하철 노선을 수정하면<br>
   Then 해당 지하철 노선 정보는 수정된다
@@ -202,10 +202,13 @@ then().
       "color" : "bg-red-600"
     }
     ```
-    - [ ] "/lines/{id}" 로 put 요청을 보낸다.
-    - [ ] 해당 id를 가진 Line 정보를 조회한다.
-      - [ ] 해당 id를 가진 Line 이 없으면 Exception 을 던진다.
-    - [ ] 요청 객체를 바탕으로 객체를 수정한다.
+    - [x] "/lines/{id}" 로 put 요청을 보낸다.
+    - [x] 요청 data validation
+      - [x] name 이 없다면 Exception 을 던진다.
+      - [x] color 가 없다면 Exception 을 던진다.
+    - [x] 해당 id를 가진 Line 정보를 조회한다.
+      - [x] 해당 id를 가진 Line 이 없으면 Exception 을 던진다.
+    - [x] 요청 객체를 바탕으로 객체를 수정한다.
 
 
 - [ ] 지하철 노선 삭제
