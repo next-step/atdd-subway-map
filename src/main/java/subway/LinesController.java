@@ -4,6 +4,7 @@ package subway;
 import java.net.URI;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -41,5 +42,12 @@ public class LinesController {
         linesService.updateLines(id, linesUpdateRequest);
 
         return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/lines/{id}")
+    public ResponseEntity<Void> deleteLines(@PathVariable Long id) {
+        linesService.deleteLines(id);
+
+        return ResponseEntity.noContent().build();
     }
 }

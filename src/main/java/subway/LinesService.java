@@ -47,13 +47,19 @@ public class LinesService {
         return new LinesResponse(lines);
     }
 
+    @Transactional
     public void updateLines(Long id, LinesUpdateRequest linesUpdateRequest) {
         final Lines lines = linesRepository.findById(id).orElse(null);
-        if(lines== null) {
+        if(lines == null) {
             throw new EntityNotFoundException();
         }
 
         lines.setName(linesUpdateRequest.getName());
         lines.setColor(linesUpdateRequest.getColor());
+    }
+
+    @Transactional
+    public void deleteLines(Long id) {
+        linesRepository.deleteById(id);
     }
 }
