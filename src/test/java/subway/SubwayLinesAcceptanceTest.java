@@ -105,6 +105,35 @@ public class SubwayLinesAcceptanceTest {
         assertThat(updatedResponse.getName()).isEqualTo(이호선);
     }
 
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 삭제하면
+     * Then 해당 지하철 노선 정보는 삭제된다
+     */
+    @Test
+    void 지하철노선_삭제() {
+        // Given
+        final ExtractableResponse<Response> createdLineResponse = createSubwayLine(일호선);
+        final SubwayLineResponse createdLine = createdLineResponse.as(SubwayLineResponse.class);
+
+        // When
+        deleteSubwayLine(createdLine);
+
+        // Then
+        final ExtractableResponse<Response> subwayLineGetResponse = findSubwayLine(
+            createdLine);
+        SubwayLineResponse foundLine = subwayLineGetResponse.as(SubwayLineResponse.class);
+        assertThat(foundLine).isNull();
+    }
+
+    private static void deleteSubwayLine(SubwayLineResponse createdLine) {
+        RestAssured
+            .given().log().all()
+            .when()
+            .delete("/subwayLines/" + createdLine.getId())
+            .then().log().all();
+    }
+
     private void updateSubwayLine(SubwayLineResponse createdLine, String name) {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
