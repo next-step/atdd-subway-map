@@ -1,17 +1,12 @@
 package subway;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.InstanceOfAssertFactories.ARRAY;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -33,6 +28,7 @@ public class SubwayLinesAcceptanceTest {
     private String 이호선 = "이호선";
 
     private String 빨간색 = "bg-red-600";
+    private String 파란색 = "bg-blue-600";
 
     /**
      * When 지하철 노선을 생성하면
@@ -56,19 +52,10 @@ public class SubwayLinesAcceptanceTest {
             .filter(current -> Objects.equals(current.getId(), createdLines.getId()))
             .findFirst().orElse(null);
 
-        assertThat(foundLines).isNotNull();
-        assertThat(foundLines.getName()).isEqualTo(createdLines.getName());
-        assertThat(foundLines.getColor()).isEqualTo(createdLines.getColor());
-
-        // Then
-        final List<Long> foundStationIdList = foundLines
-            .getStations().stream().map(StationResponse::getId)
-            .collect(Collectors.toList());
-        final List<Long> createdStationIdList = createdLines
-            .getStations().stream().map(StationResponse::getId)
-            .collect(Collectors.toList());
-        assertThat(foundStationIdList).containsAll(createdStationIdList);
+        compareLinesResponse(foundLines, createdLines);
     }
+
+
 
 
     /**
@@ -107,12 +94,8 @@ public class SubwayLinesAcceptanceTest {
         LinesResponse createdLines = createResponse.as(LinesResponse.class);
 
         // When
-        final ExtractableResponse<Response> getResponse = RestAssured
-            .given().log().all()
-            .when()
-            .get("/lines/" + createdLines.getId())
-            .then().log().all()
-            .extract();
+        final ExtractableResponse<Response> getResponse = getLines(
+            createdLines.getId());
 
         // Then
         assertThat(getResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -132,6 +115,8 @@ public class SubwayLinesAcceptanceTest {
         assertThat(foundStationIdList).containsAll(createdStationIdList);
     }
 
+
+
     /**
      * Given 지하철 노선을 생성하고
      * When 생성한 지하철 노선을 수정하면
@@ -140,7 +125,24 @@ public class SubwayLinesAcceptanceTest {
     @DirtiesContext
     @Test
     void 지하철노선_수정() {
+        // Given
+        final ExtractableResponse<Response> createResponse = createLines(일호선, 빨간색, 1L, 2L, 10L);
+        LinesResponse createdLines = createResponse.as(LinesResponse.class);
+        
+        // When
+        final ExtractableResponse<Response> updateResponse = updateLines(createdLines.getId(), 이호선, 파란색);
+
+        // Then
+        assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+            
+        // Then
+        final ExtractableResponse<Response> getLinesResponse = getLines(createdLines.getId());
+        final LinesResponse foundLines = getLinesResponse.as(LinesResponse.class);
+        
+        compareLinesResponse(foundLines, createdLines);
     }
+
+
 
     /**
      * Given 지하철 노선을 생성하고
@@ -177,5 +179,45 @@ public class SubwayLinesAcceptanceTest {
             .post("/lines")
             .then().log().all()
             .extract();
+    }
+
+    private static ExtractableResponse<Response> getLines(
+        Long id) {
+        return RestAssured
+            .given().log().all()
+            .when()
+            .get("/lines/" + id)
+            .then().log().all()
+            .extract();
+    }
+
+    private ExtractableResponse<Response> updateLines(Long id, String name, String color) {
+        final Map<String, String> params = new HashMap<>();
+        params.put("name", name);
+        params.put("color", color);
+
+        return RestAssured
+            .given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(params)
+            .when()
+            .put("/lines/" + id)
+            .then().log().all()
+            .extract();
+    }
+
+    private static void compareLinesResponse(LinesResponse foundLines, LinesResponse createdLines) {
+        assertThat(foundLines).isNotNull();
+        assertThat(foundLines.getName()).isEqualTo(createdLines.getName());
+        assertThat(foundLines.getColor()).isEqualTo(createdLines.getColor());
+
+        // Then
+        final List<Long> foundStationIdList = foundLines
+            .getStations().stream().map(StationResponse::getId)
+            .collect(Collectors.toList());
+        final List<Long> createdStationIdList = createdLines
+            .getStations().stream().map(StationResponse::getId)
+            .collect(Collectors.toList());
+        assertThat(foundStationIdList).containsAll(createdStationIdList);
     }
 }
