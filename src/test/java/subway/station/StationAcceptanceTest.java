@@ -1,23 +1,24 @@
-package subway;
+package subway.station;
 
+import annotation.TestIsolation;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+import subway.util.JsonPathUtil;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import static  io.restassured.RestAssured.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
+@TestIsolation
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationAcceptanceTest {
+
+    private StationApiRequester stationApiRequester = new StationApiRequester();
 
     /**
      * When 지하철역을 생성하면
@@ -31,13 +32,13 @@ public class StationAcceptanceTest {
         String stationName = "강남역";
 
         // when
-        ExtractableResponse<Response> response = createStationsApiCall(stationName);
+        ExtractableResponse<Response> response = stationApiRequester.createStationApiCall(stationName);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames = showStationsApiCall().jsonPath().getList("name", String.class);
+        List<String> stationNames = JsonPathUtil.getNames(stationApiRequester.showStationsApiCall());
         assertThat(stationNames).containsAnyOf(stationName);
     }
 
@@ -51,17 +52,16 @@ public class StationAcceptanceTest {
     void showStations() {
         //given
         String stationNameA = "성수역";
-        createStationsApiCall(stationNameA);
+        stationApiRequester.createStationApiCall(stationNameA);
         String stationNameB = "잠실역";
-        createStationsApiCall(stationNameB);
+        stationApiRequester.createStationApiCall(stationNameB);
 
         //when
-        ExtractableResponse<Response> response = showStationsApiCall();
+        ExtractableResponse<Response> response = stationApiRequester.showStationsApiCall();
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.jsonPath().getList("name", String.class))
-                .containsExactly(stationNameA, stationNameB);
+        assertThat(JsonPathUtil.getNames(response)).containsExactly(stationNameA, stationNameB);
     }
 
     /**
@@ -74,36 +74,13 @@ public class StationAcceptanceTest {
     void deleteStation() {
         //given
         String stationName = "언주역";
-        createStationsApiCall(stationName);
+        Long id = JsonPathUtil.getId(stationApiRequester.createStationApiCall(stationName));
 
         //when
-        ExtractableResponse<Response> response = given().log().all()
-                .pathParam("id", 1L)
-                .when().delete("/stations/{id}")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = stationApiRequester.deleteStationApiCall(id);
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-        List<String> stationsNames = showStationsApiCall().jsonPath().getList("name", String.class);
+        List<String> stationsNames = JsonPathUtil.getNames(stationApiRequester.showStationsApiCall());
         assertThat(stationsNames).isEmpty();
-    }
-
-    private ExtractableResponse<Response> createStationsApiCall(String name) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-
-        return given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> showStationsApiCall() {
-        return given().log().all()
-                .when().get("/stations")
-                .then().log().all()
-                .extract();
     }
 }
