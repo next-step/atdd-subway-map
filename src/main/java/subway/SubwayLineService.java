@@ -27,10 +27,20 @@ public class SubwayLineService {
             Collectors.toList());
     }
 
+    public SubwayLineResponse findLine(Long id) {
+        final SubwayLine line = subwayLineRepository.findById(id).orElse(null);
+        if(line == null) {
+            return null;
+        }
+
+        return createSubwayLineResponse(line);
+    }
+
     private SubwayLineResponse createSubwayLineResponse(SubwayLine line) {
         return new SubwayLineResponse(
             line.getId(),
             line.getName()
         );
     }
+
 }
