@@ -39,6 +39,42 @@ public class SubwayLinesAcceptanceTest {
     @DirtiesContext
     @Test
     void 지하철노선_생성() {
+        // When
+        Map<String, String> params = new HashMap<>();
+        params.put("name", 일호선);
+        params.put("color", 빨간색);
+        params.put("upStationId", "1");
+        params.put("downStationId", "2");
+        params.put("distance", "10");
+
+        final ExtractableResponse<Response> createResponse = RestAssured
+            .given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(params)
+            .when()
+            .post("/lines")
+            .then().log().all()
+            .extract();
+
+        // Then
+        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        // Then
+        final ExtractableResponse<Response> listResponse = RestAssured
+            .given().log().all()
+            .when()
+            .get("/lines")
+            .then().log().all()
+            .extract();
+        final List<LinesResponse> linesList = listResponse.jsonPath().getList(".", LinesResponse.class);
+        final LinesResponse foundLines = linesList.stream().filter(
+            current -> current.getId() == createResponse.jsonPath().get("id")
+        ).findFirst().orElse(null);
+
+        assertThat(foundLines).isNotNull();
+        assertThat(foundLines.getName()).isEqualTo(일호선);
+        assertThat(foundLines.getColor()).isEqualTo(빨간색);
+        assertThat(foundLines.getStations().stream().map(StationResponse::getId)).contains(1L, 2L);
     }
 
     /**
