@@ -6,6 +6,10 @@ import static org.assertj.core.api.InstanceOfAssertFactories.ARRAY;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import java.util.Arrays;
+import java.util.stream.Collectors;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,13 +21,16 @@ import org.springframework.test.annotation.DirtiesContext;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
+import org.springframework.test.context.jdbc.Sql;
 
 @DirtiesContext
 @DisplayName("지하철 노선 기능")
 @SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
 public class SubwayLinesAcceptanceTest {
-    String 일호선 = "일호선";
-    String 이호선 = "이호선";
+    private String 일호선 = "일호선";
+    private String 이호선 = "이호선";
+
+    private String 빨간색 = "bg-red-600";
 
     /**
      * When 지하철 노선을 생성하면
@@ -32,14 +39,17 @@ public class SubwayLinesAcceptanceTest {
     @Test
     void createSubwayLineTest() {
         // When
-        final ExtractableResponse<Response> response = createSubwayLine(일호선);
+        final ExtractableResponse<Response> response = createSubwayLine(일호선, 빨간색, 1L, 2L, 10);
 
         // Then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // Then
-        final List<String> subwayLinesNameList = findSubwayLines();
-        assertThat(subwayLinesNameList).containsAnyOf(일호선);
+        final SubwayLineResponse[] subwayLineList = findSubwayLines();
+        final List<String> subwayLineNameList = Arrays.stream(subwayLineList).map(
+            SubwayLineResponse::getName).collect(
+            Collectors.toList());
+        assertThat(subwayLineNameList).containsAnyOf(일호선);
     }
 
     /**
@@ -50,14 +60,17 @@ public class SubwayLinesAcceptanceTest {
     @Test
     void 지하철노선_목록_조회() {
         // Given
-        createSubwayLine(일호선);
-        createSubwayLine(이호선);
+        createSubwayLine(일호선, 빨간색, 1L, 2L, 10);
+        createSubwayLine(이호선, 빨간색, 1L, 2L, 10);
 
         // When
-        final List<String> subwayLinesNameList = findSubwayLines();
+        final SubwayLineResponse[] subwayLineList = findSubwayLines();
+        final List<String> subwayLineNameList = Arrays.stream(subwayLineList).map(
+            SubwayLineResponse::getName).collect(
+            Collectors.toList());
 
         // Then
-        assertThat(subwayLinesNameList).contains(일호선, 이호선);
+        assertThat(subwayLineNameList).contains(일호선, 이호선);
     }
 
     /**
@@ -68,7 +81,7 @@ public class SubwayLinesAcceptanceTest {
     @Test
     void 지하철노선_조회() {
         // Given
-        final ExtractableResponse<Response> createdLineResponse = createSubwayLine(일호선);
+        final ExtractableResponse<Response> createdLineResponse = createSubwayLine(일호선, 빨간색, 1L, 2L, 10);
         SubwayLineResponse createdLine = createdLineResponse.as(SubwayLineResponse.class);
 
         // When
@@ -89,7 +102,7 @@ public class SubwayLinesAcceptanceTest {
     @Test
     void 지하철노선_수정() {
         // Given
-        final ExtractableResponse<Response> createdLineResponse = createSubwayLine(일호선);
+        final ExtractableResponse<Response> createdLineResponse = createSubwayLine(일호선, 빨간색, 1L, 2L, 10);
         final SubwayLineResponse createdLine = createdLineResponse.as(SubwayLineResponse.class);
 
         // When
@@ -111,15 +124,18 @@ public class SubwayLinesAcceptanceTest {
     @Test
     void 지하철노선_삭제() {
         // Given
-        final ExtractableResponse<Response> createdLineResponse = createSubwayLine(일호선);
+        final ExtractableResponse<Response> createdLineResponse = createSubwayLine(일호선, 빨간색, 1L, 2L, 10);
         final SubwayLineResponse createdLine = createdLineResponse.as(SubwayLineResponse.class);
 
         // When
         deleteSubwayLine(createdLine);
 
         // Then
-        final List<String> subwayLinesNameList = findSubwayLines();
-        assertThat(subwayLinesNameList).doesNotContain(일호선);
+        final SubwayLineResponse[] subwayLineList = findSubwayLines();
+        final List<String> subwayLineNameList = Arrays.stream(subwayLineList).map(
+            SubwayLineResponse::getName).collect(
+            Collectors.toList());
+        assertThat(subwayLineNameList).doesNotContain(일호선);
     }
 
     private static void deleteSubwayLine(SubwayLineResponse createdLine) {
@@ -153,18 +169,22 @@ public class SubwayLinesAcceptanceTest {
             .extract();
     }
 
-    private static List<String> findSubwayLines() {
+    private static SubwayLineResponse[] findSubwayLines() {
         return RestAssured
             .given().log().all()
             .when()
                 .get("/subwayLines")
             .then().log().all()
-            .extract().jsonPath().getList("name", String.class);
+            .extract().as(SubwayLineResponse[].class);
     }
 
-    private ExtractableResponse<Response> createSubwayLine(String name) {
+    private ExtractableResponse<Response> createSubwayLine(String name, String color, Long upStationId, Long downStationId, Integer distance) {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
+        params.put("color", color);
+        params.put("upStationId", upStationId.toString());
+        params.put("downStationId", downStationId.toString());
+        params.put("distance", distance.toString());
 
         // when
         final ExtractableResponse<Response> response = RestAssured.given().log().all()
