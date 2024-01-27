@@ -219,7 +219,5 @@ then().
   - [x] 해당 id 를 가진 노선정보를 삭제한다.
 
 
-- [ ] 인수 테스트 격리
-  - @DirtiesContext
-  - @Sql
-  - Table Truncate
+- [x] 인수 테스트 격리
+  - EntityManager 이용
