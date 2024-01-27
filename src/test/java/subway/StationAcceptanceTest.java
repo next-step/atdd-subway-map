@@ -97,7 +97,7 @@ public class StationAcceptanceTest {
         assertThat(actual).containsAll(expected);
     }
 
-    private static ExtractableResponse<Response> createStationResponse(Map<String, String> params) {
+    private ExtractableResponse<Response> createStationResponse(Map<String, String> params) {
         return given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -106,7 +106,7 @@ public class StationAcceptanceTest {
                 .extract();
     }
 
-    private static List<String> findStationNames() {
+    private List<String> findStationNames() {
         return given().log().all()
                 .when().get("/stations")
                 .then().log().all()
