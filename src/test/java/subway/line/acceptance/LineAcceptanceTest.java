@@ -150,6 +150,7 @@ public class LineAcceptanceTest {
     void deleteLineByIdTest() {
         // given
         final ExtractableResponse<Response> 신분당선_response = requestCreateLine("신분당선", "bg-red-600", 지하철역_Id, 새로운지하철역_Id, 10);
+        final ExtractableResponse<Response> 분당선_response = requestCreateLine("분당선", "bg-green-600", 지하철역_Id, 또다른지하철역_Id, 10);
         final Long 신분당선_id = RestAssuredHelper.getIdFrom(신분당선_response);
 
         // when
@@ -162,7 +163,7 @@ public class LineAcceptanceTest {
                     .get(LINE_API_PATH)
                     .jsonPath()
                     .getList("id", Long.class);
-            softly.assertThat(lineIds).doesNotContain(신분당선_id);
+            softly.assertThat(lineIds).containsExactly(RestAssuredHelper.getIdFrom(분당선_response));
         });
     }
 
