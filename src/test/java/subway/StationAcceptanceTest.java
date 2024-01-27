@@ -1,13 +1,12 @@
 package subway;
 
 import io.restassured.RestAssured;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
@@ -18,8 +17,11 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class StationAcceptanceTest {
+
+    @LocalServerPort
+    private int port;
 
     /**
      * When 지하철역을 생성하면
@@ -33,24 +35,23 @@ public class StationAcceptanceTest {
         Map<String, String> params = new HashMap<>();
         params.put("name", "강남역");
 
-        ExtractableResponse<Response> response = RestAssured
+        final var response = RestAssured
             .given().log().all()
             .body(params)
+            .port(port)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .when().post("/stations")
             .then().log().all()
             .extract();
 
+        final var stationNames = getStations().stream()
+            .map(StationResponse::getName)
+            .collect(Collectors.toList());
+
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames = RestAssured
-            .given().log().all()
-            .when().get("/stations")
-            .then().log().all()
-            .extract().jsonPath().getList("name", String.class);
-
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
@@ -71,21 +72,21 @@ public class StationAcceptanceTest {
         // when
         final var response = RestAssured
             .given().log().all()
+            .port(port)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .when().get("/stations")
             .then().log().all()
             .extract();
 
+        final var stationIds = response.jsonPath().getList("id", Long.class);
+
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         // then
-        assertThat(response.jsonPath().getList("id", Long.class))
-            .containsAll(
-                createdStations.stream()
-                    .map(StationResponse::getId)
-                    .collect(Collectors.toList())
-            );
+        createdStations.forEach(
+            createdStation -> assertThat(createdStation.getId()).isIn(stationIds)
+        );
     }
 
     /**
@@ -100,28 +101,31 @@ public class StationAcceptanceTest {
         final var deletedStation = this.createStation("삼성역");
 
         // when
-        RestAssured
+        final var response = RestAssured
             .given().log().all()
+            .port(port)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .when().delete("/stations/{id}", deletedStation.getId())
             .then().log().all()
             .extract();
 
-        final var responseStations = getStations();
+        final var remainingStationIds = getStations().stream()
+            .map(StationResponse::getId)
+            .collect(Collectors.toList());
 
         // then
-        assertThat(responseStations.stream()
-            .filter(responseStation -> deletedStation.getId().equals(responseStation.getId()))
-            .findAny()
-            .isEmpty()
-        ).isTrue();
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        // then
+        assertThat(deletedStation.getId()).isNotIn(remainingStationIds);
     }
 
     private StationResponse createStation(final String stationName) {
         return RestAssured
             .given()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
             .body(Map.of("name", stationName))
+            .port(port)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
             .when().post("/stations")
             .then().extract().as(StationResponse.class);
     }
@@ -130,6 +134,7 @@ public class StationAcceptanceTest {
         return Arrays.asList(
             RestAssured
                 .given()
+                .port(port)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().get("/stations")
                 .then().extract().as(StationResponse[].class)
