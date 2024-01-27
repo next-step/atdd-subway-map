@@ -7,7 +7,9 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -60,6 +62,7 @@ public class SubwayLinesAcceptanceTest {
         assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // Then
+        final LinesResponse createdLines = createResponse.as(LinesResponse.class);
         final ExtractableResponse<Response> listResponse = RestAssured
             .given().log().all()
             .when()
@@ -67,14 +70,23 @@ public class SubwayLinesAcceptanceTest {
             .then().log().all()
             .extract();
         final List<LinesResponse> linesList = listResponse.jsonPath().getList(".", LinesResponse.class);
-        final LinesResponse foundLines = linesList.stream().filter(
-            current -> current.getId() == createResponse.jsonPath().get("id")
-        ).findFirst().orElse(null);
+        final LinesResponse foundLines = linesList
+            .stream()
+            .filter(current -> Objects.equals(current.getId(), createdLines.getId()))
+            .findFirst().orElse(null);
 
         assertThat(foundLines).isNotNull();
-        assertThat(foundLines.getName()).isEqualTo(일호선);
-        assertThat(foundLines.getColor()).isEqualTo(빨간색);
-        assertThat(foundLines.getStations().stream().map(StationResponse::getId)).contains(1L, 2L);
+        assertThat(foundLines.getName()).isEqualTo(createdLines.getName());
+        assertThat(foundLines.getColor()).isEqualTo(createdLines.getColor());
+
+        // Then
+        final List<Long> foundStationIdList = foundLines
+            .getStations().stream().map(StationResponse::getId)
+            .collect(Collectors.toList());
+        final List<Long> createdStationIdList = createdLines
+            .getStations().stream().map(StationResponse::getId)
+            .collect(Collectors.toList());
+        assertThat(foundStationIdList).containsAll(createdStationIdList);
     }
 
     /**
