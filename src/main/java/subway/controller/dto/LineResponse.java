@@ -1,4 +1,6 @@
-package subway;
+package subway.controller.dto;
+
+import subway.domain.Line;
 
 import java.util.List;
 

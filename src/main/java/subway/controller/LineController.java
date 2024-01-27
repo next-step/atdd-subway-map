@@ -1,4 +1,4 @@
-package subway;
+package subway.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -10,6 +10,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import subway.controller.dto.LineCreateRequest;
+import subway.controller.dto.LineResponse;
+import subway.service.LineService;
+import subway.controller.dto.LineUpdateRequest;
 
 import java.util.List;
 

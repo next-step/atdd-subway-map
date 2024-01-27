@@ -1,4 +1,4 @@
-package subway;
+package subway.controller.dto;
 
 /** 지하철 노선 생성 요청 데이터 */
 public class LineCreateRequest {
