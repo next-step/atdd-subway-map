@@ -1,7 +1,7 @@
 package subway.line.service.dto;
 
 import org.springframework.util.StringUtils;
-import subway.line.exception.CreateRequestNotValidException;
+import subway.line.exception.UpdateRequestNotValidException;
 
 public class LineUpdateRequest {
     private String name;
@@ -24,10 +24,10 @@ public class LineUpdateRequest {
 
     public void validate() {
         if(!StringUtils.hasLength(name)) {
-            throw new CreateRequestNotValidException("name can not be empty");
+            throw new UpdateRequestNotValidException("name can not be empty");
         }
         if(!StringUtils.hasLength(color)) {
-            throw new CreateRequestNotValidException("color can not be empty");
+            throw new UpdateRequestNotValidException("color can not be empty");
         }
     }
 }

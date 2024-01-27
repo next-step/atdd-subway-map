@@ -2,10 +2,10 @@ package subway.line.service.dto;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import subway.line.exception.CreateRequestNotValidException;
+import subway.line.exception.UpdateRequestNotValidException;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 class LineUpdateRequestTest {
 
@@ -19,19 +19,19 @@ class LineUpdateRequestTest {
     }
 
     @Test
-    @DisplayName("생성된 LineUpdateRequest 의 name 필드가 empty 면 CreateRequestNotValidException 이 던져진다.")
+    @DisplayName("생성된 LineUpdateRequest 의 name 필드가 empty 면 UpdateRequestNotValidException 이 던져진다.")
     void lineUpdateRequestNameIsEmptyTest() {
         final LineUpdateRequest LineUpdateRequest = new LineUpdateRequest("", "color");
 
-        assertThatThrownBy(LineUpdateRequest::validate).isInstanceOf(CreateRequestNotValidException.class);
+        assertThatThrownBy(LineUpdateRequest::validate).isInstanceOf(UpdateRequestNotValidException.class);
     }
 
     @Test
-    @DisplayName("생성된 LineUpdateRequest 의 color 필드가 empty 면 CreateRequestNotValidException 이 던져진다.")
+    @DisplayName("생성된 LineUpdateRequest 의 color 필드가 empty 면 UpdateRequestNotValidException 이 던져진다.")
     void lineUpdateRequestColorIsEmptyTest() {
         final LineUpdateRequest LineUpdateRequest = new LineUpdateRequest("name", "");
 
-        assertThatThrownBy(LineUpdateRequest::validate).isInstanceOf(CreateRequestNotValidException.class);
+        assertThatThrownBy(LineUpdateRequest::validate).isInstanceOf(UpdateRequestNotValidException.class);
     }
     
 }
