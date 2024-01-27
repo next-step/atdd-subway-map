@@ -20,6 +20,7 @@ import subway.api.interfaces.dto.LineCreateRequest;
 import subway.api.interfaces.dto.LineResponse;
 
 /**
+ * todo -> truncate 방식에 대한 자동화 필요 (.sql에서 읽어오지 않고 table을 찾아서 삭제하는 방식 고민)
  * @author : Rene Choi
  * @since : 2024/01/27
  */
