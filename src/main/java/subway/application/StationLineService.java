@@ -2,12 +2,12 @@ package subway.application;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import subway.dto.StationResponse;
+import subway.dto.StationLineRequest;
+import subway.dto.StationLineResponse;
 import subway.entity.StationLine;
 import subway.entity.StationLineRepository;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,17 +21,32 @@ public class StationLineService {
     }
 
     @Transactional
-    public StationLine saveStationLine(Map<String, String> stationLineMap) {
-        return stationLineRepository.save(
-                new StationLine(
-                        stationLineMap.get("name"),
-                        stationLineMap.get("color"),
-                        (long) Integer.parseInt(stationLineMap.get("upStationId")),
-                        (long) Integer.parseInt(stationLineMap.get("downStationId")),
-                        (long) Integer.parseInt(stationLineMap.get("distance"))));
+    public StationLineResponse saveStationLine(StationLineRequest request) {
+        return convertToResponse(stationLineRepository.save(convertToEntity(request)));
     }
 
-    public List<StationLine> findAllStationLines() {
-        return stationLineRepository.findAll();
+    public List<StationLineResponse> findAllStationLines() {
+        return stationLineRepository.findAll().stream()
+                .map(this::convertToResponse)
+                .collect(Collectors.toList());
+    }
+
+    private StationLine convertToEntity(StationLineRequest request) {
+        return new StationLine(
+                request.getName(),
+                request.getColor(),
+                request.getUpStationId(),
+                request.getDownStationId(),
+                request.getDownStationId());
+    }
+
+    private StationLineResponse convertToResponse(StationLine stationLine) {
+        return new StationLineResponse(
+                stationLine.getId(),
+                stationLine.getName(),
+                stationLine.getColor(),
+                stationLine.getUpStationId(),
+                stationLine.getDownStationId(),
+                stationLine.getDownStationId());
     }
 }
