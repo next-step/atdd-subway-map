@@ -91,7 +91,7 @@ public class SubwayLinesAcceptanceTest {
     void 지하철노선_조회() {
         // Given
         final ExtractableResponse<Response> createResponse = createLines(일호선, 빨간색, 1L, 2L, 10L);
-        LinesResponse createdLines = createResponse.as(LinesResponse.class);
+        final LinesResponse createdLines = createResponse.as(LinesResponse.class);
 
         // When
         final ExtractableResponse<Response> getResponse = getLines(
@@ -101,18 +101,8 @@ public class SubwayLinesAcceptanceTest {
         assertThat(getResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         // Then
-        LinesResponse foundLines = createResponse.as(LinesResponse.class);
-        assertThat(foundLines.getId()).isEqualTo(createdLines.getId());
-        assertThat(foundLines.getName()).isEqualTo(createdLines.getName());
-        assertThat(foundLines.getColor()).isEqualTo(createdLines.getColor());
-
-        final List<Long> foundStationIdList = foundLines
-            .getStations().stream().map(StationResponse::getId)
-            .collect(Collectors.toList());
-        final List<Long> createdStationIdList = createdLines
-            .getStations().stream().map(StationResponse::getId)
-            .collect(Collectors.toList());
-        assertThat(foundStationIdList).containsAll(createdStationIdList);
+        final LinesResponse foundLines = createResponse.as(LinesResponse.class);
+        compareLinesResponse(foundLines, createdLines);
     }
 
 
@@ -127,7 +117,7 @@ public class SubwayLinesAcceptanceTest {
     void 지하철노선_수정() {
         // Given
         final ExtractableResponse<Response> createResponse = createLines(일호선, 빨간색, 1L, 2L, 10L);
-        LinesResponse createdLines = createResponse.as(LinesResponse.class);
+        final LinesResponse createdLines = createResponse.as(LinesResponse.class);
         
         // When
         final ExtractableResponse<Response> updateResponse = updateLines(createdLines.getId(), 이호선, 파란색);
