@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.DisplayName;
@@ -45,18 +46,15 @@ public class SubwayLinesAcceptanceTest {
 
         // Then
         final LinesResponse createdLines = createResponse.as(LinesResponse.class);
-        final ExtractableResponse<Response> listResponse = getLinesList();
-        final List<LinesResponse> linesList = listResponse.jsonPath().getList(".", LinesResponse.class);
-        final LinesResponse foundLines = linesList
-            .stream()
+        final LinesResponse[] linesList = getLinesList().as(LinesResponse[].class);
+
+        final LinesResponse foundLines = Arrays.stream(linesList)
             .filter(current -> Objects.equals(current.getId(), createdLines.getId()))
             .findFirst().orElse(null);
 
-        compareLinesResponse(foundLines, createdLines);
+        assertThat(foundLines).isNotNull();
+        isSameLines(foundLines, createdLines);
     }
-
-
-
 
     /**
      * Given 2개의 지하철 노선을 생성하고
@@ -90,8 +88,7 @@ public class SubwayLinesAcceptanceTest {
     @Test
     void 지하철노선_조회() {
         // Given
-        final ExtractableResponse<Response> createResponse = createLines(일호선, 빨간색, 1L, 2L, 10L);
-        final LinesResponse createdLines = createResponse.as(LinesResponse.class);
+        final LinesResponse createdLines = createLines(일호선, 빨간색, 1L, 2L, 10L).as(LinesResponse.class);
 
         // When
         final ExtractableResponse<Response> getResponse = getLines(
@@ -101,11 +98,9 @@ public class SubwayLinesAcceptanceTest {
         assertThat(getResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         // Then
-        final LinesResponse foundLines = createResponse.as(LinesResponse.class);
-        compareLinesResponse(foundLines, createdLines);
+        final LinesResponse foundLines = getResponse.as(LinesResponse.class);
+        isSameLines(foundLines, createdLines);
     }
-
-
 
     /**
      * Given 지하철 노선을 생성하고
@@ -116,9 +111,8 @@ public class SubwayLinesAcceptanceTest {
     @Test
     void 지하철노선_수정() {
         // Given
-        final ExtractableResponse<Response> createResponse = createLines(일호선, 빨간색, 1L, 2L, 10L);
-        final LinesResponse createdLines = createResponse.as(LinesResponse.class);
-        
+        final LinesResponse createdLines = createLines(일호선, 빨간색, 1L, 2L, 10L).as(LinesResponse.class);
+
         // When
         final ExtractableResponse<Response> updateResponse = updateLines(createdLines.getId(), 이호선, 파란색);
 
@@ -126,13 +120,10 @@ public class SubwayLinesAcceptanceTest {
         assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
             
         // Then
-        final ExtractableResponse<Response> getLinesResponse = getLines(createdLines.getId());
-        final LinesResponse foundLines = getLinesResponse.as(LinesResponse.class);
-        
-        compareLinesResponse(foundLines, createdLines);
+        final LinesResponse foundLines = getLines(createdLines.getId()).as(LinesResponse.class);
+        assertThat(foundLines.getName()).isEqualTo(이호선);
+        assertThat(foundLines.getColor()).isEqualTo(파란색);
     }
-
-
 
     /**
      * Given 지하철 노선을 생성하고
@@ -162,7 +153,7 @@ public class SubwayLinesAcceptanceTest {
         return RestAssured
             .given().log().all()
             .when()
-            .get("/lines")
+                .get("/lines")
             .then().log().all()
             .extract();
     }
@@ -218,12 +209,10 @@ public class SubwayLinesAcceptanceTest {
             .extract();
     }
 
-    private static void compareLinesResponse(LinesResponse foundLines, LinesResponse createdLines) {
-        assertThat(foundLines).isNotNull();
+    private static void isSameLines(LinesResponse foundLines, LinesResponse createdLines) {
         assertThat(foundLines.getName()).isEqualTo(createdLines.getName());
         assertThat(foundLines.getColor()).isEqualTo(createdLines.getColor());
 
-        // Then
         final List<Long> foundStationIdList = foundLines
             .getStations().stream().map(StationResponse::getId)
             .collect(Collectors.toList());
