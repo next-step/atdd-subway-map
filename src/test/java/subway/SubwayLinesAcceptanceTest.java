@@ -74,12 +74,8 @@ public class SubwayLinesAcceptanceTest {
         SubwayLineResponse createdLine = createdLineResponse.as(SubwayLineResponse.class);
 
         // When
-        final ExtractableResponse<Response> subwayLineGetResponse = RestAssured
-            .given().log().all()
-            .when()
-                .get("/subwayLines/" + createdLine.getId())
-            .then().log().all()
-            .extract();
+        final ExtractableResponse<Response> subwayLineGetResponse = findSubwayLine(
+            createdLine);
         SubwayLineResponse foundLine = subwayLineGetResponse.as(SubwayLineResponse.class);
 
         // Then
@@ -87,7 +83,27 @@ public class SubwayLinesAcceptanceTest {
         assertThat(foundLine.getName()).isEqualTo(createdLine.getName());
     }
 
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 수정하면
+     * Then 해당 지하철 노선 정보는 수정된다
+     */
+    @Test
+    void 지하철노선_수정() {
+        // Given
+        createSubwayLine(일호선);
 
+        // When
+    }
+
+    private static ExtractableResponse<Response> findSubwayLine(SubwayLineResponse createdLine) {
+        return RestAssured
+            .given().log().all()
+            .when()
+            .get("/subwayLines/" + createdLine.getId())
+            .then().log().all()
+            .extract();
+    }
 
     private static ExtractableResponse<Response> findSubwayLines() {
         final ExtractableResponse<Response> subwayLinesGetResponse = RestAssured
