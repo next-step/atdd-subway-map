@@ -37,9 +37,15 @@ public class LineService {
     }
 
     @Transactional
-    public void updateLine(Long id, LineUpdateRequest lineUpdateRequest) {
+    public void updateLine(Long id,
+                           LineUpdateRequest lineUpdateRequest) {
         Line line = lineRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 지하철라인 정보를 찾지 못했습니다."));
         line.update(lineUpdateRequest.getName(), lineUpdateRequest.getColor());
+    }
+
+    @Transactional
+    public void deleteLine(Long id) {
+        lineRepository.deleteById(id);
     }
 
     private Line createLine(LineRequest lineRequest) {

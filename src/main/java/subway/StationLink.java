@@ -1,6 +1,8 @@
 package subway;
 
-import javax.persistence.*;
+import javax.persistence.Embeddable;
+import javax.persistence.FetchType;
+import javax.persistence.OneToOne;
 
 @Embeddable
 public class StationLink {
@@ -13,7 +15,8 @@ public class StationLink {
     public StationLink() {
     }
 
-    public StationLink(Station upStation, Station downStation) {
+    public StationLink(Station upStation,
+                       Station downStation) {
         this.upStation = upStation;
         this.downStation = downStation;
     }

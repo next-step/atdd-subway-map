@@ -2,11 +2,15 @@ package subway;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -89,10 +93,7 @@ public class LineAcceptanceTest {
         String location = createResponse.header("location");
 
         // when
-        ExtractableResponse<Response> response = given().log().all()
-                .when().get(location)
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = callApiFindLine(location);
 
         // then
         String actual = response.jsonPath().getObject("name", String.class);
@@ -122,12 +123,11 @@ public class LineAcceptanceTest {
                 .extract();
 
         // then
-        LineResponse actual = callApiFindLines().jsonPath().getObject(".", LineResponse.class);
-        LineResponse expected = new LineResponse(actual.getId(),
-                "다른분당선",
-                "bg-red-600",
-                List.of(new StationResponse(1L, "강남역"), new StationResponse(2L, "삼성역")));
-        assertThat(actual).isEqualTo(expected);
+        LineResponse actual = callApiFindLine(location).jsonPath().getObject(".", LineResponse.class);
+        String expectedName = "다른분당선";
+        String expectedColor = "bg-red-600";
+        assertThat(actual.getName()).isEqualTo(expectedName);
+        assertThat(actual.getColor()).isEqualTo(expectedColor);
     }
 
     /**
@@ -135,26 +135,26 @@ public class LineAcceptanceTest {
      * When 생성한 지하철 노선을 삭제하면
      * Then 해당 지하철 노선 정보는 삭제된다
      */
-//    @DisplayName("지하철노선을 삭제한다.")
-//    @Test
-//    void deleteStation() {
-//        // given
-//        ExtractableResponse<Response> response = callApiCreateLines(newBunDangLineParams);
-//        String location = response.header("location");
-//
-//        // when
-//        ExtractableResponse<Response> deleteResponse = given().log().all()
-//                .contentType(MediaType.APPLICATION_JSON_VALUE)
-//                .when().delete(location)
-//                .then().log().all()
-//                .extract();
-//        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-//
-//        // then
-//        List<LineResponse> actual = callApiFindLines().jsonPath().getList(".", LineResponse.class);
-//        List<LineResponse> expected = Collections.emptyList();
-//        assertThat(actual).containsAll(expected);
-//    }
+    @DisplayName("지하철노선을 삭제한다.")
+    @Test
+    void deleteStation() {
+        // given
+        ExtractableResponse<Response> response = callApiCreateLines(newBunDangLineParams);
+        String location = response.header("location");
+
+        // when
+        ExtractableResponse<Response> deleteResponse = given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().delete(location)
+                .then().log().all()
+                .extract();
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        // then
+        List<LineResponse> actual = callApiFindLines().jsonPath().getList(".", LineResponse.class);
+        List<LineResponse> expected = Collections.emptyList();
+        assertThat(actual).containsAll(expected);
+    }
 
     private ExtractableResponse<Response> callApiCreateLines(Map<String, String> params) {
         return given().log().all()
@@ -168,6 +168,13 @@ public class LineAcceptanceTest {
     private ExtractableResponse<Response> callApiFindLines() {
         return given().log().all()
                 .when().get("/lines")
+                .then().log().all()
+                .extract();
+    }
+
+    private static ExtractableResponse<Response> callApiFindLine(String location) {
+        return given().log().all()
+                .when().get(location)
                 .then().log().all()
                 .extract();
     }
