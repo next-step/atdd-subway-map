@@ -55,7 +55,36 @@ public class StationAcceptanceTest {
      * When 지하철역 목록을 조회하면
      * Then 2개의 지하철역을 응답 받는다
      */
-    // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
+    @DisplayName("지하철역 목록을 조회한다.")
+    @Test
+    void getStations() {
+        // given
+        createStation("강남역");
+        createStation("역삼역");
+
+        // when
+        List<String> stationNames =
+                RestAssured.given().log().all()
+                        .when().get("/stations")
+                        .then().log().all()
+                        .statusCode(HttpStatus.OK.value())
+                        .extract().jsonPath().getList("name", String.class);
+
+        // then
+        assertThat(stationNames).containsAnyOf("강남역", "역삼역");
+    }
+
+    private static void createStation(String name) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", name);
+
+        RestAssured.given().log().all()
+                        .body(params)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .when().post("/stations")
+                        .then().log().all()
+                        .statusCode(HttpStatus.CREATED.value());
+    }
 
     /**
      * Given 지하철역을 생성하고
