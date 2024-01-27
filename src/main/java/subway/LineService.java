@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -24,8 +25,15 @@ public class LineService {
         return createLineResponse(line);
     }
 
+    public List<LineResponse> findAllLines() {
+        return lineRepository.findAll().stream()
+                .map(this::createLineResponse)
+                .collect(Collectors.toList());
+    }
+
     private Line createLine(LineRequest lineRequest) {
-        return new Line(lineRequest.getName(), lineRequest.getColor(),
+        return new Line(lineRequest.getName(),
+                lineRequest.getColor(),
                 getStation(lineRequest.getUpStationId()),
                 getStation(lineRequest.getDownStationId()),
                 lineRequest.getDistance());
@@ -39,11 +47,11 @@ public class LineService {
         return new LineResponse(line.getId(), line.getName(), line.getColor(), getStations(line));
     }
 
-    private static List<StationResponse> getStations(Line line) {
+    private List<StationResponse> getStations(Line line) {
         return List.of(getStationResponse(line.getStationLink().getUpStation()), getStationResponse(line.getStationLink().getDownStation()));
     }
 
-    private static StationResponse getStationResponse(Station station) {
+    private StationResponse getStationResponse(Station station) {
         return new StationResponse(station.getId(),
                 station.getName());
     }
