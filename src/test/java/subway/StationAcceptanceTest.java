@@ -80,17 +80,20 @@ public class StationAcceptanceTest {
     @Test
     void deleteStationTest() {
         // given
-        final List<String> targetStations = List.of("지하철역이름", "새로운지하철역이름", "또다른지하철역이름");
-        targetStations.forEach(stationName -> stationRestAssured.post(Map.of("name", stationName)));
+        final ExtractableResponse<Response> insertedStationResponse =
+                stationRestAssured.post(Map.of("name", "지하철역이름"));
+        final Long insertedStationId = insertedStationResponse.jsonPath().getLong("id");
 
         // when
-        final ExtractableResponse<Response> response = stationRestAssured.deleteById(1L);
+        final ExtractableResponse<Response> response = stationRestAssured.deleteById(insertedStationId);
 
         // then
         assertSoftly(softly -> {
             softly.assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-            final ExtractableResponse<Response> stationsResponse = stationRestAssured.get();
-            final List<String> stationNames = stationsResponse.jsonPath().getList("name", String.class);
+            final List<String> stationNames = stationRestAssured
+                    .get()
+                    .jsonPath()
+                    .getList("name", String.class);
             softly.assertThat(stationNames).doesNotContain("지하철역이름");
         });
     }
