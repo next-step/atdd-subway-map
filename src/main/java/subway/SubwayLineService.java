@@ -2,6 +2,7 @@ package subway;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +33,18 @@ public class SubwayLineService {
         if(line == null) {
             return null;
         }
+
+        return createSubwayLineResponse(line);
+    }
+
+    @Transactional
+    public SubwayLineResponse updateLine(Long id, SubwayLineRequest subwayLineRequest) {
+        SubwayLine line = subwayLineRepository.findById(id).orElse(null);
+        if(line == null) {
+            throw new EntityNotFoundException();
+        }
+
+        line.setName(subwayLineRequest.getName());
 
         return createSubwayLineResponse(line);
     }
