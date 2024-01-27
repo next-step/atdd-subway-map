@@ -49,11 +49,15 @@ public class SubwayLineService {
         return createSubwayLineResponse(line);
     }
 
+    @Transactional
+    public void deleteLineById(Long id) {
+        subwayLineRepository.deleteById(id);
+    }
+
     private SubwayLineResponse createSubwayLineResponse(SubwayLine line) {
         return new SubwayLineResponse(
             line.getId(),
             line.getName()
         );
     }
-
 }

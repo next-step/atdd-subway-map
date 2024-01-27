@@ -3,7 +3,9 @@ package subway;
 import java.net.URI;
 import java.util.List;
 import javax.websocket.server.PathParam;
+import org.hibernate.hql.internal.ast.tree.ResolvableNode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -40,5 +42,11 @@ public class SubwayLineController {
     @PutMapping("/subwayLines/{id}")
     public ResponseEntity<SubwayLineResponse> putSubwayLine(@PathVariable Long id, @RequestBody SubwayLineRequest subwayLineRequest) {
         return ResponseEntity.ok().body(subwayLineService.updateLine(id, subwayLineRequest));
+    }
+
+    @DeleteMapping("/subwayLines/{id}")
+    public ResponseEntity<Void> deleteSubwayLine(@PathVariable Long id) {
+         subwayLineService.deleteLineById(id);
+         return ResponseEntity.noContent().build();
     }
 }
