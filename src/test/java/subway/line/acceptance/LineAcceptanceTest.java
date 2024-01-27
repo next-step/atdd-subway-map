@@ -54,15 +54,11 @@ public class LineAcceptanceTest {
         assertSoftly(softly -> {
             softly.assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
             final LineResponse lineResponse = response.as(LineResponse.class);
-            softly.assertThat(lineResponse.getName()).isEqualTo("신분당선");
-            softly.assertThat(lineResponse.getColor()).isEqualTo("bg-red-600");
-            softly.assertThat(lineResponse.getStations())
-                    .extracting("id").containsExactly(지하철역_Id, 새로운지하철역_Id);
+            assertLineResponse(lineResponse, "신분당선", "bg-red-600", 지하철역_Id, 새로운지하철역_Id);
         });
 
         // then
-        final ExtractableResponse<Response> linesResponse = RestAssuredHelper.get(LINE_API_PATH);
-        final List<String> lineNames = linesResponse.jsonPath().getList("name", String.class);
+        final List<String> lineNames = RestAssuredHelper.get(LINE_API_PATH).jsonPath().getList("name", String.class);
         assertThat(lineNames).containsAnyOf("신분당선");
     }
 
@@ -84,8 +80,8 @@ public class LineAcceptanceTest {
         // then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value())
-                , () -> assertResponseData(response, RestAssuredHelper.getIdFrom(신분당선_response), "신분당선", 지하철역_Id, 새로운지하철역_Id)
-                , () -> assertResponseData(response, RestAssuredHelper.getIdFrom(분당선_response), "분당선", 지하철역_Id, 또다른지하철역_Id)
+                , () -> assertResponseData(response, RestAssuredHelper.getIdFrom(신분당선_response), "신분당선", "bg-red-600", 지하철역_Id, 새로운지하철역_Id)
+                , () -> assertResponseData(response, RestAssuredHelper.getIdFrom(분당선_response), "분당선", "bg-green-600", 지하철역_Id, 또다른지하철역_Id)
         );
     }
 
@@ -108,9 +104,7 @@ public class LineAcceptanceTest {
         assertSoftly(softly -> {
             assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
             final LineResponse lineResponse = response.as(LineResponse.class);
-            softly.assertThat(lineResponse.getName()).isEqualTo("신분당선");
-            softly.assertThat(lineResponse.getStations())
-                    .extracting("id").containsExactly(지하철역_Id, 새로운지하철역_Id);
+            assertLineResponse(lineResponse, "신분당선", "bg-red-600", 지하철역_Id, 새로운지하철역_Id);
         });
     }
 
@@ -133,10 +127,7 @@ public class LineAcceptanceTest {
         assertSoftly(softly -> {
             assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
             final LineResponse lineResponse = RestAssuredHelper.getById(LINE_API_PATH, 신분당선_id).as(LineResponse.class);
-            softly.assertThat(lineResponse.getName()).isEqualTo("다른분당선");
-            softly.assertThat(lineResponse.getColor()).isEqualTo("bg-red-600");
-            softly.assertThat(lineResponse.getStations())
-                    .extracting("id").containsExactly(지하철역_Id, 새로운지하철역_Id);
+            assertLineResponse(lineResponse, "다른분당선", "bg-red-600", 지하철역_Id, 새로운지하철역_Id);
         });
     }
 
@@ -167,10 +158,15 @@ public class LineAcceptanceTest {
         });
     }
 
-    private void assertResponseData(final ExtractableResponse<Response> response, final Long id, final String name, final Long upStationId, final Long downStationId) {
+    private void assertResponseData(final ExtractableResponse<Response> response, final Long id, final String name, final String color, final Long upStationId, final Long downStationId) {
         final LineResponse lineResponse = RestAssuredHelper.findObjectFrom(response, id, LineResponse.class);
+        assertLineResponse(lineResponse, name, color, upStationId, downStationId);
+    }
+
+    private void assertLineResponse(final LineResponse lineResponse, final String name, final String color, final Long upStationId, final Long downStationId) {
         assertSoftly(softly -> {
             softly.assertThat(lineResponse.getName()).isEqualTo(name);
+            softly.assertThat(lineResponse.getColor()).isEqualTo(color);
             softly.assertThat(lineResponse.getStations())
                     .extracting("id").containsExactly(upStationId, downStationId);
         });
