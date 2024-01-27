@@ -6,15 +6,15 @@ public class StationLineMockData {
 
     public static final String stationLineName1 = "신분당선";
     public static final String stationLineColor1 = "bg-red-600";
-    public static final Long upStationId1 = 1L;
-    public static final Long downStationId1 = 2L;
-    public static final Long distance1 = 10L;
+    public static final int upStationId1 = 1;
+    public static final int downStationId1 = 2;
+    public static final int distance1 = 10;
 
     public static final String stationLineName2 = "분당선";
     public static final String stationLineColor2 = "bg-green-600";
-    public static final Long upStationId2 = 2L;
-    public static final Long downStationId2 = 4L;
-    public static final Long distance2 = 20L;
+    public static final int upStationId2 = 2;
+    public static final int downStationId2 = 4;
+    public static final int distance2 = 20;
 
     public static StationLineRequest createMockRequest1() {
         return  new StationLineRequest(

@@ -11,7 +11,7 @@ public class StationLine {
     public StationLine() {
     }
 
-    public StationLine(String name, String color, Long upStationId, Long downStationId, Long distance) {
+    public StationLine(String name, String color, int upStationId, int downStationId, int distance) {
         this.name = name;
         this.color = color;
         this.upStationId = upStationId;
@@ -27,11 +27,11 @@ public class StationLine {
 
     private String color; // TODO: Enum 분리 고려
 
-    private Long upStationId;
+    private int upStationId;
 
-    private Long downStationId;
+    private int downStationId;
 
-    private Long distance;
+    private int distance;
 
     public Long getId() {
         return id;
@@ -45,15 +45,15 @@ public class StationLine {
         return color;
     }
 
-    public Long getUpStationId() {
+    public int getUpStationId() {
         return upStationId;
     }
 
-    public Long getDownStationId() {
+    public int getDownStationId() {
         return downStationId;
     }
 
-    public Long getDistance() {
+    public int getDistance() {
         return distance;
     }
 }

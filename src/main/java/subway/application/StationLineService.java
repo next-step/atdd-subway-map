@@ -37,7 +37,7 @@ public class StationLineService {
                 request.getColor(),
                 request.getUpStationId(),
                 request.getDownStationId(),
-                request.getDownStationId());
+                request.getDistance());
     }
 
     private StationLineResponse convertToResponse(StationLine stationLine) {
@@ -47,6 +47,6 @@ public class StationLineService {
                 stationLine.getColor(),
                 stationLine.getUpStationId(),
                 stationLine.getDownStationId(),
-                stationLine.getDownStationId());
+                stationLine.getDistance());
     }
 }

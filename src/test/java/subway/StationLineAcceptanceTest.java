@@ -1,6 +1,7 @@
 package subway;
 
 import config.fixtures.subway.StationLineMockData;
+import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
@@ -9,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import subway.dto.StationLineRequest;
 
 import java.util.HashMap;
 import java.util.List;
@@ -30,25 +32,38 @@ public class StationLineAcceptanceTest {
     @DisplayName("지하철 노선을 생성한다.")
     @Test
     void createStationLine() {
-        // when
-        given().log().all()
-                .body(createMockRequest1())
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines")
-                .then().log().all()
-                .statusCode(HttpStatus.CREATED.value());
+        // given
+        StationLineRequest mockRequest = createMockRequest1();
 
-        List<String> stationLineName =
-                given().log().all()
-                        .when()
-                        .get("/lines")
-                        .then().log().all()
-                        .statusCode(HttpStatus.OK.value())
-                        .extract().jsonPath().getList("name", String.class);
+        // when
+        createStationLineRequest(mockRequest);
+        JsonPath allStationLineNames = findAllStationLine();
 
         // then
-        assertThat(stationLineName).containsAnyOf(StationLineMockData.stationLineName1);
+        assertThat(allStationLineNames.getList("name")).containsAnyOf(mockRequest.getName());
+        assertThat(allStationLineNames.getList("color")).containsAnyOf(mockRequest.getColor());
+        assertThat(allStationLineNames.getList("upStationId")).containsAnyOf(mockRequest.getUpStationId());
+        assertThat(allStationLineNames.getList("downStationId")).containsAnyOf(mockRequest.getDownStationId());
+        assertThat(allStationLineNames.getList("distance")).containsAnyOf(mockRequest.getDistance());
+    }
+
+    private JsonPath findAllStationLine() {
+        return given().log().all()
+                .when()
+                    .get("/lines")
+                .then().log().all()
+                    .statusCode(HttpStatus.OK.value())
+                    .extract().jsonPath();
+    }
+
+    private void createStationLineRequest(StationLineRequest request) {
+        given().log().all()
+            .body(request)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+            .post("/lines")
+        .then().log().all()
+            .statusCode(HttpStatus.CREATED.value());
     }
 
     /**

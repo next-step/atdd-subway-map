@@ -4,13 +4,13 @@ public class StationLineResponse {
     private final Long id;
     private final String name;
     private final String color;
-    private final Long upStationId;
+    private final int upStationId;
 
-    private final Long downStationId;
+    private final int downStationId;
 
-    private final Long distance;
+    private final int distance;
 
-    public StationLineResponse(Long id, String name, String color, Long upStationId, Long downStationId, Long distance) {
+    public StationLineResponse(Long id, String name, String color, int upStationId, int downStationId, int distance) {
         this.id = id;
         this.name = name;
         this.color = color;
@@ -31,15 +31,15 @@ public class StationLineResponse {
         return color;
     }
 
-    public Long getUpStationId() {
+    public int getUpStationId() {
         return upStationId;
     }
 
-    public Long getDownStationId() {
+    public int getDownStationId() {
         return downStationId;
     }
 
-    public Long getDistance() {
+    public int getDistance() {
         return distance;
     }
 }

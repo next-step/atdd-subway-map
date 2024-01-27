@@ -3,13 +3,13 @@ package subway.dto;
 public class StationLineRequest {
     private final String name;
     private final String color;
-    private final Long upStationId;
+    private final int upStationId;
 
-    private final Long downStationId;
+    private final int downStationId;
 
-    private final Long distance;
+    private final int distance;
 
-    public StationLineRequest(String name, String color, Long upStationId, Long downStationId, Long distance) {
+    public StationLineRequest(String name, String color, int upStationId, int downStationId, int distance) {
         this.name = name;
         this.color = color;
         this.upStationId = upStationId;
@@ -25,15 +25,15 @@ public class StationLineRequest {
         return color;
     }
 
-    public Long getUpStationId() {
+    public int getUpStationId() {
         return upStationId;
     }
 
-    public Long getDownStationId() {
+    public int getDownStationId() {
         return downStationId;
     }
 
-    public Long getDistance() {
+    public int getDistance() {
         return distance;
     }
 }
