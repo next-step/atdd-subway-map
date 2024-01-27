@@ -36,11 +36,7 @@ public class StationAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        final List<String> stationNames =
-            RestAssured.given().log().all()
-                .when().get("/stations")
-                .then().log().all()
-                .extract().jsonPath().getList("name", String.class);
+        final List<String> stationNames = getStationList().jsonPath().getList("name", String.class);
 
         assertThat(stationNames).containsAnyOf(강남역);
     }
