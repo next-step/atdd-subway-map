@@ -1,46 +1,38 @@
 package testhelper;
 
+import static io.restassured.RestAssured.*;
+import static org.springframework.http.MediaType.*;
+
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import org.springframework.http.MediaType;
-
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
 
 /**
  * @author : Rene Choi
  * @since : 2024/01/26
  */
-public class StationRequestExecutor {
+public class StationRequestExecutor extends AbstractRequestExecutor {
 
 	private static final String URL_PATH = "/stations";
+
+	private static RequestSpecification getRequestSpecification() {
+		return given().log().all().contentType(APPLICATION_JSON_VALUE);
+	}
 
 	public static ExtractableResponse<Response> executeCreateStationRequest(String name) {
 		Map<String, String> params = new HashMap<>();
 		params.put("name", name);
-
-		return RestAssured.given().log().all()
-			.body(params)
-			.contentType(MediaType.APPLICATION_JSON_VALUE)
-			.when().post(URL_PATH)
-			.then().log().all()
-			.extract();
+		return doPost(getRequestSpecification(), URL_PATH, params);
 	}
 
 	public static ExtractableResponse<Response> executeDeleteStationRequest(Long id) {
-		return RestAssured.given().log().all()
-			.when().delete(URL_PATH + id)
-			.then().log().all()
-			.extract();
+		return doDelete(getRequestSpecification(), URL_PATH + "/" + id);
 	}
 
 	public static ExtractableResponse<Response> executeGetStationRequest() {
-		return RestAssured.given().log().all()
-			.when().get(URL_PATH)
-			.then().log().all()
-			.extract();
+		return doGet(getRequestSpecification(), URL_PATH);
 	}
 }

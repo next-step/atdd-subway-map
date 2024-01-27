@@ -3,7 +3,7 @@ package subway.line;
 import static fixture.LineFixtureCreator.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.springframework.http.HttpStatus.*;
-import static testhelper.StationLineRequestExecutor.*;
+import static testhelper.LineRequestExecutor.*;
 import static testhelper.StationRequestExecutor.*;
 
 import java.util.List;
