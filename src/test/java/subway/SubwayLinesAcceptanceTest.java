@@ -64,6 +64,7 @@ public class SubwayLinesAcceptanceTest {
 
         // Then
         final LinesResponse createdLines = createResponse.as(LinesResponse.class);
+
         final LinesResponse[] linesList = getLinesList().as(LinesResponse[].class);
 
         final LinesResponse foundLines = Arrays.stream(linesList)
