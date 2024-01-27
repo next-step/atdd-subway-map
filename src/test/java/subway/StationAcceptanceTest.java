@@ -81,18 +81,13 @@ public class StationAcceptanceTest {
         // given
         Map<String, String> params = new HashMap<>();
         params.put("name", GANGNAM_STATION);
-        createStationResponse(params);
-
-        List<Long> stationIds = given().log().all()
-                .when().get("/stations")
-                .then().log().all()
-                .extract().jsonPath().getList("id", Long.class);
-        Long id = stationIds.get(0);
+        final ExtractableResponse<Response> stationResponse = createStationResponse(params);
+        final String location = stationResponse.header("Location");
 
         // when
         given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().delete("/stations/{id}", id)
+                .when().delete(location)
                 .then().log().all()
                 .extract();
 
