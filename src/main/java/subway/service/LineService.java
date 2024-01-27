@@ -41,6 +41,16 @@ public class LineService {
 				.orElseThrow(IllegalAccessError::new);
 	}
 
+	@Transactional
+	public void updateLine(Long id, LineRequest lineRequest) {
+		Line line = lineRepository.findById(id)
+				.orElseThrow(IllegalAccessError::new);
+
+		line.setUpdateInfo(lineRequest.getName(), lineRequest.getColor(), lineRequest.getUpStationId(), lineRequest.getDownStationId(), lineRequest.getDistance());
+
+		lineRepository.save(line);
+	}
+
 	private LineResponse createLineResponse(Line line) {
 		Station upStation = stationRepository.findById(line.getUpStationId())
 				.orElseThrow(IllegalAccessError::new);

@@ -84,6 +84,7 @@ public class LineAcceptanceTest {
 	 * Then 해당 지하철 노선 정보는 수정된다
 	 */
 	@DisplayName("지하철 노선을 수정한다.")
+	@DirtiesContext
 	@Test
 	void updateLineTest() {
 		// given
@@ -97,12 +98,12 @@ public class LineAcceptanceTest {
 								,"color", TEST_LINE_COLOR_2))
 						.contentType(MediaType.APPLICATION_JSON_VALUE)
 						.when()
-							.put("/lines")
+							.put("/lines/{id}", 1L)
 						.then()
 							.extract();
 
 		// then
-		assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+		assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 		assertThat(getLine(1L).jsonPath().getString("name")).isEqualTo(TEST_LINE_NAME_2);
 		assertThat(getLine(1L).jsonPath().getString("color")).isEqualTo(TEST_LINE_COLOR_2);
 	}
