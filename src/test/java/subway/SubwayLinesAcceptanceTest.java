@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.List;
 import org.springframework.test.context.jdbc.Sql;
 
-@DirtiesContext
+@Sql(value="/db/subwayLine.sql")
 @DisplayName("지하철 노선 기능")
 @SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
 public class SubwayLinesAcceptanceTest {
@@ -36,8 +36,9 @@ public class SubwayLinesAcceptanceTest {
      * When 지하철 노선을 생성하면
      * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
      */
+    @DirtiesContext
     @Test
-    void createSubwayLineTest() {
+    void 지하철노선_생성() {
         // When
         final ExtractableResponse<Response> response = createSubwayLine(일호선, 빨간색, 1L, 2L, 10);
 
@@ -45,11 +46,11 @@ public class SubwayLinesAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // Then
-        final SubwayLineResponse[] subwayLineList = findSubwayLines();
-        final List<String> subwayLineNameList = Arrays.stream(subwayLineList).map(
-            SubwayLineResponse::getName).collect(
-            Collectors.toList());
-        assertThat(subwayLineNameList).containsAnyOf(일호선);
+        final ExtractableResponse<Response> subwayLineResponse = findSubwayLine(response.as(SubwayLineResponse.class));
+        final SubwayLineResponse subwayLine = subwayLineResponse.as(SubwayLineResponse.class);
+
+        assertThat(subwayLine.getName()).containsAnyOf(일호선);
+        assertThat(subwayLine.getStations().stream().map(StationResponse::getId)).contains(1L, 2L);
     }
 
     /**
@@ -57,6 +58,7 @@ public class SubwayLinesAcceptanceTest {
      * When 지하철 노선 목록을 조회하면
      * Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
      */
+    @DirtiesContext
     @Test
     void 지하철노선_목록_조회() {
         // Given
@@ -78,6 +80,7 @@ public class SubwayLinesAcceptanceTest {
      * When 생성한 지하철 노선을 조회하면
      * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
      */
+    @DirtiesContext
     @Test
     void 지하철노선_조회() {
         // Given
@@ -99,6 +102,7 @@ public class SubwayLinesAcceptanceTest {
      * When 생성한 지하철 노선을 수정하면
      * Then 해당 지하철 노선 정보는 수정된다
      */
+    @DirtiesContext
     @Test
     void 지하철노선_수정() {
         // Given
@@ -121,6 +125,7 @@ public class SubwayLinesAcceptanceTest {
      * When 생성한 지하철 노선을 삭제하면
      * Then 해당 지하철 노선 정보는 삭제된다
      */
+    @DirtiesContext
     @Test
     void 지하철노선_삭제() {
         // Given
