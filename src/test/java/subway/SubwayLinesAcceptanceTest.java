@@ -79,6 +79,19 @@ public class SubwayLinesAcceptanceTest {
     @DirtiesContext
     @Test
     void 지하철노선_목록_조회() {
+        // Given
+        createLines(일호선, 빨간색, 1L, 2L, 10L);
+        createLines(이호선, 빨간색, 1L, 2L, 10L);
+
+        // When
+        final ExtractableResponse<Response> listResponse = getLinesList();
+
+        // Then
+        assertThat(listResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        // Then
+        final List<String> linesNameList = listResponse.jsonPath().getList("name", String.class);
+        assertThat(linesNameList).contains(일호선, 이호선);
     }
 
     /**
