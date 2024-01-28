@@ -39,10 +39,6 @@ public class StationAcceptanceTest extends AcceptanceTest {
         List<String> stationsNames = findResponse.jsonPath().getList("name", String.class);
         assertThat(stationsNames).hasSize(1)
                 .containsExactly("강남역");
-
-        // 테스트 찌꺼기 데이터 삭제
-        StationResponse stationResponse = createResponse.as(StationResponse.class);
-        deleteStation(stationResponse.getId());
     }
 
     /**
@@ -72,12 +68,6 @@ public class StationAcceptanceTest extends AcceptanceTest {
         // then
         assertThat(stationsNames).hasSize(2)
                 .containsExactly("강남역", "선릉역");
-
-        // 테스트 찌꺼기 데이터 삭제
-        StationResponse stationResponse = gangnamStationCreateResponse.as(StationResponse.class);
-        deleteStation(stationResponse.getId());
-        StationResponse stationResponse2 = seollEungStationCreateResponse.as(StationResponse.class);
-        deleteStation(stationResponse2.getId());
     }
 
     /**
