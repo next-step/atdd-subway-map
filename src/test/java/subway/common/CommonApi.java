@@ -74,10 +74,16 @@ public class CommonApi {
                     .extract();
         }
 
-        public static ExtractableResponse<Response> updateLineBy(Long id) {
+        public static ExtractableResponse<Response> updateLineBy(Long id, String newName, String newColor) {
+            Map<String, String> params = new HashMap<>();
+            params.put("name", newName);
+            params.put("color", newColor);
+
             return RestAssured
                     .given().log().all()
-                    .when().delete("/lines/{id}", id)
+                    .body(params)
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                    .when().put("/lines/{id}", id)
                     .then().log().all()
                     .extract();
         }
