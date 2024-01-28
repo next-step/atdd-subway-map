@@ -2,46 +2,54 @@ package subway.line;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
-import subway.line.LineResponse;
-import subway.line.LineUpdateRequest;
+import subway.testhelper.LineApiCaller;
+import subway.testhelper.StationApiCaller;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철노선 관련 기능")
-@Sql({"/test-sql/table-truncate.sql", "/test-sql/station-insert.sql"})
+@Sql({"/test-sql/table-truncate.sql"})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {
 
-    private static Map<String, String> newBunDangLineParams;
-    private static Map<String, String> zeroLineParams;
+    private Map<String, String> newBunDangLineParams;
+    private Map<String, String> zeroLineParams;
+    private final StationApiCaller stationApiCaller = new StationApiCaller();
+    private final LineApiCaller lineApiCaller = new LineApiCaller();
 
-    @BeforeAll
-    static void setUpClass() {
+    @BeforeEach
+    void setUpClass() {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "강남역");
+        Long firstId = stationApiCaller.callCreateStation(params).jsonPath().getObject("id", Long.class);
+        params.put("name", "삼성역");
+        Long secondId = stationApiCaller.callCreateStation(params).jsonPath().getObject("id", Long.class);
+        params.put("name", "선릉역");
+        Long thirdId = stationApiCaller.callCreateStation(params).jsonPath().getObject("id", Long.class);
+
         newBunDangLineParams = new HashMap<>();
         newBunDangLineParams.put("name", "신분당선");
         newBunDangLineParams.put("color", "bg-red-600");
-        newBunDangLineParams.put("upStationId", "1");
-        newBunDangLineParams.put("downStationId", "2");
+        newBunDangLineParams.put("upStationId", firstId.toString());
+        newBunDangLineParams.put("downStationId", secondId.toString());
         newBunDangLineParams.put("distance", "10");
 
         zeroLineParams = new HashMap<>();
         zeroLineParams.put("name", "0호선");
         zeroLineParams.put("color", "bg-red-100");
-        zeroLineParams.put("upStationId", "1");
-        zeroLineParams.put("downStationId", "3");
+        zeroLineParams.put("upStationId", firstId.toString());
+        zeroLineParams.put("downStationId", thirdId.toString());
         zeroLineParams.put("distance", "10");
     }
 
@@ -53,10 +61,10 @@ public class LineAcceptanceTest {
     @Test
     void createLine() {
         // when
-        callApiCreateLines(newBunDangLineParams);
+        lineApiCaller.callApiCreateLines(newBunDangLineParams);
 
         // then
-        List<String> actual = callApiFindLines().jsonPath().getList("name", String.class);
+        List<String> actual = lineApiCaller.callApiFindLines().jsonPath().getList("name", String.class);
         String expected = "신분당선";
         assertThat(actual).containsAnyOf(expected);
     }
@@ -70,11 +78,11 @@ public class LineAcceptanceTest {
     @Test
     void findLines() {
         // given
-        callApiCreateLines(newBunDangLineParams);
-        callApiCreateLines(zeroLineParams);
+        lineApiCaller.callApiCreateLines(newBunDangLineParams);
+        lineApiCaller.callApiCreateLines(zeroLineParams);
 
         // when
-        List<LineResponse> linesResponse = callApiFindLines().jsonPath().getList(".", LineResponse.class);
+        List<LineResponse> linesResponse = lineApiCaller.callApiFindLines().jsonPath().getList(".", LineResponse.class);
 
         // then
         int actual = linesResponse.size();
@@ -91,11 +99,11 @@ public class LineAcceptanceTest {
     @Test
     void findLine() {
         // given
-        ExtractableResponse<Response> createResponse = callApiCreateLines(newBunDangLineParams);
+        ExtractableResponse<Response> createResponse = lineApiCaller.callApiCreateLines(newBunDangLineParams);
         String location = createResponse.header("location");
 
         // when
-        ExtractableResponse<Response> response = callApiFindLine(location);
+        ExtractableResponse<Response> response = lineApiCaller.callApiFindLine(location);
 
         // then
         String actual = response.jsonPath().getObject("name", String.class);
@@ -112,20 +120,15 @@ public class LineAcceptanceTest {
     @Test
     void updateLine() {
         // given
-        ExtractableResponse<Response> response = callApiCreateLines(newBunDangLineParams);
+        ExtractableResponse<Response> response = lineApiCaller.callApiCreateLines(newBunDangLineParams);
         String location = response.header("location");
 
         // when
         LineUpdateRequest request = new LineUpdateRequest("다른분당선", "bg-red-600");
-        ExtractableResponse<Response> updateResponse = given().log().all()
-                .body(request)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().put(location)
-                .then().log().all()
-                .extract();
+        lineApiCaller.callApiUpdateLine(request, location);
 
         // then
-        LineResponse actual = callApiFindLine(location).jsonPath().getObject(".", LineResponse.class);
+        LineResponse actual = lineApiCaller.callApiFindLine(location).jsonPath().getObject(".", LineResponse.class);
         String expectedName = "다른분당선";
         String expectedColor = "bg-red-600";
         assertThat(actual.getName()).isEqualTo(expectedName);
@@ -141,43 +144,17 @@ public class LineAcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        ExtractableResponse<Response> response = callApiCreateLines(newBunDangLineParams);
+        ExtractableResponse<Response> response = lineApiCaller.callApiCreateLines(newBunDangLineParams);
         String location = response.header("location");
 
         // when
-        ExtractableResponse<Response> deleteResponse = given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().delete(location)
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> deleteResponse = lineApiCaller.callApiDeleteLine(location);
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         // then
-        List<LineResponse> actual = callApiFindLines().jsonPath().getList(".", LineResponse.class);
+        List<LineResponse> actual = lineApiCaller.callApiFindLines().jsonPath().getList(".", LineResponse.class);
         List<LineResponse> expected = Collections.emptyList();
         assertThat(actual).containsAll(expected);
     }
 
-    private ExtractableResponse<Response> callApiCreateLines(Map<String, String> params) {
-        return given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().log().all()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> callApiFindLines() {
-        return given().log().all()
-                .when().get("/lines")
-                .then().log().all()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> callApiFindLine(String location) {
-        return given().log().all()
-                .when().get(location)
-                .then().log().all()
-                .extract();
-    }
 }

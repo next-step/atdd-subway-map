@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import subway.testhelper.StationApiCaller;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -22,6 +23,7 @@ public class StationAcceptanceTest {
 
     private static final String GANGNAM_STATION = "강남역";
     private static final String SAMSUNG_STATION = "삼성역";
+    private final StationApiCaller stationApiCaller = new StationApiCaller();
 
     /**
      * When 지하철역을 생성하면
@@ -35,13 +37,13 @@ public class StationAcceptanceTest {
         Map<String, String> params = new HashMap<>();
         params.put("name", GANGNAM_STATION);
 
-        ExtractableResponse<Response> response = createStationResponse(params);
+        ExtractableResponse<Response> response = stationApiCaller.callCreateStation(params);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> actual = findStationNames();
+        List<String> actual = stationApiCaller.callFindStations().jsonPath().getList("name", String.class);
         String expected = GANGNAM_STATION;
         assertThat(actual).containsAnyOf(expected);
     }
@@ -57,13 +59,13 @@ public class StationAcceptanceTest {
         // given
         Map<String, String> params = new HashMap<>();
         params.put("name", GANGNAM_STATION);
-        createStationResponse(params);
+        stationApiCaller.callCreateStation(params);
 
         params.put("name", SAMSUNG_STATION);
-        createStationResponse(params);
+        stationApiCaller.callCreateStation(params);
 
         // when
-        List<String> actual = findStationNames();
+        List<String> actual = stationApiCaller.callFindStations().jsonPath().getList("name", String.class);
 
         // then
         List<String> expected = List.of(GANGNAM_STATION, SAMSUNG_STATION);
@@ -81,7 +83,7 @@ public class StationAcceptanceTest {
         // given
         Map<String, String> params = new HashMap<>();
         params.put("name", GANGNAM_STATION);
-        ExtractableResponse<Response> stationResponse = createStationResponse(params);
+        ExtractableResponse<Response> stationResponse = stationApiCaller.callCreateStation(params);
         String location = stationResponse.header("Location");
 
         // when
@@ -92,25 +94,9 @@ public class StationAcceptanceTest {
                 .extract();
 
         // then
-        List<String> actual = findStationNames();
+        List<String> actual = stationApiCaller.callFindStations().jsonPath().getList("name", String.class);
         List<String> expected = Collections.emptyList();
         assertThat(actual).containsAll(expected);
-    }
-
-    private ExtractableResponse<Response> createStationResponse(Map<String, String> params) {
-        return given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
-    }
-
-    private List<String> findStationNames() {
-        return given().log().all()
-                .when().get("/stations")
-                .then().log().all()
-                .extract().jsonPath().getList("name", String.class);
     }
 
 }
