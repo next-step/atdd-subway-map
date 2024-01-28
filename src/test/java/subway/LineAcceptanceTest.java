@@ -29,55 +29,90 @@ public class LineAcceptanceTest {
     @DisplayName("지하철노선을 생성한다.")
     @Test
     void createLine() {
-        /*
-        * TODO
-        * When 지하철 노선을 생성하면
-        * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
-        */
+        //when
+        ExtractableResponse<Response> response = CommonApi.Line.createLineBy(신분당선);
+        Long lineId = response.jsonPath().getLong("id");
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        // then
+        ExtractableResponse<Response> getResponse = CommonApi.Line.retrieveLineBy(lineId);
+        Fixture.Line line = getResponse.as(Fixture.Line.class);
+
+        assertThat(line).isEqualTo(신분당선);
     }
 
     @DisplayName("지하철노선 목록을 조회한다.")
     @Test
     void showLines() {
-        /*
-         * TODO
-         * Given 2개의 지하철 노선을 생성하고
-         * When 지하철 노선 목록을 조회하면
-         * Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
-         */
+        // given
+        CommonApi.Line.createLineBy(신분당선);
+        CommonApi.Line.createLineBy(분당선);
+
+        //when
+        ExtractableResponse<Response> response = CommonApi.Line.listLine();
+
+        //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        //then
+        Fixture.Line[] lines = response.as(Fixture.Line[].class);
+        assertThat(lines).containsExactly(신분당선, 분당선);
     }
 
     @DisplayName("지하철노선을 조회한다.")
     @Test
     void retrieveLine() {
-        /*
-         * TODO
-         * Given 지하철 노선을 생성하고
-         * When 생성한 지하철 노선을 조회하면
-         * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
-         */
+        // given
+        Long lineId = CommonApi.Line.createLineBy(신분당선).jsonPath().getLong("id");
+
+        //when
+        ExtractableResponse<Response> response = CommonApi.Line.retrieveLineBy(lineId);
+
+        //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        //then
+        Fixture.Line line = response.as(Fixture.Line.class);
+        assertThat(line).isEqualTo(신분당선);
     }
 
     @DisplayName("지하철노선을 수정한다.")
     @Test
     void updateLine() {
-        /*
-         * TODO
-         * Given 지하철 노선을 생성하고
-         * When 생성한 지하철 노선을 수정하면
-         * Then 해당 지하철 노선 정보는 수정된다
-         */
+        // given
+        Long lineId = CommonApi.Line.createLineBy(분당선).jsonPath().getLong("id");
+        String newName = "다른분당선";
+        String newColor = "bg-red-600";
+
+        //when
+        ExtractableResponse<Response> response = CommonApi.Line.updateLineBy(lineId, newName, newColor);
+
+        //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        //then
+        Fixture.Line line = response.as(Fixture.Line.class);
+        assertThat(line.name).isEqualTo(newName);
+        assertThat(line.color).isEqualTo(newColor);
     }
 
     @DisplayName("지하철노선을 삭제한다.")
     @Test
     void deleteLine() {
-        /*
-         * TODO
-         * Given 지하철 노선을 생성하고
-         * When 생성한 지하철 노선을 삭제하면
-         * Then 해당 지하철 노선 정보는 삭제된다
-         */
+        // given
+        Long lineId = CommonApi.Line.createLineBy(분당선).jsonPath().getLong("id");
+
+        //when
+        ExtractableResponse<Response> response = CommonApi.Line.deleteLineBy(lineId);
+
+        //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        //then
+        ExtractableResponse<Response> getResponse = CommonApi.Line.retrieveLineBy(lineId);
+        assertThat(getResponse.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 
 
