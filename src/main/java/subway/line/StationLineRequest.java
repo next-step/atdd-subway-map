@@ -3,11 +3,11 @@ package subway.line;
 public class StationLineRequest {
     private String name;
     private String color;
-    private int upStationId;
-    private int downStationId;
+    private long upStationId;
+    private long downStationId;
     private int distance;
 
-    public StationLineRequest(String name, String color, int upStationId, int downStationId, int distance) {
+    public StationLineRequest(String name, String color, long upStationId, long downStationId, int distance) {
         this.name = name;
         this.color = color;
         this.upStationId = upStationId;
@@ -23,11 +23,11 @@ public class StationLineRequest {
         return color;
     }
 
-    public int getUpStationId() {
+    public long getUpStationId() {
         return upStationId;
     }
 
-    public int getDownStationId() {
+    public long getDownStationId() {
         return downStationId;
     }
 

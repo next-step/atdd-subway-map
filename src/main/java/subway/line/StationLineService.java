@@ -4,29 +4,41 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.station.Station;
+import subway.station.StationRepository;
 import subway.station.StationResponse;
 
 @Service
 @Transactional(readOnly = true)
 public class StationLineService {
     private StationLineRepository stationLineRepository;
+    private StationRepository stationRepository;
 
-    public StationLineService(StationLineRepository stationLineRepository) {
+    public StationLineService(StationLineRepository stationLineRepository, StationRepository stationRepository) {
         this.stationLineRepository = stationLineRepository;
+        this.stationRepository = stationRepository;
     }
 
     @Transactional
     public StationLineResponse saveStationLine(StationLineRequest stationLineRequest) {
-        StationLine stationLine = stationLineRepository.save(new StationLine(stationLineRequest.getName(), stationLineRequest.getColor(), stationLineRequest.getUpStationId(), stationLineRequest.getDownStationId(), stationLineRequest.getDistance()));
+        Station upStation = findStationById(stationLineRequest.getUpStationId());
+        Station downStation = findStationById(stationLineRequest.getDownStationId());
+        StationLine stationLine = stationLineRepository.save(new StationLine(stationLineRequest.getName(), stationLineRequest.getColor(), upStation, downStation, stationLineRequest.getDistance()));
         return new StationLineResponse(
                 stationLine.getId(),
                 stationLine.getName(),
                 stationLine.getColor(),
                 List.of(
-                        new StationResponse(1L, "지하철역"),
-                        new StationResponse(2L, "새로운지하철역")
-                )
-        );
+                        createStationResponse(stationLine.getUpStation()),
+                        createStationResponse(stationLine.getDownStation()
+                        )
+                ));
+    }
+
+    private Station findStationById(long id) {
+        return stationRepository.findById(id).stream()
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("해당 역이 존재하지 않습니다"));
     }
 
     public StationLineResponse findStationLineById(Long id) {
@@ -39,37 +51,25 @@ public class StationLineService {
                 stationLine.getName(),
                 stationLine.getColor(),
                 List.of(
-                        new StationResponse(1L, "지하철역"),
-                        new StationResponse(2L, "새로운지하철역")
-                )
-        );
+                        createStationResponse(stationLine.getUpStation()),
+                        createStationResponse(stationLine.getDownStation()
+                        )
+                ));
     }
 
     public List<StationLineResponse> findAllStationLine() {
         List<StationLine> stationLines = stationLineRepository.findAll();
 
-        /*return stationLines.stream()  // 상행역, 하행역을 엔티티로 리팩토링하면 아래와 같은 로직으로 수행 가능할 것 같다.
+        return stationLines.stream()  // 상행역, 하행역을 단순 id 값이 아닌 엔티티로 리팩토링하면 아래와 같은 로직으로 수행 가능할 것 같다.
                 .map(stationLine -> new StationLineResponse(
                         stationLine.getId(),
                         stationLine.getName(),
                         stationLine.getColor(),
                         List.of(
-                                stationLine.getUpStation(),
-                                stationLine.getDownStation()
+                                createStationResponse(stationLine.getUpStation()),
+                                createStationResponse(stationLine.getDownStation())
                         )
-                ))
-                .collect(Collectors.toList());*/
-
-        return List.of(
-                new StationLineResponse(stationLines.get(0).getId(), stationLines.get(0).getName(), stationLines.get(0).getColor(), List.of(
-                        new StationResponse(1L, "지하철역"),
-                        new StationResponse(2L, "새로운지하철역")
-                )),
-                new StationLineResponse(stationLines.get(1).getId(), stationLines.get(1).getName(), stationLines.get(1).getColor(), List.of(
-                        new StationResponse(1L, "지하철역"),
-                        new StationResponse(3L, "또다른지하철역")
-                ))
-        );
+                )).collect(Collectors.toList());
     }
 
     @Transactional
@@ -86,31 +86,10 @@ public class StationLineService {
         stationLineRepository.deleteById(id);
     }
 
-//    public List<StationResponse> findAllStationLines() {
-//        return stationLineRepository.findAll().stream()
-//                .map(this::createStationResponse)
-//                .collect(Collectors.toList());
-
-//    }
-//    @Transactional
-//    public void deleteStationById(Long id) {
-//        stationLineRepository.deleteById(id);
-
-//    }
-//    private StationResponse createStationResponse(Station station) {
-//        return new StationResponse(
-//                station.getId(),
-//                station.getName()
-//        );
-
-//    }
-//    private StationLineResponse createStationLineResponse(StationLine stationLine) {
-//        return new StationLineResponse(
-//                stationLine.getId(),
-//                stationLine.getName(),
-//                stationLine.getColor(),
-//                List.of()
-//        );
-
-//    }
+    private StationResponse createStationResponse(Station station) {
+        return new StationResponse(
+                station.getId(),
+                station.getName()
+        );
+    }
 }

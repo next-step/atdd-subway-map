@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,9 +18,16 @@ import org.springframework.test.context.jdbc.Sql;
 
 @DisplayName("지하철역 노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@Sql("/truncate.sql")  // 어떤 방식이 더 효율적인걸까..?
-//@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+//@Sql("/truncate.sql")  // 어떤 방식이 더 효율적인걸까..?
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class StationLineAcceptanceTest {
+
+    @BeforeEach
+    void setUp() {
+        saveStation("지하철역");
+        saveStation("새로운지하철역");
+        saveStation("또다른지하철역");
+    }
 
     /**
      * When 지하철 노선을 생성하면
@@ -29,15 +37,8 @@ public class StationLineAcceptanceTest {
     @DisplayName("지하철 노선을 생성한다.")
     @Test
     void createStationLine() {
-        // given
-        ExtractableResponse<Response> response = saveStationLine("신분당선", "bg-red-600", 1L, 2L, 10L);
-
         // when
-//        ExtractableResponse<Response> response = RestAssured
-//                .given().log().all()
-//                .when().get("/lines/{id}", 1)
-//                .then().log().all()
-//                .extract();
+        ExtractableResponse<Response> response = saveStationLine("신분당선", "bg-red-600", 1L, 2L, 10L);
 
         // then
         String result = response.jsonPath().getString("name");
@@ -145,6 +146,18 @@ public class StationLineAcceptanceTest {
                 .when().delete("/lines/{id}", 1)
                 .then().log().all()
                 .statusCode(HttpStatus.NO_CONTENT.value());
+    }
+
+    private static void saveStation(String name) {
+        Map<String, String> param = new HashMap<>();
+        param.put("name", name);
+
+        RestAssured.given()
+                .body(param)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then()
+                .statusCode(HttpStatus.CREATED.value());
     }
 
     private static ExtractableResponse<Response> saveStationLine(String name, String color, long upStationId, long downStationId, long distance) {

@@ -5,6 +5,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import subway.station.Station;
 
 @Entity
 public class StationLine {
@@ -15,22 +18,20 @@ public class StationLine {
     private String name;
     @Column(length = 20, nullable = false)
     private String color;
-    @Column(nullable = false)
-    private int upStationId;
-    @Column(nullable = false)
-    private int downStationId;
+    @ManyToOne
+    @JoinColumn(nullable = false)
+    private Station upStation;
+    @ManyToOne
+    @JoinColumn(nullable = false)
+    private Station downStation;
     @Column(nullable = false)
     private int distance;
 
-    // 일단 하드 코딩으로 upStation과 downStation을 넣어놓고 커밋한 후, 엔티티로 변경하자.
-    // 질문거리: 현업에서 실제로 Controller의 응답 형식을 ResponseEntity의 상태코드로 지정해주는 것인지?? (201, 205 등을 구체적으로 나누는 것인지, 혹은 200으로 그냥 통합하는지..? 난 항상 200만 사용했었는데)
-
-
-    public StationLine(String name, String color, int upStationId, int downStationId, int distance) {
+    public StationLine(String name, String color, Station upStation, Station downStation, int distance) {
         this.name = name;
         this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
+        this.upStation = upStation;
+        this.downStation = downStation;
         this.distance = distance;
     }
 
@@ -49,12 +50,12 @@ public class StationLine {
         return color;
     }
 
-    public int getUpStationId() {
-        return upStationId;
+    public Station getUpStation() {
+        return upStation;
     }
 
-    public int getDownStationId() {
-        return downStationId;
+    public Station getDownStation() {
+        return downStation;
     }
 
     public int getDistance() {
@@ -67,18 +68,6 @@ public class StationLine {
 
     public void setColor(String color) {
         this.color = color;
-    }
-
-    @Override
-    public String toString() {
-        return "StationLine{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", color='" + color + '\'' +
-                ", upStationId=" + upStationId +
-                ", downStationId=" + downStationId +
-                ", distance=" + distance +
-                '}';
     }
 
     public void updateStationLine(StationLineRequest stationLineRequest) {
