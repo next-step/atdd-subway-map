@@ -5,7 +5,7 @@ public class LineUpdateRequest {
     private String name;
     private String color;
 
-    protected LineUpdateRequest() {
+    public LineUpdateRequest() {
     }
 
     public LineUpdateRequest(String name, String color) {
