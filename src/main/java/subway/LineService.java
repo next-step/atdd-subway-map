@@ -37,8 +37,8 @@ public class LineService {
   // TODO pagination
   // TODO entity mapping 이후 쿼리 수정
   public List<LineResponse> findAllLines() {
-    var lines = lineRepository.findAll();
-    Map<Long /* station ID */, StationResponse> stationById = stationService.findAllStations().stream()
+    final var lines = lineRepository.findAll();
+    final Map<Long /* station ID */, StationResponse> stationById = stationService.findAllStations().stream()
         .collect(Collectors.toMap(StationResponse::getId, Function.identity()));
 
     return lines.stream()
@@ -47,6 +47,21 @@ public class LineService {
             stationById.get(line.getUpStationId()),
             stationById.get(line.getDownStationId())
         )).collect(Collectors.toList());
+  }
+
+  public LineResponse findById(Long id) {
+    final var line = lineRepository.findById(id)
+        .orElseThrow(() -> new RuntimeException("노선 정보를 찾을 수 없습니다."));
+    final var upStation = stationService.findById(line.getUpStationId())
+        .orElseThrow(() -> new RuntimeException("상행역 정보를 찾을 수 없습니다."));
+    final var downStation = stationService.findById(line.getDownStationId())
+        .orElseThrow(() -> new RuntimeException("하행역 정보를 찾을 수 없습니다."));
+
+    return LineResponse.from(
+        line,
+        upStation,
+        downStation
+    );
   }
 
 }
