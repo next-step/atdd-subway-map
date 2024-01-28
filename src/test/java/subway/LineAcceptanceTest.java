@@ -1,6 +1,5 @@
 package subway;
 
-import io.restassured.RestAssured;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -8,7 +7,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import subway.controller.dto.LineCreateRequest;
 import subway.controller.dto.LineResponse;
 import subway.controller.dto.LineUpdateRequest;
@@ -24,33 +22,26 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 @DisplayName("지하철 노선 관련 기능")
 public class LineAcceptanceTest extends AcceptanceTest {
 
+    private static final String LINE_NAME_SHINBUNDANG = "신분당선";
+    private static final String LINE_NAME_BUNDANG = "분당선";
+    private static final String LINE_COLOR_RED = "bg-red-600";
+    private static final String LINE_COLOR_GREEN = "bg-green-600";
+    private static final Long DISTANCE = 10L;
+
     private static Long GANGNAM_STATION_ID;
     private static Long SEOLLEUNG_STATION_ID;
     private static Long YANGJAE_STATION_ID;
 
-    // TODO: 중복 제거 필요
     @BeforeEach
     void setFixture() {
-        GANGNAM_STATION_ID = RestAssured.given()
-                .body(Map.of("name", "강남역"))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then()
-                .extract().as(StationResponse.class).getId();
+        GANGNAM_STATION_ID = post("/stations", Map.of("name", "강남역"))
+                .as(StationResponse.class).getId();
 
-        SEOLLEUNG_STATION_ID = RestAssured.given()
-                .body(Map.of("name", "선릉역"))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then()
-                .extract().as(StationResponse.class).getId();
+        SEOLLEUNG_STATION_ID = post("/stations", Map.of("name", "선릉역"))
+                .as(StationResponse.class).getId();
 
-        YANGJAE_STATION_ID = RestAssured.given()
-                .body(Map.of("name", "양재역"))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then()
-                .extract().as(StationResponse.class).getId();
+        YANGJAE_STATION_ID = post("/stations", Map.of("name", "양재역"))
+                .as(StationResponse.class).getId();
     }
 
     /**
@@ -62,11 +53,11 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void createLine() {
         // given
         LineCreateRequest request = new LineCreateRequest(
-                "신분당선",
-                "bg-red-600",
+                LINE_NAME_SHINBUNDANG,
+                LINE_COLOR_RED,
                 GANGNAM_STATION_ID,
                 SEOLLEUNG_STATION_ID,
-                10L
+                DISTANCE
         );
 
         // when
@@ -92,18 +83,18 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void selectLines() {
         // given
         LineCreateRequest shinbundangRequest = new LineCreateRequest(
-                "신분당선",
-                "bg-red-600",
+                LINE_NAME_SHINBUNDANG,
+                LINE_COLOR_RED,
                 GANGNAM_STATION_ID,
                 SEOLLEUNG_STATION_ID,
-                10L
+                DISTANCE
         );
         ExtractableResponse<Response> shinbundangCreateResponse = createLine(shinbundangRequest);
         assertThat(shinbundangCreateResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         LineCreateRequest bundangRequest = new LineCreateRequest(
-                "분당선",
-                "bg-green-600",
+                LINE_NAME_BUNDANG,
+                LINE_COLOR_GREEN,
                 GANGNAM_STATION_ID,
                 YANGJAE_STATION_ID,
                 10L
@@ -130,11 +121,11 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void selectLine() {
         // given
         LineCreateRequest shinbundangRequest = new LineCreateRequest(
-                "신분당선",
-                "bg-red-600",
+                LINE_NAME_SHINBUNDANG,
+                LINE_COLOR_RED,
                 GANGNAM_STATION_ID,
                 SEOLLEUNG_STATION_ID,
-                10L
+                DISTANCE
         );
         ExtractableResponse<Response> shinbundangCreateResponse = createLine(shinbundangRequest);
         assertThat(shinbundangCreateResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -146,8 +137,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // then
         assertAll(
                 () -> assertThat(findLineResponse.getId()).isEqualTo(1L),
-                () -> assertThat(findLineResponse.getName()).isEqualTo("신분당선"),
-                () -> assertThat(findLineResponse.getColor()).isEqualTo("bg-red-600"),
+                () -> assertThat(findLineResponse.getName()).isEqualTo(LINE_NAME_SHINBUNDANG),
+                () -> assertThat(findLineResponse.getColor()).isEqualTo(LINE_COLOR_RED),
                 () -> assertThat(findLineResponse.getStations()).hasSize(2)
                         .extracting("id", "name")
                         .containsExactly(
@@ -167,11 +158,11 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void updateLine() {
         // given
         LineCreateRequest shinbundangRequest = new LineCreateRequest(
-                "신분당선",
-                "bg-red-600",
+                LINE_NAME_SHINBUNDANG,
+                LINE_COLOR_RED,
                 GANGNAM_STATION_ID,
                 SEOLLEUNG_STATION_ID,
-                10L
+                DISTANCE
         );
         ExtractableResponse<Response> shinbundangCreateResponse = createLine(shinbundangRequest);
         assertThat(shinbundangCreateResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -207,11 +198,11 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void deleteLine() {
         // given
         LineCreateRequest shinbundangRequest = new LineCreateRequest(
-                "신분당선",
-                "bg-red-600",
+                LINE_NAME_SHINBUNDANG,
+                LINE_COLOR_RED,
                 GANGNAM_STATION_ID,
                 SEOLLEUNG_STATION_ID,
-                10L
+                DISTANCE
         );
         ExtractableResponse<Response> shinbundangCreateResponse = createLine(shinbundangRequest);
         assertThat(shinbundangCreateResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -222,47 +213,29 @@ public class LineAcceptanceTest extends AcceptanceTest {
         assertThat(shinbundangDeleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         // then
-        List<LineResponse> findAllResponse = findLines().as(new TypeRef<>() {});
+        List<LineResponse> findAllResponse = findLines().as(new TypeRef<>() {
+        });
         assertThat(findAllResponse).isEmpty();
     }
 
     private ExtractableResponse<Response> createLine(LineCreateRequest request) {
-        return RestAssured.given().log().all()
-                .body(request)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().log().all()
-                .extract();
+        return post("/lines", request);
     }
 
     private ExtractableResponse<Response> findLines() {
-        return RestAssured.given().log().all()
-                .when().get("/lines")
-                .then().log().all()
-                .extract();
+        return get("/lines");
     }
 
     private ExtractableResponse<Response> findLine(Long id) {
-        return RestAssured.given().log().all()
-                .when().get("/lines/{id}", id)
-                .then().log().all()
-                .extract();
+        return get("/lines/{id}", id);
     }
 
     private ExtractableResponse<Response> updateLine(Long id, LineUpdateRequest request) {
-        return RestAssured.given().log().all()
-                .body(request)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().put("/lines/{id}", id)
-                .then().log().all()
-                .extract();
+        return put("/lines/{id}", request, id);
     }
 
     private ExtractableResponse<Response> deleteLine(Long id) {
-        return RestAssured.given().log().all()
-                .when().delete("/lines/{id}", id)
-                .then().log().all()
-                .extract();
+        return delete("/lines/{id}", id);
     }
 
 }
