@@ -3,6 +3,7 @@ package subway;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -70,6 +71,31 @@ public class StationAcceptanceTest extends AcceptanceTest {
                 .containsExactly("강남역", "선릉역");
     }
 
+
+    /**
+     * Given N개의 지하철역을 생성하고
+     * When 조회할 N개의 지하철역을 선택하면
+     * Then N개의 지하철역을 응답 받는다
+     */
+    @DisplayName("선택한 N개의 지하철역을 조회한다.")
+    @Test
+    void findStationBy() {
+        // given
+        Map<String, String> gangNamStationParams = new HashMap<>();
+        gangNamStationParams.put("name", "강남역");
+        ExtractableResponse<Response> gangnamStationCreateResponse = createStation(gangNamStationParams);
+        StationResponse gangnamStationResponse = gangnamStationCreateResponse.as(StationResponse.class);
+        assertThat(gangnamStationCreateResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        // when
+        ExtractableResponse<Response> findResponse = findStationBy(List.of(gangnamStationResponse.getId()));
+        List<String> stationsNames = findResponse.jsonPath().getList("name", String.class);
+
+        // then
+        assertThat(stationsNames).hasSize(1)
+                .containsExactly("강남역");
+    }
+
     /**
      * Given 지하철역을 생성하고
      * When 그 지하철역을 삭제하면
@@ -105,7 +131,20 @@ public class StationAcceptanceTest extends AcceptanceTest {
 
     private ExtractableResponse<Response> findStation() {
         return RestAssured.given().log().all()
-                .when().get("/stations")
+                .when().get("/stations/all")
+                .then().log().all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> findStationBy(List<Long> ids) {
+        RequestSpecification request = RestAssured.given().log().all();
+
+        for (Long id : ids) {
+            request.param("ids", id);
+        }
+
+        return request
+                .when().get("/stations/filter")
                 .then().log().all()
                 .extract();
     }

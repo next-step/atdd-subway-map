@@ -23,9 +23,16 @@ public class StationController {
         return ResponseEntity.created(URI.create("/stations/" + station.getId())).body(station);
     }
 
-    @GetMapping(value = "/stations")
+    @GetMapping(value = "/stations/all")
     public ResponseEntity<List<StationResponse>> showStations() {
         return ResponseEntity.ok().body(stationService.findAllStations());
+    }
+
+    @GetMapping(value = "/stations/filter")
+    public ResponseEntity<List<StationResponse>> findStationsBy(@RequestParam(required = false) List<Long> ids) {
+        return ResponseEntity.ok().body(
+                StationResponse.listOf(stationService.findStationsBy(ids))
+        );
     }
 
     @DeleteMapping("/stations/{id}")
