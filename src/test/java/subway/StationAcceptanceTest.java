@@ -18,6 +18,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationAcceptanceTest {
 
+    /**
+     * Given 지하철역을 생성한다
+     * When 지하철역 전체 목록을 조회한다
+     * Then 생성된 지하철 역들의 개수와 이름을 확인할 수 있다
+     */
     @DisplayName("지하철 역을 2개 생성하고 등록된 역들을 조회한다.")
     @Test
     void test() {
@@ -35,6 +40,11 @@ public class StationAcceptanceTest {
         );
     }
 
+    /**
+     * Given 지하철역을 생성한다
+     * When 생성한 지하철 역을 제거한다
+     * Then 204(noContent) 응답코드를 확인한다.
+     */
     @DisplayName("생성한 역을 삭제하면 204 코드를 반환한다.")
     @Test
     void test2() {
@@ -50,6 +60,11 @@ public class StationAcceptanceTest {
         assertThat(response.getStatusCode()).isEqualTo(204);
     }
 
+    /**
+     * Given 지하철역을 생성한다
+     * When 생성된 지하철 역이 아닌, 임의의 역을 제거한다
+     * Then 204(noContent) 응답코드가 아님을 확인한다
+     */
     @DisplayName("생성한 역이 아닌 역을 삭제하면 204 코드를 반환하지 않는다.")
     @Test
     void test3() {
