@@ -35,6 +35,13 @@ public class LineService {
         return LineResponse.convertToDto(savedLine);
     }
 
+    public LineResponse getSubwayLine(Long lindId) {
+        Line line = lineRepository.findById(lindId)
+                .orElseThrow(() -> new EntityNotFoundException("Line not found. Line Id: " + lindId));
+
+        return LineResponse.convertToDto(line);
+    }
+
     public List<LineResponse> getSubwayLines() {
         return lineRepository.findAll().stream()
                 .map(line -> LineResponse.convertToDto(line))
