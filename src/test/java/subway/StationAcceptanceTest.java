@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.jdbc.Sql;
 
 import java.util.HashMap;
 import java.util.List;
@@ -17,9 +18,11 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@Sql(value = "/sql/truncate.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationAcceptanceTest {
+    private final String routePrefix = "/stations";
+
     /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다
@@ -36,7 +39,7 @@ public class StationAcceptanceTest {
                 RestAssured.given().log().all()
                         .body(params)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/stations")
+                        .when().post(routePrefix)
                         .then().log().all()
                         .extract();
 
@@ -61,7 +64,7 @@ public class StationAcceptanceTest {
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when().get("/stations")
+                .when().get(routePrefix)
                 .then().log().all()
                 .extract();
 
@@ -85,7 +88,7 @@ public class StationAcceptanceTest {
         ExtractableResponse<Response> deleteStationResponse =
                 RestAssured.given().log().all()
                         .pathParam("id", setupStationId)
-                        .when().delete("/stations/{id}")
+                        .when().delete(routePrefix + "/{id}")
                         .then().log().all()
                         .extract();
 
@@ -103,14 +106,14 @@ public class StationAcceptanceTest {
         return RestAssured.given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
+                .when().post(routePrefix)
                 .then().log().all()
                 .extract().jsonPath().getLong("id");
     }
 
     private List<String> getStationNameList() {
         return RestAssured.given().log().all()
-                .when().get("/stations")
+                .when().get(routePrefix)
                 .then().log().all()
                 .extract().jsonPath().getList("name", String.class);
 
