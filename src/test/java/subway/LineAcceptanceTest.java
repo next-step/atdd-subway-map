@@ -31,13 +31,64 @@ public class LineAcceptanceTest {
     @Test
     public void 지하철_노선_생성() {
         // when
-        final String lineName = "신분당선";
-        final String lineColor = "bg-red-600";
-        final Long upStationId = 1L;
-        final Long downStationId = 2L;
-        final Integer lineDistance = 10;
-        final LineRequest request = new LineRequest(lineName, lineColor, upStationId, downStationId, lineDistance);
+        final LineRequest request = new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10);
+        final ExtractableResponse<Response> response = createSubwayLine(request);
 
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        final JsonPath jsonPath = this.getSubwayLineList();
+
+        final List<String> lineNames = jsonPath.getList("name", String.class);
+        assertThat(lineNames).hasSize(1);
+        assertThat(lineNames).containsAnyOf("신분당선");
+
+        final List<Station> lineStations = jsonPath.getList("[0].stations", Station.class);
+        assertThat(lineStations).hasSize(2);
+
+        final List<String> lineStationNames = jsonPath.getList("[0].stations.name", String.class);
+        assertThat(lineStationNames).containsExactlyInAnyOrder("강남역", "역삼역");
+    }
+
+    /**
+     * Given 2개의 지하철 노선을 생성하고
+     * When 지하철 노선 목록을 조회하면
+     * Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
+     */
+    @DisplayName("지하철 노선 목록을 조회한다.")
+    @Test
+    public void 지하철_노선_목록_조회() {
+        // given
+        final LineRequest request1 = new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10);
+        createSubwayLine(request1);
+
+        final LineRequest request2 = new LineRequest("지하철노선1", "bg-green-600", 1L, 3L, 15);
+        createSubwayLine(request2);
+
+        // when
+        final JsonPath jsonPath = this.getSubwayLineList();
+
+        // then
+        final List<String> lineNames = jsonPath.getList("name", String.class);
+        assertThat(lineNames).hasSize(2);
+        assertThat(lineNames).containsExactly("신분당선", "지하철노선1");
+
+        final List<String> lineStationNames = jsonPath.getList("[1].stations.name", String.class);
+        assertThat(lineStationNames).doesNotContain("역삼역");
+        assertThat(lineStationNames).containsExactly("강남역", "지하철역1");
+    }
+
+    private LineRequest createLineRequest(
+            final String lineName
+            , final String lineColor
+            , final Long upStationId
+            , final Long downStationId
+            , final Integer lineDistance
+    ) {
+        return new LineRequest(lineName, lineColor, upStationId, downStationId, lineDistance);
+    }
+
+    private ExtractableResponse<Response> createSubwayLine(LineRequest request) {
         final ExtractableResponse<Response> response =
                 given()
                     .log().all()
@@ -50,10 +101,11 @@ public class LineAcceptanceTest {
                     .log().all()
                 .extract();
 
-        // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        return response;
+    }
 
-        final JsonPath jsonPath =
+    private JsonPath getSubwayLineList() {
+        final JsonPath response =
                 given()
                     .log().all()
                 .when()
@@ -64,15 +116,7 @@ public class LineAcceptanceTest {
                 .extract()
                     .jsonPath();
 
-        final List<String> lineNames = jsonPath.getList("name", String.class);
-        assertThat(lineNames).hasSize(1);
-        assertThat(lineNames).containsAnyOf("신분당선");
-
-        final List<Station> lineStations = jsonPath.getList("[0].stations", Station.class);
-        assertThat(lineStations).hasSize(2);
-
-        final List<String> lineStationNames = jsonPath.getList("[0].stations.name", String.class);
-        assertThat(lineStationNames).containsExactlyInAnyOrder("강남역", "역삼역");
+        return response;
     }
 
 }
