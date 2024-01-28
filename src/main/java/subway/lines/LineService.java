@@ -3,6 +3,7 @@ package subway.lines;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.persistence.EntityNotFoundException;
@@ -86,9 +87,18 @@ public class LineService {
         lineRepository.deleteById(id);
     }
 
+    /**
+     * @param id
+     * @param sectionAddRequest
+     * @return
+     * @throws IllegalArgumentException
+     */
     @Transactional
     public LineResponse addSection(Long id, SectionAddRequest sectionAddRequest) {
         final Line line = lineRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+
+        validateAddSectionCondition(sectionAddRequest, line);
+
         final Section section = sectionRepository.save(
             new Section(
                 sectionAddRequest.getUpStationId(),
@@ -99,6 +109,12 @@ public class LineService {
         section.updateLine(line);
 
         return createLineResponse(line);
+    }
+
+    private static void validateAddSectionCondition(SectionAddRequest sectionAddRequest, Line line) {
+        if (!Objects.equals(line.getDownStationId(), sectionAddRequest.getUpStationId())) {
+            throw new IllegalArgumentException();
+        }
     }
 
     private LineResponse createLineResponse(Line line) {
