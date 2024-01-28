@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("지하철 노선 관련 기능")
 public class LineAcceptanceTest extends AcceptanceTest {
@@ -116,6 +118,43 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 .containsExactly("신분당선", "분당선");
     }
 
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 조회하면
+     * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
+     */
+    @DisplayName("지하철 노선을 조회한다.")
+    @Test
+    void selectLine() {
+        // given
+        LineRequest shinbundangRequest = new LineRequest(
+                "신분당선",
+                "bg-red-600",
+                GANGNAM_STATION_ID,
+                SEOLLEUNG_STATION_ID,
+                10L
+        );
+        ExtractableResponse<Response> shinbundangCreateResponse = createLine(shinbundangRequest);
+        assertThat(shinbundangCreateResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        LineResponse createLineResponse = shinbundangCreateResponse.as(LineResponse.class);
+
+        // when
+        LineResponse findLineResponse = findLine(createLineResponse.getId()).as(LineResponse.class);
+
+        // then
+        assertAll(
+                () -> assertThat(findLineResponse.getId()).isEqualTo(1L),
+                () -> assertThat(findLineResponse.getName()).isEqualTo("신분당선"),
+                () -> assertThat(findLineResponse.getColor()).isEqualTo("bg-red-600"),
+                () -> assertThat(findLineResponse.getStations()).hasSize(2)
+                        .extracting("id", "name")
+                        .containsExactly(
+                                tuple(1L, "강남역"),
+                                tuple(2L, "선릉역")
+                        )
+        );
+    }
+
     private ExtractableResponse<Response> createLine(LineRequest request) {
         return RestAssured.given().log().all()
                 .body(request)
@@ -128,6 +167,13 @@ public class LineAcceptanceTest extends AcceptanceTest {
     private ExtractableResponse<Response> findLines() {
         return RestAssured.given().log().all()
                 .when().get("/lines")
+                .then().log().all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> findLine(Long id) {
+        return RestAssured.given().log().all()
+                .when().get("/lines/{id}", id)
                 .then().log().all()
                 .extract();
     }

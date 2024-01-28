@@ -54,4 +54,11 @@ public class LineService {
                 .filter(station -> ids.contains(station.getId()))
                 .collect(Collectors.toList());
     }
+
+    public LineResponse findLine(Long id) {
+        Line line = lineRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 노선입니다."));
+        List<Station> stations = findStationsBy(line.stationIds());
+        return LineResponse.of(line, stations);
+    }
 }
