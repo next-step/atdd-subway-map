@@ -1,5 +1,6 @@
 package subway;
 
+import io.restassured.http.ContentType;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -13,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import subway.line.LineRepository;
 import subway.line.LineRequest;
+import subway.line.LineUpdateRequest;
 import subway.station.Station;
 import subway.station.StationRepository;
 
@@ -123,15 +125,7 @@ public class LineAcceptanceTest {
         final String subwayLineId = location.replaceAll(".*/(\\d+)$", "$1");
 
         // when
-        JsonPath jsonPath =
-                given()
-                .when()
-                    .get("/lines/{id}", subwayLineId)
-                .then()
-                    .statusCode(HttpStatus.OK.value())
-                    .log().all()
-                .extract()
-                    .jsonPath();
+        JsonPath jsonPath = this.getSubwayLine(subwayLineId);
 
         // then
         String lineName = jsonPath.get("name");
@@ -145,6 +139,44 @@ public class LineAcceptanceTest {
 
         List<String> lineStationNames = jsonPath.getList("stations.name", String.class);
         assertThat(lineStationNames).containsExactly("강남역", "역삼역");
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 수정하면
+     * Then 해당 지하철 노선 정보는 수정된다
+     */
+    @DisplayName("지하철 노선을 수정한다.")
+    @Test
+    void 지하철_노선_수정() {
+        // given
+        final LineRequest createRequest = new LineRequest("신분당선", "bg-red-600", 강남역_ID, 역삼역_ID, 10);
+        ExtractableResponse<Response> createSubwayLineResponse = createSubwayLine(createRequest);
+
+        final String location = createSubwayLineResponse.header("Location");
+        final String subwayLineId = location.replaceAll(".*/(\\d+)$", "$1");
+
+        final LineUpdateRequest updateRequest = new LineUpdateRequest("2호선", "bg-yellow-600");
+
+        // when
+        given()
+            .log().all()
+            .body(updateRequest)
+            .contentType(ContentType.JSON)
+        .when()
+            .put("lines/{id}", subwayLineId)
+        .then()
+            .statusCode(HttpStatus.OK.value())
+            .log().all();
+
+        // then
+        JsonPath afterUpdatedSubwayLine = this.getSubwayLine(subwayLineId);
+
+        String updatedName = afterUpdatedSubwayLine.get("name");
+        assertThat(updatedName).isEqualTo("2호선");
+
+        String updatedColor = afterUpdatedSubwayLine.get("color");
+        assertThat(updatedColor).isEqualTo("bg-yellow-600");
     }
 
     private ExtractableResponse<Response> createSubwayLine(LineRequest request) {
@@ -176,6 +208,17 @@ public class LineAcceptanceTest {
                     .jsonPath();
 
         return response;
+    }
+
+    private JsonPath getSubwayLine(String subwayLineId) {
+        return given()
+                .when()
+                .get("/lines/{id}", subwayLineId)
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .log().all()
+                .extract()
+                .jsonPath();
     }
 
 }
