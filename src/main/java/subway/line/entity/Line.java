@@ -25,13 +25,13 @@ public class Line {
     @JoinColumn(name = "down_station_id")
     private Station downStation;
 
-    @Column
-    private Integer distance;
+    @Column(nullable = false)
+    private int distance;
 
     protected Line() {
     }
 
-    public Line(String name, String color, Station upStation, Station downStation, Integer distance) {
+    public Line(String name, String color, Station upStation, Station downStation, int distance) {
         this.name = name;
         this.color = color;
         this.upStation = upStation;
@@ -64,7 +64,7 @@ public class Line {
         return downStation;
     }
 
-    public Integer getDistance() {
+    public int getDistance() {
         return distance;
     }
 

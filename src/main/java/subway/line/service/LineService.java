@@ -32,7 +32,7 @@ public class LineService {
         final String lineColor = request.getColor();
         final Station upStation = this.findStationById(request.getUpStationId());
         final Station downStation = this.findStationById(request.getDownStationId());
-        final Integer lineDistance = request.getDistance();
+        final int lineDistance = request.getDistance();
 
         final Line newLine = new Line(lineName, lineColor, upStation, downStation, lineDistance);
         final Line savedLine = lineRepository.save(newLine);
