@@ -1,5 +1,6 @@
 package subway.application;
 
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.dto.StationLineRequest;
@@ -29,6 +30,11 @@ public class StationLineService {
         return stationLineRepository.findAll().stream()
                 .map(this::convertToResponse)
                 .collect(Collectors.toList());
+    }
+
+    public StationLineResponse findStationLineById(Long stationLineId) {
+        return convertToResponse(stationLineRepository.findById(stationLineId)
+                .orElseThrow(RuntimeException::new)); // TODO 예외 처리
     }
 
     private StationLine convertToEntity(StationLineRequest request) {

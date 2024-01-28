@@ -1,10 +1,7 @@
 package subway.presentation;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import subway.application.StationLineService;
 import subway.dto.StationLineRequest;
 import subway.dto.StationLineResponse;
@@ -30,5 +27,10 @@ public class StationLineController {
     @GetMapping("/lines")
     public ResponseEntity<List<StationLineResponse>> findAllStationLines() {
         return ResponseEntity.ok(stationLineService.findAllStationLines());
+    }
+
+    @GetMapping("/lines/{stationLineId}")
+    public ResponseEntity<StationLineResponse> findStationLineById(@PathVariable Long stationLineId) {
+        return ResponseEntity.ok(stationLineService.findStationLineById(stationLineId));
     }
 }
