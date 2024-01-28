@@ -232,15 +232,6 @@ public class SubwayLinesAcceptanceTest {
     }
 
     private static void isSameLines(LineResponse foundLines, LineResponse createdLines) {
-        assertThat(foundLines.getName()).isEqualTo(createdLines.getName());
-        assertThat(foundLines.getColor()).isEqualTo(createdLines.getColor());
-
-        final List<Long> foundStationIdList = foundLines
-            .getStations().stream().map(StationResponse::getId)
-            .collect(Collectors.toList());
-        final List<Long> createdStationIdList = createdLines
-            .getStations().stream().map(StationResponse::getId)
-            .collect(Collectors.toList());
-        assertThat(foundStationIdList).containsAll(createdStationIdList);
+        assertThat(foundLines).usingRecursiveComparison().isEqualTo(createdLines);
     }
 }
