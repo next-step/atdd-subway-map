@@ -52,6 +52,8 @@
 - 엔드포인트: POST /lines/{id}/sections
 - 응답: 201
     - LinesResponse
+- 요청
+    - downStationId, upStationId, distance
 - 조건
     - 새로운 구간의 상행역은 해당 노선에 등록되어 있는 하행역이어야 한다.
     - 위 조건에 부합하지 않는 경우 에러 처리한다. 
