@@ -1,21 +1,17 @@
 package subway;
 
-import io.restassured.RestAssured;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+import org.springframework.test.context.jdbc.Sql;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static subway.extractableResponse.StationApiExtractableResponse.*;
 
 @DisplayName("지하철역 관련 기능")
+@Sql("/truncate.sql")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationAcceptanceTest {
 
@@ -65,7 +61,7 @@ public class StationAcceptanceTest {
     @Test
     void 지하철_역을_삭제() {
         // given
-        String stationName = "신논현역";
+        String stationName = "강남역";
         Long id = createStationByStationName(stationName).jsonPath().getLong("id");
 
         // when
@@ -75,40 +71,6 @@ public class StationAcceptanceTest {
         List<String> stationNames =
                 selectStations().jsonPath().getList("name", String.class);
         assertThat(stationNames).doesNotContain(stationName);
-    }
-
-
-    private ExtractableResponse<Response> createStationByStationName(String stationName) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", stationName);
-
-        return RestAssured
-                .given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .statusCode(HttpStatus.CREATED.value())
-                .extract();
-    }
-
-    private ExtractableResponse<Response> selectStations() {
-        return RestAssured
-                .given().log().all()
-                .when().get("/stations")
-                .then().log().all()
-                .statusCode(HttpStatus.OK.value())
-                .extract();
-    }
-
-    private ExtractableResponse<Response> deleteStation(Long id) {
-        return RestAssured
-                .given().log().all()
-                .pathParam("id", id)
-                .when().delete("/stations/{id}")
-                .then().log().all()
-                .statusCode(HttpStatus.NO_CONTENT.value())
-                .extract();
     }
 
 }
