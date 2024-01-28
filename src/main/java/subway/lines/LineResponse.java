@@ -18,12 +18,11 @@ public class LineResponse {
 
     }
 
-    public LineResponse(Line line) {
+    public LineResponse(Line line, List<Station> stations) {
         this.id = line.getId();
         this.name = line.getName();
         this.color = line.getColor();
-        this.stations = Arrays.stream(new Station[]{line.getUpStation(), line.getDownStation()})
-            .map(StationResponse::new).collect(Collectors.toList());
+        this.stations = stations.stream().map(StationResponse::new).collect(Collectors.toList());
     }
 
     public Long getId() {

@@ -8,8 +8,13 @@ public class LineCreateRequest {
     private Long downStationId;
     private Long distance;
 
-    public LineCreateRequest(String name, String color, Long upStationId, Long downStationId,
-        Long distance) {
+    public LineCreateRequest(
+        String name,
+        String color,
+        Long upStationId,
+        Long downStationId,
+        Long distance
+    ) {
         this.name = name;
         this.color = color;
         this.upStationId = upStationId;
