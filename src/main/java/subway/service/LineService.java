@@ -5,9 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 import subway.repository.LineRepository;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
-import subway.repository.StationRepository;
 import subway.entity.Line;
-import subway.entity.Station;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
@@ -17,11 +15,11 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class LineService {
 	private final LineRepository lineRepository;
-	private final StationRepository stationRepository;
+	private final StationService stationService;
 
-	public LineService(LineRepository lineRepository, StationRepository stationRepository) {
+	public LineService(LineRepository lineRepository, StationService stationService) {
 		this.lineRepository = lineRepository;
-		this.stationRepository = stationRepository;
+		this.stationService = stationService;
 	}
 
 	@Transactional
@@ -58,11 +56,7 @@ public class LineService {
 	}
 
 	private LineResponse createLineResponse(Line line) {
-		Station upStation = stationRepository.findById(line.getUpStationId())
-				.orElseThrow(EntityNotFoundException::new);
-		Station downStation = stationRepository.findById(line.getDownStationId())
-				.orElseThrow(EntityNotFoundException::new);
-
-		return new LineResponse(line, List.of(upStation, downStation));
+		return new LineResponse(line,
+				List.of(stationService.findStationById(line.getUpStationId()), stationService.findStationById(line.getDownStationId())));
 	}
 }

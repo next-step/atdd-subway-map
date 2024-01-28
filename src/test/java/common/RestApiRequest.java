@@ -21,30 +21,30 @@ public class RestApiRequest<T> {
 	}
 
 	public ExtractableResponse<Response> post(T body) {
-		return RestAssured.given()
+		return RestAssured.given().log().all()
 				.body(body)
 					.contentType(MediaType.APPLICATION_JSON_VALUE)
 				.when()
 					.post(path)
-				.then()
+				.then().log().all()
 					.extract();
 	}
 
 	public ExtractableResponse<Response> put(T body, Object... pathParams) {
-		return RestAssured.given()
+		return RestAssured.given().log().all()
 				.body(body)
 					.contentType(MediaType.APPLICATION_JSON_VALUE)
 				.when()
 					.put(path, pathParams)
-				.then()
+				.then().log().all()
 					.extract();
 	}
 
 	public ExtractableResponse<Response> delete(Object... pathParams) {
-		return RestAssured.given()
+		return RestAssured.given().log().all()
 				.when()
 					.delete(path, pathParams)
-				.then()
+				.then().log().all()
 					.extract();
 	}
 }

@@ -1,7 +1,6 @@
 package subway.dto;
 
 import subway.entity.Line;
-import subway.entity.Station;
 
 import java.util.List;
 
@@ -12,9 +11,9 @@ public class LineResponse {
 
 	private String color;
 
-	private List<Station> staions;
+	private List<StationResponse> staions;
 
-	public LineResponse(Line line, List<Station> stations) {
+	public LineResponse(Line line, List<StationResponse> stations) {
 		this.id = line.getId();
 		this.name = line.getName();
 		this.color = line.getColor();
@@ -31,5 +30,9 @@ public class LineResponse {
 
 	public String getColor() {
 		return color;
+	}
+
+	public List<StationResponse> getStaions() {
+		return staions;
 	}
 }
