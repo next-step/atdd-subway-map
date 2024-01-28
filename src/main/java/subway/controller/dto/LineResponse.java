@@ -12,6 +12,9 @@ public class LineResponse {
     private String color;
     private List<StationResponse> stations;
 
+    public LineResponse() {
+    }
+
     public static List<LineResponse> listOf(List<Line> lines, List<Station> stations) {
         return lines.stream()
                 .map(line -> of(line, containStationWithLine(line, stations)))

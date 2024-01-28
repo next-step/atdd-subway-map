@@ -1,13 +1,16 @@
 package subway.controller.dto;
 
-public class LineRequest {
+public class LineCreateRequest {
     private String name;
     private String color;
     private Long upStationId;
     private Long downStationId;
     private Long distance;
 
-    public LineRequest(String name, String color, Long upStationId, Long downStationId, Long distance) {
+    public LineCreateRequest() {
+    }
+
+    public LineCreateRequest(String name, String color, Long upStationId, Long downStationId, Long distance) {
         this.name = name;
         this.color = color;
         this.upStationId = upStationId;

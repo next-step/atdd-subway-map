@@ -8,8 +8,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import subway.controller.dto.LineRequest;
+import subway.controller.dto.LineCreateRequest;
 import subway.controller.dto.LineResponse;
+import subway.controller.dto.LineUpdateRequest;
 import subway.controller.dto.StationResponse;
 
 import java.util.List;
@@ -59,7 +60,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine() {
         // given
-        LineRequest request = new LineRequest(
+        LineCreateRequest request = new LineCreateRequest(
                 "신분당선",
                 "bg-red-600",
                 GANGNAM_STATION_ID,
@@ -89,7 +90,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void selectLines() {
         // given
-        LineRequest shinbundangRequest = new LineRequest(
+        LineCreateRequest shinbundangRequest = new LineCreateRequest(
                 "신분당선",
                 "bg-red-600",
                 GANGNAM_STATION_ID,
@@ -99,7 +100,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> shinbundangCreateResponse = createLine(shinbundangRequest);
         assertThat(shinbundangCreateResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
-        LineRequest bundangRequest = new LineRequest(
+        LineCreateRequest bundangRequest = new LineCreateRequest(
                 "분당선",
                 "bg-green-600",
                 GANGNAM_STATION_ID,
@@ -127,7 +128,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void selectLine() {
         // given
-        LineRequest shinbundangRequest = new LineRequest(
+        LineCreateRequest shinbundangRequest = new LineCreateRequest(
                 "신분당선",
                 "bg-red-600",
                 GANGNAM_STATION_ID,
@@ -155,7 +156,47 @@ public class LineAcceptanceTest extends AcceptanceTest {
         );
     }
 
-    private ExtractableResponse<Response> createLine(LineRequest request) {
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 수정하면
+     * Then 해당 지하철 노선 정보는 수정된다.
+     */
+    @DisplayName("지하철 노선을 수정한다.")
+    @Test
+    void updateLine() {
+        // given
+        LineCreateRequest shinbundangRequest = new LineCreateRequest(
+                "신분당선",
+                "bg-red-600",
+                GANGNAM_STATION_ID,
+                SEOLLEUNG_STATION_ID,
+                10L
+        );
+        ExtractableResponse<Response> shinbundangCreateResponse = createLine(shinbundangRequest);
+        assertThat(shinbundangCreateResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        LineResponse createLineResponse = shinbundangCreateResponse.as(LineResponse.class);
+
+        // when
+        ExtractableResponse<Response> shinbundangUpdateResponse = updateLine(createLineResponse.getId(), new LineUpdateRequest("다른분당선", "bg-blue-600"));
+        assertThat(shinbundangUpdateResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        // then
+        LineResponse findLineResponse = findLine(createLineResponse.getId()).as(LineResponse.class);
+
+        assertAll(
+                () -> assertThat(findLineResponse.getId()).isEqualTo(1L),
+                () -> assertThat(findLineResponse.getName()).isEqualTo("다른분당선"),
+                () -> assertThat(findLineResponse.getColor()).isEqualTo("bg-blue-600"),
+                () -> assertThat(findLineResponse.getStations()).hasSize(2)
+                        .extracting("id", "name")
+                        .containsExactly(
+                                tuple(1L, "강남역"),
+                                tuple(2L, "선릉역")
+                        )
+        );
+    }
+
+    private ExtractableResponse<Response> createLine(LineCreateRequest request) {
         return RestAssured.given().log().all()
                 .body(request)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -174,6 +215,15 @@ public class LineAcceptanceTest extends AcceptanceTest {
     private ExtractableResponse<Response> findLine(Long id) {
         return RestAssured.given().log().all()
                 .when().get("/lines/{id}", id)
+                .then().log().all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> updateLine(Long id, LineUpdateRequest request) {
+        return RestAssured.given().log().all()
+                .body(request)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().put("/lines/{id}", id)
                 .then().log().all()
                 .extract();
     }
