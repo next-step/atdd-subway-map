@@ -121,6 +121,7 @@ public class SubwayLinesAcceptanceTest {
 
         // Then
         final LineResponse foundLines = getResponse.as(LineResponse.class);
+        assertThat(foundLines).isNotNull();
         isSameLines(foundLines, createdLines);
     }
 
@@ -143,9 +144,10 @@ public class SubwayLinesAcceptanceTest {
         assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         // Then
-        final LineResponse foundLines = getLines(createdLines.getId()).as(LineResponse.class);
-        assertThat(foundLines.getName()).isEqualTo(이호선);
-        assertThat(foundLines.getColor()).isEqualTo(파란색);
+        final LineResponse foundLine = getLines(createdLines.getId()).as(LineResponse.class);
+        assertThat(foundLine).isNotNull();
+        assertThat(foundLine.getName()).isEqualTo(이호선);
+        assertThat(foundLine.getColor()).isEqualTo(파란색);
     }
 
     /**
