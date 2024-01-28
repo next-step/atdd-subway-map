@@ -30,6 +30,12 @@ import static org.springframework.test.annotation.DirtiesContext.MethodMode.BEFO
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationLineAcceptanceTest {
 
+    public static final String NAME_KEY = "name";
+    public static final String COLOR_KEY = "color";
+    public static final String UP_STATION_ID_KEY = "upStationId";
+    public static final String DOWN_STATION_ID_KEY = "downStationId";
+    public static final String DISTANCE_KEY = "distance";
+
     /**
      * When 지하철 노선을 생성하면
      * When  지하철 노선이 생성된다
@@ -47,11 +53,11 @@ public class StationLineAcceptanceTest {
 
         // then
         assertAll(
-            () -> assertThat(allStationLine.getList("name")).containsAnyOf(mockRequest.getName()),
-            () -> assertThat(allStationLine.getList("color")).containsAnyOf(mockRequest.getColor()),
-            () -> assertThat(allStationLine.getList("upStationId")).containsAnyOf(mockRequest.getUpStationId()),
-            () -> assertThat(allStationLine.getList("downStationId")).containsAnyOf(mockRequest.getDownStationId()),
-            () -> assertThat(allStationLine.getList("distance")).containsAnyOf(mockRequest.getDistance())
+            () -> assertThat(allStationLine.getList(NAME_KEY)).containsAnyOf(mockRequest.getName()),
+            () -> assertThat(allStationLine.getList(COLOR_KEY)).containsAnyOf(mockRequest.getColor()),
+            () -> assertThat(allStationLine.getList(UP_STATION_ID_KEY)).containsAnyOf(mockRequest.getUpStationId()),
+            () -> assertThat(allStationLine.getList(DOWN_STATION_ID_KEY)).containsAnyOf(mockRequest.getDownStationId()),
+            () -> assertThat(allStationLine.getList(DISTANCE_KEY)).containsAnyOf(mockRequest.getDistance())
         );
     }
 
@@ -75,15 +81,15 @@ public class StationLineAcceptanceTest {
 
         // then
         assertAll(
-                () -> assertThat(allStationLine.getList("name"))
+                () -> assertThat(allStationLine.getList(NAME_KEY))
                         .containsAnyOf(mockRequest1.getName(), mockRequest2.getName()),
-                () -> assertThat(allStationLine.getList("color"))
+                () -> assertThat(allStationLine.getList(COLOR_KEY))
                         .containsAnyOf(mockRequest1.getColor(), mockRequest2.getColor()),
-                () -> assertThat(allStationLine.getList("upStationId"))
+                () -> assertThat(allStationLine.getList(UP_STATION_ID_KEY))
                         .containsAnyOf(mockRequest1.getUpStationId(), mockRequest2.getUpStationId()),
-                () -> assertThat(allStationLine.getList("downStationId"))
+                () -> assertThat(allStationLine.getList(DOWN_STATION_ID_KEY))
                         .containsAnyOf(mockRequest1.getDownStationId(), mockRequest2.getDownStationId()),
-                () -> assertThat(allStationLine.getList("distance"))
+                () -> assertThat(allStationLine.getList(DISTANCE_KEY))
                         .containsAnyOf(mockRequest1.getDistance(), mockRequest2.getDistance())
         );
     }
@@ -105,15 +111,15 @@ public class StationLineAcceptanceTest {
 
         // then
         assertAll(
-                () -> assertThat(stationLine.get("name").toString())
+                () -> assertThat(stationLine.get(NAME_KEY).toString())
                         .isEqualTo(mockRequest1.getName()),
-                () -> assertThat(stationLine.get("color").toString())
+                () -> assertThat(stationLine.get(COLOR_KEY).toString())
                         .isEqualTo(mockRequest1.getColor()),
-                () -> assertThat(Integer.parseInt(stationLine.get("upStationId").toString()))
+                () -> assertThat(Integer.parseInt(stationLine.get(UP_STATION_ID_KEY).toString()))
                         .isEqualTo(mockRequest1.getUpStationId()),
-                () -> assertThat(Integer.parseInt(stationLine.get("downStationId").toString()))
+                () -> assertThat(Integer.parseInt(stationLine.get(DOWN_STATION_ID_KEY).toString()))
                         .isEqualTo(mockRequest1.getDownStationId()),
-                () -> assertThat(Integer.parseInt(stationLine.get("distance").toString()))
+                () -> assertThat(Integer.parseInt(stationLine.get(DISTANCE_KEY).toString()))
                         .isEqualTo(mockRequest1.getDistance())
         );
     }
@@ -139,15 +145,15 @@ public class StationLineAcceptanceTest {
 
         // then
         assertAll(
-                () -> assertThat(updatedStationLine.get("name").toString())
+                () -> assertThat(updatedStationLine.get(NAME_KEY).toString())
                         .isEqualTo(mockRequest2.getName()),
-                () -> assertThat(updatedStationLine.get("color").toString())
+                () -> assertThat(updatedStationLine.get(COLOR_KEY).toString())
                         .isEqualTo(mockRequest2.getColor()),
-                () -> assertThat(Integer.parseInt(updatedStationLine.get("upStationId").toString()))
+                () -> assertThat(Integer.parseInt(updatedStationLine.get(UP_STATION_ID_KEY).toString()))
                         .isEqualTo(mockRequest2.getUpStationId()),
-                () -> assertThat(Integer.parseInt(updatedStationLine.get("downStationId").toString()))
+                () -> assertThat(Integer.parseInt(updatedStationLine.get(DOWN_STATION_ID_KEY).toString()))
                         .isEqualTo(mockRequest2.getDownStationId()),
-                () -> assertThat(Integer.parseInt(updatedStationLine.get("distance").toString()))
+                () -> assertThat(Integer.parseInt(updatedStationLine.get(DISTANCE_KEY).toString()))
                         .isEqualTo(mockRequest2.getDistance())
         );
     }
@@ -172,15 +178,15 @@ public class StationLineAcceptanceTest {
 
         // then
         assertAll(
-                () -> assertThat(allStationLine.getList("name", String.class))
+                () -> assertThat(allStationLine.getList(NAME_KEY, String.class))
                         .doesNotContain(mockRequest1.getName()),
-                () -> assertThat(allStationLine.getList("color", String.class))
+                () -> assertThat(allStationLine.getList(COLOR_KEY, String.class))
                         .doesNotContain(mockRequest1.getColor()),
-                () -> assertThat(allStationLine.getList("upStationId", Integer.class))
+                () -> assertThat(allStationLine.getList(UP_STATION_ID_KEY, Integer.class))
                         .doesNotContain(mockRequest1.getUpStationId()),
-                () -> assertThat(allStationLine.getList("downStationId", Integer.class))
+                () -> assertThat(allStationLine.getList(DOWN_STATION_ID_KEY, Integer.class))
                         .doesNotContain(mockRequest1.getDownStationId()),
-                () -> assertThat(allStationLine.getList("distance", Integer.class))
+                () -> assertThat(allStationLine.getList(DISTANCE_KEY, Integer.class))
                         .doesNotContain(mockRequest1.getDistance())
         );
     }
