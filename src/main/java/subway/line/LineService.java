@@ -44,6 +44,18 @@ public class LineService {
         return createLineResponse(lineRepository.findById(id).get());
     }
 
+    @Transactional
+    public LineResponse modifyLine(Long id, LineRequest lineRequest) {
+        Line line = lineRepository.getReferenceById(id);
+        Station upStation = stationRepository.getById(lineRequest.getUpStationId());
+        Station downStation = stationRepository.getById(lineRequest.getDownStationId());
+
+        line.modifyLine(lineRequest.getName(), lineRequest.getColor(), upStation, downStation, lineRequest.getDistance());
+
+        return createLineResponse(line);
+    }
+
+
     private LineResponse createLineResponse(Line line) {
         return new LineResponse(
                 line.getId(),

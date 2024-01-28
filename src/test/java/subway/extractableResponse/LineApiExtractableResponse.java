@@ -40,4 +40,16 @@ public class LineApiExtractableResponse {
                 .extract();
     }
 
+    public static ExtractableResponse<Response> modifyLine(Long id, Map<String, Object> requestParam) {
+        return RestAssured
+                .given().log().all()
+                .body(requestParam)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .pathParam("id", id)
+                .when().put("/lines/{id}")
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract();
+    }
+
 }

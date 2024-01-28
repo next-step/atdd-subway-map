@@ -26,10 +26,18 @@ public class Line {
     @Column
     private Integer distance;
 
-    public Line() {
+    protected Line() {
     }
 
     public Line(String name, String color, Station upStation, Station downStation, Integer distance) {
+        this.name = name;
+        this.color = color;
+        this.upStation = upStation;
+        this.downStation = downStation;
+        this.distance = distance;
+    }
+
+    public void modifyLine(String name, String color, Station upStation, Station downStation, Integer distance) {
         this.name = name;
         this.color = color;
         this.upStation = upStation;
