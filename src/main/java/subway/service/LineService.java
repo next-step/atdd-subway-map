@@ -9,6 +9,7 @@ import subway.repository.StationRepository;
 import subway.entity.Line;
 import subway.entity.Station;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,7 +39,7 @@ public class LineService {
 	public LineResponse findLineById(Long id) {
 		return lineRepository.findById(id)
 				.map(this::createLineResponse)
-				.orElseThrow(IllegalAccessError::new);
+				.orElseThrow(EntityNotFoundException::new);
 	}
 
 	@Transactional
@@ -58,9 +59,9 @@ public class LineService {
 
 	private LineResponse createLineResponse(Line line) {
 		Station upStation = stationRepository.findById(line.getUpStationId())
-				.orElseThrow(IllegalAccessError::new);
+				.orElseThrow(EntityNotFoundException::new);
 		Station downStation = stationRepository.findById(line.getDownStationId())
-				.orElseThrow(IllegalAccessError::new);
+				.orElseThrow(EntityNotFoundException::new);
 
 		return new LineResponse(line, List.of(upStation, downStation));
 	}
