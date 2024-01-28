@@ -1,4 +1,4 @@
-package subway;
+package subway.line;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -9,6 +9,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
+import subway.line.LineResponse;
+import subway.line.LineUpdateRequest;
 
 import java.util.Collections;
 import java.util.HashMap;

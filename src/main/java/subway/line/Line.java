@@ -1,4 +1,7 @@
-package subway;
+package subway.line;
+
+import subway.station.Station;
+import subway.station.StationLink;
 
 import javax.persistence.*;
 
