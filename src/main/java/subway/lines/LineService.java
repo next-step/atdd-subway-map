@@ -87,12 +87,6 @@ public class LineService {
         lineRepository.deleteById(id);
     }
 
-    /**
-     * @param id
-     * @param sectionAddRequest
-     * @return
-     * @throws IllegalArgumentException
-     */
     @Transactional
     public LineResponse addSection(Long id, SectionAddRequest sectionAddRequest) {
         final Line line = lineRepository.findById(id).orElseThrow(EntityNotFoundException::new);
@@ -109,6 +103,12 @@ public class LineService {
         section.updateLine(line);
 
         return createLineResponse(line);
+    }
+
+    @Transactional
+    public void deleteSection(Long id, Long stationId) {
+        final Section section = sectionRepository.findByLineIdAndDownStationId(id, stationId);
+        sectionRepository.deleteById(section.getId());
     }
 
     private static void validateAddSectionCondition(SectionAddRequest sectionAddRequest, Line line) {

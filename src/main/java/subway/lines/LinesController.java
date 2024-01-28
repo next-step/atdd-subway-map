@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import subway.exceptions.BadRequestException;
 import subway.exceptions.NotFoundException;
@@ -69,6 +70,13 @@ public class LinesController {
     @DeleteMapping("/lines/{id}")
     public ResponseEntity<Void> deleteLines(@PathVariable Long id) {
         lineService.deleteLines(id);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/lines/{id}/sections")
+    public ResponseEntity<Void> deleteSection(@PathVariable Long id, @RequestParam Long stationId) {
+        lineService.deleteSection(id, stationId);
 
         return ResponseEntity.noContent().build();
     }
