@@ -72,4 +72,9 @@ public class LineService {
         return lineRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 노선입니다."));
     }
+
+    @Transactional
+    public void deleteLine(Long id) {
+        lineRepository.deleteById(id);
+    }
 }

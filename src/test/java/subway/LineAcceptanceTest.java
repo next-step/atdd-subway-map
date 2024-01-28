@@ -1,6 +1,7 @@
 package subway;
 
 import io.restassured.RestAssured;
+import io.restassured.common.mapper.TypeRef;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
@@ -196,6 +197,35 @@ public class LineAcceptanceTest extends AcceptanceTest {
         );
     }
 
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 삭제하면
+     * Then 해당 지하철 노선 정보는 삭제된다
+     */
+    @DisplayName("지하철 노선을 삭제한다.")
+    @Test
+    void deleteLine() {
+        // given
+        LineCreateRequest shinbundangRequest = new LineCreateRequest(
+                "신분당선",
+                "bg-red-600",
+                GANGNAM_STATION_ID,
+                SEOLLEUNG_STATION_ID,
+                10L
+        );
+        ExtractableResponse<Response> shinbundangCreateResponse = createLine(shinbundangRequest);
+        assertThat(shinbundangCreateResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        LineResponse createLineResponse = shinbundangCreateResponse.as(LineResponse.class);
+
+        // when
+        ExtractableResponse<Response> shinbundangDeleteResponse = deleteLine(createLineResponse.getId());
+        assertThat(shinbundangDeleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        // then
+        List<LineResponse> findAllResponse = findLines().as(new TypeRef<>() {});
+        assertThat(findAllResponse).isEmpty();
+    }
+
     private ExtractableResponse<Response> createLine(LineCreateRequest request) {
         return RestAssured.given().log().all()
                 .body(request)
@@ -224,6 +254,13 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 .body(request)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().put("/lines/{id}", id)
+                .then().log().all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> deleteLine(Long id) {
+        return RestAssured.given().log().all()
+                .when().delete("/lines/{id}", id)
                 .then().log().all()
                 .extract();
     }
