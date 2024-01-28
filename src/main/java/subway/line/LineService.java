@@ -31,8 +31,10 @@ public class LineService {
 
     @Transactional
     public LineResponse saveLine(final LineRequest lineRequest) {
-        final Station upStation = stationRepository.findById(lineRequest.getUpStationId()).orElseThrow(() -> new IllegalArgumentException(EMPTY_UP_STATION_MSG));
-        final Station downStation = stationRepository.findById(lineRequest.getDownStationId()).orElseThrow(() -> new IllegalArgumentException(EMPTY_DOWN_STATION_MSG));
+        final Station upStation = stationRepository.findById(lineRequest.getUpStationId())
+                .orElseThrow(() -> new IllegalArgumentException(EMPTY_UP_STATION_MSG));
+        final Station downStation = stationRepository.findById(lineRequest.getDownStationId())
+                .orElseThrow(() -> new IllegalArgumentException(EMPTY_DOWN_STATION_MSG));
 
         final Section section = new Section(upStation, downStation);
         final Section savedSection = sectionRepository.save(section);

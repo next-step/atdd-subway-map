@@ -21,16 +21,12 @@ public class LineResponse {
         this.name = savedLine.getName();
         this.color = savedLine.getColor();
 
-        System.out.println("savedLine.getSections()");
-        System.out.println(savedLine.getSections());
-        for (Section section:
-        savedLine.getSections()) {
-            System.out.println(section.toString());
+        final List<Section> sections = savedLine.getSections();
+        this.stations.add(createStationResponse(sections.get(0).getUpStation()));
 
+        for (Section section : savedLine.getSections()) {
+            this.stations.add(createStationResponse(section.getDownStation()));
         }
-        final Section section = savedLine.getSections().get(0);
-        this.stations.add(createStationResponse(section.getUpStation()));
-        this.stations.add(createStationResponse(section.getDownStation()));
     }
 
     public Long getId() {

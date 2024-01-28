@@ -15,11 +15,11 @@ public class Section {
     @ManyToOne(fetch = FetchType.LAZY)
     private Line line;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "UP_STATION_ID")
     private Station upStation;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "DOWN_STATION_ID")
     private Station downStation;
 
@@ -33,14 +33,6 @@ public class Section {
 
     public Line getLine() {
         return line;
-    }
-
-    public Station getUpStation() {
-        return upStation;
-    }
-
-    public Station getDownStation() {
-        return downStation;
     }
 
     // 연관관계 편의 메소드
@@ -58,13 +50,16 @@ public class Section {
         }
     }
 
+    public Station getUpStation() {
+        return upStation;
+    }
+
+    public Station getDownStation() {
+        return downStation;
+    }
+
     @Override
     public String toString() {
-        return "Section{" +
-                "id=" + id +
-                ", line=" + line +
-                ", upStation=" + upStation +
-                ", downStation=" + downStation +
-                '}';
+        return "Section{" + "id=" + id + ", line=" + line + ", upStation=" + upStation + ", downStation=" + downStation + '}';
     }
 }
