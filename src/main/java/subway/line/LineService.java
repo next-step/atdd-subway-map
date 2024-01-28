@@ -4,6 +4,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+import subway.section.Section;
+import subway.section.SectionRepository;
 import subway.station.Station;
 import subway.station.StationRepository;
 
@@ -19,32 +21,36 @@ public class LineService {
     public static final String EMPTY_DOWN_STATION_MSG = "존재 하지 않는 하행종점역 입니다.";
     private final LineRepository lineRepository;
     private final StationRepository stationRepository;
+    private final SectionRepository sectionRepository;
 
-    public LineService(final LineRepository lineRepository, final StationRepository stationRepository) {
+    public LineService(final LineRepository lineRepository, final StationRepository stationRepository, final SectionRepository sectionRepository) {
         this.lineRepository = lineRepository;
         this.stationRepository = stationRepository;
+        this.sectionRepository = sectionRepository;
     }
 
     @Transactional
     public LineResponse saveLine(final LineRequest lineRequest) {
-        final Station upStation = stationRepository.findById(lineRequest.getUpStationId())
-                .orElseThrow(() -> new IllegalArgumentException(EMPTY_UP_STATION_MSG));
-        final Station downStation = stationRepository.findById(lineRequest.getDownStationId())
-                .orElseThrow(() -> new IllegalArgumentException(EMPTY_DOWN_STATION_MSG));
+        final Station upStation = stationRepository.findById(lineRequest.getUpStationId()).orElseThrow(() -> new IllegalArgumentException(EMPTY_UP_STATION_MSG));
+        final Station downStation = stationRepository.findById(lineRequest.getDownStationId()).orElseThrow(() -> new IllegalArgumentException(EMPTY_DOWN_STATION_MSG));
 
-        final Line line = new Line(lineRequest.getName(), lineRequest.getColor(), upStation, downStation);
+        final Section section = new Section(upStation, downStation);
+        final Section savedSection = sectionRepository.save(section);
+
+        final Line line = new Line(lineRequest.getName(), lineRequest.getColor());
         final Line savedLine = lineRepository.save(line);
+        savedSection.setLine(savedLine);
         return new LineResponse(savedLine);
     }
 
     public List<LineResponse> findAllLines() {
-        return lineRepository.findAll().stream()
+        return lineRepository.findAllFetchJoin().stream()
                 .map(LineResponse::new)
                 .collect(Collectors.toList());
     }
 
     public LineResponse findLine(final Long id) {
-        final Line line = lineRepository.findById(id)
+        final Line line = lineRepository.findByIdFetchJoin(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, EMPTY_LINE_MSG));
 
         return new LineResponse(line);

@@ -1,0 +1,70 @@
+package subway.section;
+
+import subway.line.Line;
+import subway.station.Station;
+
+import javax.persistence.*;
+
+@Entity
+public class Section {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Line line;
+
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "UP_STATION_ID")
+    private Station upStation;
+
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "DOWN_STATION_ID")
+    private Station downStation;
+
+    public Section() {
+    }
+
+    public Section(final Station upStation, final Station downStation) {
+        this.upStation = upStation;
+        this.downStation = downStation;
+    }
+
+    public Line getLine() {
+        return line;
+    }
+
+    public Station getUpStation() {
+        return upStation;
+    }
+
+    public Station getDownStation() {
+        return downStation;
+    }
+
+    // 연관관계 편의 메소드
+    public void setLine(final Line line) {
+        this.line = line;
+        // 기존 팀과 연관관계를 제거
+        if (this.line != null) {
+            this.line.getSections().remove(this);
+        }
+
+        // 새로운 연관관계 설정
+        this.line = line;
+        if (line != null) { // 연관관계 제거 시, team == null
+            line.getSections().add(this);
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "Section{" +
+                "id=" + id +
+                ", line=" + line +
+                ", upStation=" + upStation +
+                ", downStation=" + downStation +
+                '}';
+    }
+}
