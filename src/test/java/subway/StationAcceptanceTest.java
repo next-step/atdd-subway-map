@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
+import subway.fixture.StationFixture;
+import subway.station.StationResponse;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

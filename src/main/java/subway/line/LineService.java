@@ -1,4 +1,4 @@
-package subway;
+package subway.line;
 
 import java.util.List;
 import java.util.Map;
@@ -6,6 +6,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.station.StationResponse;
+import subway.station.StationService;
 
 @Service
 @Transactional(readOnly = true)

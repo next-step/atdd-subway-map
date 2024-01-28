@@ -17,6 +17,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
+import subway.fixture.LineFixture;
+import subway.fixture.StationFixture;
+import subway.line.LineResponse;
+import subway.line.LineUpdateRequest;
+import subway.station.StationResponse;
 
 @Sql(value = "/truncate.sql", executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
 @DisplayName("지하철노선 관련 기능")

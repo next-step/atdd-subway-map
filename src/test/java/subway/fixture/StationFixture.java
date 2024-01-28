@@ -1,10 +1,11 @@
-package subway;
+package subway.fixture;
 
 import io.restassured.RestAssured;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import org.springframework.http.MediaType;
+import subway.station.StationResponse;
 
 public class StationFixture {
 

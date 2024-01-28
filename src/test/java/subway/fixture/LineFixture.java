@@ -1,10 +1,11 @@
-package subway;
+package subway.fixture;
 
 import io.restassured.RestAssured;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import org.springframework.http.MediaType;
+import subway.line.LineResponse;
 
 public class LineFixture {
 

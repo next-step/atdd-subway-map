@@ -1,6 +1,7 @@
-package subway;
+package subway.line;
 
 import java.util.List;
+import subway.station.StationResponse;
 
 public class LineResponse {
 

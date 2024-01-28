@@ -1,4 +1,4 @@
-package subway;
+package subway.station;
 
 import java.util.Optional;
 import org.springframework.stereotype.Service;
