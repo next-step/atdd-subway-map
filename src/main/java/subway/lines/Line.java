@@ -9,7 +9,7 @@ import javax.persistence.ManyToOne;
 import subway.station.Station;
 
 @Entity
-public class Lines {
+public class Line {
     @Id
     @GeneratedValue
     private Long id;
@@ -23,7 +23,7 @@ public class Lines {
     private Station downStation;
     private Long distance;
 
-    public Lines(String name, String color, Station upStation, Station downStation, Long distance) {
+    public Line(String name, String color, Station upStation, Station downStation, Long distance) {
         this.name = name;
         this.color = color;
         this.upStation = upStation;
@@ -31,7 +31,7 @@ public class Lines {
         this.distance = distance;
     }
 
-    public Lines() {
+    public Line() {
 
     }
 

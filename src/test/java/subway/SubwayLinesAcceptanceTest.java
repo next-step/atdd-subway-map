@@ -22,7 +22,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
-import subway.lines.LinesResponse;
+import subway.lines.LineResponse;
 import subway.station.Station;
 import subway.station.StationRepository;
 import subway.station.StationResponse;
@@ -67,11 +67,11 @@ public class SubwayLinesAcceptanceTest {
         assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // Then
-        final LinesResponse createdLines = createResponse.as(LinesResponse.class);
+        final LineResponse createdLines = createResponse.as(LineResponse.class);
 
-        final LinesResponse[] linesList = getLinesList().as(LinesResponse[].class);
+        final LineResponse[] linesList = getLinesList().as(LineResponse[].class);
 
-        final LinesResponse foundLines = Arrays.stream(linesList)
+        final LineResponse foundLines = Arrays.stream(linesList)
             .filter(current -> Objects.equals(current.getId(), createdLines.getId()))
             .findFirst().orElse(null);
 
@@ -110,8 +110,8 @@ public class SubwayLinesAcceptanceTest {
     @Test
     void 지하철노선_조회() {
         // Given
-        final LinesResponse createdLines = createLines(일호선, 빨간색, 1L, 2L, 10L).as(
-            LinesResponse.class);
+        final LineResponse createdLines = createLines(일호선, 빨간색, 1L, 2L, 10L).as(
+            LineResponse.class);
 
         // When
         final ExtractableResponse<Response> getResponse = getLines(
@@ -121,7 +121,7 @@ public class SubwayLinesAcceptanceTest {
         assertThat(getResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         // Then
-        final LinesResponse foundLines = getResponse.as(LinesResponse.class);
+        final LineResponse foundLines = getResponse.as(LineResponse.class);
         isSameLines(foundLines, createdLines);
     }
 
@@ -133,8 +133,8 @@ public class SubwayLinesAcceptanceTest {
     @Test
     void 지하철노선_수정() {
         // Given
-        final LinesResponse createdLines = createLines(일호선, 빨간색, 1L, 2L, 10L).as(
-            LinesResponse.class);
+        final LineResponse createdLines = createLines(일호선, 빨간색, 1L, 2L, 10L).as(
+            LineResponse.class);
 
         // When
         final ExtractableResponse<Response> updateResponse = updateLines(createdLines.getId(), 이호선,
@@ -144,7 +144,7 @@ public class SubwayLinesAcceptanceTest {
         assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         // Then
-        final LinesResponse foundLines = getLines(createdLines.getId()).as(LinesResponse.class);
+        final LineResponse foundLines = getLines(createdLines.getId()).as(LineResponse.class);
         assertThat(foundLines.getName()).isEqualTo(이호선);
         assertThat(foundLines.getColor()).isEqualTo(파란색);
     }
@@ -157,8 +157,8 @@ public class SubwayLinesAcceptanceTest {
     @Test
     void 지하철노선_삭제() {
         // Given
-        final LinesResponse createdLines = createLines(일호선, 빨간색, 1L, 2L, 10L)
-            .as(LinesResponse.class);
+        final LineResponse createdLines = createLines(일호선, 빨간색, 1L, 2L, 10L)
+            .as(LineResponse.class);
 
         // When
         final ExtractableResponse<Response> deleteResponse = deleteLines(createdLines.getId());
@@ -232,7 +232,7 @@ public class SubwayLinesAcceptanceTest {
             .extract();
     }
 
-    private static void isSameLines(LinesResponse foundLines, LinesResponse createdLines) {
+    private static void isSameLines(LineResponse foundLines, LineResponse createdLines) {
         assertThat(foundLines.getName()).isEqualTo(createdLines.getName());
         assertThat(foundLines.getColor()).isEqualTo(createdLines.getColor());
 

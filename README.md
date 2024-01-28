@@ -9,27 +9,27 @@
 
 ### 기능 별 응답 정리
 - 생성
-    - 엔드포인트: /lines
+    - 엔드포인트: /line
     - 응답: 201
         - LinesResponse
     - 파라미터
         - name, color, upStation, downStation, distance
 - 수정
-    - 엔드포인트: /lines/{id}
+    - 엔드포인트: /line/{id}
     - 응답: 200
         - none
     - 파라미터
         - name, color
 - 조회 list
-    - 엔드포인트: /lines
+    - 엔드포인트: /line
     - 응답: 200
         - List<LinesResponse> 
 - 조회
-    - 엔드포인트: /lines/{id}
+    - 엔드포인트: /line/{id}
     - 응답: 200
         - LinesResponse
 - 삭제
-    - 엔드포인트: /lines/{id}
+    - 엔드포인트: /line/{id}
     - 응답: 204
         - none
 

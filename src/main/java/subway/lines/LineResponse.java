@@ -7,22 +7,22 @@ import java.util.stream.Collectors;
 import subway.station.Station;
 import subway.station.StationResponse;
 
-public class LinesResponse {
+public class LineResponse {
 
     private Long id;
     private String name;
     private String color;
     private List<StationResponse> stations = new ArrayList<>();
 
-    public LinesResponse() {
+    public LineResponse() {
 
     }
 
-    public LinesResponse(Lines lines) {
-        this.id = lines.getId();
-        this.name = lines.getName();
-        this.color = lines.getColor();
-        this.stations = Arrays.stream(new Station[]{lines.getUpStation(), lines.getDownStation()})
+    public LineResponse(Line line) {
+        this.id = line.getId();
+        this.name = line.getName();
+        this.color = line.getColor();
+        this.stations = Arrays.stream(new Station[]{line.getUpStation(), line.getDownStation()})
             .map(StationResponse::new).collect(Collectors.toList());
     }
 
