@@ -6,15 +6,25 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import subway.common.CommonApi;
+import subway.common.Fixture;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 @DisplayName("지하철 노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {
+    Fixture.Station 지하철역 = Fixture.지하철역();
+    Fixture.Station 새로운지하철역 = Fixture.새로운지하철역();
+    Fixture.Station 또다른지하철역 = Fixture.또다른지하철역();
+    Fixture.Line 신분당선 = Fixture.신분당선(지하철역, 새로운지하철역);
+    Fixture.Line 분당선 = Fixture.분당선(지하철역, 또다른지하철역);
 
     @DisplayName("지하철노선을 생성한다.")
     @Test

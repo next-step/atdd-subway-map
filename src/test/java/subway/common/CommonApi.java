@@ -49,8 +49,8 @@ public class CommonApi {
             Map<String, String> params = new HashMap<>();
             params.put("name", line.name);
             params.put("color", line.color);
-            params.put("upStationId", line.upStationId);
-            params.put("downStationId", line.downStationId);
+            params.put("upStationId", line.stations.get(0).id.toString());
+            params.put("downStationId", line.stations.get(1).id.toString());
             params.put("distance", line.distance);
             return RestAssured.given().log().all()
                     .body(params)
