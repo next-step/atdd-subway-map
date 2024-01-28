@@ -9,45 +9,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
-import subway.controller.StationResponse;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
-// TODO: controller dto로 이동. 테스트 작성을 위해 임시로 여기에 위치
-class LineResponse {
-    private final Long id;
-    private final String name;
-    private final String color;
-    private final List<StationResponse> stations;
-
-    public LineResponse(Long id, String name, String color, List<StationResponse> stations) {
-        this.id = id;
-        this.name = name;
-        this.color = color;
-        this.stations = stations;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getColor() {
-        return color;
-    }
-
-    public List<StationResponse> getStations() {
-        return stations;
-    }
-}
 
 @DisplayName("지하철역 관련 기능")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -87,10 +54,9 @@ public class SubwayLineAcceptanceTest {
                         .then().log().all()
                         .extract();
 
-
-        assertThat(getLinesResponse.jsonPath().getString("color")).isEqualTo("bg-red-600");
-        assertThat(getLinesResponse.jsonPath().getString("name")).isEqualTo("신분당선");
-        assertThat(getLinesResponse.jsonPath().getList("stations.id")).containsExactly(1,2);
+        assertThat(getLinesResponse.jsonPath().getList("color")).containsExactly("bg-red-600");
+        assertThat(getLinesResponse.jsonPath().getList("name")).containsExactly("신분당선");
+        assertThat(getLinesResponse.jsonPath().getList("stations[0].id")).containsExactly(1,2);
     }
 
     /**
@@ -206,6 +172,7 @@ public class SubwayLineAcceptanceTest {
         RestAssured.given().log().all()
                 .pathParam("id", createdId)
                 .body(Map.of("name", "구분당선", "color", "bg-blue-600"))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().put("/lines/{id}")
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value());
@@ -257,7 +224,6 @@ public class SubwayLineAcceptanceTest {
         // then
         ExtractableResponse<Response> response =
                 RestAssured.given().log().all()
-                        .pathParam("id", createdId)
                         .when().get("/lines")
                         .then().log().all()
                         .statusCode(HttpStatus.OK.value())

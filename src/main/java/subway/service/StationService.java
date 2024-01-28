@@ -2,8 +2,8 @@ package subway.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import subway.controller.StationRequest;
-import subway.controller.StationResponse;
+import subway.controller.dto.StationRequest;
+import subway.controller.dto.StationResponse;
 import subway.domain.Station;
 import subway.repository.StationRepository;
 
