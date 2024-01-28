@@ -12,9 +12,11 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
 @Sql("classpath:db/teardown.sql")
 @DisplayName("노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -31,7 +33,7 @@ public class LineAcceptanceTest {
      */
     @DisplayName("노선을 생성한다.")
     @Test
-    void createLine() {
+    void apiCreateLine() {
         // when
         Map<String, String> params = createLineRequestPixture("신분당선", "bg-red-600", 1L, 2L);
 
@@ -46,7 +48,7 @@ public class LineAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        final ExtractableResponse<Response> extract = getStations();
+        final ExtractableResponse<Response> extract = apiGetLines();
         assertThat(extract.jsonPath().getList("name")).contains("신분당선");
         assertThat(extract.jsonPath().getList("color")).contains("bg-red-600");
     }
@@ -62,8 +64,8 @@ public class LineAcceptanceTest {
         // given
         Map<String, String> params1 = createLineRequestPixture("신분당선", "bg-red-600", 1L, 2L);
         Map<String, String> params2 = createLineRequestPixture("분당선", "bg-green-600", 1L, 3L);
-        createStation(params1);
-        createStation(params2);
+        apiCreateLine(params1);
+        apiCreateLine(params2);
 
         // when
         final ExtractableResponse<Response> extract = RestAssured.given().log().all()
@@ -86,10 +88,10 @@ public class LineAcceptanceTest {
      */
     @DisplayName("노선을 조회한다.")
     @Test
-    void getLine() {
+    void apiGetLine() {
         // given
         Map<String, String> params1 = createLineRequestPixture("신분당선", "bg-red-600", 1L, 2L);
-        final Long id = createStation(params1).as(LineResponse.class).getId();
+        final Long id = apiCreateLine(params1).as(LineResponse.class).getId();
 
         // when
         final ExtractableResponse<Response> extract = RestAssured.given().log().all()
@@ -115,7 +117,7 @@ public class LineAcceptanceTest {
     void modifyLine() {
         // given
         Map<String, String> params1 = createLineRequestPixture("신분당선", "bg-red-600", 1L, 2L);
-        final Long id = createStation(params1).as(LineResponse.class).getId();
+        final Long id = apiCreateLine(params1).as(LineResponse.class).getId();
         final Map<String, String> modifyBody = modifyLineRequestPixture(id, "다른분당선", "bg-red-900");
 
         // when
@@ -128,12 +130,41 @@ public class LineAcceptanceTest {
                 .extract();
 
         // then
-        final LineResponse modifyLineResponse = getStation(id).as(LineResponse.class);
+        final LineResponse modifyLineResponse = apiGetLine(id).as(LineResponse.class);
         assertThat(modifyLineResponse.getName()).isEqualTo("다른분당선");
         assertThat(modifyLineResponse.getColor()).isEqualTo("bg-red-900");
     }
 
-    private ExtractableResponse<Response> createStation(final Map<String, String> params) {
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 삭제하면
+     * Then 해당 지하철 노선 정보는 삭제된다
+     */
+    @DisplayName("노선을 삭제한다.")
+    @Test
+    void deleteLine() {
+        // given
+        Map<String, String> params1 = createLineRequestPixture("신분당선", "bg-red-600", 1L, 2L);
+        final Long id = apiCreateLine(params1).as(LineResponse.class).getId();
+
+        // when
+        RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().delete("/lines/" + id)
+                .then().log().all()
+                .statusCode(HttpStatus.NO_CONTENT.value())
+                .extract();
+
+        // then
+        RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().get("/lines/" + id)
+                .then().log().all()
+                .statusCode(HttpStatus.NOT_FOUND.value())
+                .extract();
+    }
+
+    private ExtractableResponse<Response> apiCreateLine(final Map<String, String> params) {
         return RestAssured.given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -143,7 +174,7 @@ public class LineAcceptanceTest {
                 .extract();
     }
 
-    private ExtractableResponse<Response> getStations() {
+    private ExtractableResponse<Response> apiGetLines() {
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().get("/lines")
@@ -152,7 +183,7 @@ public class LineAcceptanceTest {
                 .extract();
     }
 
-    private ExtractableResponse<Response> getStation(final Long id) {
+    private ExtractableResponse<Response> apiGetLine(final Long id) {
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().get("/lines/" + id)
