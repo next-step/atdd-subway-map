@@ -7,14 +7,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static subway.StationApiRequester.createStation;
+import static subway.StationApiRequester.getStations;
 
 @DisplayName("지하철역 관련 기능")
 @Sql(value = "/sql/truncate-all-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
@@ -28,7 +28,7 @@ public class StationAcceptanceTest {
      */
     @DisplayName("지하철역 이름이 주어지면, 지하철역을 생성한다")
     @Test
-    void createStation() {
+    void createStationTest() {
         // given
         final String stationName = "강남역";
 
@@ -58,7 +58,7 @@ public class StationAcceptanceTest {
         // given
         List<String> stationNames = List.of("역삼역", "선릉역");
         List<ExtractableResponse<Response>> createResponses = stationNames.stream()
-            .map(this::createStation).collect(Collectors.toList());
+            .map(StationApiRequester::createStation).collect(Collectors.toList());
 
         createResponses.forEach(response ->
             assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value())
@@ -108,26 +108,6 @@ public class StationAcceptanceTest {
         assertThat(getStationsResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(getStationNames(getStationsResponse))
             .noneMatch(stationNames -> stationNames.equals(stationName));
-    }
-
-    /** 주어진 지하철역 명으로 지하쳘역 생성 요청 후, 응답값을 반환합니다 */
-    private ExtractableResponse<Response> createStation(
-        final String stationName
-    ) {
-        return RestAssured.given().log().all()
-            .body(Map.of("name", stationName))
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().post("/stations")
-            .then().log().all()
-            .extract();
-    }
-
-    /** 지하철역 조회 요청 후, 응답값을 반환합니다 */
-    private ExtractableResponse<Response> getStations() {
-        return RestAssured.given().log().all()
-            .when().get("/stations")
-            .then().log().all()
-            .extract();
     }
 
     /** 주어진 응답 객체에서 지하철역명을 값만 뽑아 반환합니다 */

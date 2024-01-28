@@ -18,6 +18,7 @@ import java.util.List;
 
 import static helper.JsonPathUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static subway.LineApiRequester.*;
 
 @DisplayName("지하철 노선 관련 기능")
 @SqlGroup({
@@ -44,7 +45,7 @@ public class LineAcceptanceTest {
             );
 
             // when
-            ExtractableResponse<Response> response = LineAcceptanceTest.createSubwayLine(수인분당선);
+            ExtractableResponse<Response> response = createLine(수인분당선);
 
             assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
             assertThat(getStringPath(response.body(), "name")).isEqualTo(수인분당선.getName());
@@ -53,7 +54,7 @@ public class LineAcceptanceTest {
             assertThat(createdSubwayLineId).isNotNull();
 
             // then
-            ExtractableResponse<Response> getSubwayLinesResponse = getSubwayLine(createdSubwayLineId);
+            ExtractableResponse<Response> getSubwayLinesResponse = getLineById(createdSubwayLineId);
 
             assertThat(getSubwayLinesResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
             assertThat(getSubwayLineId(getSubwayLinesResponse)).isEqualTo(createdSubwayLineId);
@@ -81,11 +82,11 @@ public class LineAcceptanceTest {
                 "신분당선", "bg-red-600", 11L, 12L, 5
             );
 
-            createSubwayLine(수인분당선);
-            createSubwayLine(신분당선);
+            createLine(수인분당선);
+            createLine(신분당선);
 
             // when
-            ExtractableResponse<Response> getSubwayLinesResponse = getSubwayLines();
+            ExtractableResponse<Response> getSubwayLinesResponse = getAllLines();
 
             assertThat(getSubwayLinesResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
             assertThat(getListPath(getSubwayLinesResponse.body(), "name", String.class))
@@ -110,11 +111,11 @@ public class LineAcceptanceTest {
                 "수인분당선", "bg-yellow-600", 1L, 2L, 10
             );
 
-            ExtractableResponse<Response> createSubwayResponse = createSubwayLine(수인분당선);
+            ExtractableResponse<Response> createSubwayResponse = createLine(수인분당선);
             long createdSubwayLineId = getSubwayLineId(createSubwayResponse);
 
             // when
-            ExtractableResponse<Response> getSubwayLineResponse = getSubwayLine(createdSubwayLineId);
+            ExtractableResponse<Response> getSubwayLineResponse = getLineById(createdSubwayLineId);
 
             // then
             assertThat(getSubwayLineResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -139,7 +140,7 @@ public class LineAcceptanceTest {
                 "수인분당선", "bg-yellow-600", 1L, 2L, 10
             );
 
-            ExtractableResponse<Response> createSubwayResponse = createSubwayLine(수인분당선);
+            ExtractableResponse<Response> createSubwayResponse = createLine(수인분당선);
             long createdSubwayLineId = getSubwayLineId(createSubwayResponse);
 
             // when
@@ -156,7 +157,7 @@ public class LineAcceptanceTest {
             assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
             // when
-            ExtractableResponse<Response> getSubwayLineResponse = getSubwayLine(createdSubwayLineId);
+            ExtractableResponse<Response> getSubwayLineResponse = getLineById(createdSubwayLineId);
 
             // then
             assertThat(getSubwayLineResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -184,7 +185,7 @@ public class LineAcceptanceTest {
                 "수인분당선", "bg-yellow-600", 1L, 2L, 10
             );
 
-            ExtractableResponse<Response> createSubwayResponse = createSubwayLine(수인분당선);
+            ExtractableResponse<Response> createSubwayResponse = createLine(수인분당선);
             long createdSubwayLineId = getSubwayLineId(createSubwayResponse);
 
             // when
@@ -197,23 +198,11 @@ public class LineAcceptanceTest {
             assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
             // then
-            ExtractableResponse<Response> getSubwayLinesResponse = getSubwayLines();
+            ExtractableResponse<Response> getSubwayLinesResponse = getAllLines();
 
             assertThat(getSubwayLinesResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
             assertThat(getSubwayLineIds(getSubwayLinesResponse)).noneMatch(id -> id.equals(createdSubwayLineId));
         }
-    }
-
-    /** 주어진 지하철 노선 정보를 통해 지하철 노선 생성 요청 후 응답값을 반환합니다 */
-    private static ExtractableResponse<Response> createSubwayLine(
-        final LineCreateRequest request
-    ) {
-        return RestAssured.given().log().all()
-            .body(request)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().post("/lines")
-            .then().log().all()
-            .extract();
     }
 
     /** 주어진 응답값에서 식별자를 추출해 반환합니다 */
@@ -224,22 +213,5 @@ public class LineAcceptanceTest {
     /** 주어진 응답값에서 식별자목록을 추출해 반환합니다 */
     private List<Long> getSubwayLineIds(final ExtractableResponse<Response> response) {
         return getListPath(response.body(), "id", Long.class);
-    }
-
-    /** 모든 지하철 노선을 조회하는 요청 후 응답값을 반환합니다 */
-    private ExtractableResponse<Response> getSubwayLines() {
-        return RestAssured.given().log().all()
-            .when().get("/lines")
-            .then().log().all()
-            .extract();
-    }
-
-    /** 주어진 지하철 노선 식별자를 통해 지하철 노선 조회 후 응답값을 반환합니다 */
-    private ExtractableResponse<Response> getSubwayLine(final long subwayLineId) {
-        return RestAssured.given().log().all()
-            .pathParam("lineId", subwayLineId)
-            .when().get("/lines/{lineId}")
-            .then().log().all()
-            .extract();
     }
 }
