@@ -33,7 +33,7 @@ public class StationAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        assertThat(listStationName()).containsAnyOf("강남역");
+        assertThat(listStationName()).containsExactly("강남역");
     }
 
     /**
@@ -47,18 +47,18 @@ public class StationAcceptanceTest {
         // given
         final String 강남역 = "강남역";
         final String 역삼역 = "역삼역";
-        this.createStationBy(강남역);
-        this.createStationBy(역삼역);
+        createStationBy(강남역);
+        createStationBy(역삼역);
 
         // when
-        ExtractableResponse<Response> response = this.listStation();
+        ExtractableResponse<Response> response = listStation();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         // then
         List<String> stationNames = response.jsonPath().getList("name", String.class);
-        assertThat(stationNames).containsAnyOf(강남역, 역삼역);
+        assertThat(stationNames).containsExactly(강남역, 역삼역);
     }
 
 
@@ -107,8 +107,9 @@ public class StationAcceptanceTest {
     }
 
     private ExtractableResponse<Response> deleteStationBy(Long id) {
-        return  RestAssured.given().log().all()
-                .when().delete("/stations/" + id)
+        return  RestAssured
+                .given().log().all()
+                .when().delete("/stations/{id}", id)
                 .then().log().all()
                 .extract();
     }
