@@ -48,7 +48,7 @@ public class LineService {
 
     public List<LineResponse> getSubwayLines() {
         return lineRepository.findAll().stream()
-                .map(line -> LineResponse.convertToDto(line))
+                .map(LineResponse::convertToDto)
                 .collect(Collectors.toList());
     }
 
