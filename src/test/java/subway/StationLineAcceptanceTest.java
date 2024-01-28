@@ -19,6 +19,7 @@ import java.util.Map;
 import static config.fixtures.subway.StationLineMockData.createMockRequest1;
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("지하철 노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -40,30 +41,13 @@ public class StationLineAcceptanceTest {
         JsonPath allStationLineNames = findAllStationLine();
 
         // then
-        assertThat(allStationLineNames.getList("name")).containsAnyOf(mockRequest.getName());
-        assertThat(allStationLineNames.getList("color")).containsAnyOf(mockRequest.getColor());
-        assertThat(allStationLineNames.getList("upStationId")).containsAnyOf(mockRequest.getUpStationId());
-        assertThat(allStationLineNames.getList("downStationId")).containsAnyOf(mockRequest.getDownStationId());
-        assertThat(allStationLineNames.getList("distance")).containsAnyOf(mockRequest.getDistance());
-    }
-
-    private JsonPath findAllStationLine() {
-        return given().log().all()
-                .when()
-                    .get("/lines")
-                .then().log().all()
-                    .statusCode(HttpStatus.OK.value())
-                    .extract().jsonPath();
-    }
-
-    private void createStationLineRequest(StationLineRequest request) {
-        given().log().all()
-            .body(request)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when()
-            .post("/lines")
-        .then().log().all()
-            .statusCode(HttpStatus.CREATED.value());
+        assertAll(
+            () -> assertThat( allStationLineNames.getList("name")).containsAnyOf(mockRequest.getName()),
+            () -> assertThat(allStationLineNames.getList("color")).containsAnyOf(mockRequest.getColor()),
+            () -> assertThat(allStationLineNames.getList("upStationId")).containsAnyOf(mockRequest.getUpStationId()),
+            () -> assertThat(allStationLineNames.getList("downStationId")).containsAnyOf(mockRequest.getDownStationId()),
+            () -> assertThat(allStationLineNames.getList("distance")).containsAnyOf(mockRequest.getDistance())
+        );
     }
 
     /**
@@ -242,6 +226,35 @@ public class StationLineAcceptanceTest {
 
         // then
         assertThat(stationLineNames).doesNotContain(StationLineMockData.stationLineName1);
+    }
+
+    /**
+     * 지하철 노선 목록을 조회하고 jsonPath 반환
+     *
+     * @return 지하철 노선 목록을 나타내는 jsonPath 반환
+     */
+    private JsonPath findAllStationLine() {
+        return given().log().all()
+            .when()
+                .get("/lines")
+            .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract().jsonPath();
+    }
+
+    /**
+     * 지하철 노선 생성 요청
+     *
+     * @param request 지하철 요청 정보를 담은 객체
+     */
+    private void createStationLineRequest(StationLineRequest request) {
+        given().log().all()
+            .body(request)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+            .post("/lines")
+        .then().log().all()
+            .statusCode(HttpStatus.CREATED.value());
     }
 
     /**

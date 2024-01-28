@@ -27,7 +27,7 @@ public class StationLineController {
         return ResponseEntity.created(URI.create("/lines/" + stationLine.getId())).body(stationLine);
     }
 
-    @GetMapping("lines")
+    @GetMapping("/lines")
     public ResponseEntity<List<StationLineResponse>> findAllStationLines() {
         return ResponseEntity.ok(stationLineService.findAllStationLines());
     }
