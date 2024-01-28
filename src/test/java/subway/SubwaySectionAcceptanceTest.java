@@ -1,5 +1,13 @@
 package subway;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import io.restassured.RestAssured;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -7,16 +15,21 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import subway.lines.Line;
 import subway.lines.LineRepository;
 import subway.station.Station;
 import subway.station.StationRepository;
+import subway.station.StationResponse;
 
 @DisplayName("지하철 구간 테스트")
 @SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
 public class SubwaySectionAcceptanceTest {
 
+    Long downStationId;
     Long extraStationId;
+    Long lineId;
 
     @Autowired
     private StationRepository stationRepository;
@@ -31,9 +44,10 @@ public class SubwaySectionAcceptanceTest {
     void setUp() {
         final Station firstStation = stationRepository.save(new Station("역1"));
         final Station secondStation = stationRepository.save(new Station("역2"));
+        downStationId = secondStation.getId();
         extraStationId = stationRepository.save(new Station("역3")).getId();
 
-        lineRepository.save(new Line("노선1", "빨간색", firstStation, secondStation, 10L));
+        lineId = lineRepository.save(new Line("노선1", "빨간색", firstStation, secondStation, 10L)).getId();
     }
 
     @AfterEach
@@ -47,7 +61,17 @@ public class SubwaySectionAcceptanceTest {
      */
     @Test
     void 지하철구간_추가() {
+        // When
+        final ExtractableResponse<Response> response = addSections(downStationId, extraStationId, 10L);
 
+        // Then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        // Then
+        List<StationResponse> stationList = response
+            .jsonPath()
+            .getList("station", StationResponse.class);
+        assertThat(stationList.stream().map(StationResponse::getId)).containsAnyOf(extraStationId);
     }
 
     /**
@@ -87,5 +111,21 @@ public class SubwaySectionAcceptanceTest {
     @Test
     void 지하철구간_종점제거_하행종점역이_아닌_경우() {
 
+    }
+
+    private ExtractableResponse<Response> addSections(Long downStationId, Long upStationId, Long distance) {
+        final Map<String, String> params = new HashMap<>();
+        params.put("downStationId", downStationId.toString());
+        params.put("upStationId", upStationId.toString());
+        params.put("distance", distance.toString());
+
+        return RestAssured
+            .given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(params)
+            .when()
+            .post("/lines/" + lineId + "/sections")
+            .then().log().all()
+            .extract();
     }
 }
