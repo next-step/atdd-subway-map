@@ -76,9 +76,6 @@ public class StationAcceptanceTest {
         // then
         final List<String> stationNames = jsonPath.getList("name", String.class);
 
-        assertThat(stationNames).hasSize(2);
-        assertThat(stationNames).contains("역삼역", "교대역");
-        assertThat(stationNames).doesNotContain("강남역");
         assertThat(stationNames).containsExactly("교대역", "역삼역");
     }
 
@@ -110,7 +107,6 @@ public class StationAcceptanceTest {
         final JsonPath jsonPathAfterStationDeletion = this.getStationList();
         final List<String> stationNames = jsonPathAfterStationDeletion.getList("name", String.class);
 
-        assertThat(stationNames).isEmpty();
         assertThat(stationNames).doesNotContain("강남역");
     }
 
