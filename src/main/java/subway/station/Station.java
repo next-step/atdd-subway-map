@@ -13,10 +13,10 @@ public class Station {
     @Column(length = 20, nullable = false)
     private String name;
 
-    @OneToMany(mappedBy = "upStation", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "upStation", cascade = CascadeType.ALL)
     private List<Line> linesAsUpStation;
 
-    @OneToMany(mappedBy = "downStation", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "downStation", cascade = CascadeType.ALL)
     private List<Line> linesAsDownStation;
 
     public Station() {
