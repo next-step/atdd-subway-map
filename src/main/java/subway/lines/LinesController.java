@@ -29,19 +29,19 @@ public class LinesController {
     public ResponseEntity<LineResponse> createLines(
         @RequestBody LineCreateRequest lineCreateRequest
     ) {
-        LineResponse lines = lineService.saveLines(lineCreateRequest);
+        LineResponse lines = lineService.saveLine(lineCreateRequest);
 
         return ResponseEntity.created(URI.create("/lines/" + lines.getId())).body(lines);
     }
 
     @GetMapping("/lines")
     public ResponseEntity<List<LineResponse>> getLinesList() {
-        return ResponseEntity.ok().body(lineService.getLinesList());
+        return ResponseEntity.ok().body(lineService.getLines());
     }
 
     @GetMapping("/lines/{id}")
     public ResponseEntity<LineResponse> getLines(@PathVariable Long id) {
-        return ResponseEntity.ok().body(lineService.getLines(id));
+        return ResponseEntity.ok().body(lineService.getLine(id));
     }
 
     @PostMapping("/lines/{id}/sections")

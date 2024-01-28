@@ -30,7 +30,7 @@ public class LineService {
     }
 
     @Transactional
-    public LineResponse saveLines(LineCreateRequest lineCreateRequest) {
+    public LineResponse saveLine(LineCreateRequest lineCreateRequest) {
         final Line line = lineRepository.save(
             new Line(
                 lineCreateRequest.getName(),
@@ -54,12 +54,12 @@ public class LineService {
         return createLineResponse(line);
     }
 
-    public List<LineResponse> getLinesList() {
+    public List<LineResponse> getLines() {
         return lineRepository.findAll().stream().map(this::createLineResponse)
             .collect(Collectors.toList());
     }
 
-    public LineResponse getLines(Long id) {
+    public LineResponse getLine(Long id) {
         final Line line = lineRepository.findById(id).orElse(null);
         if (line == null) {
             return null;
