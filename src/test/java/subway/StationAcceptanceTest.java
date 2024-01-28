@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import subway.station.entity.Station;
+import subway.station.dto.StationRequest;
 import subway.station.repository.StationRepository;
 
 import java.util.List;
@@ -40,8 +40,8 @@ public class StationAcceptanceTest {
     void 지하철역_생성() {
         // when
         final String stationName = "강남역";
-        final Station station = new Station(stationName);
-        final ExtractableResponse<Response> response = this.createStation(station);
+        final StationRequest request = new StationRequest(stationName);
+        final ExtractableResponse<Response> response = this.createStation(request);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -63,12 +63,12 @@ public class StationAcceptanceTest {
     void 지하철역_목록_조회() {
         // given
         final String stationName1 = "교대역";
-        final Station station1 = new Station(stationName1);
-        this.createStation(station1);
+        final StationRequest request1 = new StationRequest(stationName1);
+        this.createStation(request1);
 
         final String stationName2 = "역삼역";
-        final Station station2 = new Station(stationName2);
-        this.createStation(station2);
+        final StationRequest request2 = new StationRequest(stationName2);
+        this.createStation(request2);
 
         // when
         final JsonPath jsonPath = this.getStationList();
@@ -92,8 +92,8 @@ public class StationAcceptanceTest {
     void 지하철역_삭제() {
         // given
         final String stationName = "강남역";
-        final Station station = new Station(stationName);
-        final ExtractableResponse<Response> createStationResponse = this.createStation(station);
+        final StationRequest request = new StationRequest(stationName);
+        final ExtractableResponse<Response> createStationResponse = this.createStation(request);
 
         // when
         final String location = createStationResponse.header("Location");
@@ -129,11 +129,11 @@ public class StationAcceptanceTest {
         return response;
     }
 
-    private ExtractableResponse<Response> createStation(final Station station) {
+    private ExtractableResponse<Response> createStation(final StationRequest request) {
         final ExtractableResponse<Response> response =
                 given()
                     .log().all()
-                    .body(station)
+                    .body(request)
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                     .post("/stations")
