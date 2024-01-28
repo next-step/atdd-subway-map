@@ -45,6 +45,35 @@ public class LineAcceptanceTest {
         assertThat(lineNames).containsAnyOf(lineName);
     }
 
+    /**
+     * Given 2개의 지하철 노선을 생성하고
+     * When 지하철 노선 목록을 조회하면
+     * Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
+     */
+    @DisplayName("지하철 노선 목록을 조회한다.")
+    @Test
+    void 지하철_노선_목록을_조회() {
+        // given
+        String lineName1 = "신분당선";
+        Long upStationId1 = createStationByStationName("강남역").jsonPath().getLong("id");
+        Long downStationId1 = createStationByStationName("신논현역").jsonPath().getLong("id");
+        Map<String, Object> requestBody = createRequestBody(lineName1, "bg-red-600", upStationId1, downStationId1, 10);
+
+        createLine(requestBody);
+
+        String lineName2 = "수인분당선";
+        Long upStationId2 = createStationByStationName("압구정로데오역").jsonPath().getLong("id");
+        Long downStationId2 = createStationByStationName("강남구청역").jsonPath().getLong("id");
+        Map<String, Object> requestBody2 = createRequestBody(lineName2, "bg-yellow-600", upStationId2, downStationId2, 10);
+
+        createLine(requestBody2);
+
+        // when & then
+        List<String> lineNames =
+                selectLines().jsonPath().getList("name", String.class);
+        assertThat(lineNames).contains("신분당선", "수인분당선");
+    }
+
     private Map<String, Object> createRequestBody(String name, String color, Long upStationId, Long downStationId, Integer distance) {
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("name", name);
