@@ -57,7 +57,7 @@ public class StationAcceptanceTest {
         );
 
         inputNames.forEach(this::createStationFromName);
-        int INPUT_SIZE = inputNames.size();
+        int inputSize = inputNames.size();
 
         // when
         ExtractableResponse<Response> response = allStations();
@@ -65,7 +65,8 @@ public class StationAcceptanceTest {
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         List<String> stationNames = response.jsonPath().getList("name", String.class);
-        assertThat(stationNames).hasSize(INPUT_SIZE);
+        assertThat(stationNames).hasSize(inputSize);
+        assertThat(stationNames).containsExactly(지하철_이름_강남역, 지하철_이름_역삼역);
     }
 
 
@@ -80,10 +81,8 @@ public class StationAcceptanceTest {
         int id = createStationFromName("강남역").jsonPath().getInt("id");
         deleteById(id);
 
-        stationsById(id)
-                .then()
-                .statusCode(500);
-
+        int size = allStations().jsonPath().getList("name", String.class).size();
+        assertThat(size).isEqualTo(0);
     }
 
     private void deleteById(int id) {
