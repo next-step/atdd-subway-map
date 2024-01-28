@@ -30,6 +30,7 @@ import subway.station.StationResponse;
 @SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
 public class SubwaySectionAcceptanceTest {
 
+    Long upStationId;
     Long downStationId;
     Long extraStationId;
     Long lineId;
@@ -45,7 +46,7 @@ public class SubwaySectionAcceptanceTest {
 
     @BeforeEach
     void setUp() {
-        final Long upStationId = stationRepository.save(new Station("역1")).getId();
+        upStationId = stationRepository.save(new Station("역1")).getId();
         downStationId = stationRepository.save(new Station("역2")).getId();
         extraStationId = stationRepository.save(new Station("역3")).getId();
 
@@ -101,6 +102,16 @@ public class SubwaySectionAcceptanceTest {
     @Test
     void 지하철구간_추가_하행선아닌_경우() {
 
+        // When
+        final ExtractableResponse<Response> response = addSections(
+            lineId,
+            upStationId,
+            extraStationId,
+            10L
+        );
+
+        // Then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     /**
