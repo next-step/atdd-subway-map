@@ -45,6 +45,6 @@
     - ID에 해당하는 노선이 없을 경우
       - 컨트롤러에서 throw?
       - 서비스에서 throw?
-  - `updateStationLine` 메서드는 @Transaction 어노테이션이 없다면, 조회시 수정 전 데이터가 조회
+  - `updateStationLine` 메서드는 @Transaction 어노테이션이 없다면, 조회시 수정 전 데이터가 조회(deleteStationLine 동일)
     - 테스트 메서드에서는 EntityManager가 하나만 사용되는 것인가?
       - 아님. entity.clear 혹은 entity.flush를 호출해도 실패
