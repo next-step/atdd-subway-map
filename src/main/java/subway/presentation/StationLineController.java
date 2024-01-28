@@ -40,4 +40,10 @@ public class StationLineController {
         StationLineResponse stationLine = stationLineService.updateStationLine(stationLineId, request);
         return ResponseEntity.created(URI.create("/lines/" + stationLine.getId())).body(stationLine);
     }
+
+    @DeleteMapping("/lines/{stationLineId}")
+    public ResponseEntity<Void> deleteStationLine(@PathVariable Long stationLineId) {
+        stationLineService.deleteStationLine(stationLineId);
+        return ResponseEntity.noContent().build();
+    }
 }

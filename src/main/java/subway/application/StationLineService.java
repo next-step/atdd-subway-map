@@ -45,6 +45,10 @@ public class StationLineService {
         return convertToResponse(stationLineRepository.save(updateStationLine(request, stationLine)));
     }
 
+    public void deleteStationLine(Long stationLineId) {
+        stationLineRepository.deleteById(stationLineId);
+    }
+
     private StationLine updateStationLine(StationLineRequest request, StationLine stationLine) {
         return stationLine.update(
                 request.getName(),
