@@ -4,7 +4,6 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.MediaType;
-import subway.LineAcceptanceTest;
 
 import java.util.HashMap;
 import java.util.List;
@@ -45,13 +44,13 @@ public class CommonApi {
     }
     public static class Line {
 
-        public static ExtractableResponse<Response> createLineBy(Fixture.Line line) {
+        public static ExtractableResponse<Response> createLineBy(LineFixture line) {
             Map<String, String> params = new HashMap<>();
             params.put("name", line.name);
             params.put("color", line.color);
-            params.put("upStationId", line.stations.get(0).id.toString());
-            params.put("downStationId", line.stations.get(1).id.toString());
-            params.put("distance", line.distance);
+            params.put("upStationId", line.upStation.id.toString());
+            params.put("downStationId", line.downStation.id.toString());
+            params.put("distance", line.distance.toString());
             return RestAssured.given().log().all()
                     .body(params)
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -83,7 +82,7 @@ public class CommonApi {
                     .given().log().all()
                     .body(params)
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
-                    .when().put("/lines/{id}", id)
+                    .when().patch("/lines/{id}", id)
                     .then().log().all()
                     .extract();
         }
