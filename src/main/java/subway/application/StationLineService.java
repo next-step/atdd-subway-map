@@ -8,6 +8,7 @@ import subway.dto.StationLineResponse;
 import subway.entity.StationLine;
 import subway.entity.StationLineRepository;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,20 +35,24 @@ public class StationLineService {
 
     public StationLineResponse findStationLineById(Long stationLineId) {
         return convertToResponse(stationLineRepository.findById(stationLineId)
-                .orElseThrow(RuntimeException::new)); // TODO 예외 처리
+                .orElseThrow(EntityNotFoundException::new)); // TODO: Throw Custom Exception?
     }
 
     @Transactional
     public StationLineResponse updateStationLine(Long stationLineId, StationLineRequest request) {
-        StationLine stationLine = stationLineRepository.findById(stationLineId).orElseThrow(RuntimeException::new);
-        stationLine.update(
+        StationLine stationLine = stationLineRepository.findById(stationLineId)
+                .orElseThrow(EntityNotFoundException::new);
+        return convertToResponse(stationLineRepository.save(updateStationLine(request, stationLine)));
+    }
+
+    private StationLine updateStationLine(StationLineRequest request, StationLine stationLine) {
+        return stationLine.update(
                 request.getName(),
                 request.getColor(),
                 request.getUpStationId(),
                 request.getDownStationId(),
                 request.getDistance()
         );
-        return convertToResponse(stationLineRepository.save(stationLine));
     }
 
     private StationLine convertToEntity(StationLineRequest request) {
