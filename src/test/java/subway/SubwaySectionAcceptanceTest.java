@@ -1,13 +1,46 @@
 package subway;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import subway.lines.Line;
+import subway.lines.LineRepository;
+import subway.station.Station;
+import subway.station.StationRepository;
 
 @DisplayName("지하철 구간 테스트")
 @SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
 public class SubwaySectionAcceptanceTest {
+
+    Long extraStationId;
+
+    @Autowired
+    private StationRepository stationRepository;
+
+    @Autowired
+    private LineRepository lineRepository;
+
+    @Autowired
+    private DatabaseCleaner databaseCleaner;
+
+    @BeforeEach
+    void setUp() {
+        final Station firstStation = stationRepository.save(new Station("역1"));
+        final Station secondStation = stationRepository.save(new Station("역2"));
+        extraStationId = stationRepository.save(new Station("역3")).getId();
+
+        lineRepository.save(new Line("노선1", "빨간색", firstStation, secondStation, 10L));
+    }
+
+    @AfterEach
+    void cleanUp() {
+        databaseCleaner.tableClear();
+    }
+
     /**
      * When 지하철 구간을 추가하면
      * Then 지하철 노선 조회시 추가된 구간을 확인할 수 있다.
