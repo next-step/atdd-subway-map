@@ -60,16 +60,12 @@ public class StationAcceptanceTest {
     void getStationSuccess() {
         // given
         List<String> givenNames = List.of(
-                createStation("아차산역").getName(),
-                createStation("장한평역").getName()
+                StationFactory.createStation("아차산역").getName(),
+                StationFactory.createStation("장한평역").getName()
         );
 
         // when
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract();
+        ExtractableResponse<Response> response = StationFactory.getStations();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -85,7 +81,7 @@ public class StationAcceptanceTest {
     @Test
     void deleteStationSuccess() {
         // given
-        Long createdStationId = createStation("광나루역").getId();
+        Long createdStationId = StationFactory.createStation("광나루역").getId();
 
         ExtractableResponse<Response> response =
                 RestAssured.given().log().all()
@@ -96,21 +92,9 @@ public class StationAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         // when
-        response = RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract();
+        response = StationFactory.getStations();
 
         // then
         assertThat(response.jsonPath().getList("id", Long.class)).doesNotContain(createdStationId);
-    }
-
-    private StationResponse createStation(String name) {
-        return RestAssured
-                .given()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(Map.of("name", name))
-                .when().post("/stations")
-                .then().extract().as(StationResponse.class);
     }
 }
