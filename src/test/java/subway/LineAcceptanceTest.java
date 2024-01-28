@@ -9,11 +9,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
+import javax.websocket.OnClose;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static subway.extractableResponse.StationApiExtractableResponse.createStationByStationName;
+import static subway.extractableResponse.LineApiExtractableResponse.createLine;
+import static subway.extractableResponse.LineApiExtractableResponse.selectLines;
 
 @DisplayName("지하철 노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -30,15 +34,10 @@ public class LineAcceptanceTest {
         String lineName = "신분당선";
         Long upStationId = createStationByStationName("강남역").jsonPath().getLong("id");
         Long downStationId = createStationByStationName("신논현역").jsonPath().getLong("id");
-        Map<String, Object> requestParam = new HashMap<>();
-        requestParam.put("name", lineName);
-        requestParam.put("color", "bg-red-600");
-        requestParam.put("upStationId", upStationId);
-        requestParam.put("downStationId", downStationId);
-        requestParam.put("distance", 10);
+        Map<String, Object> requestBody = createRequestBody(lineName, "bg-red-600", upStationId, downStationId, 10);
 
         // when
-        createLine(requestParam);
+        createLine(requestBody);
 
         // then
         List<String> lineNames =
@@ -46,39 +45,15 @@ public class LineAcceptanceTest {
         assertThat(lineNames).containsAnyOf(lineName);
     }
 
-    private ExtractableResponse<Response> createStationByStationName(String stationName) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", stationName);
+    private Map<String, Object> createRequestBody(String name, String color, Long upStationId, Long downStationId, Integer distance) {
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("name", name);
+        requestBody.put("color", color);
+        requestBody.put("upStationId", upStationId);
+        requestBody.put("downStationId", downStationId);
+        requestBody.put("distance", distance);
 
-        return RestAssured
-                .given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .statusCode(HttpStatus.CREATED.value())
-                .extract();
-    }
-
-    private ExtractableResponse<Response> createLine(Map<String, Object> requestParam) {
-
-        return RestAssured
-                .given().log().all()
-                .body(requestParam)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().log().all()
-                .statusCode(HttpStatus.CREATED.value())
-                .extract();
-    }
-
-    private ExtractableResponse<Response> selectLines() {
-        return RestAssured
-                .given().log().all()
-                .when().get("/lines")
-                .then().log().all()
-                .statusCode(HttpStatus.OK.value())
-                .extract();
+        return requestBody;
     }
 
 }
