@@ -13,9 +13,12 @@ import org.springframework.http.MediaType;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Sql(value = "/truncate.sql", executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class StationAcceptanceTest {
