@@ -3,14 +3,18 @@ package subway;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.jdbc.Sql;
+import subway.line.LineRepository;
 import subway.line.LineRequest;
 import subway.station.Station;
+import subway.station.StationRepository;
 
 import java.util.List;
 
@@ -18,10 +22,35 @@ import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
-@Sql(scripts = "/reset-db.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {
 
+    @Autowired
+    private StationRepository stationRepository;
+    @Autowired
+    private LineRepository lineRepository;
+
+    private Long 강남역_ID;
+    private Long 역삼역_ID;
+    private Long 지하철역_ID;
+
+    @BeforeEach
+    void setUp() {
+        Station 강남역 = stationRepository.save(new Station("강남역"));
+        강남역_ID = 강남역.getId();
+
+        Station 역삼역 = stationRepository.save(new Station("역삼역"));
+        역삼역_ID = 역삼역.getId();
+
+        Station 지하철역 = stationRepository.save(new Station("지하철역"));
+        지하철역_ID = 지하철역.getId();
+    }
+
+    @AfterEach
+    void tearDown() {
+        lineRepository.deleteAll();
+        stationRepository.deleteAll();
+    }
 
     /**
      * When 지하철 노선을 생성하면
@@ -31,7 +60,7 @@ public class LineAcceptanceTest {
     @Test
     public void 지하철_노선_생성() {
         // when
-        final LineRequest request = new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10);
+        final LineRequest request = new LineRequest("신분당선", "bg-red-600", 강남역_ID, 역삼역_ID, 10);
         final ExtractableResponse<Response> response = createSubwayLine(request);
 
         // then
@@ -59,10 +88,10 @@ public class LineAcceptanceTest {
     @Test
     public void 지하철_노선_목록_조회() {
         // given
-        final LineRequest request1 = new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10);
+        final LineRequest request1 = new LineRequest("신분당선", "bg-red-600", 강남역_ID, 역삼역_ID, 10);
         createSubwayLine(request1);
 
-        final LineRequest request2 = new LineRequest("지하철노선1", "bg-green-600", 1L, 3L, 15);
+        final LineRequest request2 = new LineRequest("지하철노선", "bg-green-600", 강남역_ID, 지하철역_ID, 15);
         createSubwayLine(request2);
 
         // when
@@ -71,21 +100,11 @@ public class LineAcceptanceTest {
         // then
         final List<String> lineNames = jsonPath.getList("name", String.class);
         assertThat(lineNames).hasSize(2);
-        assertThat(lineNames).containsExactly("신분당선", "지하철노선1");
+        assertThat(lineNames).containsExactly("신분당선", "지하철노선");
 
         final List<String> lineStationNames = jsonPath.getList("[1].stations.name", String.class);
         assertThat(lineStationNames).doesNotContain("역삼역");
-        assertThat(lineStationNames).containsExactly("강남역", "지하철역1");
-    }
-
-    private LineRequest createLineRequest(
-            final String lineName
-            , final String lineColor
-            , final Long upStationId
-            , final Long downStationId
-            , final Integer lineDistance
-    ) {
-        return new LineRequest(lineName, lineColor, upStationId, downStationId, lineDistance);
+        assertThat(lineStationNames).containsExactly("강남역", "지하철역");
     }
 
     private ExtractableResponse<Response> createSubwayLine(LineRequest request) {
