@@ -18,9 +18,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import subway.lines.Line;
 import subway.lines.LineCreateRequest;
-import subway.lines.LineRepository;
+import subway.lines.LineResponse;
 import subway.lines.LineService;
 import subway.station.Station;
 import subway.station.StationRepository;
@@ -51,7 +50,7 @@ public class SubwaySectionAcceptanceTest {
         extraStationId = stationRepository.save(new Station("역3")).getId();
 
         lineId = lineService
-            .saveLines(
+            .saveLine(
                 new LineCreateRequest(
                     "노선1",
                     "색1",
@@ -121,7 +120,28 @@ public class SubwaySectionAcceptanceTest {
      */
     @Test
     void 지하철구간_종점_제거() {
+        // Given
+        addSections(lineId, downStationId, extraStationId, 10L);
 
+        // When
+        final ExtractableResponse<Response> response = RestAssured
+            .given().log().all()
+            .when()
+            .queryParam("stationId", extraStationId)
+            .delete("/lines/"+ lineId + "/sections")
+            .then().log().all()
+            .extract();
+
+        // Then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        // Then
+        final List<Long> stationIdList = lineService
+            .getLine(lineId)
+            .getStations().stream().map(StationResponse::getId)
+            .toList();
+
+        assertThat(stationIdList).doesNotContain(extraStationId);
     }
 
     /**
@@ -144,10 +164,10 @@ public class SubwaySectionAcceptanceTest {
 
     }
 
-    private ExtractableResponse<Response> addSections(Long lineId, Long downStationId, Long upStationId, Long distance) {
+    private ExtractableResponse<Response> addSections(Long lineId, Long upStationId, Long downStationId, Long distance) {
         final Map<String, String> params = new HashMap<>();
-        params.put("downStationId", downStationId.toString());
         params.put("upStationId", upStationId.toString());
+        params.put("downStationId", downStationId.toString());
         params.put("distance", distance.toString());
 
         return RestAssured
