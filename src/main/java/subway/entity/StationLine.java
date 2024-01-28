@@ -56,4 +56,12 @@ public class StationLine {
     public int getDistance() {
         return distance;
     }
+
+    public void update(String name, String color, int upStationId, int downStationId, int distance) {
+        this.name = name;
+        this.color = color;
+        this.upStationId = upStationId;
+        this.downStationId = downStationId;
+        this.distance = distance;
+    }
 }

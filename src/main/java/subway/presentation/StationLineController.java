@@ -33,4 +33,11 @@ public class StationLineController {
     public ResponseEntity<StationLineResponse> findStationLineById(@PathVariable Long stationLineId) {
         return ResponseEntity.ok(stationLineService.findStationLineById(stationLineId));
     }
+
+    @PatchMapping("/lines/{stationLineId}")
+    public ResponseEntity<StationLineResponse> updateStationLine(@PathVariable Long stationLineId,
+                                                                 @RequestBody StationLineRequest request) {
+        StationLineResponse stationLine = stationLineService.updateStationLine(stationLineId, request);
+        return ResponseEntity.created(URI.create("/lines/" + stationLine.getId())).body(stationLine);
+    }
 }

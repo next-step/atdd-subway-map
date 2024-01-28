@@ -37,6 +37,19 @@ public class StationLineService {
                 .orElseThrow(RuntimeException::new)); // TODO 예외 처리
     }
 
+    @Transactional
+    public StationLineResponse updateStationLine(Long stationLineId, StationLineRequest request) {
+        StationLine stationLine = stationLineRepository.findById(stationLineId).orElseThrow(RuntimeException::new);
+        stationLine.update(
+                request.getName(),
+                request.getColor(),
+                request.getUpStationId(),
+                request.getDownStationId(),
+                request.getDistance()
+        );
+        return convertToResponse(stationLineRepository.save(stationLine));
+    }
+
     private StationLine convertToEntity(StationLineRequest request) {
         return new StationLine(
                 request.getName(),
