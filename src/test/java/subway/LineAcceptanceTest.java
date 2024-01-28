@@ -38,13 +38,13 @@ public class LineAcceptanceTest {
 
     @BeforeEach
     void setUp() {
-        Station 강남역 = stationRepository.save(new Station("강남역"));
+        final Station 강남역 = stationRepository.save(new Station("강남역"));
         강남역_ID = 강남역.getId();
 
-        Station 역삼역 = stationRepository.save(new Station("역삼역"));
+        final Station 역삼역 = stationRepository.save(new Station("역삼역"));
         역삼역_ID = 역삼역.getId();
 
-        Station 지하철역 = stationRepository.save(new Station("지하철역"));
+        final Station 지하철역 = stationRepository.save(new Station("지하철역"));
         지하철역_ID = 지하철역.getId();
     }
 
@@ -123,19 +123,19 @@ public class LineAcceptanceTest {
         final String subwayLineId = this.getCreatedSubwayLineId(createSubwayLineResponse);
 
         // when
-        JsonPath jsonPath = this.getSubwayLine(subwayLineId);
+        final JsonPath jsonPath = this.getSubwayLine(subwayLineId);
 
         // then
-        String lineName = jsonPath.get("name");
+        final String lineName = jsonPath.get("name");
         assertThat(lineName).isEqualTo("신분당선");
 
-        String lineColor = jsonPath.get("color");
+        final String lineColor = jsonPath.get("color");
         assertThat(lineColor).isEqualTo("bg-red-600");
 
-        List<Station> lineStations = jsonPath.getList("stations", Station.class);
+        final List<Station> lineStations = jsonPath.getList("stations", Station.class);
         assertThat(lineStations).hasSize(2);
 
-        List<String> lineStationNames = jsonPath.getList("stations.name", String.class);
+        final List<String> lineStationNames = jsonPath.getList("stations.name", String.class);
         assertThat(lineStationNames).containsExactly("강남역", "역삼역");
     }
 
@@ -166,12 +166,12 @@ public class LineAcceptanceTest {
             .log().all();
 
         // then
-        JsonPath afterUpdatedSubwayLine = this.getSubwayLine(subwayLineId);
+        final JsonPath afterUpdatedSubwayLine = this.getSubwayLine(subwayLineId);
 
-        String updatedName = afterUpdatedSubwayLine.get("name");
+        final String updatedName = afterUpdatedSubwayLine.get("name");
         assertThat(updatedName).isEqualTo("2호선");
 
-        String updatedColor = afterUpdatedSubwayLine.get("color");
+        final String updatedColor = afterUpdatedSubwayLine.get("color");
         assertThat(updatedColor).isEqualTo("bg-yellow-600");
     }
 
@@ -203,14 +203,14 @@ public class LineAcceptanceTest {
         assertThat(lineNames).doesNotContain("신분당선");
     }
 
-    private String getCreatedSubwayLineId(ExtractableResponse<Response> createSubwayLineResponse) {
+    private String getCreatedSubwayLineId(final ExtractableResponse<Response> createSubwayLineResponse) {
         final String location = createSubwayLineResponse.header("Location");
         final String subwayLineId = location.replaceAll(".*/(\\d+)$", "$1");
 
         return subwayLineId;
     }
 
-    private ExtractableResponse<Response> createSubwayLine(LineRequest request) {
+    private ExtractableResponse<Response> createSubwayLine(final LineRequest request) {
         final ExtractableResponse<Response> response =
                 given()
                     .log().all()
@@ -241,8 +241,8 @@ public class LineAcceptanceTest {
         return response;
     }
 
-    private JsonPath getSubwayLine(String subwayLineId) {
-        return given()
+    private JsonPath getSubwayLine(final String subwayLineId) {
+        final JsonPath response = given()
                 .when()
                 .get("/lines/{id}", subwayLineId)
                 .then()
@@ -250,6 +250,8 @@ public class LineAcceptanceTest {
                 .log().all()
                 .extract()
                 .jsonPath();
+
+        return response;
     }
 
 }

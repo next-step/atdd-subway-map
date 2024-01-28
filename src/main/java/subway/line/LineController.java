@@ -37,14 +37,14 @@ public class LineController {
     }
 
     @PutMapping("/lines/{id}")
-    public ResponseEntity<Void> updateSubwayLine(@PathVariable Long id, @RequestBody LineUpdateRequest request) {
+    public ResponseEntity<Void> updateSubwayLine(final @PathVariable Long id, final @RequestBody LineUpdateRequest request) {
         lineService.updateSubwayLine(id, request);
 
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/lines/{id}")
-    public ResponseEntity<Void> deleteSubwayLine(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteSubwayLine(final @PathVariable Long id) {
         lineService.deleteSubwayLine(id);
 
         return ResponseEntity.noContent().build();

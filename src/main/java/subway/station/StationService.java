@@ -16,8 +16,9 @@ public class StationService {
     }
 
     @Transactional
-    public StationResponse saveStation(StationRequest stationRequest) {
-        Station station = stationRepository.save(new Station(stationRequest.getName()));
+    public StationResponse saveStation(final StationRequest stationRequest) {
+        final Station station = stationRepository.save(new Station(stationRequest.getName()));
+
         return createStationResponse(station);
     }
 
@@ -28,11 +29,11 @@ public class StationService {
     }
 
     @Transactional
-    public void deleteStationById(Long id) {
+    public void deleteStationById(final Long id) {
         stationRepository.deleteById(id);
     }
 
-    private StationResponse createStationResponse(Station station) {
+    private StationResponse createStationResponse(final Station station) {
         return new StationResponse(
                 station.getId(),
                 station.getName()
