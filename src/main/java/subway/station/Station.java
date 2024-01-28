@@ -1,4 +1,4 @@
-package subway;
+package subway.station;
 
 import javax.persistence.*;
 
@@ -10,11 +10,12 @@ public class Station {
     @Column(length = 20, nullable = false)
     private String name;
 
-    public Station() {
-    }
 
     public Station(String name) {
         this.name = name;
+    }
+
+    public Station() {
     }
 
     public Long getId() {
@@ -23,5 +24,9 @@ public class Station {
 
     public String getName() {
         return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }
