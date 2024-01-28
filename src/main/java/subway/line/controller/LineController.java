@@ -23,7 +23,7 @@ public class LineController {
     public ResponseEntity<LineResponse> createSubwayLine(final @RequestBody LineRequest request) {
         final LineResponse subwayLine = lineService.createSubwayLine(request);
 
-        return ResponseEntity.created(URI.create("/line/"+subwayLine.getId())).body(subwayLine);
+        return ResponseEntity.created(URI.create("/line/" + subwayLine.getId())).body(subwayLine);
     }
 
     @GetMapping("/lines")

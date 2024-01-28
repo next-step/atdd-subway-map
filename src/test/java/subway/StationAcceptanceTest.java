@@ -62,13 +62,13 @@ public class StationAcceptanceTest {
     @Test
     void 지하철역_목록_조회() {
         // given
-        final String stationName1 = "교대역";
-        final StationRequest request1 = new StationRequest(stationName1);
-        this.createStation(request1);
+        final String 역이름_교대역 = "교대역";
+        final StationRequest 교대역_생성_요청 = new StationRequest(역이름_교대역);
+        this.createStation(교대역_생성_요청);
 
-        final String stationName2 = "역삼역";
-        final StationRequest request2 = new StationRequest(stationName2);
-        this.createStation(request2);
+        final String 역이름_역삼역 = "역삼역";
+        final StationRequest 역삼역_생성_요청 = new StationRequest(역이름_역삼역);
+        this.createStation(역삼역_생성_요청);
 
         // when
         final JsonPath jsonPath = this.getStationList();

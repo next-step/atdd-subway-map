@@ -90,11 +90,11 @@ public class LineAcceptanceTest {
     @Test
     void 지하철_노선_목록_조회() {
         // given
-        final LineRequest request1 = new LineRequest("신분당선", "bg-red-600", 강남역_ID, 역삼역_ID, 10);
-        this.createSubwayLine(request1);
+        final LineRequest 강남역_생성_요청 = new LineRequest("신분당선", "bg-red-600", 강남역_ID, 역삼역_ID, 10);
+        this.createSubwayLine(강남역_생성_요청);
 
-        final LineRequest request2 = new LineRequest("지하철노선", "bg-green-600", 강남역_ID, 지하철역_ID, 15);
-        this.createSubwayLine(request2);
+        final LineRequest 지하철노선_생성_요청 = new LineRequest("지하철노선", "bg-green-600", 강남역_ID, 지하철역_ID, 15);
+        this.createSubwayLine(지하철노선_생성_요청);
 
         // when
         final JsonPath jsonPath = this.getSubwayLineList();
