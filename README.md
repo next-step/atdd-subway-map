@@ -71,3 +71,153 @@ then().
   - [x] statusCode 가 204 No Content 인지 확인한다.
   - [x] "/stations" 로 Get 요청을 보낸다.
   - [x] jsonPath 를 이용해 해당 지하철역이 삭제 되었는지 확인한다.
+
+
+## 2단계 - 지하철 노선 관리
+### 요구사항
+- [x] 지하철 노선 생성 - "POST /lines"
+  > When 지하철 노선을 생성하면 <br>
+  Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
+  - Request Data
+    ```json
+    {
+      "name" : "신분당선",
+      "color" : "bg-red-600",
+      "upStationId" : 1,
+      "downStationId" : 2,
+      "distance" : 10
+    }
+    ```
+  - Response Data
+    ```json
+    {
+      "id" : 1,
+      "name" : "신분당선",
+      "color" : "bg-red-600",
+      "stations" : [
+        {
+          "id": 1,
+          "name": "지하철역"
+        },
+        {
+          "id": 2,
+          "name": "새로운지하철역"
+        } 
+      ]
+    }
+    ```
+  - [x] "/lines" 로 Post 요청을 보낸다.
+  - [x] 요청 data validation
+    - [x] name 이 없다면 Exception 을 던진다.
+    - [x] color 가 없다면 Exception 을 던진다.
+    - [x] 상행역, 하행역 없다면 Exception 을 던진다.
+    - [x] distance 가 0 이하이면 Exception 을 던진다.
+    - [x] 상행역, 하행역이 같다면 Exception 을 던진다.
+  - [x] Line 을 저장한다.
+    - [x] 저장시 상행역, 하행역이 저장되어있지 않으면 Exception 을 던진다.
+  - [x] 저장 후 응답 객체를 만든다.
+    - [x] 응답 객체에 상행역, 하행역 정보를 이용해 응답 객체에 포힘시킨다.
+
+
+- [x] 지하철 노선 목록 조회 - "GET /lines"
+  > Given 2개의 지하철 노선을 생성하고<br>
+  When 지하철 노선 목록을 조회하면<br>
+  Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
+  - Response Data
+    ```json
+    [
+      {
+        "id" : 1,
+        "name" : "신분당선",
+        "color" : "bg-red-600",
+        "stations" : [
+          {
+            "id": 1,
+            "name": "지하철역"
+          },
+          {
+            "id": 2,
+            "name": "새로운지하철역"
+          } 
+        ]
+      },
+      {
+        "id" : 2,
+        "name" : "분당선",
+        "color" : "bg-green-600",
+        "stations" : [
+          {
+            "id": 1,
+            "name": "지하철역"
+          },
+          {
+            "id": 3,
+            "name": "또다른지하철역"
+          } 
+        ]
+      }
+    ]
+    ```
+  - [x] "/lines" 로 Get 요청을 보낸다.
+  - [x] Line 들을 상행역, 하행역과 함께 조회한다.
+  - [x] 응답 객체로 변환해 반환한다.
+
+
+- [x] 지하철 노선 조회 - "GET /lines/{id}"
+  > Given 지하철 노선을 생성하고<br>
+  When 생성한 지하철 노선을 조회하면<br>
+  Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
+  - Response Data
+    ```json
+    {
+      "id" : 1,
+      "name" : "신분당선",
+      "color" : "bg-red-600",
+      "stations" : [
+        {
+          "id": 1,
+          "name": "지하철역"
+        },
+        {
+          "id": 2,
+          "name": "새로운지하철역"
+        } 
+      ]
+    }
+    ```
+    - [x] "/lines/{id}" 로 Get 요청을 보낸다.
+    - [x] 해당 id를 가진 Line 정보를 상행역, 하행역과 함께 조회한다.
+      - [x] 해당 id를 가진 Line 이 없으면 Exception 을 던진다.
+    - [x] 응답 객체로 변환해 반환한다.
+
+
+- [x] 지하철 노선 수정 - "PUT /lines/{id}"
+  > Given 지하철 노선을 생성하고<br>
+  When 생성한 지하철 노선을 수정하면<br>
+  Then 해당 지하철 노선 정보는 수정된다
+  - Request Data
+    ```json
+    {
+      "name" : "신분당선",
+      "color" : "bg-red-600"
+    }
+    ```
+    - [x] "/lines/{id}" 로 put 요청을 보낸다.
+    - [x] 요청 data validation
+      - [x] name 이 없다면 Exception 을 던진다.
+      - [x] color 가 없다면 Exception 을 던진다.
+    - [x] 해당 id를 가진 Line 정보를 조회한다.
+      - [x] 해당 id를 가진 Line 이 없으면 Exception 을 던진다.
+    - [x] 요청 객체를 바탕으로 객체를 수정한다.
+
+
+- [x] 지하철 노선 삭제 - "DELETE /lines/{id}"
+  > Given 지하철 노선을 생성하고<br>
+  When 생성한 지하철 노선을 삭제하면<br>
+  Then 해당 지하철 노선 정보는 삭제된다
+  - [x] "/lines/{id}" 로 delete 요청을 보낸다.
+  - [x] 해당 id 를 가진 노선정보를 삭제한다.
+
+
+- [x] 인수 테스트 격리
+  - EntityManager 이용
