@@ -23,6 +23,9 @@ public class Line {
     @JoinColumn(name = "DOWN_STATION_ID")
     private Station downStation;
 
+    public Line() {
+    }
+
     public Line(final String name, final String color, final Station upStation, final Station downStation) {
         this.name = name;
         this.color = color;

@@ -24,10 +24,19 @@ public class LineResponse {
         return id;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public List<StationResponse> getStations() {
+        return stations;
+    }
+
     private StationResponse createStationResponse(Station station) {
-        return new StationResponse(
-                station.getId(),
-                station.getName()
-        );
+        return new StationResponse(station.getId(), station.getName());
     }
 }
