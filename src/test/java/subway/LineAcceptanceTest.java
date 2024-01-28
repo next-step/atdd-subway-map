@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
@@ -17,6 +16,7 @@ import static subway.extractableResponse.LineApiExtractableResponse.*;
 import static subway.extractableResponse.StationApiExtractableResponse.createStationByStationName;
 
 @DisplayName("지하철 노선 관련 기능")
+@Sql("/truncate.sql")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {
 

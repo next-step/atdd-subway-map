@@ -3,6 +3,7 @@ package subway;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.jdbc.Sql;
 
 import java.util.List;
 
@@ -10,6 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static subway.extractableResponse.StationApiExtractableResponse.*;
 
 @DisplayName("지하철역 관련 기능")
+@Sql("/truncate.sql")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationAcceptanceTest {
 
@@ -59,7 +61,7 @@ public class StationAcceptanceTest {
     @Test
     void 지하철_역을_삭제() {
         // given
-        String stationName = "신논현역";
+        String stationName = "강남역";
         Long id = createStationByStationName(stationName).jsonPath().getLong("id");
 
         // when
