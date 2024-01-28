@@ -50,4 +50,12 @@ public class Line {
     return color;
   }
 
+  public Long getUpStationId() {
+    return upStationId;
+  }
+
+  public Long getDownStationId() {
+    return downStationId;
+  }
+
 }

@@ -87,9 +87,13 @@ public class LineTest {
   @Test
   void getLinesSuccess() {
     // given
+    final var 강남역 = StationFixture.createStation("강남역");
+    final var 청계산입구역 = StationFixture.createStation("청계산입구역");
+    final var 논현역 = StationFixture.createStation("논현역");
+    final var 강남구청역 = StationFixture.createStation("강남구청역");
     final var createdLines = List.of(
-        createLine("신분당선", "bg-red-600", 1, 2, 10),
-        createLine("7호선", "bg-green-300", 3, 4, 20)
+        createLine("신분당선", "bg-red-600", 강남역.getId(), 청계산입구역.getId(), 10),
+        createLine("7호선", "bg-green-300", 논현역.getId(), 강남구청역.getId(), 20)
     );
 
     // when
@@ -120,7 +124,7 @@ public class LineTest {
   @Test
   void getLineSuccess() {
     // given
-    final var createdLine = createLine("신분당선", "bg-red-600", 1, 2, 10);
+    final var createdLine = createLine("신분당선", "bg-red-600", 1L, 2L, 10);
 
     // when
     final var response = RestAssured
@@ -148,7 +152,7 @@ public class LineTest {
   @Test
   void updateLineSuccess() {
     // given
-    final var createdLine = createLine("신분당선", "bg-red-600", 1, 2, 10);
+    final var createdLine = createLine("신분당선", "bg-red-600", 1L, 2L, 10);
     final var updateParam = new LineUpdateRequest("2호선", "bg-green-800");
 
     // when
@@ -186,7 +190,7 @@ public class LineTest {
   @Test
   void deleteLineSuccess() {
     // given
-    final var deletedLine = createLine("신분당선", "bg-red-600", 1, 2, 10);
+    final var deletedLine = createLine("신분당선", "bg-red-600", 1L, 2L, 10);
 
     // when
     final var response = RestAssured
@@ -210,9 +214,9 @@ public class LineTest {
   private LineResponse createLine(
       final String name,
       final String color,
-      final Integer upStationId,
-      final Integer downStationId,
-      final Integer distance
+      final Long upStationId,
+      final Long downStationId,
+      final int distance
   ) {
     final var params = new HashMap<>();
     params.put("name", name);
@@ -234,7 +238,7 @@ public class LineTest {
         RestAssured
         .given()
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when().post("/lines")
+        .when().get("/lines")
         .then().extract().as(LineResponse[].class)
     );
   }

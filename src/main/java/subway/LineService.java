@@ -1,5 +1,9 @@
 package subway;
 
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -8,11 +12,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class LineService {
 
   private final LineRepository lineRepository;
-  private final StationRepository stationRepository;
+  private final StationService stationService;
 
-  public LineService(final LineRepository lineRepository, final StationRepository stationRepository) {
+  public LineService(final LineRepository lineRepository, final StationService stationService) {
     this.lineRepository = lineRepository;
-    this.stationRepository = stationRepository;
+    this.stationService = stationService;
   }
 
   // TODO request validation
@@ -20,14 +24,29 @@ public class LineService {
   // TODO station not found 예외 처리
   @Transactional
   public LineResponse saveLine(final LineCreateRequest request) {
-    final var upStation = stationRepository.findById(request.getUpStationId())
+    final var upStation = stationService.findById(request.getUpStationId())
         .orElseThrow(() -> new RuntimeException("상행역 정보를 찾을 수 없습니다."));
-    final var downStation = stationRepository.findById(request.getDownStationId())
+    final var downStation = stationService.findById(request.getDownStationId())
         .orElseThrow(() -> new RuntimeException("하행역 정보를 찾을 수 없습니다."));
 
     final var line = lineRepository.save(request.to());
 
-    return LineResponse.from(line, StationResponse.from(upStation), StationResponse.from(downStation));
+    return LineResponse.from(line, upStation, downStation);
+  }
+
+  // TODO pagination
+  // TODO entity mapping 이후 쿼리 수정
+  public List<LineResponse> findAllLines() {
+    var lines = lineRepository.findAll();
+    Map<Long /* station ID */, StationResponse> stationById = stationService.findAllStations().stream()
+        .collect(Collectors.toMap(StationResponse::getId, Function.identity()));
+
+    return lines.stream()
+        .map(line -> LineResponse.from(
+            line,
+            stationById.get(line.getUpStationId()),
+            stationById.get(line.getDownStationId())
+        )).collect(Collectors.toList());
   }
 
 }
