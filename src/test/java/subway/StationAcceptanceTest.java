@@ -42,11 +42,7 @@ public class StationAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
+        List<String> stationNames = loadStations().jsonPath().getList("name", String.class);
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
@@ -63,11 +59,7 @@ public class StationAcceptanceTest {
         createStation("역삼역");
 
         // when
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract();
+        ExtractableResponse<Response> response = loadStations();
 
         // then
         List<StationResponse> responses = response.jsonPath().getList(".", StationResponse.class);
@@ -81,11 +73,36 @@ public class StationAcceptanceTest {
      * When 그 지하철역을 삭제하면
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
-    // TODO: 지하철역 제거 인수 테스트 메서드 생성
+    @DisplayName("지하철역을 삭제한다.")
+    @Test
+    void deleteStation() {
+        // given
+        ExtractableResponse<Response> createdResponse = createStation("강남역");
+        Long stationId = createdResponse.jsonPath().getLong("id");
 
-    private void createStation(String stationName) {
+        // when
+        ExtractableResponse<Response> deleteResponse =
+                RestAssured.given().log().all()
+                        .when().delete("/stations/{id}", stationId)
+                        .then().log().all()
+                        .extract();
+
+        // then
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        List<String> stationNames = loadStations().jsonPath().getList("name", String.class);
+        assertThat(stationNames).doesNotContain("강남역");
+    }
+
+    private ExtractableResponse<Response> loadStations() {
+        return RestAssured.given().log().all()
+                .when().get("/stations")
+                .then().log().all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> createStation(String stationName) {
         StationRequest request = new StationRequest(stationName);
-        RestAssured.given().log().all()
+        return RestAssured.given().log().all()
                 .body(request)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/stations")
