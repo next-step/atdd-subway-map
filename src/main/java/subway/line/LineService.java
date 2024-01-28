@@ -40,6 +40,10 @@ public class LineService {
                 .collect(Collectors.toList());
     }
 
+    public LineResponse findLine(Long id) {
+        return createLineResponse(lineRepository.findById(id).get());
+    }
+
     private LineResponse createLineResponse(Line line) {
         return new LineResponse(
                 line.getId(),

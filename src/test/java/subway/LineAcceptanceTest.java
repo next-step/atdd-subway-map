@@ -92,8 +92,8 @@ public class LineAcceptanceTest {
         Long lineId = createLine(requestBody).jsonPath().getLong("id");
 
         // when & then
-        String lineNames = selectLine(lineId).jsonPath().get("name");
-        assertThat(lineNames).isEqualTo(lineNames);
+        String responseLineName = selectLine(lineId).jsonPath().get("name");
+        assertThat(lineName).isEqualTo(responseLineName);
     }
 
     private Map<String, Object> createRequestBody(String name, String color, Long upStationId, Long downStationId, Integer distance) {
