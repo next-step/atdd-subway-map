@@ -1,5 +1,7 @@
 package subway.line;
 
+import subway.Station.Station;
+
 import javax.persistence.*;
 
 @Entity
@@ -15,11 +17,11 @@ public class Line {
     @Column(length = 20)
     private String color;
 
-    @Column
-    private Long upStationId;
+    @OneToOne(fetch = FetchType.LAZY)
+    private Station upStation;
 
-    @Column
-    private Long downStationId;
+    @OneToOne(fetch = FetchType.LAZY)
+    private Station downStation;
 
     @Column
     private Integer distance;
@@ -27,11 +29,11 @@ public class Line {
     public Line() {
     }
 
-    public Line(String name, String color, Long upStationId, Long downStationId, Integer distance) {
+    public Line(String name, String color, Station upStation, Station downStation, Integer distance) {
         this.name = name;
         this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
+        this.upStation = upStation;
+        this.downStation = downStation;
         this.distance = distance;
     }
 
@@ -47,12 +49,12 @@ public class Line {
         return color;
     }
 
-    public Long getUpStationId() {
-        return upStationId;
+    public Station getUpStation() {
+        return upStation;
     }
 
-    public Long getDownStationId() {
-        return downStationId;
+    public Station getDownStation() {
+        return downStation;
     }
 
     public Integer getDistance() {

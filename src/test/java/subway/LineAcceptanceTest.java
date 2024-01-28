@@ -41,9 +41,9 @@ public class LineAcceptanceTest {
         createLine(requestParam);
 
         // then
-        List<String> stationNames =
+        List<String> lineNames =
                 selectLines().jsonPath().getList("name", String.class);
-        assertThat(stationNames).doesNotContain(lineName);
+        assertThat(lineNames).containsAnyOf(lineName);
     }
 
     private ExtractableResponse<Response> createStationByStationName(String stationName) {

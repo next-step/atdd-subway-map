@@ -7,6 +7,7 @@ import subway.Station.StationRepository;
 import subway.Station.StationResponse;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -21,26 +22,32 @@ public class LineService {
 
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
-        Line line = lineRepository.save(
-                new Line(
-                        lineRequest.getName(), lineRequest.getColor(), lineRequest.getUpStationId(), lineRequest.getDownStationId(), lineRequest.getDistance()
-                )
-        );
-
         Station upStation = stationRepository.getById(lineRequest.getUpStationId());
         Station downStation = stationRepository.getById(lineRequest.getDownStationId());
 
-        return createLineResponse(line, upStation, downStation);
+        Line line = lineRepository.save(
+                new Line(
+                        lineRequest.getName(), lineRequest.getColor(), upStation, downStation, lineRequest.getDistance()
+                )
+        );
+
+        return createLineResponse(line);
     }
 
-    private LineResponse createLineResponse(Line line, Station upStation, Station downStation) {
+    public List<LineResponse> findAllLines() {
+        return lineRepository.findAll().stream()
+                .map(this::createLineResponse)
+                .collect(Collectors.toList());
+    }
+
+    private LineResponse createLineResponse(Line line) {
         return new LineResponse(
                 line.getId(),
                 line.getName(),
                 line.getColor(),
                 List.of(
-                        new StationResponse(upStation.getId(), upStation.getName()),
-                        new StationResponse(downStation.getId(), downStation.getName())
+                        new StationResponse(line.getUpStation().getId(), line.getUpStation().getName()),
+                        new StationResponse(line.getDownStation().getId(), line.getDownStation().getName())
                 ),
                 line.getDistance()
         );
