@@ -82,12 +82,14 @@ public class LineAcceptanceTest {
         lineApiCaller.callApiCreateLines(zeroLineParams);
 
         // when
-        List<LineResponse> linesResponse = lineApiCaller.callApiFindLines().jsonPath().getList(".", LineResponse.class);
+        List<String> actual = lineApiCaller.callApiFindLines().jsonPath().getList("name", String.class);
 
         // then
-        int actual = linesResponse.size();
-        int expected = 2;
+        List<String> expected = List.of("신분당선", "0호선");
+        int actualSize = actual.size();
+        int expectedSize = 2;
         assertThat(actual).isEqualTo(expected);
+        assertThat(actualSize).isEqualTo(expectedSize);
     }
 
     /**
