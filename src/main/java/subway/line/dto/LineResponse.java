@@ -1,8 +1,8 @@
 package subway.line.dto;
 
 import subway.line.entity.Line;
-import subway.station.Station;
-import subway.station.StationResponse;
+import subway.station.entity.Station;
+import subway.station.dto.StationResponse;
 
 import java.util.ArrayList;
 import java.util.List;

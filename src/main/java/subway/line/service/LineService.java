@@ -7,8 +7,8 @@ import subway.line.dto.LineResponse;
 import subway.line.dto.LineUpdateRequest;
 import subway.line.entity.Line;
 import subway.line.repository.LineRepository;
-import subway.station.Station;
-import subway.station.StationRepository;
+import subway.station.entity.Station;
+import subway.station.repository.StationRepository;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.List;

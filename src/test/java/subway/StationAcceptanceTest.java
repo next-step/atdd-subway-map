@@ -10,8 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import subway.station.Station;
-import subway.station.StationRepository;
+import subway.station.entity.Station;
+import subway.station.repository.StationRepository;
 
 import java.util.List;
 

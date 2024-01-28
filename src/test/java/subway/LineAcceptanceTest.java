@@ -15,8 +15,8 @@ import org.springframework.http.MediaType;
 import subway.line.repository.LineRepository;
 import subway.line.dto.LineRequest;
 import subway.line.dto.LineUpdateRequest;
-import subway.station.Station;
-import subway.station.StationRepository;
+import subway.station.entity.Station;
+import subway.station.repository.StationRepository;
 
 import java.util.List;
 
