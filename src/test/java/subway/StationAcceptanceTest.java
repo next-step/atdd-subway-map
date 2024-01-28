@@ -26,11 +26,7 @@ public class StationAcceptanceTest {
         createStation("어린이대공원역");
 
         // when
-        List<String> stationNames = RestAssured.given().log().all()
-                .when().get("/stations")
-                .then().log().all()
-                .extract()
-                .response().jsonPath().getList("name", String.class);
+        List<String> stationNames = getStations();
 
         // then
         assertThat(stationNames.size()).isEqualTo(2);
@@ -44,15 +40,11 @@ public class StationAcceptanceTest {
     void test2() {
         // given
         ExtractableResponse<Response> station = createStation("건대입구역");
-        Long stationId = station.response().jsonPath().getLong("id");
+        Long stationId = getStationId(station);
         String id = String.valueOf(stationId);
 
         // when
-        Response response = RestAssured.given().log().all()
-                .when().delete("/stations/" + id)
-                .then().log().all()
-                .extract()
-                .response();
+        Response response = deleteStation(id);
 
         // then
         assertThat(response.getStatusCode()).isEqualTo(204);
@@ -63,15 +55,11 @@ public class StationAcceptanceTest {
     void test3() {
         // given
         ExtractableResponse<Response> station = createStation("건대입구역");
-        Long stationId = station.response().jsonPath().getLong("id");
+        Long stationId = getStationId(station);
         String id = String.valueOf(stationId + 1);
 
         // when
-        Response response = RestAssured.given().log().all()
-                .when().delete("/stations/" + id)
-                .then().log().all()
-                .extract()
-                .response();
+        Response response = deleteStation(id);
 
         // then
         assertThat(response.getStatusCode()).isNotEqualTo(204);
@@ -87,5 +75,26 @@ public class StationAcceptanceTest {
                 .when().post("/stations")
                 .then().log().all()
                 .extract();
+    }
+
+    private List<String> getStations() {
+        List<String> stationNames = RestAssured.given().log().all()
+                .when().get("/stations")
+                .then().log().all()
+                .extract()
+                .response().jsonPath().getList("name", String.class);
+        return stationNames;
+    }
+
+    private Response deleteStation(String id) {
+        return RestAssured.given().log().all()
+                .when().delete("/stations/" + id)
+                .then().log().all()
+                .extract()
+                .response();
+    }
+
+    private long getStationId(ExtractableResponse<Response> station) {
+        return station.response().jsonPath().getLong("id");
     }
 }
