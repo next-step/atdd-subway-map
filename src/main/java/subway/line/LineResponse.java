@@ -12,6 +12,9 @@ public class LineResponse {
     private String color;
     private List<StationResponse> stations = new ArrayList<>();
 
+    public LineResponse() {
+    }
+
     public LineResponse(final Line savedLine) {
         this.id = savedLine.getId();
         this.name = savedLine.getName();

@@ -79,6 +79,31 @@ public class LineAcceptanceTest {
         assertThat(extract.jsonPath().getList("color")).contains("bg-red-600", "bg-green-600");
     }
 
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 조회하면
+     * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
+     */
+    @DisplayName("노선을 조회한다.")
+    @Test
+    void getLine() {
+        // given
+        Map<String, String> params1 = createLineRequestPixture("신분당선", "bg-red-600", 1L, 2L);
+        final Long id = createStation(params1).as(LineResponse.class).getId();
+
+        // when
+        final ExtractableResponse<Response> extract = RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().get("/lines/" + id)
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract();
+
+        // then
+        final LineResponse lineResponse = extract.as(LineResponse.class);
+        assertThat(lineResponse.getName()).isEqualTo("신분당선");
+        assertThat(lineResponse.getColor()).isEqualTo("bg-red-600");
+    }
 
     private ExtractableResponse<Response> createStation(final Map<String, String> params) {
         return RestAssured.given().log().all()
