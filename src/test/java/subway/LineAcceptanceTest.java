@@ -63,7 +63,7 @@ public class LineAcceptanceTest {
     void 지하철_노선_생성() {
         // when
         final LineRequest request = new LineRequest("신분당선", "bg-red-600", 강남역_ID, 역삼역_ID, 10);
-        final ExtractableResponse<Response> response = createSubwayLine(request);
+        final ExtractableResponse<Response> response = this.createSubwayLine(request);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -91,10 +91,10 @@ public class LineAcceptanceTest {
     void 지하철_노선_목록_조회() {
         // given
         final LineRequest request1 = new LineRequest("신분당선", "bg-red-600", 강남역_ID, 역삼역_ID, 10);
-        createSubwayLine(request1);
+        this.createSubwayLine(request1);
 
         final LineRequest request2 = new LineRequest("지하철노선", "bg-green-600", 강남역_ID, 지하철역_ID, 15);
-        createSubwayLine(request2);
+        this.createSubwayLine(request2);
 
         // when
         final JsonPath jsonPath = this.getSubwayLineList();
@@ -119,10 +119,8 @@ public class LineAcceptanceTest {
     void 지하철_노선_조회() {
         // given
         final LineRequest request = new LineRequest("신분당선", "bg-red-600", 강남역_ID, 역삼역_ID, 10);
-        ExtractableResponse<Response> createSubwayLineResponse = createSubwayLine(request);
-
-        final String location = createSubwayLineResponse.header("Location");
-        final String subwayLineId = location.replaceAll(".*/(\\d+)$", "$1");
+        final ExtractableResponse<Response> createSubwayLineResponse = this.createSubwayLine(request);
+        final String subwayLineId = this.getCreatedSubwayLineId(createSubwayLineResponse);
 
         // when
         JsonPath jsonPath = this.getSubwayLine(subwayLineId);
@@ -151,10 +149,8 @@ public class LineAcceptanceTest {
     void 지하철_노선_수정() {
         // given
         final LineRequest createRequest = new LineRequest("신분당선", "bg-red-600", 강남역_ID, 역삼역_ID, 10);
-        ExtractableResponse<Response> createSubwayLineResponse = createSubwayLine(createRequest);
-
-        final String location = createSubwayLineResponse.header("Location");
-        final String subwayLineId = location.replaceAll(".*/(\\d+)$", "$1");
+        final ExtractableResponse<Response> createSubwayLineResponse = this.createSubwayLine(createRequest);
+        final String subwayLineId = getCreatedSubwayLineId(createSubwayLineResponse);
 
         final LineUpdateRequest updateRequest = new LineUpdateRequest("2호선", "bg-yellow-600");
 
@@ -177,6 +173,41 @@ public class LineAcceptanceTest {
 
         String updatedColor = afterUpdatedSubwayLine.get("color");
         assertThat(updatedColor).isEqualTo("bg-yellow-600");
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 삭제하면
+     * Then 해당 지하철 노선 정보는 삭제된다
+     */
+    @DisplayName("지하철 노선을 삭제한다.")
+    @Test
+    void 지하철_노선_삭제() {
+        // given
+        final LineRequest createRequest = new LineRequest("신분당선", "bg-red-600", 강남역_ID, 역삼역_ID, 10);
+        final ExtractableResponse<Response> createSubwayLineResponse = this.createSubwayLine(createRequest);
+        final String subwayLineId = this.getCreatedSubwayLineId(createSubwayLineResponse);
+
+        // when
+        given()
+        .when()
+            .delete("/lines/{id}", subwayLineId)
+        .then()
+            .statusCode(HttpStatus.NO_CONTENT.value())
+            .log().all();
+
+        // then
+        final JsonPath jsonPath = this.getSubwayLineList();
+        final List<String> lineNames = jsonPath.getList("name", String.class);
+        assertThat(lineNames).isEmpty();
+        assertThat(lineNames).doesNotContain("신분당선");
+    }
+
+    private String getCreatedSubwayLineId(ExtractableResponse<Response> createSubwayLineResponse) {
+        final String location = createSubwayLineResponse.header("Location");
+        final String subwayLineId = location.replaceAll(".*/(\\d+)$", "$1");
+
+        return subwayLineId;
     }
 
     private ExtractableResponse<Response> createSubwayLine(LineRequest request) {
