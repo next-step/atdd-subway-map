@@ -66,12 +66,11 @@ public class StationAcceptanceTest {
     void deleteStation() {
         // given
         ExtractableResponse<Response> response = createStation("강남역");
-        long id = response.jsonPath().getLong("id");
+        String locationHeader = response.header("Location");
 
         // when
         RestAssured.given().log().all()
-                .pathParam("id", id)
-                .when().delete("/stations/{id}")
+                .when().delete(locationHeader)
                 .then().log().all()
                 .statusCode(HttpStatus.NO_CONTENT.value());
 
