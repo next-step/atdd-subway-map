@@ -19,7 +19,7 @@ public class Station {
     @OneToMany(mappedBy = "downStation", cascade = CascadeType.ALL)
     private List<Line> linesAsDownStation;
 
-    public Station() {
+    protected Station() {
     }
 
     public Station(String name) {
