@@ -159,7 +159,14 @@ public class SubwaySectionAcceptanceTest {
      */
     @Test
     void 지하철구간_종점제거_하행종점역이_아닌_경우() {
+        // Given
+        addSections(lineId, downStationId, extraStationId, 10L);
 
+        // When
+        final ExtractableResponse<Response> response = deleteSection(lineId, upStationId);
+
+        // Then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     private ExtractableResponse<Response> addSections(Long lineId, Long upStationId, Long downStationId, Long distance) {
