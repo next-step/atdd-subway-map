@@ -45,4 +45,12 @@ public class LineService {
         return new LineResponse(line);
     }
 
+    @Transactional
+    public void modifyLine(final LineRequest lineRequest) {
+        final Line line = lineRepository.findById(lineRequest.getId())
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 노선 입니다."));
+
+        line.changeName(lineRequest.getName());
+        line.changeColor(lineRequest.getColor());
+    }
 }

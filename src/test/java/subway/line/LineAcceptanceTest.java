@@ -105,6 +105,34 @@ public class LineAcceptanceTest {
         assertThat(lineResponse.getColor()).isEqualTo("bg-red-600");
     }
 
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 수정하면
+     * Then 해당 지하철 노선 정보는 수정된다
+     */
+    @DisplayName("노선을 수정한다.")
+    @Test
+    void modifyLine() {
+        // given
+        Map<String, String> params1 = createLineRequestPixture("신분당선", "bg-red-600", 1L, 2L);
+        final Long id = createStation(params1).as(LineResponse.class).getId();
+        final Map<String, String> modifyBody = modifyLineRequestPixture(id, "다른분당선", "bg-red-900");
+
+        // when
+        final ExtractableResponse<Response> extract = RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(modifyBody)
+                .when().put("/lines")
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract();
+
+        // then
+        final LineResponse modifyLineResponse = getStation(id).as(LineResponse.class);
+        assertThat(modifyLineResponse.getName()).isEqualTo("다른분당선");
+        assertThat(modifyLineResponse.getColor()).isEqualTo("bg-red-900");
+    }
+
     private ExtractableResponse<Response> createStation(final Map<String, String> params) {
         return RestAssured.given().log().all()
                 .body(params)
@@ -124,12 +152,29 @@ public class LineAcceptanceTest {
                 .extract();
     }
 
+    private ExtractableResponse<Response> getStation(final Long id) {
+        return RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().get("/lines/" + id)
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract();
+    }
+
     private Map<String, String> createLineRequestPixture(final String name, final String color, final Long upStationId, final Long downStationId) {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
         params.put("color", color);
         params.put("upStationId", String.valueOf(upStationId));
         params.put("downStationId", String.valueOf(downStationId));
+        return params;
+    }
+
+    private Map<String, String> modifyLineRequestPixture(final Long id, final String name, final String color) {
+        Map<String, String> params = new HashMap<>();
+        params.put("id", String.valueOf(id));
+        params.put("name", name);
+        params.put("color", color);
         return params;
     }
 }
