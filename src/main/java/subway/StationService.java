@@ -38,4 +38,10 @@ public class StationService {
                 station.getName()
         );
     }
+
+    public StationResponse findStationById(Long id) {
+        Station station = stationRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 역이 존재하지 않습니다."));
+        return new StationResponse(station.getId(), station.getName());
+    }
 }
