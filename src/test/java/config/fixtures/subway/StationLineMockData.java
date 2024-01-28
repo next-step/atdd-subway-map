@@ -25,5 +25,14 @@ public class StationLineMockData {
                     StationLineMockData.distance1);
     }
 
+    public static StationLineRequest createMockRequest2() {
+        return  new StationLineRequest(
+                StationLineMockData.stationLineName2,
+                StationLineMockData.stationLineColor2,
+                StationLineMockData.upStationId2,
+                StationLineMockData.downStationId2,
+                StationLineMockData.distance2);
+    }
+
 
 }

@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import static config.fixtures.subway.StationLineMockData.createMockRequest1;
+import static config.fixtures.subway.StationLineMockData.createMockRequest2;
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -42,7 +43,7 @@ public class StationLineAcceptanceTest {
 
         // then
         assertAll(
-            () -> assertThat( allStationLineNames.getList("name")).containsAnyOf(mockRequest.getName()),
+            () -> assertThat(allStationLineNames.getList("name")).containsAnyOf(mockRequest.getName()),
             () -> assertThat(allStationLineNames.getList("color")).containsAnyOf(mockRequest.getColor()),
             () -> assertThat(allStationLineNames.getList("upStationId")).containsAnyOf(mockRequest.getUpStationId()),
             () -> assertThat(allStationLineNames.getList("downStationId")).containsAnyOf(mockRequest.getDownStationId()),
@@ -59,45 +60,28 @@ public class StationLineAcceptanceTest {
     @Test
     void findAllStationLines() {
         // given
-        Map<String, String> map1 = new HashMap<>();
-        map1.put("name", StationLineMockData.stationLineName1);
-        map1.put("color", StationLineMockData.stationLineColor1);
-        map1.put("upStationId", String.valueOf(StationLineMockData.upStationId1));
-        map1.put("downStationId", String.valueOf(StationLineMockData.downStationId1));
-        map1.put("distance", String.valueOf(StationLineMockData.distance1));
+        StationLineRequest mockRequest1 = createMockRequest1();
+        StationLineRequest mockRequest2 = createMockRequest2();
 
-        Map<String, String> map2 = new HashMap<>();
-        map2.put("name", StationLineMockData.stationLineName2);
-        map2.put("color", StationLineMockData.stationLineColor2);
-        map2.put("upStationId", String.valueOf(StationLineMockData.upStationId2));
-        map2.put("downStationId", String.valueOf(StationLineMockData.downStationId2));
-        map2.put("distance", String.valueOf(StationLineMockData.distance2));
+        createStationLineRequest(mockRequest1);
+        createStationLineRequest(mockRequest2);
 
-        given().log().all()
-                .body(map1)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines")
-                .then().log().all()
-                .statusCode(HttpStatus.CREATED.value());
-
-        given().log().all()
-                .body(map2)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines")
-                .then().log().all()
-                .statusCode(HttpStatus.CREATED.value());
         // when
-        List<String> stationLineNames = given()
-                .when()
-                .get("/lines")
-                .then()
-                .extract().jsonPath().getList("name");
+        JsonPath allStationLineNames = findAllStationLine();
 
         // then
-        assertThat(stationLineNames)
-                .containsAnyOf(StationLineMockData.stationLineName1, StationLineMockData.stationLineName2);
+        assertAll(
+                () -> assertThat(allStationLineNames.getList("name"))
+                        .containsAnyOf(mockRequest1.getName(), mockRequest2.getName()),
+                () -> assertThat(allStationLineNames.getList("color"))
+                        .containsAnyOf(mockRequest1.getColor(), mockRequest2.getColor()),
+                () -> assertThat(allStationLineNames.getList("upStationId"))
+                        .containsAnyOf(mockRequest1.getUpStationId(), mockRequest2.getUpStationId()),
+                () -> assertThat(allStationLineNames.getList("downStationId"))
+                        .containsAnyOf(mockRequest1.getDownStationId(), mockRequest2.getDownStationId()),
+                () -> assertThat(allStationLineNames.getList("distance"))
+                        .containsAnyOf(mockRequest1.getDistance(), mockRequest2.getDistance())
+        );
     }
 
     /**
