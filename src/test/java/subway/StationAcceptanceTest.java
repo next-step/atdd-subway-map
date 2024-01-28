@@ -54,7 +54,7 @@ public class StationAcceptanceTest {
 
         setStationName(params, "건대입구역");
         ExtractableResponse<Response> station = createStation(params);
-        int stationId = station.response().jsonPath().getInt("id");
+        Long stationId = station.response().jsonPath().getLong("id");
         String id = String.valueOf(stationId);
 
         // when
@@ -76,7 +76,7 @@ public class StationAcceptanceTest {
 
         setStationName(params, "건대입구역");
         ExtractableResponse<Response> station = createStation(params);
-        int stationId = station.response().jsonPath().getInt("id");
+        Long stationId = station.response().jsonPath().getLong("id");
         String id = String.valueOf(stationId + 1);
 
         // when
