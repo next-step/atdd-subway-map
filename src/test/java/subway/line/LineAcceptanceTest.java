@@ -61,10 +61,13 @@ public class LineAcceptanceTest {
     @Test
     void createLine() {
         // when
-        lineApiCaller.callApiCreateLines(newBunDangLineParams);
+        ExtractableResponse<Response> response = lineApiCaller.callApiCreateLines(newBunDangLineParams);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> actual = lineApiCaller.callApiFindLines().jsonPath().getList("name", String.class);
+        response = lineApiCaller.callApiFindLines();
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        List<String> actual = response.jsonPath().getList("name", String.class);
         String expected = "신분당선";
         assertThat(actual).containsAnyOf(expected);
     }
@@ -78,11 +81,15 @@ public class LineAcceptanceTest {
     @Test
     void findLines() {
         // given
-        lineApiCaller.callApiCreateLines(newBunDangLineParams);
-        lineApiCaller.callApiCreateLines(zeroLineParams);
+        ExtractableResponse<Response> response = lineApiCaller.callApiCreateLines(newBunDangLineParams);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        response = lineApiCaller.callApiCreateLines(zeroLineParams);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // when
-        List<String> actual = lineApiCaller.callApiFindLines().jsonPath().getList("name", String.class);
+        response = lineApiCaller.callApiFindLines();
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        List<String> actual = response.jsonPath().getList("name", String.class);
 
         // then
         List<String> expected = List.of("신분당선", "0호선");
@@ -101,11 +108,12 @@ public class LineAcceptanceTest {
     @Test
     void findLine() {
         // given
-        ExtractableResponse<Response> createResponse = lineApiCaller.callApiCreateLines(newBunDangLineParams);
-        String location = createResponse.header("location");
+        ExtractableResponse<Response> response = lineApiCaller.callApiCreateLines(newBunDangLineParams);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        String location = response.header("location");
 
         // when
-        ExtractableResponse<Response> response = lineApiCaller.callApiFindLine(location);
+        response = lineApiCaller.callApiFindLine(location);
 
         // then
         String actual = response.jsonPath().getObject("name", String.class);
@@ -123,14 +131,18 @@ public class LineAcceptanceTest {
     void updateLine() {
         // given
         ExtractableResponse<Response> response = lineApiCaller.callApiCreateLines(newBunDangLineParams);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         String location = response.header("location");
 
         // when
         LineUpdateRequest request = new LineUpdateRequest("다른분당선", "bg-red-600");
-        lineApiCaller.callApiUpdateLine(request, location);
+        response = lineApiCaller.callApiUpdateLine(request, location);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         // then
-        LineResponse actual = lineApiCaller.callApiFindLine(location).jsonPath().getObject(".", LineResponse.class);
+        response = lineApiCaller.callApiFindLine(location);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        LineResponse actual = response.jsonPath().getObject(".", LineResponse.class);
         String expectedName = "다른분당선";
         String expectedColor = "bg-red-600";
         assertThat(actual.getName()).isEqualTo(expectedName);
@@ -147,14 +159,17 @@ public class LineAcceptanceTest {
     void deleteStation() {
         // given
         ExtractableResponse<Response> response = lineApiCaller.callApiCreateLines(newBunDangLineParams);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         String location = response.header("location");
 
         // when
-        ExtractableResponse<Response> deleteResponse = lineApiCaller.callApiDeleteLine(location);
-        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        response = lineApiCaller.callApiDeleteLine(location);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         // then
-        List<LineResponse> actual = lineApiCaller.callApiFindLines().jsonPath().getList(".", LineResponse.class);
+        response = lineApiCaller.callApiFindLines();
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        List<LineResponse> actual = response.jsonPath().getList(".", LineResponse.class);
         List<LineResponse> expected = Collections.emptyList();
         assertThat(actual).containsAll(expected);
     }
