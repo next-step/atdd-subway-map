@@ -45,6 +45,7 @@ public class StationLineService {
         return convertToResponse(stationLineRepository.save(updateStationLine(request, stationLine)));
     }
 
+    @Transactional
     public void deleteStationLine(Long stationLineId) {
         stationLineRepository.deleteById(stationLineId);
     }
