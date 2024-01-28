@@ -58,7 +58,7 @@ public class LineAcceptanceTest {
      */
     @DisplayName("지하철 노선을 생성한다.")
     @Test
-    public void 지하철_노선_생성() {
+    void 지하철_노선_생성() {
         // when
         final LineRequest request = new LineRequest("신분당선", "bg-red-600", 강남역_ID, 역삼역_ID, 10);
         final ExtractableResponse<Response> response = createSubwayLine(request);
@@ -86,7 +86,7 @@ public class LineAcceptanceTest {
      */
     @DisplayName("지하철 노선 목록을 조회한다.")
     @Test
-    public void 지하철_노선_목록_조회() {
+    void 지하철_노선_목록_조회() {
         // given
         final LineRequest request1 = new LineRequest("신분당선", "bg-red-600", 강남역_ID, 역삼역_ID, 10);
         createSubwayLine(request1);
@@ -105,6 +105,46 @@ public class LineAcceptanceTest {
         final List<String> lineStationNames = jsonPath.getList("[1].stations.name", String.class);
         assertThat(lineStationNames).doesNotContain("역삼역");
         assertThat(lineStationNames).containsExactly("강남역", "지하철역");
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 조회하면
+     * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
+     */
+    @DisplayName("지하철 노선을 조회한다.")
+    @Test
+    void 지하철_노선_조회() {
+        // given
+        final LineRequest request = new LineRequest("신분당선", "bg-red-600", 강남역_ID, 역삼역_ID, 10);
+        ExtractableResponse<Response> createSubwayLineResponse = createSubwayLine(request);
+
+        final String location = createSubwayLineResponse.header("Location");
+        final String subwayLineId = location.replaceAll(".*/(\\d+)$", "$1");
+
+        // when
+        JsonPath jsonPath =
+                given()
+                .when()
+                    .get("/lines/{id}", subwayLineId)
+                .then()
+                    .statusCode(HttpStatus.OK.value())
+                    .log().all()
+                .extract()
+                    .jsonPath();
+
+        // then
+        String lineName = jsonPath.get("name");
+        assertThat(lineName).isEqualTo("신분당선");
+
+        String lineColor = jsonPath.get("color");
+        assertThat(lineColor).isEqualTo("bg-red-600");
+
+        List<Station> lineStations = jsonPath.getList("stations", Station.class);
+        assertThat(lineStations).hasSize(2);
+
+        List<String> lineStationNames = jsonPath.getList("stations.name", String.class);
+        assertThat(lineStationNames).containsExactly("강남역", "역삼역");
     }
 
     private ExtractableResponse<Response> createSubwayLine(LineRequest request) {
