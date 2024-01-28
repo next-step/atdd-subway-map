@@ -76,8 +76,12 @@ public class LinesController {
 
     @DeleteMapping("/lines/{id}/sections")
     public ResponseEntity<Void> deleteSection(@PathVariable Long id, @RequestParam Long stationId) {
-        lineService.deleteSection(id, stationId);
+        try {
+            lineService.deleteSection(id, stationId);
 
-        return ResponseEntity.noContent().build();
+            return ResponseEntity.noContent().build();
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException();
+        }
     }
 }

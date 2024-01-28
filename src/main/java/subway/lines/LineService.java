@@ -107,6 +107,11 @@ public class LineService {
 
     @Transactional
     public void deleteSection(Long id, Long stationId) {
+        final int numberOfSection = sectionRepository.countByLineId(id);
+        if(numberOfSection == 1) {
+            throw new IllegalArgumentException();
+        }
+
         final Section section = sectionRepository.findByLineIdAndDownStationId(id, stationId);
         sectionRepository.deleteById(section.getId());
     }
