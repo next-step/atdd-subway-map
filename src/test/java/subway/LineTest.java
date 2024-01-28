@@ -3,7 +3,6 @@ package subway;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.restassured.RestAssured;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -57,7 +56,7 @@ public class LineTest {
         .then().log().all()
         .extract();
 
-    final var line = getLines().stream()
+    final var line = LineFixture.getLines().stream()
         .filter(it -> LINE_NAME.equals(it.getName()))
         .findFirst();
     final var stationIds = line.map(LineResponse::getStations)
@@ -92,8 +91,8 @@ public class LineTest {
     final var 논현역 = StationFixture.createStation("논현역");
     final var 강남구청역 = StationFixture.createStation("강남구청역");
     final var createdLines = List.of(
-        createLine("신분당선", "bg-red-600", 강남역.getId(), 청계산입구역.getId(), 10),
-        createLine("7호선", "bg-green-300", 논현역.getId(), 강남구청역.getId(), 20)
+        LineFixture.createLine("신분당선", "bg-red-600", 강남역.getId(), 청계산입구역.getId(), 10),
+        LineFixture.createLine("7호선", "bg-green-300", 논현역.getId(), 강남구청역.getId(), 20)
     );
 
     // when
@@ -126,7 +125,7 @@ public class LineTest {
     // given
     final var upStation = StationFixture.createStation("강남역");
     final var downStation = StationFixture.createStation("청계산입구역");
-    final var createdLine = createLine("신분당선", "bg-red-600", upStation.getId(), downStation.getId(), 10);
+    final var createdLine = LineFixture.createLine("신분당선", "bg-red-600", upStation.getId(), downStation.getId(), 10);
 
     // when
     final var response = RestAssured
@@ -150,11 +149,11 @@ public class LineTest {
    * When 생성한 지하철 노선을 수정하면
    * Then 해당 지하철 노선 정보는 수정된다
    */
-  @DisplayName("노선을 조회한다.")
+  @DisplayName("노선을 수정한다.")
   @Test
   void updateLineSuccess() {
     // given
-    final var createdLine = createLine("신분당선", "bg-red-600", 1L, 2L, 10);
+    final var 신분당선 = LineFixture.createLine("신분당선", "bg-red-600", 1L, 2L, 10);
     final var updateParam = new LineUpdateRequest("2호선", "bg-green-800");
 
     // when
@@ -166,12 +165,12 @@ public class LineTest {
         .given().log().all()
         .body(params)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when().put("/lines/{id}", createdLine.getId())
+        .when().put("/lines/{id}", 신분당선.getId())
         .then().log().all()
         .extract();
 
-    final var line = getLines().stream()
-        .filter(it -> createdLine.getId().equals(it.getId()))
+    final var line = LineFixture.getLines().stream()
+        .filter(it -> 신분당선.getId().equals(it.getId()))
         .findFirst();
 
     // then
@@ -192,7 +191,7 @@ public class LineTest {
   @Test
   void deleteLineSuccess() {
     // given
-    final var deletedLine = createLine("신분당선", "bg-red-600", 1L, 2L, 10);
+    final var deletedLine = LineFixture.createLine("신분당선", "bg-red-600", 1L, 2L, 10);
 
     // when
     final var response = RestAssured
@@ -202,7 +201,7 @@ public class LineTest {
         .then().log().all()
         .extract();
 
-    final var remainingLineIds = getLines().stream()
+    final var remainingLineIds = LineFixture.getLines().stream()
         .map(LineResponse::getId)
         .collect(Collectors.toList());
 
@@ -211,38 +210,6 @@ public class LineTest {
 
     // then
     assertThat(deletedLine.getId()).isNotIn(remainingLineIds);
-  }
-
-  private LineResponse createLine(
-      final String name,
-      final String color,
-      final Long upStationId,
-      final Long downStationId,
-      final int distance
-  ) {
-    final var params = new HashMap<>();
-    params.put("name", name);
-    params.put("color", color);
-    params.put("upStationId", upStationId);
-    params.put("downStationId", downStationId);
-    params.put("distance", distance);
-
-    return RestAssured
-        .given()
-        .body(params)
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when().post("/lines")
-        .then().extract().as(LineResponse.class);
-  }
-
-  private List<LineResponse> getLines() {
-    return Arrays.asList(
-        RestAssured
-        .given()
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when().get("/lines")
-        .then().extract().as(LineResponse[].class)
-    );
   }
 
 }

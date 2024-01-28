@@ -49,6 +49,7 @@ public class LineService {
         )).collect(Collectors.toList());
   }
 
+  // TODO entity mapping 이후 쿼리 수정
   public LineResponse findById(Long id) {
     final var line = lineRepository.findById(id)
         .orElseThrow(() -> new RuntimeException("노선 정보를 찾을 수 없습니다."));
@@ -62,6 +63,14 @@ public class LineService {
         upStation,
         downStation
     );
+  }
+
+  @Transactional
+  public void updateLine(final Long id, final LineUpdateRequest request) {
+    final var line = lineRepository.findById(id)
+        .orElseThrow(() -> new RuntimeException("노선 정보를 찾을 수 없습니다."));
+
+    line.updateLine(request.getName(), request.getColor());
   }
 
 }
