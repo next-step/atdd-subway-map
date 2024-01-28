@@ -56,6 +56,12 @@ public class LineService {
         line.updateDetails(name, color);
     }
 
+    @Transactional
+    public void deleteSubwayLine(final Long lineId) {
+        this.findLineById(lineId);
+        lineRepository.deleteById(lineId);
+    }
+
     private Station findStationById(final Long stationId) {
         return stationRepository.findById(stationId)
                 .orElseThrow(() -> new EntityNotFoundException("Station not found. Station Id: " + stationId));

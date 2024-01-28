@@ -43,4 +43,11 @@ public class LineController {
         return ResponseEntity.ok().build();
     }
 
+    @DeleteMapping("/lines/{id}")
+    public ResponseEntity<Void> deleteSubwayLine(@PathVariable Long id) {
+        lineService.deleteSubwayLine(id);
+
+        return ResponseEntity.noContent().build();
+    }
+
 }
