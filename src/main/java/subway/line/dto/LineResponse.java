@@ -1,5 +1,6 @@
-package subway.line;
+package subway.line.dto;
 
+import subway.line.entity.Line;
 import subway.station.Station;
 import subway.station.StationResponse;
 

@@ -1,6 +1,6 @@
 package subway.station;
 
-import subway.line.Line;
+import subway.line.entity.Line;
 
 import javax.persistence.*;
 import java.util.List;

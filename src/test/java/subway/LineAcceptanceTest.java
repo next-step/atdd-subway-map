@@ -12,9 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import subway.line.LineRepository;
-import subway.line.LineRequest;
-import subway.line.LineUpdateRequest;
+import subway.line.repository.LineRepository;
+import subway.line.dto.LineRequest;
+import subway.line.dto.LineUpdateRequest;
 import subway.station.Station;
 import subway.station.StationRepository;
 
