@@ -1,23 +1,24 @@
 package subway;
 
-import io.restassured.RestAssured;
+import common.RestApiRequest;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
+import subway.dto.LineRequest;
 
-import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Sql(value = "/db/test.sql")
 @DisplayName("지하철 노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {
+	private final RestApiRequest<LineRequest> restApiRequest = new RestApiRequest<>("/lines");
+	private final RestApiRequest<LineRequest> restApiRequestWithIdParam = new RestApiRequest<>("/lines/{id}");
 	private static final String TEST_LINE_NAME_1 = "신분당선";
 	private static final String TEST_LINE_NAME_2 = "분당선";
 	private static final String TEST_LINE_COLOR_1 = "bg-red";
@@ -31,11 +32,11 @@ public class LineAcceptanceTest {
 	@Test
 	void createLineTest() {
 		// when
-		ExtractableResponse<Response> response = createLine(TEST_LINE_NAME_1, TEST_LINE_COLOR_1, 1L, 2L, 10);
+		ExtractableResponse<Response> response = restApiRequest.post(new LineRequest(TEST_LINE_NAME_1, TEST_LINE_COLOR_1, 1L, 2L, 10));
 
 		// then
 		assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-		assertThat(getLines().jsonPath().getList("name")).contains(TEST_LINE_NAME_1);
+		assertThat(restApiRequest.get().jsonPath().getList("name")).contains(TEST_LINE_NAME_1);
 	}
 
 	/**
@@ -48,11 +49,11 @@ public class LineAcceptanceTest {
 	@Test
 	void getLinesTest() {
 		// given
-		createLine(TEST_LINE_NAME_1, TEST_LINE_COLOR_1, 1L, 2L, 10);
-		createLine(TEST_LINE_NAME_2, TEST_LINE_COLOR_2, 2L, 4L, 15);
+		restApiRequest.post(new LineRequest(TEST_LINE_NAME_1, TEST_LINE_COLOR_1, 1L, 2L, 10));
+		restApiRequest.post(new LineRequest(TEST_LINE_NAME_2, TEST_LINE_COLOR_2, 2L, 4L, 15));
 
 		// when
-		ExtractableResponse<Response> response = getLines();
+		ExtractableResponse<Response> response = restApiRequest.get();
 
 		// then
 		assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -69,10 +70,10 @@ public class LineAcceptanceTest {
 	@Test
 	void getLineTest() {
 		// given
-		createLine(TEST_LINE_NAME_1, TEST_LINE_COLOR_1, 1L, 2L, 10);
+		restApiRequest.post(new LineRequest(TEST_LINE_NAME_1, TEST_LINE_COLOR_1, 1L, 2L, 10));
 
 		// when
-		ExtractableResponse<Response> response = getLine(1L);
+		ExtractableResponse<Response> response = restApiRequestWithIdParam.get(1L);
 
 		// then
 		assertThat(response.jsonPath().getString("name")).isEqualTo(TEST_LINE_NAME_1);
@@ -88,24 +89,16 @@ public class LineAcceptanceTest {
 	@Test
 	void updateLineTest() {
 		// given
-		createLine(TEST_LINE_NAME_1, TEST_LINE_COLOR_1, 1L, 2L, 10);
+		restApiRequest.post(new LineRequest(TEST_LINE_NAME_1, TEST_LINE_COLOR_1, 1L, 2L, 10));
 
 		// when
-		ExtractableResponse<Response> response =
-				RestAssured.given()
-						.body(Map.of(
-								"name", TEST_LINE_NAME_2
-								,"color", TEST_LINE_COLOR_2))
-						.contentType(MediaType.APPLICATION_JSON_VALUE)
-						.when()
-							.put("/lines/{id}", 1L)
-						.then()
-							.extract();
+		ExtractableResponse<Response> response = restApiRequestWithIdParam.put(new LineRequest(TEST_LINE_NAME_2, TEST_LINE_COLOR_2, null, null, 0), 1L);
+		ExtractableResponse<Response> getResponse = restApiRequestWithIdParam.get(1L);
 
 		// then
 		assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-		assertThat(getLine(1L).jsonPath().getString("name")).isEqualTo(TEST_LINE_NAME_2);
-		assertThat(getLine(1L).jsonPath().getString("color")).isEqualTo(TEST_LINE_COLOR_2);
+		assertThat(getResponse.jsonPath().getString("name")).isEqualTo(TEST_LINE_NAME_2);
+		assertThat(getResponse.jsonPath().getString("color")).isEqualTo(TEST_LINE_COLOR_2);
 	}
 
 	/**
@@ -118,47 +111,13 @@ public class LineAcceptanceTest {
 	@Test
 	void deleteLineTest() {
 		// given
-		createLine(TEST_LINE_NAME_1, TEST_LINE_COLOR_1, 1L, 2L, 10);
+		restApiRequest.post(new LineRequest(TEST_LINE_NAME_1, TEST_LINE_COLOR_1, 1L, 2L, 10));
 
 		// when
-		RestAssured.given()
-				.when()
-					.delete("/lines/{id}", 1L)
-				.then()
-					.statusCode(HttpStatus.NO_CONTENT.value());
+		ExtractableResponse<Response> response = restApiRequestWithIdParam.delete(1L);
 
 		// then
-		assertThat(getLines().jsonPath().getString("name")).doesNotContain(TEST_LINE_NAME_1);
-	}
-
-	private ExtractableResponse<Response> createLine(String name, String color, Long upStationId, Long downStationId, int distance) {
-		return RestAssured.given()
-					.body(Map.of(
-						"name", name
-						,"color", color
-						,"upStationId", upStationId
-						,"downStationId", downStationId
-						,"distance", distance))
-					.contentType(MediaType.APPLICATION_JSON_VALUE)
-		            .when()
-						.post("/lines")
-		            .then()
-		                .extract();
-	}
-
-	private ExtractableResponse<Response> getLines() {
-		return RestAssured.given()
-		            .when()
-						.get("/lines")
-		            .then()
-		                .extract();
-	}
-
-	private ExtractableResponse<Response> getLine(Long id) {
-		return RestAssured.given()
-				.when()
-				.get("/lines/{id}", id)
-				.then()
-				.extract();
+		assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+		assertThat(restApiRequest.get().jsonPath().getString("name")).doesNotContain(TEST_LINE_NAME_1);
 	}
 }
