@@ -46,10 +46,6 @@ public class Line {
         return stationLink;
     }
 
-    public Long getDistance() {
-        return distance;
-    }
-
     public void update(String name,
                        String color) {
         this.name = name;
