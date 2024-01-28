@@ -39,15 +39,15 @@ public class StationLineAcceptanceTest {
 
         // when
         createStationLineRequest(mockRequest);
-        JsonPath allStationLineNames = findAllStationLine();
+        JsonPath allStationLine = findAllStationLines();
 
         // then
         assertAll(
-            () -> assertThat(allStationLineNames.getList("name")).containsAnyOf(mockRequest.getName()),
-            () -> assertThat(allStationLineNames.getList("color")).containsAnyOf(mockRequest.getColor()),
-            () -> assertThat(allStationLineNames.getList("upStationId")).containsAnyOf(mockRequest.getUpStationId()),
-            () -> assertThat(allStationLineNames.getList("downStationId")).containsAnyOf(mockRequest.getDownStationId()),
-            () -> assertThat(allStationLineNames.getList("distance")).containsAnyOf(mockRequest.getDistance())
+            () -> assertThat(allStationLine.getList("name")).containsAnyOf(mockRequest.getName()),
+            () -> assertThat(allStationLine.getList("color")).containsAnyOf(mockRequest.getColor()),
+            () -> assertThat(allStationLine.getList("upStationId")).containsAnyOf(mockRequest.getUpStationId()),
+            () -> assertThat(allStationLine.getList("downStationId")).containsAnyOf(mockRequest.getDownStationId()),
+            () -> assertThat(allStationLine.getList("distance")).containsAnyOf(mockRequest.getDistance())
         );
     }
 
@@ -58,7 +58,7 @@ public class StationLineAcceptanceTest {
      */
     @DisplayName("지하철 노선 목록을 조회한다.")
     @Test
-    void findAllStationLines() {
+    void findAllStationLine() {
         // given
         StationLineRequest mockRequest1 = createMockRequest1();
         StationLineRequest mockRequest2 = createMockRequest2();
@@ -67,19 +67,19 @@ public class StationLineAcceptanceTest {
         createStationLineRequest(mockRequest2);
 
         // when
-        JsonPath allStationLineNames = findAllStationLine();
+        JsonPath allStationLine = findAllStationLines();
 
         // then
         assertAll(
-                () -> assertThat(allStationLineNames.getList("name"))
+                () -> assertThat(allStationLine.getList("name"))
                         .containsAnyOf(mockRequest1.getName(), mockRequest2.getName()),
-                () -> assertThat(allStationLineNames.getList("color"))
+                () -> assertThat(allStationLine.getList("color"))
                         .containsAnyOf(mockRequest1.getColor(), mockRequest2.getColor()),
-                () -> assertThat(allStationLineNames.getList("upStationId"))
+                () -> assertThat(allStationLine.getList("upStationId"))
                         .containsAnyOf(mockRequest1.getUpStationId(), mockRequest2.getUpStationId()),
-                () -> assertThat(allStationLineNames.getList("downStationId"))
+                () -> assertThat(allStationLine.getList("downStationId"))
                         .containsAnyOf(mockRequest1.getDownStationId(), mockRequest2.getDownStationId()),
-                () -> assertThat(allStationLineNames.getList("distance"))
+                () -> assertThat(allStationLine.getList("distance"))
                         .containsAnyOf(mockRequest1.getDistance(), mockRequest2.getDistance())
         );
     }
@@ -93,31 +93,25 @@ public class StationLineAcceptanceTest {
     @Test
     void findStationLine() {
         // given
-        Map<String, String> map1 = new HashMap<>();
-        map1.put("name", StationLineMockData.stationLineName1);
-        map1.put("color", StationLineMockData.stationLineColor1);
-        map1.put("upStationId", String.valueOf(StationLineMockData.upStationId1));
-        map1.put("downStationId", String.valueOf(StationLineMockData.downStationId1));
-        map1.put("distance", String.valueOf(StationLineMockData.distance1));
-
-        ExtractableResponse<Response> response = given().log().all()
-                .body(map1)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines")
-                .then().log().all()
-                .statusCode(HttpStatus.CREATED.value())
-                .extract();
+        StationLineRequest mockRequest1 = createMockRequest1();
+        ExtractableResponse<Response> response = createStationLineRequest(mockRequest1);
 
         // when
-        List<String> stationLineNames = given().log().all()
-                .when()
-                .get("/line" + getCreatedLocationId(response))
-                .then().log().all()
-                .extract().jsonPath().getList("name", String.class);
+        JsonPath stationLine = findStationLine(getCreatedLocationId(response));
 
         // then
-        assertThat(stationLineNames).containsAnyOf(StationLineMockData.stationLineName1);
+        assertAll(
+                () -> assertThat(stationLine.get("name").toString())
+                        .isEqualTo(mockRequest1.getName()),
+                () -> assertThat(stationLine.get("color").toString())
+                        .isEqualTo(mockRequest1.getColor()),
+                () -> assertThat(Integer.parseInt(stationLine.get("upStationId").toString()))
+                        .isEqualTo(mockRequest1.getUpStationId()),
+                () -> assertThat(Integer.parseInt(stationLine.get("downStationId").toString()))
+                        .isEqualTo(mockRequest1.getDownStationId()),
+                () -> assertThat(Integer.parseInt(stationLine.get("distance").toString()))
+                        .isEqualTo(mockRequest1.getDistance())
+        );
     }
 
     /**
@@ -130,11 +124,11 @@ public class StationLineAcceptanceTest {
     void updateStationLine() {
         // given
         Map<String, String> map1 = new HashMap<>();
-        map1.put("name", StationLineMockData.stationLineName1);
-        map1.put("color", StationLineMockData.stationLineColor1);
-        map1.put("upStationId", String.valueOf(StationLineMockData.upStationId1));
-        map1.put("downStationId", String.valueOf(StationLineMockData.downStationId1));
-        map1.put("distance", String.valueOf(StationLineMockData.distance1));
+        map1.put("name", StationLineMockData.NAME_1);
+        map1.put("color", StationLineMockData.COLOR_1);
+        map1.put("upStationId", String.valueOf(StationLineMockData.UP_STATION_ID_1));
+        map1.put("downStationId", String.valueOf(StationLineMockData.DOWN_STATION_ID_1));
+        map1.put("distance", String.valueOf(StationLineMockData.DISTANCE_1));
 
         ExtractableResponse<Response> createResponse =
                 given().log().all()
@@ -147,8 +141,8 @@ public class StationLineAcceptanceTest {
                         .extract();
 
         Map<String, String> map2 = new HashMap<>();
-        map2.put("name", StationLineMockData.stationLineName2);
-        map2.put("color", StationLineMockData.stationLineColor2);
+        map2.put("name", StationLineMockData.NAME_2);
+        map2.put("color", StationLineMockData.COLOR_2);
 
         // when
         List<String> stationLineNames =
@@ -161,7 +155,7 @@ public class StationLineAcceptanceTest {
                         .statusCode(HttpStatus.OK.value())
                         .extract().jsonPath().getList("name", String.class);
         // then
-        assertThat(stationLineNames).containsAnyOf(StationLineMockData.stationLineName2);
+        assertThat(stationLineNames).containsAnyOf(StationLineMockData.NAME_2);
 
     }
 
@@ -175,11 +169,11 @@ public class StationLineAcceptanceTest {
     void deleteStationLine() {
         // given
         Map<String, String> map1 = new HashMap<>();
-        map1.put("name", StationLineMockData.stationLineName1);
-        map1.put("color", StationLineMockData.stationLineColor1);
-        map1.put("upStationId", String.valueOf(StationLineMockData.upStationId1));
-        map1.put("downStationId", String.valueOf(StationLineMockData.downStationId1));
-        map1.put("distance", String.valueOf(StationLineMockData.distance1));
+        map1.put("name", StationLineMockData.NAME_1);
+        map1.put("color", StationLineMockData.COLOR_1);
+        map1.put("upStationId", String.valueOf(StationLineMockData.UP_STATION_ID_1));
+        map1.put("downStationId", String.valueOf(StationLineMockData.DOWN_STATION_ID_1));
+        map1.put("distance", String.valueOf(StationLineMockData.DISTANCE_1));
 
         ExtractableResponse<Response> createResponse =
                 given().log().all()
@@ -209,7 +203,7 @@ public class StationLineAcceptanceTest {
                         .extract().jsonPath().getList("name", String.class);
 
         // then
-        assertThat(stationLineNames).doesNotContain(StationLineMockData.stationLineName1);
+        assertThat(stationLineNames).doesNotContain(StationLineMockData.NAME_1);
     }
 
     /**
@@ -217,7 +211,7 @@ public class StationLineAcceptanceTest {
      *
      * @return 지하철 노선 목록을 나타내는 jsonPath 반환
      */
-    private JsonPath findAllStationLine() {
+    private JsonPath findAllStationLines() {
         return given().log().all()
             .when()
                 .get("/lines")
@@ -226,19 +220,29 @@ public class StationLineAcceptanceTest {
                 .extract().jsonPath();
     }
 
+    private JsonPath findStationLine(Long stationLineId) {
+        return given().log().all()
+                .when()
+                    .get("/lines/" + stationLineId)
+                .then().log().all()
+                    .extract().jsonPath();
+    }
+
     /**
-     * 지하철 노선 생성 요청
+     * 지하철 노선 생성 요청 후 Response 객체 반환
      *
      * @param request 지하철 요청 정보를 담은 객체
+     * @return REST Assured 기반으로 생성된 Response 객체
      */
-    private void createStationLineRequest(StationLineRequest request) {
-        given().log().all()
+    private ExtractableResponse<Response> createStationLineRequest(StationLineRequest request) {
+        return given().log().all()
             .body(request)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
             .post("/lines")
         .then().log().all()
-            .statusCode(HttpStatus.CREATED.value());
+            .statusCode(HttpStatus.CREATED.value())
+            .extract();
     }
 
     /**
@@ -247,9 +251,9 @@ public class StationLineAcceptanceTest {
      * @param createResponse 응답값
      * @return 추출된 Location 속성의 ID
      */
-    private int getCreatedLocationId(ExtractableResponse<Response> createResponse) {
-        return Integer
-                .parseInt(createResponse.header(HttpHeaders.LOCATION)
+    private Long getCreatedLocationId(ExtractableResponse<Response> createResponse) {
+        return Long
+                .parseLong(createResponse.header(HttpHeaders.LOCATION)
                         .substring(createResponse.header(HttpHeaders.LOCATION).lastIndexOf('/') + 1));
     }
 }
