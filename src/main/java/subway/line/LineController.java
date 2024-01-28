@@ -16,7 +16,7 @@ public class LineController {
     }
 
     @PostMapping("/lines")
-    public ResponseEntity<LineResponse> createSubwayLine(@RequestBody LineRequest request) {
+    public ResponseEntity<LineResponse> createSubwayLine(final @RequestBody LineRequest request) {
         final LineResponse subwayLine = lineService.createSubwayLine(request);
 
         return ResponseEntity.created(URI.create("/line/"+subwayLine.getId())).body(subwayLine);
@@ -30,11 +30,17 @@ public class LineController {
     }
 
     @GetMapping("/lines/{id}")
-    public ResponseEntity<LineResponse> getSubwayLine(@PathVariable Long id) {
+    public ResponseEntity<LineResponse> getSubwayLine(final @PathVariable Long id) {
         final LineResponse subwayLine = lineService.getSubwayLine(id);
 
         return ResponseEntity.ok(subwayLine);
     }
 
+    @PutMapping("/lines/{id}")
+    public ResponseEntity<Void> updateSubwayLine(@PathVariable Long id, @RequestBody LineUpdateRequest request) {
+        lineService.updateSubwayLine(id, request);
+
+        return ResponseEntity.ok().build();
+    }
 
 }

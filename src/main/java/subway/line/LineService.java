@@ -25,8 +25,8 @@ public class LineService {
     public LineResponse createSubwayLine(final LineRequest request) {
         final String lineName = request.getName();
         final String lineColor = request.getColor();
-        final Station upStation = this.getStation(request.getUpStationId());
-        final Station downStation = this.getStation(request.getDownStationId());
+        final Station upStation = this.findStationById(request.getUpStationId());
+        final Station downStation = this.findStationById(request.getDownStationId());
         final Integer lineDistance = request.getDistance();
 
         final Line newLine = new Line(lineName, lineColor, upStation, downStation, lineDistance);
@@ -35,9 +35,8 @@ public class LineService {
         return LineResponse.convertToDto(savedLine);
     }
 
-    public LineResponse getSubwayLine(Long lindId) {
-        Line line = lineRepository.findById(lindId)
-                .orElseThrow(() -> new EntityNotFoundException("Line not found. Line Id: " + lindId));
+    public LineResponse getSubwayLine(final Long lindId) {
+        final Line line = this.findLineById(lindId);
 
         return LineResponse.convertToDto(line);
     }
@@ -48,8 +47,22 @@ public class LineService {
                 .collect(Collectors.toList());
     }
 
-    private Station getStation(Long stationId) {
+    @Transactional
+    public void updateSubwayLine(final Long id, final LineUpdateRequest request) {
+        final Line line = this.findLineById(id);
+
+        final String name = request.getName();
+        final String color = request.getColor();
+        line.updateDetails(name, color);
+    }
+
+    private Station findStationById(final Long stationId) {
         return stationRepository.findById(stationId)
                 .orElseThrow(() -> new EntityNotFoundException("Station not found. Station Id: " + stationId));
+    }
+
+    private Line findLineById(final Long lindId) {
+        return lineRepository.findById(lindId)
+                .orElseThrow(() -> new EntityNotFoundException("Line not found. Line Id: " + lindId));
     }
 }
