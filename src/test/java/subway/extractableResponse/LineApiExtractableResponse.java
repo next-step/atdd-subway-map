@@ -30,13 +30,13 @@ public class LineApiExtractableResponse {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> selectLine(Long id) {
+    public static ExtractableResponse<Response> selectLine(Long id, HttpStatus httpStatus) {
         return RestAssured
                 .given().log().all()
                 .pathParam("id", id)
                 .when().get("/lines/{id}")
                 .then().log().all()
-                .statusCode(HttpStatus.OK.value())
+                .statusCode(httpStatus.value())
                 .extract();
     }
 
@@ -49,6 +49,17 @@ public class LineApiExtractableResponse {
                 .when().put("/lines/{id}")
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
+                .extract();
+    }
+
+    public static ExtractableResponse<Response> deleteLine(Long id) {
+        return RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .pathParam("id", id)
+                .when().delete("/lines/{id}")
+                .then().log().all()
+                .statusCode(HttpStatus.NO_CONTENT.value())
                 .extract();
     }
 

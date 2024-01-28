@@ -1,10 +1,13 @@
 package subway.line;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 import subway.Station.Station;
 import subway.Station.StationRepository;
 import subway.Station.StationResponse;
+import subway.code.UseStatus;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,13 +38,16 @@ public class LineService {
     }
 
     public List<LineResponse> findAllLines() {
-        return lineRepository.findAll().stream()
+        return lineRepository.findAllByUseStatus(UseStatus.Y).stream()
                 .map(this::createLineResponse)
                 .collect(Collectors.toList());
     }
 
     public LineResponse findLine(Long id) {
-        return createLineResponse(lineRepository.findById(id).get());
+        final Line line = lineRepository.findByIdAndUseStatus(id, UseStatus.Y)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "없는 지하철 노선입니다."));
+
+        return createLineResponse(line);
     }
 
     @Transactional
@@ -55,6 +61,11 @@ public class LineService {
         return createLineResponse(line);
     }
 
+    @Transactional
+    public void deleteLine(Long id) {
+        Line line = lineRepository.getById(id);
+        line.delete();
+    }
 
     private LineResponse createLineResponse(Line line) {
         return new LineResponse(

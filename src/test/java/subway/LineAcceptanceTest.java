@@ -4,6 +4,9 @@ import io.restassured.path.json.JsonPath;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
@@ -85,7 +88,7 @@ public class LineAcceptanceTest {
         Long lineId = createLine(requestBody).jsonPath().getLong("id");
 
         // when & then
-        String responseLineName = selectLine(lineId).jsonPath().get("name");
+        String responseLineName = selectLine(lineId, HttpStatus.OK).jsonPath().get("name");
         assertThat(lineName).isEqualTo(responseLineName);
     }
 
@@ -113,11 +116,34 @@ public class LineAcceptanceTest {
         modifyLine(lineId, modifyRequestBody);
 
         // then
-        JsonPath responseJsonPath = selectLine(lineId).jsonPath();
+        JsonPath responseJsonPath = selectLine(lineId, HttpStatus.OK).jsonPath();
         List<String> stationNames = responseJsonPath.getList("stations.name");
 
         assertThat(newLineName).isEqualTo(responseJsonPath.get("name"));
         assertThat(stationNames).containsAnyOf("양재역");
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 삭제하면
+     * Then 해당 지하철 노선 정보는 삭제된다.
+     */
+    @DisplayName("지하철 노선을 삭제한다.")
+    @Test
+    void 지하철_노선을_삭제() {
+        // given
+        String lineName = "신분당선";
+        Long upStationId = createStationByStationName("강남역").jsonPath().getLong("id");
+        Long downStationId = createStationByStationName("신논현역").jsonPath().getLong("id");
+        Map<String, Object> requestBody = createRequestBody(lineName, "bg-red-600", upStationId, downStationId, 10);
+
+        Long lineId = createLine(requestBody).jsonPath().getLong("id");
+
+        // when
+        deleteLine(lineId);
+
+        // then
+        assertThat(selectLine(lineId, HttpStatus.NOT_FOUND).statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 
     private Map<String, Object> createRequestBody(String name, String color, Long upStationId, Long downStationId, Integer distance) {

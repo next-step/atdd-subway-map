@@ -1,6 +1,7 @@
 package subway.line;
 
 import subway.Station.Station;
+import subway.code.UseStatus;
 
 import javax.persistence.*;
 
@@ -26,6 +27,9 @@ public class Line {
     @Column
     private Integer distance;
 
+    @Enumerated(EnumType.STRING)
+    private UseStatus useStatus;
+
     protected Line() {
     }
 
@@ -35,6 +39,7 @@ public class Line {
         this.upStation = upStation;
         this.downStation = downStation;
         this.distance = distance;
+        this.useStatus = UseStatus.Y;
     }
 
     public void modifyLine(String name, String color, Station upStation, Station downStation, Integer distance) {
@@ -43,6 +48,10 @@ public class Line {
         this.upStation = upStation;
         this.downStation = downStation;
         this.distance = distance;
+    }
+
+    public void delete() {
+        this.useStatus = UseStatus.N;
     }
 
     public Long getId() {
