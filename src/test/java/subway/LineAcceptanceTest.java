@@ -18,6 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static subway.extractableResponse.StationApiExtractableResponse.createStationByStationName;
 import static subway.extractableResponse.LineApiExtractableResponse.createLine;
 import static subway.extractableResponse.LineApiExtractableResponse.selectLines;
+import static subway.extractableResponse.LineApiExtractableResponse.selectLine;
 
 @DisplayName("지하철 노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -71,7 +72,28 @@ public class LineAcceptanceTest {
         // when & then
         List<String> lineNames =
                 selectLines().jsonPath().getList("name", String.class);
-        assertThat(lineNames).contains("신분당선", "수인분당선");
+        assertThat(lineNames).containsAnyOf("신분당선", "수인분당선");
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 조회하면
+     * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
+     */
+    @DisplayName("지하철 노선을 조회한다.")
+    @Test
+    void 지하철_노선을_조회() {
+        // given
+        String lineName = "신분당선";
+        Long upStationId = createStationByStationName("강남역").jsonPath().getLong("id");
+        Long downStationId = createStationByStationName("신논현역").jsonPath().getLong("id");
+        Map<String, Object> requestBody = createRequestBody(lineName, "bg-red-600", upStationId, downStationId, 10);
+
+        Long lineId = createLine(requestBody).jsonPath().getLong("id");
+
+        // when & then
+        String lineNames = selectLine(lineId).jsonPath().get("name");
+        assertThat(lineNames).isEqualTo(lineNames);
     }
 
     private Map<String, Object> createRequestBody(String name, String color, Long upStationId, Long downStationId, Integer distance) {

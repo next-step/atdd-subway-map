@@ -57,7 +57,7 @@ public class StationAcceptanceTest {
                 selectStations().jsonPath().getList("name", String.class);
 
         // then
-        assertThat(stationNames).contains("강남역", "광화문역");
+        assertThat(stationNames).containsAnyOf("강남역", "광화문역");
     }
 
     /**

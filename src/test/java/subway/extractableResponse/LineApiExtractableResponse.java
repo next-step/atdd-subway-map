@@ -30,4 +30,14 @@ public class LineApiExtractableResponse {
                 .extract();
     }
 
+    public static ExtractableResponse<Response> selectLine(Long id) {
+        return RestAssured
+                .given().log().all()
+                .pathParam("id", id)
+                .when().get("/lines/{id}")
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract();
+    }
+
 }
