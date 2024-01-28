@@ -101,19 +101,35 @@ public class LineService {
             )
         );
         section.updateLine(line);
+        line.updatesSection(section.getDownStationId(), line.getDistance() + section.getDistance());
 
         return createLineResponse(line);
     }
 
     @Transactional
     public void deleteSection(Long id, Long stationId) {
+        Line line = lineRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+
+        validateDeleteSectionCondition(id, stationId, line);
+
+        final Section section = sectionRepository.findByLineIdAndDownStationId(id, stationId);
+        if(section == null) {
+            throw new EntityNotFoundException();
+        }
+
+        line.updatesSection(section.getUpStationId(), line.getDistance() - section.getDistance());
+        sectionRepository.deleteById(section.getId());
+    }
+
+    private void validateDeleteSectionCondition(Long id, Long stationId, Line line) {
         final int numberOfSection = sectionRepository.countByLineId(id);
         if(numberOfSection == 1) {
             throw new IllegalArgumentException();
         }
 
-        final Section section = sectionRepository.findByLineIdAndDownStationId(id, stationId);
-        sectionRepository.deleteById(section.getId());
+        if(line.getDownStationId() != stationId) {
+            throw new IllegalArgumentException();
+        }
     }
 
     private static void validateAddSectionCondition(SectionAddRequest sectionAddRequest, Line line) {
