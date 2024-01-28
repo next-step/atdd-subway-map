@@ -1,9 +1,6 @@
 package subway.station.entity;
 
-import subway.line.entity.Line;
-
 import javax.persistence.*;
-import java.util.List;
 
 @Entity
 public class Station {
@@ -12,12 +9,6 @@ public class Station {
     private Long id;
     @Column(length = 20, nullable = false)
     private String name;
-
-    @OneToMany(mappedBy = "upStation", cascade = CascadeType.ALL)
-    private List<Line> linesAsUpStation;
-
-    @OneToMany(mappedBy = "downStation", cascade = CascadeType.ALL)
-    private List<Line> linesAsDownStation;
 
     protected Station() {
     }
@@ -32,14 +23,6 @@ public class Station {
 
     public String getName() {
         return name;
-    }
-
-    public List<Line> getLinesAsUpStation() {
-        return linesAsUpStation;
-    }
-
-    public List<Line> getLinesAsDownStation() {
-        return linesAsDownStation;
     }
 
     @Override
