@@ -6,12 +6,15 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import subway.dto.StationLineRequest;
 
+import javax.persistence.EntityManager;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +24,7 @@ import static config.fixtures.subway.StationLineMockData.createMockRequest2;
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.springframework.test.annotation.DirtiesContext.MethodMode.BEFORE_METHOD;
 
 @DisplayName("지하철 노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -123,40 +127,29 @@ public class StationLineAcceptanceTest {
     @Test
     void updateStationLine() {
         // given
-        Map<String, String> map1 = new HashMap<>();
-        map1.put("name", StationLineMockData.NAME_1);
-        map1.put("color", StationLineMockData.COLOR_1);
-        map1.put("upStationId", String.valueOf(StationLineMockData.UP_STATION_ID_1));
-        map1.put("downStationId", String.valueOf(StationLineMockData.DOWN_STATION_ID_1));
-        map1.put("distance", String.valueOf(StationLineMockData.DISTANCE_1));
+        StationLineRequest mockRequest1 = createMockRequest1();
+        StationLineRequest mockRequest2 = createMockRequest2();
 
-        ExtractableResponse<Response> createResponse =
-                given().log().all()
-                        .body(map1)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when()
-                        .post("/lines")
-                        .then().log().all()
-                        .statusCode(HttpStatus.CREATED.value())
-                        .extract();
-
-        Map<String, String> map2 = new HashMap<>();
-        map2.put("name", StationLineMockData.NAME_2);
-        map2.put("color", StationLineMockData.COLOR_2);
+        ExtractableResponse<Response> createResponse = createStationLineRequest(mockRequest1);
 
         // when
-        List<String> stationLineNames =
-                given().log().all()
-                        .body(map2)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when()
-                        .patch("/lines/" + getCreatedLocationId(createResponse))
-                        .then().log().all()
-                        .statusCode(HttpStatus.OK.value())
-                        .extract().jsonPath().getList("name", String.class);
-        // then
-        assertThat(stationLineNames).containsAnyOf(StationLineMockData.NAME_2);
+        updateStationLineRequest(mockRequest2, getCreatedLocationId(createResponse));
 
+        JsonPath updatedStationLine = findStationLine(getCreatedLocationId(createResponse));
+
+        // then
+        assertAll(
+                () -> assertThat(updatedStationLine.get("name").toString())
+                        .isEqualTo(mockRequest2.getName()),
+                () -> assertThat(updatedStationLine.get("color").toString())
+                        .isEqualTo(mockRequest2.getColor()),
+                () -> assertThat(Integer.parseInt(updatedStationLine.get("upStationId").toString()))
+                        .isEqualTo(mockRequest2.getUpStationId()),
+                () -> assertThat(Integer.parseInt(updatedStationLine.get("downStationId").toString()))
+                        .isEqualTo(mockRequest2.getDownStationId()),
+                () -> assertThat(Integer.parseInt(updatedStationLine.get("distance").toString()))
+                        .isEqualTo(mockRequest2.getDistance())
+        );
     }
 
     /**
@@ -164,46 +157,32 @@ public class StationLineAcceptanceTest {
      * When  생성한 지하철 노선을 삭제하면
      * Then  해당 지하철 노선 정보는 삭제된다.
      */
+    @DirtiesContext(methodMode = BEFORE_METHOD)
     @DisplayName("지하철 노선을 삭제한다.")
     @Test
     void deleteStationLine() {
         // given
-        Map<String, String> map1 = new HashMap<>();
-        map1.put("name", StationLineMockData.NAME_1);
-        map1.put("color", StationLineMockData.COLOR_1);
-        map1.put("upStationId", String.valueOf(StationLineMockData.UP_STATION_ID_1));
-        map1.put("downStationId", String.valueOf(StationLineMockData.DOWN_STATION_ID_1));
-        map1.put("distance", String.valueOf(StationLineMockData.DISTANCE_1));
-
-        ExtractableResponse<Response> createResponse =
-                given().log().all()
-                        .body(map1)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when()
-                        .post("/lines")
-                        .then().log().all()
-                        .statusCode(HttpStatus.CREATED.value())
-                        .extract();
+        StationLineRequest mockRequest1 = createMockRequest1();
+        ExtractableResponse<Response> createResponse = createStationLineRequest(mockRequest1);
 
         // when
-        given().log().all()
-                .body(map1)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .delete("/lines/" + getCreatedLocationId(createResponse))
-                .then().log().all()
-                .statusCode(HttpStatus.NO_CONTENT.value())
-                .extract().jsonPath().getList("name", String.class);
+        deleteStationLineRequest(getCreatedLocationId(createResponse));
 
-        List<String> stationLineNames =
-                given().log().all()
-                        .when()
-                        .get("/line" + getCreatedLocationId(createResponse))
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
+        JsonPath allStationLine = findAllStationLines();
 
         // then
-        assertThat(stationLineNames).doesNotContain(StationLineMockData.NAME_1);
+        assertAll(
+                () -> assertThat(allStationLine.getList("name", String.class))
+                        .doesNotContain(mockRequest1.getName()),
+                () -> assertThat(allStationLine.getList("color", String.class))
+                        .doesNotContain(mockRequest1.getColor()),
+                () -> assertThat(allStationLine.getList("upStationId", Integer.class))
+                        .doesNotContain(mockRequest1.getUpStationId()),
+                () -> assertThat(allStationLine.getList("downStationId", Integer.class))
+                        .doesNotContain(mockRequest1.getDownStationId()),
+                () -> assertThat(allStationLine.getList("distance", Integer.class))
+                        .doesNotContain(mockRequest1.getDistance())
+        );
     }
 
     /**
@@ -220,6 +199,12 @@ public class StationLineAcceptanceTest {
                 .extract().jsonPath();
     }
 
+    /**
+     * 주어진 지하철 노선 ID에 해당하는 지하철 노선 정보 반환
+     *
+     * @param stationLineId 지하철 노선 ID
+     * @return 지하철 노선 정보를 나타내는 jsonPath 반환
+     */
     private JsonPath findStationLine(Long stationLineId) {
         return given().log().all()
                 .when()
@@ -243,6 +228,37 @@ public class StationLineAcceptanceTest {
         .then().log().all()
             .statusCode(HttpStatus.CREATED.value())
             .extract();
+    }
+
+    /**
+     * 지하철 노선 수정 요청 후 Response 객체 반환
+     *
+     * @param request 지하철 수정 정보를 담은 객체
+     * @param stationLineId 수정할 지하철 노선 ID
+     */
+    private void updateStationLineRequest(StationLineRequest request, Long stationLineId) {
+        given().log().all()
+            .body(request)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+            .patch("/lines/" + stationLineId)
+        .then().log().all()
+            .statusCode(HttpStatus.CREATED.value())
+            .extract().jsonPath();
+    }
+
+    /**
+     * 지하철 노선 삭제 요청
+     *
+     * @param stationLineId 삭제할 지하철 노선 ID
+     */
+    private void deleteStationLineRequest(Long stationLineId) {
+        given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+            .delete("/lines/" + stationLineId)
+        .then().log().all()
+            .statusCode(HttpStatus.NO_CONTENT.value());
     }
 
     /**
