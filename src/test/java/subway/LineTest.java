@@ -153,7 +153,9 @@ public class LineTest {
   @Test
   void updateLineSuccess() {
     // given
-    final var 신분당선 = LineFixture.createLine("신분당선", "bg-red-600", 1L, 2L, 10);
+    final var upStation = StationFixture.createStation("강남역");
+    final var downStation = StationFixture.createStation("청계산입구역");
+    final var 신분당선 = LineFixture.createLine("신분당선", "bg-red-600", upStation.getId(), downStation.getId(), 10);
     final var updateParam = new LineUpdateRequest("2호선", "bg-green-800");
 
     // when
@@ -191,7 +193,9 @@ public class LineTest {
   @Test
   void deleteLineSuccess() {
     // given
-    final var deletedLine = LineFixture.createLine("신분당선", "bg-red-600", 1L, 2L, 10);
+    final var upStation = StationFixture.createStation("강남역");
+    final var downStation = StationFixture.createStation("청계산입구역");
+    final var deletedLine = LineFixture.createLine("신분당선", "bg-red-600", upStation.getId(), downStation.getId(), 10);
 
     // when
     final var response = RestAssured
