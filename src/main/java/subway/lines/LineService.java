@@ -9,6 +9,7 @@ import javax.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.section.Section;
+import subway.section.SectionAddRequest;
 import subway.section.SectionRepository;
 import subway.station.Station;
 import subway.station.StationRepository;
@@ -85,6 +86,21 @@ public class LineService {
         lineRepository.deleteById(id);
     }
 
+    @Transactional
+    public LineResponse addSection(Long id, SectionAddRequest sectionAddRequest) {
+        final Line line = lineRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+        final Section section = sectionRepository.save(
+            new Section(
+                sectionAddRequest.getUpStationId(),
+                sectionAddRequest.getDownStationId(),
+                sectionAddRequest.getDistance()
+            )
+        );
+        section.updateLine(line);
+
+        return createLineResponse(line);
+    }
+
     private LineResponse createLineResponse(Line line) {
         final Set<Long> stationIdSet = new HashSet<>();
         line.getSections().forEach(section -> {
@@ -100,4 +116,5 @@ public class LineService {
 
         return new LineResponse(line, stations);
     }
+
 }

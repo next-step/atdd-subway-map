@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import subway.section.SectionAddRequest;
 
 @RestController
 public class LinesController {
@@ -38,6 +39,12 @@ public class LinesController {
     @GetMapping("/lines/{id}")
     public ResponseEntity<LineResponse> getLines(@PathVariable Long id) {
         return ResponseEntity.ok().body(lineService.getLines(id));
+    }
+
+    @PostMapping("/lines/{id}/sections")
+    public ResponseEntity<LineResponse> addSection(@PathVariable Long id, @RequestBody
+        SectionAddRequest sectionAddRequest) {
+        return ResponseEntity.ok().body(lineService.addSection(id, sectionAddRequest));
     }
 
     @PutMapping("/lines/{id}")
