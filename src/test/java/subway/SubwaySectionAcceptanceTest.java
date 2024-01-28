@@ -124,13 +124,7 @@ public class SubwaySectionAcceptanceTest {
         addSections(lineId, downStationId, extraStationId, 10L);
 
         // When
-        final ExtractableResponse<Response> response = RestAssured
-            .given().log().all()
-            .when()
-            .queryParam("stationId", extraStationId)
-            .delete("/lines/"+ lineId + "/sections")
-            .then().log().all()
-            .extract();
+        final ExtractableResponse<Response> response = deleteSection(lineId, extraStationId);
 
         // Then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
@@ -151,7 +145,11 @@ public class SubwaySectionAcceptanceTest {
      */
     @Test
     void 지하철구간_종점제거_2개역_존재_경우() {
+        // When
+        final ExtractableResponse<Response> response = deleteSection(lineId, extraStationId);
 
+        // Then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     /**
@@ -179,4 +177,15 @@ public class SubwaySectionAcceptanceTest {
             .then().log().all()
             .extract();
     }
+
+    private ExtractableResponse<Response> deleteSection(Long lineId, Long stationId) {
+        return RestAssured
+            .given().log().all()
+            .when()
+            .queryParam("stationId", stationId)
+            .delete("/lines/"+ lineId + "/sections")
+            .then().log().all()
+            .extract();
+    }
+
 }
