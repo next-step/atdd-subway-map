@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,6 +24,11 @@ public class LineTest {
   @LocalServerPort
   private int port;
 
+  @BeforeEach
+  void setUp() {
+    RestAssured.port = port;
+  }
+
   /**
    * When 노선을 생성하면
    * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
@@ -32,21 +38,20 @@ public class LineTest {
   void createLineSuccess() {
     // given
     final var LINE_NAME = "신분당선";
-    final var UP_STATION_ID = 1;
-    final var DOWN_STATION_ID = 2;
+    final var upStation = StationFixture.createStation("강남역");
+    final var downStation = StationFixture.createStation("청계산입구역");
 
     // when
     Map<String, Object> params = new HashMap<>();
     params.put("name", LINE_NAME);
     params.put("color", "bg-red-600");
-    params.put("upStationId", UP_STATION_ID);
-    params.put("downStationId", DOWN_STATION_ID);
+    params.put("upStationId", upStation.getId());
+    params.put("downStationId", downStation.getId());
     params.put("distance", 10);
 
     final var response = RestAssured
         .given().log().all()
         .body(params)
-        .port(port)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when().post("/lines")
         .then().log().all()
@@ -67,10 +72,10 @@ public class LineTest {
     assertThat(line).isNotEmpty();
 
     // then
-    assertThat(UP_STATION_ID).isIn(stationIds);
+    assertThat(upStation.getId()).isIn(stationIds);
 
     // then
-    assertThat(DOWN_STATION_ID).isIn(stationIds);
+    assertThat(downStation.getId()).isIn(stationIds);
   }
 
   /**
@@ -90,7 +95,6 @@ public class LineTest {
     // when
     final var response = RestAssured
         .given().log().all()
-        .port(port)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when().get("/lines")
         .then().log().all()
@@ -121,7 +125,6 @@ public class LineTest {
     // when
     final var response = RestAssured
         .given().log().all()
-        .port(port)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when().get("/lines/{id}", createdLine.getId())
         .then().log().all()
@@ -156,7 +159,6 @@ public class LineTest {
     final var response = RestAssured
         .given().log().all()
         .body(params)
-        .port(port)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when().put("/lines/{id}", createdLine.getId())
         .then().log().all()
@@ -189,7 +191,6 @@ public class LineTest {
     // when
     final var response = RestAssured
         .given().log().all()
-        .port(port)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when().delete("/lines/{id}", deletedLine.getId())
         .then().log().all()
@@ -223,7 +224,6 @@ public class LineTest {
     return RestAssured
         .given()
         .body(params)
-        .port(port)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when().post("/lines")
         .then().extract().as(LineResponse.class);
@@ -233,7 +233,6 @@ public class LineTest {
     return Arrays.asList(
         RestAssured
         .given()
-        .port(port)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when().post("/lines")
         .then().extract().as(LineResponse[].class)
