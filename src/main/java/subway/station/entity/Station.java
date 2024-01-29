@@ -1,4 +1,4 @@
-package subway;
+package subway.station.entity;
 
 import javax.persistence.*;
 
@@ -10,7 +10,7 @@ public class Station {
     @Column(length = 20, nullable = false)
     private String name;
 
-    public Station() {
+    protected Station() {
     }
 
     public Station(String name) {
@@ -23,5 +23,13 @@ public class Station {
 
     public String getName() {
         return name;
+    }
+
+    @Override
+    public String toString() {
+        return "Station{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
     }
 }

@@ -3,24 +3,32 @@ package subway;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.jdbc.Sql;
+import subway.station.dto.StationRequest;
+import subway.station.repository.StationRepository;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
-@Sql(scripts = "/reset-db.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationAcceptanceTest {
+
+    @Autowired
+    private StationRepository stationRepository;
+
+    @AfterEach
+    void tearDown() {
+        stationRepository.deleteAll();
+    }
 
     /**
      * When 지하철역을 생성하면
@@ -31,23 +39,16 @@ public class StationAcceptanceTest {
     @Test
     void 지하철역_생성() {
         // when
-        String stationName = "강남역";
-        ExtractableResponse<Response> response = this.createStation(stationName);
+        final String stationName = "강남역";
+        final StationRequest request = new StationRequest(stationName);
+        final ExtractableResponse<Response> response = this.createStation(request);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames =
-                given()
-                    .log().all()
-                .when()
-                    .get("/stations")
-                .then()
-                    .log().all()
-                .extract()
-                    .jsonPath()
-                    .getList("name", String.class);
+        final JsonPath jsonPath = this.getStationList();
+        final List<String> stationNames = jsonPath.getList("name", String.class);
 
         assertThat(stationNames).containsAnyOf("강남역");
     }
@@ -61,20 +62,21 @@ public class StationAcceptanceTest {
     @Test
     void 지하철역_목록_조회() {
         // given
-        String stationName1 = "교대역";
-        this.createStation(stationName1);
-        String stationName2 = "역삼역";
-        this.createStation(stationName2);
+        final String 역이름_교대역 = "교대역";
+        final StationRequest 교대역_생성_요청 = new StationRequest(역이름_교대역);
+        this.createStation(교대역_생성_요청);
+
+        final String 역이름_역삼역 = "역삼역";
+        final StationRequest 역삼역_생성_요청 = new StationRequest(역이름_역삼역);
+        this.createStation(역삼역_생성_요청);
 
         // when
-        ExtractableResponse<Response> response = this.getStationList();
+        final JsonPath jsonPath = this.getStationList();
 
         // then
-        JsonPath jsonPath = response.jsonPath();
-        List<String> stationNames = jsonPath.getList("name", String.class);
+        final List<String> stationNames = jsonPath.getList("name", String.class);
 
-        assertThat(stationNames).hasSize(2);
-        assertThat(stationNames).contains("교대역", "역삼역");
+        assertThat(stationNames).containsExactly("교대역", "역삼역");
     }
 
     /**
@@ -86,33 +88,30 @@ public class StationAcceptanceTest {
     @Test
     void 지하철역_삭제() {
         // given
-        String stationName = "강남역";
-        this.createStation(stationName);
+        final String stationName = "강남역";
+        final StationRequest request = new StationRequest(stationName);
+        final ExtractableResponse<Response> createStationResponse = this.createStation(request);
 
         // when
-        ExtractableResponse<Response> responseAfterStationCreation = this.getStationList();
-        JsonPath jsonPathAfterStationCreation = responseAfterStationCreation.jsonPath();
-        List<Long> stationIds = jsonPathAfterStationCreation.getList("id", Long.class);
-        Long stationId = stationIds.get(0);
+        final String location = createStationResponse.header("Location");
+        final String stationId = location.replaceAll(".*/(\\d+)$", "$1");
 
         given()
         .when()
-            .delete("/stations/"+stationId)
+            .delete("/stations/{id}", stationId)
         .then()
             .statusCode(HttpStatus.NO_CONTENT.value())
             .log().all();
 
         // then
-        ExtractableResponse<Response> responseAfterStationDeletion = this.getStationList();
-        JsonPath jsonPathAfterStationDeletion = responseAfterStationDeletion.jsonPath();
-        List<String> stationNames = jsonPathAfterStationDeletion.getList("name", String.class);
+        final JsonPath jsonPathAfterStationDeletion = this.getStationList();
+        final List<String> stationNames = jsonPathAfterStationDeletion.getList("name", String.class);
 
-        assertThat(stationNames).hasSize(0);
         assertThat(stationNames).doesNotContain("강남역");
     }
 
-    private ExtractableResponse<Response> getStationList() {
-        ExtractableResponse<Response> response =
+    private JsonPath getStationList() {
+        final JsonPath response =
                 given()
                     .log().all()
                 .when()
@@ -120,23 +119,22 @@ public class StationAcceptanceTest {
                 .then()
                     .statusCode(HttpStatus.OK.value())
                     .log().all()
-                .extract();
+                .extract()
+                    .jsonPath();
 
         return response;
     }
 
-    private ExtractableResponse<Response> createStation(String stationName) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", stationName);
-
-        ExtractableResponse<Response> response =
+    private ExtractableResponse<Response> createStation(final StationRequest request) {
+        final ExtractableResponse<Response> response =
                 given()
                     .log().all()
-                    .body(params)
+                    .body(request)
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                     .post("/stations")
                 .then()
+                    .statusCode(HttpStatus.CREATED.value())
                     .log().all()
                 .extract();
 
