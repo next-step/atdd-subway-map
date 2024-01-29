@@ -1,4 +1,4 @@
-package subway;
+package subway.station;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import subway.testhelper.StationApiCaller;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -19,6 +20,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationAcceptanceTest {
+
+    private static final String GANGNAM_STATION = "강남역";
+    private static final String SAMSUNG_STATION = "삼성역";
+    private final StationApiCaller stationApiCaller = new StationApiCaller();
+
     /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다
@@ -29,16 +35,16 @@ public class StationAcceptanceTest {
     void createStation() {
         // when
         Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
+        params.put("name", GANGNAM_STATION);
 
-        ExtractableResponse<Response> response = createStationResponse(params);
+        ExtractableResponse<Response> response = stationApiCaller.callCreateStation(params);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> actual = findStationNames();
-        String expected = "강남역";
+        List<String> actual = stationApiCaller.callFindStations().jsonPath().getList("name", String.class);
+        String expected = GANGNAM_STATION;
         assertThat(actual).containsAnyOf(expected);
     }
 
@@ -52,17 +58,17 @@ public class StationAcceptanceTest {
     void findStations() {
         // given
         Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-        createStationResponse(params);
+        params.put("name", GANGNAM_STATION);
+        stationApiCaller.callCreateStation(params);
 
-        params.put("name", "삼성역");
-        createStationResponse(params);
+        params.put("name", SAMSUNG_STATION);
+        stationApiCaller.callCreateStation(params);
 
         // when
-        List<String> actual = findStationNames();
+        List<String> actual = stationApiCaller.callFindStations().jsonPath().getList("name", String.class);
 
         // then
-        List<String> expected = List.of("강남역", "삼성역");
+        List<String> expected = List.of(GANGNAM_STATION, SAMSUNG_STATION);
         assertThat(actual).containsAll(expected);
     }
 
@@ -76,42 +82,21 @@ public class StationAcceptanceTest {
     void deleteStation() {
         // given
         Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-        createStationResponse(params);
-
-        List<Long> stationIds = given().log().all()
-                .when().get("/stations")
-                .then().log().all()
-                .extract().jsonPath().getList("id", Long.class);
-        Long id = stationIds.get(0);
+        params.put("name", GANGNAM_STATION);
+        ExtractableResponse<Response> stationResponse = stationApiCaller.callCreateStation(params);
+        String location = stationResponse.header("Location");
 
         // when
         given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().delete("/stations/{id}", id)
+                .when().delete(location)
                 .then().log().all()
                 .extract();
 
         // then
-        List<String> actual = findStationNames();
+        List<String> actual = stationApiCaller.callFindStations().jsonPath().getList("name", String.class);
         List<String> expected = Collections.emptyList();
         assertThat(actual).containsAll(expected);
-    }
-
-    private static ExtractableResponse<Response> createStationResponse(Map<String, String> params) {
-        return given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
-    }
-
-    private static List<String> findStationNames() {
-        return given().log().all()
-                .when().get("/stations")
-                .then().log().all()
-                .extract().jsonPath().getList("name", String.class);
     }
 
 }
