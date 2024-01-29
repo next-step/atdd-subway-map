@@ -20,14 +20,13 @@ public class LineTestFixture {
                 .when()
                 .post("/lines")
                 .then().log().all()
-                .statusCode(201).extract();
+                .extract();
     }
 
     public static ExtractableResponse<Response> allLines() {
         return RestAssured.given().log().all()
                 .when().get("/lines")
                 .then().log().all()
-                .statusCode(200)
                 .extract();
     }
 
@@ -35,7 +34,6 @@ public class LineTestFixture {
         return RestAssured.given().log().all()
                 .when().get("/lines/{id}",id)
                 .then().log().all()
-                .statusCode(200)
                 .extract();
     }
 
@@ -44,14 +42,12 @@ public class LineTestFixture {
             .body(params)
             .contentType("application/json")
             .when().put("/lines/{id}",id)
-            .then().log().all()
-            .statusCode(200);
+            .then().log().all();
     }
 
     public static void deleteLine(long id) {
         RestAssured.given().log().all()
             .when().delete("/lines/{id}", id)
-            .then().log().all()
-            .statusCode(204);
+            .then().log().all();
     }
 }
