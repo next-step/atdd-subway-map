@@ -7,7 +7,11 @@ import io.restassured.response.Response;
 import java.util.Map;
 
 public class SectionApiHelper {
+
     public static final String SECTION_API_PATH = "/lines/{id}/sections";
+
+    private SectionApiHelper() {
+    }
 
     public static ExtractableResponse<Response> create(final Long lineId, final Long upStationId, final Long downStationId, final int distance) {
         final Map<String, Object> createLineRequest = createRequestFixture(upStationId, downStationId, distance);

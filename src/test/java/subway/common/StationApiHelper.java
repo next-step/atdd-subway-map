@@ -7,7 +7,11 @@ import io.restassured.response.Response;
 import java.util.Map;
 
 public class StationApiHelper {
+
     public static final String STATION_API_PATH = "/stations";
+
+    private StationApiHelper() {
+    }
 
     public static ExtractableResponse<Response> createStation(final String name) {
         return RestAssuredHelper.post(STATION_API_PATH, Map.of("name", name));

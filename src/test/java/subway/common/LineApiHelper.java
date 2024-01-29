@@ -7,7 +7,11 @@ import io.restassured.response.Response;
 import java.util.Map;
 
 public class LineApiHelper {
+
     public static final String LINE_API_PATH = "/lines";
+
+    private LineApiHelper() {
+    }
 
     public static ExtractableResponse<Response> createLine(final String name, final String color, final Long upStationId, final Long downStationId, final int distance) {
         final Map<String, Object> createLineRequest = createLineRequestFixture(name, color, upStationId, downStationId, distance);
