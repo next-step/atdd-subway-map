@@ -4,6 +4,8 @@ import static java.util.stream.Collectors.*;
 
 import java.util.List;
 
+import javax.persistence.EntityNotFoundException;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,7 +59,8 @@ public class LineService {
 	}
 
 	private LineStationMap saveLineStationMap(Lane lane, Line line, Integer sort, Long stationId) {
-		Station station = stationRepository.findById(stationId).orElseThrow();
+		Station station = stationRepository.findById(stationId)
+			.orElseThrow(EntityNotFoundException::new);
 		LineStationMap lineStationMap = new LineStationMap(lane, line, sort, station);
 		return lineStationMapRepository.save(lineStationMap);
 	}
@@ -71,14 +74,19 @@ public class LineService {
 
 	@Transactional
 	public void update(Long id, LineUpdateRequest request) {
-		Line line = lineRepository.findById(id).orElseThrow();
+		Line line = finLineById(id);
 		line.changeName(request.getName());
 		line.changeColor(request.getColor());
 	}
 
+	private Line finLineById(Long id) {
+		return lineRepository.findById(id)
+			.orElseThrow(EntityNotFoundException::new);
+	}
+
 	@Transactional
 	public void delete(Long id) {
-		Line line = lineRepository.findById(id).orElseThrow();
+		Line line = finLineById(id);
 		List<LineStationMap> lineStationMaps = lineStationMapRepository.findAllByLineId(line.getId());
 		List<Station> stations = lineStationMaps.stream().map(LineStationMap::getStation).collect(toList());
 
