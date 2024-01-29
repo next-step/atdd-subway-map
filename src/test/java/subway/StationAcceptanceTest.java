@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -87,6 +88,31 @@ public class StationAcceptanceTest {
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
     // TODO: 지하철역 제거 인수 테스트 메서드 생성
+    @DisplayName("지하철역을 삭제한다.")
+    @Test
+    void deleteStation() {
+        // given
+        String stationName = "강남역";
+        Map<String, String> params = new HashMap<>();
+        params.put("name", stationName);
+        ExtractableResponse<Response> response = createStation(params);
+
+        // when
+        Long stationId = response.as(StationResponse.class).getId();
+        ExtractableResponse<Response> deleteResponse = RestAssured.given().log().all()
+                .when().delete("/stations/" + stationId)
+                .then().log().all()
+                .extract();
+
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        //then
+        List<String> responseList = RestAssured.given().log().all()
+                .when().get("/stations")
+                .then().log().all()
+                .extract().jsonPath().get("name");
+        assertThat(responseList).doesNotContain(stationName);
+    }
 
     private ExtractableResponse<Response> createStation(Map<String, String> params) {
         return RestAssured.given().log().all()
