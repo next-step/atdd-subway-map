@@ -10,11 +10,8 @@ import subway.line.LineCreateRequest;
 import subway.line.LineResponse;
 
 public class LineCreator {
-	private String upStationName;
-	private String downStationName;
-
-	private LineCreator() {
-	}
+	private final String upStationName;
+	private final String downStationName;
 
 	private LineCreator(String upStationName, String downStationName) {
 		this.upStationName = upStationName;
