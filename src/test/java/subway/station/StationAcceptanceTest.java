@@ -5,7 +5,6 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import subway.testhelper.StationApiCaller;
 
@@ -36,10 +35,8 @@ public class StationAcceptanceTest {
         Map<String, String> params = new HashMap<>();
         params.put("name", GANGNAM_STATION);
 
-        ExtractableResponse<Response> response = StationApiCaller.callCreateStation(params);
-
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        ExtractableResponse<Response> response = StationApiCaller.callCreateStation(params);
 
         // then
         List<String> actual = StationApiCaller.callFindStations().jsonPath().getList("name", String.class);

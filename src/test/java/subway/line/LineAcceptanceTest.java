@@ -6,7 +6,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
 import org.springframework.test.context.jdbc.Sql;
 import subway.testhelper.LineApiCaller;
 import subway.testhelper.StationApiCaller;
@@ -59,12 +58,10 @@ public class LineAcceptanceTest {
     @Test
     void createLine() {
         // when
-        ExtractableResponse<Response> response = LineApiCaller.callApiCreateLines(newBunDangLineParams);
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        LineApiCaller.callApiCreateLines(newBunDangLineParams);
 
         // then
-        response = LineApiCaller.callApiFindLines();
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        ExtractableResponse<Response> response = LineApiCaller.callApiFindLines();
         List<String> actual = response.jsonPath().getList("name", String.class);
         String expected = "신분당선";
         assertThat(actual).containsAnyOf(expected);
@@ -79,14 +76,11 @@ public class LineAcceptanceTest {
     @Test
     void findLines() {
         // given
-        ExtractableResponse<Response> response = LineApiCaller.callApiCreateLines(newBunDangLineParams);
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        response = LineApiCaller.callApiCreateLines(zeroLineParams);
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        LineApiCaller.callApiCreateLines(newBunDangLineParams);
+        LineApiCaller.callApiCreateLines(zeroLineParams);
 
         // when
-        response = LineApiCaller.callApiFindLines();
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        ExtractableResponse<Response> response  = LineApiCaller.callApiFindLines();
         List<String> actual = response.jsonPath().getList("name", String.class);
 
         // then
@@ -104,7 +98,6 @@ public class LineAcceptanceTest {
     void findLine() {
         // given
         ExtractableResponse<Response> response = LineApiCaller.callApiCreateLines(newBunDangLineParams);
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         String location = response.header("location");
 
         // when
@@ -126,17 +119,14 @@ public class LineAcceptanceTest {
     void updateLine() {
         // given
         ExtractableResponse<Response> response = LineApiCaller.callApiCreateLines(newBunDangLineParams);
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         String location = response.header("location");
 
         // when
         LineUpdateRequest request = new LineUpdateRequest("다른분당선", "bg-red-600");
         response = LineApiCaller.callApiUpdateLine(request, location);
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         // then
         response = LineApiCaller.callApiFindLine(location);
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         LineResponse actual = response.jsonPath().getObject(".", LineResponse.class);
         String expectedName = "다른분당선";
         String expectedColor = "bg-red-600";
@@ -154,16 +144,13 @@ public class LineAcceptanceTest {
     void deleteStation() {
         // given
         ExtractableResponse<Response> response = LineApiCaller.callApiCreateLines(newBunDangLineParams);
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         String location = response.header("location");
 
         // when
-        response = LineApiCaller.callApiDeleteLine(location);
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        LineApiCaller.callApiDeleteLine(location);
 
         // then
         response = LineApiCaller.callApiFindLines();
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         List<LineResponse> actual = response.jsonPath().getList(".", LineResponse.class);
         List<LineResponse> expected = Collections.emptyList();
         assertThat(actual).containsAll(expected);

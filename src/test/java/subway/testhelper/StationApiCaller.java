@@ -2,6 +2,7 @@ package subway.testhelper;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import java.util.Map;
@@ -16,6 +17,7 @@ public class StationApiCaller {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/stations")
                 .then().log().all()
+                .statusCode(HttpStatus.CREATED.value())
                 .extract();
     }
 
@@ -23,6 +25,7 @@ public class StationApiCaller {
         return given().log().all()
                 .when().get("/stations")
                 .then().log().all()
+                .statusCode(HttpStatus.OK.value())
                 .extract();
     }
 }
