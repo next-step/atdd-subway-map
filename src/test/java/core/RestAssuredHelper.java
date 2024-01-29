@@ -6,7 +6,8 @@ import io.restassured.response.Response;
 import org.springframework.http.MediaType;
 
 public class RestAssuredHelper {
-    private RestAssuredHelper() {}
+    private RestAssuredHelper() {
+    }
 
     public static ExtractableResponse<Response> get(final String path) {
         return RestAssured
@@ -25,6 +26,15 @@ public class RestAssuredHelper {
     public static ExtractableResponse<Response> post(final String path, final Object body) {
         return RestAssured
                 .given()
+                .body(body)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post(path)
+                .then().extract();
+    }
+
+    public static ExtractableResponse<Response> post(final String path, final Long pathVariable, final Object body) {
+        return RestAssured
+                .given().pathParam("id", pathVariable)
                 .body(body)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post(path)
@@ -51,7 +61,7 @@ public class RestAssuredHelper {
         return response.jsonPath().getLong("id");
     }
 
-    public static  <T> T findObjectFrom(final ExtractableResponse<Response> response, final Long id, final Class<T> type) {
+    public static <T> T findObjectFrom(final ExtractableResponse<Response> response, final Long id, final Class<T> type) {
         return response.jsonPath().getObject(String.format("find {it.id==%d}", id), type);
     }
 
