@@ -89,7 +89,7 @@ public class LineAcceptanceTest {
 
         // when & then
         String responseLineName = selectLine(lineId).jsonPath().get("name");
-        assertThat(신분당선).isEqualTo(responseLineName);
+        assertThat(responseLineName).isEqualTo(신분당선);
     }
 
     /**
@@ -120,7 +120,7 @@ public class LineAcceptanceTest {
         JsonPath responseJsonPath = selectLine(lineId).jsonPath();
         List<String> stationNames = responseJsonPath.getList("stations.name");
 
-        assertThat(구분당선).isEqualTo(responseJsonPath.get("name"));
+        assertThat((String)responseJsonPath.get("name")).isEqualTo(구분당선);
         assertThat(stationNames).containsAnyOf(양재역);
     }
 
