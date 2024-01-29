@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.jdbc.Sql;
+import subway.domain.request.SubwayLineRequest;
 
 import java.util.HashMap;
 import java.util.List;
@@ -18,6 +20,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+//@DirtiesContext
+@Sql("/truncate.sql")
 public class SubwayLineAcceptanceTest {
 
     @BeforeEach
@@ -35,7 +39,7 @@ public class SubwayLineAcceptanceTest {
     @Test
     void createSubwayLine() {
         // when
-        ExtractableResponse<Response> response = createSubwayLine("신분당선", "bg-red-600", 1L, 2L, 10);
+        ExtractableResponse<Response> response = createSubwayLine(new SubwayLineRequest("신분당선", "bg-red-600", 1L, 2L, 10));
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -55,8 +59,8 @@ public class SubwayLineAcceptanceTest {
     @Test
     void showSubwayLines() {
         //given
-        createSubwayLine("신분당선", "bg-red-600", 1L, 2L, 10);
-        createSubwayLine("분당선", "bg-green-600", 1L, 3L, 10);
+        createSubwayLine(new SubwayLineRequest("신분당선", "bg-red-600", 1L, 2L, 10));
+        createSubwayLine(new SubwayLineRequest("분당선", "bg-green-600", 1L, 3L, 10));
 
         //when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -83,7 +87,7 @@ public class SubwayLineAcceptanceTest {
     @Test
     void showSubwayLine() {
         //given
-        createSubwayLine("신분당선", "bg-red-600", 1L, 2L, 10);
+        createSubwayLine(new SubwayLineRequest("신분당선", "bg-red-600", 1L, 2L, 10));
 
         //when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -99,7 +103,7 @@ public class SubwayLineAcceptanceTest {
     }
 
     /**
-     *Given 지하철 노선을 생성하고
+     * Given 지하철 노선을 생성하고
      * When 생성한 지하철 노선을 수정하면
      * Then 해당 지하철 노선 정보는 수정된다
      */
@@ -107,7 +111,7 @@ public class SubwayLineAcceptanceTest {
     @Test
     void updateSubwayLine() {
         //given
-        createSubwayLine("신분당선", "bg-red-600", 1L, 2L, 10);
+        createSubwayLine(new SubwayLineRequest("신분당선", "bg-red-600", 1L, 2L, 10));
 
         //when
         Map<String, String> params = new HashMap<>();
@@ -130,7 +134,7 @@ public class SubwayLineAcceptanceTest {
 
 
     /**
-     *Given 지하철 노선을 생성고
+     * Given 지하철 노선을 생성고
      * When 생성한 지하철 노선을 삭제하면
      * Then 해당 지하철 노선 정보는 삭제된다
      */
@@ -138,7 +142,7 @@ public class SubwayLineAcceptanceTest {
     @Test
     void deleteSubwayLine() {
         //given
-        createSubwayLine("신분당선", "bg-red-600", 1L, 2L, 10);
+        createSubwayLine(new SubwayLineRequest("신분당선", "bg-red-600", 1L, 2L, 10));
 
         //when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -171,22 +175,13 @@ public class SubwayLineAcceptanceTest {
                 .extract().jsonPath().getList("name", String.class);
     }
 
-    private static ExtractableResponse<Response> createSubwayLine(String name, String color, Long upStationId, Long downStationId, int distance) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-        params.put("color", color);
-        params.put("upStationId", upStationId.toString());
-        params.put("downStationId", downStationId.toString());
-        params.put("distance", Integer.toString(distance));
-
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .body(params)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/lines")
-                        .then().log().all()
-                        .extract();
-        return response;
+    private static ExtractableResponse<Response> createSubwayLine(SubwayLineRequest request) {
+        return RestAssured.given().log().all()
+                .body(request)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines")
+                .then().log().all()
+                .extract();
     }
 
 
