@@ -10,12 +10,12 @@ public class LineCreateRequest {
     private String color;
     private Long upStationId;
     private Long downStationId;
-    private long distance;
+    private int distance;
 
     private LineCreateRequest() {
     }
 
-    public LineCreateRequest(final String name, final String color, final Long upStationId, final Long downStationId, final long distance) {
+    public LineCreateRequest(final String name, final String color, final Long upStationId, final Long downStationId, final int distance) {
         this.name = name;
         this.color = color;
         this.upStationId = upStationId;
@@ -39,7 +39,7 @@ public class LineCreateRequest {
         return downStationId;
     }
 
-    public long getDistance() {
+    public int getDistance() {
         return distance;
     }
 

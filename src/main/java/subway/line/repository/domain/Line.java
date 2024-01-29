@@ -25,12 +25,12 @@ public class Line {
     private Station downStation;
 
     @Column(nullable = false)
-    private Long distance;
+    private int distance;
 
     protected Line() {
     }
 
-    public Line(final String name, final String color, final Station upStation, final Station downStation, final Long distance) {
+    public Line(final String name, final String color, final Station upStation, final Station downStation, final int distance) {
         this.name = name;
         this.color = color;
         this.upStation = upStation;
@@ -58,7 +58,7 @@ public class Line {
         return downStation;
     }
 
-    public Long getDistance() {
+    public int getDistance() {
         return distance;
     }
 
