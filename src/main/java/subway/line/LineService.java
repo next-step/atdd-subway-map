@@ -7,7 +7,6 @@ import org.springframework.web.server.ResponseStatusException;
 import subway.station.Station;
 import subway.station.StationRepository;
 import subway.station.StationResponse;
-import subway.code.UseStatus;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,13 +37,13 @@ public class LineService {
     }
 
     public List<LineResponse> findAllLines() {
-        return lineRepository.findAllByUseStatus(UseStatus.Y).stream()
+        return lineRepository.findAll().stream()
                 .map(this::createLineResponse)
                 .collect(Collectors.toList());
     }
 
     public LineResponse findLine(Long id) {
-        Line line = lineRepository.findByIdAndUseStatus(id, UseStatus.Y)
+        Line line = lineRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "없는 지하철 노선입니다."));
 
         return createLineResponse(line);
@@ -52,7 +51,7 @@ public class LineService {
 
     @Transactional
     public LineResponse modifyLine(Long id, LineRequest lineRequest) {
-        Line line = lineRepository.findByIdAndUseStatus(id, UseStatus.Y)
+        Line line = lineRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "없는 지하철 노선입니다."));
         Station upStation = stationRepository.getById(lineRequest.getUpStationId());
         Station downStation = stationRepository.getById(lineRequest.getDownStationId());
@@ -64,8 +63,9 @@ public class LineService {
 
     @Transactional
     public void deleteLine(final Long id) {
-        final Line line = lineRepository.getById(id);
-        line.delete();
+        lineRepository.deleteById(id);
+//        final Line line = lineRepository.getById(id);
+//        line.delete();
     }
 
     private LineResponse createLineResponse(Line line) {

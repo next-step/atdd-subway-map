@@ -1,11 +1,15 @@
 package subway.line;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 import subway.station.Station;
-import subway.code.UseStatus;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
 
 @Entity
+@Where(clause = "deleted_at IS NULL")
+@SQLDelete(sql = "UPDATE line SET deleted_at = CURRENT_TIMESTAMP where id = ?")
 public class Line {
 
     @Id
@@ -27,8 +31,8 @@ public class Line {
     @Column
     private Integer distance;
 
-    @Enumerated(EnumType.STRING)
-    private UseStatus useStatus;
+    @Column
+    private Timestamp deleted_at;
 
     protected Line() {
     }
@@ -39,7 +43,6 @@ public class Line {
         this.upStation = upStation;
         this.downStation = downStation;
         this.distance = distance;
-        this.useStatus = UseStatus.Y;
     }
 
     public void modifyLine(String name, String color, Station upStation, Station downStation, Integer distance) {
@@ -48,10 +51,6 @@ public class Line {
         this.upStation = upStation;
         this.downStation = downStation;
         this.distance = distance;
-    }
-
-    public void delete() {
-        this.useStatus = UseStatus.N;
     }
 
     public Long getId() {
