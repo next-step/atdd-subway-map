@@ -1,4 +1,4 @@
-package subway.Station;
+package subway.station;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

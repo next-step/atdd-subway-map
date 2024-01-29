@@ -1,4 +1,4 @@
-package subway.Station;
+package subway.station;
 
 public class StationResponse {
     private Long id;

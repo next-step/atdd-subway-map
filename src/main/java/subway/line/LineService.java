@@ -4,9 +4,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-import subway.Station.Station;
-import subway.Station.StationRepository;
-import subway.Station.StationResponse;
+import subway.station.Station;
+import subway.station.StationRepository;
+import subway.station.StationResponse;
 import subway.code.UseStatus;
 
 import java.util.List;
@@ -44,7 +44,7 @@ public class LineService {
     }
 
     public LineResponse findLine(Long id) {
-        final Line line = lineRepository.findByIdAndUseStatus(id, UseStatus.Y)
+        Line line = lineRepository.findByIdAndUseStatus(id, UseStatus.Y)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "없는 지하철 노선입니다."));
 
         return createLineResponse(line);
@@ -52,7 +52,8 @@ public class LineService {
 
     @Transactional
     public LineResponse modifyLine(Long id, LineRequest lineRequest) {
-        Line line = lineRepository.getReferenceById(id);
+        Line line = lineRepository.findByIdAndUseStatus(id, UseStatus.Y)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "없는 지하철 노선입니다."));
         Station upStation = stationRepository.getById(lineRequest.getUpStationId());
         Station downStation = stationRepository.getById(lineRequest.getDownStationId());
 
@@ -62,8 +63,8 @@ public class LineService {
     }
 
     @Transactional
-    public void deleteLine(Long id) {
-        Line line = lineRepository.getById(id);
+    public void deleteLine(final Long id) {
+        final Line line = lineRepository.getById(id);
         line.delete();
     }
 
