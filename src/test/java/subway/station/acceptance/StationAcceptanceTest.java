@@ -1,7 +1,6 @@
 package subway.station.acceptance;
 
 import core.AcceptanceTestExtension;
-import core.RestAssuredHelper;
 import core.TestConfig;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -11,10 +10,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
+import subway.common.StationApiHelper;
 import subway.station.service.dto.StationResponse;
 
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
@@ -37,17 +36,16 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        final ExtractableResponse<Response> response = RestAssuredHelper.post(STATION_API_PATH, Map.of("name", "강남역"));
+        final String 강남역 = "강남역";
+        final ExtractableResponse<Response> response = StationApiHelper.createStation(강남역);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        final StationResponse stationResponse = response.as(StationResponse.class);
-        assertThat(stationResponse.getName()).isEqualTo("강남역");
+        assertThat(response.as(StationResponse.class).getName()).isEqualTo(강남역);
 
         // then
-        final ExtractableResponse<Response> stationsResponse = RestAssuredHelper.get(STATION_API_PATH);
-        final List<String> stationNames = stationsResponse.jsonPath().getList("name", String.class);
-        assertThat(stationNames).containsAnyOf("강남역");
+        final List<String> stationNames = getStationNames(StationApiHelper.fetchStations());
+        assertThat(stationNames).containsAnyOf(강남역);
     }
 
     /**
@@ -59,17 +57,20 @@ public class StationAcceptanceTest {
     @Test
     void fetchStationsTest() {
         // given
-        final List<String> targetStations = List.of("지하철역이름", "새로운지하철역이름", "또다른지하철역이름");
-        targetStations.forEach(stationName -> RestAssuredHelper.post(STATION_API_PATH, Map.of("name", stationName)));
+        final String 지하철역이름 = "지하철역이름";
+        final String 새로운지하철역이름 = "새로운지하철역이름";
+        final String 또다른지하철역이름 = "또다른지하철역이름";
+        final List<String> targetStations = List.of(지하철역이름, 새로운지하철역이름, 또다른지하철역이름);
+        targetStations.forEach(StationApiHelper::createStation);
 
         // when
-        final ExtractableResponse<Response> response = RestAssuredHelper.get(STATION_API_PATH);
+        final ExtractableResponse<Response> response = StationApiHelper.fetchStations();
 
         // then
         assertSoftly(softly -> {
             softly.assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-            final List<String> stationNames = response.jsonPath().getList("name", String.class);
-            softly.assertThat(stationNames).containsAll(List.of("지하철역이름", "새로운지하철역이름", "또다른지하철역이름"));
+            final List<String> stationNames = getStationNames(response);
+            softly.assertThat(stationNames).containsAll(List.of(지하철역이름, 새로운지하철역이름, 또다른지하철역이름));
         });
     }
 
@@ -82,22 +83,22 @@ public class StationAcceptanceTest {
     @Test
     void deleteStationTest() {
         // given
-        final ExtractableResponse<Response> insertedStationResponse =
-                RestAssuredHelper.post(STATION_API_PATH, Map.of("name", "지하철역이름"));
-        final Long insertedStationId = insertedStationResponse.jsonPath().getLong("id");
+        final String 지하철역이름 = "지하철역이름";
+        final Long insertedStationId = StationApiHelper.createStation(지하철역이름).jsonPath().getLong("id");
 
         // when
-        final ExtractableResponse<Response> response = RestAssuredHelper.deleteById(STATION_API_PATH, insertedStationId);
+        final ExtractableResponse<Response> response = StationApiHelper.removeStation(insertedStationId);
 
         // then
         assertSoftly(softly -> {
             softly.assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-            final List<String> stationNames = RestAssuredHelper
-                    .get(STATION_API_PATH)
-                    .jsonPath()
-                    .getList("name", String.class);
-            softly.assertThat(stationNames).doesNotContain("지하철역이름");
+            final List<String> stationNames = getStationNames(StationApiHelper.fetchStations());
+            softly.assertThat(stationNames).doesNotContain(지하철역이름);
         });
+    }
+
+    private List<String> getStationNames(final ExtractableResponse<Response> response) {
+        return response.jsonPath().getList("name", String.class);
     }
 
 }
