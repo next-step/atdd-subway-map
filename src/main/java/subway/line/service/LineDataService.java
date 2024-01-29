@@ -10,6 +10,7 @@ import subway.station.StationRepository;
 import subway.station.StationResponse;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class LineDataService {
@@ -33,10 +34,8 @@ public class LineDataService {
     }
 
     public LineResponse mappingToLineResponse(Line line) {
-        List<StationResponse> stations = List.of(
-                mappingToStationResponse(line.getUpStation()),
-                mappingToStationResponse(line.getDownStation())
-        );
+        List<StationResponse> stations = line.getStations().stream()
+                .map(this::mappingToStationResponse).collect(Collectors.toList());
 
         return new LineResponse(line.getId(), line.getName(), line.getColor(), stations);
     }

@@ -1,8 +1,13 @@
 package subway.line;
 
+import subway.section.Section;
+import subway.section.SectionException;
 import subway.station.Station;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 public class Line {
@@ -25,6 +30,8 @@ public class Line {
     @JoinColumn(name = "down_station_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Station downStation;
 
+    @OneToMany(mappedBy = "line")
+    private List<Section> sections = new ArrayList<>();
     public Line() {
     }
 
@@ -60,8 +67,31 @@ public class Line {
         return downStation;
     }
 
+    public List<Section> getSections() {
+        return sections;
+    }
+
+    public List<Station> getStations() {
+        List<Station> stations = sections.stream().map(Section::getUpStation).collect(Collectors.toList());
+        stations.add(downStation);
+
+        return stations;
+    }
+
     public void updateLine(String name, String color) {
         this.name = name;
         this.color = color;
+    }
+
+    public void generateSection(Section section) {
+        this.downStation = section.getDownStation();
+        this.distance = this.distance + section.getDistance();
+        sections.add(section);
+    }
+
+    public void deleteSection(Section section) {
+        this.downStation = section.getUpStation();
+        this.distance = this.distance - section.getDistance();
+        sections.remove(section);
     }
 }
