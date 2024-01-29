@@ -35,20 +35,7 @@ public class SubwayLineAcceptanceTest {
     @Test
     void createSubwayLine() {
         // when
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "신분당선");
-        params.put("color", "bg-red-600");
-        params.put("upStationId", "1");
-        params.put("downStationId", "2");
-        params.put("distance", "10");
-
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .body(params)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/lines")
-                        .then().log().all()
-                        .extract();
+        ExtractableResponse<Response> response = createSubwayLine("신분당선", "bg-red-600", 1L, 2L, 10);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -59,18 +46,17 @@ public class SubwayLineAcceptanceTest {
     }
 
 
-
     /**
-     * Given 2개의 지하철역을 생성하고
-     * When 지하철역 목록을 조회하면
-     * Then 2개의 지하철역을 응답 받는다
+     * Given 2개의 지하철 노선을 생성하고
+     * When 지하철 노선 목록을 조회하면
+     * Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
      */
-    @DisplayName("지하철역 목록 조회")
+    @DisplayName("지하철노선 목록 조회")
     @Test
-    void showStations() {
+    void showSubwayLines() {
         //given
-        createStation("강남역");
-        createStation("성수역");
+        createSubwayLine("신분당선", "bg-red-600", 1L, 2L, 10);
+        createSubwayLine("분당선", "bg-green-600", 1L, 3L, 10);
 
         //when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -81,24 +67,78 @@ public class SubwayLineAcceptanceTest {
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         //then
-        List<String> stationNames = response.jsonPath().getList("name", String.class);
-        assertThat(stationNames.size()).isEqualTo(2);
+        List<String> subwayLineNames = response.jsonPath().getList("name", String.class);
+        assertThat(subwayLineNames.size()).isEqualTo(2);
         //then
-        assertThat(stationNames).containsAnyOf("강남역", "성수역");
+        assertThat(subwayLineNames).containsAnyOf("신분당선", "분당선");
     }
 
 
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 조회하면
+     * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
+     */
+    @DisplayName("지하철노선 조회")
+    @Test
+    void showSubwayLine() {
+        //given
+        createSubwayLine("신분당선", "bg-red-600", 1L, 2L, 10);
+
+        //when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .when().get("/lines/1")
+                .then().log().all()
+                .extract();
+
+        //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        //then
+        String name = response.jsonPath().get("name");
+        assertThat(name).isEqualTo("신분당선");
+    }
 
     /**
-     * Given 지하철역을 생성하고
-     * When 그 지하철역을 삭제하면
-     * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
+     *Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 수정하면
+     * Then 해당 지하철 노선 정보는 수정된다
      */
-    @DisplayName("지하철역 제거")
+    @DisplayName("지하철노선 수정")
     @Test
-    void deleteStation() {
+    void updateSubwayLine() {
         //given
-        createStation("강남역");
+        createSubwayLine("신분당선", "bg-red-600", 1L, 2L, 10);
+
+        //when
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "다른 분당선");
+        params.put("color", "bg-red-600");
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().put("/lines/1")
+                .then().log().all()
+                .extract();
+
+        //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        //then
+        List<String> subwayLineNames = getSubwayLines();
+        assertThat(subwayLineNames.size()).isEqualTo(1);
+        assertThat(subwayLineNames).containsAnyOf("다른 분당선");
+    }
+
+
+    /**
+     *Given 지하철 노선을 생성고
+     * When 생성한 지하철 노선을 삭제하면
+     * Then 해당 지하철 노선 정보는 삭제된다
+     */
+    @DisplayName("지하철노선 삭제")
+    @Test
+    void deleteSubwayLine() {
+        //given
+        createSubwayLine("신분당선", "bg-red-600", 1L, 2L, 10);
 
         //when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -110,7 +150,7 @@ public class SubwayLineAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
         //then
         List<String> stationNames = getSubwayLines();
-        assertThat(stationNames).doesNotContain("강남역");
+        assertThat(stationNames).doesNotContain("신분당선");
     }
 
     private void createStation(String stationName) {
@@ -129,6 +169,24 @@ public class SubwayLineAcceptanceTest {
                 .when().get("/lines")
                 .then().log().all()
                 .extract().jsonPath().getList("name", String.class);
+    }
+
+    private static ExtractableResponse<Response> createSubwayLine(String name, String color, Long upStationId, Long downStationId, int distance) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", name);
+        params.put("color", color);
+        params.put("upStationId", upStationId.toString());
+        params.put("downStationId", downStationId.toString());
+        params.put("distance", Integer.toString(distance));
+
+        ExtractableResponse<Response> response =
+                RestAssured.given().log().all()
+                        .body(params)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .when().post("/lines")
+                        .then().log().all()
+                        .extract();
+        return response;
     }
 
 

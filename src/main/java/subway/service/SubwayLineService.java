@@ -11,6 +11,7 @@ import subway.repository.StationRepository;
 import subway.repository.SubwayLineRepository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -19,8 +20,9 @@ public class SubwayLineService {
     private SubwayLineRepository subwayLineRepository;
     private StationRepository stationRepository;
 
-    public SubwayLineService(SubwayLineRepository subwayLineRepository) {
+    public SubwayLineService(SubwayLineRepository subwayLineRepository, StationRepository stationRepository) {
         this.subwayLineRepository = subwayLineRepository;
+        this.stationRepository = stationRepository;
     }
 
     @Transactional
@@ -38,10 +40,29 @@ public class SubwayLineService {
                 .collect(Collectors.toList());
     }
 
-    public Station findStatinoById(Long id) {
-        Station station = stationRepository.findById(id).stream()
-                .findFirst().orElseThrow(() -> new IllegalArgumentException("존재하지 않는 역입니다."));
-        return station;
+    public SubwayLineResponse findSubwayLineById(Long id) {
+        SubwayLine subwayLine = subwayLineRepository.findById(id).stream()
+                .findFirst().get();
+
+        return SubwayLineResponse.createResponseByEntity(subwayLine);
+
+    }
+
+    @Transactional
+    public SubwayLineResponse updateSubwayLine(Long id, SubwayLineRequest request) {
+        SubwayLine subwayLine = subwayLineRepository.findById(id).stream().findFirst().get();
+        SubwayLine newSubwayLine = SubwayLine.builder()
+                .id(subwayLine.getId())
+                .name(request.getName())
+                .color(request.getColor())
+                .upStation(subwayLine.getUpStation())
+                .downStation(subwayLine.getDownStation())
+                .distance(subwayLine.getDistance())
+                .build();
+
+        SubwayLine savedSubwayLine = subwayLineRepository.save(newSubwayLine);
+        return createSubwayLineResponse(savedSubwayLine);
+
     }
 
     @Transactional
@@ -50,16 +71,13 @@ public class SubwayLineService {
     }
 
     private SubwayLineResponse createSubwayLineResponse(SubwayLine subwayLine) {
-        Station upStation = subwayLine.getUpStation();
-        Station downStation = subwayLine.getDownStation();
-
-        return new SubwayLineResponse(
-                subwayLine.getId(),
-                subwayLine.getName(),
-                subwayLine.getColor(),
-                List.of(new StationResponse(upStation.getId(), upStation.getName()),
-                        new StationResponse(downStation.getId(), downStation.getName())
-                )
-        );
+        return SubwayLineResponse.createResponseByEntity(subwayLine);
     }
+
+    public Station findStatinoById(Long id) {
+        return stationRepository.findById(id).stream()
+                .findFirst().orElseThrow(() -> new IllegalArgumentException("존재하지 않는 역입니다."));
+    }
+
+
 }

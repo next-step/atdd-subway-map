@@ -26,4 +26,5 @@ public class SubwayLineRequest {
     public int getDistance() {
         return distance;
     }
+
 }

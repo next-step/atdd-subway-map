@@ -1,10 +1,15 @@
 package subway.domain.entity;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
 @Entity
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class SubwayLine {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,9 +26,6 @@ public class SubwayLine {
     private Station downStation;
     @Column(nullable = false)
     private int distance;
-
-    public SubwayLine() {
-    }
 
     public SubwayLine(String name, String color, Station upStation, Station downStation, int distance) {
         this.name = name;
