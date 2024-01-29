@@ -39,11 +39,14 @@ public class LineAcceptanceTest {
 
         //when
         Map<String, Object> param = new HashMap<>();
-        param.put("name", "");
-        param.put("color", "");
+        param.put("name", "신분당선");
+        param.put("color", "bg-red-600");
         param.put("upStationId", 1);
         param.put("downStationId", 2);
         param.put("distance", 10);
+
+        StationRestAssuredCRUD.createStation("강남역");
+        StationRestAssuredCRUD.createStation("양재역");
 
         ExtractableResponse<Response> createResponse = RestAssured
                 .given().log().all()
