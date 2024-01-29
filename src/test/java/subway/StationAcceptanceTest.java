@@ -15,10 +15,11 @@ import org.springframework.http.MediaType;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import subway.create.StationCreator;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class StationAcceptanceTest {
+class StationAcceptanceTest {
     /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다
@@ -64,8 +65,8 @@ public class StationAcceptanceTest {
         String createStation1 = "강남역";
         String createStation2 = "양재역";
 
-        createStation(createStation1);
-        createStation(createStation2);
+        StationCreator.action(createStation1);
+        StationCreator.action(createStation2);
 
         // when
         ExtractableResponse<Response> response =
@@ -81,18 +82,6 @@ public class StationAcceptanceTest {
         assertThat(stationNames).containsAnyOf(createStation1, createStation2);
     }
 
-    private Long createStation(String stationName) {
-        HashMap<String, String> param = new HashMap<>();
-        param.put("name", stationName);
-
-        return RestAssured.given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .body(param)
-            .when().post("/stations")
-            .then().log().all()
-            .extract().jsonPath().getLong("id");
-    }
-
     /**
      * Given 지하철역을 생성하고
      * When 그 지하철역을 삭제하면
@@ -104,7 +93,7 @@ public class StationAcceptanceTest {
     void deleteStation() {
         // given
         String createStation = "양재역";
-        Long stationId = createStation(createStation);
+        Long stationId = StationCreator.action(createStation);
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
