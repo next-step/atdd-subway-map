@@ -1,7 +1,10 @@
-package subway;
+package subway.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import subway.controller.dto.StationRequest;
+import subway.controller.dto.StationResponse;
+import subway.service.StationService;
 
 import java.net.URI;
 import java.util.List;
@@ -20,7 +23,7 @@ public class StationController {
         return ResponseEntity.created(URI.create("/stations/" + station.getId())).body(station);
     }
 
-    @GetMapping(value = "/stations")
+    @GetMapping(value = "/stations/all")
     public ResponseEntity<List<StationResponse>> showStations() {
         return ResponseEntity.ok().body(stationService.findAllStations());
     }
