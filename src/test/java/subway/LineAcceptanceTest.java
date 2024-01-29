@@ -28,8 +28,11 @@ public class LineAcceptanceTest {
         params.put("name", "신분당선");
         params.put("color", "bg-red-600");
         params.put("upStationId", 1L);
-        params.put("douwnStationId", 1L);
+        params.put("downStationId", 2L);
         params.put("distance", 10);
+
+        createStation("건대입구");
+        createStation("어린이대공원");
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -41,5 +44,21 @@ public class LineAcceptanceTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(201);
+        assertThat(response.jsonPath().getString("name")).isEqualTo("신분당선");
+        assertThat(response.jsonPath().getList("stations.name", String.class)).containsAnyOf(
+                "건대입구", "어린이대공원"
+        );
+    }
+
+    private ExtractableResponse<Response> createStation(String stationName) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", stationName);
+
+        return RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
     }
 }
