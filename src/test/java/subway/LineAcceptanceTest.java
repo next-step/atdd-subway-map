@@ -1,14 +1,18 @@
 package subway;
 
+import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.jdbc.Sql;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.test.context.ActiveProfiles;
 import subway.fixture.LineTestFixture;
 import subway.fixture.StationTestFixture;
+import subway.setup.DataBaseCleanUp;
 
 import java.util.HashMap;
 import java.util.List;
@@ -16,8 +20,16 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
+@ActiveProfiles("AcceptanceTest")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {
+
+    private final DataBaseCleanUp dataBaseCleanUp;
+
+    @Autowired
+    public LineAcceptanceTest(DataBaseCleanUp dataBaseCleanUp) {
+        this.dataBaseCleanUp = dataBaseCleanUp;
+    }
 
     private final String 노선이름_1 = "1호선";
     private final String 노선이름_2 = "2호선";
@@ -29,8 +41,10 @@ public class LineAcceptanceTest {
     private long 하행종점_아이디;
 
     @BeforeEach
-    @Sql({"/sql/delete-station.sql","/sql/delete-line.sql"})
     void setUp() {
+        dataBaseCleanUp.init();
+        dataBaseCleanUp.execute();
+
         상행종점_아이디 =StationTestFixture.createStationFromName("강남역").jsonPath().getLong("id");
         하행종점_아이디 =StationTestFixture.createStationFromName("역삼역").jsonPath().getLong("id");;
     }
@@ -64,11 +78,10 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선 조회")
     @Test
     void showLine() {
-        // given
-        long 노선_아이디 = 1l;
-
+        //given
+        long 노선_아이디 = LineTestFixture.createLine(노선이름_1, 노선색_1, 상행종점_아이디, 하행종점_아이디).jsonPath().getLong("id");
         // when
-        LineTestFixture.createLine(노선이름_1, 노선색_1, 상행종점_아이디, 하행종점_아이디);
+
         ExtractableResponse<Response> response = LineTestFixture.showLine(노선_아이디);
 
         //then
@@ -80,8 +93,7 @@ public class LineAcceptanceTest {
     @Test
     void updateLine() {
         // given
-        long 노선_아이디 = 1l;
-        LineTestFixture.createLine(노선이름_1, 노선색_1, 상행종점_아이디, 하행종점_아이디);
+        long 노선_아이디 = LineTestFixture.createLine(노선이름_1, 노선색_1, 상행종점_아이디, 하행종점_아이디).jsonPath().getLong("id");
 
         String 변경할_노선이름 = "3호선";
         String 변경할_노선색 = "ORANGE";
