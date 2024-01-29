@@ -28,10 +28,10 @@ public class LineAcceptanceTest {
     @Test
     void 지하철_노선을_생성() {
         // given
-        String lineName = "신분당선";
+        String 신분당선 = "신분당선";
         Long upStationId = createStation(StationRequest.from("강남역")).jsonPath().getLong("id");
         Long downStationId = createStation(StationRequest.from("신논현역")).jsonPath().getLong("id");
-        LineRequest lineRequest = LineRequest.of(lineName, "bg-red-600", upStationId, downStationId, 10);
+        LineRequest lineRequest = LineRequest.of(신분당선, "bg-red-600", upStationId, downStationId, 10);
 
         // when
         assertThat(createLine(lineRequest).statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -39,7 +39,7 @@ public class LineAcceptanceTest {
         // then
         List<String> lineNames =
                 selectLines().jsonPath().getList("name", String.class);
-        assertThat(lineNames).containsAnyOf(lineName);
+        assertThat(lineNames).containsAnyOf(신분당선);
     }
 
     /**
@@ -51,24 +51,24 @@ public class LineAcceptanceTest {
     @Test
     void 지하철_노선_목록을_조회() {
         // given
-        String lineName1 = "신분당선";
+        String 신분당선 = "신분당선";
         Long upStationId1 = createStation(StationRequest.from("강남역")).jsonPath().getLong("id");
         Long downStationId1 = createStation(StationRequest.from("신논현역")).jsonPath().getLong("id");
-        LineRequest lineRequest1 = LineRequest.of(lineName1, "bg-red-600", upStationId1, downStationId1, 10);
+        LineRequest lineRequest1 = LineRequest.of(신분당선, "bg-red-600", upStationId1, downStationId1, 10);
 
         createLine(lineRequest1);
 
-        String lineName2 = "수인분당선";
+        String 수인분당선 = "수인분당선";
         Long upStationId2 = createStation(StationRequest.from("압구정로데오역")).jsonPath().getLong("id");
         Long downStationId2 = createStation(StationRequest.from("강남구청역")).jsonPath().getLong("id");
-        LineRequest lineRequest2 = LineRequest.of(lineName2, "bg-yellow-600", upStationId2, downStationId2, 10);
+        LineRequest lineRequest2 = LineRequest.of(수인분당선, "bg-yellow-600", upStationId2, downStationId2, 10);
 
         createLine(lineRequest2);
 
         // when & then
         List<String> lineNames =
                 selectLines().jsonPath().getList("name", String.class);
-        assertThat(lineNames).containsAnyOf("신분당선", "수인분당선");
+        assertThat(lineNames).containsAnyOf(신분당선, 수인분당선);
     }
 
     /**
@@ -80,16 +80,16 @@ public class LineAcceptanceTest {
     @Test
     void 지하철_노선을_조회() {
         // given
-        String lineName = "신분당선";
+        String 신분당선 = "신분당선";
         Long upStationId = createStation(StationRequest.from("강남역")).jsonPath().getLong("id");
         Long downStationId = createStation(StationRequest.from("신논현역")).jsonPath().getLong("id");
-        LineRequest lineRequest = LineRequest.of(lineName, "bg-red-600", upStationId, downStationId, 10);
+        LineRequest lineRequest = LineRequest.of(신분당선, "bg-red-600", upStationId, downStationId, 10);
 
         Long lineId = createLine(lineRequest).jsonPath().getLong("id");
 
         // when & then
         String responseLineName = selectLine(lineId).jsonPath().get("name");
-        assertThat(lineName).isEqualTo(responseLineName);
+        assertThat(신분당선).isEqualTo(responseLineName);
     }
 
     /**
@@ -101,17 +101,18 @@ public class LineAcceptanceTest {
     @Test
     void 지하철_노선을_수정() {
         // given
-        String lineName = "신분당선";
+        String 신분당선 = "신분당선";
         Long upStationId = createStation(StationRequest.from("강남역")).jsonPath().getLong("id");
         Long downStationId = createStation(StationRequest.from("신논현역")).jsonPath().getLong("id");
-        LineRequest lineRequest = LineRequest.of(lineName, "bg-red-600", upStationId, downStationId, 10);
+        LineRequest lineRequest = LineRequest.of(신분당선, "bg-red-600", upStationId, downStationId, 10);
 
         Long lineId = createLine(lineRequest).jsonPath().getLong("id");
 
         // when
-        Long newDownStationId = createStation(StationRequest.from("양재역")).jsonPath().getLong("id");
-        String newLineName = "구분당선";
-        LineRequest modifyLineRequest = LineRequest.of(newLineName, "bg-red-600", upStationId, newDownStationId, 10);
+        String 양재역 = "양재역";
+        Long newDownStationId = createStation(StationRequest.from(양재역)).jsonPath().getLong("id");
+        String 구분당선 = "구분당선";
+        LineRequest modifyLineRequest = LineRequest.of(구분당선, "bg-red-600", upStationId, newDownStationId, 10);
 
         modifyLine(lineId, modifyLineRequest);
 
@@ -119,8 +120,8 @@ public class LineAcceptanceTest {
         JsonPath responseJsonPath = selectLine(lineId).jsonPath();
         List<String> stationNames = responseJsonPath.getList("stations.name");
 
-        assertThat(newLineName).isEqualTo(responseJsonPath.get("name"));
-        assertThat(stationNames).containsAnyOf("양재역");
+        assertThat(구분당선).isEqualTo(responseJsonPath.get("name"));
+        assertThat(stationNames).containsAnyOf(양재역);
     }
 
     /**
@@ -132,10 +133,10 @@ public class LineAcceptanceTest {
     @Test
     void 지하철_노선을_삭제() {
         // given
-        String lineName = "신분당선";
+        String 신분당선 = "신분당선";
         Long upStationId = createStation(StationRequest.from("강남역")).jsonPath().getLong("id");
         Long downStationId = createStation(StationRequest.from("신논현역")).jsonPath().getLong("id");
-        LineRequest lineRequest = LineRequest.of(lineName, "bg-red-600", upStationId, downStationId, 10);
+        LineRequest lineRequest = LineRequest.of(신분당선, "bg-red-600", upStationId, downStationId, 10);
 
         Long lineId = createLine(lineRequest).jsonPath().getLong("id");
 

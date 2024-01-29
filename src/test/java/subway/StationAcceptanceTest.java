@@ -25,12 +25,13 @@ public class StationAcceptanceTest {
     @Test
     void 지하철_역을_생성() {
         // when & then
-        createStation(StationRequest.from("강남역"));
+        String 강남역 = "강남역";
+        createStation(StationRequest.from(강남역));
 
         // then
         List<String> stationNames =
                 selectStations().jsonPath().getList("name", String.class);
-        assertThat(stationNames).containsAnyOf("강남역");
+        assertThat(stationNames).containsAnyOf(강남역);
     }
 
     /**
@@ -42,15 +43,17 @@ public class StationAcceptanceTest {
     @Test
     void 지하철_역_목록을_조회() {
         // given
-        createStation(StationRequest.from("강남역"));
-        createStation(StationRequest.from("광화문역"));
+        String 강남역 = "강남역";
+        String 광화문역 = "광화문역";
+        createStation(StationRequest.from(강남역));
+        createStation(StationRequest.from(광화문역));
 
         // when
         List<String> stationNames =
                 selectStations().jsonPath().getList("name", String.class);
 
         // then
-        assertThat(stationNames).containsAnyOf("강남역", "광화문역");
+        assertThat(stationNames).containsAnyOf(강남역, 광화문역);
     }
 
     /**
@@ -62,8 +65,8 @@ public class StationAcceptanceTest {
     @Test
     void 지하철_역을_삭제() {
         // given
-        String stationName = "강남역";
-        Long id = createStation(StationRequest.from(stationName)).jsonPath().getLong("id");
+        String 강남역 = "강남역";
+        Long id = createStation(StationRequest.from(강남역)).jsonPath().getLong("id");
 
         // when
         deleteStation(id);
@@ -71,7 +74,7 @@ public class StationAcceptanceTest {
         // then
         List<String> stationNames =
                 selectStations().jsonPath().getList("name", String.class);
-        assertThat(stationNames).doesNotContain(stationName);
+        assertThat(stationNames).doesNotContain(강남역);
     }
 
 }
