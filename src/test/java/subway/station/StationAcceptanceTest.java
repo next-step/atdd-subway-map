@@ -26,14 +26,14 @@ public class StationAcceptanceTest {
 	@Test
 	void createStation() {
 		// when
-		ExtractableResponse<Response> request = executeCreateStationRequest("강남역");
+		ExtractableResponse<Response> createResponse = executeCreateStationRequest("강남역");
 
 		// then
-		assertThat(request.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+		assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
 		// then
-		ExtractableResponse<Response> response = executeGetStationRequest();
-		List<String> stationNames = parseSubwayNames(response);
+		ExtractableResponse<Response> getResponse = executeGetStationRequest();
+		List<String> stationNames = parseSubwayNames(getResponse);
 		assertThat(stationNames).containsAnyOf("강남역");
 	}
 
