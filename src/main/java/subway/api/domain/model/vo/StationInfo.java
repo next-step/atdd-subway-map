@@ -1,20 +1,18 @@
 package subway.api.domain.model.vo;
 
 import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Value;
 import subway.api.domain.model.entity.Link;
 
 /**
  * @author : Rene Choi
  * @since : 2024/01/27
  */
-@Getter
-@Setter
+@Value
 @Builder
 public class StationInfo {
-	private Long id;
-	private String name;
+	Long id;
+	String name;
 
 	public static StationInfo fromUpStation(Link link) {
 		return StationInfo.builder()
