@@ -8,12 +8,10 @@ import subway.dto.StationDTO;
 import subway.station.Station;
 
 public class LineResponse {
-	private Long id;
-	private String name;
-	private String color;
-	private List<StationDTO> stations;
-
-	private LineResponse() {}
+	private final Long id;
+	private final String name;
+	private final String color;
+	private final List<StationDTO> stations;
 
 	private LineResponse(Long id, String name, String color, List<StationDTO> station) {
 		this.id = id;
