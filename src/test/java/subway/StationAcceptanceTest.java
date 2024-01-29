@@ -50,8 +50,8 @@ public class StationAcceptanceTest {
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
-    private static ExtractableResponse<Response> makeStation(String stationName) {
-        return RestAssured.given().log().all()
+    static ExtractableResponse<Response> makeStation(String stationName) {
+        return RestAssured.given()
                 .body(Map.of("name", stationName))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
