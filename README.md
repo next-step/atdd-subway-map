@@ -221,3 +221,28 @@ then().
 
 - [x] 인수 테스트 격리
   - EntityManager 이용
+
+## 2단계 - 지하철 구간 관리
+### 요구사항
+- [ ] 구간 등록 기능 - "POST /lines/{lineId}/sections"
+  ```json
+  // Request body
+  {
+      "downStationId": "4",
+      "upStationId": "2",
+      "distance": 10
+  }
+  ```
+  - 성공 시나리오
+  > When 지하철 구간을 생성하면<br>
+  Then 지하철 노선 조회시 구간 정보와 함께 조회할 수 있다.
+  - 실패 시나리오
+  > When 지하철 구간을 생성하는데<br>
+  > When 구간 상행역이 해당 노선의 하행 종점역이 아니라면<br>
+  Then 에러가 난다.
+  
+  > When 지하철 구간을 생성하는데<br>
+  > When 구간 하행역이 해당 노선에 등록되어 있다면<br>
+  Then 에러가 난다.
+
+- [ ] 구간 제거 기능 - "DELETE /lines/{lineId}/stations?stationId=:id"
