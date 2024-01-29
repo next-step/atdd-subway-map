@@ -56,4 +56,15 @@ public class LineApiCaller {
                 .statusCode(HttpStatus.NO_CONTENT.value())
                 .extract();
     }
+
+    public static ExtractableResponse<Response> callApiUpdateSections(Map<String, String> params,
+                                                                      String location) {
+        return given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post(location + "/sections")
+                .then().log().all()
+                .statusCode(HttpStatus.NO_CONTENT.value())
+                .extract();
+    }
 }

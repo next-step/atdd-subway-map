@@ -24,29 +24,32 @@ public class LineAcceptanceTest {
 
     private Map<String, String> newBunDangLineParams;
     private Map<String, String> zeroLineParams;
+    private Long firstSectionId;
+    private Long secondSectionId;
+    private Long thirdSectionId;
 
     @BeforeEach
     void setUpClass() {
         Map<String, String> params = new HashMap<>();
         params.put("name", "강남역");
-        Long firstId = StationApiCaller.callCreateStation(params).jsonPath().getObject("id", Long.class);
+        firstSectionId = StationApiCaller.callCreateStation(params).jsonPath().getObject("id", Long.class);
         params.put("name", "삼성역");
-        Long secondId = StationApiCaller.callCreateStation(params).jsonPath().getObject("id", Long.class);
+        secondSectionId = StationApiCaller.callCreateStation(params).jsonPath().getObject("id", Long.class);
         params.put("name", "선릉역");
-        Long thirdId = StationApiCaller.callCreateStation(params).jsonPath().getObject("id", Long.class);
+        thirdSectionId = StationApiCaller.callCreateStation(params).jsonPath().getObject("id", Long.class);
 
         newBunDangLineParams = new HashMap<>();
         newBunDangLineParams.put("name", "신분당선");
         newBunDangLineParams.put("color", "bg-red-600");
-        newBunDangLineParams.put("upStationId", firstId.toString());
-        newBunDangLineParams.put("downStationId", secondId.toString());
+        newBunDangLineParams.put("upStationId", firstSectionId.toString());
+        newBunDangLineParams.put("downStationId", secondSectionId.toString());
         newBunDangLineParams.put("distance", "10");
 
         zeroLineParams = new HashMap<>();
         zeroLineParams.put("name", "0호선");
         zeroLineParams.put("color", "bg-red-100");
-        zeroLineParams.put("upStationId", firstId.toString());
-        zeroLineParams.put("downStationId", thirdId.toString());
+        zeroLineParams.put("upStationId", firstSectionId.toString());
+        zeroLineParams.put("downStationId", thirdSectionId.toString());
         zeroLineParams.put("distance", "10");
     }
 
@@ -156,4 +159,29 @@ public class LineAcceptanceTest {
         assertThat(actual).containsAll(expected);
     }
 
+    /**
+     * GIVEN 지하철 노선을 생성하고
+     * WHEN 노선을 수정하면
+     * THEN 수정된 노선이 조회 된다
+     */
+    @DisplayName("지하철노선의 구간을 수정한다.")
+    @Test
+    void updateSections() {
+        // given
+        ExtractableResponse<Response> response = LineApiCaller.callApiCreateLines(newBunDangLineParams);
+        String location = response.header("location");
+
+        // when
+        Map<String, String> params = new HashMap<>();
+        params.put("upStationId", secondSectionId.toString());
+        params.put("downStationId", thirdSectionId.toString());
+        params.put("distance", "10");
+        LineApiCaller.callApiUpdateSections(params, location);
+
+        // then
+        response = LineApiCaller.callApiFindLine(location);
+        List<Long> actual = response.jsonPath().getList("id", Long.class);
+        Long[] expected = {1L, 2L, 3L};
+        assertThat(actual).containsExactly(expected);
+    }
 }
