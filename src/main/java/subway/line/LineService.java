@@ -34,7 +34,7 @@ public class LineService {
     }
 
     public LineResponse findLineById(Long id) {
-        Line line = this.lineRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 노선이 존재하지 않습니다."));
+        Line line = getLine(id);
         return createLineResponse(line);
     }
 
@@ -46,8 +46,12 @@ public class LineService {
 
     @Transactional
     public void updateLineById(Long id, LineRequest lineRequest) {
-        Line line = this.lineRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 노선이 존재하지 않습니다."));
+        Line line = getLine(id);
         line.update(lineRequest.getName(), lineRequest.getColor());
+    }
+
+    private Line getLine(Long id) {
+        return this.lineRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 노선이 존재하지 않습니다."));
     }
 
     private LineResponse createLineResponse(Line line) {
