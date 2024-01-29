@@ -1,8 +1,9 @@
-package subway;
+package subway.station;
 
 public class StationResponse {
-    private Long id;
-    private String name;
+
+    private final Long id;
+    private final String name;
 
     public StationResponse(Long id, String name) {
         this.id = id;
@@ -16,4 +17,9 @@ public class StationResponse {
     public String getName() {
         return name;
     }
+
+    public static StationResponse from(final Station station) {
+        return new StationResponse(station.getId(), station.getName());
+    }
+
 }

@@ -1,5 +1,6 @@
-package subway;
+package subway.station;
 
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +26,11 @@ public class StationService {
         return stationRepository.findAll().stream()
                 .map(this::createStationResponse)
                 .collect(Collectors.toList());
+    }
+
+    public Optional<StationResponse> findById(long id) {
+        return stationRepository.findById(id)
+            .map(StationResponse::from);
     }
 
     @Transactional
