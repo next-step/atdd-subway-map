@@ -2,7 +2,6 @@ package subway;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,10 +31,8 @@ public class LineAcceptanceTest {
     @BeforeEach
     @Sql({"/sql/delete-station.sql","/sql/delete-line.sql"})
     void setUp() {
-        StationTestFixture.createStationFromName("강남역");
-        StationTestFixture.createStationFromName("역삼역");
-        상행종점_아이디 = 1;
-        하행종점_아이디 = 2;
+        상행종점_아이디 =StationTestFixture.createStationFromName("강남역").jsonPath().getLong("id");
+        하행종점_아이디 =StationTestFixture.createStationFromName("역삼역").jsonPath().getLong("id");;
     }
 
     @DisplayName("지하철 노선 생성")
