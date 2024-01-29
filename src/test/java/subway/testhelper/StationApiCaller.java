@@ -10,7 +10,7 @@ import static io.restassured.RestAssured.given;
 
 public class StationApiCaller {
 
-    public ExtractableResponse<Response> callCreateStation(Map<String, String> params) {
+    public static ExtractableResponse<Response> callCreateStation(Map<String, String> params) {
         return given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -19,7 +19,7 @@ public class StationApiCaller {
                 .extract();
     }
 
-    public ExtractableResponse<Response> callFindStations() {
+    public static ExtractableResponse<Response> callFindStations() {
         return given().log().all()
                 .when().get("/stations")
                 .then().log().all()

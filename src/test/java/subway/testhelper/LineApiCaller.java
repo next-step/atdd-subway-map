@@ -11,7 +11,7 @@ import static io.restassured.RestAssured.given;
 
 public class LineApiCaller {
 
-    public ExtractableResponse<Response> callApiCreateLines(Map<String, String> params) {
+    public static ExtractableResponse<Response> callApiCreateLines(Map<String, String> params) {
         return given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -20,21 +20,21 @@ public class LineApiCaller {
                 .extract();
     }
 
-    public ExtractableResponse<Response> callApiFindLines() {
+    public static ExtractableResponse<Response> callApiFindLines() {
         return given().log().all()
                 .when().get("/lines")
                 .then().log().all()
                 .extract();
     }
 
-    public ExtractableResponse<Response> callApiFindLine(String location) {
+    public static ExtractableResponse<Response> callApiFindLine(String location) {
         return given().log().all()
                 .when().get(location)
                 .then().log().all()
                 .extract();
     }
 
-    public ExtractableResponse<Response> callApiUpdateLine(LineUpdateRequest request, String location) {
+    public static ExtractableResponse<Response> callApiUpdateLine(LineUpdateRequest request, String location) {
         return given().log().all()
                 .body(request)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -43,7 +43,7 @@ public class LineApiCaller {
                 .extract();
     }
 
-    public ExtractableResponse<Response> callApiDeleteLine(String location) {
+    public static ExtractableResponse<Response> callApiDeleteLine(String location) {
         return given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().delete(location)
