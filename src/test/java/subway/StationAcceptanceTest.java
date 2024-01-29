@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+
 import org.springframework.test.annotation.DirtiesContext;
 
 @DisplayName("지하철역 관련 기능")
@@ -58,6 +59,37 @@ public class StationAcceptanceTest {
      * Then 2개의 지하철역을 응답 받는다
      */
     // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
+    @DisplayName("지하철 역 목록을 조회한다.")
+    @Test
+    void getStations() {
+        // given
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "강남역");
+        RestAssured.given()
+            .body(params)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().post("/stations")
+            .then()
+            .extract();
+
+        params.put("name", "역삼역");
+        RestAssured.given()
+            .body(params)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().post("/stations")
+            .then()
+            .extract();
+
+        // when
+        List<String> stationNames =
+            RestAssured.given().log().all()
+                .when().get("/stations")
+                .then().log().all()
+                .extract().jsonPath().getList("name", String.class);
+
+        // then
+        assertThat(stationNames).containsAnyOf("강남역", "역삼역");
+    }
 
     /**
      * Given 지하철역을 생성하고
@@ -65,5 +97,32 @@ public class StationAcceptanceTest {
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
     // TODO: 지하철역 제거 인수 테스트 메서드 생성
+    @DisplayName("지하철 역을 제거한다.")
+    @Test
+    void deleteStation() {
+        // given
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "강남역");
+        RestAssured.given()
+            .body(params)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().post("/stations")
+            .then()
+            .extract();
 
+        // when
+        RestAssured.given().log().all()
+            .when().delete("/stations/1")
+            .then().log().all()
+            .extract();
+
+
+        // then
+        List<String> stationNames =
+            RestAssured.given().log().all()
+                .when().get("/stations")
+                .then().log().all()
+                .extract().jsonPath().getList("name", String.class);
+        assertThat(stationNames).doesNotContain("강남역");
+    }
 }
