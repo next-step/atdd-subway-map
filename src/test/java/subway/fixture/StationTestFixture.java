@@ -20,4 +20,18 @@ public class StationTestFixture {
                 .then().log().all()
                 .extract();
     }
+
+    public static ExtractableResponse<Response> allStations() {
+        return RestAssured.given().log().all()
+                .when().get("/stations")
+                .then().log().all()
+                .extract();
+    }
+
+    public static void deleteById(long id) {
+        RestAssured.given().log().all()
+                .when().delete("/stations/{id}",id)
+                .then().log().all()
+                .extract();
+    }
 }

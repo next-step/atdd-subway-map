@@ -18,6 +18,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationAcceptanceTest {
 
+    private final String 지하철_이름_강남역 = "강남역";
+    private final String 지하철_이름_역삼역 = "역삼역";
 
     /**
      * When 지하철역을 생성하면
@@ -27,7 +29,7 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 생성한다.")
     @Test
     void createStation() {
-        String 지하철_이름_강남역 = "강남역";
+
         ExtractableResponse<Response> response =
                 StationTestFixture.createStationFromName(지하철_이름_강남역);
 
@@ -36,7 +38,7 @@ public class StationAcceptanceTest {
 
         // then
         List<String> stationNames =
-                allStations().jsonPath().getList("name", String.class);
+                StationTestFixture.allStations().jsonPath().getList("name", String.class);
         assertThat(stationNames).containsAnyOf(지하철_이름_강남역);
     }
 
@@ -46,12 +48,10 @@ public class StationAcceptanceTest {
      * Then 2개의 지하철역을 응답 받는다
      */
     @DisplayName("지하철역 목록을 조회한다.")
-    @Sql(value = "/sql/delete-station.sql")
+    @Sql("/sql/delete-station.sql")
     @Test
     void showStations() {
         // given
-        String 지하철_이름_강남역 = "강남역";
-        String 지하철_이름_역삼역 = "역삼역";
         List<String> inputNames = List.of(
                 지하철_이름_강남역,
                 지하철_이름_역삼역
@@ -61,7 +61,7 @@ public class StationAcceptanceTest {
         int inputSize = inputNames.size();
 
         // when
-        ExtractableResponse<Response> response = allStations();
+        ExtractableResponse<Response> response = StationTestFixture.allStations();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -79,33 +79,12 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 삭제한다.")
     @Test
     void deleteStations(){
-        int id = StationTestFixture.createStationFromName("강남역").jsonPath().getInt("id");
-        deleteById(id);
+        long id = StationTestFixture.createStationFromName(지하철_이름_강남역).jsonPath().getInt("id");
+        StationTestFixture.deleteById(id);
 
-        int size = allStations().jsonPath().getList("name", String.class).size();
-        assertThat(size).isEqualTo(0);
-    }
-
-    private void deleteById(int id) {
-        RestAssured.given().log().all()
-                .when().delete("/stations/{id}",id)
-                .then().log().all()
-                .extract();
+        List<Long> ids = StationTestFixture.allStations().jsonPath().getList("id", Long.class);
+        assertThat(ids).doesNotContain(id);
     }
 
 
-
-
-    private static ExtractableResponse<Response> allStations() {
-        return RestAssured.given().log().all()
-                .when().get("/stations")
-                .then().log().all()
-                .extract();
-    }
-
-    private Response stationsById(int id) {
-        return RestAssured.given().log().all()
-                .when().get("/stations/{id}",id);
-
-    }
 }
