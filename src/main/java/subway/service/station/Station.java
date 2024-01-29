@@ -1,6 +1,9 @@
-package subway;
+package subway.service.station;
+
+import subway.service.line.Line;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 public class Station {
@@ -9,6 +12,9 @@ public class Station {
     private Long id;
     @Column(length = 20, nullable = false)
     private String name;
+
+    @ManyToMany
+    private List<Line> lines;
 
     public Station() {
     }

@@ -1,7 +1,8 @@
-package subway;
+package subway.controller.station;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import subway.service.station.StationService;
 
 import java.net.URI;
 import java.util.List;
