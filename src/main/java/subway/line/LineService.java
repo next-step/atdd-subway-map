@@ -23,7 +23,7 @@ public class LineService {
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
         Station upStation = this.stationRepository.findById(lineRequest.getUpStationId()).orElseThrow(() -> new IllegalArgumentException("상행역이 존재하지 않습니다."));
-        Station downStation = this.stationRepository.findById(lineRequest.getDownStationId()).orElseThrow(() -> new IllegalArgumentException("상행역이 존재하지 않습니다."));
+        Station downStation = this.stationRepository.findById(lineRequest.getDownStationId()).orElseThrow(() -> new IllegalArgumentException("하행역이 존재하지 않습니다."));
         Line line = this.lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor(), upStation, downStation));
         return createLineResponse(line);
     }

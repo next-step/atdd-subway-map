@@ -22,4 +22,15 @@ public class LineResponse {
         return id;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public List<Station> getStations() {
+        return stations;
+    }
 }

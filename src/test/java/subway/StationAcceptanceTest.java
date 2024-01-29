@@ -7,17 +7,17 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+import org.springframework.test.context.jdbc.Sql;
+import subway.fixture.StationTestFixture;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationAcceptanceTest {
+
 
     /**
      * When 지하철역을 생성하면
@@ -29,7 +29,7 @@ public class StationAcceptanceTest {
     void createStation() {
         String 지하철_이름_강남역 = "강남역";
         ExtractableResponse<Response> response =
-                createStationFromName(지하철_이름_강남역);
+                StationTestFixture.createStationFromName(지하철_이름_강남역);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -46,6 +46,7 @@ public class StationAcceptanceTest {
      * Then 2개의 지하철역을 응답 받는다
      */
     @DisplayName("지하철역 목록을 조회한다.")
+    @Sql(value = "/sql/delete-station.sql")
     @Test
     void showStations() {
         // given
@@ -56,7 +57,7 @@ public class StationAcceptanceTest {
                 지하철_이름_역삼역
         );
 
-        inputNames.forEach(this::createStationFromName);
+        inputNames.forEach(StationTestFixture::createStationFromName);
         int inputSize = inputNames.size();
 
         // when
@@ -78,7 +79,7 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 삭제한다.")
     @Test
     void deleteStations(){
-        int id = createStationFromName("강남역").jsonPath().getInt("id");
+        int id = StationTestFixture.createStationFromName("강남역").jsonPath().getInt("id");
         deleteById(id);
 
         int size = allStations().jsonPath().getList("name", String.class).size();
@@ -93,16 +94,7 @@ public class StationAcceptanceTest {
     }
 
 
-    private ExtractableResponse<Response> createStationFromName(String name) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-        return RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
-    }
+
 
     private static ExtractableResponse<Response> allStations() {
         return RestAssured.given().log().all()
