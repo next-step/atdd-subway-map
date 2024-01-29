@@ -1,6 +1,10 @@
 package subway.domain;
 
+import java.util.List;
+
 import javax.persistence.*;
+
+import subway.line.Line;
 
 @Entity
 @Table(name = "station")
