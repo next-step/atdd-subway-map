@@ -39,7 +39,7 @@ class LineAcceptanceTest {
 	@Test
 	void saveLine() {
 		// when
-		ExtractableResponse<Response> savedLine = LineCreator.of()
+		ExtractableResponse<Response> savedLine = LineCreator.init()
 			.build()
 			.actionReturnExtractableResponse();
 		LineResponse actualResponse = savedLine.jsonPath().getObject("", LineResponse.class);
@@ -65,8 +65,8 @@ class LineAcceptanceTest {
 	@Test
 	void createLineAndRetrieveLines() {
 		// given
-		LineCreator lineCreator1 = LineCreator.of().build();
-		LineCreator lineCreator2 = LineCreator.of().upStationName("남강역").downStationName("재양역").build();
+		LineCreator lineCreator1 = LineCreator.init().build();
+		LineCreator lineCreator2 = LineCreator.init().upStationName("남강역").downStationName("재양역").build();
 		LineResponse line1 = lineCreator1.actionReturnLineResponse();
 		LineResponse line2 = lineCreator2.actionReturnLineResponse();
 
@@ -94,7 +94,7 @@ class LineAcceptanceTest {
 	@Test
 	void createLineAndRetrieveLine() {
 		// given
-		LineResponse expectedResponse = LineCreator.of()
+		LineResponse expectedResponse = LineCreator.init()
 			.build()
 			.actionReturnLineResponse();
 
@@ -124,7 +124,7 @@ class LineAcceptanceTest {
 		// given
 		String expectedName = "변경된 이름";
 		String expectedColor = "변경된 색깔";
-		LineResponse lineResponse = LineCreator.of()
+		LineResponse lineResponse = LineCreator.init()
 			.build()
 			.actionReturnLineResponse();
 
@@ -164,7 +164,7 @@ class LineAcceptanceTest {
 	@Test
 	void deleteLine() {
 		// given
-		LineResponse lineResponse = LineCreator.of()
+		LineResponse lineResponse = LineCreator.init()
 			.build()
 			.actionReturnLineResponse();
 
