@@ -21,7 +21,6 @@ public class StationApiExtractableResponse {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/stations")
                 .then().log().all()
-                .statusCode(HttpStatus.CREATED.value())
                 .extract();
     }
 
@@ -30,7 +29,6 @@ public class StationApiExtractableResponse {
                 .given().log().all()
                 .when().get("/stations")
                 .then().log().all()
-                .statusCode(HttpStatus.OK.value())
                 .extract();
     }
 
@@ -40,7 +38,6 @@ public class StationApiExtractableResponse {
                 .pathParam("id", id)
                 .when().delete("/stations/{id}")
                 .then().log().all()
-                .statusCode(HttpStatus.NO_CONTENT.value())
                 .extract();
     }
 

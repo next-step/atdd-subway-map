@@ -34,7 +34,7 @@ public class LineAcceptanceTest {
         Map<String, Object> requestBody = createRequestBody(lineName, "bg-red-600", upStationId, downStationId, 10);
 
         // when
-        createLine(requestBody);
+        assertThat(createLine(requestBody).statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
         List<String> lineNames =
@@ -88,7 +88,7 @@ public class LineAcceptanceTest {
         Long lineId = createLine(requestBody).jsonPath().getLong("id");
 
         // when & then
-        String responseLineName = selectLine(lineId, HttpStatus.OK).jsonPath().get("name");
+        String responseLineName = selectLine(lineId).jsonPath().get("name");
         assertThat(lineName).isEqualTo(responseLineName);
     }
 
@@ -116,7 +116,7 @@ public class LineAcceptanceTest {
         modifyLine(lineId, modifyRequestBody);
 
         // then
-        JsonPath responseJsonPath = selectLine(lineId, HttpStatus.OK).jsonPath();
+        JsonPath responseJsonPath = selectLine(lineId).jsonPath();
         List<String> stationNames = responseJsonPath.getList("stations.name");
 
         assertThat(newLineName).isEqualTo(responseJsonPath.get("name"));
@@ -143,7 +143,7 @@ public class LineAcceptanceTest {
         deleteLine(lineId);
 
         // then
-        assertThat(selectLine(lineId, HttpStatus.NOT_FOUND).statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+        assertThat(selectLine(lineId).statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 
     private Map<String, Object> createRequestBody(String name, String color, Long upStationId, Long downStationId, Integer distance) {

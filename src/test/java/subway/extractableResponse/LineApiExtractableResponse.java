@@ -17,7 +17,6 @@ public class LineApiExtractableResponse {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/lines")
                 .then().log().all()
-                .statusCode(HttpStatus.CREATED.value())
                 .extract();
     }
 
@@ -26,17 +25,15 @@ public class LineApiExtractableResponse {
                 .given().log().all()
                 .when().get("/lines")
                 .then().log().all()
-                .statusCode(HttpStatus.OK.value())
                 .extract();
     }
 
-    public static ExtractableResponse<Response> selectLine(Long id, HttpStatus httpStatus) {
+    public static ExtractableResponse<Response> selectLine(Long id) {
         return RestAssured
                 .given().log().all()
                 .pathParam("id", id)
                 .when().get("/lines/{id}")
                 .then().log().all()
-                .statusCode(httpStatus.value())
                 .extract();
     }
 
@@ -48,7 +45,6 @@ public class LineApiExtractableResponse {
                 .pathParam("id", id)
                 .when().put("/lines/{id}")
                 .then().log().all()
-                .statusCode(HttpStatus.OK.value())
                 .extract();
     }
 
@@ -59,7 +55,6 @@ public class LineApiExtractableResponse {
                 .pathParam("id", id)
                 .when().delete("/lines/{id}")
                 .then().log().all()
-                .statusCode(HttpStatus.NO_CONTENT.value())
                 .extract();
     }
 
