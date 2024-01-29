@@ -4,15 +4,14 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.MediaType;
-
-import java.util.Map;
+import subway.line.LineRequest;
 
 public class LineApiExtractableResponse {
 
-    public static ExtractableResponse<Response> createLine(Map<String, Object> requestParam) {
+    public static ExtractableResponse<Response> createLine(LineRequest lineRequest) {
         return RestAssured
                 .given().log().all()
-                .body(requestParam)
+                .body(lineRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/lines")
                 .then().log().all()
@@ -36,10 +35,10 @@ public class LineApiExtractableResponse {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> modifyLine(Long id, Map<String, Object> requestParam) {
+    public static ExtractableResponse<Response> modifyLine(Long id, LineRequest lineRequest) {
         return RestAssured
                 .given().log().all()
-                .body(requestParam)
+                .body(lineRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .pathParam("id", id)
                 .when().put("/lines/{id}")

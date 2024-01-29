@@ -6,14 +6,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.jdbc.Sql;
+import subway.line.LineRequest;
+import subway.station.StationRequest;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static subway.extractableResponse.LineApiExtractableResponse.*;
-import static subway.extractableResponse.StationApiExtractableResponse.createStationByStationName;
+import static subway.extractableResponse.StationApiExtractableResponse.createStation;
 
 @DisplayName("지하철 노선 관련 기능")
 @Sql("/truncate.sql")
@@ -29,12 +29,12 @@ public class LineAcceptanceTest {
     void 지하철_노선을_생성() {
         // given
         String lineName = "신분당선";
-        Long upStationId = createStationByStationName("강남역").jsonPath().getLong("id");
-        Long downStationId = createStationByStationName("신논현역").jsonPath().getLong("id");
-        Map<String, Object> requestBody = createRequestBody(lineName, "bg-red-600", upStationId, downStationId, 10);
+        Long upStationId = createStation(StationRequest.from("강남역")).jsonPath().getLong("id");
+        Long downStationId = createStation(StationRequest.from("신논현역")).jsonPath().getLong("id");
+        LineRequest lineRequest = LineRequest.of(lineName, "bg-red-600", upStationId, downStationId, 10);
 
         // when
-        assertThat(createLine(requestBody).statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(createLine(lineRequest).statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
         List<String> lineNames =
@@ -52,18 +52,18 @@ public class LineAcceptanceTest {
     void 지하철_노선_목록을_조회() {
         // given
         String lineName1 = "신분당선";
-        Long upStationId1 = createStationByStationName("강남역").jsonPath().getLong("id");
-        Long downStationId1 = createStationByStationName("신논현역").jsonPath().getLong("id");
-        Map<String, Object> requestBody = createRequestBody(lineName1, "bg-red-600", upStationId1, downStationId1, 10);
+        Long upStationId1 = createStation(StationRequest.from("강남역")).jsonPath().getLong("id");
+        Long downStationId1 = createStation(StationRequest.from("신논현역")).jsonPath().getLong("id");
+        LineRequest lineRequest1 = LineRequest.of(lineName1, "bg-red-600", upStationId1, downStationId1, 10);
 
-        createLine(requestBody);
+        createLine(lineRequest1);
 
         String lineName2 = "수인분당선";
-        Long upStationId2 = createStationByStationName("압구정로데오역").jsonPath().getLong("id");
-        Long downStationId2 = createStationByStationName("강남구청역").jsonPath().getLong("id");
-        Map<String, Object> requestBody2 = createRequestBody(lineName2, "bg-yellow-600", upStationId2, downStationId2, 10);
+        Long upStationId2 = createStation(StationRequest.from("압구정로데오역")).jsonPath().getLong("id");
+        Long downStationId2 = createStation(StationRequest.from("강남구청역")).jsonPath().getLong("id");
+        LineRequest lineRequest2 = LineRequest.of(lineName2, "bg-yellow-600", upStationId2, downStationId2, 10);
 
-        createLine(requestBody2);
+        createLine(lineRequest2);
 
         // when & then
         List<String> lineNames =
@@ -81,11 +81,11 @@ public class LineAcceptanceTest {
     void 지하철_노선을_조회() {
         // given
         String lineName = "신분당선";
-        Long upStationId = createStationByStationName("강남역").jsonPath().getLong("id");
-        Long downStationId = createStationByStationName("신논현역").jsonPath().getLong("id");
-        Map<String, Object> requestBody = createRequestBody(lineName, "bg-red-600", upStationId, downStationId, 10);
+        Long upStationId = createStation(StationRequest.from("강남역")).jsonPath().getLong("id");
+        Long downStationId = createStation(StationRequest.from("신논현역")).jsonPath().getLong("id");
+        LineRequest lineRequest = LineRequest.of(lineName, "bg-red-600", upStationId, downStationId, 10);
 
-        Long lineId = createLine(requestBody).jsonPath().getLong("id");
+        Long lineId = createLine(lineRequest).jsonPath().getLong("id");
 
         // when & then
         String responseLineName = selectLine(lineId).jsonPath().get("name");
@@ -102,18 +102,18 @@ public class LineAcceptanceTest {
     void 지하철_노선을_수정() {
         // given
         String lineName = "신분당선";
-        Long upStationId = createStationByStationName("강남역").jsonPath().getLong("id");
-        Long downStationId = createStationByStationName("신논현역").jsonPath().getLong("id");
-        Map<String, Object> requestBody = createRequestBody(lineName, "bg-red-600", upStationId, downStationId, 10);
+        Long upStationId = createStation(StationRequest.from("강남역")).jsonPath().getLong("id");
+        Long downStationId = createStation(StationRequest.from("신논현역")).jsonPath().getLong("id");
+        LineRequest lineRequest = LineRequest.of(lineName, "bg-red-600", upStationId, downStationId, 10);
 
-        Long lineId = createLine(requestBody).jsonPath().getLong("id");
+        Long lineId = createLine(lineRequest).jsonPath().getLong("id");
 
         // when
-        Long newDownStationId = createStationByStationName("양재역").jsonPath().getLong("id");
+        Long newDownStationId = createStation(StationRequest.from("양재역")).jsonPath().getLong("id");
         String newLineName = "구분당선";
-        Map<String, Object> modifyRequestBody = createRequestBody(newLineName, "bg-red-600", upStationId, newDownStationId, 10);
+        LineRequest modifyLineRequest = LineRequest.of(newLineName, "bg-red-600", upStationId, newDownStationId, 10);
 
-        modifyLine(lineId, modifyRequestBody);
+        modifyLine(lineId, modifyLineRequest);
 
         // then
         JsonPath responseJsonPath = selectLine(lineId).jsonPath();
@@ -133,28 +133,17 @@ public class LineAcceptanceTest {
     void 지하철_노선을_삭제() {
         // given
         String lineName = "신분당선";
-        Long upStationId = createStationByStationName("강남역").jsonPath().getLong("id");
-        Long downStationId = createStationByStationName("신논현역").jsonPath().getLong("id");
-        Map<String, Object> requestBody = createRequestBody(lineName, "bg-red-600", upStationId, downStationId, 10);
+        Long upStationId = createStation(StationRequest.from("강남역")).jsonPath().getLong("id");
+        Long downStationId = createStation(StationRequest.from("신논현역")).jsonPath().getLong("id");
+        LineRequest lineRequest = LineRequest.of(lineName, "bg-red-600", upStationId, downStationId, 10);
 
-        Long lineId = createLine(requestBody).jsonPath().getLong("id");
+        Long lineId = createLine(lineRequest).jsonPath().getLong("id");
 
         // when
         deleteLine(lineId);
 
         // then
         assertThat(selectLine(lineId).statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
-    }
-
-    private Map<String, Object> createRequestBody(String name, String color, Long upStationId, Long downStationId, Integer distance) {
-        Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("name", name);
-        requestBody.put("color", color);
-        requestBody.put("upStationId", upStationId);
-        requestBody.put("downStationId", downStationId);
-        requestBody.put("distance", distance);
-
-        return requestBody;
     }
 
 }

@@ -4,6 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
+import subway.station.StationRequest;
 
 import java.util.List;
 
@@ -24,7 +25,7 @@ public class StationAcceptanceTest {
     @Test
     void 지하철_역을_생성() {
         // when & then
-        createStationByStationName("강남역");
+        createStation(StationRequest.from("강남역"));
 
         // then
         List<String> stationNames =
@@ -41,8 +42,8 @@ public class StationAcceptanceTest {
     @Test
     void 지하철_역_목록을_조회() {
         // given
-        createStationByStationName("강남역");
-        createStationByStationName("광화문역");
+        createStation(StationRequest.from("강남역"));
+        createStation(StationRequest.from("광화문역"));
 
         // when
         List<String> stationNames =
@@ -62,7 +63,7 @@ public class StationAcceptanceTest {
     void 지하철_역을_삭제() {
         // given
         String stationName = "강남역";
-        Long id = createStationByStationName(stationName).jsonPath().getLong("id");
+        Long id = createStation(StationRequest.from(stationName)).jsonPath().getLong("id");
 
         // when
         deleteStation(id);
