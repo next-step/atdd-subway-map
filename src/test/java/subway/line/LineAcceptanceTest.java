@@ -90,11 +90,8 @@ public class LineAcceptanceTest {
         List<String> actual = response.jsonPath().getList("name", String.class);
 
         // then
-        List<String> expected = List.of("신분당선", "0호선");
-        int actualSize = actual.size();
-        int expectedSize = 2;
-        assertThat(actual).isEqualTo(expected);
-        assertThat(actualSize).isEqualTo(expectedSize);
+        String[] expected = {"신분당선", "0호선"};
+        assertThat(actual).containsExactly(expected);
     }
 
     /**
