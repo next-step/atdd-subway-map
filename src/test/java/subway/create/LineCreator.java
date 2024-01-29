@@ -25,7 +25,7 @@ public class LineCreator {
 		return new Builder();
 	}
 
-	public static Builder of() {
+	public static Builder init() {
 		return LineCreator.builder()
 			.upStationName("강남역")
 			.downStationName("양재역");
