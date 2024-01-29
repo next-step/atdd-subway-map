@@ -38,9 +38,10 @@ public class LineAcceptanceTest {
         );
 
         //when
-        given().body(requestParams)
-               .contentType(MediaType.APPLICATION_JSON_VALUE)
-               .when().post("/lines").then().log().all();
+        given()
+            .body(requestParams)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().post("/lines").then().log().all();
 
         //then
         List<LineResponse> responses = when().get("/lines").then().extract().jsonPath().getList(".", LineResponse.class);
