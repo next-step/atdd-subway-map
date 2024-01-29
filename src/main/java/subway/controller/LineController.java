@@ -35,7 +35,15 @@ public class LineController {
 	}
 
 	@PutMapping("/lines/{id}")
-	ResponseEntity<Void> updateLine(@PathVariable Long id, @RequestBody LineRequest lineRequest) {
+	ResponseEntity<String> updateLine(@PathVariable Long id, @RequestBody LineRequest lineRequest) {
+		if(lineRequest.getName().isEmpty()) {
+			return ResponseEntity.badRequest().body("이름 값이 빈 값일 수 없습니다.");
+		}
+
+		if(lineRequest.getColor().isEmpty()) {
+			return ResponseEntity.badRequest().body("이름 값이 빈 값일 수 없습니다.");
+		}
+
 		lineService.updateLine(id, lineRequest);
 		return ResponseEntity.ok().build();
 	}

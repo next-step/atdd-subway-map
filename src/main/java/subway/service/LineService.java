@@ -43,9 +43,9 @@ public class LineService {
 	@Transactional
 	public void updateLine(Long id, LineRequest lineRequest) {
 		Line line = lineRepository.findById(id)
-				.orElseThrow(IllegalAccessError::new);
+				.orElseThrow(EntityNotFoundException::new);
 
-		line.setUpdateInfo(lineRequest.getName(), lineRequest.getColor(), lineRequest.getUpStationId(), lineRequest.getDownStationId(), lineRequest.getDistance());
+		line.setUpdateInfo(lineRequest.getName(), lineRequest.getColor());
 
 		lineRepository.save(line);
 	}

@@ -92,13 +92,34 @@ public class LineAcceptanceTest {
 		restApiRequest.post(new LineRequest(TEST_LINE_NAME_1, TEST_LINE_COLOR_1, 1L, 2L, 10));
 
 		// when
-		ExtractableResponse<Response> response = restApiRequestWithIdParam.put(new LineRequest(TEST_LINE_NAME_2, TEST_LINE_COLOR_2, null, null, 0), 1L);
+		ExtractableResponse<Response> response = restApiRequestWithIdParam.put(new LineRequest(TEST_LINE_NAME_2, TEST_LINE_COLOR_2), 1L);
 		ExtractableResponse<Response> getResponse = restApiRequestWithIdParam.get(1L);
 
 		// then
 		assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 		assertThat(getResponse.jsonPath().getString("name")).isEqualTo(TEST_LINE_NAME_2);
 		assertThat(getResponse.jsonPath().getString("color")).isEqualTo(TEST_LINE_COLOR_2);
+	}
+
+	/**
+	 * Given 지하철 노선을 생성하고
+	 * When 생성한 지하철 노선을 null 값이 있는 채로 수정하면
+	 * Then 해당 지하철 노선 정보는 수정되지 않고 Bad Request (400) 을 반환한다.
+	 */
+	@DisplayName("지하철 노선을 수정한다.")
+	@DirtiesContext
+	@Test
+	void updateLineWithNullThenFailTest() {
+		// given
+		restApiRequest.post(new LineRequest(TEST_LINE_NAME_1, TEST_LINE_COLOR_1, 1L, 2L, 10));
+
+		// when
+		ExtractableResponse<Response> response = restApiRequestWithIdParam.put(new LineRequest(TEST_LINE_NAME_2, ""), 1L);
+		ExtractableResponse<Response> getResponse = restApiRequestWithIdParam.get(1L);
+
+		// then
+		assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+		assertThat(getResponse.jsonPath().getString("name")).isEqualTo(TEST_LINE_NAME_1);
 	}
 
 	/**

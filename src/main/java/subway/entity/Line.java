@@ -52,25 +52,20 @@ public class Line {
 		return downStationId;
 	}
 
-	public void setUpdateInfo(String name, String color, Long upStationId, Long downStationId, int distance) {
-		if(!ObjectUtils.isEmpty(name)) {
-			this.name = name;
-		}
+	public int getDistance() {
+		return distance;
+	}
 
-		if(!ObjectUtils.isEmpty(color)) {
-			this.color = color;
-		}
+	public void setName(String name) {
+		this.name = name;
+	}
 
-		if(!ObjectUtils.isEmpty(upStationId)) {
-			this.upStationId = upStationId;
-		}
+	public void setColor(String color) {
+		this.color = color;
+	}
 
-		if(!ObjectUtils.isEmpty(downStationId)) {
-			this.downStationId = downStationId;
-		}
-
-		if(!ObjectUtils.isEmpty(distance)) {
-			this.distance = distance;
-		}
+	public void setUpdateInfo(String name, String color) {
+		this.name = name;
+		this.color = color;
 	}
 }
