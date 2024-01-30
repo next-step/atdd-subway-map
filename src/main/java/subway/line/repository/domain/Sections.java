@@ -17,6 +17,7 @@ import java.util.stream.Stream;
 @Embeddable
 public class Sections implements Iterable<Section> {
     private static final int MINIMUM_SECTION_COUNT = 1;
+
     @OneToMany(cascade = CascadeType.PERSIST, orphanRemoval = true)
     @JoinColumn(name = "section_id")
     private List<Section> sections = new ArrayList<>();
@@ -50,17 +51,17 @@ public class Sections implements Iterable<Section> {
     }
 
     private void validateLastSectionDisconnection(final Station station) {
-        if(sections.size() <= MINIMUM_SECTION_COUNT) {
+        if (sections.size() <= MINIMUM_SECTION_COUNT) {
             throw new SectionDisconnectException("더이상 구간을 제거할 수 없습니다.");
         }
 
-        if(isNotDownStationOfLastSection(station)) {
+        if (isNotDownStationOfLastSection(station)) {
             throw new SectionDisconnectException("마지막 구간만 제거할 수 있습니다.");
         }
     }
 
     private void validateSectionConnection(final Section section) {
-        if(sections.isEmpty()) {
+        if (sections.isEmpty()) {
             return;
         }
 
@@ -75,8 +76,7 @@ public class Sections implements Iterable<Section> {
     }
 
     private boolean containsStation(final Station station) {
-        return sections.stream()
-                .anyMatch(row -> row.contains(station));
+        return sections.stream().anyMatch(section -> section.contains(station));
     }
 
     private boolean isNotLastSectionConnectable(final Section section) {
@@ -92,7 +92,7 @@ public class Sections implements Iterable<Section> {
     }
 
     private Optional<Section> getLastSection() {
-        if(sections.isEmpty()) {
+        if (sections.isEmpty()) {
             return Optional.empty();
         }
         return Optional.of(sections.get(sections.size() - 1));
