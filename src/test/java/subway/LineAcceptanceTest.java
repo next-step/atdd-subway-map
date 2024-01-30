@@ -162,20 +162,70 @@ public class LineAcceptanceTest {
                 .then().log().all()
                 .extract();
 
-        Long createId = createResponse.body().jsonPath().getLong("id");
+        Long createdId = createResponse.body().jsonPath().getLong("id");
 
         //when
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
-                    .pathParam("id", createId)
+                    .pathParam("id", createdId)
                 .when()
                     .get("/lines/{id}")
                 .then().log().all()
                 .extract();
 
         // then
-        assertThat(response.jsonPath().getLong("id")).isEqualTo(createId);
+        assertThat(response.jsonPath().getLong("id")).isEqualTo(createdId);
+
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 수정하면
+     * Then 해당 지하철 노선 정보는 수정된다
+     */
+    @DisplayName("지하철 노선을 수정한다")
+    @Test
+    void createAndEditLine() {
+
+        //given
+        StationRestAssuredCRUD.createStation("강남역");
+        StationRestAssuredCRUD.createStation("양재역");
+
+        Map<String, Object> param = new HashMap<>();
+        param.put("name", "신분당선");
+        param.put("color", "bg-red-600");
+        param.put("upStationId", 1);
+        param.put("downStationId", 2);
+        param.put("distance", 10);
+
+        ExtractableResponse<Response> createResponse = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(param)
+                .when()
+                .post("/lines")
+                .then().log().all()
+                .extract();
+
+        Long createdId = createResponse.body().jsonPath().getLong("id");
+
+        //when
+        Map<String, Object> editParam = new HashMap<>();
+        editParam.put("name", "수인분당선");
+        editParam.put("color", "bg-yellow-600");
+
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                    .pathParam("id", createdId)
+                .when()
+                    .put("/lines/{id}")
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
     }
 }
