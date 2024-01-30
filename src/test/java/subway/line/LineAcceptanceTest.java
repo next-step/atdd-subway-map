@@ -27,35 +27,35 @@ public class LineAcceptanceTest {
 
     private Map<String, String> newBunDangLineParams;
     private Map<String, String> zeroLineParams;
-    private Long firstSectionId;
-    private Long secondSectionId;
-    private Long thirdSectionId;
-    private Long forthSectionId;
+    private Long firstStationId;
+    private Long secondStationId;
+    private Long thirdStationId;
+    private Long forthStationId;
 
     @BeforeEach
     void setUpClass() {
         Map<String, String> params = new HashMap<>();
         params.put("name", "강남역");
-        firstSectionId = StationApiCaller.callCreateStation(params).jsonPath().getObject("id", Long.class);
+        firstStationId = StationApiCaller.callCreateStation(params).jsonPath().getObject("id", Long.class);
         params.put("name", "삼성역");
-        secondSectionId = StationApiCaller.callCreateStation(params).jsonPath().getObject("id", Long.class);
+        secondStationId = StationApiCaller.callCreateStation(params).jsonPath().getObject("id", Long.class);
         params.put("name", "선릉역");
-        thirdSectionId = StationApiCaller.callCreateStation(params).jsonPath().getObject("id", Long.class);
+        thirdStationId = StationApiCaller.callCreateStation(params).jsonPath().getObject("id", Long.class);
         params.put("name", "교대역");
-        forthSectionId = StationApiCaller.callCreateStation(params).jsonPath().getObject("id", Long.class);
+        forthStationId = StationApiCaller.callCreateStation(params).jsonPath().getObject("id", Long.class);
 
         newBunDangLineParams = new HashMap<>();
         newBunDangLineParams.put("name", "신분당선");
         newBunDangLineParams.put("color", "bg-red-600");
-        newBunDangLineParams.put("upStationId", firstSectionId.toString());
-        newBunDangLineParams.put("downStationId", secondSectionId.toString());
+        newBunDangLineParams.put("upStationId", firstStationId.toString());
+        newBunDangLineParams.put("downStationId", secondStationId.toString());
         newBunDangLineParams.put("distance", "10");
 
         zeroLineParams = new HashMap<>();
         zeroLineParams.put("name", "0호선");
         zeroLineParams.put("color", "bg-red-100");
-        zeroLineParams.put("upStationId", firstSectionId.toString());
-        zeroLineParams.put("downStationId", thirdSectionId.toString());
+        zeroLineParams.put("upStationId", firstStationId.toString());
+        zeroLineParams.put("downStationId", thirdStationId.toString());
         zeroLineParams.put("distance", "10");
     }
 
@@ -179,15 +179,15 @@ public class LineAcceptanceTest {
 
         // when
         Map<String, String> params = new HashMap<>();
-        params.put("upStationId", secondSectionId.toString());
-        params.put("downStationId", thirdSectionId.toString());
+        params.put("upStationId", secondStationId.toString());
+        params.put("downStationId", thirdStationId.toString());
         params.put("distance", "10");
         LineApiCaller.callApiUpdateSections(params, location);
 
         // then
         response = LineApiCaller.callApiFindLine(location);
         List<Long> actual = response.jsonPath().getList("stations.id", Long.class);
-        Long[] expected = {firstSectionId, secondSectionId, thirdSectionId};
+        Long[] expected = {firstStationId, secondStationId, thirdStationId};
         assertThat(actual).containsExactly(expected);
     }
 
@@ -205,8 +205,8 @@ public class LineAcceptanceTest {
 
         // when
         Map<String, String> params = new HashMap<>();
-        params.put("upStationId", thirdSectionId.toString());
-        params.put("downStationId", forthSectionId.toString());
+        params.put("upStationId", thirdStationId.toString());
+        params.put("downStationId", forthStationId.toString());
         params.put("distance", "10");
         response = given().log().all()
                 .body(params)
@@ -239,8 +239,8 @@ public class LineAcceptanceTest {
 
         // when
         Map<String, String> params = new HashMap<>();
-        params.put("upStationId", secondSectionId.toString());
-        params.put("downStationId", firstSectionId.toString());
+        params.put("upStationId", secondStationId.toString());
+        params.put("downStationId", firstStationId.toString());
         params.put("distance", "10");
         response = given().log().all()
                 .body(params)
@@ -272,18 +272,18 @@ public class LineAcceptanceTest {
         String location = response.header("location");
 
         Map<String, String> params = new HashMap<>();
-        params.put("upStationId", secondSectionId.toString());
-        params.put("downStationId", thirdSectionId.toString());
+        params.put("upStationId", secondStationId.toString());
+        params.put("downStationId", thirdStationId.toString());
         params.put("distance", "10");
         LineApiCaller.callApiUpdateSections(params, location);
 
         // when
-        LineApiCaller.callApiDeleteSection(location, thirdSectionId.toString());
+        LineApiCaller.callApiDeleteSection(location, thirdStationId.toString());
 
         // then
         response = LineApiCaller.callApiFindLine(location);
         List<Long> actual = response.jsonPath().getList("stations.id", Long.class);
-        Long[] expected = {firstSectionId, secondSectionId};
+        Long[] expected = {firstStationId, secondStationId};
         assertThat(actual).containsExactly(expected);
     }
 }

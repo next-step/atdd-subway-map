@@ -70,10 +70,11 @@ public class LineApiCaller {
     }
 
     public static ExtractableResponse<Response> callApiDeleteSection(String location,
-                                                                     String id) {
+                                                                     String stationId) {
         return given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().delete(location + "{id}" + "/sections", id)
+                .queryParam("stationId", stationId)
+                .when().delete(location + "/sections")
                 .then().log().all()
                 .statusCode(HttpStatus.NO_CONTENT.value())
                 .extract();
