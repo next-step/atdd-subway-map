@@ -3,14 +3,12 @@ package subway;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +50,17 @@ public class StationAcceptanceTest {
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
+    static ExtractableResponse<Response> makeStation(String stationName) {
+        return RestAssured.given()
+                .body(Map.of("name", stationName))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/stations")
+                .then()
+                .statusCode(HttpStatus.CREATED.value())
+                .extract();
+    }
+
     /**
      * Given 2개의 지하철역을 생성하고
      * When 지하철역 목록을 조회하면
@@ -62,21 +71,8 @@ public class StationAcceptanceTest {
     @Test
     void showStations() {
         // given
-        RestAssured.given()
-                .body(Map.of("name", "gangnam"))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/stations")
-                .then()
-                .statusCode(HttpStatus.CREATED.value());
-
-        RestAssured.given()
-                .body(Map.of("name", "yeoksam"))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/stations")
-                .then()
-                .statusCode(HttpStatus.CREATED.value());
+        makeStation("gangnam");
+        makeStation("yeoksam");
 
         // when
         ExtractableResponse<Response> response = RestAssured.given()
@@ -101,14 +97,7 @@ public class StationAcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        Long id = RestAssured.given()
-                .body(Map.of("name", "gangnam"))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/stations")
-                .then().log().all()
-                .statusCode(HttpStatus.CREATED.value())
-                .extract().jsonPath().getLong("id");
+        Long id = makeStation("gangnam").jsonPath().getLong("id");
 
         // when
         RestAssured.given()
