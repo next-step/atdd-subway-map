@@ -3,6 +3,7 @@ package subway;
 import common.RestApiRequest;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,14 +16,21 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Sql(value = "/db/sectionTest.sql")
+@Sql(value = "/db/lineTest.sql")
 @DisplayName("지하철 구간 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class SectionAcceptanceTest {
 	private final RestApiRequest<SectionRequest> sectionApiRequest = new RestApiRequest<>("/lines/{id}/sections");
 	private final RestApiRequest<LineRequest> lineApiRequest = new RestApiRequest<>("/lines/{id}");
 
+	@BeforeEach
+	void createLine() {
+		// given
+		new RestApiRequest<>("/lines").post(new LineRequest("라인1", "색상1", 1L, 2L, 10));
+	}
+
 	/**
+	 * Given 지하철 노선을 생성한다.
 	 * When 생성한 지하철 노선의 하행 종점역부터 새로운 구간의 하행역을 등록하면
 	 * Then 지하철 노선 조회 시, 새로운 하행 종점역을 확인할 수 있다.
 	 */
@@ -39,7 +47,8 @@ public class SectionAcceptanceTest {
 	}
 
 	/**
-	 * Given 지하철 노선에 구간을 등록한다.
+	 * Given 지하철 노선을 생성한다.
+	 * Given 생성한 지하철 노선에 구간을 등록한다.
 	 * When 등록한 구간과 같은 구간을 등록하면
 	 * Then 등록되지 않고 코드값 500 (Internal sever Error) 을 반환한다.
 	 */
@@ -58,6 +67,7 @@ public class SectionAcceptanceTest {
 	}
 
 	/**
+	 * Given 지하철 노선을 생성한다.
 	 * Given 지하철 노선에 구간을 등록한다.
 	 * When 상행역이 해당 노선의 하행 종점역이 아닌 구간을 등록하면
 	 * Then 등록되지 않고 코드값 500 (Internal sever Error) 을 반환한다.
@@ -77,6 +87,7 @@ public class SectionAcceptanceTest {
 	}
 
 	/**
+	 * Given 지하철 노선을 생성한다.
 	 * Given 지하철 노선에 구간을 생성한다.
 	 * When 해당 구간을 삭제하면
 	 * Then 구간 목록 조회 시, 생성한 구간을 찾을 수 없다.
@@ -97,6 +108,7 @@ public class SectionAcceptanceTest {
 	}
 
 	/**
+	 * Given 지하철 노선을 생성한다.
 	 * Given 지하철 노선에 구간을 생성한다.
 	 * When 해당 노선의 하행 종점역이 아닌 구간을 삭제하면
 	 * Then 삭제되지 않고 코드값 500 (Internal sever Error) 을 반환한다.
@@ -116,6 +128,7 @@ public class SectionAcceptanceTest {
 	}
 
 	/**
+	 * Given 지하철 노선을 생성한다.
 	 * Given 지하철 노선에 구간을 생성한다.
 	 * When 해당 노선에 상행 종점역과 하행 종점역만 있는 경우 해당 구간을 삭제하면
 	 * Then 삭제되지 않고 코드값 500 (Internal sever Error) 을 반환한다.
