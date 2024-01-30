@@ -35,8 +35,12 @@ public class Sections {
                 .collect(Collectors.toList());
     }
 
+    private Section lastSection() {
+        return this.sectionList.get(sectionList.size() - 1);
+    }
+
     public Station lastStation() {
-        return this.sectionList.get(sectionList.size() - 1).getDownStation();
+        return lastSection().getDownStation();
     }
 
     public void add(Section section) {
@@ -66,11 +70,16 @@ public class Sections {
     }
 
     public Section delete(Station station) {
-        Section lastSection = this.sectionList.stream()
+        Section findSection = this.sectionList.stream()
                 .filter(section -> section.isSameDownStation(station))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("삭제할 역을 찾지 못하였습니다."));
-        this.sectionList.remove(lastSection);
-        return lastSection;
+
+        if(!lastSection().equals(findSection)) {
+            throw new IllegalArgumentException("마지막 구간의 역이 아닙니다.");
+        }
+
+        this.sectionList.remove(findSection);
+        return findSection;
     }
 }

@@ -77,7 +77,7 @@ class LineTest {
 
     @Test
     @DisplayName("생성된 라인의 구간을 삭제 할 수 있다.")
-    void deleteSection() {
+    void deleteSection1() {
         line.addSection(inputSection);
         line.deleteSection(new Station(3L, 교대역));
 
@@ -91,6 +91,13 @@ class LineTest {
         Long actualDistance = line.getDistance();
         Long expectedDistance = 10L;
         assertThat(actualDistance).isEqualTo(expectedDistance);
+    }
+
+    @Test
+    @DisplayName("생성된 라인의 마지막 구간이 아니면 삭제가 안된다")
+    void deleteSection2() {
+        line.addSection(inputSection);
+        assertThrows(IllegalArgumentException.class, () -> line.deleteSection(new Station(2L, 선릉역)));
     }
 
 }
