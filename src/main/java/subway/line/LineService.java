@@ -36,10 +36,10 @@ public class LineService {
         final Station downStation = stationRepository.findById(lineRequest.getDownStationId())
                 .orElseThrow(() -> new IllegalArgumentException(EMPTY_DOWN_STATION_MSG));
 
-        final Section section = new Section(upStation, downStation);
+        final Section section = new Section(upStation, downStation, lineRequest.getDistance());
         final Section savedSection = sectionRepository.save(section);
 
-        final Line line = new Line(lineRequest.getName(), lineRequest.getColor());
+        final Line line = new Line(lineRequest.getName(), lineRequest.getColor(), upStation.getId(), downStation.getId());
         final Line savedLine = lineRepository.save(line);
         savedSection.setLine(savedLine);
         return new LineResponse(savedLine);

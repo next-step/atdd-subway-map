@@ -28,9 +28,10 @@ public class Section {
     public Section() {
     }
 
-    public Section(final Station upStation, final Station downStation) {
+    public Section(final Station upStation, final Station downStation, final int distance) {
         this.upStation = upStation;
         this.downStation = downStation;
+        this.distance = distance;
     }
 
     public Line getLine() {
