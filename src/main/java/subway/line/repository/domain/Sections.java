@@ -16,6 +16,7 @@ import java.util.stream.Stream;
 
 @Embeddable
 public class Sections implements Iterable<Section> {
+    private static final int MINIMUM_SECTION_COUNT = 1;
     @OneToMany(cascade = CascadeType.PERSIST, orphanRemoval = true)
     @JoinColumn(name = "section_id")
     private List<Section> sections = new ArrayList<>();
@@ -49,7 +50,7 @@ public class Sections implements Iterable<Section> {
     }
 
     private void validateLastSectionDisconnection(final Station station) {
-        if(sections.size() <= 1) {
+        if(sections.size() <= MINIMUM_SECTION_COUNT) {
             throw new SectionDisconnectException("더이상 구간을 제거할 수 없습니다.");
         }
 
