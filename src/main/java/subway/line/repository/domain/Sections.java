@@ -1,6 +1,7 @@
 package subway.line.repository.domain;
 
 import subway.line.exception.SectionConnectException;
+import subway.line.exception.SectionDisconnectException;
 import subway.station.repository.domain.Station;
 
 import javax.persistence.CascadeType;
@@ -43,6 +44,10 @@ public class Sections implements Iterable<Section> {
     }
 
     public void disconnectLastSection(final Station station) {
+        if(sections.size() <= 1) {
+            throw new SectionDisconnectException("더이상 구간을 제거할 수 없습니다.");
+        }
+
         this.sections.remove(sections.size() - 1);
     }
 
