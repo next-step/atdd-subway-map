@@ -1,0 +1,42 @@
+package subway;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.net.URI;
+import java.util.List;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/lines")
+public class LineController {
+    private final LineService lineService;
+
+    @PostMapping
+    public ResponseEntity<LineResponse> create(@RequestBody LineCreateRequest request) {
+        LineResponse line = lineService.create(request);
+        return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<LineResponse>> showLines() {
+        return ResponseEntity.ok().body(lineService.findAll());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<LineResponse> showLine(@PathVariable Long id) {
+        return ResponseEntity.ok().body(lineService.findById(id));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<LineResponse> update(@PathVariable Long id, @RequestBody LineUpdateRequest request) {
+        return ResponseEntity.ok().body(lineService.update(id, request));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<LineResponse> delete(@PathVariable Long id) {
+        lineService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+}
