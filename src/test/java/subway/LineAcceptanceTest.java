@@ -80,7 +80,7 @@ public class LineAcceptanceTest {
      */
     @DisplayName("2개의 지하철 노선을 생성하고 노선 목록을 조회한다")
     @Test
-    void createAndShowTwoLines() {
+    void createAndShowTwoLineList() {
 
         //given
         StationRestAssuredCRUD.createStation("미금역");
@@ -140,7 +140,7 @@ public class LineAcceptanceTest {
      */
     @DisplayName("지하철 노선을 생성하고 노선을 조회한다")
     @Test
-    void test() {
+    void createAndShowLine() {
 
         //given
         StationRestAssuredCRUD.createStation("강남역");
@@ -168,14 +168,14 @@ public class LineAcceptanceTest {
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
-                    .param("id", createId)
+                    .pathParam("id", createId)
                 .when()
                     .get("/lines/{id}")
                 .then().log().all()
                 .extract();
 
         // then
-        assertThat(response.jsonPath().getList("id")).containsExactly(createId);
+        assertThat(response.jsonPath().getLong("id")).isEqualTo(createId);
 
     }
 }

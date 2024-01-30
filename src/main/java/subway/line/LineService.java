@@ -42,6 +42,16 @@ public class LineService {
         return lineResponses;
     }
 
+    public LineResponse findLine(Long id) {
+        Line line = lineRepository.findById(id).orElseThrow();
+
+        List<Station> stations = new ArrayList<>();
+        stations.add(stationRepository.findById(line.getUpStationId()).orElseThrow());
+        stations.add(stationRepository.findById(line.getDownStationId()).orElseThrow());
+
+        return createLineResponse(line, stations);
+    }
+
     private LineResponse createLineResponse(Line line, List<Station> stations) {
         return new LineResponse(
                 line.getId(),
@@ -50,5 +60,4 @@ public class LineService {
                 stations
         );
     }
-
 }
