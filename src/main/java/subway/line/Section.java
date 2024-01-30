@@ -37,6 +37,10 @@ public class Section {
         return downStation;
     }
 
+    public Long calculateDistance(Long distance) {
+        return this.distance + distance;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -48,9 +52,5 @@ public class Section {
     @Override
     public int hashCode() {
         return Objects.hash(id, upStation, downStation, distance);
-    }
-
-    public Long calculateDistance(Long distance) {
-        return this.distance + distance;
     }
 }
