@@ -1,19 +1,18 @@
-package subway.create;
+package subway.fixture;
 
-import org.springframework.http.MediaType;
+import static subway.location.enums.Location.*;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import subway.fixture.LineRequestFixture;
 import subway.line.LineCreateRequest;
 import subway.line.LineResponse;
+import subway.rest.Rest;
 
-public class LineCreator {
+public class LineFixture {
 	private final String upStationName;
 	private final String downStationName;
 
-	private LineCreator(String upStationName, String downStationName) {
+	private LineFixture(String upStationName, String downStationName) {
 		this.upStationName = upStationName;
 		this.downStationName = downStationName;
 	}
@@ -23,24 +22,21 @@ public class LineCreator {
 	}
 
 	public static Builder init() {
-		return LineCreator.builder()
+		return LineFixture.builder()
 			.upStationName("강남역")
 			.downStationName("양재역");
 	}
 
 	private ExtractableResponse<Response> action(LineCreateRequest request) {
-		return RestAssured
-			.given().log().all()
+		return Rest.builder()
+			.uri(LINES.path())
 			.body(request)
-			.contentType(MediaType.APPLICATION_JSON_VALUE)
-			.when().post("/lines")
-			.then().log().all()
-			.extract();
+			.post();
 	}
 
 	public ExtractableResponse<Response> actionReturnExtractableResponse() {
-		Long upStationId = StationCreator.action(upStationName);
-		Long downStationId = StationCreator.action(downStationName);
+		Long upStationId = generateStationId(upStationName);
+		Long downStationId = generateStationId(downStationName);
 		LineCreateRequest lineCreateRequest = LineRequestFixture.create()
 			.upStationId(upStationId)
 			.downStationId(downStationId)
@@ -49,9 +45,17 @@ public class LineCreator {
 		return action(lineCreateRequest);
 	}
 
+	private Long generateStationId(String stationName) {
+		return StationFixture.builder()
+			.stationName(stationName)
+			.build()
+			.actionReturnExtractableResponse()
+			.jsonPath()
+			.getLong("id");
+	}
+
 	public LineResponse actionReturnLineResponse() {
-		return actionReturnExtractableResponse().jsonPath()
-			.getObject("", LineResponse.class);
+		return actionReturnExtractableResponse().as(LineResponse.class);
 	}
 
 	public static class Builder {
@@ -71,8 +75,8 @@ public class LineCreator {
 			return this;
 		}
 
-		public LineCreator build() {
-			return new LineCreator(upStationName, downStationName);
+		public LineFixture build() {
+			return new LineFixture(upStationName, downStationName);
 		}
 	}
 }
