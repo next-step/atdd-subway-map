@@ -38,4 +38,9 @@ public class LineService {
                 .collect(Collectors.toList());
     }
 
+    public LineResponse findById(Long id) {
+        return lineRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException())
+                .createLineResponse();
+    }
 }
