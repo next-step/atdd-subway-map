@@ -13,7 +13,7 @@ import subway.dto.LineRequest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Sql(value = "/db/test.sql")
+@Sql(value = "/db/lineTest.sql")
 @DisplayName("지하철 노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {

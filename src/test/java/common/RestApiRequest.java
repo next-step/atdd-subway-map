@@ -20,12 +20,12 @@ public class RestApiRequest<T> {
 						.extract();
 	}
 
-	public ExtractableResponse<Response> post(T body) {
+	public ExtractableResponse<Response> post(T body, Object... pathParams) {
 		return RestAssured.given().log().all()
 				.body(body)
 					.contentType(MediaType.APPLICATION_JSON_VALUE)
 				.when()
-					.post(path)
+					.post(path, pathParams)
 				.then().log().all()
 					.extract();
 	}
