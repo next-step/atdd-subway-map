@@ -179,6 +179,31 @@ public class LineAcceptanceTest {
      * When 생성한 지하철 노선을 삭제하면
      * Then 해당 지하철 노선 정보는 삭제된다
      */
+    @DisplayName("지하철 노선을 삭제한다.")
+    @Test
+    void deleteLine() {
+        // given
+        ExtractableResponse<Response> 강남역 = createStation("강남역");
+        ExtractableResponse<Response> 건대입구역 = createStation("건대입구역");
+        String 강남역_ID = 강남역.jsonPath().getString("id");
+        String 건대입구역_ID = 건대입구역.jsonPath().getString("id");
+
+        ExtractableResponse<Response> 이호선 = createLine("2호선", "bg-green-999", 강남역_ID, 건대입구역_ID, "10");
+        String 이호선_ID = 이호선.jsonPath().getString("id");
+
+        // when
+        ExtractableResponse<Response> response =
+                RestAssured.given().log().all()
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .when().delete("/lines/{lineId}", 이호선_ID)
+                        .then().log().all()
+                        .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        ExtractableResponse<Response> loadLine = loadLine(response.jsonPath().getLong("id"));
+        assertThat(loadLine.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
 
 
     private ExtractableResponse<Response> createStation(String stationName) {
