@@ -17,6 +17,14 @@ public class Section {
 
 	private int distance;
 
+	public Long getId() {
+		return id;
+	}
+
+	public Line getLine() {
+		return line;
+	}
+
 	public Long getDownStationId() {
 		return downStationId;
 	}

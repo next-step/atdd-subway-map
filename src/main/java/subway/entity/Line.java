@@ -71,4 +71,9 @@ public class Line {
 		this.endStationId = stationId;
 		this.distance = this.distance + distance;
 	}
+
+	public void removeSection(Long stationId, int distance) {
+		this.endStationId = stationId;
+		this.distance = this.distance - distance;
+	}
 }

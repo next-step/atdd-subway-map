@@ -3,6 +3,7 @@ package subway.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.dto.SectionRequest;
+import subway.dto.SectionResponse;
 import subway.entity.Section;
 import subway.repository.LineRepository;
 import subway.dto.LineRequest;
@@ -85,8 +86,41 @@ public class LineService {
 		sectionRepository.save(section);
 	}
 
+	@Transactional
+	public void deleteSection(Long id, Long stationId) {
+		Line line = lineRepository.findById(id)
+				.orElseThrow(EntityNotFoundException::new);
+
+		Section section = sectionRepository.findByLineAndDownStationId(line, stationId);
+
+		if(!stationId.equals(line.getEndStationId())) {
+			throw new IllegalArgumentException("노선의 하행 종점역만 제거할 수 있습니다.");
+		}
+
+		if(line.getStartStationId().equals(section.getUpStationId())) {
+			throw new IllegalArgumentException("상행 종점역과 하행 종점역만 있는 노선입니다.");
+		}
+
+		sectionRepository.delete(section);
+
+		line.removeSection(section.getUpStationId(), section.getDistance());
+		lineRepository.save(line);
+	}
+
+	public List<SectionResponse> findSectionsByLine(Long id) {
+		Line line = lineRepository.findById(id)
+				.orElseThrow(EntityNotFoundException::new);
+
+		return sectionRepository.findByLine(line).stream()
+				.map(this::createSectionResponse).collect(Collectors.toList());
+	}
+
 	private LineResponse createLineResponse(Line line) {
 		return new LineResponse(line,
 				List.of(stationService.findStationById(line.getStartStationId()), stationService.findStationById(line.getEndStationId())));
+	}
+
+	private SectionResponse createSectionResponse(Section section) {
+		return new SectionResponse(section);
 	}
 }
