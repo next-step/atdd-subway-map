@@ -56,19 +56,6 @@ public class Sections {
                 .anyMatch(s -> s.anyMatchUpStationOrDownStation(section));
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Sections sections = (Sections) o;
-        return Objects.equals(sectionList, sections.sectionList);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(sectionList);
-    }
-
     public Section delete(Station station) {
         if(this.sectionList.size() == 1) {
             throw new IllegalArgumentException("구간이 하나 일 때는 삭제를 할 수 없습니다.");
@@ -85,5 +72,18 @@ public class Sections {
 
         this.sectionList.remove(findSection);
         return findSection;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Sections sections = (Sections) o;
+        return Objects.equals(sectionList, sections.sectionList);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(sectionList);
     }
 }
