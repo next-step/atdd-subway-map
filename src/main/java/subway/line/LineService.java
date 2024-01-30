@@ -40,4 +40,9 @@ public class LineService {
                 )
                 .collect(Collectors.toList());
     }
+
+    @Transactional
+    public void deleteStationById(Long id) {
+        lineRepository.deleteById(id);
+    }
 }

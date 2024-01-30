@@ -130,6 +130,22 @@ public class LineAcceptanceTest {
     @DisplayName("지하철노선을 삭제한다.")
     @Test
     void deleteLine() {
+        Map<String, Object> params = new HashMap<>();
+        params.put("name", "신분당선");
+        params.put("color", "bg-red-600");
+        params.put("upStationId", SINSA_STATION_ID);
+        params.put("downStationId", GWANGGYO_STATION_ID);
+        params.put("distance", 10L);
 
+        long id = RestAssuredUtil.post(params, "/lines").jsonPath().getLong("id");
+
+        // when
+        RestAssuredUtil.delete("/lines/" + id);
+
+        // then
+        List<String> stationNames
+                = RestAssuredUtil.get("/lines").jsonPath().getList("name", String.class);
+
+        assertThat(stationNames).doesNotContain("신분당선");
     }
 }
