@@ -89,10 +89,14 @@ public class LineAcceptanceTest {
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.jsonPath().getList(".")).hasSize(2);
+        assertThat(response.jsonPath().getList("id", String.class)).containsExactly(이호선_ID, 칠호선_ID);
         assertThat(response.jsonPath().getList("name", String.class)).containsExactly("2호선", "7호선");
         assertThat(response.jsonPath().getList("color", String.class)).containsExactly("bg-green-999", "bg-orange-600");
-        assertThat(response.jsonPath().getList("upStationId", String.class)).containsExactly(강남역_ID, 건대입구역_ID);
-        assertThat(response.jsonPath().getList("downStationId", String.class)).containsExactly(건대입구역_ID, 군자역_ID);
+        assertThat(response.jsonPath().getList("stations", String.class)).hasSize(2);
+        assertThat(response.jsonPath().getList("stations[0].id", String.class)).containsExactly(강남역_ID, 건대입구역_ID);
+        assertThat(response.jsonPath().getList("stations[0].name", String.class)).containsExactly("강남역", "건대입구역");
+        assertThat(response.jsonPath().getList("stations[1].id", String.class)).containsExactly(건대입구역_ID, 군자역_ID);
+        assertThat(response.jsonPath().getList("stations[1].name", String.class)).containsExactly("건대입구역", "군자역");
     }
 
     /**
