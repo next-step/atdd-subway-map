@@ -44,6 +44,11 @@ public class Sections implements Iterable<Section> {
     }
 
     public void disconnectLastSection(final Station station) {
+        validateLastSectionDisconnection(station);
+        this.sections.remove(sections.size() - 1);
+    }
+
+    private void validateLastSectionDisconnection(final Station station) {
         if(sections.size() <= 1) {
             throw new SectionDisconnectException("더이상 구간을 제거할 수 없습니다.");
         }
@@ -51,8 +56,6 @@ public class Sections implements Iterable<Section> {
         if(isNotDownStationOfLastSection(station)) {
             throw new SectionDisconnectException("마지막 구간만 제거할 수 있습니다.");
         }
-
-        this.sections.remove(sections.size() - 1);
     }
 
     private void validateSectionConnection(final Section section) {
