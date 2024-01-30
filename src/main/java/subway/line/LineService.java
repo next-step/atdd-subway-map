@@ -20,19 +20,19 @@ public class LineService {
 
     public LineResponse create(LineCreateRequest request) {
 
+        Station upStation = stationRepository.findById(request.getUpStationId()).orElseThrow(
+                () -> new EntityNotFoundException("해당 엔티티를 찾을 수 없습니다.")
+        );
+        Station downStation = stationRepository.findById(request.getDownStationId()).orElseThrow(
+                () -> new EntityNotFoundException("해당 엔티티를 찾을 수 없습니다.")
+        );
+
         Line line = LineCreateRequest.toEntity(request);
         Line savedLine = lineRepository.save(line);
-
-        Station upStation = stationRepository.findById(savedLine.getUpStationId()).orElseThrow(
-                () -> new EntityNotFoundException("해당 엔티티를 찾을 수 없습니다.")
-        );
-        Station downStation = stationRepository.findById(savedLine.getDownStationId()).orElseThrow(
-                () -> new EntityNotFoundException("해당 엔티티를 찾을 수 없습니다.")
-        );
 
         StationResponse upStationResponse = StationResponse.of(upStation);
         StationResponse downStationResponse = StationResponse.of(downStation);
 
-        return LineResponse.of(line, upStationResponse, downStationResponse);
+        return LineResponse.of(savedLine, upStationResponse, downStationResponse);
     }
 }
