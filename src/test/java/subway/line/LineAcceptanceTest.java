@@ -224,4 +224,38 @@ public class LineAcceptanceTest {
         String expectedBody = "마지막 구간과 추가될 구간의 시작은 같아야 합니다.";
         assertThat(actualBody).isEqualTo(expectedBody);
     }
+
+    /**
+     * GIVEN 지하철 노선을 생성하고
+     * WHEN 새로운 구간이 이미 해당 노선에 등록되어있는 역이면
+     * THEN  BadRequest(400) HTTP STATUS 가 발생한다
+     */
+    @DisplayName("지하철노선의 구간을 수정할때 새로운 구간이 이미 해당 노선에 등록되어있는 역이면 Bad Request가 발생한다")
+    @Test
+    void updateSections3() {
+        // given
+        ExtractableResponse<Response> response = LineApiCaller.callApiCreateLines(newBunDangLineParams);
+        String location = response.header("location");
+
+        // when
+        Map<String, String> params = new HashMap<>();
+        params.put("upStationId", secondSectionId.toString());
+        params.put("downStationId", firstSectionId.toString());
+        params.put("distance", "10");
+        response = given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post(location + "/sections")
+                .then().log().all()
+                .extract();
+
+        // then
+        int actual = response.statusCode();
+        int expected = HttpStatus.BAD_REQUEST.value();
+        assertThat(actual).isEqualTo(expected);
+
+        String actualBody = response.asString();
+        String expectedBody = "이미 구간에 포함 되어 있는 역 입니다.";
+        assertThat(actualBody).isEqualTo(expectedBody);
+    }
 }

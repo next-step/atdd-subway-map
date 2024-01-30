@@ -79,14 +79,14 @@ host: localhost:52165
 
 ## TODO
 
-- [ ] 구간 등록
+- [x] 구간 등록
   - [x] GIVEN  지하철 노선을 생성하고</br>
     WHEN  노선을 수정하면</br>
     THEN   수정된 노선이 조회 된다
-  - [ ] GIVEN  지하철 노선을 생성하고</br>
+  - [x] GIVEN  지하철 노선을 생성하고</br>
     WHEN  새로운 구간의 상행역이 기존의 하행역과 일치 하지 않는다면</br>
     THEN   BadRequest(400) HTTP STATUS 가 발생한다
-  - [ ] GIVEN  지하철 노선을 생성하고</br>
+  - [x] GIVEN  지하철 노선을 생성하고</br>
     WHEN  새로운 구간이 이미 해당 노선에 등록되어있는 역이면</br>
     THEN   BadRequest(400) HTTP STATUS 가 발생한다
 - [ ] 구간 제거
