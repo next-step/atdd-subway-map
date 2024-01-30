@@ -15,11 +15,11 @@ public class Section {
     @ManyToOne(fetch = FetchType.LAZY)
     private Line line;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "UP_STATION_ID")
     private Station upStation;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "DOWN_STATION_ID")
     private Station downStation;
 
