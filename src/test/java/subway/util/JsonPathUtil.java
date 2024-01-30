@@ -18,4 +18,12 @@ public class JsonPathUtil {
     public static List<String> getNames(ExtractableResponse<Response> response) {
         return response.jsonPath().getList("name", String.class);
     }
+
+    public static String getString(ExtractableResponse<Response> response, String path) {
+        return response.jsonPath().getString(path);
+    }
+
+    public static<T> List<T> getList(ExtractableResponse<Response> response, String path, Class<T> clazz) {
+        return response.jsonPath().getList(path, clazz);
+    }
 }

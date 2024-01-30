@@ -9,6 +9,7 @@ import subway.line.dto.LineUpdateRequest;
 import subway.section.Section;
 import subway.section.SectionRepository;
 import subway.station.Station;
+import subway.station.StationDataService;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -23,15 +24,18 @@ public class LineService {
     private final SectionRepository sectionRepository;
     private final LineDataService lineDataService;
 
-    public LineService(LineRepository lineRepository, SectionRepository sectionRepository, LineDataService lineDataService) {
+    private final StationDataService stationDataService;
+
+    public LineService(LineRepository lineRepository, SectionRepository sectionRepository, LineDataService lineDataService, StationDataService stationDataService) {
         this.lineRepository = lineRepository;
         this.sectionRepository = sectionRepository;
         this.lineDataService = lineDataService;
+        this.stationDataService = stationDataService;
     }
 
     public LineResponse saveLine(LineCreateRequest request) {
-        Station upStation = lineDataService.findStation(request.getUpStationId());
-        Station downStation = lineDataService.findStation(request.getDownStationId());
+        Station upStation = stationDataService.findStation(request.getUpStationId());
+        Station downStation = stationDataService.findStation(request.getDownStationId());
 
         Line line = new Line(
                 request.getName(),
@@ -42,7 +46,7 @@ public class LineService {
         );
         Line savedLine = lineRepository.save(line);
 
-        Section section = Section.of(request.getDistance(), upStation, downStation, savedLine);
+        Section section = new Section(request.getDistance(), upStation, downStation, savedLine);
         sectionRepository.save(section);
 
         return lineDataService.mappingToLineResponse(savedLine);

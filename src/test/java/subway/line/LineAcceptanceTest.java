@@ -1,13 +1,14 @@
 package subway.line;
 
-import annotation.TestIsolation;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
+import subway.TableTruncate;
 import subway.station.StationApiRequester;
 import subway.line.dto.LineCreateRequest;
 import subway.line.dto.LineUpdateRequest;
@@ -15,16 +16,20 @@ import subway.util.JsonPathUtil;
 
 import static org.assertj.core.api.Assertions.*;
 
-@TestIsolation
 @DisplayName("지하철노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {
 
-    private StationApiRequester stationApiRequester = new StationApiRequester();
-    private LineApiRequester lineApiRequester = new LineApiRequester();
+    @Autowired
+    private TableTruncate tableTruncate;
+
+    private final StationApiRequester stationApiRequester = new StationApiRequester();
+    private final LineApiRequester lineApiRequester = new LineApiRequester();
 
     @BeforeEach
     void setUp() {
+        tableTruncate.truncate();
+
         stationApiRequester.createStationApiCall("잠실역");
         stationApiRequester.createStationApiCall("용산역");
         stationApiRequester.createStationApiCall("건대입구역");
@@ -141,8 +146,8 @@ public class LineAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         ExtractableResponse<Response> findLineResponse = lineApiRequester.findLineApiCall(id);
-        assertThat(findLineResponse.jsonPath().getString("name")).isEqualTo("1호선");
-        assertThat(findLineResponse.jsonPath().getString("color")).isEqualTo("blue");
+        assertThat(JsonPathUtil.getString(findLineResponse, "name")).isEqualTo("1호선");
+        assertThat(JsonPathUtil.getString(findLineResponse, "color")).isEqualTo("blue");
     }
 
     /**

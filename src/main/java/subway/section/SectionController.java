@@ -14,7 +14,7 @@ public class SectionController {
 
     @PostMapping("/lines/{id}/sections")
     @ResponseStatus(HttpStatus.CREATED)
-    public void createSection(@PathVariable Long id, @RequestBody SectionCreateRequest request) {
+    public void generateSection(@PathVariable Long id, @RequestBody SectionCreateRequest request) {
         sectionService.saveSection(id, request);
     }
 
