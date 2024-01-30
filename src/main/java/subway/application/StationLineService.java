@@ -1,6 +1,5 @@
 package subway.application;
 
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.dto.StationLineRequest;
@@ -39,10 +38,10 @@ public class StationLineService {
     }
 
     @Transactional
-    public StationLineResponse updateStationLine(Long stationLineId, StationLineRequest request) {
+    public void updateStationLine(Long stationLineId, StationLineRequest request) {
         StationLine stationLine = stationLineRepository.findById(stationLineId)
                 .orElseThrow(EntityNotFoundException::new);
-        return convertToResponse(stationLineRepository.save(updateStationLine(request, stationLine)));
+        convertToResponse(stationLineRepository.save(updateStationLine(request, stationLine)));
     }
 
     @Transactional
@@ -53,10 +52,7 @@ public class StationLineService {
     private StationLine updateStationLine(StationLineRequest request, StationLine stationLine) {
         return stationLine.update(
                 request.getName(),
-                request.getColor(),
-                request.getUpStationId(),
-                request.getDownStationId(),
-                request.getDistance()
+                request.getColor()
         );
     }
 

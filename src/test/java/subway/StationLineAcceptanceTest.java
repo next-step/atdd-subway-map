@@ -148,13 +148,7 @@ public class StationLineAcceptanceTest {
                 () -> assertThat(updatedStationLine.get(NAME_KEY).toString())
                         .isEqualTo(mockRequest2.getName()),
                 () -> assertThat(updatedStationLine.get(COLOR_KEY).toString())
-                        .isEqualTo(mockRequest2.getColor()),
-                () -> assertThat(Integer.parseInt(updatedStationLine.get(UP_STATION_ID_KEY).toString()))
-                        .isEqualTo(mockRequest2.getUpStationId()),
-                () -> assertThat(Integer.parseInt(updatedStationLine.get(DOWN_STATION_ID_KEY).toString()))
-                        .isEqualTo(mockRequest2.getDownStationId()),
-                () -> assertThat(Integer.parseInt(updatedStationLine.get(DISTANCE_KEY).toString()))
-                        .isEqualTo(mockRequest2.getDistance())
+                        .isEqualTo(mockRequest2.getColor())
         );
     }
 
@@ -247,9 +241,9 @@ public class StationLineAcceptanceTest {
             .body(request)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
-            .patch("/lines/" + stationLineId)
+            .put("/lines/" + stationLineId)
         .then().log().all()
-            .statusCode(HttpStatus.CREATED.value())
+            .statusCode(HttpStatus.OK.value())
             .extract().jsonPath();
     }
 

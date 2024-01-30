@@ -34,11 +34,11 @@ public class StationLineController {
         return ResponseEntity.ok(stationLineService.findStationLineById(stationLineId));
     }
 
-    @PatchMapping("/lines/{stationLineId}")
-    public ResponseEntity<StationLineResponse> updateStationLine(@PathVariable Long stationLineId,
-                                                                 @RequestBody StationLineRequest request) {
-        StationLineResponse stationLine = stationLineService.updateStationLine(stationLineId, request);
-        return ResponseEntity.created(URI.create("/lines/" + stationLine.getId())).body(stationLine);
+    @PutMapping("/lines/{stationLineId}")
+    public ResponseEntity<Void> updateStationLine(@PathVariable Long stationLineId,
+                                                  @RequestBody StationLineRequest request) {
+        stationLineService.updateStationLine(stationLineId, request);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/lines/{stationLineId}")
