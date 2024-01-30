@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
+import subway.util.StationTestUtil;
 
 import java.util.HashMap;
 import java.util.List;
@@ -44,7 +45,7 @@ public class StationAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames = getStationNames();
+        List<String> stationNames = StationTestUtil.getStationNames();
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
@@ -59,8 +60,8 @@ public class StationAcceptanceTest {
     @Test
     void showStations() {
         //given
-        createStation("강남역");
-        createStation("성수역");
+        StationTestUtil.createStation("강남역");
+        StationTestUtil.createStation("성수역");
 
         //when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -88,7 +89,7 @@ public class StationAcceptanceTest {
     @Test
     void deleteStation() {
         //given
-        long id = createStation("강남역").jsonPath().getLong("id");
+        long id = StationTestUtil.createStation("강남역").jsonPath().getLong("id");
 
         //when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -99,26 +100,8 @@ public class StationAcceptanceTest {
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
         //then
-        List<String> stationNames = getStationNames();
+        List<String> stationNames = StationTestUtil.getStationNames();
         assertThat(stationNames).doesNotContain("강남역");
     }
 
-    private ExtractableResponse<Response> createStation(String stationName) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", stationName);
-
-        return RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
-    }
-
-    private List<String> getStationNames() {
-        return RestAssured.given().log().all()
-                .when().get("/stations")
-                .then().log().all()
-                .extract().jsonPath().getList("name", String.class);
-    }
 }
