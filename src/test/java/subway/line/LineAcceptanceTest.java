@@ -89,7 +89,7 @@ public class LineAcceptanceTest {
         LineApiCaller.callApiCreateLines(zeroLineParams);
 
         // when
-        ExtractableResponse<Response> response  = LineApiCaller.callApiFindLines();
+        ExtractableResponse<Response> response = LineApiCaller.callApiFindLines();
         List<String> actual = response.jsonPath().getList("name", String.class);
 
         // then
@@ -196,7 +196,7 @@ public class LineAcceptanceTest {
      * WHEN 새로운 구간의 상행역이 기존의 하행역과 일치 하지 않는다면
      * THEN BadRequest(400) HTTP STATUS 가 발생한다
      */
-    @DisplayName("지하철노선의 구간을 수정할때 새로운 구간의 상행역이 기존의 하행역과 일치 하지 않는다면 Bad Request가 발생한다")
+    @DisplayName("새로운 구간의 상행역이 기존의 하행역과 일치 하지 않는다면 Bad Request가 발생한다")
     @Test
     void updateSections2() {
         // given
@@ -230,7 +230,7 @@ public class LineAcceptanceTest {
      * WHEN 새로운 구간이 이미 해당 노선에 등록되어있는 역이면
      * THEN  BadRequest(400) HTTP STATUS 가 발생한다
      */
-    @DisplayName("지하철노선의 구간을 수정할때 새로운 구간이 이미 해당 노선에 등록되어있는 역이면 Bad Request가 발생한다")
+    @DisplayName("새로운 구간이 이미 해당 노선에 등록되어있는 역이면 Bad Request가 발생한다")
     @Test
     void updateSections3() {
         // given
@@ -285,5 +285,41 @@ public class LineAcceptanceTest {
         List<Long> actual = response.jsonPath().getList("stations.id", Long.class);
         Long[] expected = {firstStationId, secondStationId};
         assertThat(actual).containsExactly(expected);
+    }
+
+    /**
+     * GIVEN 지하철 노선을 생성하고 노선을 수정 후
+     * WHEN 마지막 구간이 아닌 지하철 구간을 제거하면
+     * THEN  BadRequest(400) HTTP STATUS 가 발생한다
+     */
+    @DisplayName("마지막 구간이 아닌 지하철 구간을 제거하면 BadRequest(400) HTTP STATUS 가 발생한다")
+    @Test
+    void deleteSections2() {
+        // given
+        ExtractableResponse<Response> response = LineApiCaller.callApiCreateLines(newBunDangLineParams);
+        String location = response.header("location");
+
+        Map<String, String> params = new HashMap<>();
+        params.put("upStationId", secondStationId.toString());
+        params.put("downStationId", thirdStationId.toString());
+        params.put("distance", "10");
+        LineApiCaller.callApiUpdateSections(params, location);
+
+        // when
+        response = given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .queryParam("stationId", secondStationId.toString())
+                .when().delete(location + "/sections")
+                .then().log().all()
+                .extract();
+
+        // then
+        int actual = response.statusCode();
+        int expected = HttpStatus.BAD_REQUEST.value();
+        assertThat(actual).isEqualTo(expected);
+
+        String actualBody = response.asString();
+        String expectedBody = "마지막 구간의 역이 아닙니다.";
+        assertThat(actualBody).isEqualTo(expectedBody);
     }
 }
