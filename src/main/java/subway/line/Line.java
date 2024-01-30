@@ -1,5 +1,6 @@
 package subway.line;
 
+import org.hibernate.annotations.Cascade;
 import subway.station.Station;
 
 import javax.persistence.*;

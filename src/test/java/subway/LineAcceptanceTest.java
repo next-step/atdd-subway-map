@@ -9,20 +9,50 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.jdbc.Sql;
 import subway.line.LineRequest;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Sql(value = "/table_truncate.sql")
 @DisplayName("지하철 노선 테스트")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {
+    private static boolean setUpIsDone = false;
+
     @BeforeEach
-    public void makeStations() {
+    public void setUp() {
+        if (setUpIsDone) return;
+
         StationAcceptanceTest.makeStation("gangnam");
         StationAcceptanceTest.makeStation("yeoksam");
         StationAcceptanceTest.makeStation("samseong");
+
+        setUpIsDone = true;
+    }
+
+    public ExtractableResponse<Response> makeLine(LineRequest lineRequest) {
+        return RestAssured
+                .given().log().all()
+                .when()
+                .body(lineRequest)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .post("/lines")
+                .then().log().all()
+                .statusCode(HttpStatus.CREATED.value())
+                .extract();
+    }
+
+    public ExtractableResponse<Response> getLines() {
+        return RestAssured
+                .given().log().all()
+                .when()
+                .get("/lines")
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract();
     }
 
     /**
@@ -33,31 +63,31 @@ public class LineAcceptanceTest {
     @Test
     void createLine() {
         // when
-        ExtractableResponse<Response> newLineResponse = RestAssured
-                .given().log().all()
-                .when()
-                .body(new LineRequest(
-                        "신분당선",
-                        "bg-red-600",
-                        1L,
-                        2L,
-                        10L))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .post("/lines")
-                .then().log().all()
-                .statusCode(HttpStatus.CREATED.value())
-                .extract();
+        LineRequest lineRequest = new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10L);
+        ExtractableResponse<Response> newLineResponse = makeLine(lineRequest);
 
         // then
-        ExtractableResponse<Response> linesResponse = RestAssured
-                .given().log().all()
-                .when()
-                .get("/lines")
-                .then().log().all()
-                .statusCode(HttpStatus.OK.value())
-                .extract();
+        List<Long> ids = getLines().jsonPath().getList("id", Long.class);
 
-        List<Long> ids = linesResponse.jsonPath().getList("id", Long.class);
-        assertThat(ids).contains(newLineResponse.jsonPath().getLong("id"));
+        assertThat(ids).containsOnly(newLineResponse.jsonPath().getLong("id"));
+    }
+
+    /**
+     * given 2개의 지하철 노선을 생성하고
+     * when 지하철 노선 목록을 조회하면
+     * then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
+     */
+    @DisplayName("지하철 노선 목록 조회")
+    @Test
+    void showLines() {
+        // given
+        Long id_1 = makeLine(new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10L)).jsonPath().getLong("id");
+        Long id_2 = makeLine(new LineRequest("분당선", "bg-green-600", 1L, 3L, 7L)).jsonPath().getLong("id");
+
+        //when
+        ExtractableResponse<Response> response = getLines();
+
+        //then
+        assertThat(response.jsonPath().getList("id", Long.class)).containsOnly(id_1, id_2);
     }
 }
