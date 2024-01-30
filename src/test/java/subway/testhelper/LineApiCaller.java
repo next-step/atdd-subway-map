@@ -38,7 +38,8 @@ public class LineApiCaller {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> callApiUpdateLine(LineUpdateRequest request, String location) {
+    public static ExtractableResponse<Response> callApiUpdateLine(LineUpdateRequest request,
+                                                                  String location) {
         return given().log().all()
                 .body(request)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -63,6 +64,16 @@ public class LineApiCaller {
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post(location + "/sections")
+                .then().log().all()
+                .statusCode(HttpStatus.NO_CONTENT.value())
+                .extract();
+    }
+
+    public static ExtractableResponse<Response> callApiDeleteSection(String location,
+                                                                     String id) {
+        return given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().delete(location + "{id}" + "/sections", id)
                 .then().log().all()
                 .statusCode(HttpStatus.NO_CONTENT.value())
                 .extract();

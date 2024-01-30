@@ -258,4 +258,32 @@ public class LineAcceptanceTest {
         String expectedBody = "이미 구간에 포함 되어 있는 역 입니다.";
         assertThat(actualBody).isEqualTo(expectedBody);
     }
+
+    /**
+     * GIVEN 지하철 노선을 생성하고 노선을 수정 후
+     * WHEN 지하철 마지막 구간을 제거하면
+     * THEN 마지막 구간이 제거된다
+     */
+    @DisplayName("지하철 구간을 제거한다.")
+    @Test
+    void deleteSections() {
+        // given
+        ExtractableResponse<Response> response = LineApiCaller.callApiCreateLines(newBunDangLineParams);
+        String location = response.header("location");
+
+        Map<String, String> params = new HashMap<>();
+        params.put("upStationId", secondSectionId.toString());
+        params.put("downStationId", thirdSectionId.toString());
+        params.put("distance", "10");
+        LineApiCaller.callApiUpdateSections(params, location);
+
+        // when
+        LineApiCaller.callApiDeleteSection(location, thirdSectionId.toString());
+
+        // then
+        response = LineApiCaller.callApiFindLine(location);
+        List<Long> actual = response.jsonPath().getList("stations.id", Long.class);
+        Long[] expected = {firstSectionId, secondSectionId};
+        assertThat(actual).containsExactly(expected);
+    }
 }
