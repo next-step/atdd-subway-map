@@ -13,9 +13,13 @@ public class SectionApiHelper {
     private SectionApiHelper() {
     }
 
-    public static ExtractableResponse<Response> create(final Long lineId, final Long upStationId, final Long downStationId, final int distance) {
+    public static ExtractableResponse<Response> createSection(final Long lineId, final Long upStationId, final Long downStationId, final int distance) {
         final Map<String, Object> createLineRequest = createRequestFixture(upStationId, downStationId, distance);
         return RestAssuredHelper.post(SECTION_API_PATH, lineId, createLineRequest);
+    }
+
+    public static ExtractableResponse<Response> removeSection(final Long lineId, final Long stationId) {
+        return RestAssuredHelper.deleteByIdWithParam(SECTION_API_PATH, lineId, Map.of("stationId", stationId));
     }
 
     private static Map<String, Object> createRequestFixture(final Long upStationId, final Long downStationId, final int distance) {

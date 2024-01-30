@@ -10,6 +10,9 @@ import subway.common.LineApiHelper;
 import subway.common.SectionApiHelper;
 import subway.common.StationApiHelper;
 import subway.line.service.dto.LineResponse;
+import subway.station.service.dto.StationResponse;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
@@ -46,7 +49,7 @@ public class SectionAcceptanceTest {
         void createSectionTest() {
             // when
             final int 구간_distance = 5;
-            final ExtractableResponse<Response> response = SectionApiHelper.create(신분당선_Id, 새로운지하철역_Id, 또다른지하철역_Id, 구간_distance);
+            final ExtractableResponse<Response> response = SectionApiHelper.createSection(신분당선_Id, 새로운지하철역_Id, 또다른지하철역_Id, 구간_distance);
 
             // then
             assertSoftly(softly -> {
@@ -68,12 +71,12 @@ public class SectionAcceptanceTest {
         void createSectionFail_UpStationIsNotTheSameWithDownStationOfLineTest() {
             // when
             final int 구간_distance = 5;
-            final ExtractableResponse<Response> response = SectionApiHelper.create(신분당선_Id, 지하철역_Id, 또다른지하철역_Id, 구간_distance);
+            final ExtractableResponse<Response> response = SectionApiHelper.createSection(신분당선_Id, 지하철역_Id, 또다른지하철역_Id, 구간_distance);
 
             // then
             Assertions.assertAll(
                     () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
-                    this::assertStationNotChanged
+                    SectionAcceptanceTest.this::assertStationNotChanged
             );
         }
 
@@ -87,23 +90,92 @@ public class SectionAcceptanceTest {
         void createSectionFail_DownStationIsAlreadyInTest() {
             // when
             final int 구간_distance = 5;
-            final ExtractableResponse<Response> response = SectionApiHelper.create(신분당선_Id, 새로운지하철역_Id, 지하철역_Id, 구간_distance);
+            final ExtractableResponse<Response> response = SectionApiHelper.createSection(신분당선_Id, 새로운지하철역_Id, 지하철역_Id, 구간_distance);
 
             // then
             Assertions.assertAll(
                     () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
-                    this::assertStationNotChanged
+                    SectionAcceptanceTest.this::assertStationNotChanged
             );
         }
 
-        private void assertStationNotChanged() {
-            assertSoftly(softly -> {
-                final LineResponse lineResponse = LineApiHelper.fetchLineById(신분당선_Id).as(LineResponse.class);
-                softly.assertThat(lineResponse.getDistance()).isEqualTo(신분당선_distance);
-                softly.assertThat(lineResponse.getStations())
-                        .extracting("id").containsExactly(지하철역_Id, 새로운지하철역_Id);
-            });
+    }
+
+    @Nested
+    @DisplayName("구간 제거")
+    class Deletion {
+        /**
+         * Given 지하철 구간을 생성하고
+         * When 지하철 구간을 제거하면
+         * Then 지하철 노선 조회시 해당 구간 정보가 제외되고 조회된다.
+         */
+        @DisplayName("성공")
+        @Test
+        void removeSectionTest() {
+            // given
+            final int 구간_distance = 5;
+            SectionApiHelper.createSection(신분당선_Id, 새로운지하철역_Id, 또다른지하철역_Id, 구간_distance);
+
+            // when
+            final ExtractableResponse<Response> response = SectionApiHelper.removeSection(신분당선_Id, 또다른지하철역_Id);
+
+            // then
+            Assertions.assertAll(
+                    () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value()),
+                    SectionAcceptanceTest.this::assertStationNotChanged
+            );
         }
+
+        /**
+         * When 지하철 구간을 제거하는데
+         * When 해당 지하철 구간이 한개만 남아 있다면
+         * Then 에러가 난다.
+         */
+        @DisplayName("실패 - 해당 지하철 노선에 구간이 한개만 남아 있다면 실패한다.")
+        @Test
+        void removeSectionFail_OnlyOneSectionLeftTest() {
+            // when
+            final ExtractableResponse<Response> response = SectionApiHelper.removeSection(신분당선_Id, 새로운지하철역_Id);
+
+            // then
+            Assertions.assertAll(
+                    () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
+                    SectionAcceptanceTest.this::assertStationNotChanged
+            );
+        }
+
+        /**
+         * Given 지하철 구간을 생성하고
+         * When 지하철 구간을 제거하는데
+         * When 해당 지하철 구간이 마지막 구간이 아니면
+         * Then 에러가 난다.
+         */
+        @DisplayName("실패 - 삭제 구간이 해당 지하철 노선 구간의 마지막 구간이 아니면 실패한다.")
+        @Test
+        void createSectionFail_TargetSectionIsNotLastSectionTest() {
+            // given
+            final int 구간_distance = 5;
+            SectionApiHelper.createSection(신분당선_Id, 새로운지하철역_Id, 또다른지하철역_Id, 구간_distance);
+
+            // when
+            final ExtractableResponse<Response> response = SectionApiHelper.removeSection(신분당선_Id, 새로운지하철역_Id);
+
+            // then
+            Assertions.assertAll(
+                    () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
+                    SectionAcceptanceTest.this::assertStationNotChanged
+            );
+        }
+
+    }
+
+    private void assertStationNotChanged() {
+        assertSoftly(softly -> {
+            final LineResponse lineResponse = LineApiHelper.fetchLineById(신분당선_Id).as(LineResponse.class);
+            softly.assertThat(lineResponse.getDistance()).isEqualTo(신분당선_distance);
+            softly.assertThat(lineResponse.getStations())
+                    .extracting("id").containsExactly(지하철역_Id, 새로운지하철역_Id);
+        });
     }
 
 

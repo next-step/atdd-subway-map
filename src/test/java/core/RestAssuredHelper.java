@@ -5,6 +5,8 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.MediaType;
 
+import java.util.Map;
+
 public class RestAssuredHelper {
     private RestAssuredHelper() {
     }
@@ -57,6 +59,14 @@ public class RestAssuredHelper {
                 .then().extract();
     }
 
+    public static ExtractableResponse<Response> deleteByIdWithParam(final String path, final Long id, final Map<String, ?> parametersMap) {
+        return RestAssured
+                .given().pathParam("id", id)
+                .queryParams(parametersMap)
+                .when().delete(path)
+                .then().extract();
+    }
+
     public static Long getIdFrom(final ExtractableResponse<Response> response) {
         return response.jsonPath().getLong("id");
     }
@@ -64,5 +74,4 @@ public class RestAssuredHelper {
     public static <T> T findObjectFrom(final ExtractableResponse<Response> response, final Long id, final Class<T> type) {
         return response.jsonPath().getObject(String.format("find {it.id==%d}", id), type);
     }
-
 }
