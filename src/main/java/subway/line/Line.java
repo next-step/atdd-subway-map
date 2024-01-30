@@ -82,11 +82,15 @@ public class Line {
     }
 
     public void addSection(Section section) {
-        this.distance = section.calculateDistance(distance);
         if(!this.sections.isSameLastStationAndStartStation(section)) {
             throw new IllegalArgumentException("마지막 구간과 추가될 구간의 시작은 같아야 합니다.");
         }
 
+        if(this.sections.anyMatchStation(section)) {
+            throw new IllegalArgumentException("이미 구간에 포함 되어 있는 역 입니다.");
+        }
+
+        this.distance = section.calculateDistance(distance);
         this.sections.add(section);
     }
 

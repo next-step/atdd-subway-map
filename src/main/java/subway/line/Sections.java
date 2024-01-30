@@ -44,7 +44,12 @@ public class Sections {
     }
 
     public boolean isSameLastStationAndStartStation(Section station) {
-        return lastStation().equals(station.getUpStation());
+        return station.isSameUpStation(lastStation());
+    }
+
+    public boolean anyMatchStation(Section section) {
+        return this.sectionList.stream()
+                .anyMatch(s -> s.anyMatchUpStationOrDownStation(section));
     }
 
     @Override
