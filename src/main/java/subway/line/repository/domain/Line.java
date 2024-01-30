@@ -74,10 +74,19 @@ public class Line {
     }
 
     private void validateSectionConnectivity(final Section section) {
+        final Station downStation = section.getDownStation();
+        if(isAlreadyConnectedSection(downStation)) {
+            throw new SectionConnectException("생성할 구간 하행역이 해당 노선에 이미 등록되어있습니다.");
+        }
+
         final Station lastDownStation = getLastDownStation();
         if (!section.getUpStation().equals(lastDownStation)) {
             throw new SectionConnectException("생성할 구간 상행역이 해당 노선의 하행 종점역이 아닙니다.");
         }
+    }
+
+    private boolean isAlreadyConnectedSection(final Station downStation) {
+        return this.sections.stream().anyMatch(row -> row.getUpStation().equals(downStation) || row.getDownStation().equals(downStation));
     }
 
     private Station getLastDownStation() {

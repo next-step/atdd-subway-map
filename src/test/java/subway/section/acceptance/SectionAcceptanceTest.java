@@ -5,10 +5,7 @@ import core.RestAssuredHelper;
 import core.TestConfig;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
@@ -18,6 +15,7 @@ import subway.common.SectionApiHelper;
 import subway.common.StationApiHelper;
 import subway.line.service.dto.LineResponse;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 @DisplayName("구간 관련 기능")
@@ -79,13 +77,10 @@ public class SectionAcceptanceTest {
             final ExtractableResponse<Response> response = SectionApiHelper.create(신분당선_Id, 지하철역_Id, 또다른지하철역_Id, 구간_distance);
 
             // then
-            assertSoftly(softly -> {
-                softly.assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-                final LineResponse lineResponse = LineApiHelper.fetchLineById(신분당선_Id).as(LineResponse.class);
-                softly.assertThat(lineResponse.getDistance()).isEqualTo(신분당선_distance);
-                softly.assertThat(lineResponse.getStations())
-                        .extracting("id").containsExactly(지하철역_Id, 새로운지하철역_Id);
-            });
+            Assertions.assertAll(
+                    () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
+                    this::assertStationNotChanged
+            );
         }
 
         /**
@@ -101,12 +96,18 @@ public class SectionAcceptanceTest {
             final ExtractableResponse<Response> response = SectionApiHelper.create(신분당선_Id, 새로운지하철역_Id, 지하철역_Id, 구간_distance);
 
             // then
+            Assertions.assertAll(
+                    () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
+                    this::assertStationNotChanged
+            );
+        }
+
+        private void assertStationNotChanged() {
             assertSoftly(softly -> {
-                softly.assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
                 final LineResponse lineResponse = LineApiHelper.fetchLineById(신분당선_Id).as(LineResponse.class);
-                softly.assertThat(lineResponse.getDistance()).isEqualTo(신분당선_distance + 구간_distance);
+                softly.assertThat(lineResponse.getDistance()).isEqualTo(신분당선_distance);
                 softly.assertThat(lineResponse.getStations())
-                        .extracting("id").containsExactly(지하철역_Id, 또다른지하철역_Id);
+                        .extracting("id").containsExactly(지하철역_Id, 새로운지하철역_Id);
             });
         }
     }
