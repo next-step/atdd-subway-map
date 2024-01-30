@@ -6,7 +6,6 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -14,19 +13,12 @@ import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import subway.dto.StationLineRequest;
 
-import javax.persistence.EntityManager;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static config.fixtures.subway.StationLineMockData.createMockRequest1;
-import static config.fixtures.subway.StationLineMockData.createMockRequest2;
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.springframework.test.annotation.DirtiesContext.MethodMode.BEFORE_METHOD;
 
 @DisplayName("지하철 노선 관련 기능")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationLineAcceptanceTest {
 
@@ -45,19 +37,19 @@ public class StationLineAcceptanceTest {
     @Test
     void createStationLine() {
         // given
-        StationLineRequest mockRequest = createMockRequest1();
+        StationLineRequest 신분당선 = StationLineMockData.신분당선;
 
         // when
-        createStationLineRequest(mockRequest);
+        createStationLineRequest(신분당선);
         JsonPath allStationLine = findAllStationLines();
 
         // then
         assertAll(
-            () -> assertThat(allStationLine.getList(NAME_KEY)).containsAnyOf(mockRequest.getName()),
-            () -> assertThat(allStationLine.getList(COLOR_KEY)).containsAnyOf(mockRequest.getColor()),
-            () -> assertThat(allStationLine.getList(UP_STATION_ID_KEY)).containsAnyOf(mockRequest.getUpStationId()),
-            () -> assertThat(allStationLine.getList(DOWN_STATION_ID_KEY)).containsAnyOf(mockRequest.getDownStationId()),
-            () -> assertThat(allStationLine.getList(DISTANCE_KEY)).containsAnyOf(mockRequest.getDistance())
+                () -> assertThat(allStationLine.getList(NAME_KEY)).containsAnyOf(신분당선.getName()),
+                () -> assertThat(allStationLine.getList(COLOR_KEY)).containsAnyOf(신분당선.getColor()),
+                () -> assertThat(allStationLine.getList(UP_STATION_ID_KEY)).containsAnyOf(신분당선.getUpStationId()),
+                () -> assertThat(allStationLine.getList(DOWN_STATION_ID_KEY)).containsAnyOf(신분당선.getDownStationId()),
+                () -> assertThat(allStationLine.getList(DISTANCE_KEY)).containsAnyOf(신분당선.getDistance())
         );
     }
 
@@ -70,11 +62,11 @@ public class StationLineAcceptanceTest {
     @Test
     void findAllStationLine() {
         // given
-        StationLineRequest mockRequest1 = createMockRequest1();
-        StationLineRequest mockRequest2 = createMockRequest2();
+        StationLineRequest 신분당선 = StationLineMockData.신분당선;
+        StationLineRequest 분당선 = StationLineMockData.분당선;
 
-        createStationLineRequest(mockRequest1);
-        createStationLineRequest(mockRequest2);
+        createStationLineRequest(신분당선);
+        createStationLineRequest(분당선);
 
         // when
         JsonPath allStationLine = findAllStationLines();
@@ -82,15 +74,15 @@ public class StationLineAcceptanceTest {
         // then
         assertAll(
                 () -> assertThat(allStationLine.getList(NAME_KEY))
-                        .containsAnyOf(mockRequest1.getName(), mockRequest2.getName()),
+                        .containsAnyOf(신분당선.getName(), 분당선.getName()),
                 () -> assertThat(allStationLine.getList(COLOR_KEY))
-                        .containsAnyOf(mockRequest1.getColor(), mockRequest2.getColor()),
+                        .containsAnyOf(신분당선.getColor(), 분당선.getColor()),
                 () -> assertThat(allStationLine.getList(UP_STATION_ID_KEY))
-                        .containsAnyOf(mockRequest1.getUpStationId(), mockRequest2.getUpStationId()),
+                        .containsAnyOf(신분당선.getUpStationId(), 분당선.getUpStationId()),
                 () -> assertThat(allStationLine.getList(DOWN_STATION_ID_KEY))
-                        .containsAnyOf(mockRequest1.getDownStationId(), mockRequest2.getDownStationId()),
+                        .containsAnyOf(신분당선.getDownStationId(), 분당선.getDownStationId()),
                 () -> assertThat(allStationLine.getList(DISTANCE_KEY))
-                        .containsAnyOf(mockRequest1.getDistance(), mockRequest2.getDistance())
+                        .containsAnyOf(신분당선.getDistance(), 분당선.getDistance())
         );
     }
 
@@ -103,8 +95,8 @@ public class StationLineAcceptanceTest {
     @Test
     void findStationLine() {
         // given
-        StationLineRequest mockRequest1 = createMockRequest1();
-        ExtractableResponse<Response> response = createStationLineRequest(mockRequest1);
+        StationLineRequest 신분당선 = StationLineMockData.신분당선;
+        ExtractableResponse<Response> response = createStationLineRequest(신분당선);
 
         // when
         JsonPath stationLine = findStationLine(getCreatedLocationId(response));
@@ -112,15 +104,15 @@ public class StationLineAcceptanceTest {
         // then
         assertAll(
                 () -> assertThat(stationLine.get(NAME_KEY).toString())
-                        .isEqualTo(mockRequest1.getName()),
+                        .isEqualTo(신분당선.getName()),
                 () -> assertThat(stationLine.get(COLOR_KEY).toString())
-                        .isEqualTo(mockRequest1.getColor()),
+                        .isEqualTo(신분당선.getColor()),
                 () -> assertThat(Integer.parseInt(stationLine.get(UP_STATION_ID_KEY).toString()))
-                        .isEqualTo(mockRequest1.getUpStationId()),
+                        .isEqualTo(신분당선.getUpStationId()),
                 () -> assertThat(Integer.parseInt(stationLine.get(DOWN_STATION_ID_KEY).toString()))
-                        .isEqualTo(mockRequest1.getDownStationId()),
+                        .isEqualTo(신분당선.getDownStationId()),
                 () -> assertThat(Integer.parseInt(stationLine.get(DISTANCE_KEY).toString()))
-                        .isEqualTo(mockRequest1.getDistance())
+                        .isEqualTo(신분당선.getDistance())
         );
     }
 
@@ -133,22 +125,22 @@ public class StationLineAcceptanceTest {
     @Test
     void updateStationLine() {
         // given
-        StationLineRequest mockRequest1 = createMockRequest1();
-        StationLineRequest mockRequest2 = createMockRequest2();
+        StationLineRequest 신분당선 = StationLineMockData.신분당선;
+        StationLineRequest 분당선 = StationLineMockData.분당선;
 
-        ExtractableResponse<Response> createResponse = createStationLineRequest(mockRequest1);
+        ExtractableResponse<Response> createResponse = createStationLineRequest(신분당선);
 
         // when
-        updateStationLineRequest(mockRequest2, getCreatedLocationId(createResponse));
+        updateStationLineRequest(분당선, getCreatedLocationId(createResponse));
 
         JsonPath updatedStationLine = findStationLine(getCreatedLocationId(createResponse));
 
         // then
         assertAll(
                 () -> assertThat(updatedStationLine.get(NAME_KEY).toString())
-                        .isEqualTo(mockRequest2.getName()),
+                        .isEqualTo(분당선.getName()),
                 () -> assertThat(updatedStationLine.get(COLOR_KEY).toString())
-                        .isEqualTo(mockRequest2.getColor())
+                        .isEqualTo(분당선.getColor())
         );
     }
 
@@ -157,13 +149,12 @@ public class StationLineAcceptanceTest {
      * When  생성한 지하철 노선을 삭제하면
      * Then  해당 지하철 노선 정보는 삭제된다.
      */
-    @DirtiesContext(methodMode = BEFORE_METHOD)
     @DisplayName("지하철 노선을 삭제한다.")
     @Test
     void deleteStationLine() {
         // given
-        StationLineRequest mockRequest1 = createMockRequest1();
-        ExtractableResponse<Response> createResponse = createStationLineRequest(mockRequest1);
+        StationLineRequest 신분당선 = StationLineMockData.신분당선;
+        ExtractableResponse<Response> createResponse = createStationLineRequest(신분당선);
 
         // when
         deleteStationLineRequest(getCreatedLocationId(createResponse));
@@ -173,15 +164,15 @@ public class StationLineAcceptanceTest {
         // then
         assertAll(
                 () -> assertThat(allStationLine.getList(NAME_KEY, String.class))
-                        .doesNotContain(mockRequest1.getName()),
+                        .doesNotContain(신분당선.getName()),
                 () -> assertThat(allStationLine.getList(COLOR_KEY, String.class))
-                        .doesNotContain(mockRequest1.getColor()),
+                        .doesNotContain(신분당선.getColor()),
                 () -> assertThat(allStationLine.getList(UP_STATION_ID_KEY, Integer.class))
-                        .doesNotContain(mockRequest1.getUpStationId()),
+                        .doesNotContain(신분당선.getUpStationId()),
                 () -> assertThat(allStationLine.getList(DOWN_STATION_ID_KEY, Integer.class))
-                        .doesNotContain(mockRequest1.getDownStationId()),
+                        .doesNotContain(신분당선.getDownStationId()),
                 () -> assertThat(allStationLine.getList(DISTANCE_KEY, Integer.class))
-                        .doesNotContain(mockRequest1.getDistance())
+                        .doesNotContain(신분당선.getDistance())
         );
     }
 
@@ -192,11 +183,11 @@ public class StationLineAcceptanceTest {
      */
     private JsonPath findAllStationLines() {
         return given().log().all()
-            .when()
-                .get("/lines")
-            .then().log().all()
-                .statusCode(HttpStatus.OK.value())
-                .extract().jsonPath();
+                .when()
+                    .get("/lines")
+                .then().log().all()
+                    .statusCode(HttpStatus.OK.value())
+                    .extract().jsonPath();
     }
 
     /**
@@ -221,19 +212,19 @@ public class StationLineAcceptanceTest {
      */
     private ExtractableResponse<Response> createStationLineRequest(StationLineRequest request) {
         return given().log().all()
-            .body(request)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when()
-            .post("/lines")
-        .then().log().all()
-            .statusCode(HttpStatus.CREATED.value())
-            .extract();
+                    .body(request)
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                    .post("/lines")
+                .then().log().all()
+                    .statusCode(HttpStatus.CREATED.value())
+                    .extract();
     }
 
     /**
      * 지하철 노선 수정 요청 후 Response 객체 반환
      *
-     * @param request 지하철 수정 정보를 담은 객체
+     * @param request       지하철 수정 정보를 담은 객체
      * @param stationLineId 수정할 지하철 노선 ID
      */
     private void updateStationLineRequest(StationLineRequest request, Long stationLineId) {
