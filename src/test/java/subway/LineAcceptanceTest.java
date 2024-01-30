@@ -8,33 +8,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import subway.fixture.LineFixture;
 import subway.fixture.StationFixture;
 import subway.line.LineResponse;
 import subway.line.LineUpdateRequest;
 import subway.station.StationResponse;
 
-@Sql(value = "/truncate.sql", executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
 @DisplayName("지하철노선 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class LineTest {
-
-  @LocalServerPort
-  private int port;
-
-  @BeforeEach
-  void setUp() {
-    RestAssured.port = port;
-  }
+public class LineAcceptanceTest extends AcceptanceTest {
 
   /**
    * When 노선을 생성하면
@@ -44,13 +29,13 @@ public class LineTest {
   @Test
   void createLineSuccess() {
     // given
-    final var LINE_NAME = "신분당선";
+    final var lineName = "신분당선";
     final var upStation = StationFixture.createStation("강남역");
     final var downStation = StationFixture.createStation("청계산입구역");
 
     // when
     Map<String, Object> params = new HashMap<>();
-    params.put("name", LINE_NAME);
+    params.put("name", lineName);
     params.put("color", "bg-red-600");
     params.put("upStationId", upStation.getId());
     params.put("downStationId", downStation.getId());
@@ -65,12 +50,8 @@ public class LineTest {
         .extract();
 
     final var line = LineFixture.getLines().stream()
-        .filter(it -> LINE_NAME.equals(it.getName()))
+        .filter(it -> lineName.equals(it.getName()))
         .findFirst();
-    final var stationIds = line.map(LineResponse::getStations)
-        .orElseGet(Collections::emptyList).stream()
-        .map(StationResponse::getId)
-            .collect(Collectors.toList());
 
     // then
     assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -79,9 +60,12 @@ public class LineTest {
     assertThat(line).isNotEmpty();
 
     // then
-    assertThat(upStation.getId()).isIn(stationIds);
+    final var stationIds = line.map(LineResponse::getStations)
+        .orElseGet(Collections::emptyList).stream()
+        .map(StationResponse::getId)
+        .collect(Collectors.toList());
 
-    // then
+    assertThat(upStation.getId()).isIn(stationIds);
     assertThat(downStation.getId()).isIn(stationIds);
   }
 
