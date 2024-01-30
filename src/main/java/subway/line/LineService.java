@@ -65,7 +65,7 @@ public class LineService {
 	}
 
 	public LineResponse line(Long id) {
-		Line line = lineRepository.findById(id).orElseThrow();
+		Line line = findLineById(id);
 		List<LineStationMap> lineStationMap = lineStationMapRepository.findAllByLineId(line.getId());
 		List<Station> stations = lineStationMap.stream().map(LineStationMap::getStation).collect(toList());
 		return LineResponse.of(line, stations);
@@ -73,19 +73,19 @@ public class LineService {
 
 	@Transactional
 	public void update(Long id, LineUpdateRequest request) {
-		Line line = finLineById(id);
+		Line line = findLineById(id);
 		line.changeName(request.getName());
 		line.changeColor(request.getColor());
 	}
 
-	private Line finLineById(Long id) {
+	private Line findLineById(Long id) {
 		return lineRepository.findById(id)
 			.orElseThrow(EntityNotFoundException::new);
 	}
 
 	@Transactional
 	public void delete(Long id) {
-		Line line = finLineById(id);
+		Line line = findLineById(id);
 		List<LineStationMap> lineStationMaps = lineStationMapRepository.findAllByLineId(line.getId());
 		List<Station> stations = lineStationMaps.stream().map(LineStationMap::getStation).collect(toList());
 
