@@ -20,8 +20,8 @@ public class SectionController {
     }
 
     @PostMapping("/lines/{lineId}/sections")
-    public ResponseEntity<SectionResponse> createLine(@PathVariable Long lineId, @RequestBody SectionRequest sectionRequest) {
-        SectionResponse sectionResponse = sectionService.saveSection(lineId, sectionRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body(sectionResponse);
+    public ResponseEntity createLine(@PathVariable Long lineId, @RequestBody SectionRequest sectionRequest) {
+        sectionService.saveSection(lineId, sectionRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }

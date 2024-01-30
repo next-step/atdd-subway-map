@@ -27,7 +27,7 @@ public class SectionService {
     }
 
     @Transactional
-    public SectionResponse saveSection(final Long lineId, final SectionRequest sectionRequest) {
+    public void saveSection(final Long lineId, final SectionRequest sectionRequest) {
         final Line line = lineRepository.findById(lineId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, EMPTY_LINE_MSG));
 
         final Station upStation = stationRepository.findById(sectionRequest.getUpStationId())
@@ -35,6 +35,9 @@ public class SectionService {
         final Station downStation = stationRepository.findById(sectionRequest.getDownStationId())
                 .orElseThrow(() -> new IllegalArgumentException(EMPTY_DOWN_STATION_MSG));
         line.registerValidate(upStation, downStation);
-        return null;
+
+        final Section section = new Section(upStation, downStation, sectionRequest.getDistance());
+        section.setLine(line);
+        sectionRepository.save(section);
     }
 }

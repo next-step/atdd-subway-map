@@ -63,6 +63,12 @@ public class Section {
 
     @Override
     public String toString() {
-        return "Section{" + "id=" + id + ", line=" + line + ", upStation=" + upStation + ", downStation=" + downStation + '}';
+        return "Section{" +
+                "id=" + id +
+                ", line=" + line +
+                ", upStation=" + upStation +
+                ", downStation=" + downStation +
+                ", distance=" + distance +
+                '}';
     }
 }

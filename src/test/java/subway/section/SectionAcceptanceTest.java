@@ -52,8 +52,27 @@ public class SectionAcceptanceTest {
         예외가_발생한다(response, HttpStatus.BAD_REQUEST);
     }
 
-    private AbstractIntegerAssert<?> 예외가_발생한다(final ExtractableResponse<Response> response, HttpStatus httpStatus) {
-        return assertThat(response.statusCode()).isEqualTo(httpStatus.value());
+    /**
+     * When 노선이 생성되어 있다.
+     *      구간을 등록한다.
+     * Then 정상 응답 처리된다.
+     */
+    @DisplayName("노선에 구간을 등록한다.")
+    @Test
+    public void 구간등록_정상처리() {
+        final Long lineId = 노선이_생성되어_있다("신분당선", "bg-red-600", 1L, 2L);
+
+        final ExtractableResponse<Response> response = 구간을_등록한다(lineId, 2L, 3L, 10);
+
+        정상_응답한다(response, HttpStatus.CREATED);
+    }
+
+    private void 정상_응답한다(final ExtractableResponse<Response> response, final HttpStatus httpStatus) {
+        assertThat(response.statusCode()).isEqualTo(httpStatus.value());
+    }
+
+    private void 예외가_발생한다(final ExtractableResponse<Response> response, HttpStatus httpStatus) {
+        assertThat(response.statusCode()).isEqualTo(httpStatus.value());
     }
 
     private ExtractableResponse<Response> 구간을_등록한다(final Long lineId, final Long upStationId,
