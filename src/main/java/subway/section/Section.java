@@ -79,4 +79,8 @@ public class Section {
                 ", distance=" + distance +
                 '}';
     }
+
+    public void changeDownStation(final Station downStation) {
+        this.downStation = downStation;
+    }
 }

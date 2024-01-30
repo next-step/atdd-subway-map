@@ -99,6 +99,24 @@ public class SectionAcceptanceTest {
         예외가_발생한다(response, HttpStatus.BAD_REQUEST);
     }
 
+    /**
+     * When 노선이 생성되어 있다.
+     *      구간이 등록되어 있다.
+     *      구간을 제거한다.
+     * Then 정상 응답 처리된다.
+     */
+    @DisplayName("노선의 구간을 제거한다.")
+    @Test
+    public void 구간제거_정상() {
+        final Long lineId = 노선이_생성되어_있다("신분당선", "bg-red-600", 1L, 2L);
+
+        구간이_등록되어_있다(lineId, 2L, 3L, 10);
+
+        final ExtractableResponse<Response> response = 구간을_제거한다(lineId, 3L);
+
+        구간이_정상_제거된다(response, HttpStatus.NO_CONTENT);
+    }
+
     private ExtractableResponse<Response> 구간을_제거한다(final Long lineId, Long stationId) {
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -106,6 +124,10 @@ public class SectionAcceptanceTest {
                 .when().delete("/lines/" + lineId + "/sections")
                 .then().log().all()
                 .extract();
+    }
+
+    private void 구간이_정상_제거된다(final ExtractableResponse<Response> response, final HttpStatus httpStatus) {
+        assertThat(response.statusCode()).isEqualTo(httpStatus.value());
     }
 
     private void 구간이_정상_등록한다(final ExtractableResponse<Response> response, final HttpStatus httpStatus) {

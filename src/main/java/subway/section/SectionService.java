@@ -9,6 +9,8 @@ import subway.line.LineRepository;
 import subway.station.Station;
 import subway.station.StationRepository;
 
+import java.util.List;
+
 @Service
 @Transactional(readOnly = true)
 public class SectionService {
@@ -38,6 +40,8 @@ public class SectionService {
                 .orElseThrow(() -> new IllegalArgumentException(EMPTY_DOWN_STATION_MSG));
         line.registerValidate(upStation, downStation);
 
+        line.changeDownStation(downStation);
+
         final Section section = new Section(upStation, downStation, sectionRequest.getDistance());
         section.setLine(line);
         final Section savedSection = sectionRepository.save(section);
@@ -50,6 +54,13 @@ public class SectionService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, EMPTY_LINE_MSG));
 
         line.deleteValidate(stationId);
-        throw new UnsupportedOperationException("Unsupported deleteSection");
+
+        final List<Section> sections = line.getSections();
+        for (Section section : sections) {
+            if (section.getDownStation().getId() == stationId) {
+                sectionRepository.delete(section);
+            }
+        }
+
     }
 }
