@@ -52,6 +52,19 @@ public class LineService {
         lineRepository.deleteById(id);
     }
 
+    @Transactional
+    public void addSection(Long id,
+                           SectionsUpdateRequest sectionsUpdateRequest) {
+        Line line = lineRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 지하철라인 정보를 찾지 못했습니다."));
+        line.addSection(createSection(sectionsUpdateRequest));
+    }
+
+    private Section createSection(SectionsUpdateRequest sectionsUpdateRequest) {
+        return new Section(getStation(sectionsUpdateRequest.getUpStationId()),
+                getStation(sectionsUpdateRequest.getDownStationId()),
+                sectionsUpdateRequest.getDistance());
+    }
+
     private Line createLine(LineRequest lineRequest) {
         return new Line(lineRequest.getName(),
                 lineRequest.getColor(),

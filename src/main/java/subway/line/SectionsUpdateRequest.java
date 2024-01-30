@@ -12,4 +12,16 @@ public class SectionsUpdateRequest {
         this.upStationId = upStationId;
         this.distance = distance;
     }
+
+    public Long getDownStationId() {
+        return downStationId;
+    }
+
+    public Long getUpStationId() {
+        return upStationId;
+    }
+
+    public Long getDistance() {
+        return distance;
+    }
 }
