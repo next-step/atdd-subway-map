@@ -75,4 +75,18 @@ class LineTest {
         assertThrows(IllegalArgumentException.class, () -> line.addSection(input));
     }
 
+    @Test
+    @DisplayName("생성된 라인의 구간을 삭제 할 수 있다.")
+    void deleteSection() {
+        line.addSection(inputSection);
+        line.deleteSection(new Station(3L, 교대역));
+
+        Sections actual = line.getSections();
+        Sections expected = Sections.from(
+                List.of(new Section(new Station(1L, 강남역),
+                                new Station(2L, 선릉역),
+                                10L)));
+        assertThat(actual).isEqualTo(expected);
+    }
+
 }
