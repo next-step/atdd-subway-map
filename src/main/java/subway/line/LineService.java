@@ -19,8 +19,11 @@ public class LineService {
 	private final LineRepository lineRepository;
 	private final LineStationMapRepository lineStationMapRepository;
 
-	public LineService(StationRepository stationRepository, LineRepository lineRepository,
-		LineStationMapRepository lineStationMapRepository) {
+	public LineService(
+		StationRepository stationRepository,
+		LineRepository lineRepository,
+		LineStationMapRepository lineStationMapRepository
+	) {
 		this.stationRepository = stationRepository;
 		this.lineRepository = lineRepository;
 		this.lineStationMapRepository = lineStationMapRepository;
