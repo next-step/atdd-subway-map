@@ -1,6 +1,7 @@
 package subway;
 
 import static org.assertj.core.api.Assertions.*;
+import static subway.location.enums.Location.*;
 
 import java.util.List;
 
@@ -9,16 +10,15 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import subway.create.LineCreator;
+import subway.fixture.LineFixture;
 import subway.line.LineResponse;
 import subway.line.LineUpdateRequest;
+import subway.rest.Rest;
 
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -39,20 +39,15 @@ class LineAcceptanceTest {
 	@Test
 	void saveLine() {
 		// when
-		ExtractableResponse<Response> savedLine = LineCreator.init()
+		ExtractableResponse<Response> savedLine = LineFixture.init()
 			.build()
 			.actionReturnExtractableResponse();
-		LineResponse actualResponse = savedLine.jsonPath().getObject("", LineResponse.class);
+		LineResponse actualResponse = savedLine.as(LineResponse.class);
 
-		String uri = String.format("/%s/%s", "lines", actualResponse.getId());
-		LineResponse expectedResponse = RestAssured
-			.given().log().all()
-			.when().get(uri)
-			.then().log().all()
-			.extract().jsonPath().getObject("", LineResponse.class);
+		String uri = LINES.addPath(actualResponse.getId());
+		LineResponse expectedResponse = Rest.builder().get(uri).as(LineResponse.class);
 
 		// then
-		assertThat(savedLine.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 		assertThat(actualResponse).usingRecursiveComparison().isEqualTo(expectedResponse);
 	}
 
@@ -65,24 +60,20 @@ class LineAcceptanceTest {
 	@Test
 	void createLineAndRetrieveLines() {
 		// given
-		LineCreator lineCreator1 = LineCreator.init().build();
-		LineCreator lineCreator2 = LineCreator.init().upStationName("남강역").downStationName("재양역").build();
-		LineResponse line1 = lineCreator1.actionReturnLineResponse();
-		LineResponse line2 = lineCreator2.actionReturnLineResponse();
+		LineFixture lineFixture1 = LineFixture.init().build();
+		LineFixture lineFixture2 = LineFixture.init().upStationName("남강역").downStationName("재양역").build();
+		LineResponse expectedLineResponse1 = lineFixture1.actionReturnLineResponse();
+		LineResponse expectedLineResponse2 = lineFixture2.actionReturnLineResponse();
 
 		// when
-		ExtractableResponse<Response> extractableResponse = RestAssured
-			.given().log().all()
-			.when().get("/lines")
-			.then().log().all()
-			.extract();
-
-		List<LineResponse> actualResponse = extractableResponse.jsonPath().getList("", LineResponse.class);
+		List<LineResponse> actualResponse = Rest.builder()
+			.get(LINES.path())
+			.jsonPath()
+			.getList("", LineResponse.class);
 
 		// then
-		assertThat(extractableResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
-		assertThat(actualResponse.get(0)).usingRecursiveComparison().isEqualTo(line1);
-		assertThat(actualResponse.get(1)).usingRecursiveComparison().isEqualTo(line2);
+		assertThat(actualResponse.get(0)).usingRecursiveComparison().isEqualTo(expectedLineResponse1);
+		assertThat(actualResponse.get(1)).usingRecursiveComparison().isEqualTo(expectedLineResponse2);
 	}
 
 	/**
@@ -94,22 +85,16 @@ class LineAcceptanceTest {
 	@Test
 	void createLineAndRetrieveLine() {
 		// given
-		LineResponse expectedResponse = LineCreator.init()
+		LineResponse expectedResponse = LineFixture.init()
 			.build()
 			.actionReturnLineResponse();
 
 		// when
-		String uri = String.format("/%s/%s", "lines", expectedResponse.getId());
-		ExtractableResponse<Response> extractableResponse = RestAssured
-			.given().log().all()
-			.when().get(uri)
-			.then().log().all()
-			.extract();
-
-		LineResponse actualResponse = extractableResponse.jsonPath().getObject("", LineResponse.class);
+		String uri = LINES.addPath(expectedResponse.getId());
+		ExtractableResponse<Response> extractableResponse = Rest.builder().get(uri);
+		LineResponse actualResponse = extractableResponse.as(LineResponse.class);
 
 		// then
-		assertThat(extractableResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 		assertThat(actualResponse).usingRecursiveComparison().isEqualTo(expectedResponse);
 	}
 
@@ -124,33 +109,18 @@ class LineAcceptanceTest {
 		// given
 		String expectedName = "변경된 이름";
 		String expectedColor = "변경된 색깔";
-		LineResponse lineResponse = LineCreator.init()
+		LineResponse lineResponse = LineFixture.init()
 			.build()
 			.actionReturnLineResponse();
 
 		// when
 		LineUpdateRequest request = new LineUpdateRequest(expectedName, expectedColor);
 
-		String uri = String.format("/%s/%s", "lines", lineResponse.getId());
-		ExtractableResponse<Response> extractableResponse =
-			RestAssured
-				.given().log().all()
-				.body(request)
-				.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.when().put(uri)
-				.then().log().all()
-				.extract();
-
-		LineResponse actualResponse = RestAssured
-			.given().log().all()
-			.body(request)
-			.contentType(MediaType.APPLICATION_JSON_VALUE)
-			.when().get(uri)
-			.then().log().all()
-			.extract().jsonPath().getObject("", LineResponse.class);
+		String uri = LINES.addPath(lineResponse.getId());
+		Rest.builder().uri(uri).body(request).put();
+		LineResponse actualResponse = Rest.builder().get(uri).as(LineResponse.class);
 
 		// then
-		assertThat(extractableResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 		assertThat(actualResponse.getName()).isEqualTo(expectedName);
 		assertThat(actualResponse.getColor()).isEqualTo(expectedColor);
 	}
@@ -164,20 +134,20 @@ class LineAcceptanceTest {
 	@Test
 	void deleteLine() {
 		// given
-		LineResponse lineResponse = LineCreator.init()
+		LineResponse lineResponse = LineFixture.init()
 			.build()
 			.actionReturnLineResponse();
 
 		// when
-		String uri = String.format("/%s/%s", "lines", lineResponse.getId());
-		ExtractableResponse<Response> extractableResponse =
-			RestAssured
-				.given().log().all()
-				.when().delete(uri)
-				.then().log().all()
-				.extract();
+		String uri = LINES.addPath(lineResponse.getId());
+		Rest.builder().delete(uri);
 
 		// then
-		assertThat(extractableResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+		List<LineResponse> actualResponse = Rest.builder()
+			.get(LINES.path())
+			.jsonPath()
+			.getList("", LineResponse.class);
+
+		assertThat(actualResponse).isEmpty();
 	}
 }
