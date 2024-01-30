@@ -39,6 +39,10 @@ public class LineCreateRequest {
 		return distance;
 	}
 
+	public Line toEntity() {
+		return new Line(name, color, distance);
+	}
+
 	public static Builder builder() {
 		return new Builder();
 	}
