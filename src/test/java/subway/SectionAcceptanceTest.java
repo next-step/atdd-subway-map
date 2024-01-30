@@ -89,10 +89,49 @@ public class SectionAcceptanceTest {
 		sectionApiRequest.post(new SectionRequest(4L, 2L, 10), 1L);
 
 		// when
-		ExtractableResponse<Response> response = sectionApiRequest.delete(Map.of("stationId", 2L), 1L);
+		ExtractableResponse<Response> response = sectionApiRequest.delete(Map.of("stationId", 4L), 1L);
 
 		// then
 		assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-		assertThat(sectionApiRequest.get(1L).jsonPath().getString("downStationId")).doesNotContain("2");
+		assertThat(sectionApiRequest.get(1L).jsonPath().getString("downStationId")).doesNotContain("4");
+	}
+
+	/**
+	 * Given 지하철 노선에 구간을 생성한다.
+	 * When 해당 노선의 하행 종점역이 아닌 구간을 삭제하면
+	 * Then 삭제되지 않고 코드값 500 (Internal sever Error) 을 반환한다.
+	 */
+	@DisplayName("지하철 노선의 하행 종점역이 아닌 구간을 제거하면 실패한다.")
+	@DirtiesContext
+	@Test
+	void deleteSectionWithStationIsNotEndThenFailTest() {
+		// given
+		sectionApiRequest.post(new SectionRequest(4L, 2L, 10), 1L);
+
+		// when
+		ExtractableResponse<Response> response = sectionApiRequest.delete(Map.of("stationId", 2L), 1L);
+
+		// then
+		assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+	}
+
+	/**
+	 * Given 지하철 노선에 구간을 생성한다.
+	 * When 해당 노선에 상행 종점역과 하행 종점역만 있는 경우 해당 구간을 삭제하면
+	 * Then 삭제되지 않고 코드값 500 (Internal sever Error) 을 반환한다.
+	 */
+	@DisplayName("상행 종점역과 하행 종점역만 있는 지하철 노선의 구간을 제거하면 실패한다.")
+	@DirtiesContext
+	@Test
+	void deleteSectionWithLineHasOneSectionThenFailTest() {
+		// given
+		sectionApiRequest.post(new SectionRequest(4L, 2L, 10), 1L);
+
+		// when
+		sectionApiRequest.delete(Map.of("stationId", 4L), 1L);
+		ExtractableResponse<Response> response = sectionApiRequest.delete(Map.of("stationId", 2L), 1L);
+
+		// then
+		assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
 	}
 }
