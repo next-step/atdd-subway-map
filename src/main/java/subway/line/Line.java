@@ -23,7 +23,6 @@ public class Line {
     private Long downStationId;
     @OneToMany(mappedBy = "line", fetch = FetchType.LAZY, orphanRemoval = true)
     List<Section> sections = new ArrayList<>();
-
     public Line() {
     }
 
@@ -83,21 +82,17 @@ public class Line {
     }
 
     public void deleteValidate(final Long stationId) {
-        System.out.println("1111111");
-        System.out.println(this.downStationId);
-        System.out.println(stationId);
         if (this.downStationId != stationId) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제할 수 없는 지하철 역 입니다.");
         }
 
-        System.out.println("this.sections.size()");
-        System.out.println(this.sections.size());
         if (this.sections.size() < 2) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제할 수 없는 지하철 역 입니다.");
         }
     }
 
-    public void changeDownStation(final Station downStation) {
-        this.downStationId = downStation.getId();
+    public void changeDownStation(final Station station) {
+        this.downStationId = station.getId();
     }
+
 }

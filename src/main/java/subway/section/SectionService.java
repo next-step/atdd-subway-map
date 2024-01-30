@@ -58,6 +58,7 @@ public class SectionService {
         final List<Section> sections = line.getSections();
         for (Section section : sections) {
             if (section.getDownStation().getId() == stationId) {
+                line.changeDownStation(section.getUpStation());
                 sectionRepository.delete(section);
             }
         }
