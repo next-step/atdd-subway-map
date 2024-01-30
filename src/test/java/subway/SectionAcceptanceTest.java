@@ -11,6 +11,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
+import subway.dto.SectionRequest;
 import subway.dto.StationResponse;
 
 import java.util.Map;
@@ -21,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철 구간 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class SectionAcceptanceTest {
-	private final RestApiRequest<Map<String, Object>> sectionApiRequest = new RestApiRequest<>("/lines/{id}/sections");
+	private final RestApiRequest<SectionRequest> sectionApiRequest = new RestApiRequest<>("/lines/{id}/sections");
 	private final RestApiRequest<LineRequest> lineApiRequest = new RestApiRequest<>("/lines/{id}");
 
 	/**
@@ -32,11 +33,7 @@ public class SectionAcceptanceTest {
 	@Test
 	void createSectionTest() {
 		// when
-		ExtractableResponse<Response> response = sectionApiRequest.post(Map.of(
-				"downStationId", 3L
-				,"upStationId", 2L
-				,"distance", 10
-				,"line_id", 1L), 1L);
+		ExtractableResponse<Response> response = sectionApiRequest.post(new SectionRequest(3L, 2L, 10), 1L);
 
 		// then
 		assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -54,17 +51,10 @@ public class SectionAcceptanceTest {
 	@Test
 	void createSectionWithRegisteredStationThenFailTest() {
 		// given
-		sectionApiRequest.post(Map.of(
-				"downStationId", 4L
-				,"upStationId", 2L
-				,"distance", 10
-				,"line_id", 1L), 1L);
+		sectionApiRequest.post(new SectionRequest(4L, 2L, 10), 1L);
 
 		// when & then
-		ExtractableResponse<Response> response = sectionApiRequest.post(Map.of(
-				"downStationId", 2L
-				,"upStationId", 4L
-				,"distance", 10), 1L);
+		ExtractableResponse<Response> response = sectionApiRequest.post(new SectionRequest(4L, 2L, 10), 1L);
 
 		// then
 		assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
@@ -80,16 +70,10 @@ public class SectionAcceptanceTest {
 	@Test
 	void createSectionWithUpStationIsNotEndStationThenFailTest() {
 		// given
-		sectionApiRequest.post(Map.of(
-				"downStationId", 4L
-				,"upStationId", 2L
-				,"distance", 10), 1L);
+		sectionApiRequest.post(new SectionRequest(4L, 2L, 10), 1L);
 
 		// when
-		ExtractableResponse<Response> response = sectionApiRequest.post(Map.of(
-				"downStationId", 5L
-				,"upStationId", 3L
-				,"distance", 10), 1L);
+		ExtractableResponse<Response> response = sectionApiRequest.post(new SectionRequest(5L, 3L, 10), 1L);
 
 		// then
 		assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
