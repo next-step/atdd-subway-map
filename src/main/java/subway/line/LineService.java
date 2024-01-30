@@ -57,6 +57,7 @@ public class LineService {
                            SectionsUpdateRequest sectionsUpdateRequest) {
         Line line = lineRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 지하철라인 정보를 찾지 못했습니다."));
         line.addSection(createSection(sectionsUpdateRequest));
+        lineRepository.save(line);
     }
 
     private Section createSection(SectionsUpdateRequest sectionsUpdateRequest) {

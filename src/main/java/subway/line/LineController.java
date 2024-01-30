@@ -43,4 +43,11 @@ public class LineController {
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping(value = "/lines/{id}/sections")
+    public ResponseEntity<Void> addSection(@PathVariable Long id,
+                                           @RequestBody SectionsUpdateRequest sectionsUpdateRequest) {
+        lineService.addSection(id, sectionsUpdateRequest);
+        return ResponseEntity.noContent().build();
+    }
+
 }

@@ -180,8 +180,8 @@ public class LineAcceptanceTest {
 
         // then
         response = LineApiCaller.callApiFindLine(location);
-        List<Long> actual = response.jsonPath().getList("id", Long.class);
-        Long[] expected = {1L, 2L, 3L};
+        List<Long> actual = response.jsonPath().getList("stations.id", Long.class);
+        Long[] expected = {firstSectionId, secondSectionId, thirdSectionId};
         assertThat(actual).containsExactly(expected);
     }
 }
