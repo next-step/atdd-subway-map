@@ -103,6 +103,26 @@ public class LineAcceptanceTest {
         assertThat(response.jsonPath().getString("name")).isEqualTo("다른분당선");
     }
 
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 삭제하면
+     * Then 해당 지하철 노선 정보는 삭제된다
+     */
+    @DisplayName("지하철 노선을 삭제한다.")
+    @Test
+    void deleteLine() {
+        // given
+        ExtractableResponse<Response> line = createLine("신분당선", "bg-red-600", 1L, 2L);
+        String locationHeader = line.header("Location");
+
+        // when
+        deleteLine(locationHeader);
+        List<String> lineNames = getLineNames();
+
+        // then
+        assertThat(lineNames).doesNotContain("신분당선");
+    }
+
     private static ExtractableResponse<Response> createStation(String name) {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
@@ -159,6 +179,13 @@ public class LineAcceptanceTest {
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
                 .extract();
+    }
+
+    private static void deleteLine(String locationHeader) {
+        RestAssured.given().log().all()
+                .when().delete(locationHeader)
+                .then().log().all()
+                .statusCode(HttpStatus.NO_CONTENT.value());
     }
 
 }

@@ -38,16 +38,21 @@ public class LineService {
                 .collect(Collectors.toList());
     }
 
-    public LineResponse findById(Long id) {
+    public LineResponse findLineById(Long id) {
         return lineRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException())
                 .createLineResponse();
     }
 
     @Transactional
-    public void updateById(Long id, LineUpdateRequest lineUpdateRequest) {
+    public void updateLineById(Long id, LineUpdateRequest lineUpdateRequest) {
         lineRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException())
                 .update(lineUpdateRequest);
+    }
+
+    @Transactional
+    public void deleteLineById(Long id) {
+        lineRepository.deleteById(id);
     }
 }
