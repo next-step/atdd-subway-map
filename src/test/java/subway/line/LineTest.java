@@ -60,4 +60,5 @@ class LineTest {
                 5L);
         assertThrows(IllegalArgumentException.class, () -> line.addSection(input));
     }
+
 }

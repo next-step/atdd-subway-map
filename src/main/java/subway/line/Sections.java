@@ -55,4 +55,8 @@ public class Sections {
     public int hashCode() {
         return Objects.hash(sectionList);
     }
+
+    public boolean isSameDownStation(Station station) {
+        return lastStation().equals(station);
+    }
 }
