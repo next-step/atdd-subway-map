@@ -54,4 +54,8 @@ public class Line {
         return distance;
     }
 
+    public void changeLineInfo(String name, String color) {
+        this.name = name;
+        this.color = color;
+    }
 }

@@ -52,6 +52,11 @@ public class LineService {
         return createLineResponse(line, stations);
     }
 
+    public void modifyLine(Long id, LineRequest lineRequest) {
+        Line line = lineRepository.findById(id).orElseThrow();
+        line.changeLineInfo(lineRequest.getName(), lineRequest.getColor());
+    }
+
     private LineResponse createLineResponse(Line line, List<Station> stations) {
         return new LineResponse(
                 line.getId(),

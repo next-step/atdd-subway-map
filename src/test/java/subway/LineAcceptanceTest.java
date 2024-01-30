@@ -186,7 +186,7 @@ public class LineAcceptanceTest {
      */
     @DisplayName("지하철 노선을 수정한다")
     @Test
-    void createAndEditLine() {
+    void createAndModifyLine() {
 
         //given
         StationRestAssuredCRUD.createStation("강남역");
@@ -201,10 +201,10 @@ public class LineAcceptanceTest {
 
         ExtractableResponse<Response> createResponse = RestAssured
                 .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(param)
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                    .body(param)
                 .when()
-                .post("/lines")
+                    .post("/lines")
                 .then().log().all()
                 .extract();
 
@@ -219,13 +219,14 @@ public class LineAcceptanceTest {
                 .given().log().all()
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
                     .pathParam("id", createdId)
+                    .body(editParam)
                 .when()
                     .put("/lines/{id}")
                 .then().log().all()
                 .extract();
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
     }
 }
