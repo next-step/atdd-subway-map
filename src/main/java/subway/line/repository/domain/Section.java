@@ -47,6 +47,10 @@ public class Section {
         return distance;
     }
 
+    public boolean contains(final Station station) {
+        return upStation.equals(station) || downStation.equals(station);
+    }
+
     @Override
     public boolean equals(final Object o) {
         if (this == o) return true;

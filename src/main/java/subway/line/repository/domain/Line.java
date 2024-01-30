@@ -1,12 +1,6 @@
 package subway.line.repository.domain;
 
-import subway.line.exception.SectionConnectException;
-import subway.station.repository.domain.Station;
-
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 @Entity
 public class Line {
@@ -20,9 +14,8 @@ public class Line {
     @Column(length = 20, nullable = false)
     private String color;
 
-    @OneToMany(cascade = CascadeType.PERSIST, orphanRemoval = true)
-    @JoinColumn(name = "section_id")
-    private List<Section> sections = new ArrayList<>();
+    @Embedded
+    private Sections sections = new Sections();
 
     @Column(nullable = false)
     private int distance;
@@ -48,8 +41,8 @@ public class Line {
         return color;
     }
 
-    public List<Section> getSections() {
-        return Collections.unmodifiableList(sections);
+    public Sections getSections() {
+        return sections;
     }
 
     public int getDistance() {
@@ -65,31 +58,8 @@ public class Line {
     }
 
     public void addSection(final Section section) {
-        if (!this.sections.isEmpty()) {
-            validateSectionConnectivity(section);
-        }
-
-        this.sections.add(section);
+        this.sections.connect(section);
         distance += section.getDistance();
     }
 
-    private void validateSectionConnectivity(final Section section) {
-        final Station downStation = section.getDownStation();
-        if(isAlreadyConnectedSection(downStation)) {
-            throw new SectionConnectException("생성할 구간 하행역이 해당 노선에 이미 등록되어있습니다.");
-        }
-
-        final Station lastDownStation = getLastDownStation();
-        if (!section.getUpStation().equals(lastDownStation)) {
-            throw new SectionConnectException("생성할 구간 상행역이 해당 노선의 하행 종점역이 아닙니다.");
-        }
-    }
-
-    private boolean isAlreadyConnectedSection(final Station downStation) {
-        return this.sections.stream().anyMatch(row -> row.getUpStation().equals(downStation) || row.getDownStation().equals(downStation));
-    }
-
-    private Station getLastDownStation() {
-        return this.sections.get(sections.size() - 1).getDownStation();
-    }
 }

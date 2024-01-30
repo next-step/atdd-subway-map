@@ -1,7 +1,7 @@
 package subway.line.service.dto;
 
 import subway.line.repository.domain.Line;
-import subway.line.repository.domain.Section;
+import subway.line.repository.domain.Sections;
 import subway.station.service.dto.StationResponse;
 
 import java.util.List;
@@ -36,7 +36,7 @@ public class LineResponse {
         );
     }
 
-    private static List<StationResponse> createStationResponseFrom(final List<Section> sections) {
+    private static List<StationResponse> createStationResponseFrom(final Sections sections) {
         return sections
                 .stream()
                 .flatMap(section -> Stream.of(section.getUpStation(), section.getDownStation()))

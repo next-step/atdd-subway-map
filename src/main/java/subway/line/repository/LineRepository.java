@@ -12,6 +12,6 @@ public interface LineRepository extends JpaRepository<Line, Long> {
     @Query("select line from Line line left join fetch line.sections")
     List<Line> findAllWithLines();
 
-    @Query("select line from Line line left join fetch line.sections section join fetch section.upStation join fetch section.downStation where line.id = :id")
+    @Query("select line from Line line left join fetch line.sections.sections section join fetch section.upStation join fetch section.downStation where line.id = :id")
     Optional<Line> findByIdWithSection(@Param("id") Long id);
 }
