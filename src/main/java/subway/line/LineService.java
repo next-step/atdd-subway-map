@@ -52,15 +52,15 @@ public class LineService {
 	}
 
 	private List<Station> createLineStationMap(Line line, Long upStationId, Long downStationId) {
-		LineStationMap upLane = saveLineStationMap(Lane.UP, line, 999, upStationId);
-		LineStationMap downLane = saveLineStationMap(Lane.DOWN, line, 999, downStationId);
+		LineStationMap upLane = saveLineStationMap(line, upStationId, 0L);
+		LineStationMap downLane = saveLineStationMap(line, downStationId, upLane.getStation().getId());
 		return List.of(upLane.getStation(), downLane.getStation());
 	}
 
-	private LineStationMap saveLineStationMap(Lane lane, Line line, Integer sort, Long stationId) {
+	private LineStationMap saveLineStationMap(Line line, Long stationId, Long upperId) {
 		Station station = stationRepository.findById(stationId)
 			.orElseThrow(EntityNotFoundException::new);
-		LineStationMap lineStationMap = new LineStationMap(lane, line, sort, station);
+		LineStationMap lineStationMap = new LineStationMap(line, station, upperId);
 		return lineStationMapRepository.save(lineStationMap);
 	}
 
