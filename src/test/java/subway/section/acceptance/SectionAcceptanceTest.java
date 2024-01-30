@@ -82,9 +82,9 @@ public class SectionAcceptanceTest {
             assertSoftly(softly -> {
                 softly.assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
                 final LineResponse lineResponse = LineApiHelper.fetchLineById(신분당선_Id).as(LineResponse.class);
-                softly.assertThat(lineResponse.getDistance()).isEqualTo(신분당선_distance + 구간_distance);
+                softly.assertThat(lineResponse.getDistance()).isEqualTo(신분당선_distance);
                 softly.assertThat(lineResponse.getStations())
-                        .extracting("id").containsExactly(지하철역_Id, 또다른지하철역_Id);
+                        .extracting("id").containsExactly(지하철역_Id, 새로운지하철역_Id);
             });
         }
 

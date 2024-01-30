@@ -1,5 +1,8 @@
 package subway.line.repository.domain;
 
+import subway.line.exception.SectionConnectException;
+import subway.station.repository.domain.Station;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -62,7 +65,22 @@ public class Line {
     }
 
     public void addSection(final Section section) {
+        if (!this.sections.isEmpty()) {
+            validateSectionConnectivity(section);
+        }
+
         this.sections.add(section);
         distance += section.getDistance();
+    }
+
+    private void validateSectionConnectivity(final Section section) {
+        final Station lastDownStation = getLastDownStation();
+        if (!section.getUpStation().equals(lastDownStation)) {
+            throw new SectionConnectException("생성할 구간 상행역이 해당 노선의 하행 종점역이 아닙니다.");
+        }
+    }
+
+    private Station getLastDownStation() {
+        return this.sections.get(sections.size() - 1).getDownStation();
     }
 }
