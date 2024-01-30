@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -18,55 +19,200 @@ import subway.line.LineResponse;
 import subway.line.LineUpdateRequest;
 import subway.station.StationResponse;
 
-@DisplayName("지하철노선 관련 기능")
+@DisplayName("지하철 노선 관련 기능")
 public class LineAcceptanceTest extends AcceptanceTest {
 
-  /**
-   * When 노선을 생성하면
-   * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
-   */
-  @DisplayName("노선을 생성한다.")
-  @Test
-  void createLineSuccess() {
-    // given
-    final var lineName = "신분당선";
-    final var upStation = StationFixture.createStation("강남역");
-    final var downStation = StationFixture.createStation("청계산입구역");
+  @Nested
+  @DisplayName("지하철 노선 기본 기능")
+  class LineTest {
 
-    // when
-    Map<String, Object> params = new HashMap<>();
-    params.put("name", lineName);
-    params.put("color", "bg-red-600");
-    params.put("upStationId", upStation.getId());
-    params.put("downStationId", downStation.getId());
-    params.put("distance", 10);
+    /**
+     * When 노선을 생성하면
+     * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
+     */
+    @DisplayName("노선을 생성한다.")
+    @Test
+    void createLineSuccess() {
+      // given
+      final var lineName = "신분당선";
+      final var upStation = StationFixture.createStation("강남역");
+      final var downStation = StationFixture.createStation("청계산입구역");
 
-    final var response = RestAssured
-        .given().log().all()
-        .body(params)
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when().post("/lines")
-        .then().log().all()
-        .extract();
+      // when
+      Map<String, Object> params = new HashMap<>();
+      params.put("name", lineName);
+      params.put("color", "bg-red-600");
+      params.put("upStationId", upStation.getId());
+      params.put("downStationId", downStation.getId());
+      params.put("distance", 10);
 
-    final var line = LineFixture.getLines().stream()
-        .filter(it -> lineName.equals(it.getName()))
-        .findFirst();
+      final var response = RestAssured
+          .given().log().all()
+          .body(params)
+          .contentType(MediaType.APPLICATION_JSON_VALUE)
+          .when().post("/lines")
+          .then().log().all()
+          .extract();
 
-    // then
-    assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+      final var line = LineFixture.getLines().stream()
+          .filter(it -> lineName.equals(it.getName()))
+          .findFirst();
 
-    // then
-    assertThat(line).isNotEmpty();
+      // then
+      assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
-    // then
-    final var stationIds = line.map(LineResponse::getStations)
-        .orElseGet(Collections::emptyList).stream()
-        .map(StationResponse::getId)
-        .collect(Collectors.toList());
+      // then
+      assertThat(line).isNotEmpty();
 
-    assertThat(upStation.getId()).isIn(stationIds);
-    assertThat(downStation.getId()).isIn(stationIds);
+      // then
+      final var stationIds = line.map(LineResponse::getStations)
+          .orElseGet(Collections::emptyList).stream()
+          .map(StationResponse::getId)
+          .collect(Collectors.toList());
+
+      assertThat(upStation.getId()).isIn(stationIds);
+      assertThat(downStation.getId()).isIn(stationIds);
+    }
+
+    /**
+     * Given 2개의 지하철 노선을 생성하고
+     * When 지하철 노선 목록을 조회하면
+     * Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
+     */
+    @DisplayName("노선 목록을 조회한다.")
+    @Test
+    void getLinesSuccess() {
+      // given
+      final var 강남역 = StationFixture.createStation("강남역");
+      final var 청계산입구역 = StationFixture.createStation("청계산입구역");
+      final var 논현역 = StationFixture.createStation("논현역");
+      final var 강남구청역 = StationFixture.createStation("강남구청역");
+      final var createdLines = List.of(
+          LineFixture.createLine("신분당선", "bg-red-600", 강남역.getId(), 청계산입구역.getId(), 10),
+          LineFixture.createLine("7호선", "bg-green-300", 논현역.getId(), 강남구청역.getId(), 20)
+      );
+
+      // when
+      final var response = RestAssured
+          .given().log().all()
+          .contentType(MediaType.APPLICATION_JSON_VALUE)
+          .when().get("/lines")
+          .then().log().all()
+          .extract();
+
+      final var lineIds = response.jsonPath().getList("id", Long.class);
+
+      // then
+      assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+      // then
+      createdLines.forEach(
+          createdLine -> assertThat(createdLine.getId()).isIn(lineIds)
+      );
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 조회하면
+     * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
+     */
+    @DisplayName("노선을 조회한다.")
+    @Test
+    void getLineSuccess() {
+      // given
+      final var upStation = StationFixture.createStation("강남역");
+      final var downStation = StationFixture.createStation("청계산입구역");
+      final var createdLine = LineFixture.createLine("신분당선", "bg-red-600", upStation.getId(), downStation.getId(), 10);
+
+      // when
+      final var response = RestAssured
+          .given().log().all()
+          .contentType(MediaType.APPLICATION_JSON_VALUE)
+          .when().get("/lines/{id}", createdLine.getId())
+          .then().log().all()
+          .extract();
+
+      final var line = response.as(LineResponse.class);
+
+      // then
+      assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+      // then
+      assertThat(createdLine.getId()).isEqualTo(line.getId());
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 수정하면
+     * Then 해당 지하철 노선 정보는 수정된다
+     */
+    @DisplayName("노선을 수정한다.")
+    @Test
+    void updateLineSuccess() {
+      // given
+      final var upStation = StationFixture.createStation("강남역");
+      final var downStation = StationFixture.createStation("청계산입구역");
+      final var createdLine = LineFixture.createLine("신분당선", "bg-red-600", upStation.getId(), downStation.getId(), 10);
+      final var updateParam = new LineUpdateRequest("2호선", "bg-green-800");
+
+      // when
+      Map<String, Object> params = new HashMap<>();
+      params.put("name", updateParam.getName());
+      params.put("color", updateParam.getColor());
+
+      final var response = RestAssured
+          .given().log().all()
+          .body(params)
+          .contentType(MediaType.APPLICATION_JSON_VALUE)
+          .when().put("/lines/{id}", createdLine.getId())
+          .then().log().all()
+          .extract();
+
+      final var line = LineFixture.getLines().stream()
+          .filter(it -> createdLine.getId().equals(it.getId()))
+          .findFirst();
+
+      // then
+      assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+      // then
+      assertThat(line.isPresent()).isTrue();
+      assertThat(line.get().getName()).isEqualTo(updateParam.getName());
+      assertThat(line.get().getColor()).isEqualTo(updateParam.getColor());
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 삭제하면
+     * Then 해당 지하철 노선 정보는 삭제된다
+     */
+    @DisplayName("지하철역을 삭제한다.")
+    @Test
+    void deleteLineSuccess() {
+      // given
+      final var upStation = StationFixture.createStation("강남역");
+      final var downStation = StationFixture.createStation("청계산입구역");
+      final var deletedLine = LineFixture.createLine("신분당선", "bg-red-600", upStation.getId(), downStation.getId(), 10);
+
+      // when
+      final var response = RestAssured
+          .given().log().all()
+          .contentType(MediaType.APPLICATION_JSON_VALUE)
+          .when().delete("/lines/{id}", deletedLine.getId())
+          .then().log().all()
+          .extract();
+
+      final var remainingLineIds = LineFixture.getLines().stream()
+          .map(LineResponse::getId)
+          .collect(Collectors.toList());
+
+      // then
+      assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+      // then
+      assertThat(deletedLine.getId()).isNotIn(remainingLineIds);
+    }
+
   }
 
   /**
