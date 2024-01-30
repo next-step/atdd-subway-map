@@ -1,31 +1,20 @@
 package subway;
 
-import io.restassured.RestAssured;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
+import static org.assertj.core.api.Assertions.*;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
+import subway.rest.Rest;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class RestAssuredTest {
-
+class RestAssuredTest {
     @DisplayName("구글 페이지 접근 테스트")
     @Test
     void accessGoogle() {
-        // TODO: 구글 페이지 요청 구현
-        ExtractableResponse<Response> response = RestAssured.given()
-            .log().all()
-            .baseUri("https://www.google.co.kr/")
-            .accept(MediaType.APPLICATION_JSON_VALUE)
-            .when().get()
-            .then().log().all()
-            .extract();
-
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        ExtractableResponse<Response> extractableResponse = Rest.builder().get("https://www.google.co.kr");
+        assertThat(extractableResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 }
