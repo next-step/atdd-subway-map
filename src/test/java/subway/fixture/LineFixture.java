@@ -41,4 +41,12 @@ public class LineFixture {
     );
   }
 
+  public static LineResponse getLine(final Long id) {
+    return RestAssured
+            .given()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().get("/lines/{id}", id)
+            .then().extract().as(LineResponse.class);
+  }
+
 }
