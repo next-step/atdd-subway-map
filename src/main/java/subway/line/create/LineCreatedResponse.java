@@ -1,4 +1,4 @@
-package subway.line;
+package subway.line.create;
 
 import java.util.List;
 
