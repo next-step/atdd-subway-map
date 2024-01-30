@@ -34,6 +34,6 @@ public class LineController {
     public ResponseEntity<LineResponse> modifyLine(@PathVariable Long id,
                                                    @RequestBody LineRequest lineRequest) {
         lineService.modifyLine(id, lineRequest);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }
 }
