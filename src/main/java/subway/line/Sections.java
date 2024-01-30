@@ -65,4 +65,12 @@ public class Sections {
         return Objects.hash(sectionList);
     }
 
+    public Section delete(Station station) {
+        Section lastSection = this.sectionList.stream()
+                .filter(section -> section.isSameDownStation(station))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("삭제할 역을 찾지 못하였습니다."));
+        this.sectionList.remove(lastSection);
+        return lastSection;
+    }
 }

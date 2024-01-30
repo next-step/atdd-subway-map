@@ -90,11 +90,13 @@ public class Line {
             throw new IllegalArgumentException("이미 구간에 포함 되어 있는 역 입니다.");
         }
 
-        this.distance = section.calculateDistance(distance);
+        this.distance = section.calculateAddDistance(this.distance);
         this.sections.add(section);
     }
 
     public void deleteSection(Station station) {
+        Section removedSection = this.sections.delete(station);
+        this.distance = removedSection.calculateSubDistance(this.distance);
     }
 
     @Override

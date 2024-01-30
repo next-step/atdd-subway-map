@@ -37,8 +37,12 @@ public class Section {
         return downStation;
     }
 
-    public Long calculateDistance(Long distance) {
-        return this.distance + distance;
+    public Long calculateAddDistance(Long distance) {
+        return distance + this.distance;
+    }
+
+    public Long calculateSubDistance(Long distance) {
+        return distance - this.distance;
     }
 
     public boolean anyMatchUpStationOrDownStation(Section section) {

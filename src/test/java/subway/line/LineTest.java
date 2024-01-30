@@ -87,6 +87,10 @@ class LineTest {
                                 new Station(2L, 선릉역),
                                 10L)));
         assertThat(actual).isEqualTo(expected);
+
+        Long actualDistance = line.getDistance();
+        Long expectedDistance = 10L;
+        assertThat(actualDistance).isEqualTo(expectedDistance);
     }
 
 }
