@@ -202,8 +202,8 @@ public class LineAcceptanceTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-        ExtractableResponse<Response> loadLine = loadLine(response.jsonPath().getLong("id"));
-        assertThat(loadLine.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        ExtractableResponse<Response> loadLine = loadLine(Long.valueOf(이호선_ID));
+        assertThat(loadLine.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
 

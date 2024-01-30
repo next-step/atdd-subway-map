@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import subway.line.create.LineCreateRequest;
 import subway.line.create.LineCreateService;
 import subway.line.create.LineCreatedResponse;
+import subway.line.delete.LineDeleteService;
 import subway.line.load.LineLoadService;
 import subway.line.load.LineLoadedResponse;
 import subway.line.update.LineUpdateRequest;
@@ -20,11 +21,13 @@ public class LineController {
     private final LineCreateService lineCreateService;
     private final LineLoadService lineLoadService;
     private final LineUpdateService lineUpdateService;
+    private final LineDeleteService lineDeleteService;
 
-    public LineController(LineCreateService lineCreateService, LineLoadService lineLoadService, LineUpdateService lineUpdateService) {
+    public LineController(LineCreateService lineCreateService, LineLoadService lineLoadService, LineUpdateService lineUpdateService, LineDeleteService lineDeleteService) {
         this.lineCreateService = lineCreateService;
         this.lineLoadService = lineLoadService;
         this.lineUpdateService = lineUpdateService;
+        this.lineDeleteService = lineDeleteService;
     }
 
     @PostMapping
@@ -41,13 +44,19 @@ public class LineController {
 
     @GetMapping("/{line-id}")
     public ResponseEntity<LineLoadedResponse> getLine(@PathVariable("line-id") Long lineId) {
-        LineLoadedResponse response = lineLoadService.getLine(lineId);
+        LineLoadedResponse response = lineLoadService.loadLine(lineId);
         return ResponseEntity.ok().body(response);
     }
 
     @PutMapping("/{line-id}")
-    public ResponseEntity<LineLoadedResponse> updateLine(@PathVariable("line-id") Long lineId, @RequestBody LineUpdateRequest request) {
+    public ResponseEntity<Void> updateLine(@PathVariable("line-id") Long lineId, @RequestBody LineUpdateRequest request) {
         lineUpdateService.updateLine(lineId, request);
         return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{line-id}")
+    public ResponseEntity<Void> deleteLine(@PathVariable("line-id") Long lineId) {
+        lineDeleteService.deleteLine(lineId);
+        return ResponseEntity.noContent().build();
     }
 }

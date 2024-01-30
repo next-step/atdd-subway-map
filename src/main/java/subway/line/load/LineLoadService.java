@@ -28,7 +28,7 @@ public class LineLoadService {
                 .collect(Collectors.toList());
         }
 
-    public LineLoadedResponse getLine(Long lineId) {
+    public LineLoadedResponse loadLine(Long lineId) {
         Line line = lineRepository.findById(lineId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 노선입니다. lineId: " + lineId));
 
