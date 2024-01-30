@@ -23,6 +23,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class LineAcceptanceTest {
     private static boolean setUpIsDone = false;
 
+    private static final LineRequest LINE_REQUEST_1 = new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10L);
+    private static final LineRequest LINE_REQUEST_2 = new LineRequest("분당선", "bg-green-600", 1L, 3L, 7L);
+
     @BeforeEach
     public void setUp() {
         if (setUpIsDone) return;
@@ -75,8 +78,7 @@ public class LineAcceptanceTest {
     @Test
     void createLine() {
         // when
-        LineRequest lineRequest = new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10L);
-        ExtractableResponse<Response> newLineResponse = makeLine(lineRequest);
+        ExtractableResponse<Response> newLineResponse = makeLine(LINE_REQUEST_1);
 
         // then
         List<Long> ids = getLines().jsonPath().getList("id", Long.class);
@@ -93,8 +95,8 @@ public class LineAcceptanceTest {
     @Test
     void showLines() {
         // given
-        Long id_1 = makeLine(new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10L)).jsonPath().getLong("id");
-        Long id_2 = makeLine(new LineRequest("분당선", "bg-green-600", 1L, 3L, 7L)).jsonPath().getLong("id");
+        Long id_1 = makeLine(LINE_REQUEST_1).jsonPath().getLong("id");
+        Long id_2 = makeLine(LINE_REQUEST_2).jsonPath().getLong("id");
 
         //when
         ExtractableResponse<Response> response = getLines();
@@ -112,7 +114,7 @@ public class LineAcceptanceTest {
     @Test
     void showLine() {
         // given
-        Long id = makeLine(new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10L)).jsonPath().getLong("id");
+        Long id = makeLine(LINE_REQUEST_1).jsonPath().getLong("id");
 
         //when
         ExtractableResponse<Response> response = getLine(id);
@@ -130,7 +132,7 @@ public class LineAcceptanceTest {
     @Test
     void updateLine() {
         // given
-        Long id = makeLine(new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10L)).jsonPath().getLong("id");
+        Long id = makeLine(LINE_REQUEST_1).jsonPath().getLong("id");
 
         // when
         Map<String, String> request = Map.of("name", "다른분당선", "color", "bg-red-600");
@@ -143,11 +145,35 @@ public class LineAcceptanceTest {
                 .put("/lines/" + id)
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value());
-        // 문제없음
+
         // then
         ExtractableResponse<Response> response = getLine(id);
 
         assertThat(response.jsonPath().getString("name")).isEqualTo("다른분당선");
         assertThat(response.jsonPath().getString("color")).isEqualTo("bg-red-600");
+    }
+
+    /**
+     * given 지하철 노선을 생성하고
+     * when 생성한 지하철 노선을 삭제하면
+     * then 해당 지하철 노선 정보는 삭제된다.
+     */
+    @DisplayName("지하철 노선 삭제")
+    @Test
+    void deleteLine() {
+        // given
+        Long id = makeLine(LINE_REQUEST_1).jsonPath().getLong("id");
+
+        // when
+        RestAssured
+                .given().log().all()
+                .when()
+                .delete("/lines/" + id)
+                .then()
+                .statusCode(HttpStatus.NO_CONTENT.value());
+
+        // then
+        ExtractableResponse<Response> response = getLines();
+        assertThat(response.jsonPath().getList("id", Long.class)).doesNotContain(id);
     }
 }
