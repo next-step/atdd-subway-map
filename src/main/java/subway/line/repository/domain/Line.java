@@ -1,5 +1,7 @@
 package subway.line.repository.domain;
 
+import subway.station.repository.domain.Station;
+
 import javax.persistence.*;
 
 @Entity
@@ -58,8 +60,12 @@ public class Line {
     }
 
     public void addSection(final Section section) {
-        this.sections.connect(section);
+        sections.connect(section);
         distance += section.getDistance();
     }
-
+    public void removeSectionByStation(final Station station) {
+        final int lastSectionDistance = sections.getLastSectionDistance();
+        distance -= lastSectionDistance;
+        sections.disconnectLastSection(station);
+    }
 }

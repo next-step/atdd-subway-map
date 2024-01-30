@@ -36,6 +36,16 @@ public class Sections implements Iterable<Section> {
         this.sections.add(section);
     }
 
+    public int getLastSectionDistance() {
+        return getLastSection()
+                .map(Section::getDistance)
+                .orElse(0);
+    }
+
+    public void disconnectLastSection(final Station station) {
+        this.sections.remove(sections.size() - 1);
+    }
+
     private void validateSectionConnection(final Section section) {
         if(sections.isEmpty()) {
             return;
@@ -61,9 +71,13 @@ public class Sections implements Iterable<Section> {
     }
 
     private Optional<Station> getLastDownStation() {
+        return getLastSection().map(Section::getDownStation);
+    }
+
+    private Optional<Section> getLastSection() {
         if(sections.isEmpty()) {
             return Optional.empty();
         }
-        return Optional.of(sections.get(sections.size() - 1).getDownStation());
+        return Optional.of(sections.get(sections.size() - 1));
     }
 }

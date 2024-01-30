@@ -74,6 +74,13 @@ public class LineService {
         line.addSection(newSection);
     }
 
+    @Transactional
+    public void removeSection(final Long lineId, final Long stationId) {
+        final Station station = findStation(stationId);
+        final Line line = findLine(lineId);
+        line.removeSectionByStation(station);
+    }
+
     private Section createSection(final SectionCreateRequest sectionCreateRequest) {
         final Station upStation = findStation(sectionCreateRequest.getUpStationId());
         final Station downStation = findStation(sectionCreateRequest.getDownStationId());
@@ -87,4 +94,5 @@ public class LineService {
     private Station findStation(final Long stationId) {
         return stationRepository.findById(stationId).orElseThrow(() -> new StationNotExistException(stationId));
     }
+
 }
