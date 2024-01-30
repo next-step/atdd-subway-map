@@ -34,7 +34,7 @@ public class SectionService {
                 .orElseThrow(() -> new IllegalArgumentException(EMPTY_UP_STATION_MSG));
         final Station downStation = stationRepository.findById(sectionRequest.getDownStationId())
                 .orElseThrow(() -> new IllegalArgumentException(EMPTY_DOWN_STATION_MSG));
-        line.registerValidate(upStation);
+        line.registerValidate(upStation, downStation);
         return null;
     }
 }

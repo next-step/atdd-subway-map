@@ -58,9 +58,13 @@ public class Line {
         this.color = color;
     }
 
-    public void registerValidate(final Station upStation) {
+    public void registerValidate(final Station upStation, final Station downStation) {
         if (this.downStationId != upStation.getId()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "노선의 하행종점역과 등록하려는 구간의 상행역이 다릅니다.");
+        }
+
+        if (!this.sections.contains(downStation)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 등록되어 있는 지하철역 입니다.");
         }
     }
 }
