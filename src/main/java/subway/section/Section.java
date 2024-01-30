@@ -22,6 +22,8 @@ public class Section {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "DOWN_STATION_ID")
     private Station downStation;
+    @Column(nullable = false)
+    private int distance;
 
     public Section() {
     }

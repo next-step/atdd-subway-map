@@ -8,8 +8,6 @@ import java.util.List;
 
 @Entity
 public class Line {
-    @OneToMany(mappedBy = "line", fetch = FetchType.LAZY, orphanRemoval = true)
-    List<Section> sections = new ArrayList<>();
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -17,6 +15,8 @@ public class Line {
     private String name;
     @Column(length = 20, nullable = false)
     private String color;
+    @OneToMany(mappedBy = "line", fetch = FetchType.LAZY, orphanRemoval = true)
+    List<Section> sections = new ArrayList<>();
 
     public Line() {
     }
