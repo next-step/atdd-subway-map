@@ -7,6 +7,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.jdbc.Sql;
 import subway.station.StationResponse;
 import util.RestAssuredUtil;
 
@@ -16,6 +18,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Sql(value = "/table_truncate.sql")
 @DisplayName("지하철 노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {
@@ -23,6 +26,8 @@ public class LineAcceptanceTest {
     private static Long GWANGGYO_STATION_ID;
     private static Long DAEHWA_STATION_ID;
     private static Long OGEUM_STATION_ID;
+    private static Line LINE_SHINBUNDANG;
+    private static Line LINE_THREE;
 
     @BeforeEach
     void setFixture() {
@@ -34,6 +39,8 @@ public class LineAcceptanceTest {
                 .as(StationResponse.class).getId();
         OGEUM_STATION_ID = RestAssuredUtil.post(Map.of("name", "오금역"), "stations")
                 .as(StationResponse.class).getId();
+        LINE_SHINBUNDANG = new Line("신분당선", "bg-red-600", SINSA_STATION_ID, GWANGGYO_STATION_ID, 10L);
+        LINE_THREE = new Line("3호선", "bg-navy-600", DAEHWA_STATION_ID, OGEUM_STATION_ID, 20L);
     }
 
     /**
@@ -43,15 +50,8 @@ public class LineAcceptanceTest {
     @DisplayName("지하철노선을 생성한다.")
     @Test
     void createLine() {
-        Map<String, Object> params = new HashMap<>();
-        params.put("name", "신분당선");
-        params.put("color", "bg-red-600");
-        params.put("upStationId", SINSA_STATION_ID);
-        params.put("downStationId", GWANGGYO_STATION_ID);
-        params.put("distance", 10L);
-
         ExtractableResponse<Response> response
-                = RestAssuredUtil.post(params, "/lines");
+                = RestAssuredUtil.post(LINE_SHINBUNDANG, "/lines");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -71,23 +71,8 @@ public class LineAcceptanceTest {
     @DisplayName("지하철노선 목록을 조회한다.")
     @Test
     void findAllLine() {
-        Map<String, Object> params = new HashMap<>();
-        params.put("name", "신분당선");
-        params.put("color", "bg-red-600");
-        params.put("upStationId", SINSA_STATION_ID);
-        params.put("downStationId", GWANGGYO_STATION_ID);
-        params.put("distance", 10L);
-
-        RestAssuredUtil.post(params, "/lines");
-
-        Map<String, Object> params2 = new HashMap<>();
-        params2.put("name", "3호선");
-        params2.put("color", "bg-navy-600");
-        params2.put("upStationId", DAEHWA_STATION_ID);
-        params2.put("downStationId", OGEUM_STATION_ID);
-        params2.put("distance", 20L);
-
-        RestAssuredUtil.post(params2, "/lines");
+        RestAssuredUtil.post(LINE_SHINBUNDANG, "/lines");
+        RestAssuredUtil.post(LINE_THREE, "/lines");
 
         // then
         List<String> lineNames
@@ -106,14 +91,7 @@ public class LineAcceptanceTest {
     @DisplayName("지하철노선을 조회한다.")
     @Test
     void findLine() {
-        Map<String, Object> params = new HashMap<>();
-        params.put("name", "신분당선");
-        params.put("color", "bg-red-600");
-        params.put("upStationId", SINSA_STATION_ID);
-        params.put("downStationId", GWANGGYO_STATION_ID);
-        params.put("distance", 10L);
-
-        long id = RestAssuredUtil.post(params, "/lines").jsonPath().getLong("id");
+        long id = RestAssuredUtil.post(LINE_SHINBUNDANG, "/lines").jsonPath().getLong("id");
 
         // then
         String lineName
@@ -131,14 +109,7 @@ public class LineAcceptanceTest {
     @DisplayName("지하철노선을 수정한다.")
     @Test
     void updateLine() {
-        Map<String, Object> params = new HashMap<>();
-        params.put("name", "신분당선");
-        params.put("color", "bg-red-600");
-        params.put("upStationId", SINSA_STATION_ID);
-        params.put("downStationId", GWANGGYO_STATION_ID);
-        params.put("distance", 10L);
-
-        long id = RestAssuredUtil.post(params, "/lines").jsonPath().getLong("id");
+        long id = RestAssuredUtil.post(LINE_SHINBUNDANG, "/lines").jsonPath().getLong("id");
 
         Map<String, Object> updateParams = new HashMap<>();
         updateParams.put("name", "4호선");
@@ -162,14 +133,7 @@ public class LineAcceptanceTest {
     @DisplayName("지하철노선을 삭제한다.")
     @Test
     void deleteLine() {
-        Map<String, Object> params = new HashMap<>();
-        params.put("name", "신분당선");
-        params.put("color", "bg-red-600");
-        params.put("upStationId", SINSA_STATION_ID);
-        params.put("downStationId", GWANGGYO_STATION_ID);
-        params.put("distance", 10L);
-
-        long id = RestAssuredUtil.post(params, "/lines").jsonPath().getLong("id");
+        long id = RestAssuredUtil.post(LINE_SHINBUNDANG, "/lines").jsonPath().getLong("id");
 
         // when
         RestAssuredUtil.delete("/lines/" + id);
