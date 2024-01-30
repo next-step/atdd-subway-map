@@ -1,4 +1,4 @@
-package subway.section.acceptance;
+package subway.line.acceptance;
 
 import core.AcceptanceTest;
 import core.RestAssuredHelper;
