@@ -229,6 +229,7 @@ public class LineAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
     }
+
     /**
      * Given 지하철 노선을 생성하고
      * When 생성한 지하철 노선을 삭제하면

@@ -19,6 +19,7 @@ public class LineService {
         this.stationRepository = stationRepository;
     }
 
+    @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
         List<Station> stations = new ArrayList<>();
         stations.add(stationRepository.findById(lineRequest.getUpStationId()).orElseThrow());
@@ -55,6 +56,11 @@ public class LineService {
     public void modifyLine(Long id, LineRequest lineRequest) {
         Line line = lineRepository.findById(id).orElseThrow();
         line.changeLineInfo(lineRequest.getName(), lineRequest.getColor());
+    }
+
+    @Transactional
+    public void deleteLine(Long id) {
+        lineRepository.deleteById(id);
     }
 
     private LineResponse createLineResponse(Line line, List<Station> stations) {
