@@ -50,8 +50,7 @@ public class LineService {
 
 	@Transactional
 	public void updateLine(Long id, LineRequest lineRequest) {
-		Line line = lineRepository.findById(id)
-				.orElseThrow(EntityNotFoundException::new);
+		Line line = findLindById(id);
 
 		line.setUpdateInfo(lineRequest.getName(), lineRequest.getColor());
 
@@ -66,8 +65,7 @@ public class LineService {
 
 	@Transactional
 	public void createSection(Long id, SectionRequest sectionRequest) {
-		Line line = lineRepository.findById(id)
-				.orElseThrow(EntityNotFoundException::new);
+		Line line = findLindById(id);
 
 		if(!line.getEndStationId().equals(sectionRequest.getUpStationId())) {
 			throw new IllegalArgumentException("노선의 하행 종점역과 구간의 상행역은 같아야 합니다.");
@@ -88,8 +86,7 @@ public class LineService {
 
 	@Transactional
 	public void deleteSection(Long id, Long stationId) {
-		Line line = lineRepository.findById(id)
-				.orElseThrow(EntityNotFoundException::new);
+		Line line = findLindById(id);
 
 		Section section = sectionRepository.findByLineAndDownStationId(line, stationId);
 
@@ -108,11 +105,15 @@ public class LineService {
 	}
 
 	public List<SectionResponse> findSectionsByLine(Long id) {
-		Line line = lineRepository.findById(id)
-				.orElseThrow(EntityNotFoundException::new);
+		Line line = findLindById(id);
 
 		return sectionRepository.findByLine(line).stream()
 				.map(this::createSectionResponse).collect(Collectors.toList());
+	}
+
+	private Line findLindById(Long id) {
+		return lineRepository.findById(id)
+				.orElseThrow(EntityNotFoundException::new);
 	}
 
 	private LineResponse createLineResponse(Line line) {
