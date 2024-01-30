@@ -1,6 +1,5 @@
 package subway;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,10 +8,10 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+import org.springframework.test.context.jdbc.Sql;
 import subway.controller.dto.LineCreateRequest;
+import subway.controller.dto.SectionAddRequest;
 
-import java.util.Map;
 
 import static helper.JsonPathUtils.getListPath;
 import static helper.JsonPathUtils.getLongPath;
@@ -20,9 +19,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static subway.LineApiRequester.createLine;
 import static subway.LineApiRequester.getLineById;
 import static subway.SectionApiRequester.addSectionToLine;
+import static subway.SectionApiRequester.deleteSection;
 import static subway.StationApiRequester.createStation;
 
 @DisplayName("지하철 노선 구간 관련 기능")
+@Sql(value = "/sql/truncate-all-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineSectionAcceptanceTest {
 
@@ -35,12 +36,13 @@ public class LineSectionAcceptanceTest {
         class Context_with_valid_section_data {
 
             long lineId;
+            long upStationId;
             long downStationId;
             long newDownStationId;
 
             @BeforeEach
             void setup() {
-                long upStationId = getLongPath(createStation("수원역").body(), "id");
+                upStationId = getLongPath(createStation("수원역").body(), "id");
                 downStationId = getLongPath(createStation("고색역").body(), "id");
                 newDownStationId = getLongPath(createStation("오목천역").body(), "id");
 
@@ -63,12 +65,7 @@ public class LineSectionAcceptanceTest {
                 // when
                 ExtractableResponse<Response> response = addSectionToLine(
                     lineId,
-                    // TODO: DTO로 변경
-                    Map.of(
-                        "upStationId", downStationId,
-                        "downStationId", newDownStationId,
-                        "distance", 3
-                    )
+                    new SectionAddRequest(downStationId, newDownStationId, 3)
                 );
 
                 assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -77,8 +74,8 @@ public class LineSectionAcceptanceTest {
                 ExtractableResponse<Response> lineResponse = getLineById(lineId);
 
                 assertThat(
-                    getListPath(lineResponse.body(), "$.stations.id", Long.class)
-                ).contains(downStationId, newDownStationId);
+                    getListPath(lineResponse.body(), "stations.id", Long.class)
+                ).contains(upStationId, downStationId, newDownStationId);
             }
         }
 
@@ -86,7 +83,6 @@ public class LineSectionAcceptanceTest {
         @Nested
         class Context_up_station_id_is_not_before_down_station_id {
 
-            // TODO: 변수명 직관적으로..
             long lineId;
             long notDownStationId;
             long downStationId;
@@ -112,19 +108,10 @@ public class LineSectionAcceptanceTest {
             @Test
             void will_return_400_status_code() {
                 // when
-                ExtractableResponse<Response> response = RestAssured.given().log().all()
-                    .body(
-                        Map.of(
-                            "upStationId", notDownStationId,
-                            "downStationId", newDownStationId,
-                            "distance", 3
-                        )
-                    )
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                    .pathParam("lineId", lineId)
-                    .when().post("/lines/{lineId}/sections")
-                    .then().log().all()
-                    .extract();
+                ExtractableResponse<Response> response = addSectionToLine(
+                    lineId,
+                    new SectionAddRequest(notDownStationId, newDownStationId, 3)
+                );
 
                 assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
             }
@@ -136,13 +123,12 @@ public class LineSectionAcceptanceTest {
 
             long lineId;
             long alreadyExistStationId;
-            long newDownStationId;
+            long downStationId;
 
             @BeforeEach
             void setup() {
                 long upStationId = getLongPath(createStation("수원역").body(), "id");
-                long downStationId = getLongPath(createStation("고색역").body(), "id");
-                newDownStationId = getLongPath(createStation("오목천역").body(), "id");
+                downStationId = getLongPath(createStation("고색역").body(), "id");
 
                 ExtractableResponse<Response> response = createLine(
                     new LineCreateRequest(
@@ -158,19 +144,10 @@ public class LineSectionAcceptanceTest {
             @Test
             void will_return_400_status_code() {
                 // when
-                ExtractableResponse<Response> response = RestAssured.given().log().all()
-                    .body(
-                        Map.of(
-                            "upStationId", newDownStationId,
-                            "downStationId", alreadyExistStationId,
-                            "distance", 3
-                        )
-                    )
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                    .pathParam("lineId", lineId)
-                    .when().post("/lines/{lineId}/sections")
-                    .then().log().all()
-                    .extract();
+                ExtractableResponse<Response> response = addSectionToLine(
+                    lineId,
+                    new SectionAddRequest(downStationId, alreadyExistStationId, 3)
+                );
 
                 assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
             }
@@ -187,11 +164,13 @@ public class LineSectionAcceptanceTest {
 
             long lineId;
             long downStationId;
+            long deleteStationId;
 
             @BeforeEach
             void setup() {
                 long upStationId = getLongPath(createStation("수원역").body(), "id");
                 downStationId = getLongPath(createStation("고색역").body(), "id");
+                deleteStationId = getLongPath(createStation("오목천역").body(), "id");
 
                 ExtractableResponse<Response> response = createLine(
                     new LineCreateRequest(
@@ -200,32 +179,28 @@ public class LineSectionAcceptanceTest {
                 );
 
                 lineId = getLongPath(response.body(), "id");
+
+                addSectionToLine(
+                    lineId,
+                    new SectionAddRequest(downStationId, deleteStationId, 3)
+                );
             }
 
             @DisplayName("구간이 삭제되어 노선조회 시 해당 역을 조회할 수 없다")
             @Test
             void delete_station() {
                 // when
-                ExtractableResponse<Response> response = RestAssured.given().log().all()
-                    .pathParam("lineId", lineId)
-                    .queryParam("stationId", downStationId)
-                    .when().delete("/lines/{lineId}/sections")
-                    .then().log().all()
-                    .extract();
+                ExtractableResponse<Response> response = deleteSection(lineId, deleteStationId);
 
                 assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
                 // then
-                ExtractableResponse<Response> lineResponse = RestAssured.given().log().all()
-                    .pathParam("lineId", lineId)
-                    .when().get("/lines/{lineId}")
-                    .then().log().all()
-                    .extract();
+                ExtractableResponse<Response> lineResponse = getLineById(lineId);
 
                 assertThat(lineResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
                 assertThat(
-                    getListPath(lineResponse.body(), "$.stations.id", Long.class)
-                ).noneMatch(id -> id.equals(downStationId));
+                    getListPath(lineResponse.body(), "stations.id", Long.class)
+                ).noneMatch(id -> id.equals(deleteStationId));
             }
         }
 
@@ -252,11 +227,7 @@ public class LineSectionAcceptanceTest {
 
                 addSectionToLine(
                     lineId,
-                    Map.of(
-                        "upStationId", downStationId,
-                        "downStationId", newDownStationId,
-                        "distance", 3
-                    )
+                    new SectionAddRequest(downStationId, newDownStationId, 3)
                 );
 
                 notDownStationId = downStationId;
@@ -266,12 +237,7 @@ public class LineSectionAcceptanceTest {
             @Test
             void will_return_400_status_code() {
                 // when
-                ExtractableResponse<Response> response = RestAssured.given().log().all()
-                    .pathParam("lineId", lineId)
-                    .queryParam("stationId", notDownStationId)
-                    .when().delete("/lines/{lineId}/sections")
-                    .then().log().all()
-                    .extract();
+                ExtractableResponse<Response> response = deleteSection(lineId, notDownStationId);
 
                 //then
                 assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -303,12 +269,7 @@ public class LineSectionAcceptanceTest {
             @Test
             void will_return_400_status_code() {
                 // when
-                ExtractableResponse<Response> response = RestAssured.given().log().all()
-                    .pathParam("lineId", lineId)
-                    .queryParam("stationId", downStationId)
-                    .when().delete("/lines/{lineId}/sections")
-                    .then().log().all()
-                    .extract();
+                ExtractableResponse<Response> response = deleteSection(lineId, downStationId);
 
                 //then
                 assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
