@@ -62,4 +62,9 @@ public class Line {
     public List<Long> stationIds() {
         return List.of(upStationId, downStationId);
     }
+
+    public void update(String name, String color) {
+        this.name = name;
+        this.color = color;
+    }
 }

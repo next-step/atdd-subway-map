@@ -41,6 +41,20 @@ public class LineService {
                 .collect(Collectors.toList());
     }
 
+    public LineResponse findById(Long id) {
+        Line line = lineRepository.getReferenceById(id);
+        List<Station> stations = stationRepository.findAll().stream()
+                .filter(station -> line.stationIds().contains(station.getId()))
+                .collect(Collectors.toList());
+        return new LineResponse(line, stations);
+    }
+
+    @Transactional
+    public void updateLine(Long id, UpdateLineRequest updateLineRequest) {
+        Line line = lineRepository.getReferenceById(id);
+        line.update(updateLineRequest.getName(), updateLineRequest.getColor());
+    }
+
     @Transactional
     public void deleteStationById(Long id) {
         lineRepository.deleteById(id);

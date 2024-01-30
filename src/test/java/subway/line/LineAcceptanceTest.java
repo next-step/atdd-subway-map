@@ -106,7 +106,20 @@ public class LineAcceptanceTest {
     @DisplayName("지하철노선을 조회한다.")
     @Test
     void findLine() {
+        Map<String, Object> params = new HashMap<>();
+        params.put("name", "신분당선");
+        params.put("color", "bg-red-600");
+        params.put("upStationId", SINSA_STATION_ID);
+        params.put("downStationId", GWANGGYO_STATION_ID);
+        params.put("distance", 10L);
 
+        long id = RestAssuredUtil.post(params, "/lines").jsonPath().getLong("id");
+
+        // then
+        String lineName
+                = RestAssuredUtil.get("/lines/" + id).jsonPath().getString("name");
+
+        assertThat(lineName).isEqualTo("신분당선");
     }
 
     /**
@@ -118,7 +131,26 @@ public class LineAcceptanceTest {
     @DisplayName("지하철노선을 수정한다.")
     @Test
     void updateLine() {
+        Map<String, Object> params = new HashMap<>();
+        params.put("name", "신분당선");
+        params.put("color", "bg-red-600");
+        params.put("upStationId", SINSA_STATION_ID);
+        params.put("downStationId", GWANGGYO_STATION_ID);
+        params.put("distance", 10L);
 
+        long id = RestAssuredUtil.post(params, "/lines").jsonPath().getLong("id");
+
+        Map<String, Object> updateParams = new HashMap<>();
+        updateParams.put("name", "4호선");
+        updateParams.put("color", "bg-blue-600");
+
+        RestAssuredUtil.put(updateParams, "/lines/" + id);
+
+        // then
+        String lineName
+                = RestAssuredUtil.get("/lines/" + id).jsonPath().getString("name");
+
+        assertThat(lineName).isEqualTo("4호선");
     }
 
     /**
@@ -143,9 +175,9 @@ public class LineAcceptanceTest {
         RestAssuredUtil.delete("/lines/" + id);
 
         // then
-        List<String> stationNames
+        List<String> lineNames
                 = RestAssuredUtil.get("/lines").jsonPath().getList("name", String.class);
 
-        assertThat(stationNames).doesNotContain("신분당선");
+        assertThat(lineNames).doesNotContain("신분당선");
     }
 }
