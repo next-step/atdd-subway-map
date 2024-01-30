@@ -90,7 +90,7 @@ host: localhost:52165
     WHEN  새로운 구간이 이미 해당 노선에 등록되어있는 역이면</br>
     THEN   BadRequest(400) HTTP STATUS 가 발생한다
 - [ ] 구간 제거
-  - [ ] GIVEN  지하철 노선을 생성하고 노선을 수정 후</br>
+  - [x] GIVEN  지하철 노선을 생성하고 노선을 수정 후</br>
     WHEN  지하철 마지막 구간을 제거하면</br>
     THEN   마지막 구간이 제거된다
   - [ ] GIVEN  지하철 노선을 생성하고 노선을 수정 후</br>

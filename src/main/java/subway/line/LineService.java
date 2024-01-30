@@ -36,14 +36,14 @@ public class LineService {
     }
 
     public LineResponse findLine(Long id) {
-        Line line = lineRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 지하철라인 정보를 찾지 못했습니다."));
+        Line line = getLine(id);
         return createLineResponse(line);
     }
 
     @Transactional
     public void updateLine(Long id,
                            LineUpdateRequest lineUpdateRequest) {
-        Line line = lineRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 지하철라인 정보를 찾지 못했습니다."));
+        Line line = getLine(id);
         line.update(lineUpdateRequest.getName(), lineUpdateRequest.getColor());
     }
 
@@ -55,9 +55,21 @@ public class LineService {
     @Transactional
     public void addSection(Long id,
                            SectionsUpdateRequest sectionsUpdateRequest) {
-        Line line = lineRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 지하철라인 정보를 찾지 못했습니다."));
+        Line line = getLine(id);
         line.addSection(createSection(sectionsUpdateRequest));
         lineRepository.save(line);
+    }
+
+    @Transactional
+    public void deleteSection(Long id,
+                              Long stationId) {
+        Line line = getLine(id);
+        line.deleteSection(getStation(stationId));
+        lineRepository.save(line);
+    }
+
+    private Line getLine(Long id) {
+        return lineRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 지하철라인 정보를 찾지 못했습니다."));
     }
 
     private Section createSection(SectionsUpdateRequest sectionsUpdateRequest) {
