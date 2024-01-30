@@ -4,17 +4,14 @@ import io.restassured.http.ContentType;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import subway.line.dto.LineRequest;
 import subway.line.dto.LineUpdateRequest;
-import subway.line.repository.LineRepository;
 import subway.station.entity.Station;
 import subway.station.repository.StationRepository;
 
@@ -24,20 +21,20 @@ import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class LineAcceptanceTest {
+public class LineAcceptanceTest extends BaseTest {
 
     @Autowired
     private StationRepository stationRepository;
-    @Autowired
-    private LineRepository lineRepository;
 
     private Long 강남역_ID;
     private Long 역삼역_ID;
     private Long 지하철역_ID;
 
+    @Override
     @BeforeEach
     void setUp() {
+        super.setUp();
+
         final Station 강남역 = stationRepository.save(new Station("강남역"));
         강남역_ID = 강남역.getId();
 
@@ -46,12 +43,6 @@ public class LineAcceptanceTest {
 
         final Station 지하철역 = stationRepository.save(new Station("지하철역"));
         지하철역_ID = 지하철역.getId();
-    }
-
-    @AfterEach
-    void tearDown() {
-        lineRepository.deleteAll();
-        stationRepository.deleteAll();
     }
 
     /**
