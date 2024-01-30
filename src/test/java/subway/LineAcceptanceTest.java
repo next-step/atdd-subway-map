@@ -26,6 +26,8 @@ public class LineAcceptanceTest extends BaseTest {
     @Autowired
     private StationRepository stationRepository;
 
+    private static final String API_PATH = "/lines";
+
     private Long 강남역_ID;
     private Long 역삼역_ID;
     private Long 지하철역_ID;
@@ -54,7 +56,7 @@ public class LineAcceptanceTest extends BaseTest {
     void 지하철_노선_생성() {
         // when
         final LineRequest request = new LineRequest("신분당선", "bg-red-600", 강남역_ID, 역삼역_ID, 10);
-        this.createSubwayLine(request);
+        callCreateApi(request, API_PATH);
 
         // then
         final JsonPath jsonPath = this.getSubwayLineList();
@@ -73,10 +75,10 @@ public class LineAcceptanceTest extends BaseTest {
     void 지하철_노선_목록_조회() {
         // given
         final LineRequest 강남역_생성_요청 = new LineRequest("신분당선", "bg-red-600", 강남역_ID, 역삼역_ID, 10);
-        this.createSubwayLine(강남역_생성_요청);
+        callCreateApi(강남역_생성_요청, API_PATH);
 
         final LineRequest 지하철노선_생성_요청 = new LineRequest("지하철노선", "bg-green-600", 강남역_ID, 지하철역_ID, 15);
-        this.createSubwayLine(지하철노선_생성_요청);
+        callCreateApi(강남역_생성_요청, API_PATH);
 
         // when
         final JsonPath jsonPath = this.getSubwayLineList();
@@ -96,7 +98,7 @@ public class LineAcceptanceTest extends BaseTest {
     void 지하철_노선_조회() {
         // given
         final LineRequest request = new LineRequest("신분당선", "bg-red-600", 강남역_ID, 역삼역_ID, 10);
-        final ExtractableResponse<Response> createSubwayLineResponse = this.createSubwayLine(request);
+        final ExtractableResponse<Response> createSubwayLineResponse = callCreateApi(request, API_PATH);
         final String subwayLineId = this.getCreatedSubwayLineId(createSubwayLineResponse);
 
         // when
@@ -117,7 +119,7 @@ public class LineAcceptanceTest extends BaseTest {
     void 지하철_노선_수정() {
         // given
         final LineRequest createRequest = new LineRequest("신분당선", "bg-red-600", 강남역_ID, 역삼역_ID, 10);
-        final ExtractableResponse<Response> createSubwayLineResponse = this.createSubwayLine(createRequest);
+        final ExtractableResponse<Response> createSubwayLineResponse = callCreateApi(createRequest, API_PATH);
         final String subwayLineId = getCreatedSubwayLineId(createSubwayLineResponse);
 
         final LineUpdateRequest updateRequest = new LineUpdateRequest("2호선", "bg-yellow-600");
@@ -153,7 +155,7 @@ public class LineAcceptanceTest extends BaseTest {
     void 지하철_노선_삭제() {
         // given
         final LineRequest createRequest = new LineRequest("신분당선", "bg-red-600", 강남역_ID, 역삼역_ID, 10);
-        final ExtractableResponse<Response> createSubwayLineResponse = this.createSubwayLine(createRequest);
+        final ExtractableResponse<Response> createSubwayLineResponse = callCreateApi(createRequest, API_PATH);
         final String subwayLineId = this.getCreatedSubwayLineId(createSubwayLineResponse);
 
         // when
@@ -176,22 +178,6 @@ public class LineAcceptanceTest extends BaseTest {
         final String subwayLineId = location.replaceAll(".*/(\\d+)$", "$1");
 
         return subwayLineId;
-    }
-
-    private ExtractableResponse<Response> createSubwayLine(final LineRequest request) {
-        final ExtractableResponse<Response> response =
-                given()
-                    .log().all()
-                    .body(request)
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                    .post("/lines")
-                .then()
-                    .statusCode(HttpStatus.CREATED.value())
-                    .log().all()
-                .extract();
-
-        return response;
     }
 
     private JsonPath getSubwayLineList() {

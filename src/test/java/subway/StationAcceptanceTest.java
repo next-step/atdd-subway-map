@@ -6,7 +6,6 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import subway.station.dto.StationRequest;
 
 import java.util.List;
@@ -16,6 +15,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
 public class StationAcceptanceTest extends BaseTest {
+
+    private static final String API_PATH = "/stations";
 
     /**
      * When 지하철역을 생성하면
@@ -28,7 +29,7 @@ public class StationAcceptanceTest extends BaseTest {
         // when
         final String stationName = "강남역";
         final StationRequest request = new StationRequest(stationName);
-        final ExtractableResponse<Response> response = this.createStation(request);
+        final ExtractableResponse<Response> response = callCreateApi(request, API_PATH);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -51,11 +52,11 @@ public class StationAcceptanceTest extends BaseTest {
         // given
         final String 역이름_교대역 = "교대역";
         final StationRequest 교대역_생성_요청 = new StationRequest(역이름_교대역);
-        this.createStation(교대역_생성_요청);
+        callCreateApi(교대역_생성_요청, API_PATH);
 
         final String 역이름_역삼역 = "역삼역";
         final StationRequest 역삼역_생성_요청 = new StationRequest(역이름_역삼역);
-        this.createStation(역삼역_생성_요청);
+        callCreateApi(역삼역_생성_요청, API_PATH);
 
         // when
         final JsonPath jsonPath = this.getStationList();
@@ -77,7 +78,7 @@ public class StationAcceptanceTest extends BaseTest {
         // given
         final String stationName = "강남역";
         final StationRequest request = new StationRequest(stationName);
-        final ExtractableResponse<Response> createStationResponse = this.createStation(request);
+        final ExtractableResponse<Response> createStationResponse = callCreateApi(request, API_PATH);
 
         // when
         final String location = createStationResponse.header("Location");
@@ -108,22 +109,6 @@ public class StationAcceptanceTest extends BaseTest {
                     .log().all()
                 .extract()
                     .jsonPath();
-
-        return response;
-    }
-
-    private ExtractableResponse<Response> createStation(final StationRequest request) {
-        final ExtractableResponse<Response> response =
-                given()
-                    .log().all()
-                    .body(request)
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                    .post("/stations")
-                .then()
-                    .statusCode(HttpStatus.CREATED.value())
-                    .log().all()
-                .extract();
 
         return response;
     }
