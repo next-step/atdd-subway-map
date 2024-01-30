@@ -27,8 +27,8 @@ public class SubwayLineService {
 
     @Transactional
     public SubwayLineResponse saveSubwayLine(SubwayLineRequest request) {
-        Station upStation = findStatinoById(request.getUpStationId());
-        Station dwonStation = findStatinoById(request.getDownStationId());
+        Station upStation = findStationById(request.getUpStationId());
+        Station dwonStation = findStationById(request.getDownStationId());
 
         SubwayLine subwayLine = subwayLineRepository.save(new SubwayLine(request.getName(), request.getColor(), upStation, dwonStation, request.getDistance()));
         return createSubwayLineResponse(subwayLine);
@@ -41,16 +41,15 @@ public class SubwayLineService {
     }
 
     public SubwayLineResponse findSubwayLineById(Long id) {
-        SubwayLine subwayLine = subwayLineRepository.findById(id).stream()
-                .findFirst().get();
+        SubwayLine subwayLine = subwayLineRepository.findById(id).get();
 
-        return SubwayLineResponse.createResponseByEntity(subwayLine);
+        return createSubwayLineResponse(subwayLine);
 
     }
 
     @Transactional
     public SubwayLineResponse updateSubwayLine(Long id, SubwayLineRequest request) {
-        SubwayLine subwayLine = subwayLineRepository.findById(id).stream().findFirst().get();
+        SubwayLine subwayLine = subwayLineRepository.findById(id).get();
         SubwayLine newSubwayLine = SubwayLine.builder()
                 .id(subwayLine.getId())
                 .name(request.getName())
@@ -60,8 +59,8 @@ public class SubwayLineService {
                 .distance(subwayLine.getDistance())
                 .build();
 
-        SubwayLine savedSubwayLine = subwayLineRepository.save(newSubwayLine);
-        return createSubwayLineResponse(savedSubwayLine);
+        SubwayLine updatedSubwayLine = subwayLineRepository.save(newSubwayLine);
+        return createSubwayLineResponse(updatedSubwayLine);
 
     }
 
@@ -70,14 +69,20 @@ public class SubwayLineService {
         subwayLineRepository.deleteById(id);
     }
 
+    public Station findStationById(Long id) {
+        return this.stationRepository.findById(id).get();
+    }
+
     private SubwayLineResponse createSubwayLineResponse(SubwayLine subwayLine) {
-        return SubwayLineResponse.createResponseByEntity(subwayLine);
+        Station upStation = findStationById(subwayLine.getUpStation().getId());
+        Station downStation = findStationById(subwayLine.getDownStation().getId());
+
+        return new SubwayLineResponse(
+                subwayLine.getId(),
+                subwayLine.getName(),
+                subwayLine.getColor(),
+                List.of(upStation, downStation),
+                subwayLine.getDistance()
+        );
     }
-
-    public Station findStatinoById(Long id) {
-        return stationRepository.findById(id).stream()
-                .findFirst().orElseThrow(() -> new IllegalArgumentException("존재하지 않는 역입니다."));
-    }
-
-
 }

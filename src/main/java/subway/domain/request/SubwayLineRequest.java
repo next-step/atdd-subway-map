@@ -13,5 +13,4 @@ public class SubwayLineRequest {
     private Long upStationId;
     private Long downStationId;
     private int distance;
-
 }

@@ -11,12 +11,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 import subway.domain.request.SubwayLineRequest;
+import subway.util.StationTestUtil;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static subway.util.SubwayLineUtil.*;
 
 @DisplayName("지하철노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -26,9 +28,9 @@ public class SubwayLineAcceptanceTest {
 
     @BeforeEach
     void setUp() {
-        createStation("지하철역");
-        createStation("새로운지하철역");
-        createStation("또다른지하철역");
+        StationTestUtil.createStation("지하철역");
+        StationTestUtil.createStation("새로운지하철역");
+        StationTestUtil.createStation("또다른지하철역");
     }
 
     /**
@@ -37,7 +39,7 @@ public class SubwayLineAcceptanceTest {
      */
     @DisplayName("지하철 노선을 생성한다.")
     @Test
-    void createSubwayLine() {
+    void createSubwayLineTest() {
         // when
         ExtractableResponse<Response> response = createSubwayLine(new SubwayLineRequest("신분당선", "bg-red-600", 1L, 2L, 10));
 
@@ -87,11 +89,11 @@ public class SubwayLineAcceptanceTest {
     @Test
     void showSubwayLine() {
         //given
-        createSubwayLine(new SubwayLineRequest("신분당선", "bg-red-600", 1L, 2L, 10));
+        long id = createSubwayLine(new SubwayLineRequest("신분당선", "bg-red-600", 1L, 2L, 10)).jsonPath().getLong("id");
 
         //when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when().get("/lines/1")
+                .when().get("/lines/" + id)
                 .then().log().all()
                 .extract();
 
@@ -111,7 +113,7 @@ public class SubwayLineAcceptanceTest {
     @Test
     void updateSubwayLine() {
         //given
-        createSubwayLine(new SubwayLineRequest("신분당선", "bg-red-600", 1L, 2L, 10));
+        long id = createSubwayLine(new SubwayLineRequest("신분당선", "bg-red-600", 1L, 2L, 10)).jsonPath().getLong("id");
 
         //when
         Map<String, String> params = new HashMap<>();
@@ -120,7 +122,7 @@ public class SubwayLineAcceptanceTest {
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().put("/lines/1")
+                .when().put("/lines/" + id)
                 .then().log().all()
                 .extract();
 
@@ -142,11 +144,11 @@ public class SubwayLineAcceptanceTest {
     @Test
     void deleteSubwayLine() {
         //given
-        createSubwayLine(new SubwayLineRequest("신분당선", "bg-red-600", 1L, 2L, 10));
+        long id = createSubwayLine(new SubwayLineRequest("신분당선", "bg-red-600", 1L, 2L, 10)).jsonPath().getLong("id");
 
         //when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when().delete("/lines/1")
+                .when().delete("/lines/" + id)
                 .then().log().all()
                 .extract();
 
@@ -156,33 +158,5 @@ public class SubwayLineAcceptanceTest {
         List<String> stationNames = getSubwayLines();
         assertThat(stationNames).doesNotContain("신분당선");
     }
-
-    private void createStation(String stationName) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", stationName);
-
-        RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all();
-    }
-
-    private List<String> getSubwayLines() {
-        return RestAssured.given().log().all()
-                .when().get("/lines")
-                .then().log().all()
-                .extract().jsonPath().getList("name", String.class);
-    }
-
-    private static ExtractableResponse<Response> createSubwayLine(SubwayLineRequest request) {
-        return RestAssured.given().log().all()
-                .body(request)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().log().all()
-                .extract();
-    }
-
 
 }
