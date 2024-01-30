@@ -43,4 +43,11 @@ public class LineService {
                 .orElseThrow(() -> new EntityNotFoundException())
                 .createLineResponse();
     }
+
+    @Transactional
+    public void updateById(Long id, LineUpdateRequest lineUpdateRequest) {
+        lineRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException())
+                .update(lineUpdateRequest);
+    }
 }

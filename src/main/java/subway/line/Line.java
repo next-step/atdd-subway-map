@@ -58,4 +58,9 @@ public class Line {
     public LineResponse createLineResponse() {
         return new LineResponse(id, name, List.of(upStation.createStationResponse(), downStation.createStationResponse()));
     }
+
+    public void update(LineUpdateRequest lineUpdateRequest) {
+        this.name = lineUpdateRequest.getName();
+        this.color = lineUpdateRequest.getColor();
+    }
 }

@@ -77,14 +77,43 @@ public class LineAcceptanceTest {
         String locationHeader = line.header("Location");
 
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when().get(locationHeader)
-                .then().log().all()
-                .statusCode(HttpStatus.OK.value())
-                .extract();
+        ExtractableResponse<Response> response = getLine(locationHeader);
 
         // then
         assertThat(response.jsonPath().getString("name")).isEqualTo("신분당선");
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 수정하면
+     * Then 해당 지하철 노선 정보는 수정된다
+     */
+    @DisplayName("지하철 노선을 수정한다.")
+    @Test
+    void updateLine() {
+        // given
+        ExtractableResponse<Response> line = createLine("신분당선", "bg-red-600", 1L, 2L);
+        String locationHeader = line.header("Location");
+
+        // when
+        updateLine("다른분당선", "bg-red-600", locationHeader);
+        ExtractableResponse<Response> response = getLine(locationHeader);
+
+        // then
+        assertThat(response.jsonPath().getString("name")).isEqualTo("다른분당선");
+    }
+
+    private static ExtractableResponse<Response> createStation(String name) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", name);
+
+        return RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all()
+                .statusCode(HttpStatus.CREATED.value())
+                .extract();
     }
 
     private ExtractableResponse<Response> createLine(String name, String color, Long upStationId, Long downStationId) {
@@ -110,16 +139,25 @@ public class LineAcceptanceTest {
                 .extract().jsonPath().getList("name", String.class);
     }
 
-    private static ExtractableResponse<Response> createStation(String name) {
+    private static ExtractableResponse<Response> getLine(String locationHeader) {
+        return RestAssured.given().log().all()
+                .when().get(locationHeader)
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract();
+    }
+
+    private static void updateLine(String name, String color, String locationHeader) {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
+        params.put("color", color);
 
-        return RestAssured.given().log().all()
+        RestAssured.given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
+                .when().patch(locationHeader)
                 .then().log().all()
-                .statusCode(HttpStatus.CREATED.value())
+                .statusCode(HttpStatus.OK.value())
                 .extract();
     }
 
