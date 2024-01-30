@@ -43,6 +43,7 @@ public class StationLineAcceptanceTest {
 
         // when
         createStationLineRequest(신분당선);
+
         // then
         assertThat(convertStationLines(findAllStationLinesRequest())).usingRecursiveComparison()
                 .ignoringFields("id")
@@ -105,6 +106,7 @@ public class StationLineAcceptanceTest {
         // when
         updateStationLineRequest(수정된_신분당선, getCreatedLocationId(createResponse));
 
+        // then
         assertThat(convertStationLine(findStationLineRequest(getCreatedLocationId(createResponse)))).usingRecursiveComparison()
                 .ignoringFields("id")
                 .isEqualTo(수정된_신분당선);
@@ -181,8 +183,7 @@ public class StationLineAcceptanceTest {
      * @return 추출된 Location 속성의 ID
      */
     public static Long getCreatedLocationId(ExtractableResponse<Response> createResponse) {
-        return Long
-                .parseLong(createResponse.header(HttpHeaders.LOCATION)
-                        .substring(createResponse.header(HttpHeaders.LOCATION).lastIndexOf('/') + 1));
+        return Long.parseLong(createResponse.header(HttpHeaders.LOCATION)
+                    .substring(createResponse.header(HttpHeaders.LOCATION).lastIndexOf('/') + 1));
     }
 }
