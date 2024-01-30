@@ -38,4 +38,8 @@ public class LineService {
                 .map(this::createLineResponse)
                 .collect(Collectors.toList());
     }
+
+    public LineResponse showLine(Long id) {
+        return createLineResponse(lineRepository.findById(id).orElseThrow());
+    }
 }
