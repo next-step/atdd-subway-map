@@ -2,8 +2,6 @@ package subway.line;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -20,43 +18,38 @@ public class LineStationMap {
 	private Long id;
 
 	@Column(nullable = false)
-	@Enumerated(EnumType.STRING)
-	private Lane lane;
+	private Long upperId;
 
-	@ManyToOne
-	@JoinColumn(name = "line_id")
+	@ManyToOne(targetEntity = Line.class)
+	@JoinColumn(name = "line_id", nullable = false)
 	private Line line;
 
-	@Column(nullable = false)
-	private Integer sort;
-
 	@ManyToOne(targetEntity = Station.class)
-	@JoinColumn(name = "station_id")
+	@JoinColumn(name = "station_id", nullable = false)
 	private Station station;
 
-	public LineStationMap() {
+	protected LineStationMap() {
 	}
 
-	public LineStationMap(Lane lane, Line line, Integer sort, Station station) {
-		this.lane = lane;
+	public LineStationMap(Line line, Station station, Long upperId) {
 		this.line = line;
-		this.sort = sort;
 		this.station = station;
+		this.upperId = upperId;
 	}
 
-	public Lane getLane() {
-		return lane;
+	public Long getId() {
+		return id;
 	}
 
 	public Line getLine() {
 		return line;
 	}
 
-	public Integer getSort() {
-		return sort;
-	}
-
 	public Station getStation() {
 		return station;
+	}
+
+	public Long getUpperId() {
+		return upperId;
 	}
 }
