@@ -322,4 +322,34 @@ public class LineAcceptanceTest {
         String expectedBody = "마지막 구간의 역이 아닙니다.";
         assertThat(actualBody).isEqualTo(expectedBody);
     }
+
+    /**
+     * GIVEN 지하철 노선을 시작과 끝만 생성하고
+     * WHEN 지하철 마지막 구간을 제거하면
+     * THEN  BadRequest(400) HTTP STATUS 가 발생한다
+     */
+    @DisplayName("지하철 노선을 시작과 끝만 생성하고 지하철 마지막 구간을 제거하면 BadRequest(400) HTTP STATUS 가 발생한다")
+    @Test
+    void deleteSections3() {
+        // given
+        ExtractableResponse<Response> response = LineApiCaller.callApiCreateLines(newBunDangLineParams);
+        String location = response.header("location");
+
+        // when
+        response = given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .queryParam("stationId", secondStationId.toString())
+                .when().delete(location + "/sections")
+                .then().log().all()
+                .extract();
+
+        // then
+        int actual = response.statusCode();
+        int expected = HttpStatus.BAD_REQUEST.value();
+        assertThat(actual).isEqualTo(expected);
+
+        String actualBody = response.asString();
+        String expectedBody = "구간이 하나 일 때는 삭제를 할 수 없습니다.";
+        assertThat(actualBody).isEqualTo(expectedBody);
+    }
 }

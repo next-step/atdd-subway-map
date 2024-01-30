@@ -93,9 +93,9 @@ host: localhost:52165
   - [x] GIVEN  지하철 노선을 생성하고 노선을 수정 후</br>
     WHEN  지하철 마지막 구간을 제거하면</br>
     THEN   마지막 구간이 제거된다
-  - [ ] GIVEN  지하철 노선을 생성하고 노선을 수정 후</br>
+  - [x] GIVEN  지하철 노선을 생성하고 노선을 수정 후</br>
     WHEN  마지막 구간이 아닌 지하철 구간을 제거하면</br>
     THEN   BadRequest(400) HTTP STATUS 가 발생한다
-  - [ ] GIVEN  지하철 노선을 시작과 끝만 생성하고</br>
+  - [x] GIVEN  지하철 노선을 시작과 끝만 생성하고</br>
     WHEN  지하철 마지막 구간을 제거하면</br>
     THEN   BadRequest(400) HTTP STATUS 가 발생한다
