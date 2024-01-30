@@ -4,7 +4,10 @@ import core.AcceptanceTest;
 import core.RestAssuredHelper;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import subway.common.LineApiHelper;
 import subway.common.SectionApiHelper;
@@ -13,6 +16,7 @@ import subway.line.service.dto.LineResponse;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("구간 관련 기능")
 @AcceptanceTest
@@ -25,6 +29,8 @@ public class SectionAcceptanceTest {
     private final String 신분당선 = "신분당선";
     private final String 신분당선_color = "bg-red-600";
     private final int 신분당선_distance = 10;
+    private final int 구간_distance = 5;
+
 
     @BeforeEach
     void setUp() {
@@ -45,17 +51,13 @@ public class SectionAcceptanceTest {
         @Test
         void createSectionTest() {
             // when
-            final int 구간_distance = 5;
             final ExtractableResponse<Response> response = SectionApiHelper.createSection(신분당선_Id, 새로운지하철역_Id, 또다른지하철역_Id, 구간_distance);
 
             // then
-            assertSoftly(softly -> {
-                softly.assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-                final LineResponse lineResponse = LineApiHelper.fetchLineById(신분당선_Id).as(LineResponse.class);
-                softly.assertThat(lineResponse.getDistance()).isEqualTo(신분당선_distance + 구간_distance);
-                softly.assertThat(lineResponse.getStations())
-                        .extracting("id").containsExactly(지하철역_Id, 새로운지하철역_Id, 또다른지하철역_Id);
-            });
+            assertAll(
+                    () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
+                    SectionAcceptanceTest.this::assertSectionAdded
+            );
         }
 
         /**
@@ -67,13 +69,12 @@ public class SectionAcceptanceTest {
         @Test
         void createSectionFail_UpStationIsNotTheSameWithDownStationOfLineTest() {
             // when
-            final int 구간_distance = 5;
             final ExtractableResponse<Response> response = SectionApiHelper.createSection(신분당선_Id, 지하철역_Id, 또다른지하철역_Id, 구간_distance);
 
             // then
-            Assertions.assertAll(
+            assertAll(
                     () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
-                    SectionAcceptanceTest.this::assertStationNotChanged
+                    SectionAcceptanceTest.this::assertSectionsNotChanged
             );
         }
 
@@ -86,17 +87,17 @@ public class SectionAcceptanceTest {
         @Test
         void createSectionFail_DownStationIsAlreadyInTest() {
             // when
-            final int 구간_distance = 5;
             final ExtractableResponse<Response> response = SectionApiHelper.createSection(신분당선_Id, 새로운지하철역_Id, 지하철역_Id, 구간_distance);
 
             // then
-            Assertions.assertAll(
+            assertAll(
                     () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
-                    SectionAcceptanceTest.this::assertStationNotChanged
+                    SectionAcceptanceTest.this::assertSectionsNotChanged
             );
         }
 
     }
+
 
     @Nested
     @DisplayName("구간 제거")
@@ -110,16 +111,15 @@ public class SectionAcceptanceTest {
         @Test
         void removeSectionTest() {
             // given
-            final int 구간_distance = 5;
             SectionApiHelper.createSection(신분당선_Id, 새로운지하철역_Id, 또다른지하철역_Id, 구간_distance);
 
             // when
             final ExtractableResponse<Response> response = SectionApiHelper.removeSection(신분당선_Id, 또다른지하철역_Id);
 
             // then
-            Assertions.assertAll(
+            assertAll(
                     () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value()),
-                    SectionAcceptanceTest.this::assertStationNotChanged
+                    SectionAcceptanceTest.this::assertSectionsNotChanged
             );
         }
 
@@ -135,9 +135,9 @@ public class SectionAcceptanceTest {
             final ExtractableResponse<Response> response = SectionApiHelper.removeSection(신분당선_Id, 새로운지하철역_Id);
 
             // then
-            Assertions.assertAll(
+            assertAll(
                     () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
-                    SectionAcceptanceTest.this::assertStationNotChanged
+                    SectionAcceptanceTest.this::assertSectionsNotChanged
             );
         }
 
@@ -151,25 +151,30 @@ public class SectionAcceptanceTest {
         @Test
         void createSectionFail_TargetSectionIsNotLastSectionTest() {
             // given
-            final int 구간_distance = 5;
             SectionApiHelper.createSection(신분당선_Id, 새로운지하철역_Id, 또다른지하철역_Id, 구간_distance);
 
             // when
             final ExtractableResponse<Response> response = SectionApiHelper.removeSection(신분당선_Id, 새로운지하철역_Id);
 
             // then
-            assertSoftly(softly -> {
-                softly.assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-                final LineResponse lineResponse = LineApiHelper.fetchLineById(신분당선_Id).as(LineResponse.class);
-                softly.assertThat(lineResponse.getDistance()).isEqualTo(신분당선_distance + 구간_distance);
-                softly.assertThat(lineResponse.getStations())
-                        .extracting("id").containsExactly(지하철역_Id, 새로운지하철역_Id, 또다른지하철역_Id);
-            });
+            assertAll(
+                    () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
+                    SectionAcceptanceTest.this::assertSectionAdded
+            );
         }
 
     }
 
-    private void assertStationNotChanged() {
+    private void assertSectionAdded() {
+        assertSoftly(softly -> {
+            final LineResponse lineResponse = LineApiHelper.fetchLineById(신분당선_Id).as(LineResponse.class);
+            softly.assertThat(lineResponse.getDistance()).isEqualTo(신분당선_distance + 구간_distance);
+            softly.assertThat(lineResponse.getStations())
+                    .extracting("id").containsExactly(지하철역_Id, 새로운지하철역_Id, 또다른지하철역_Id);
+        });
+    }
+
+    private void assertSectionsNotChanged() {
         assertSoftly(softly -> {
             final LineResponse lineResponse = LineApiHelper.fetchLineById(신분당선_Id).as(LineResponse.class);
             softly.assertThat(lineResponse.getDistance()).isEqualTo(신분당선_distance);
