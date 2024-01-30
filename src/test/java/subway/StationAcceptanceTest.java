@@ -88,11 +88,10 @@ public class StationAcceptanceTest {
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         //then
-
         List<String> stationList = StationRestAssuredCRUD.showStations()
                 .jsonPath().getList("name", String.class);
 
-        assertThat(stationList).isNotIn("강남역");
+        assertThat(stationList).doesNotContain("강남역");
     }
 
 }

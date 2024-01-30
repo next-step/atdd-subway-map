@@ -12,7 +12,7 @@ public class Line {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "line_name")
+    @Column
     private String name;
     private String color;
     private Long upStationId;

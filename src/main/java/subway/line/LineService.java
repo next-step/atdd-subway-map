@@ -53,6 +53,7 @@ public class LineService {
         return createLineResponse(line, stations);
     }
 
+    @Transactional
     public void modifyLine(Long id, LineRequest lineRequest) {
         Line line = lineRepository.findById(id).orElseThrow();
         line.changeLineInfo(lineRequest.getName(), lineRequest.getColor());

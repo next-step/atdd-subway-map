@@ -59,17 +59,15 @@ public class LineAcceptanceTest {
 
         assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
-        Long createdId = createResponse.response().body().jsonPath().getLong("id");
-
         // then
-        List<Long> lineIdList = RestAssured
+        List<String> lineNames = RestAssured
                 .given().log().all()
                 .when()
                 .get("/lines")
                 .then().log().all()
-                .extract().jsonPath().getList("id", Long.class);
+                .extract().jsonPath().getList("name", String.class);
 
-        assertThat(lineIdList).contains(createdId);
+        assertThat(lineNames).contains("신분당선");
 
     }
 
@@ -83,8 +81,8 @@ public class LineAcceptanceTest {
     void createAndShowTwoLineList() {
 
         //given
-        StationRestAssuredCRUD.createStation("미금역");
         StationRestAssuredCRUD.createStation("강남역");
+        StationRestAssuredCRUD.createStation("양재역");
         StationRestAssuredCRUD.createStation("서현역");
 
         Map<String, Object> param = new HashMap<>();
@@ -127,7 +125,7 @@ public class LineAcceptanceTest {
                 .then().log().all()
                 .extract();
 
-        List<String> names =  response.jsonPath().getList("name", String.class);
+        List<String> names = response.jsonPath().getList("name", String.class);
 
         // then
         assertThat(names).containsAll(List.of("신분당선", "수인분당선"));
@@ -174,9 +172,11 @@ public class LineAcceptanceTest {
                 .then().log().all()
                 .extract();
 
+        String name = response.jsonPath().getString("name");
+
         // then
         assertThat(response.jsonPath().getLong("id")).isEqualTo(createdId);
-
+        assertThat(name).isEqualTo("신분당선");
     }
 
     /**
@@ -228,6 +228,17 @@ public class LineAcceptanceTest {
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
+        ExtractableResponse<Response> modifyResponse = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .pathParam("id", createdId)
+                .when()
+                .get("/lines/{id}")
+                .then().log().all()
+                .extract();
+
+        String name = modifyResponse.jsonPath().getString("name");
+        assertThat(name).isEqualTo("수인분당선");
     }
 
     /**
@@ -262,7 +273,7 @@ public class LineAcceptanceTest {
         Long createdId = createResponse.body().jsonPath().getLong("id");
 
         //when
-        ExtractableResponse<Response> response = RestAssured
+        ExtractableResponse<Response> deleteResponse = RestAssured
                 .given().log().all()
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
                     .pathParam("id", createdId)
@@ -272,6 +283,17 @@ public class LineAcceptanceTest {
                 .extract();
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        ExtractableResponse<Response> resultResponse = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .get("/lines")
+                .then().log().all()
+                .extract();
+
+        List<String> names = resultResponse.jsonPath().getList("name", String.class);
+        assertThat(names).doesNotContain("신분당선");
     }
 }
