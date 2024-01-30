@@ -102,6 +102,34 @@ public class LineAcceptanceTest {
      * When 생성한 지하철 노선을 조회하면
      * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
      */
+    @DisplayName("지하철 노선을 조회한다.")
+    @Test
+    void getLine() {
+        // given
+        ExtractableResponse<Response> 강남역 = createStation("강남역");
+        ExtractableResponse<Response> 건대입구역 = createStation("건대입구역");
+        String 강남역_ID = 강남역.jsonPath().getString("id");
+        String 건대입구역_ID = 건대입구역.jsonPath().getString("id");
+
+        ExtractableResponse<Response> 이호선 = createLine("2호선", "bg-green-999", 강남역_ID, 건대입구역_ID, "10");
+        String 이호선_ID = 이호선.jsonPath().getString("id");
+
+        // when
+        ExtractableResponse<Response> response =
+                RestAssured.given().log().all()
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .when().get("/lines/{lineId}", 이호선_ID)
+                        .then().log().all()
+                        .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.jsonPath().getString("name")).isEqualTo("2호선");
+        assertThat(response.jsonPath().getString("color")).isEqualTo("bg-green-999");
+        assertThat(response.jsonPath().getString("upStationId")).isEqualTo(강남역_ID);
+        assertThat(response.jsonPath().getString("downStationId")).isEqualTo(건대입구역_ID);
+        assertThat(response.jsonPath().getString("distance")).isEqualTo("10");
+    }
 
     /**
      * Given 지하철 노선을 생성하고
