@@ -20,13 +20,20 @@ public class LineLoadService {
         this.stationRepository = stationRepository;
     }
 
-    public List<LineLoadedResponse> getLines() {
+    public List<LineLoadedResponse> loadLines() {
         List<Line> lines = lineRepository.findAll();
 
         return lines.stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
         }
+
+    public LineLoadedResponse getLine(Long lineId) {
+        Line line = lineRepository.findById(lineId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 노선입니다. lineId: " + lineId));
+
+        return mapToResponse(line);
+    }
 
     private LineLoadedResponse mapToResponse(Line line) {
         List<Station> stations = stationRepository.findAllByIdIn(List.of(line.getUpStationId(), line.getDownStationId()));

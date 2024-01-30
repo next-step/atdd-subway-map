@@ -128,8 +128,9 @@ public class LineAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.jsonPath().getString("name")).isEqualTo("2호선");
         assertThat(response.jsonPath().getString("color")).isEqualTo("bg-green-999");
-        assertThat(response.jsonPath().getString("upStationId")).isEqualTo(강남역_ID);
-        assertThat(response.jsonPath().getString("downStationId")).isEqualTo(건대입구역_ID);
+        assertThat(response.jsonPath().getList("stations")).hasSize(2);
+        assertThat(response.jsonPath().getList("stations.id", String.class)).containsExactly(강남역_ID, 건대입구역_ID);
+        assertThat(response.jsonPath().getList("stations.name", String.class)).containsExactly("강남역", "건대입구역");
     }
 
     /**

@@ -31,7 +31,13 @@ public class LineController {
 
     @GetMapping
     public ResponseEntity<List<LineLoadedResponse>> getLine() {
-        List<LineLoadedResponse> responses = lineLoadService.getLines();
+        List<LineLoadedResponse> responses = lineLoadService.loadLines();
         return ResponseEntity.ok().body(responses);
+    }
+
+    @GetMapping("/{line-id}")
+    public ResponseEntity<LineLoadedResponse> getLine(@PathVariable("line-id") Long lineId) {
+        LineLoadedResponse response = lineLoadService.getLine(lineId);
+        return ResponseEntity.ok().body(response);
     }
 }
