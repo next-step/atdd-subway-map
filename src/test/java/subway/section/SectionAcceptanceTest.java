@@ -67,6 +67,17 @@ public class SectionAcceptanceTest {
         정상_응답한다(response, HttpStatus.CREATED);
     }
 
+    /**
+     * When 노선이 생성되어 있다.
+     *      구간이 등록되어 있다.
+     *      마지막 구간이 아닌 구간을 제거한다.
+     * Then 예외가 발생한다.
+     */
+    @DisplayName("노선의 구간을 제거할 때 마지막구간이 아니면 오류가 발생한다.")
+    @Test
+    public void 구간제거_마지막구간이_아닐때() {
+    }
+
     private void 정상_응답한다(final ExtractableResponse<Response> response, final HttpStatus httpStatus) {
         assertThat(response.statusCode()).isEqualTo(httpStatus.value());
     }
