@@ -43,4 +43,13 @@ public class SectionService {
         final Section savedSection = sectionRepository.save(section);
         return new SectionResponse(savedSection.getId(), savedSection.getDistance());
     }
+
+    @Transactional
+    public void deleteSection(final Long stationId, final Long lineId) {
+        final Line line = lineRepository.findById(lineId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, EMPTY_LINE_MSG));
+
+        line.deleteValidate(stationId);
+        throw new UnsupportedOperationException("Unsupported deleteSection");
+    }
 }

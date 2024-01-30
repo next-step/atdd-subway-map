@@ -81,4 +81,10 @@ public class Line {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 등록되어 있는 지하철역 입니다.");
         }
     }
+
+    public void deleteValidate(final Long stationId) {
+        if (this.downStationId != stationId) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제할 수 없는 지하철 역 입니다.");
+        }
+    }
 }
