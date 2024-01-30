@@ -2,10 +2,7 @@ package subway.line.section;
 
 import subway.station.Station;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Embeddable;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -16,6 +13,7 @@ public class Sections {
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "line_id")
+    @OrderBy("upStation.id ASC")
     private List<Section> sectionList = new ArrayList<>();
 
     protected Sections() {
