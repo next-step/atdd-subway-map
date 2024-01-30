@@ -222,7 +222,7 @@ then().
 - [x] 인수 테스트 격리
   - EntityManager 이용
 
-## 2단계 - 지하철 구간 관리
+## 3단계 - 지하철 구간 관리
 ### 요구사항
 - [x] 구간 등록 기능 - "POST /lines/{lineId}/sections"
   ```json
@@ -245,7 +245,7 @@ then().
   > When 구간 하행역이 해당 노선에 등록되어 있다면<br>
   Then 에러가 난다.
 
-- [ ] 구간 제거 기능 - "DELETE /lines/{lineId}/stations?stationId=:id"
+- [x] 구간 제거 기능 - "DELETE /lines/{lineId}/stations?stationId=:id"
   - 성공 시나리오
   > Given 지하철 구간을 생성하고<br> 
   When 지하철 구간을 제거하면<br>
