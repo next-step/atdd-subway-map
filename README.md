@@ -80,7 +80,7 @@ host: localhost:52165
 ## TODO
 
 - [ ] 구간 등록
-  - [ ] GIVEN  지하철 노선을 생성하고</br>
+  - [x] GIVEN  지하철 노선을 생성하고</br>
     WHEN  노선을 수정하면</br>
     THEN   수정된 노선이 조회 된다
   - [ ] GIVEN  지하철 노선을 생성하고</br>

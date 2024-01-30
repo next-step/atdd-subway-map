@@ -6,6 +6,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 import subway.testhelper.LineApiCaller;
 import subway.testhelper.StationApiCaller;
@@ -15,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철노선 관련 기능")
@@ -183,5 +186,35 @@ public class LineAcceptanceTest {
         List<Long> actual = response.jsonPath().getList("stations.id", Long.class);
         Long[] expected = {firstSectionId, secondSectionId, thirdSectionId};
         assertThat(actual).containsExactly(expected);
+    }
+
+    /**
+     * GIVEN 지하철 노선을 생성하고
+     * WHEN 새로운 구간의 상행역이 기존의 하행역과 일치 하지 않는다면
+     * THEN BadRequest(400) HTTP STATUS 가 발생한다
+     */
+    @DisplayName("지하철노선의 구간을 수정할때 새로운 구간의 상행역이 기존의 하행역과 일치 하지 않는다면 Bad Request가 발생한다")
+    @Test
+    void updateSections2() {
+        // given
+        ExtractableResponse<Response> response = LineApiCaller.callApiCreateLines(newBunDangLineParams);
+        String location = response.header("location");
+
+        // when
+        Map<String, String> params = new HashMap<>();
+        params.put("upStationId", thirdSectionId.toString());
+        params.put("downStationId", "100");
+        params.put("distance", "10");
+        response = given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post(location + "/sections")
+                .then().log().all()
+                .extract();
+
+        // then
+        int actual = response.statusCode();
+        int expected = HttpStatus.BAD_REQUEST.value();
+        assertThat(actual).isEqualTo(expected);
     }
 }
