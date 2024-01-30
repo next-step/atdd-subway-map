@@ -1,17 +1,13 @@
 package subway.line.acceptance;
 
-import core.AcceptanceTestExtension;
+import core.AcceptanceTest;
 import core.RestAssuredHelper;
-import core.TestConfig;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.ContextConfiguration;
 import subway.common.LineApiHelper;
 import subway.common.StationApiHelper;
 import subway.line.service.dto.LineResponse;
@@ -23,9 +19,7 @@ import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("노선 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ContextConfiguration(classes = TestConfig.class)
-@ExtendWith(AcceptanceTestExtension.class)
+@AcceptanceTest
 public class LineAcceptanceTest {
     private Long 지하철역_Id;
     private Long 새로운지하철역_Id;

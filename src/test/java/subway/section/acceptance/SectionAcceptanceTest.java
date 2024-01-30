@@ -1,15 +1,11 @@
 package subway.section.acceptance;
 
-import core.AcceptanceTestExtension;
+import core.AcceptanceTest;
 import core.RestAssuredHelper;
-import core.TestConfig;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.ContextConfiguration;
 import subway.common.LineApiHelper;
 import subway.common.SectionApiHelper;
 import subway.common.StationApiHelper;
@@ -19,9 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 @DisplayName("구간 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ContextConfiguration(classes = TestConfig.class)
-@ExtendWith(AcceptanceTestExtension.class)
+@AcceptanceTest
 public class SectionAcceptanceTest {
 
     private Long 지하철역_Id;
