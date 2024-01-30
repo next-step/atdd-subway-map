@@ -3,6 +3,8 @@ package subway.line;
 import subway.station.Station;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Line {
@@ -14,7 +16,7 @@ public class Line {
     @Column(length = 20, nullable = false)
     private String color;
     @Embedded
-    private Section section;
+    private Sections sections;
     @Column(nullable = false)
     private Long distance;
 
@@ -28,7 +30,9 @@ public class Line {
                 Long distance) {
         this.name = name;
         this.color = color;
-        this.section = new Section(upStation, downStation);
+        List<Section> list = new ArrayList<>();
+        list.add(new Section(upStation, downStation));
+        this.sections = Sections.from(list);
         this.distance = distance;
     }
 
@@ -44,8 +48,8 @@ public class Line {
         return color;
     }
 
-    public Section getStationLink() {
-        return section;
+    public Sections getSections() {
+        return sections;
     }
 
     public void update(String name,

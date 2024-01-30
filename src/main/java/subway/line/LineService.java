@@ -6,6 +6,7 @@ import subway.station.Station;
 import subway.station.StationRepository;
 import subway.station.StationResponse;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -71,10 +72,19 @@ public class LineService {
     }
 
     private List<StationResponse> getStations(Line line) {
-        return List.of(getStationResponse(line.getStationLink().getUpStation()), getStationResponse(line.getStationLink().getDownStation()));
+        Sections sections = line.getSections();
+        List<StationResponse> stationResponses = new ArrayList<>(getStationResponses(sections.startStations()));
+        stationResponses.add(getStationResponses(sections.lastStation()));
+        return stationResponses;
     }
 
-    private StationResponse getStationResponse(Station station) {
+    private List<StationResponse> getStationResponses(List<Station> stations) {
+        return stations.stream()
+                .map(this::getStationResponses)
+                .collect(Collectors.toList());
+    }
+
+    private StationResponse getStationResponses(Station station) {
         return new StationResponse(station.getId(),
                 station.getName());
     }

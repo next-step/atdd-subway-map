@@ -2,12 +2,13 @@ package subway.line;
 
 import subway.station.Station;
 
-import javax.persistence.Embeddable;
-import javax.persistence.FetchType;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 
-@Embeddable
+@Entity
 public class Section {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     @OneToOne(fetch = FetchType.LAZY)
     private Station upStation;
 
