@@ -15,13 +15,17 @@ public class Section {
     @OneToOne(fetch = FetchType.LAZY)
     private Station downStation;
 
-    public Section() {
+    private Long distance;
+
+    protected Section() {
     }
 
     public Section(Station upStation,
-                   Station downStation) {
+                   Station downStation,
+                   Long distance) {
         this.upStation = upStation;
         this.downStation = downStation;
+        this.distance = distance;
     }
 
     public Station getUpStation() {
