@@ -1,8 +1,9 @@
 package subway.line.repository.domain;
 
-import subway.station.repository.domain.Station;
-
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 @Entity
 public class Line {
@@ -16,13 +17,9 @@ public class Line {
     @Column(length = 20, nullable = false)
     private String color;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "up_station_id")
-    private Station upStation;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "down_station_id")
-    private Station downStation;
+    @OneToMany(cascade = CascadeType.PERSIST, orphanRemoval = true)
+    @JoinColumn(name = "section_id")
+    private List<Section> sections = new ArrayList<>();
 
     @Column(nullable = false)
     private int distance;
@@ -30,12 +27,10 @@ public class Line {
     protected Line() {
     }
 
-    public Line(final String name, final String color, final Station upStation, final Station downStation, final int distance) {
+    public Line(final String name, final String color, final Section section) {
         this.name = name;
         this.color = color;
-        this.upStation = upStation;
-        this.downStation = downStation;
-        this.distance = distance;
+        addSection(section);
     }
 
     public Long getId() {
@@ -50,12 +45,8 @@ public class Line {
         return color;
     }
 
-    public Station getUpStation() {
-        return upStation;
-    }
-
-    public Station getDownStation() {
-        return downStation;
+    public List<Section> getSections() {
+        return Collections.unmodifiableList(sections);
     }
 
     public int getDistance() {
@@ -68,5 +59,10 @@ public class Line {
 
     public void changeColor(final String color) {
         this.color = color;
+    }
+
+    public void addSection(final Section section) {
+        this.sections.add(section);
+        distance += section.getDistance();
     }
 }

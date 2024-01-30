@@ -63,4 +63,8 @@ public class LineCreateRequest {
             throw new CreateRequestNotValidException("distance must be greater than 0");
         }
     }
+
+    public SectionCreateRequest toSectionCreateRequest() {
+        return new SectionCreateRequest(this.upStationId, this.downStationId, this.distance);
+    }
 }

@@ -1,9 +1,12 @@
 package subway.line.service.dto;
 
 import subway.line.repository.domain.Line;
+import subway.line.repository.domain.Section;
 import subway.station.service.dto.StationResponse;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class LineResponse {
     private Long id;
@@ -29,8 +32,17 @@ public class LineResponse {
                 , line.getName()
                 , line.getColor()
                 , line.getDistance()
-                , List.of(StationResponse.from(line.getUpStation()), StationResponse.from(line.getDownStation()))
+                , createStationResponseFrom(line.getSections())
         );
+    }
+
+    private static List<StationResponse> createStationResponseFrom(final List<Section> sections) {
+        return sections
+                .stream()
+                .flatMap(section -> Stream.of(section.getUpStation(), section.getDownStation()))
+                .distinct()
+                .map(StationResponse::from)
+                .collect(Collectors.toList());
     }
 
     public Long getId() {

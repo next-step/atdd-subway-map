@@ -9,9 +9,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface LineRepository extends JpaRepository<Line, Long> {
-    @Query("select line from Line line join fetch line.upStation join fetch line.downStation")
+    @Query("select line from Line line left join fetch line.sections")
     List<Line> findAllWithLines();
 
-    @Query("select line from Line line join fetch line.upStation join fetch line.downStation where line.id = :id")
-    Optional<Line> findByIdWithStation(@Param("id") Long id);
+    @Query("select line from Line line left join fetch line.sections section join fetch section.upStation join fetch section.downStation where line.id = :id")
+    Optional<Line> findByIdWithSection(@Param("id") Long id);
 }
