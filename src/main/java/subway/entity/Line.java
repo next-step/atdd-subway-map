@@ -1,7 +1,5 @@
 package subway.entity;
 
-import org.springframework.util.ObjectUtils;
-
 import javax.persistence.*;
 
 @Entity
@@ -14,9 +12,9 @@ public class Line {
 
 	private String color;
 
-	private Long upStationId;
+	private Long startStationId;
 
-	private Long downStationId;
+	private Long endStationId;
 
 	private int distance;
 
@@ -24,11 +22,11 @@ public class Line {
 
 	}
 
-	public Line(String name, String color, Long upStationId, Long downStationId, int distance) {
+	public Line(String name, String color, Long startStationId, Long endStationId, int distance) {
 		this.name = name;
 		this.color = color;
-		this.upStationId = upStationId;
-		this.downStationId = downStationId;
+		this.startStationId = startStationId;
+		this.endStationId = endStationId;
 		this.distance = distance;
 	}
 
@@ -44,12 +42,12 @@ public class Line {
 		return color;
 	}
 
-	public Long getUpStationId() {
-		return upStationId;
+	public Long getStartStationId() {
+		return startStationId;
 	}
 
-	public Long getDownStationId() {
-		return downStationId;
+	public Long getEndStationId() {
+		return endStationId;
 	}
 
 	public int getDistance() {
@@ -67,5 +65,10 @@ public class Line {
 	public void setUpdateInfo(String name, String color) {
 		this.name = name;
 		this.color = color;
+	}
+
+	public void addSection(Long stationId, int distance) {
+		this.endStationId = stationId;
+		this.distance = this.distance + distance;
 	}
 }

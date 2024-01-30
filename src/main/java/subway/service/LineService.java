@@ -24,7 +24,7 @@ public class LineService {
 
 	@Transactional
 	public LineResponse saveLine(LineRequest lineRequest) {
-		Line line = new Line(lineRequest.getName(), lineRequest.getColor(), lineRequest.getUpStationId(), lineRequest.getDownStationId(), lineRequest.getDistance());
+		Line line = new Line(lineRequest.getName(), lineRequest.getColor(), lineRequest.getStartStationId(), lineRequest.getEndStationId(), lineRequest.getDistance());
 
 		return createLineResponse(lineRepository.save(line));
 	}
@@ -57,6 +57,6 @@ public class LineService {
 
 	private LineResponse createLineResponse(Line line) {
 		return new LineResponse(line,
-				List.of(stationService.findStationById(line.getUpStationId()), stationService.findStationById(line.getDownStationId())));
+				List.of(stationService.findStationById(line.getStartStationId()), stationService.findStationById(line.getEndStationId())));
 	}
 }
