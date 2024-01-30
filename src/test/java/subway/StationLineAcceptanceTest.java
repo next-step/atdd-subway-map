@@ -8,8 +8,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import subway.dto.StationLineRequest;
 import subway.entity.StationLine;
@@ -18,8 +16,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
+import static subway.StationLineRequest.*;
 
 @DisplayName("지하철 노선 관련 기능")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -46,7 +44,7 @@ public class StationLineAcceptanceTest {
         // when
         createStationLineRequest(신분당선);
         // then
-        assertThat(convertStationLines(findAllStationLines())).usingRecursiveComparison()
+        assertThat(convertStationLines(findAllStationLinesRequest())).usingRecursiveComparison()
                 .ignoringFields("id")
                 .isEqualTo(List.of(신분당선));
     }
@@ -67,7 +65,7 @@ public class StationLineAcceptanceTest {
         createStationLineRequest(분당선);
 
         // when
-        assertThat(convertStationLines(findAllStationLines())).usingRecursiveComparison()
+        assertThat(convertStationLines(findAllStationLinesRequest())).usingRecursiveComparison()
                 .ignoringFields("id")
                 .isEqualTo(List.of(신분당선, 분당선));
     }
@@ -85,7 +83,7 @@ public class StationLineAcceptanceTest {
         ExtractableResponse<Response> response = createStationLineRequest(신분당선);
 
         // when, then
-        assertThat(convertStationLine(findStationLine(getCreatedLocationId(response)))).usingRecursiveComparison()
+        assertThat(convertStationLine(findStationLineRequest(getCreatedLocationId(response)))).usingRecursiveComparison()
                 .ignoringFields("id")
                 .isEqualTo(신분당선);
     }
@@ -107,7 +105,7 @@ public class StationLineAcceptanceTest {
         // when
         updateStationLineRequest(수정된_신분당선, getCreatedLocationId(createResponse));
 
-        assertThat(convertStationLine(findStationLine(getCreatedLocationId(createResponse)))).usingRecursiveComparison()
+        assertThat(convertStationLine(findStationLineRequest(getCreatedLocationId(createResponse)))).usingRecursiveComparison()
                 .ignoringFields("id")
                 .isEqualTo(수정된_신분당선);
     }
@@ -131,7 +129,7 @@ public class StationLineAcceptanceTest {
         deleteStationLineRequest(getCreatedLocationId(createResponse));
 
         // then
-        assertThat(convertStationLines(findAllStationLines())).usingRecursiveComparison()
+        assertThat(convertStationLines(findAllStationLinesRequest())).usingRecursiveComparison()
                 .ignoringFields("id")
                 .isEqualTo(List.of(분당선));
     }
@@ -177,88 +175,12 @@ public class StationLineAcceptanceTest {
     }
 
     /**
-     * 지하철 노선 목록을 조회하고 jsonPath 반환
-     *
-     * @return 지하철 노선 목록을 나타내는 jsonPath 반환
-     */
-    private JsonPath findAllStationLines() {
-        return given().log().all()
-                .when()
-                .get("/lines")
-                .then().log().all()
-                .statusCode(HttpStatus.OK.value())
-                .extract().jsonPath();
-    }
-
-    /**
-     * 주어진 지하철 노선 ID에 해당하는 지하철 노선 정보 반환
-     *
-     * @param stationLineId 지하철 노선 ID
-     * @return 지하철 노선 정보를 나타내는 jsonPath 반환
-     */
-    private JsonPath findStationLine(Long stationLineId) {
-        return given().log().all()
-                .when()
-                .get("/lines/" + stationLineId)
-                .then().log().all()
-                .extract().jsonPath();
-    }
-
-    /**
-     * 지하철 노선 생성 요청 후 Response 객체 반환
-     *
-     * @param request 지하철 요청 정보를 담은 객체
-     * @return REST Assured 기반으로 생성된 Response 객체
-     */
-    private ExtractableResponse<Response> createStationLineRequest(StationLineRequest request) {
-        return given().log().all()
-                .body(request)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines")
-                .then().log().all()
-                .statusCode(HttpStatus.CREATED.value())
-                .extract();
-    }
-
-    /**
-     * 지하철 노선 수정 요청 후 Response 객체 반환
-     *
-     * @param request       지하철 수정 정보를 담은 객체
-     * @param stationLineId 수정할 지하철 노선 ID
-     */
-    private void updateStationLineRequest(StationLineRequest request, Long stationLineId) {
-        given().log().all()
-                .body(request)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .put("/lines/" + stationLineId)
-                .then().log().all()
-                .statusCode(HttpStatus.OK.value())
-                .extract().jsonPath();
-    }
-
-    /**
-     * 지하철 노선 삭제 요청
-     *
-     * @param stationLineId 삭제할 지하철 노선 ID
-     */
-    private void deleteStationLineRequest(Long stationLineId) {
-        given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .delete("/lines/" + stationLineId)
-                .then().log().all()
-                .statusCode(HttpStatus.NO_CONTENT.value());
-    }
-
-    /**
      * 주어진 응답값으로부터 추출된 Location 속성에서 ID를 반환
      *
      * @param createResponse 응답값
      * @return 추출된 Location 속성의 ID
      */
-    private Long getCreatedLocationId(ExtractableResponse<Response> createResponse) {
+    public static Long getCreatedLocationId(ExtractableResponse<Response> createResponse) {
         return Long
                 .parseLong(createResponse.header(HttpHeaders.LOCATION)
                         .substring(createResponse.header(HttpHeaders.LOCATION).lastIndexOf('/') + 1));
