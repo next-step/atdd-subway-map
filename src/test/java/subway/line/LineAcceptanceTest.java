@@ -3,6 +3,7 @@ package subway.line;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -62,6 +63,39 @@ public class LineAcceptanceTest {
      * When 지하철 노선 목록을 조회하면
      * Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
      */
+    @DisplayName("지하철 노선 목록을 조회한다.")
+    @Test
+    void getLines() {
+        // given
+        ExtractableResponse<Response> 강남역 = createStation("강남역");
+        ExtractableResponse<Response> 건대입구역 = createStation("건대입구역");
+        ExtractableResponse<Response> 군자역 = createStation("군자역");
+        String 강남역_ID = 강남역.jsonPath().getString("id");
+        String 건대입구역_ID = 건대입구역.jsonPath().getString("id");
+        String 군자역_ID = 군자역.jsonPath().getString("id");
+
+        ExtractableResponse<Response> 이호선 = createLine("2호선", "bg-green-999", 강남역_ID, 건대입구역_ID, "10");
+        ExtractableResponse<Response> 칠호선 = createLine("7호선", "bg-orange-600", 건대입구역_ID, 군자역_ID, "20");
+        String 이호선_ID = 이호선.jsonPath().getString("id");
+        String 칠호선_ID = 칠호선.jsonPath().getString("id");
+
+        // when
+        ExtractableResponse<Response> response =
+                RestAssured.given().log().all()
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .when().get("/lines")
+                        .then().log().all()
+                        .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.jsonPath().getList(".")).hasSize(2);
+        assertThat(response.jsonPath().getList("name", String.class)).containsExactly("2호선", "7호선");
+        assertThat(response.jsonPath().getList("color", String.class)).containsExactly("bg-green-999", "bg-orange-600");
+        assertThat(response.jsonPath().getList("upStationId", String.class)).containsExactly(강남역_ID, 건대입구역_ID);
+        assertThat(response.jsonPath().getList("downStationId", String.class)).containsExactly(건대입구역_ID, 군자역_ID);
+        assertThat(response.jsonPath().getList("distance", String.class)).containsExactly("10", "20");
+    }
 
     /**
      * Given 지하철 노선을 생성하고
@@ -88,6 +122,29 @@ public class LineAcceptanceTest {
                 .body(request)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/stations")
+                .then().log().all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> createLine(String lineName, String lineColor, String upStationId, String downStationId, String distance) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", lineName);
+        params.put("color", lineColor);
+        params.put("upStationId", upStationId);
+        params.put("downStationId", downStationId);
+        params.put("distance", distance);
+
+        return RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines")
+                .then().log().all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> loadStations() {
+        return RestAssured.given().log().all()
+                .when().get("/stations")
                 .then().log().all()
                 .extract();
     }
