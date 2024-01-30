@@ -1,5 +1,6 @@
 package subway;
 
+
 public class StationResponse {
     private Long id;
     private String name;
