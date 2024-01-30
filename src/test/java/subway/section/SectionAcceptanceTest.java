@@ -84,6 +84,21 @@ public class SectionAcceptanceTest {
         예외가_발생한다(response, HttpStatus.BAD_REQUEST);
     }
 
+    /**
+     * When 노선이 생성되어 있다.
+     *      구간이 하나인 노선의 구간을 제거한다.
+     * Then 예외가 발생한다.
+     */
+    @DisplayName("노선의 구간을 제거할 때 구간이 1개인 경우 오류가 발생한다.")
+    @Test
+    public void 구간제거_구간이_하나일때() {
+        final Long lineId = 노선이_생성되어_있다("신분당선", "bg-red-600", 1L, 2L);
+
+        final ExtractableResponse<Response> response = 구간을_제거한다(lineId, 2L);
+
+        예외가_발생한다(response, HttpStatus.BAD_REQUEST);
+    }
+
     private ExtractableResponse<Response> 구간을_제거한다(final Long lineId, Long stationId) {
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
