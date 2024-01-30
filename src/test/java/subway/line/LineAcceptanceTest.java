@@ -30,6 +30,7 @@ public class LineAcceptanceTest {
     private Long firstSectionId;
     private Long secondSectionId;
     private Long thirdSectionId;
+    private Long forthSectionId;
 
     @BeforeEach
     void setUpClass() {
@@ -40,6 +41,8 @@ public class LineAcceptanceTest {
         secondSectionId = StationApiCaller.callCreateStation(params).jsonPath().getObject("id", Long.class);
         params.put("name", "선릉역");
         thirdSectionId = StationApiCaller.callCreateStation(params).jsonPath().getObject("id", Long.class);
+        params.put("name", "교대역");
+        forthSectionId = StationApiCaller.callCreateStation(params).jsonPath().getObject("id", Long.class);
 
         newBunDangLineParams = new HashMap<>();
         newBunDangLineParams.put("name", "신분당선");
@@ -203,7 +206,7 @@ public class LineAcceptanceTest {
         // when
         Map<String, String> params = new HashMap<>();
         params.put("upStationId", thirdSectionId.toString());
-        params.put("downStationId", "100");
+        params.put("downStationId", forthSectionId.toString());
         params.put("distance", "10");
         response = given().log().all()
                 .body(params)
@@ -216,5 +219,9 @@ public class LineAcceptanceTest {
         int actual = response.statusCode();
         int expected = HttpStatus.BAD_REQUEST.value();
         assertThat(actual).isEqualTo(expected);
+
+        String actualBody = response.asString();
+        String expectedBody = "마지막 구간과 추가될 구간의 시작은 같아야 합니다.";
+        assertThat(actualBody).isEqualTo(expectedBody);
     }
 }
