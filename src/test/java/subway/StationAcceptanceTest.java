@@ -19,22 +19,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철역 관련 기능")
 @ActiveProfiles("AcceptanceTest")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class StationAcceptanceTest {
-
-    private final DataBaseCleanUp dataBaseCleanUp;
+public class StationAcceptanceTest extends BaseTest{
 
     private final String 지하철_이름_강남역 = "강남역";
     private final String 지하철_이름_역삼역 = "역삼역";
 
-    @Autowired
-    public StationAcceptanceTest(DataBaseCleanUp dataBaseCleanUp) {
-        this.dataBaseCleanUp = dataBaseCleanUp;
-    }
-
-    @BeforeEach
-    void setUp() {
-        dataBaseCleanUp.execute();
-    }
     /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다

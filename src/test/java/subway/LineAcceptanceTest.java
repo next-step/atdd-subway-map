@@ -22,14 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철 노선 관련 기능")
 @ActiveProfiles("AcceptanceTest")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class LineAcceptanceTest {
-
-    private final DataBaseCleanUp dataBaseCleanUp;
-
-    @Autowired
-    public LineAcceptanceTest(DataBaseCleanUp dataBaseCleanUp) {
-        this.dataBaseCleanUp = dataBaseCleanUp;
-    }
+public class LineAcceptanceTest extends BaseTest{
 
     private final String 노선이름_1 = "1호선";
     private final String 노선이름_2 = "2호선";
@@ -40,11 +33,9 @@ public class LineAcceptanceTest {
     private long 상행종점_아이디;
     private long 하행종점_아이디;
 
+
     @BeforeEach
     void setUp() {
-        dataBaseCleanUp.init();
-        dataBaseCleanUp.execute();
-
         상행종점_아이디 =StationTestFixture.createStationFromName("강남역").jsonPath().getLong("id");
         하행종점_아이디 =StationTestFixture.createStationFromName("역삼역").jsonPath().getLong("id");;
     }
