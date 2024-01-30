@@ -3,6 +3,8 @@ package subway.line;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import subway.line.section.Section;
+import subway.line.section.Sections;
 import subway.station.Station;
 
 import java.util.List;
