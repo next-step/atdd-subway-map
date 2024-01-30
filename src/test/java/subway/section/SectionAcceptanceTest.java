@@ -3,7 +3,6 @@ package subway.section;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.assertj.core.api.AbstractIntegerAssert;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -64,7 +63,7 @@ public class SectionAcceptanceTest {
 
         final ExtractableResponse<Response> response = 구간을_등록한다(lineId, 2L, 3L, 10);
 
-        정상_응답한다(response, HttpStatus.CREATED);
+        구간이_정상_등록한다(response, HttpStatus.CREATED);
     }
 
     /**
@@ -76,16 +75,26 @@ public class SectionAcceptanceTest {
     @DisplayName("노선의 구간을 제거할 때 마지막구간이 아니면 오류가 발생한다.")
     @Test
     public void 구간제거_마지막구간이_아닐때() {
+        final Long lineId = 노선이_생성되어_있다("신분당선", "bg-red-600", 1L, 2L);
+        구간을_등록한다(lineId, 2L, 3L, 10);
     }
 
-    private void 정상_응답한다(final ExtractableResponse<Response> response, final HttpStatus httpStatus) {
+    private void 구간이_정상_등록한다(final ExtractableResponse<Response> response, final HttpStatus httpStatus) {
+        final SectionResponse sectionResponse = response.as(SectionResponse.class);
         assertThat(response.statusCode()).isEqualTo(httpStatus.value());
+        assertThat(sectionResponse.getDistance()).isEqualTo(10);
     }
 
     private void 예외가_발생한다(final ExtractableResponse<Response> response, HttpStatus httpStatus) {
         assertThat(response.statusCode()).isEqualTo(httpStatus.value());
     }
 
+    private ExtractableResponse<Response> 구간이_등록되어_있다(final Long lineId, final Long upStationId,
+                                                   final Long downStationId, final int distance) {
+        final Map<String, String> params = registerSectionRequestPixture(upStationId, downStationId, distance);
+        final ExtractableResponse<Response> response = apiRegisteSection(lineId, params);
+        return response;
+    }
     private ExtractableResponse<Response> 구간을_등록한다(final Long lineId, final Long upStationId,
                                                                       final Long downStationId, final int distance) {
         final Map<String, String> params = registerSectionRequestPixture(upStationId, downStationId, distance);

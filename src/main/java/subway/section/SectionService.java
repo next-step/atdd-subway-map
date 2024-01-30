@@ -20,15 +20,17 @@ public class SectionService {
     private final LineRepository lineRepository;
     private final StationRepository stationRepository;
 
-    public SectionService(final SectionRepository sectionRepository, final LineRepository lineRepository, final StationRepository stationRepository) {
+    public SectionService(final SectionRepository sectionRepository, final LineRepository lineRepository,
+                          final StationRepository stationRepository) {
         this.sectionRepository = sectionRepository;
         this.lineRepository = lineRepository;
         this.stationRepository = stationRepository;
     }
 
     @Transactional
-    public void saveSection(final Long lineId, final SectionRequest sectionRequest) {
-        final Line line = lineRepository.findById(lineId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, EMPTY_LINE_MSG));
+    public SectionResponse saveSection(final Long lineId, final SectionRequest sectionRequest) {
+        final Line line = lineRepository.findById(lineId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, EMPTY_LINE_MSG));
 
         final Station upStation = stationRepository.findById(sectionRequest.getUpStationId())
                 .orElseThrow(() -> new IllegalArgumentException(EMPTY_UP_STATION_MSG));
@@ -38,6 +40,7 @@ public class SectionService {
 
         final Section section = new Section(upStation, downStation, sectionRequest.getDistance());
         section.setLine(line);
-        sectionRepository.save(section);
+        final Section savedSection = sectionRepository.save(section);
+        return new SectionResponse(savedSection.getId(), savedSection.getDistance());
     }
 }
