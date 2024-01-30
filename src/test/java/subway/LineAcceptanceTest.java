@@ -3,7 +3,6 @@ package subway;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,21 +20,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철 노선 테스트")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {
-    private static boolean setUpIsDone = false;
-
-    private static final LineRequest LINE_REQUEST_1 = new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10L);
-    private static final LineRequest LINE_REQUEST_2 = new LineRequest("분당선", "bg-green-600", 1L, 3L, 7L);
-
-    @BeforeEach
-    public void setUp() {
-        if (setUpIsDone) return;
-
-        StationAcceptanceTest.makeStation("gangnam");
-        StationAcceptanceTest.makeStation("yeoksam");
-        StationAcceptanceTest.makeStation("samseong");
-
-        setUpIsDone = true;
-    }
 
     public ExtractableResponse<Response> makeLine(LineRequest lineRequest) {
         return RestAssured
@@ -78,12 +62,15 @@ public class LineAcceptanceTest {
     @Test
     void createLine() {
         // when
-        ExtractableResponse<Response> newLineResponse = makeLine(LINE_REQUEST_1);
+        Long stationId1 = StationAcceptanceTest.makeStation("gangnam").jsonPath().getLong("id");
+        Long stationId2 = StationAcceptanceTest.makeStation("yeoksam").jsonPath().getLong("id");
+
+        ExtractableResponse<Response> response = makeLine(new LineRequest("신분당선", "bg-red-600", stationId1, stationId2, 10L));
 
         // then
         List<Long> ids = getLines().jsonPath().getList("id", Long.class);
 
-        assertThat(ids).containsOnly(newLineResponse.jsonPath().getLong("id"));
+        assertThat(ids).containsOnly(response.jsonPath().getLong("id"));
     }
 
     /**
@@ -95,14 +82,18 @@ public class LineAcceptanceTest {
     @Test
     void showLines() {
         // given
-        Long id_1 = makeLine(LINE_REQUEST_1).jsonPath().getLong("id");
-        Long id_2 = makeLine(LINE_REQUEST_2).jsonPath().getLong("id");
+        Long stationId1 = StationAcceptanceTest.makeStation("gangnam").jsonPath().getLong("id");
+        Long stationId2 = StationAcceptanceTest.makeStation("yeoksam").jsonPath().getLong("id");
+        Long stationId3 = StationAcceptanceTest.makeStation("samseong").jsonPath().getLong("id");
 
-        //when
+        Long lineId1 = makeLine(new LineRequest("신분당선", "bg-red-600", stationId1, stationId2, 10L)).jsonPath().getLong("id");
+        Long lineId2 = makeLine(new LineRequest("분당선", "bg-green-600", stationId1, stationId3, 7L)).jsonPath().getLong("id");
+
+        // when
         ExtractableResponse<Response> response = getLines();
 
-        //then
-        assertThat(response.jsonPath().getList("id", Long.class)).containsOnly(id_1, id_2);
+        // then
+        assertThat(response.jsonPath().getList("id", Long.class)).containsOnly(lineId1, lineId2);
     }
 
     /**
@@ -113,14 +104,17 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선 단일 조회")
     @Test
     void showLine() {
+        Long stationId1 = StationAcceptanceTest.makeStation("gangnam").jsonPath().getLong("id");
+        Long stationId2 = StationAcceptanceTest.makeStation("yeoksam").jsonPath().getLong("id");
+
         // given
-        Long id = makeLine(LINE_REQUEST_1).jsonPath().getLong("id");
+        Long lineId = makeLine(new LineRequest("신분당선", "bg-red-600", stationId1, stationId2, 10L)).jsonPath().getLong("id");
 
-        //when
-        ExtractableResponse<Response> response = getLine(id);
+        // when
+        ExtractableResponse<Response> response = getLine(lineId);
 
-        //then
-        assertThat(response.jsonPath().getLong("id")).isEqualTo(id);
+        // then
+        assertThat(response.jsonPath().getLong("id")).isEqualTo(lineId);
     }
 
     /**
@@ -132,7 +126,10 @@ public class LineAcceptanceTest {
     @Test
     void updateLine() {
         // given
-        Long id = makeLine(LINE_REQUEST_1).jsonPath().getLong("id");
+        Long stationId1 = StationAcceptanceTest.makeStation("gangnam").jsonPath().getLong("id");
+        Long stationId2 = StationAcceptanceTest.makeStation("yeoksam").jsonPath().getLong("id");
+
+        Long lineId = makeLine(new LineRequest("신분당선", "bg-red-600", stationId1, stationId2, 10L)).jsonPath().getLong("id");
 
         // when
         Map<String, String> request = Map.of("name", "다른분당선", "color", "bg-red-600");
@@ -142,12 +139,12 @@ public class LineAcceptanceTest {
                 .when()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(request)
-                .put("/lines/" + id)
+                .put("/lines/" + lineId)
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value());
 
         // then
-        ExtractableResponse<Response> response = getLine(id);
+        ExtractableResponse<Response> response = getLine(lineId);
 
         assertThat(response.jsonPath().getString("name")).isEqualTo("다른분당선");
         assertThat(response.jsonPath().getString("color")).isEqualTo("bg-red-600");
@@ -161,19 +158,22 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선 삭제")
     @Test
     void deleteLine() {
+        Long stationId1 = StationAcceptanceTest.makeStation("gangnam").jsonPath().getLong("id");
+        Long stationId2 = StationAcceptanceTest.makeStation("yeoksam").jsonPath().getLong("id");
+
         // given
-        Long id = makeLine(LINE_REQUEST_1).jsonPath().getLong("id");
+        Long lineId = makeLine(new LineRequest("신분당선", "bg-red-600", stationId1, stationId2, 10L)).jsonPath().getLong("id");
 
         // when
         RestAssured
                 .given().log().all()
                 .when()
-                .delete("/lines/" + id)
+                .delete("/lines/" + lineId)
                 .then()
                 .statusCode(HttpStatus.NO_CONTENT.value());
 
         // then
         ExtractableResponse<Response> response = getLines();
-        assertThat(response.jsonPath().getList("id", Long.class)).doesNotContain(id);
+        assertThat(response.jsonPath().getList("id", Long.class)).doesNotContain(lineId);
     }
 }

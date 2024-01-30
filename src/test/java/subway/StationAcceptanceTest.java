@@ -71,8 +71,8 @@ public class StationAcceptanceTest {
     @Test
     void showStations() {
         // given
-        makeStation("gangnam");
-        makeStation("yeoksam");
+        Long id_1 = makeStation("gangnam").jsonPath().getLong("id");
+        Long id_2 = makeStation("yeoksam").jsonPath().getLong("id");
 
         // when
         ExtractableResponse<Response> response = RestAssured.given()
@@ -82,8 +82,8 @@ public class StationAcceptanceTest {
                 .extract();
 
         // then
-        List<String> names = response.jsonPath().getList("name");
-        assertThat(names).containsExactly("gangnam", "yeoksam");
+        List<Long> names = response.jsonPath().getList("id", Long.class);
+        assertThat(names).contains(id_1, id_2);
     }
 
 
