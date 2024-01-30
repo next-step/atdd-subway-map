@@ -37,7 +37,7 @@ public class LineFixture {
 	public ExtractableResponse<Response> actionReturnExtractableResponse() {
 		Long upStationId = generateStationId(upStationName);
 		Long downStationId = generateStationId(downStationName);
-		LineCreateRequest lineCreateRequest = LineRequestFixture.create()
+		LineCreateRequest lineCreateRequest = LineRequestFixture.builder()
 			.upStationId(upStationId)
 			.downStationId(downStationId)
 			.build();
