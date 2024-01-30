@@ -5,6 +5,8 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.MediaType;
 
+import java.util.Map;
+
 public class RestApiRequest<T> {
 	private final String path;
 
@@ -46,5 +48,14 @@ public class RestApiRequest<T> {
 					.delete(path, pathParams)
 				.then().log().all()
 					.extract();
+	}
+
+	public ExtractableResponse<Response> delete(Map<String, Object> queryParams, Object... pathParams) {
+		return RestAssured.given().log().all()
+					.queryParams(queryParams)
+				.when()
+					.delete(path, pathParams)
+				.then().log().all()
+				.extract();
 	}
 }
