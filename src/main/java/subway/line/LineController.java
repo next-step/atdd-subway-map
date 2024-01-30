@@ -7,6 +7,8 @@ import subway.line.create.LineCreateService;
 import subway.line.create.LineCreatedResponse;
 import subway.line.load.LineLoadService;
 import subway.line.load.LineLoadedResponse;
+import subway.line.update.LineUpdateRequest;
+import subway.line.update.LineUpdateService;
 
 import java.net.URI;
 import java.util.List;
@@ -17,10 +19,12 @@ public class LineController {
 
     private final LineCreateService lineCreateService;
     private final LineLoadService lineLoadService;
+    private final LineUpdateService lineUpdateService;
 
-    public LineController(LineCreateService lineCreateService, LineLoadService lineLoadService) {
+    public LineController(LineCreateService lineCreateService, LineLoadService lineLoadService, LineUpdateService lineUpdateService) {
         this.lineCreateService = lineCreateService;
         this.lineLoadService = lineLoadService;
+        this.lineUpdateService = lineUpdateService;
     }
 
     @PostMapping
@@ -39,5 +43,11 @@ public class LineController {
     public ResponseEntity<LineLoadedResponse> getLine(@PathVariable("line-id") Long lineId) {
         LineLoadedResponse response = lineLoadService.getLine(lineId);
         return ResponseEntity.ok().body(response);
+    }
+
+    @PutMapping("/{line-id}")
+    public ResponseEntity<LineLoadedResponse> updateLine(@PathVariable("line-id") Long lineId, @RequestBody LineUpdateRequest request) {
+        lineUpdateService.updateLine(lineId, request);
+        return ResponseEntity.ok().build();
     }
 }

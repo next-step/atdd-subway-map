@@ -126,6 +126,7 @@ public class LineAcceptanceTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.jsonPath().getString("id")).isEqualTo(이호선_ID);
         assertThat(response.jsonPath().getString("name")).isEqualTo("2호선");
         assertThat(response.jsonPath().getString("color")).isEqualTo("bg-green-999");
         assertThat(response.jsonPath().getList("stations")).hasSize(2);
@@ -152,10 +153,7 @@ public class LineAcceptanceTest {
 
         Map<String, String> params = new HashMap<>();
         params.put("name", "3호선");
-        params.put("color", "bg-green-999");
-        params.put("upStationId", 건대입구역_ID);
-        params.put("downStationId", 강남역_ID);
-        params.put("distance", "10");
+        params.put("color", "bg-blue-222");
 
         // when
         ExtractableResponse<Response> response =
@@ -168,11 +166,13 @@ public class LineAcceptanceTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        ExtractableResponse<Response> loadLine = loadLine(response.jsonPath().getLong("id"));
+        ExtractableResponse<Response> loadLine = loadLine(Long.valueOf(이호선_ID));
+        assertThat(loadLine.jsonPath().getString("id")).isEqualTo(이호선_ID);
         assertThat(loadLine.jsonPath().getString("name")).isEqualTo("3호선");
-        assertThat(loadLine.jsonPath().getString("color")).isEqualTo("bg-green-999");
-        assertThat(loadLine.jsonPath().getString("upStationId")).isEqualTo(건대입구역_ID);
-        assertThat(loadLine.jsonPath().getString("downStationId")).isEqualTo(강남역_ID);
+        assertThat(loadLine.jsonPath().getString("color")).isEqualTo("bg-blue-222");
+        assertThat(loadLine.jsonPath().getList("stations")).hasSize(2);
+        assertThat(loadLine.jsonPath().getList("stations.id", String.class)).containsExactly(강남역_ID, 건대입구역_ID);
+        assertThat(loadLine.jsonPath().getList("stations.name", String.class)).containsExactly("강남역", "건대입구역");
     }
 
     /**
@@ -229,13 +229,6 @@ public class LineAcceptanceTest {
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/lines")
-                .then().log().all()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> loadStations() {
-        return RestAssured.given().log().all()
-                .when().get("/stations")
                 .then().log().all()
                 .extract();
     }
