@@ -3,7 +3,6 @@ package subway.line;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -51,11 +50,11 @@ public class LineAcceptanceTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        ExtractableResponse<Response> loadLine = loadLine(response.jsonPath().getLong("id"));
-        assertThat(loadLine.jsonPath().getString("name")).isEqualTo("2호선");
-        assertThat(loadLine.jsonPath().getString("color")).isEqualTo("bg-green-999");
-        assertThat(loadLine.jsonPath().getString("upStationId")).isEqualTo(강남역_ID);
-        assertThat(loadLine.jsonPath().getString("downStationId")).isEqualTo(건대입구역_ID);
+        assertThat(response.jsonPath().getString("name")).isEqualTo("2호선");
+        assertThat(response.jsonPath().getString("color")).isEqualTo("bg-green-999");
+        assertThat(response.jsonPath().getList("stations")).hasSize(2);
+        assertThat(response.jsonPath().getList("stations.id", String.class)).containsExactly(강남역_ID, 건대입구역_ID);
+        assertThat(response.jsonPath().getList("stations.name", String.class)).containsExactly("강남역", "건대입구역");
     }
 
     /**
@@ -94,7 +93,6 @@ public class LineAcceptanceTest {
         assertThat(response.jsonPath().getList("color", String.class)).containsExactly("bg-green-999", "bg-orange-600");
         assertThat(response.jsonPath().getList("upStationId", String.class)).containsExactly(강남역_ID, 건대입구역_ID);
         assertThat(response.jsonPath().getList("downStationId", String.class)).containsExactly(건대입구역_ID, 군자역_ID);
-        assertThat(response.jsonPath().getList("distance", String.class)).containsExactly("10", "20");
     }
 
     /**
@@ -128,7 +126,6 @@ public class LineAcceptanceTest {
         assertThat(response.jsonPath().getString("color")).isEqualTo("bg-green-999");
         assertThat(response.jsonPath().getString("upStationId")).isEqualTo(강남역_ID);
         assertThat(response.jsonPath().getString("downStationId")).isEqualTo(건대입구역_ID);
-        assertThat(response.jsonPath().getString("distance")).isEqualTo("10");
     }
 
     /**
@@ -171,7 +168,6 @@ public class LineAcceptanceTest {
         assertThat(loadLine.jsonPath().getString("color")).isEqualTo("bg-green-999");
         assertThat(loadLine.jsonPath().getString("upStationId")).isEqualTo(건대입구역_ID);
         assertThat(loadLine.jsonPath().getString("downStationId")).isEqualTo(강남역_ID);
-        assertThat(response.jsonPath().getString("distance")).isEqualTo("10");
     }
 
     /**
