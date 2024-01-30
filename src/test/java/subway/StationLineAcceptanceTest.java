@@ -12,10 +12,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import subway.dto.StationLineRequest;
+import subway.entity.StationLine;
+
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("지하철 노선 관련 기능")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -41,16 +45,10 @@ public class StationLineAcceptanceTest {
 
         // when
         createStationLineRequest(신분당선);
-        JsonPath allStationLine = findAllStationLines();
-
         // then
-        assertAll(
-                () -> assertThat(allStationLine.getList(NAME_KEY)).containsAnyOf(신분당선.getName()),
-                () -> assertThat(allStationLine.getList(COLOR_KEY)).containsAnyOf(신분당선.getColor()),
-                () -> assertThat(allStationLine.getList(UP_STATION_ID_KEY)).containsAnyOf(신분당선.getUpStationId()),
-                () -> assertThat(allStationLine.getList(DOWN_STATION_ID_KEY)).containsAnyOf(신분당선.getDownStationId()),
-                () -> assertThat(allStationLine.getList(DISTANCE_KEY)).containsAnyOf(신분당선.getDistance())
-        );
+        assertThat(convertStationLines(findAllStationLines())).usingRecursiveComparison()
+                .ignoringFields("id")
+                .isEqualTo(List.of(신분당선));
     }
 
     /**
@@ -69,21 +67,9 @@ public class StationLineAcceptanceTest {
         createStationLineRequest(분당선);
 
         // when
-        JsonPath allStationLine = findAllStationLines();
-
-        // then
-        assertAll(
-                () -> assertThat(allStationLine.getList(NAME_KEY))
-                        .containsAnyOf(신분당선.getName(), 분당선.getName()),
-                () -> assertThat(allStationLine.getList(COLOR_KEY))
-                        .containsAnyOf(신분당선.getColor(), 분당선.getColor()),
-                () -> assertThat(allStationLine.getList(UP_STATION_ID_KEY))
-                        .containsAnyOf(신분당선.getUpStationId(), 분당선.getUpStationId()),
-                () -> assertThat(allStationLine.getList(DOWN_STATION_ID_KEY))
-                        .containsAnyOf(신분당선.getDownStationId(), 분당선.getDownStationId()),
-                () -> assertThat(allStationLine.getList(DISTANCE_KEY))
-                        .containsAnyOf(신분당선.getDistance(), 분당선.getDistance())
-        );
+        assertThat(convertStationLines(findAllStationLines())).usingRecursiveComparison()
+                .ignoringFields("id")
+                .isEqualTo(List.of(신분당선, 분당선));
     }
 
     /**
@@ -98,22 +84,10 @@ public class StationLineAcceptanceTest {
         StationLineRequest 신분당선 = StationLineMockData.신분당선;
         ExtractableResponse<Response> response = createStationLineRequest(신분당선);
 
-        // when
-        JsonPath stationLine = findStationLine(getCreatedLocationId(response));
-
-        // then
-        assertAll(
-                () -> assertThat(stationLine.get(NAME_KEY).toString())
-                        .isEqualTo(신분당선.getName()),
-                () -> assertThat(stationLine.get(COLOR_KEY).toString())
-                        .isEqualTo(신분당선.getColor()),
-                () -> assertThat(Integer.parseInt(stationLine.get(UP_STATION_ID_KEY).toString()))
-                        .isEqualTo(신분당선.getUpStationId()),
-                () -> assertThat(Integer.parseInt(stationLine.get(DOWN_STATION_ID_KEY).toString()))
-                        .isEqualTo(신분당선.getDownStationId()),
-                () -> assertThat(Integer.parseInt(stationLine.get(DISTANCE_KEY).toString()))
-                        .isEqualTo(신분당선.getDistance())
-        );
+        // when, then
+        assertThat(convertStationLine(findStationLine(getCreatedLocationId(response)))).usingRecursiveComparison()
+                .ignoringFields("id")
+                .isEqualTo(신분당선);
     }
 
     /**
@@ -126,22 +100,16 @@ public class StationLineAcceptanceTest {
     void updateStationLine() {
         // given
         StationLineRequest 신분당선 = StationLineMockData.신분당선;
-        StationLineRequest 분당선 = StationLineMockData.분당선;
+        StationLineRequest 수정된_신분당선 = StationLineMockData.수정된_신분당선;
 
         ExtractableResponse<Response> createResponse = createStationLineRequest(신분당선);
 
         // when
-        updateStationLineRequest(분당선, getCreatedLocationId(createResponse));
+        updateStationLineRequest(수정된_신분당선, getCreatedLocationId(createResponse));
 
-        JsonPath updatedStationLine = findStationLine(getCreatedLocationId(createResponse));
-
-        // then
-        assertAll(
-                () -> assertThat(updatedStationLine.get(NAME_KEY).toString())
-                        .isEqualTo(분당선.getName()),
-                () -> assertThat(updatedStationLine.get(COLOR_KEY).toString())
-                        .isEqualTo(분당선.getColor())
-        );
+        assertThat(convertStationLine(findStationLine(getCreatedLocationId(createResponse)))).usingRecursiveComparison()
+                .ignoringFields("id")
+                .isEqualTo(수정된_신분당선);
     }
 
     /**
@@ -154,25 +122,57 @@ public class StationLineAcceptanceTest {
     void deleteStationLine() {
         // given
         StationLineRequest 신분당선 = StationLineMockData.신분당선;
+        StationLineRequest 분당선 = StationLineMockData.분당선;
+
         ExtractableResponse<Response> createResponse = createStationLineRequest(신분당선);
+        createStationLineRequest(분당선);
 
         // when
         deleteStationLineRequest(getCreatedLocationId(createResponse));
 
-        JsonPath allStationLine = findAllStationLines();
-
         // then
-        assertAll(
-                () -> assertThat(allStationLine.getList(NAME_KEY, String.class))
-                        .doesNotContain(신분당선.getName()),
-                () -> assertThat(allStationLine.getList(COLOR_KEY, String.class))
-                        .doesNotContain(신분당선.getColor()),
-                () -> assertThat(allStationLine.getList(UP_STATION_ID_KEY, Integer.class))
-                        .doesNotContain(신분당선.getUpStationId()),
-                () -> assertThat(allStationLine.getList(DOWN_STATION_ID_KEY, Integer.class))
-                        .doesNotContain(신분당선.getDownStationId()),
-                () -> assertThat(allStationLine.getList(DISTANCE_KEY, Integer.class))
-                        .doesNotContain(신분당선.getDistance())
+        assertThat(convertStationLines(findAllStationLines())).usingRecursiveComparison()
+                .ignoringFields("id")
+                .isEqualTo(List.of(분당선));
+    }
+
+    /**
+     * 주어진 JsonPath로 부터 StationLine 객체 목록 만들어서 반환
+     *
+     * @param jsonPath JSON 응답 객체
+     * @return StationLine 객체 목록
+     */
+    private List<StationLine> convertStationLines(JsonPath jsonPath) {
+        List<String> names = jsonPath.getList(NAME_KEY, String.class);
+        List<String> colors = jsonPath.getList(COLOR_KEY, String.class);
+        List<Integer> upStationIds = jsonPath.getList(UP_STATION_ID_KEY, Integer.class);
+        List<Integer> downStationIds = jsonPath.getList(DOWN_STATION_ID_KEY, Integer.class);
+        List<Integer> distances = jsonPath.getList(DISTANCE_KEY, Integer.class);
+
+        return IntStream.range(0, names.size())
+                .mapToObj(i -> new StationLine(
+                        names.get(i),
+                        colors.get(i),
+                        upStationIds.get(i),
+                        downStationIds.get(i),
+                        distances.get(i)
+                ))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 주어진 JsonPath로 부터 StationLine 객체를 만들어서 반환
+     *
+     * @param jsonPath JSON 응답 객체
+     * @return StationLine 객체
+     */
+    private StationLine convertStationLine(JsonPath jsonPath) {
+        return new StationLine(
+                jsonPath.get(NAME_KEY).toString(),
+                jsonPath.get(COLOR_KEY).toString(),
+                Integer.parseInt(jsonPath.get(UP_STATION_ID_KEY).toString()),
+                Integer.parseInt(jsonPath.get(DOWN_STATION_ID_KEY).toString()),
+                Integer.parseInt(jsonPath.get(DISTANCE_KEY).toString())
         );
     }
 
@@ -184,10 +184,10 @@ public class StationLineAcceptanceTest {
     private JsonPath findAllStationLines() {
         return given().log().all()
                 .when()
-                    .get("/lines")
+                .get("/lines")
                 .then().log().all()
-                    .statusCode(HttpStatus.OK.value())
-                    .extract().jsonPath();
+                .statusCode(HttpStatus.OK.value())
+                .extract().jsonPath();
     }
 
     /**
@@ -199,9 +199,9 @@ public class StationLineAcceptanceTest {
     private JsonPath findStationLine(Long stationLineId) {
         return given().log().all()
                 .when()
-                    .get("/lines/" + stationLineId)
+                .get("/lines/" + stationLineId)
                 .then().log().all()
-                    .extract().jsonPath();
+                .extract().jsonPath();
     }
 
     /**
@@ -212,13 +212,13 @@ public class StationLineAcceptanceTest {
      */
     private ExtractableResponse<Response> createStationLineRequest(StationLineRequest request) {
         return given().log().all()
-                    .body(request)
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(request)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
-                    .post("/lines")
+                .post("/lines")
                 .then().log().all()
-                    .statusCode(HttpStatus.CREATED.value())
-                    .extract();
+                .statusCode(HttpStatus.CREATED.value())
+                .extract();
     }
 
     /**
@@ -229,13 +229,13 @@ public class StationLineAcceptanceTest {
      */
     private void updateStationLineRequest(StationLineRequest request, Long stationLineId) {
         given().log().all()
-            .body(request)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when()
-            .put("/lines/" + stationLineId)
-        .then().log().all()
-            .statusCode(HttpStatus.OK.value())
-            .extract().jsonPath();
+                .body(request)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .put("/lines/" + stationLineId)
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract().jsonPath();
     }
 
     /**
@@ -245,11 +245,11 @@ public class StationLineAcceptanceTest {
      */
     private void deleteStationLineRequest(Long stationLineId) {
         given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when()
-            .delete("/lines/" + stationLineId)
-        .then().log().all()
-            .statusCode(HttpStatus.NO_CONTENT.value());
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .delete("/lines/" + stationLineId)
+                .then().log().all()
+                .statusCode(HttpStatus.NO_CONTENT.value());
     }
 
     /**
