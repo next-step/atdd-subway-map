@@ -13,6 +13,7 @@ import org.springframework.test.context.jdbc.Sql;
 import subway.line.LineRequest;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -53,6 +54,17 @@ public class LineAcceptanceTest {
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
                 .extract();
+    }
+
+    private static ExtractableResponse<Response> getLine(Long id) {
+        ExtractableResponse<Response> response = RestAssured
+                .given()
+                .when()
+                .get("/lines/" + id)
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract();
+        return response;
     }
 
     /**
@@ -103,15 +115,39 @@ public class LineAcceptanceTest {
         Long id = makeLine(new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10L)).jsonPath().getLong("id");
 
         //when
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .when()
-                .get("/lines/"+id)
-                .then()
-                .statusCode(HttpStatus.OK.value())
-                .extract();
+        ExtractableResponse<Response> response = getLine(id);
 
         //then
         assertThat(response.jsonPath().getLong("id")).isEqualTo(id);
+    }
+
+    /**
+     * given 지하철 노선을 생성하고
+     * when 생성한 지하철 노선을 수정하면
+     * then 해당 지하철 노선 정보는 수정된다.
+     */
+    @DisplayName("지하철 노선 수정")
+    @Test
+    void updateLine() {
+        // given
+        Long id = makeLine(new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10L)).jsonPath().getLong("id");
+
+        // when
+        Map<String, String> request = Map.of("name", "다른분당선", "color", "bg-red-600");
+
+        RestAssured
+                .given().log().all()
+                .when()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(request)
+                .put("/lines/" + id)
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value());
+        // 문제없음
+        // then
+        ExtractableResponse<Response> response = getLine(id);
+
+        assertThat(response.jsonPath().getString("name")).isEqualTo("다른분당선");
+        assertThat(response.jsonPath().getString("color")).isEqualTo("bg-red-600");
     }
 }

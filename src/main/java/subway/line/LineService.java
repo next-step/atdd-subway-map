@@ -3,12 +3,15 @@ package subway.line;
 import org.springframework.stereotype.Service;
 import subway.station.Station;
 import subway.station.StationRepository;
+import subway.station.StationResponse;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class LineService {
     private final LineRepository lineRepository;
     private final StationRepository stationRepository;
@@ -17,12 +20,10 @@ public class LineService {
         this.lineRepository = lineRepository;
         this.stationRepository = stationRepository;
     }
-
     private LineResponse createLineResponse(Line line) {
         return new LineResponse(line.getId(), line.getName(), line.getColor(), List.of(line.getUpStation(), line.getDownStation()));
     }
 
-    @Transactional
     public LineResponse createLine(LineRequest lineRequest) {
         Station upStation = stationRepository.findById(lineRequest.getUpStationId()).orElseThrow();
         Station downStation = stationRepository.findById(lineRequest.getDownStationId()).orElseThrow();
@@ -41,5 +42,11 @@ public class LineService {
 
     public LineResponse showLine(Long id) {
         return createLineResponse(lineRepository.findById(id).orElseThrow());
+    }
+
+    public void updateLine(Long id, UpdateLineRequest updateLineRequest) {
+        Line line = lineRepository.findById(id).orElseThrow();
+        line.setName(updateLineRequest.getName());
+        line.setColor(updateLineRequest.getColor());
     }
 }

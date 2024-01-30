@@ -1,6 +1,5 @@
 package subway.line;
 
-import org.hibernate.annotations.Cascade;
 import subway.station.Station;
 
 import javax.persistence.*;
@@ -55,5 +54,13 @@ public class Line {
 
     public Station getDownStation() {
         return downStation;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
     }
 }
