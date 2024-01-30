@@ -3,6 +3,7 @@ package subway.entity;
 import javax.persistence.*;
 
 @Entity
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"line_id", "upStationId", "downStationId"}))
 public class Section {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -11,9 +12,10 @@ public class Section {
 	@ManyToOne
 	Line line;
 
+	private Long upStationId;
+
 	private Long downStationId;
 
-	private Long upStationId;
 
 	private int distance;
 
