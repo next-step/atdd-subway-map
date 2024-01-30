@@ -32,10 +32,10 @@ public class Section {
 	public Section() {
 	}
 
-	public Section(Line line, Long downStationId, Long upStationId, int distance) {
+	public Section(Line line, Long upStationId, Long downStationId, int distance) {
 		this.line = line;
-		this.downStationId = downStationId;
 		this.upStationId = upStationId;
+		this.downStationId = downStationId;
 		this.distance = distance;
 	}
 }
