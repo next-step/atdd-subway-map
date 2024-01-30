@@ -4,6 +4,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
+import subway.dto.SectionRequest;
 import subway.service.LineService;
 
 import java.net.URI;
@@ -41,7 +42,7 @@ public class LineController {
 		}
 
 		if(lineRequest.getColor().isEmpty()) {
-			return ResponseEntity.badRequest().body("이름 값이 빈 값일 수 없습니다.");
+			return ResponseEntity.badRequest().body("색상 값이 빈 값일 수 없습니다.");
 		}
 
 		lineService.updateLine(id, lineRequest);
@@ -52,5 +53,11 @@ public class LineController {
 	ResponseEntity<Void> deleteLine(@PathVariable Long id) {
 		lineService.deleteLine(id);
 		return ResponseEntity.noContent().build();
+	}
+
+	@PostMapping("/lines/{id}/sections")
+	ResponseEntity<String> createSection(@PathVariable Long id, @RequestBody SectionRequest sectionRequest) {
+		lineService.createSection(id, sectionRequest);
+		return ResponseEntity.created(URI.create("/lines/" + id)).build();
 	}
 }

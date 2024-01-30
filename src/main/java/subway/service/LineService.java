@@ -2,10 +2,13 @@ package subway.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.dto.SectionRequest;
+import subway.entity.Section;
 import subway.repository.LineRepository;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 import subway.entity.Line;
+import subway.repository.SectionRepository;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
@@ -16,10 +19,12 @@ import java.util.stream.Collectors;
 public class LineService {
 	private final LineRepository lineRepository;
 	private final StationService stationService;
+	private final SectionRepository sectionRepository;
 
-	public LineService(LineRepository lineRepository, StationService stationService) {
+	public LineService(LineRepository lineRepository, StationService stationService, SectionRepository sectionRepository) {
 		this.lineRepository = lineRepository;
 		this.stationService = stationService;
+		this.sectionRepository = sectionRepository;
 	}
 
 	@Transactional
@@ -53,6 +58,28 @@ public class LineService {
 	@Transactional
 	public void deleteLine(Long id) {
 		lineRepository.deleteById(id);
+	}
+
+	@Transactional
+	public void createSection(Long id, SectionRequest sectionRequest) {
+		Line line = lineRepository.findById(id)
+				.orElseThrow(EntityNotFoundException::new);
+
+		if(!line.getEndStationId().equals(sectionRequest.getUpStationId())) {
+			throw new IllegalArgumentException("노선의 하행 종점역과 구간의 상행역은 같아야 합니다.");
+		}
+
+		sectionRepository.findByLine(line).forEach(x -> {
+			if (sectionRequest.getDownStationId().equals(x.getUpStationId()) || sectionRequest.getDownStationId().equals(x.getDownStationId())) {
+				throw new IllegalArgumentException("해당 노선에 " + sectionRequest.getDownStationId() + "역이 이미 존재합니다.");
+			}
+		});
+
+		line.addSection(sectionRequest.getDownStationId(), sectionRequest.getDistance());
+		lineRepository.save(line);
+
+		Section section = new Section(line, sectionRequest.getDownStationId(), sectionRequest.getUpStationId(), sectionRequest.getDistance());
+		sectionRepository.save(section);
 	}
 
 	private LineResponse createLineResponse(Line line) {
