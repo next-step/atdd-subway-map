@@ -24,4 +24,8 @@ public class Station {
     public String getName() {
         return name;
     }
+
+    public StationResponse createStationResponse() {
+        return new StationResponse(id, name);
+    }
 }
