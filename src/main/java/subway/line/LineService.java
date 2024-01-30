@@ -45,11 +45,7 @@ public class LineService {
 
 	@Transactional
 	public LineResponse save(LineCreateRequest request) {
-		Line line = new Line(
-			request.getName(),
-			request.getColor(),
-			request.getDistance()
-		);
+		Line line = request.toEntity();
 		Line savedLine = lineRepository.save(line);
 		List<Station> stations = createLineStationMap(savedLine, request.getUpStationId(), request.getDownStationId());
 		return LineResponse.of(savedLine, stations);
