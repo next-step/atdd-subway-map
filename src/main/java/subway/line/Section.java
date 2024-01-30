@@ -1,22 +1,24 @@
-package subway.station;
+package subway.line;
+
+import subway.station.Station;
 
 import javax.persistence.Embeddable;
 import javax.persistence.FetchType;
 import javax.persistence.OneToOne;
 
 @Embeddable
-public class StationLink {
+public class Section {
     @OneToOne(fetch = FetchType.LAZY)
     private Station upStation;
 
     @OneToOne(fetch = FetchType.LAZY)
     private Station downStation;
 
-    public StationLink() {
+    public Section() {
     }
 
-    public StationLink(Station upStation,
-                       Station downStation) {
+    public Section(Station upStation,
+                   Station downStation) {
         this.upStation = upStation;
         this.downStation = downStation;
     }

@@ -1,7 +1,6 @@
 package subway.line;
 
 import subway.station.Station;
-import subway.station.StationLink;
 
 import javax.persistence.*;
 
@@ -15,7 +14,7 @@ public class Line {
     @Column(length = 20, nullable = false)
     private String color;
     @Embedded
-    private StationLink stationLink;
+    private Section section;
     @Column(nullable = false)
     private Long distance;
 
@@ -29,7 +28,7 @@ public class Line {
                 Long distance) {
         this.name = name;
         this.color = color;
-        this.stationLink = new StationLink(upStation, downStation);
+        this.section = new Section(upStation, downStation);
         this.distance = distance;
     }
 
@@ -45,8 +44,8 @@ public class Line {
         return color;
     }
 
-    public StationLink getStationLink() {
-        return stationLink;
+    public Section getStationLink() {
+        return section;
     }
 
     public void update(String name,
