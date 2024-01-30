@@ -29,7 +29,7 @@ public class Line {
 	@OneToMany(mappedBy = "line")
 	private final List<LineStationMap> lineStationMaps = new ArrayList<>();
 
-	public Line() {
+	protected Line() {
 	}
 
 	public Line(String name, String color, Integer distance) {
