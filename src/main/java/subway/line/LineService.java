@@ -7,7 +7,6 @@ import subway.StationRepository;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -28,6 +27,21 @@ public class LineService {
         return createLineResponse(line, stations);
     }
 
+    public List<LineResponse> findAllLines() {
+        List<LineResponse> lineResponses = new ArrayList<>();
+
+        List<Line> lines = lineRepository.findAll();
+        for(Line line : lines) {
+            List<Station> stations = new ArrayList<>();
+            stations.add(stationRepository.findById(line.getUpStationId()).orElseThrow());
+            stations.add(stationRepository.findById(line.getDownStationId()).orElseThrow());
+
+            lineResponses.add(createLineResponse(line, stations));
+        }
+
+        return lineResponses;
+    }
+
     private LineResponse createLineResponse(Line line, List<Station> stations) {
         return new LineResponse(
                 line.getId(),
@@ -36,4 +50,5 @@ public class LineService {
                 stations
         );
     }
+
 }
