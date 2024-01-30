@@ -43,6 +43,10 @@ public class Sections {
         this.sectionList.add(section);
     }
 
+    public boolean isSameLastStationAndStartStation(Section station) {
+        return lastStation().equals(station.getUpStation());
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -56,7 +60,4 @@ public class Sections {
         return Objects.hash(sectionList);
     }
 
-    public boolean isSameDownStation(Station station) {
-        return lastStation().equals(station);
-    }
 }

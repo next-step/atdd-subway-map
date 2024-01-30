@@ -83,9 +83,10 @@ public class Line {
 
     public void addSection(Section section) {
         this.distance = section.calculateDistance(distance);
-        if(!this.sections.isSameDownStation(section.getUpStation())) {
+        if(!this.sections.isSameLastStationAndStartStation(section)) {
             throw new IllegalArgumentException("마지막 구간과 추가될 구간의 시작은 같아야 합니다.");
         }
+
         this.sections.add(section);
     }
 

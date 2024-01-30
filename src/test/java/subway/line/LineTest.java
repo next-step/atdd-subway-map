@@ -17,6 +17,7 @@ class LineTest {
     private static final String 교대역 = "교대역";
     private static final String 서초역 = "서초역";
     private Line line;
+    private Section inputSection;
 
     @BeforeEach
     void setUp() {
@@ -25,16 +26,17 @@ class LineTest {
                 new Station(1L, 강남역),
                 new Station(2L, 선릉역),
                 10L);
+
+        inputSection = new Section(
+                new Station(2L, 선릉역),
+                new Station(3L, 교대역),
+                5L);
     }
 
     @Test
     @DisplayName("생성된 라인에 구간을 더할 수 있다")
     void addSection1() {
-        Section input = new Section(
-                new Station(2L, 선릉역),
-                new Station(3L, 교대역),
-                5L);
-        line.addSection(input);
+        line.addSection(inputSection);
 
         Sections actual = line.getSections();
         Sections expected = Sections.from(
@@ -52,11 +54,23 @@ class LineTest {
     }
 
     @Test
-    @DisplayName("생성된 라인의 마지막 구간과 더하는 구간의 시작이 다르면 더할 수 없다")
+    @DisplayName("생성된 라인의 마지막 역과 더하는 구간의 시작역이 다르면 더할 수 없다")
     void addSection2() {
         Section input = new Section(
                 new Station(3L, 교대역),
                 new Station(4L, 서초역),
+                5L);
+        assertThrows(IllegalArgumentException.class, () -> line.addSection(input));
+    }
+
+    @Test
+    @DisplayName("생성된 라인의 역들에 더하는 구간의 마지막역이 포함되어 있으면 더할 수 없다")
+    void addSection3() {
+        line.addSection(inputSection);
+
+        Section input = new Section(
+                new Station(3L, 교대역),
+                new Station(2L, 선릉역),
                 5L);
         assertThrows(IllegalArgumentException.class, () -> line.addSection(input));
     }
