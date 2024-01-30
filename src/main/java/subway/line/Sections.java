@@ -70,6 +70,10 @@ public class Sections {
     }
 
     public Section delete(Station station) {
+        if(this.sectionList.size() == 1) {
+            throw new IllegalArgumentException("구간이 하나 일 때는 삭제를 할 수 없습니다.");
+        }
+
         Section findSection = this.sectionList.stream()
                 .filter(section -> section.isSameDownStation(station))
                 .findFirst()

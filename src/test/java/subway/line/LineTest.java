@@ -100,4 +100,10 @@ class LineTest {
         assertThrows(IllegalArgumentException.class, () -> line.deleteSection(new Station(2L, 선릉역)));
     }
 
+    @Test
+    @DisplayName("생성된 라인의 마지막 구간이 2개면 삭제가 안된다")
+    void deleteSection3() {
+        assertThrows(IllegalArgumentException.class, () -> line.deleteSection(new Station(2L, 선릉역)));
+    }
+
 }
