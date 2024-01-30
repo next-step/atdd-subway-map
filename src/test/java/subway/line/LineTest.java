@@ -1,11 +1,12 @@
 package subway.line;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import subway.station.Station;
 
 import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class LineTest {
 
@@ -31,11 +32,11 @@ class LineTest {
                         new Section(new Station(2L, "선릉역"),
                                 new Station("교대역"),
                                 5L)));
-        Assertions.assertThat(actual).isEqualTo(expected);
+        assertThat(actual).isEqualTo(expected);
 
         Long actualDistance = line.getDistance();
         Long expectedDistance = 15L;
-        Assertions.assertThat(actualDistance).isEqualTo(expectedDistance);
+        assertThat(actualDistance).isEqualTo(expectedDistance);
     }
 
 }

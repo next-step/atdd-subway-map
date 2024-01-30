@@ -5,6 +5,7 @@ import subway.station.Station;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 public class Line {
@@ -80,6 +81,21 @@ public class Line {
         this.color = color;
     }
 
-    public void addSection(Section input) {
+    public void addSection(Section section) {
+        this.distance = section.calculateDistance(distance);
+        this.sections.add(section);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Line line = (Line) o;
+        return Objects.equals(id, line.id) && Objects.equals(name, line.name) && Objects.equals(color, line.color) && Objects.equals(sections, line.sections) && Objects.equals(distance, line.distance);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, color, sections, distance);
     }
 }

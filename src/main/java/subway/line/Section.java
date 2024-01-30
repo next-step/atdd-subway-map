@@ -3,6 +3,7 @@ package subway.line;
 import subway.station.Station;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 public class Section {
@@ -34,5 +35,22 @@ public class Section {
 
     public Station getDownStation() {
         return downStation;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Section section = (Section) o;
+        return Objects.equals(id, section.id) && Objects.equals(upStation, section.upStation) && Objects.equals(downStation, section.downStation) && Objects.equals(distance, section.distance);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, upStation, downStation, distance);
+    }
+
+    public Long calculateDistance(Long distance) {
+        return this.distance + distance;
     }
 }

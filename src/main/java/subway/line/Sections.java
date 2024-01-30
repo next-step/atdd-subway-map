@@ -8,6 +8,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Embeddable
@@ -36,5 +37,22 @@ public class Sections {
 
     public Station lastStation() {
         return this.sectionList.get(sectionList.size() - 1).getDownStation();
+    }
+
+    public void add(Section section) {
+        this.sectionList.add(section);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Sections sections = (Sections) o;
+        return Objects.equals(sectionList, sections.sectionList);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(sectionList);
     }
 }
