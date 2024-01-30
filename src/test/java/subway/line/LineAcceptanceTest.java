@@ -136,6 +136,43 @@ public class LineAcceptanceTest {
      * When 생성한 지하철 노선을 수정하면
      * Then 해당 지하철 노선 정보는 수정된다
      */
+    @DisplayName("지하철 노선을 수정한다.")
+    @Test
+    void updateLine() {
+        // given
+        ExtractableResponse<Response> 강남역 = createStation("강남역");
+        ExtractableResponse<Response> 건대입구역 = createStation("건대입구역");
+        String 강남역_ID = 강남역.jsonPath().getString("id");
+        String 건대입구역_ID = 건대입구역.jsonPath().getString("id");
+
+        ExtractableResponse<Response> 이호선 = createLine("2호선", "bg-green-999", 강남역_ID, 건대입구역_ID, "10");
+        String 이호선_ID = 이호선.jsonPath().getString("id");
+
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "3호선");
+        params.put("color", "bg-green-999");
+        params.put("upStationId", 건대입구역_ID);
+        params.put("downStationId", 강남역_ID);
+        params.put("distance", "10");
+
+        // when
+        ExtractableResponse<Response> response =
+                RestAssured.given().log().all()
+                        .body(params)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .when().put("/lines/{lineId}", 이호선_ID)
+                        .then().log().all()
+                        .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        ExtractableResponse<Response> loadLine = loadLine(response.jsonPath().getLong("id"));
+        assertThat(loadLine.jsonPath().getString("name")).isEqualTo("3호선");
+        assertThat(loadLine.jsonPath().getString("color")).isEqualTo("bg-green-999");
+        assertThat(loadLine.jsonPath().getString("upStationId")).isEqualTo(건대입구역_ID);
+        assertThat(loadLine.jsonPath().getString("downStationId")).isEqualTo(강남역_ID);
+        assertThat(response.jsonPath().getString("distance")).isEqualTo("10");
+    }
 
     /**
      * Given 지하철 노선을 생성하고
