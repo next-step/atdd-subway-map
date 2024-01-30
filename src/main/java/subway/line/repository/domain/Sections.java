@@ -48,6 +48,10 @@ public class Sections implements Iterable<Section> {
             throw new SectionDisconnectException("더이상 구간을 제거할 수 없습니다.");
         }
 
+        if(isNotDownStationOfLastSection(station)) {
+            throw new SectionDisconnectException("마지막 구간만 제거할 수 있습니다.");
+        }
+
         this.sections.remove(sections.size() - 1);
     }
 
@@ -60,7 +64,7 @@ public class Sections implements Iterable<Section> {
             throw new SectionConnectException("생성할 구간 하행역이 해당 노선에 이미 등록되어 있습니다.");
         }
 
-        if (canConnectToLastDownStation(section)) {
+        if (isNotLastSectionConnectable(section)) {
             throw new SectionConnectException("생성할 구간 상행역이 해당 노선의 하행 종점역이 아닙니다.");
         }
 
@@ -71,8 +75,12 @@ public class Sections implements Iterable<Section> {
                 .anyMatch(row -> row.contains(station));
     }
 
-    private boolean canConnectToLastDownStation(final Section section) {
+    private boolean isNotLastSectionConnectable(final Section section) {
         return getLastDownStation().stream().noneMatch(station -> station.equals(section.getUpStation()));
+    }
+
+    private boolean isNotDownStationOfLastSection(final Station targetStation) {
+        return getLastDownStation().stream().noneMatch(station -> station.equals(targetStation));
     }
 
     private Optional<Station> getLastDownStation() {

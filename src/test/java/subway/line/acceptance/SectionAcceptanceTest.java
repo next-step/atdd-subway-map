@@ -10,9 +10,6 @@ import subway.common.LineApiHelper;
 import subway.common.SectionApiHelper;
 import subway.common.StationApiHelper;
 import subway.line.service.dto.LineResponse;
-import subway.station.service.dto.StationResponse;
-
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
@@ -161,10 +158,13 @@ public class SectionAcceptanceTest {
             final ExtractableResponse<Response> response = SectionApiHelper.removeSection(신분당선_Id, 새로운지하철역_Id);
 
             // then
-            Assertions.assertAll(
-                    () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
-                    SectionAcceptanceTest.this::assertStationNotChanged
-            );
+            assertSoftly(softly -> {
+                softly.assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+                final LineResponse lineResponse = LineApiHelper.fetchLineById(신분당선_Id).as(LineResponse.class);
+                softly.assertThat(lineResponse.getDistance()).isEqualTo(신분당선_distance + 구간_distance);
+                softly.assertThat(lineResponse.getStations())
+                        .extracting("id").containsExactly(지하철역_Id, 새로운지하철역_Id, 또다른지하철역_Id);
+            });
         }
 
     }
