@@ -1,4 +1,4 @@
-package subway;
+package subway.line;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

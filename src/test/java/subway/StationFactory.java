@@ -4,6 +4,7 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.MediaType;
+import subway.station.StationResponse;
 
 import java.util.HashMap;
 import java.util.Map;
