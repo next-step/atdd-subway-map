@@ -1,6 +1,7 @@
-package subway;
+package subway.line;
 
 import lombok.Getter;
+import subway.station.Station;
 
 @Getter
 public class LineCreateRequest {
@@ -10,13 +11,11 @@ public class LineCreateRequest {
     private Long upstationId;
     private Long downstationId;
 
-    public static Line toEntity(LineCreateRequest request, Station upstation, Station downstation) {
+    public static Line toEntity(LineCreateRequest request) {
         return Line.builder()
                 .name(request.getName())
                 .color(request.getColor())
                 .distance(request.getDistance())
-                .upstation(upstation)
-                .downstation(downstation)
                 .build();
     }
 }
