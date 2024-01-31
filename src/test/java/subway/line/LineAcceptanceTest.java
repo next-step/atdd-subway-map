@@ -35,10 +35,7 @@ class LineAcceptanceTest implements LineFixture {
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
-        ExtractableResponse<Response> lineResponse = RestAssured.given().log().all()
-                .when().get("/lines")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> lineResponse = getLinesExtractableResponse();
 
         assertThat(lineResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(lineResponse.body().jsonPath().getList("name", String.class))
@@ -58,10 +55,7 @@ class LineAcceptanceTest implements LineFixture {
         createLineByNameAndStation("수인분당선", "지하철3", "지하철4");
 
         // when
-        ExtractableResponse<Response> lineResponse = RestAssured.given().log().all()
-                .when().get("/lines")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> lineResponse = getLinesExtractableResponse();
 
         // then
         assertThat(lineResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -78,17 +72,17 @@ class LineAcceptanceTest implements LineFixture {
     @Test
     void getLineById() {
         // given
-        long lindId = createLineByNameAndStation("신분당선", "지하철1", "지하철2").jsonPath().getLong("id");
+        long lineId = getLineId();
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when().get("/lines/" + lindId)
+                .when().get("/lines/" + lineId)
                 .then().log().all()
                 .extract();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.as(LineResponse.class).getId()).isEqualTo(lindId);
+        assertThat(response.as(LineResponse.class).getId()).isEqualTo(lineId);
     }
 
     /**
@@ -100,7 +94,7 @@ class LineAcceptanceTest implements LineFixture {
     @Test
     void updateLine() {
         // given
-        long lineId = createLineByNameAndStation("신분당선", "지하철1", "지하철2").jsonPath().getLong("id");
+        long lineId = getLineId();
 
         Map<String, Object> params = new HashMap<>();
         params.put("name", "변경된 지하철");
@@ -129,7 +123,7 @@ class LineAcceptanceTest implements LineFixture {
     @Test
     void deleteLineById() {
         // given
-        long lineId = createLineByNameAndStation("신분당선", "지하철1", "지하철2").jsonPath().getLong("id");
+        long lineId = getLineId();
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -139,6 +133,19 @@ class LineAcceptanceTest implements LineFixture {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    private static ExtractableResponse<Response> getLinesExtractableResponse() {
+        ExtractableResponse<Response> lineResponse = RestAssured.given().log().all()
+                .when().get("/lines")
+                .then().log().all()
+                .extract();
+        return lineResponse;
+    }
+
+    private long getLineId() {
+        long lindId = createLineByNameAndStation("신분당선", "지하철1", "지하철2").jsonPath().getLong("id");
+        return lindId;
     }
 
 }
