@@ -16,14 +16,8 @@ public class LineService {
         this.lineRepository = lineRepository;
     }
 
-    public LineResponse saveLine(LineRequest lineRequest) {
-        Line line = lineRepository.save(Line.builder()
-                .name(lineRequest.getName())
-                .color(lineRequest.getColor())
-                .upStationId(lineRequest.getUpStationId())
-                .downStationId(lineRequest.getDownStationId())
-                .distance(lineRequest.getDistance())
-                .build());
+    public LineResponse saveLine(LineCreateRequest lineCreateRequest) {
+        Line line = lineRepository.save(lineCreateRequest.to());
         return createLineResponse(line);
     }
 
@@ -37,7 +31,7 @@ public class LineService {
     public LineResponse findLineById(Long id) {
         return lineRepository.findById(id)
                 .map(this::createLineResponse)
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 노선입니다."));
     }
 
     public void updateLineById(Long id, LineUpdateRequest lineUpdateRequest) {
