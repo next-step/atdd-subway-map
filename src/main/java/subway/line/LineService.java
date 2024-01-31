@@ -2,6 +2,7 @@ package subway.line;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,7 @@ public class LineService {
     final var downStation = stationService.findById(request.getDownStationId())
         .orElseThrow(() -> new RuntimeException("하행역 정보를 찾을 수 없습니다."));
 
+    // TODO update lineID to station
     final var line = lineRepository.save(request.to());
 
     return LineResponse.from(line, upStation, downStation);
@@ -78,6 +80,19 @@ public class LineService {
   @Transactional
   public void deleteLineById(final Long id) {
     lineRepository.deleteById(id);
+  }
+
+  @Transactional
+  public void saveSection(final Long lineId, final SectionCreateRequest request) {
+    // TODO station fetch join
+    final var line = lineRepository.findById(lineId)
+        .orElseThrow(() -> new RuntimeException("노선 정보를 찾을 수 없습니다."));
+    final var section = request.to();
+
+    LineValidator.checkSectionForAddition(line, section);
+
+    section.registerLine(lineId);
+    line.addSection(section);
   }
 
 }

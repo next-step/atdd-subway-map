@@ -1,10 +1,14 @@
 package subway.line;
 
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import subway.station.Station;
 
 @Entity
 public class Line {
@@ -26,6 +30,9 @@ public class Line {
 
   @Column(nullable = false)
   private int distance;
+
+  @OneToMany(mappedBy = "line", fetch = FetchType.LAZY)
+  private List<Station> stations;
 
   public Line(String name, String color, Long upStationId, Long downStationId, int distance) {
     this.name = name;
@@ -58,9 +65,18 @@ public class Line {
     return downStationId;
   }
 
+  public List<Station> getStations() {
+    return stations;
+  }
+
   public void updateLine(final String name, final String color) {
     this.name = name;
     this.color = color;
+  }
+
+  public void addSection(Section section) {
+    this.downStationId = section.getDownStationId();
+    this.distance += section.getDistance();
   }
 
 }
