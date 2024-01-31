@@ -7,7 +7,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import subway.line.dto.response.LineResponse;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -82,6 +86,35 @@ class LineAcceptanceTest implements LineFixture {
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.as(LineResponse.class).getId()).isEqualTo(lindId);
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 수정하면
+     * Then 해당 지하철 노선 정보는 수정된다.
+     */
+    @DisplayName("생성된 지하철 노선의 정보를 수정할 수 있다.")
+    @Test
+    void updateLine() {
+        // given
+        long lineId = createLineByNameAndStation("신분당선", "지하철1", "지하철2").jsonPath().getLong("id");
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("name", "변경된 지하철");
+        params.put("color", "bg-red-600");
+
+        // when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().put("/lines/" + lineId)
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.jsonPath().getString("name")).isEqualTo("변경된 지하철");
+        assertThat(response.jsonPath().getString("color")).isEqualTo("bg-red-600");
     }
 
 }

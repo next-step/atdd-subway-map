@@ -49,4 +49,15 @@ public class Line {
                 .distance(distance)
                 .build();
     }
+
+    public void update(String name, String color) {
+        if(name != null){
+            this.name = name;
+        }
+
+        if(color != null){
+            this.color = color;
+        }
+
+    }
 }
