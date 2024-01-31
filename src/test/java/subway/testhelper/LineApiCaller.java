@@ -65,7 +65,7 @@ public class LineApiCaller {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post(location + "/sections")
                 .then().log().all()
-                .statusCode(HttpStatus.NO_CONTENT.value())
+                .statusCode(HttpStatus.CREATED.value())
                 .extract();
     }
 
