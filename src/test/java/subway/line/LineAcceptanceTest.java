@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import subway.section.SectionRepository;
 import subway.station.StationRepository;
 import subway.station.StationRequest;
 
@@ -29,10 +30,14 @@ public class LineAcceptanceTest {
     @Autowired
     private LineRepository lineRepository;
 
+    @Autowired
+    private SectionRepository sectionRepository;
+
     @BeforeEach
     void setUp() {
-        stationRepository.deleteAllInBatch();
+        sectionRepository.deleteAllInBatch();
         lineRepository.deleteAllInBatch();
+        stationRepository.deleteAllInBatch();
     }
 
     /**
@@ -222,8 +227,8 @@ public class LineAcceptanceTest {
         assertThat(loadLine.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
-    @Nested
     @DisplayName("지하철 구간 등록")
+    @Nested
     class AddSection {
 
         /**
@@ -285,8 +290,6 @@ public class LineAcceptanceTest {
             // given
             ExtractableResponse<Response> 성수역 = createStation("성수역");
             String 성수역_ID = 성수역.jsonPath().getString("id");
-            ExtractableResponse<Response> 건대입구역 = createStation("건대입구역");
-            String 건대입구역_ID = 건대입구역.jsonPath().getString("id");
             ExtractableResponse<Response> 구의역 = createStation("구의역");
             String 구의역_ID = 구의역.jsonPath().getString("id");
 
@@ -301,8 +304,8 @@ public class LineAcceptanceTest {
 
             // when
             Map<String, String> params = new HashMap<>();
-            params.put("upStationId", 건대입구역_ID);
-            params.put("downStationId", 구의역_ID);
+            params.put("upStationId", 구의역_ID);
+            params.put("downStationId", 성수역_ID);
             params.put("distance", "10");
 
             ExtractableResponse<Response> response =
@@ -315,7 +318,7 @@ public class LineAcceptanceTest {
 
             // then
             assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-            assertThat(response.jsonPath().getString("message")).isEqualTo("주어진 하행역은 이미 노선에 등록되어 있는 등록된 역입니다. downStationId: " + 구의역_ID);
+            assertThat(response.body().asString()).isEqualTo("주어진 하행역은 이미 노선에 등록되어 있는 등록된 역입니다. downStationId: " + 성수역_ID);
         }
 
         /**
@@ -362,7 +365,7 @@ public class LineAcceptanceTest {
 
             // then
             assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-            assertThat(response.jsonPath().getString("message")).isEqualTo("새로운 구간의 상행역은 노선의 하행 종착역과 같아야 합니다. upStationId: " + 구의역_ID);
+            assertThat(response.body().asString()).isEqualTo("새로운 구간의 상행역은 노선의 하행 종착역과 같아야 합니다. upStationId: " + 구의역_ID);
         }
     }
 
@@ -395,6 +398,20 @@ public class LineAcceptanceTest {
     private ExtractableResponse<Response> loadLine(Long lineId) {
         return RestAssured.given().log().all()
                 .when().get("/lines/{lineId}", lineId)
+                .then().log().all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> addSection(String lineId, String upStationId, String downStationId, String distance) {
+        Map<String, String> params = new HashMap<>();
+        params.put("upStationId", upStationId);
+        params.put("downStationId", downStationId);
+        params.put("distance", distance);
+
+        return RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines/{lineId}/sections", lineId)
                 .then().log().all()
                 .extract();
     }

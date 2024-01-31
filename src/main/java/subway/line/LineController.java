@@ -2,6 +2,9 @@ package subway.line;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import subway.line.addsection.LineAddSectionRequest;
+import subway.line.addsection.LineAddSectionService;
+import subway.line.addsection.LineAddedSectionResponse;
 import subway.line.create.LineCreateRequest;
 import subway.line.create.LineCreateService;
 import subway.line.create.LineCreatedResponse;
@@ -22,12 +25,14 @@ public class LineController {
     private final LineLoadService lineLoadService;
     private final LineUpdateService lineUpdateService;
     private final LineDeleteService lineDeleteService;
+    private final LineAddSectionService lineAddSectionService;
 
-    public LineController(LineCreateService lineCreateService, LineLoadService lineLoadService, LineUpdateService lineUpdateService, LineDeleteService lineDeleteService) {
+    public LineController(LineCreateService lineCreateService, LineLoadService lineLoadService, LineUpdateService lineUpdateService, LineDeleteService lineDeleteService, LineAddSectionService lineAddSectionService) {
         this.lineCreateService = lineCreateService;
         this.lineLoadService = lineLoadService;
         this.lineUpdateService = lineUpdateService;
         this.lineDeleteService = lineDeleteService;
+        this.lineAddSectionService = lineAddSectionService;
     }
 
     @PostMapping
@@ -58,5 +63,11 @@ public class LineController {
     public ResponseEntity<Void> deleteLine(@PathVariable("line-id") Long lineId) {
         lineDeleteService.deleteLine(lineId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{line-id}/sections")
+    public ResponseEntity<LineAddedSectionResponse> addSection(@PathVariable("line-id") Long lineId, @RequestBody LineAddSectionRequest request) {
+        LineAddedSectionResponse response = lineAddSectionService.addSection(lineId, request);
+        return ResponseEntity.created(URI.create("/lines/" + response.getId())).body(response);
     }
 }
