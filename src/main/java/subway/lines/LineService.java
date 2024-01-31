@@ -77,10 +77,7 @@ public class LineService {
 
         line.validateSectionToAdd(sectionAddRequest);
 
-        final Section section = sectionAddRequest.getSection();
-        section.updateLine(line);
-        sectionRepository.save(section);
-
+        final Section section = sectionRepository.save(sectionAddRequest.getSection(line));
         line.updateSectionInfo(section.getDownStationId(), line.getDistance() + section.getDistance());
 
         return createLineResponse(line);
