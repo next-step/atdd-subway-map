@@ -3,19 +3,23 @@ package subway.line.delete;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.line.LineRepository;
+import subway.section.SectionRepository;
 
 @Transactional
 @Service
 public class LineDeleteService {
 
     private final LineRepository lineRepository;
+    private final SectionRepository sectionRepository;
 
-    public LineDeleteService(LineRepository lineRepository) {
+    public LineDeleteService(LineRepository lineRepository, SectionRepository sectionRepository) {
         this.lineRepository = lineRepository;
+        this.sectionRepository = sectionRepository;
     }
 
     public void deleteLine(Long lineId) {
         validateExistLine(lineId);
+        sectionRepository.deleteAllByLineId(lineId);
         lineRepository.deleteById(lineId);
     }
 

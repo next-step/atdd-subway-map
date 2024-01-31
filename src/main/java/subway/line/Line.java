@@ -16,24 +16,17 @@ public class Line {
     @Column(length = 20, nullable = false)
     private String color;
 
-    @Column(name = "up_station_id", nullable = false)
-    private Long upStationId;
-
-    @Column(name = "down_station_id", nullable = false)
-    private Long downStationId;
-
-    @Column(nullable = false)
-    private Long distance;
-
     protected Line() {
     }
 
-    public Line(String name, String color, Long upStationId, Long downStationId, Long distance) {
+    public Line(String name, String color) {
+        this(null, name, color);
+    }
+
+    public Line(Long id, String name, String color) {
+        this.id = id;
         this.name = name;
         this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
-        this.distance = distance;
     }
 
     public void update(String name, String color) {
@@ -51,18 +44,6 @@ public class Line {
 
     public String getColor() {
         return color;
-    }
-
-    public Long getUpStationId() {
-        return upStationId;
-    }
-
-    public Long getDownStationId() {
-        return downStationId;
-    }
-
-    public Long getDistance() {
-        return distance;
     }
 
     @Override

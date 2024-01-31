@@ -3,6 +3,9 @@ package subway.line.load;
 import org.springframework.stereotype.Service;
 import subway.line.Line;
 import subway.line.LineRepository;
+import subway.section.Section;
+import subway.section.SectionRepository;
+import subway.section.Sections;
 import subway.station.Station;
 import subway.station.StationRepository;
 
@@ -14,10 +17,12 @@ public class LineLoadService {
 
     private final LineRepository lineRepository;
     private final StationRepository stationRepository;
+    private final SectionRepository sectionRepository;
 
-    public LineLoadService(LineRepository lineRepository, StationRepository stationRepository) {
+    public LineLoadService(LineRepository lineRepository, StationRepository stationRepository, SectionRepository sectionRepository) {
         this.lineRepository = lineRepository;
         this.stationRepository = stationRepository;
+        this.sectionRepository = sectionRepository;
     }
 
     public List<LineLoadedResponse> loadLines() {
@@ -36,7 +41,8 @@ public class LineLoadService {
     }
 
     private LineLoadedResponse mapToResponse(Line line) {
-        List<Station> stations = stationRepository.findAllByIdIn(List.of(line.getUpStationId(), line.getDownStationId()));
+        Sections sections = new Sections(sectionRepository.findAllByLineIdOrderById(line.getId()));
+        List<Station> stations = stationRepository.findAllByIdIn(sections.getStationIds());
         return new LineLoadedResponse(line.getId(), line.getName(), line.getColor(), mapToStationResponses(stations));
     }
 
