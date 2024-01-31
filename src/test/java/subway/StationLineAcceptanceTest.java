@@ -18,6 +18,7 @@ import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static subway.StationLineSteps.*;
+import static utils.HttpResponseUtils.getCreatedLocationId;
 
 @DisplayName("지하철 노선 관련 기능")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -174,16 +175,5 @@ public class StationLineAcceptanceTest {
                 Integer.parseInt(jsonPath.get(DOWN_STATION_ID_KEY).toString()),
                 Integer.parseInt(jsonPath.get(DISTANCE_KEY).toString())
         );
-    }
-
-    /**
-     * 주어진 응답값으로부터 추출된 Location 속성에서 ID를 반환
-     *
-     * @param createResponse 응답값
-     * @return 추출된 Location 속성의 ID
-     */
-    public static Long getCreatedLocationId(ExtractableResponse<Response> createResponse) {
-        return Long.parseLong(createResponse.header(HttpHeaders.LOCATION)
-                    .substring(createResponse.header(HttpHeaders.LOCATION).lastIndexOf('/') + 1));
     }
 }
