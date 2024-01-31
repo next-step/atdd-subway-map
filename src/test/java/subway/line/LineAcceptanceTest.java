@@ -36,13 +36,13 @@ public class LineAcceptanceTest {
     void setUpClass() {
         Map<String, String> params = new HashMap<>();
         params.put("name", "강남역");
-        강남역_ID = StationApiCaller.callCreateStation(params).jsonPath().getObject("id", Long.class);
+        강남역_ID = getId(StationApiCaller.callCreateStation(params));
         params.put("name", "삼성역");
-        삼성역_ID = StationApiCaller.callCreateStation(params).jsonPath().getObject("id", Long.class);
+        삼성역_ID = getId(StationApiCaller.callCreateStation(params));
         params.put("name", "선릉역");
-        선릉역_ID = StationApiCaller.callCreateStation(params).jsonPath().getObject("id", Long.class);
+        선릉역_ID = getId(StationApiCaller.callCreateStation(params));
         params.put("name", "교대역");
-        교대역_ID = StationApiCaller.callCreateStation(params).jsonPath().getObject("id", Long.class);
+        교대역_ID = getId(StationApiCaller.callCreateStation(params));
 
         newBunDangLineParams = new HashMap<>();
         newBunDangLineParams.put("name", "신분당선");
@@ -57,6 +57,10 @@ public class LineAcceptanceTest {
         zeroLineParams.put("upStationId", 강남역_ID.toString());
         zeroLineParams.put("downStationId", 선릉역_ID.toString());
         zeroLineParams.put("distance", "10");
+    }
+
+    private Long getId(ExtractableResponse<Response> response) {
+        return response.jsonPath().getObject("id", Long.class);
     }
 
     /**
