@@ -38,10 +38,10 @@ public class StationAcceptanceTest {
         params.put("name", GANGNAM_STATION);
 
         // then
-        ExtractableResponse<Response> response = StationApiCaller.callCreateStation(params);
+        ExtractableResponse<Response> response = StationApiCaller.지하철_역_생성(params);
 
         // then
-        List<String> actual = StationApiCaller.callFindStations().jsonPath().getList("name", String.class);
+        List<String> actual = StationApiCaller.지하철_역들_조회().jsonPath().getList("name", String.class);
         String expected = GANGNAM_STATION;
         assertThat(actual).containsAnyOf(expected);
     }
@@ -57,13 +57,13 @@ public class StationAcceptanceTest {
         // given
         Map<String, String> params = new HashMap<>();
         params.put("name", GANGNAM_STATION);
-        StationApiCaller.callCreateStation(params);
+        StationApiCaller.지하철_역_생성(params);
 
         params.put("name", SAMSUNG_STATION);
-        StationApiCaller.callCreateStation(params);
+        StationApiCaller.지하철_역_생성(params);
 
         // when
-        List<String> actual = StationApiCaller.callFindStations().jsonPath().getList("name", String.class);
+        List<String> actual = StationApiCaller.지하철_역들_조회().jsonPath().getList("name", String.class);
 
         // then
         List<String> expected = List.of(GANGNAM_STATION, SAMSUNG_STATION);
@@ -81,7 +81,7 @@ public class StationAcceptanceTest {
         // given
         Map<String, String> params = new HashMap<>();
         params.put("name", GANGNAM_STATION);
-        ExtractableResponse<Response> stationResponse = StationApiCaller.callCreateStation(params);
+        ExtractableResponse<Response> stationResponse = StationApiCaller.지하철_역_생성(params);
         String location = stationResponse.header("Location");
 
         // when
@@ -92,7 +92,7 @@ public class StationAcceptanceTest {
                 .extract();
 
         // then
-        List<String> actual = StationApiCaller.callFindStations().jsonPath().getList("name", String.class);
+        List<String> actual = StationApiCaller.지하철_역들_조회().jsonPath().getList("name", String.class);
         List<String> expected = Collections.emptyList();
         assertThat(actual).containsAll(expected);
     }

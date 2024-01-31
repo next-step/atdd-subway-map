@@ -11,7 +11,7 @@ import static io.restassured.RestAssured.given;
 
 public class StationApiCaller {
 
-    public static ExtractableResponse<Response> callCreateStation(Map<String, String> params) {
+    public static ExtractableResponse<Response> 지하철_역_생성(Map<String, String> params) {
         return given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -21,7 +21,7 @@ public class StationApiCaller {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> callFindStations() {
+    public static ExtractableResponse<Response> 지하철_역들_조회() {
         return given().log().all()
                 .when().get("/stations")
                 .then().log().all()

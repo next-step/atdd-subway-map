@@ -39,13 +39,13 @@ public class LineAcceptanceTest {
     void setUpClass() {
         Map<String, String> params = new HashMap<>();
         params.put("name", "강남역");
-        강남역_ID = getId(StationApiCaller.callCreateStation(params));
+        강남역_ID = getId(StationApiCaller.지하철_역_생성(params));
         params.put("name", "삼성역");
-        삼성역_ID = getId(StationApiCaller.callCreateStation(params));
+        삼성역_ID = getId(StationApiCaller.지하철_역_생성(params));
         params.put("name", "선릉역");
-        선릉역_ID = getId(StationApiCaller.callCreateStation(params));
+        선릉역_ID = getId(StationApiCaller.지하철_역_생성(params));
         params.put("name", "교대역");
-        교대역_ID = getId(StationApiCaller.callCreateStation(params));
+        교대역_ID = getId(StationApiCaller.지하철_역_생성(params));
 
         신분당선 = new HashMap<>();
         신분당선.put("name", "신분당선");
@@ -89,10 +89,10 @@ public class LineAcceptanceTest {
     @Test
     void createLine() {
         // when
-        LineApiCaller.callApiCreateLines(신분당선);
+        LineApiCaller.지하철_노선_생성(신분당선);
 
         // then
-        ExtractableResponse<Response> response = LineApiCaller.callApiFindLines();
+        ExtractableResponse<Response> response = LineApiCaller.지하철_노선들_조회();
         List<String> actual = response.jsonPath().getList("name", String.class);
         String expected = "신분당선";
         assertThat(actual).containsAnyOf(expected);
@@ -107,11 +107,11 @@ public class LineAcceptanceTest {
     @Test
     void findLines() {
         // given
-        LineApiCaller.callApiCreateLines(신분당선);
-        LineApiCaller.callApiCreateLines(영호선);
+        LineApiCaller.지하철_노선_생성(신분당선);
+        LineApiCaller.지하철_노선_생성(영호선);
 
         // when
-        ExtractableResponse<Response> response = LineApiCaller.callApiFindLines();
+        ExtractableResponse<Response> response = LineApiCaller.지하철_노선들_조회();
         List<String> actual = response.jsonPath().getList("name", String.class);
 
         // then
@@ -128,11 +128,11 @@ public class LineAcceptanceTest {
     @Test
     void findLine() {
         // given
-        ExtractableResponse<Response> response = LineApiCaller.callApiCreateLines(신분당선);
+        ExtractableResponse<Response> response = LineApiCaller.지하철_노선_생성(신분당선);
         String location = response.header("location");
 
         // when
-        response = LineApiCaller.callApiFindLine(location);
+        response = LineApiCaller.지하철_노선_조회(location);
 
         // then
         String actual = response.jsonPath().getObject("name", String.class);
@@ -149,15 +149,15 @@ public class LineAcceptanceTest {
     @Test
     void updateLine() {
         // given
-        ExtractableResponse<Response> response = LineApiCaller.callApiCreateLines(신분당선);
+        ExtractableResponse<Response> response = LineApiCaller.지하철_노선_생성(신분당선);
         String location = response.header("location");
 
         // when
         LineUpdateRequest request = new LineUpdateRequest("다른분당선", "bg-red-600");
-        response = LineApiCaller.callApiUpdateLine(request, location);
+        response = LineApiCaller.지하철_노선_수정(request, location);
 
         // then
-        response = LineApiCaller.callApiFindLine(location);
+        response = LineApiCaller.지하철_노선_조회(location);
         LineResponse actual = response.jsonPath().getObject(".", LineResponse.class);
         String expectedName = "다른분당선";
         String expectedColor = "bg-red-600";
@@ -174,14 +174,14 @@ public class LineAcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        ExtractableResponse<Response> response = LineApiCaller.callApiCreateLines(신분당선);
+        ExtractableResponse<Response> response = LineApiCaller.지하철_노선_생성(신분당선);
         String location = response.header("location");
 
         // when
-        LineApiCaller.callApiDeleteLine(location);
+        LineApiCaller.지하철_노선_삭제(location);
 
         // then
-        response = LineApiCaller.callApiFindLines();
+        response = LineApiCaller.지하철_노선들_조회();
         List<LineResponse> actual = response.jsonPath().getList(".", LineResponse.class);
         List<LineResponse> expected = Collections.emptyList();
         assertThat(actual).containsAll(expected);
@@ -196,14 +196,14 @@ public class LineAcceptanceTest {
     @Test
     void updateSections() {
         // given
-        ExtractableResponse<Response> response = LineApiCaller.callApiCreateLines(신분당선);
+        ExtractableResponse<Response> response = LineApiCaller.지하철_노선_생성(신분당선);
         String location = response.header("location");
 
         // when
-        LineApiCaller.callApiUpdateSections(삼성역_부터_선릉역_구간, location);
+        LineApiCaller.지하철_노선에_구간_추가(삼성역_부터_선릉역_구간, location);
 
         // then
-        response = LineApiCaller.callApiFindLine(location);
+        response = LineApiCaller.지하철_노선_조회(location);
         List<Long> actual = response.jsonPath().getList("stations.id", Long.class);
         Long[] expected = {강남역_ID, 삼성역_ID, 선릉역_ID};
         assertThat(actual).containsExactly(expected);
@@ -218,7 +218,7 @@ public class LineAcceptanceTest {
     @Test
     void updateSections2() {
         // given
-        ExtractableResponse<Response> response = LineApiCaller.callApiCreateLines(신분당선);
+        ExtractableResponse<Response> response = LineApiCaller.지하철_노선_생성(신분당선);
         String location = response.header("location");
 
         // when
@@ -248,7 +248,7 @@ public class LineAcceptanceTest {
     @Test
     void updateSections3() {
         // given
-        ExtractableResponse<Response> response = LineApiCaller.callApiCreateLines(신분당선);
+        ExtractableResponse<Response> response = LineApiCaller.지하철_노선_생성(신분당선);
         String location = response.header("location");
         response = given().log().all()
                 .body(삼성역_부터_강남역_구간)
@@ -276,15 +276,15 @@ public class LineAcceptanceTest {
     @Test
     void deleteSections() {
         // given
-        ExtractableResponse<Response> response = LineApiCaller.callApiCreateLines(신분당선);
+        ExtractableResponse<Response> response = LineApiCaller.지하철_노선_생성(신분당선);
         String location = response.header("location");
-        LineApiCaller.callApiUpdateSections(삼성역_부터_선릉역_구간, location);
+        LineApiCaller.지하철_노선에_구간_추가(삼성역_부터_선릉역_구간, location);
 
         // when
-        LineApiCaller.callApiDeleteSection(location, 선릉역_ID.toString());
+        LineApiCaller.지하철_노선_구간_삭제(location, 선릉역_ID.toString());
 
         // then
-        response = LineApiCaller.callApiFindLine(location);
+        response = LineApiCaller.지하철_노선_조회(location);
         List<Long> actual = response.jsonPath().getList("stations.id", Long.class);
         Long[] expected = {강남역_ID, 삼성역_ID};
         assertThat(actual).containsExactly(expected);
@@ -299,9 +299,9 @@ public class LineAcceptanceTest {
     @Test
     void deleteSections2() {
         // given
-        ExtractableResponse<Response> response = LineApiCaller.callApiCreateLines(신분당선);
+        ExtractableResponse<Response> response = LineApiCaller.지하철_노선_생성(신분당선);
         String location = response.header("location");
-        LineApiCaller.callApiUpdateSections(삼성역_부터_선릉역_구간, location);
+        LineApiCaller.지하철_노선에_구간_추가(삼성역_부터_선릉역_구간, location);
 
         // when
         response = given().log().all()
@@ -330,7 +330,7 @@ public class LineAcceptanceTest {
     @Test
     void deleteSections3() {
         // given
-        ExtractableResponse<Response> response = LineApiCaller.callApiCreateLines(신분당선);
+        ExtractableResponse<Response> response = LineApiCaller.지하철_노선_생성(신분당선);
         String location = response.header("location");
 
         // when

@@ -12,7 +12,7 @@ import static io.restassured.RestAssured.given;
 
 public class LineApiCaller {
 
-    public static ExtractableResponse<Response> callApiCreateLines(Map<String, String> params) {
+    public static ExtractableResponse<Response> 지하철_노선_생성(Map<String, String> params) {
         return given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -22,7 +22,7 @@ public class LineApiCaller {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> callApiFindLines() {
+    public static ExtractableResponse<Response> 지하철_노선들_조회() {
         return given().log().all()
                 .when().get("/lines")
                 .then().log().all()
@@ -30,7 +30,7 @@ public class LineApiCaller {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> callApiFindLine(String location) {
+    public static ExtractableResponse<Response> 지하철_노선_조회(String location) {
         return given().log().all()
                 .when().get(location)
                 .then().log().all()
@@ -38,8 +38,8 @@ public class LineApiCaller {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> callApiUpdateLine(LineUpdateRequest request,
-                                                                  String location) {
+    public static ExtractableResponse<Response> 지하철_노선_수정(LineUpdateRequest request,
+                                                          String location) {
         return given().log().all()
                 .body(request)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -49,7 +49,7 @@ public class LineApiCaller {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> callApiDeleteLine(String location) {
+    public static ExtractableResponse<Response> 지하철_노선_삭제(String location) {
         return given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().delete(location)
@@ -58,8 +58,8 @@ public class LineApiCaller {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> callApiUpdateSections(Map<String, String> params,
-                                                                      String location) {
+    public static ExtractableResponse<Response> 지하철_노선에_구간_추가(Map<String, String> params,
+                                                              String location) {
         return given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -69,8 +69,8 @@ public class LineApiCaller {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> callApiDeleteSection(String location,
-                                                                     String stationId) {
+    public static ExtractableResponse<Response> 지하철_노선_구간_삭제(String location,
+                                                             String stationId) {
         return given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .queryParam("stationId", stationId)
