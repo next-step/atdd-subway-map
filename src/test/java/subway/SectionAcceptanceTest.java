@@ -71,4 +71,31 @@ public class SectionAcceptanceTest {
                 .then()
                 .statusCode(HttpStatus.BAD_REQUEST.value());
     }
+
+    /**
+     * given 지하철 노선을 생성 후
+     * when 하행 종점역이 아닌 역을 상행선으로 등록하려고 하면
+     * then 구간 등록 에러가 발생한다.
+     */
+    @DisplayName("에러_지하철 노선 등록_하행 종점역이 일치하지 않음")
+    @Test
+    void addSectionError_isNotCurrentDownStation() {
+        // given
+        Long stationId1 = makeStation("gangnam").jsonPath().getLong("id");
+        Long stationId2 = makeStation("yeoksam").jsonPath().getLong("id");
+        Long stationId3 = makeStation("samseong").jsonPath().getLong("id");
+
+        Long lineId = makeLine(new LineRequest("신분당선", "bg-red-600", stationId1, stationId2, 10L)).jsonPath().getLong("id");
+
+        // when
+        // then
+        RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(new SectionRequest(stationId1, stationId3, 13L))
+                .when().log().all()
+                .post("/lines/" + lineId + "/sections")
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value());
+    }
 }
