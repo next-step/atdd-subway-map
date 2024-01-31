@@ -1,0 +1,31 @@
+package testhelper;
+
+import java.util.List;
+
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
+import subway.api.interfaces.dto.LineResponse;
+
+/**
+ * @author : Rene Choi
+ * @since : 2024/01/31
+ */
+public class ExtractableResponseParser {
+
+	public static long parseId(ExtractableResponse<Response> createResponse) {
+		return createResponse.jsonPath().getLong("id");
+	}
+
+	public static List<LineResponse> parseLines(ExtractableResponse<Response> response) {
+		return response.jsonPath().getList("", LineResponse.class);
+	}
+
+	public static List<String> parseLineNames(ExtractableResponse<Response> response) {
+		return response.jsonPath().getList("name", String.class);
+	}
+
+	public static List<String> parseSubwayNames(ExtractableResponse<Response> response) {
+		return response.jsonPath().getList("name", String.class);
+	}
+
+}

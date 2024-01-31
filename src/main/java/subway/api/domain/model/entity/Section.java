@@ -10,6 +10,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -24,7 +26,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Link implements Comparable<Link> {
+public class Section implements Comparable<Section> {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,20 +45,23 @@ public class Link implements Comparable<Link> {
 
 	@ManyToOne
 	@JoinColumn(name = "line_id")
+	@JsonBackReference
 	private Line line;
 
 	/**
-	 * Link의 동등성은 상행, 하행, 거리로 판단합니다.
-	 * 상행역, 하행역, 거리가 모두 같을 경우 해당 Link는 같은 객체로 평가합니다.
+	 * Section의 동등성은 상행, 하행, 거리로 판단합니다.
+	 * 상행역, 하행역, 거리가 모두 같을 경우 해당 Section은 같은 객체로 평가합니다.
 	 */
 	@Override
 	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
-		Link link = (Link) o;
-		return Objects.equals(upStation, link.upStation) &&
-			Objects.equals(downStation, link.downStation) &&
-			Objects.equals(distance, link.distance);
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
+		Section section = (Section)o;
+		return Objects.equals(upStation, section.upStation) &&
+			Objects.equals(downStation, section.downStation) &&
+			Objects.equals(distance, section.distance);
 	}
 
 	@Override
@@ -64,14 +69,13 @@ public class Link implements Comparable<Link> {
 		return Objects.hash(upStation, downStation, distance);
 	}
 
-
 	@Override
-	public int compareTo(Link other) {
+	public int compareTo(Section other) {
 		return this.distance.compareTo(other.id);
 	}
 
-	public static Link of(Station upStation, Station downStation, Long distance, Line line) {
-		return Link.builder()
+	public static Section of(Station upStation, Station downStation, Long distance, Line line) {
+		return Section.builder()
 			.upStation(upStation)
 			.downStation(downStation)
 			.distance(distance)
@@ -87,10 +91,11 @@ public class Link implements Comparable<Link> {
 		return this.downStation.getId();
 	}
 
-	public String  fetchUpStationName() {
+	public String fetchUpStationName() {
 		return this.upStation.getName();
 	}
-	public String  fetchDownStationName() {
+
+	public String fetchDownStationName() {
 		return this.downStation.getName();
 	}
 }

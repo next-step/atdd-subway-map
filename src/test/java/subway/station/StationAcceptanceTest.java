@@ -1,5 +1,6 @@
 package subway.station;
 
+import static testhelper.ExtractableResponseParser.*;
 import static testhelper.StationRequestExecutor.*;
 import static org.assertj.core.api.Assertions.*;
 
@@ -77,7 +78,5 @@ public class StationAcceptanceTest {
 		assertThat(stationNames).doesNotContain("신사역");
 	}
 
-	public List<String> parseSubwayNames(ExtractableResponse<Response> response){
-		return response.jsonPath().getList("name", String.class);
-	}
+
 }

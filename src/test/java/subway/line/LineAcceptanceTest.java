@@ -3,6 +3,7 @@ package subway.line;
 import static fixture.LineFixtureCreator.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.springframework.http.HttpStatus.*;
+import static testhelper.ExtractableResponseParser.*;
 import static testhelper.LineRequestExecutor.*;
 import static testhelper.StationRequestExecutor.*;
 
@@ -96,7 +97,7 @@ public class LineAcceptanceTest {
 		executeCreateStationRequest("새로운지하철역");
 		ExtractableResponse<Response> createResponse = executeCreateLineRequest(createStationLineCreateDefaultRequest());
 
-		Long createdLineId = parseLineId(createResponse);
+		Long createdLineId = parseId(createResponse);
 
 		// when
 		ExtractableResponse<Response> response = executeGetSpecificStationLineRequest(createdLineId);
@@ -121,7 +122,6 @@ public class LineAcceptanceTest {
 	 */
 	@Test
 	@Sql(scripts = {"/cleanup.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-
 	@DisplayName("지하철노선 수정")
 	void updateLine(){
 		// given
@@ -132,7 +132,7 @@ public class LineAcceptanceTest {
 		firstCreateRequest.setName("1호선");
 		firstCreateRequest.setColor("bg-blue-500");
 		ExtractableResponse<Response> createResponse = executeCreateLineRequest(firstCreateRequest);
-		Long createdLineId = parseLineId(createResponse);
+		Long createdLineId = parseId(createResponse);
 
 		// when
 		executeUpdateLineRequest(createdLineId, createStationLineUpdateDefaultRequest("다른분당선", "bg-red-600"));
@@ -161,7 +161,7 @@ public class LineAcceptanceTest {
 		executeCreateStationRequest("지하철역1");
 		executeCreateStationRequest("지하철역2");
 		ExtractableResponse<Response> createResponse = executeCreateLineRequest(createStationLineCreateDefaultRequest());
-		Long createdLineId = parseLineId(createResponse);
+		Long createdLineId = parseId(createResponse);
 
 		// when
 		ExtractableResponse<Response> deleteResponse = executeDeleteLineRequest(createdLineId);
@@ -172,18 +172,6 @@ public class LineAcceptanceTest {
 
 
 
-
-	private  long parseLineId(ExtractableResponse<Response> createResponse) {
-		return createResponse.jsonPath().getLong("id");
-	}
-
-	private List<LineResponse> parseLines(ExtractableResponse<Response> response) {
-		return response.jsonPath().getList("", LineResponse.class);
-	}
-
-	public List<String> parseLineNames(ExtractableResponse<Response> response){
-		return response.jsonPath().getList("name", String.class);
-	}
 
 
 

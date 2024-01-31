@@ -10,7 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import subway.api.domain.model.entity.Line;
-import subway.api.domain.model.vo.StationInfo;
+import subway.api.domain.dto.outport.StationInfo;
 import subway.common.mapper.ModelMapperBasedVoMapper;
 
 /**
@@ -36,7 +36,7 @@ public class LineResponse {
 	}
 
 	private static List<StationInfo> parseStations(Line line) {
-		return line.getLinks().stream()
+		return line.getSections().stream()
 			.flatMap(link -> Stream.of(StationInfo.fromUpStation(link), StationInfo.fromDownStation(link)))
 			.distinct()
 			.collect(Collectors.toList());

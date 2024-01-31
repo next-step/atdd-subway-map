@@ -10,10 +10,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import subway.api.domain.model.entity.Line;
-import subway.api.domain.model.entity.Link;
+import subway.api.domain.model.entity.Section;
 import subway.api.domain.operators.LineFactory;
 import subway.api.domain.operators.LineResolver;
-import subway.api.domain.operators.LinkFactory;
+import subway.api.domain.operators.SectionFactory;
 import subway.api.domain.service.LineService;
 import subway.api.interfaces.dto.LineCreateRequest;
 import subway.api.interfaces.dto.LineResponse;
@@ -29,16 +29,16 @@ import subway.api.interfaces.dto.LineUpdateRequest;
 public class SimpleLineService implements LineService {
 
 	private final LineFactory lineFactory;
-	private final LinkFactory linkFactory;
+	private final SectionFactory sectionFactory;
 	private final LineResolver lineResolver;
 
 	@Override
 	@Transactional
 	public LineResponse saveLine(LineCreateRequest request) {
 		Line line = lineFactory.createLine(request);
-		Link link = linkFactory.createLink(request, line);
+		Section section = sectionFactory.createSection(request, line);
 
-		line.updateLink(link);
+		line.updateLink(section);
 
 		return LineResponse.from(line);
 	}
@@ -70,7 +70,7 @@ public class SimpleLineService implements LineService {
 	public void deleteLineById(Long id) {
 		Line line = fetchLineOrThrow(id);
 
-		linkFactory.deleteByLine(line);
+		sectionFactory.deleteByLine(line);
 		lineFactory.deleteLine(line);
 	}
 
