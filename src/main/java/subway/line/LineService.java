@@ -27,7 +27,7 @@ public class LineService {
     }
 
     @Transactional
-    public LineResponse saveStation(LineRequest lineRequest) {
+    public LineResponse saveLine(LineRequest lineRequest) {
         Line line = lineRepository.save(createLine(lineRequest));
         return createLineResponse(line);
     }
