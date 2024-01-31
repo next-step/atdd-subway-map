@@ -3,11 +3,9 @@ package subway.line;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import subway.section.Section;
-import subway.section.SectionService;
+import subway.section.*;
 import subway.station.Station;
 import subway.station.StationRepository;
-import subway.station.StationResponse;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
@@ -18,18 +16,16 @@ import java.util.stream.Collectors;
 public class LineService {
     private final LineRepository lineRepository;
     private final StationRepository stationRepository;
-    private final SectionService sectionService;
 
     @Transactional
     public LineResponse create(LineCreateRequest request) {
         Station upstation = stationRepository.findById(request.getUpstationId()).orElseThrow(EntityNotFoundException::new);
         Station downstation = stationRepository.findById(request.getDownstationId()).orElseThrow(EntityNotFoundException::new);
 
-        Line line = LineCreateRequest.toEntity(request, upstation, downstation);
+        Line line = LineCreateRequest.toEntity(request);
 
         lineRepository.save(line);
-        Section section = sectionService.init(line);
-        line.addSection(section);
+        line.initSection(upstation, downstation);
 
         return LineResponse.from(line);
     }
@@ -60,5 +56,32 @@ public class LineService {
 
     public void delete(Long id) {
         lineRepository.deleteById(id);
+    }
+
+    @Transactional
+    public SectionResponse addSection(Long lineId, SectionAddRequest request) {
+        Line line = lineRepository.findById(lineId).orElseThrow(EntityNotFoundException::new);
+
+        Station upstation = stationRepository.findById(request.getUpstationId()).orElseThrow(EntityNotFoundException::new);
+        Station downstation = stationRepository.findById(request.getDownstationId()).orElseThrow(EntityNotFoundException::new);
+
+        Section newSection = Section.builder()
+                .line(line)
+                .upstation(upstation)
+                .downstation(downstation)
+                .distance(request.getDistance())
+                .build();
+
+        line.addSection(newSection);
+
+        return SectionResponse.from(newSection);
+    }
+
+    @Transactional
+    public void deleteSection(Long lineId, Long stationId) {
+        Line line = lineRepository.findById(lineId).orElseThrow(EntityNotFoundException::new);
+        Station deleteStation = stationRepository.findById(stationId).orElseThrow(EntityNotFoundException::new);
+
+        line.popSection(deleteStation);
     }
 }

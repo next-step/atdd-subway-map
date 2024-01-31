@@ -36,7 +36,7 @@ public class SectionAcceptanceTest {
      * When 지하철노선을 조회하면
      * Then 순서대로 방화역 - 강동역 - 마천역이 조회된다
      */
-    @DisplayName("지하철노선 구간 추가")
+    @DisplayName("지하철노선 구간 추가 성공")
     @Test
     void addSectionSuccess() {
         // given
@@ -58,7 +58,7 @@ public class SectionAcceptanceTest {
      * When 이러한 구간을 노선에 추가하려고 하면
      * Then 이 요청은 실패해야 한다
      */
-    @DisplayName("지하철노선 구간 추가 실패")
+    @DisplayName("하행종점역을 상행역으로 하지 않는 구간 추가 실패")
     @Test
     void addSectionFailWhenUpstationNotDownstationofLine() {
         // given
@@ -85,7 +85,7 @@ public class SectionAcceptanceTest {
      * When 이러한 구간을 노선에 추가하려고 하면
      * Then 이 요청은 실패해야 한다
      */
-    @DisplayName("지하철노선 구간 추가 실패2")
+    @DisplayName("노선에 등록되어있는 역을 하행역으로 하는 구간 실패")
     @Test
     void addSectionFailWhenNewDownstationAlreadyOnLine() {
         // given
@@ -105,7 +105,7 @@ public class SectionAcceptanceTest {
      * When 구간을 삭제하면
      * Then 노선을 조회했을 때 삭제한 구간을 찾을 수 없다
      */
-    @DisplayName("지하철노선 구간을 삭제")
+    @DisplayName("지하철노선 구간 삭제 성공")
     @Test
     void sectionDeleteSuccess() {
         // given
@@ -129,7 +129,7 @@ public class SectionAcceptanceTest {
      * When 마지막 구간이 아닌 구간을 삭제하려고 할 때
      * Then 이 요청은 실패한다
      */
-    @DisplayName("지하철노선 구간 삭제 실패")
+    @DisplayName("마지막 구간이 아닌 구간 삭제 실패")
     @Test
     void NonLastSectionDeleteFail() {
         // given
@@ -149,7 +149,7 @@ public class SectionAcceptanceTest {
      * When 마지막 구간을 삭제하려고 할 때
      * Then 이 요청은 실패한다
      */
-    @DisplayName("지하철노선 구간 삭제 실패")
+    @DisplayName("종점역만 존재하는 노선의 구간 삭제 실패")
     @Test
     void sectionDeleteFailInMinimalLine() {
         // when

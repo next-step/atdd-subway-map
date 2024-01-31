@@ -29,4 +29,16 @@ public class Section {
     private Station downstation;
 
     private int distance;
+
+    public static Section initSection(Line line, Station upstation, Station downstation) {
+        Section section = Section.builder()
+                .line(line)
+                .upstation(upstation)
+                .downstation(downstation)
+                .distance(line.getDistance())
+                .build();
+
+        //sectionRepository.save(section);
+        return section;
+    }
 }

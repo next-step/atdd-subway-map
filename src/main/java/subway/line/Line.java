@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import subway.section.Section;
+import subway.section.Sections;
 import subway.station.Station;
 
 import javax.persistence.*;
@@ -26,28 +27,17 @@ public class Line {
     @Column(nullable = false)
     private String name;
 
-    @ManyToOne
-    private Station upstation;
+//    @ManyToOne
+//    private Station upstation;
+//
+//    @ManyToOne
+//    private Station downstation;
 
-    @ManyToOne
-    private Station downstation;
-
-    @OneToMany(mappedBy = "line", cascade = CascadeType.ALL)
-    private List<Section> sections = new ArrayList<>();
+    @Embedded
+    private Sections sections = new Sections();
 
     @Column(nullable = false)
     private int distance;
-
-    @Builder
-    public Line(Long id, String color, String name, Station upstation, Station downstation, List<Section> sections, int distance) {
-        this.id = id;
-        this.color = color;
-        this.name = name;
-        this.upstation = upstation;
-        this.downstation = downstation;
-        this.sections = sections != null ? sections : new ArrayList<>();
-        this.distance = distance;
-    }
 
     public void updateName(String name) {
         this.name = name;
@@ -57,15 +47,28 @@ public class Line {
         this.color = color;
     }
 
-    public void addSection(Section section) {
-        sections.add(section);
-        downstation = section.getDownstation();
+    public void initSection(Station upstation, Station downstation) {
+        Section section = Section.initSection(this, upstation, downstation);
+        sections.initSection(section);
     }
 
-    public Section popSection() {
-        Section removedSection =  sections.remove(sections.size() - 1);
-        downstation = sections.get(sections.size() - 1).getDownstation();
+    public void addSection(Section section) {
+        sections.addSection(section);
+        distance += section.getDistance();
+    }
 
-        return removedSection;
+    public void popSection(Station station) {
+        int lastSectionDistance = sections.getLastSectionDistance();
+        distance -= lastSectionDistance;
+        sections.popSection(station);
+    }
+
+    @Builder
+    public Line(Long id, String color, String name, Sections sections, int distance) {
+        this.id = id;
+        this.color = color;
+        this.name = name;
+        this.sections = sections != null ? sections : new Sections();
+        this.distance = distance;
     }
 }

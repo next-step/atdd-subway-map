@@ -3,6 +3,8 @@ package subway.line;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import subway.section.SectionAddRequest;
+import subway.section.SectionResponse;
 
 import java.net.URI;
 import java.util.List;
@@ -35,8 +37,19 @@ public class LineController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<LineResponse> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
         lineService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/sections")
+    public ResponseEntity<SectionResponse> addSection(@PathVariable("id") Long lineId, @RequestBody SectionAddRequest request) {
+        return ResponseEntity.created(URI.create("/lines/")).body(lineService.addSection(lineId, request));
+    }
+
+    @DeleteMapping("/{id}/sections")
+    public ResponseEntity<Void> deleteSection(@PathVariable("id") Long lineId, @RequestParam("stationId") Long stationId) {
+        lineService.deleteSection(lineId, stationId);
         return ResponseEntity.noContent().build();
     }
 }
