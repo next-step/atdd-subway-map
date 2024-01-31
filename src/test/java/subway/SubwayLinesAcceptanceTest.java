@@ -38,15 +38,12 @@ public class SubwayLinesAcceptanceTest {
     private String 파란색 = "bg-blue-600";
 
     @Autowired
-    private StationRepository stationRepository;
-
-    @Autowired
     private DatabaseCleaner databaseCleaner;
 
     @BeforeEach
     void setUp() {
-        stationRepository.save(new Station("강남역"));
-        stationRepository.save(new Station("역삼역"));
+        StationApiRequester.createStation("강남역");
+        StationApiRequester.createStation("역삼역");
     }
 
     @AfterEach
@@ -61,7 +58,7 @@ public class SubwayLinesAcceptanceTest {
     @Test
     void 지하철노선_생성() {
         // When
-        final ExtractableResponse<Response> createResponse = createLines(일호선, 빨간색, 1L, 2L, 10L);
+        final ExtractableResponse<Response> createResponse =SubwayLineApiRequester.createLines(일호선, 빨간색, 1L, 2L, 10L);
 
         // Then
         assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -69,7 +66,7 @@ public class SubwayLinesAcceptanceTest {
         // Then
         final LineResponse createdLines = createResponse.as(LineResponse.class);
 
-        final LineResponse[] linesList = getLinesList().as(LineResponse[].class);
+        final LineResponse[] linesList = SubwayLineApiRequester.getLinesList().as(LineResponse[].class);
 
         final LineResponse foundLines = Arrays.stream(linesList)
             .filter(current -> Objects.equals(current.getId(), createdLines.getId()))
@@ -87,11 +84,11 @@ public class SubwayLinesAcceptanceTest {
     @Test
     void 지하철노선_목록_조회() {
         // Given
-        createLines(일호선, 빨간색, 1L, 2L, 10L);
-        createLines(이호선, 빨간색, 1L, 2L, 10L);
+        SubwayLineApiRequester.createLines(일호선, 빨간색, 1L, 2L, 10L);
+        SubwayLineApiRequester.createLines(이호선, 빨간색, 1L, 2L, 10L);
 
         // When
-        final ExtractableResponse<Response> listResponse = getLinesList();
+        final ExtractableResponse<Response> listResponse = SubwayLineApiRequester.getLinesList();
 
         // Then
         assertThat(listResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -109,11 +106,11 @@ public class SubwayLinesAcceptanceTest {
     @Test
     void 지하철노선_조회() {
         // Given
-        final LineResponse createdLines = createLines(일호선, 빨간색, 1L, 2L, 10L).as(
+        final LineResponse createdLines = SubwayLineApiRequester.createLines(일호선, 빨간색, 1L, 2L, 10L).as(
             LineResponse.class);
 
         // When
-        final ExtractableResponse<Response> getResponse = getLines(
+        final ExtractableResponse<Response> getResponse = SubwayLineApiRequester.getLines(
             createdLines.getId());
 
         // Then
@@ -133,18 +130,18 @@ public class SubwayLinesAcceptanceTest {
     @Test
     void 지하철노선_수정() {
         // Given
-        final LineResponse createdLines = createLines(일호선, 빨간색, 1L, 2L, 10L).as(
+        final LineResponse createdLines = SubwayLineApiRequester.createLines(일호선, 빨간색, 1L, 2L, 10L).as(
             LineResponse.class);
 
         // When
-        final ExtractableResponse<Response> updateResponse = updateLines(createdLines.getId(), 이호선,
+        final ExtractableResponse<Response> updateResponse = SubwayLineApiRequester.updateLines(createdLines.getId(), 이호선,
             파란색);
 
         // Then
         assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         // Then
-        final LineResponse foundLine = getLines(createdLines.getId()).as(LineResponse.class);
+        final LineResponse foundLine = SubwayLineApiRequester.getLines(createdLines.getId()).as(LineResponse.class);
         assertThat(foundLine).isNotNull();
         assertThat(foundLine.getName()).isEqualTo(이호선);
         assertThat(foundLine.getColor()).isEqualTo(파란색);
@@ -158,79 +155,18 @@ public class SubwayLinesAcceptanceTest {
     @Test
     void 지하철노선_삭제() {
         // Given
-        final LineResponse createdLines = createLines(일호선, 빨간색, 1L, 2L, 10L)
+        final LineResponse createdLines = SubwayLineApiRequester.createLines(일호선, 빨간색, 1L, 2L, 10L)
             .as(LineResponse.class);
 
         // When
-        final ExtractableResponse<Response> deleteResponse = deleteLines(createdLines.getId());
+        final ExtractableResponse<Response> deleteResponse = SubwayLineApiRequester.deleteLines(createdLines.getId());
 
         // Then
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         // Then
-        final List<Long> idList = getLinesList().jsonPath().getList("id", Long.class);
+        final List<Long> idList = SubwayLineApiRequester.getLinesList().jsonPath().getList("id", Long.class);
         assertThat(idList).doesNotContain(createdLines.getId());
-    }
-
-    private static ExtractableResponse<Response> getLinesList() {
-        return RestAssured
-            .given().log().all()
-            .when()
-            .get("/lines")
-            .then().log().all()
-            .extract();
-    }
-
-    private ExtractableResponse<Response> createLines(String name, String color, Long upStationId,
-        Long downStationId, Long distance) {
-        final Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-        params.put("color", color);
-        params.put("upStationId", upStationId.toString());
-        params.put("downStationId", downStationId.toString());
-        params.put("distance", distance.toString());
-
-        return RestAssured
-            .given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .body(params)
-            .when()
-            .post("/lines")
-            .then().log().all()
-            .extract();
-    }
-
-    private static ExtractableResponse<Response> getLines(Long id) {
-        return RestAssured
-            .given().log().all()
-            .when()
-            .get("/lines/" + id)
-            .then().log().all()
-            .extract();
-    }
-
-    private ExtractableResponse<Response> updateLines(Long id, String name, String color) {
-        final Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-        params.put("color", color);
-
-        return RestAssured
-            .given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .body(params)
-            .when()
-            .put("/lines/" + id)
-            .then().log().all()
-            .extract();
-    }
-
-    private static ExtractableResponse<Response> deleteLines(Long id) {
-        return RestAssured
-            .given().log().all()
-            .when()
-            .delete("/lines/" + id)
-            .then().log().all()
-            .extract();
     }
 
     private static void isSameLines(LineResponse foundLines, LineResponse createdLines) {
