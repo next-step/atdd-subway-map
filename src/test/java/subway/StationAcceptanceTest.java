@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static subway.AcceptanceMethods.makeStation;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -50,16 +51,7 @@ public class StationAcceptanceTest {
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
-    static ExtractableResponse<Response> makeStation(String stationName) {
-        return RestAssured.given()
-                .body(Map.of("name", stationName))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/stations")
-                .then()
-                .statusCode(HttpStatus.CREATED.value())
-                .extract();
-    }
+
 
     /**
      * Given 2개의 지하철역을 생성하고

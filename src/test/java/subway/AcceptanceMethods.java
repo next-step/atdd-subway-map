@@ -1,0 +1,56 @@
+package subway;
+
+import io.restassured.RestAssured;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import subway.line.LineRequest;
+
+import java.util.Map;
+
+public class AcceptanceMethods {
+    public static ExtractableResponse<Response> makeStation(String stationName) {
+        return RestAssured.given()
+                .body(Map.of("name", stationName))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/stations")
+                .then()
+                .statusCode(HttpStatus.CREATED.value())
+                .extract();
+    }
+
+    public static ExtractableResponse<Response> makeLine(LineRequest lineRequest) {
+        return RestAssured
+                .given().log().all()
+                .when()
+                .body(lineRequest)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .post("/lines")
+                .then().log().all()
+                .statusCode(HttpStatus.CREATED.value())
+                .extract();
+    }
+
+    public static ExtractableResponse<Response> getLine(Long id) {
+        ExtractableResponse<Response> response = RestAssured
+                .given()
+                .when()
+                .get("/lines/" + id)
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract();
+        return response;
+    }
+
+    public static ExtractableResponse<Response> getLines() {
+        return RestAssured
+                .given().log().all()
+                .when()
+                .get("/lines")
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract();
+    }
+}

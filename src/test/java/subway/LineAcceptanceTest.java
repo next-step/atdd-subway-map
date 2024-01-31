@@ -15,44 +15,13 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static subway.AcceptanceMethods.*;
 
 @Sql(value = "/table_truncate.sql")
 @DisplayName("지하철 노선 테스트")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {
 
-    public ExtractableResponse<Response> makeLine(LineRequest lineRequest) {
-        return RestAssured
-                .given().log().all()
-                .when()
-                .body(lineRequest)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .post("/lines")
-                .then().log().all()
-                .statusCode(HttpStatus.CREATED.value())
-                .extract();
-    }
-
-    public ExtractableResponse<Response> getLines() {
-        return RestAssured
-                .given().log().all()
-                .when()
-                .get("/lines")
-                .then().log().all()
-                .statusCode(HttpStatus.OK.value())
-                .extract();
-    }
-
-    private static ExtractableResponse<Response> getLine(Long id) {
-        ExtractableResponse<Response> response = RestAssured
-                .given()
-                .when()
-                .get("/lines/" + id)
-                .then().log().all()
-                .statusCode(HttpStatus.OK.value())
-                .extract();
-        return response;
-    }
 
     /**
      * when 지하철 노선을 생성하면
@@ -62,8 +31,8 @@ public class LineAcceptanceTest {
     @Test
     void createLine() {
         // when
-        Long stationId1 = StationAcceptanceTest.makeStation("gangnam").jsonPath().getLong("id");
-        Long stationId2 = StationAcceptanceTest.makeStation("yeoksam").jsonPath().getLong("id");
+        Long stationId1 = makeStation("gangnam").jsonPath().getLong("id");
+        Long stationId2 = makeStation("yeoksam").jsonPath().getLong("id");
 
         ExtractableResponse<Response> response = makeLine(new LineRequest("신분당선", "bg-red-600", stationId1, stationId2, 10L));
 
@@ -82,9 +51,9 @@ public class LineAcceptanceTest {
     @Test
     void showLines() {
         // given
-        Long stationId1 = StationAcceptanceTest.makeStation("gangnam").jsonPath().getLong("id");
-        Long stationId2 = StationAcceptanceTest.makeStation("yeoksam").jsonPath().getLong("id");
-        Long stationId3 = StationAcceptanceTest.makeStation("samseong").jsonPath().getLong("id");
+        Long stationId1 = makeStation("gangnam").jsonPath().getLong("id");
+        Long stationId2 = makeStation("yeoksam").jsonPath().getLong("id");
+        Long stationId3 = makeStation("samseong").jsonPath().getLong("id");
 
         Long lineId1 = makeLine(new LineRequest("신분당선", "bg-red-600", stationId1, stationId2, 10L)).jsonPath().getLong("id");
         Long lineId2 = makeLine(new LineRequest("분당선", "bg-green-600", stationId1, stationId3, 7L)).jsonPath().getLong("id");
@@ -104,8 +73,8 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선 단일 조회")
     @Test
     void showLine() {
-        Long stationId1 = StationAcceptanceTest.makeStation("gangnam").jsonPath().getLong("id");
-        Long stationId2 = StationAcceptanceTest.makeStation("yeoksam").jsonPath().getLong("id");
+        Long stationId1 = makeStation("gangnam").jsonPath().getLong("id");
+        Long stationId2 = makeStation("yeoksam").jsonPath().getLong("id");
 
         // given
         Long lineId = makeLine(new LineRequest("신분당선", "bg-red-600", stationId1, stationId2, 10L)).jsonPath().getLong("id");
@@ -126,8 +95,8 @@ public class LineAcceptanceTest {
     @Test
     void updateLine() {
         // given
-        Long stationId1 = StationAcceptanceTest.makeStation("gangnam").jsonPath().getLong("id");
-        Long stationId2 = StationAcceptanceTest.makeStation("yeoksam").jsonPath().getLong("id");
+        Long stationId1 = makeStation("gangnam").jsonPath().getLong("id");
+        Long stationId2 = makeStation("yeoksam").jsonPath().getLong("id");
 
         Long lineId = makeLine(new LineRequest("신분당선", "bg-red-600", stationId1, stationId2, 10L)).jsonPath().getLong("id");
 
@@ -158,8 +127,8 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선 삭제")
     @Test
     void deleteLine() {
-        Long stationId1 = StationAcceptanceTest.makeStation("gangnam").jsonPath().getLong("id");
-        Long stationId2 = StationAcceptanceTest.makeStation("yeoksam").jsonPath().getLong("id");
+        Long stationId1 = makeStation("gangnam").jsonPath().getLong("id");
+        Long stationId2 = makeStation("yeoksam").jsonPath().getLong("id");
 
         // given
         Long lineId = makeLine(new LineRequest("신분당선", "bg-red-600", stationId1, stationId2, 10L)).jsonPath().getLong("id");
