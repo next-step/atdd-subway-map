@@ -1,6 +1,6 @@
 package subway.line.dto;
 
-import subway.line.Line;
+import subway.line.entity.Line;
 import subway.station.dto.StationResponse;
 
 import java.util.List;
@@ -24,7 +24,7 @@ public class LineResponse {
     }
 
     public static LineResponse ofEntity(Line line) {
-        List<StationResponse> stations = line.getStations().stream()
+        List<StationResponse> stations = line.getSections().getStations().stream()
                 .map(StationResponse::ofEntity).collect(Collectors.toList());
 
         return new LineResponse(line.getId(), line.getName(), line.getColor(), stations);

@@ -1,70 +1,27 @@
-package subway.line;
+package subway.line.entity;
 
 import subway.line.exception.LineException;
 import subway.section.Section;
 import subway.station.Station;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Embeddable;
+import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Entity
-public class Line {
+@Embeddable
+public class Sections {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    private String name;
-
-    private String color;
-
-    private int distance;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "up_station_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private Station upStation;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "down_station_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private Station downStation;
-
-    @OneToMany(mappedBy = "line")
+    @OneToMany(mappedBy = "line", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private List<Section> sections = new ArrayList<>();
-    public Line() {
+
+    public Sections() {
     }
 
-    public Line(String name, String color, int distance, Station upStation, Station downStation) {
-        this.name = name;
-        this.color = color;
-        this.distance = distance;
-        this.upStation = upStation;
-        this.downStation = downStation;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getColor() {
-        return color;
-    }
-
-    public int getDistance() {
-        return distance;
-    }
-
-    public Station getUpStation() {
-        return upStation;
-    }
-
-    public Station getDownStation() {
-        return downStation;
+    public Sections(List<Section> sections) {
+        this.sections = sections;
     }
 
     public List<Section> getSections() {
@@ -73,29 +30,25 @@ public class Line {
 
     public List<Station> getStations() {
         List<Station> stations = sections.stream().map(Section::getUpStation).collect(Collectors.toList());
-        stations.add(downStation);
-
+        stations.add(getDownFinalStation());
         return stations;
     }
 
-    public void updateLine(String name, String color) {
-        this.name = name;
-        this.color = color;
+    public Station getDownFinalStation() {
+        return sections.get(sections.size() - 1).getDownStation();
     }
 
-    public void generateSection(Section section) {
+    public void addSection(Section section) {
+        if (sections.size() > 0) {
+            verifyDownStation(section);
 
-        verifyDownStation(section);
-
-        verifyAlreadyStation(section);
-
-        this.downStation = section.getDownStation();
-        this.distance = this.distance + section.getDistance();
+            verifyAlreadyStation(section);
+        }
         sections.add(section);
     }
 
     private void verifyDownStation(Section section) {
-        boolean isNotLineDownStation = !this.downStation.getId().equals(section.getUpStation().getId());
+        boolean isNotLineDownStation = !getDownFinalStation().getId().equals(section.getUpStation().getId());
 
         if (isNotLineDownStation) {
             throw new LineException("등록할 구간의 상행역이 노선에 등록되어있는 하행종점역이 아닌 경우 구간 등록이 불가능합니다.");
@@ -112,16 +65,12 @@ public class Line {
         }
     }
 
-    public Section deleteSection(Long stationId) {
+    public void removeSection(Long stationId) {
         verifySectionCount();
 
         Section deleteSection = verifyDeleteDownStation(stationId);
 
-        this.downStation = deleteSection.getUpStation();
-        this.distance = this.distance - deleteSection.getDistance();
         sections.remove(deleteSection);
-
-        return deleteSection;
     }
 
     private void verifySectionCount() {
@@ -134,7 +83,7 @@ public class Line {
         Section deleteSection = sections.stream().filter(s -> s.getDownStation().getId().equals(stationId)).findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("존재하지않는 구간입니다."));
 
-        if (!deleteSection.getDownStation().getId().equals(downStation.getId())) {
+        if (!deleteSection.getDownStation().getId().equals(getDownFinalStation().getId())) {
             throw new LineException("노선의 하행종점역만 제거할 수 있습니다.");
         }
         return deleteSection;

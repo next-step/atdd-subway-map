@@ -1,7 +1,7 @@
 package subway.line.service;
 
 import org.springframework.stereotype.Service;
-import subway.line.Line;
+import subway.line.entity.Line;
 import subway.line.exception.LineException;
 import subway.line.LineRepository;
 

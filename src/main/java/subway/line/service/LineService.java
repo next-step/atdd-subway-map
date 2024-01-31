@@ -1,13 +1,11 @@
 package subway.line.service;
 
 import org.springframework.stereotype.Service;
-import subway.line.Line;
+import subway.line.entity.Line;
 import subway.line.LineRepository;
 import subway.line.dto.LineCreateRequest;
 import subway.line.dto.LineResponse;
 import subway.line.dto.LineUpdateRequest;
-import subway.section.Section;
-import subway.section.SectionRepository;
 import subway.station.Station;
 import subway.station.service.StationDataService;
 
@@ -20,34 +18,24 @@ import java.util.stream.Collectors;
 public class LineService {
 
     private final LineRepository lineRepository;
-
-    private final SectionRepository sectionRepository;
     private final LineDataService lineDataService;
-
     private final StationDataService stationDataService;
 
-    public LineService(LineRepository lineRepository, SectionRepository sectionRepository, LineDataService lineDataService, StationDataService stationDataService) {
+    public LineService(LineRepository lineRepository, LineDataService lineDataService, StationDataService stationDataService) {
         this.lineRepository = lineRepository;
-        this.sectionRepository = sectionRepository;
         this.lineDataService = lineDataService;
         this.stationDataService = stationDataService;
     }
 
     public LineResponse saveLine(LineCreateRequest request) {
+        Line line = new Line(request.getName(), request.getColor());
+
         Station upStation = stationDataService.findStation(request.getUpStationId());
         Station downStation = stationDataService.findStation(request.getDownStationId());
 
-        Line line = new Line(
-                request.getName(),
-                request.getColor(),
-                request.getDistance(),
-                upStation,
-                downStation
-        );
-        Line savedLine = lineRepository.save(line);
+        line.generateSection(request.getDistance(), upStation, downStation);
 
-        Section section = new Section(request.getDistance(), upStation, downStation, savedLine);
-        sectionRepository.save(section);
+        Line savedLine = lineRepository.save(line);
 
         return LineResponse.ofEntity(savedLine);
     }
