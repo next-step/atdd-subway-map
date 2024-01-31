@@ -59,4 +59,22 @@ public class Sections {
             throw new IllegalArgumentException("주어진 하행역은 이미 노선에 등록되어 있는 등록된 역입니다. downStationId: " + downStationId);
         }
     }
+
+    public void validateRemovableLastSection(Long stationId) {
+        validateLatestSection(stationId);
+        validateSize();
+    }
+
+    private void validateLatestSection(Long stationId) {
+        Section lastSection = getLastSection();
+        if (!lastSection.getDownStationId().equals(stationId)) {
+            throw new IllegalArgumentException("노선의 하행 종착역만 삭제할 수 있습니다. stationId: " + stationId);
+        }
+    }
+
+    private void validateSize() {
+        if (values.size() < 2) {
+            throw new IllegalArgumentException("노선에 남은 구간이 1개뿐이라 삭제할 수 없습니다.");
+        }
+    }
 }

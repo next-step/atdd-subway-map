@@ -11,6 +11,7 @@ import subway.line.create.LineCreatedResponse;
 import subway.line.delete.LineDeleteService;
 import subway.line.load.LineLoadService;
 import subway.line.load.LineLoadedResponse;
+import subway.line.removeSection.LineRemoveSectionService;
 import subway.line.update.LineUpdateRequest;
 import subway.line.update.LineUpdateService;
 
@@ -26,13 +27,15 @@ public class LineController {
     private final LineUpdateService lineUpdateService;
     private final LineDeleteService lineDeleteService;
     private final LineAddSectionService lineAddSectionService;
+    private final LineRemoveSectionService lineRemoveSectionService;
 
-    public LineController(LineCreateService lineCreateService, LineLoadService lineLoadService, LineUpdateService lineUpdateService, LineDeleteService lineDeleteService, LineAddSectionService lineAddSectionService) {
+    public LineController(LineCreateService lineCreateService, LineLoadService lineLoadService, LineUpdateService lineUpdateService, LineDeleteService lineDeleteService, LineAddSectionService lineAddSectionService, LineRemoveSectionService lineRemoveSectionService) {
         this.lineCreateService = lineCreateService;
         this.lineLoadService = lineLoadService;
         this.lineUpdateService = lineUpdateService;
         this.lineDeleteService = lineDeleteService;
         this.lineAddSectionService = lineAddSectionService;
+        this.lineRemoveSectionService = lineRemoveSectionService;
     }
 
     @PostMapping
@@ -69,5 +72,11 @@ public class LineController {
     public ResponseEntity<LineAddedSectionResponse> addSection(@PathVariable("line-id") Long lineId, @RequestBody LineAddSectionRequest request) {
         LineAddedSectionResponse response = lineAddSectionService.addSection(lineId, request);
         return ResponseEntity.created(URI.create("/lines/" + response.getId())).body(response);
+    }
+
+    @DeleteMapping("/{line-id}/sections")
+    public ResponseEntity<Void> deleteSection(@PathVariable("line-id") Long lineId, @RequestParam("stationId") Long stationdId) {
+        lineRemoveSectionService.deleteSection(lineId, stationdId);
+        return ResponseEntity.noContent().build();
     }
 }

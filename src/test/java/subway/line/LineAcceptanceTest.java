@@ -406,7 +406,7 @@ public class LineAcceptanceTest {
             ExtractableResponse<Response> response =
                     RestAssured.given().log().all()
                             .contentType(MediaType.APPLICATION_JSON_VALUE)
-                            .when().delete("/lines/{lineId}/sections?stationId={stationId}", 강남역_ID)
+                            .when().delete("/lines/{lineId}/sections?stationId={stationId}", 이호선_ID, 강남역_ID)
                             .then().log().all()
                             .extract();
 
@@ -451,7 +451,7 @@ public class LineAcceptanceTest {
             ExtractableResponse<Response> response =
                     RestAssured.given().log().all()
                             .contentType(MediaType.APPLICATION_JSON_VALUE)
-                            .when().delete("/lines/{lineId}/sections?stationId={stationId}", 구의역_ID)
+                            .when().delete("/lines/{lineId}/sections?stationId={stationId}", 이호선_ID, 구의역_ID)
                             .then().log().all()
                             .extract();
 
@@ -489,7 +489,7 @@ public class LineAcceptanceTest {
             ExtractableResponse<Response> response =
                     RestAssured.given().log().all()
                             .contentType(MediaType.APPLICATION_JSON_VALUE)
-                            .when().delete("/lines/{lineId}/sections?stationId={stationId}", 구의역_ID)
+                            .when().delete("/lines/{lineId}/sections?stationId={stationId}", 이호선_ID, 구의역_ID)
                             .then().log().all()
                             .extract();
 
