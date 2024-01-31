@@ -96,7 +96,7 @@ public class SubwaySectionAcceptanceTest {
     }
 
     /**
-     * When 지하철 구간이 하행선이 아닌 곳에서 추가하면
+     * When 지하철 구간으로 기존에 추가된 역을 추가하면
      * Then 400 에러가 리턴된다.
      */
     @Test
