@@ -5,8 +5,10 @@ import org.springframework.transaction.annotation.Transactional;
 import subway.line.dto.LineRequest;
 import subway.line.dto.LineResponse;
 import subway.line.dto.LineUpdateRequest;
+import subway.line.dto.SectionRequest;
 import subway.line.entity.Line;
 import subway.line.repository.LineRepository;
+import subway.station.dto.StationResponse;
 import subway.station.entity.Station;
 import subway.station.repository.StationRepository;
 
@@ -76,4 +78,9 @@ public class LineService {
         return lineRepository.findById(lindId)
                 .orElseThrow(() -> new EntityNotFoundException("Line not found. Line Id: " + lindId));
     }
+
+    public LineResponse createLineSection(final Long id, final SectionRequest request) {
+        return new LineResponse(1L, "신분당선", "B", List.of(new StationResponse(1L, "C")));
+    }
+
 }

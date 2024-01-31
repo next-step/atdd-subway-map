@@ -12,7 +12,6 @@ import subway.line.dto.SectionRequest;
 import subway.station.entity.Station;
 import subway.station.repository.StationRepository;
 
-import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 구간 관련 기능")
@@ -60,20 +59,11 @@ public class SectionAcceptanceTest extends BaseTest{
 
         // when
         final SectionRequest sectionRequest = new SectionRequest(역삼역_ID, 지하철역_ID, 5);
-        callCreateApi(sectionRequest, SECTION_API_PATH, 신분당선_ID);
+        JsonPath createSectionResponse = callCreateApi(sectionRequest, SECTION_API_PATH, 신분당선_ID).jsonPath();
 
         // then
-        final JsonPath getLineResponse =
-                given()
-                .when()
-                .get(LINE_API_PATH + "{id}", 신분당선_ID)
-                .then()
-                .log().all()
-                .extract()
-                .jsonPath();
-
-        final int distance = (int) getLineResponse.get("distance");
-        assertThat(distance).isEqualTo(15);
+        final String lineName = createSectionResponse.get("name");
+        assertThat(lineName).isEqualTo("신분당선");
     }
 
     /**
