@@ -25,8 +25,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {
 
-    private Map<String, String> newBunDangLineParams;
-    private Map<String, String> zeroLineParams;
+    private Map<String, String> 신분당선;
+    private Map<String, String> 영호선;
+    private Map<String, String> 삼성역_부터_선릉역_구간;
+    private Map<String, String> 선릉역_부터_교대역_구간;
+    private Map<String, String> 삼성역_부터_강남역_구간;
     private Long 강남역_ID;
     private Long 삼성역_ID;
     private Long 선릉역_ID;
@@ -44,19 +47,34 @@ public class LineAcceptanceTest {
         params.put("name", "교대역");
         교대역_ID = getId(StationApiCaller.callCreateStation(params));
 
-        newBunDangLineParams = new HashMap<>();
-        newBunDangLineParams.put("name", "신분당선");
-        newBunDangLineParams.put("color", "bg-red-600");
-        newBunDangLineParams.put("upStationId", 강남역_ID.toString());
-        newBunDangLineParams.put("downStationId", 삼성역_ID.toString());
-        newBunDangLineParams.put("distance", "10");
+        신분당선 = new HashMap<>();
+        신분당선.put("name", "신분당선");
+        신분당선.put("color", "bg-red-600");
+        신분당선.put("upStationId", 강남역_ID.toString());
+        신분당선.put("downStationId", 삼성역_ID.toString());
+        신분당선.put("distance", "10");
 
-        zeroLineParams = new HashMap<>();
-        zeroLineParams.put("name", "0호선");
-        zeroLineParams.put("color", "bg-red-100");
-        zeroLineParams.put("upStationId", 강남역_ID.toString());
-        zeroLineParams.put("downStationId", 선릉역_ID.toString());
-        zeroLineParams.put("distance", "10");
+        영호선 = new HashMap<>();
+        영호선.put("name", "0호선");
+        영호선.put("color", "bg-red-100");
+        영호선.put("upStationId", 강남역_ID.toString());
+        영호선.put("downStationId", 선릉역_ID.toString());
+        영호선.put("distance", "10");
+
+        삼성역_부터_선릉역_구간 = new HashMap<>();
+        삼성역_부터_선릉역_구간.put("upStationId", 삼성역_ID.toString());
+        삼성역_부터_선릉역_구간.put("downStationId", 선릉역_ID.toString());
+        삼성역_부터_선릉역_구간.put("distance", "10");
+
+        선릉역_부터_교대역_구간 = new HashMap<>();
+        선릉역_부터_교대역_구간.put("upStationId", 선릉역_ID.toString());
+        선릉역_부터_교대역_구간.put("downStationId", 교대역_ID.toString());
+        선릉역_부터_교대역_구간.put("distance", "10");
+
+        삼성역_부터_강남역_구간 = new HashMap<>();
+        삼성역_부터_강남역_구간.put("upStationId", 삼성역_ID.toString());
+        삼성역_부터_강남역_구간.put("downStationId", 강남역_ID.toString());
+        삼성역_부터_강남역_구간.put("distance", "10");
     }
 
     private Long getId(ExtractableResponse<Response> response) {
@@ -71,7 +89,7 @@ public class LineAcceptanceTest {
     @Test
     void createLine() {
         // when
-        LineApiCaller.callApiCreateLines(newBunDangLineParams);
+        LineApiCaller.callApiCreateLines(신분당선);
 
         // then
         ExtractableResponse<Response> response = LineApiCaller.callApiFindLines();
@@ -89,8 +107,8 @@ public class LineAcceptanceTest {
     @Test
     void findLines() {
         // given
-        LineApiCaller.callApiCreateLines(newBunDangLineParams);
-        LineApiCaller.callApiCreateLines(zeroLineParams);
+        LineApiCaller.callApiCreateLines(신분당선);
+        LineApiCaller.callApiCreateLines(영호선);
 
         // when
         ExtractableResponse<Response> response = LineApiCaller.callApiFindLines();
@@ -110,7 +128,7 @@ public class LineAcceptanceTest {
     @Test
     void findLine() {
         // given
-        ExtractableResponse<Response> response = LineApiCaller.callApiCreateLines(newBunDangLineParams);
+        ExtractableResponse<Response> response = LineApiCaller.callApiCreateLines(신분당선);
         String location = response.header("location");
 
         // when
@@ -131,7 +149,7 @@ public class LineAcceptanceTest {
     @Test
     void updateLine() {
         // given
-        ExtractableResponse<Response> response = LineApiCaller.callApiCreateLines(newBunDangLineParams);
+        ExtractableResponse<Response> response = LineApiCaller.callApiCreateLines(신분당선);
         String location = response.header("location");
 
         // when
@@ -156,7 +174,7 @@ public class LineAcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        ExtractableResponse<Response> response = LineApiCaller.callApiCreateLines(newBunDangLineParams);
+        ExtractableResponse<Response> response = LineApiCaller.callApiCreateLines(신분당선);
         String location = response.header("location");
 
         // when
@@ -178,15 +196,11 @@ public class LineAcceptanceTest {
     @Test
     void updateSections() {
         // given
-        ExtractableResponse<Response> response = LineApiCaller.callApiCreateLines(newBunDangLineParams);
+        ExtractableResponse<Response> response = LineApiCaller.callApiCreateLines(신분당선);
         String location = response.header("location");
 
         // when
-        Map<String, String> params = new HashMap<>();
-        params.put("upStationId", 삼성역_ID.toString());
-        params.put("downStationId", 선릉역_ID.toString());
-        params.put("distance", "10");
-        LineApiCaller.callApiUpdateSections(params, location);
+        LineApiCaller.callApiUpdateSections(삼성역_부터_선릉역_구간, location);
 
         // then
         response = LineApiCaller.callApiFindLine(location);
@@ -204,16 +218,12 @@ public class LineAcceptanceTest {
     @Test
     void updateSections2() {
         // given
-        ExtractableResponse<Response> response = LineApiCaller.callApiCreateLines(newBunDangLineParams);
+        ExtractableResponse<Response> response = LineApiCaller.callApiCreateLines(신분당선);
         String location = response.header("location");
 
         // when
-        Map<String, String> params = new HashMap<>();
-        params.put("upStationId", 선릉역_ID.toString());
-        params.put("downStationId", 교대역_ID.toString());
-        params.put("distance", "10");
         response = given().log().all()
-                .body(params)
+                .body(선릉역_부터_교대역_구간)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post(location + "/sections")
                 .then().log().all()
@@ -238,16 +248,10 @@ public class LineAcceptanceTest {
     @Test
     void updateSections3() {
         // given
-        ExtractableResponse<Response> response = LineApiCaller.callApiCreateLines(newBunDangLineParams);
+        ExtractableResponse<Response> response = LineApiCaller.callApiCreateLines(신분당선);
         String location = response.header("location");
-
-        // when
-        Map<String, String> params = new HashMap<>();
-        params.put("upStationId", 삼성역_ID.toString());
-        params.put("downStationId", 강남역_ID.toString());
-        params.put("distance", "10");
         response = given().log().all()
-                .body(params)
+                .body(삼성역_부터_강남역_구간)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post(location + "/sections")
                 .then().log().all()
@@ -272,14 +276,9 @@ public class LineAcceptanceTest {
     @Test
     void deleteSections() {
         // given
-        ExtractableResponse<Response> response = LineApiCaller.callApiCreateLines(newBunDangLineParams);
+        ExtractableResponse<Response> response = LineApiCaller.callApiCreateLines(신분당선);
         String location = response.header("location");
-
-        Map<String, String> params = new HashMap<>();
-        params.put("upStationId", 삼성역_ID.toString());
-        params.put("downStationId", 선릉역_ID.toString());
-        params.put("distance", "10");
-        LineApiCaller.callApiUpdateSections(params, location);
+        LineApiCaller.callApiUpdateSections(삼성역_부터_선릉역_구간, location);
 
         // when
         LineApiCaller.callApiDeleteSection(location, 선릉역_ID.toString());
@@ -300,14 +299,9 @@ public class LineAcceptanceTest {
     @Test
     void deleteSections2() {
         // given
-        ExtractableResponse<Response> response = LineApiCaller.callApiCreateLines(newBunDangLineParams);
+        ExtractableResponse<Response> response = LineApiCaller.callApiCreateLines(신분당선);
         String location = response.header("location");
-
-        Map<String, String> params = new HashMap<>();
-        params.put("upStationId", 삼성역_ID.toString());
-        params.put("downStationId", 선릉역_ID.toString());
-        params.put("distance", "10");
-        LineApiCaller.callApiUpdateSections(params, location);
+        LineApiCaller.callApiUpdateSections(삼성역_부터_선릉역_구간, location);
 
         // when
         response = given().log().all()
@@ -336,7 +330,7 @@ public class LineAcceptanceTest {
     @Test
     void deleteSections3() {
         // given
-        ExtractableResponse<Response> response = LineApiCaller.callApiCreateLines(newBunDangLineParams);
+        ExtractableResponse<Response> response = LineApiCaller.callApiCreateLines(신분당선);
         String location = response.header("location");
 
         // when
