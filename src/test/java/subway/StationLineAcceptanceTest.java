@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.StationLineRequest.*;
+import static subway.StationLineSteps.*;
 
 @DisplayName("지하철 노선 관련 기능")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -42,10 +42,10 @@ public class StationLineAcceptanceTest {
         StationLineRequest 신분당선 = StationLineMockData.신분당선;
 
         // when
-        createStationLineRequest(신분당선);
+        지하철_노선_생성_요청(신분당선);
 
         // then
-        assertThat(convertStationLines(findAllStationLinesRequest())).usingRecursiveComparison()
+        assertThat(convertStationLines(모든_지하철_노선_조회_요청())).usingRecursiveComparison()
                 .ignoringFields("id")
                 .isEqualTo(List.of(신분당선));
     }
@@ -62,11 +62,11 @@ public class StationLineAcceptanceTest {
         StationLineRequest 신분당선 = StationLineMockData.신분당선;
         StationLineRequest 분당선 = StationLineMockData.분당선;
 
-        createStationLineRequest(신분당선);
-        createStationLineRequest(분당선);
+        지하철_노선_생성_요청(신분당선);
+        지하철_노선_생성_요청(분당선);
 
         // when
-        assertThat(convertStationLines(findAllStationLinesRequest())).usingRecursiveComparison()
+        assertThat(convertStationLines(모든_지하철_노선_조회_요청())).usingRecursiveComparison()
                 .ignoringFields("id")
                 .isEqualTo(List.of(신분당선, 분당선));
     }
@@ -81,10 +81,10 @@ public class StationLineAcceptanceTest {
     void findStationLine() {
         // given
         StationLineRequest 신분당선 = StationLineMockData.신분당선;
-        ExtractableResponse<Response> response = createStationLineRequest(신분당선);
+        ExtractableResponse<Response> response = 지하철_노선_생성_요청(신분당선);
 
         // when, then
-        assertThat(convertStationLine(findStationLineRequest(getCreatedLocationId(response)))).usingRecursiveComparison()
+        assertThat(convertStationLine(지하철_노선_조회_요청(getCreatedLocationId(response)))).usingRecursiveComparison()
                 .ignoringFields("id")
                 .isEqualTo(신분당선);
     }
@@ -101,13 +101,13 @@ public class StationLineAcceptanceTest {
         StationLineRequest 신분당선 = StationLineMockData.신분당선;
         StationLineRequest 수정된_신분당선 = StationLineMockData.수정된_신분당선;
 
-        ExtractableResponse<Response> createResponse = createStationLineRequest(신분당선);
+        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(신분당선);
 
         // when
-        updateStationLineRequest(수정된_신분당선, getCreatedLocationId(createResponse));
+        지하철_노선_수정_요청(수정된_신분당선, getCreatedLocationId(createResponse));
 
         // then
-        assertThat(convertStationLine(findStationLineRequest(getCreatedLocationId(createResponse)))).usingRecursiveComparison()
+        assertThat(convertStationLine(지하철_노선_조회_요청(getCreatedLocationId(createResponse)))).usingRecursiveComparison()
                 .ignoringFields("id")
                 .isEqualTo(수정된_신분당선);
     }
@@ -124,14 +124,14 @@ public class StationLineAcceptanceTest {
         StationLineRequest 신분당선 = StationLineMockData.신분당선;
         StationLineRequest 분당선 = StationLineMockData.분당선;
 
-        ExtractableResponse<Response> createResponse = createStationLineRequest(신분당선);
-        createStationLineRequest(분당선);
+        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(신분당선);
+        지하철_노선_생성_요청(분당선);
 
         // when
-        deleteStationLineRequest(getCreatedLocationId(createResponse));
+        지하철_노선_삭제_요청(getCreatedLocationId(createResponse));
 
         // then
-        assertThat(convertStationLines(findAllStationLinesRequest())).usingRecursiveComparison()
+        assertThat(convertStationLines(모든_지하철_노선_조회_요청())).usingRecursiveComparison()
                 .ignoringFields("id")
                 .isEqualTo(List.of(분당선));
     }

@@ -22,7 +22,7 @@ public class StationLine {
 
     private int distance;
 
-    public StationLine() {
+    protected StationLine() {
     }
 
     public StationLine(String name, String color, int upStationId, int downStationId, int distance) {
