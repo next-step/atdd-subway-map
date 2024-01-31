@@ -9,7 +9,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import subway.line.dto.LineRequest;
 import subway.line.dto.LineUpdateRequest;
 import subway.station.entity.Station;
@@ -78,7 +77,7 @@ public class LineAcceptanceTest extends BaseTest {
         callCreateApi(강남역_생성_요청, API_PATH);
 
         final LineRequest 지하철노선_생성_요청 = new LineRequest("지하철노선", "bg-green-600", 강남역_ID, 지하철역_ID, 15);
-        callCreateApi(강남역_생성_요청, API_PATH);
+        callCreateApi(지하철노선_생성_요청, API_PATH);
 
         // when
         final JsonPath jsonPath = this.getSubwayLineList();

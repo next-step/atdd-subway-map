@@ -37,5 +37,21 @@ public abstract class BaseTest {
         return response;
     }
 
+    protected ExtractableResponse<Response> callCreateApi(final Object requestBody, final String path, final Long pathVariable) {
+        final ExtractableResponse<Response> response =
+                given()
+                        .log().all()
+                        .body(requestBody)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .when()
+                        .post(path, pathVariable)
+                        .then()
+                        .statusCode(HttpStatus.CREATED.value())
+                        .log().all()
+                        .extract();
+
+        return response;
+    }
+
 }
 
