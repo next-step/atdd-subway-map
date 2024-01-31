@@ -1,10 +1,10 @@
 package subway.line;
 
 import org.springframework.stereotype.Service;
+import subway.line.section.*;
 import subway.station.Station;
 import subway.station.StationNotFoundException;
 import subway.station.StationRepository;
-import subway.station.StationResponse;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
@@ -16,11 +16,14 @@ import java.util.stream.Collectors;
 public class LineService {
     private final LineRepository lineRepository;
     private final StationRepository stationRepository;
+    private final SectionRepository sectionRepository;
 
-    public LineService(LineRepository lineRepository, StationRepository stationRepository) {
+    public LineService(LineRepository lineRepository, StationRepository stationRepository, SectionRepository sectionRepository) {
         this.lineRepository = lineRepository;
         this.stationRepository = stationRepository;
+        this.sectionRepository = sectionRepository;
     }
+
     private LineResponse createLineResponse(Line line) {
         return new LineResponse(line.getId(), line.getName(), line.getColor(), List.of(line.getUpStation(), line.getDownStation()));
     }
@@ -28,9 +31,11 @@ public class LineService {
     public LineResponse createLine(LineRequest lineRequest) throws StationNotFoundException {
         Station upStation = stationRepository.findById(lineRequest.getUpStationId()).orElseThrow(StationNotFoundException::new);
         Station downStation = stationRepository.findById(lineRequest.getDownStationId()).orElseThrow(StationNotFoundException::new);
-        Line line = new Line(lineRequest.getName(), lineRequest.getColor(), upStation, downStation);
+        Line line = new Line(lineRequest.getName(), lineRequest.getColor(), upStation, downStation, lineRequest.getDistance());
 
         lineRepository.save(line);
+        sectionRepository.saveAll(Section.firstSectionsOf(line));
+
         return createLineResponse(line);
     }
 
@@ -53,5 +58,38 @@ public class LineService {
 
     public void deleteLine(Long id) {
         lineRepository.deleteById(id);
+    }
+
+    public List<SectionResponse> showLineSections(Long id) throws LineNotFoundException {
+        Line line = lineRepository.findById(id).orElseThrow(LineNotFoundException::new);
+        return new ArrayList<>();
+    }
+
+    private SectionResponse createSectionResponse(Section section) {
+        return new SectionResponse(section.getStation().getId(), section.getStation().getName(), section.getDistanceFromPrev());
+    }
+
+    private LineSectionResponse createLineSectionResponse(Line line) {
+        List<SectionResponse> sectionResponses = line.getSections().stream()
+                .map(this::createSectionResponse)
+                .collect(Collectors.toList());
+        return new LineSectionResponse(line.getId(), line.getName(), line.getUpStation().getId(), line.getDownStation().getId(), sectionResponses);
+    }
+
+    public LineSectionResponse addLineSection(Long id, SectionRequest sectionRequest) throws Exception {
+        Line line = lineRepository.findById(id).get();
+        if (!line.isCurrentDownStationId(sectionRequest.getUpStationId())) {
+            throw new Exception("새 구간의 상행역이 현재 노선의 하행 종점역이 아닙니다.");
+        }
+        Station downStation = stationRepository.findById(sectionRequest.getDownStationId()).get();
+        line.setDownStation(downStation);
+        Long increasedDistance = line.changeDistance(sectionRequest.getDistance());
+
+        Section section = new Section(new SectionId(line.getId(), sectionRequest.getDownStationId()), increasedDistance);
+        section.setLine(line);
+        section.setStation(downStation);
+        sectionRepository.save(section);
+
+        return createLineSectionResponse(line);
     }
 }

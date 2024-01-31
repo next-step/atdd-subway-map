@@ -2,6 +2,8 @@ package subway.line;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import subway.line.section.SectionRequest;
+import subway.line.section.SectionResponse;
 import subway.station.StationNotFoundException;
 
 import java.net.URI;
@@ -41,5 +43,15 @@ public class LineController {
     public ResponseEntity<Void> deleteLine(@PathVariable Long id) {
         lineService.deleteLine(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/lines/{id}/sections")
+    public ResponseEntity<List<SectionResponse>> showLineSections(@PathVariable Long id) throws LineNotFoundException {
+        return ResponseEntity.ok().body(lineService.showLineSections(id));
+    }
+
+    @PostMapping("/lines/{id}/sections")
+    public ResponseEntity<LineSectionResponse> addLineSection(@PathVariable Long id, @RequestBody SectionRequest sectionRequest) throws Exception {
+        return ResponseEntity.ok().body(lineService.addLineSection(id, sectionRequest));
     }
 }
