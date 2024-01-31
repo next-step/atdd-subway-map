@@ -42,6 +42,14 @@ public class Sections {
     }
 
     public void add(Section section) {
+        if(!isSameLastStationAndStartStation(section)) {
+            throw new IllegalArgumentException("마지막 구간과 추가될 구간의 시작은 같아야 합니다.");
+        }
+
+        if(anyMatchStation(section)) {
+            throw new IllegalArgumentException("이미 구간에 포함 되어 있는 역 입니다.");
+        }
+
         this.sectionList.add(section);
     }
 
