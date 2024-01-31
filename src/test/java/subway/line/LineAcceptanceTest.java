@@ -167,8 +167,8 @@ public class LineAcceptanceTest {
 
     /**
      * GIVEN 지하철 노선을 생성하고
-     * WHEN 노선을 수정하면
-     * THEN 수정된 노선이 조회 된다
+     * WHEN 지하철 노선에 구간을 추가하면
+     * THEN 수정된 구간을 조회 할 수 있다
      */
     @DisplayName("지하철노선의 구간을 수정한다.")
     @Test
