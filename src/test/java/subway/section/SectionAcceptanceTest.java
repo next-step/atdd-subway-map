@@ -157,7 +157,7 @@ public class SectionAcceptanceTest {
         assertThat(response.asPrettyString()).isEqualTo("구간이 1개인 노선의 구간은 삭제할 수 없습니다.");
     }
 
-    private static List<Long> getStationIds(ExtractableResponse<Response> findLine) {
+    private List<Long> getStationIds(ExtractableResponse<Response> findLine) {
         return JsonPathUtil.getList(findLine, "stations", StationResponse.class)
                 .stream().map(StationResponse::getId).collect(Collectors.toList());
     }
