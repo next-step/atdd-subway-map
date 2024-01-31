@@ -1,4 +1,4 @@
-package subway;
+package subway.station;
 
 import javax.persistence.*;
 
@@ -23,5 +23,9 @@ public class Station {
 
     public String getName() {
         return name;
+    }
+
+    public StationResponse createStationResponse() {
+        return new StationResponse(id, name);
     }
 }

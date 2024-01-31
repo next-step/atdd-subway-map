@@ -27,26 +27,13 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .body(params)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/stations")
-                        .then().log().all()
-                        .extract();
+        ExtractableResponse<Response> response = createStation("강남역");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
+        List<String> stationNames = getStationNames();
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
@@ -63,12 +50,7 @@ public class StationAcceptanceTest {
         createStation("역삼역");
 
         // when
-        List<String> stationNames =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .statusCode(HttpStatus.OK.value())
-                        .extract().jsonPath().getList("name", String.class);
+        List<String> stationNames = getStationNames();
 
         // then
         assertThat(stationNames).containsAnyOf("강남역", "역삼역");
@@ -84,23 +66,16 @@ public class StationAcceptanceTest {
     void deleteStation() {
         // given
         ExtractableResponse<Response> response = createStation("강남역");
-        long id = response.jsonPath().getLong("id");
+        String locationHeader = response.header("Location");
 
         // when
         RestAssured.given().log().all()
-                .pathParam("id", id)
-                .when().delete("/stations/{id}")
+                .when().delete(locationHeader)
                 .then().log().all()
                 .statusCode(HttpStatus.NO_CONTENT.value());
 
         // then
-        List<String> stationNames =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .statusCode(HttpStatus.OK.value())
-                        .extract().jsonPath().getList("name", String.class);
-
+        List<String> stationNames = getStationNames();
         assertThat(stationNames).doesNotContain("강남역");
     }
 
@@ -115,5 +90,12 @@ public class StationAcceptanceTest {
                 .then().log().all()
                 .statusCode(HttpStatus.CREATED.value())
                 .extract();
+    }
+
+    private static List<String> getStationNames() {
+        return RestAssured.given().log().all()
+                .when().get("/stations")
+                .then().log().all()
+                .extract().jsonPath().getList("name", String.class);
     }
 }
