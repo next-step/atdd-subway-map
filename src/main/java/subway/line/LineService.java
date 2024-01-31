@@ -60,9 +60,8 @@ public class LineService {
         lineRepository.deleteById(id);
     }
 
-    public List<SectionResponse> showLineSections(Long id) throws LineNotFoundException {
-        Line line = lineRepository.findById(id).orElseThrow(LineNotFoundException::new);
-        return new ArrayList<>();
+    public LineSectionResponse showLineSections(Long id) throws LineNotFoundException {
+        return createLineSectionResponse(lineRepository.findById(id).orElseThrow(LineNotFoundException::new));
     }
 
     private SectionResponse createSectionResponse(Section section) {

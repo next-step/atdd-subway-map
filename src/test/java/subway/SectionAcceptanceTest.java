@@ -40,7 +40,7 @@ public class SectionAcceptanceTest {
         RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(new SectionRequest(2L, 3L, 13L))
+                .body(new SectionRequest(stationId2, stationId3, 13L))
                 .when().log().all()
                 .post("/lines/" + lineId + "/sections")
                 .then()
@@ -49,13 +49,13 @@ public class SectionAcceptanceTest {
 
         // then
         ExtractableResponse<Response> lineSectionResponse = RestAssured
-                .given().log().all()
+                .given()
                 .when()
                 .get("/lines/" + lineId + "/sections")
-                .then()
+                .then().log().all()
                 .statusCode(HttpStatus.OK.value())
                 .extract();
         assertThat(lineSectionResponse.jsonPath().getList("sections.stationId", Long.class))
-                .contains(2L, 3L);
+                .containsExactly(stationId1, stationId2, stationId3);
     }
 }

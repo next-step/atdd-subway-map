@@ -46,7 +46,7 @@ public class LineController {
     }
 
     @GetMapping("/lines/{id}/sections")
-    public ResponseEntity<List<SectionResponse>> showLineSections(@PathVariable Long id) throws LineNotFoundException {
+    public ResponseEntity<LineSectionResponse> showLineSections(@PathVariable Long id) throws LineNotFoundException {
         return ResponseEntity.ok().body(lineService.showLineSections(id));
     }
 
