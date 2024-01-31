@@ -3,11 +3,14 @@ package subway;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import subway.fixture.LineFixture;
 
 import java.util.HashMap;
@@ -18,7 +21,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관리 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@ActiveProfiles("acceptance")
 public class LineAcceptanceTest {
+
+    @Autowired
+    private DatabaseCleanup databaseCleanup;
+
+    @BeforeEach
+    void setUp() {
+        databaseCleanup.execute();
+    }
+
     /**
      * When 지하철 노선을 생성하면
      * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
@@ -98,7 +111,7 @@ public class LineAcceptanceTest {
         // when
         String lineName =
                 RestAssured.given().log().all()
-                        .pathParam("id", createResponse.jsonPath().getLong("id"))
+                        .pathParam("lineId", createResponse.jsonPath().getLong("id"))
                         .when().get("/lines/{lineId}")
                         .then().log().all()
                         .extract().jsonPath().getString("name");
@@ -163,7 +176,7 @@ public class LineAcceptanceTest {
         ExtractableResponse<Response> deleteResponse =
                 RestAssured.given().log().all()
                         .pathParam("lineId", createResponse.jsonPath().getLong("id"))
-                        .when().delete("/lines/{lineId")
+                        .when().delete("/lines/{lineId}")
                         .then().log().all()
                         .extract();
 
