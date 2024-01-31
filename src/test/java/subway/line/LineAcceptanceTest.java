@@ -117,4 +117,25 @@ class LineAcceptanceTest implements LineFixture {
         assertThat(response.jsonPath().getString("color")).isEqualTo("bg-red-600");
     }
 
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 삭제하면
+     * Then 해당 지하철 노선 정보는 삭제된다.
+     */
+    @DisplayName("지하철 노선을 삭제한다.")
+    @Test
+    void deleteLineById() {
+        // given
+        long lineId = createLineByNameAndStation("신분당선", "지하철1", "지하철2").jsonPath().getLong("id");
+
+        // when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .when().delete("/lines/" + lineId)
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
 }
