@@ -7,6 +7,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
+import subway.line.dto.response.LineResponse;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -59,6 +60,28 @@ class LineAcceptanceTest implements LineFixture {
         assertThat(lineResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(lineResponse.jsonPath().getList("name", String.class)).hasSize(2)
                 .containsExactlyInAnyOrder("수인분당선", "신분당선");
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 조회하면
+     * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
+     */
+    @DisplayName("생성한 지하철 노선에 대한 정보를 조회할 수 있다.")
+    @Test
+    void getLineById() {
+        // given
+        long lindId = createLineByNameAndStation("신분당선", "지하철1", "지하철2").jsonPath().getLong("id");
+
+        // when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .when().get("/lines/" + lindId)
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.as(LineResponse.class).getId()).isEqualTo(lindId);
     }
 
 }
