@@ -1,7 +1,6 @@
 package subway.lines;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import subway.station.Station;

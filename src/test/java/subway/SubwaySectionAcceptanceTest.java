@@ -2,12 +2,9 @@ package subway;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,12 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import subway.lines.LineCreateRequest;
-import subway.lines.LineResponse;
-import subway.lines.LineService;
-import subway.station.Station;
-import subway.station.StationRepository;
 import subway.station.StationResponse;
 
 @DisplayName("지하철 구간 테스트")

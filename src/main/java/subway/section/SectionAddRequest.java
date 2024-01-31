@@ -1,7 +1,5 @@
 package subway.section;
 
-import java.util.HashSet;
-import java.util.Set;
 import subway.lines.Line;
 
 public class SectionAddRequest {

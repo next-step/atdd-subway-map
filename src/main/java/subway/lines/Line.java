@@ -20,6 +20,7 @@ public class Line {
     @GeneratedValue
     private Long id;
     private String name;
+
     private String color;
 
     private Long upStationId;
