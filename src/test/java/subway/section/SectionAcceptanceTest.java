@@ -5,10 +5,8 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import subway.TableTruncate;
+import subway.annotation.AcceptanceTest;
 import subway.line.LineApiRequester;
 import subway.line.dto.LineCreateRequest;
 import subway.station.StationApiRequester;
@@ -21,18 +19,15 @@ import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("지하철노선 구간 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@AcceptanceTest
 public class SectionAcceptanceTest {
 
-    @Autowired
-    private TableTruncate tableTruncate;
     private final StationApiRequester stationApiRequester = new StationApiRequester();
     private final LineApiRequester lineApiRequester = new LineApiRequester();
     private final SectionApiRequester sectionApiRequester = new SectionApiRequester();
 
     @BeforeEach
     void setUp() {
-        tableTruncate.truncate();
         stationApiRequester.createStationApiCall("잠실역");
         stationApiRequester.createStationApiCall("용산역");
         stationApiRequester.createStationApiCall("건대입구역");
