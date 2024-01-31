@@ -1,5 +1,6 @@
 package subway.api.domain.service;
 
+import subway.api.domain.dto.inport.SectionCreateCommand;
 import subway.api.domain.dto.outport.SectionInfo;
 import subway.api.interfaces.dto.SectionCreateRequest;
 
@@ -8,7 +9,7 @@ import subway.api.interfaces.dto.SectionCreateRequest;
  * @since : 2024/01/31
  */
 public interface SectionService {
-	SectionInfo addSection(Long lineId, SectionCreateRequest createRequest);
+	SectionInfo addSection(Long lineId, SectionCreateCommand createRequest);
 
 	void deleteSection(Long lineId, Long stationId);
 }

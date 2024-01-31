@@ -3,6 +3,7 @@ package subway.api.infrastructure.operators;
 import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
+import subway.api.domain.dto.inport.SectionCreateCommand;
 import subway.api.domain.model.entity.Line;
 import subway.api.domain.model.entity.Section;
 import subway.api.domain.model.entity.Station;
@@ -34,8 +35,8 @@ public class SimpleSectionFactory implements SectionFactory {
 	}
 
 	@Override
-	public Section createSection(SectionCreateRequest request, Line line, Station upStation, Station downStation) {
-		Section section = Section.of(upStation, downStation, request.getDistance(), line);
+	public Section createSection(SectionCreateCommand command, Line line, Station upStation, Station downStation) {
+		Section section = Section.of(upStation, downStation, command.getDistance(), line);
 		return sectionRepository.save(section);
 	}
 

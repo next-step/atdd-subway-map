@@ -1,10 +1,13 @@
 package subway.api.domain.service.impl;
 
+import static org.springframework.http.HttpStatus.*;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import subway.api.domain.dto.inport.SectionCreateCommand;
 import subway.api.domain.dto.outport.SectionInfo;
 import subway.api.domain.model.entity.Line;
 import subway.api.domain.model.entity.Section;
@@ -35,15 +38,15 @@ public class SimpleSectionService implements SectionService {
 
 	@Override
 	@Transactional
-	public SectionInfo addSection(Long lineId, SectionCreateRequest createRequest) {
-		Line line = lineResolver.fetchOptional(lineId).orElseThrow(() -> new LineNotFoundException(HttpStatus.BAD_REQUEST));
+	public SectionInfo addSection(Long lineId, SectionCreateCommand createCommand) {
+		Line line = lineResolver.fetchOptional(lineId).orElseThrow(() -> new LineNotFoundException(BAD_REQUEST));
 
-		sectionCreationValidator.validate(line, createRequest);
+		sectionCreationValidator.validate(line, createCommand);
 
-		Station upStation = stationResolver.fetchOptional(createRequest.getUpStationId()).orElseThrow(() -> new StationNotFoundException(HttpStatus.BAD_REQUEST));
-		Station downStation = stationResolver.fetchOptional(createRequest.getDownStationId()).orElseThrow(() -> new StationNotFoundException(HttpStatus.BAD_REQUEST));
+		Station upStation = stationResolver.fetchOptional(createCommand.getUpStationId()).orElseThrow(() -> new StationNotFoundException(BAD_REQUEST));
+		Station downStation = stationResolver.fetchOptional(createCommand.getDownStationId()).orElseThrow(() -> new StationNotFoundException(BAD_REQUEST));
 
-		Section newSection = sectionFactory.createSection(createRequest, line, upStation, downStation);
+		Section newSection = sectionFactory.createSection(createCommand, line, upStation, downStation);
 		line.addSection(newSection);
 
 		return SectionInfo.from(newSection);
@@ -53,7 +56,7 @@ public class SimpleSectionService implements SectionService {
 	@Override
 	@Transactional
 	public void deleteSection(Long lineId, Long stationId) {
-		Line line = lineResolver.fetchOptional(lineId).orElseThrow(() -> new LineNotFoundException(HttpStatus.BAD_REQUEST));
+		Line line = lineResolver.fetchOptional(lineId).orElseThrow(() -> new LineNotFoundException(BAD_REQUEST));
 
 		if (!line.isDownEndStation(stationId)) {
 			throw new SectionDeletionNotValidException();

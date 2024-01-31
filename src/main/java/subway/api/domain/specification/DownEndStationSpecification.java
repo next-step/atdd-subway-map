@@ -2,6 +2,7 @@ package subway.api.domain.specification;
 
 import org.springframework.stereotype.Component;
 
+import subway.api.domain.dto.inport.SectionCreateCommand;
 import subway.api.domain.model.entity.Line;
 import subway.api.interfaces.dto.SectionCreateRequest;
 
@@ -12,12 +13,12 @@ import subway.api.interfaces.dto.SectionCreateRequest;
 @Component
 public class DownEndStationSpecification implements SubwaySpecification {
 	@Override
-	public boolean isNotSatisfiedBy(Line line, SectionCreateRequest request) {
+	public boolean isNotSatisfiedBy(Line line, SectionCreateCommand request) {
 		return !isSatisfiedBy(line,request);
 	}
 
 	@Override
-	public boolean isSatisfiedBy(Line line, SectionCreateRequest request) {
+	public boolean isSatisfiedBy(Line line, SectionCreateCommand request) {
 		return line.isDownEndStation(request.getUpStationId());
 	}
 }

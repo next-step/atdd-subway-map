@@ -1,5 +1,6 @@
 package subway.api.domain.operators;
 
+import subway.api.domain.dto.inport.SectionCreateCommand;
 import subway.api.domain.model.entity.Line;
 import subway.api.domain.model.entity.Section;
 import subway.api.domain.model.entity.Station;
@@ -13,7 +14,7 @@ import subway.api.interfaces.dto.SectionCreateRequest;
 public interface SectionFactory {
 	Section createSection(LineCreateRequest request, Line line);
 
-	Section createSection(SectionCreateRequest request, Line line, Station upStation, Station downStation);
+	Section createSection(SectionCreateCommand command, Line line, Station upStation, Station downStation);
 
 	void deleteByLine(Line line);
 }

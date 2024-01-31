@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
+import subway.api.domain.dto.inport.SectionCreateCommand;
 import subway.api.domain.dto.outport.SectionInfo;
 import subway.api.domain.service.SectionService;
 import subway.api.interfaces.dto.SectionCreateRequest;
@@ -28,7 +29,7 @@ public class SectionController {
 
 	@PostMapping("/{lineId}/sections")
 	public ResponseEntity<SectionInfo> createNewSection(@PathVariable Long lineId, @RequestBody SectionCreateRequest createRequest) {
-		SectionInfo sectionInfo = sectionService.addSection(lineId, createRequest);
+		SectionInfo sectionInfo = sectionService.addSection(lineId, SectionCreateCommand.from(createRequest));
 		return ResponseEntity.created(URI.create("/lines/" + lineId + "/sections/" + sectionInfo.getId())).body(sectionInfo);
 	}
 

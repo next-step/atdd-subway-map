@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
+import subway.api.domain.dto.inport.SectionCreateCommand;
 import subway.api.domain.model.entity.Line;
 import subway.api.domain.operators.SectionCreationValidator;
 import subway.api.domain.specification.SubwaySpecification;
@@ -21,7 +22,7 @@ public class SimpleSectionCreationValidator implements SectionCreationValidator 
 	private final List<SubwaySpecification> specifications;
 
 	@Override
-	public void validate(Line line, SectionCreateRequest request) {
+	public void validate(Line line, SectionCreateCommand request) {
 		specifications.stream()
 			.filter(spec -> spec.isNotSatisfiedBy(line, request))
 			.findFirst()
