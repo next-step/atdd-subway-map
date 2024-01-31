@@ -27,35 +27,35 @@ public class LineAcceptanceTest {
 
     private Map<String, String> newBunDangLineParams;
     private Map<String, String> zeroLineParams;
-    private Long firstStationId;
-    private Long secondStationId;
-    private Long thirdStationId;
-    private Long forthStationId;
+    private Long 강남역_ID;
+    private Long 삼성역_ID;
+    private Long 선릉역_ID;
+    private Long 교대역_ID;
 
     @BeforeEach
     void setUpClass() {
         Map<String, String> params = new HashMap<>();
         params.put("name", "강남역");
-        firstStationId = StationApiCaller.callCreateStation(params).jsonPath().getObject("id", Long.class);
+        강남역_ID = StationApiCaller.callCreateStation(params).jsonPath().getObject("id", Long.class);
         params.put("name", "삼성역");
-        secondStationId = StationApiCaller.callCreateStation(params).jsonPath().getObject("id", Long.class);
+        삼성역_ID = StationApiCaller.callCreateStation(params).jsonPath().getObject("id", Long.class);
         params.put("name", "선릉역");
-        thirdStationId = StationApiCaller.callCreateStation(params).jsonPath().getObject("id", Long.class);
+        선릉역_ID = StationApiCaller.callCreateStation(params).jsonPath().getObject("id", Long.class);
         params.put("name", "교대역");
-        forthStationId = StationApiCaller.callCreateStation(params).jsonPath().getObject("id", Long.class);
+        교대역_ID = StationApiCaller.callCreateStation(params).jsonPath().getObject("id", Long.class);
 
         newBunDangLineParams = new HashMap<>();
         newBunDangLineParams.put("name", "신분당선");
         newBunDangLineParams.put("color", "bg-red-600");
-        newBunDangLineParams.put("upStationId", firstStationId.toString());
-        newBunDangLineParams.put("downStationId", secondStationId.toString());
+        newBunDangLineParams.put("upStationId", 강남역_ID.toString());
+        newBunDangLineParams.put("downStationId", 삼성역_ID.toString());
         newBunDangLineParams.put("distance", "10");
 
         zeroLineParams = new HashMap<>();
         zeroLineParams.put("name", "0호선");
         zeroLineParams.put("color", "bg-red-100");
-        zeroLineParams.put("upStationId", firstStationId.toString());
-        zeroLineParams.put("downStationId", thirdStationId.toString());
+        zeroLineParams.put("upStationId", 강남역_ID.toString());
+        zeroLineParams.put("downStationId", 선릉역_ID.toString());
         zeroLineParams.put("distance", "10");
     }
 
@@ -179,15 +179,15 @@ public class LineAcceptanceTest {
 
         // when
         Map<String, String> params = new HashMap<>();
-        params.put("upStationId", secondStationId.toString());
-        params.put("downStationId", thirdStationId.toString());
+        params.put("upStationId", 삼성역_ID.toString());
+        params.put("downStationId", 선릉역_ID.toString());
         params.put("distance", "10");
         LineApiCaller.callApiUpdateSections(params, location);
 
         // then
         response = LineApiCaller.callApiFindLine(location);
         List<Long> actual = response.jsonPath().getList("stations.id", Long.class);
-        Long[] expected = {firstStationId, secondStationId, thirdStationId};
+        Long[] expected = {강남역_ID, 삼성역_ID, 선릉역_ID};
         assertThat(actual).containsExactly(expected);
     }
 
@@ -205,8 +205,8 @@ public class LineAcceptanceTest {
 
         // when
         Map<String, String> params = new HashMap<>();
-        params.put("upStationId", thirdStationId.toString());
-        params.put("downStationId", forthStationId.toString());
+        params.put("upStationId", 선릉역_ID.toString());
+        params.put("downStationId", 교대역_ID.toString());
         params.put("distance", "10");
         response = given().log().all()
                 .body(params)
@@ -239,8 +239,8 @@ public class LineAcceptanceTest {
 
         // when
         Map<String, String> params = new HashMap<>();
-        params.put("upStationId", secondStationId.toString());
-        params.put("downStationId", firstStationId.toString());
+        params.put("upStationId", 삼성역_ID.toString());
+        params.put("downStationId", 강남역_ID.toString());
         params.put("distance", "10");
         response = given().log().all()
                 .body(params)
@@ -272,18 +272,18 @@ public class LineAcceptanceTest {
         String location = response.header("location");
 
         Map<String, String> params = new HashMap<>();
-        params.put("upStationId", secondStationId.toString());
-        params.put("downStationId", thirdStationId.toString());
+        params.put("upStationId", 삼성역_ID.toString());
+        params.put("downStationId", 선릉역_ID.toString());
         params.put("distance", "10");
         LineApiCaller.callApiUpdateSections(params, location);
 
         // when
-        LineApiCaller.callApiDeleteSection(location, thirdStationId.toString());
+        LineApiCaller.callApiDeleteSection(location, 선릉역_ID.toString());
 
         // then
         response = LineApiCaller.callApiFindLine(location);
         List<Long> actual = response.jsonPath().getList("stations.id", Long.class);
-        Long[] expected = {firstStationId, secondStationId};
+        Long[] expected = {강남역_ID, 삼성역_ID};
         assertThat(actual).containsExactly(expected);
     }
 
@@ -300,15 +300,15 @@ public class LineAcceptanceTest {
         String location = response.header("location");
 
         Map<String, String> params = new HashMap<>();
-        params.put("upStationId", secondStationId.toString());
-        params.put("downStationId", thirdStationId.toString());
+        params.put("upStationId", 삼성역_ID.toString());
+        params.put("downStationId", 선릉역_ID.toString());
         params.put("distance", "10");
         LineApiCaller.callApiUpdateSections(params, location);
 
         // when
         response = given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .queryParam("stationId", secondStationId.toString())
+                .queryParam("stationId", 삼성역_ID.toString())
                 .when().delete(location + "/sections")
                 .then().log().all()
                 .extract();
@@ -338,7 +338,7 @@ public class LineAcceptanceTest {
         // when
         response = given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .queryParam("stationId", secondStationId.toString())
+                .queryParam("stationId", 삼성역_ID.toString())
                 .when().delete(location + "/sections")
                 .then().log().all()
                 .extract();
