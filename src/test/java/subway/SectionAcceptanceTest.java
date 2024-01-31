@@ -11,11 +11,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 import subway.line.LineRequest;
-import subway.line.section.CannotAddSectionException;
 import subway.line.section.SectionRequest;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static subway.AcceptanceMethods.*;
 
 @Sql(value = "/table_truncate.sql")
@@ -97,5 +95,44 @@ public class SectionAcceptanceTest {
                 .post("/lines/" + lineId + "/sections")
                 .then()
                 .statusCode(HttpStatus.BAD_REQUEST.value());
+    }
+
+    /**
+     * given 2개의 지하철 구간을 등록하고
+     * when 1개의 구간을 삭제하면
+     * then 지하철 노선 조회 시 1개의 구간만 노출된다.
+     */
+    @DisplayName("지하철 구간 삭제")
+    @Test
+    void deleteSection() {
+        // given
+        Long stationId1 = makeStation("gangnam").jsonPath().getLong("id");
+        Long stationId2 = makeStation("yeoksam").jsonPath().getLong("id");
+        Long stationId3 = makeStation("samseong").jsonPath().getLong("id");
+
+        Long lineId = makeLine(new LineRequest("신분당선", "bg-red-600", stationId1, stationId2, 10L)).jsonPath().getLong("id");
+        makeSection(lineId, new SectionRequest(stationId2, stationId3, 13L));
+
+        System.out.println("------ REST delete ------");
+        // when
+        RestAssured
+                .given()
+                .param("stationId", stationId3)
+                .when()
+                .delete("/lines/" + lineId + "/sections")
+                .then()
+                .statusCode(HttpStatus.NO_CONTENT.value());
+        System.out.println("------ REST delete end ------");
+        // then
+        ExtractableResponse<Response> response = RestAssured
+                .given()
+                .when()
+                .get("/lines/" + lineId + "/sections")
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract();
+
+        assertThat(response.jsonPath().getLong("downStationId")).isEqualTo(stationId2);
+        assertThat(response.jsonPath().getList("sections.id", Long.class)).doesNotContain(stationId3);
     }
 }

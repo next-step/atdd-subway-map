@@ -1,20 +1,25 @@
 package subway.line;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import subway.line.section.*;
 import subway.station.Station;
 import subway.station.StationNotFoundException;
 import subway.station.StationRepository;
-import subway.station.StationRequest;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
 @Transactional
 public class LineService {
+    @PersistenceContext
+    private EntityManager entityManager;
     private final LineRepository lineRepository;
     private final StationRepository stationRepository;
     private final SectionRepository sectionRepository;
@@ -80,8 +85,7 @@ public class LineService {
         Line line = lineRepository.findById(id).get();
         Station downStation = stationRepository.findById(sectionRequest.getDownStationId()).get();
 
-        line.changeDownStation(sectionRequest.getUpStationId(), downStation);
-        Long increasedDistance = line.changeDistance(sectionRequest.getDistance());
+        Long increasedDistance = line.addSection(sectionRequest, downStation);
 
         Section section = new Section(new SectionId(line.getId(), sectionRequest.getDownStationId()), increasedDistance);
         section.setLine(line);
@@ -89,5 +93,12 @@ public class LineService {
 
         sectionRepository.save(section);
         return createLineSectionResponse(line);
+    }
+
+    public void deleteLineSection(Long id, Long stationId) throws CannotDeleteSectionException {
+        Line line = lineRepository.findById(id).get();
+        Section section = sectionRepository.findById(new SectionId(line.getId(), stationId)).orElseThrow();
+        line.deleteSection(section);
+        sectionRepository.delete(section);
     }
 }

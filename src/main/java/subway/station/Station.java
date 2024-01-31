@@ -1,6 +1,7 @@
 package subway.station;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 public class Station {
@@ -24,4 +25,14 @@ public class Station {
     public String getName() {
         return name;
     }
+
+    @Override
+    public String toString() {
+        return "Station{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
+    }
+
+
 }

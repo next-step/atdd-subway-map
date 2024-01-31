@@ -3,6 +3,7 @@ package subway.line;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import subway.line.section.CannotAddSectionException;
+import subway.line.section.CannotDeleteSectionException;
 import subway.line.section.SectionRequest;
 import subway.station.StationNotFoundException;
 
@@ -55,6 +56,16 @@ public class LineController {
         try {
             return ResponseEntity.ok().body(lineService.addLineSection(id, sectionRequest));
         } catch (CannotAddSectionException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @DeleteMapping("/lines/{id}/sections")
+    public ResponseEntity<Void> deleteLineSection(@PathVariable Long id, @RequestParam Long stationId) {
+        try {
+            lineService.deleteLineSection(id, stationId);
+            return ResponseEntity.noContent().build();
+        } catch (CannotDeleteSectionException e) {
             return ResponseEntity.badRequest().build();
         }
     }
