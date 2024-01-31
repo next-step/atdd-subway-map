@@ -26,11 +26,8 @@ public class SectionAcceptanceTest {
 
     @Autowired
     private TableTruncate tableTruncate;
-
     private final StationApiRequester stationApiRequester = new StationApiRequester();
-
     private final LineApiRequester lineApiRequester = new LineApiRequester();
-
     private final SectionApiRequester sectionApiRequester = new SectionApiRequester();
 
     @BeforeEach

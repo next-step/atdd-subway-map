@@ -21,9 +21,7 @@ public class StationAcceptanceTest {
 
     @Autowired
     private TableTruncate tableTruncate;
-
     private final StationApiRequester stationApiRequester = new StationApiRequester();
-
     @BeforeEach
     void setUp() {
         tableTruncate.truncate();
@@ -60,17 +58,17 @@ public class StationAcceptanceTest {
     @Test
     void showStations() {
         //given
-        String stationNameA = "성수역";
-        stationApiRequester.createStationApiCall(stationNameA);
-        String stationNameB = "잠실역";
-        stationApiRequester.createStationApiCall(stationNameB);
+        String 성수역 = "성수역";
+        stationApiRequester.createStationApiCall(성수역);
+        String 잠실역 = "잠실역";
+        stationApiRequester.createStationApiCall(잠실역);
 
         //when
         ExtractableResponse<Response> response = stationApiRequester.showStationsApiCall();
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(JsonPathUtil.getNames(response)).containsExactly(stationNameA, stationNameB);
+        assertThat(JsonPathUtil.getNames(response)).containsExactly(성수역, 잠실역);
     }
 
     /**
@@ -82,11 +80,11 @@ public class StationAcceptanceTest {
     @Test
     void deleteStation() {
         //given
-        String stationName = "언주역";
-        Long id = JsonPathUtil.getId(stationApiRequester.createStationApiCall(stationName));
+        String 언주역 = "언주역";
+        Long 언주역id = JsonPathUtil.getId(stationApiRequester.createStationApiCall(언주역));
 
         //when
-        ExtractableResponse<Response> response = stationApiRequester.deleteStationApiCall(id);
+        ExtractableResponse<Response> response = stationApiRequester.deleteStationApiCall(언주역id);
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
         List<String> stationsNames = JsonPathUtil.getNames(stationApiRequester.showStationsApiCall());
