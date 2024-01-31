@@ -209,9 +209,9 @@ public class LineAcceptanceTest {
     /**
      * GIVEN 지하철 노선을 생성하고
      * WHEN 새로운 구간의 상행역이 기존의 하행역과 일치 하지 않는다면
-     * THEN BadRequest(400) HTTP STATUS 가 발생한다
+     * THEN 에러 처리와 함께 '마지막 구간과 추가될 구간의 시작은 같아야 합니다.' 라는 메세지가 출력된다.
      */
-    @DisplayName("새로운 구간의 상행역이 기존의 하행역과 일치 하지 않는다면 Bad Request가 발생한다")
+    @DisplayName("새로운 구간의 상행역이 기존의 하행역과 일치 하지 않는다면 에러 처리 된다.")
     @Test
     void updateSections2() {
         // given
@@ -239,9 +239,9 @@ public class LineAcceptanceTest {
     /**
      * GIVEN 지하철 노선을 생성하고
      * WHEN 새로운 구간이 이미 해당 노선에 등록되어있는 역이면
-     * THEN  BadRequest(400) HTTP STATUS 가 발생한다
+     * THEN 에러처리와 함께 '이미 구간에 포함 되어 있는 역 입니다.' 라는 메세지가 출력된다.
      */
-    @DisplayName("새로운 구간이 이미 해당 노선에 등록되어있는 역이면 Bad Request가 발생한다")
+    @DisplayName("새로운 구간이 이미 해당 노선에 등록되어있는 역이면 에러 처리된다.")
     @Test
     void updateSections3() {
         // given
@@ -290,9 +290,9 @@ public class LineAcceptanceTest {
     /**
      * GIVEN 지하철 노선을 생성하고 노선을 수정 후
      * WHEN 마지막 구간이 아닌 지하철 구간을 제거하면
-     * THEN  BadRequest(400) HTTP STATUS 가 발생한다
+     * THEN 에러 처리와 함께 '마지막 구간의 역이 아닙니다.' 라는 메세지가 출력된다.
      */
-    @DisplayName("마지막 구간이 아닌 지하철 구간을 제거하면 BadRequest(400) HTTP STATUS 가 발생한다")
+    @DisplayName("마지막 구간이 아닌 지하철 구간을 제거하면 에러 처리된다.")
     @Test
     void deleteSections2() {
         // given
@@ -320,10 +320,10 @@ public class LineAcceptanceTest {
 
     /**
      * GIVEN 지하철 노선을 시작과 끝만 생성하고
-     * WHEN 지하철 마지막 구간을 제거하면
-     * THEN  BadRequest(400) HTTP STATUS 가 발생한다
+     * WHEN 지하철 마지막 구간을 제거를 시도하면
+     * THEN 에러 처리와 함께 '구간이 하나 일 때는 삭제를 할 수 없습니다' 라는 메세지가 출력된다.
      */
-    @DisplayName("지하철 노선을 시작과 끝만 생성하고 지하철 마지막 구간을 제거하면 BadRequest(400) HTTP STATUS 가 발생한다")
+    @DisplayName("지하철 노선을 시작과 끝만 생성하고 지하철 마지막 구간을 제거하면 에러 처리된다.")
     @Test
     void deleteSections3() {
         // given
