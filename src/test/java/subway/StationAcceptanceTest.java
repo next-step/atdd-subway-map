@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import subway.station.StationRequest;
+import subway.station.StationResponse;
 
 import java.util.HashMap;
 import java.util.List;
@@ -32,13 +34,7 @@ public class StationAcceptanceTest {
         Map<String, String> params = new HashMap<>();
         params.put("name", "강남역");
 
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .body(params)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/stations")
-                        .then().log().all()
-                        .extract();
+        ExtractableResponse<Response> response = requestCreateStation("강남역");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -64,18 +60,9 @@ public class StationAcceptanceTest {
         List<String> requestNames = asList("강남역", "역삼역", "선릉역");
 
         for (String requestName : requestNames) {
-            StationResponse response = RestAssured
-                    .given().log().all()
-                        .body(new StationRequest(requestName))
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                    .when()
-                        .post("/stations")
-                    .then().log().all()
-                        .statusCode(HttpStatus.CREATED.value())
-                    .extract()
-                        .as(StationResponse.class);
+            ExtractableResponse<Response> response = requestCreateStation(requestName);
 
-            assertThat(response.getName()).isEqualTo(requestName);
+            assertThat(response.as(StationResponse.class).getName()).isEqualTo(requestName);
         }
 
         // when
@@ -108,16 +95,8 @@ public class StationAcceptanceTest {
         // given
         String requestName = "강남역";
 
-        StationResponse createResponse = RestAssured
-                .given().log().all()
-                    .body(new StationRequest(requestName))
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                    .post("/stations")
-                .then().log().all()
-                    .statusCode(HttpStatus.CREATED.value())
-                .extract()
-                    .as(StationResponse.class);
+        StationResponse createResponse =
+            requestCreateStation(requestName).as(StationResponse.class);
 
         assertThat(createResponse.getName()).isEqualTo(requestName);
 
@@ -132,6 +111,15 @@ public class StationAcceptanceTest {
 
         // then
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    static ExtractableResponse<Response> requestCreateStation(String name) {
+        return RestAssured.given().log().all()
+            .body(new StationRequest(name))
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().post("/stations")
+            .then().log().all()
+            .extract();
     }
 
 }
