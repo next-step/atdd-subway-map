@@ -43,17 +43,17 @@ public class Line {
         return sections;
     }
 
-    public void generateSection(int distance, Station upStation, Station downStation) {
-        Section section = new Section(distance, upStation, downStation, this);
-        sections.addSection(section);
+    public void updateLine(String name, String color) {
+        this.name = name;
+        this.color = color;
     }
 
     public void deleteSection(Long stationId) {
         sections.removeSection(stationId);
     }
 
-    public void updateLine(String name, String color) {
-        this.name = name;
-        this.color = color;
+    public void generateSection(int distance, Station upStation, Station downStation) {
+        Section section = new Section(distance, upStation, downStation, this);
+        sections.addSection(section);
     }
 }
