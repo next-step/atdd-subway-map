@@ -9,12 +9,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -43,32 +40,11 @@ public class LineAcceptanceTest {
         StationRestAssuredCRUD.createStation("강남역");
         StationRestAssuredCRUD.createStation("양재역");
 
-        Map<String, Object> param = new HashMap<>();
-        param.put("name", "신분당선");
-        param.put("color", "bg-red-600");
-        param.put("upStationId", 1);
-        param.put("downStationId", 2);
-        param.put("distance", 10);
-
-        ExtractableResponse<Response> createResponse = RestAssured
-                .given().log().all()
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                    .body(param)
-                .when()
-                    .post("/lines")
-                .then().log().all()
-                .extract();
-
+        ExtractableResponse<Response> createResponse = LineRestAssuredCRUD.createStation("신분당선", "bg-red-600", 1L, 2L, 10);
         assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> lineNames = RestAssured
-                .given().log().all()
-                .when()
-                .get("/lines")
-                .then().log().all()
-                .extract().jsonPath().getList("name", String.class);
-
+        List<String> lineNames = LineRestAssuredCRUD.showStationList().jsonPath().getList("name", String.class);
         assertThat(lineNames).contains("신분당선");
 
     }
@@ -87,47 +63,11 @@ public class LineAcceptanceTest {
         StationRestAssuredCRUD.createStation("양재역");
         StationRestAssuredCRUD.createStation("서현역");
 
-        Map<String, Object> param = new HashMap<>();
-        param.put("name", "신분당선");
-        param.put("color", "bg-red-600");
-        param.put("upStationId", 1);
-        param.put("downStationId", 2);
-        param.put("distance", 10);
-
-        ExtractableResponse<Response> shinBundangResponse = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(param)
-                .when()
-                .post("/lines")
-                .then().log().all()
-                .extract();
-
-        param.put("name", "수인분당선");
-        param.put("color", "bg-yellow-600");
-        param.put("upStationId", 1);
-        param.put("downStationId", 3);
-        param.put("distance", 10);
-
-        ExtractableResponse<Response> suinBundangResponse = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(param)
-                .when()
-                .post("/lines")
-                .then().log().all()
-                .extract();
+        LineRestAssuredCRUD.createStation("신분당선", "bg-red-600", 1L, 2L, 10);
+        LineRestAssuredCRUD.createStation("수인분당선", "bg-yellow-600", 1L, 3L, 10);
 
         //when
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                    .get("/lines")
-                .then().log().all()
-                .extract();
-
-        List<String> names = response.jsonPath().getList("name", String.class);
+        List<String> names = LineRestAssuredCRUD.showStationList().jsonPath().getList("name", String.class);
 
         // then
         assertThat(names).containsAll(List.of("신분당선", "수인분당선"));
@@ -146,38 +86,14 @@ public class LineAcceptanceTest {
         StationRestAssuredCRUD.createStation("강남역");
         StationRestAssuredCRUD.createStation("양재역");
 
-        Map<String, Object> param = new HashMap<>();
-        param.put("name", "신분당선");
-        param.put("color", "bg-red-600");
-        param.put("upStationId", 1);
-        param.put("downStationId", 2);
-        param.put("distance", 10);
-
-        ExtractableResponse<Response> createResponse = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(param)
-                .when()
-                .post("/lines")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> createResponse = LineRestAssuredCRUD.createStation("신분당선", "bg-red-600", 1L, 2L, 10);
 
         Long createdId = createResponse.body().jsonPath().getLong("id");
 
         //when
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                    .pathParam("id", createdId)
-                .when()
-                    .get("/lines/{id}")
-                .then().log().all()
-                .extract();
-
-        String name = response.jsonPath().getString("name");
+        String name = LineRestAssuredCRUD.showStation(createdId).jsonPath().getString("name");
 
         // then
-        assertThat(response.jsonPath().getLong("id")).isEqualTo(createdId);
         assertThat(name).isEqualTo("신분당선");
     }
 
@@ -194,52 +110,17 @@ public class LineAcceptanceTest {
         StationRestAssuredCRUD.createStation("강남역");
         StationRestAssuredCRUD.createStation("양재역");
 
-        Map<String, Object> param = new HashMap<>();
-        param.put("name", "신분당선");
-        param.put("color", "bg-red-600");
-        param.put("upStationId", 1);
-        param.put("downStationId", 2);
-        param.put("distance", 10);
-
-        ExtractableResponse<Response> createResponse = RestAssured
-                .given().log().all()
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                    .body(param)
-                .when()
-                    .post("/lines")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> createResponse = LineRestAssuredCRUD.createStation("신분당선", "bg-red-600", 1L, 2L, 10);
 
         Long createdId = createResponse.body().jsonPath().getLong("id");
 
         //when
-        Map<String, Object> editParam = new HashMap<>();
-        editParam.put("name", "수인분당선");
-        editParam.put("color", "bg-yellow-600");
-
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                    .pathParam("id", createdId)
-                    .body(editParam)
-                .when()
-                    .put("/lines/{id}")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> modifyResponse = LineRestAssuredCRUD.modifyStation(createdId, "수인분당선", "bg-yellow-600");
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(modifyResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
-        ExtractableResponse<Response> modifyResponse = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .pathParam("id", createdId)
-                .when()
-                .get("/lines/{id}")
-                .then().log().all()
-                .extract();
-
-        String name = modifyResponse.jsonPath().getString("name");
+        String name = LineRestAssuredCRUD.showStation(createdId).jsonPath().getString("name");
         assertThat(name).isEqualTo("수인분당선");
     }
 
@@ -256,46 +137,18 @@ public class LineAcceptanceTest {
         StationRestAssuredCRUD.createStation("강남역");
         StationRestAssuredCRUD.createStation("양재역");
 
-        Map<String, Object> param = new HashMap<>();
-        param.put("name", "신분당선");
-        param.put("color", "bg-red-600");
-        param.put("upStationId", 1);
-        param.put("downStationId", 2);
-        param.put("distance", 10);
 
-        ExtractableResponse<Response> createResponse = RestAssured
-                .given().log().all()
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                    .body(param)
-                .when()
-                    .post("/lines")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> createResponse = LineRestAssuredCRUD.createStation("신분당선", "bg-red-600", 1L, 2L, 10);
 
         Long createdId = createResponse.body().jsonPath().getLong("id");
 
         //when
-        ExtractableResponse<Response> deleteResponse = RestAssured
-                .given().log().all()
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                    .pathParam("id", createdId)
-                .when()
-                    .delete("/lines/{id}")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> deleteResponse = LineRestAssuredCRUD.deleteStation(createdId);
 
         // then
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
-        ExtractableResponse<Response> resultResponse = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .get("/lines")
-                .then().log().all()
-                .extract();
-
-        List<String> names = resultResponse.jsonPath().getList("name", String.class);
+        List<String> names = LineRestAssuredCRUD.showStationList().jsonPath().getList("name", String.class);
         assertThat(names).doesNotContain("신분당선");
     }
 }
