@@ -369,6 +369,137 @@ public class LineAcceptanceTest {
         }
     }
 
+    @DisplayName("지하철 구간 제거")
+    @Nested
+    class RemoveSection {
+
+        /**
+         * Given 3개의 지하철 역(A, B, C)이 등록되어 있다.
+         * And 1개의 지하철 노선이 등록되어 있다.
+         * And 지하철 노선에 2개의 구간(A-B, B-C)이 등록되어 있다.
+         * When 지하철 노선에서 하행 종착역(C)을 이용해서 구간(B-C)을 제거한다.
+         * Then 지하철 노선에 남은 구간 목록은 1개(A-B)이다.
+         */
+        @DisplayName("지하철 노선에서 구간을 제거한다.")
+        @Test
+        void success() {
+            // given
+            ExtractableResponse<Response> 건대입구역 = createStation("건대입구역");
+            String 건대입구역_ID = 건대입구역.jsonPath().getString("id");
+            ExtractableResponse<Response> 구의역 = createStation("구의역");
+            String 구의역_ID = 구의역.jsonPath().getString("id");
+            ExtractableResponse<Response> 강남역 = createStation("강남역");
+            String 강남역_ID = 강남역.jsonPath().getString("id");
+
+            ExtractableResponse<Response> 이호선 = createLine(
+                    "2호선",
+                    "bg-green-000",
+                    건대입구역_ID,
+                    구의역_ID,
+                    "10"
+            );
+            String 이호선_ID = 이호선.jsonPath().getString("id");
+
+            ExtractableResponse<Response> 건대입구역_구의역_구간 = addSection(이호선_ID, 구의역_ID, 강남역_ID, "10");
+
+            // when
+            ExtractableResponse<Response> response =
+                    RestAssured.given().log().all()
+                            .contentType(MediaType.APPLICATION_JSON_VALUE)
+                            .when().delete("/lines/{lineId}/sections?stationId={stationId}", 강남역_ID)
+                            .then().log().all()
+                            .extract();
+
+            // then
+            assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+            ExtractableResponse<Response> loadLine = loadLine(Long.valueOf(이호선_ID));
+            assertThat(loadLine.jsonPath().getList("stations")).hasSize(2);
+            assertThat(loadLine.jsonPath().getList("stations.id", String.class)).containsExactly(건대입구역_ID, 구의역_ID);
+            assertThat(loadLine.jsonPath().getList("stations.name", String.class)).containsExactly("건대입구역", "구의역");
+        }
+
+        /**
+         * Given 3개의 지하철 역(A, B, C)이 등록되어 있다.
+         * And 1개의 지하철 노선이 등록되어 있다.
+         * And 지하철 노선에 2개의 구간(A-B, B-C)이 등록되어 있다.
+         * When 지하철 노선에서 하행 종착역이 아닌 역(B)을 이용해서 구간을 제거한다.
+         * Then 지하철 노선의 가장 마지막 구간이 아니므로 에러가 발생한다.
+         */
+        @DisplayName("지하철 노선에서 하행 종착역이 아닌 역을 이용해서 구간을 제거하면 에러가 발생한다.")
+        @Test
+        void invalidLastStationError() {
+            // given
+            ExtractableResponse<Response> 건대입구역 = createStation("건대입구역");
+            String 건대입구역_ID = 건대입구역.jsonPath().getString("id");
+            ExtractableResponse<Response> 구의역 = createStation("구의역");
+            String 구의역_ID = 구의역.jsonPath().getString("id");
+            ExtractableResponse<Response> 강남역 = createStation("강남역");
+            String 강남역_ID = 강남역.jsonPath().getString("id");
+
+            ExtractableResponse<Response> 이호선 = createLine(
+                    "2호선",
+                    "bg-green-000",
+                    건대입구역_ID,
+                    구의역_ID,
+                    "10"
+            );
+            String 이호선_ID = 이호선.jsonPath().getString("id");
+
+            ExtractableResponse<Response> 건대입구역_구의역_구간 = addSection(이호선_ID, 구의역_ID, 강남역_ID, "10");
+
+            // when
+            ExtractableResponse<Response> response =
+                    RestAssured.given().log().all()
+                            .contentType(MediaType.APPLICATION_JSON_VALUE)
+                            .when().delete("/lines/{lineId}/sections?stationId={stationId}", 구의역_ID)
+                            .then().log().all()
+                            .extract();
+
+            // then
+            assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+            assertThat(response.body().asString()).isEqualTo("노선의 하행 종착역만 삭제할 수 있습니다. stationId: " + 구의역_ID);
+        }
+
+        /**
+         * Given 3개의 지하철 역(A, B, C)이 등록되어 있다.
+         * And 1개의 지하철 노선이 등록되어 있다.
+         * And 지하철 노선에 1개의 구간(A-B)이 등록되어 있다.
+         * When 지하철 노선에서 하행 종착역(B)을 이용해서 구간을 제거한다.
+         * Then 지하철 노선에 구간이 1개뿐인 경우 구간을 제거할 수 없어 에러가 발생한다.
+         */
+        @DisplayName("지하철 노선에서 구간이 1개뿐인 경우 구간을 제거할 수 없어 에러가 발생한다.")
+        @Test
+        void invalidSectionSizeError() {
+            // given
+            ExtractableResponse<Response> 건대입구역 = createStation("건대입구역");
+            String 건대입구역_ID = 건대입구역.jsonPath().getString("id");
+            ExtractableResponse<Response> 구의역 = createStation("구의역");
+            String 구의역_ID = 구의역.jsonPath().getString("id");
+
+            ExtractableResponse<Response> 이호선 = createLine(
+                    "2호선",
+                    "bg-green-000",
+                    건대입구역_ID,
+                    구의역_ID,
+                    "10"
+            );
+            String 이호선_ID = 이호선.jsonPath().getString("id");
+
+            // when
+            ExtractableResponse<Response> response =
+                    RestAssured.given().log().all()
+                            .contentType(MediaType.APPLICATION_JSON_VALUE)
+                            .when().delete("/lines/{lineId}/sections?stationId={stationId}", 구의역_ID)
+                            .then().log().all()
+                            .extract();
+
+            // then
+            assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+            assertThat(response.body().asString()).isEqualTo("노선에 남은 구간이 1개뿐이라 삭제할 수 없습니다.");
+        }
+    }
+
+
     private ExtractableResponse<Response> createStation(String stationName) {
         StationRequest request = new StationRequest(stationName);
         return RestAssured.given().log().all()
