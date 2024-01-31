@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,6 +57,30 @@ public class StationAcceptanceTest {
      * Then 2개의 지하철역을 응답 받는다
      */
     // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
+    @DisplayName("지하철역을 조회한다.")
+    @Test
+    void getStations(){
+        // given
+        String stationName1 = "강남역";
+        String stationName2 = "역삼역";
+
+        Map<String, String> params1 = new HashMap<>();
+        params1.put("name", stationName1);
+        createStation(params1);
+        Map<String, String> params2 = new HashMap<>();
+        params2.put("name", stationName2);
+        createStation(params2);
+
+        // when
+        List<String> stationNames =
+                RestAssured.given().log().all()
+                        .when().get("/stations")
+                        .then().log().all()
+                        .extract().jsonPath().getList("name", String.class);
+        //then
+        assertThat(stationNames.size()).isEqualTo(2);
+        assertThat(stationNames).containsAnyOf(stationName1, stationName2);
+    }
 
     /**
      * Given 지하철역을 생성하고
@@ -63,5 +88,38 @@ public class StationAcceptanceTest {
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
     // TODO: 지하철역 제거 인수 테스트 메서드 생성
+    @DisplayName("지하철역을 삭제한다.")
+    @Test
+    void deleteStation() {
+        // given
+        String stationName = "강남역";
+        Map<String, String> params = new HashMap<>();
+        params.put("name", stationName);
+        ExtractableResponse<Response> response = createStation(params);
 
+        // when
+        Long stationId = response.as(StationResponse.class).getId();
+        ExtractableResponse<Response> deleteResponse = RestAssured.given().log().all()
+                .when().delete("/stations/" + stationId)
+                .then().log().all()
+                .extract();
+
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        //then
+        List<String> responseList = RestAssured.given().log().all()
+                .when().get("/stations")
+                .then().log().all()
+                .extract().jsonPath().get("name");
+        assertThat(responseList).doesNotContain(stationName);
+    }
+
+    private ExtractableResponse<Response> createStation(Map<String, String> params) {
+        return RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+    }
 }
