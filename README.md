@@ -81,8 +81,8 @@ host: localhost:52165
 
 - [x] 구간 등록
   - [x] GIVEN  지하철 노선을 생성하고</br>
-    WHEN  노선을 수정하면</br>
-    THEN   수정된 노선이 조회 된다
+    WHEN  지하철 노선에 구간을 추가하면</br>
+    THEN   수정된 구간을 조회 할 수 있다
   - [x] GIVEN  지하철 노선을 생성하고</br>
     WHEN  새로운 구간의 상행역이 기존의 하행역과 일치 하지 않는다면</br>
     THEN   BadRequest(400) HTTP STATUS 가 발생한다
