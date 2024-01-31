@@ -7,8 +7,9 @@ import subway.line.dto.LineResponse;
 import subway.line.dto.LineUpdateRequest;
 import subway.line.dto.SectionRequest;
 import subway.line.entity.Line;
+import subway.line.entity.Section;
 import subway.line.repository.LineRepository;
-import subway.station.dto.StationResponse;
+import subway.line.repository.SectionRepository;
 import subway.station.entity.Station;
 import subway.station.repository.StationRepository;
 
@@ -22,10 +23,12 @@ public class LineService {
 
     private final LineRepository lineRepository;
     private final StationRepository stationRepository;
+    private final SectionRepository sectionRepository;
 
-    public LineService(LineRepository lineRepository, StationRepository stationRepository) {
+    public LineService(final LineRepository lineRepository, final StationRepository stationRepository, final SectionRepository sectionRepository) {
         this.lineRepository = lineRepository;
         this.stationRepository = stationRepository;
+        this.sectionRepository = sectionRepository;
     }
 
     @Transactional
@@ -37,6 +40,8 @@ public class LineService {
         final int lineDistance = request.getDistance();
 
         final Line newLine = new Line(lineName, lineColor, upStation, downStation, lineDistance);
+        final Section section = new Section(newLine, upStation, downStation, lineDistance);
+        newLine.getSections().add(section);
         final Line savedLine = lineRepository.save(newLine);
 
         return LineResponse.convertToDto(savedLine);
@@ -79,8 +84,43 @@ public class LineService {
                 .orElseThrow(() -> new EntityNotFoundException("Line not found. Line Id: " + lindId));
     }
 
-    public LineResponse createLineSection(final Long id, final SectionRequest request) {
-        return new LineResponse(1L, "신분당선", "B", List.of(new StationResponse(1L, "C")));
+    @Transactional
+    public LineResponse createLineSection(final Long lineId, final SectionRequest request) {
+        final Line line = this.findLineById(lineId);
+
+        if (this.isSectionRegistered(request, line)) {
+            throw new IllegalArgumentException();
+        }
+
+        this.validateNoDuplicateDownStation(request);
+
+        final Station requestUpStation = this.findStationById(request.getUpStationId());
+        final Station requestDownStation = this.findStationById(request.getDownStationId());
+
+        final Section section = new Section(line, requestUpStation, requestDownStation, request.getDistance());
+        sectionRepository.save(section);
+
+        line.changeDownStation(requestDownStation, request.getDistance());
+
+        return LineResponse.convertToDto(line);
+    }
+
+    private void validateNoDuplicateDownStation(final SectionRequest request) {
+        final List<Section> SectionListByDownStationId = sectionRepository.findByDownStation_Id(request.getDownStationId());
+        for (Section section : SectionListByDownStationId) {
+            if(this.isAlreadyRegistered(request, section)) {
+                throw new IllegalArgumentException();
+            }
+        }
+    }
+
+    private boolean isAlreadyRegistered(final SectionRequest request, final Section section) {
+        return request.getUpStationId().equals(section.getDownStation().getId());
+    }
+
+    private boolean isSectionRegistered(final SectionRequest request, final Line line) {
+        return request.getDownStationId().equals(line.getDownStation().getId())
+                && request.getUpStationId().equals(line.getUpStation().getId());
     }
 
 }

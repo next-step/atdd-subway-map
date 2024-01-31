@@ -46,7 +46,7 @@ public class SectionAcceptanceTest extends BaseTest{
     /**
      * Given 1개의 지하철 노선을 등록하고
      * When 지하철 노선에 구간을 등록하면
-     * Then 지하철 구간 조회 시 생성한 구간을 찾을 수 있다
+     * Then 지하철 노선 조회 시 새로운 구간의 하행역을 찾을 수 있다
      */
     @DisplayName("지하철 구간을 생성한다.")
     @Test
@@ -64,6 +64,9 @@ public class SectionAcceptanceTest extends BaseTest{
         // then
         final String lineName = createSectionResponse.get("name");
         assertThat(lineName).isEqualTo("신분당선");
+
+        final String newDownStationName = createSectionResponse.get("stations[1].name");
+        assertThat(newDownStationName).isEqualTo("지하철역");
     }
 
     /**

@@ -3,6 +3,8 @@ package subway.line.entity;
 import subway.station.entity.Station;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Line {
@@ -28,6 +30,9 @@ public class Line {
     @Column(nullable = false)
     private int distance;
 
+    @OneToMany(mappedBy = "line", cascade = CascadeType.ALL)
+    private List<Section> sections = new ArrayList<>();
+
     protected Line() {
     }
 
@@ -42,6 +47,11 @@ public class Line {
     public void updateDetails(String name, String color) {
         this.name = name;
         this.color = color;
+    }
+
+    public void changeDownStation(Station newDownStation, final int distance) {
+        this.downStation = newDownStation;
+        this.distance += distance;
     }
 
     public Long getId() {
@@ -66,6 +76,10 @@ public class Line {
 
     public int getDistance() {
         return distance;
+    }
+
+    public List<Section> getSections() {
+        return sections;
     }
 
     @Override
