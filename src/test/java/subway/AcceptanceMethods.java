@@ -66,4 +66,25 @@ public class AcceptanceMethods {
                 .statusCode(HttpStatus.OK.value())
                 .extract();
     }
+
+    public static void removeSection(Long stationId, Long lineId) {
+        RestAssured
+                .given()
+                .param("stationId", stationId)
+                .when()
+                .delete("/lines/" + lineId + "/sections")
+                .then()
+                .statusCode(HttpStatus.NO_CONTENT.value());
+    }
+
+    public static ExtractableResponse<Response> getLineSections(Long lineId) {
+        ExtractableResponse<Response> response = RestAssured
+                .given()
+                .when()
+                .get("/lines/" + lineId + "/sections")
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract();
+        return response;
+    }
 }

@@ -113,26 +113,66 @@ public class SectionAcceptanceTest {
         Long lineId = makeLine(new LineRequest("신분당선", "bg-red-600", stationId1, stationId2, 10L)).jsonPath().getLong("id");
         makeSection(lineId, new SectionRequest(stationId2, stationId3, 13L));
 
-        System.out.println("------ REST delete ------");
         // when
-        RestAssured
-                .given()
-                .param("stationId", stationId3)
-                .when()
-                .delete("/lines/" + lineId + "/sections")
-                .then()
-                .statusCode(HttpStatus.NO_CONTENT.value());
-        System.out.println("------ REST delete end ------");
+        removeSection(stationId3, lineId);
+
         // then
-        ExtractableResponse<Response> response = RestAssured
-                .given()
-                .when()
-                .get("/lines/" + lineId + "/sections")
-                .then().log().all()
-                .statusCode(HttpStatus.OK.value())
-                .extract();
+        ExtractableResponse<Response> response = getLineSections(lineId);
 
         assertThat(response.jsonPath().getLong("downStationId")).isEqualTo(stationId2);
         assertThat(response.jsonPath().getList("sections.id", Long.class)).doesNotContain(stationId3);
+    }
+
+
+    /**
+     * 2개의 지하철 구간을 등록하고
+     * 하행 종점역이 아닌 역을 제거하면
+     * 구간 제거 에러가 발생한다.
+     */
+    @DisplayName("에러_지하철 노선 제거_하행 종점역이 아닌 역 제거")
+    @Test
+    void deleteSectionError_isNotCurrentDownStation() {
+        // given
+        Long stationId1 = makeStation("gangnam").jsonPath().getLong("id");
+        Long stationId2 = makeStation("yeoksam").jsonPath().getLong("id");
+        Long stationId3 = makeStation("samseong").jsonPath().getLong("id");
+
+        Long lineId = makeLine(new LineRequest("신분당선", "bg-red-600", stationId1, stationId2, 10L)).jsonPath().getLong("id");
+        makeSection(lineId, new SectionRequest(stationId2, stationId3, 13L));
+
+        // when
+        // then
+        RestAssured
+                .given()
+                .param("stationId", stationId2)
+                .when()
+                .delete("/lines/" + lineId + "/sections")
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value());
+    }
+
+    /**
+     * given 1개의 지하철 구간을 등록하고
+     * when 하행 종점역인 구간을 제거하면
+     * then 구간 제거 에러가 발생한다.
+     */
+    @DisplayName("에러_지하철 노선 제거_상행 종점역과 하행 종점역만 존재")
+    @Test
+    void deleteSectionError_justOneSection() {
+        // given
+        Long stationId1 = makeStation("gangnam").jsonPath().getLong("id");
+        Long stationId2 = makeStation("yeoksam").jsonPath().getLong("id");
+
+        Long lineId = makeLine(new LineRequest("신분당선", "bg-red-600", stationId1, stationId2, 10L)).jsonPath().getLong("id");
+
+        // when
+        // then
+        RestAssured
+                .given()
+                .param("stationId", stationId2)
+                .when()
+                .delete("/lines/" + lineId + "/sections")
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value());
     }
 }
