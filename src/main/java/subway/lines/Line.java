@@ -67,6 +67,10 @@ public class Line {
         this.distance = distance;
     }
 
+    public void addSection(Section section) {
+        this.sections.add(section);
+    }
+
     public Long getDownStationId() {
         return downStationId;
     }

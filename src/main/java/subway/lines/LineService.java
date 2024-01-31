@@ -31,24 +31,15 @@ public class LineService {
 
     @Transactional
     public LineResponse saveLine(LineCreateRequest lineCreateRequest) {
-        final Line line = lineRepository.save(
-            new Line(
-                lineCreateRequest.getName(),
-                lineCreateRequest.getColor(),
-                lineCreateRequest.getUpStationId(),
-                lineCreateRequest.getDownStationId(),
-                lineCreateRequest.getDistance()
-            )
-        );
+        final Line line = lineRepository.save(lineCreateRequest.getLine());
 
-        sectionRepository.save(
-            new Section(
-                line,
-                lineCreateRequest.getUpStationId(),
-                lineCreateRequest.getDownStationId(),
-                lineCreateRequest.getDistance()
-            )
+        final Section section = new Section(
+            lineCreateRequest.getUpStationId(),
+            lineCreateRequest.getDownStationId(),
+            lineCreateRequest.getDistance()
         );
+        section.updateLine(line);
+        sectionRepository.save(section);
 
         return createLineResponse(line);
     }
@@ -92,7 +83,10 @@ public class LineService {
 
         line.validateSectionToAdd(sectionAddRequest);
 
-        final Section section = sectionRepository.save(sectionAddRequest.getSection(line));
+        final Section section = sectionAddRequest.getSection();
+        section.updateLine(line);
+        sectionRepository.save(section);
+
         line.updateSectionInfo(section.getDownStationId(), line.getDistance() + section.getDistance());
 
         return createLineResponse(line);

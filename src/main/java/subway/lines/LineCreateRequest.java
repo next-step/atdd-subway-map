@@ -41,4 +41,8 @@ public class LineCreateRequest {
     public Long getDistance() {
         return distance;
     }
+
+    public Line getLine() {
+        return new Line(name, color, upStationId, downStationId, distance);
+    }
 }
