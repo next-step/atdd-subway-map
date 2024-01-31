@@ -5,6 +5,7 @@ import subway.line.section.*;
 import subway.station.Station;
 import subway.station.StationNotFoundException;
 import subway.station.StationRepository;
+import subway.station.StationRequest;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
@@ -28,7 +29,7 @@ public class LineService {
         return new LineResponse(line.getId(), line.getName(), line.getColor(), List.of(line.getUpStation(), line.getDownStation()));
     }
 
-    public LineResponse createLine(LineRequest lineRequest) throws StationNotFoundException {
+    public LineResponse createLine(LineRequest lineRequest) throws StationNotFoundException, CannotAddSectionException {
         Station upStation = stationRepository.findById(lineRequest.getUpStationId()).orElseThrow(StationNotFoundException::new);
         Station downStation = stationRepository.findById(lineRequest.getDownStationId()).orElseThrow(StationNotFoundException::new);
         Line line = new Line(lineRequest.getName(), lineRequest.getColor(), upStation, downStation, lineRequest.getDistance());
@@ -75,20 +76,18 @@ public class LineService {
         return new LineSectionResponse(line.getId(), line.getName(), line.getUpStation().getId(), line.getDownStation().getId(), sectionResponses);
     }
 
-    public LineSectionResponse addLineSection(Long id, SectionRequest sectionRequest) throws Exception {
+    public LineSectionResponse addLineSection(Long id, SectionRequest sectionRequest) throws CannotAddSectionException {
         Line line = lineRepository.findById(id).get();
-        if (!line.isCurrentDownStationId(sectionRequest.getUpStationId())) {
-            throw new Exception("새 구간의 상행역이 현재 노선의 하행 종점역이 아닙니다.");
-        }
         Station downStation = stationRepository.findById(sectionRequest.getDownStationId()).get();
-        line.setDownStation(downStation);
+
+        line.changeDownStation(sectionRequest.getUpStationId(), downStation);
         Long increasedDistance = line.changeDistance(sectionRequest.getDistance());
 
         Section section = new Section(new SectionId(line.getId(), sectionRequest.getDownStationId()), increasedDistance);
         section.setLine(line);
         section.setStation(downStation);
-        sectionRepository.save(section);
 
+        sectionRepository.save(section);
         return createLineSectionResponse(line);
     }
 }

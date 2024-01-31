@@ -6,6 +6,7 @@ import io.restassured.response.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import subway.line.LineRequest;
+import subway.line.section.SectionRequest;
 
 import java.util.Map;
 
@@ -50,6 +51,18 @@ public class AcceptanceMethods {
                 .when()
                 .get("/lines")
                 .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract();
+    }
+
+    public static ExtractableResponse<Response> makeSection(Long lineId, SectionRequest sectionRequest) {
+        return RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(sectionRequest)
+                .when().log().all()
+                .post("/lines/" + lineId + "/sections")
+                .then()
                 .statusCode(HttpStatus.OK.value())
                 .extract();
     }

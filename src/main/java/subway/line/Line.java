@@ -1,5 +1,7 @@
 package subway.line;
 
+import org.springframework.http.HttpStatus;
+import subway.line.section.CannotAddSectionException;
 import subway.line.section.Section;
 import subway.station.Station;
 
@@ -81,10 +83,6 @@ public class Line {
         this.color = color;
     }
 
-    public void setDownStation(Station downStation) {
-        this.downStation = downStation;
-    }
-
     public void setDistance(Long distance) {
         this.distance = distance;
     }
@@ -93,12 +91,20 @@ public class Line {
         return downStation.getId().equals(upStationId);
     }
 
-    public Long changeDistance(Long distance) throws Exception {
+    public Long changeDistance(Long distance) throws CannotAddSectionException {
         long increasedDistance = distance - this.distance;
         if (increasedDistance < 0) {
-            throw new Exception("총 구간 길이가 이전의 길이보다 작습니다.");
+            throw new CannotAddSectionException("총 구간 길이가 이전의 길이보다 작습니다.");
         }
+
         this.distance = distance;
         return increasedDistance;
+    }
+
+    public void changeDownStation(Long upStationId, Station downStation) throws CannotAddSectionException {
+        if (!isCurrentDownStationId(upStationId)) {
+            throw new CannotAddSectionException("새 구간의 상행역이 현재 노선의 하행 종점역이 아닙니다.");
+        }
+        this.downStation = downStation;
     }
 }

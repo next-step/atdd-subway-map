@@ -2,7 +2,6 @@ package subway.line.section;
 
 import com.sun.istack.NotNull;
 import org.hibernate.annotations.CreationTimestamp;
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.domain.Persistable;
 import subway.line.Line;
 import subway.station.Station;
@@ -10,6 +9,7 @@ import subway.station.Station;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 public class Section implements Persistable {
@@ -43,7 +43,7 @@ public class Section implements Persistable {
         this.distanceFromPrev = distanceFromPrev;
     }
 
-    public static List<Section> firstSectionsOf(Line line) {
+    public static List<Section> firstSectionsOf(Line line) throws CannotAddSectionException {
         Section up = new Section(line, line.getUpStation(), 0L);
         Section down = new Section(line, line.getDownStation(), line.getDistance());
 
@@ -80,15 +80,42 @@ public class Section implements Persistable {
         return createdAt == null;
     }
 
-    public void setLine(@NotNull Line line) {
+    public void setLine(@NotNull Line line) throws CannotAddSectionException {
         if (this.line != null) {
             this.line.getSections().remove(line);
         }
         this.line = line;
-        line.getSections().add(this);
+
+        List<Section> sections = line.getSections();
+        if (sections.contains(this)) {
+            throw new CannotAddSectionException("이미 등록된 역은 구간으로 추가할 수 없습니다.");
+        }
+        sections.add(this);
     }
 
     public void setStation(Station station) {
         this.station = station;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Section section = (Section) o;
+        return Objects.equals(sectionId, section.sectionId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(sectionId);
+    }
+
+    @Override
+    public String toString() {
+        return "Section{" +
+                "sectionId=" + sectionId +
+                ", distanceFromPrev=" + distanceFromPrev +
+                ", createdAt=" + createdAt +
+                '}';
     }
 }
