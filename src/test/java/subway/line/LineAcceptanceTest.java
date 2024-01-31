@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
+import subway.testhelper.JsonPathHelper;
 import subway.testhelper.LineApiCaller;
 import subway.testhelper.StationApiCaller;
 
@@ -39,13 +40,13 @@ public class LineAcceptanceTest {
     void setUpClass() {
         Map<String, String> params = new HashMap<>();
         params.put("name", "강남역");
-        강남역_ID = getId(StationApiCaller.지하철_역_생성(params));
+        강남역_ID = JsonPathHelper.getObject(StationApiCaller.지하철_역_생성(params), "id", Long.class);
         params.put("name", "삼성역");
-        삼성역_ID = getId(StationApiCaller.지하철_역_생성(params));
+        삼성역_ID = JsonPathHelper.getObject(StationApiCaller.지하철_역_생성(params), "id", Long.class);
         params.put("name", "선릉역");
-        선릉역_ID = getId(StationApiCaller.지하철_역_생성(params));
+        선릉역_ID = JsonPathHelper.getObject(StationApiCaller.지하철_역_생성(params), "id", Long.class);
         params.put("name", "교대역");
-        교대역_ID = getId(StationApiCaller.지하철_역_생성(params));
+        교대역_ID = JsonPathHelper.getObject(StationApiCaller.지하철_역_생성(params), "id", Long.class);
 
         신분당선 = new HashMap<>();
         신분당선.put("name", "신분당선");
@@ -77,10 +78,6 @@ public class LineAcceptanceTest {
         삼성역_부터_강남역_구간.put("distance", "10");
     }
 
-    private Long getId(ExtractableResponse<Response> response) {
-        return response.jsonPath().getObject("id", Long.class);
-    }
-
     /**
      * When 지하철 노선을 생성하면
      * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
@@ -93,7 +90,7 @@ public class LineAcceptanceTest {
 
         // then
         ExtractableResponse<Response> response = LineApiCaller.지하철_노선들_조회();
-        List<String> actual = response.jsonPath().getList("name", String.class);
+        List<String> actual = JsonPathHelper.getAll(response, "name", String.class);
         String expected = "신분당선";
         assertThat(actual).containsAnyOf(expected);
     }
@@ -112,7 +109,7 @@ public class LineAcceptanceTest {
 
         // when
         ExtractableResponse<Response> response = LineApiCaller.지하철_노선들_조회();
-        List<String> actual = response.jsonPath().getList("name", String.class);
+        List<String> actual = JsonPathHelper.getAll(response, "name", String.class);
 
         // then
         String[] expected = {"신분당선", "0호선"};
@@ -135,7 +132,7 @@ public class LineAcceptanceTest {
         response = LineApiCaller.지하철_노선_조회(location);
 
         // then
-        String actual = response.jsonPath().getObject("name", String.class);
+        String actual = JsonPathHelper.getObject(response, "name", String.class);
         String expected = "신분당선";
         assertThat(actual).isEqualTo(expected);
     }
@@ -154,11 +151,11 @@ public class LineAcceptanceTest {
 
         // when
         LineUpdateRequest request = new LineUpdateRequest("다른분당선", "bg-red-600");
-        response = LineApiCaller.지하철_노선_수정(request, location);
+        LineApiCaller.지하철_노선_수정(request, location);
 
         // then
         response = LineApiCaller.지하철_노선_조회(location);
-        LineResponse actual = response.jsonPath().getObject(".", LineResponse.class);
+        LineResponse actual = JsonPathHelper.getObject(response, ".", LineResponse.class);
         String expectedName = "다른분당선";
         String expectedColor = "bg-red-600";
         assertThat(actual.getName()).isEqualTo(expectedName);
@@ -182,7 +179,7 @@ public class LineAcceptanceTest {
 
         // then
         response = LineApiCaller.지하철_노선들_조회();
-        List<LineResponse> actual = response.jsonPath().getList(".", LineResponse.class);
+        List<LineResponse> actual = JsonPathHelper.getAll(response, ".", LineResponse.class);
         List<LineResponse> expected = Collections.emptyList();
         assertThat(actual).containsAll(expected);
     }
@@ -204,7 +201,7 @@ public class LineAcceptanceTest {
 
         // then
         response = LineApiCaller.지하철_노선_조회(location);
-        List<Long> actual = response.jsonPath().getList("stations.id", Long.class);
+        List<Long> actual = JsonPathHelper.getAll(response, "stations.id", Long.class);
         Long[] expected = {강남역_ID, 삼성역_ID, 선릉역_ID};
         assertThat(actual).containsExactly(expected);
     }
@@ -285,7 +282,7 @@ public class LineAcceptanceTest {
 
         // then
         response = LineApiCaller.지하철_노선_조회(location);
-        List<Long> actual = response.jsonPath().getList("stations.id", Long.class);
+        List<Long> actual = JsonPathHelper.getAll(response, "stations.id", Long.class);
         Long[] expected = {강남역_ID, 삼성역_ID};
         assertThat(actual).containsExactly(expected);
     }
