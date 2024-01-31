@@ -33,9 +33,8 @@ public class Line {
     @Column(nullable = false)
     private Integer distance;
 
-    public Line updateLine(LineRequest req) {
-        this.name = req.getName();
-        this.color = req.getColor();
-        return this;
+    public void updateLine(final String name, final String color) {
+        this.name = name;
+        this.color = color;
     }
 }

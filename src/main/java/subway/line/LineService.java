@@ -40,10 +40,10 @@ public class LineService {
                 .orElseThrow(RuntimeException::new);
     }
 
-    public void updateLineById(Long id, LineRequest lineRequest) {
-        lineRepository.findById(id)
-                .map(line -> line.updateLine(lineRequest))
-                .orElseThrow(RuntimeException::new);
+    public void updateLineById(Long id, LineUpdateRequest lineUpdateRequest) {
+        Line line = lineRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 노선입니다."));
+        line.updateLine(lineUpdateRequest.getName(), lineUpdateRequest.getColor());
     }
 
     public void deleteLineById(Long id) {
