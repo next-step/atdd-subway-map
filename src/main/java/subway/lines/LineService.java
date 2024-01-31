@@ -50,10 +50,7 @@ public class LineService {
     }
 
     public LineResponse getLine(Long id) {
-        final Line line = lineRepository.findById(id).orElse(null);
-        if (line == null) {
-            return null;
-        }
+        final Line line = lineRepository.findById(id).orElseThrow(EntityNotFoundException::new);
 
         return createLineResponse(line);
     }
