@@ -1,5 +1,6 @@
 package subway.exceptions;
 
+import javax.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -8,14 +9,14 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(BadRequestException.class)
-    protected ResponseEntity<ErrorResponse> handleAccessDeniedException(BadRequestException e) {
+    @ExceptionHandler(IllegalArgumentException.class)
+    protected ResponseEntity<ErrorResponse> handleAccessDeniedException(IllegalArgumentException e) {
         final ErrorResponse response = ErrorResponse.of(ErrorCode.INVALID_INPUT_VALUE);
         return new ResponseEntity<>(response, HttpStatus.valueOf(ErrorCode.INVALID_INPUT_VALUE.getStatus()));
     }
 
-    @ExceptionHandler(NotFoundException.class)
-    protected ResponseEntity<ErrorResponse> handleBusinessException(final NotFoundException e) {
+    @ExceptionHandler(EntityNotFoundException.class)
+    protected ResponseEntity<ErrorResponse> handleBusinessException(final EntityNotFoundException e) {
         final ErrorResponse response = ErrorResponse.of(ErrorCode.NOT_FOUND);
         return new ResponseEntity<>(response, HttpStatus.valueOf(ErrorCode.NOT_FOUND.getStatus()));
     }

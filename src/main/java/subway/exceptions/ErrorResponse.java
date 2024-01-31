@@ -1,6 +1,7 @@
 package subway.exceptions;
 
 import java.util.List;
+import org.apache.catalina.connector.Response;
 
 public class ErrorResponse {
 
@@ -17,5 +18,17 @@ public class ErrorResponse {
         response.code = code.getCode();
 
         return response;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public String getCode() {
+        return code;
     }
 }
