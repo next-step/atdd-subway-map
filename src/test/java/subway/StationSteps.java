@@ -15,12 +15,12 @@ public class StationSteps {
     }
 
     static void 지하철_역_생성_요청(StationRequest request) {
-        given().log().all()
-                .body(request)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/stations")
-                .then().log().all()
-                .statusCode(HttpStatus.CREATED.value());
+        given()
+            .body(request)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+            .post("/stations")
+        .then()
+            .statusCode(HttpStatus.CREATED.value());
     }
 }
