@@ -30,4 +30,5 @@ public class StationTestUtil {
                 .then().log().all()
                 .extract().jsonPath().getList("name", String.class);
     }
+
 }

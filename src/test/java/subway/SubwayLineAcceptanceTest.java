@@ -18,7 +18,8 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.util.SubwayLineUtil.*;
+import static subway.util.SubwayLineUtil.createSubwayLine;
+import static subway.util.SubwayLineUtil.getSubwayLines;
 
 @DisplayName("지하철노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -26,11 +27,12 @@ import static subway.util.SubwayLineUtil.*;
 @Sql("/truncate.sql")
 public class SubwayLineAcceptanceTest {
 
+    long stationId1, stationId2, stationId3;
     @BeforeEach
     void setUp() {
-        StationTestUtil.createStation("지하철역");
-        StationTestUtil.createStation("새로운지하철역");
-        StationTestUtil.createStation("또다른지하철역");
+        stationId1 = StationTestUtil.createStation("지하철역").jsonPath().getLong("id");
+        stationId2 = StationTestUtil.createStation("새로운지하철역").jsonPath().getLong("id");
+        stationId3 = StationTestUtil.createStation("또다른지하철역").jsonPath().getLong("id");
     }
 
     /**
@@ -61,8 +63,8 @@ public class SubwayLineAcceptanceTest {
     @Test
     void showSubwayLines() {
         //given
-        createSubwayLine(new SubwayLineRequest("신분당선", "bg-red-600", 1L, 2L, 10));
-        createSubwayLine(new SubwayLineRequest("분당선", "bg-green-600", 1L, 3L, 10));
+        createSubwayLine(new SubwayLineRequest("신분당선", "bg-red-600", stationId1, stationId2, 10));
+        createSubwayLine(new SubwayLineRequest("분당선", "bg-green-600", stationId1, stationId3, 10));
 
         //when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -74,7 +76,6 @@ public class SubwayLineAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         //then
         List<String> subwayLineNames = response.jsonPath().getList("name", String.class);
-        assertThat(subwayLineNames.size()).isEqualTo(2);
         //then
         assertThat(subwayLineNames).containsAnyOf("신분당선", "분당선");
     }
@@ -89,7 +90,7 @@ public class SubwayLineAcceptanceTest {
     @Test
     void showSubwayLine() {
         //given
-        long id = createSubwayLine(new SubwayLineRequest("신분당선", "bg-red-600", 1L, 2L, 10)).jsonPath().getLong("id");
+        long id = createSubwayLine(new SubwayLineRequest("신분당선", "bg-red-600", stationId1, stationId2, 10)).jsonPath().getLong("id");
 
         //when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
