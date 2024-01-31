@@ -26,24 +26,6 @@ public class Line {
     protected Line() {
     }
 
-    public Line(Long id,
-                String name,
-                String color,
-                Sections sections,
-                Long distance) {
-        this.id = id;
-        this.name = name;
-        this.color = color;
-        this.sections = sections;
-        this.distance = distance;
-    }
-    public Line(String name,
-                String color,
-                Sections sections,
-                Long distance) {
-        this(0L, name, color, sections, distance);
-    }
-
     public Line(String name,
                 String color,
                 Station upStation,
