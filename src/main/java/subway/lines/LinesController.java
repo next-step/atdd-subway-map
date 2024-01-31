@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import subway.exceptions.BadRequestException;
 import subway.exceptions.NotFoundException;
 import subway.section.SectionAddRequest;
+import subway.section.SectionDeleteRequest;
 
 @RestController
 public class LinesController {
@@ -77,7 +78,7 @@ public class LinesController {
     @DeleteMapping("/lines/{id}/sections")
     public ResponseEntity<Void> deleteSection(@PathVariable Long id, @RequestParam Long stationId) {
         try {
-            lineService.deleteSection(id, stationId);
+            lineService.deleteSection(id, new SectionDeleteRequest(stationId));
 
             return ResponseEntity.noContent().build();
         } catch (IllegalArgumentException e) {

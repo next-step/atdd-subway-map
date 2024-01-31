@@ -3,7 +3,6 @@ package subway.lines;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.persistence.EntityNotFoundException;
@@ -11,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.section.Section;
 import subway.section.SectionAddRequest;
+import subway.section.SectionDeleteRequest;
 import subway.section.SectionRepository;
 import subway.station.Station;
 import subway.station.StationRepository;
@@ -41,15 +41,14 @@ public class LineService {
             )
         );
 
-        final Section section = sectionRepository.save(
+        sectionRepository.save(
             new Section(
+                line,
                 lineCreateRequest.getUpStationId(),
                 lineCreateRequest.getDownStationId(),
                 lineCreateRequest.getDistance()
             )
         );
-
-        section.updateLine(line);
 
         return createLineResponse(line);
     }
@@ -91,51 +90,23 @@ public class LineService {
     public LineResponse addSection(Long id, SectionAddRequest sectionAddRequest) {
         final Line line = lineRepository.findById(id).orElseThrow(EntityNotFoundException::new);
 
-        validateAddSectionCondition(sectionAddRequest, line);
+        line.validateSectionToAdd(sectionAddRequest);
 
-        final Section section = sectionRepository.save(
-            new Section(
-                sectionAddRequest.getUpStationId(),
-                sectionAddRequest.getDownStationId(),
-                sectionAddRequest.getDistance()
-            )
-        );
-        section.updateLine(line);
-        line.updatesSection(section.getDownStationId(), line.getDistance() + section.getDistance());
+        final Section section = sectionRepository.save(sectionAddRequest.getSection(line));
+        line.updateSectionInfo(section.getDownStationId(), line.getDistance() + section.getDistance());
 
         return createLineResponse(line);
     }
 
     @Transactional
-    public void deleteSection(Long id, Long stationId) {
-        Line line = lineRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+    public void deleteSection(Long id, SectionDeleteRequest sectionDeleteRequest) {
+        final Line line = lineRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+        line.validateSectionCanBeDeleted(sectionDeleteRequest);
 
-        validateDeleteSectionCondition(id, stationId, line);
+        final Section sectionToDelete = sectionRepository.findByLineIdAndDownStationId(id, sectionDeleteRequest.getStationId()).orElseThrow(EntityNotFoundException::new);
+        line.updateSectionInfo(sectionToDelete.getUpStationId(), line.getDistance() - sectionToDelete.getDistance());
 
-        final Section section = sectionRepository.findByLineIdAndDownStationId(id, stationId);
-        if(section == null) {
-            throw new EntityNotFoundException();
-        }
-
-        line.updatesSection(section.getUpStationId(), line.getDistance() - section.getDistance());
-        sectionRepository.deleteById(section.getId());
-    }
-
-    private void validateDeleteSectionCondition(Long id, Long stationId, Line line) {
-        final int numberOfSection = sectionRepository.countByLineId(id);
-        if(numberOfSection == 1) {
-            throw new IllegalArgumentException();
-        }
-
-        if(line.getDownStationId() != stationId) {
-            throw new IllegalArgumentException();
-        }
-    }
-
-    private static void validateAddSectionCondition(SectionAddRequest sectionAddRequest, Line line) {
-        if (!Objects.equals(line.getDownStationId(), sectionAddRequest.getUpStationId())) {
-            throw new IllegalArgumentException();
-        }
+        sectionRepository.deleteById(sectionToDelete.getId());
     }
 
     private LineResponse createLineResponse(Line line) {

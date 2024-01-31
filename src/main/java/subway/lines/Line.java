@@ -2,15 +2,17 @@ package subway.lines;
 
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import subway.section.Section;
-import subway.station.Station;
+import subway.section.SectionAddRequest;
+import subway.section.SectionDeleteRequest;
 
 @Entity
 public class Line {
@@ -60,13 +62,9 @@ public class Line {
         this.color = color;
     }
 
-    public void updatesSection(Long downStationId, Long distance) {
+    public void updateSectionInfo(Long downStationId, Long distance) {
         this.downStationId = downStationId;
         this.distance = distance;
-    }
-
-    public void addSection(Section section) {
-        this.sections.add(section);
     }
 
     public Long getDownStationId() {
@@ -75,5 +73,31 @@ public class Line {
 
     public List<Section> getSections() {
         return sections;
+    }
+
+    public void validateSectionToAdd(SectionAddRequest sectionAddRequest) {
+        final Set<Long> stationIdSet = new HashSet<>();
+        sections.forEach(section -> {
+            stationIdSet.add(section.getUpStationId());
+            stationIdSet.add(section.getDownStationId());
+        });
+
+        if (stationIdSet.contains(sectionAddRequest.getDownStationId())) {
+            throw new IllegalArgumentException();
+        }
+
+        if (!Objects.equals(downStationId, sectionAddRequest.getUpStationId())) {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    public void validateSectionCanBeDeleted(SectionDeleteRequest sectionDeleteRequest) {
+        if (sections.size() == 1) {
+            throw new IllegalArgumentException();
+        }
+
+        if(!Objects.equals(downStationId, sectionDeleteRequest.getStationId())) {
+            throw new IllegalArgumentException();
+        }
     }
 }

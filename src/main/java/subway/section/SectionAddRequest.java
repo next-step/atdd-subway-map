@@ -1,5 +1,9 @@
 package subway.section;
 
+import java.util.HashSet;
+import java.util.Set;
+import subway.lines.Line;
+
 public class SectionAddRequest {
     private Long upStationId;
     private Long downStationId;
@@ -22,5 +26,9 @@ public class SectionAddRequest {
 
     public Long getDistance() {
         return distance;
+    }
+
+    public Section getSection(Line line) {
+       return new Section(line, upStationId, downStationId, distance);
     }
 }
