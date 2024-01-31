@@ -1,7 +1,6 @@
 package subway.section;
 
 import subway.line.Line;
-import subway.line.exception.LineException;
 import subway.station.Station;
 
 import javax.persistence.*;

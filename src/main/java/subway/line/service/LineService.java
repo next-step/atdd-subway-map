@@ -9,7 +9,7 @@ import subway.line.dto.LineUpdateRequest;
 import subway.section.Section;
 import subway.section.SectionRepository;
 import subway.station.Station;
-import subway.station.StationDataService;
+import subway.station.service.StationDataService;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -49,19 +49,19 @@ public class LineService {
         Section section = new Section(request.getDistance(), upStation, downStation, savedLine);
         sectionRepository.save(section);
 
-        return lineDataService.mappingToLineResponse(savedLine);
+        return LineResponse.ofEntity(savedLine);
     }
 
     public List<LineResponse> findLines() {
         List<Line> lines = lineRepository.findAll();
 
-        return lines.stream().map(lineDataService::mappingToLineResponse).collect(Collectors.toList());
+        return lines.stream().map(LineResponse::ofEntity).collect(Collectors.toList());
     }
 
     public LineResponse findLine(Long id) {
         Line line = lineDataService.findLine(id);
 
-        return lineDataService.mappingToLineResponse(line);
+        return LineResponse.ofEntity(line);
     }
 
     public void updateLine(Long id, LineUpdateRequest request) {

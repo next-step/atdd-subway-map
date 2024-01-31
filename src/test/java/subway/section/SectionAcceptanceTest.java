@@ -12,7 +12,7 @@ import subway.TableTruncate;
 import subway.line.LineApiRequester;
 import subway.line.dto.LineCreateRequest;
 import subway.station.StationApiRequester;
-import subway.station.StationResponse;
+import subway.station.dto.StationResponse;
 import subway.util.JsonPathUtil;
 
 import java.util.List;
