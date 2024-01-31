@@ -56,11 +56,12 @@ public class LineService {
     }
 
     @Transactional
-    public void addSection(Long id,
+    public LineResponse addSection(Long id,
                            SectionsUpdateRequest sectionsUpdateRequest) {
         Line line = getLine(id);
         line.addSection(createSection(sectionsUpdateRequest));
         lineRepository.save(line);
+        return createLineResponse(line);
     }
 
     @Transactional
