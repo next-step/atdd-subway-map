@@ -35,30 +35,21 @@ public class SubwaySectionAcceptanceTest {
     Long lineId;
 
     @Autowired
-    private StationRepository stationRepository;
-
-    @Autowired
-    private LineService lineService;
-
-    @Autowired
     private DatabaseCleaner databaseCleaner;
 
     @BeforeEach
     void setUp() {
-        upStationId = stationRepository.save(new Station("역1")).getId();
-        downStationId = stationRepository.save(new Station("역2")).getId();
-        extraStationId = stationRepository.save(new Station("역3")).getId();
+        upStationId = StationApiRequester.createStation("역1").jsonPath().getLong("id");
+        downStationId = StationApiRequester.createStation("역2").jsonPath().getLong("id");
+        extraStationId = StationApiRequester.createStation("역3").jsonPath().getLong("id");
 
-        lineId = lineService
-            .saveLine(
-                new LineCreateRequest(
-                    "노선1",
-                    "색1",
-                    upStationId,
-                    downStationId,
-                    10L
-                ))
-            .getId();
+        lineId = SubwayLineApiRequester.createLines(
+            "노선1",
+            "색1",
+            upStationId,
+            downStationId,
+            10L
+        ).jsonPath().getLong("id");
     }
 
     @AfterEach
@@ -73,7 +64,7 @@ public class SubwaySectionAcceptanceTest {
     @Test
     void 지하철구간_추가() {
         // When
-        final ExtractableResponse<Response> response = addSections(
+        final ExtractableResponse<Response> response = SubwaySectionApiRequester.addSections(
             lineId,
             downStationId,
             extraStationId,
@@ -102,10 +93,29 @@ public class SubwaySectionAcceptanceTest {
     void 지하철구간_추가_하행선아닌_경우() {
 
         // When
-        final ExtractableResponse<Response> response = addSections(
+        final ExtractableResponse<Response> response = SubwaySectionApiRequester.addSections(
             lineId,
             upStationId,
             extraStationId,
+            10L
+        );
+
+        // Then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    /**
+     * When 지하철 구간이 하행선이 아닌 곳에서 추가하면
+     * Then 400 에러가 리턴된다.
+     */
+    @Test
+    void 지하철구간_추가_기존_역을_추가하는_경우() {
+
+        // When
+        final ExtractableResponse<Response> response = SubwaySectionApiRequester.addSections(
+            lineId,
+            downStationId,
+            upStationId,
             10L
         );
 
@@ -121,19 +131,16 @@ public class SubwaySectionAcceptanceTest {
     @Test
     void 지하철구간_종점_제거() {
         // Given
-        addSections(lineId, downStationId, extraStationId, 10L);
+        SubwaySectionApiRequester.addSections(lineId, downStationId, extraStationId, 10L);
 
         // When
-        final ExtractableResponse<Response> response = deleteSection(lineId, extraStationId);
+        final ExtractableResponse<Response> response = SubwaySectionApiRequester.deleteSection(lineId, extraStationId);
 
         // Then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         // Then
-        final List<Long> stationIdList = lineService
-            .getLine(lineId)
-            .getStations().stream().map(StationResponse::getId)
-            .toList();
+        final List<Long> stationIdList = SubwayLineApiRequester.getLinesList().jsonPath().getList("id", Long.class);
 
         assertThat(stationIdList).doesNotContain(extraStationId);
     }
@@ -146,7 +153,7 @@ public class SubwaySectionAcceptanceTest {
     @Test
     void 지하철구간_종점제거_2개역_존재_경우() {
         // When
-        final ExtractableResponse<Response> response = deleteSection(lineId, extraStationId);
+        final ExtractableResponse<Response> response = SubwaySectionApiRequester.deleteSection(lineId, extraStationId);
 
         // Then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -160,39 +167,12 @@ public class SubwaySectionAcceptanceTest {
     @Test
     void 지하철구간_종점제거_하행종점역이_아닌_경우() {
         // Given
-        addSections(lineId, downStationId, extraStationId, 10L);
+        SubwaySectionApiRequester.addSections(lineId, downStationId, extraStationId, 10L);
 
         // When
-        final ExtractableResponse<Response> response = deleteSection(lineId, upStationId);
+        final ExtractableResponse<Response> response = SubwaySectionApiRequester.deleteSection(lineId, upStationId);
 
         // Then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
-
-    private ExtractableResponse<Response> addSections(Long lineId, Long upStationId, Long downStationId, Long distance) {
-        final Map<String, String> params = new HashMap<>();
-        params.put("upStationId", upStationId.toString());
-        params.put("downStationId", downStationId.toString());
-        params.put("distance", distance.toString());
-
-        return RestAssured
-            .given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .body(params)
-            .when()
-            .post("/lines/" + lineId + "/sections")
-            .then().log().all()
-            .extract();
-    }
-
-    private ExtractableResponse<Response> deleteSection(Long lineId, Long stationId) {
-        return RestAssured
-            .given().log().all()
-            .when()
-            .queryParam("stationId", stationId)
-            .delete("/lines/"+ lineId + "/sections")
-            .then().log().all()
-            .extract();
-    }
-
 }
