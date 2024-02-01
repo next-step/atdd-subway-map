@@ -1,6 +1,7 @@
 package subway.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.dto.LineRequest;
@@ -22,8 +23,8 @@ public class LineService {
 
 	@Transactional
 	public LineResponse saveLines(LineRequest request) {
-		StationResponse upStation = stationService.findStationById(request.getUpStationId());
-		StationResponse downStation = stationService.findStationById(request.getDownStationId());
+		StationResponse upStation = getStations(request.getUpStationId());
+		StationResponse downStation = getStations(request.getDownStationId());
 
 		Line line =
 				lineRepository.save(
@@ -35,6 +36,19 @@ public class LineService {
 								request.getDistance()));
 
 		return createLineResponse(line, upStation, downStation);
+	}
+
+	public List<LineResponse> getLines() {
+		return lineRepository.findAll().stream()
+				.map(
+						line ->
+								createLineResponse(
+										line, getStations(line.getUpStationId()), getStations(line.getDownStationId())))
+				.collect(Collectors.toList());
+	}
+
+	private StationResponse getStations(Long stationId) {
+		return stationService.findStationById(stationId);
 	}
 
 	private LineResponse createLineResponse(
