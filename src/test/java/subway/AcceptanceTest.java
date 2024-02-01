@@ -9,8 +9,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
-
-import java.util.Map;
+import subway.controller.dto.LineCreateRequest;
+import subway.controller.dto.StationCreateRequest;
 
 import static io.restassured.RestAssured.UNDEFINED_PORT;
 
@@ -32,8 +32,12 @@ public class AcceptanceTest {
         databaseCleaner.clear();
     }
 
-    protected ExtractableResponse<Response> createStation(Map<String, String> body, int statusCode) {
-        return post("/stations", body, statusCode);
+    protected ExtractableResponse<Response> createStation(StationCreateRequest request, int statusCode) {
+        return post("/stations", request, statusCode);
+    }
+
+    protected ExtractableResponse<Response> createLine(LineCreateRequest request, int statusCode) {
+        return post("/lines", request, statusCode);
     }
 
     protected ExtractableResponse<Response> get(String path, int statusCode, Object... pathParams) {

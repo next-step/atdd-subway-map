@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.http.HttpStatus.*;
 import static subway.LineFixture.BUNDANG_LINE;
 import static subway.LineFixture.SHINBUNDANG_LINE;
+import static subway.StationFixture.*;
 
 @DisplayName("지하철 노선 관련 기능")
 public class LineAcceptanceTest extends AcceptanceTest {
@@ -29,13 +30,13 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
     @BeforeEach
     void setFixture() {
-        GANGNAM_STATION_ID = createStation(Map.of("name", "강남역"), CREATED.value())
+        GANGNAM_STATION_ID = createStation(GANGNAM_STATION.toCreateRequest(), CREATED.value())
                 .as(StationResponse.class).getId();
 
-        SEOLLEUNG_STATION_ID = createStation(Map.of("name", "선릉역"), CREATED.value())
+        SEOLLEUNG_STATION_ID = createStation(SEOLLEUNG_STATION.toCreateRequest(), CREATED.value())
                 .as(StationResponse.class).getId();
 
-        YANGJAE_STATION_ID = createStation(Map.of("name", "양재역"), CREATED.value())
+        YANGJAE_STATION_ID = createStation(YANGJAE_STATION.toCreateRequest(), CREATED.value())
                 .as(StationResponse.class).getId();
     }
 
@@ -166,10 +167,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
         List<LineResponse> findAllResponse = findLines(OK.value()).as(new TypeRef<>() {
         });
         assertThat(findAllResponse).isEmpty();
-    }
-
-    private ExtractableResponse<Response> createLine(LineCreateRequest request, int statusCode) {
-        return post("/lines", request, statusCode);
     }
 
     private ExtractableResponse<Response> findLines(int statusCode) {

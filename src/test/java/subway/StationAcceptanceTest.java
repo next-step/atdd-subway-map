@@ -6,12 +6,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import subway.controller.dto.StationResponse;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpStatus.*;
+import static subway.StationFixture.GANGNAM_STATION;
+import static subway.StationFixture.SEOLLEUNG_STATION;
 
 @DisplayName("지하철역 관련 기능")
 public class StationAcceptanceTest extends AcceptanceTest {
@@ -27,11 +27,8 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철역을 생성한다.")
     @Test
     void createStation() {
-        // given
-        Map<String, String> gangNamStationParams = createParams(STATION_NAME_GANGNAM);
-
         // when
-        createStation(gangNamStationParams, CREATED.value());
+        createStation(GANGNAM_STATION.toCreateRequest(), CREATED.value());
 
         ExtractableResponse<Response> findResponse = findStation(OK.value());
         List<String> stationsNames = findResponse.jsonPath().getList("name", String.class);
@@ -47,13 +44,8 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철역 목록을 조회한다.")
     @Test
     void selectStation() {
-        // given
-        Map<String, String> gangNamStationParams = createParams(STATION_NAME_GANGNAM);
-        createStation(gangNamStationParams, CREATED.value());
-
-        // given
-        Map<String, String> seollEungStationParams = createParams(STATION_NAME_SEOLLEUNG);
-        createStation(seollEungStationParams, CREATED.value());
+        createStation(GANGNAM_STATION.toCreateRequest(), CREATED.value());
+        createStation(SEOLLEUNG_STATION.toCreateRequest(), CREATED.value());
 
         // when
         ExtractableResponse<Response> findResponse = findStation(OK.value());
@@ -73,8 +65,7 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void removeStation() {
         // given
-        Map<String, String> gangNamStationParams = createParams(STATION_NAME_GANGNAM);
-        ExtractableResponse<Response> createResponse = createStation(gangNamStationParams, CREATED.value());
+        ExtractableResponse<Response> createResponse = createStation(GANGNAM_STATION.toCreateRequest(), CREATED.value());
         StationResponse stationResponse = createResponse.as(StationResponse.class);
 
         // when
@@ -84,12 +75,6 @@ public class StationAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> findResponse = findStation(OK.value());
         List<String> stationsNames = findResponse.jsonPath().getList("name", String.class);
         assertThat(stationsNames).isEmpty();
-    }
-
-    private Map<String, String> createParams(String stationName) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", stationName);
-        return params;
     }
 
     private ExtractableResponse<Response> findStation(int statusCode) {
