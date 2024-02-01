@@ -123,4 +123,6 @@ public class LineService {
                 && request.getUpStationId().equals(line.getUpStation().getId());
     }
 
+    public void deleteLineSection(final Long lineId, final Long stationId) {
+    }
 }
