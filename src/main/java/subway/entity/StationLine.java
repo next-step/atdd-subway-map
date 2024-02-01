@@ -71,4 +71,8 @@ public class StationLine {
     public List<StationSection> getSections() {
         return sections;
     }
+
+    public void updateDownStation(Long downStationId) {
+        this.downStationId = downStationId;
+    }
 }

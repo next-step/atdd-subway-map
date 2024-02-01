@@ -33,16 +33,16 @@ public class StationSectionAcceptanceTest {
     }
 
     /**
-      * Given 지하철 노선이 생성되고
-      * When  지하철 구간을 생성할 때, 상행역 ID를 1보다 작은 숫자로 요청하면
-      * Then  지하철 구간 생성에 실패한다.
-      */
+     * Given 지하철 노선이 생성되고
+     * When  지하철 구간을 생성할 때, 상행역 ID를 1보다 작은 숫자로 요청하면
+     * Then  지하철 구간 생성에 실패한다.
+     */
     @ParameterizedTest
     @ValueSource(ints = {-100, -1, 0})
     void 상행역_ID가_1보다_작은_숫자일_경우_등록_실패(int upStationId) {
         // given
         ExtractableResponse<Response> response =
-                지하철_노선_생성_요청(호남선_생성_상행_하행_설정(1, 2));
+                지하철_노선_생성_요청(호남선_생성_상행_하행_설정(1L, 2L));
 
         Map<String, Object> section = new HashMap<>();
         section.put("upStationId", upStationId);
@@ -69,7 +69,7 @@ public class StationSectionAcceptanceTest {
     void 하행역_ID가_1보다_작은_숫자일_경우_등록_실패(int downStationId) {
         // given
         ExtractableResponse<Response> response =
-                지하철_노선_생성_요청(호남선_생성_상행_하행_설정(1, 2));
+                지하철_노선_생성_요청(호남선_생성_상행_하행_설정(1L, 2L));
 
         Map<String, Object> section = new HashMap<>();
         section.put("upStationId", "1");
@@ -96,7 +96,7 @@ public class StationSectionAcceptanceTest {
     void 거리가_1보다_작은_숫자일_경우_등록_실패(int distance) {
         // given
         ExtractableResponse<Response> response =
-                지하철_노선_생성_요청(호남선_생성_상행_하행_설정(1, 2));
+                지하철_노선_생성_요청(호남선_생성_상행_하행_설정(1L, 2L));
 
         Map<String, Object> section = new HashMap<>();
         section.put("downStationId", "1");
@@ -114,17 +114,17 @@ public class StationSectionAcceptanceTest {
     }
 
     /**
-      * Given 지하철 노선이 생성되고
-      * When  지하철 구간을 생성할 때,
-      * When  요청한 상행역이 하행 종점역으로 등록되어 있으면서
-      * When  요청한 하행역이 구간으로 등록되어 있지 않을 경우
-      * Then  지하철 구간 등록에 성공한다.
-      */
+     * Given 지하철 노선이 생성되고
+     * When  지하철 구간을 생성할 때,
+     * When  요청한 상행역이 하행 종점역으로 등록되어 있으면서
+     * When  요청한 하행역이 구간으로 등록되어 있지 않을 경우
+     * Then  지하철 구간 등록에 성공한다.
+     */
     @Test
     void 상행역이_하행_종점역으로_등록되어_있고_하행역이_구간으로_등록되지_않은_역일_경우_등록_성공() {
         // given
         ExtractableResponse<Response> response =
-                지하철_노선_생성_요청(호남선_생성_상행_하행_설정(1, 2));
+                지하철_노선_생성_요청(호남선_생성_상행_하행_설정(1L, 2L));
 
         Map<String, Object> section = new HashMap<>();
         section.put("upStationId", "2"); // 호남선에서 하행 종점역으로 설정된 역 ID
@@ -151,7 +151,7 @@ public class StationSectionAcceptanceTest {
     void 상행역이_하행_종점역으로_등록되어_있지_않을_경우_등록_실패() {
         // given
         ExtractableResponse<Response> response =
-                지하철_노선_생성_요청(호남선_생성_상행_하행_설정(1, 4));
+                지하철_노선_생성_요청(호남선_생성_상행_하행_설정(1L, 4L));
 
         Map<String, Object> section = new HashMap<>();
         section.put("upStationId", "5"); // 상행역이 하행 종점역으로 등록되어 있지 않은 역 ID
@@ -175,10 +175,10 @@ public class StationSectionAcceptanceTest {
      * Then  지하철 구간 등록에 실패한다.
      */
     @Test
-    void 상행역으로_등록되어_있지_않은_경우_등록_실패() {
+    void 상행역으로_역_등록되어_있지_않은_경우_등록_실패() {
         // given
         ExtractableResponse<Response> response =
-                지하철_노선_생성_요청(호남선_생성_상행_하행_설정(1, 10));
+                지하철_노선_생성_요청(호남선_생성_상행_하행_설정(1L, 10L));
 
         Map<String, Object> section = new HashMap<>();
         section.put("upStationId", "11");
@@ -205,7 +205,7 @@ public class StationSectionAcceptanceTest {
     void 상행역이_이미_구간에_등록되어_있는_경우_등록_실패() {
         // given
         ExtractableResponse<Response> response =
-                지하철_노선_생성_요청(호남선_생성_상행_하행_설정(1, 2));
+                지하철_노선_생성_요청(호남선_생성_상행_하행_설정(1L, 2L));
 
         Map<String, Object> 등록_성공_할_구간 = new HashMap<>();
         등록_성공_할_구간.put("upStationId", "2");
@@ -222,9 +222,9 @@ public class StationSectionAcceptanceTest {
                 .statusCode(HttpStatus.CREATED.value());
 
         Map<String, Object> 등록_실패_할_구간 = new HashMap<>();
-        등록_성공_할_구간.put("upStationId", "2"); // 이미 구간으로 등록된 역 ID
-        등록_성공_할_구간.put("downStationId", "4");
-        등록_성공_할_구간.put("distance", 10);
+        등록_실패_할_구간.put("upStationId", "2"); // 이미 구간으로 등록된 역 ID
+        등록_실패_할_구간.put("downStationId", "4");
+        등록_실패_할_구간.put("distance", 10);
 
         given().log().all()
                 .body(등록_실패_할_구간)
@@ -245,7 +245,7 @@ public class StationSectionAcceptanceTest {
     void 하행역이_이미_하행_종점역으로_등록되어_있는_경우_등록_실패() {
         // given
         ExtractableResponse<Response> response =
-                지하철_노선_생성_요청(호남선_생성_상행_하행_설정(1, 4));
+                지하철_노선_생성_요청(호남선_생성_상행_하행_설정(1L, 4L));
 
         Map<String, Object> section = new HashMap<>();
         section.put("upStationId", "4");
@@ -272,7 +272,7 @@ public class StationSectionAcceptanceTest {
     void 하행역이_역으로_등록되어_있지_않은_경우_등록_실패() {
         // given
         ExtractableResponse<Response> response =
-                지하철_노선_생성_요청(호남선_생성_상행_하행_설정(1, 10));
+                지하철_노선_생성_요청(호남선_생성_상행_하행_설정(1L, 10L));
 
         Map<String, Object> section = new HashMap<>();
         section.put("upStationId", "10");
@@ -299,7 +299,7 @@ public class StationSectionAcceptanceTest {
     void 하행역이_이미_구간에_등록되어_있는_경우_등록_실패() {
         // given
         ExtractableResponse<Response> response =
-                지하철_노선_생성_요청(호남선_생성_상행_하행_설정(1, 2));
+                지하철_노선_생성_요청(호남선_생성_상행_하행_설정(1L, 2L));
 
         Map<String, Object> 등록_성공_할_구간 = new HashMap<>();
         등록_성공_할_구간.put("upStationId", "2");
@@ -316,9 +316,9 @@ public class StationSectionAcceptanceTest {
                 .statusCode(HttpStatus.CREATED.value());
 
         Map<String, Object> 등록_실패_할_구간 = new HashMap<>();
-        등록_성공_할_구간.put("upStationId", "3");
-        등록_성공_할_구간.put("downStationId", "2"); // 이미 구간에 등록되어 있는 역 ID
-        등록_성공_할_구간.put("distance", 10);
+        등록_실패_할_구간.put("upStationId", "3");
+        등록_실패_할_구간.put("downStationId", "2"); // 이미 구간에 등록되어 있는 역 ID
+        등록_실패_할_구간.put("distance", 10);
 
         given().log().all()
                 .body(등록_실패_할_구간)
