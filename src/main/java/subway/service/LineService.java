@@ -9,6 +9,7 @@ import subway.dto.LineResponse;
 import subway.dto.StationResponse;
 import subway.entity.Line;
 import subway.repository.LineRepository;
+import subway.service.exception.NotFoundLineException;
 
 @Service
 @Transactional(readOnly = true)
@@ -45,6 +46,16 @@ public class LineService {
 								createLineResponse(
 										line, getStations(line.getUpStationId()), getStations(line.getDownStationId())))
 				.collect(Collectors.toList());
+	}
+
+	public LineResponse getLine(Long id) {
+		return lineRepository
+				.findById(id)
+				.map(
+						line ->
+								createLineResponse(
+										line, getStations(line.getUpStationId()), getStations(line.getDownStationId())))
+				.orElseThrow(() -> new NotFoundLineException(id));
 	}
 
 	private StationResponse getStations(Long stationId) {
