@@ -6,6 +6,8 @@ import subway.dto.StationLineRequest;
 import subway.dto.StationLineResponse;
 import subway.entity.StationLine;
 import subway.entity.StationLineRepository;
+import subway.entity.StationSection;
+import subway.entity.StationSectionRepository;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
@@ -17,13 +19,19 @@ public class StationLineService {
 
     private final StationLineRepository stationLineRepository;
 
-    public StationLineService(StationLineRepository stationLineRepository) {
+    private final StationSectionRepository stationSectionRepository;
+
+    public StationLineService(StationLineRepository stationLineRepository,
+                              StationSectionRepository stationSectionRepository) {
         this.stationLineRepository = stationLineRepository;
+        this.stationSectionRepository = stationSectionRepository;
     }
 
     @Transactional
     public StationLineResponse saveStationLine(StationLineRequest request) {
-        return convertToResponse(stationLineRepository.save(convertToEntity(request)));
+        StationLine stationLine = stationLineRepository.save(convertToStationLineEntity(request));
+        stationSectionRepository.save(convertToStationSectionEntity(stationLine));
+        return convertToResponse(stationLine);
     }
 
     public List<StationLineResponse> findAllStationLines() {
@@ -56,7 +64,7 @@ public class StationLineService {
         );
     }
 
-    private StationLine convertToEntity(StationLineRequest request) {
+    private StationLine convertToStationLineEntity(StationLineRequest request) {
         return new StationLine(
                 request.getName(),
                 request.getColor(),
@@ -70,6 +78,13 @@ public class StationLineService {
                 stationLine.getId(),
                 stationLine.getName(),
                 stationLine.getColor(),
+                stationLine.getUpStationId(),
+                stationLine.getDownStationId(),
+                stationLine.getDistance());
+    }
+
+    private static StationSection convertToStationSectionEntity(StationLine stationLine) {
+        return new StationSection(
                 stationLine.getUpStationId(),
                 stationLine.getDownStationId(),
                 stationLine.getDistance());
