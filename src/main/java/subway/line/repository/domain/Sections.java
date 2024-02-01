@@ -20,7 +20,7 @@ public class Sections implements Iterable<Section> {
     private static final int MINIMUM_SECTION_COUNT = 1;
 
     @OneToMany(cascade = CascadeType.PERSIST, orphanRemoval = true)
-    @JoinColumn(name = "section_id")
+    @JoinColumn(name = "line_id")
     private List<Section> sections = new ArrayList<>();
 
     protected Sections() {

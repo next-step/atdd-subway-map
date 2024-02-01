@@ -13,6 +13,7 @@ import subway.common.LineApiHelper;
 import subway.common.SectionApiHelper;
 import subway.common.StationApiHelper;
 import subway.line.service.dto.LineResponse;
+import subway.line.service.dto.SectionResponse;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
@@ -53,9 +54,14 @@ public class SectionAcceptanceTest {
             // when
             final ExtractableResponse<Response> response = SectionApiHelper.createSection(신분당선_Id, 새로운지하철역_Id, 또다른지하철역_Id, 구간_distance);
 
+            final SectionResponse sectionResponse = response.as(SectionResponse.class);
+
             // then
             assertAll(
-                    () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
+                    () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
+                    () -> assertThat(sectionResponse.getUpStation().getId()).isEqualTo(새로운지하철역_Id),
+                    () -> assertThat(sectionResponse.getDownStation().getId()).isEqualTo(또다른지하철역_Id),
+                    () -> assertThat(sectionResponse.getDistance()).isEqualTo(구간_distance),
                     SectionAcceptanceTest.this::assertSectionAdded
             );
         }

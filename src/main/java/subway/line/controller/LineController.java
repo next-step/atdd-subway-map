@@ -3,10 +3,7 @@ package subway.line.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import subway.line.service.LineService;
-import subway.line.service.dto.LineCreateRequest;
-import subway.line.service.dto.LineResponse;
-import subway.line.service.dto.LineUpdateRequest;
-import subway.line.service.dto.SectionCreateRequest;
+import subway.line.service.dto.*;
 
 import java.net.URI;
 import java.util.List;
@@ -48,9 +45,9 @@ public class LineController {
     }
 
     @PostMapping("/lines/{lineId}/sections")
-    public ResponseEntity<Void> registerSection(@PathVariable final Long lineId, @RequestBody final SectionCreateRequest createRequest) {
-        lineService.addSection(lineId, createRequest);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<SectionResponse> registerSection(@PathVariable final Long lineId, @RequestBody final SectionCreateRequest createRequest) {
+        final SectionResponse sectionResponse = lineService.addSection(lineId, createRequest);
+        return ResponseEntity.created(URI.create(String.format("/lines/%s/sections/%s", lineId, sectionResponse.getId()))).body(sectionResponse);
     }
 
     @DeleteMapping("/lines/{lineId}/sections")

@@ -4,12 +4,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.line.exception.LineNotExistException;
 import subway.line.repository.LineRepository;
+import subway.line.repository.SectionRepository;
 import subway.line.repository.domain.Line;
 import subway.line.repository.domain.Section;
-import subway.line.service.dto.LineCreateRequest;
-import subway.line.service.dto.LineResponse;
-import subway.line.service.dto.LineUpdateRequest;
-import subway.line.service.dto.SectionCreateRequest;
+import subway.line.service.dto.*;
 import subway.station.exception.StationNotExistException;
 import subway.station.repository.StationRepository;
 import subway.station.repository.domain.Station;
@@ -22,10 +20,12 @@ import java.util.stream.Collectors;
 public class LineService {
     private final LineRepository lineRepository;
     private final StationRepository stationRepository;
+    private final SectionRepository sectionRepository;
 
-    public LineService(final LineRepository lineRepository, final StationRepository stationRepository) {
+    public LineService(final LineRepository lineRepository, final StationRepository stationRepository, final SectionRepository sectionRepository) {
         this.lineRepository = lineRepository;
         this.stationRepository = stationRepository;
+        this.sectionRepository = sectionRepository;
     }
 
     @Transactional
@@ -66,12 +66,14 @@ public class LineService {
     }
 
     @Transactional
-    public void addSection(final Long lineId, final SectionCreateRequest createRequest) {
+    public SectionResponse addSection(final Long lineId, final SectionCreateRequest createRequest) {
         createRequest.validate();
-        final Section newSection = createSection(createRequest);
+        final Section savedSection = sectionRepository.save(createSection(createRequest));
 
         final Line line = findLine(lineId);
-        line.addSection(newSection);
+        line.addSection(savedSection);
+
+        return SectionResponse.from(savedSection);
     }
 
     @Transactional
