@@ -18,7 +18,7 @@ public class LineStationMap {
 	private Long id;
 
 	@Column(nullable = false)
-	private Long upperId;
+	private Long upperStationId;
 
 	@ManyToOne(targetEntity = Line.class)
 	@JoinColumn(name = "line_id", nullable = false)
@@ -31,10 +31,10 @@ public class LineStationMap {
 	protected LineStationMap() {
 	}
 
-	public LineStationMap(Line line, Station station, Long upperId) {
+	public LineStationMap(Line line, Station station, Long upperStationId) {
 		this.line = line;
 		this.station = station;
-		this.upperId = upperId;
+		this.upperStationId = upperStationId;
 	}
 
 	public Long getId() {
@@ -49,7 +49,7 @@ public class LineStationMap {
 		return station;
 	}
 
-	public Long getUpperId() {
-		return upperId;
+	public Long getUpperStationId() {
+		return upperStationId;
 	}
 }
