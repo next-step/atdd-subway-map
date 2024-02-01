@@ -28,17 +28,20 @@ public class StationSectionService {
     public StationSectionResponse saveStationSection(StationSectionRequest request) {
         StationLine stationLine = findStationLineById(request.getStationLineId());
         StationSection stationSection = convertToStationSectionEntity(request);
-        hasStation(stationSection);
 
-        if (!stationSection.canSave(stationLine)) {
-            throw new IllegalArgumentException("해당 역은 저장할 수 없습니다.");
+        if (!existStation(stationSection)) {
+            throw new IllegalArgumentException("요청한 역은 존재하지 않습니다.");
+        }
+        if (!stationSection.canSave(stationLine)) { // 호출 위치가 서로 변경되어야 함.
+            throw new IllegalArgumentException("요청한 구간을 저장할 수 없습니다.");
         }
         return convertToResponse(canStationSectionSave(stationSection, stationLine));
     }
 
-    private void hasStation(StationSection stationSection) {
-        stationRepository.findById(stationSection.getUpStationId()).orElseThrow(EntityNotFoundException::new);
-        stationRepository.findById(stationSection.getDownStationId()).orElseThrow(EntityNotFoundException::new);
+    private boolean existStation(StationSection stationSection) {
+        boolean upStationExists = stationRepository.findById(stationSection.getUpStationId()).isPresent();
+        boolean downStationExists = stationRepository.findById(stationSection.getDownStationId()).isPresent();
+        return upStationExists && downStationExists;
     }
 
     private StationSection canStationSectionSave(StationSection stationSection, StationLine stationLine) {

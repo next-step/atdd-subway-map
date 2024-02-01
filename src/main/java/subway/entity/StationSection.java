@@ -49,7 +49,7 @@ public class StationSection {
     }
 
     public boolean canSave(StationLine stationLine) {
-        if(stationsSame()) {
+        if(areStationsSame()) {
             return false;
         }
         if(hasUpStation(stationLine)) {
@@ -64,11 +64,11 @@ public class StationSection {
     }
 
     private boolean hasUpStation(StationLine stationLine) {
-        return !this.upStationId.equals(stationLine.getDownStationId());
+        return !this.upStationId.equals(stationLine.getDownStationId()); // TODO: 호출 위치 변경
     }
 
-    private boolean stationsSame() {
-        return upStationId.equals(this.downStationId);
+    private boolean areStationsSame() {
+        return upStationId.equals(downStationId);
     }
 
     public Long getId() {
