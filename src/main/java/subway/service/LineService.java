@@ -6,60 +6,65 @@ import subway.controller.dto.LineCreateRequest;
 import subway.controller.dto.LineResponse;
 import subway.controller.dto.LineUpdateRequest;
 import subway.domain.Line;
+import subway.domain.Section;
 import subway.domain.Station;
 import subway.repository.LineRepository;
+import subway.repository.SectionRepository;
 import subway.repository.StationRepository;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
-@Transactional(readOnly = true)
 public class LineService {
     private LineRepository lineRepository;
     private StationRepository stationRepository;
+    private SectionRepository sectionRepository;
 
-    public LineService(LineRepository lineRepository, StationRepository stationRepository) {
+    public LineService(LineRepository lineRepository, StationRepository stationRepository, SectionRepository sectionRepository) {
         this.lineRepository = lineRepository;
         this.stationRepository = stationRepository;
+        this.sectionRepository = sectionRepository;
     }
 
     @Transactional
-    public LineResponse saveLine(LineCreateRequest lineCreateRequest) {
+    public LineResponse saveLine(LineCreateRequest request) {
         Line line = lineRepository.save(new Line(
-                lineCreateRequest.getName(),
-                lineCreateRequest.getColor(),
-                lineCreateRequest.getUpStationId(),
-                lineCreateRequest.getDownStationId(),
-                lineCreateRequest.getDistance()
+                request.getName(),
+                request.getColor()
         ));
-        return LineResponse.of(line, findStationsBy(line.stationIds()));
+        List<Station> stations = stationRepository.findByIdIn(request.stationIds());
+
+        Station upStation = findBy(request.getUpStationId(), stations);
+        Station downStation = findBy(request.getDownStationId(), stations);
+
+        sectionRepository.save(new Section(
+                line,
+                upStation,
+                downStation,
+                request.getDistance()
+        ));
+        return LineResponse.ofWithStations(line, List.of(upStation, downStation));
     }
 
+    private Station findBy(Long stationId, List<Station> stations) {
+        return stations.stream()
+                .filter(station -> station.getId().equals(stationId))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 역입니다."));
+    }
+
+    @Transactional(readOnly = true)
     public List<LineResponse> findLines() {
         List<Line> lines = lineRepository.findAll();
-        List<Station> stations = stations(lines);
-        return LineResponse.listOf(lines, stations);
+        List<Section> sections = sectionRepository.findAllByLineIn(lines);
+        return LineResponse.listOf(lines, sections);
     }
 
-    private List<Station> stations(List<Line> lines) {
-        List<Long> stationIds = lines.stream()
-                .map(Line::stationIds)
-                .flatMap(List::stream)
-                .collect(Collectors.toList());
-        return findStationsBy(stationIds);
-    }
-
-    private List<Station> findStationsBy(List<Long> ids) {
-        return stationRepository.findAll().stream()
-                .filter(station -> ids.contains(station.getId()))
-                .collect(Collectors.toList());
-    }
-
+    @Transactional(readOnly = true)
     public LineResponse findLine(Long id) {
         Line line = findBy(id);
-        List<Station> stations = findStationsBy(line.stationIds());
-        return LineResponse.of(line, stations);
+        List<Section> sections = sectionRepository.findByLine(line);
+        return LineResponse.ofWithSections(line, sections);
     }
 
     @Transactional
@@ -75,6 +80,7 @@ public class LineService {
 
     @Transactional
     public void deleteLine(Long id) {
+        sectionRepository.deleteByLine(new Line(id));
         lineRepository.deleteById(id);
     }
 }

@@ -1,5 +1,7 @@
 package subway.controller.dto;
 
+import java.util.List;
+
 public class LineCreateRequest {
     private String name;
     private String color;
@@ -16,6 +18,10 @@ public class LineCreateRequest {
         this.upStationId = upStationId;
         this.downStationId = downStationId;
         this.distance = distance;
+    }
+
+    public List<Long> stationIds(){
+        return List.of(upStationId, downStationId);
     }
 
     public String getName() {

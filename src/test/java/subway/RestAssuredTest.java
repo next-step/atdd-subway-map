@@ -11,10 +11,10 @@ import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpStatus.OK;
 
+@Disabled
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class RestAssuredTest {
 
-    @Disabled
     @DisplayName("구글 페이지 접근 테스트")
     @Test
     void accessGoogle() {

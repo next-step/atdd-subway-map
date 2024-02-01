@@ -1,6 +1,7 @@
 package subway.controller.dto;
 
 import subway.domain.Line;
+import subway.domain.Section;
 import subway.domain.Station;
 
 import java.util.List;
@@ -22,23 +23,27 @@ public class LineResponse {
         this.stations = stations;
     }
 
-    public static List<LineResponse> listOf(List<Line> lines, List<Station> stations) {
+    public static List<LineResponse> listOf(List<Line> lines, List<Section> sections) {
         return lines.stream()
-                .map(line -> of(line, containStationWithLine(line, stations)))
+                .map(line -> ofWithSections(line, sections))
                 .collect(Collectors.toList());
     }
 
-    public static LineResponse of(Line line, List<Station> stations) {
-        List<Station> containStations = containStationWithLine(line, stations);
+    public static LineResponse ofWithStations(Line line, List<Station> stations) {
+        return new LineResponse(line.getId(), line.getName(), line.getColor(), StationResponse.listOf(stations));
+    }
+
+    public static LineResponse ofWithSections(Line line, List<Section> sections) {
+        List<Station> containStations = containStationWithLine(line, sections);
         return new LineResponse(line.getId(), line.getName(), line.getColor(), StationResponse.listOf(containStations));
     }
 
-    private static List<Station> containStationWithLine(Line line, List<Station> stations) {
-        return line.stationIds().stream()
-                .map(id -> stations.stream()
-                        .filter(station -> station.getId().equals(id))
-                        .findFirst()
-                        .orElseThrow(() -> new IllegalArgumentException("역이 존재하지 않습니다.")))
+    private static List<Station> containStationWithLine(Line line, List<Section> sections) {
+        return sections.stream()
+                .filter(section -> section.isSameLine(line))
+                .map(Section::stations)
+                .flatMap(List::stream)
+                .distinct()
                 .collect(Collectors.toList());
     }
 

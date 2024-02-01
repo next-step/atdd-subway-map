@@ -1,6 +1,9 @@
 package subway.domain;
 
+import org.hibernate.Hibernate;
+
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 public class Line {
@@ -15,6 +18,10 @@ public class Line {
     private String color;
 
     protected Line() {
+    }
+
+    public Line(Long id) {
+        this.id = id;
     }
 
     public Line(String name, String color) {
@@ -37,6 +44,19 @@ public class Line {
 
     public String getColor() {
         return color;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || Hibernate.getClass(this) != Hibernate.getClass(object)) return false;
+        Line line = (Line) object;
+        return Objects.equals(id, line.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }
 
