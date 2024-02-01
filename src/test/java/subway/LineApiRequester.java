@@ -3,6 +3,7 @@ package subway;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import subway.controller.dto.LineCreateRequest;
 
@@ -17,6 +18,7 @@ public class LineApiRequester {
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .when().post("/lines")
             .then().log().all()
+            .statusCode(HttpStatus.CREATED.value())
             .extract();
     }
 
@@ -25,6 +27,7 @@ public class LineApiRequester {
         return RestAssured.given().log().all()
             .when().get("/lines")
             .then().log().all()
+            .statusCode(HttpStatus.OK.value())
             .extract();
     }
 
@@ -34,6 +37,7 @@ public class LineApiRequester {
             .pathParam("id", id)
             .when().get("/lines/{id}")
             .then().log().all()
+            .statusCode(HttpStatus.OK.value())
             .extract();
     }
 }

@@ -18,8 +18,7 @@ import static helper.JsonPathUtils.getLongPath;
 import static org.assertj.core.api.Assertions.assertThat;
 import static subway.LineApiRequester.createLine;
 import static subway.LineApiRequester.getLineById;
-import static subway.SectionApiRequester.addSectionToLine;
-import static subway.SectionApiRequester.deleteSection;
+import static subway.SectionApiRequester.*;
 import static subway.StationApiRequester.createStation;
 
 @DisplayName("지하철 노선 구간 관련 기능")
@@ -63,7 +62,7 @@ public class LineSectionAcceptanceTest {
             @Test
             void addSection() {
                 // when
-                ExtractableResponse<Response> response = addSectionToLine(
+                ExtractableResponse<Response> response = addSectionToLineSuccess(
                     lineId,
                     new SectionAddRequest(downStationId, newDownStationId, 3)
                 );
@@ -180,7 +179,7 @@ public class LineSectionAcceptanceTest {
 
                 lineId = getLongPath(response.body(), "id");
 
-                addSectionToLine(
+                addSectionToLineSuccess(
                     lineId,
                     new SectionAddRequest(downStationId, deleteStationId, 3)
                 );
@@ -225,7 +224,7 @@ public class LineSectionAcceptanceTest {
 
                 lineId = getLongPath(response.body(), "id");
 
-                addSectionToLine(
+                addSectionToLineSuccess(
                     lineId,
                     new SectionAddRequest(downStationId, newDownStationId, 3)
                 );
