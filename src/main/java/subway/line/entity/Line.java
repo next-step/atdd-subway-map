@@ -49,9 +49,14 @@ public class Line {
         this.color = color;
     }
 
-    public void changeDownStation(Station newDownStation, final int distance) {
+    public void addDownStation(final Station newDownStation, final int distance) {
         this.downStation = newDownStation;
         this.distance += distance;
+    }
+
+    public void subtractDownStation(final Station preDownStation, final int distance) {
+        this.downStation = preDownStation;
+        this.distance -= distance;
     }
 
     public Long getId() {

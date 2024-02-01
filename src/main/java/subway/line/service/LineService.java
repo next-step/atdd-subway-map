@@ -100,7 +100,7 @@ public class LineService {
         final Section section = new Section(line, requestUpStation, requestDownStation, request.getDistance());
         sectionRepository.save(section);
 
-        line.changeDownStation(requestDownStation, request.getDistance());
+        line.addDownStation(requestDownStation, request.getDistance());
 
         return LineResponse.convertToDto(line);
     }
@@ -123,6 +123,21 @@ public class LineService {
                 && request.getUpStationId().equals(line.getUpStation().getId());
     }
 
+    @Transactional
     public void deleteLineSection(final Long lineId, final Long stationId) {
+        Line line = this.findLineById(lineId);
+
+        if (line.getSections().size() == 1) {
+            throw new IllegalArgumentException();
+        }
+
+        List<Section> sections = line.getSections();
+        for (Section section : sections) {
+            if (section.getDownStation().getId().equals(stationId)) {
+                line.subtractDownStation(section.getUpStation(), section.getDistance());
+                break;
+            }
+        }
+
     }
 }
