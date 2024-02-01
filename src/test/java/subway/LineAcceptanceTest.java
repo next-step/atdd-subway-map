@@ -1,26 +1,37 @@
 package subway;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.DynamicTest.*;
 import static subway.location.enums.Location.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.http.HttpMethod;
+import org.springframework.test.context.jdbc.Sql;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import subway.dto.StationDTO;
 import subway.fixture.LineFixture;
+import subway.fixture.SectionRequestFixture;
+import subway.fixture.StationFixture;
 import subway.line.LineResponse;
 import subway.line.LineUpdateRequest;
+import subway.line.SectionRequest;
 import subway.rest.Rest;
+import subway.station.StationResponse;
 
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@Sql(value = "/truncate.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class LineAcceptanceTest {
 	@LocalServerPort
@@ -39,12 +50,12 @@ class LineAcceptanceTest {
 	@Test
 	void saveLine() {
 		// when
-		ExtractableResponse<Response> savedLine = LineFixture.init()
+		ExtractableResponse<Response> savedLine = LineFixture.builder()
 			.build()
-			.actionReturnExtractableResponse();
+			.create();
 		LineResponse actualResponse = savedLine.as(LineResponse.class);
 
-		String uri = LINES.addPath(actualResponse.getId());
+		String uri = LINES.path(actualResponse.getId()).toUriString();
 		LineResponse expectedResponse = Rest.builder().get(uri).as(LineResponse.class);
 
 		// then
@@ -60,8 +71,8 @@ class LineAcceptanceTest {
 	@Test
 	void createLineAndRetrieveLines() {
 		// given
-		LineFixture lineFixture1 = LineFixture.init().build();
-		LineFixture lineFixture2 = LineFixture.init().upStationName("남강역").downStationName("재양역").build();
+		LineFixture lineFixture1 = LineFixture.builder().build();
+		LineFixture lineFixture2 = LineFixture.builder().upStationName("남강역").downStationName("재양역").build();
 		LineResponse expectedLineResponse1 = lineFixture1.actionReturnLineResponse();
 		LineResponse expectedLineResponse2 = lineFixture2.actionReturnLineResponse();
 
@@ -85,12 +96,12 @@ class LineAcceptanceTest {
 	@Test
 	void createLineAndRetrieveLine() {
 		// given
-		LineResponse expectedResponse = LineFixture.init()
+		LineResponse expectedResponse = LineFixture.builder()
 			.build()
 			.actionReturnLineResponse();
 
 		// when
-		String uri = LINES.addPath(expectedResponse.getId());
+		String uri = LINES.path(expectedResponse.getId()).toUriString();
 		ExtractableResponse<Response> extractableResponse = Rest.builder().get(uri);
 		LineResponse actualResponse = extractableResponse.as(LineResponse.class);
 
@@ -109,14 +120,14 @@ class LineAcceptanceTest {
 		// given
 		String expectedName = "변경된 이름";
 		String expectedColor = "변경된 색깔";
-		LineResponse lineResponse = LineFixture.init()
+		LineResponse lineResponse = LineFixture.builder()
 			.build()
 			.actionReturnLineResponse();
 
 		// when
 		LineUpdateRequest request = new LineUpdateRequest(expectedName, expectedColor);
 
-		String uri = LINES.addPath(lineResponse.getId());
+		String uri = LINES.path(lineResponse.getId()).toUriString();
 		Rest.builder().uri(uri).body(request).put();
 		LineResponse actualResponse = Rest.builder().get(uri).as(LineResponse.class);
 
@@ -134,12 +145,12 @@ class LineAcceptanceTest {
 	@Test
 	void deleteLine() {
 		// given
-		LineResponse lineResponse = LineFixture.init()
+		LineResponse lineResponse = LineFixture.builder()
 			.build()
 			.actionReturnLineResponse();
 
 		// when
-		String uri = LINES.addPath(lineResponse.getId());
+		String uri = LINES.path(lineResponse.getId()).toUriString();
 		Rest.builder().delete(uri);
 
 		// then
