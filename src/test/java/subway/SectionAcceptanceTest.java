@@ -7,11 +7,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import subway.line.dto.LineRequest;
 import subway.line.dto.SectionRequest;
 import subway.station.entity.Station;
 import subway.station.repository.StationRepository;
 
+import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 구간 관련 기능")
@@ -52,14 +54,10 @@ public class SectionAcceptanceTest extends BaseTest{
     @Test
     void 지하철_구간_등록() {
         // given
-        final LineRequest lineRequest = new LineRequest("신분당선", "bg-red-600", 강남역_ID, 역삼역_ID, 10);
-        final ExtractableResponse<Response> createLineResponse = callCreateApi(lineRequest, LINE_API_PATH);
-        final String location = createLineResponse.header("Location");
-        신분당선_ID = Long.parseLong(location.replaceAll(".*/(\\d+)$", "$1"));
+        this.신분당선_생성();
 
         // when
-        final SectionRequest sectionRequest = new SectionRequest(역삼역_ID, 지하철역_ID, 5);
-        JsonPath createSectionResponse = callCreateApi(sectionRequest, SECTION_API_PATH, 신분당선_ID).jsonPath();
+        JsonPath createSectionResponse = this.신분당선_구간_연장_역삼역_지하철역().jsonPath();
 
         // then
         final String lineName = createSectionResponse.get("name");
@@ -78,11 +76,44 @@ public class SectionAcceptanceTest extends BaseTest{
     @Test
     void 지하철_구간_삭제() {
         // given
+        this.신분당선_생성();
+        ExtractableResponse<Response> createSectionResponse = this.신분당선_구간_연장_역삼역_지하철역();
+        final String location = createSectionResponse.header("Location");
+        final long 신규_구간_ID = Long.parseLong(location.replaceAll(".*/(\\d+)$", "$1"));
 
         // when
+        given().log().all()
+                .when()
+                .delete(SECTION_API_PATH, 신분당선_ID, 신규_구간_ID)
+                .then().log().all()
+                .extract();
 
         // then
+        JsonPath getLineResponse = given()
+                .when()
+                .get(LINE_API_PATH + "/{id}", 신분당선_ID)
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .log().all()
+                .extract()
+                .jsonPath();
 
+        final String newDownStationName = getLineResponse.get("stations[1].name");
+        assertThat(newDownStationName).isNotEqualTo("지하철역");
+    }
+
+    private ExtractableResponse<Response> 신분당선_구간_연장_역삼역_지하철역() {
+        final SectionRequest sectionRequest = new SectionRequest(역삼역_ID, 지하철역_ID, 5);
+        ExtractableResponse<Response> createSectionResponse = callCreateApi(sectionRequest, SECTION_API_PATH, 신분당선_ID);
+
+        return createSectionResponse;
+    }
+
+    private void 신분당선_생성() {
+        final LineRequest lineRequest = new LineRequest("신분당선", "bg-red-600", 강남역_ID, 역삼역_ID, 10);
+        final ExtractableResponse<Response> createLineResponse = callCreateApi(lineRequest, LINE_API_PATH);
+        final String location = createLineResponse.header("Location");
+        신분당선_ID = Long.parseLong(location.replaceAll(".*/(\\d+)$", "$1"));
     }
 
 }
