@@ -42,8 +42,7 @@ public class SectionService {
 
         line.changeDownStation(downStation);
 
-        final Section section = new Section(upStation, downStation, sectionRequest.getDistance());
-        section.setLine(line);
+        final Section section = new Section(upStation, downStation, sectionRequest.getDistance(), line);
         final Section savedSection = sectionRepository.save(section);
         return new SectionResponse(savedSection.getId(), savedSection.getDistance());
     }

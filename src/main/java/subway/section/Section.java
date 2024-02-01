@@ -28,6 +28,13 @@ public class Section {
     public Section() {
     }
 
+    public Section(Station upStation, Station downStation, int distance, Line line) {
+        this.upStation = upStation;
+        this.downStation = downStation;
+        this.distance = distance;
+        this.line = line;
+    }
+
     public Section(final Station upStation, final Station downStation, final int distance) {
         this.upStation = upStation;
         this.downStation = downStation;
@@ -44,21 +51,6 @@ public class Section {
 
     public Line getLine() {
         return line;
-    }
-
-    // 연관관계 편의 메소드
-    public void setLine(final Line line) {
-        this.line = line;
-        // 기존 팀과 연관관계를 제거
-        if (this.line != null) {
-            this.line.getSections().remove(this);
-        }
-
-        // 새로운 연관관계 설정
-        this.line = line;
-        if (line != null) { // 연관관계 제거 시, team == null
-            line.getSections().add(this);
-        }
     }
 
     public Station getUpStation() {
@@ -78,9 +70,5 @@ public class Section {
                 ", downStation=" + downStation +
                 ", distance=" + distance +
                 '}';
-    }
-
-    public void changeDownStation(final Station downStation) {
-        this.downStation = downStation;
     }
 }

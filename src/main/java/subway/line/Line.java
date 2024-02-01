@@ -23,14 +23,19 @@ public class Line {
     private Long downStationId;
     @OneToMany(mappedBy = "line", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, orphanRemoval = true)
     List<Section> sections = new ArrayList<>();
+
+
     public Line() {
     }
 
-    public Line(final String name, final String color, final Long upStationId, final Long downStationId) {
+    public Line(String name, String color, Station upStation, Station downStation, int distance) {
         this.name = name;
         this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
+        this.upStationId = upStation.getId();
+        this.downStationId = downStation.getId();
+
+        Section section = new Section(upStation, downStation, distance, this);
+        this.sections.add(section);
     }
 
     public Long getId() {
