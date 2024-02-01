@@ -9,12 +9,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
-import subway.line.LineResponse;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static subway.line.LIneAcceptanceTestUtil.노선이_생성되어_있다;
 
 @Sql("classpath:db/teardown.sql")
 @DisplayName("구간 관련 기능")
@@ -23,7 +23,7 @@ public class SectionAcceptanceTest {
 
     /**
      * When 노선이 생성되어 있다.
-     *      노선의 하행종점역이 아닌 상행역의 구간을 등록한다.
+     * 노선의 하행종점역이 아닌 상행역의 구간을 등록한다.
      * Then 예외가 발생한다.
      */
     @DisplayName("노선에 구간을 등록 할 때, 구간의 상행역이 노선의 하행좀정역이 아니면 오류가 발생한다.")
@@ -38,7 +38,7 @@ public class SectionAcceptanceTest {
 
     /**
      * When 노선이 생성되어 있다.
-     *      노선에 이미 등록되어 있는 역을 등록한다.
+     * 노선에 이미 등록되어 있는 역을 등록한다.
      * Then 예외가 발생한다.
      */
     @DisplayName("노선에 구간을 등록 할 때, 노선에 이미 등록되어 있는 역을 등록하면 오류가 발생한다.")
@@ -53,7 +53,7 @@ public class SectionAcceptanceTest {
 
     /**
      * When 노선이 생성되어 있다.
-     *      구간을 등록한다.
+     * 구간을 등록한다.
      * Then 정상 응답 처리된다.
      */
     @DisplayName("노선에 구간을 등록한다.")
@@ -68,8 +68,8 @@ public class SectionAcceptanceTest {
 
     /**
      * When 노선이 생성되어 있다.
-     *      구간이 등록되어 있다.
-     *      마지막 구간이 아닌 구간을 제거한다.
+     * 구간이 등록되어 있다.
+     * 마지막 구간이 아닌 구간을 제거한다.
      * Then 예외가 발생한다.
      */
     @DisplayName("노선의 구간을 제거할 때 마지막구간이 아니면 오류가 발생한다.")
@@ -86,7 +86,7 @@ public class SectionAcceptanceTest {
 
     /**
      * When 노선이 생성되어 있다.
-     *      구간이 하나인 노선의 구간을 제거한다.
+     * 구간이 하나인 노선의 구간을 제거한다.
      * Then 예외가 발생한다.
      */
     @DisplayName("노선의 구간을 제거할 때 구간이 1개인 경우 오류가 발생한다.")
@@ -101,8 +101,8 @@ public class SectionAcceptanceTest {
 
     /**
      * When 노선이 생성되어 있다.
-     *      구간이 등록되어 있다.
-     *      구간을 제거한다.
+     * 구간이 등록되어 있다.
+     * 구간을 제거한다.
      * Then 정상 응답 처리된다.
      */
     @DisplayName("노선의 구간을 제거한다.")
@@ -141,14 +141,15 @@ public class SectionAcceptanceTest {
     }
 
     private Long 구간이_등록되어_있다(final Long lineId, final Long upStationId,
-                                                   final Long downStationId, final int distance) {
+                             final Long downStationId, final int distance) {
         final Map<String, String> params = registerSectionRequestPixture(upStationId, downStationId, distance);
         final ExtractableResponse<Response> response = apiRegisteSection(lineId, params);
         final SectionResponse sectionResponse = response.as(SectionResponse.class);
         return sectionResponse.getId();
     }
+
     private ExtractableResponse<Response> 구간을_등록한다(final Long lineId, final Long upStationId,
-                                                                      final Long downStationId, final int distance) {
+                                                   final Long downStationId, final int distance) {
         final Map<String, String> params = registerSectionRequestPixture(upStationId, downStationId, distance);
         final ExtractableResponse<Response> response = apiRegisteSection(lineId, params);
         return response;
@@ -161,31 +162,6 @@ public class SectionAcceptanceTest {
                 .when().post("/lines/" + lineId + "/sections")
                 .then().log().all()
                 .extract();
-    }
-
-    private Long 노선이_생성되어_있다(final String name, final String color, final Long upStationId, final Long downStationId) {
-        Map<String, String> params1 = createLineRequestPixture(name, color, upStationId, downStationId);
-        final LineResponse lineResponse = apiCreateLine(params1);
-        return lineResponse.getId();
-    }
-
-    private LineResponse apiCreateLine(final Map<String, String> params) {
-        return RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().log().all()
-                .statusCode(HttpStatus.CREATED.value())
-                .extract().as(LineResponse.class);
-    }
-
-    private Map<String, String> createLineRequestPixture(final String name, final String color, final Long upStationId, final Long downStationId) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-        params.put("color", color);
-        params.put("upStationId", String.valueOf(upStationId));
-        params.put("downStationId", String.valueOf(downStationId));
-        return params;
     }
 
     private Map<String, String> registerSectionRequestPixture(final Long upStationId, final Long downStationId, final int distance) {

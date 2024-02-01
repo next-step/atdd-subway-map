@@ -3,7 +3,6 @@ package subway.line;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,6 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static subway.line.LIneAcceptanceTestUtil.노선이_생성되어_있다;
 
 @Sql("classpath:db/teardown.sql")
 @DisplayName("노선 관련 기능")
@@ -29,17 +29,7 @@ public class LineAcceptanceTest {
     @Test
     void apiCreateLine() {
         // when
-        Map<String, String> params = createLineRequestPixture("신분당선", "bg-red-600", 1L, 2L);
-
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().log().all()
-                .extract();
-
-        // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        노선이_생성되어_있다("신분당선", "bg-red-600", 1L, 2L);
 
         // then
         final ExtractableResponse<Response> extract = apiGetLines();
@@ -56,10 +46,8 @@ public class LineAcceptanceTest {
     @Test
     void getLines() {
         // given
-        Map<String, String> params1 = createLineRequestPixture("신분당선", "bg-red-600", 1L, 2L);
-        Map<String, String> params2 = createLineRequestPixture("분당선", "bg-green-600", 1L, 3L);
-        apiCreateLine(params1);
-        apiCreateLine(params2);
+        노선이_생성되어_있다("신분당선", "bg-red-600", 1L, 2L);
+        노선이_생성되어_있다("분당선", "bg-green-600", 1L, 3L);
 
         // when
         final ExtractableResponse<Response> extract = RestAssured.given().log().all()
@@ -84,13 +72,12 @@ public class LineAcceptanceTest {
     @Test
     void apiGetLine() {
         // given
-        Map<String, String> params1 = createLineRequestPixture("신분당선", "bg-red-600", 1L, 2L);
-        final Long id = apiCreateLine(params1).as(LineResponse.class).getId();
+        Long lineId = 노선이_생성되어_있다("신분당선", "bg-red-600", 1L, 2L);
 
         // when
         final ExtractableResponse<Response> extract = RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/lines/" + id)
+                .when().get("/lines/" + lineId)
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
                 .extract();
@@ -110,12 +97,11 @@ public class LineAcceptanceTest {
     @Test
     void modifyLine() {
         // given
-        Map<String, String> params1 = createLineRequestPixture("신분당선", "bg-red-600", 1L, 2L);
-        final Long id = apiCreateLine(params1).as(LineResponse.class).getId();
-        final Map<String, String> modifyBody = modifyLineRequestPixture(id, "다른분당선", "bg-red-900");
+        Long lineId = 노선이_생성되어_있다("신분당선", "bg-red-600", 1L, 2L);
 
         // when
-        final ExtractableResponse<Response> extract = RestAssured.given().log().all()
+        final Map<String, String> modifyBody = modifyLineRequestPixture(lineId, "다른분당선", "bg-red-900");
+        final ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(modifyBody)
                 .when().put("/lines")
@@ -124,7 +110,7 @@ public class LineAcceptanceTest {
                 .extract();
 
         // then
-        final LineResponse modifyLineResponse = apiGetLine(id).as(LineResponse.class);
+        final LineResponse modifyLineResponse = apiGetLine(lineId).as(LineResponse.class);
         assertThat(modifyLineResponse.getName()).isEqualTo("다른분당선");
         assertThat(modifyLineResponse.getColor()).isEqualTo("bg-red-900");
     }
@@ -138,13 +124,12 @@ public class LineAcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        Map<String, String> params1 = createLineRequestPixture("신분당선", "bg-red-600", 1L, 2L);
-        final Long id = apiCreateLine(params1).as(LineResponse.class).getId();
+        Long lineId = 노선이_생성되어_있다("신분당선", "bg-red-600", 1L, 2L);
 
         // when
         RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().delete("/lines/" + id)
+                .when().delete("/lines/" + lineId)
                 .then().log().all()
                 .statusCode(HttpStatus.NO_CONTENT.value())
                 .extract();
@@ -152,19 +137,9 @@ public class LineAcceptanceTest {
         // then
         RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/lines/" + id)
+                .when().get("/lines/" + lineId)
                 .then().log().all()
                 .statusCode(HttpStatus.NOT_FOUND.value())
-                .extract();
-    }
-
-    private ExtractableResponse<Response> apiCreateLine(final Map<String, String> params) {
-        return RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().log().all()
-                .statusCode(HttpStatus.CREATED.value())
                 .extract();
     }
 
@@ -184,15 +159,6 @@ public class LineAcceptanceTest {
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
                 .extract();
-    }
-
-    private Map<String, String> createLineRequestPixture(final String name, final String color, final Long upStationId, final Long downStationId) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-        params.put("color", color);
-        params.put("upStationId", String.valueOf(upStationId));
-        params.put("downStationId", String.valueOf(downStationId));
-        return params;
     }
 
     private Map<String, String> modifyLineRequestPixture(final Long id, final String name, final String color) {
