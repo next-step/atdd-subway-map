@@ -116,6 +116,21 @@ public class LineAcceptanceTest {
 		assertThat(getResponse.jsonPath().getString("color")).isEqualTo(requestBody.getColor());
 	}
 
+	@DisplayName("특정 지하철 노선을 삭제한다")
+	@Test
+	void delete_line() {
+		// given
+		StationApi.createStation(StationFixture.강남역_생성_요청());
+		StationApi.createStation(StationFixture.압구정역_생성_요청());
+		Long lineId = createLine(LineFixture.신분당선_생성()).body().jsonPath().getLong("id");
+
+		// when
+		ExtractableResponse<Response> response = deleteLine(lineId);
+
+		// then
+		assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+	}
+
 	private ExtractableResponse<Response> createLine(LineRequest request) {
 		return RestAssured.given()
 				.log()
@@ -164,6 +179,19 @@ public class LineAcceptanceTest {
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
 				.when()
 				.put("/lines/" + lineId)
+				.then()
+				.log()
+				.all()
+				.extract();
+	}
+
+	private ExtractableResponse<Response> deleteLine(Long lineId) {
+		return RestAssured.given()
+				.log()
+				.all()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.when()
+				.delete("/lines/" + lineId)
 				.then()
 				.log()
 				.all()
