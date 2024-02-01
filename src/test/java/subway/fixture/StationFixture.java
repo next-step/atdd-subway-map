@@ -15,19 +15,10 @@ public class StationFixture {
 	}
 
 	public static Builder builder() {
-		return new Builder();
+		return new Builder().stationName("강남역");
 	}
 
-	public static StationFixture.Builder init() {
-		return StationFixture.builder()
-			.stationName("강남역");
-	}
-
-	public String getStationName() {
-		return stationName;
-	}
-
-	public ExtractableResponse<Response> actionReturnExtractableResponse() {
+	public ExtractableResponse<Response> create() {
 		StationRequest request = new StationRequest(stationName);
 
 		return Rest.builder()
