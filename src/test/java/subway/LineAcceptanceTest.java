@@ -124,6 +124,62 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선을 생성하고 생성한 지하철 노선을 조회하면 생성한 지하철 노선의 정보를 응답받을 수 있다.")
     @Test
     void test3() {
+        //given
+        // 역 저장
+        Map<String, String> param1 = Map.of("name", "역삼역");
+        Map<String, String> param2 = Map.of("name", "선릉역");
+        Map<String, String> param3 = Map.of("name", "왕십리역");
+        Map<String, String> param4 = Map.of("name", "고색역");
+
+        createStation(param1);
+        createStation(param2);
+        createStation(param3);
+        createStation(param4);
+
+        String lineName1 = "신분당선";
+        String lineColor1 = "bg-red-600";
+        Long upStationId1 = 1L;
+        Long downStationId1 = 2L;
+        Integer distance1 = 10;
+
+        Map<String, String> requestParam1 = Map.of(
+            "name", lineName1,
+            "color", lineColor1,
+            "upStationId", upStationId1.toString(),
+            "downStationId", downStationId1.toString(),
+            "distance", distance1.toString()
+        );
+
+        given()
+            .body(requestParam1)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().post("/lines").then().log().all();
+
+        String lineName2 = "분당선";
+        String lineColor2 = "bg-yellow-600";
+        Long upStationId2 = 3L;
+        Long downStationId2 = 4L;
+        Integer distance2 = 2;
+
+        Map<String, String> requestParam2 = Map.of(
+            "name", lineName2,
+            "color", lineColor2,
+            "upStationId", upStationId2.toString(),
+            "downStationId", downStationId2.toString(),
+            "distance", distance2.toString()
+        );
+
+        given()
+            .body(requestParam2)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().post("/lines").then().log().all();
+
+
+        //when
+        LineResponse lineResponse = when().get("/lines/1").then().extract().jsonPath().getObject(".", LineResponse.class);
+        assertThat(lineResponse.getId()).isEqualTo(1);
+        assertThat(lineResponse.getName()).isEqualTo(lineName1);
+        assertThat(lineResponse.getColor()).isEqualTo(lineColor1);
 
     }
 
