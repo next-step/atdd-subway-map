@@ -2,17 +2,17 @@ package subway.station;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import subway.testhelper.StationApiCaller;
+import subway.testhelper.StationFixture;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -21,9 +21,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationAcceptanceTest {
+    private static final String 강남역 = "강남역";
+    private static final String 삼성역 = "삼성역";
+    private static StationFixture stationFixture;
 
-    private static final String GANGNAM_STATION = "강남역";
-    private static final String SAMSUNG_STATION = "삼성역";
+    @BeforeAll
+    static void setUp() {
+        stationFixture = new StationFixture();
+    }
 
     /**
      * When 지하철역을 생성하면
@@ -34,15 +39,12 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        Map<String, String> params = new HashMap<>();
-        params.put("name", GANGNAM_STATION);
-
         // then
-        ExtractableResponse<Response> response = StationApiCaller.지하철_역_생성(params);
+        ExtractableResponse<Response> response = StationApiCaller.지하철_역_생성(stationFixture.get강남역_params());
 
         // then
         List<String> actual = StationApiCaller.지하철_역들_조회().jsonPath().getList("name", String.class);
-        String expected = GANGNAM_STATION;
+        String expected = 강남역;
         assertThat(actual).containsAnyOf(expected);
     }
 
@@ -55,18 +57,14 @@ public class StationAcceptanceTest {
     @Test
     void findStations() {
         // given
-        Map<String, String> params = new HashMap<>();
-        params.put("name", GANGNAM_STATION);
-        StationApiCaller.지하철_역_생성(params);
-
-        params.put("name", SAMSUNG_STATION);
-        StationApiCaller.지하철_역_생성(params);
+        StationApiCaller.지하철_역_생성(stationFixture.get강남역_params());
+        StationApiCaller.지하철_역_생성(stationFixture.get삼성역_params());
 
         // when
         List<String> actual = StationApiCaller.지하철_역들_조회().jsonPath().getList("name", String.class);
 
         // then
-        List<String> expected = List.of(GANGNAM_STATION, SAMSUNG_STATION);
+        List<String> expected = List.of(강남역, 삼성역);
         assertThat(actual).containsAll(expected);
     }
 
@@ -79,9 +77,7 @@ public class StationAcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        Map<String, String> params = new HashMap<>();
-        params.put("name", GANGNAM_STATION);
-        ExtractableResponse<Response> stationResponse = StationApiCaller.지하철_역_생성(params);
+        ExtractableResponse<Response> stationResponse = StationApiCaller.지하철_역_생성(stationFixture.get강남역_params());
         String location = stationResponse.header("Location");
 
         // when

@@ -9,12 +9,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
-import subway.testhelper.JsonPathHelper;
-import subway.testhelper.LineApiCaller;
-import subway.testhelper.StationApiCaller;
+import subway.testhelper.*;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -34,48 +31,22 @@ public class LineAcceptanceTest {
     private Long 강남역_ID;
     private Long 삼성역_ID;
     private Long 선릉역_ID;
-    private Long 교대역_ID;
 
     @BeforeEach
     void setUpClass() {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-        강남역_ID = JsonPathHelper.getObject(StationApiCaller.지하철_역_생성(params), "id", Long.class);
-        params.put("name", "삼성역");
-        삼성역_ID = JsonPathHelper.getObject(StationApiCaller.지하철_역_생성(params), "id", Long.class);
-        params.put("name", "선릉역");
-        선릉역_ID = JsonPathHelper.getObject(StationApiCaller.지하철_역_생성(params), "id", Long.class);
-        params.put("name", "교대역");
-        교대역_ID = JsonPathHelper.getObject(StationApiCaller.지하철_역_생성(params), "id", Long.class);
+        StationFixture stationFixture = new StationFixture();
+        강남역_ID = stationFixture.get강남역_ID();
+        삼성역_ID = stationFixture.get삼성역_ID();
+        선릉역_ID = stationFixture.get선릉역_ID();
 
-        신분당선 = new HashMap<>();
-        신분당선.put("name", "신분당선");
-        신분당선.put("color", "bg-red-600");
-        신분당선.put("upStationId", 강남역_ID.toString());
-        신분당선.put("downStationId", 삼성역_ID.toString());
-        신분당선.put("distance", "10");
+        LineFixture lineFixture = new LineFixture(stationFixture);
+        신분당선 = lineFixture.get신분당선_params();
+        영호선 = lineFixture.get영호선_params();
 
-        영호선 = new HashMap<>();
-        영호선.put("name", "0호선");
-        영호선.put("color", "bg-red-100");
-        영호선.put("upStationId", 강남역_ID.toString());
-        영호선.put("downStationId", 선릉역_ID.toString());
-        영호선.put("distance", "10");
-
-        삼성역_부터_선릉역_구간 = new HashMap<>();
-        삼성역_부터_선릉역_구간.put("upStationId", 삼성역_ID.toString());
-        삼성역_부터_선릉역_구간.put("downStationId", 선릉역_ID.toString());
-        삼성역_부터_선릉역_구간.put("distance", "10");
-
-        선릉역_부터_교대역_구간 = new HashMap<>();
-        선릉역_부터_교대역_구간.put("upStationId", 선릉역_ID.toString());
-        선릉역_부터_교대역_구간.put("downStationId", 교대역_ID.toString());
-        선릉역_부터_교대역_구간.put("distance", "10");
-
-        삼성역_부터_강남역_구간 = new HashMap<>();
-        삼성역_부터_강남역_구간.put("upStationId", 삼성역_ID.toString());
-        삼성역_부터_강남역_구간.put("downStationId", 강남역_ID.toString());
-        삼성역_부터_강남역_구간.put("distance", "10");
+        SectionFixture sectionFixture = new SectionFixture(stationFixture);
+        삼성역_부터_선릉역_구간 = sectionFixture.get삼성역_부터_선릉역_구간_params();
+        선릉역_부터_교대역_구간 = sectionFixture.get선릉역_부터_교대역_구간_params();
+        삼성역_부터_강남역_구간 = sectionFixture.get삼성역_부터_강남역_구간_params();
     }
 
     /**
