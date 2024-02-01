@@ -2,14 +2,16 @@ package subway.location.enums;
 
 import java.util.function.Function;
 
+import org.springframework.web.util.UriComponentsBuilder;
+
 public enum Location {
-	LINES("/lines", path -> "/lines/" + path),
-	STATIONS("/stations", path -> "/stations/" + path);
+	LINES("/lines", path -> UriComponentsBuilder.fromPath("/lines/").path(path)),
+	STATIONS("/stations", path -> UriComponentsBuilder.fromPath("/stations/").path(path));
 
 	private final String uri;
-	private final Function<String, String> expression;
+	private final Function<String, UriComponentsBuilder> expression;
 
-	Location(String uri, Function<String, String> expression) {
+	Location(String uri, Function<String, UriComponentsBuilder> expression) {
 		this.uri = uri;
 		this.expression = expression;
 	}
@@ -18,7 +20,7 @@ public enum Location {
 		return uri;
 	}
 
-	public String addPath(Object path) {
+	public UriComponentsBuilder path(Object path) {
 		return expression.apply(String.valueOf(path));
 	}
 }
