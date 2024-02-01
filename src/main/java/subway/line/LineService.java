@@ -2,10 +2,14 @@ package subway.line;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.line.section.Section;
+import subway.line.section.Sections;
+import subway.line.section.SectionsUpdateRequest;
 import subway.station.Station;
 import subway.station.StationRepository;
 import subway.station.StationResponse;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,7 +27,7 @@ public class LineService {
     }
 
     @Transactional
-    public LineResponse saveStation(LineRequest lineRequest) {
+    public LineResponse saveLine(LineRequest lineRequest) {
         Line line = lineRepository.save(createLine(lineRequest));
         return createLineResponse(line);
     }
@@ -35,20 +39,47 @@ public class LineService {
     }
 
     public LineResponse findLine(Long id) {
-        Line line = lineRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 지하철라인 정보를 찾지 못했습니다."));
+        Line line = getLine(id);
         return createLineResponse(line);
     }
 
     @Transactional
     public void updateLine(Long id,
                            LineUpdateRequest lineUpdateRequest) {
-        Line line = lineRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 지하철라인 정보를 찾지 못했습니다."));
+        Line line = getLine(id);
         line.update(lineUpdateRequest.getName(), lineUpdateRequest.getColor());
     }
 
     @Transactional
     public void deleteLine(Long id) {
         lineRepository.deleteById(id);
+    }
+
+    @Transactional
+    public LineResponse addSection(Long id,
+                           SectionsUpdateRequest sectionsUpdateRequest) {
+        Line line = getLine(id);
+        line.addSection(createSection(sectionsUpdateRequest));
+        lineRepository.save(line);
+        return createLineResponse(line);
+    }
+
+    @Transactional
+    public void deleteSection(Long id,
+                              Long stationId) {
+        Line line = getLine(id);
+        line.deleteSection(getStation(stationId));
+        lineRepository.save(line);
+    }
+
+    private Line getLine(Long id) {
+        return lineRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 지하철라인 정보를 찾지 못했습니다."));
+    }
+
+    private Section createSection(SectionsUpdateRequest sectionsUpdateRequest) {
+        return new Section(getStation(sectionsUpdateRequest.getUpStationId()),
+                getStation(sectionsUpdateRequest.getDownStationId()),
+                sectionsUpdateRequest.getDistance());
     }
 
     private Line createLine(LineRequest lineRequest) {
@@ -71,10 +102,19 @@ public class LineService {
     }
 
     private List<StationResponse> getStations(Line line) {
-        return List.of(getStationResponse(line.getStationLink().getUpStation()), getStationResponse(line.getStationLink().getDownStation()));
+        Sections sections = line.getSections();
+        List<StationResponse> stationResponses = new ArrayList<>(getStationResponses(sections.startStations()));
+        stationResponses.add(getStationResponses(sections.lastStation()));
+        return stationResponses;
     }
 
-    private StationResponse getStationResponse(Station station) {
+    private List<StationResponse> getStationResponses(List<Station> stations) {
+        return stations.stream()
+                .map(this::getStationResponses)
+                .collect(Collectors.toList());
+    }
+
+    private StationResponse getStationResponses(Station station) {
         return new StationResponse(station.getId(),
                 station.getName());
     }
