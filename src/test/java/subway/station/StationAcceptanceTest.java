@@ -6,7 +6,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import subway.testhelper.JsonPathHelper;
 import subway.testhelper.StationApiCaller;
@@ -15,7 +14,6 @@ import subway.testhelper.StationFixture;
 import java.util.Collections;
 import java.util.List;
 
-import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
@@ -83,11 +81,7 @@ public class StationAcceptanceTest {
         String location = stationResponse.header("Location");
 
         // when
-        given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().delete(location)
-                .then().log().all()
-                .extract();
+        StationApiCaller.지하철_역_삭제(location);
 
         // then
         List<String> actual = JsonPathHelper.getAll(StationApiCaller.지하철_역들_조회(), "name", String.class);
