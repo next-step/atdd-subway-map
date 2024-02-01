@@ -2,11 +2,11 @@ package subway.application;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.dto.StationSectionRequest;
+import subway.dto.StationSectionResponse;
 import subway.entity.*;
 
 import javax.persistence.EntityNotFoundException;
-import java.util.List;
-import java.util.Map;
 
 @Service
 @Transactional(readOnly = true)
@@ -25,19 +25,15 @@ public class StationSectionService {
     }
 
     @Transactional
-    public StationSection saveStationSection(Long stationLineId, Map<String, Object> request) {
-        StationLine stationLine = findStationLineById(stationLineId);
-
+    public StationSectionResponse saveStationSection(StationSectionRequest request) {
+        StationLine stationLine = findStationLineById(request.getStationLineId());
         StationSection stationSection = convertToStationSectionEntity(request);
-
         hasStation(stationSection);
 
         if (!stationSection.canSave(stationLine)) {
             throw new IllegalArgumentException("해당 역은 저장할 수 없습니다.");
         }
-
-        stationSection.setStationLine(stationLine);
-        return canStationSectionSave(stationSection, stationLine);
+        return convertToResponse(canStationSectionSave(stationSection, stationLine));
     }
 
     private void hasStation(StationSection stationSection) {
@@ -46,20 +42,30 @@ public class StationSectionService {
     }
 
     private StationSection canStationSectionSave(StationSection stationSection, StationLine stationLine) {
+        stationSection.setStationLine(stationLine);
         stationSection.updateLineDownStationId();
         stationSection.canSave(stationLine);
         return stationSectionRepository.save(stationSection);
     }
 
-    private static StationSection convertToStationSectionEntity(Map<String, Object> request) {
+    private static StationSection convertToStationSectionEntity(StationSectionRequest request) {
         return new StationSection(
-                Long.parseLong(request.get("upStationId").toString()),
-                Long.parseLong(request.get("downStationId").toString()),
-                Integer.parseInt(request.get("distance").toString())
+                request.getUpStationId(),
+                request.getDownStationId(),
+                request.getDistance()
         );
     }
 
     private StationLine findStationLineById(Long stationLineId) {
         return stationLineRepository.findById(stationLineId).orElseThrow(EntityNotFoundException::new);
+    }
+
+    private StationSectionResponse convertToResponse(StationSection stationSection) {
+        return new StationSectionResponse(
+            stationSection.getId(),
+            stationSection.getUpStationId(),
+            stationSection.getDownStationId(),
+            stationSection.getDistance()
+        );
     }
 }

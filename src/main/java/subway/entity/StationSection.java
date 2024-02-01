@@ -6,8 +6,11 @@ import javax.persistence.*;
 
 @Entity
 public class StationSection {
+
     public static final int MIN_STATION_ID_VALUE = 1;
+
     public static final int MIN_DISTANCE_VALUE = 1;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -46,19 +49,26 @@ public class StationSection {
     }
 
     public boolean canSave(StationLine stationLine) {
-        // 1. 요청된 상행, 하행역이 같은 번호인지?
-        if(this.upStationId.equals(this.downStationId)) {
+        if(stationsSame()) {
             return false;
         }
-
-        // 2. 요청된 상행역이 하행 종점역으로 등록되었는지?
-        if(!this.upStationId.equals(stationLine.getDownStationId())) {
+        if(hasUpStation(stationLine)) {
             return false;
         }
+        return containsDifferentDownStation(stationLine);
+    }
 
-        // 3. 요청된 하행 종점역이 Line에 저장된 구간별 상행역 번호가 아닌지?
+    private boolean containsDifferentDownStation(StationLine stationLine) {
         return stationLine.getSections().stream()
                 .noneMatch(stationSection -> this.downStationId.equals(stationSection.getUpStationId()));
+    }
+
+    private boolean hasUpStation(StationLine stationLine) {
+        return !this.upStationId.equals(stationLine.getDownStationId());
+    }
+
+    private boolean stationsSame() {
+        return upStationId.equals(this.downStationId);
     }
 
     public Long getId() {

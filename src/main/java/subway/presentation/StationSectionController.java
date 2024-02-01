@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import subway.application.StationSectionService;
+import subway.dto.StationSectionRequest;
+import subway.dto.StationSectionResponse;
 import subway.entity.StationSection;
 
 import java.net.URI;
@@ -21,11 +23,11 @@ public class StationSectionController {
     }
 
     @PostMapping("/lines/{stationLineId}/sections")
-    public ResponseEntity<StationSection> createStationLine(@PathVariable Long stationLineId,
-                                                            @RequestBody Map<String, Object> request) {
-        StationSection stationSection = stationLineService.saveStationSection(stationLineId, request);
+    public ResponseEntity<StationSectionResponse> createStationLine(@PathVariable Long stationLineId,
+                                                                    @RequestBody StationSectionRequest request) {
+        StationSectionResponse stationSectionResponse =
+                stationLineService.saveStationSection(request.updateStationLineId(stationLineId));
         return ResponseEntity.created(
-                URI.create(String.format("/lines/%d/sections", stationSection.getStationLine().getId()))).body(stationSection);
-
+                URI.create(String.format("/lines/%d/sections", stationLineId))).body(stationSectionResponse);
     }
 }
