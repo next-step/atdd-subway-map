@@ -57,7 +57,7 @@ public class SectionAcceptanceTest extends BaseTest{
         this.신분당선_생성();
 
         // when
-        JsonPath createSectionResponse = this.신분당선_구간_연장_역삼역_지하철역().jsonPath();
+        JsonPath createSectionResponse = this.신분당선_구간_연장_역삼역_지하철역();
 
         // then
         final String lineName = createSectionResponse.get("name");
@@ -77,19 +77,20 @@ public class SectionAcceptanceTest extends BaseTest{
     void 지하철_구간_삭제() {
         // given
         this.신분당선_생성();
-        ExtractableResponse<Response> createSectionResponse = this.신분당선_구간_연장_역삼역_지하철역();
-        final String location = createSectionResponse.header("Location");
-        final long 신규_구간_ID = Long.parseLong(location.replaceAll(".*/(\\d+)$", "$1"));
+        this.신분당선_구간_연장_역삼역_지하철역();
 
         // when
         given().log().all()
+                .param("stationId", 지하철역_ID)
                 .when()
-                .delete(SECTION_API_PATH, 신분당선_ID, 신규_구간_ID)
-                .then().log().all()
+                .delete(SECTION_API_PATH, 신분당선_ID)
+                .then()
+                .statusCode(HttpStatus.NO_CONTENT.value())
+                .log().all()
                 .extract();
 
         // then
-        JsonPath getLineResponse = given()
+        final JsonPath getLineResponse = given()
                 .when()
                 .get(LINE_API_PATH + "/{id}", 신분당선_ID)
                 .then()
@@ -102,11 +103,12 @@ public class SectionAcceptanceTest extends BaseTest{
         assertThat(newDownStationName).isNotEqualTo("지하철역");
     }
 
-    private ExtractableResponse<Response> 신분당선_구간_연장_역삼역_지하철역() {
+    private JsonPath 신분당선_구간_연장_역삼역_지하철역() {
         final SectionRequest sectionRequest = new SectionRequest(역삼역_ID, 지하철역_ID, 5);
-        ExtractableResponse<Response> createSectionResponse = callCreateApi(sectionRequest, SECTION_API_PATH, 신분당선_ID);
+        final ExtractableResponse<Response> createSectionResponse = callCreateApi(sectionRequest, SECTION_API_PATH, 신분당선_ID);
+        final JsonPath jsonPath = createSectionResponse.jsonPath();
 
-        return createSectionResponse;
+        return jsonPath;
     }
 
     private void 신분당선_생성() {
