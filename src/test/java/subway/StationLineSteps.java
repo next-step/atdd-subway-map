@@ -45,7 +45,7 @@ public class StationLineSteps {
      * @param request 지하철 요청 정보를 담은 객체
      * @return REST Assured 기반으로 생성된 Response 객체
      */
-    static ExtractableResponse<Response> 지하철_노선_생성_요청(StationLineRequest request) {
+    static ExtractableResponse<Response> 지하철_노선_생성_요청_검증_포함(StationLineRequest request) {
         return given().log().all()
                 .body(request)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)

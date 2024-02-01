@@ -7,7 +7,6 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpHeaders;
 import org.springframework.test.annotation.DirtiesContext;
 import subway.dto.StationLineRequest;
 import subway.entity.StationLine;
@@ -43,7 +42,7 @@ public class StationLineAcceptanceTest {
         StationLineRequest 신분당선 = StationLineMockData.신분당선;
 
         // when
-        지하철_노선_생성_요청(신분당선);
+        지하철_노선_생성_요청_검증_포함(신분당선);
 
         // then
         assertThat(convertStationLines(모든_지하철_노선_조회_요청())).usingRecursiveComparison()
@@ -63,8 +62,8 @@ public class StationLineAcceptanceTest {
         StationLineRequest 신분당선 = StationLineMockData.신분당선;
         StationLineRequest 분당선 = StationLineMockData.분당선;
 
-        지하철_노선_생성_요청(신분당선);
-        지하철_노선_생성_요청(분당선);
+        지하철_노선_생성_요청_검증_포함(신분당선);
+        지하철_노선_생성_요청_검증_포함(분당선);
 
         // when
         assertThat(convertStationLines(모든_지하철_노선_조회_요청())).usingRecursiveComparison()
@@ -82,7 +81,7 @@ public class StationLineAcceptanceTest {
     void findStationLine() {
         // given
         StationLineRequest 신분당선 = StationLineMockData.신분당선;
-        ExtractableResponse<Response> response = 지하철_노선_생성_요청(신분당선);
+        ExtractableResponse<Response> response = 지하철_노선_생성_요청_검증_포함(신분당선);
 
         // when, then
         assertThat(convertStationLine(지하철_노선_조회_요청(getCreatedLocationId(response)))).usingRecursiveComparison()
@@ -102,7 +101,7 @@ public class StationLineAcceptanceTest {
         StationLineRequest 신분당선 = StationLineMockData.신분당선;
         StationLineRequest 수정된_신분당선 = StationLineMockData.수정된_신분당선;
 
-        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(신분당선);
+        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청_검증_포함(신분당선);
 
         // when
         지하철_노선_수정_요청(수정된_신분당선, getCreatedLocationId(createResponse));
@@ -125,8 +124,8 @@ public class StationLineAcceptanceTest {
         StationLineRequest 신분당선 = StationLineMockData.신분당선;
         StationLineRequest 분당선 = StationLineMockData.분당선;
 
-        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(신분당선);
-        지하철_노선_생성_요청(분당선);
+        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청_검증_포함(신분당선);
+        지하철_노선_생성_요청_검증_포함(분당선);
 
         // when
         지하철_노선_삭제_요청(getCreatedLocationId(createResponse));
