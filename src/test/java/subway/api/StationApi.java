@@ -1,4 +1,4 @@
-package subway.fixture;
+package subway.api;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;

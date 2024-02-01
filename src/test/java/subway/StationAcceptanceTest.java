@@ -1,9 +1,9 @@
 package subway;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.fixture.StationApi.createStation;
-import static subway.fixture.StationApi.deleteStation;
-import static subway.fixture.StationApi.getStations;
+import static subway.api.StationApi.createStation;
+import static subway.api.StationApi.deleteStation;
+import static subway.api.StationApi.getStations;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
