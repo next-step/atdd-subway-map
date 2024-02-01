@@ -1,8 +1,10 @@
 package subway.line;
 
+import subway.line.section.Section;
 import subway.station.Station;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 public class Line {
@@ -24,6 +26,13 @@ public class Line {
     @ManyToOne
     @JoinColumn(name = "down_station_id")
     private Station downStation;
+
+    public List<Section> getSections() {
+        return sections;
+    }
+
+    @OneToMany(mappedBy = "line")
+    private List<Section> sections;
 
     public Line() {
     }
@@ -58,5 +67,9 @@ public class Line {
     public void update(String name, String color) {
         this.name = name;
         this.color = color;
+    }
+
+    public void changeDownStation(Station station){
+        this.downStation = station;
     }
 }

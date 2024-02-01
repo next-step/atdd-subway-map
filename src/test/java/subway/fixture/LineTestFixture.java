@@ -30,6 +30,13 @@ public class LineTestFixture {
                 .extract();
     }
 
+    public static ExtractableResponse<Response> getLine(long id) {
+        return RestAssured.given().log().all()
+                .when().get("/lines.{id}", id)
+                .then().log().all()
+                .extract();
+    }
+
     public static ExtractableResponse<Response> showLine(long id) {
         return RestAssured.given().log().all()
                 .when().get("/lines/{id}",id)
