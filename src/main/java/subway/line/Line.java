@@ -6,7 +6,6 @@ import subway.section.Section;
 import subway.station.Station;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -18,12 +17,10 @@ public class Line {
     private String name;
     @Column(length = 20, nullable = false)
     private String color;
-
     private Long upStationId;
     private Long downStationId;
-    @OneToMany(mappedBy = "line", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, orphanRemoval = true)
-    List<Section> sections = new ArrayList<>();
-
+    @Embedded
+    private Sections sections = new Sections();
 
     public Line() {
     }
@@ -51,7 +48,7 @@ public class Line {
     }
 
     public List<Section> getSections() {
-        return sections;
+        return this.sections.getSections();
     }
 
     public void changeName(final String name) {
@@ -63,26 +60,14 @@ public class Line {
     }
 
     public void registerValidate(final Station upStation, final Station downStation) {
-        checkLineDownStationAndSectionUpStation(upStation);
+        checkEqualsLineDownStation(upStation);
 
-        checkLineStationsDuplicate(downStation);
+        this.sections.checkLineStationsDuplicate(downStation);
     }
 
-    private void checkLineDownStationAndSectionUpStation(final Station upStation) {
+    private void checkEqualsLineDownStation(final Station upStation) {
         if (!this.downStationId.equals(upStation.getId())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "노선의 하행종점역과 등록하려는 구간의 상행역이 다릅니다.");
-        }
-    }
-
-    private void checkLineStationsDuplicate(final Station downStation) {
-        for (Section section : this.sections) {
-            checkSameStation(downStation, section);
-        }
-    }
-
-    private static void checkSameStation(final Station downStation, final Section section) {
-        if (section.getUpStation().getId().equals(downStation.getId())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 등록되어 있는 지하철역 입니다.");
         }
     }
 
@@ -91,7 +76,7 @@ public class Line {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제할 수 없는 지하철 역 입니다.");
         }
 
-        if (this.sections.size() < 2) {
+        if (this.sections.count() < 2) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제할 수 없는 지하철 역 입니다.");
         }
     }
@@ -101,11 +86,6 @@ public class Line {
     }
 
     public void removeSection(final Long stationId) {
-        final Section deleteSection = this.sections.stream()
-                .filter(s -> s.getDownStation().getId().equals(stationId))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("역을 찾을 수 없습니다."));
-        System.out.println("제거될 구간: " + deleteSection.getId());
-        this.sections.remove(deleteSection);
+        this.sections.removeSection(stationId);
     }
 }

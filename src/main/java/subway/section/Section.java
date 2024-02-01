@@ -1,5 +1,7 @@
 package subway.section;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import subway.line.Line;
 import subway.station.Station;
 
@@ -35,12 +37,6 @@ public class Section {
         this.line = line;
     }
 
-    public Section(final Station upStation, final Station downStation, final int distance) {
-        this.upStation = upStation;
-        this.downStation = downStation;
-        this.distance = distance;
-    }
-
     public Long getId() {
         return id;
     }
@@ -61,14 +57,14 @@ public class Section {
         return downStation;
     }
 
+    public void checkEqualsUpStation(final Station downStation) {
+        if (this.upStation.isSame(downStation)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 등록되어 있는 지하철역 입니다.");
+        }
+    }
+
     @Override
     public String toString() {
-        return "Section{" +
-                "id=" + id +
-                ", line=" + line +
-                ", upStation=" + upStation +
-                ", downStation=" + downStation +
-                ", distance=" + distance +
-                '}';
+        return "Section{" + "id=" + id + ", line=" + line + ", upStation=" + upStation + ", downStation=" + downStation + ", distance=" + distance + '}';
     }
 }
