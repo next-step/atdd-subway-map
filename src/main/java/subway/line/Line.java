@@ -1,10 +1,6 @@
 package subway.line;
 
-import subway.Station;
-
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 public class Line {
@@ -18,16 +14,15 @@ public class Line {
     private Long upStationId;
     private Long downStationId;
     private int distance;
-    //private List<Station> stations = new ArrayList<>();
 
     public Line() {}
 
-    public Line(LineRequest lineRequest) {
-        this.name = lineRequest.getName();
-        this.color = lineRequest.getColor();
-        this.upStationId = lineRequest.getUpStationId();
-        this.downStationId = lineRequest.getDownStationId();
-        this.distance = lineRequest.getDistance();
+    public Line(String name, String color, Long upStationId, Long downStationId, int distance) {
+        this.name = name;
+        this.color = color;
+        this.upStationId = upStationId;
+        this.downStationId = downStationId;
+        this.distance = distance;
     }
 
     public Long getId() {

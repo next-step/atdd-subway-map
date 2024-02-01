@@ -26,4 +26,8 @@ public class LineRequest {
     public int getDistance() {
         return distance;
     }
+
+    public Line createLine() {
+        return new Line(name, color, upStationId, downStationId, distance);
+    }
 }

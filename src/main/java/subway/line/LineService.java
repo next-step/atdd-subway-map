@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.Station;
 import subway.StationRepository;
+import subway.StationResponse;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +25,8 @@ public class LineService {
         List<Station> stations = new ArrayList<>();
         stations.add(stationRepository.findById(lineRequest.getUpStationId()).orElseThrow());
         stations.add(stationRepository.findById(lineRequest.getDownStationId()).orElseThrow());
-        Line line = lineRepository.save(new Line(lineRequest));
+
+        Line line = lineRepository.save(lineRequest.createLine());
         return createLineResponse(line, stations);
     }
 
@@ -65,11 +67,11 @@ public class LineService {
     }
 
     private LineResponse createLineResponse(Line line, List<Station> stations) {
-        return new LineResponse(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                stations
-        );
+        List<StationResponse> stationResponses = new ArrayList<>();
+        for(Station station : stations) {
+            stationResponses.add(new StationResponse(station));
+        }
+
+        return new LineResponse(line, stationResponses);
     }
 }
