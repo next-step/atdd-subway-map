@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Embeddable
@@ -32,6 +33,13 @@ public class Sections implements Iterable<Section> {
 
     public Stream<Section> stream() {
         return sections.stream();
+    }
+
+    public List<Station> getStations() {
+        return sections.stream()
+                .flatMap(section -> Stream.of(section.getUpStation(), section.getDownStation()))
+                .distinct()
+                .collect(Collectors.toList());
     }
 
     public void connect(final Section section) {

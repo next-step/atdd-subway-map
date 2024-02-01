@@ -3,6 +3,8 @@ package subway.line.repository.domain;
 import subway.station.repository.domain.Station;
 
 import javax.persistence.*;
+import java.util.Collections;
+import java.util.List;
 
 @Entity
 public class Line {
@@ -43,8 +45,8 @@ public class Line {
         return color;
     }
 
-    public Sections getSections() {
-        return sections;
+    public List<Station> getStations() {
+        return Collections.unmodifiableList(sections.getStations());
     }
 
     public int getDistance() {
