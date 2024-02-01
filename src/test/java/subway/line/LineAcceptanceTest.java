@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.line.LIneAcceptanceTestUtil.노선이_생성되어_있다;
+import static subway.line.LineSteps.*;
 
 @Sql("classpath:db/teardown.sql")
 @DisplayName("노선 관련 기능")
@@ -32,7 +32,7 @@ public class LineAcceptanceTest {
         노선이_생성되어_있다("신분당선", "bg-red-600", 1L, 2L);
 
         // then
-        final ExtractableResponse<Response> extract = apiGetLines();
+        final ExtractableResponse<Response> extract = 노선목록을_조회한다();
         assertThat(extract.jsonPath().getList("name")).contains("신분당선");
         assertThat(extract.jsonPath().getList("color")).contains("bg-red-600");
     }
@@ -110,7 +110,7 @@ public class LineAcceptanceTest {
                 .extract();
 
         // then
-        final LineResponse modifyLineResponse = apiGetLine(lineId).as(LineResponse.class);
+        final LineResponse modifyLineResponse = 노선을_조회한다(lineId);
         assertThat(modifyLineResponse.getName()).isEqualTo("다른분당선");
         assertThat(modifyLineResponse.getColor()).isEqualTo("bg-red-900");
     }
@@ -143,22 +143,13 @@ public class LineAcceptanceTest {
                 .extract();
     }
 
-    private ExtractableResponse<Response> apiGetLines() {
-        return RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/lines")
-                .then().log().all()
-                .statusCode(HttpStatus.OK.value())
-                .extract();
+    public static Long 노선이_생성되어_있다(final String name, final String color, final Long upStationId, final Long downStationId) {
+        return LineSteps.노선이_생성되어_있다(name, color, upStationId, downStationId).as(LineResponse.class).getId();
     }
 
-    private ExtractableResponse<Response> apiGetLine(final Long id) {
-        return RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/lines/" + id)
-                .then().log().all()
-                .statusCode(HttpStatus.OK.value())
-                .extract();
+    private static LineResponse 노선을_조회한다(final Long lineId) {
+        final ExtractableResponse<Response> response = LineSteps.노선을_조회한다(lineId);
+        return response.as(LineResponse.class);
     }
 
     private Map<String, String> modifyLineRequestPixture(final Long id, final String name, final String color) {

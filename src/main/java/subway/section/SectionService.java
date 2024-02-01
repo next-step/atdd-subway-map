@@ -39,7 +39,6 @@ public class SectionService {
         final Station downStation = stationRepository.findById(sectionRequest.getDownStationId())
                 .orElseThrow(() -> new IllegalArgumentException(EMPTY_DOWN_STATION_MSG));
         line.registerValidate(upStation, downStation);
-
         line.changeDownStation(downStation);
 
         final Section section = new Section(upStation, downStation, sectionRequest.getDistance(), line);

@@ -9,12 +9,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
+import subway.line.LineResponse;
+import subway.line.LineSteps;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.line.LIneAcceptanceTestUtil.노선이_생성되어_있다;
+import static subway.line.LineSteps.노선이_생성되어_있다;
 
 @Sql("classpath:db/teardown.sql")
 @DisplayName("구간 관련 기능")
@@ -115,6 +117,10 @@ public class SectionAcceptanceTest {
         final ExtractableResponse<Response> response = 구간을_제거한다(lineId, 3L);
 
         구간이_정상_제거된다(response, HttpStatus.NO_CONTENT);
+    }
+
+    public static Long 노선이_생성되어_있다(final String name, final String color, final Long upStationId, final Long downStationId) {
+        return LineSteps.노선이_생성되어_있다(name, color, upStationId, downStationId).as(LineResponse.class).getId();
     }
 
     private ExtractableResponse<Response> 구간을_제거한다(final Long lineId, Long stationId) {
