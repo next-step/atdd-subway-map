@@ -80,7 +80,9 @@ public class Sections implements Iterable<Section> {
     }
 
     private boolean isNotLastSectionConnectable(final Section section) {
-        return getLastDownStation().stream().noneMatch(station -> station.equals(section.getUpStation()));
+        return getLastDownStation()
+                .map(station -> station.notEquals(section.getUpStation()))
+                .orElse(true);
     }
 
     private boolean isNotDownStationOfLastSection(final Station targetStation) {
