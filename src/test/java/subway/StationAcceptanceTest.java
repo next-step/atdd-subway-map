@@ -66,7 +66,7 @@ public class StationAcceptanceTest {
     /**
      * Given 지하철역을 생성한다
      * When 생성된 지하철 역이 아닌, 임의의 역을 제거한다
-     * Then 204(noContent) 응답코드가 아님을 확인한다
+     * Then 204(noContent) 응답코드가 아니고 500 에러 코드임을 확인한다
      */
     @DisplayName("생성한 역이 아닌 역을 삭제하면 204 코드를 반환하지 않는다.")
     @Test
@@ -81,6 +81,7 @@ public class StationAcceptanceTest {
 
         // then
         assertThat(response.getStatusCode()).isNotEqualTo(204);
+        assertThat(response.getStatusCode()).isEqualTo(500);
     }
 
     private ExtractableResponse<Response> createStation(String stationName) {
