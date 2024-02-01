@@ -1,5 +1,6 @@
 package subway;
 
+import fixture.LineTestUtil;
 import io.restassured.RestAssured;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -65,7 +66,7 @@ public class LineAcceptanceTest {
         param.put("color", Color.GREEN.name());
 
         //When 지하철 노선을 생성하면
-        LineResponse lineResponse = createLine(param);
+        LineResponse lineResponse = LineTestUtil.createLine(param);
 
         //Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
         List<String> names = RestAssured.given().log().all()
@@ -92,12 +93,12 @@ public class LineAcceptanceTest {
         param.put("name", "2호선");
         param.put("color", Color.GREEN.name());
 
-        createLine(param);
+        LineTestUtil.createLine(param);
 
         param.put("name", "7호선");
         param.put("color", Color.GREEN.name());
 
-        createLine(param);
+        LineTestUtil.createLine(param);
 
 
         // when
@@ -126,7 +127,7 @@ public class LineAcceptanceTest {
         param.put("name", "2호선");
         param.put("color", Color.GREEN.name());
 
-        LineResponse expected = createLine(param);
+        LineResponse expected = LineTestUtil.createLine(param);
 
         // when
         LineResponse actual = RestAssured.given().log().all()
@@ -155,7 +156,7 @@ public class LineAcceptanceTest {
         param.put("name", "2호선");
         param.put("color", Color.GREEN.name());
 
-        LineResponse expected = createLine(param);
+        LineResponse expected = LineTestUtil.createLine(param);
 
         // when
         param.put("color", Color.RED.name());
@@ -191,7 +192,7 @@ public class LineAcceptanceTest {
         param.put("name", "2호선");
         param.put("color", Color.GREEN.name());
 
-        LineResponse expected = createLine(param);
+        LineResponse expected = LineTestUtil.createLine(param);
 
         // when
         RestAssured.given().log().all()
@@ -205,23 +206,8 @@ public class LineAcceptanceTest {
                 .when()
                     .get("/lines/" + expected.getId())
                 .then().log().all()
-                    .statusCode(HttpStatus.BAD_REQUEST.value())
-                    .extract();
-
+                    .statusCode(HttpStatus.NO_CONTENT.value());
     }
 
-
-
-    private static LineResponse createLine(Map<String, String> param) {
-        return RestAssured.given().log().all()
-                .when()
-                    .body(param)
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                    .post("/lines")
-                .then()
-                    .statusCode(HttpStatus.CREATED.value())
-                    .extract()
-                    .as(LineResponse.class);
-    }
 
 }

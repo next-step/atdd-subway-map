@@ -16,13 +16,10 @@ public class Line {
     @Enumerated(EnumType.STRING)
     private Color color;
 
-    @Column(nullable = false)
     private Integer upStationId;
 
-    @Column(nullable = false)
     private Integer downStationId;
 
-    @Column(nullable = false)
     private Integer distance;
 
     protected Line() {}
