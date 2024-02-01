@@ -35,10 +35,10 @@ public class LineService {
 			.orElseThrow(EntityNotFoundException::new);
 	}
 
-	private LineStationMap saveLineStationMap(Line line, Long stationId, Long upperId) {
+	private LineStationMap saveLineStationMap(Line line, Long stationId, Long upperStationId) {
 		Station station = stationRepository.findById(stationId)
 			.orElseThrow(EntityNotFoundException::new);
-		LineStationMap lineStationMap = new LineStationMap(line, station, upperId);
+		LineStationMap lineStationMap = new LineStationMap(line, station, upperStationId);
 		return lineStationMapRepository.save(lineStationMap);
 	}
 
