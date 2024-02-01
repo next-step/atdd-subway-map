@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 import subway.dto.StationResponse;
+import subway.dto.UpdateLineRequest;
 import subway.entity.Line;
 import subway.repository.LineRepository;
 import subway.service.exception.NotFoundLineException;
@@ -56,6 +57,13 @@ public class LineService {
 								createLineResponse(
 										line, getStations(line.getUpStationId()), getStations(line.getDownStationId())))
 				.orElseThrow(() -> new NotFoundLineException(id));
+	}
+
+	@Transactional
+	public void updateLine(Long id, UpdateLineRequest request) {
+		Line line = lineRepository.findById(id).orElseThrow(() -> new NotFoundLineException(id));
+
+		line.updateLine(request.getName(), request.getColor());
 	}
 
 	private StationResponse getStations(Long stationId) {
