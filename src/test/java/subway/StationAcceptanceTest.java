@@ -10,8 +10,8 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpStatus.*;
-import static subway.StationFixture.GANGNAM_STATION;
-import static subway.StationFixture.SEOLLEUNG_STATION;
+import static subway.fixture.StationFixture.GANGNAM_STATION;
+import static subway.fixture.StationFixture.SEOLLEUNG_STATION;
 
 @DisplayName("지하철역 관련 기능")
 public class StationAcceptanceTest extends AcceptanceTest {

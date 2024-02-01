@@ -1,4 +1,4 @@
-package subway;
+package subway.fixture;
 
 import subway.controller.dto.LineCreateRequest;
 

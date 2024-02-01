@@ -12,15 +12,14 @@ import subway.controller.dto.LineUpdateRequest;
 import subway.controller.dto.StationResponse;
 
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.http.HttpStatus.*;
-import static subway.LineFixture.BUNDANG_LINE;
-import static subway.LineFixture.SHINBUNDANG_LINE;
-import static subway.StationFixture.*;
+import static subway.fixture.LineFixture.BUNDANG_LINE;
+import static subway.fixture.LineFixture.SHINBUNDANG_LINE;
+import static subway.fixture.StationFixture.*;
 
 @DisplayName("지하철 노선 관련 기능")
 public class LineAcceptanceTest extends AcceptanceTest {
