@@ -2,12 +2,13 @@ package subway.station;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
+import subway.testhelper.JsonPathHelper;
 import subway.testhelper.StationApiCaller;
 import subway.testhelper.StationFixture;
 
@@ -17,16 +18,17 @@ import java.util.List;
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
+
 @DirtiesContext
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationAcceptanceTest {
     private static final String 강남역 = "강남역";
     private static final String 삼성역 = "삼성역";
-    private static StationFixture stationFixture;
+    private StationFixture stationFixture;
 
-    @BeforeAll
-    static void setUp() {
+    @BeforeEach
+    void setUp() {
         stationFixture = new StationFixture();
     }
 
@@ -43,7 +45,7 @@ public class StationAcceptanceTest {
         ExtractableResponse<Response> response = StationApiCaller.지하철_역_생성(stationFixture.get강남역_params());
 
         // then
-        List<String> actual = StationApiCaller.지하철_역들_조회().jsonPath().getList("name", String.class);
+        List<String> actual = JsonPathHelper.getAll(StationApiCaller.지하철_역들_조회(), "name", String.class);
         String expected = 강남역;
         assertThat(actual).containsAnyOf(expected);
     }
@@ -61,7 +63,7 @@ public class StationAcceptanceTest {
         StationApiCaller.지하철_역_생성(stationFixture.get삼성역_params());
 
         // when
-        List<String> actual = StationApiCaller.지하철_역들_조회().jsonPath().getList("name", String.class);
+        List<String> actual = JsonPathHelper.getAll(StationApiCaller.지하철_역들_조회(), "name", String.class);
 
         // then
         List<String> expected = List.of(강남역, 삼성역);
@@ -88,7 +90,7 @@ public class StationAcceptanceTest {
                 .extract();
 
         // then
-        List<String> actual = StationApiCaller.지하철_역들_조회().jsonPath().getList("name", String.class);
+        List<String> actual = JsonPathHelper.getAll(StationApiCaller.지하철_역들_조회(), "name", String.class);
         List<String> expected = Collections.emptyList();
         assertThat(actual).containsAll(expected);
     }
