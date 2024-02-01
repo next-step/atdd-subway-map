@@ -28,7 +28,7 @@ public class SectionService {
     }
 
     @Transactional
-    public SectionResponse addSection(Long lineId, SectionAddRequest request) {
+    public void addSection(Long lineId, SectionAddRequest request) {
         Line line = findLineById(lineId);
 
         Station upStation = findStationById(request.getUpStationId());
@@ -42,8 +42,6 @@ public class SectionService {
         );
 
         line.addSection(section);
-
-        return SectionResponse.ofEntity(section);
     }
 
 

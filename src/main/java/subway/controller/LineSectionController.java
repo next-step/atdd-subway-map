@@ -25,11 +25,11 @@ public class LineSectionController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public SectionResponse addSection(
+    public void addSection(
         @PathVariable Long lineId,
         @RequestBody SectionAddRequest request
     ) {
-        return service.addSection(lineId, request);
+        service.addSection(lineId, request);
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
