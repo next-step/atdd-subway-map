@@ -48,5 +48,4 @@ public class StationService {
                                 .map(station -> new StationResponse(station.getId(), station.getName()))
                                 .orElseThrow(() -> new NoStationException("지하철 역이 없습니다."));
     }
-
 }

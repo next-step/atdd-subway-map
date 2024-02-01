@@ -174,4 +174,11 @@ public class LineAcceptanceTest extends BaseAcceptanceTest{
             .when().put("/lines").then().log().all();
     }
 
+    void createStation(Map<String, String> param1) {
+        given().body(param1)
+               .contentType(MediaType.APPLICATION_JSON_VALUE).log().all()
+               .when().post("/stations")
+               .then().log().all();
+    }
+
 }
