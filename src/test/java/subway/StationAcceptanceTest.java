@@ -10,7 +10,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.jdbc.Sql;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -19,7 +19,7 @@ import subway.fixture.StationFixture;
 import subway.rest.Rest;
 
 @DisplayName("지하철역 관련 기능")
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@Sql(value = "/truncate.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class StationAcceptanceTest {
     @LocalServerPort
@@ -39,15 +39,18 @@ class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        StationFixture expectedFixture = StationFixture.init().build();
-        expectedFixture.actionReturnExtractableResponse();
+        String expectedStationName = StationFixture.builder()
+            .build()
+            .create()
+            .jsonPath()
+            .getString("name");
 
         // then
-        List<String> stationNames = Rest.builder()
+        List<String> actualStationNames = Rest.builder()
             .get(STATIONS.path())
             .jsonPath()
             .getList("name", String.class);
-        assertThat(stationNames).containsAnyOf(expectedFixture.getStationName());
+        assertThat(actualStationNames).containsAnyOf(expectedStationName);
     }
 
     /**
@@ -59,16 +62,8 @@ class StationAcceptanceTest {
     @Test
     void createTwoStation() {
         // given
-        StationFixture.Builder stationFixture = StationFixture.init();
-        String 강남역 = stationFixture.build()
-            .actionReturnExtractableResponse()
-            .jsonPath()
-            .getString("name");
-        String 양재역 = stationFixture.stationName("양재역")
-            .build()
-            .actionReturnExtractableResponse()
-            .jsonPath()
-            .getString("name");
+        String 강남역 = createStation("강남역").jsonPath().getString("name");
+        String 양재역 = createStation("양재역").jsonPath().getString("name");;
 
         // when
         ExtractableResponse<Response> response = Rest.builder().get(STATIONS.path());
@@ -77,6 +72,13 @@ class StationAcceptanceTest {
 
         // then
         assertThat(stationNames).containsAnyOf(강남역, 양재역);
+    }
+
+    private ExtractableResponse<Response> createStation(String stationName) {
+        return StationFixture.builder()
+            .stationName(stationName)
+            .build()
+            .create();
     }
 
     /**
@@ -88,14 +90,14 @@ class StationAcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        Long stationId = StationFixture.init()
-            .build()
-            .actionReturnExtractableResponse()
+        Long stationId = StationFixture.builder().build()
+            .create()
             .jsonPath()
             .getLong("id");
 
         // when
-        Rest.builder().delete(STATIONS.addPath(stationId));
+        String uri = STATIONS.path(stationId).toUriString();
+        Rest.builder().delete(uri);
 
         // then
         List<Long> stationIds = Rest.builder()
