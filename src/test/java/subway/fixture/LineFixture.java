@@ -18,11 +18,7 @@ public class LineFixture {
 	}
 
 	public static Builder builder() {
-		return new Builder();
-	}
-
-	public static Builder init() {
-		return LineFixture.builder()
+		return new Builder()
 			.upStationName("강남역")
 			.downStationName("양재역");
 	}
@@ -34,9 +30,10 @@ public class LineFixture {
 			.post();
 	}
 
-	public ExtractableResponse<Response> actionReturnExtractableResponse() {
+	public ExtractableResponse<Response> create() {
 		Long upStationId = generateStationId(upStationName);
 		Long downStationId = generateStationId(downStationName);
+
 		LineCreateRequest lineCreateRequest = LineRequestFixture.builder()
 			.upStationId(upStationId)
 			.downStationId(downStationId)
@@ -49,13 +46,13 @@ public class LineFixture {
 		return StationFixture.builder()
 			.stationName(stationName)
 			.build()
-			.actionReturnExtractableResponse()
+			.create()
 			.jsonPath()
 			.getLong("id");
 	}
 
 	public LineResponse actionReturnLineResponse() {
-		return actionReturnExtractableResponse().as(LineResponse.class);
+		return create().as(LineResponse.class);
 	}
 
 	public static class Builder {
