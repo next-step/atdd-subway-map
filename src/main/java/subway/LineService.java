@@ -43,4 +43,9 @@ public class LineService {
                              .map(LineResponse::createLineResponse)
                              .collect(Collectors.toList());
     }
+
+    public LineResponse getLine(Long id) {
+        Line line = lineRepository.findById(id).orElseThrow(() -> new NoStationException(id + "에 해당하는 지하철 역이 존재하지 않습니다."));
+        return LineResponse.createLineResponse(line);
+    }
 }
