@@ -64,7 +64,7 @@ public class Line {
     }
 
     private void checkLineDownStationAndSectionUpStation(final Station upStation) {
-        if (this.downStationId != upStation.getId()) {
+        if (!this.downStationId.equals(upStation.getId())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "노선의 하행종점역과 등록하려는 구간의 상행역이 다릅니다.");
         }
     }
@@ -76,13 +76,13 @@ public class Line {
     }
 
     private static void checkSameStation(final Station downStation, final Section section) {
-        if (section.getUpStation().getId() == downStation.getId()) {
+        if (section.getUpStation().getId().equals(downStation.getId())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 등록되어 있는 지하철역 입니다.");
         }
     }
 
     public void deleteValidate(final Long stationId) {
-        if (this.downStationId != stationId) {
+        if (!this.downStationId.equals(stationId)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제할 수 없는 지하철 역 입니다.");
         }
 
