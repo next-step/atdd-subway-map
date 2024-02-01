@@ -1,10 +1,13 @@
-package subway.line;
+package subway.domain;
 
 import org.springframework.beans.factory.annotation.Value;
 
+import lombok.Getter;
+
+@Getter
 public class LineRequest {
-    private String lineName;
-    private String lineColor;
+    private String name;
+    private String color;
     private Long upStationId;
     private Long downStationId;
     private int distance;

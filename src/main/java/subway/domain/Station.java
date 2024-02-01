@@ -1,10 +1,6 @@
-package subway;
-
-import java.util.List;
+package subway.domain;
 
 import javax.persistence.*;
-
-import subway.line.Line;
 
 @Entity
 @Table(name = "station")
@@ -15,11 +11,20 @@ public class Station {
     @Column(length = 20, nullable = false)
     private String name;
 
+    @ManyToOne
+    @JoinColumn(name = "line_id")
+    private Line line;
+
     public Station() {
     }
 
     public Station(String name) {
         this.name = name;
+    }
+
+    public Station(String name, Line line) {
+        this.name = name;
+        this.line = line;
     }
 
     public Long getId() {
@@ -28,5 +33,9 @@ public class Station {
 
     public String getName() {
         return name;
+    }
+
+    public void updateLine(Line line) {
+        this.line = line;
     }
 }

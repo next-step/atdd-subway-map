@@ -4,7 +4,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
+
+import subway.domain.LineResponse;
+import subway.domain.Station;
+import subway.domain.StationRequest;
+import subway.domain.StationResponse;
+import subway.domain.Stations;
 
 @Service
 @Transactional(readOnly = true)
@@ -18,12 +25,12 @@ public class StationService {
     @Transactional
     public StationResponse saveStation(StationRequest stationRequest) {
         Station station = stationRepository.save(new Station(stationRequest.getName()));
-        return createStationResponse(station);
+        return StationResponse.createStationResponse(station);
     }
 
     public List<StationResponse> findAllStations() {
         return stationRepository.findAll().stream()
-                .map(this::createStationResponse)
+                .map(StationResponse::createStationResponse)
                 .collect(Collectors.toList());
     }
 
@@ -32,17 +39,9 @@ public class StationService {
         stationRepository.deleteById(id);
     }
 
-    private StationResponse createStationResponse(Station station) {
-        return new StationResponse(
-                station.getId(),
-                station.getName()
-        );
-    }
-
     public StationResponse findStationById(Long id) {
         return stationRepository.findById(id)
                                 .map(station -> new StationResponse(station.getId(), station.getName()))
                                 .orElseThrow(() -> new NoStationException("지하철 역이 없습니다."));
     }
-
 }

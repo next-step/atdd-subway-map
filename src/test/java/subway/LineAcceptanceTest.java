@@ -13,7 +13,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.MediaType;
 
-import subway.line.LineResponse;
+import subway.domain.LineResponse;
+import subway.domain.StationResponse;
 
 @DisplayName("지하철 노선 관련 기능")
 @SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
@@ -23,6 +24,13 @@ public class LineAcceptanceTest {
     @Test
     void test_canSearchLine_whenCreateLine() {
         //given
+        // 역 저장
+        Map<String, String> param1 = Map.of("name", "역삼역");
+        Map<String, String> param2 = Map.of("name", "선릉역");
+
+        createStation(param1);
+        createStation(param2);
+
         String lineName = "신분당선";
         String lineColor = "bg-red-600";
         Long upStationId = 1L;
@@ -44,8 +52,13 @@ public class LineAcceptanceTest {
             .when().post("/lines").then().log().all();
 
         //then
-        List<LineResponse> responses = when().get("/lines").then().extract().jsonPath().getList(".", LineResponse.class);
-        assertThat(responses).extracting(LineResponse::getName).containsExactly(lineName);
+        LineResponse lineResponse = when().get("/lines").then().extract().jsonPath().getList(".", LineResponse.class).get(0);
+        assertThat(lineResponse).extracting(LineResponse::getName).isEqualTo(lineName);
+        assertThat(lineResponse).extracting(LineResponse::getColor).isEqualTo(lineColor);
+        List<StationResponse> stationsResponse = lineResponse.getStations();
+
+        assertThat(stationsResponse).extracting(StationResponse::getId).containsExactly(1L, 2L);
+        assertThat(stationsResponse).extracting(StationResponse::getName).containsExactly("역삼역", "선릉역");
     }
 
     @DisplayName("2개의 지하철 노선을 생성하고 지하철 노선 목록을 조회하면 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.")
@@ -70,6 +83,13 @@ public class LineAcceptanceTest {
     @Test
     void test5() {
 
+    }
+
+    void createStation(Map<String, String> param1) {
+        given().body(param1)
+               .contentType(MediaType.APPLICATION_JSON_VALUE).log().all()
+               .when().post("/stations")
+               .then().log().all();
     }
 
 }

@@ -6,6 +6,9 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.util.List;
 
+import subway.domain.StationRequest;
+import subway.domain.StationResponse;
+
 @RestController
 public class StationController {
     private StationService stationService;
