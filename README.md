@@ -85,17 +85,17 @@ host: localhost:52165
     THEN   수정된 구간을 조회 할 수 있다
   - [x] GIVEN  지하철 노선을 생성하고</br>
     WHEN  새로운 구간의 상행역이 기존의 하행역과 일치 하지 않는다면</br>
-    THEN   BadRequest(400) HTTP STATUS 가 발생한다
+    THEN  에러 처리와 함께 '마지막 구간과 추가될 구간의 시작은 같아야 합니다.' 라는 메세지가 출력된다.
   - [x] GIVEN  지하철 노선을 생성하고</br>
     WHEN  새로운 구간이 이미 해당 노선에 등록되어있는 역이면</br>
-    THEN   BadRequest(400) HTTP STATUS 가 발생한다
+    THEN  에러처리와 함께 '이미 구간에 포함 되어 있는 역 입니다.' 라는 메세지가 출력된다.
 - [x] 구간 제거
   - [x] GIVEN  지하철 노선을 생성하고 노선을 수정 후</br>
     WHEN  지하철 마지막 구간을 제거하면</br>
-    THEN   마지막 구간이 제거된다
+    THEN  마지막 구간이 제거된다
   - [x] GIVEN  지하철 노선을 생성하고 노선을 수정 후</br>
     WHEN  마지막 구간이 아닌 지하철 구간을 제거하면</br>
-    THEN   BadRequest(400) HTTP STATUS 가 발생한다
+    THEN  에러 처리와 함께 '마지막 구간의 역이 아닙니다.' 라는 메세지가 출력된다.
   - [x] GIVEN  지하철 노선을 시작과 끝만 생성하고</br>
     WHEN  지하철 마지막 구간을 제거하면</br>
-    THEN   BadRequest(400) HTTP STATUS 가 발생한다
+    THEN  에러 처리와 함께 '구간이 하나 일 때는 삭제를 할 수 없습니다' 라는 메세지가 출력된다.
