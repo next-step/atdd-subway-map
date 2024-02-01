@@ -48,27 +48,27 @@ public class StationSection {
         return distance;
     }
 
-    public boolean canSave(StationLine stationLine) {
-        if(areStationsSame()) {
-            return false;
-        }
-        if(hasUpStation(stationLine)) {
-            return false;
-        }
-        return containsDifferentDownStation(stationLine);
+    public boolean connectToLastUpStation(Long downStationId) {
+        return this.upStationId.equals(downStationId);
     }
 
-    private boolean containsDifferentDownStation(StationLine stationLine) {
-        return stationLine.getSections().stream()
-                .noneMatch(stationSection -> this.downStationId.equals(stationSection.getUpStationId()));
-    }
-
-    private boolean hasUpStation(StationLine stationLine) {
-        return !this.upStationId.equals(stationLine.getDownStationId()); // TODO: 호출 위치 변경
-    }
-
-    private boolean areStationsSame() {
+    public boolean areStationsSame() {
         return upStationId.equals(downStationId);
+    }
+
+    public boolean isUpStationSameAsDownStation(StationSection toSaveSection) {
+        return upStationId.equals(toSaveSection.getDownStationId());
+    }
+
+    public StationSection setStationLine(StationLine stationLine) {
+        this.stationLine = stationLine;
+        stationLine.getSections().add(this);
+
+        return this;
+    }
+
+    public void updateLineDownStationId() {
+        this.stationLine.updateDownStation(this.downStationId);
     }
 
     public Long getId() {
@@ -89,14 +89,5 @@ public class StationSection {
 
     public StationLine getStationLine() {
         return stationLine;
-    }
-
-    public void setStationLine(StationLine stationLine) {
-        this.stationLine = stationLine;
-        stationLine.getSections().add(this);
-    }
-
-    public void updateLineDownStationId() {
-        this.stationLine.updateDownStation(this.downStationId);
     }
 }

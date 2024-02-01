@@ -32,10 +32,10 @@ public class StationSectionService {
         if (!existStation(stationSection)) {
             throw new IllegalArgumentException("요청한 역은 존재하지 않습니다.");
         }
-        if (!stationSection.canSave(stationLine)) { // 호출 위치가 서로 변경되어야 함.
+        if (!stationLine.canSave(stationSection)) {
             throw new IllegalArgumentException("요청한 구간을 저장할 수 없습니다.");
         }
-        return convertToResponse(canStationSectionSave(stationSection, stationLine));
+        return convertToResponse(saveStationSection(stationSection.setStationLine(stationLine)));
     }
 
     private boolean existStation(StationSection stationSection) {
@@ -44,11 +44,14 @@ public class StationSectionService {
         return upStationExists && downStationExists;
     }
 
-    private StationSection canStationSectionSave(StationSection stationSection, StationLine stationLine) {
-        stationSection.setStationLine(stationLine);
+    private StationSection saveStationSection(StationSection stationSection) {
+        stationSection.setStationLine(stationSection.getStationLine());
         stationSection.updateLineDownStationId();
-        stationSection.canSave(stationLine);
         return stationSectionRepository.save(stationSection);
+    }
+
+    private StationLine findStationLineById(Long stationLineId) {
+        return stationLineRepository.findById(stationLineId).orElseThrow(EntityNotFoundException::new);
     }
 
     private static StationSection convertToStationSectionEntity(StationSectionRequest request) {
@@ -57,10 +60,6 @@ public class StationSectionService {
                 request.getDownStationId(),
                 request.getDistance()
         );
-    }
-
-    private StationLine findStationLineById(Long stationLineId) {
-        return stationLineRepository.findById(stationLineId).orElseThrow(EntityNotFoundException::new);
     }
 
     private StationSectionResponse convertToResponse(StationSection stationSection) {

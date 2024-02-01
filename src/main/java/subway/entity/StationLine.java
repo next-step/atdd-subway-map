@@ -44,6 +44,21 @@ public class StationLine {
         return this;
     }
 
+    public boolean canSave(StationSection toSaveSection) {
+        if(toSaveSection.areStationsSame()) {
+            return false;
+        }
+        if(!toSaveSection.connectToLastUpStation(downStationId)) {
+            return false;
+        }
+        return hasNoConnectingDownStation(toSaveSection);
+    }
+
+    private boolean hasNoConnectingDownStation(StationSection toSaveSection) {
+        return sections.stream()
+                .noneMatch(existSection -> existSection.isUpStationSameAsDownStation(toSaveSection));
+    }
+
     public Long getId() {
         return id;
     }
