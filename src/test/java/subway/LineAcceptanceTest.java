@@ -12,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import subway.dto.LineRequest;
+import subway.dto.UpdateLineRequest;
 import subway.fixture.LineFixture;
 import subway.fixture.StationApi;
 import subway.fixture.StationFixture;
@@ -94,6 +95,27 @@ public class LineAcceptanceTest {
 						LineFixture.신분당선_생성().getDownStationId().intValue());
 	}
 
+	@DisplayName("특정 지하철 노선 정보를 수정한다.")
+	@Test
+	void update_line() {
+		// given
+		StationApi.createStation(StationFixture.강남역_생성_요청());
+		StationApi.createStation(StationFixture.압구정역_생성_요청());
+		Long lineId = createLine(LineFixture.신분당선_생성()).body().jsonPath().getLong("id");
+
+		UpdateLineRequest requestBody = LineFixture.다른분당선_업데이트();
+
+		// when
+		ExtractableResponse<Response> response = updateLine(lineId, requestBody);
+
+		// then
+		assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+		ResponseBodyExtractionOptions getResponse = getLine(lineId).body();
+		assertThat(getResponse.jsonPath().getString("name")).isEqualTo(requestBody.getName());
+		assertThat(getResponse.jsonPath().getString("color")).isEqualTo(requestBody.getColor());
+	}
+
 	private ExtractableResponse<Response> createLine(LineRequest request) {
 		return RestAssured.given()
 				.log()
@@ -128,6 +150,20 @@ public class LineAcceptanceTest {
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
 				.when()
 				.get("/lines/" + lineId)
+				.then()
+				.log()
+				.all()
+				.extract();
+	}
+
+	private ExtractableResponse<Response> updateLine(Long lineId, UpdateLineRequest request) {
+		return RestAssured.given()
+				.log()
+				.all()
+				.body(request)
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.when()
+				.put("/lines/" + lineId)
 				.then()
 				.log()
 				.all()
