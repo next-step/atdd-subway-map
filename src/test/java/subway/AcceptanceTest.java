@@ -10,6 +10,8 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.Map;
+
 import static io.restassured.RestAssured.UNDEFINED_PORT;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -30,36 +32,44 @@ public class AcceptanceTest {
         databaseCleaner.clear();
     }
 
-    protected ExtractableResponse<Response> get(String path, Object... pathParams) {
+    protected ExtractableResponse<Response> createStation(Map<String, String> body, int statusCode) {
+        return post("/stations", body, statusCode);
+    }
+
+    protected ExtractableResponse<Response> get(String path, int statusCode, Object... pathParams) {
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().get(path, pathParams)
                 .then().log().all()
+                .statusCode(statusCode)
                 .extract();
     }
 
-    protected ExtractableResponse<Response> post(String path, Object body, Object... pathParams) {
+    protected ExtractableResponse<Response> post(String path, Object body, int statusCode, Object... pathParams) {
         return RestAssured.given().log().all()
                 .body(body)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post(path, pathParams)
                 .then().log().all()
+                .statusCode(statusCode)
                 .extract();
     }
 
-    protected ExtractableResponse<Response> put(String path, Object body, Object... pathParams) {
+    protected ExtractableResponse<Response> put(String path, Object body, int statusCode, Object... pathParams) {
         return RestAssured.given().log().all()
                 .body(body)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().put(path, pathParams)
                 .then().log().all()
+                .statusCode(statusCode)
                 .extract();
     }
 
-    protected ExtractableResponse<Response> delete(String path, Object... pathParams) {
+    protected ExtractableResponse<Response> delete(String path, int statusCode, Object... pathParams) {
         return RestAssured.given().log().all()
                 .when().delete(path, pathParams)
                 .then().log().all()
+                .statusCode(statusCode)
                 .extract();
     }
 

@@ -19,7 +19,7 @@ public class Line {
     @Column(nullable = false)
     private Long distance;
 
-    public Line() {
+    protected Line() {
     }
 
     public Line(String name, String color, Long upStationId, Long downStationId, Long distance) {

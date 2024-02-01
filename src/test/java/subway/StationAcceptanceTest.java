@@ -4,7 +4,6 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
 import subway.controller.dto.StationResponse;
 
 import java.util.HashMap;
@@ -12,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.http.HttpStatus.*;
 
 @DisplayName("지하철역 관련 기능")
 public class StationAcceptanceTest extends AcceptanceTest {
@@ -31,12 +31,9 @@ public class StationAcceptanceTest extends AcceptanceTest {
         Map<String, String> gangNamStationParams = createParams(STATION_NAME_GANGNAM);
 
         // when
-        ExtractableResponse<Response> createResponse = createStation(gangNamStationParams);
+        createStation(gangNamStationParams, CREATED.value());
 
-        // then
-        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-        ExtractableResponse<Response> findResponse = findStation();
+        ExtractableResponse<Response> findResponse = findStation(OK.value());
         List<String> stationsNames = findResponse.jsonPath().getList("name", String.class);
         assertThat(stationsNames).hasSize(1)
                 .containsExactly(STATION_NAME_GANGNAM);
@@ -52,16 +49,14 @@ public class StationAcceptanceTest extends AcceptanceTest {
     void selectStation() {
         // given
         Map<String, String> gangNamStationParams = createParams(STATION_NAME_GANGNAM);
-        ExtractableResponse<Response> gangnamStationCreateResponse = createStation(gangNamStationParams);
-        assertThat(gangnamStationCreateResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        createStation(gangNamStationParams, CREATED.value());
 
         // given
         Map<String, String> seollEungStationParams = createParams(STATION_NAME_SEOLLEUNG);
-        ExtractableResponse<Response> seollEungStationCreateResponse = createStation(seollEungStationParams);
-        assertThat(seollEungStationCreateResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        createStation(seollEungStationParams, CREATED.value());
 
         // when
-        ExtractableResponse<Response> findResponse = findStation();
+        ExtractableResponse<Response> findResponse = findStation(OK.value());
         List<String> stationsNames = findResponse.jsonPath().getList("name", String.class);
 
         // then
@@ -79,15 +74,14 @@ public class StationAcceptanceTest extends AcceptanceTest {
     void removeStation() {
         // given
         Map<String, String> gangNamStationParams = createParams(STATION_NAME_GANGNAM);
-        ExtractableResponse<Response> createResponse = createStation(gangNamStationParams);
-        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        ExtractableResponse<Response> createResponse = createStation(gangNamStationParams, CREATED.value());
         StationResponse stationResponse = createResponse.as(StationResponse.class);
 
         // when
-        deleteStation(stationResponse.getId());
+        deleteStation(stationResponse.getId(), NO_CONTENT.value());
 
         // then
-        ExtractableResponse<Response> findResponse = findStation();
+        ExtractableResponse<Response> findResponse = findStation(OK.value());
         List<String> stationsNames = findResponse.jsonPath().getList("name", String.class);
         assertThat(stationsNames).isEmpty();
     }
@@ -98,16 +92,12 @@ public class StationAcceptanceTest extends AcceptanceTest {
         return params;
     }
 
-    private ExtractableResponse<Response> createStation(Map<String, String> body) {
-        return post("/stations", body);
+    private ExtractableResponse<Response> findStation(int statusCode) {
+        return get("/stations/all", statusCode);
     }
 
-    private ExtractableResponse<Response> findStation() {
-        return get("/stations/all");
-    }
-
-    private ExtractableResponse<Response> deleteStation(Long id) {
-        return delete("/stations/{id}", id);
+    private ExtractableResponse<Response> deleteStation(Long id, int statusCode) {
+        return delete("/stations/{id}", statusCode, id);
     }
 
 }

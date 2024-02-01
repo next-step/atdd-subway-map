@@ -15,6 +15,13 @@ public class LineResponse {
     public LineResponse() {
     }
 
+    public LineResponse(Long id, String name, String color, List<StationResponse> stations) {
+        this.id = id;
+        this.name = name;
+        this.color = color;
+        this.stations = stations;
+    }
+
     public static List<LineResponse> listOf(List<Line> lines, List<Station> stations) {
         return lines.stream()
                 .map(line -> of(line, containStationWithLine(line, stations)))
@@ -33,13 +40,6 @@ public class LineResponse {
                         .findFirst()
                         .orElseThrow(() -> new IllegalArgumentException("역이 존재하지 않습니다.")))
                 .collect(Collectors.toList());
-    }
-
-    public LineResponse(Long id, String name, String color, List<StationResponse> stations) {
-        this.id = id;
-        this.name = name;
-        this.color = color;
-        this.stations = stations;
     }
 
     public Long getId() {
