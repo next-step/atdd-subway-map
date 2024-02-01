@@ -55,13 +55,6 @@ public class SectionService {
 
         line.deleteValidate(stationId);
 
-        final List<Section> sections = line.getSections();
-        for (Section section : sections) {
-            if (section.getDownStation().getId().equals(stationId)) {
-                line.changeDownStation(section.getUpStation());
-                sectionRepository.delete(section);
-            }
-        }
-
+        line.removeSection(stationId);
     }
 }

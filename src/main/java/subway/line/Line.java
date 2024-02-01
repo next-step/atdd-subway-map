@@ -21,7 +21,7 @@ public class Line {
 
     private Long upStationId;
     private Long downStationId;
-    @OneToMany(mappedBy = "line", fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToMany(mappedBy = "line", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, orphanRemoval = true)
     List<Section> sections = new ArrayList<>();
     public Line() {
     }
@@ -95,4 +95,12 @@ public class Line {
         this.downStationId = station.getId();
     }
 
+    public void removeSection(final Long stationId) {
+        final Section deleteSection = this.sections.stream()
+                .filter(s -> s.getDownStation().getId().equals(stationId))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("역을 찾을 수 없습니다."));
+        System.out.println("제거될 구간: " + deleteSection.getId());
+        this.sections.remove(deleteSection);
+    }
 }
