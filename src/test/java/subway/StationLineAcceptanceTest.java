@@ -47,7 +47,7 @@ public class StationLineAcceptanceTest {
 
         // then
         assertThat(convertStationLines(모든_지하철_노선_조회_요청())).usingRecursiveComparison()
-                .ignoringFields("id")
+                .ignoringFields("id", "sections")
                 .isEqualTo(List.of(신분당선));
     }
 
@@ -68,7 +68,7 @@ public class StationLineAcceptanceTest {
 
         // when
         assertThat(convertStationLines(모든_지하철_노선_조회_요청())).usingRecursiveComparison()
-                .ignoringFields("id")
+                .ignoringFields("id", "sections")
                 .isEqualTo(List.of(신분당선, 분당선));
     }
 
@@ -86,7 +86,7 @@ public class StationLineAcceptanceTest {
 
         // when, then
         assertThat(convertStationLine(지하철_노선_조회_요청(getCreatedLocationId(response)))).usingRecursiveComparison()
-                .ignoringFields("id")
+                .ignoringFields("id", "sections")
                 .isEqualTo(신분당선);
     }
 
@@ -109,7 +109,7 @@ public class StationLineAcceptanceTest {
 
         // then
         assertThat(convertStationLine(지하철_노선_조회_요청(getCreatedLocationId(createResponse)))).usingRecursiveComparison()
-                .ignoringFields("id")
+                .ignoringFields("id", "sections")
                 .isEqualTo(수정된_신분당선);
     }
 
@@ -133,7 +133,7 @@ public class StationLineAcceptanceTest {
 
         // then
         assertThat(convertStationLines(모든_지하철_노선_조회_요청())).usingRecursiveComparison()
-                .ignoringFields("id")
+                .ignoringFields("id", "sections")
                 .isEqualTo(List.of(분당선));
     }
 
@@ -146,8 +146,8 @@ public class StationLineAcceptanceTest {
     private List<StationLine> convertStationLines(JsonPath jsonPath) {
         List<String> names = jsonPath.getList(NAME_KEY, String.class);
         List<String> colors = jsonPath.getList(COLOR_KEY, String.class);
-        List<Integer> upStationIds = jsonPath.getList(UP_STATION_ID_KEY, Integer.class);
-        List<Integer> downStationIds = jsonPath.getList(DOWN_STATION_ID_KEY, Integer.class);
+        List<Long> upStationIds = jsonPath.getList(UP_STATION_ID_KEY, Long.class);
+        List<Long> downStationIds = jsonPath.getList(DOWN_STATION_ID_KEY, Long.class);
         List<Integer> distances = jsonPath.getList(DISTANCE_KEY, Integer.class);
 
         return IntStream.range(0, names.size())
@@ -171,8 +171,8 @@ public class StationLineAcceptanceTest {
         return new StationLine(
                 jsonPath.get(NAME_KEY).toString(),
                 jsonPath.get(COLOR_KEY).toString(),
-                Integer.parseInt(jsonPath.get(UP_STATION_ID_KEY).toString()),
-                Integer.parseInt(jsonPath.get(DOWN_STATION_ID_KEY).toString()),
+                Long.parseLong(jsonPath.get(UP_STATION_ID_KEY).toString()),
+                Long.parseLong(jsonPath.get(DOWN_STATION_ID_KEY).toString()),
                 Integer.parseInt(jsonPath.get(DISTANCE_KEY).toString())
         );
     }

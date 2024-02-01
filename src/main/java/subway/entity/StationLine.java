@@ -1,9 +1,10 @@
 package subway.entity;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class StationLine {
@@ -14,18 +15,22 @@ public class StationLine {
 
     private String name;
 
-    private String color; // TODO: Enum 분리 고려
+    private String color;
 
-    private int upStationId;
+    private Long upStationId;
 
-    private int downStationId;
+    private Long downStationId;
 
     private int distance;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "stationLine")
+    private List<StationSection> sections = new ArrayList<>();
 
     protected StationLine() {
     }
 
-    public StationLine(String name, String color, int upStationId, int downStationId, int distance) {
+    public StationLine(String name, String color, Long upStationId, Long downStationId, int distance) {
         this.name = name;
         this.color = color;
         this.upStationId = upStationId;
@@ -51,15 +56,19 @@ public class StationLine {
         return color;
     }
 
-    public int getUpStationId() {
+    public Long getUpStationId() {
         return upStationId;
     }
 
-    public int getDownStationId() {
+    public Long getDownStationId() {
         return downStationId;
     }
 
     public int getDistance() {
         return distance;
+    }
+
+    public List<StationSection> getSections() {
+        return sections;
     }
 }
