@@ -66,6 +66,11 @@ public class LineService {
 		line.updateLine(request.getName(), request.getColor());
 	}
 
+	@Transactional
+	public void deleteLine(Long id) {
+		lineRepository.deleteById(id);
+	}
+
 	private StationResponse getStations(Long stationId) {
 		return stationService.findStationById(stationId);
 	}
