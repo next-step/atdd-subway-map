@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
+import subway.line.LineCreateRequest;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,23 +28,19 @@ public class LineAcceptanceTest {
     @Test
     void 지하철노선을_생성하고_조회한다() {
         // given
-        Map<String, Object> params = new HashMap<>();
-        params.put("name", "신분당선");
-        params.put("color", "bg-red-600");
-        params.put("upStationId", 1L);
-        params.put("downStationId", 2L);
-        params.put("distance", 10);
-
         createStation("건대입구");
         createStation("어린이대공원");
 
+        LineCreateRequest lineCreateRequest = new LineCreateRequest(
+                "신분당선",
+                "bg-red-600",
+                1L,
+                2L,
+                10
+        );
+
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = createLine(lineCreateRequest);
 
         // then
         assertThat(response.statusCode()).isEqualTo(201);
@@ -51,6 +48,15 @@ public class LineAcceptanceTest {
         assertThat(response.jsonPath().getList("stations.name", String.class)).containsAnyOf(
                 "건대입구", "어린이대공원"
         );
+    }
+
+    private ExtractableResponse<Response> createLine(LineCreateRequest request) {
+        return RestAssured.given().log().all()
+                .body(request)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines")
+                .then().log().all()
+                .extract();
     }
 
     private ExtractableResponse<Response> createStation(String stationName) {
