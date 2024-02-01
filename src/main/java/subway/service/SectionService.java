@@ -41,24 +41,20 @@ public class SectionService {
             request.getDistance()
         );
 
-        line.verifyAddableSection(section);
+        line.addSection(section);
 
-        return SectionResponse.ofEntity(sectionRepository.save(section));
+        return SectionResponse.ofEntity(section);
     }
 
 
     @Transactional
     public void deleteSection(Long lineId, Long stationId) {
         Line line = findLineById(lineId);
-        Station station = findStationById(stationId);
 
         Section section = sectionRepository.findByLineIdAndDownStationId(lineId, stationId)
             .orElseThrow(EntityNotFoundException::new);
 
-        line.verifyDeletableStation(station);
         line.removeSection(section);
-
-        sectionRepository.deleteById(section.getId());
     }
 
     private Line findLineById(Long lindId) {
