@@ -169,7 +169,7 @@ public class LineAcceptanceTest {
      */
     @DisplayName("지하철노선을 삭제한다.")
     @Test
-    void deleteStation() {
+    void deleteLine() {
         // given
         ExtractableResponse<Response> response = LineApiCaller.지하철_노선_생성(신분당선);
         String location = response.header("location");
