@@ -69,6 +69,31 @@ public class LineAcceptanceTest {
 		assertThat(responseBody.jsonPath().getList("stations").size()).isEqualTo(2);
 	}
 
+	@DisplayName("지하철 노선을 조회한다.")
+	@Test
+	void get_line() {
+		// given
+		StationApi.createStation(StationFixture.강남역_생성_요청());
+		StationApi.createStation(StationFixture.압구정역_생성_요청());
+		Long lineId = createLine(LineFixture.신분당선_생성()).body().jsonPath().getLong("id");
+
+		// when
+		ExtractableResponse<Response> response = getLine(lineId);
+
+		// then
+		assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+		ResponseBodyExtractionOptions responseBody = response.body();
+		assertThat(responseBody.jsonPath().getLong("id")).isEqualTo(lineId);
+		assertThat(responseBody.jsonPath().getString("color"))
+				.isEqualTo(LineFixture.신분당선_생성().getColor());
+		assertThat(responseBody.jsonPath().getList("stations.id").size()).isEqualTo(2);
+		assertThat(responseBody.jsonPath().getList("stations.id"))
+				.contains(
+						LineFixture.신분당선_생성().getUpStationId().intValue(),
+						LineFixture.신분당선_생성().getDownStationId().intValue());
+	}
+
 	private ExtractableResponse<Response> createLine(LineRequest request) {
 		return RestAssured.given()
 				.log()
@@ -90,6 +115,19 @@ public class LineAcceptanceTest {
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
 				.when()
 				.get("/lines")
+				.then()
+				.log()
+				.all()
+				.extract();
+	}
+
+	private ExtractableResponse<Response> getLine(Long lineId) {
+		return RestAssured.given()
+				.log()
+				.all()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.when()
+				.get("/lines/" + lineId)
 				.then()
 				.log()
 				.all()
