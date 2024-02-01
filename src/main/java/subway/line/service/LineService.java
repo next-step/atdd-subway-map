@@ -8,9 +8,8 @@ import subway.line.repository.SectionRepository;
 import subway.line.repository.domain.Line;
 import subway.line.repository.domain.Section;
 import subway.line.service.dto.*;
-import subway.station.exception.StationNotExistException;
-import subway.station.repository.StationRepository;
 import subway.station.repository.domain.Station;
+import subway.station.service.StationProvider;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,13 +18,13 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class LineService {
     private final LineRepository lineRepository;
-    private final StationRepository stationRepository;
     private final SectionRepository sectionRepository;
+    private final StationProvider stationProvider;
 
-    public LineService(final LineRepository lineRepository, final StationRepository stationRepository, final SectionRepository sectionRepository) {
+    public LineService(final LineRepository lineRepository, final SectionRepository sectionRepository, final StationProvider stationProvider) {
         this.lineRepository = lineRepository;
-        this.stationRepository = stationRepository;
         this.sectionRepository = sectionRepository;
+        this.stationProvider = stationProvider;
     }
 
     @Transactional
@@ -78,23 +77,19 @@ public class LineService {
 
     @Transactional
     public void removeSection(final Long lineId, final Long stationId) {
-        final Station station = findStation(stationId);
+        final Station station = stationProvider.findById(stationId);
         final Line line = findLine(lineId);
         line.removeSectionByStation(station);
     }
 
     private Section createSection(final SectionCreateRequest sectionCreateRequest) {
-        final Station upStation = findStation(sectionCreateRequest.getUpStationId());
-        final Station downStation = findStation(sectionCreateRequest.getDownStationId());
+        final Station upStation = stationProvider.findById(sectionCreateRequest.getUpStationId());
+        final Station downStation = stationProvider.findById(sectionCreateRequest.getDownStationId());
         return new Section(upStation, downStation, sectionCreateRequest.getDistance());
     }
 
     private Line findLine(final Long id) {
         return lineRepository.findByIdWithSection(id).orElseThrow(() -> new LineNotExistException(id));
-    }
-
-    private Station findStation(final Long stationId) {
-        return stationRepository.findById(stationId).orElseThrow(() -> new StationNotExistException(stationId));
     }
 
 }
