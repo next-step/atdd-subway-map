@@ -28,4 +28,12 @@ public class Line {
         this.downStationId = downStationId;
         this.distance = distance;
     }
+
+    public void updateName(String name) {
+        this.name = name;
+    }
+
+    public void updateColor(String color) {
+        this.color = color;
+    }
 }
