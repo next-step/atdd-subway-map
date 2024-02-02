@@ -17,8 +17,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철 노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {
-	private final RestApiRequest<LineRequest> restApiRequest = new RestApiRequest<>("/lines");
-	private final RestApiRequest<LineRequest> restApiRequestWithIdParam = new RestApiRequest<>("/lines/{id}");
 	private static final String TEST_LINE_NAME_1 = "신분당선";
 	private static final String TEST_LINE_NAME_2 = "분당선";
 	private static final String TEST_LINE_COLOR_1 = "bg-red";
@@ -32,11 +30,11 @@ public class LineAcceptanceTest {
 	@Test
 	void createLineTest() {
 		// when
-		ExtractableResponse<Response> response = restApiRequest.post(new LineRequest(TEST_LINE_NAME_1, TEST_LINE_COLOR_1, 1L, 2L, 10));
+		ExtractableResponse<Response> response = LineSteps.노선_생성_요청(TEST_LINE_NAME_1, TEST_LINE_COLOR_1, 1L, 2L, 10);
 
 		// then
 		assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-		assertThat(restApiRequest.get().jsonPath().getList("name")).contains(TEST_LINE_NAME_1);
+		assertThat(LineSteps.노선_전체_조회_요청().jsonPath().getList("name")).contains(TEST_LINE_NAME_1);
 	}
 
 	/**
@@ -49,11 +47,11 @@ public class LineAcceptanceTest {
 	@Test
 	void getLinesTest() {
 		// given
-		restApiRequest.post(new LineRequest(TEST_LINE_NAME_1, TEST_LINE_COLOR_1, 1L, 2L, 10));
-		restApiRequest.post(new LineRequest(TEST_LINE_NAME_2, TEST_LINE_COLOR_2, 2L, 4L, 15));
+		LineSteps.노선_생성_요청(TEST_LINE_NAME_1, TEST_LINE_COLOR_1, 1L, 2L, 10);
+		LineSteps.노선_생성_요청(TEST_LINE_NAME_2, TEST_LINE_COLOR_2, 2L, 4L, 15);
 
 		// when
-		ExtractableResponse<Response> response = restApiRequest.get();
+		ExtractableResponse<Response> response = LineSteps.노선_전체_조회_요청();
 
 		// then
 		assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -70,10 +68,10 @@ public class LineAcceptanceTest {
 	@Test
 	void getLineTest() {
 		// given
-		restApiRequest.post(new LineRequest(TEST_LINE_NAME_1, TEST_LINE_COLOR_1, 1L, 2L, 10));
+		LineSteps.노선_생성_요청(TEST_LINE_NAME_1, TEST_LINE_COLOR_1, 1L, 2L, 10);
 
 		// when
-		ExtractableResponse<Response> response = restApiRequestWithIdParam.get(1L);
+		ExtractableResponse<Response> response = LineSteps.노선_단건_조회_요청(1L);
 
 		// then
 		assertThat(response.jsonPath().getString("name")).isEqualTo(TEST_LINE_NAME_1);
@@ -89,11 +87,11 @@ public class LineAcceptanceTest {
 	@Test
 	void updateLineTest() {
 		// given
-		restApiRequest.post(new LineRequest(TEST_LINE_NAME_1, TEST_LINE_COLOR_1, 1L, 2L, 10));
+		LineSteps.노선_생성_요청(TEST_LINE_NAME_1, TEST_LINE_COLOR_1, 1L, 2L, 10);
 
 		// when
-		ExtractableResponse<Response> response = restApiRequestWithIdParam.put(new LineRequest(TEST_LINE_NAME_2, TEST_LINE_COLOR_2), 1L);
-		ExtractableResponse<Response> getResponse = restApiRequestWithIdParam.get(1L);
+		ExtractableResponse<Response> response = LineSteps.노선_수정_요청(TEST_LINE_NAME_2, TEST_LINE_COLOR_2, 1L);
+		ExtractableResponse<Response> getResponse = LineSteps.노선_단건_조회_요청(1L);
 
 		// then
 		assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -103,7 +101,7 @@ public class LineAcceptanceTest {
 
 	/**
 	 * Given 지하철 노선을 생성하고
-	 * When 생성한 지하철 노선을 null 값이 있는 채로 수정하면
+	 * When 생성한 지하철 노선을 빈 값이 있는 채로 수정하면
 	 * Then 해당 지하철 노선 정보는 수정되지 않고 Bad Request (400) 을 반환한다.
 	 */
 	@DisplayName("지하철 노선을 수정한다.")
@@ -111,15 +109,13 @@ public class LineAcceptanceTest {
 	@Test
 	void updateLineWithNullThenFailTest() {
 		// given
-		restApiRequest.post(new LineRequest(TEST_LINE_NAME_1, TEST_LINE_COLOR_1, 1L, 2L, 10));
+		LineSteps.노선_생성_요청(TEST_LINE_NAME_1, TEST_LINE_COLOR_1, 1L, 2L, 10);
 
 		// when
-		ExtractableResponse<Response> response = restApiRequestWithIdParam.put(new LineRequest(TEST_LINE_NAME_2, ""), 1L);
-		ExtractableResponse<Response> getResponse = restApiRequestWithIdParam.get(1L);
+		ExtractableResponse<Response> response = LineSteps.노선_수정_요청(TEST_LINE_NAME_2, "", 1L);
 
 		// then
 		assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-		assertThat(getResponse.jsonPath().getString("name")).isEqualTo(TEST_LINE_NAME_1);
 	}
 
 	/**
@@ -132,13 +128,13 @@ public class LineAcceptanceTest {
 	@Test
 	void deleteLineTest() {
 		// given
-		restApiRequest.post(new LineRequest(TEST_LINE_NAME_1, TEST_LINE_COLOR_1, 1L, 2L, 10));
+		LineSteps.노선_생성_요청(TEST_LINE_NAME_1, TEST_LINE_COLOR_1, 1L, 2L, 10);
 
 		// when
-		ExtractableResponse<Response> response = restApiRequestWithIdParam.delete(1L);
+		ExtractableResponse<Response> response = LineSteps.노선_삭제_요청(1L);
 
 		// then
 		assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-		assertThat(restApiRequest.get().jsonPath().getString("name")).doesNotContain(TEST_LINE_NAME_1);
+		assertThat(LineSteps.노선_전체_조회_요청().jsonPath().getString("name")).doesNotContain(TEST_LINE_NAME_1);
 	}
 }

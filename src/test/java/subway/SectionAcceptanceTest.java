@@ -1,6 +1,5 @@
 package subway;
 
-import common.RestApiRequest;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,7 +9,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
-import subway.dto.*;
 
 import java.util.Map;
 
@@ -20,13 +18,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철 구간 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class SectionAcceptanceTest {
-	private final RestApiRequest<SectionRequest> sectionApiRequest = new RestApiRequest<>("/lines/{id}/sections");
-	private final RestApiRequest<LineRequest> lineApiRequest = new RestApiRequest<>("/lines/{id}");
+	private static final Long 노선 = 1L;
+	private static final Long 상행종점역 = 1L;
+	private static final Long 처음_등록한_종점역 = 2L;
+	private static final Long 두번째_등록한_종점역 = 3L;
+	private static final Long 등록할_역 = 4L;
+	private static final Long 하행종점역이_아닌_역 = 5L;
 
 	@BeforeEach
 	void createLine() {
 		// given
-		new RestApiRequest<>("/lines").post(new LineRequest("라인1", "색상1", 1L, 2L, 10));
+		LineSteps.노선_생성_요청("역1", "색1", 상행종점역, 처음_등록한_종점역, 1);
 	}
 
 	/**
@@ -39,12 +41,11 @@ public class SectionAcceptanceTest {
 	@Test
 	void createSectionTest() {
 		// when
-		ExtractableResponse<Response> response = sectionApiRequest.post(new SectionRequest(3L, 2L, 10), 1L);
+		ExtractableResponse<Response> response = SectionSteps.구간_생성_요청(두번째_등록한_종점역, 처음_등록한_종점역, 10, 노선);
 
 		// then
 		assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-		assertThat(lineApiRequest.get(1L).as(LineResponse.class).getStaions().stream()
-				.map(StationResponse::getId)).contains(3L);
+		assertThat(SectionSteps.구간_조회_요청(노선).jsonPath().getList("downStationId")).contains(두번째_등록한_종점역.intValue());
 	}
 
 	/**
@@ -58,14 +59,13 @@ public class SectionAcceptanceTest {
 	@Test
 	void createSectionWithRegisteredStationThenFailTest() {
 		// given
-		sectionApiRequest.post(new SectionRequest(4L, 2L, 10), 1L);
+		SectionSteps.구간_생성_요청(두번째_등록한_종점역, 처음_등록한_종점역, 10, 노선);
 
 		// when & then
-		ExtractableResponse<Response> response = sectionApiRequest.post(new SectionRequest(1L, 4L, 10), 1L);
+		ExtractableResponse<Response> response = SectionSteps.구간_생성_요청(상행종점역, 두번째_등록한_종점역, 10, 노선);
 
 		// then
-		assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-		assertThat(response.body().jsonPath().getString("message")).isEqualTo("해당 노선에 1역이 이미 존재합니다.");
+		실패시_코드값_메시지_검증(response, HttpStatus.BAD_REQUEST.value(), "해당 노선에 1역이 이미 존재합니다.");
 	}
 
 	/**
@@ -79,14 +79,13 @@ public class SectionAcceptanceTest {
 	@Test
 	void createSectionWithUpStationIsNotEndStationThenFailTest() {
 		// given
-		sectionApiRequest.post(new SectionRequest(4L, 2L, 10), 1L);
+		SectionSteps.구간_생성_요청(두번째_등록한_종점역, 처음_등록한_종점역, 10, 노선);
 
 		// when
-		ExtractableResponse<Response> response = sectionApiRequest.post(new SectionRequest(5L, 3L, 10), 1L);
+		ExtractableResponse<Response> response = SectionSteps.구간_생성_요청(등록할_역, 하행종점역이_아닌_역, 10, 노선);
 
 		// then
-		assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-		assertThat(response.body().jsonPath().getString("message")).isEqualTo("노선의 하행 종점역과 구간의 상행역은 같아야 합니다.");
+		실패시_코드값_메시지_검증(response, HttpStatus.BAD_REQUEST.value(),"노선의 하행 종점역과 구간의 상행역은 같아야 합니다.");
 	}
 
 	/**
@@ -100,14 +99,14 @@ public class SectionAcceptanceTest {
 	@Test
 	void deleteSectionTest() {
 		// given
-		sectionApiRequest.post(new SectionRequest(4L, 2L, 10), 1L);
+		SectionSteps.구간_생성_요청(두번째_등록한_종점역, 처음_등록한_종점역, 10, 노선);
 
 		// when
-		ExtractableResponse<Response> response = sectionApiRequest.delete(Map.of("stationId", 4L), 1L);
+		ExtractableResponse<Response> response = SectionSteps.구간_삭제_요청(Map.of("stationId", 두번째_등록한_종점역), 노선);
 
 		// then
 		assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-		assertThat(sectionApiRequest.get(1L).jsonPath().getString("downStationId")).doesNotContain("4");
+		assertThat(SectionSteps.구간_조회_요청(노선).jsonPath().getList("downStationId")).doesNotContain(두번째_등록한_종점역.intValue());
 	}
 
 	/**
@@ -121,19 +120,17 @@ public class SectionAcceptanceTest {
 	@Test
 	void deleteSectionWithStationIsNotEndThenFailTest() {
 		// given
-		sectionApiRequest.post(new SectionRequest(4L, 2L, 10), 1L);
+		SectionSteps.구간_생성_요청(두번째_등록한_종점역, 처음_등록한_종점역, 10, 노선);
 
 		// when
-		ExtractableResponse<Response> response = sectionApiRequest.delete(Map.of("stationId", 2L), 1L);
+		ExtractableResponse<Response> response = SectionSteps.구간_삭제_요청(Map.of("stationId", 처음_등록한_종점역), 노선);
 
 		// then
-		assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-		assertThat(response.body().jsonPath().getString("message")).isEqualTo("노선의 하행 종점역만 제거할 수 있습니다.");
+		실패시_코드값_메시지_검증(response, HttpStatus.BAD_REQUEST.value(),"노선의 하행 종점역만 제거할 수 있습니다.");
 	}
 
 	/**
 	 * Given 지하철 노선을 생성한다.
-	 * Given 지하철 노선에 구간을 생성한다.
 	 * When 해당 노선에 상행 종점역과 하행 종점역만 있는 경우 해당 구간을 삭제하면
 	 * Then 삭제되지 않고 코드값 400 (Bad Request) 을 반환한다.
 	 */
@@ -141,15 +138,15 @@ public class SectionAcceptanceTest {
 	@DirtiesContext
 	@Test
 	void deleteSectionWithLineHasOneSectionThenFailTest() {
-		// given
-		sectionApiRequest.post(new SectionRequest(4L, 2L, 10), 1L);
-
 		// when
-		sectionApiRequest.delete(Map.of("stationId", 4L), 1L);
-		ExtractableResponse<Response> response = sectionApiRequest.delete(Map.of("stationId", 2L), 1L);
+		ExtractableResponse<Response> response = SectionSteps.구간_삭제_요청(Map.of("stationId", 2L), 1L);
 
 		// then
-		assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-		assertThat(response.body().jsonPath().getString("message")).isEqualTo("상행 종점역과 하행 종점역만 있는 노선입니다.");
+		실패시_코드값_메시지_검증(response, HttpStatus.BAD_REQUEST.value(),"상행 종점역과 하행 종점역만 있는 노선입니다.");
+	}
+
+	private void 실패시_코드값_메시지_검증(ExtractableResponse<Response> response, int statusCode, String message) {
+		assertThat(response.statusCode()).isEqualTo(statusCode);
+		assertThat(response.body().jsonPath().getString("message")).isEqualTo(message);
 	}
 }
