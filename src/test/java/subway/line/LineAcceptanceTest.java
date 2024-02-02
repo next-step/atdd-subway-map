@@ -5,9 +5,7 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import subway.TableTruncate;
 import subway.annotation.AcceptanceTest;
 import subway.station.StationApiRequester;
 import subway.line.dto.LineCreateRequest;
@@ -23,12 +21,17 @@ public class LineAcceptanceTest {
     private final StationApiRequester stationApiRequester = new StationApiRequester();
     private final LineApiRequester lineApiRequester = new LineApiRequester();
 
+    Long 잠실역id;
+    Long 용산역id;
+    Long 건대입구역id;
+    Long 성수역id;
+
     @BeforeEach
     void setUp() {
-        stationApiRequester.createStationApiCall("잠실역");
-        stationApiRequester.createStationApiCall("용산역");
-        stationApiRequester.createStationApiCall("건대입구역");
-        stationApiRequester.createStationApiCall("성수역");
+        잠실역id = JsonPathUtil.getId(stationApiRequester.createStationApiCall("잠실역"));
+        용산역id = JsonPathUtil.getId(stationApiRequester.createStationApiCall("용산역"));
+        건대입구역id = JsonPathUtil.getId(stationApiRequester.createStationApiCall("건대입구역"));
+        성수역id = JsonPathUtil.getId(stationApiRequester.createStationApiCall("성수역"));
     }
 
     /**
@@ -42,8 +45,8 @@ public class LineAcceptanceTest {
         LineCreateRequest 이호선 = new LineCreateRequest(
                 "2호선",
                 "green",
-                1L,
-                2L,
+                잠실역id,
+                용산역id,
                 10
         );
         ExtractableResponse<Response> response = lineApiRequester.createLineApiCall(이호선);
@@ -66,8 +69,8 @@ public class LineAcceptanceTest {
         LineCreateRequest 이호선 = new LineCreateRequest(
                 "2호선",
                 "green",
-                1L,
-                2L,
+                잠실역id,
+                용산역id,
                 10
         );
         Long 이호선id = JsonPathUtil.getId(lineApiRequester.createLineApiCall(이호선));
@@ -75,8 +78,8 @@ public class LineAcceptanceTest {
         LineCreateRequest 일호선 = new LineCreateRequest(
                 "1호선",
                 "blue",
-                3L,
-                4L,
+                건대입구역id,
+                성수역id,
                 10
         );
         Long 일호선id = JsonPathUtil.getId(lineApiRequester.createLineApiCall(일호선));
@@ -101,8 +104,8 @@ public class LineAcceptanceTest {
         LineCreateRequest 이호선 = new LineCreateRequest(
                 "2호선",
                 "green",
-                1L,
-                2L,
+                잠실역id,
+                용산역id,
                 10
         );
         Long 이호선id = JsonPathUtil.getId(lineApiRequester.createLineApiCall(이호선));
@@ -127,8 +130,8 @@ public class LineAcceptanceTest {
         LineCreateRequest 이호선 = new LineCreateRequest(
                 "2호선",
                 "green",
-                1L,
-                2L,
+                잠실역id,
+                용산역id,
                 10
         );
         Long 이호선id = JsonPathUtil.getId(lineApiRequester.createLineApiCall(이호선));
@@ -157,8 +160,8 @@ public class LineAcceptanceTest {
         LineCreateRequest 이호선 = new LineCreateRequest(
                 "2호선",
                 "green",
-                1L,
-                2L,
+                잠실역id,
+                용산역id,
                 10
         );
         Long 이호선id = JsonPathUtil.getId(lineApiRequester.createLineApiCall(이호선));

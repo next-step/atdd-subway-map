@@ -26,15 +26,21 @@ public class SectionAcceptanceTest {
     private final LineApiRequester lineApiRequester = new LineApiRequester();
     private final SectionApiRequester sectionApiRequester = new SectionApiRequester();
 
+    Long 잠실역id;
+    Long 용산역id;
+    Long 건대입구역id;
+    Long 성수역id;
+    Long 이호선id;
+
     @BeforeEach
     void setUp() {
-        stationApiRequester.createStationApiCall("잠실역");
-        stationApiRequester.createStationApiCall("용산역");
-        stationApiRequester.createStationApiCall("건대입구역");
-        stationApiRequester.createStationApiCall("성수역");
+        잠실역id = JsonPathUtil.getId(stationApiRequester.createStationApiCall("잠실역"));
+        용산역id = JsonPathUtil.getId(stationApiRequester.createStationApiCall("용산역"));
+        건대입구역id = JsonPathUtil.getId(stationApiRequester.createStationApiCall("건대입구역"));
+        성수역id = JsonPathUtil.getId(stationApiRequester.createStationApiCall("성수역"));
 
-        LineCreateRequest request = new LineCreateRequest("2호선", "green", 1L, 2L, 10);
-        lineApiRequester.createLineApiCall(request);
+        LineCreateRequest 이호선 = new LineCreateRequest("2호선", "green", 잠실역id, 용산역id, 10);
+        이호선id = JsonPathUtil.getId(lineApiRequester.createLineApiCall(이호선));
     }
 
     /**
@@ -45,15 +51,15 @@ public class SectionAcceptanceTest {
     @Test
     void generateSection() {
         //when
-        SectionCreateRequest request = new SectionCreateRequest(2L, 3L, 5);
+        SectionCreateRequest request = new SectionCreateRequest(용산역id, 건대입구역id, 5);
 
-        ExtractableResponse<Response> response = sectionApiRequester.generateSection(request, 1L);
+        ExtractableResponse<Response> response = sectionApiRequester.generateSection(request, 이호선id);
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
-        ExtractableResponse<Response> findLine = lineApiRequester.findLineApiCall(1L);
-        assertThat(getStationIds(findLine)).containsExactly(1L, 2L, 3L);
+        ExtractableResponse<Response> 이호선 = lineApiRequester.findLineApiCall(이호선id);
+        assertThat(getStationIds(이호선)).containsExactly(잠실역id, 용산역id, 건대입구역id);
     }
 
     /**
@@ -64,9 +70,9 @@ public class SectionAcceptanceTest {
     @Test
     void generateSectionException() {
         //when
-        SectionCreateRequest request = new SectionCreateRequest(3L, 4L, 5);
+        SectionCreateRequest request = new SectionCreateRequest(건대입구역id, 성수역id, 5);
 
-        ExtractableResponse<Response> response = sectionApiRequester.generateSection(request, 1L);
+        ExtractableResponse<Response> response = sectionApiRequester.generateSection(request, 이호선id);
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -81,9 +87,9 @@ public class SectionAcceptanceTest {
     @Test
     void generateAlreadySection() {
         //when
-        SectionCreateRequest request = new SectionCreateRequest(2L, 1L, 5);
+        SectionCreateRequest request = new SectionCreateRequest(용산역id, 잠실역id, 5);
 
-        ExtractableResponse<Response> response = sectionApiRequester.generateSection(request, 1L);
+        ExtractableResponse<Response> response = sectionApiRequester.generateSection(request, 이호선id);
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -99,18 +105,18 @@ public class SectionAcceptanceTest {
     @Test
     void deleteSection() {
         //given
-        SectionCreateRequest request = new SectionCreateRequest(2L, 3L, 5);
+        SectionCreateRequest request = new SectionCreateRequest(용산역id, 건대입구역id, 5);
 
-        sectionApiRequester.generateSection(request, 1L);
+        sectionApiRequester.generateSection(request, 이호선id);
 
         //when
-        ExtractableResponse<Response> response = sectionApiRequester.deleteSection(1L, 3L);
+        ExtractableResponse<Response> response = sectionApiRequester.deleteSection(이호선id, 건대입구역id);
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
-        ExtractableResponse<Response> findLine = lineApiRequester.findLineApiCall(1L);
-        assertThat(getStationIds(findLine)).containsExactly(1L, 2L);
+        ExtractableResponse<Response> 이호선 = lineApiRequester.findLineApiCall(이호선id);
+        assertThat(getStationIds(이호선)).containsExactly(잠실역id, 용산역id);
     }
 
     /**
@@ -122,12 +128,12 @@ public class SectionAcceptanceTest {
     @Test
     void deleteNotDownSection() {
         //given
-        SectionCreateRequest request = new SectionCreateRequest(2L, 3L, 5);
+        SectionCreateRequest request = new SectionCreateRequest(용산역id, 건대입구역id, 5);
 
-        sectionApiRequester.generateSection(request, 1L);
+        sectionApiRequester.generateSection(request, 이호선id);
 
         //when
-        ExtractableResponse<Response> response = sectionApiRequester.deleteSection(1L, 2L);
+        ExtractableResponse<Response> response = sectionApiRequester.deleteSection(이호선id, 용산역id);
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -142,7 +148,7 @@ public class SectionAcceptanceTest {
     @Test
     void deleteSectionException() {
         //when
-        ExtractableResponse<Response> response = sectionApiRequester.deleteSection(1L, 1L);
+        ExtractableResponse<Response> response = sectionApiRequester.deleteSection(이호선id, 잠실역id);
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
