@@ -1,4 +1,4 @@
-package subway;
+package subway.line;
 
 import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
