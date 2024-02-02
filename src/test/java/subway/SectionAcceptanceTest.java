@@ -35,6 +35,7 @@ public class SectionAcceptanceTest {
 	 * Then 지하철 노선 조회 시, 새로운 하행 종점역을 확인할 수 있다.
 	 */
 	@DisplayName("지하철 노선에 구간을 등록한다.")
+	@DirtiesContext
 	@Test
 	void createSectionTest() {
 		// when
