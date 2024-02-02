@@ -1,6 +1,7 @@
 package subway.entity;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"line_id", "upStationId", "downStationId"}))
@@ -23,10 +24,6 @@ public class Section {
 		return id;
 	}
 
-	public Line getLine() {
-		return line;
-	}
-
 	public Long getDownStationId() {
 		return downStationId;
 	}
@@ -47,5 +44,19 @@ public class Section {
 		this.upStationId = upStationId;
 		this.downStationId = downStationId;
 		this.distance = distance;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if(obj instanceof Section) {
+			return Objects.equals(((Section) obj).getId(), id);
+		}
+
+		return false;
 	}
 }

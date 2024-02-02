@@ -1,6 +1,8 @@
 package subway.entity;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Line {
@@ -18,6 +20,9 @@ public class Line {
 
 	private int distance;
 
+	@OneToMany(mappedBy = "line", cascade = CascadeType.PERSIST, orphanRemoval = true)
+	private List<Section> sections;
+
 	public Line() {
 
 	}
@@ -28,6 +33,7 @@ public class Line {
 		this.startStationId = startStationId;
 		this.endStationId = endStationId;
 		this.distance = distance;
+		this.sections = new ArrayList<>();
 	}
 
 	public Long getId() {
@@ -54,12 +60,8 @@ public class Line {
 		return distance;
 	}
 
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public void setColor(String color) {
-		this.color = color;
+	public List<Section> getSections() {
+		return sections;
 	}
 
 	public void setUpdateInfo(String name, String color) {
@@ -67,13 +69,29 @@ public class Line {
 		this.color = color;
 	}
 
-	public void addSection(Long stationId, int distance) {
-		this.endStationId = stationId;
-		this.distance = this.distance + distance;
+	public void addSection(Section section) {
+		this.endStationId = section.getDownStationId();
+		this.distance = this.distance + section.getDistance();
+		this.sections.add(section);
 	}
 
-	public void removeSection(Long stationId, int distance) {
-		this.endStationId = stationId;
-		this.distance = this.distance - distance;
+	public void deleteSection(Section section) {
+		this.endStationId = section.getUpStationId();
+		this.distance = this.distance - section.getDistance();
+		sections.remove(section);
+	}
+
+	public boolean hasStation(Long stationId) {
+		for(Section section : sections) {
+			if(stationId.equals(section.getDownStationId())) {
+				return true;
+			}
+
+			if(stationId.equals(section.getUpStationId())) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 }
