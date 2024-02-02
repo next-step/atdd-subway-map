@@ -122,7 +122,7 @@ public class SectionManagementTest extends CommonAcceptanceTest {
 	 */
 	@Test
 	@DisplayName("구간 제거 - 성공 케이스")
-	void deleteSection_Success() {
+	void deleteDownEndSection_Success() {
 		// Given
 		ExtractableResponse<Response> stationCreateResponse1 = executeCreateStationRequest("상행 종점역");
 		long stationId1 = parseId(stationCreateResponse1);
@@ -152,7 +152,7 @@ public class SectionManagementTest extends CommonAcceptanceTest {
 	 */
 	@Test
 	@DisplayName("구간 제거 - 예외 케이스 -> 마지막 구간이 아닌 구간을 제외할 때 예외 발생")
-	void deleteSection_Failure_1() {
+	void deleteNotDownEndSection_Failure_1() {
 		// Given
 		ExtractableResponse<Response> stationCreateResponse1 = executeCreateStationRequest("Station A");
 		long stationId1 = parseId(stationCreateResponse1);
@@ -186,8 +186,8 @@ public class SectionManagementTest extends CommonAcceptanceTest {
 	 * - Then 에러를 반환한다.
 	 */
 	@Test
-	@DisplayName("구간 제거 - 예외 케이스 -> 상행 종점역과 하행 종점역이 각 1개만 있는 경우 삭제 할 수 없다는 조건을 불만족")
-	void deleteSection_Failure_2() {
+	@DisplayName("구간 제거 - 예외 케이스 -> 상행 종점역과 하행 종점역이 각 1개만 있는 경우 해당 역을 삭제하는 경우 최소 개수 조건을 유지해야 한다는 조건을 불만족하여 예외")
+	void deleteSectionWhenMinimumRequiredStationCountNotSatisfied_Failure_2() {
 		// Given
 		ExtractableResponse<Response> stationCreateResponse1 = executeCreateStationRequest("상행 종점역");
 		long stationId1 = parseId(stationCreateResponse1);
