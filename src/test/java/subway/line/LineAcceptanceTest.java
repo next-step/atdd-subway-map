@@ -111,11 +111,8 @@ public class LineAcceptanceTest {
     void updateLine() {
         long id = RestAssuredUtil.post(LINE_SHINBUNDANG, "/lines").jsonPath().getLong("id");
 
-        Map<String, Object> updateParams = new HashMap<>();
-        updateParams.put("name", "4호선");
-        updateParams.put("color", "bg-blue-600");
-
-        RestAssuredUtil.put(updateParams, "/lines/" + id);
+        UpdateLineRequest updateReq = new UpdateLineRequest("4호선", "bg-blue-600");
+        RestAssuredUtil.put(updateReq, "/lines/" + id);
 
         // then
         String lineName
