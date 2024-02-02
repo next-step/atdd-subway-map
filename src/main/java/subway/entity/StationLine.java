@@ -9,6 +9,7 @@ import java.util.List;
 @Entity
 public class StationLine {
 
+    public static final int MIN_DELETE_REQUIRED_SECTIONS_SIZE = 1;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -24,7 +25,7 @@ public class StationLine {
     private int distance;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "stationLine")
+    @OneToMany(mappedBy = "stationLine", cascade = CascadeType.REMOVE)
     private List<StationSection> sections = new ArrayList<>();
 
     protected StationLine() {
@@ -57,6 +58,13 @@ public class StationLine {
     private boolean hasNoConnectingDownStation(StationSection toSaveSection) {
         return sections.stream()
                 .noneMatch(existSection -> existSection.isUpStationSameAsDownStation(toSaveSection));
+    }
+
+    public boolean canDelete(Long stationIdToDelete) {
+        if(!this.downStationId.equals(stationIdToDelete)) {
+            return false;
+        }
+        return sections.size() > MIN_DELETE_REQUIRED_SECTIONS_SIZE;
     }
 
     public Long getId() {

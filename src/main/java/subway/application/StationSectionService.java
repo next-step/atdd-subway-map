@@ -38,6 +38,15 @@ public class StationSectionService {
         return convertToResponse(saveStationSection(stationSection.setStationLine(stationLine)));
     }
 
+    @Transactional
+    public void deleteStationSection(Long stationLineId, Long stationIdToDelete) {
+        StationLine stationLine = findStationLineById(stationLineId);
+
+        if(!stationLine.canDelete(stationIdToDelete)) {
+            throw new IllegalArgumentException("요청한 구간(혹은 역)을 삭제할 수 없습니다.");
+        }
+    }
+
     private boolean existStation(StationSection stationSection) {
         boolean upStationExists = stationRepository.findById(stationSection.getUpStationId()).isPresent();
         boolean downStationExists = stationRepository.findById(stationSection.getDownStationId()).isPresent();
@@ -45,7 +54,6 @@ public class StationSectionService {
     }
 
     private StationSection saveStationSection(StationSection stationSection) {
-        stationSection.setStationLine(stationSection.getStationLine());
         stationSection.updateLineDownStationId();
         return stationSectionRepository.save(stationSection);
     }

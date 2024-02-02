@@ -87,6 +87,7 @@ public class StationLineService {
         return new StationSection(
                 stationLine.getUpStationId(),
                 stationLine.getDownStationId(),
-                stationLine.getDistance());
+                stationLine.getDistance(),
+                stationLine);
     }
 }

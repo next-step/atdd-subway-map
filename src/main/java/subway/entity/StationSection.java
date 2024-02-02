@@ -34,6 +34,13 @@ public class StationSection {
         this.distance = validateDistance(distance);
     }
 
+    public StationSection(Long upStationId, Long downStationId, int distance, StationLine stationLine) {
+        this.upStationId = validateStationId(upStationId, "upStationId");
+        this.downStationId = validateStationId(downStationId, "downStationId");
+        this.distance = validateDistance(distance);
+        this.stationLine = stationLine;
+    }
+
     private Long validateStationId(Long stationId, String fieldName) {
         if (stationId == null || stationId < MIN_STATION_ID_VALUE) {
             throw new IllegalArgumentException(fieldName + "은(는) 0보다 커야합니다.");

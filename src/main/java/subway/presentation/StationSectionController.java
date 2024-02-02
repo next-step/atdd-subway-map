@@ -1,17 +1,12 @@
 package subway.presentation;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import subway.application.StationSectionService;
 import subway.dto.StationSectionRequest;
 import subway.dto.StationSectionResponse;
-import subway.entity.StationSection;
 
 import java.net.URI;
-import java.util.Map;
 
 @RestController
 public class StationSectionController {
@@ -29,5 +24,12 @@ public class StationSectionController {
                 stationLineService.saveStationSection(request.updateStationLineId(stationLineId));
         return ResponseEntity.created(
                 URI.create(String.format("/lines/%d/sections", stationLineId))).body(stationSectionResponse);
+    }
+
+    @DeleteMapping("/lines/{stationLineId}/sections")
+    public ResponseEntity<Void> deleteStationLine(@PathVariable Long stationLineId,
+                                                  @RequestParam(name = "stationId") Long stationIdToDelete) {
+        stationLineService.deleteStationSection(stationLineId, stationIdToDelete);
+        return ResponseEntity.noContent().build();
     }
 }
