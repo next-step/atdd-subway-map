@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -27,7 +29,7 @@ public class Line {
     private Long downStationId;
     private Long distance;
 
-    @OneToMany(mappedBy = "line")
+    @OneToMany(mappedBy = "line", cascade={CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private List<Section> sections = new ArrayList<>();
 
     public Line(String name, String color, Long upStationId, Long downStationId, Long distance) {
@@ -63,13 +65,18 @@ public class Line {
         this.color = color;
     }
 
-    public void updateSectionInfo(Long downStationId, Long distance) {
-        this.downStationId = downStationId;
-        this.distance = distance;
+    public void deleteSection(Section section) {
+        sections = sections.stream()
+            .filter(sectionItem-> !Objects.equals(section.getId(), sectionItem.getId()))
+            .collect(Collectors.toList());
+        downStationId = section.getUpStationId();
+        distance -= section.getDistance();
     }
 
     public void addSection(Section section) {
-        this.sections.add(section);
+        sections.add(section);
+        downStationId = section.getDownStationId();
+        distance += section.getDistance();
     }
 
     public Long getDownStationId() {
@@ -78,31 +85,5 @@ public class Line {
 
     public List<Section> getSections() {
         return sections;
-    }
-
-    public void validateSectionToAdd(SectionAddRequest sectionAddRequest) {
-        final Set<Long> stationIdSet = new HashSet<>();
-        sections.forEach(section -> {
-            stationIdSet.add(section.getUpStationId());
-            stationIdSet.add(section.getDownStationId());
-        });
-
-        if (stationIdSet.contains(sectionAddRequest.getDownStationId())) {
-            throw new IllegalArgumentException();
-        }
-
-        if (!Objects.equals(downStationId, sectionAddRequest.getUpStationId())) {
-            throw new IllegalArgumentException();
-        }
-    }
-
-    public void validateSectionCanBeDeleted(SectionDeleteRequest sectionDeleteRequest) {
-        if (sections.size() == 1) {
-            throw new IllegalArgumentException();
-        }
-
-        if(!Objects.equals(downStationId, sectionDeleteRequest.getStationId())) {
-            throw new IllegalArgumentException();
-        }
     }
 }
