@@ -4,20 +4,23 @@ import subway.line.repository.domain.Line;
 import subway.station.service.dto.StationResponse;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class LineResponse {
     private Long id;
     private String name;
     private String color;
+    private int distance;
     private List<StationResponse> stations;
 
     private LineResponse() {
     }
 
-    private LineResponse(final Long id, final String name, final String color, final List<StationResponse> stations) {
+    private LineResponse(final Long id, final String name, final String color, final int distance, final List<StationResponse> stations) {
         this.id = id;
         this.name = name;
         this.color = color;
+        this.distance = distance;
         this.stations = stations;
     }
 
@@ -26,7 +29,11 @@ public class LineResponse {
                 line.getId()
                 , line.getName()
                 , line.getColor()
-                , List.of(StationResponse.from(line.getUpStation()), StationResponse.from(line.getDownStation()))
+                , line.getDistance()
+                , line.getStations()
+                .stream()
+                .map(StationResponse::from)
+                .collect(Collectors.toList())
         );
     }
 
@@ -44,5 +51,9 @@ public class LineResponse {
 
     public List<StationResponse> getStations() {
         return stations;
+    }
+
+    public int getDistance() {
+        return distance;
     }
 }

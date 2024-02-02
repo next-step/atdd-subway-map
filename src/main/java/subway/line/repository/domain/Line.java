@@ -3,6 +3,8 @@ package subway.line.repository.domain;
 import subway.station.repository.domain.Station;
 
 import javax.persistence.*;
+import java.util.Collections;
+import java.util.List;
 
 @Entity
 public class Line {
@@ -16,26 +18,19 @@ public class Line {
     @Column(length = 20, nullable = false)
     private String color;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "up_station_id")
-    private Station upStation;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "down_station_id")
-    private Station downStation;
+    @Embedded
+    private Sections sections = new Sections();
 
     @Column(nullable = false)
-    private Long distance;
+    private int distance;
 
     protected Line() {
     }
 
-    public Line(final String name, final String color, final Station upStation, final Station downStation, final Long distance) {
+    public Line(final String name, final String color, final Section section) {
         this.name = name;
         this.color = color;
-        this.upStation = upStation;
-        this.downStation = downStation;
-        this.distance = distance;
+        addSection(section);
     }
 
     public Long getId() {
@@ -50,15 +45,11 @@ public class Line {
         return color;
     }
 
-    public Station getUpStation() {
-        return upStation;
+    public List<Station> getStations() {
+        return Collections.unmodifiableList(sections.getStations());
     }
 
-    public Station getDownStation() {
-        return downStation;
-    }
-
-    public Long getDistance() {
+    public int getDistance() {
         return distance;
     }
 
@@ -68,5 +59,15 @@ public class Line {
 
     public void changeColor(final String color) {
         this.color = color;
+    }
+
+    public void addSection(final Section section) {
+        sections.connect(section);
+        distance += section.getDistance();
+    }
+    public void removeSectionByStation(final Station station) {
+        final int lastSectionDistance = sections.getLastSectionDistance();
+        distance -= lastSectionDistance;
+        sections.disconnectLastSection(station);
     }
 }

@@ -1,7 +1,9 @@
 package subway.line.exception;
 
 
-public class UpdateRequestNotValidException extends RuntimeException {
+import subway.common.exception.ValidationError;
+
+public class UpdateRequestNotValidException extends ValidationError {
     public UpdateRequestNotValidException(final String message) {
         super(message);
     }
