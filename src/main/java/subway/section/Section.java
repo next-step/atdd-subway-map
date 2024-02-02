@@ -22,14 +22,12 @@ public class Section {
 
     private Long distance;
 
-    public Section(Long upStationId, Long downStationId, Long distance) {
+    public Section(Line line, Long upStationId, Long downStationId, Long distance) {
+        this.line = line;
         this.upStationId = upStationId;
         this.downStationId = downStationId;
         this.distance = distance;
-    }
 
-    public void updateLine(Line line) {
-        this.line = line;
         line.addSection(this);
     }
 
