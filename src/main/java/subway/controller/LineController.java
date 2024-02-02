@@ -22,7 +22,7 @@ public class LineController {
         this.lineService = lineService;
     }
 
-    @PostMapping()
+    @PostMapping
     public ResponseEntity<LineResponseBody> createLine(@RequestBody LineCreateRequestBody lineCreateRequestBody) {
         LineDto line = lineService.saveLine(new SaveLineDto(
                 lineCreateRequestBody.getName(),
@@ -34,7 +34,7 @@ public class LineController {
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(LineResponseBody.create(line));
     }
 
-    @GetMapping()
+    @GetMapping
     public ResponseEntity<List<LineResponseBody>> showLines() {
         List<LineDto> lines = lineService.findAllLines();
         return ResponseEntity.ok().body(LineResponseBody.create(lines));

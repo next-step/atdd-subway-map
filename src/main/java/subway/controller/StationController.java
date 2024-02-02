@@ -3,7 +3,7 @@ package subway.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import subway.controller.dto.StationRequest;
-import subway.controller.dto.StationResponse;
+import subway.controller.dto.StationResponseBody;
 import subway.service.StationService;
 
 import java.net.URI;
@@ -18,13 +18,13 @@ public class StationController {
     }
 
     @PostMapping("/stations")
-    public ResponseEntity<StationResponse> createStation(@RequestBody StationRequest stationRequest) {
-        StationResponse station = stationService.saveStation(stationRequest);
+    public ResponseEntity<StationResponseBody> createStation(@RequestBody StationRequest stationRequest) {
+        StationResponseBody station = stationService.saveStation(stationRequest);
         return ResponseEntity.created(URI.create("/stations/" + station.getId())).body(station);
     }
 
     @GetMapping(value = "/stations")
-    public ResponseEntity<List<StationResponse>> showStations() {
+    public ResponseEntity<List<StationResponseBody>> showStations() {
         return ResponseEntity.ok().body(stationService.findAllStations());
     }
 

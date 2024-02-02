@@ -2,23 +2,34 @@ package subway.line;
 
 import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.annotation.DirtiesContext;
 
 import subway.controller.dto.LineCreateRequestBody;
 import subway.controller.dto.LineUpdateRequestBody;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
-@Sql(value = "/sql/truncate.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {
     private final String routePrefix = "/lines";
+
+    @BeforeEach
+    void createStationFixture() {
+        setupStationByName("강남역");
+        setupStationByName("신논현역");
+        setupStationByName("논현역");
+    }
 
     /**
      * When 지하철 노선을 생성하면
@@ -185,6 +196,8 @@ public class LineAcceptanceTest {
                 .doesNotContain(createdFixture.getString("name"));
     }
 
+    // TODO: 아래 함수들 util류로 분류
+
     /***
      * 테스트를 위해 노선을 생성하고 생성된 리스폰스의 JsonPath를 반환합니다.
      */
@@ -220,5 +233,16 @@ public class LineAcceptanceTest {
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
                 .extract().jsonPath();
+    }
+
+    private Long setupStationByName(String stationName) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", stationName);
+        return RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all()
+                .extract().jsonPath().getLong("id");
     }
 }

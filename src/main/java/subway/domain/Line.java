@@ -1,9 +1,10 @@
 package subway.domain;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Entity
 public class Line {
@@ -11,30 +12,18 @@ public class Line {
     private Long id;
     private String name;
     private String color;
-    // TODO: 연관관계 매핑 추가
-    // private List<Station> stations;
-    private Long upStationId;
-    private Long downStationId;
-    private int distance;
+    @OneToMany(mappedBy = "line", cascade = CascadeType.PERSIST, orphanRemoval = true)
+    private final List<Section> sections = new ArrayList<>();
 
-    private Line(String name, String color, Long upStationId, Long downStationId, int distance) {
+    private Line(String name, String color) {
         this.name = name;
         this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
-        this.distance = distance;
     }
 
     protected Line() {}
 
-    public static Line create(
-            String name,
-            String color,
-            Long upStationId,
-            Long downStationId,
-            int distance
-    ) {
-        return new Line(name, color, upStationId, downStationId, distance);
+    public static Line create(String name, String color) {
+        return new Line(name, color);
     }
 
     public void update(String name, String color) {
@@ -54,15 +43,32 @@ public class Line {
         return color;
     }
 
-    public Long getUpStationId() {
-        return upStationId;
+    public List<Section> getSections() {
+        return sections;
     }
 
-    public Long getDownStationId() {
-        return downStationId;
+    public List<Station> getAllStations() {
+        return sections.stream()
+                .flatMap(section -> Stream.of(section.getUpStation(), section.getDownStation()))
+                .collect(Collectors.toList());
     }
 
-    public int getDistance() {
-        return distance;
+    public void addSection(Section section) {
+        if (sections.isEmpty()) {
+            sections.add(section);
+        } else if (isAvailableDownStation(section.getDownStation()) && isAvailableUpStation(section.getUpStation())) {
+            sections.add(section);
+        } else {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    private Boolean isAvailableDownStation(Station downStation) {
+        return !getAllStations().contains(downStation);
+    }
+
+    private Boolean isAvailableUpStation(Station upStation) {
+        Section lastSection = sections.get(sections.size() - 1);
+        return lastSection.getDownStation().equals(upStation);
     }
 }

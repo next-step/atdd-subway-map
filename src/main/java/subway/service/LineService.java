@@ -3,10 +3,13 @@ package subway.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.domain.Line;
-import subway.controller.dto.StationResponse;
+import subway.domain.Section;
+import subway.domain.Station;
 import subway.repository.LineRepository;
+import subway.repository.SectionRepository;
 import subway.service.dto.LineDto;
 import subway.service.dto.SaveLineDto;
+import subway.service.dto.StationDto;
 import subway.service.dto.UpdateLineDto;
 
 import javax.persistence.EntityNotFoundException;
@@ -17,20 +20,23 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class LineService {
     private final LineRepository lineRepository;
+    private final StationService stationService;
 
-    public LineService(LineRepository lineRepository) {
+    public LineService(LineRepository lineRepository, StationService stationService) {
         this.lineRepository = lineRepository;
+        this.stationService = stationService;
     }
 
     @Transactional
     public LineDto saveLine(SaveLineDto saveLineDto) {
+        Station upStation = stationService.findStationById(saveLineDto.getUpStationId());
+        Station downStation = stationService.findStationById(saveLineDto.getDownStationId());
         Line line = lineRepository.save(Line.create(
                 saveLineDto.getName(),
-                saveLineDto.getColor(),
-                saveLineDto.getUpStationId(),
-                saveLineDto.getDownStationId(),
-                saveLineDto.getDistance()
+                saveLineDto.getColor()
         ));
+        Section section = Section.create(upStation, downStation, line, saveLineDto.getDistance());
+        line.addSection(section);
         return this.createLineDto(line);
     }
 
@@ -60,22 +66,18 @@ public class LineService {
         return lineRepository.findById(id).orElseThrow(EntityNotFoundException::new);
     }
 
-    /**
-     * step2 에서는 노선과 지하철역 매핑까지 처리하지 않는다. 매핑 작업 전에는 단순 더미 처리로 구현.
-     */
-    private List<StationResponse> getStations(Long upStationId, Long downStationId) {
-        return List.of(
-                new StationResponse(upStationId, "dummy"),
-                new StationResponse(downStationId, "dummy")
-        );
-    }
-
     private LineDto createLineDto(Line line) {
         return new LineDto(
                 line.getId(),
                 line.getName(),
                 line.getColor(),
-                this.getStations(line.getUpStationId(), line.getDownStationId())
+                createStationDto(line.getAllStations())
         );
+    }
+
+    private List<StationDto> createStationDto(List<Station> stations) {
+        return stations.stream()
+                .map(station -> new StationDto(station.getId(), station.getName()))
+                .collect(Collectors.toList());
     }
 }
