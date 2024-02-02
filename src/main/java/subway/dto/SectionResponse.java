@@ -5,8 +5,6 @@ import subway.entity.Section;
 public class SectionResponse {
 	private Long id;
 
-	private Long lineId;
-
 	private Long downStationId;
 
 	private Long upStationId;
@@ -18,7 +16,6 @@ public class SectionResponse {
 
 	public SectionResponse(Section section) {
 		this.id = section.getId();
-		this.lineId = section.getLine().getId();
 		this.downStationId = section.getDownStationId();
 		this.upStationId = section.getUpStationId();
 		this.distance = section.getDistance();
@@ -26,10 +23,6 @@ public class SectionResponse {
 
 	public Long getId() {
 		return id;
-	}
-
-	public Long getLineId() {
-		return lineId;
 	}
 
 	public Long getDownStationId() {
