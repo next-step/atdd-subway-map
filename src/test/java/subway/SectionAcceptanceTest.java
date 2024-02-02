@@ -76,27 +76,15 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     /**
      * GIVEN 지하철 역을 생성하고
      * GIVEN 지하철 역에 노선을 등록하고
-     * WHEN 새로운 지하철 구간을 노선의 상행 종점역에 등록하면
+     * WHEN 새로운 지하철 구간의 상행역을 노선의 하행 종점역이 아닌 곳에 등록하면
      * Then 새로운 구간을 등록할 수 없다
      */
     @Test
-    void 실패_새로운_지하철_구간_등록시_노선의_상행_종점역에_등록하면_예외가_발생한다() {
+    void 실패_새로운_구간_등록시_상행역을_노선의_하행_종점역에_등록하지_않으면_예외가_발생한다() {
         SectionCreateRequest request = sectionCreateRequest(GANGNAM_STATION_ID, YANGJAE_STATION_ID, 10);
         String message = post("/lines/{lineId}/sections", request, OK.value(), SHINBUNDANG_LINE_ID)
                 .as(ExceptionResponse.class).getMessage();
-        assertThat(message).isEqualTo("상행 종점역에는 구간을 등록할 수 없습니다.");
-    }
-
-    /**
-     * GIVEN 지하철 역을 생성하고
-     * GIVEN 지하철 역에 노선을 등록하고
-     * GIVEN 구간을 등록하고
-     * WHEN 새로운 지하철 구간을 노선의 중간에 있는 역에 등록하면
-     * Then 새로운 구간을 등록할 수 없다
-     */
-    @Test
-    void 실패_새로운_지하철_구간_등록시_노선의_중간역에_등록하면_예외가_발생한다() {
-
+        assertThat(message).isEqualTo("새로운 구간의 상행역은 노선의 하행 종점역에만 등록할 수 있습니다.");
     }
 
     /**

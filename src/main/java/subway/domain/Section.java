@@ -39,12 +39,12 @@ public class Section {
         return this.line.equals(line);
     }
 
-    public List<Station> stations() {
-        return List.of(upStation, downStation);
+    public boolean isUpStation(Station station){
+        return this.upStation.equals(station);
     }
 
-    public Station downStation() {
-        return downStation;
+    public List<Station> stations() {
+        return List.of(upStation, downStation);
     }
 
 }
