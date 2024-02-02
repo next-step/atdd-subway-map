@@ -14,13 +14,13 @@ import subway.dto.StationLineRequest;
 import subway.dto.StationSectionRequest;
 
 import static config.fixtures.subway.StationLineMockData.호남선_생성;
+import static config.fixtures.subway.StationMockData.독산역;
 import static config.fixtures.subway.StationMockData.역_10개;
 import static config.fixtures.subway.StationSectionMockData.지하철_구간;
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static subway.StationLineSteps.지하철_노선_생성_요청_검증_포함;
-import static subway.StationSectionSteps.지하철_구간_생성요청_검증_생략;
-import static subway.StationSectionSteps.지하철_구간_생성요청_상태코드_검증_포함;
+import static subway.StationSectionSteps.*;
 import static subway.StationSteps.지하철_역_생성_요청;
 import static utils.HttpResponseUtils.getCreatedLocationId;
 
@@ -251,15 +251,14 @@ public class StationSectionAcceptanceTest {
         StationSectionRequest 생성할_지하철_구간 = 지하철_구간(2L, 4L, 10);
         지하철_구간_생성요청_상태코드_검증_포함(getCreatedLocationId(response), 생성할_지하철_구간);
 
-        // when, then
-        given().log().all()
-                .when()
-                .param("stationId", 생성할_지하철_구간.getDownStationId())
-                .delete(String.format("/lines/%d/sections", getCreatedLocationId(response)))
-                .then().log().all()
-                .statusCode(HttpStatus.NO_CONTENT.value());
+        // then
+        ExtractableResponse<Response> 성공하는_삭제요청_응답 =
+                지하철_구간_삭제요청_검증_생략(생성할_지하철_구간.getDownStationId(), getCreatedLocationId(response));
+
+        // then
+        assertThat(성공하는_삭제요청_응답.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
-    
+
     /**
       * Given 지하철 노선이 생성되고
       * When  지하철 구간을 제거할 때,
@@ -273,13 +272,12 @@ public class StationSectionAcceptanceTest {
         ExtractableResponse<Response> response =
                 지하철_노선_생성_요청_검증_포함(호남선);
 
-        // when, then
-        given().log().all()
-                .when()
-                .param("stationId", 호남선.getDownStationId())
-                .delete(String.format("/lines/%d/sections", getCreatedLocationId(response)))
-                .then().log().all()
-                .statusCode(HttpStatus.BAD_REQUEST.value());
+        // then
+        ExtractableResponse<Response> 성공하는_삭제요청_응답 =
+                지하철_구간_삭제요청_검증_생략(호남선.getDownStationId(), getCreatedLocationId(response));
+
+        // then
+        assertThat(성공하는_삭제요청_응답.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     /**
@@ -293,17 +291,15 @@ public class StationSectionAcceptanceTest {
         // given
         ExtractableResponse<Response> response =
                 지하철_노선_생성_요청_검증_포함(호남선_생성(1L, 2L));
-
         StationSectionRequest 생성할_지하철_구간 = 지하철_구간(2L, 4L, 10);
         지하철_구간_생성요청_상태코드_검증_포함(getCreatedLocationId(response), 생성할_지하철_구간);
 
-        // when, then
-        given().log().all()
-                .when()
-                .param("stationId", 생성할_지하철_구간.getUpStationId())
-                .delete(String.format("/lines/%d/sections", getCreatedLocationId(response)))
-                .then().log().all()
-                .statusCode(HttpStatus.BAD_REQUEST.value());
+        // then
+        ExtractableResponse<Response> 성공하는_삭제요청_응답 =
+                지하철_구간_삭제요청_검증_생략(생성할_지하철_구간.getUpStationId(), getCreatedLocationId(response));
+
+        // then
+        assertThat(성공하는_삭제요청_응답.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     /**
@@ -321,12 +317,11 @@ public class StationSectionAcceptanceTest {
         StationSectionRequest 생성할_지하철_구간 = 지하철_구간(2L, 4L, 10);
         지하철_구간_생성요청_상태코드_검증_포함(getCreatedLocationId(response), 생성할_지하철_구간);
 
-        // when, then
-        given().log().all()
-                .when()
-                .param("stationId", 100)
-                .delete(String.format("/lines/%d/sections", getCreatedLocationId(response)))
-                .then().log().all()
-                .statusCode(HttpStatus.BAD_REQUEST.value());
+        // then
+        ExtractableResponse<Response> 성공하는_삭제요청_응답 =
+                지하철_구간_삭제요청_검증_생략(100L, getCreatedLocationId(response));
+
+        // then
+        assertThat(성공하는_삭제요청_응답.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 }

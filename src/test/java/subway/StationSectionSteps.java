@@ -29,4 +29,13 @@ public class StationSectionSteps {
                 .statusCode(HttpStatus.CREATED.value())
                 .extract();
     }
+
+    public static ExtractableResponse<Response> 지하철_구간_삭제요청_검증_생략(
+            Long downStationIdToDelete, Long stationLineId) {
+        return given().log().all()
+                .when()
+                .param("stationId", downStationIdToDelete)
+                .delete(String.format("/lines/%d/sections", stationLineId))
+                .then().extract();
+    }
 }
