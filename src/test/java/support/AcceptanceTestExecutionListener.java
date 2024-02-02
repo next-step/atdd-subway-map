@@ -11,7 +11,7 @@ public class AcceptanceTestExecutionListener extends AbstractTestExecutionListen
 
     @Override
     public void beforeTestMethod(TestContext testContext) {
-        var context = getWebServerApplicationContext(testContext);
+        ServletWebServerApplicationContext context = getWebServerApplicationContext(testContext);
         RestAssured.port = getServerPort(context);
     }
 

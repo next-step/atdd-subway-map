@@ -1,4 +1,4 @@
-package subway;
+package subway.station;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import io.restassured.RestAssured;
@@ -31,26 +31,15 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        Map<String, String> params = new HashMap<>();
-        params.put("name", GANGNAM_STATION_NAME);
-
-        ExtractableResponse<Response> response =
-            RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = saveStationResponse(GANGNAM_STATION_NAME);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames =
-            RestAssured.given().log().all()
-                .when().get("/stations")
-                .then().log().all()
-                .extract().jsonPath().getList("name", String.class);
+        List<String> stationNames = getStationListResponse()
+            .jsonPath()
+            .getList("name", String.class);
         assertThat(stationNames).containsAnyOf(GANGNAM_STATION_NAME);
     }
 
@@ -63,11 +52,11 @@ public class StationAcceptanceTest {
     @Test
     void getStationList() {
         // given
-        saveStation(GANGNAM_STATION_NAME);
-        saveStation(SAMSUNG_STATION_NAME);
+        saveStationResponse(GANGNAM_STATION_NAME);
+        saveStationResponse(SAMSUNG_STATION_NAME);
 
         // when
-        ExtractableResponse<Response> response = getStations();
+        ExtractableResponse<Response> response = getStationListResponse();
 
         // then
         SoftAssertions.assertSoftly(softAssertions -> {
@@ -88,8 +77,8 @@ public class StationAcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        ExtractableResponse<Response> saveResponse = saveStation(SAMSUNG_STATION_NAME);
-        saveStation(SAMSUNG_STATION_NAME);
+        ExtractableResponse<Response> saveResponse = saveStationResponse(SAMSUNG_STATION_NAME);
+        saveStationResponse(SAMSUNG_STATION_NAME);
         Integer deleteStationId = saveResponse.jsonPath().get("id");
 
         // when
@@ -103,7 +92,7 @@ public class StationAcceptanceTest {
         // then
         SoftAssertions.assertSoftly(softAssertions -> {
             assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-            ResponseBodyExtractionOptions currentStations = getStations().body();
+            ResponseBodyExtractionOptions currentStations = getStationListResponse().body();
             assertThat(currentStations.as(List.class)).hasSize(1);
             assertThat(currentStations.jsonPath().getList("name")).doesNotContain(GANGNAM_STATION_NAME);
         });
@@ -111,7 +100,7 @@ public class StationAcceptanceTest {
     }
 
 
-    private ExtractableResponse<Response> getStations() {
+    private ExtractableResponse<Response> getStationListResponse() {
         return RestAssured.given().log().all()
             .accept(MediaType.APPLICATION_JSON_VALUE)
             .when().get("/stations")
@@ -119,7 +108,7 @@ public class StationAcceptanceTest {
             .extract();
     }
 
-    private ExtractableResponse<Response> saveStation(String name) {
+    private ExtractableResponse<Response> saveStationResponse(String name) {
         return RestAssured.given()
             .body(Map.of("name", name))
             .contentType(MediaType.APPLICATION_JSON_VALUE)

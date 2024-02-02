@@ -1,4 +1,4 @@
-package subway;
+package subway.station;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,8 +16,8 @@ public class StationService {
     }
 
     @Transactional
-    public StationResponse saveStation(StationRequest stationRequest) {
-        Station station = stationRepository.save(new Station(stationRequest.getName()));
+    public StationResponse saveStation(StationCreateRequest stationCreateRequest) {
+        Station station = stationRepository.save(new Station(stationCreateRequest.getName()));
         return createStationResponse(station);
     }
 
