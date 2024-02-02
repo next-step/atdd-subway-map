@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import subway.api.domain.model.entity.Line;
 import subway.api.domain.dto.outport.StationInfo;
-import subway.common.mapper.ModelMapperBasedVoMapper;
+import subway.common.mapper.ModelMapperBasedObjectMapper;
 
 /**
  * @author : Rene Choi
@@ -30,7 +30,7 @@ public class LineResponse {
 	private List<StationInfo> stations;
 
 	public static LineResponse from(Line line) {
-		LineResponse response = ModelMapperBasedVoMapper.convert(line, LineResponse.class);
+		LineResponse response = ModelMapperBasedObjectMapper.convert(line, LineResponse.class);
 		response.setStations(parseStations(line));
 		return response;
 	}

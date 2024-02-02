@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import subway.api.domain.model.entity.Line;
-import subway.common.mapper.ObjectMapperBasedVoMapper;
+import subway.common.mapper.ObjectMapperBasedObjectMapper;
 
 /**
  * @author : Rene Choi
@@ -29,6 +29,6 @@ public class LineInfo {
 	private SortedSet<SectionInfo> sections;
 
 	public static LineInfo from(Line line) {
-		return ObjectMapperBasedVoMapper.convert(line, LineInfo.class);
+		return ObjectMapperBasedObjectMapper.convert(line, LineInfo.class);
 	}
 }

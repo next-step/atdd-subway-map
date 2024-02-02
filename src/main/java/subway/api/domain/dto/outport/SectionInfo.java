@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import subway.api.domain.model.entity.Section;
-import subway.common.mapper.ObjectMapperBasedVoMapper;
+import subway.common.mapper.ObjectMapperBasedObjectMapper;
 
 /**
  * @author : Rene Choi
@@ -35,7 +35,7 @@ public class SectionInfo implements Comparable<SectionInfo> {
 	}
 
 	public static SectionInfo from(Section section) {
-		SectionInfo sectionInfo = ObjectMapperBasedVoMapper.convert(section, SectionInfo.class);
+		SectionInfo sectionInfo = ObjectMapperBasedObjectMapper.convert(section, SectionInfo.class);
 		sectionInfo.setLine(LineInfo.from(section.getLine()));
 		return sectionInfo;
 	}

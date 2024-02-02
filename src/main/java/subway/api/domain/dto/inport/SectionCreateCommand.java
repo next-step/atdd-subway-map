@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import subway.api.interfaces.dto.SectionCreateRequest;
-import subway.common.mapper.ModelMapperBasedVoMapper;
+import subway.common.mapper.ModelMapperBasedObjectMapper;
 
 /**
  * @author : Rene Choi
@@ -24,6 +24,6 @@ public class SectionCreateCommand {
 	private Long distance;
 
 	public static SectionCreateCommand from(SectionCreateRequest createRequest){
-		return ModelMapperBasedVoMapper.convert(createRequest, SectionCreateCommand.class);
+		return ModelMapperBasedObjectMapper.convert(createRequest, SectionCreateCommand.class);
 	}
 }

@@ -12,12 +12,12 @@ import org.modelmapper.spi.MappingContext;
  * @author : Rene Choi
  * @since : 2024/01/27
  */
-public class ModelMapperBasedVoMapper {
+public class ModelMapperBasedObjectMapper {
 
 	private static final ModelMapper modelMapper = new ModelMapper();
 
 	static {
-		modelMapper.addConverter(ModelMapperBasedVoMapper::convertLocalDateTime);
+		modelMapper.addConverter(ModelMapperBasedObjectMapper::convertLocalDateTime);
 		modelMapper.getConfiguration()
 			.setMatchingStrategy(MatchingStrategies.STRICT);
 	}

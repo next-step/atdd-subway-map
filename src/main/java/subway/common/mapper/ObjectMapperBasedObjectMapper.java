@@ -16,7 +16,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
  * @author : Rene Choi
  * @since : 2024/01/31
  */
-public class ObjectMapperBasedVoMapper {
+public class ObjectMapperBasedObjectMapper {
 
 	private static final ObjectMapper objectMapper;
 

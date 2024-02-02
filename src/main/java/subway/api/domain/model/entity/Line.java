@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import subway.api.interfaces.dto.LineCreateRequest;
 import subway.common.exception.SectionDeletionNotValidException;
-import subway.common.mapper.ModelMapperBasedVoMapper;
+import subway.common.mapper.ModelMapperBasedObjectMapper;
 
 /**
  * @author : Rene Choi
@@ -57,7 +57,7 @@ public class Line {
 	private SortedSet<Section> sections = new TreeSet<>();
 
 	public static Line from(LineCreateRequest createRequest) {
-		return ModelMapperBasedVoMapper.convert(createRequest, Line.class);
+		return ModelMapperBasedObjectMapper.convert(createRequest, Line.class);
 	}
 
 	public void updateLink(Section section) {
