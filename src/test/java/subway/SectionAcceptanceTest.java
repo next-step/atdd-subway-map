@@ -51,7 +51,7 @@ public class SectionAcceptanceTest {
 	 * Given 지하철 노선을 생성한다.
 	 * Given 생성한 지하철 노선에 구간을 등록한다.
 	 * When 등록한 구간과 같은 구간을 등록하면
-	 * Then 등록되지 않고 코드값 500 (Internal sever Error) 을 반환한다.
+	 * Then 등록되지 않고 코드값 400 (Bad Request) 을 반환한다.
 	 */
 	@DisplayName("지하철 노선에 등록되어 있는 역을 등록하면 실패한다.")
 	@DirtiesContext
@@ -61,17 +61,18 @@ public class SectionAcceptanceTest {
 		sectionApiRequest.post(new SectionRequest(4L, 2L, 10), 1L);
 
 		// when & then
-		ExtractableResponse<Response> response = sectionApiRequest.post(new SectionRequest(4L, 2L, 10), 1L);
+		ExtractableResponse<Response> response = sectionApiRequest.post(new SectionRequest(1L, 4L, 10), 1L);
 
 		// then
-		assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+		assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+		assertThat(response.body().jsonPath().getString("message")).isEqualTo("해당 노선에 1역이 이미 존재합니다.");
 	}
 
 	/**
 	 * Given 지하철 노선을 생성한다.
 	 * Given 지하철 노선에 구간을 등록한다.
 	 * When 상행역이 해당 노선의 하행 종점역이 아닌 구간을 등록하면
-	 * Then 등록되지 않고 코드값 500 (Internal sever Error) 을 반환한다.
+	 * Then 등록되지 않고 코드값 400 (Bad Requet) 을 반환한다.
 	 */
 	@DisplayName("하행 종점역이 상행역이 아닌 구간을 등록하면 실패한다.")
 	@DirtiesContext
@@ -84,7 +85,8 @@ public class SectionAcceptanceTest {
 		ExtractableResponse<Response> response = sectionApiRequest.post(new SectionRequest(5L, 3L, 10), 1L);
 
 		// then
-		assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+		assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+		assertThat(response.body().jsonPath().getString("message")).isEqualTo("노선의 하행 종점역과 구간의 상행역은 같아야 합니다.");
 	}
 
 	/**
@@ -112,7 +114,7 @@ public class SectionAcceptanceTest {
 	 * Given 지하철 노선을 생성한다.
 	 * Given 지하철 노선에 구간을 생성한다.
 	 * When 해당 노선의 하행 종점역이 아닌 구간을 삭제하면
-	 * Then 삭제되지 않고 코드값 500 (Internal sever Error) 을 반환한다.
+	 * Then 삭제되지 않고 코드값 400 (Bad Request) 을 반환한다.
 	 */
 	@DisplayName("지하철 노선의 하행 종점역이 아닌 구간을 제거하면 실패한다.")
 	@DirtiesContext
@@ -125,14 +127,15 @@ public class SectionAcceptanceTest {
 		ExtractableResponse<Response> response = sectionApiRequest.delete(Map.of("stationId", 2L), 1L);
 
 		// then
-		assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+		assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+		assertThat(response.body().jsonPath().getString("message")).isEqualTo("노선의 하행 종점역만 제거할 수 있습니다.");
 	}
 
 	/**
 	 * Given 지하철 노선을 생성한다.
 	 * Given 지하철 노선에 구간을 생성한다.
 	 * When 해당 노선에 상행 종점역과 하행 종점역만 있는 경우 해당 구간을 삭제하면
-	 * Then 삭제되지 않고 코드값 500 (Internal sever Error) 을 반환한다.
+	 * Then 삭제되지 않고 코드값 400 (Bad Request) 을 반환한다.
 	 */
 	@DisplayName("상행 종점역과 하행 종점역만 있는 지하철 노선의 구간을 제거하면 실패한다.")
 	@DirtiesContext
@@ -146,6 +149,7 @@ public class SectionAcceptanceTest {
 		ExtractableResponse<Response> response = sectionApiRequest.delete(Map.of("stationId", 2L), 1L);
 
 		// then
-		assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+		assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+		assertThat(response.body().jsonPath().getString("message")).isEqualTo("상행 종점역과 하행 종점역만 있는 노선입니다.");
 	}
 }
