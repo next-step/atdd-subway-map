@@ -22,8 +22,8 @@ public class LineService {
 
     public LineResponse create(LineCreateRequest request) {
 
-        Station upStation = getStation(request.getUpStationId());
-        Station downStation = getStation(request.getDownStationId());
+        Station upStation = getStationEntity(request.getUpStationId());
+        Station downStation = getStationEntity(request.getDownStationId());
 
         Line line = LineCreateRequest.toEntity(request);
         Line savedLine = lineRepository.save(line);
@@ -40,8 +40,8 @@ public class LineService {
         List<LineResponse> responses = new ArrayList<>();
 
         for (Line line : lines) {
-            Station upStation = getStation(line.getUpStationId());
-            Station downStation = getStation(line.getDownStationId());
+            Station upStation = getStationEntity(line.getUpStationId());
+            Station downStation = getStationEntity(line.getDownStationId());
 
             StationResponse upStationResponse = StationResponse.of(upStation);
             StationResponse downStationResponse = StationResponse.of(downStation);
@@ -54,12 +54,10 @@ public class LineService {
     }
 
     public LineResponse getLine(Long lineId) {
-        Line line = lineRepository.findById(lineId).orElseThrow(
-                () -> new EntityNotFoundException("해당 엔티티를 찾을 수 없습니다.")
-        );
+        Line line = getLineEntity(lineId);
 
-        Station upStation = getStation(line.getUpStationId());
-        Station downStation = getStation(line.getDownStationId());
+        Station upStation = getStationEntity(line.getUpStationId());
+        Station downStation = getStationEntity(line.getDownStationId());
 
         StationResponse upStationResponse = StationResponse.of(upStation);
         StationResponse downStationResponse = StationResponse.of(downStation);
@@ -67,11 +65,21 @@ public class LineService {
         return LineResponse.of(line, upStationResponse, downStationResponse);
     }
 
-    private Station getStation(Long stationId) {
-        return stationRepository.findById(stationId).orElseThrow(
+    public void updateLine(Long lineId, LineUpdateRequest request) {
+        Line line = getLineEntity(lineId);
+        line.updateName(request.getName());
+        line.updateColor(request.getColor());
+    }
+
+    private Line getLineEntity(Long lineId) {
+        return lineRepository.findById(lineId).orElseThrow(
                 () -> new EntityNotFoundException("해당 엔티티를 찾을 수 없습니다.")
         );
     }
 
-
+    private Station getStationEntity(Long stationId) {
+        return stationRepository.findById(stationId).orElseThrow(
+                () -> new EntityNotFoundException("해당 엔티티를 찾을 수 없습니다.")
+        );
+    }
 }
