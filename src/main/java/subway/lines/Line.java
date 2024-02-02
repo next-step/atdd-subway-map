@@ -1,20 +1,13 @@
 package subway.lines;
 
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
-import javax.persistence.CascadeType;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import subway.section.Section;
-import subway.section.SectionAddRequest;
-import subway.section.SectionDeleteRequest;
+import subway.section.SectionList;
 
 @Entity
 public class Line {
@@ -29,8 +22,8 @@ public class Line {
     private Long downStationId;
     private Long distance;
 
-    @OneToMany(mappedBy = "line", cascade={CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
-    private List<Section> sections = new ArrayList<>();
+    @Embedded
+    private SectionList sectionList = new SectionList();
 
     public Line(String name, String color, Long upStationId, Long downStationId, Long distance) {
         this.name = name;
@@ -68,11 +61,11 @@ public class Line {
     public void deleteSection(Section section) {
         downStationId = section.getUpStationId();
         distance -= section.getDistance();
-        sections.remove(section);
+        sectionList.deleteSection(section);
     }
 
     public void addSection(Section section) {
-        sections.add(section);
+        sectionList.addSection(section);
         downStationId = section.getDownStationId();
         distance += section.getDistance();
     }
@@ -82,6 +75,6 @@ public class Line {
     }
 
     public List<Section> getSections() {
-        return sections;
+        return sectionList.getSections();
     }
 }
