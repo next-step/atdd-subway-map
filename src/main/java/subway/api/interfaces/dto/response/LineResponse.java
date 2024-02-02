@@ -2,7 +2,6 @@ package subway.api.interfaces.dto.response;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -36,11 +35,6 @@ public class LineResponse {
 	}
 
 	private static List<StationInfo> parseStations(Line line) {
-		return line.getSections().stream()
-			.flatMap(link -> Stream.of(StationInfo.fromUpStation(link), StationInfo.fromDownStation(link)))
-			.distinct()
-			.collect(Collectors.toList());
+		return line.parseStations().stream().map(StationInfo::from).collect(Collectors.toList());
 	}
-
-
 }

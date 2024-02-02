@@ -7,7 +7,6 @@ import subway.api.domain.dto.inport.LineCreateCommand;
 import subway.api.domain.model.entity.Line;
 import subway.api.domain.operators.LineFactory;
 import subway.api.infrastructure.persistence.LineRepository;
-import subway.api.interfaces.dto.request.LineCreateRequest;
 
 /**
  * @author : Rene Choi
@@ -28,4 +27,5 @@ public class SimpleLineFactory implements LineFactory {
 	public void deleteLine(Line line) {
 		lineRepository.delete(line);
 	}
+
 }

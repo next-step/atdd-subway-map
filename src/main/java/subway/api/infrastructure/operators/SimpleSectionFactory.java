@@ -11,7 +11,6 @@ import subway.api.domain.model.entity.Station;
 import subway.api.domain.operators.SectionFactory;
 import subway.api.infrastructure.persistence.SectionRepository;
 import subway.api.infrastructure.persistence.StationRepository;
-import subway.api.interfaces.dto.request.LineCreateRequest;
 
 /**
  * @author : Rene Choi
@@ -32,6 +31,13 @@ public class SimpleSectionFactory implements SectionFactory {
 		Section section = Section.of(upStation, downStation, request.getDistance(), line);
 
 		return sectionRepository.save(section);
+	}
+
+	@Override
+	public Section createSection(LineCreateCommand createCommand) {
+		Station upStation = stationRepository.findById(createCommand.getUpStationId()).orElseThrow();
+		Station downStation = stationRepository.findById(createCommand.getDownStationId()).orElseThrow();
+		return sectionRepository.save( Section.of(upStation, downStation, createCommand.getDistance()));
 	}
 
 	@Override

@@ -16,6 +16,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * @author : Rene Choi
@@ -23,6 +24,7 @@ import lombok.NoArgsConstructor;
  */
 @Entity
 @Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -71,7 +73,11 @@ public class Section implements Comparable<Section> {
 
 	@Override
 	public int compareTo(Section other) {
-		return this.distance.compareTo(other.id);
+		return this.id.compareTo(other.id);
+	}
+
+	public static Section of(Station upStation, Station downStation, Long distance) {
+		return Section.of(upStation, downStation, distance, null);
 	}
 
 	public static Section of(Station upStation, Station downStation, Long distance, Line line) {
@@ -98,4 +104,18 @@ public class Section implements Comparable<Section> {
 	public String fetchDownStationName() {
 		return this.downStation.getName();
 	}
+
+	public boolean isDownEndStation(Long stationId) {
+		return this.fetchDownStationId().equals(stationId);
+	}
+
+	public boolean isUpEndStation(Long stationId) {
+		return this.fetchUpStationId().equals(stationId);
+	}
+
+	public boolean isAnyStation(Long stationId){
+		return isDownEndStation(stationId) || isUpEndStation(stationId);
+	}
+
+
 }

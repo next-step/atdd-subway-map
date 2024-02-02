@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import subway.api.domain.model.entity.Section;
+import subway.api.domain.model.entity.Station;
+import subway.common.mapper.ModelMapperBasedObjectMapper;
 
 /**
  * @author : Rene Choi
@@ -32,5 +34,9 @@ public class StationInfo {
 			.id(section.fetchDownStationId())
 			.name(section.fetchDownStationName())
 			.build();
+	}
+
+	public static StationInfo from(Station station){
+		return ModelMapperBasedObjectMapper.convert(station, StationInfo.class);
 	}
 }

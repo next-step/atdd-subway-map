@@ -31,7 +31,7 @@ public class SectionInfo implements Comparable<SectionInfo> {
 
 	@Override
 	public int compareTo(SectionInfo other) {
-		return this.distance.compareTo(other.id);
+		return this.id.compareTo(other.id);
 	}
 
 	public static SectionInfo from(Section section) {

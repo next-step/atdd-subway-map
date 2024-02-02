@@ -1,7 +1,5 @@
 package subway.api.domain.dto.outport;
 
-import java.util.SortedSet;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -26,7 +24,7 @@ public class LineInfo {
 
 	private String color;
 
-	private SortedSet<SectionInfo> sections;
+	private SectionInfos sections;
 
 	public static LineInfo from(Line line) {
 		return ObjectMapperBasedObjectMapper.convert(line, LineInfo.class);

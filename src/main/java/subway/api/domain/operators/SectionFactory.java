@@ -5,7 +5,6 @@ import subway.api.domain.dto.inport.SectionCreateCommand;
 import subway.api.domain.model.entity.Line;
 import subway.api.domain.model.entity.Section;
 import subway.api.domain.model.entity.Station;
-import subway.api.interfaces.dto.request.LineCreateRequest;
 
 /**
  * @author : Rene Choi
@@ -13,6 +12,8 @@ import subway.api.interfaces.dto.request.LineCreateRequest;
  */
 public interface SectionFactory {
 	Section createSection(LineCreateCommand request, Line line);
+
+	Section createSection(LineCreateCommand createCommand);
 
 	Section createSection(SectionCreateCommand command, Line line, Station upStation, Station downStation);
 
