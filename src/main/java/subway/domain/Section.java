@@ -43,6 +43,10 @@ public class Section {
         return this.upStation.equals(station);
     }
 
+    public boolean isDownStation(Station station){
+        return this.downStation.equals(station);
+    }
+
     public List<Station> stations() {
         return List.of(upStation, downStation);
     }
