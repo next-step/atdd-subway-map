@@ -96,7 +96,36 @@ public class LineAcceptanceTest {
         assertThat((List<Map<String, ?>>) lines.get(1).get("stations")).extracting("name").containsExactlyInAnyOrder("건대입구", "군자");
     }
 
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 조회하면
+     * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
+     */
+    @Test
+    void 한개의_지하철_노선을_조회한다() {
+        // given
+        createStation("건대입구");
+        createStation("어린이대공원");
 
+        LineCreateRequest lineCreateRequest = new LineCreateRequest(
+                "신분당선",
+                "bg-red-600",
+                1L,
+                2L,
+                10
+        );
+        ExtractableResponse<Response> extractableResponse = createLine(lineCreateRequest);
+        Long lineId = extractableResponse.jsonPath().getLong("id");
+
+        // when
+        ExtractableResponse<Response> response = getLine(lineId);
+
+        // then
+        assertThat(response.jsonPath().getString("name")).isEqualTo("신분당선");
+        assertThat(response.jsonPath().getList("stations.name", String.class)).containsAnyOf(
+                "건대입구", "어린이대공원"
+        );
+    }
 
     private ExtractableResponse<Response> createLine(LineCreateRequest request) {
         return RestAssured.given().log().all()
@@ -125,5 +154,12 @@ public class LineAcceptanceTest {
                 .then().log().all()
                 .extract();
         return response;
+    }
+
+    private ExtractableResponse<Response> getLine(Long lineId) {
+        return RestAssured.given().log().all()
+                .when().get("/lines/" + lineId)
+                .then().log().all()
+                .extract();
     }
 }
