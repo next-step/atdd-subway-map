@@ -1,16 +1,16 @@
 package subway.line.section;
 
 public class SectionRequest {
-    private long downStationId;
     private long upStationId;
+    private long downStationId;
     private int distance;
-
-    public long getDownStationId() {
-        return downStationId;
-    }
 
     public long getUpStationId() {
         return upStationId;
+    }
+
+    public long getDownStationId() {
+        return downStationId;
     }
 
     public int getDistance() {

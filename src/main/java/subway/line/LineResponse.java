@@ -1,6 +1,6 @@
 package subway.line;
 
-import subway.station.Station;
+import subway.line.section.Section;
 
 import java.util.List;
 
@@ -9,13 +9,13 @@ public class LineResponse {
     private Long id;
     private String name;
     private String color;
-    private List<Station> stations;
+    private List<Section> sections;
 
     public LineResponse(Line line) {
         this.id = line.getId();
         this.name = line.getName();
         this.color = line.getColor();
-        this.stations = List.of(line.getUpStation(), line.getDownStation());
+        this.sections = line.getSections();
     }
 
     public Long getId() {
@@ -30,7 +30,7 @@ public class LineResponse {
         return color;
     }
 
-    public List<Station> getStations() {
-        return stations;
+    public List<Section> getSections() {
+        return sections;
     }
 }
