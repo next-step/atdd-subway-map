@@ -8,12 +8,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 
+import org.springframework.test.annotation.DirtiesContext;
 import subway.fixture.LineFixture;
 import subway.fixture.StationFixture;
 import subway.util.RestAssuredUtil;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @DisplayName("지하철역 노선 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {
