@@ -32,14 +32,14 @@ public class LineService {
     @Transactional
     public LineResponse saveLine(LineCreateRequest lineCreateRequest) {
         final Line line = lineRepository.save(lineCreateRequest.getLine());
-
-        final Section section = new Section(
-            line,
-            lineCreateRequest.getUpStationId(),
-            lineCreateRequest.getDownStationId(),
-            lineCreateRequest.getDistance()
+        line.addSection(
+            new Section(
+                line,
+                lineCreateRequest.getUpStationId(),
+                lineCreateRequest.getDownStationId(),
+                lineCreateRequest.getDistance()
+            )
         );
-        sectionRepository.save(section);
 
         return createLineResponse(line);
     }
