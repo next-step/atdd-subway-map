@@ -53,6 +53,20 @@ public class LineService {
         return responses;
     }
 
+    public LineResponse getLine(Long lineId) {
+        Line line = lineRepository.findById(lineId).orElseThrow(
+                () -> new EntityNotFoundException("해당 엔티티를 찾을 수 없습니다.")
+        );
+
+        Station upStation = getStation(line.getUpStationId());
+        Station downStation = getStation(line.getDownStationId());
+
+        StationResponse upStationResponse = StationResponse.of(upStation);
+        StationResponse downStationResponse = StationResponse.of(downStation);
+
+        return LineResponse.of(line, upStationResponse, downStationResponse);
+    }
+
     private Station getStation(Long stationId) {
         return stationRepository.findById(stationId).orElseThrow(
                 () -> new EntityNotFoundException("해당 엔티티를 찾을 수 없습니다.")
