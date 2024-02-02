@@ -10,8 +10,11 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
+import subway.dto.StationLineRequest;
+import subway.dto.StationSectionRequest;
 
 import static config.fixtures.subway.StationLineMockData.호남선_생성;
+import static config.fixtures.subway.StationMockData.독산역;
 import static config.fixtures.subway.StationMockData.역_10개;
 import static config.fixtures.subway.StationSectionMockData.지하철_구간;
 import static io.restassured.RestAssured.given;
@@ -233,5 +236,98 @@ public class StationSectionAcceptanceTest {
 
         // then
         assertThat(실패하는_생성요청_응답.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    /**
+     * Given 지하철 노선이 생성되고
+     * When  지하철 구간을 제거할 때,
+     * When  구간이 최소 1개 이상 존재하고, 하행 종점역이 포함된 구간을 삭제하는 경우
+     * Then  지하철 구간 삭제에 성공한다.
+     */
+    @Test
+    void 구간이_한개_이상_존재하고_하행_종점역이_포함된_구간을_삭제하는_경우_삭제_성공() {
+        // given
+        ExtractableResponse<Response> response =
+                지하철_노선_생성_요청_검증_포함(호남선_생성(1L, 2L));
+        StationSectionRequest 생성할_지하철_구간 = 지하철_구간(2L, 4L, 10);
+        지하철_구간_생성요청_상태코드_검증_포함(getCreatedLocationId(response), 생성할_지하철_구간);
+
+        // when, then
+        given().log().all()
+                .when()
+                .param("stationId", 생성할_지하철_구간.getDownStationId())
+                .delete(String.format("/lines/%d/sections", getCreatedLocationId(response)))
+                .then().log().all()
+                .statusCode(HttpStatus.NO_CONTENT.value());
+    }
+    
+    /**
+      * Given 지하철 노선이 생성되고
+      * When  지하철 구간을 제거할 때,
+      * When  기존 1개의 구간만 존재할 경우(역이 2개만 존재할 경우)
+      * Then  지하철 구간 삭제에 실패한다.
+      */
+    @Test
+    void 한개의_구간만_존재할_경우_삭제_실패() {
+        // given
+        StationLineRequest 호남선 = 호남선_생성(1L, 2L);
+        ExtractableResponse<Response> response =
+                지하철_노선_생성_요청_검증_포함(호남선);
+
+        // when, then
+        given().log().all()
+                .when()
+                .param("stationId", 호남선.getDownStationId())
+                .delete(String.format("/lines/%d/sections", getCreatedLocationId(response)))
+                .then().log().all()
+                .statusCode(HttpStatus.BAD_REQUEST.value());
+    }
+
+    /**
+      * Given 지하철 노선이 생성되고
+      * When  지하철 구간을 제거할 때,
+      * When  하행 종점역을 제거하는 것이 아닌 경우
+      * Then  지하철 구간 삭제에 실패한다.
+      */
+    @Test
+    void 하행_종점역을_제거하는_것이_아닌_경우_삭제_실패() {
+        // given
+        ExtractableResponse<Response> response =
+                지하철_노선_생성_요청_검증_포함(호남선_생성(1L, 2L));
+
+        StationSectionRequest 생성할_지하철_구간 = 지하철_구간(2L, 4L, 10);
+        지하철_구간_생성요청_상태코드_검증_포함(getCreatedLocationId(response), 생성할_지하철_구간);
+
+        // when, then
+        given().log().all()
+                .when()
+                .param("stationId", 생성할_지하철_구간.getUpStationId())
+                .delete(String.format("/lines/%d/sections", getCreatedLocationId(response)))
+                .then().log().all()
+                .statusCode(HttpStatus.BAD_REQUEST.value());
+    }
+
+    /**
+     * Given 지하철 노선이 생성되고
+     * When  지하철 구간을 제거할 때,
+     * When  존재하지 않는 역을 제거하는 경우
+     * Then  지하철 구간 삭제에 실패한다.
+     */
+    @Test
+    void 존재하지_않는_역을_제거하는_경우_삭제_실패() {
+        // given
+        ExtractableResponse<Response> response =
+                지하철_노선_생성_요청_검증_포함(호남선_생성(1L, 2L));
+
+        StationSectionRequest 생성할_지하철_구간 = 지하철_구간(2L, 4L, 10);
+        지하철_구간_생성요청_상태코드_검증_포함(getCreatedLocationId(response), 생성할_지하철_구간);
+
+        // when, then
+        given().log().all()
+                .when()
+                .param("stationId", 100)
+                .delete(String.format("/lines/%d/sections", getCreatedLocationId(response)))
+                .then().log().all()
+                .statusCode(HttpStatus.BAD_REQUEST.value());
     }
 }
