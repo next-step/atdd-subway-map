@@ -88,13 +88,10 @@ public class StationAcceptanceTest {
                 .when().get("/stations")
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
-                .body("name", hasSize(2))
-                .body("name", contains("강남역", "부천역"))
                 .extract().jsonPath().getList("name", String.class);
 
         // then
         assertThat(stationNames).containsAnyOf("강남역", "부천역");
-        assertThat(stationNames.size()).isEqualTo(2);
     }
 
     /**

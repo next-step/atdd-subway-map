@@ -1,5 +1,6 @@
 package subway.line;
 
+import subway.section.Section;
 import subway.station.Station;
 import subway.station.StationResponse;
 
@@ -19,8 +20,13 @@ public class LineResponse {
         this.id = savedLine.getId();
         this.name = savedLine.getName();
         this.color = savedLine.getColor();
-        this.stations.add(createStationResponse(savedLine.getUpStation()));
-        this.stations.add(createStationResponse(savedLine.getDownStation()));
+
+        final List<Section> sections = savedLine.getSections();
+        this.stations.add(createStationResponse(sections.get(0).getUpStation()));
+
+        for (Section section : savedLine.getSections()) {
+            this.stations.add(createStationResponse(section.getDownStation()));
+        }
     }
 
     public Long getId() {
