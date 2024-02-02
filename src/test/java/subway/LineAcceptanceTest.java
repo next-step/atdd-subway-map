@@ -1,6 +1,5 @@
 package subway;
 
-import common.RestApiRequest;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
@@ -9,7 +8,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
-import subway.dto.LineRequest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
