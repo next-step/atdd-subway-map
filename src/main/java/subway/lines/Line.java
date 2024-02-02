@@ -66,11 +66,9 @@ public class Line {
     }
 
     public void deleteSection(Section section) {
-        sections = sections.stream()
-            .filter(sectionItem-> !Objects.equals(section.getId(), sectionItem.getId()))
-            .collect(Collectors.toList());
         downStationId = section.getUpStationId();
         distance -= section.getDistance();
+        sections.remove(section);
     }
 
     public void addSection(Section section) {
