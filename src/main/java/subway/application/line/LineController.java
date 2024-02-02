@@ -1,4 +1,4 @@
-package subway.line;
+package subway.application.line;
 
 import java.net.URI;
 import java.util.List;

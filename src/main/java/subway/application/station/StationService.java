@@ -1,10 +1,12 @@
-package subway.station;
+package subway.application.station;
 
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.domain.Station;
+import subway.domain.StationRepository;
 
 @Service
 @Transactional(readOnly = true)

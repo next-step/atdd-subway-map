@@ -1,13 +1,20 @@
-package subway.line;
+package subway.application.line;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import subway.station.Station;
-import subway.station.StationRepository;
-import subway.station.StationResponse;
+import subway.domain.Line;
+import subway.domain.LineRepository;
+import subway.domain.Section;
+import subway.application.line.section.SectionRequest;
+import subway.domain.SectionRegister;
+import subway.domain.Station;
+import subway.domain.StationRepository;
+import subway.application.station.StationResponse;
 
 @Service
 @RequiredArgsConstructor
@@ -19,7 +26,8 @@ public class LineService {
 
     @Transactional
     public LineResponse createLine(LineRequest request) {
-        Line createdLine = new Line(request.getName(), request.getColor(), request.getDistance());
+        Line createdLine = new Line(request.getName(), request.getColor(), request.getDistance(),
+            request.getUpStationId(), request.getDownStationId());
         lineRepository.save(createdLine);
         Station upStation = stationRepository.findById(request.getUpStationId())
             .orElseGet(() -> {
@@ -93,5 +101,17 @@ public class LineService {
     @Transactional
     public void deleteLine(Long id) {
         lineRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void registSection(Long lineId, SectionRequest request) {
+        Line line = lineRepository.findById(lineId)
+            .orElseThrow(() -> new RuntimeException("노선이 존재하지 않습니다."));
+        Section section = new Section(line, request.getUpStationId(), request.getDownStationId(),
+            request.getDistance());
+        Set<Station> stations = new HashSet<>(stationRepository.findAllByLineId(
+            lineId));
+        SectionRegister sectionRegister = new SectionRegister();
+        sectionRegister.registSectionInLine(stations, line, section);
     }
 }
