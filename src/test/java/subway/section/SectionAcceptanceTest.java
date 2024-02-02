@@ -49,4 +49,33 @@ public class SectionAcceptanceTest {
     void registerSectionWithNonExistingStation() {
     }
 
+    /**
+     Given 지하철 노선이 생성되고,
+     When 해당 노선에 등록된 하행 종점역을 제거하려고 하면,
+     Then 해당 구간이 성공적으로 제거된다.
+     */
+    @Test
+    @DisplayName("하행 종점역 제거")
+    void removeTerminalStation() {
+    }
+
+    /**
+     Given 지하철 노선이 생성되고,
+     When 해당 노선에 등록된 하행 종점역이 아닌 역을 제거하려고 하면,
+     Then 에러 메시지가 반환된다.
+     */
+    @Test
+    @DisplayName("하행 종점역이 아닌 역 제거 시 에러")
+    void removeNonTerminalStation() {
+    }
+
+    /**
+     Given 지하철 노선이 생성되고, 상행 종점역과 하행 종점역만 있는 경우,
+     When 역을 제거하려고 하면,
+     Then 에러 메시지가 반환된다.
+     */
+    @Test
+    @DisplayName("구간이 1개인 경우 역 제거 시 에러")
+    void removeStationWhenSingleSection() {
+    }
 }
