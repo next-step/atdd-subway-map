@@ -34,11 +34,11 @@ public class LineService {
         final Line line = lineRepository.save(lineCreateRequest.getLine());
 
         final Section section = new Section(
+            line,
             lineCreateRequest.getUpStationId(),
             lineCreateRequest.getDownStationId(),
             lineCreateRequest.getDistance()
         );
-        section.updateLine(line);
         sectionRepository.save(section);
 
         return createLineResponse(line);
@@ -64,10 +64,6 @@ public class LineService {
 
     @Transactional
     public void deleteLines(Long id) {
-        final Line line = lineRepository.findById(id).orElseThrow(EntityNotFoundException::new);
-        sectionRepository.deleteAllById(
-            line.getSections().stream().map(Section::getId).collect(Collectors.toSet())
-        );
         lineRepository.deleteById(id);
     }
 
@@ -75,10 +71,9 @@ public class LineService {
     public LineResponse addSection(Long id, SectionAddRequest sectionAddRequest) {
         final Line line = lineRepository.findById(id).orElseThrow(EntityNotFoundException::new);
 
-        line.validateSectionToAdd(sectionAddRequest);
+        sectionAddRequest.validateSectionToAdd(line);
 
-        final Section section = sectionRepository.save(sectionAddRequest.getSection(line));
-        line.updateSectionInfo(section.getDownStationId(), line.getDistance() + section.getDistance());
+        line.addSection(sectionAddRequest.getSection(line));
 
         return createLineResponse(line);
     }
@@ -86,12 +81,10 @@ public class LineService {
     @Transactional
     public void deleteSection(Long id, SectionDeleteRequest sectionDeleteRequest) {
         final Line line = lineRepository.findById(id).orElseThrow(EntityNotFoundException::new);
-        line.validateSectionCanBeDeleted(sectionDeleteRequest);
+        sectionDeleteRequest.validateToDelete(line);
 
         final Section sectionToDelete = sectionRepository.findByLineIdAndDownStationId(id, sectionDeleteRequest.getStationId()).orElseThrow(EntityNotFoundException::new);
-        line.updateSectionInfo(sectionToDelete.getUpStationId(), line.getDistance() - sectionToDelete.getDistance());
-
-        sectionRepository.deleteById(sectionToDelete.getId());
+        line.deleteSection(sectionToDelete);
     }
 
     private LineResponse createLineResponse(Line line) {
