@@ -2,13 +2,9 @@ package subway.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import subway.controller.dto.LineCreateRequestBody;
-import subway.controller.dto.LineResponseBody;
-import subway.controller.dto.LineUpdateRequestBody;
+import subway.controller.dto.*;
 import subway.service.LineService;
-import subway.service.dto.LineDto;
-import subway.service.dto.SaveLineDto;
-import subway.service.dto.UpdateLineDto;
+import subway.service.dto.*;
 
 import java.net.URI;
 import java.util.List;
@@ -63,5 +59,23 @@ public class LineController {
     public ResponseEntity<Void> deleteLine(@PathVariable Long id) {
         lineService.deleteLineById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/sections")
+    public ResponseEntity<SectionResponseBody> createLineSection(
+            @PathVariable Long id,
+            @RequestBody SectionCreateRequestBody sectionCreateRequestBody
+    ) {
+        lineService.saveLineSection(new SaveLineSectionDto(
+                id,
+                sectionCreateRequestBody.getUpStationId(),
+                sectionCreateRequestBody.getDownStationId(),
+                sectionCreateRequestBody.getDistance()
+        ));
+        return ResponseEntity.created(URI.create("/lines/" + id)).build();
+    }
+
+    private StationResponseBody toStationResponseBody(StationDto stationDto) {
+        return new StationResponseBody(stationDto.getId(), stationDto.getName());
     }
 }

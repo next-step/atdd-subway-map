@@ -1,5 +1,7 @@
 package subway.domain;
 
+import subway.exception.LineSectionException;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,6 +52,7 @@ public class Line {
     public List<Station> getAllStations() {
         return sections.stream()
                 .flatMap(section -> Stream.of(section.getUpStation(), section.getDownStation()))
+                .distinct()
                 .collect(Collectors.toList());
     }
 
@@ -59,7 +62,7 @@ public class Line {
         } else if (isAvailableDownStation(section.getDownStation()) && isAvailableUpStation(section.getUpStation())) {
             sections.add(section);
         } else {
-            throw new IllegalArgumentException();
+            throw new LineSectionException("안됨");
         }
     }
 

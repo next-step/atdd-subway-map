@@ -6,11 +6,7 @@ import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Station;
 import subway.repository.LineRepository;
-import subway.repository.SectionRepository;
-import subway.service.dto.LineDto;
-import subway.service.dto.SaveLineDto;
-import subway.service.dto.StationDto;
-import subway.service.dto.UpdateLineDto;
+import subway.service.dto.*;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
@@ -62,6 +58,19 @@ public class LineService {
         lineRepository.deleteById(id);
     }
 
+    @Transactional
+    public LineSectionDto saveLineSection(SaveLineSectionDto saveLineSectionDto) {
+        Station upStation = stationService.findStationById(saveLineSectionDto.getUpStationId());
+        Station downStation = stationService.findStationById(saveLineSectionDto.getDownStationId());
+
+        Line line = findLineByIdOrFail(saveLineSectionDto.getLineId());
+
+        Section section = Section.create(upStation, downStation, line, saveLineSectionDto.getDistance());
+        line.addSection(section);
+
+        return createLineSectionDto(section);
+    }
+
     private Line findLineByIdOrFail(Long id) {
         return lineRepository.findById(id).orElseThrow(EntityNotFoundException::new);
     }
@@ -72,6 +81,18 @@ public class LineService {
                 line.getName(),
                 line.getColor(),
                 createStationDto(line.getAllStations())
+        );
+    }
+
+    private LineSectionDto createLineSectionDto(Section section) {
+        Station upStation = section.getUpStation();
+        Station downStation = section.getDownStation();
+
+        return new LineSectionDto(
+                section.getId(),
+                new StationDto(upStation.getId(), upStation.getName()),
+                new StationDto(downStation.getId(), downStation.getName()),
+                section.getDistance()
         );
     }
 
