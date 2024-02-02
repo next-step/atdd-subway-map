@@ -8,6 +8,7 @@ import subway.controller.dto.LineUpdateRequest;
 import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Station;
+import subway.domain.Stations;
 import subway.repository.LineRepository;
 import subway.repository.SectionRepository;
 import subway.repository.StationRepository;
@@ -32,10 +33,10 @@ public class LineService {
                 request.getName(),
                 request.getColor()
         ));
-        List<Station> stations = stationRepository.findByIdIn(request.stationIds());
+        Stations stations = new Stations(stationRepository.findByIdIn(request.stationIds()));
 
-        Station upStation = findBy(request.getUpStationId(), stations);
-        Station downStation = findBy(request.getDownStationId(), stations);
+        Station upStation = stations.findBy(request.getUpStationId());
+        Station downStation = stations.findBy(request.getDownStationId());
 
         sectionRepository.save(new Section(
                 line,
@@ -44,13 +45,6 @@ public class LineService {
                 request.getDistance()
         ));
         return LineResponse.ofWithStations(line, List.of(upStation, downStation));
-    }
-
-    private Station findBy(Long stationId, List<Station> stations) {
-        return stations.stream()
-                .filter(station -> station.getId().equals(stationId))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 역입니다."));
     }
 
     @Transactional(readOnly = true)
