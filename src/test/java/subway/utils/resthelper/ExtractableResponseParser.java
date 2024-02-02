@@ -1,4 +1,4 @@
-package testhelper;
+package subway.utils.resthelper;
 
 import java.util.List;
 

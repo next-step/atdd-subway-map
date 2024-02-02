@@ -1,4 +1,4 @@
-package fixture;
+package subway.fixture;
 
 import subway.api.interfaces.dto.LineCreateRequest;
 import subway.api.interfaces.dto.LineUpdateRequest;

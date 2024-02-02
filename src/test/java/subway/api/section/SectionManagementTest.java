@@ -1,20 +1,19 @@
-package subway.section;
+package subway.api.section;
 
-import static fixture.LineFixtureCreator.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static testhelper.ExtractableResponseParser.*;
-import static testhelper.LineRequestExecutor.*;
-import static testhelper.SectionRequestExecutor.*;
-import static testhelper.StationRequestExecutor.*;
+import static subway.fixture.LineFixtureCreator.*;
+import static subway.utils.resthelper.ExtractableResponseParser.*;
+import static subway.utils.resthelper.LineRequestExecutor.*;
+import static subway.utils.resthelper.SectionRequestExecutor.*;
+import static subway.utils.resthelper.StationRequestExecutor.*;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.jdbc.Sql;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import subway.api.CommonAcceptanceTest;
 import subway.api.interfaces.dto.LineCreateRequest;
 import subway.api.interfaces.dto.SectionCreateRequest;
 
@@ -23,8 +22,7 @@ import subway.api.interfaces.dto.SectionCreateRequest;
  * @since : 2024/01/31
  */
 @DisplayName("지하철 구간 관리 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class SectionManagementTest {
+public class SectionManagementTest extends CommonAcceptanceTest {
 
 	/**
 	 * 구간 등록 - 성공 케이스
@@ -35,7 +33,6 @@ public class SectionManagementTest {
 	 * - And 조건을 만족하지 않는 경우 에러를 반환한다.
 	 */
 	@Test
-	@Sql(scripts = {"/cleanup.sql"})
 	@DisplayName("구간 등록 - 성공 케이스")
 	void createSection_Success() {
 		// given
@@ -55,7 +52,7 @@ public class SectionManagementTest {
 		SectionCreateRequest sectionCreateRequest = SectionCreateRequest.builder().upStationId(stationId2).downStationId(stationId3).distance(10L).build();
 		ExtractableResponse<Response> response = executeCreateSectionRequest(lineId, sectionCreateRequest);
 
-		assertEquals( HttpStatus.CREATED.value(), response.statusCode());
+		assertEquals(HttpStatus.CREATED.value(), response.statusCode());
 	}
 
 	/**
@@ -65,7 +62,6 @@ public class SectionManagementTest {
 	 * - Then 에러를 반환한다.
 	 */
 	@Test
-	@Sql(scripts = {"/cleanup.sql"})
 	@DisplayName("구간 등록 - 예외 케이스 1 -> 새로운 구간은 상행역은 해당 노선에 등록되어 있는 하행 종점역이어야 한다는 조건을 불만족")
 	void createSection_Failure_1() {
 		// Given
@@ -96,7 +92,6 @@ public class SectionManagementTest {
 	 * - Then 에러를 반환한다.
 	 */
 	@Test
-	@Sql(scripts = {"/cleanup.sql"})
 	@DisplayName("구간 등록 - 예외 케이스 2 -> 이미 해당 노선에 등록되어있는 역은 새로운 구간의 하행역이 될 수 없다는 조건을 불만족")
 	void createSection_Failure_2() {
 		// Given
@@ -114,7 +109,7 @@ public class SectionManagementTest {
 		ExtractableResponse<Response> response = executeCreateSectionRequest(lineId, invalidSectionRequest);
 
 		// Then
-		assertEquals( HttpStatus.BAD_REQUEST.value(), response.statusCode());
+		assertEquals(HttpStatus.BAD_REQUEST.value(), response.statusCode());
 	}
 
 	/**
@@ -126,7 +121,6 @@ public class SectionManagementTest {
 	 * - And 조건을 만족하지 않는 경우 에러를 반환한다.
 	 */
 	@Test
-	@Sql(scripts = {"/cleanup.sql"})
 	@DisplayName("구간 제거 - 성공 케이스")
 	void deleteSection_Success() {
 		// Given
@@ -157,7 +151,6 @@ public class SectionManagementTest {
 	 * - Then 에러를 반환한다.
 	 */
 	@Test
-	@Sql(scripts = {"/cleanup.sql"})
 	@DisplayName("구간 제거 - 예외 케이스 -> 마지막 구간이 아닌 구간을 제외할 때 예외 발생")
 	void deleteSection_Failure_1() {
 		// Given
@@ -193,7 +186,6 @@ public class SectionManagementTest {
 	 * - Then 에러를 반환한다.
 	 */
 	@Test
-	@Sql(scripts = {"/cleanup.sql"})
 	@DisplayName("구간 제거 - 예외 케이스 -> 상행 종점역과 하행 종점역이 각 1개만 있는 경우 삭제 할 수 없다는 조건을 불만족")
 	void deleteSection_Failure_2() {
 		// Given

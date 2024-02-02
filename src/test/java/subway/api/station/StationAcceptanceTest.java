@@ -1,22 +1,21 @@
-package subway.station;
+package subway.api.station;
 
-import static testhelper.ExtractableResponseParser.*;
-import static testhelper.StationRequestExecutor.*;
 import static org.assertj.core.api.Assertions.*;
+import static subway.utils.resthelper.ExtractableResponseParser.*;
+import static subway.utils.resthelper.StationRequestExecutor.*;
 
 import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import subway.api.CommonAcceptanceTest;
 
 @DisplayName("지하철역 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class StationAcceptanceTest {
+public class StationAcceptanceTest extends CommonAcceptanceTest {
 
 	/**
 	 * When 지하철역을 생성하면
@@ -77,6 +76,5 @@ public class StationAcceptanceTest {
 		List<String> stationNames = parseSubwayNames(response);
 		assertThat(stationNames).doesNotContain("신사역");
 	}
-
 
 }

@@ -1,4 +1,4 @@
-package testhelper;
+package subway.utils.resthelper;
 
 import static io.restassured.RestAssured.*;
 import static org.springframework.http.MediaType.*;
