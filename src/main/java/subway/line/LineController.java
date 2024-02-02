@@ -1,5 +1,6 @@
 package subway.line;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,5 +35,12 @@ public class LineController {
         return ResponseEntity.ok(response);
     }
 
+    @PutMapping("/lines/{lineId}")
+    public ResponseEntity<Void> updateLine(@PathVariable Long lineId, @RequestBody LineUpdateRequest request) {
+        lineService.updateLine(lineId, request);
+        return ResponseEntity.ok().build();
+    }
 }
+
+
 
