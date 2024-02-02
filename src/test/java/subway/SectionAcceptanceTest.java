@@ -90,6 +90,20 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     /**
      * GIVEN 지하철 역을 생성하고
      * GIVEN 지하철 역에 노선을 등록하고
+     * WHEN 새로운 지하철 구간의 상행역을 노선의 하행 종점역이 아닌 곳에 등록하면
+     * Then 새로운 구간을 등록할 수 없다
+     */
+    @Test
+    void 실패_새로운_구간_등록시_하행역을_노선의_하행역에_등록하면_예외가_발생한다() {
+        SectionCreateRequest request = sectionCreateRequest(YANGJAE_STATION_ID, SEOLLEUNG_STATION_ID, 10);
+        String message = post("/lines/{lineId}/sections", request, OK.value(), SHINBUNDANG_LINE_ID)
+                .as(ExceptionResponse.class).getMessage();
+        assertThat(message).isEqualTo("새로운 구간의 하행역은 노선의 역에 등록할 수 없습니다.");
+    }
+
+    /**
+     * GIVEN 지하철 역을 생성하고
+     * GIVEN 지하철 역에 노선을 등록하고
      * GIVEN 구간을 등록하고
      * WHEN 새로운 지하철 구간 등록시 노선의 총 거리가 기존의 노선 거리랑 작거나 같다면
      * Then 새로운 구간을 등록할 수 없다
