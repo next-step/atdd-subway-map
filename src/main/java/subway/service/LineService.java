@@ -28,8 +28,9 @@ public class LineService {
 	@Transactional
 	public LineResponse saveLine(LineRequest lineRequest) {
 		Line line = new Line(lineRequest.getName(), lineRequest.getColor(), lineRequest.getStartStationId(), lineRequest.getEndStationId(), lineRequest.getDistance());
+
 		Section section = new Section(line, lineRequest.getStartStationId(), line.getEndStationId(), lineRequest.getDistance());
-		line.addSection(section);
+		line.createSection(section);
 
 		return createLineResponse(lineRepository.save(line));
 	}
@@ -63,14 +64,6 @@ public class LineService {
 	public void createSection(Long id, SectionRequest sectionRequest) {
 		Line line = findLindById(id);
 
-		if(!line.getEndStationId().equals(sectionRequest.getUpStationId())) {
-			throw new IllegalArgumentException("노선의 하행 종점역과 구간의 상행역은 같아야 합니다.");
-		}
-
-		if(line.hasStation(sectionRequest.getDownStationId())) {
-			throw new IllegalArgumentException("해당 노선에 " + sectionRequest.getDownStationId() + "역이 이미 존재합니다.");
-		}
-
 		Section section = new Section(line, sectionRequest.getUpStationId(), sectionRequest.getDownStationId(), sectionRequest.getDistance());
 		line.addSection(section);
 	}
@@ -79,24 +72,12 @@ public class LineService {
 	public void deleteSection(Long id, Long stationId) {
 		Line line = findLindById(id);
 
-		if(!stationId.equals(line.getEndStationId())) {
-			throw new IllegalArgumentException("노선의 하행 종점역만 제거할 수 있습니다.");
-		}
-
-		Section section = line.getSections().stream()
-				.filter(x-> stationId.equals(x.getDownStationId()))
-				.findAny().orElseThrow(EntityNotFoundException::new);
-
-		if(line.getStartStationId().equals(section.getUpStationId())) {
-			throw new IllegalArgumentException("상행 종점역과 하행 종점역만 있는 노선입니다.");
-		}
-
-		line.deleteSection(section);
+		line.deleteSection(stationId);
 	}
 
 	public List<SectionResponse> findSectionsByLine(Long id) {
-		return findLindById(id).getSections().stream()
-				.map(this::createSectionResponse).collect(Collectors.toList());
+		return findLindById(id).getSections()
+				.convertToSectionResponse();
 	}
 
 	private Line findLindById(Long id) {
@@ -107,9 +88,5 @@ public class LineService {
 	private LineResponse createLineResponse(Line line) {
 		return new LineResponse(line,
 				List.of(stationService.findStationById(line.getStartStationId()), stationService.findStationById(line.getEndStationId())));
-	}
-
-	private SectionResponse createSectionResponse(Section section) {
-		return new SectionResponse(section);
 	}
 }
