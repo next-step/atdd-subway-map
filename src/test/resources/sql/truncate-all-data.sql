@@ -1,2 +1,3 @@
-TRUNCATE TABLE station;
-TRUNCATE TABLE line;
+DELETE FROM `section`;
+DELETE FROM `line`;
+DELETE FROM `station`;

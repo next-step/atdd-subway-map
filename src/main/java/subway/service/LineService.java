@@ -2,12 +2,15 @@ package subway.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import subway.controller.dto.StationResponse;
 import subway.domain.Line;
 import subway.controller.dto.LineCreateRequest;
 import subway.domain.LineRepository;
 import subway.controller.dto.LineResponse;
 import subway.controller.dto.LineUpdateRequest;
+import subway.domain.Section;
+import subway.domain.SectionRepository;
+import subway.domain.Station;
+import subway.domain.StationRepository;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
@@ -19,11 +22,13 @@ import java.util.stream.Collectors;
 public class LineService {
 
     private final LineRepository lineRepository;
-    private final StationService stationService;
+    private final StationRepository stationRepository;
+    private final SectionRepository sectionRepository;
 
-    public LineService(LineRepository lineRepository, StationService stationService) {
+    public LineService(LineRepository lineRepository, StationRepository stationRepository, SectionRepository sectionRepository) {
         this.lineRepository = lineRepository;
-        this.stationService = stationService;
+        this.stationRepository = stationRepository;
+        this.sectionRepository = sectionRepository;
     }
 
     /**
@@ -35,17 +40,20 @@ public class LineService {
     @Transactional
     public LineResponse createLine(LineCreateRequest createRequest) {
 
-        Line line = lineRepository.save(
-            Line.of(
-                createRequest.getName(),
-                createRequest.getColor(),
-                createRequest.getUpStationId(),
-                createRequest.getDownStationId(),
-                createRequest.getDistance()
-            )
+        Station upStation = findStationById(createRequest.getUpStationId());
+        Station downStation = findStationById(createRequest.getDownStationId());
+
+        Line line = Line.of(
+            createRequest.getName(),
+            createRequest.getColor()
         );
 
-        return LineResponse.of(line, getStations(line));
+        Section section = Section.of(line, upStation, downStation, createRequest.getDistance());
+
+        sectionRepository.save(section);
+        line.addSection(section);
+
+        return LineResponse.of(lineRepository.save(line));
     }
 
     /**
@@ -55,7 +63,8 @@ public class LineService {
      */
     public List<LineResponse> getLines() {
         return lineRepository.findAll()
-            .stream().map(line -> LineResponse.of(line, getStations(line)))
+            .stream()
+            .map(LineResponse::of)
             .collect(Collectors.toList());
     }
 
@@ -67,16 +76,14 @@ public class LineService {
      * @throws EntityNotFoundException 식별자에 해당하는 지하철노선을 찾지 못한 경우 던짐
      */
     public LineResponse getLine(Long lineId) {
-        Line line = findLineById(lineId);
-
-        return LineResponse.of(line, getStations(line));
+        return LineResponse.of(findLineById(lineId));
     }
 
     /**
      * 주어진 지하철 노선 식별자로 찾은 노선의 정보를 주어진 변경 정보로 수정합니다.
      * 지하철 노선을 찾지 못하면 예외를 던집니다.
      *
-     * @param lineId 지하철 노선 식별자
+     * @param lineId           지하철 노선 식별자
      * @param updateRequestDto 지하철 노선 변경 데이터
      * @throws EntityNotFoundException 식별자에 해당하는 지하철노선을 찾지 못한 경우 던짐
      */
@@ -97,7 +104,10 @@ public class LineService {
      */
     @Transactional
     public void deleteLine(Long lineId) {
-        lineRepository.delete(findLineById(lineId));
+        Line line = findLineById(lineId);
+
+        sectionRepository.deleteAll(line.getAllSections());
+        lineRepository.delete(line);
     }
 
     /** 주어진 지하철 노선 식별자로 찾은 노선정보 엔티티 반환. 찾지못하면 예외 던짐 */
@@ -107,10 +117,8 @@ public class LineService {
             .orElseThrow(EntityNotFoundException::new);
     }
 
-    private List<StationResponse> getStations(Line line) {
-        StationResponse upStation = stationService.findByStationId(line.getUpStationId());
-        StationResponse downStation = stationService.findByStationId(line.getDownStationId());
-
-        return List.of(upStation, downStation);
+    private Station findStationById(Long stationId) {
+        return stationRepository.findById(stationId)
+            .orElseThrow(EntityNotFoundException::new);
     }
 }
