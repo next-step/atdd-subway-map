@@ -1,10 +1,10 @@
-package subway.line;
+package subway.line.entity;
 
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.AccessLevel;
-import subway.station.Station;
+import subway.station.entity.Station;
 
 import javax.persistence.*;
 

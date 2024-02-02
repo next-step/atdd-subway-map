@@ -1,6 +1,4 @@
-package subway.station;
-
-import subway.line.LineUpdateRequest;
+package subway.station.entity;
 
 import javax.persistence.*;
 

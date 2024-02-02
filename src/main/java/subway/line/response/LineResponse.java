@@ -1,11 +1,10 @@
-package subway.line;
+package subway.line.response;
 
 import lombok.Builder;
 import lombok.Getter;
-import subway.station.Station;
-import subway.station.StationResponse;
+import subway.station.entity.Station;
+import subway.station.response.StationResponse;
 
-import java.time.LocalTime;
 import java.util.List;
 
 @Getter
