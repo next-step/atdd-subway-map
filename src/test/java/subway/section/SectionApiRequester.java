@@ -8,7 +8,7 @@ import static io.restassured.RestAssured.given;
 
 public class SectionApiRequester {
 
-    public ExtractableResponse<Response> generateSection(
+    public static ExtractableResponse<Response> generateSection(
             SectionCreateRequest request,
             Long id
     ) {
@@ -21,7 +21,7 @@ public class SectionApiRequester {
                 .extract();
     }
 
-    public ExtractableResponse<Response> deleteSection(Long lineId, Long stationId) {
+    public static ExtractableResponse<Response> deleteSection(Long lineId, Long stationId) {
         return given().log().all()
                 .pathParam("id", lineId)
                 .queryParam("stationId", stationId)

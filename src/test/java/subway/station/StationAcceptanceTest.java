@@ -15,9 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철역 관련 기능")
 @AcceptanceTest
 public class StationAcceptanceTest {
-
-    private final StationApiRequester stationApiRequester = new StationApiRequester();
-
+    
     /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다
@@ -30,13 +28,13 @@ public class StationAcceptanceTest {
         String stationName = "강남역";
 
         // when
-        ExtractableResponse<Response> response = stationApiRequester.createStationApiCall(stationName);
+        ExtractableResponse<Response> response = StationApiRequester.createStationApiCall(stationName);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames = JsonPathUtil.getNames(stationApiRequester.showStationsApiCall());
+        List<String> stationNames = JsonPathUtil.getNames(StationApiRequester.showStationsApiCall());
         assertThat(stationNames).containsAnyOf(stationName);
     }
 
@@ -50,12 +48,12 @@ public class StationAcceptanceTest {
     void showStations() {
         //given
         String 성수역 = "성수역";
-        stationApiRequester.createStationApiCall(성수역);
+        StationApiRequester.createStationApiCall(성수역);
         String 잠실역 = "잠실역";
-        stationApiRequester.createStationApiCall(잠실역);
+        StationApiRequester.createStationApiCall(잠실역);
 
         //when
-        ExtractableResponse<Response> response = stationApiRequester.showStationsApiCall();
+        ExtractableResponse<Response> response = StationApiRequester.showStationsApiCall();
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -72,13 +70,13 @@ public class StationAcceptanceTest {
     void deleteStation() {
         //given
         String 언주역 = "언주역";
-        Long 언주역id = JsonPathUtil.getId(stationApiRequester.createStationApiCall(언주역));
+        Long 언주역id = JsonPathUtil.getId(StationApiRequester.createStationApiCall(언주역));
 
         //when
-        ExtractableResponse<Response> response = stationApiRequester.deleteStationApiCall(언주역id);
+        ExtractableResponse<Response> response = StationApiRequester.deleteStationApiCall(언주역id);
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-        List<String> stationsNames = JsonPathUtil.getNames(stationApiRequester.showStationsApiCall());
+        List<String> stationsNames = JsonPathUtil.getNames(StationApiRequester.showStationsApiCall());
         assertThat(stationsNames).isEmpty();
     }
 }

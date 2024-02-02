@@ -10,7 +10,7 @@ import static io.restassured.RestAssured.given;
 
 public class LineApiRequester {
 
-    public ExtractableResponse<Response> createLineApiCall(LineCreateRequest request) {
+    public static ExtractableResponse<Response> createLineApiCall(LineCreateRequest request) {
         return given().log().all()
                 .body(request)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -19,14 +19,14 @@ public class LineApiRequester {
                 .extract();
     }
 
-    public ExtractableResponse<Response> findLinesApiCall() {
+    public static ExtractableResponse<Response> findLinesApiCall() {
         return given().log().all()
                 .when().get("/lines")
                 .then().log().all()
                 .extract();
     }
 
-    public ExtractableResponse<Response> findLineApiCall(Long id) {
+    public static ExtractableResponse<Response> findLineApiCall(Long id) {
         return given().log().all()
                 .pathParam("id", id)
                 .when().get("/lines/{id}")
@@ -34,7 +34,7 @@ public class LineApiRequester {
                 .extract();
     }
 
-    public ExtractableResponse<Response> updateLineApiCall(Long id, LineUpdateRequest request) {
+    public static ExtractableResponse<Response> updateLineApiCall(Long id, LineUpdateRequest request) {
         return given().log().all()
                 .pathParam("id", id)
                 .body(request)
@@ -44,7 +44,7 @@ public class LineApiRequester {
                 .extract();
     }
 
-    public ExtractableResponse<Response> deleteLineApiCall(Long id) {
+    public static ExtractableResponse<Response> deleteLineApiCall(Long id) {
         return given().log().all()
                 .pathParam("id", id)
                 .when().delete("/lines/{id}")
