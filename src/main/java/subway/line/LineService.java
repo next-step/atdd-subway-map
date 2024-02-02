@@ -71,6 +71,11 @@ public class LineService {
         line.updateColor(request.getColor());
     }
 
+    public void deleteLine(Long lineId) {
+        Line line = getLineEntity(lineId);
+        lineRepository.delete(line);
+    }
+
     private Line getLineEntity(Long lineId) {
         return lineRepository.findById(lineId).orElseThrow(
                 () -> new EntityNotFoundException("해당 엔티티를 찾을 수 없습니다.")
