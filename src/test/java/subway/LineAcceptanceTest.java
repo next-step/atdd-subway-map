@@ -7,7 +7,6 @@ import static subway.api.LineApi.getLine;
 import static subway.api.LineApi.getLines;
 import static subway.api.LineApi.updateLine;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import io.restassured.response.ResponseBodyExtractionOptions;
@@ -15,9 +14,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import subway.api.LineApi;
-import subway.dto.LineRequest;
+import org.springframework.test.context.jdbc.Sql;
 import subway.dto.UpdateLineRequest;
 import subway.fixture.LineFixture;
 import subway.api.StationApi;
@@ -25,6 +22,7 @@ import subway.fixture.StationFixture;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@Sql("/truncate.sql")
 public class LineAcceptanceTest {
 	/** When 지하철 노선을 생성하면
 	 * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
