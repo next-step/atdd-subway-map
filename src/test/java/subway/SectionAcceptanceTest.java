@@ -1,24 +1,32 @@
 package subway;
 
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import subway.controller.dto.LineCreateRequest;
+import subway.controller.dto.LineResponse;
+import subway.controller.dto.SectionCreateRequest;
 import subway.controller.dto.StationResponse;
 
-import static org.springframework.http.HttpStatus.CREATED;
+import java.util.stream.Stream;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.http.HttpStatus.*;
 import static subway.fixture.LineFixture.SHINBUNDANG_LINE;
 import static subway.fixture.StationFixture.GANGNAM_STATION;
 import static subway.fixture.StationFixture.SEOLLEUNG_STATION;
 
-
-
 @DisplayName("지하철 구간 관련 기능")
-public class SectionAcceptanceTest  extends AcceptanceTest {
+public class SectionAcceptanceTest extends AcceptanceTest {
 
-    private static Long GANGNAM_STATION_ID;
-    private static Long SEOLLEUNG_STATION_ID;
-    private static Long SHINBUNDANG_LINE_ID;
+    private Long GANGNAM_STATION_ID;
+    private Long SEOLLEUNG_STATION_ID;
+    private Long SHINBUNDANG_LINE_ID;
 
     @BeforeEach
     void setFixture() {
@@ -29,19 +37,35 @@ public class SectionAcceptanceTest  extends AcceptanceTest {
                 .as(StationResponse.class).getId();
 
         LineCreateRequest request = SHINBUNDANG_LINE.toCreateRequest(GANGNAM_STATION_ID, SEOLLEUNG_STATION_ID);
-        Long SHINBUNDANG_LINE_ID = createLine(request, CREATED.value())
-                .as(StationResponse.class).getId();
+        SHINBUNDANG_LINE_ID = createLine(request, CREATED.value())
+                .as(LineResponse.class).getId();
     }
 
     /**
      * GIVEN 지하철역을 생성하고
      * GIVEN 지하철 역에 노선을 등록하고
-     * WHEN 새로운 지하철 구간 등록시 상행 지하철역, 하행 지하철역, 노선의 총 거리를 모두 등록하지 않으면
+     * WHEN 새로운 지하철 구간 등록시 상행 지하철역과 하행 지하철역을 등록하지 않으면
      * Then 새로운 구간을 등록할 수 없다
      */
-    @Test
-    void 실패_새로운_지하철_구간_등록시_필수값을_모두_입력하지_않으면_예외가_발생한다() {
+    @ParameterizedTest
+    @MethodSource("provideSectionCreateRequest")
+    void 실패_새로운_지하철_구간_등록시_필수값을_모두_입력하지_않으면_예외가_발생한다(SectionCreateRequest request) {
+        ExtractableResponse<Response> response = post("/lines/{lineId}/sections", request, BAD_REQUEST.value(), SHINBUNDANG_LINE_ID);
+        assertThat(response.statusCode()).isEqualTo(BAD_REQUEST.value());
+    }
 
+    private static Stream<Arguments> provideSectionCreateRequest() {
+        return Stream.of(
+                Arguments.of(
+                        SectionCreateRequest
+                                .builder()
+                                .upStationId("1")
+                                .build()),
+                Arguments.of(SectionCreateRequest
+                        .builder()
+                        .downStationId("2")
+                        .build())
+        );
     }
 
     /**
@@ -77,17 +101,6 @@ public class SectionAcceptanceTest  extends AcceptanceTest {
      */
     @Test
     void 실패_새로운_지하철_구간_등록시_노선의_총_거리가_기존의_노선_거리랑_작거나_같다면_예외가_발생한다() {
-
-    }
-
-    /**
-     * GIVEN 지하철역을 생성하고
-     * GIVEN 지하철 역에 노선을 등록하고
-     * WHEN 지하철 구간 등록시 기존의 구간이 없다면
-     * Then 노선의 첫 구간이 등록된다
-     */
-    @Test
-    void 성공_새로운_지하철_구간_등록시_기존의_구간이_없다면_노선의_첫_구간이_등록된다() {
 
     }
 
