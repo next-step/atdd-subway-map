@@ -1,15 +1,15 @@
-package subway;
+package subway.acceptance;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
-import subway.station.StationRequest;
+import subway.station.presentaion.request.CreateStationRequest;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.extractableResponse.StationApiExtractableResponse.*;
+import static subway.acceptance.extractableResponse.StationApiExtractableResponse.*;
 
 @DisplayName("지하철역 관련 기능")
 @Sql("/truncate.sql")
@@ -26,7 +26,7 @@ public class StationAcceptanceTest {
     void 지하철_역을_생성() {
         // when & then
         String 강남역 = "강남역";
-        createStation(StationRequest.from(강남역));
+        createStation(CreateStationRequest.from(강남역));
 
         // then
         List<String> stationNames =
@@ -45,8 +45,8 @@ public class StationAcceptanceTest {
         // given
         String 강남역 = "강남역";
         String 광화문역 = "광화문역";
-        createStation(StationRequest.from(강남역));
-        createStation(StationRequest.from(광화문역));
+        createStation(CreateStationRequest.from(강남역));
+        createStation(CreateStationRequest.from(광화문역));
 
         // when
         List<String> stationNames =
@@ -66,7 +66,7 @@ public class StationAcceptanceTest {
     void 지하철_역을_삭제() {
         // given
         String 강남역 = "강남역";
-        Long id = createStation(StationRequest.from(강남역)).jsonPath().getLong("id");
+        Long id = createStation(CreateStationRequest.from(강남역)).jsonPath().getLong("id");
 
         // when
         deleteStation(id);

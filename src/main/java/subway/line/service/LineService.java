@@ -1,12 +1,17 @@
-package subway.line;
+package subway.line.service;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-import subway.station.Station;
-import subway.station.StationRepository;
-import subway.station.StationResponse;
+import subway.line.domain.Line;
+import subway.line.domain.LineRepository;
+import subway.line.presentaion.request.CreateLineRequest;
+import subway.line.presentaion.request.UpdateLineRequest;
+import subway.line.presentaion.response.LineResponse;
+import subway.station.domain.Station;
+import subway.station.domain.StationRepository;
+import subway.station.presentaion.response.StationResponse;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,13 +28,13 @@ public class LineService {
     }
 
     @Transactional
-    public LineResponse saveLine(LineRequest lineRequest) {
-        Station upStation = stationRepository.getById(lineRequest.getUpStationId());
-        Station downStation = stationRepository.getById(lineRequest.getDownStationId());
+    public LineResponse saveLine(CreateLineRequest createLineRequest) {
+        Station upStation = stationRepository.getById(createLineRequest.getUpStationId());
+        Station downStation = stationRepository.getById(createLineRequest.getDownStationId());
 
         Line line = lineRepository.save(
                 new Line(
-                        lineRequest.getName(), lineRequest.getColor(), upStation, downStation, lineRequest.getDistance()
+                        createLineRequest.getName(), createLineRequest.getColor(), upStation, downStation, createLineRequest.getDistance()
                 )
         );
 
@@ -50,13 +55,11 @@ public class LineService {
     }
 
     @Transactional
-    public LineResponse modifyLine(Long id, LineRequest lineRequest) {
+    public LineResponse updateLine(Long id, UpdateLineRequest updateLineRequest) {
         Line line = lineRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "없는 지하철 노선입니다."));
-        Station upStation = stationRepository.getById(lineRequest.getUpStationId());
-        Station downStation = stationRepository.getById(lineRequest.getDownStationId());
 
-        line.modifyLine(lineRequest.getName(), lineRequest.getColor(), upStation, downStation, lineRequest.getDistance());
+        line.updateLine(updateLineRequest.getColor(), updateLineRequest.getDistance());
 
         return createLineResponse(line);
     }

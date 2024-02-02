@@ -1,6 +1,6 @@
-package subway.line;
+package subway.line.presentaion.request;
 
-public class LineRequest {
+public class CreateLineRequest {
 
     private String name;
 
@@ -12,10 +12,10 @@ public class LineRequest {
 
     private Integer distance;
 
-    private LineRequest() {
+    private CreateLineRequest() {
     }
 
-    private LineRequest(String name, String color, Long upStationId, Long downStationId, Integer distance) {
+    private CreateLineRequest(String name, String color, Long upStationId, Long downStationId, Integer distance) {
         this.name = name;
         this.color = color;
         this.upStationId = upStationId;
@@ -23,8 +23,8 @@ public class LineRequest {
         this.distance = distance;
     }
 
-    public static LineRequest of(String name, String color, Long upStationId, Long downStationId, Integer distance) {
-        return new LineRequest(name, color, upStationId, downStationId, distance);
+    public static CreateLineRequest of(String name, String color, Long upStationId, Long downStationId, Integer distance) {
+        return new CreateLineRequest(name, color, upStationId, downStationId, distance);
     }
 
     public String getName() {

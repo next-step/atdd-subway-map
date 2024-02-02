@@ -1,7 +1,11 @@
-package subway.line;
+package subway.line.presentaion;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import subway.line.presentaion.request.CreateLineRequest;
+import subway.line.presentaion.request.UpdateLineRequest;
+import subway.line.presentaion.response.LineResponse;
+import subway.line.service.LineService;
 
 import java.net.URI;
 import java.util.List;
@@ -15,8 +19,8 @@ public class LineController {
     }
 
     @PostMapping("/lines")
-    public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
-        LineResponse line = lineService.saveLine(lineRequest);
+    public ResponseEntity<LineResponse> createLine(@RequestBody CreateLineRequest createLineRequest) {
+        LineResponse line = lineService.saveLine(createLineRequest);
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
 
@@ -32,8 +36,8 @@ public class LineController {
     }
 
     @PutMapping("/lines/{id}")
-    public ResponseEntity<LineResponse> modifyLine(@PathVariable Long id, @RequestBody LineRequest lineRequest) {
-        LineResponse line = lineService.modifyLine(id, lineRequest);
+    public ResponseEntity<LineResponse> updateLine(@PathVariable Long id, @RequestBody UpdateLineRequest updateLineRequest) {
+        LineResponse line = lineService.updateLine(id, updateLineRequest);
         return ResponseEntity.ok().body(line);
     }
 

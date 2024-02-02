@@ -1,8 +1,8 @@
-package subway.line;
+package subway.line.domain;
 
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
-import subway.station.Station;
+import subway.station.domain.Station;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -45,11 +45,8 @@ public class Line {
         this.distance = distance;
     }
 
-    public void modifyLine(String name, String color, Station upStation, Station downStation, Integer distance) {
-        this.name = name;
+    public void updateLine(String color, Integer distance) {
         this.color = color;
-        this.upStation = upStation;
-        this.downStation = downStation;
         this.distance = distance;
     }
 

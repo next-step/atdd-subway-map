@@ -1,17 +1,17 @@
-package subway.extractableResponse;
+package subway.acceptance.extractableResponse;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.MediaType;
-import subway.station.StationRequest;
+import subway.station.presentaion.request.CreateStationRequest;
 
 public class StationApiExtractableResponse {
 
-    public static ExtractableResponse<Response> createStation(StationRequest stationRequest) {
+    public static ExtractableResponse<Response> createStation(CreateStationRequest createStationRequest) {
         return RestAssured
                 .given().log().all()
-                .body(stationRequest)
+                .body(createStationRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/stations")
                 .then().log().all()

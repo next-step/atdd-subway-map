@@ -1,17 +1,18 @@
-package subway.extractableResponse;
+package subway.acceptance.extractableResponse;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.MediaType;
-import subway.line.LineRequest;
+import subway.line.presentaion.request.CreateLineRequest;
+import subway.line.presentaion.request.UpdateLineRequest;
 
 public class LineApiExtractableResponse {
 
-    public static ExtractableResponse<Response> createLine(LineRequest lineRequest) {
+    public static ExtractableResponse<Response> createLine(CreateLineRequest createLineRequest) {
         return RestAssured
                 .given().log().all()
-                .body(lineRequest)
+                .body(createLineRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/lines")
                 .then().log().all()
@@ -35,10 +36,10 @@ public class LineApiExtractableResponse {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> modifyLine(Long id, LineRequest lineRequest) {
+    public static ExtractableResponse<Response> modifyLine(Long id, UpdateLineRequest updateLineRequest) {
         return RestAssured
                 .given().log().all()
-                .body(lineRequest)
+                .body(updateLineRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .pathParam("id", id)
                 .when().put("/lines/{id}")
