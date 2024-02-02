@@ -6,6 +6,7 @@ import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 import subway.dto.SectionRequest;
 import subway.dto.SectionResponse;
+import subway.exception.ExceptionResponse;
 import subway.service.LineService;
 
 import java.net.URI;
@@ -37,13 +38,13 @@ public class LineController {
 	}
 
 	@PutMapping("/lines/{id}")
-	ResponseEntity<String> updateLine(@PathVariable Long id, @RequestBody LineRequest lineRequest) {
+	ResponseEntity<ExceptionResponse> updateLine(@PathVariable Long id, @RequestBody LineRequest lineRequest) {
 		if(lineRequest.getName().isEmpty()) {
-			return ResponseEntity.badRequest().body("이름 값이 빈 값일 수 없습니다.");
+			return ResponseEntity.badRequest().body(new ExceptionResponse("이름 값이 빈 값일 수 없습니다."));
 		}
 
 		if(lineRequest.getColor().isEmpty()) {
-			return ResponseEntity.badRequest().body("색상 값이 빈 값일 수 없습니다.");
+			return ResponseEntity.badRequest().body(new ExceptionResponse("색상 값이 빈 값일 수 없습니다."));
 		}
 
 		lineService.updateLine(id, lineRequest);
