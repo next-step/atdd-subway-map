@@ -40,6 +40,12 @@ public class LineController {
         lineService.updateLine(lineId, request);
         return ResponseEntity.ok().build();
     }
+
+    @DeleteMapping("/lines/{lineId}")
+    public ResponseEntity<Void> deleteLine(@PathVariable Long lineId) {
+        lineService.deleteLine(lineId);
+        return ResponseEntity.noContent().build();
+    }
 }
 
 
