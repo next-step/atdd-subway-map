@@ -56,6 +56,21 @@ public class Line {
                 .collect(Collectors.toList());
     }
 
+    public Station getTheMostDownStation() {
+        Section theMostDownSection = sections.get(sections.size() - 1);
+        return theMostDownSection.getDownStation();
+    }
+
+    public void deleteStation(Long stationId) {
+        if (sections.size() <= 1) {
+            throw new LineSectionException();
+        }
+        if (getTheMostDownStation().getId() != stationId) {
+            throw new LineSectionException();
+        }
+        sections.remove(sections.size() - 1);
+    }
+
     public void addSection(Section section) {
         if (sections.isEmpty()) {
             sections.add(section);

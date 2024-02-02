@@ -71,6 +71,12 @@ public class LineService {
         return createLineSectionDto(section);
     }
 
+    @Transactional
+    public void deleteLineSection(Long lineId, Long stationId) {
+        Line line = findLineByIdOrFail(lineId);
+        line.deleteStation(stationId);
+    }
+
     private Line findLineByIdOrFail(Long id) {
         return lineRepository.findById(id).orElseThrow(EntityNotFoundException::new);
     }

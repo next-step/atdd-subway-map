@@ -224,7 +224,7 @@ public class SectionAcceptanceTest {
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
                     .when().delete(routePrefix + "/{id}/sections")
                     .then().log().all()
-                    .statusCode(HttpStatus.CREATED.value());
+                    .statusCode(HttpStatus.NO_CONTENT.value());
 
             // then
             assertThat(getJsonPathOfGetLine(createdLine).getList("stations.id", Long.class))
