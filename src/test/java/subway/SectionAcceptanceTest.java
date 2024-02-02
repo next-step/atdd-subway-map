@@ -12,20 +12,22 @@ import subway.controller.dto.LineCreateRequest;
 import subway.controller.dto.LineResponse;
 import subway.controller.dto.SectionCreateRequest;
 import subway.controller.dto.StationResponse;
+import subway.exception.ExceptionResponse;
 
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpStatus.*;
 import static subway.fixture.LineFixture.SHINBUNDANG_LINE;
-import static subway.fixture.StationFixture.GANGNAM_STATION;
-import static subway.fixture.StationFixture.SEOLLEUNG_STATION;
+import static subway.fixture.StationFixture.*;
 
 @DisplayName("지하철 구간 관련 기능")
 public class SectionAcceptanceTest extends AcceptanceTest {
 
     private Long GANGNAM_STATION_ID;
     private Long SEOLLEUNG_STATION_ID;
+    private Long YANGJAE_STATION_ID;
+
     private Long SHINBUNDANG_LINE_ID;
 
     @BeforeEach
@@ -36,25 +38,28 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         SEOLLEUNG_STATION_ID = createStation(SEOLLEUNG_STATION.toCreateRequest(), CREATED.value())
                 .as(StationResponse.class).getId();
 
+        YANGJAE_STATION_ID = createStation(YANGJAE_STATION.toCreateRequest(), CREATED.value())
+                .as(StationResponse.class).getId();
+
         LineCreateRequest request = SHINBUNDANG_LINE.toCreateRequest(GANGNAM_STATION_ID, SEOLLEUNG_STATION_ID);
         SHINBUNDANG_LINE_ID = createLine(request, CREATED.value())
                 .as(LineResponse.class).getId();
     }
 
     /**
-     * GIVEN 지하철역을 생성하고
+     * GIVEN 지하철 역을 생성하고
      * GIVEN 지하철 역에 노선을 등록하고
      * WHEN 새로운 지하철 구간 등록시 상행 지하철역과 하행 지하철역을 등록하지 않으면
      * Then 새로운 구간을 등록할 수 없다
      */
     @ParameterizedTest
-    @MethodSource("provideSectionCreateRequest")
+    @MethodSource("provideBlankSectionCreateRequest")
     void 실패_새로운_지하철_구간_등록시_필수값을_모두_입력하지_않으면_예외가_발생한다(SectionCreateRequest request) {
         ExtractableResponse<Response> response = post("/lines/{lineId}/sections", request, BAD_REQUEST.value(), SHINBUNDANG_LINE_ID);
         assertThat(response.statusCode()).isEqualTo(BAD_REQUEST.value());
     }
 
-    private static Stream<Arguments> provideSectionCreateRequest() {
+    private static Stream<Arguments> provideBlankSectionCreateRequest() {
         return Stream.of(
                 Arguments.of(
                         SectionCreateRequest
@@ -69,19 +74,21 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     }
 
     /**
-     * GIVEN 지하철역을 생성하고
+     * GIVEN 지하철 역을 생성하고
      * GIVEN 지하철 역에 노선을 등록하고
-     * GIVEN 구간을 등록하고
      * WHEN 새로운 지하철 구간을 노선의 상행 종점역에 등록하면
      * Then 새로운 구간을 등록할 수 없다
      */
     @Test
     void 실패_새로운_지하철_구간_등록시_노선의_상행_종점역에_등록하면_예외가_발생한다() {
-
+        SectionCreateRequest request = sectionCreateRequest(GANGNAM_STATION_ID, YANGJAE_STATION_ID, 10);
+        String message = post("/lines/{lineId}/sections", request, OK.value(), SHINBUNDANG_LINE_ID)
+                .as(ExceptionResponse.class).getMessage();
+        assertThat(message).isEqualTo("상행 종점역에는 구간을 등록할 수 없습니다.");
     }
 
     /**
-     * GIVEN 지하철역을 생성하고
+     * GIVEN 지하철 역을 생성하고
      * GIVEN 지하철 역에 노선을 등록하고
      * GIVEN 구간을 등록하고
      * WHEN 새로운 지하철 구간을 노선의 중간에 있는 역에 등록하면
@@ -93,7 +100,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     }
 
     /**
-     * GIVEN 지하철역을 생성하고
+     * GIVEN 지하철 역을 생성하고
      * GIVEN 지하철 역에 노선을 등록하고
      * GIVEN 구간을 등록하고
      * WHEN 새로운 지하철 구간 등록시 노선의 총 거리가 기존의 노선 거리랑 작거나 같다면
@@ -105,7 +112,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     }
 
     /**
-     * GIVEN 지하철역을 생성하고
+     * GIVEN 지하철 역을 생성하고
      * GIVEN 지하철 역에 노선을 등록하고
      * GIVEN 구간을 등록하고
      * WHEN 새로운 지하철 구간 등록시 노선의 하행 종점역에 등록하면
@@ -114,6 +121,14 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void 성공_새로운_지하철_구간_등록시_노선의_하행_종점역에_등록할_수_있다() {
 
+    }
+
+    private SectionCreateRequest sectionCreateRequest(Long upStationId, Long downStationId, int distance) {
+        return SectionCreateRequest.builder()
+                .upStationId(upStationId.toString())
+                .downStationId(downStationId.toString())
+                .distance(distance)
+                .build();
     }
 
 }
