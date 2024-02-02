@@ -1,24 +1,26 @@
-package subway;
+package subway.station;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.assertj.core.api.SoftAssertions;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-
+import io.restassured.response.ResponseBodyExtractionOptions;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.assertj.core.api.SoftAssertions;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import support.annotation.AcceptanceTest;
 
 @DisplayName("지하철역 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@AcceptanceTest
 public class StationAcceptanceTest {
+
+    public static final String GANGNAM_STATION_NAME = "강남역";
+    public static final String SAMSUNG_STATION_NAME = "삼성역";
 
     /**
      * When 지하철역을 생성하면
@@ -29,27 +31,16 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-
-        ExtractableResponse<Response> response =
-            RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = saveStationResponse(GANGNAM_STATION_NAME);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames =
-            RestAssured.given().log().all()
-                .when().get("/stations")
-                .then().log().all()
-                .extract().jsonPath().getList("name", String.class);
-        assertThat(stationNames).containsAnyOf("강남역");
+        List<String> stationNames = getStationListResponse()
+            .jsonPath()
+            .getList("name", String.class);
+        assertThat(stationNames).containsAnyOf(GANGNAM_STATION_NAME);
     }
 
     /**
@@ -61,17 +52,17 @@ public class StationAcceptanceTest {
     @Test
     void getStationList() {
         // given
-        saveStation("강남역");
-        saveStation("교대역");
+        saveStationResponse(GANGNAM_STATION_NAME);
+        saveStationResponse(SAMSUNG_STATION_NAME);
 
         // when
-        ExtractableResponse<Response> response = getStations();
+        ExtractableResponse<Response> response = getStationListResponse();
 
         // then
         SoftAssertions.assertSoftly(softAssertions -> {
             assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-            assertThat(response.body().as(List.class)).hasSize(3);
-            assertThat(response.jsonPath().getList("name")).containsAnyOf("강남역", "교대역");
+            assertThat(response.body().as(List.class)).hasSize(2);
+            assertThat(response.jsonPath().getList("name")).containsAnyOf(GANGNAM_STATION_NAME, SAMSUNG_STATION_NAME);
         });
 
     }
@@ -86,7 +77,8 @@ public class StationAcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        ExtractableResponse<Response> saveResponse = saveStation("강남역");
+        ExtractableResponse<Response> saveResponse = saveStationResponse(SAMSUNG_STATION_NAME);
+        saveStationResponse(SAMSUNG_STATION_NAME);
         Integer deleteStationId = saveResponse.jsonPath().get("id");
 
         // when
@@ -100,13 +92,15 @@ public class StationAcceptanceTest {
         // then
         SoftAssertions.assertSoftly(softAssertions -> {
             assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-            assertThat(getStations().body().as(List.class)).isEmpty();
+            ResponseBodyExtractionOptions currentStations = getStationListResponse().body();
+            assertThat(currentStations.as(List.class)).hasSize(1);
+            assertThat(currentStations.jsonPath().getList("name")).doesNotContain(GANGNAM_STATION_NAME);
         });
 
     }
 
 
-    private ExtractableResponse<Response> getStations() {
+    private ExtractableResponse<Response> getStationListResponse() {
         return RestAssured.given().log().all()
             .accept(MediaType.APPLICATION_JSON_VALUE)
             .when().get("/stations")
@@ -114,7 +108,7 @@ public class StationAcceptanceTest {
             .extract();
     }
 
-    private ExtractableResponse<Response> saveStation(String name) {
+    private ExtractableResponse<Response> saveStationResponse(String name) {
         return RestAssured.given()
             .body(Map.of("name", name))
             .contentType(MediaType.APPLICATION_JSON_VALUE)
