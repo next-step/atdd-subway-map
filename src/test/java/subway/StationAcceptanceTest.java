@@ -2,39 +2,21 @@ package subway;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.ActiveProfiles;
 import subway.fixture.StationTestFixture;
-import subway.setup.DataBaseCleanUp;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
-@ActiveProfiles("AcceptanceTest")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class StationAcceptanceTest {
-
-    private final DataBaseCleanUp dataBaseCleanUp;
+public class StationAcceptanceTest extends BaseTest{
 
     private final String 지하철_이름_강남역 = "강남역";
     private final String 지하철_이름_역삼역 = "역삼역";
 
-    @Autowired
-    public StationAcceptanceTest(DataBaseCleanUp dataBaseCleanUp) {
-        this.dataBaseCleanUp = dataBaseCleanUp;
-    }
-
-    @BeforeEach
-    void setUp() {
-        dataBaseCleanUp.execute();
-    }
     /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다
@@ -92,7 +74,7 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 삭제한다.")
     @Test
     void deleteStations(){
-        long id = StationTestFixture.createStationFromName(지하철_이름_강남역).jsonPath().getInt("id");
+        long id = StationTestFixture.createStationFromName(지하철_이름_강남역).jsonPath().getLong("id");
         StationTestFixture.deleteById(id);
 
         List<Long> ids = StationTestFixture.allStations().jsonPath().getList("id", Long.class);

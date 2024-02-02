@@ -13,8 +13,19 @@ public class LineTestFixture {
                 .body(new HashMap<String, Object>() {{
                     put("name", lineName);
                     put("color", lineColor);
-                    put("upStationId", upStationId);
-                    put("downStationId", downStationId);
+                }})
+                .contentType("application/json")
+                .when()
+                .post("/lines")
+                .then().log().all()
+                .extract();
+    }
+
+    public static ExtractableResponse<Response> createLine(String lineName, String lineColor) {
+        return RestAssured.given().log().all()
+                .body(new HashMap<String, Object>() {{
+                    put("name", lineName);
+                    put("color", lineColor);
                 }})
                 .contentType("application/json")
                 .when()
@@ -27,6 +38,13 @@ public class LineTestFixture {
         return RestAssured.given().log().all()
                 .when().get("/lines")
                 .then().log().all()
+                .extract();
+    }
+
+    public static ExtractableResponse<Response> getLine(long id) {
+        return RestAssured.given().log().all()
+                .when().get("/lines/{id}", id)
+                .then()
                 .extract();
     }
 

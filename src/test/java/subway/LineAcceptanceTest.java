@@ -1,18 +1,12 @@
 package subway;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.test.context.ActiveProfiles;
 import subway.fixture.LineTestFixture;
 import subway.fixture.StationTestFixture;
-import subway.setup.DataBaseCleanUp;
 
 import java.util.HashMap;
 import java.util.List;
@@ -20,16 +14,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
-@ActiveProfiles("AcceptanceTest")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class LineAcceptanceTest {
-
-    private final DataBaseCleanUp dataBaseCleanUp;
-
-    @Autowired
-    public LineAcceptanceTest(DataBaseCleanUp dataBaseCleanUp) {
-        this.dataBaseCleanUp = dataBaseCleanUp;
-    }
+public class LineAcceptanceTest extends BaseTest{
 
     private final String 노선이름_1 = "1호선";
     private final String 노선이름_2 = "2호선";
@@ -40,11 +25,9 @@ public class LineAcceptanceTest {
     private long 상행종점_아이디;
     private long 하행종점_아이디;
 
+
     @BeforeEach
     void setUp() {
-        dataBaseCleanUp.init();
-        dataBaseCleanUp.execute();
-
         상행종점_아이디 =StationTestFixture.createStationFromName("강남역").jsonPath().getLong("id");
         하행종점_아이디 =StationTestFixture.createStationFromName("역삼역").jsonPath().getLong("id");;
     }

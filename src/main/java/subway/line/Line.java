@@ -1,8 +1,13 @@
 package subway.line;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import subway.exception.HttpBadRequestException;
+import subway.line.section.Section;
 import subway.station.Station;
 
 import javax.persistence.*;
+import java.util.List;
+import java.util.Objects;
 
 @Entity
 public class Line {
@@ -17,30 +22,21 @@ public class Line {
     @Column(length = 20, nullable = false)
     private String color;
 
-    @ManyToOne
-    @JoinColumn(name = "up_station_id")
-    private Station upStation;
 
-    @ManyToOne
-    @JoinColumn(name = "down_station_id")
-    private Station downStation;
+    @JsonManagedReference
+    @OneToMany(mappedBy = "line", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Section> sections;
 
     public Line() {
     }
 
-    public Line(String name, String color, Station upStation, Station downStation) {
+    public Line(String name, String color) {
         this.name = name;
         this.color = color;
-        this.upStation = upStation;
-        this.downStation = downStation;
     }
 
-    public Station getUpStation() {
-        return upStation;
-    }
-
-    public Station getDownStation() {
-        return downStation;
+    public List<Section> getSections() {
+        return sections;
     }
 
     public Long getId() {
@@ -58,5 +54,17 @@ public class Line {
     public void update(String name, String color) {
         this.name = name;
         this.color = color;
+    }
+
+    public void deleteSection(Section section) {
+        if (sections.size() == 1) {
+            throw new HttpBadRequestException("노선에는 최소 한 개의 구간이 존재해야 합니다.");
+        }
+
+        if(!Objects.equals(sections.get(sections.size()-1), section)){
+            throw new HttpBadRequestException("노선의 마지막 구간만 삭제할 수 있습니다.");
+        }
+
+        sections.remove(section);
     }
 }

@@ -22,20 +22,18 @@ public class LineService {
 
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
-        Station upStation = this.stationRepository.findById(lineRequest.getUpStationId()).orElseThrow(() -> new IllegalArgumentException("상행역이 존재하지 않습니다."));
-        Station downStation = this.stationRepository.findById(lineRequest.getDownStationId()).orElseThrow(() -> new IllegalArgumentException("하행역이 존재하지 않습니다."));
-        Line line = this.lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor(), upStation, downStation));
-        return createLineResponse(line);
+        Line line = this.lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor()));
+        return new LineResponse(line);
     }
 
     public List<LineResponse> findAllLines() {
         List<Line> lines = this.lineRepository.findAll();
-        return lines.stream().map(this::createLineResponse).collect(Collectors.toList());
+        return lines.stream().map(LineResponse::new).collect(Collectors.toList());
     }
 
     public LineResponse findLineById(Long id) {
         Line line = getLine(id);
-        return createLineResponse(line);
+        return new LineResponse(line);
     }
 
     @Transactional
@@ -54,7 +52,5 @@ public class LineService {
         return this.lineRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 노선이 존재하지 않습니다."));
     }
 
-    private LineResponse createLineResponse(Line line) {
-        return new LineResponse(line);
-    }
+
 }
