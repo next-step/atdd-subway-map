@@ -43,11 +43,13 @@ public class LineService {
 
         return createLineResponse(line);
 
-    }
+     }
 
     @Transactional
     public LineResponse updateLine(Long id, LineRequest request) {
         Line line = lineRepository.findById(id).get();
+
+        // Todo
         Line newLine = new Line(line.getId(), request.getName(), request.getColor(), line.getUpStation(), line.getDownStation(), line.getDistance(), null);
 
         Line updatedLine = lineRepository.save(newLine);

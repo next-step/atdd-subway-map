@@ -123,7 +123,7 @@ public class LineAcceptanceTest {
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().put("/lines/" + id)
+                .when().put("/lines/{id}", id)
                 .then().log().all()
                 .extract();
 
