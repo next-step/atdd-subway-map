@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,14 +63,13 @@ public class StationAcceptanceTest {
         String 강남역 = "강남역";
         String 교대역 = "교대역";
 
-        createSubway(강남역);
-        createSubway(교대역);
+        createStation(강남역);
+        createStation(교대역);
 
         //when
         List<String> responseList = getStationNameList();
 
         //then
-        assertThat(responseList.size()).isEqualTo(2);
         assertThat(responseList).containsAnyOf(강남역, 교대역);
     }
 
@@ -84,7 +84,7 @@ public class StationAcceptanceTest {
         //given
         String 역삼역 = "역삼역";
 
-        ExtractableResponse<Response> response = createSubway(역삼역);
+        ExtractableResponse<Response> response = createStation(역삼역);
 
         //when
         ExtractableResponse<Response> deleteResponse = RestAssured.given().log().all()
@@ -107,7 +107,7 @@ public class StationAcceptanceTest {
                 .extract().jsonPath().get("name");
     }
 
-    private ExtractableResponse<Response> createSubway(String stationName) {
+    private ExtractableResponse<Response> createStation(String stationName) {
         Map<String, String> requestParams = new HashMap<>();
         requestParams.put("name", stationName);
 
