@@ -10,7 +10,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SubwayLineResponse {
+public class LineResponse {
     private Long id;
     private String name;
     private String color;

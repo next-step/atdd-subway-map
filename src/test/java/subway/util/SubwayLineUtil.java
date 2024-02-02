@@ -4,13 +4,13 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.MediaType;
-import subway.domain.request.SubwayLineRequest;
+import subway.domain.request.LineRequest;
 
 import java.util.List;
 
 public class SubwayLineUtil {
 
-    public static ExtractableResponse<Response> createSubwayLine(SubwayLineRequest request) {
+    public static ExtractableResponse<Response> createSubwayLine(LineRequest request) {
         return RestAssured.given().log().all()
                 .body(request)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)

@@ -1,4 +1,4 @@
-package subway;
+package subway.acceptance;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -10,7 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
-import subway.domain.request.SubwayLineRequest;
+import subway.domain.request.LineRequest;
 import subway.util.StationTestUtil;
 
 import java.util.HashMap;
@@ -25,7 +25,7 @@ import static subway.util.SubwayLineUtil.getSubwayLines;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 //@DirtiesContext
 @Sql("/truncate.sql")
-public class SubwayLineAcceptanceTest {
+public class LineAcceptanceTest {
 
     long stationId1, stationId2, stationId3;
     @BeforeEach
@@ -43,7 +43,7 @@ public class SubwayLineAcceptanceTest {
     @Test
     void createSubwayLineTest() {
         // when
-        ExtractableResponse<Response> response = createSubwayLine(new SubwayLineRequest("신분당선", "bg-red-600", 1L, 2L, 10));
+        ExtractableResponse<Response> response = createSubwayLine(new LineRequest("신분당선", "bg-red-600", stationId1, stationId2, 10));
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -63,8 +63,8 @@ public class SubwayLineAcceptanceTest {
     @Test
     void showSubwayLines() {
         //given
-        createSubwayLine(new SubwayLineRequest("신분당선", "bg-red-600", stationId1, stationId2, 10));
-        createSubwayLine(new SubwayLineRequest("분당선", "bg-green-600", stationId1, stationId3, 10));
+        createSubwayLine(new LineRequest("신분당선", "bg-red-600", stationId1, stationId2, 10));
+        createSubwayLine(new LineRequest("분당선", "bg-green-600", stationId1, stationId3, 10));
 
         //when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -90,7 +90,7 @@ public class SubwayLineAcceptanceTest {
     @Test
     void showSubwayLine() {
         //given
-        long id = createSubwayLine(new SubwayLineRequest("신분당선", "bg-red-600", stationId1, stationId2, 10)).jsonPath().getLong("id");
+        long id = createSubwayLine(new LineRequest("신분당선", "bg-red-600", stationId1, stationId2, 10)).jsonPath().getLong("id");
 
         //when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -114,7 +114,7 @@ public class SubwayLineAcceptanceTest {
     @Test
     void updateSubwayLine() {
         //given
-        long id = createSubwayLine(new SubwayLineRequest("신분당선", "bg-red-600", 1L, 2L, 10)).jsonPath().getLong("id");
+        long id = createSubwayLine(new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10)).jsonPath().getLong("id");
 
         //when
         Map<String, String> params = new HashMap<>();
@@ -145,7 +145,7 @@ public class SubwayLineAcceptanceTest {
     @Test
     void deleteSubwayLine() {
         //given
-        long id = createSubwayLine(new SubwayLineRequest("신분당선", "bg-red-600", 1L, 2L, 10)).jsonPath().getLong("id");
+        long id = createSubwayLine(new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10)).jsonPath().getLong("id");
 
         //when
         ExtractableResponse<Response> response = RestAssured.given().log().all()

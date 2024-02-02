@@ -1,33 +1,39 @@
 package subway.domain.entity;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-@Builder
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SubwayLine {
+public class Line {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(length = 20, nullable = false)
     private String name;
-    @Column(length = 20, nullable = false)
     private String color;
+
     @ManyToOne
     @JoinColumn(nullable = false)
     private Station upStation;
+
     @ManyToOne
     @JoinColumn(nullable = false)
     private Station downStation;
+
     @Column(nullable = false)
     private int distance;
 
-    public SubwayLine(String name, String color, Station upStation, Station downStation, int distance) {
+    @OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
+    List<Section> sections = new ArrayList<>();
+
+    public Line(String name, String color, Station upStation, Station downStation, int distance) {
         this.name = name;
         this.color = color;
         this.upStation = upStation;
@@ -35,28 +41,12 @@ public class SubwayLine {
         this.distance = distance;
     }
 
-    public Long getId() {
-        return id;
+    public Line(String name, String color) {
+        this.name = name;
+        this.color = color;
     }
 
-    public String getName() {
-        return name;
+    public void addSection(Station upStation, Station downStation, int distance) {
+        this.sections.add(new Section(this, upStation, downStation, distance));
     }
-
-    public String getColor() {
-        return color;
-    }
-
-    public Station getUpStation() {
-        return upStation;
-    }
-
-    public Station getDownStation() {
-        return downStation;
-    }
-
-    public int getDistance() {
-        return distance;
-    }
-
 }
