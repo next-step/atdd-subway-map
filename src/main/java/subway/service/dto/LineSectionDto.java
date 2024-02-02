@@ -1,5 +1,6 @@
 package subway.service.dto;
 
+import subway.domain.Section;
 import subway.domain.Station;
 
 public class LineSectionDto {
@@ -29,5 +30,11 @@ public class LineSectionDto {
 
     public Integer getDistance() {
         return distance;
+    }
+
+    public static LineSectionDto from(Section section) {
+        StationDto upStation = StationDto.from(section.getUpStation());
+        StationDto downStation = StationDto.from(section.getDownStation());
+        return new LineSectionDto(section.getId(), upStation, downStation, section.getDistance());
     }
 }

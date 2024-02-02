@@ -5,6 +5,7 @@ import subway.exception.LineSectionException;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -14,6 +15,8 @@ public class Line {
     private Long id;
     private String name;
     private String color;
+
+    // TODO: Line 도메인 안에 Section 관리 로직을 분리할 수 있도록 Embedded 적용하기
     @OneToMany(mappedBy = "line", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private final List<Section> sections = new ArrayList<>();
 
@@ -24,8 +27,11 @@ public class Line {
 
     protected Line() {}
 
-    public static Line create(String name, String color) {
-        return new Line(name, color);
+    public static Line create(String name, String color, Station upStation, Station downStation, Integer distance) {
+        Line line = new Line(name, color);
+        Section section = Section.create(upStation, downStation, line, distance);
+        line.sections.add(section);
+        return line;
     }
 
     public void update(String name, String color) {
@@ -65,7 +71,7 @@ public class Line {
         if (sections.size() <= 1) {
             throw new LineSectionException();
         }
-        if (getTheMostDownStation().getId() != stationId) {
+        if (!Objects.equals(getTheMostDownStation().getId(), stationId)) {
             throw new LineSectionException();
         }
         sections.remove(sections.size() - 1);

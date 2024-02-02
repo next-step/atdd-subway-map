@@ -1,12 +1,12 @@
 package subway.service.dto;
 
-public class SaveLineSectionDto {
+public class SaveLineSectionCommand {
     private Long lineId;
     private Long upStationId;
     private Long downStationId;
     private Integer distance;
 
-    public SaveLineSectionDto(Long lineId, Long upStationId, Long downStationId, Integer distance) {
+    public SaveLineSectionCommand(Long lineId, Long upStationId, Long downStationId, Integer distance) {
         this.lineId = lineId;
         this.upStationId = upStationId;
         this.downStationId = downStationId;

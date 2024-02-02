@@ -20,13 +20,7 @@ public class LineController {
 
     @PostMapping
     public ResponseEntity<LineResponseBody> createLine(@RequestBody LineCreateRequestBody lineCreateRequestBody) {
-        LineDto line = lineService.saveLine(new SaveLineDto(
-                lineCreateRequestBody.getName(),
-                lineCreateRequestBody.getColor(),
-                lineCreateRequestBody.getUpStationId(),
-                lineCreateRequestBody.getDownStationId(),
-                lineCreateRequestBody.getDistance()
-        ));
+        LineDto line = lineService.saveLine(lineCreateRequestBody.toCommand());
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(LineResponseBody.create(line));
     }
 
@@ -47,11 +41,7 @@ public class LineController {
             @PathVariable Long id,
             @RequestBody LineUpdateRequestBody lineUpdateRequestBody
     ) {
-        lineService.updateLine(new UpdateLineDto(
-                id,
-                lineUpdateRequestBody.getName(),
-                lineUpdateRequestBody.getColor()
-        ));
+        lineService.updateLine(lineUpdateRequestBody.toCommand(id));
         return ResponseEntity.ok().build();
     }
 
@@ -66,12 +56,7 @@ public class LineController {
             @PathVariable Long id,
             @RequestBody SectionCreateRequestBody sectionCreateRequestBody
     ) {
-        lineService.saveLineSection(new SaveLineSectionDto(
-                id,
-                sectionCreateRequestBody.getUpStationId(),
-                sectionCreateRequestBody.getDownStationId(),
-                sectionCreateRequestBody.getDistance()
-        ));
+        lineService.saveLineSection(sectionCreateRequestBody.toCommand(id));
         return ResponseEntity.created(URI.create("/lines/" + id)).build();
     }
 
@@ -81,9 +66,5 @@ public class LineController {
             @RequestParam("stationId") Long stationId) {
         lineService.deleteLineSection(lineId, stationId);
         return ResponseEntity.noContent().build();
-    }
-
-    private StationResponseBody toStationResponseBody(StationDto stationDto) {
-        return new StationResponseBody(stationDto.getId(), stationDto.getName());
     }
 }

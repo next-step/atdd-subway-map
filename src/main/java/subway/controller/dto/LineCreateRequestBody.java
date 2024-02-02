@@ -1,10 +1,22 @@
 package subway.controller.dto;
 
+import subway.service.dto.SaveLineCommand;
+
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+
+
 public class LineCreateRequestBody {
+    @NotBlank
     private String name;
+    @NotBlank
     private String color;
+    @NotBlank
     private Long upStationId;
+    @NotBlank
     private Long downStationId;
+    @NotBlank
+    @Min(value = 1)
     private int distance;
 
     public LineCreateRequestBody(String name, String color, Long upStationId, Long downStationId, int distance) {
@@ -33,5 +45,9 @@ public class LineCreateRequestBody {
 
     public int getDistance() {
         return distance;
+    }
+
+    public SaveLineCommand toCommand() {
+        return new SaveLineCommand(name, color, upStationId, downStationId, distance);
     }
 }

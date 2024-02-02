@@ -1,5 +1,7 @@
 package subway.service.dto;
 
+import subway.domain.Line;
+
 import java.util.List;
 
 public class LineDto {
@@ -29,5 +31,9 @@ public class LineDto {
 
     public List<StationDto> getStations() {
         return stations;
+    }
+
+    public static LineDto from(Line line) {
+        return new LineDto(line.getId(), line.getName(), line.getColor(), StationDto.from(line.getAllStations()));
     }
 }

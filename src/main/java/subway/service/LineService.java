@@ -24,33 +24,33 @@ public class LineService {
     }
 
     @Transactional
-    public LineDto saveLine(SaveLineDto saveLineDto) {
-        Station upStation = stationService.findStationById(saveLineDto.getUpStationId());
-        Station downStation = stationService.findStationById(saveLineDto.getDownStationId());
+    public LineDto saveLine(SaveLineCommand command) {
+        Station upStation = stationService.findStationById(command.getUpStationId());
+        Station downStation = stationService.findStationById(command.getDownStationId());
         Line line = lineRepository.save(Line.create(
-                saveLineDto.getName(),
-                saveLineDto.getColor()
+                command.getName(),
+                command.getColor(),
+                upStation,
+                downStation,
+                command.getDistance()
         ));
-        Section section = Section.create(upStation, downStation, line, saveLineDto.getDistance());
-        line.addSection(section);
-        return this.createLineDto(line);
+        return LineDto.from(line);
     }
 
     public List<LineDto> findAllLines() {
         return lineRepository.findAll().stream()
-                .map(this::createLineDto).collect(Collectors.toList());
+                .map(LineDto::from).collect(Collectors.toList());
     }
 
     public LineDto getLineByIdOrFail(Long id) {
         Line line = this.findLineByIdOrFail(id);
-        return this.createLineDto(line);
+        return LineDto.from(line);
     }
 
     @Transactional
-    public void updateLine(UpdateLineDto updateLineDto) {
-        Line line = this.findLineByIdOrFail(updateLineDto.getTargetId());
-        line.update(updateLineDto.getName(), updateLineDto.getColor());
-        lineRepository.save(line);
+    public void updateLine(UpdateLineCommand command) {
+        Line line = this.findLineByIdOrFail(command.getTargetId());
+        line.update(command.getName(), command.getColor());
     }
 
     @Transactional
@@ -59,16 +59,16 @@ public class LineService {
     }
 
     @Transactional
-    public LineSectionDto saveLineSection(SaveLineSectionDto saveLineSectionDto) {
-        Station upStation = stationService.findStationById(saveLineSectionDto.getUpStationId());
-        Station downStation = stationService.findStationById(saveLineSectionDto.getDownStationId());
+    public LineSectionDto saveLineSection(SaveLineSectionCommand command) {
+        Station upStation = stationService.findStationById(command.getUpStationId());
+        Station downStation = stationService.findStationById(command.getDownStationId());
 
-        Line line = findLineByIdOrFail(saveLineSectionDto.getLineId());
+        Line line = findLineByIdOrFail(command.getLineId());
 
-        Section section = Section.create(upStation, downStation, line, saveLineSectionDto.getDistance());
+        Section section = Section.create(upStation, downStation, line, command.getDistance());
         line.addSection(section);
 
-        return createLineSectionDto(section);
+        return LineSectionDto.from(section);
     }
 
     @Transactional
@@ -79,32 +79,5 @@ public class LineService {
 
     private Line findLineByIdOrFail(Long id) {
         return lineRepository.findById(id).orElseThrow(EntityNotFoundException::new);
-    }
-
-    private LineDto createLineDto(Line line) {
-        return new LineDto(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                createStationDto(line.getAllStations())
-        );
-    }
-
-    private LineSectionDto createLineSectionDto(Section section) {
-        Station upStation = section.getUpStation();
-        Station downStation = section.getDownStation();
-
-        return new LineSectionDto(
-                section.getId(),
-                new StationDto(upStation.getId(), upStation.getName()),
-                new StationDto(downStation.getId(), downStation.getName()),
-                section.getDistance()
-        );
-    }
-
-    private List<StationDto> createStationDto(List<Station> stations) {
-        return stations.stream()
-                .map(station -> new StationDto(station.getId(), station.getName()))
-                .collect(Collectors.toList());
     }
 }
