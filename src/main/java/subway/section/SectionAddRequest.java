@@ -1,5 +1,8 @@
 package subway.section;
 
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 import subway.lines.Line;
 
 public class SectionAddRequest {
@@ -27,9 +30,22 @@ public class SectionAddRequest {
     }
 
     public Section getSection(Line line) {
-       final Section section = new Section(upStationId, downStationId, distance);
-       section.updateLine(line);
+        return new Section(line, upStationId, downStationId, distance);
+    }
 
-       return section;
+    public void validateSectionToAdd(Line line) {
+        final Set<Long> stationIdSet = new HashSet<>();
+        line.getSections().forEach(section -> {
+            stationIdSet.add(section.getUpStationId());
+            stationIdSet.add(section.getDownStationId());
+        });
+
+        if (stationIdSet.contains(downStationId)) {
+            throw new IllegalArgumentException();
+        }
+
+        if (!Objects.equals(upStationId, line.getDownStationId())) {
+            throw new IllegalArgumentException();
+        }
     }
 }
