@@ -6,9 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.jdbc.Sql;
 import subway.controller.dto.LineCreateRequest;
 import subway.controller.dto.SectionAddRequest;
 
@@ -22,8 +20,7 @@ import static subway.SectionApiRequester.*;
 import static subway.StationApiRequester.createStation;
 
 @DisplayName("지하철 노선 구간 관련 기능")
-@Sql(value = "/sql/truncate-all-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@AcceptanceTest
 public class LineSectionAcceptanceTest {
 
     @DisplayName("지하철 노선 구간 등록")

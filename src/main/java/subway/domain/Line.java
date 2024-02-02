@@ -1,17 +1,16 @@
 package subway.domain;
 
-import subway.exception.SectionAddFailureException;
-import subway.exception.SectionDeleteFailureException;
-
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Table;
 import java.util.List;
 
 /** 지하철 노선 엔티티 */
+@Table(name = "line")
 @Entity
 public class Line {
 

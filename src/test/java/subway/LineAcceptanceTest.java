@@ -3,14 +3,12 @@ package subway;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.jdbc.SqlGroup;
 import subway.controller.dto.LineCreateRequest;
 import subway.controller.dto.LineUpdateRequest;
 
@@ -19,13 +17,10 @@ import java.util.List;
 import static helper.JsonPathUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static subway.LineApiRequester.*;
+import static subway.StationApiRequester.createStation;
 
 @DisplayName("지하철 노선 관련 기능")
-@SqlGroup({
-    @Sql(value = "/sql/setup-station-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD),
-    @Sql(value = "/sql/truncate-all-data.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-})
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@AcceptanceTest
 public class LineAcceptanceTest {
 
     /**
@@ -35,13 +30,23 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선 생성")
     @Nested
     class 지하철_노선_생성_테스트 {
+
+        long upStationId;
+        long downStationId;
+
+        @BeforeEach
+        void setup() {
+            upStationId = getLongPath(createStation("수원역"), "id");
+            downStationId = getLongPath(createStation("고색역"), "id");
+        }
+
         // TODO: 유효하지 않은 값에 대한 검증 추가
         @DisplayName("지하철 노선을 생성하면, 생성한 노선을 찾을 수 있다")
         @Test
         void createSubwayLine() {
             // given
             LineCreateRequest 수인분당선 = new LineCreateRequest(
-                "수인분당선", "bg-yellow-600", 1L, 2L, 10
+                "수인분당선", "bg-yellow-600", upStationId, downStationId, 10
             );
 
             // when
@@ -70,16 +75,29 @@ public class LineAcceptanceTest {
     @Nested
     class 지하철_노선_목록_조회_테스트 {
 
+        long 수인분당선_upStationId;
+        long 수인분당선_downStationId;
+        long 신분당선_upStationId;
+        long 신분당선_downStationId;
+
+        @BeforeEach
+        void setup() {
+            수인분당선_upStationId = getLongPath(createStation("수원역"), "id");
+            수인분당선_downStationId = getLongPath(createStation("고색역"), "id");
+
+            신분당선_upStationId = getLongPath(createStation("강남역"), "id");
+            신분당선_downStationId = getLongPath(createStation("양재역"), "id");
+        }
+
         @DisplayName("생성한 지하철 노선을 모두 조회할 수 있다")
         @Test
         void will_return_created_subway_lines() {
-            // TODO: Request DTO 사용으로 변경?
             // given
             LineCreateRequest 수인분당선 = new LineCreateRequest(
-                "수인분당선", "bg-yellow-600", 1L, 2L, 10
+                "수인분당선", "bg-yellow-600", 수인분당선_upStationId, 수인분당선_downStationId, 10
             );
             LineCreateRequest 신분당선 = new LineCreateRequest(
-                "신분당선", "bg-red-600", 11L, 12L, 5
+                "신분당선", "bg-red-600", 신분당선_upStationId, 신분당선_downStationId, 5
             );
 
             createLine(수인분당선);
@@ -102,13 +120,23 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선 조회")
     @Nested
     class 지하철_노선_조회_테스트 {
+
+        long upStationId;
+        long downStationId;
+
+        @BeforeEach
+        void setup() {
+            upStationId = getLongPath(createStation("수원역"), "id");
+            downStationId = getLongPath(createStation("고색역"), "id");
+        }
+
         // TODO: 찾을 수 없는 노선 ID가 주어지는 경우 검증
         @DisplayName("생성한 지하철 노선을 조회하면 해당 노선의 정보를 응답받는다")
         @Test
         void will_return_subway_line() {
             // given
             LineCreateRequest 수인분당선 = new LineCreateRequest(
-                "수인분당선", "bg-yellow-600", 1L, 2L, 10
+                "수인분당선", "bg-yellow-600", upStationId, downStationId, 10
             );
 
             ExtractableResponse<Response> createSubwayResponse = createLine(수인분당선);
@@ -131,13 +159,23 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선 수정")
     @Nested
     class 지하철_노선_수정_테스트 {
+
+        long upStationId;
+        long downStationId;
+
+        @BeforeEach
+        void setup() {
+            upStationId = getLongPath(createStation("수원역"), "id");
+            downStationId = getLongPath(createStation("고색역"), "id");
+        }
+
         // TODO: 유효하지 않은 수정 데이터 검증
         @DisplayName("생성한 지하철 노선을 수정하면 해당 지하철 노선 정보는 수정된다")
         @Test
         void will_return_updated_subway_line_data() {
             // given
             LineCreateRequest 수인분당선 = new LineCreateRequest(
-                "수인분당선", "bg-yellow-600", 1L, 2L, 10
+                "수인분당선", "bg-yellow-600", upStationId, downStationId, 10
             );
 
             ExtractableResponse<Response> createSubwayResponse = createLine(수인분당선);
@@ -177,12 +215,21 @@ public class LineAcceptanceTest {
     @Nested
     class 지하철_노선_삭제_테스트 {
 
+        long upStationId;
+        long downStationId;
+
+        @BeforeEach
+        void setup() {
+            upStationId = getLongPath(createStation("수원역"), "id");
+            downStationId = getLongPath(createStation("고색역"), "id");
+        }
+
         @DisplayName("생성한 지하철 노선을 삭제하면 해당 지하철 노선 정보는 삭제된다")
         @Test
         void will_delete_subway_line() {
             // given
             LineCreateRequest 수인분당선 = new LineCreateRequest(
-                "수인분당선", "bg-yellow-600", 1L, 2L, 10
+                "수인분당선", "bg-yellow-600", upStationId, downStationId, 10
             );
 
             ExtractableResponse<Response> createSubwayResponse = createLine(수인분당선);

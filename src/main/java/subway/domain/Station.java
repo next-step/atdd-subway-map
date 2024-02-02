@@ -2,6 +2,7 @@ package subway.domain;
 
 import javax.persistence.*;
 
+@Table(name = "station")
 @Entity
 public class Station {
 
