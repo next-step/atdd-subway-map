@@ -2,7 +2,6 @@ package subway.api.domain.specification;
 
 import subway.api.domain.dto.inport.SectionCreateCommand;
 import subway.api.domain.model.entity.Line;
-import subway.api.interfaces.dto.SectionCreateRequest;
 
 /**
  * @author : Rene Choi

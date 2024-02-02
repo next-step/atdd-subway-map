@@ -3,6 +3,7 @@ package subway.api.infrastructure.operators;
 import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
+import subway.api.domain.dto.inport.LineCreateCommand;
 import subway.api.domain.dto.inport.SectionCreateCommand;
 import subway.api.domain.model.entity.Line;
 import subway.api.domain.model.entity.Section;
@@ -10,8 +11,7 @@ import subway.api.domain.model.entity.Station;
 import subway.api.domain.operators.SectionFactory;
 import subway.api.infrastructure.persistence.SectionRepository;
 import subway.api.infrastructure.persistence.StationRepository;
-import subway.api.interfaces.dto.LineCreateRequest;
-import subway.api.interfaces.dto.SectionCreateRequest;
+import subway.api.interfaces.dto.request.LineCreateRequest;
 
 /**
  * @author : Rene Choi
@@ -24,7 +24,7 @@ public class SimpleSectionFactory implements SectionFactory {
 	private final SectionRepository sectionRepository;
 
 	@Override
-	public Section createSection(LineCreateRequest request, Line line) {
+	public Section createSection(LineCreateCommand request, Line line) {
 
 		Station upStation = stationRepository.findById(request.getUpStationId()).orElseThrow();
 		Station downStation = stationRepository.findById(request.getDownStationId()).orElseThrow();

@@ -1,7 +1,7 @@
 package subway.fixture;
 
-import subway.api.interfaces.dto.LineCreateRequest;
-import subway.api.interfaces.dto.LineUpdateRequest;
+import subway.api.interfaces.dto.request.LineCreateRequest;
+import subway.api.interfaces.dto.request.LineUpdateRequest;
 
 /**
  * @author : Rene Choi

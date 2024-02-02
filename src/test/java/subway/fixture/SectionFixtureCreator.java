@@ -1,6 +1,6 @@
 package subway.fixture;
 
-import subway.api.interfaces.dto.SectionCreateRequest;
+import subway.api.interfaces.dto.request.SectionCreateRequest;
 
 /**
  * @author : Rene Choi

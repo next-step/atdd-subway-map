@@ -1,4 +1,4 @@
-package subway.api.interfaces.dto;
+package subway.api.interfaces.dto.request;
 
 import jdk.jfr.Description;
 import lombok.AllArgsConstructor;

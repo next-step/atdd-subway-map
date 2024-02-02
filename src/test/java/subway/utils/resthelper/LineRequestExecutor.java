@@ -6,8 +6,8 @@ import static org.springframework.http.MediaType.*;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
-import subway.api.interfaces.dto.LineCreateRequest;
-import subway.api.interfaces.dto.LineUpdateRequest;
+import subway.api.interfaces.dto.request.LineCreateRequest;
+import subway.api.interfaces.dto.request.LineUpdateRequest;
 
 /**
  * @author : Rene Choi

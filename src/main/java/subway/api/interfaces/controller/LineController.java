@@ -13,10 +13,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
+import subway.api.domain.dto.inport.LineCreateCommand;
+import subway.api.domain.dto.inport.LineUpdateCommand;
 import subway.api.domain.service.LineService;
-import subway.api.interfaces.dto.LineCreateRequest;
-import subway.api.interfaces.dto.LineResponse;
-import subway.api.interfaces.dto.LineUpdateRequest;
+import subway.api.interfaces.dto.request.LineCreateRequest;
+import subway.api.interfaces.dto.response.LineResponse;
+import subway.api.interfaces.dto.request.LineUpdateRequest;
 
 /**
  * @author : Rene Choi
@@ -30,7 +32,7 @@ public class LineController {
 
 	@PostMapping("/lines")
 	public ResponseEntity<LineResponse> createLine(@RequestBody LineCreateRequest createRequest) {
-		LineResponse station = service.saveLine(createRequest);
+		LineResponse station = service.saveLine(LineCreateCommand.from(createRequest));
 		return ResponseEntity.created(URI.create("/lines/" + station.getId())).body(station);
 	}
 
@@ -46,7 +48,7 @@ public class LineController {
 
 	@PutMapping("/lines/{id}")
 	public ResponseEntity<LineResponse> updateLine(@PathVariable Long id, @RequestBody LineUpdateRequest updateRequest) {
-		return ResponseEntity.ok().body(service.updateLineById(id, updateRequest));
+		return ResponseEntity.ok().body(service.updateLineById(id, LineUpdateCommand.from(updateRequest)));
 	}
 
 	@DeleteMapping("/lines/{id}")

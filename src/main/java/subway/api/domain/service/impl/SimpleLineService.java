@@ -9,15 +9,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import subway.api.domain.dto.inport.LineCreateCommand;
+import subway.api.domain.dto.inport.LineUpdateCommand;
 import subway.api.domain.model.entity.Line;
 import subway.api.domain.model.entity.Section;
 import subway.api.domain.operators.LineFactory;
 import subway.api.domain.operators.LineResolver;
 import subway.api.domain.operators.SectionFactory;
 import subway.api.domain.service.LineService;
-import subway.api.interfaces.dto.LineCreateRequest;
-import subway.api.interfaces.dto.LineResponse;
-import subway.api.interfaces.dto.LineUpdateRequest;
+import subway.api.interfaces.dto.request.LineCreateRequest;
+import subway.api.interfaces.dto.response.LineResponse;
+import subway.api.interfaces.dto.request.LineUpdateRequest;
 
 /**
  * @author : Rene Choi
@@ -34,7 +36,7 @@ public class SimpleLineService implements LineService {
 
 	@Override
 	@Transactional
-	public LineResponse saveLine(LineCreateRequest request) {
+	public LineResponse saveLine(LineCreateCommand request) {
 		Line line = lineFactory.createLine(request);
 		Section section = sectionFactory.createSection(request, line);
 
@@ -55,7 +57,7 @@ public class SimpleLineService implements LineService {
 
 	@Override
 	@Transactional
-	public LineResponse updateLineById(Long id, LineUpdateRequest updateRequest) {
+	public LineResponse updateLineById(Long id, LineUpdateCommand updateRequest) {
 		Line line = fetchLineOrThrow(id);
 
 		line

@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 import subway.api.domain.dto.inport.SectionCreateCommand;
 import subway.api.domain.dto.outport.SectionInfo;
 import subway.api.domain.service.SectionService;
-import subway.api.interfaces.dto.SectionCreateRequest;
+import subway.api.interfaces.dto.request.SectionCreateRequest;
 
 /**
  * @author : Rene Choi

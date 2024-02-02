@@ -2,7 +2,6 @@ package subway.api.domain.service;
 
 import subway.api.domain.dto.inport.SectionCreateCommand;
 import subway.api.domain.dto.outport.SectionInfo;
-import subway.api.interfaces.dto.SectionCreateRequest;
 
 /**
  * @author : Rene Choi

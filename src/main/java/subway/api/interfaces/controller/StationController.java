@@ -6,21 +6,20 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.util.List;
 
+import lombok.RequiredArgsConstructor;
+import subway.api.domain.dto.inport.StationCreateCommand;
 import subway.api.domain.service.impl.StationService;
-import subway.api.interfaces.dto.StationRequest;
-import subway.api.interfaces.dto.StationResponse;
+import subway.api.interfaces.dto.request.StationCreateRequest;
+import subway.api.interfaces.dto.response.StationResponse;
 
 @RestController
+@RequiredArgsConstructor
 public class StationController {
-    private StationService stationService;
-
-    public StationController(StationService stationService) {
-        this.stationService = stationService;
-    }
+    private final StationService stationService;
 
     @PostMapping("/stations")
-    public ResponseEntity<StationResponse> createStation(@RequestBody StationRequest stationRequest) {
-        StationResponse station = stationService.saveStation(stationRequest);
+    public ResponseEntity<StationResponse> createStation(@RequestBody StationCreateRequest stationCreateRequest) {
+        StationResponse station = stationService.saveStation(StationCreateCommand.from(stationCreateRequest));
         return ResponseEntity.created(URI.create("/stations/" + station.getId())).body(station);
     }
 

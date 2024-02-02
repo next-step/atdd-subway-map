@@ -9,7 +9,6 @@ import subway.api.domain.dto.inport.SectionCreateCommand;
 import subway.api.domain.model.entity.Line;
 import subway.api.domain.operators.SectionCreationValidator;
 import subway.api.domain.specification.SubwaySpecification;
-import subway.api.interfaces.dto.SectionCreateRequest;
 import subway.common.exception.SectionCreationNotValidException;
 
 /**

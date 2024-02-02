@@ -18,7 +18,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import subway.api.interfaces.dto.LineCreateRequest;
+import subway.api.domain.dto.inport.LineCreateCommand;
+import subway.api.interfaces.dto.request.LineCreateRequest;
 import subway.common.exception.SectionDeletionNotValidException;
 import subway.common.mapper.ModelMapperBasedObjectMapper;
 
@@ -56,8 +57,8 @@ public class Line {
 	@JsonManagedReference
 	private SortedSet<Section> sections = new TreeSet<>();
 
-	public static Line from(LineCreateRequest createRequest) {
-		return ModelMapperBasedObjectMapper.convert(createRequest, Line.class);
+	public static Line from(LineCreateCommand createCommand) {
+		return ModelMapperBasedObjectMapper.convert(createCommand, Line.class);
 	}
 
 	public void updateLink(Section section) {

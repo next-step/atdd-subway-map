@@ -4,7 +4,7 @@ import java.util.List;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import subway.api.interfaces.dto.LineResponse;
+import subway.api.interfaces.dto.response.LineResponse;
 
 /**
  * @author : Rene Choi

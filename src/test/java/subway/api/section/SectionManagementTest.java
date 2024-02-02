@@ -14,8 +14,8 @@ import org.springframework.http.HttpStatus;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import subway.api.CommonAcceptanceTest;
-import subway.api.interfaces.dto.LineCreateRequest;
-import subway.api.interfaces.dto.SectionCreateRequest;
+import subway.api.interfaces.dto.request.LineCreateRequest;
+import subway.api.interfaces.dto.request.SectionCreateRequest;
 
 /**
  * @author : Rene Choi

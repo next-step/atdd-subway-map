@@ -2,7 +2,6 @@ package subway.api.domain.service.impl;
 
 import static org.springframework.http.HttpStatus.*;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,7 +16,6 @@ import subway.api.domain.operators.SectionFactory;
 import subway.api.domain.operators.StationResolver;
 import subway.api.domain.operators.impl.SimpleSectionCreationValidator;
 import subway.api.domain.service.SectionService;
-import subway.api.interfaces.dto.SectionCreateRequest;
 import subway.common.exception.LineNotFoundException;
 import subway.common.exception.SectionDeletionNotValidException;
 import subway.common.exception.StationNotFoundException;

@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import subway.api.interfaces.dto.SectionCreateRequest;
+import subway.api.interfaces.dto.request.SectionCreateRequest;
 import subway.common.mapper.ModelMapperBasedObjectMapper;
 
 /**

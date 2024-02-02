@@ -1,4 +1,4 @@
-package subway.api.interfaces.dto;
+package subway.api.interfaces.dto.response;
 
 public class StationResponse {
     private Long id;
