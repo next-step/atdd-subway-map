@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import subway.controller.dto.LineCreateRequest;
 import subway.controller.dto.LineResponse;
 import subway.controller.dto.SectionCreateRequest;
@@ -105,12 +106,16 @@ public class SectionAcceptanceTest extends AcceptanceTest {
      * GIVEN 지하철 역을 생성하고
      * GIVEN 지하철 역에 노선을 등록하고
      * GIVEN 구간을 등록하고
-     * WHEN 새로운 지하철 구간 등록시 노선의 총 거리가 기존의 노선 거리랑 작거나 같다면
+     * WHEN 새로운 지하철 구간 등록시 노선의 길이 보다 작거나 같다면
      * Then 새로운 구간을 등록할 수 없다
      */
-    @Test
-    void 실패_새로운_지하철_구간_등록시_노선의_총_거리가_기존의_노선_거리랑_작거나_같다면_예외가_발생한다() {
-
+    @ParameterizedTest
+    @ValueSource(ints = {10, 9})
+    void 실패_새로운_지하철_구간_등록시_노선_길이보다_작거나_같다면_예외가_발생한다(int distance) {
+        SectionCreateRequest request = sectionCreateRequest(SEOLLEUNG_STATION_ID, YANGJAE_STATION_ID, distance);
+        String message = post("/lines/{lineId}/sections", request, OK.value(), SHINBUNDANG_LINE_ID)
+                .as(ExceptionResponse.class).getMessage();
+        assertThat(message).isEqualTo("새로운 구간의 길이는 노선의 길이 보다 작거나 같을 수 없습니다.");
     }
 
     /**
