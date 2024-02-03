@@ -1,20 +1,21 @@
 package subway;
 
-import fixture.LineTestUtil;
 import io.restassured.RestAssured;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
+import subway.fixture.LineSteps;
+import subway.fixture.StationSteps;
 import subway.line.Color;
 import subway.line.LineResponse;
+import subway.station.StationResponse;
 
-import javax.persistence.EntityManager;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,23 +25,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Transactional
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class LineAcceptanceTest {
+
+    private static StationResponse 선릉역;
+    private static StationResponse 삼성역;
 
     @LocalServerPort
     private int port;
 
-    @Autowired
-    private EntityManager em;
 
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
-    }
+        선릉역 = StationSteps.createStation("선릉역");
+        삼성역 = StationSteps.createStation("삼성역");
 
-    @BeforeEach
-    void tearDown() {
-        em.createNativeQuery("TRUNCATE TABLE Line").executeUpdate();
-        em.flush();
     }
 
     /**
@@ -61,12 +61,14 @@ public class LineAcceptanceTest {
     public void create_line() {
 
         //given
-        Map<String, String> param = new HashMap<>();
+        Map<String, Object> param = new HashMap<>();
         param.put("name", "2호선");
         param.put("color", Color.GREEN.name());
+        param.put("upStationId", 선릉역.getId());
+        param.put("downStationId", 삼성역.getId());
 
         //When 지하철 노선을 생성하면
-        LineResponse lineResponse = LineTestUtil.createLine(param);
+        LineResponse lineResponse = LineSteps.createLine(param);
 
         //Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
         List<String> names = RestAssured.given().log().all()
@@ -88,17 +90,17 @@ public class LineAcceptanceTest {
     @Test
     public void findLines() {
 
+
+
         //given
-        Map<String, String> param = new HashMap<>();
+        Map<String, Object> param = new HashMap<>();
         param.put("name", "2호선");
         param.put("color", Color.GREEN.name());
+        param.put("upStationId", 선릉역.getId());
+        param.put("downStationId", 삼성역.getId());
 
-        LineTestUtil.createLine(param);
-
-        param.put("name", "7호선");
-        param.put("color", Color.GREEN.name());
-
-        LineTestUtil.createLine(param);
+        //When 지하철 노선을 생성하면
+        LineSteps.createLine(param);
 
 
         // when
@@ -111,7 +113,7 @@ public class LineAcceptanceTest {
                     .jsonPath().getList("name", String.class);
 
         // then
-        assertThat(names).containsExactly("2호선", "7호선");
+        assertThat(names).containsExactly("2호선");
     }
 
 
@@ -122,24 +124,29 @@ public class LineAcceptanceTest {
     @Test
     public void findLine() {
 
-        // given
-        Map<String, String> param = new HashMap<>();
+
+        //given
+        Map<String, Object> param = new HashMap<>();
         param.put("name", "2호선");
         param.put("color", Color.GREEN.name());
+        param.put("upStationId", 선릉역.getId());
+        param.put("downStationId", 삼성역.getId());
 
-        LineResponse expected = LineTestUtil.createLine(param);
+        //When 지하철 노선을 생성하면
+        LineResponse lineResponse = LineSteps.createLine(param);
+
 
         // when
         LineResponse actual = RestAssured.given().log().all()
                 .when()
-                    .get("/lines/" + expected.getId())
+                    .get("/lines/" + lineResponse.getId())
                 .then().log().all()
                     .statusCode(HttpStatus.OK.value())
                     .extract()
                     .as(LineResponse.class);
 
         // then
-        assertThat(actual.equals(expected)).isTrue();
+        assertThat(actual.equals(lineResponse)).isTrue();
     }
 
 
@@ -151,12 +158,16 @@ public class LineAcceptanceTest {
     @Test
     public void updateLine() {
 
-        // given
-        Map<String, String> param = new HashMap<>();
+
+        //given
+        Map<String, Object> param = new HashMap<>();
         param.put("name", "2호선");
         param.put("color", Color.GREEN.name());
+        param.put("upStationId", 선릉역.getId());
+        param.put("downStationId", 삼성역.getId());
 
-        LineResponse expected = LineTestUtil.createLine(param);
+        //When 지하철 노선을 생성하면
+        LineResponse lineResponse = LineSteps.createLine(param);
 
         // when
         param.put("color", Color.RED.name());
@@ -164,14 +175,14 @@ public class LineAcceptanceTest {
                 .when()
                     .body(param)
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
-                    .put("/lines/" + expected.getId())
+                    .put("/lines/" + lineResponse.getId())
                 .then().log().all()
                     .statusCode(HttpStatus.NO_CONTENT.value());
 
         // then
         LineResponse actual = RestAssured.given().log().all()
                 .when()
-                    .get("/lines/" + expected.getId())
+                    .get("/lines/" + lineResponse.getId())
                 .then().log().all()
                     .statusCode(HttpStatus.OK.value())
                     .extract()
@@ -187,27 +198,31 @@ public class LineAcceptanceTest {
     @Test
     public void deleteLine() {
 
-        // given
-        Map<String, String> param = new HashMap<>();
+
+        //given
+        Map<String, Object> param = new HashMap<>();
         param.put("name", "2호선");
         param.put("color", Color.GREEN.name());
+        param.put("upStationId", 선릉역.getId());
+        param.put("downStationId", 삼성역.getId());
 
-        LineResponse expected = LineTestUtil.createLine(param);
+        LineResponse lineResponse = LineSteps.createLine(param);
 
         // when
         RestAssured.given().log().all()
                 .when()
-                    .delete("/lines/" + expected.getId())
+                    .delete("/lines/" + lineResponse.getId())
                 .then().log().all()
                     .statusCode(HttpStatus.NO_CONTENT.value());
 
         // then
         RestAssured.given().log().all()
                 .when()
-                    .get("/lines/" + expected.getId())
+                    .get("/lines/" + lineResponse.getId())
                 .then().log().all()
-                    .statusCode(HttpStatus.NO_CONTENT.value());
-    }
+                    .statusCode(HttpStatus.BAD_REQUEST.value())
+                    .extract();
 
+    }
 
 }

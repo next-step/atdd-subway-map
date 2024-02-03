@@ -1,14 +1,18 @@
 package subway;
 
 import io.restassured.RestAssured;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import subway.station.StationResponse;
 
+import javax.persistence.EntityManager;
 import java.util.Collections;
 import java.util.List;
 
@@ -16,12 +20,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class StationAcceptanceTest {
     
     private final static String GET_STATIONS_URL = "/stations";
     private final static String POST_STATIONS_URL = "/stations";
     private final static String DELETE_STATIONS_URL = "/stations/%d";
+    //@Autowired
+    //private EntityManager em;
 
+    @BeforeEach
+    void setUp() {
+        //em.createNativeQuery("TRUNCATE TABLE Station").executeUpdate();
+        //em.flush();
+    }
 
     /**
      * When 지하철역을 생성하면
