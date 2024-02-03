@@ -1,13 +1,18 @@
 package subway.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class StationSectionResponse {
 
     private Long id;
 
+    @JsonIgnore
     private Long upStationId;
 
+    @JsonIgnore
     private Long downStationId;
 
+    @JsonIgnore
     private int distance;
 
     public StationSectionResponse(Long id, Long upStationId, Long downStationId, int distance) {

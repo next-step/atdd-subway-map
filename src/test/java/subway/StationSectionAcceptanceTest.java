@@ -13,9 +13,10 @@ import org.springframework.test.annotation.DirtiesContext;
 import subway.dto.StationLineRequest;
 import subway.dto.StationSectionRequest;
 
+import java.util.Arrays;
+
 import static config.fixtures.subway.StationLineMockData.호남선_생성;
-import static config.fixtures.subway.StationMockData.독산역;
-import static config.fixtures.subway.StationMockData.역_10개;
+import static config.fixtures.subway.StationMockData.*;
 import static config.fixtures.subway.StationSectionMockData.지하철_구간;
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;

@@ -25,7 +25,7 @@ public class StationSectionService {
     }
 
     @Transactional
-    public StationSectionResponse saveStationSection(StationSectionRequest request) {
+    public StationSectionResponse createStationSection(StationSectionRequest request) {
         StationLine stationLine = findStationLineById(request.getStationLineId());
         StationSection stationSection = convertToStationSectionEntity(request);
 
@@ -42,7 +42,7 @@ public class StationSectionService {
     public void deleteStationSection(Long stationLineId, Long stationIdToDelete) {
         StationLine stationLine = findStationLineById(stationLineId);
 
-        if(!stationLine.canDelete(stationIdToDelete)) {
+        if (!stationLine.canDelete(stationIdToDelete)) {
             throw new IllegalArgumentException("요청한 구간(혹은 역)을 삭제할 수 없습니다.");
         }
     }
@@ -72,10 +72,10 @@ public class StationSectionService {
 
     private StationSectionResponse convertToResponse(StationSection stationSection) {
         return new StationSectionResponse(
-            stationSection.getId(),
-            stationSection.getUpStationId(),
-            stationSection.getDownStationId(),
-            stationSection.getDistance()
+                stationSection.getId(),
+                stationSection.getUpStationId(),
+                stationSection.getDownStationId(),
+                stationSection.getDistance()
         );
     }
 }

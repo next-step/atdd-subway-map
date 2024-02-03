@@ -4,19 +4,23 @@ import config.fixtures.subway.StationLineMockData;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import subway.dto.StationLineRequest;
+import subway.dto.StationLineResponse;
 import subway.entity.StationLine;
 
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static config.fixtures.subway.StationMockData.역_10개;
 import static org.assertj.core.api.Assertions.assertThat;
 import static subway.StationLineSteps.*;
+import static subway.StationSteps.지하철_역_생성_요청;
 import static utils.HttpResponseUtils.getCreatedLocationId;
 
 @DisplayName("지하철 노선 관련 기능")
@@ -24,11 +28,17 @@ import static utils.HttpResponseUtils.getCreatedLocationId;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationLineAcceptanceTest {
 
+    public static final String ID_KEY = "id";
     public static final String NAME_KEY = "name";
     public static final String COLOR_KEY = "color";
     public static final String UP_STATION_ID_KEY = "upStationId";
     public static final String DOWN_STATION_ID_KEY = "downStationId";
     public static final String DISTANCE_KEY = "distance";
+
+    @BeforeEach
+    void 초기_지하철_역_설정() {
+        지하철_역_생성_요청(역_10개);
+    }
 
     /**
      * When 지하철 노선을 생성하면
@@ -45,8 +55,8 @@ public class StationLineAcceptanceTest {
         지하철_노선_생성_요청_검증_포함(신분당선);
 
         // then
-        assertThat(convertStationLines(모든_지하철_노선_조회_요청())).usingRecursiveComparison()
-                .ignoringFields("id", "sections")
+        assertThat(convertStationLineResponses(모든_지하철_노선_조회_요청())).usingRecursiveComparison()
+                .ignoringFields("id", "stations")
                 .isEqualTo(List.of(신분당선));
     }
 
@@ -66,8 +76,8 @@ public class StationLineAcceptanceTest {
         지하철_노선_생성_요청_검증_포함(분당선);
 
         // when
-        assertThat(convertStationLines(모든_지하철_노선_조회_요청())).usingRecursiveComparison()
-                .ignoringFields("id", "sections")
+        assertThat(convertStationLineResponses(모든_지하철_노선_조회_요청())).usingRecursiveComparison()
+                .ignoringFields("id", "stations")
                 .isEqualTo(List.of(신분당선, 분당선));
     }
 
@@ -84,8 +94,8 @@ public class StationLineAcceptanceTest {
         ExtractableResponse<Response> response = 지하철_노선_생성_요청_검증_포함(신분당선);
 
         // when, then
-        assertThat(convertStationLine(지하철_노선_조회_요청(getCreatedLocationId(response)))).usingRecursiveComparison()
-                .ignoringFields("id", "sections")
+        assertThat(convertStationLineResponse(지하철_노선_조회_요청(getCreatedLocationId(response)))).usingRecursiveComparison()
+                .ignoringFields("id", "stations")
                 .isEqualTo(신분당선);
     }
 
@@ -107,8 +117,8 @@ public class StationLineAcceptanceTest {
         지하철_노선_수정_요청(수정된_신분당선, getCreatedLocationId(createResponse));
 
         // then
-        assertThat(convertStationLine(지하철_노선_조회_요청(getCreatedLocationId(createResponse)))).usingRecursiveComparison()
-                .ignoringFields("id", "sections")
+        assertThat(convertStationLineResponse(지하철_노선_조회_요청(getCreatedLocationId(createResponse)))).usingRecursiveComparison()
+                .ignoringFields("id", "stations")
                 .isEqualTo(수정된_신분당선);
     }
 
@@ -131,48 +141,36 @@ public class StationLineAcceptanceTest {
         지하철_노선_삭제_요청(getCreatedLocationId(createResponse));
 
         // then
-        assertThat(convertStationLines(모든_지하철_노선_조회_요청())).usingRecursiveComparison()
-                .ignoringFields("id", "sections")
+        assertThat(convertStationLineResponses(모든_지하철_노선_조회_요청())).usingRecursiveComparison()
+                .ignoringFields("id", "stations")
                 .isEqualTo(List.of(분당선));
     }
 
-    /**
-     * 주어진 JsonPath로 부터 StationLine 객체 목록 만들어서 반환
-     *
-     * @param jsonPath JSON 응답 객체
-     * @return StationLine 객체 목록
-     */
-    private List<StationLine> convertStationLines(JsonPath jsonPath) {
+    private List<StationLineResponse> convertStationLineResponses(JsonPath jsonPath) {
+        List<Long> ids = jsonPath.getList(ID_KEY, Long.class);
         List<String> names = jsonPath.getList(NAME_KEY, String.class);
         List<String> colors = jsonPath.getList(COLOR_KEY, String.class);
-        List<Long> upStationIds = jsonPath.getList(UP_STATION_ID_KEY, Long.class);
-        List<Long> downStationIds = jsonPath.getList(DOWN_STATION_ID_KEY, Long.class);
-        List<Integer> distances = jsonPath.getList(DISTANCE_KEY, Integer.class);
 
         return IntStream.range(0, names.size())
-                .mapToObj(i -> new StationLine(
+                .mapToObj(i -> new StationLineResponse(
+                        ids.get(i),
                         names.get(i),
-                        colors.get(i),
-                        upStationIds.get(i),
-                        downStationIds.get(i),
-                        distances.get(i)
+                        colors.get(i)
                 ))
                 .collect(Collectors.toList());
     }
 
     /**
-     * 주어진 JsonPath로 부터 StationLine 객체를 만들어서 반환
+     * 주어진 JsonPath로 부터 StationLineResponse 객체를 만들어서 반환
      *
      * @param jsonPath JSON 응답 객체
-     * @return StationLine 객체
+     * @return StationLineResponse 객체
      */
-    private StationLine convertStationLine(JsonPath jsonPath) {
-        return new StationLine(
+    private StationLineResponse convertStationLineResponse(JsonPath jsonPath) {
+        return new StationLineResponse(
+                jsonPath.getLong(ID_KEY),
                 jsonPath.get(NAME_KEY).toString(),
-                jsonPath.get(COLOR_KEY).toString(),
-                Long.parseLong(jsonPath.get(UP_STATION_ID_KEY).toString()),
-                Long.parseLong(jsonPath.get(DOWN_STATION_ID_KEY).toString()),
-                Integer.parseInt(jsonPath.get(DISTANCE_KEY).toString())
+                jsonPath.get(COLOR_KEY).toString()
         );
     }
 }

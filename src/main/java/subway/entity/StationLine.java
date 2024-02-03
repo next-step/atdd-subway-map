@@ -98,4 +98,9 @@ public class StationLine {
     public void updateDownStation(Long downStationId) {
         this.downStationId = downStationId;
     }
+
+    public StationLine setStationSection(StationSection createdStationSection) {
+        this.sections.add(createdStationSection);
+        return this;
+    }
 }

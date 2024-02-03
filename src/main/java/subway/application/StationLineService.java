@@ -4,12 +4,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.dto.StationLineRequest;
 import subway.dto.StationLineResponse;
-import subway.dto.StationSectionResponse;
+import subway.dto.StationResponse;
 import subway.entity.*;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,7 +33,7 @@ public class StationLineService {
     public StationLineResponse createStationLine(StationLineRequest request) {
         StationLine stationLine = stationLineRepository.save(convertToStationLineEntity(request));
         StationSection createdStationSection = stationSectionRepository.save(convertToStationSectionEntity(stationLine));
-        return convertToResponse(stationLine.addStationSection(createdStationSection));
+        return convertToResponse(stationLine.setStationSection(createdStationSection));
     }
 
     public List<StationLineResponse> findAllStationLines() {
@@ -80,10 +80,7 @@ public class StationLineService {
                 stationLine.getId(),
                 stationLine.getName(),
                 stationLine.getColor(),
-                stationLine.getUpStationId(),
-                stationLine.getDownStationId(),
-                stationLine.getDistance(),
-                convertToStationSectionResponse(stationLine.getSections()));
+                convertToStationResponses(stationLine.getSections()));
     }
 
     private StationSection convertToStationSectionEntity(StationLine stationLine) {
@@ -94,15 +91,29 @@ public class StationLineService {
                 stationLine);
     }
 
-    private List<StationSectionResponse> convertToStationSectionResponse(List<StationSection> stationSections) {
-        return stationSections.stream()
-                .map(stationSection -> new StationSectionResponse(
-                        stationSection.getId(),
-                        findStationById(stationSection).getName(),
-                        stationSection.getUpStationId(),
-                        stationSection.getDownStationId(),
-                        stationSection.getDistance()))
-                .collect(Collectors.toList());
+    private List<StationResponse> convertToStationResponses(List<StationSection> stationSections) {
+        List<StationResponse> stationResponses = new ArrayList<>();
+
+        stationResponses.add(findStation(findFirstStation(stationSections)));
+        stationSections.forEach(stationSection -> stationResponses.add(findStation(stationSection.getDownStationId())));
+
+        return stationResponses;
+    }
+
+    private static Long findFirstStation(List<StationSection> stationSections) {
+        return stationSections.get(0).getUpStationId();
+    }
+
+    private StationResponse findStation(Long stationId) {
+        return convertToStationResponse(
+                stationRepository.findById(stationId).orElseThrow(IllegalArgumentException::new));
+    }
+
+    private StationResponse convertToStationResponse(Station station) {
+        return new StationResponse(
+                station.getId(),
+                station.getName()
+        );
     }
 
     private Station findStationById(StationSection stationSection) {
