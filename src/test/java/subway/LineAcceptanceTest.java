@@ -172,10 +172,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
         return get("/lines", statusCode);
     }
 
-    private ExtractableResponse<Response> findLine(Long id, int statusCode) {
-        return get("/lines/{id}", statusCode, id);
-    }
-
     private ExtractableResponse<Response> updateLine(Long id, LineUpdateRequest request, int statusCode) {
         return put("/lines/{id}", request, statusCode, id);
     }

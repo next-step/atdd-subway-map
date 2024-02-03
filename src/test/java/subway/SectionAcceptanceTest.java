@@ -18,6 +18,7 @@ import subway.exception.ExceptionResponse;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.springframework.http.HttpStatus.*;
 import static subway.fixture.LineFixture.SHINBUNDANG_LINE;
 import static subway.fixture.StationFixture.*;
@@ -127,7 +128,18 @@ public class SectionAcceptanceTest extends AcceptanceTest {
      */
     @Test
     void 성공_새로운_지하철_구간_등록시_노선의_하행_종점역에_등록할_수_있다() {
+        SectionCreateRequest request = sectionCreateRequest(SEOLLEUNG_STATION_ID, YANGJAE_STATION_ID, 13);
+        ExtractableResponse<Response> createResponse = post("/lines/{lineId}/sections", request, CREATED.value(), SHINBUNDANG_LINE_ID);
 
+        // 등록한 노선 조회
+        LineResponse response = findLine(SHINBUNDANG_LINE_ID, OK.value()).as(LineResponse.class);
+        assertThat(response.getStations()).hasSize(3)
+                .extracting("id", "name")
+                .containsExactly(
+                        tuple(1L, "강남역"),
+                        tuple(2L, "선릉역"),
+                        tuple(3L, "양재역")
+                );
     }
 
     private SectionCreateRequest sectionCreateRequest(Long upStationId, Long downStationId, int distance) {

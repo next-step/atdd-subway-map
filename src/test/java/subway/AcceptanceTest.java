@@ -40,6 +40,10 @@ public class AcceptanceTest {
         return post("/lines", request, statusCode);
     }
 
+    protected ExtractableResponse<Response> findLine(Long id, int statusCode) {
+        return get("/lines/{id}", statusCode, id);
+    }
+
     protected ExtractableResponse<Response> get(String path, int statusCode, Object... pathParams) {
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
