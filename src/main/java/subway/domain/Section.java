@@ -47,6 +47,10 @@ public class Section {
         return this.downStation.equals(station);
     }
 
+    public boolean matchesStation(Station station) {
+        return isUpStation(station) || isDownStation(station);
+    }
+
     public List<Station> stations() {
         return List.of(upStation, downStation);
     }

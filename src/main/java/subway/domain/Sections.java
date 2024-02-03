@@ -23,12 +23,22 @@ public class Sections {
     }
 
     public void validateRegisterStationBy(Station upStation, Station downStation) {
+        validateUpStation(upStation);
+        validateDownStation(downStation);
+    }
+
+    private void validateUpStation(Station upStation) {
         if (sections.stream().anyMatch(section -> section.isUpStation(upStation))) {
             throw new ApplicationException("새로운 구간의 상행역은 노선의 하행 종점역에만 등록할 수 있습니다.");
         }
+    }
 
-        if (sections.stream().anyMatch(section -> section.isDownStation(downStation))) {
-            throw new ApplicationException("새로운 구간의 하행역은 노선의 역에 등록할 수 없습니다.");
+    private void validateDownStation(Station downStation) {
+        boolean isDownStationRegistered = sections.stream()
+                .anyMatch(section -> section.matchesStation(downStation));
+
+        if (isDownStationRegistered) {
+            throw new ApplicationException("새로운 구간의 하행역은 노선에 존재하는 역에 등록할 수 없습니다.");
         }
     }
 
