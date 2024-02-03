@@ -1,5 +1,18 @@
 package subway.section;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.http.HttpStatus.CREATED;
+import static subway.acceptance.AcceptanceTestBase.assertStatusCode;
+import static subway.acceptance.ResponseParser.getStringIdFromResponse;
+import static subway.line.LineAcceptanceTestHelper.노선_단건조회_요청;
+import static subway.line.LineAcceptanceTestHelper.노선_생성_요청;
+import static subway.line.LineAcceptanceTestHelper.노선_파라미터_생성;
+import static subway.station.StationAcceptanceTestHelper.지하철_파라미터_생성;
+import static subway.station.StationAcceptanceTestHelper.지하철역_생성_요청;
+
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import subway.acceptance.AcceptanceTest;
@@ -7,6 +20,19 @@ import subway.acceptance.AcceptanceTest;
 @DisplayName("구간 관련 기능")
 @AcceptanceTest
 public class SectionAcceptanceTest {
+    final String 상행역 = "강남역";
+    private String 상행ID;
+    final String 하행역 = "역삼역";
+    private String 하행ID;
+    final String 신규역 = "선릉역";
+
+    @BeforeEach
+    void setup() {
+        상행ID = getStringIdFromResponse(지하철역_생성_요청(지하철_파라미터_생성(상행역)));
+        하행ID = getStringIdFromResponse(지하철역_생성_요청(지하철_파라미터_생성(하행역)));
+
+        노선_생성_요청(노선_파라미터_생성("2호선", "1", "2"));
+    }
 
     /**
      Given 지하철 노선이 생성되고,
@@ -16,6 +42,16 @@ public class SectionAcceptanceTest {
     @Test
     @DisplayName("상행역이 종점역일 때 구간 등록")
     void registerSectionWithTerminalStation() {
+        //given
+        String 신규하행ID = getStringIdFromResponse(지하철역_생성_요청(지하철_파라미터_생성(신규역)));
+
+        //when
+        ExtractableResponse<Response> response = SectionAcceptanceTestHelper.구간_등록_요청(
+            SectionAcceptanceTestHelper.구간_파라미터_생성(상행ID, 하행ID));
+
+        //then
+        assertStatusCode(response, CREATED);
+        assertThat(노선_단건조회_요청(response).jsonPath().getString("stations[1].id")).isEqualTo(신규하행ID);
     }
 
     /**
@@ -26,6 +62,11 @@ public class SectionAcceptanceTest {
     @Test
     @DisplayName("상행역이 종점역이 아닐 때 구간 등록 에러")
     void registerSectionWithNonTerminalStation() {
+        //given
+
+        //when
+
+        //then
     }
 
     /**
@@ -36,6 +77,11 @@ public class SectionAcceptanceTest {
     @Test
     @DisplayName("하행역이 이미 등록된 역일 때 구간 등록 에러")
     void registerSectionWithExistingStation() {
+        //given
+
+        //when
+
+        //then
     }
 
 
@@ -47,6 +93,11 @@ public class SectionAcceptanceTest {
     @Test
     @DisplayName("하행역이 이미 등록된 역이 아닐 때 구간 등록")
     void registerSectionWithNonExistingStation() {
+        //given
+
+        //when
+
+        //then
     }
 
     /**
@@ -57,6 +108,11 @@ public class SectionAcceptanceTest {
     @Test
     @DisplayName("하행 종점역 제거")
     void removeTerminalStation() {
+        //given
+
+        //when
+
+        //then
     }
 
     /**
@@ -67,6 +123,11 @@ public class SectionAcceptanceTest {
     @Test
     @DisplayName("하행 종점역이 아닌 역 제거 시 에러")
     void removeNonTerminalStation() {
+        //given
+
+        //when
+
+        //then
     }
 
     /**
@@ -77,5 +138,10 @@ public class SectionAcceptanceTest {
     @Test
     @DisplayName("구간이 1개인 경우 역 제거 시 에러")
     void removeStationWhenSingleSection() {
+        //given
+
+        //when
+
+        //then
     }
 }

@@ -10,6 +10,10 @@ public class ResponseParser {
         return response.jsonPath().getLong("id");
     }
 
+    public static String getStringIdFromResponse(final ExtractableResponse<Response> response) {
+        return response.jsonPath().getString("id");
+    }
+
     public static String getNameFromResponse(final ExtractableResponse<Response> response) {
         return response.jsonPath().getString("name");
     }

@@ -19,23 +19,13 @@ public class LineAcceptanceTestHelper {
                           .extract();
     }
 
-    public static HashMap<String, String> 노선_파라미터_생성() {
+    public static HashMap<String, String> 노선_파라미터_생성(String name, String upStationId, String downStationId) {
         HashMap<String, String> params = new HashMap<>();
-        params.put("name", "신분당선");
+        params.put("name", name);
         params.put("color", "bg-red-600");
-        params.put("upStationId", "1");
-        params.put("downStationId", "2");
+        params.put("upStationId", upStationId);
+        params.put("downStationId", downStationId);
         params.put("distance", "10");
-        return params;
-    }
-
-    public static HashMap<String, String> 노선_파라미터_생성2() {
-        HashMap<String, String> params = new HashMap<>();
-        params.put("name", "2호선");
-        params.put("color", "bg-green-600");
-        params.put("upStationId", "5");
-        params.put("downStationId", "20");
-        params.put("distance", "50");
         return params;
     }
 

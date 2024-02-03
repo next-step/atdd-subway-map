@@ -9,14 +9,6 @@ import static subway.acceptance.ResponseParser.getIdFromResponse;
 import static subway.acceptance.ResponseParser.getNameFromResponse;
 import static subway.acceptance.ResponseParser.getNamesFromResponse;
 import static subway.line.LineAcceptanceTestHelper.*;
-import static subway.line.LineAcceptanceTestHelper.노선_단건조회_요청;
-import static subway.line.LineAcceptanceTestHelper.노선_생성_요청;
-import static subway.line.LineAcceptanceTestHelper.노선_수정_요청;
-import static subway.line.LineAcceptanceTestHelper.노선_파라미터_생성;
-import static subway.line.LineAcceptanceTestHelper.노선_파라미터_생성2;
-import static subway.line.LineAcceptanceTestHelper.노선목록_조회_요청;
-import static subway.line.LineAcceptanceTestHelper.노선수정_파라미터_생성;
-
 import java.util.HashMap;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -34,7 +26,7 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선 생성")
     void createLine() {
         // given
-        HashMap<String, String> params = 노선_파라미터_생성();
+        HashMap<String, String> params = 노선_파라미터_생성("신분당선", "1", "2");
 
         // when
         var response = 노선_생성_요청(params);
@@ -52,8 +44,8 @@ public class LineAcceptanceTest {
     @DisplayName("노선 목록 조회")
     void fineLine() {
         // given
-        노선_생성_요청(노선_파라미터_생성());
-        노선_생성_요청(노선_파라미터_생성2());
+        노선_생성_요청(노선_파라미터_생성("신분당선", "1", "2"));
+        노선_생성_요청(노선_파라미터_생성("2호선", "1", "10"));
 
         // when
         var response = 노선목록_조회_요청();
@@ -72,7 +64,7 @@ public class LineAcceptanceTest {
     @DisplayName("노선 단건 조회")
     void findLineDetail() {
         // given
-        HashMap<String, String> params = 노선_파라미터_생성();
+        HashMap<String, String> params = 노선_파라미터_생성("신분당선", "1", "2");
         var createResponse = 노선_생성_요청(params);
 
         // when
@@ -93,7 +85,7 @@ public class LineAcceptanceTest {
     @DisplayName("노선 수정")
     void modifyLine() {
         // given
-        var createResponse = 노선_생성_요청(노선_파라미터_생성());
+        var createResponse = 노선_생성_요청(노선_파라미터_생성("신분당선", "1", "2"));
         Long id = getIdFromResponse(createResponse);
         HashMap<String, String> updateParam = 노선수정_파라미터_생성();
 
@@ -114,7 +106,7 @@ public class LineAcceptanceTest {
     @DisplayName("노선 삭제")
     void removeLine() {
         // given
-        var createResponse = 노선_생성_요청(노선_파라미터_생성());
+        var createResponse = 노선_생성_요청(노선_파라미터_생성("신분당선", "1", "2"));
         Long id = getIdFromResponse(createResponse);
 
         // when
