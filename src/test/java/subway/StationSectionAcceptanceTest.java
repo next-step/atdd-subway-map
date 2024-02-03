@@ -13,8 +13,6 @@ import org.springframework.test.annotation.DirtiesContext;
 import subway.dto.StationLineRequest;
 import subway.dto.StationSectionRequest;
 
-import java.util.Arrays;
-
 import static config.fixtures.subway.StationLineMockData.호남선_생성;
 import static config.fixtures.subway.StationMockData.*;
 import static config.fixtures.subway.StationSectionMockData.지하철_구간;
@@ -37,12 +35,12 @@ public class StationSectionAcceptanceTest {
 
     /**
      * Given 지하철 노선이 생성되고
-     * When  지하철 구간을 생성할 때, 상행역 ID를 1보다 작은 숫자로 요청하면
+     * When  지하철 구간을 생성할 때, 상행역이 존재하지 않는 역일 경우
      * Then  지하철 구간 생성에 실패한다.
      */
     @ParameterizedTest
     @ValueSource(longs = {-100L, -1L, 0L})
-    void 상행역_ID가_1보다_작은_숫자일_경우_등록_실패(Long upStationId) {
+    void 상행역이_존재하지_않는_역일_경우_등록_실패(Long upStationId) {
         // given
         ExtractableResponse<Response> response =
                 지하철_노선_생성_요청_검증_포함(호남선_생성(1L, 2L));
@@ -57,12 +55,12 @@ public class StationSectionAcceptanceTest {
 
     /**
      * Given 지하철 노선이 생성되고
-     * When  지하철 구간을 생성할 때, 하행역 ID를 1보다 작은 숫자로 요청하면
+     * When  지하철 구간을 생성할 때, 하행역 존재하지 않는 역일 경우
      * Then  지하철 구간 생성에 실패한다.
      */
     @ParameterizedTest
     @ValueSource(longs = {-100L, -1L, 0L})
-    void 하행역_ID가_1보다_작은_숫자일_경우_등록_실패(Long downStationId) {
+    void 하행역이_존재하지_않는_역일_경우_등록_실패(Long downStationId) {
         // given
         ExtractableResponse<Response> response =
                 지하철_노선_생성_요청_검증_포함(호남선_생성(1L, 2L));
@@ -163,7 +161,7 @@ public class StationSectionAcceptanceTest {
      * Then  지하철 구간 등록에 실패한다.
      */
     @Test
-    void 상행역이_이미_구간에_등록되어_있는_경우_등록_실패() { // TODO: 삭제(상행역이_하행_종점역으로_등록되어_있지_않을_경우_등록_실패와 동일)
+    void 상행역이_이미_구간에_등록되어_있는_경우_등록_실패() {
         // given
         ExtractableResponse<Response> response =
                 지하철_노선_생성_요청_검증_포함(호남선_생성(1L, 2L));
