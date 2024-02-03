@@ -7,12 +7,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
 import subway.station.StationResponse;
 import util.RestAssuredUtil;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -39,8 +37,8 @@ public class LineAcceptanceTest {
                 .as(StationResponse.class).getId();
         OGEUM_STATION_ID = RestAssuredUtil.post(Map.of("name", "오금역"), "stations")
                 .as(StationResponse.class).getId();
-        LINE_SHINBUNDANG = new Line("신분당선", "bg-red-600", SINSA_STATION_ID, GWANGGYO_STATION_ID, 10L);
-        LINE_THREE = new Line("3호선", "bg-navy-600", DAEHWA_STATION_ID, OGEUM_STATION_ID, 20L);
+        LINE_SHINBUNDANG = new Line("신분당선", "bg-red-600", 10L, SINSA_STATION_ID, GWANGGYO_STATION_ID);
+        LINE_THREE = new Line("3호선", "bg-navy-600", 20L, DAEHWA_STATION_ID, OGEUM_STATION_ID);
     }
 
     /**

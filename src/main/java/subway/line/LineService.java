@@ -5,6 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 import subway.station.Station;
 import subway.station.StationRepository;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,10 +23,12 @@ public class LineService {
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
         Line line = lineRepository.save(lineRequest.toEntity());
-        List<Station> stations = stationRepository.findAll().stream()
-                .filter(station -> line.stationIds().contains(station.getId()))
-                .collect(Collectors.toList());
-        return new LineResponse(line, stations);
+        Station upStation = stationRepository.findById(lineRequest.getUpStationId())
+                .orElseThrow(() -> new EntityNotFoundException("해당 역을 상행종점역으로 등록할 수 없습니다."));
+        Station downStation = stationRepository.findById(lineRequest.getDownStationId())
+                .orElseThrow(() -> new EntityNotFoundException("해당 역을 하행종점역으로 등록할 수 없습니다."));
+
+        return new LineResponse(line, List.of(upStation, downStation));
     }
 
     public List<LineResponse> findAllLines() {
