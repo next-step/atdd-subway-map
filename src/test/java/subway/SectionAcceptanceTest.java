@@ -202,7 +202,17 @@ public class SectionAcceptanceTest extends AcceptanceTest {
      */
     @Test
     void 성공_지하철_구간_제거시_구간의_제거에_성공한다() {
+        SectionCreateRequest request = sectionCreateRequest(SEOLLEUNG_STATION_ID, YANGJAE_STATION_ID, 13);
+        post("/lines/{lineId}/sections", request, CREATED.value(), SHINBUNDANG_LINE_ID);
+        delete("/lines/{lineId}/sections", NO_CONTENT.value(), Map.of("stationId", "2"), SHINBUNDANG_LINE_ID);
 
+        LineResponse response = findLine(SHINBUNDANG_LINE_ID, OK.value()).as(LineResponse.class);
+        assertThat(response.getStations()).hasSize(2)
+                .extracting("id", "name")
+                .containsExactly(
+                        tuple(1L, "강남역"),
+                        tuple(2L, "선릉역")
+                );
     }
 
 }
