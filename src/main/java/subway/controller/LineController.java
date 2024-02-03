@@ -6,6 +6,7 @@ import subway.domain.request.LineRequest;
 import subway.domain.request.SectionRequest;
 import subway.domain.response.LineResponse;
 import subway.service.LineService;
+import subway.service.SectionService;
 
 import java.net.URI;
 import java.util.List;
@@ -14,15 +15,17 @@ import java.util.List;
 @RequestMapping("/lines")
 public class LineController {
     private final LineService lineService;
+    private final SectionService sectionService;
 
-    public LineController(LineService lineService) {
+    public LineController(LineService lineService, SectionService sectionService) {
         this.lineService = lineService;
+        this.sectionService = sectionService;
     }
 
     @PostMapping("")
     public ResponseEntity<LineResponse> createSubwayLine(@RequestBody LineRequest lineRequest) {
-        LineResponse subwayLine = lineService.saveLine(lineRequest);
-        return ResponseEntity.created(URI.create("/lines/" + subwayLine.getId())).body(subwayLine);
+        LineResponse line = lineService.saveLine(lineRequest);
+        return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
 
     @GetMapping(value = "")
@@ -47,10 +50,14 @@ public class LineController {
     }
 
     @PostMapping("/{id}/sections")
-    public ResponseEntity<Void> addSection(@PathVariable Long id, @RequestBody SectionRequest sectionRequest) {
-        lineService.addSection(id, sectionRequest);
+    public ResponseEntity<Void> addSection(@PathVariable("id") Long id, @RequestBody SectionRequest sectionRequest) {
+        sectionService.addSection(id, sectionRequest);
         return ResponseEntity.ok().build();
     }
 
-
+    @DeleteMapping("/{id}/sections")
+    public ResponseEntity<Void> deleteSection(@PathVariable("id") Long id, @RequestParam("stationId") Long stationId) {
+        sectionService.deleteSection(id, stationId);
+        return ResponseEntity.noContent().build();
+    }
 }

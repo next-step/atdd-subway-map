@@ -19,11 +19,10 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static subway.util.LineTestUtil.createSubwayLine;
-import static subway.util.LineTestUtil.getSubwayLines;
+import static subway.util.LineTestUtil.getLines;
 
-@DisplayName("지하철노선 관련 기능")
+@DisplayName("지하철 노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-//@DirtiesContext
 @Sql("/truncate.sql")
 public class LineAcceptanceTest {
 
@@ -49,7 +48,7 @@ public class LineAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> subwayLines = getSubwayLines();
+        List<String> subwayLines = getLines();
         assertThat(subwayLines).containsAnyOf("신분당선");
     }
 
@@ -130,7 +129,7 @@ public class LineAcceptanceTest {
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         //then
-        List<String> subwayLineNames = getSubwayLines();
+        List<String> subwayLineNames = getLines();
         assertThat(subwayLineNames.size()).isEqualTo(1);
         assertThat(subwayLineNames).containsAnyOf("다른 분당선");
     }
@@ -156,7 +155,7 @@ public class LineAcceptanceTest {
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
         //then
-        List<String> stationNames = getSubwayLines();
+        List<String> stationNames = getLines();
         assertThat(stationNames).doesNotContain("신분당선");
     }
 

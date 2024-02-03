@@ -19,10 +19,17 @@ public class LineTestUtil {
                 .extract();
     }
 
-    public static List<String> getSubwayLines() {
+    public static List<String> getLines() {
         return RestAssured.given().log().all()
                 .when().get("/lines")
                 .then().log().all()
                 .extract().jsonPath().getList("name", String.class);
+    }
+
+    public static ExtractableResponse<Response> getLine(Long id) {
+        return RestAssured.given().log().all()
+                .when().get("/lines/{id}", id)
+                .then().log().all()
+                .extract();
     }
 }

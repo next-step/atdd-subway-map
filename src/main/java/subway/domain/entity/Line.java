@@ -1,5 +1,6 @@
 package subway.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,16 +21,17 @@ public class Line {
     private String color;
 
     @ManyToOne
-    @JoinColumn(nullable = false)
+//    @JoinColumn(nullable = false)
     private Station upStation;
 
     @ManyToOne
-    @JoinColumn(nullable = false)
+//    @JoinColumn(nullable = false)
     private Station downStation;
 
     @Column(nullable = false)
     private int distance;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     List<Section> sections = new ArrayList<>();
 
@@ -57,5 +59,9 @@ public class Line {
 
     public void addSection(Station upStation, Station downStation, int distance) {
         this.sections.add(new Section(this, upStation, downStation, distance));
+    }
+
+    public void deleteSection(Section section) {
+        this.sections.remove(section);
     }
 }
