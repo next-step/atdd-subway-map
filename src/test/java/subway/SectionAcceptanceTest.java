@@ -145,7 +145,6 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         SectionCreateRequest request = sectionCreateRequest(SEOLLEUNG_STATION_ID, YANGJAE_STATION_ID, 13);
         ExtractableResponse<Response> createResponse = post("/lines/{lineId}/sections", request, CREATED.value(), SHINBUNDANG_LINE_ID);
 
-        // 등록한 노선 조회
         LineResponse response = findLine(SHINBUNDANG_LINE_ID, OK.value()).as(LineResponse.class);
         assertThat(response.getStations()).hasSize(3)
                 .extracting("id", "name")
@@ -162,6 +161,41 @@ public class SectionAcceptanceTest extends AcceptanceTest {
                 .downStationId(downStationId.toString())
                 .distance(distance)
                 .build();
+    }
+
+    /**
+     * GIVEN 지하철 역을 생성하고
+     * GIVEN 지하철 역에 노선을 등록하고
+     * GIVEN 구간을 등록하고
+     * WHEN 지하철 구간 제거시 마지막 구간이 아닐 경우
+     * Then 구간을 제거할 수 없다
+     */
+    @Test
+    void 실패_지하철_구간_제거시_마지막_구간이_아닐경우_예외가_발생한다() {
+
+    }
+
+    /**
+     * GIVEN 지하철 역을 생성하고
+     * GIVEN 지하철 역에 노선을 등록하고
+     * WHEN 지하철 구간 제거시 구간이 한개만 있는 경우
+     * Then 구간을 제거할 수 없다
+     */
+    @Test
+    void 실패_지하철_구간_제거시_구간이_한개만_있는_경우_예외가_발생한다() {
+
+    }
+
+    /**
+     * GIVEN 지하철 역을 생성하고
+     * GIVEN 지하철 역에 노선을 등록하고
+     * GIVEN 구간을 등록하고
+     * WHEN 지하철 구간 제거시
+     * Then 구간을 제거한다
+     */
+    @Test
+    void 성공_지하철_구간_제거시_구간의_제거에_성공한다() {
+
     }
 
 }
