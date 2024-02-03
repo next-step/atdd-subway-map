@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
@@ -27,11 +28,16 @@ public class StationAcceptanceTest {
     private final static String GET_STATIONS_URL = "/stations";
     private final static String POST_STATIONS_URL = "/stations";
     private final static String DELETE_STATIONS_URL = "/stations/%d";
+
+    @LocalServerPort
+    private int port;
+
     //@Autowired
     //private EntityManager em;
 
     @BeforeEach
     void setUp() {
+        RestAssured.port = port;
         //em.createNativeQuery("TRUNCATE TABLE Station").executeUpdate();
         //em.flush();
     }
