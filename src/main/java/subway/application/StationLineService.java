@@ -4,34 +4,36 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.dto.StationLineRequest;
 import subway.dto.StationLineResponse;
-import subway.entity.StationLine;
-import subway.entity.StationLineRepository;
-import subway.entity.StationSection;
-import subway.entity.StationSectionRepository;
+import subway.dto.StationSectionResponse;
+import subway.entity.*;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
 public class StationLineService {
 
+    private final StationRepository stationRepository;
+
     private final StationLineRepository stationLineRepository;
 
     private final StationSectionRepository stationSectionRepository;
 
-    public StationLineService(StationLineRepository stationLineRepository,
+    public StationLineService(StationRepository stationRepository, StationLineRepository stationLineRepository,
                               StationSectionRepository stationSectionRepository) {
+        this.stationRepository = stationRepository;
         this.stationLineRepository = stationLineRepository;
         this.stationSectionRepository = stationSectionRepository;
     }
 
     @Transactional
-    public StationLineResponse saveStationLine(StationLineRequest request) {
+    public StationLineResponse createStationLine(StationLineRequest request) {
         StationLine stationLine = stationLineRepository.save(convertToStationLineEntity(request));
-        stationSectionRepository.save(convertToStationSectionEntity(stationLine));
-        return convertToResponse(stationLine);
+        StationSection createdStationSection = stationSectionRepository.save(convertToStationSectionEntity(stationLine));
+        return convertToResponse(stationLine.addStationSection(createdStationSection));
     }
 
     public List<StationLineResponse> findAllStationLines() {
@@ -80,14 +82,30 @@ public class StationLineService {
                 stationLine.getColor(),
                 stationLine.getUpStationId(),
                 stationLine.getDownStationId(),
-                stationLine.getDistance());
+                stationLine.getDistance(),
+                convertToStationSectionResponse(stationLine.getSections()));
     }
 
-    private static StationSection convertToStationSectionEntity(StationLine stationLine) {
+    private StationSection convertToStationSectionEntity(StationLine stationLine) {
         return new StationSection(
                 stationLine.getUpStationId(),
                 stationLine.getDownStationId(),
                 stationLine.getDistance(),
                 stationLine);
+    }
+
+    private List<StationSectionResponse> convertToStationSectionResponse(List<StationSection> stationSections) {
+        return stationSections.stream()
+                .map(stationSection -> new StationSectionResponse(
+                        stationSection.getId(),
+                        findStationById(stationSection).getName(),
+                        stationSection.getUpStationId(),
+                        stationSection.getDownStationId(),
+                        stationSection.getDistance()))
+                .collect(Collectors.toList());
+    }
+
+    private Station findStationById(StationSection stationSection) {
+        return stationRepository.findById(stationSection.getUpStationId()).orElseThrow(EntityNotFoundException::new);
     }
 }

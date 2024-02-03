@@ -21,7 +21,7 @@ public class StationSectionController {
     public ResponseEntity<StationSectionResponse> createStationLine(@PathVariable Long stationLineId,
                                                                     @RequestBody StationSectionRequest request) {
         StationSectionResponse stationSectionResponse =
-                stationLineService.saveStationSection(request.updateStationLineId(stationLineId));
+                stationLineService.createStationSection(request.updateStationLineId(stationLineId));
         return ResponseEntity.created(
                 URI.create(String.format("/lines/%d/sections", stationLineId))).body(stationSectionResponse);
     }

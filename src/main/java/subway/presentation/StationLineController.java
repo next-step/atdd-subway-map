@@ -20,7 +20,7 @@ public class StationLineController {
 
     @PostMapping("/lines")
     public ResponseEntity<StationLineResponse> createStationLine(@RequestBody StationLineRequest request) {
-        StationLineResponse stationLine = stationLineService.saveStationLine(request);
+        StationLineResponse stationLine = stationLineService.createStationLine(request);
         return ResponseEntity.created(URI.create("/lines/" + stationLine.getId())).body(stationLine);
     }
 
