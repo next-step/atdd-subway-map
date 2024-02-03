@@ -49,6 +49,6 @@ public class LineService {
     }
 
     private LineResponse createLineResponse(Line line) {
-        return new LineResponse(line.getId(), line.getName(), line.getStations());
+        return new LineResponse(line.getId(), line.getName());
     }
 }

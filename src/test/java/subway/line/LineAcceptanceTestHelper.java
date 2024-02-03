@@ -11,7 +11,7 @@ import org.springframework.http.MediaType;
 
 public class LineAcceptanceTestHelper {
 
-    static ExtractableResponse<Response> 노선_생성_요청(HashMap<String, String> params) {
+    public static ExtractableResponse<Response> 노선_생성_요청(HashMap<String, String> params) {
         return RestAssured.given().log().all()
                           .body(params)
                           .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -20,7 +20,7 @@ public class LineAcceptanceTestHelper {
                           .extract();
     }
 
-    static HashMap<String, String> 노선_파라미터_생성() {
+    public static HashMap<String, String> 노선_파라미터_생성() {
         HashMap<String, String> params = new HashMap<>();
         params.put("name", "신분당선");
         params.put("color", "bg-red-600");

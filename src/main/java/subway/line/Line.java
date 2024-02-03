@@ -1,14 +1,10 @@
 package subway.line;
 
-import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
-import subway.station.Station;
 
 @Entity
 public class Line {
@@ -22,9 +18,6 @@ public class Line {
     private Long upStationId;
     private Long downStationId;
     private Long distance;
-    @OneToMany
-    @JoinColumn(name = "id")
-    private List<Station> stations;
 
     public Line(String name, String color, Long upStationId, Long downStationId, Long distance) {
         this.name = name;
@@ -90,11 +83,4 @@ public class Line {
         this.distance = distance;
     }
 
-    public List<Station> getStations() {
-        return stations;
-    }
-
-    public void setStations(List<Station> stations) {
-        this.stations = stations;
-    }
 }

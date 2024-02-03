@@ -8,7 +8,9 @@ import static subway.acceptance.AcceptanceTestBase.assertStatusCode;
 import static subway.acceptance.ResponseParser.getIdFromResponse;
 import static subway.acceptance.ResponseParser.getNamesFromResponse;
 import static subway.line.LineAcceptanceTestHelper.지하철역_생성_요청;
-import static subway.station.StationAcceptanceTestHelper.*;
+import static subway.station.StationAcceptanceTestHelper.지하철_파라미터_생성;
+import static subway.station.StationAcceptanceTestHelper.지하철역_제거_요청;
+import static subway.station.StationAcceptanceTestHelper.지하철역_조회_요청;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;

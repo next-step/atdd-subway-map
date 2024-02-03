@@ -12,7 +12,7 @@ public class LineResponse {
     private Long distance;
     private List<Station> stations;
 
-    public LineResponse(Long id, String name, List<Station> stations) {
+    public LineResponse(Long id, String name) {
         this.id = id;
         this.name = name;
         this.stations = stations;
