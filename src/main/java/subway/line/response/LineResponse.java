@@ -15,11 +15,10 @@ public class LineResponse {
     private List<StationResponse> stations;
 
     @Builder
-    public LineResponse(Long id, String name, String color, Station upStation, Station downStation) {
+    public LineResponse(Long id, String name, String color, StationResponse upStation, StationResponse downStation) {
         this.id = id;
         this.name = name;
         this.color = color;
-        this.stations = List.of(new StationResponse(upStation.getId(), upStation.getName()),
-                new StationResponse(downStation.getId(), downStation.getName()));
+        this.stations = List.of(upStation, downStation);
     }
 }

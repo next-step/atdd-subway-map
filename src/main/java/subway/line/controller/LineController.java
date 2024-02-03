@@ -7,10 +7,12 @@ import subway.line.request.LineCreateRequest;
 import subway.line.response.LineResponse;
 import subway.line.request.LineUpdateRequest;
 
+import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
 
 @RestController
+@RequestMapping("/lines")
 public class LineController {
     private LineService lineService;
 
@@ -18,29 +20,29 @@ public class LineController {
         this.lineService = lineService;
     }
 
-    @PostMapping("/lines")
-    public ResponseEntity<LineResponse> createLine(@RequestBody LineCreateRequest lineCreateRequest) {
+    @PostMapping()
+    public ResponseEntity<LineResponse> createLine(@Valid @RequestBody LineCreateRequest lineCreateRequest) {
         LineResponse lineResponse = lineService.saveLine(lineCreateRequest);
         return ResponseEntity.created(URI.create("/lines/" + lineResponse.getId())).body(lineResponse);
     }
 
-    @GetMapping("/lines")
+    @GetMapping()
     public ResponseEntity<List<LineResponse>> findAllLines() {
         return ResponseEntity.ok().body(lineService.findAllLine());
     }
 
-    @GetMapping("/lines/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<LineResponse> findLines(@PathVariable Long id) {
         return ResponseEntity.ok().body(lineService.findLine(id));
     }
 
-    @PutMapping("/lines/{id}")
-    public ResponseEntity<LineResponse> updateLines(@PathVariable Long id, @RequestBody LineUpdateRequest lineUpdateRequest) {
+    @PutMapping("/{id}")
+    public ResponseEntity<LineResponse> updateLines(@PathVariable Long id,@Valid @RequestBody LineUpdateRequest lineUpdateRequest) {
         lineService.updateLine(id, lineUpdateRequest);
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/lines/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteLine(@PathVariable Long id) {
         lineService.deleteLine(id);
         return ResponseEntity.noContent().build();

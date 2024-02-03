@@ -10,6 +10,7 @@ import subway.line.request.LineCreateRequest;
 import subway.line.request.LineUpdateRequest;
 import subway.station.entity.Station;
 import subway.station.repository.StationRepository;
+import subway.station.response.StationResponse;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -43,8 +44,14 @@ public class LineService {
         return LineResponse.builder()
                 .id(line.getId())
                 .name(line.getName())
-                .upStation(upStation)
-                .downStation(downStation)
+                .upStation(StationResponse.builder()
+                        .id(line.getUpStation().getId())
+                        .name(line.getUpStation().getName())
+                        .build())
+                .downStation(StationResponse.builder()
+                        .id(line.getDownStation().getId())
+                        .name(line.getDownStation().getName())
+                        .build())
                 .build();
     }
 
@@ -65,8 +72,14 @@ public class LineService {
                 .map(line -> LineResponse.builder().id(line.getId())
                         .name(line.getName())
                         .color(line.getColor())
-                        .upStation(line.getUpStation())
-                        .downStation(line.getDownStation()).build())
+                        .upStation(StationResponse.builder()
+                                .id(line.getUpStation().getId())
+                                .name(line.getUpStation().getName())
+                                .build())
+                        .downStation(StationResponse.builder()
+                                .id(line.getUpStation().getId())
+                                .name(line.getUpStation().getName())
+                                .build()).build())
                 .collect(Collectors.toList());
     }
 
@@ -77,8 +90,14 @@ public class LineService {
                 .id(findLine.getId())
                 .color(findLine.getColor())
                 .name(findLine.getName())
-                .upStation(findLine.getUpStation())
-                .downStation(findLine.getDownStation())
+                .upStation(StationResponse.builder()
+                        .id(findLine.getUpStation().getId())
+                        .name(findLine.getUpStation().getName())
+                        .build())
+                .downStation(StationResponse.builder()
+                        .id(findLine.getUpStation().getId())
+                        .name(findLine.getUpStation().getName())
+                        .build())
                 .build();
     }
 
