@@ -69,30 +69,37 @@ public class Line {
 
     public void deleteStation(Long stationId) {
         if (sections.size() <= 1) {
-            throw new LineSectionException();
+            throw new LineSectionException("삭제할 수 있는 구간이 없습니다.");
         }
         if (!Objects.equals(getTheMostDownStation().getId(), stationId)) {
-            throw new LineSectionException();
+            throw new LineSectionException("노선의 하행역만 삭제할 수 있습니다.");
         }
         sections.remove(sections.size() - 1);
     }
 
     public void addSection(Section section) {
+        validateStationsOfSection(section);
+        sections.add(section);
+    }
+
+    private void validateStationsOfSection(Section section) {
         if (sections.isEmpty()) {
-            sections.add(section);
-        } else if (isAvailableDownStation(section.getDownStation()) && isAvailableUpStation(section.getUpStation())) {
-            sections.add(section);
-        } else {
-            throw new LineSectionException("안됨");
+            return;
+        }
+        if (isDownStationAlreadyIncluded(section.getDownStation())) {
+            throw new LineSectionException("이미 노선에 포함된 역은 하행역으로 지정할 수 없습니다.");
+        }
+        if (isUpStationDifferentFromCurrentDownStation(section.getUpStation())) {
+            throw new LineSectionException("노선의 하행역만 상행역으로 지정 가능합니다.");
         }
     }
 
-    private Boolean isAvailableDownStation(Station downStation) {
-        return !getAllStations().contains(downStation);
+    private Boolean isDownStationAlreadyIncluded(Station downStation) {
+        return getAllStations().contains(downStation);
     }
 
-    private Boolean isAvailableUpStation(Station upStation) {
+    private Boolean isUpStationDifferentFromCurrentDownStation(Station upStation) {
         Section lastSection = sections.get(sections.size() - 1);
-        return lastSection.getDownStation().equals(upStation);
+        return !upStation.equals(lastSection.getDownStation());
     }
 }
