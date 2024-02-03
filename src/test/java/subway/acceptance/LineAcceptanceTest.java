@@ -18,8 +18,8 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.util.SubwayLineUtil.createSubwayLine;
-import static subway.util.SubwayLineUtil.getSubwayLines;
+import static subway.util.LineTestUtil.createSubwayLine;
+import static subway.util.LineTestUtil.getSubwayLines;
 
 @DisplayName("지하철노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)

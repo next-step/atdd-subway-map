@@ -8,7 +8,7 @@ import subway.domain.request.LineRequest;
 
 import java.util.List;
 
-public class SubwayLineUtil {
+public class LineTestUtil {
 
     public static ExtractableResponse<Response> createSubwayLine(LineRequest request) {
         return RestAssured.given().log().all()
