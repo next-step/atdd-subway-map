@@ -1,14 +1,20 @@
-package subway.line;
+package subway.service;
 
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import subway.station.Station;
-import subway.station.StationRepository;
+import subway.dto.line.LineRequest;
+import subway.dto.line.LineResponse;
+import subway.dto.line.LineUpdateRequest;
+import subway.entity.Line;
+import subway.entity.Section;
+import subway.entity.Station;
+import subway.repository.LineRepository;
+import subway.repository.StationRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Repository
+@Service
 @Transactional(readOnly = true)
 public class LineService {
     private final LineRepository lineRepository;
@@ -33,6 +39,8 @@ public class LineService {
         Line line = lineRepository.save(
             new Line(request.getName(), request.getColor(), request.getDistance(), upStation, downStation)
         );
+        Section section = new Section(line, line.getDownStation(), line.getUpStation(), line.getDistance());
+        line.createSection(section);
 
         return new LineResponse(line);
     }
@@ -45,21 +53,16 @@ public class LineService {
     }
 
     /** 지하철 노선을 조회한다. */
-    public LineResponse getLine(
-        Long id
-    ) {
-        Line line = lineRepository.findById(id).orElseThrow();
+    public LineResponse getLine(Long id) {
+        Line line = findLine(id);
         return new LineResponse(line);
     }
 
     /** 지하철 노선을 수정한다. */
     @Transactional
-    public void modifyLine(
-        Long id,
-        LineUpdateRequest request
-    ) {
+    public void modifyLine(Long id, LineUpdateRequest request) {
         Line line = lineRepository.findById(id).orElseThrow();
-        line.updateLine(request);
+        line.updateLine(request.getName(), request.getColor());
     }
 
     /** 지하철 노선을 삭제한다. */
@@ -67,4 +70,10 @@ public class LineService {
     public void deleteLine(Long id) {
         lineRepository.deleteById(id);
     }
+
+    public Line findLine(Long id) {
+        return lineRepository.findById(id)
+            .orElseThrow(IllegalArgumentException::new);
+    }
+
 }
