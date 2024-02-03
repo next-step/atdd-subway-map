@@ -1,19 +1,16 @@
-package subway.line;
+package subway.section;
 
+import subway.line.entity.Line;
 import subway.station.Station;
 
 import javax.persistence.*;
 
 @Entity
-public class Line {
+public class Section {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    private String name;
-
-    private String color;
 
     private int distance;
 
@@ -25,27 +22,22 @@ public class Line {
     @JoinColumn(name = "down_station_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Station downStation;
 
-    public Line() {
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "line_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private Line line;
+
+    public Section() {
     }
 
-    public Line(String name, String color, int distance, Station upStation, Station downStation) {
-        this.name = name;
-        this.color = color;
+    public Section(int distance, Station upStation, Station downStation, Line line) {
         this.distance = distance;
         this.upStation = upStation;
         this.downStation = downStation;
+        this.line = line;
     }
 
     public Long getId() {
         return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getColor() {
-        return color;
     }
 
     public int getDistance() {
@@ -60,8 +52,7 @@ public class Line {
         return downStation;
     }
 
-    public void updateLine(String name, String color) {
-        this.name = name;
-        this.color = color;
+    public Line getLine() {
+        return line;
     }
 }

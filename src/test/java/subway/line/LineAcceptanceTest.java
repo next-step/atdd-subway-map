@@ -1,13 +1,12 @@
 package subway.line;
 
-import annotation.TestIsolation;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
+import subway.annotation.AcceptanceTest;
 import subway.station.StationApiRequester;
 import subway.line.dto.LineCreateRequest;
 import subway.line.dto.LineUpdateRequest;
@@ -15,20 +14,20 @@ import subway.util.JsonPathUtil;
 
 import static org.assertj.core.api.Assertions.*;
 
-@TestIsolation
 @DisplayName("지하철노선 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@AcceptanceTest
 public class LineAcceptanceTest {
-
-    private StationApiRequester stationApiRequester = new StationApiRequester();
-    private LineApiRequester lineApiRequester = new LineApiRequester();
+    Long 잠실역id;
+    Long 용산역id;
+    Long 건대입구역id;
+    Long 성수역id;
 
     @BeforeEach
     void setUp() {
-        stationApiRequester.createStationApiCall("잠실역");
-        stationApiRequester.createStationApiCall("용산역");
-        stationApiRequester.createStationApiCall("건대입구역");
-        stationApiRequester.createStationApiCall("성수역");
+        잠실역id = JsonPathUtil.getId(StationApiRequester.createStationApiCall("잠실역"));
+        용산역id = JsonPathUtil.getId(StationApiRequester.createStationApiCall("용산역"));
+        건대입구역id = JsonPathUtil.getId(StationApiRequester.createStationApiCall("건대입구역"));
+        성수역id = JsonPathUtil.getId(StationApiRequester.createStationApiCall("성수역"));
     }
 
     /**
@@ -39,18 +38,18 @@ public class LineAcceptanceTest {
     @Test
     void createLine() {
         //when
-        LineCreateRequest request = new LineCreateRequest(
+        LineCreateRequest 이호선 = new LineCreateRequest(
                 "2호선",
                 "green",
-                1L,
-                2L,
+                잠실역id,
+                용산역id,
                 10
         );
-        ExtractableResponse<Response> response = lineApiRequester.createLineApiCall(request);
+        ExtractableResponse<Response> response = LineApiRequester.createLineApiCall(이호선);
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(JsonPathUtil.getIds(lineApiRequester.findLinesApiCall()))
+        assertThat(JsonPathUtil.getIds(LineApiRequester.findLinesApiCall()))
                 .containsExactly(JsonPathUtil.getId(response));
     }
 
@@ -63,30 +62,30 @@ public class LineAcceptanceTest {
     @Test
     void showLiens() {
         //given
-        LineCreateRequest requestA = new LineCreateRequest(
+        LineCreateRequest 이호선 = new LineCreateRequest(
                 "2호선",
                 "green",
-                1L,
-                2L,
+                잠실역id,
+                용산역id,
                 10
         );
-        Long savedIdA = JsonPathUtil.getId(lineApiRequester.createLineApiCall(requestA));
+        Long 이호선id = JsonPathUtil.getId(LineApiRequester.createLineApiCall(이호선));
 
-        LineCreateRequest requestB = new LineCreateRequest(
+        LineCreateRequest 일호선 = new LineCreateRequest(
                 "1호선",
                 "blue",
-                3L,
-                4L,
+                건대입구역id,
+                성수역id,
                 10
         );
-        Long savedIdB = JsonPathUtil.getId(lineApiRequester.createLineApiCall(requestB));
+        Long 일호선id = JsonPathUtil.getId(LineApiRequester.createLineApiCall(일호선));
 
         //when
-        ExtractableResponse<Response> response = lineApiRequester.findLinesApiCall();
+        ExtractableResponse<Response> response = LineApiRequester.findLinesApiCall();
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(JsonPathUtil.getIds(response)).containsExactly(savedIdA, savedIdB);
+        assertThat(JsonPathUtil.getIds(response)).containsExactly(이호선id, 일호선id);
     }
 
     /**
@@ -98,21 +97,21 @@ public class LineAcceptanceTest {
     @Test
     void showLine() {
         //given
-        LineCreateRequest request = new LineCreateRequest(
+        LineCreateRequest 이호선 = new LineCreateRequest(
                 "2호선",
                 "green",
-                1L,
-                2L,
+                잠실역id,
+                용산역id,
                 10
         );
-        Long savedId = JsonPathUtil.getId(lineApiRequester.createLineApiCall(request));
+        Long 이호선id = JsonPathUtil.getId(LineApiRequester.createLineApiCall(이호선));
 
         //when
-        ExtractableResponse<Response> response = lineApiRequester.findLineApiCall(savedId);
+        ExtractableResponse<Response> response = LineApiRequester.findLineApiCall(이호선id);
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(JsonPathUtil.getId(response)).isEqualTo(savedId);
+        assertThat(JsonPathUtil.getId(response)).isEqualTo(이호선id);
     }
 
     /**
@@ -124,25 +123,25 @@ public class LineAcceptanceTest {
     @Test
     void updateLine() {
         //given
-        LineCreateRequest createRequest = new LineCreateRequest(
+        LineCreateRequest 이호선 = new LineCreateRequest(
                 "2호선",
                 "green",
-                1L,
-                2L,
+                잠실역id,
+                용산역id,
                 10
         );
-        Long id = JsonPathUtil.getId(lineApiRequester.createLineApiCall(createRequest));
+        Long 이호선id = JsonPathUtil.getId(LineApiRequester.createLineApiCall(이호선));
 
         //when
-        LineUpdateRequest request = new LineUpdateRequest("1호선", "blue");
-        ExtractableResponse<Response> response = lineApiRequester.updateLineApiCall(id, request);
+        LineUpdateRequest 일호선 = new LineUpdateRequest("1호선", "blue");
+        ExtractableResponse<Response> response = LineApiRequester.updateLineApiCall(이호선id, 일호선);
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
-        ExtractableResponse<Response> findLineResponse = lineApiRequester.findLineApiCall(id);
-        assertThat(findLineResponse.jsonPath().getString("name")).isEqualTo("1호선");
-        assertThat(findLineResponse.jsonPath().getString("color")).isEqualTo("blue");
+        ExtractableResponse<Response> findLineResponse = LineApiRequester.findLineApiCall(이호선id);
+        assertThat(JsonPathUtil.getString(findLineResponse, "name")).isEqualTo("1호선");
+        assertThat(JsonPathUtil.getString(findLineResponse, "color")).isEqualTo("blue");
     }
 
     /**
@@ -154,20 +153,20 @@ public class LineAcceptanceTest {
     @Test
     void deleteLine() {
         //given
-        LineCreateRequest request = new LineCreateRequest(
+        LineCreateRequest 이호선 = new LineCreateRequest(
                 "2호선",
                 "green",
-                1L,
-                2L,
+                잠실역id,
+                용산역id,
                 10
         );
-        Long id = JsonPathUtil.getId(lineApiRequester.createLineApiCall(request));
+        Long 이호선id = JsonPathUtil.getId(LineApiRequester.createLineApiCall(이호선));
 
         //when
-        ExtractableResponse<Response> response = lineApiRequester.deleteLineApiCall(id);
+        ExtractableResponse<Response> response = LineApiRequester.deleteLineApiCall(이호선id);
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-        assertThat(lineApiRequester.findLineApiCall(id).asPrettyString()).isEqualTo("존재하지 않는 노선입니다.");
+        assertThat(LineApiRequester.findLineApiCall(이호선id).asPrettyString()).isEqualTo("존재하지 않는 노선입니다.");
     }
 }

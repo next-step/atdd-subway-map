@@ -1,6 +1,6 @@
 package subway.line.exception;
 
-public class LineException extends IllegalArgumentException {
+public class LineException extends RuntimeException {
 
     public LineException() {
     }

@@ -1,4 +1,4 @@
-package subway.line.exception;
+package subway.section.exception;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,14 +8,14 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
-public class LineControllerAdvice {
+public class SectionControllerAdvice {
 
-    private final Logger log = LoggerFactory.getLogger(LineControllerAdvice.class);
+    private final Logger log = LoggerFactory.getLogger(SectionControllerAdvice.class);
 
-    @ExceptionHandler(LineException.class)
+    @ExceptionHandler(SectionException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public String lineExceptionAdvice(LineException e) {
-        log.debug("LineException 발생 ::: {}", e.getMessage());
+    public String sectionException(SectionException e) {
+        log.debug("SectionException 발생 ::: {}", e.getMessage());
         return e.getMessage();
     }
 }

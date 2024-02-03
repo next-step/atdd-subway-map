@@ -11,7 +11,7 @@ import static io.restassured.RestAssured.given;
 
 public class StationApiRequester {
 
-    public ExtractableResponse<Response> createStationApiCall(String name) {
+    public static ExtractableResponse<Response> createStationApiCall(String name) {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
 
@@ -23,14 +23,14 @@ public class StationApiRequester {
                 .extract();
     }
 
-    public ExtractableResponse<Response> showStationsApiCall() {
+    public static ExtractableResponse<Response> showStationsApiCall() {
         return given().log().all()
                 .when().get("/stations")
                 .then().log().all()
                 .extract();
     }
 
-    public ExtractableResponse<Response> deleteStationApiCall(Long id) {
+    public static ExtractableResponse<Response> deleteStationApiCall(Long id) {
         return given().log().all()
                 .pathParam("id", id)
                 .when().delete("/stations/{id}")
