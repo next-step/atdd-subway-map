@@ -3,6 +3,7 @@ package subway;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,6 +12,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import subway.controller.dto.LineCreateRequest;
 import subway.controller.dto.StationCreateRequest;
+
+import java.util.Map;
 
 import static io.restassured.RestAssured.UNDEFINED_PORT;
 
@@ -73,8 +76,14 @@ public class AcceptanceTest {
                 .extract();
     }
 
-    protected ExtractableResponse<Response> delete(String path, int statusCode, Object... pathParams) {
-        return RestAssured.given().log().all()
+    protected ExtractableResponse<Response> delete(String path, int statusCode, Map<String, ?> queryParams, Object... pathParams) {
+        RequestSpecification requestSpecification = RestAssured.given().log().all();
+
+        if (queryParams != null && !queryParams.isEmpty()) {
+            queryParams.forEach(requestSpecification::queryParam);
+        }
+
+        return requestSpecification
                 .when().delete(path, pathParams)
                 .then().log().all()
                 .statusCode(statusCode)

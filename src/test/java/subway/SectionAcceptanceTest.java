@@ -15,6 +15,7 @@ import subway.controller.dto.SectionCreateRequest;
 import subway.controller.dto.StationResponse;
 import subway.exception.ExceptionResponse;
 
+import java.util.Map;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -172,7 +173,11 @@ public class SectionAcceptanceTest extends AcceptanceTest {
      */
     @Test
     void 실패_지하철_구간_제거시_마지막_구간이_아닐경우_예외가_발생한다() {
-
+        SectionCreateRequest request = sectionCreateRequest(SEOLLEUNG_STATION_ID, YANGJAE_STATION_ID, 13);
+        post("/lines/{lineId}/sections", request, CREATED.value(), SHINBUNDANG_LINE_ID);
+        String message = delete("/lines/{lineId}/sections", OK.value(), Map.of("stationId", "1"), SHINBUNDANG_LINE_ID)
+                .as(ExceptionResponse.class).getMessage();
+        assertThat(message).isEqualTo("마지막 구간이 아닐 경우 구간을 제거할 수 없습니다.");
     }
 
     /**
@@ -183,7 +188,9 @@ public class SectionAcceptanceTest extends AcceptanceTest {
      */
     @Test
     void 실패_지하철_구간_제거시_구간이_한개만_있는_경우_예외가_발생한다() {
-
+        String message = delete("/lines/{lineId}/sections", OK.value(), Map.of("stationId", "1"), SHINBUNDANG_LINE_ID)
+                .as(ExceptionResponse.class).getMessage();
+        assertThat(message).isEqualTo("구간이 한개만 있을 경우 구간을 제거할 수 없습니다.");
     }
 
     /**

@@ -6,6 +6,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import subway.controller.dto.StationResponse;
 
+import java.util.HashMap;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -82,7 +83,7 @@ public class StationAcceptanceTest extends AcceptanceTest {
     }
 
     private ExtractableResponse<Response> deleteStation(Long id, int statusCode) {
-        return delete("/stations/{id}", statusCode, id);
+        return delete("/stations/{id}", statusCode, new HashMap<>(), id);
     }
 
 }

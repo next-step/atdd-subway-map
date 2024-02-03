@@ -11,6 +11,7 @@ import subway.controller.dto.LineResponse;
 import subway.controller.dto.LineUpdateRequest;
 import subway.controller.dto.StationResponse;
 
+import java.util.HashMap;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -177,7 +178,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     }
 
     private ExtractableResponse<Response> deleteLine(Long id, int statusCode) {
-        return delete("/lines/{id}", statusCode, id);
+        return delete("/lines/{id}", statusCode, new HashMap<>(), id);
     }
 
 }
