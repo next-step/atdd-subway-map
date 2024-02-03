@@ -23,13 +23,8 @@ public class SimpleSectionFactory implements SectionFactory {
 	private final SectionRepository sectionRepository;
 
 	@Override
-	public Section createSection(LineCreateCommand request, Line line) {
-
-		Station upStation = stationRepository.findById(request.getUpStationId()).orElseThrow();
-		Station downStation = stationRepository.findById(request.getDownStationId()).orElseThrow();
-
-		Section section = Section.of(upStation, downStation, request.getDistance(), line);
-
+	public Section createSection(SectionCreateCommand command, Station upStation, Station downStation) {
+		Section section = Section.of(upStation, downStation, command.getDistance());
 		return sectionRepository.save(section);
 	}
 
@@ -37,17 +32,11 @@ public class SimpleSectionFactory implements SectionFactory {
 	public Section createSection(LineCreateCommand createCommand) {
 		Station upStation = stationRepository.findById(createCommand.getUpStationId()).orElseThrow();
 		Station downStation = stationRepository.findById(createCommand.getDownStationId()).orElseThrow();
-		return sectionRepository.save( Section.of(upStation, downStation, createCommand.getDistance()));
-	}
-
-	@Override
-	public Section createSection(SectionCreateCommand command, Line line, Station upStation, Station downStation) {
-		Section section = Section.of(upStation, downStation, command.getDistance(), line);
-		return sectionRepository.save(section);
+		return sectionRepository.save(Section.of(upStation, downStation, createCommand.getDistance()));
 	}
 
 	@Override
 	public void deleteByLine(Line line) {
-		sectionRepository.deleteByLine(line);
+		sectionRepository.deleteAll(line.getSections());
 	}
 }

@@ -58,7 +58,6 @@ public class Line {
 
 	public void addSection(Section section) {
 		this.sections.addSection(section);
-		section.setLine(this);			// 연관관계 매핑
 	}
 
 	public boolean isSectionCountBelowThreshold(long size) {

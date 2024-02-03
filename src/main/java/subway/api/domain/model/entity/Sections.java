@@ -9,6 +9,7 @@ import java.util.stream.Stream;
 
 import javax.persistence.Embeddable;
 import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 
 import org.hibernate.annotations.SortNatural;
@@ -42,7 +43,8 @@ public class Sections implements Iterable<Section> {
 	 * - Line과 Station 사이 -> 노선이 삭제된다고 하더라도 연관된 지하철 역이 사라져서는 안된다. 따라서 Section 와 Station 사이에서는 Cascade 옵션을 적용하면 안 된다.
 	 * => 결론적으로 현재 필드에 CascadeType.ALL 옵션 적용은 불필요하다.
 	 */
-	@OneToMany(mappedBy = "line", fetch = FetchType.LAZY)
+	@OneToMany(fetch = FetchType.LAZY)
+	@JoinColumn(name = "line_id")
 	@SortNatural
 	private SortedSet<Section> sections = new TreeSet<>();
 

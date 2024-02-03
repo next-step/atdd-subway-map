@@ -44,7 +44,7 @@ public class SimpleSectionService implements SectionService {
 		Station upStation = stationResolver.fetchOptional(createCommand.getUpStationId()).orElseThrow(() -> new StationNotFoundException(BAD_REQUEST));
 		Station downStation = stationResolver.fetchOptional(createCommand.getDownStationId()).orElseThrow(() -> new StationNotFoundException(BAD_REQUEST));
 
-		Section newSection = sectionFactory.createSection(createCommand, line, upStation, downStation);
+		Section newSection = sectionFactory.createSection(createCommand, upStation, downStation);
 		line.addSection(newSection);
 
 		return SectionInfo.from(newSection);

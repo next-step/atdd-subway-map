@@ -27,7 +27,6 @@ public class SectionInfo implements Comparable<SectionInfo> {
 
 	private Long distance;
 
-	private LineInfo line;
 
 	@Override
 	public int compareTo(SectionInfo other) {
@@ -35,8 +34,6 @@ public class SectionInfo implements Comparable<SectionInfo> {
 	}
 
 	public static SectionInfo from(Section section) {
-		SectionInfo sectionInfo = ObjectMapperBasedObjectMapper.convert(section, SectionInfo.class);
-		sectionInfo.setLine(LineInfo.from(section.getLine()));
-		return sectionInfo;
+		return ObjectMapperBasedObjectMapper.convert(section, SectionInfo.class);
 	}
 }

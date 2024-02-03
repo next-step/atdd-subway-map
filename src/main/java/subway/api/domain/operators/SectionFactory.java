@@ -11,11 +11,10 @@ import subway.api.domain.model.entity.Station;
  * @since : 2024/01/27
  */
 public interface SectionFactory {
-	Section createSection(LineCreateCommand request, Line line);
 
 	Section createSection(LineCreateCommand createCommand);
 
-	Section createSection(SectionCreateCommand command, Line line, Station upStation, Station downStation);
+	Section createSection(SectionCreateCommand command, Station upStation, Station downStation);
 
 	void deleteByLine(Line line);
 }
