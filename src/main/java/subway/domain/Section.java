@@ -51,4 +51,7 @@ public class Section {
         return List.of(upStation, downStation);
     }
 
+    public Long distance() {
+        return distance;
+    }
 }

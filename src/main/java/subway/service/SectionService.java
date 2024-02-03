@@ -24,10 +24,11 @@ public class SectionService {
         Sections sections = new Sections(sectionRepository.findByLine(line));
 
         Stations stations = new Stations(stationRepository.findByIdIn(request.stationIds()));
-        sections.validateStationRegisterBy(
+        sections.validateRegisterStationBy(
                 stations.findBy(Long.parseLong(request.getUpStationId())),
                 stations.findBy(Long.parseLong(request.getDownStationId()))
         );
+        sections.validateLineDistance(request.getDistance());
 
         return 1L;
     }

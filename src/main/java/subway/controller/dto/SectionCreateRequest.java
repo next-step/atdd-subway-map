@@ -12,12 +12,12 @@ public class SectionCreateRequest {
     private String downStationId;
     @NotBlank
     private String upStationId;
-    private int distance;
+    private long distance;
 
     public SectionCreateRequest() {
     }
 
-    public SectionCreateRequest(String downStationId, String upStationId, int distance) {
+    public SectionCreateRequest(String downStationId, String upStationId, long distance) {
         this.downStationId = downStationId;
         this.upStationId = upStationId;
         this.distance = distance;
@@ -35,7 +35,7 @@ public class SectionCreateRequest {
         return upStationId;
     }
 
-    public int getDistance() {
+    public long getDistance() {
         return distance;
     }
 }

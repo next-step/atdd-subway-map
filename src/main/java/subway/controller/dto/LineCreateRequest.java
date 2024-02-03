@@ -7,7 +7,7 @@ public class LineCreateRequest {
     private String color;
     private Long upStationId;
     private Long downStationId;
-    private Long distance;
+    private long distance;
 
     public LineCreateRequest() {
     }
