@@ -54,7 +54,7 @@ public class StationSectionService {
     }
 
     private StationSection saveStationSection(StationSection stationSection) {
-        stationSection.updateLineDownStationId();
+        stationSection.updateDownStationOfLine();
         return stationSectionRepository.save(stationSection);
     }
 

@@ -1,7 +1,5 @@
 package subway.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import javax.persistence.*;
 
 @Entity
@@ -21,7 +19,6 @@ public class StationSection {
 
     private int distance;
 
-    @JsonIgnore
     @ManyToOne
     private StationLine stationLine;
 
@@ -74,7 +71,7 @@ public class StationSection {
         return this;
     }
 
-    public void updateLineDownStationId() {
+    public void updateDownStationOfLine() {
         this.stationLine.updateDownStation(this.downStationId);
     }
 
