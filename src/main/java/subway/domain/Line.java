@@ -56,6 +56,7 @@ public class Line {
     }
 
     public void registSection(Section section) {
+        this.downStationId = section.getDownStationId();
         sections.add(section);
     }
 

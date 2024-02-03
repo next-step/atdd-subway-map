@@ -31,8 +31,8 @@ public class Fixtures {
     }
 
     public static Map<String, String> getRegistSectionParams(
-        String downStationId,
         String upStationId,
+        String downStationId,
         String distance
     ) {
         Map<String, String> params = new HashMap<>();

@@ -59,4 +59,8 @@ public class Station {
     public int hashCode() {
         return Objects.hash(id, lineId);
     }
+
+    public boolean isStationRegisteredToLine() {
+        return lineId != null;
+    }
 }

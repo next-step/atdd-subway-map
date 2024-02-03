@@ -44,7 +44,7 @@ class SectionAcceptanceTest {
             newDownStationId.toString(),
             Integer.toString(10));
         int statusCode = RequestFixtures.지하철구간_등록하기(lineId, params).statusCode();
-        assertThat(statusCode).isEqualTo(HttpStatus.OK);
+        assertThat(statusCode).isEqualTo(HttpStatus.OK.value());
     }
 
 }
