@@ -6,23 +6,22 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import lombok.RequiredArgsConstructor;
+import subway.api.domain.dto.inport.StationCreateCommand;
 import subway.api.domain.model.entity.Station;
 import subway.api.infrastructure.persistence.StationRepository;
-import subway.api.interfaces.dto.StationRequest;
-import subway.api.interfaces.dto.StationResponse;
+import subway.api.interfaces.dto.request.StationCreateRequest;
+import subway.api.interfaces.dto.response.StationResponse;
 
 @Service
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class StationService {
-    private StationRepository stationRepository;
-
-    public StationService(StationRepository stationRepository) {
-        this.stationRepository = stationRepository;
-    }
+    private final StationRepository stationRepository;
 
     @Transactional
-    public StationResponse saveStation(StationRequest stationRequest) {
-        Station station = stationRepository.save(new Station(stationRequest.getName()));
+    public StationResponse saveStation(StationCreateCommand stationCreateRequest) {
+        Station station = stationRepository.save(new Station(stationCreateRequest.getName()));
         return createStationResponse(station);
     }
 
