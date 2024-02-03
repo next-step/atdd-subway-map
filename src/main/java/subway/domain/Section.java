@@ -54,4 +54,8 @@ public class Section {
     public Long distance() {
         return distance;
     }
+
+    public Long id() {
+        return id;
+    }
 }

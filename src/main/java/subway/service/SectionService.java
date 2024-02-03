@@ -3,9 +3,7 @@ package subway.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import subway.controller.dto.SectionCreateRequest;
-import subway.domain.Line;
-import subway.domain.Sections;
-import subway.domain.Stations;
+import subway.domain.*;
 import subway.repository.LineRepository;
 import subway.repository.SectionRepository;
 import subway.repository.StationRepository;
@@ -24,13 +22,16 @@ public class SectionService {
         Sections sections = new Sections(sectionRepository.findByLine(line));
 
         Stations stations = new Stations(stationRepository.findByIdIn(request.stationIds()));
-        sections.validateRegisterStationBy(
-                stations.findBy(Long.parseLong(request.getUpStationId())),
-                stations.findBy(Long.parseLong(request.getDownStationId()))
-        );
+        Station upStation = stations.findBy(Long.parseLong(request.getUpStationId()));
+        Station downStation = stations.findBy(Long.parseLong(request.getDownStationId()));
+        sections.validateRegisterStationBy(upStation, downStation);
         sections.validateLineDistance(request.getDistance());
 
-        return 1L;
+        Section section = sectionRepository.save(
+                new Section(line, upStation, downStation, sections.calculateSectionDistance(request.getDistance()))
+        );
+
+        return section.id();
     }
 
 }
