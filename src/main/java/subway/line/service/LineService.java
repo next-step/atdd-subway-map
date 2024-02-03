@@ -40,8 +40,6 @@ public class LineService {
         final int lineDistance = request.getDistance();
 
         final Line newLine = new Line(lineName, lineColor, upStation, downStation, lineDistance);
-        final Section section = new Section(newLine, upStation, downStation, lineDistance);
-        newLine.getSections().add(section);
         final Line savedLine = lineRepository.save(newLine);
 
         return LineResponse.convertToDto(savedLine);
@@ -131,7 +129,7 @@ public class LineService {
             throw new IllegalArgumentException();
         }
 
-        List<Section> sections = line.getSections();
+        List<Section> sections = line.getSections().getSections();
         for (Section section : sections) {
             if (section.getDownStation().getId().equals(stationId)) {
                 line.subtractDownStation(section.getUpStation(), section.getDistance());

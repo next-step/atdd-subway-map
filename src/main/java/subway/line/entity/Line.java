@@ -30,8 +30,8 @@ public class Line {
     @Column(nullable = false)
     private int distance;
 
-    @OneToMany(mappedBy = "line", cascade = CascadeType.ALL)
-    private List<Section> sections = new ArrayList<>();
+    @Embedded
+    private Sections sections;
 
     protected Line() {
     }
@@ -42,6 +42,10 @@ public class Line {
         this.upStation = upStation;
         this.downStation = downStation;
         this.distance = distance;
+
+        List<Section> sectionList = new ArrayList<>();
+        sectionList.add(new Section(this, upStation, downStation, distance));
+        this.sections = Sections.from(sectionList);
     }
 
     public void updateDetails(String name, String color) {
@@ -83,7 +87,7 @@ public class Line {
         return distance;
     }
 
-    public List<Section> getSections() {
+    public Sections getSections() {
         return sections;
     }
 
