@@ -30,14 +30,14 @@ public class LineAcceptanceTest {
     @Test
     void 지하철노선을_생성하고_조회한다() {
         // given
-        createStation("건대입구");
-        createStation("어린이대공원");
+        Long 건대입구_id = createStation("건대입구");
+        Long 어린이대공원_id = createStation("어린이대공원");
 
         LineCreateRequest lineCreateRequest = new LineCreateRequest(
                 "신분당선",
                 "bg-red-600",
-                1L,
-                2L,
+                건대입구_id,
+                어린이대공원_id,
                 10
         );
 
@@ -60,15 +60,15 @@ public class LineAcceptanceTest {
     @Test
     void 생성한_지하철노선을_모두_조회한다() {
         // given
-        createStation("건대입구");
-        createStation("어린이대공원");
-        createStation("군자");
+        Long 건대입구_id = createStation("건대입구");
+        Long 어린이대공원_id = createStation("어린이대공원");
+        Long 군자_id = createStation("군자");
 
         LineCreateRequest lineCreateRequest_1 = new LineCreateRequest(
                 "신분당선",
                 "bg-red-600",
-                1L,
-                2L,
+                건대입구_id,
+                어린이대공원_id,
                 10
         );
         createLine(lineCreateRequest_1);
@@ -76,8 +76,8 @@ public class LineAcceptanceTest {
         LineCreateRequest lineCreateRequest_2 = new LineCreateRequest(
                 "분당선",
                 "bg-green-600",
-                1L,
-                3L,
+                건대입구_id,
+                군자_id,
                 20
         );
         createLine(lineCreateRequest_2);
@@ -104,20 +104,18 @@ public class LineAcceptanceTest {
     @Test
     void 한개의_지하철_노선을_조회한다() {
         // given
-        createStation("건대입구");
-        createStation("어린이대공원");
+        Long 건대입구_id = createStation("건대입구");
+        Long 어린이대공원_id = createStation("어린이대공원");
 
         LineCreateRequest lineCreateRequest = new LineCreateRequest(
                 "신분당선",
                 "bg-red-600",
-                1L,
-                2L,
+                건대입구_id,
+                어린이대공원_id,
                 10
         );
         ExtractableResponse<Response> extractableResponse = createLine(lineCreateRequest);
         Long lineId = extractableResponse.jsonPath().getLong("id");
-
-        String locationHeader = extractableResponse.header("Location");
 
         // when
         ExtractableResponse<Response> response = getLine(lineId);
@@ -137,14 +135,14 @@ public class LineAcceptanceTest {
     @Test
     void 지하철노선_정보를_수정한다() {
         // given
-        createStation("건대입구");
-        createStation("어린이대공원");
+        Long 건대입구_id = createStation("건대입구");
+        Long 어린이대공원_id = createStation("어린이대공원");
 
         LineCreateRequest lineCreateRequest = new LineCreateRequest(
                 "신분당선",
                 "bg-red-600",
-                1L,
-                2L,
+                건대입구_id,
+                어린이대공원_id,
                 10
         );
         ExtractableResponse<Response> extractableResponse = createLine(lineCreateRequest);
@@ -170,14 +168,14 @@ public class LineAcceptanceTest {
     @Test
     void 지하철노선을_삭제한다() {
         // given
-        createStation("건대입구");
-        createStation("어린이대공원");
+        Long 건대입구_id = createStation("건대입구");
+        Long 어린이대공원_id = createStation("어린이대공원");
 
         LineCreateRequest lineCreateRequest = new LineCreateRequest(
                 "신분당선",
                 "bg-red-600",
-                1L,
-                2L,
+                건대입구_id,
+                어린이대공원_id,
                 10
         );
         ExtractableResponse<Response> extractableResponse = createLine(lineCreateRequest);
@@ -200,7 +198,7 @@ public class LineAcceptanceTest {
                 .extract();
     }
 
-    private ExtractableResponse<Response> createStation(String stationName) {
+    private Long createStation(String stationName) {
         Map<String, String> params = new HashMap<>();
         params.put("name", stationName);
 
@@ -209,7 +207,8 @@ public class LineAcceptanceTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/stations")
                 .then().log().all()
-                .extract();
+                .extract()
+                .response().jsonPath().getLong("id");
     }
 
     private ExtractableResponse<Response> getLines() {
