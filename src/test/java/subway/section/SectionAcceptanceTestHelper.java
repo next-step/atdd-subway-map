@@ -24,4 +24,20 @@ public class SectionAcceptanceTestHelper {
         params.put("distance", "10");
         return params;
     }
+
+    static HashMap<String, String> 구간제거_파라미터_생성(String 신규하행ID) {
+        HashMap<String, String> params = new HashMap<>();
+        params.put("stationId", 신규하행ID);
+        return params;
+    }
+
+    static ExtractableResponse<Response> 구간_제거_요청(HashMap<String, String> params) {
+        return RestAssured.given().log().all()
+                          .body(params)
+                          .contentType(
+                              MediaType.APPLICATION_JSON_VALUE)
+                          .when().delete("/lines/1/sections")
+                          .then().log().all()
+                          .extract();
+    }
 }
