@@ -115,10 +115,9 @@ public class LineAcceptanceTest {
         RestAssuredUtil.put(updateReq, "/lines/" + id);
 
         // then
-        String lineName
-                = RestAssuredUtil.get("/lines/" + id).jsonPath().getString("name");
-
-        assertThat(lineName).isEqualTo("4호선");
+        LineResponse res =
+                RestAssuredUtil.get("/lines/" + id).as(LineResponse.class);
+        assertThat(res.getName()).isEqualTo("4호선");
     }
 
     /**
