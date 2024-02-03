@@ -1,5 +1,7 @@
 package subway.section;
 
+import static subway.line.LineAcceptanceTestHelper.노선_단건조회_요청;
+
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -39,5 +41,9 @@ public class SectionAcceptanceTestHelper {
                           .when().delete("/lines/1/sections")
                           .then().log().all()
                           .extract();
+    }
+
+    public static String 노선_하행ID조회(ExtractableResponse<Response> response) {
+        return 노선_단건조회_요청(response).jsonPath().getString("stations[1].id");
     }
 }

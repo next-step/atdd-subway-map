@@ -73,10 +73,6 @@ public class SectionAcceptanceTest {
         assertThat(노선_하행ID조회(response)).isEqualTo(하행ID);
     }
 
-    private static String 노선_하행ID조회(ExtractableResponse<Response> response) {
-        return 노선_단건조회_요청(response).jsonPath().getString("stations[1].id");
-    }
-
     /**
      Given 지하철 노선이 생성되고,
      When 이미 해당 노선에 등록되어 있는 역이 새로운 구간의 하행역이라면,
