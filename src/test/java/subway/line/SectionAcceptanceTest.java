@@ -1,26 +1,47 @@
 package subway.line;
 
-import io.restassured.RestAssured;
-import io.restassured.path.json.JsonPath;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
+import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
-import subway.controller.dto.LineCreateRequestBody;
-
-import java.util.HashMap;
-import java.util.Map;
+import subway.helper.api.LineApi;
+import subway.helper.api.StationApi;
+import subway.helper.db.Truncator;
+import subway.helper.fixture.LineFixture;
+import subway.helper.fixture.SectionFixture;
+import subway.helper.fixture.StationFixture;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 구간 관련 기능")
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class SectionAcceptanceTest {
     private final String routePrefix = "/lines";
+    private static Long 강남역Id;
+    private static Long 신논현역Id;
+    private static Long 논현역Id;
+    private static Long 신분당선Id;
+
+    @Autowired
+    private Truncator truncator;
+
+    @AfterEach
+    void clear() {
+        truncator.truncateAll();
+    }
+
+
+    @BeforeEach
+    void createFixture() {
+        // stations
+        강남역Id = StationApi.create(StationFixture.강남역).getLong("id");
+        신논현역Id = StationApi.create(StationFixture.신논현역).getLong("id");
+        논현역Id = StationApi.create(StationFixture.논현역).getLong("id");
+        // line
+        신분당선Id = LineApi.createLine(LineFixture.신분당선(강남역Id, 신논현역Id)).getLong("id");
+    }
 
     @Nested
     class SectionCreateTest {
@@ -32,27 +53,15 @@ public class SectionAcceptanceTest {
         @DisplayName("등록하려는 상행역이 기존 노선의 하행역이 아닌 경우 에러가 발생한다.")
         @Test
         void createLineSectionFailForUpStationValidation() {
-            // given
-            Long upStationId = setupStationByName("강남역");
-            Long downStationId = setupStationByName("역삼역");
-            Long willAddedStationId = setupStationByName("선릉역");
-
-            Long createdLine = setupLine(
-                    "2호선", "bg-green-600", upStationId, downStationId, 10
+            // when
+            ExtractableResponse<Response> response = LineApi.createSection(
+                    신분당선Id, SectionFixture.추가구간(강남역Id, 논현역Id)
             );
 
-            // when
-            RestAssured.given().log().all()
-                    .body(Map.of("downStationId", willAddedStationId, "upStationId", upStationId, "distance", 10))
-                    .pathParam("id", createdLine)
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                    .when().post(routePrefix + "/{id}/sections")
-                    .then().log().all()
-                    .statusCode(HttpStatus.UNPROCESSABLE_ENTITY.value());
-
             // then
-            assertThat(getJsonPathOfGetLine(createdLine).getList("stations.id", Long.class))
-                    .containsExactly(upStationId, downStationId);
+            assertThat(response.statusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY.value());
+            assertThat(LineApi.getSection(신분당선Id).getList("stations.id", Long.class))
+                    .containsExactly(강남역Id, 신논현역Id);
         }
 
         /**
@@ -63,27 +72,15 @@ public class SectionAcceptanceTest {
         @DisplayName("등록하려는 하행역이 기존 노선에 이미 존재하는 역인 경우 에러가 발생한다.")
         @Test
         void createLineSectionFailForDownStationValidation() {
-            // given
-            Long upStationId = setupStationByName("강남역");
-            Long downStationId = setupStationByName("역삼역");
-            Long willAddedStationId = setupStationByName("선릉역");
-
-            Long createdLine = setupLine(
-                    "2호선", "bg-green-600", upStationId, downStationId, 10
+            // when
+            ExtractableResponse<Response> response = LineApi.createSection(
+                    신분당선Id, SectionFixture.추가구간(논현역Id, 강남역Id)
             );
 
-            // when
-            RestAssured.given().log().all()
-                    .body(Map.of("downStationId", upStationId, "upStationId", downStationId, "distance", 10))
-                    .pathParam("id", createdLine)
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                    .when().post(routePrefix + "/{id}/sections")
-                    .then().log().all()
-                    .statusCode(HttpStatus.UNPROCESSABLE_ENTITY.value());
-
             // then
-            assertThat(getJsonPathOfGetLine(createdLine).getList("stations.id", Long.class))
-                    .containsExactly(upStationId, downStationId);
+            assertThat(response.statusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY.value());
+            assertThat(LineApi.getSection(신분당선Id).getList("stations.id", Long.class))
+                    .containsExactly(강남역Id, 신논현역Id);
         }
 
 
@@ -95,27 +92,15 @@ public class SectionAcceptanceTest {
         @DisplayName("지하철 노선 구간을 추가한다.")
         @Test
         void createLineSection() {
-            // given
-            Long upStationId = setupStationByName("강남역");
-            Long downStationId = setupStationByName("역삼역");
-            Long willAddedStationId = setupStationByName("선릉역");
-
-            Long createdLine = setupLine(
-                    "2호선", "bg-green-600", upStationId, downStationId, 10
+            // when
+            ExtractableResponse<Response> response = LineApi.createSection(
+                    신분당선Id, SectionFixture.추가구간(신논현역Id, 논현역Id)
             );
 
-            // when
-            RestAssured.given().log().all()
-                    .body(Map.of("downStationId", willAddedStationId, "upStationId", downStationId, "distance", 10))
-                    .pathParam("id", createdLine)
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                    .when().post(routePrefix + "/{id}/sections")
-                    .then().log().all()
-                    .statusCode(HttpStatus.CREATED.value());
-
             // then
-            assertThat(getJsonPathOfGetLine(createdLine).getList("stations.id", Long.class))
-                    .containsExactly(upStationId, downStationId, willAddedStationId);
+            assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+            assertThat(LineApi.getSection(신분당선Id).getList("stations.id", Long.class))
+                    .containsExactly(강남역Id, 신논현역Id, 논현역Id);
         }
     }
 
@@ -130,27 +115,13 @@ public class SectionAcceptanceTest {
         @DisplayName("구간이 1개인 경우 역을 제거하려 시도하면 에러가 발생한다.")
         @Test
         void deleteLineSectionFailWithOneLine() {
-            // given
-            Long upStationId = setupStationByName("강남역");
-            Long downStationId = setupStationByName("역삼역");
-            Long willAddedStationId = setupStationByName("선릉역");
-
-            Long createdLine = setupLine(
-                    "2호선", "bg-green-600", upStationId, downStationId, 10
-            );
-
             // when
-            RestAssured.given().log().all()
-                    .queryParam("stationId", upStationId)
-                    .pathParam("id", createdLine)
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                    .when().delete(routePrefix + "/{id}/sections")
-                    .then().log().all()
-                    .statusCode(HttpStatus.UNPROCESSABLE_ENTITY.value());
+            ExtractableResponse<Response> response = LineApi.deleteSection(신분당선Id, 신논현역Id);
 
             // then
-            assertThat(getJsonPathOfGetLine(createdLine).getList("stations.id", Long.class))
-                    .containsExactly(upStationId, downStationId);
+            assertThat(response.statusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY.value());
+            assertThat(LineApi.getSection(신분당선Id).getList("stations.id", Long.class))
+                    .containsExactly(강남역Id, 신논현역Id);
         }
 
         /**
@@ -161,35 +132,13 @@ public class SectionAcceptanceTest {
         @DisplayName("하행역이 아닌 역을 제거하려는 경우 에러가 발생한다.")
         @Test
         void deleteLineSectionFailWithUpStation() {
-            // given
-            Long upStationId = setupStationByName("강남역");
-            Long downStationId = setupStationByName("역삼역");
-            Long willAddedStationId = setupStationByName("선릉역");
-
-            Long createdLine = setupLine(
-                    "2호선", "bg-green-600", upStationId, downStationId, 10
-            );
-
-            RestAssured.given().log().all()
-                    .body(Map.of("downStationId", willAddedStationId, "upStationId", downStationId, "distance", 10))
-                    .pathParam("id", createdLine)
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                    .when().post(routePrefix + "/{id}/sections")
-                    .then().log().all()
-                    .statusCode(HttpStatus.CREATED.value());
-
             // when
-            RestAssured.given().log().all()
-                            .queryParam("stationId", upStationId)
-                            .pathParam("id", createdLine)
-                            .contentType(MediaType.APPLICATION_JSON_VALUE)
-                            .when().delete(routePrefix + "/{id}/sections")
-                            .then().log().all()
-                            .statusCode(HttpStatus.UNPROCESSABLE_ENTITY.value());
+            ExtractableResponse<Response> response = LineApi.deleteSection(신분당선Id, 강남역Id);
 
             // then
-            assertThat(getJsonPathOfGetLine(createdLine).getList("stations.id", Long.class))
-                    .containsExactly(upStationId, downStationId, willAddedStationId);
+            assertThat(response.statusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY.value());
+            assertThat(LineApi.getSection(신분당선Id).getList("stations.id", Long.class))
+                    .containsExactly(강남역Id, 신논현역Id);
         }
 
         /**
@@ -201,73 +150,16 @@ public class SectionAcceptanceTest {
         @Test
         void deleteLineSectionSuccess() {
             // given
-            Long upStationId = setupStationByName("강남역");
-            Long downStationId = setupStationByName("역삼역");
-            Long willAddedStationId = setupStationByName("선릉역");
-
-            Long createdLine = setupLine(
-                    "2호선", "bg-green-600", upStationId, downStationId, 10
-            );
-
-            RestAssured.given().log().all()
-                    .body(Map.of("downStationId", willAddedStationId, "upStationId", downStationId, "distance", 10))
-                    .pathParam("id", createdLine)
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                    .when().post(routePrefix + "/{id}/sections")
-                    .then().log().all()
-                    .statusCode(HttpStatus.CREATED.value());
+            LineApi.createSection(신분당선Id, SectionFixture.추가구간(신논현역Id, 논현역Id));
 
             // when
-            RestAssured.given().log().all()
-                    .queryParam("stationId", willAddedStationId)
-                    .pathParam("id", createdLine)
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                    .when().delete(routePrefix + "/{id}/sections")
-                    .then().log().all()
-                    .statusCode(HttpStatus.NO_CONTENT.value());
+            ExtractableResponse<Response> response = LineApi.deleteSection(신분당선Id, 논현역Id);
 
             // then
-            assertThat(getJsonPathOfGetLine(createdLine).getList("stations.id", Long.class))
-                    .containsExactly(upStationId, downStationId);
+            assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+            assertThat(LineApi.getSection(신분당선Id).getList("stations.id", Long.class))
+                    .containsExactly(강남역Id, 신논현역Id);
         }
 
-    }
-
-    // TODO: 아래 private 함수들 test util 같은 곳으로 옮기기
-    private Long setupStationByName(String stationName) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", stationName);
-        return RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract().jsonPath().getLong("id");
-    }
-
-    private Long setupLine(
-            String name,
-            String color,
-            Long upStationId,
-            Long downStationId,
-            int distance
-    ) {
-        LineCreateRequestBody lineCreateRequestBody = new LineCreateRequestBody(
-                name, color, upStationId, downStationId, distance
-        );
-        return RestAssured.given().log().all()
-                .body(lineCreateRequestBody)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post(routePrefix)
-                .then().log().all().extract().jsonPath().getLong("id");
-    }
-
-    private JsonPath getJsonPathOfGetLine(Long lineId) {
-        return RestAssured.given().log().all()
-                .pathParam("id", lineId)
-                .when().get(routePrefix + "/{id}")
-                .then().log().all()
-                .statusCode(HttpStatus.OK.value())
-                .extract().jsonPath();
     }
 }

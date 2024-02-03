@@ -2,33 +2,46 @@ package subway.line;
 
 import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
 
 import subway.controller.dto.LineCreateRequestBody;
 import subway.controller.dto.LineUpdateRequestBody;
-
-import java.util.HashMap;
-import java.util.Map;
+import subway.helper.api.LineApi;
+import subway.helper.api.StationApi;
+import subway.helper.db.Truncator;
+import subway.helper.fixture.LineFixture;
+import subway.helper.fixture.StationFixture;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {
     private final String routePrefix = "/lines";
+    private static Long 강남역Id;
+    private static Long 신논현역Id;
+    private static Long 역삼역Id;
+
+    @Autowired
+    private Truncator truncator;
+
+    @AfterEach
+    void clear() {
+        truncator.truncateAll();
+    }
 
     @BeforeEach
     void createStationFixture() {
-        setupStationByName("강남역");
-        setupStationByName("신논현역");
-        setupStationByName("논현역");
+        강남역Id = StationApi.create(StationFixture.강남역).getLong("id");
+        신논현역Id = StationApi.create(StationFixture.신논현역).getLong("id");
+        역삼역Id = StationApi.create(StationFixture.역삼역).getLong("id");
     }
 
     /**
@@ -51,7 +64,7 @@ public class LineAcceptanceTest {
                 .statusCode(HttpStatus.CREATED.value());
 
         // then
-        JsonPath getLinesResponseJson = this.getJsonPathOfGetLineList();
+        JsonPath getLinesResponseJson = LineApi.getLines();
 
         assertThat(getLinesResponseJson.getList("color", String.class))
                 .containsExactly(lineCreateRequestBody.getColor());
@@ -75,12 +88,8 @@ public class LineAcceptanceTest {
     @Test
     void getSubwayLineList() {
         // given
-        JsonPath createdFixture1 = this.createDefaultLineFixture(
-                "분당선", "bg-yellow-600", 1L, 2L, 10
-        );
-        JsonPath createdFixture2 = this.createDefaultLineFixture(
-                "2호선", "bg-green-600", 1L, 3L, 15
-        );
+        JsonPath fixture1 = LineApi.createLine(LineFixture.신분당선(강남역Id, 신논현역Id));
+        JsonPath fixture2 = LineApi.createLine(LineFixture.이호선(강남역Id, 역삼역Id));
 
         // when
         JsonPath getLinesResponseJson =
@@ -93,8 +102,8 @@ public class LineAcceptanceTest {
         // then
         assertThat(getLinesResponseJson.getList("name", String.class))
                 .containsExactly(
-                        createdFixture1.getString("name"),
-                        createdFixture2.getString("name")
+                        fixture1.getString("name"),
+                        fixture2.getString("name")
                 );
     }
 
@@ -107,9 +116,7 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선 상세 정보를 조회한다.")
     @Test
     void getSubwayLine() {
-        JsonPath createdFixture = this.createDefaultLineFixture(
-                "신분당선", "bg-red-600", 1L, 2L, 10
-        );
+        JsonPath createdFixture = LineApi.createLine(LineFixture.신분당선(강남역Id, 신논현역Id));
 
         // when
         JsonPath response =
@@ -143,9 +150,7 @@ public class LineAcceptanceTest {
     @Test
     void updateSubwayLine() {
         // given
-        JsonPath createdFixture = this.createDefaultLineFixture(
-                "신분당선", "bg-red-600", 1L, 2L, 10
-        );
+        JsonPath createdFixture = LineApi.createLine(LineFixture.신분당선(강남역Id, 신논현역Id));
 
         // when
         LineUpdateRequestBody lineUpdateRequestBody = new LineUpdateRequestBody("구분당선", "bg-blue-600");
@@ -159,7 +164,7 @@ public class LineAcceptanceTest {
                 .statusCode(HttpStatus.OK.value());
 
         // then
-        JsonPath getLineJsonPath = this.getJsonPathOfGetLine(createdFixture.getLong("id"));
+        JsonPath getLineJsonPath = LineApi.getLine(createdFixture.getLong("id"));
 
         assertThat(getLineJsonPath.getString("name"))
                 .isEqualTo(lineUpdateRequestBody.getName());
@@ -180,9 +185,7 @@ public class LineAcceptanceTest {
     @Test
     void deleteSubwayLine() {
         // given
-        JsonPath createdFixture = this.createDefaultLineFixture(
-                "신분당선", "bg-red-600", 1L, 2L, 10
-        );
+        JsonPath createdFixture = LineApi.createLine(LineFixture.신분당선(강남역Id, 신논현역Id));
 
         // when
         RestAssured.given().log().all()
@@ -191,58 +194,8 @@ public class LineAcceptanceTest {
                 .then().log().all().statusCode(HttpStatus.NO_CONTENT.value());
 
         // then
-        assertThat(this.getJsonPathOfGetLineList()
+        assertThat(LineApi.getLines()
                 .getList("name", String.class))
                 .doesNotContain(createdFixture.getString("name"));
-    }
-
-    // TODO: 아래 함수들 util류로 분류
-
-    /***
-     * 테스트를 위해 노선을 생성하고 생성된 리스폰스의 JsonPath를 반환합니다.
-     */
-    private JsonPath createDefaultLineFixture(
-            String name,
-            String color,
-            Long upStationId,
-            Long downStationId,
-            int distance
-    ) {
-        LineCreateRequestBody lineCreateRequestBody = new LineCreateRequestBody(
-                name, color, upStationId, downStationId, distance
-        );
-        return RestAssured.given().log().all()
-                .body(lineCreateRequestBody)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post(routePrefix)
-                .then().log().all().extract().jsonPath();
-    }
-
-    private JsonPath getJsonPathOfGetLineList() {
-        return RestAssured.given().log().all()
-                .when().get(routePrefix)
-                .then().log().all()
-                .statusCode(HttpStatus.OK.value())
-                .extract().jsonPath();
-    }
-
-    private JsonPath getJsonPathOfGetLine(Long lineId) {
-        return RestAssured.given().log().all()
-                .pathParam("id", lineId)
-                .when().get(routePrefix + "/{id}")
-                .then().log().all()
-                .statusCode(HttpStatus.OK.value())
-                .extract().jsonPath();
-    }
-
-    private Long setupStationByName(String stationName) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", stationName);
-        return RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract().jsonPath().getLong("id");
     }
 }
