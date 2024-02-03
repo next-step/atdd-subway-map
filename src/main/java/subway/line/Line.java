@@ -15,16 +15,10 @@ public class Line {
     @Column(length = 20, nullable = false)
     private String name;
     private String color;
-    private Long upStationId;
-    private Long downStationId;
-    private Long distance;
 
-    public Line(String name, String color, Long upStationId, Long downStationId, Long distance) {
+    public Line(String name, String color) {
         this.name = name;
         this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
-        this.distance = distance;
     }
 
     public Line() {
@@ -57,30 +51,6 @@ public class Line {
 
     public void setColor(String color) {
         this.color = color;
-    }
-
-    public Long getUpStationId() {
-        return upStationId;
-    }
-
-    public void setUpStationId(Long upStationId) {
-        this.upStationId = upStationId;
-    }
-
-    public Long getDownStationId() {
-        return downStationId;
-    }
-
-    public void setDownStationId(Long downStationId) {
-        this.downStationId = downStationId;
-    }
-
-    public Long getDistance() {
-        return distance;
-    }
-
-    public void setDistance(Long distance) {
-        this.distance = distance;
     }
 
 }
