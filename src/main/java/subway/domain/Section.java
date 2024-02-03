@@ -35,15 +35,15 @@ public class Section {
         this.distance = distance;
     }
 
-    public boolean isSameLine(Line line){
+    public boolean isSameLine(Line line) {
         return this.line.equals(line);
     }
 
-    public boolean isUpStation(Station station){
+    public boolean isUpStation(Station station) {
         return this.upStation.equals(station);
     }
 
-    public boolean isDownStation(Station station){
+    public boolean isDownStation(Station station) {
         return this.downStation.equals(station);
     }
 
@@ -55,11 +55,24 @@ public class Section {
         return List.of(upStation, downStation);
     }
 
+    public Long id() {
+        return id;
+    }
+
+    public Station upStation() {
+        return upStation;
+    }
+
+    public Station downStation() {
+        return downStation;
+    }
+
     public Long distance() {
         return distance;
     }
 
-    public Long id() {
-        return id;
+    public boolean isSameId(Long id) {
+        return this.id.equals(id);
     }
+
 }
