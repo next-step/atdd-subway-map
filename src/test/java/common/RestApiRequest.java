@@ -5,46 +5,54 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.MediaType;
 
+import java.util.Map;
+
 public class RestApiRequest<T> {
-	private final String path;
-
-	public RestApiRequest(String path) {
-		this.path = path;
+	public RestApiRequest() {
 	}
 
-	public ExtractableResponse<Response> get(Object... pathParams) {
-			return RestAssured.given().log().all()
-					.when()
-						.get(path, pathParams)
-					.then().log().all()
-						.extract();
+	public ExtractableResponse<Response> get(String path, Object... pathParams) {
+		return RestAssured.given().log().all()
+				.when()
+				.get(path, pathParams)
+				.then().log().all()
+				.extract();
 	}
 
-	public ExtractableResponse<Response> post(T body) {
+	public ExtractableResponse<Response> post(String path, T body, Object... pathParams) {
 		return RestAssured.given().log().all()
 				.body(body)
-					.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
 				.when()
-					.post(path)
+				.post(path, pathParams)
 				.then().log().all()
-					.extract();
+				.extract();
 	}
 
-	public ExtractableResponse<Response> put(T body, Object... pathParams) {
+	public ExtractableResponse<Response> put(String path, T body, Object... pathParams) {
 		return RestAssured.given().log().all()
 				.body(body)
-					.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
 				.when()
-					.put(path, pathParams)
+				.put(path, pathParams)
 				.then().log().all()
-					.extract();
+				.extract();
 	}
 
-	public ExtractableResponse<Response> delete(Object... pathParams) {
+	public ExtractableResponse<Response> delete(String path, Object... pathParams) {
 		return RestAssured.given().log().all()
 				.when()
-					.delete(path, pathParams)
+				.delete(path, pathParams)
 				.then().log().all()
-					.extract();
+				.extract();
+	}
+
+	public ExtractableResponse<Response> delete(String path, Map<String, Object> queryParams, Object... pathParams) {
+		return RestAssured.given().log().all()
+				.queryParams(queryParams)
+				.when()
+				.delete(path, pathParams)
+				.then().log().all()
+				.extract();
 	}
 }

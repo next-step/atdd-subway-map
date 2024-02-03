@@ -2,6 +2,9 @@ package subway.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.dto.SectionRequest;
+import subway.dto.SectionResponse;
+import subway.entity.Section;
 import subway.repository.LineRepository;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
@@ -24,7 +27,10 @@ public class LineService {
 
 	@Transactional
 	public LineResponse saveLine(LineRequest lineRequest) {
-		Line line = new Line(lineRequest.getName(), lineRequest.getColor(), lineRequest.getUpStationId(), lineRequest.getDownStationId(), lineRequest.getDistance());
+		Line line = new Line(lineRequest.getName(), lineRequest.getColor(), lineRequest.getStartStationId(), lineRequest.getEndStationId(), lineRequest.getDistance());
+
+		Section section = new Section(line, lineRequest.getStartStationId(), line.getEndStationId(), lineRequest.getDistance());
+		line.createSection(section);
 
 		return createLineResponse(lineRepository.save(line));
 	}
@@ -42,8 +48,7 @@ public class LineService {
 
 	@Transactional
 	public void updateLine(Long id, LineRequest lineRequest) {
-		Line line = lineRepository.findById(id)
-				.orElseThrow(EntityNotFoundException::new);
+		Line line = findLindById(id);
 
 		line.setUpdateInfo(lineRequest.getName(), lineRequest.getColor());
 
@@ -55,8 +60,33 @@ public class LineService {
 		lineRepository.deleteById(id);
 	}
 
+	@Transactional
+	public void createSection(Long id, SectionRequest sectionRequest) {
+		Line line = findLindById(id);
+
+		Section section = new Section(line, sectionRequest.getUpStationId(), sectionRequest.getDownStationId(), sectionRequest.getDistance());
+		line.addSection(section);
+	}
+
+	@Transactional
+	public void deleteSection(Long id, Long stationId) {
+		Line line = findLindById(id);
+
+		line.deleteSection(stationId);
+	}
+
+	public List<SectionResponse> findSectionsByLine(Long id) {
+		return findLindById(id).getSections()
+				.convertToSectionResponse();
+	}
+
+	private Line findLindById(Long id) {
+		return lineRepository.findById(id)
+				.orElseThrow(EntityNotFoundException::new);
+	}
+
 	private LineResponse createLineResponse(Line line) {
 		return new LineResponse(line,
-				List.of(stationService.findStationById(line.getUpStationId()), stationService.findStationById(line.getDownStationId())));
+				List.of(stationService.findStationById(line.getStartStationId()), stationService.findStationById(line.getEndStationId())));
 	}
 }
