@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
+import subway.fixture.StationSteps;
 import subway.station.StationResponse;
 
 import javax.persistence.EntityManager;
@@ -20,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class StationAcceptanceTest {
     
     private final static String GET_STATIONS_URL = "/stations";
@@ -45,8 +46,7 @@ public class StationAcceptanceTest {
     void createStation(){
 
         // when
-        final String 강남역 = "강남역";
-        createStation(new TestStationRequest(강남역));
+        StationResponse 강남역 = StationSteps.createStation("강남역");
 
         // then
         List<String> stationNames =
@@ -58,7 +58,7 @@ public class StationAcceptanceTest {
                         .extract()
                             .jsonPath().getList("name", String.class);
 
-        assertThat(stationNames).containsAnyOf(강남역);
+        assertThat(stationNames).containsAnyOf(강남역.getName());
     }
 
 
@@ -72,10 +72,8 @@ public class StationAcceptanceTest {
     public void findSubwayStation() {
 
         // when
-        final String 강남역 = "강남역";
-        createStation(new TestStationRequest(강남역));
-        final String 역삼역 = "역삼역";
-        createStation(new TestStationRequest(역삼역));
+        StationResponse 강남역 = StationSteps.createStation("강남역");
+        StationResponse 역삼역 = StationSteps.createStation("역삼역");
 
         // then
         List<String> stationNames =
@@ -87,7 +85,7 @@ public class StationAcceptanceTest {
                         .extract()
                             .jsonPath().getList("name", String.class);
 
-        assertThat(stationNames).containsExactly(강남역, 역삼역);
+        assertThat(stationNames).containsExactly(강남역.getName(), 역삼역.getName());
     }
 
 
@@ -100,13 +98,12 @@ public class StationAcceptanceTest {
     @Test
     public void deleteSubwayStation() {
 
-        final String 강남역 = "강남역";
-        StationResponse gangnamResponse = createStation(new TestStationRequest(강남역));
+        StationResponse 강남역 = StationSteps.createStation("강남역");
 
         // when
         RestAssured.given().log().all()
                 .when()
-                    .delete(String.format(DELETE_STATIONS_URL, gangnamResponse.getId()))
+                    .delete(String.format(DELETE_STATIONS_URL, 강남역.getId()))
                 .then()
                     .statusCode(HttpStatus.NO_CONTENT.value())
                     .log().all();
@@ -121,35 +118,5 @@ public class StationAcceptanceTest {
 
         assertThat(acutal).isEqualTo(Collections.emptyList());
     }
-
-    @TestFactory
-    private StationResponse createStation(TestStationRequest request) {
-
-        return RestAssured.given().log().all()
-                    .body(request)
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                    .post(POST_STATIONS_URL)
-                .then().log().all()
-                    .statusCode(HttpStatus.CREATED.value())
-                .extract()
-                .as(StationResponse.class);
-    }
-
-    private static class TestStationRequest {
-        private String name;
-
-        public TestStationRequest() {
-        }
-
-        public TestStationRequest(String name) {
-            this.name = name;
-        }
-
-        public String getName() {
-            return name;
-        }
-    }
-
 
 }

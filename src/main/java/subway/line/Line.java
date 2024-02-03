@@ -18,10 +18,10 @@ public class Line {
     @Enumerated(EnumType.STRING)
     private Color color;
 
-    @Column(nullable = false)
-    private Integer upStationId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Station upStation;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "down_station_id")
     private Station downStation;
 

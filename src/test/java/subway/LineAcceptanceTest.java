@@ -40,7 +40,6 @@ public class LineAcceptanceTest {
         RestAssured.port = port;
         선릉역 = StationSteps.createStation("선릉역");
         삼성역 = StationSteps.createStation("삼성역");
-
     }
 
     /**
@@ -220,9 +219,8 @@ public class LineAcceptanceTest {
                 .when()
                     .get("/lines/" + lineResponse.getId())
                 .then().log().all()
-                    .statusCode(HttpStatus.BAD_REQUEST.value())
-                    .extract();
-
+                    .statusCode(HttpStatus.NO_CONTENT.value());
     }
+
 
 }
