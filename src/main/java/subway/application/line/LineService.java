@@ -26,27 +26,13 @@ public class LineService {
 
     @Transactional
     public LineResponse createLine(LineRequest request) {
-        Line createdLine = new Line(request.getName(), request.getColor(), request.getDistance(),
-            request.getUpStationId(), request.getDownStationId());
-        lineRepository.save(createdLine);
         Station upStation = stationRepository.findById(request.getUpStationId())
-            .orElseGet(() -> {
-                Station station = new Station(
-                    newStationName(request.getUpStationId()),
-                    createdLine.getId());
-                stationRepository.save(station);
-                return station;
-            });
+            .orElseThrow(() -> new IllegalArgumentException("지하철을 찾을 수 없습니다."));
         Station downStation = stationRepository.findById(request.getDownStationId())
-            .orElseGet(() -> {
-                Station station = new Station(
-                    newStationName(request.getDownStationId()),
-                    createdLine.getId());
-                stationRepository.save(station);
-                return station;
-            });
-        upStation.updateLineId(createdLine.getId());
-        downStation.updateLineId(createdLine.getId());
+            .orElseThrow(() -> new IllegalArgumentException("지하철을 찾을 수 없습니다."));
+        Line createdLine = new Line(request.getName(), request.getColor(), request.getDistance(),
+            upStation, downStation);
+        lineRepository.save(createdLine);
         return new LineResponse(
             createdLine.getId(),
             createdLine.getName(),

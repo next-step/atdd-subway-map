@@ -26,7 +26,7 @@ public class Section {
     @JoinColumn(name = "line_id")
     private Line line;
 
-    private Section() {
+    protected Section() {
     }
 
     public Section(Line line, Long upStationId, Long downStationId, Integer distance) {
@@ -43,4 +43,6 @@ public class Section {
     public Long getDownStationId() {
         return downStationId;
     }
+
+
 }

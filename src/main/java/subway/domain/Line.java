@@ -41,12 +41,17 @@ public class Line {
     public Line() {
     }
 
-    public Line(String name, String color, int distance, Long upStationId, Long downStationId) {
+    public Line(String name, String color, int distance, Station upStation, Station downStation) {
         this.name = name;
         this.color = color;
         this.distance = distance;
+        Long upStationId = upStation.getId();
+        Long downStationId = downStation.getId();
         this.upStationId = upStationId;
         this.downStationId = downStationId;
+
+        Section section = new Section(this, upStationId, downStation, distance);
+        sections.add(section);
     }
 
 
@@ -58,9 +63,5 @@ public class Line {
     public void registSection(Section section) {
         this.downStationId = section.getDownStationId();
         sections.add(section);
-    }
-
-    private boolean isNotLastSection(Section section) {
-        return !section.getUpStationId().equals(downStationId);
     }
 }
