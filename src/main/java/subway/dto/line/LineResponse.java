@@ -1,10 +1,12 @@
-package subway.line;
+package subway.dto.line;
 
-import subway.station.Station;
-import subway.station.StationResponse;
+import subway.dto.station.StationResponse;
+import subway.entity.Line;
+import subway.entity.Sections;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class LineResponse {
     private Long id;
@@ -18,21 +20,17 @@ public class LineResponse {
         this.id = line.getId();
         this.name = line.getName();
         this.color = line.getColor();
-        this.stations.add(
-            createStationResponse(line.getUpStation())
-        );
-        this.stations.add(
-            createStationResponse(line.getDownStation())
+        this.stations.addAll(
+            createStationResponses(line.getSections())
         );
     }
 
-    private StationResponse createStationResponse(
-        Station station
+    private List<StationResponse> createStationResponses(
+        Sections sections
     ) {
-        return new StationResponse(
-            station.getId(),
-            station.getName()
-        );
+        return sections.getStations().stream()
+            .map(station -> new StationResponse(station.getId(), station.getName()))
+            .collect(Collectors.toList());
     }
 
     public Long getId() {
