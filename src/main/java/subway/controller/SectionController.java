@@ -10,7 +10,7 @@ import java.net.URI;
 
 @RestController
 public class SectionController {
-    private SectionService sectionService;
+    private final SectionService sectionService;
 
     public SectionController(SectionService sectionService) {
         this.sectionService = sectionService;

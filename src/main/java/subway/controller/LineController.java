@@ -13,12 +13,10 @@ import java.util.List;
 
 @RestController
 public class LineController {
-    private LineService lineService;
-    private StationService stationService;
+    private final LineService lineService;
 
-    public LineController(LineService lineService, StationService stationService) {
+    public LineController(LineService lineService) {
         this.lineService = lineService;
-        this.stationService = stationService;
     }
 
     @PostMapping("/lines")
