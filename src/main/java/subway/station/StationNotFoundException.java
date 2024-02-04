@@ -1,4 +1,4 @@
-package subway.line;
+package subway.station;
 
 public class StationNotFoundException extends RuntimeException {
 
