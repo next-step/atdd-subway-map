@@ -20,21 +20,20 @@ import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFOR
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @DirtiesContext(classMode = BEFORE_EACH_TEST_METHOD)
 public class LineAcceptanceTest {
-    Station.Fixture 지하철역;
-    Station.Fixture 새로운지하철역;
-    Station.Fixture 또다른지하철역;
-    Line.Fixture 신분당선;
-    Line.Fixture 분당선;
+
+    Line.RequestBody 신분당선;
+    Line.RequestBody 분당선;
 
     @BeforeEach
     void setUpFixture() {
-        지하철역 = Station.지하철역();
-        새로운지하철역 = Station.새로운지하철역();
-        또다른지하철역 = Station.또다른지하철역();
-        신분당선 = Line.신분당선(지하철역, 새로운지하철역);
-        분당선 = Line.분당선(지하철역, 또다른지하철역);
+        신분당선 = Line.REQUEST_BODY();
+        분당선 = Line.REQUEST_BODY();
     }
 
+    /**
+     * When 지하철 노선을 생성하면
+     * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
+     */
     @DisplayName("지하철노선을 생성한다.")
     @Test
     void createLine() {
@@ -51,6 +50,11 @@ public class LineAcceptanceTest {
         assertThat(actual).usingRecursiveComparison().ignoringFields("distance").isEqualTo(line);
     }
 
+    /**
+     * Given 2개의 지하철 노선을 생성하고
+     * When 지하철 노선 목록을 조회하면
+     * Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
+     */
     @DisplayName("지하철노선 목록을 조회한다.")
     @Test
     void showLines() {
@@ -71,6 +75,11 @@ public class LineAcceptanceTest {
 
     }
 
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 조회하면
+     * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
+     */
     @DisplayName("지하철노선을 조회한다.")
     @Test
     void retrieveLine() {
@@ -88,6 +97,11 @@ public class LineAcceptanceTest {
         assertThat(line).usingRecursiveComparison().ignoringFields("distance").isEqualTo(expected);
     }
 
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 수정하면
+     * Then 해당 지하철 노선 정보는 수정된다
+     */
     @DisplayName("지하철노선을 수정한다.")
     @Test
     void updateLine() {
@@ -110,6 +124,11 @@ public class LineAcceptanceTest {
         assertThat(line.getColor()).isEqualTo(newColor);
     }
 
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 삭제하면
+     * Then 해당 지하철 노선 정보는 삭제된다
+     */
     @DisplayName("지하철노선을 삭제한다.")
     @Test
     void deleteLine() {

@@ -18,6 +18,9 @@ import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFOR
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @DirtiesContext(classMode = BEFORE_EACH_TEST_METHOD)
 public class StationAcceptanceTest {
+    final Station.RequestBody 강남역 = Station.랜덤_REQUEST_BODY();
+    final Station.RequestBody 역삼역 = Station.랜덤_REQUEST_BODY();
+
     /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다
@@ -27,13 +30,13 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        ExtractableResponse<Response> response = Station.Api.createStationBy("강남역");
+        ExtractableResponse<Response> response = Station.Api.createStationBy(강남역);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        assertThat(Station.Api.listStationName()).containsExactly("강남역");
+        assertThat(Station.Api.listStationName()).containsExactly(강남역.name);
     }
 
     /**
@@ -45,8 +48,6 @@ public class StationAcceptanceTest {
     @Test
     void showStations() {
         // given
-        final String 강남역 = "강남역";
-        final String 역삼역 = "역삼역";
         Station.Api.createStationBy(강남역);
         Station.Api.createStationBy(역삼역);
 
@@ -58,7 +59,7 @@ public class StationAcceptanceTest {
 
         // then
         List<String> stationNames = response.jsonPath().getList("name", String.class);
-        assertThat(stationNames).containsExactly(강남역, 역삼역);
+        assertThat(stationNames).containsExactly(강남역.name, 역삼역.name);
     }
 
 
@@ -71,7 +72,6 @@ public class StationAcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        final String 강남역 = "강남역";
         final Long 강남역_ID = Station.Api.createStationBy(강남역).jsonPath().getLong("id");
 
         // when
@@ -81,7 +81,7 @@ public class StationAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         // then
-        assertThat(Station.Api.listStationName()).doesNotContain(강남역);
+        assertThat(Station.Api.listStationName()).doesNotContain(강남역.name);
     }
 
 

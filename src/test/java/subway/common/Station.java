@@ -3,7 +3,9 @@ package subway.common;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.http.MediaType;
+import subway.controller.station.StationResponse;
 
 import java.util.HashMap;
 import java.util.List;
@@ -11,22 +13,18 @@ import java.util.Map;
 
 public class Station {
 
-    public static class Fixture {
-        public final Long id;
+    public static class RequestBody {
         public final String name;
 
-        private Fixture(Long id, String name) {
-            this.id = id;
+        private RequestBody(String name) {
             this.name = name;
         }
     }
 
     public static class Api {
 
-        public static ExtractableResponse<Response> createStationBy(String name) {
-            Map<String, String> params = new HashMap<>();
-            params.put("name", name);
-            return RestAssured.given().log().all().body(params).contentType(MediaType.APPLICATION_JSON_VALUE).when().post("/stations").then().log().all().extract();
+        public static ExtractableResponse<Response> createStationBy(RequestBody requestBody) {
+            return RestAssured.given().log().all().body(requestBody).contentType(MediaType.APPLICATION_JSON_VALUE).when().post("/stations").then().log().all().extract();
         }
 
         public static ExtractableResponse<Response> listStation() {
@@ -41,22 +39,15 @@ public class Station {
             return RestAssured.given().log().all().when().delete("/stations/{id}", id).then().log().all().extract();
         }
     }
-
-    public static Station.Fixture 지하철역() {
-        final String name = "지하철역";
-        Long id = Station.Api.createStationBy(name).jsonPath().getLong("id");
-        return new Fixture(id, name);
+    public static StationResponse 랜덤역생성() {
+        final String name = RandomStringUtils.randomAlphanumeric(10);
+        return Station.Api.createStationBy(new RequestBody(name)).as(StationResponse.class);
     }
 
-    public static Station.Fixture 새로운지하철역() {
-        final String name = "새로운지하철역";
-        Long id = Station.Api.createStationBy(name).jsonPath().getLong("id");
-        return new Fixture(id, name);
+    public static RequestBody 랜덤_REQUEST_BODY() {
+        final String name = RandomStringUtils.randomAlphanumeric(10);
+        return new RequestBody(name);
     }
 
-    public static Station.Fixture 또다른지하철역() {
-        final String name = "또다른지하철역";
-        Long id = Station.Api.createStationBy(name).jsonPath().getLong("id");
-        return new Fixture(id, name);
-    }
+
 }

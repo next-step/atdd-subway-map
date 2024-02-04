@@ -3,29 +3,38 @@ package subway.common;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.http.MediaType;
+import subway.controller.line.LineResponse;
+import subway.controller.station.StationResponse;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class Line {
-    public static class Fixture {
-        public Long id;
+    public static class RequestBody {
         public String name;
         public String color;
-        public Station.Fixture upStation;
-        public Station.Fixture downStation;
+        public Long upStation;
+        public Long downStation;
         public Long distance;
 
+        private RequestBody(String name, String color, Long upStation, Long downStation, Long distance) {
+            this.name = name;
+            this.color = color;
+            this.upStation = upStation;
+            this.downStation = downStation;
+            this.distance = distance;
+        }
     }
 
     public static class Api {
-        public static ExtractableResponse<Response> createLineBy(Line.Fixture line) {
-            Map<String, String> params = new HashMap<>();
+        public static ExtractableResponse<Response> createLineBy(Line.RequestBody line) {
+            Map<String, Object> params = new HashMap<>();
             params.put("name", line.name);
             params.put("color", line.color);
-            params.put("upStationId", line.upStation.id.toString());
-            params.put("downStationId", line.downStation.id.toString());
+            params.put("upStationId", line.upStation);
+            params.put("downStationId", line.downStation);
             params.put("distance", line.distance.toString());
             return RestAssured.given().log().all()
                     .body(params)
@@ -72,30 +81,16 @@ public class Line {
         }
     }
 
-    public static Line.Fixture 신분당선(Station.Fixture up, Station.Fixture down) {
-        final String name = "신분당선";
-        final String color = "bg-red-600";
+    public static Line.RequestBody REQUEST_BODY() {
+        final String name = RandomStringUtils.randomAlphanumeric(10);
+        final String color = RandomStringUtils.randomAlphanumeric(10);
         final Long distance = 10L;
-        Line.Fixture line = new Line.Fixture();
-        line.name = name;
-        line.color = color;
-        line.upStation = up;
-        line.downStation = down;
-        line.distance = distance;
-        return line;
+
+        StationResponse 상행역 = Station.랜덤역생성();
+        StationResponse 하행역 = Station.랜덤역생성();
+        return new Line.RequestBody(name, color, 상행역.getId(), 하행역.getId(), distance);
     }
-
-    public static Line.Fixture 분당선(Station.Fixture up, Station.Fixture down) {
-        final String name = "분당선";
-        final String color = "bg-greed-600";
-        final Long distance = 10L;
-
-        Line.Fixture line = new Line.Fixture();
-        line.name = name;
-        line.color = color;
-        line.upStation = up;
-        line.downStation = down;
-        line.distance = distance;
-        return line;
+    public static LineResponse 랜덤노선생성() {
+        return Api.createLineBy(REQUEST_BODY()).as(LineResponse.class);
     }
 }
