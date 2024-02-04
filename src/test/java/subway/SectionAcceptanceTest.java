@@ -13,8 +13,11 @@ import org.springframework.test.context.jdbc.Sql;
 import subway.line.LineRequest;
 import subway.line.section.SectionRequest;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.AcceptanceMethods.*;
+import static subway.utils.AcceptanceMethods.*;
+import static subway.utils.StationFixtures.stationFixtures;
 
 @Sql(value = "/table_truncate.sql")
 @DisplayName("지하철 구간 테스트")
@@ -29,18 +32,16 @@ public class SectionAcceptanceTest {
     @Test
     void createSection() {
         // given
-        Long stationId1 = makeStation("gangnam").jsonPath().getLong("id");
-        Long stationId2 = makeStation("yeoksam").jsonPath().getLong("id");
-        Long stationId3 = makeStation("samseong").jsonPath().getLong("id");
+        List<Long> stationIds = stationFixtures(3);
 
-        Long lineId = makeLine(new LineRequest("신분당선", "bg-red-600", stationId1, stationId2, 10L)).jsonPath().getLong("id");
+        Long lineId = makeLine(new LineRequest("신분당선", "bg-red-600", stationIds.get(0), stationIds.get(1), 10L)).jsonPath().getLong("id");
 
         // when
-        ExtractableResponse<Response> response = makeSection(lineId, new SectionRequest(stationId2, stationId3, 13L));
+        ExtractableResponse<Response> response = makeSection(lineId, new SectionRequest(stationIds.get(1), stationIds.get(2), 13L));
 
         // then
-        assertThat(response.jsonPath().getLong("upStation.id")).isEqualTo(stationId2);
-        assertThat(response.jsonPath().getLong("downStation.id")).isEqualTo(stationId3);
+        assertThat(response.jsonPath().getLong("upStation.id")).isEqualTo(stationIds.get(1));
+        assertThat(response.jsonPath().getLong("downStation.id")).isEqualTo(stationIds.get(2));
     }
 
     /**
@@ -52,23 +53,22 @@ public class SectionAcceptanceTest {
     @Test
     void addSectionError_duplicated() {
         // given
-        Long stationId1 = makeStation("gangnam").jsonPath().getLong("id");
-        Long stationId2 = makeStation("yeoksam").jsonPath().getLong("id");
-        Long stationId3 = makeStation("samseong").jsonPath().getLong("id");
+        List<Long> stationIds = stationFixtures(3);
 
-        Long lineId = makeLine(new LineRequest("신분당선", "bg-red-600", stationId1, stationId2, 10L)).jsonPath().getLong("id");
-        makeSection(lineId, new SectionRequest(stationId2, stationId3, 13L));
+        Long lineId = makeLine(new LineRequest("신분당선", "bg-red-600", stationIds.get(0), stationIds.get(1), 10L)).jsonPath().getLong("id");
+        makeSection(lineId, new SectionRequest(stationIds.get(1), stationIds.get(2), 13L));
         // when
         // then
         RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(new SectionRequest(stationId3, stationId2, 16L))
+                .body(new SectionRequest(stationIds.get(2), stationIds.get(1), 16L))
                 .when()
                 .post("/lines/" + lineId + "/sections")
                 .then().log().all()
                 .statusCode(HttpStatus.BAD_REQUEST.value());
     }
+
 
     /**
      * given 지하철 노선을 생성 후
@@ -79,18 +79,15 @@ public class SectionAcceptanceTest {
     @Test
     void addSectionError_isNotCurrentDownStation() {
         // given
-        Long stationId1 = makeStation("gangnam").jsonPath().getLong("id");
-        Long stationId2 = makeStation("yeoksam").jsonPath().getLong("id");
-        Long stationId3 = makeStation("samseong").jsonPath().getLong("id");
-
-        Long lineId = makeLine(new LineRequest("신분당선", "bg-red-600", stationId1, stationId2, 10L)).jsonPath().getLong("id");
+        List<Long> stationIds = stationFixtures(3);
+        Long lineId = makeLine(new LineRequest("신분당선", "bg-red-600", stationIds.get(0), stationIds.get(1), 10L)).jsonPath().getLong("id");
 
         // when
         // then
         RestAssured
                 .given()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(new SectionRequest(stationId1, stationId3, 13L))
+                .body(new SectionRequest(stationIds.get(0), stationIds.get(1), 13L))
                 .when()
                 .post("/lines/" + lineId + "/sections")
                 .then().log().all()
@@ -106,20 +103,18 @@ public class SectionAcceptanceTest {
     @Test
     void deleteSection() {
         // given
-        Long stationId1 = makeStation("gangnam").jsonPath().getLong("id");
-        Long stationId2 = makeStation("yeoksam").jsonPath().getLong("id");
-        Long stationId3 = makeStation("samseong").jsonPath().getLong("id");
+        List<Long> stationIds = stationFixtures(3);
 
-        Long lineId = makeLine(new LineRequest("신분당선", "bg-red-600", stationId1, stationId2, 10L)).jsonPath().getLong("id");
-        makeSection(lineId, new SectionRequest(stationId2, stationId3, 13L));
+        Long lineId = makeLine(new LineRequest("신분당선", "bg-red-600", stationIds.get(0), stationIds.get(1), 10L)).jsonPath().getLong("id");
+        makeSection(lineId, new SectionRequest(stationIds.get(1), stationIds.get(2), 13L));
 
         // when
-        removeSection(stationId3, lineId);
+        removeSection(stationIds.get(2), lineId);
 
         // then
         ExtractableResponse<Response> response = getLineSections(lineId);
 
-        assertThat(response.jsonPath().getList("sections.downStation.id", Long.class)).doesNotContain(stationId3);
+        assertThat(response.jsonPath().getList("sections.downStation.id", Long.class)).doesNotContain(stationIds.get(2));
     }
 
 
@@ -132,18 +127,15 @@ public class SectionAcceptanceTest {
     @Test
     void deleteSectionError_isNotCurrentDownStation() {
         // given
-        Long stationId1 = makeStation("gangnam").jsonPath().getLong("id");
-        Long stationId2 = makeStation("yeoksam").jsonPath().getLong("id");
-        Long stationId3 = makeStation("samseong").jsonPath().getLong("id");
-
-        Long lineId = makeLine(new LineRequest("신분당선", "bg-red-600", stationId1, stationId2, 10L)).jsonPath().getLong("id");
-        makeSection(lineId, new SectionRequest(stationId2, stationId3, 13L));
+        List<Long> stationIds = stationFixtures(3);
+        Long lineId = makeLine(new LineRequest("신분당선", "bg-red-600", stationIds.get(0), stationIds.get(1), 10L)).jsonPath().getLong("id");
+        makeSection(lineId, new SectionRequest(stationIds.get(1), stationIds.get(2), 13L));
 
         // when
         // then
         RestAssured
                 .given()
-                .param("stationId", stationId2)
+                .param("stationId", stationIds.get(1))
                 .when()
                 .delete("/lines/" + lineId + "/sections")
                 .then().log().all()
@@ -159,16 +151,14 @@ public class SectionAcceptanceTest {
     @Test
     void deleteSectionError_justOneSection() {
         // given
-        Long stationId1 = makeStation("gangnam").jsonPath().getLong("id");
-        Long stationId2 = makeStation("yeoksam").jsonPath().getLong("id");
-
-        Long lineId = makeLine(new LineRequest("신분당선", "bg-red-600", stationId1, stationId2, 10L)).jsonPath().getLong("id");
+        List<Long> stationIds = stationFixtures(2);
+        Long lineId = makeLine(new LineRequest("신분당선", "bg-red-600", stationIds.get(0), stationIds.get(1), 10L)).jsonPath().getLong("id");
 
         // when
         // then
         RestAssured
                 .given()
-                .param("stationId", stationId2)
+                .param("stationId", stationIds.get(1))
                 .when()
                 .delete("/lines/" + lineId + "/sections")
                 .then().log().all()

@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.AcceptanceMethods.*;
+import static subway.utils.AcceptanceMethods.*;
 
 @Sql(value = "/table_truncate.sql")
 @DisplayName("지하철 노선 테스트")
