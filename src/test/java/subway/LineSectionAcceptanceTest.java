@@ -13,6 +13,7 @@ import org.springframework.test.context.jdbc.Sql;
 import subway.common.Line;
 import subway.common.Section;
 import subway.common.Station;
+import subway.common.util.AcceptanceTest;
 import subway.interfaces.line.dto.LineResponse;
 import subway.interfaces.station.dto.StationResponse;
 
@@ -20,8 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD;
 
 @DisplayName("지하철 노선 구간 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@Sql("/truncate.sql")
+@AcceptanceTest
 public class LineSectionAcceptanceTest {
 
     StationResponse A역;

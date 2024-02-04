@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
 import subway.common.Station;
+import subway.common.util.AcceptanceTest;
 
 import java.util.List;
 
@@ -16,8 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD;
 
 @DisplayName("지하철역 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@Sql("/truncate.sql")
+@AcceptanceTest
 public class StationAcceptanceTest {
     final Station.RequestBody 강남역 = Station.랜덤_REQUEST_BODY();
     final Station.RequestBody 역삼역 = Station.랜덤_REQUEST_BODY();
