@@ -113,7 +113,6 @@ public class LineAcceptanceTest extends BaseAcceptanceTest{
         assertThat(lineResponse_신분당선_수정.getColor()).isEqualTo(putRequest.get("color"));
         assertThat(lineResponse_신분당선_수정.getName()).isEqualTo(putRequest.get("name"));
     }
-
     @DisplayName("지하철 노선을 생성하고 생성한 지하철 노선을 삭제하면 해당 지하철 노선 정보는 삭제된다.")
     @Test
     void test_지하철_노선_삭제() {
@@ -174,8 +173,8 @@ public class LineAcceptanceTest extends BaseAcceptanceTest{
             .when().put("/lines").then().log().all();
     }
 
-    void createStation(Map<String, String> param1) {
-        given().body(param1)
+    void createStation(Map<String, String> param) {
+        given().body(param)
                .contentType(MediaType.APPLICATION_JSON_VALUE).log().all()
                .when().post("/stations")
                .then().log().all();
