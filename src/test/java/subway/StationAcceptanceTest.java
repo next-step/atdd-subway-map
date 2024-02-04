@@ -11,9 +11,6 @@ import subway.fixture.AcceptanceTest;
 import subway.fixture.StationSteps;
 import subway.station.StationResponse;
 
-import java.util.Collections;
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
@@ -21,8 +18,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Transactional
 class StationAcceptanceTest {
     
-    private final static String GET_STATIONS_URL = "/stations";
-    private final static String POST_STATIONS_URL = "/stations";
     private final static String DELETE_STATIONS_URL = "/stations/%d";
 
     @LocalServerPort
@@ -46,16 +41,9 @@ class StationAcceptanceTest {
         StationResponse 강남역 = StationSteps.createStation("강남역");
 
         // then
-        List<String> stationNames =
-                RestAssured.given().log().all()
-                        .when()
-                            .get(GET_STATIONS_URL)
-                        .then()
-                            .log().all()
-                        .extract()
-                            .jsonPath().getList("name", String.class);
+        StationResponse actual = StationSteps.getStation(강남역.getId());
 
-        assertThat(stationNames).containsAnyOf(강남역.getName());
+        assertThat(actual.getName()).containsAnyOf(강남역.getName());
     }
 
 
@@ -73,16 +61,8 @@ class StationAcceptanceTest {
         StationResponse 역삼역 = StationSteps.createStation("역삼역");
 
         // then
-        List<String> stationNames =
-                RestAssured.given().log().all()
-                        .when()
-                            .get(GET_STATIONS_URL)
-                        .then()
-                            .log().all()
-                        .extract()
-                            .jsonPath().getList("name", String.class);
-
-        assertThat(stationNames).containsExactly(강남역.getName(), 역삼역.getName());
+        String[] actual = StationSteps.getStations().stream().map(StationResponse::getName).toArray(String[]::new);
+        assertThat(actual).containsExactly(강남역.getName(), 역삼역.getName());
     }
 
 
@@ -106,14 +86,8 @@ class StationAcceptanceTest {
                     .log().all();
 
         // then
-        List<String> acutal = RestAssured.given()
-                .when()
-                .get(GET_STATIONS_URL)
-                .then().log().all()
-                .extract()
-                .jsonPath().getList("name", String.class);
-
-        assertThat(acutal).isEqualTo(Collections.emptyList());
+        String[] actual = StationSteps.getStations().stream().map(StationResponse::getName).toArray(String[]::new);
+        assertThat(actual).isEmpty();
     }
 
 }

@@ -36,6 +36,10 @@ public class LineResponse {
         return color;
     }
 
+    public List<StationResponse> getStations() {
+        return stations;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

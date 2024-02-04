@@ -2,10 +2,9 @@ package subway.station;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.line.StationNotFoundException;
 
-import javax.swing.text.html.Option;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,6 +26,12 @@ public class StationService {
         return stationRepository.findAll().stream()
                 .map(this::createStationResponse)
                 .collect(Collectors.toList());
+    }
+
+    public StationResponse findStation(long id) {
+        Station station = stationRepository.findById(id)
+                .orElseThrow(() -> new StationNotFoundException(id));
+        return createStationResponse(station);
     }
 
     @Transactional

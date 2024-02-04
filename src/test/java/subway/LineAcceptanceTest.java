@@ -22,8 +22,10 @@ import javax.persistence.EntityManager;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
 @DisplayName("지하철역 관련 기능")
 @AcceptanceTest
@@ -71,15 +73,7 @@ class LineAcceptanceTest {
         LineResponse lineResponse = LineSteps.createLine(param);
 
         //Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
-        List<String> names = RestAssured.given().log().all()
-                .when()
-                    .get("/lines")
-                .then().log().all()
-                    .statusCode(HttpStatus.OK.value())
-                    .extract()
-                    .jsonPath().getList("name", String.class);
-
-        assertThat(names).containsAnyOf(lineResponse.getName());
+        assertThat(LineSteps.getLines()).containsAnyOf(lineResponse);
     }
 
 
@@ -89,41 +83,6 @@ class LineAcceptanceTest {
     @DisplayName("지하철 노선 목록을 조회한다")
     @Test
     void findLines() {
-
-
-
-        //given
-        Map<String, Object> param = new HashMap<>();
-        param.put("name", "2호선");
-        param.put("color", Color.GREEN.name());
-        param.put("upStationId", 선릉역.getId());
-        param.put("downStationId", 삼성역.getId());
-
-        //When 지하철 노선을 생성하면
-        LineSteps.createLine(param);
-
-
-        // when
-        List<String> names = RestAssured.given().log().all()
-                .when()
-                    .get("/lines")
-                .then().log().all()
-                    .statusCode(HttpStatus.OK.value())
-                    .extract()
-                    .jsonPath().getList("name", String.class);
-
-        // then
-        assertThat(names).containsExactly("2호선");
-    }
-
-
-    //Given 지하철 노선을 생성하고
-    //When 생성한 지하철 노선을 조회하면
-    //Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
-    @DisplayName("지하철 노선을 조회한다")
-    @Test
-    void findLine() {
-
 
         //given
         Map<String, Object> param = new HashMap<>();
@@ -135,29 +94,23 @@ class LineAcceptanceTest {
         //When 지하철 노선을 생성하면
         LineResponse lineResponse = LineSteps.createLine(param);
 
-
-        // when
-        LineResponse actual = RestAssured.given().log().all()
-                .when()
-                    .get("/lines/" + lineResponse.getId())
-                .then().log().all()
-                    .statusCode(HttpStatus.OK.value())
-                    .extract()
-                    .as(LineResponse.class);
-
         // then
+        LineResponse actual = LineSteps.getLine(lineResponse.getId());
         assertThat(actual).isEqualTo(lineResponse);
+
+        for (StationResponse expected : actual.getStations()) {
+            assertThat(StationSteps.getStation(expected.getId()))
+                    .isEqualTo(expected);
+        }
     }
 
 
-
-    // Given 지하철 노선을 생성하고
-    // When 생성한 지하철 노선을 수정하면
-    // Then 해당 지하철 노선 정보는 수정된다
-    @DisplayName("지하철 노선 수정한다")
+    //Given 지하철 노선을 생성하고
+    //When 생성한 지하철 노선을 조회하면
+    //Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
+    @DisplayName("지하철 노선을 조회한다")
     @Test
-    void updateLine() {
-
+    void findLine() {
 
         //given
         Map<String, Object> param = new HashMap<>();
@@ -167,6 +120,27 @@ class LineAcceptanceTest {
         param.put("downStationId", 삼성역.getId());
 
         //When 지하철 노선을 생성하면
+        LineResponse lineResponse = LineSteps.createLine(param);
+
+        // then
+        assertThat(LineSteps.getLine(lineResponse.getId())).isEqualTo(lineResponse);
+    }
+
+
+    // Given 지하철 노선을 생성하고
+    // When 생성한 지하철 노선을 수정하면
+    // Then 해당 지하철 노선 정보는 수정된다
+    @DisplayName("지하철 노선 수정한다")
+    @Test
+    void updateLine() {
+
+        //given
+        Map<String, Object> param = new HashMap<>();
+        param.put("name", "2호선");
+        param.put("color", Color.GREEN.name());
+        param.put("upStationId", 선릉역.getId());
+        param.put("downStationId", 삼성역.getId());
+
         LineResponse lineResponse = LineSteps.createLine(param);
 
         // when
@@ -180,14 +154,7 @@ class LineAcceptanceTest {
                     .statusCode(HttpStatus.NO_CONTENT.value());
 
         // then
-        LineResponse actual = RestAssured.given().log().all()
-                .when()
-                    .get("/lines/" + lineResponse.getId())
-                .then().log().all()
-                    .statusCode(HttpStatus.OK.value())
-                    .extract()
-                    .as(LineResponse.class);
-
+        LineResponse actual = LineSteps.getLine(lineResponse.getId());
         assertThat(actual.getColor()).isEqualTo(Color.RED);
     }
 
@@ -211,16 +178,16 @@ class LineAcceptanceTest {
         // when
         RestAssured.given().log().all()
                 .when()
-                    .delete("/lines/" + lineResponse.getId())
+                .delete("/lines/" + lineResponse.getId())
                 .then().log().all()
-                    .statusCode(HttpStatus.NO_CONTENT.value());
+                .statusCode(HttpStatus.NO_CONTENT.value());
 
         // then
         RestAssured.given().log().all()
                 .when()
-                    .get("/lines/" + lineResponse.getId())
+                .get("/lines/" + lineResponse.getId())
                 .then().log().all()
-                    .statusCode(HttpStatus.NO_CONTENT.value());
+                .statusCode(HttpStatus.NO_CONTENT.value());
     }
 
 
