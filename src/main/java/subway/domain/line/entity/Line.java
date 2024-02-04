@@ -1,5 +1,7 @@
 package subway.domain.line.entity;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import subway.common.exception.CustomException;
 import subway.domain.station.entity.Station;
 
@@ -9,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Getter
+@NoArgsConstructor
 public class Line {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,12 +24,9 @@ public class Line {
     @Column(length = 20, nullable = false)
     private String color;
 
+    @Getter
     @OneToMany(mappedBy = "line")
     private List<Section> sections;
-
-    public Line() {
-
-    }
 
     public Line(String name, String color, Section section) {
         this.name = name;
@@ -33,18 +34,6 @@ public class Line {
         this.sections = new ArrayList<>();
         this.sections.add(section);
         section.setLine(this);
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getColor() {
-        return color;
     }
 
     public Station getUpStation() {
@@ -81,10 +70,6 @@ public class Line {
         this.color = color;
     }
 
-    public List<Section> getSections() {
-        return this.sections;
-    }
-
     public void add(Section section) {
         if (!this.getDownStation().equals(section.getUpStation())) {
             throw new InvalidParameterException("잘못된 상행역");
@@ -115,16 +100,6 @@ public class Line {
 
     public boolean contains(Station station) {
         return this.sections.stream().anyMatch(section -> section.getUpStation().equals(station));
-    }
-
-    @Override
-    public String toString() {
-        return "Line{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", color='" + color + '\'' +
-                ", sections=" + sections +
-                '}';
     }
 
 }

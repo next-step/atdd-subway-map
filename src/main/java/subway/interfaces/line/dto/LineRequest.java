@@ -1,53 +1,28 @@
 package subway.interfaces.line.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+
+@Getter
 public class LineRequest {
-    private String name;
-    private String color;
-    private Long upStationId;
-    private Long downStationId;
-    private Long distance;
-
-    public String getName() {
-        return name;
+    @Getter
+    @NoArgsConstructor
+    public static class Line {
+        private String name;
+        private String color;
+        private Long upStationId;
+        private Long downStationId;
+        private Long distance;
     }
 
-    public String getColor() {
-        return color;
-    }
 
-    public Long getUpStationId() {
-        return upStationId;
-    }
-
-    public Long getDownStationId() {
-        return downStationId;
-    }
-
-    public Long getDistance() {
-        return distance;
-    }
-
+    @Getter
+    @NoArgsConstructor
     public static class Section {
-        private final Long upStationId;
-        private final Long downStationId;
-        private final Long distance;
-
-        public Section(Long upStationId, Long downStationId, Long distance) {
-            this.upStationId = upStationId;
-            this.downStationId = downStationId;
-            this.distance = distance;
-        }
-
-        public Long getUpStationId() {
-            return upStationId;
-        }
-
-        public Long getDownStationId() {
-            return downStationId;
-        }
-
-        public Long getDistance() {
-            return distance;
-        }
+        private Long upStationId;
+        private Long downStationId;
+        private Long distance;
     }
 }

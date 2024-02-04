@@ -1,5 +1,6 @@
 package subway.infrastructure.line.dao;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import subway.domain.line.LineCommand;
 import subway.domain.line.entity.Line;
@@ -15,28 +16,23 @@ import java.util.List;
 import java.util.Objects;
 
 @Component
+@RequiredArgsConstructor
 public class LineStore {
     private final LineRepository lineRepository;
     private final SectionRepository sectionRepository;
     private final StationRepository stationRepository;
 
-    public LineStore(LineRepository lineRepository, SectionRepository sectionRepository, StationRepository stationRepository) {
-        this.lineRepository = lineRepository;
-        this.sectionRepository = sectionRepository;
-        this.stationRepository = stationRepository;
-    }
-
     public Section createSection(LineCommand.SectionAddCommand command) {
         return this.createSection(command.getUpStationId(), command.getDownStationId(), command.getDistance());
     }
-    public Section createSection(LineRequest lineRequest) {
+    public Section createSection(LineRequest.Line lineRequest) {
         return this.createSection(lineRequest.getUpStationId(), lineRequest.getDownStationId(), lineRequest.getDistance());
     }
     private Section createSection(Long upStationId, Long downStationId, Long distance) {
         List<Station> stations = stationRepository.findAllById(List.of(upStationId, downStationId));
         Station upStation = stations.stream().filter(station -> Objects.equals(station.getId(), upStationId)).findFirst().orElseThrow(() -> new EntityNotFoundException("station_id: " + upStationId));
         Station downStation = stations.stream().filter(station -> Objects.equals(station.getId(), downStationId)).findFirst().orElseThrow(() -> new EntityNotFoundException("station_id: " + downStationId));
-        Section init = new Section(upStation, downStation, distance);
+        Section init = Section.of(upStation, downStation, distance);
         return sectionRepository.save(init);
     }
 

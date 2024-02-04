@@ -28,7 +28,7 @@ public class LineService {
     }
 
     @Transactional
-    public LineResponse saveLine(LineRequest request) {
+    public LineResponse saveLine(LineRequest.Line request) {
         Section section = lineStore.createSection(request);
         Line init = new Line(request.getName(), request.getColor(), section);
         return LineResponse.from(lineStore.store(init));

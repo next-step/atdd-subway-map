@@ -1,5 +1,6 @@
 package subway.infrastructure.line.dao;
 
+import lombok.RequiredArgsConstructor;
 import org.hibernate.query.Query;
 import org.springframework.stereotype.Component;
 import subway.domain.line.entity.Line;
@@ -11,12 +12,9 @@ import javax.persistence.EntityNotFoundException;
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class LineReader {
     private final LineRepository lineRepository;
-
-    public LineReader(LineRepository lineRepository) {
-        this.lineRepository = lineRepository;
-    }
 
     public Line readBy(Long id) {
         return lineRepository.findById(id).orElseThrow(EntityNotFoundException::new);
