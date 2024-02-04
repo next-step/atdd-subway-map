@@ -113,7 +113,7 @@ public class LineAcceptanceTest {
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .when().post("/lines").then().log().all().extract().jsonPath().getObject(".", LineResponse.class);
         Map<String, String> putRequest = Map.of(
-            "name", "신분당선",
+            "name", "다른분당선",
             "color", "Red"
         );
         //when
@@ -127,7 +127,8 @@ public class LineAcceptanceTest {
 
         //then
         LineResponse lineResponse_신분당선_수정 = when().get("/lines/" + linePostResponse.getId()).then().extract().jsonPath().getObject(".", LineResponse.class);
-        assertThat(lineResponse_신분당선_수정.getColor()).isEqualTo(putRequest.get("color"));shtj
+        assertThat(lineResponse_신분당선_수정.getColor()).isEqualTo(putRequest.get("color"));
+        assertThat(lineResponse_신분당선_수정.getName()).isEqualTo(putRequest.get("name"));
     }
 
     @DisplayName("지하철 노선을 생성하고 생성한 지하철 노선을 삭제하면 해당 지하철 노선 정보는 삭제된다.")

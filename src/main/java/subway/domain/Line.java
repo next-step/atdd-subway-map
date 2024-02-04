@@ -1,5 +1,7 @@
 package subway.domain;
 
+import java.util.Objects;
+
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -39,5 +41,13 @@ public class Line {
                    .stations(stations)
                    .build();
 
+    }
+
+    public void updateLine(String name, String color) {
+        if (Objects.isNull(name) || Objects.isNull(color)) {
+            throw new IllegalArgumentException("값이 존재하지 않습니다.");
+        }
+        this.name = name;
+        this.color = color;
     }
 }
