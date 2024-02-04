@@ -13,7 +13,6 @@ import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.MediaType;
@@ -130,7 +129,7 @@ public class LineAcceptanceTest extends BaseAcceptanceTest{
 
     @DisplayName("지하철 노선을 생성하고 생성한 지하철 노선을 삭제하면 해당 지하철 노선 정보는 삭제된다.")
     @Test
-    void test5() {
+    void test_지하철_노선_삭제() {
         //given
         LineResponse linePostResponse = given()
             .body(getRequestParam_신분당선())
