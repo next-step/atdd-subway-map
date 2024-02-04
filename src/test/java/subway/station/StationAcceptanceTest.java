@@ -31,14 +31,14 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        ExtractableResponse<Response> response = RestAssuredUtil.sendPost(StationFixture.createStationParams(강남역),"/stations");
+        ExtractableResponse<Response> response = RestAssuredUtil.생성_요청(StationFixture.createStationParams(강남역),"/stations");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
         List<String> stationNames =
-                RestAssuredUtil.sendGet("/stations").jsonPath().getList("name", String.class);
+                RestAssuredUtil.조회_요청("/stations").jsonPath().getList("name", String.class);
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
@@ -51,12 +51,12 @@ public class StationAcceptanceTest {
     @Test
     void findStation() {
         //given
-        RestAssuredUtil.sendPost(StationFixture.createStationParams(강남역), "/stations");
-        RestAssuredUtil.sendPost(StationFixture.createStationParams(교대역), "/stations");
+        RestAssuredUtil.생성_요청(StationFixture.createStationParams(강남역), "/stations");
+        RestAssuredUtil.생성_요청(StationFixture.createStationParams(교대역), "/stations");
 
 
         //when
-        List<String> responseList = RestAssuredUtil.sendGet("/stations").jsonPath().get("name");
+        List<String> responseList = RestAssuredUtil.조회_요청("/stations").jsonPath().get("name");
 
         //then
         assertThat(responseList).containsAnyOf(강남역, 교대역);
@@ -71,14 +71,14 @@ public class StationAcceptanceTest {
     @Test
     void removeStation() {
         //given
-        ExtractableResponse<Response> response = RestAssuredUtil.sendPost(StationFixture.createStationParams(역삼역), "/stations");
+        ExtractableResponse<Response> response = RestAssuredUtil.생성_요청(StationFixture.createStationParams(역삼역), "/stations");
 
         //when
-        ExtractableResponse<Response> deleteResponse = RestAssuredUtil.sendDelete("/stations/" + response.jsonPath().getLong("id"));
+        ExtractableResponse<Response> deleteResponse = RestAssuredUtil.삭제_요청("/stations/" + response.jsonPath().getLong("id"));
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         //then
-        List<String> responseList = RestAssuredUtil.sendGet("/stations").jsonPath().get("name");
+        List<String> responseList = RestAssuredUtil.조회_요청("/stations").jsonPath().get("name");
 
         assertThat(responseList).doesNotContain(역삼역);
     }
