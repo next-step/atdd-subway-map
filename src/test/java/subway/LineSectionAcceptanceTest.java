@@ -2,10 +2,13 @@ package subway;
 
 
 import io.restassured.common.mapper.TypeRef;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import subway.common.Line;
 import subway.common.Section;
@@ -15,6 +18,7 @@ import subway.controller.station.StationResponse;
 
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD;
 
 @DisplayName("지하철 노선 구간 관련 기능")
@@ -55,7 +59,16 @@ public class LineSectionAcceptanceTest {
     @DisplayName("지하철 노선에 구간을 등록한다.")
     @Test
     void enrollSectionToLine() {
+        // When
+        ExtractableResponse<Response> response = Section.Api.createBy(A역_B역_노선.getId(), B역_C역_구간);
 
+        // Then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        //Then
+        A역_B역_노선 = Line.Api.retrieveLineBy(A역_B역_노선.getId()).as(LineResponse.class);
+        assertThat(A역_B역_노선.getDownStation().getId()).isEqualTo(C역.getId());
+        assertThat(A역_B역_노선.getDownStation().getName()).isEqualTo(C역.getName());
     }
 
     /**
@@ -66,7 +79,15 @@ public class LineSectionAcceptanceTest {
     @DisplayName("구간의 하행역이 이미 노선에 포함되어있는 경우 등록을 실패한다.")
     @Test
     void failEnrollSectionToLineWithAlreadyExist() {
+        // When
+        ExtractableResponse<Response> response = Section.Api.createBy(A역_B역_노선.getId(), D역_B역_구간);
 
+        // Then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
+
+        // Then
+        String failMessage = response.jsonPath().getString("message");
+        assertThat(failMessage).isEqualTo("이미 포함된 하행역");
     }
 
     /**
@@ -77,7 +98,15 @@ public class LineSectionAcceptanceTest {
     @DisplayName("새로운 구간의 상행역과 기존 노선의 하행역이 같지 않으면 등록을 실패한다.")
     @Test
     void failEnrollSectionToLineWithInvalidUpStation() {
+        // When
+        ExtractableResponse<Response> response = Section.Api.createBy(A역_B역_노선.getId(), C역_D역_구간);
 
+        // Then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+
+        // Then
+        String failMessage = response.jsonPath().getString("message");
+        assertThat(failMessage).isEqualTo("잘못된 상행역");
     }
 
     /**
