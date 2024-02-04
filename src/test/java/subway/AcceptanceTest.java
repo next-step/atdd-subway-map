@@ -35,15 +35,15 @@ public class AcceptanceTest {
         databaseCleaner.clear();
     }
 
-    protected ExtractableResponse<Response> createStation(StationCreateRequest request, int statusCode) {
+    protected ExtractableResponse<Response> 지하철역_생성_요청(StationCreateRequest request, int statusCode) {
         return post("/stations", request, statusCode);
     }
 
-    protected ExtractableResponse<Response> createLine(LineCreateRequest request, int statusCode) {
+    protected ExtractableResponse<Response> 노선_생성_요청(LineCreateRequest request, int statusCode) {
         return post("/lines", request, statusCode);
     }
 
-    protected ExtractableResponse<Response> findLine(Long id, int statusCode) {
+    protected ExtractableResponse<Response> 노선_조회_요청(Long id, int statusCode) {
         return get("/lines/{id}", statusCode, id);
     }
 

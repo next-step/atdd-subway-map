@@ -18,25 +18,25 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.http.HttpStatus.*;
-import static subway.fixture.LineFixture.BUNDANG_LINE;
-import static subway.fixture.LineFixture.SHINBUNDANG_LINE;
+import static subway.fixture.LineFixture.분당선;
+import static subway.fixture.LineFixture.신분당선;
 import static subway.fixture.StationFixture.*;
 
 @DisplayName("지하철 노선 관련 기능")
 public class LineAcceptanceTest extends AcceptanceTest {
-    private static Long GANGNAM_STATION_ID;
-    private static Long SEOLLEUNG_STATION_ID;
-    private static Long YANGJAE_STATION_ID;
+    private static Long 강남역_ID;
+    private static Long 선릉역_ID;
+    private static Long 양재역_ID;
 
     @BeforeEach
     void setFixture() {
-        GANGNAM_STATION_ID = createStation(GANGNAM_STATION.toCreateRequest(), CREATED.value())
+        강남역_ID = 지하철역_생성_요청(GANGNAM_STATION.toCreateRequest(), CREATED.value())
                 .as(StationResponse.class).getId();
 
-        SEOLLEUNG_STATION_ID = createStation(SEOLLEUNG_STATION.toCreateRequest(), CREATED.value())
+        선릉역_ID = 지하철역_생성_요청(SEOLLEUNG_STATION.toCreateRequest(), CREATED.value())
                 .as(StationResponse.class).getId();
 
-        YANGJAE_STATION_ID = createStation(YANGJAE_STATION.toCreateRequest(), CREATED.value())
+        양재역_ID = 지하철역_생성_요청(YANGJAE_STATION.toCreateRequest(), CREATED.value())
                 .as(StationResponse.class).getId();
     }
 
@@ -48,14 +48,14 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine() {
         // given
-        LineCreateRequest request = SHINBUNDANG_LINE.toCreateRequest(GANGNAM_STATION_ID, SEOLLEUNG_STATION_ID);
+        LineCreateRequest request = 신분당선.toCreateRequest(강남역_ID, 선릉역_ID);
 
         // when
-        ExtractableResponse<Response> createResponse = createLine(request, CREATED.value());
+        ExtractableResponse<Response> createResponse = 노선_생성_요청(request, CREATED.value());
 
         // then
         LineResponse lineResponse = createResponse.as(LineResponse.class);
-        ExtractableResponse<Response> findResponse = findLines(OK.value());
+        ExtractableResponse<Response> findResponse = 노선_조회_요청(OK.value());
         List<Long> lineIds = findResponse.jsonPath().getList("id", Long.class);
         assertThat(lineIds).containsAnyOf(lineResponse.getId());
     }
@@ -69,14 +69,14 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void selectLines() {
         // given
-        LineCreateRequest shinbundangRequest = SHINBUNDANG_LINE.toCreateRequest(GANGNAM_STATION_ID, SEOLLEUNG_STATION_ID);
-        createLine(shinbundangRequest, CREATED.value());
+        LineCreateRequest shinbundangRequest = 신분당선.toCreateRequest(강남역_ID, 선릉역_ID);
+        노선_생성_요청(shinbundangRequest, CREATED.value());
 
-        LineCreateRequest bundangRequest = BUNDANG_LINE.toCreateRequest(GANGNAM_STATION_ID, YANGJAE_STATION_ID);
-        createLine(bundangRequest, CREATED.value());
+        LineCreateRequest bundangRequest = 분당선.toCreateRequest(강남역_ID, 양재역_ID);
+        노선_생성_요청(bundangRequest, CREATED.value());
 
         //when
-        ExtractableResponse<Response> findResponse = findLines(OK.value());
+        ExtractableResponse<Response> findResponse = 노선_조회_요청(OK.value());
         List<String> linesNames = findResponse.jsonPath().getList("name", String.class);
 
         // then
@@ -93,12 +93,12 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void selectLine() {
         // given
-        LineCreateRequest shinbundangRequest = SHINBUNDANG_LINE.toCreateRequest(GANGNAM_STATION_ID, SEOLLEUNG_STATION_ID);
-        ExtractableResponse<Response> shinbundangCreateResponse = createLine(shinbundangRequest, CREATED.value());
+        LineCreateRequest shinbundangRequest = 신분당선.toCreateRequest(강남역_ID, 선릉역_ID);
+        ExtractableResponse<Response> shinbundangCreateResponse = 노선_생성_요청(shinbundangRequest, CREATED.value());
         LineResponse createLineResponse = shinbundangCreateResponse.as(LineResponse.class);
 
         // when
-        LineResponse findLineResponse = findLine(createLineResponse.getId(), OK.value()).as(LineResponse.class);
+        LineResponse findLineResponse = 노선_조회_요청(createLineResponse.getId(), OK.value()).as(LineResponse.class);
 
         // then
         assertAll(
@@ -123,15 +123,15 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
-        LineCreateRequest shinbundangRequest = SHINBUNDANG_LINE.toCreateRequest(GANGNAM_STATION_ID, SEOLLEUNG_STATION_ID);
-        ExtractableResponse<Response> shinbundangCreateResponse = createLine(shinbundangRequest, CREATED.value());
+        LineCreateRequest shinbundangRequest = 신분당선.toCreateRequest(강남역_ID, 선릉역_ID);
+        ExtractableResponse<Response> shinbundangCreateResponse = 노선_생성_요청(shinbundangRequest, CREATED.value());
         LineResponse createLineResponse = shinbundangCreateResponse.as(LineResponse.class);
 
         // when
-        updateLine(createLineResponse.getId(), new LineUpdateRequest("다른분당선", "bg-blue-600"), OK.value());
+        노선_수정_요청(createLineResponse.getId(), new LineUpdateRequest("다른분당선", "bg-blue-600"), OK.value());
 
         // then
-        LineResponse findLineResponse = findLine(createLineResponse.getId(), OK.value()).as(LineResponse.class);
+        LineResponse findLineResponse = 노선_조회_요청(createLineResponse.getId(), OK.value()).as(LineResponse.class);
 
         assertAll(
                 () -> assertThat(findLineResponse.getId()).isEqualTo(1L),
@@ -155,29 +155,29 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        LineCreateRequest shinbundangRequest = SHINBUNDANG_LINE.toCreateRequest(GANGNAM_STATION_ID, SEOLLEUNG_STATION_ID);
-        ExtractableResponse<Response> shinbundangCreateResponse = createLine(shinbundangRequest, CREATED.value());
+        LineCreateRequest shinbundangRequest = 신분당선.toCreateRequest(강남역_ID, 선릉역_ID);
+        ExtractableResponse<Response> shinbundangCreateResponse = 노선_생성_요청(shinbundangRequest, CREATED.value());
         LineResponse createLineResponse = shinbundangCreateResponse.as(LineResponse.class);
 
         // when
-        ExtractableResponse<Response> shinbundangDeleteResponse = deleteLine(createLineResponse.getId(), NO_CONTENT.value());
+        ExtractableResponse<Response> shinbundangDeleteResponse = 노선_삭제_요청(createLineResponse.getId(), NO_CONTENT.value());
         assertThat(shinbundangDeleteResponse.statusCode()).isEqualTo(NO_CONTENT.value());
 
         // then
-        List<LineResponse> findAllResponse = findLines(OK.value()).as(new TypeRef<>() {
+        List<LineResponse> findAllResponse = 노선_조회_요청(OK.value()).as(new TypeRef<>() {
         });
         assertThat(findAllResponse).isEmpty();
     }
 
-    private ExtractableResponse<Response> findLines(int statusCode) {
+    private ExtractableResponse<Response> 노선_조회_요청(int statusCode) {
         return get("/lines", statusCode);
     }
 
-    private ExtractableResponse<Response> updateLine(Long id, LineUpdateRequest request, int statusCode) {
+    private ExtractableResponse<Response> 노선_수정_요청(Long id, LineUpdateRequest request, int statusCode) {
         return put("/lines/{id}", request, statusCode, id);
     }
 
-    private ExtractableResponse<Response> deleteLine(Long id, int statusCode) {
+    private ExtractableResponse<Response> 노선_삭제_요청(Long id, int statusCode) {
         return delete("/lines/{id}", statusCode, new HashMap<>(), id);
     }
 

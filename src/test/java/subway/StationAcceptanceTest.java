@@ -17,8 +17,8 @@ import static subway.fixture.StationFixture.SEOLLEUNG_STATION;
 @DisplayName("지하철역 관련 기능")
 public class StationAcceptanceTest extends AcceptanceTest {
 
-    private static final String STATION_NAME_GANGNAM = "강남역";
-    private static final String STATION_NAME_SEOLLEUNG = "선릉역";
+    private static final String 강남역 = "강남역";
+    private static final String 선릉역 = "선릉역";
 
     /**
      * When 지하철역을 생성하면
@@ -29,13 +29,13 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void createStation() {
         // when
-        createStation(GANGNAM_STATION.toCreateRequest(), CREATED.value());
+        지하철역_생성_요청(GANGNAM_STATION.toCreateRequest(), CREATED.value());
 
         // then
-        ExtractableResponse<Response> findResponse = findStation(OK.value());
+        ExtractableResponse<Response> findResponse = 지하철역_조회_요청(OK.value());
         List<String> stationsNames = findResponse.jsonPath().getList("name", String.class);
         assertThat(stationsNames).hasSize(1)
-                .containsExactly(STATION_NAME_GANGNAM);
+                .containsExactly(강남역);
     }
 
     /**
@@ -47,16 +47,16 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void selectStation() {
         // given
-        createStation(GANGNAM_STATION.toCreateRequest(), CREATED.value());
-        createStation(SEOLLEUNG_STATION.toCreateRequest(), CREATED.value());
+        지하철역_생성_요청(GANGNAM_STATION.toCreateRequest(), CREATED.value());
+        지하철역_생성_요청(SEOLLEUNG_STATION.toCreateRequest(), CREATED.value());
 
         // when
-        ExtractableResponse<Response> findResponse = findStation(OK.value());
+        ExtractableResponse<Response> findResponse = 지하철역_조회_요청(OK.value());
         List<String> stationsNames = findResponse.jsonPath().getList("name", String.class);
 
         // then
         assertThat(stationsNames).hasSize(2)
-                .containsExactly("강남역", STATION_NAME_SEOLLEUNG);
+                .containsExactly("강남역", 선릉역);
     }
 
     /**
@@ -68,23 +68,23 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void removeStation() {
         // given
-        ExtractableResponse<Response> createResponse = createStation(GANGNAM_STATION.toCreateRequest(), CREATED.value());
+        ExtractableResponse<Response> createResponse = 지하철역_생성_요청(GANGNAM_STATION.toCreateRequest(), CREATED.value());
         StationResponse stationResponse = createResponse.as(StationResponse.class);
 
         // when
-        deleteStation(stationResponse.getId(), NO_CONTENT.value());
+        지하철역_삭제_요청(stationResponse.getId(), NO_CONTENT.value());
 
         // then
-        ExtractableResponse<Response> findResponse = findStation(OK.value());
+        ExtractableResponse<Response> findResponse = 지하철역_조회_요청(OK.value());
         List<String> stationsNames = findResponse.jsonPath().getList("name", String.class);
         assertThat(stationsNames).isEmpty();
     }
 
-    private ExtractableResponse<Response> findStation(int statusCode) {
+    private ExtractableResponse<Response> 지하철역_조회_요청(int statusCode) {
         return get("/stations/all", statusCode);
     }
 
-    private ExtractableResponse<Response> deleteStation(Long id, int statusCode) {
+    private ExtractableResponse<Response> 지하철역_삭제_요청(Long id, int statusCode) {
         return delete("/stations/{id}", statusCode, new HashMap<>(), id);
     }
 

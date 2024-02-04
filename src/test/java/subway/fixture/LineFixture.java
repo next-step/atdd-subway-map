@@ -3,8 +3,8 @@ package subway.fixture;
 import subway.controller.dto.LineCreateRequest;
 
 public enum LineFixture {
-    SHINBUNDANG_LINE("신분당선", "bg-red-600", 1L, 2L, 10L),
-    BUNDANG_LINE("분당선", "bg-green-600", 1L, 2L, 10L);
+    신분당선("신분당선", "bg-red-600", 1L, 2L, 10L),
+    분당선("분당선", "bg-green-600", 1L, 2L, 10L);
 
     private final String lineName;
     private final String lineColor;
