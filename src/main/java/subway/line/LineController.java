@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import subway.line.section.CannotAddSectionException;
 import subway.line.section.CannotDeleteSectionException;
 import subway.line.section.SectionRequest;
+import subway.line.section.SectionResponse;
 import subway.station.StationNotFoundException;
 
 import java.net.URI;
@@ -52,9 +53,10 @@ public class LineController {
     }
 
     @PostMapping("/lines/{id}/sections")
-    public ResponseEntity<LineSectionResponse> addLineSection(@PathVariable Long id, @RequestBody SectionRequest sectionRequest) {
+    public ResponseEntity<SectionResponse> addLineSection(@PathVariable Long id, @RequestBody SectionRequest sectionRequest) {
         try {
-            return ResponseEntity.ok().body(lineService.addLineSection(id, sectionRequest));
+            SectionResponse sectionResponse = lineService.addLineSection(id, sectionRequest);
+            return ResponseEntity.created(URI.create("/lines/" + id + "/sections/" + sectionResponse.getId())).body(sectionResponse);
         } catch (CannotAddSectionException e) {
             return ResponseEntity.badRequest().build();
         }

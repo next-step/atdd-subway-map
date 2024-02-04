@@ -39,8 +39,8 @@ public class SectionAcceptanceTest {
         ExtractableResponse<Response> response = makeSection(lineId, new SectionRequest(stationId2, stationId3, 13L));
 
         // then
-        assertThat(response.jsonPath().getList("sections.stationId", Long.class))
-                .containsExactly(stationId1, stationId2, stationId3);
+        assertThat(response.jsonPath().getLong("upStation.id")).isEqualTo(stationId2);
+        assertThat(response.jsonPath().getLong("downStation.id")).isEqualTo(stationId3);
     }
 
     /**
@@ -119,8 +119,7 @@ public class SectionAcceptanceTest {
         // then
         ExtractableResponse<Response> response = getLineSections(lineId);
 
-        assertThat(response.jsonPath().getLong("downStationId")).isEqualTo(stationId2);
-        assertThat(response.jsonPath().getList("sections.id", Long.class)).doesNotContain(stationId3);
+        assertThat(response.jsonPath().getList("sections.downStation.id", Long.class)).doesNotContain(stationId3);
     }
 
 

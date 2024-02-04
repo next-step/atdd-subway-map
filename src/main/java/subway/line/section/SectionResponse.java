@@ -32,25 +32,14 @@ public class SectionResponse {
     public Long getDistance() {
         return distance;
     }
-    //    private Long stationId;
-//    private String name;
-//    private Long distanceFromPrev;
-//
-//    public SectionResponse(Long stationId, String name, Long distanceFromPrev) {
-//        this.stationId = stationId;
-//        this.name = name;
-//        this.distanceFromPrev = distanceFromPrev;
-//    }
-//
-//    public Long getStationId() {
-//        return stationId;
-//    }
-//
-//    public String getName() {
-//        return name;
-//    }
-//
-//    public Long getDistanceFromPrev() {
-//        return distanceFromPrev;
-//    }
+
+    @Override
+    public String toString() {
+        return "SectionResponse{" +
+                "id=" + id +
+                ", upStation=" + upStation +
+                ", downStation=" + downStation +
+                ", distance=" + distance +
+                '}';
+    }
 }

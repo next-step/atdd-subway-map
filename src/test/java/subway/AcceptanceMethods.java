@@ -24,7 +24,7 @@ public class AcceptanceMethods {
 
     public static ExtractableResponse<Response> makeLine(LineRequest lineRequest) {
         return RestAssured
-                .given().log().all()
+                .given()
                 .when()
                 .body(lineRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -47,7 +47,7 @@ public class AcceptanceMethods {
 
     public static ExtractableResponse<Response> getLines() {
         return RestAssured
-                .given().log().all()
+                .given()
                 .when()
                 .get("/lines")
                 .then().log().all()
@@ -57,13 +57,13 @@ public class AcceptanceMethods {
 
     public static ExtractableResponse<Response> makeSection(Long lineId, SectionRequest sectionRequest) {
         return RestAssured
-                .given().log().all()
+                .given()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(sectionRequest)
                 .when().log().all()
                 .post("/lines/" + lineId + "/sections")
                 .then()
-                .statusCode(HttpStatus.OK.value())
+                .statusCode(HttpStatus.CREATED.value())
                 .extract();
     }
 
