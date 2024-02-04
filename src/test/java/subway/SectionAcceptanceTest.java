@@ -58,7 +58,10 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @ParameterizedTest
     @MethodSource("provideBlankSectionCreateRequest")
     void 실패_새로운_지하철_구간_등록시_필수값을_모두_입력하지_않으면_예외가_발생한다(SectionCreateRequest request) {
+        // when
         ExtractableResponse<Response> response = post("/lines/{lineId}/sections", request, BAD_REQUEST.value(), SHINBUNDANG_LINE_ID);
+
+        // then
         assertThat(response.statusCode()).isEqualTo(BAD_REQUEST.value());
     }
 
@@ -84,9 +87,14 @@ public class SectionAcceptanceTest extends AcceptanceTest {
      */
     @Test
     void 실패_새로운_구간_등록시_상행역을_노선의_하행_종점역에_등록하지_않으면_예외가_발생한다() {
+        // given
         SectionCreateRequest request = sectionCreateRequest(GANGNAM_STATION_ID, YANGJAE_STATION_ID, 10);
+
+        // when
         String message = post("/lines/{lineId}/sections", request, OK.value(), SHINBUNDANG_LINE_ID)
                 .as(ExceptionResponse.class).getMessage();
+
+        // then
         assertThat(message).isEqualTo("새로운 구간의 상행역은 노선의 하행 종점역에만 등록할 수 있습니다.");
     }
 
@@ -98,9 +106,14 @@ public class SectionAcceptanceTest extends AcceptanceTest {
      */
     @Test
     void 실패_새로운_구간_등록시_하행역을_노선의_존재하는_역에_등록하면_예외가_발생한다() {
+        // given
         SectionCreateRequest request = sectionCreateRequest(SEOLLEUNG_STATION_ID, GANGNAM_STATION_ID, 10);
+
+        // when
         String message = post("/lines/{lineId}/sections", request, OK.value(), SHINBUNDANG_LINE_ID)
                 .as(ExceptionResponse.class).getMessage();
+
+        // then
         assertThat(message).isEqualTo("새로운 구간의 하행역은 노선에 존재하는 역에 등록할 수 없습니다.");
     }
 
@@ -112,9 +125,14 @@ public class SectionAcceptanceTest extends AcceptanceTest {
      */
     @Test
     void 실패_새로운_구간_등록시_하행역을_노선의_하행역에_등록하면_예외가_발생한다() {
+        // given
         SectionCreateRequest request = sectionCreateRequest(YANGJAE_STATION_ID, SEOLLEUNG_STATION_ID, 10);
+
+        // when
         String message = post("/lines/{lineId}/sections", request, OK.value(), SHINBUNDANG_LINE_ID)
                 .as(ExceptionResponse.class).getMessage();
+
+        // then
         assertThat(message).isEqualTo("새로운 구간의 하행역은 노선에 존재하는 역에 등록할 수 없습니다.");
     }
 
@@ -128,9 +146,14 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @ParameterizedTest
     @ValueSource(ints = {10, 9})
     void 실패_새로운_지하철_구간_등록시_노선_길이보다_작거나_같다면_예외가_발생한다(int distance) {
+        // given
         SectionCreateRequest request = sectionCreateRequest(SEOLLEUNG_STATION_ID, YANGJAE_STATION_ID, distance);
+
+        // when
         String message = post("/lines/{lineId}/sections", request, OK.value(), SHINBUNDANG_LINE_ID)
                 .as(ExceptionResponse.class).getMessage();
+
+        // then
         assertThat(message).isEqualTo("새로운 구간의 길이는 노선의 길이 보다 작거나 같을 수 없습니다.");
     }
 
@@ -143,9 +166,13 @@ public class SectionAcceptanceTest extends AcceptanceTest {
      */
     @Test
     void 성공_새로운_지하철_구간_등록시_노선의_하행_종점역에_등록할_수_있다() {
+        // given
         SectionCreateRequest request = sectionCreateRequest(SEOLLEUNG_STATION_ID, YANGJAE_STATION_ID, 13);
-        ExtractableResponse<Response> createResponse = post("/lines/{lineId}/sections", request, CREATED.value(), SHINBUNDANG_LINE_ID);
 
+        // when
+        post("/lines/{lineId}/sections", request, CREATED.value(), SHINBUNDANG_LINE_ID);
+
+        // then
         LineResponse response = findLine(SHINBUNDANG_LINE_ID, OK.value()).as(LineResponse.class);
         assertThat(response.getStations()).hasSize(3)
                 .extracting("id", "name")
@@ -173,10 +200,15 @@ public class SectionAcceptanceTest extends AcceptanceTest {
      */
     @Test
     void 실패_지하철_구간_제거시_마지막_구간이_아닐경우_예외가_발생한다() {
+        // given
         SectionCreateRequest request = sectionCreateRequest(SEOLLEUNG_STATION_ID, YANGJAE_STATION_ID, 13);
         post("/lines/{lineId}/sections", request, CREATED.value(), SHINBUNDANG_LINE_ID);
+
+        // when
         String message = delete("/lines/{lineId}/sections", OK.value(), Map.of("stationId", "1"), SHINBUNDANG_LINE_ID)
                 .as(ExceptionResponse.class).getMessage();
+
+        // then
         assertThat(message).isEqualTo("마지막 구간이 아닐 경우 구간을 제거할 수 없습니다.");
     }
 
@@ -188,8 +220,11 @@ public class SectionAcceptanceTest extends AcceptanceTest {
      */
     @Test
     void 실패_지하철_구간_제거시_구간이_한개만_있는_경우_예외가_발생한다() {
+        // when
         String message = delete("/lines/{lineId}/sections", OK.value(), Map.of("stationId", "1"), SHINBUNDANG_LINE_ID)
                 .as(ExceptionResponse.class).getMessage();
+
+        // then
         assertThat(message).isEqualTo("구간이 한개만 있을 경우 구간을 제거할 수 없습니다.");
     }
 
@@ -202,10 +237,14 @@ public class SectionAcceptanceTest extends AcceptanceTest {
      */
     @Test
     void 성공_지하철_구간_제거시_구간의_제거에_성공한다() {
+        // given
         SectionCreateRequest request = sectionCreateRequest(SEOLLEUNG_STATION_ID, YANGJAE_STATION_ID, 13);
         post("/lines/{lineId}/sections", request, CREATED.value(), SHINBUNDANG_LINE_ID);
+
+        // when
         delete("/lines/{lineId}/sections", NO_CONTENT.value(), Map.of("stationId", "2"), SHINBUNDANG_LINE_ID);
 
+        // then
         LineResponse response = findLine(SHINBUNDANG_LINE_ID, OK.value()).as(LineResponse.class);
         assertThat(response.getStations()).hasSize(2)
                 .extracting("id", "name")

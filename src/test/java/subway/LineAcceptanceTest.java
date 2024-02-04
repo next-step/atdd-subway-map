@@ -53,8 +53,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // when
         ExtractableResponse<Response> createResponse = createLine(request, CREATED.value());
 
+        // then
         LineResponse lineResponse = createResponse.as(LineResponse.class);
-
         ExtractableResponse<Response> findResponse = findLines(OK.value());
         List<Long> lineIds = findResponse.jsonPath().getList("id", Long.class);
         assertThat(lineIds).containsAnyOf(lineResponse.getId());

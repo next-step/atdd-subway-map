@@ -31,6 +31,7 @@ public class StationAcceptanceTest extends AcceptanceTest {
         // when
         createStation(GANGNAM_STATION.toCreateRequest(), CREATED.value());
 
+        // then
         ExtractableResponse<Response> findResponse = findStation(OK.value());
         List<String> stationsNames = findResponse.jsonPath().getList("name", String.class);
         assertThat(stationsNames).hasSize(1)
@@ -45,6 +46,7 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철역 목록을 조회한다.")
     @Test
     void selectStation() {
+        // given
         createStation(GANGNAM_STATION.toCreateRequest(), CREATED.value());
         createStation(SEOLLEUNG_STATION.toCreateRequest(), CREATED.value());
 
