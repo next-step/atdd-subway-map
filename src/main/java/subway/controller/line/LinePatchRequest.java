@@ -1,4 +1,4 @@
-package subway.controller.line;
+package subway.controller.line.controller;
 
 public class LinePatchRequest {
     private String name;
