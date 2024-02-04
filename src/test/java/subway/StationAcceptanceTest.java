@@ -4,20 +4,21 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
 import subway.controller.dto.StationResponse;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.http.HttpStatus.*;
+import static subway.fixture.StationFixture.GANGNAM_STATION;
+import static subway.fixture.StationFixture.SEOLLEUNG_STATION;
 
 @DisplayName("지하철역 관련 기능")
 public class StationAcceptanceTest extends AcceptanceTest {
 
-    private static final String STATION_NAME_GANGNAM = "강남역";
-    private static final String STATION_NAME_SEOLLEUNG = "선릉역";
+    private static final String 강남역 = "강남역";
+    private static final String 선릉역 = "선릉역";
 
     /**
      * When 지하철역을 생성하면
@@ -27,19 +28,14 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철역을 생성한다.")
     @Test
     void createStation() {
-        // given
-        Map<String, String> gangNamStationParams = createParams(STATION_NAME_GANGNAM);
-
         // when
-        ExtractableResponse<Response> createResponse = createStation(gangNamStationParams);
+        지하철역_생성_요청(GANGNAM_STATION.toCreateRequest(), CREATED.value());
 
         // then
-        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-        ExtractableResponse<Response> findResponse = findStation();
+        ExtractableResponse<Response> findResponse = 지하철역_조회_요청(OK.value());
         List<String> stationsNames = findResponse.jsonPath().getList("name", String.class);
         assertThat(stationsNames).hasSize(1)
-                .containsExactly(STATION_NAME_GANGNAM);
+                .containsExactly(강남역);
     }
 
     /**
@@ -51,22 +47,16 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void selectStation() {
         // given
-        Map<String, String> gangNamStationParams = createParams(STATION_NAME_GANGNAM);
-        ExtractableResponse<Response> gangnamStationCreateResponse = createStation(gangNamStationParams);
-        assertThat(gangnamStationCreateResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-        // given
-        Map<String, String> seollEungStationParams = createParams(STATION_NAME_SEOLLEUNG);
-        ExtractableResponse<Response> seollEungStationCreateResponse = createStation(seollEungStationParams);
-        assertThat(seollEungStationCreateResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        지하철역_생성_요청(GANGNAM_STATION.toCreateRequest(), CREATED.value());
+        지하철역_생성_요청(SEOLLEUNG_STATION.toCreateRequest(), CREATED.value());
 
         // when
-        ExtractableResponse<Response> findResponse = findStation();
+        ExtractableResponse<Response> findResponse = 지하철역_조회_요청(OK.value());
         List<String> stationsNames = findResponse.jsonPath().getList("name", String.class);
 
         // then
         assertThat(stationsNames).hasSize(2)
-                .containsExactly("강남역", STATION_NAME_SEOLLEUNG);
+                .containsExactly("강남역", 선릉역);
     }
 
     /**
@@ -78,36 +68,24 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void removeStation() {
         // given
-        Map<String, String> gangNamStationParams = createParams(STATION_NAME_GANGNAM);
-        ExtractableResponse<Response> createResponse = createStation(gangNamStationParams);
-        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        ExtractableResponse<Response> createResponse = 지하철역_생성_요청(GANGNAM_STATION.toCreateRequest(), CREATED.value());
         StationResponse stationResponse = createResponse.as(StationResponse.class);
 
         // when
-        deleteStation(stationResponse.getId());
+        지하철역_삭제_요청(stationResponse.getId(), NO_CONTENT.value());
 
         // then
-        ExtractableResponse<Response> findResponse = findStation();
+        ExtractableResponse<Response> findResponse = 지하철역_조회_요청(OK.value());
         List<String> stationsNames = findResponse.jsonPath().getList("name", String.class);
         assertThat(stationsNames).isEmpty();
     }
 
-    private Map<String, String> createParams(String stationName) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", stationName);
-        return params;
+    private ExtractableResponse<Response> 지하철역_조회_요청(int statusCode) {
+        return get("/stations/all", statusCode);
     }
 
-    private ExtractableResponse<Response> createStation(Map<String, String> body) {
-        return post("/stations", body);
-    }
-
-    private ExtractableResponse<Response> findStation() {
-        return get("/stations/all");
-    }
-
-    private ExtractableResponse<Response> deleteStation(Long id) {
-        return delete("/stations/{id}", id);
+    private ExtractableResponse<Response> 지하철역_삭제_요청(Long id, int statusCode) {
+        return delete("/stations/{id}", statusCode, new HashMap<>(), id);
     }
 
 }

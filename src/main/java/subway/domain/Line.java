@@ -1,42 +1,37 @@
 package subway.domain;
 
+import org.hibernate.Hibernate;
+
 import javax.persistence.*;
-import java.util.List;
+import java.util.Objects;
 
 @Entity
 public class Line {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(length = 20, nullable = false)
     private String name;
+
     @Column(length = 20, nullable = false)
     private String color;
-    @Column(nullable = false)
-    private Long upStationId;
-    @Column(nullable = false)
-    private Long downStationId;
-    @Column(nullable = false)
-    private Long distance;
 
-    public Line() {
+    protected Line() {
     }
 
-    public Line(String name, String color, Long upStationId, Long downStationId, Long distance) {
+    public Line(Long id) {
+        this.id = id;
+    }
+
+    public Line(String name, String color) {
         this.name = name;
         this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
-        this.distance = distance;
     }
 
     public void update(String name, String color){
         this.name = name;
         this.color = color;
-    }
-
-    public List<Long> stationIds(){
-        return List.of(upStationId, downStationId);
     }
 
     public Long getId() {
@@ -51,16 +46,17 @@ public class Line {
         return color;
     }
 
-    public Long getUpStationId() {
-        return upStationId;
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || Hibernate.getClass(this) != Hibernate.getClass(object)) return false;
+        Line line = (Line) object;
+        return Objects.equals(id, line.id);
     }
 
-    public Long getDownStationId() {
-        return downStationId;
-    }
-
-    public Long getDistance() {
-        return distance;
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }
 

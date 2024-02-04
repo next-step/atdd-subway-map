@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.domain.Station;
 import subway.repository.StationRepository;
-import subway.controller.dto.StationRequest;
+import subway.controller.dto.StationCreateRequest;
 import subway.controller.dto.StationResponse;
 
 import java.util.List;
@@ -13,15 +13,15 @@ import java.util.stream.Collectors;
 @Service
 @Transactional(readOnly = true)
 public class StationService {
-    private StationRepository stationRepository;
+    private final StationRepository stationRepository;
 
     public StationService(StationRepository stationRepository) {
         this.stationRepository = stationRepository;
     }
 
     @Transactional
-    public StationResponse saveStation(StationRequest stationRequest) {
-        Station station = stationRepository.save(new Station(stationRequest.getName()));
+    public StationResponse saveStation(StationCreateRequest stationCreateRequest) {
+        Station station = stationRepository.save(new Station(stationCreateRequest.getName()));
         return createStationResponse(station);
     }
 
