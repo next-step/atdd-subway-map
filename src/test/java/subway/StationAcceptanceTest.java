@@ -8,8 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import subway.station.StationRequest;
-import subway.station.StationResponse;
+import subway.dto.station.StationRequest;
+import subway.dto.station.StationResponse;
 
 import java.util.HashMap;
 import java.util.List;
@@ -113,7 +113,7 @@ public class StationAcceptanceTest {
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
-    static ExtractableResponse<Response> requestCreateStation(String name) {
+    private ExtractableResponse<Response> requestCreateStation(String name) {
         return RestAssured.given().log().all()
             .body(new StationRequest(name))
             .contentType(MediaType.APPLICATION_JSON_VALUE)

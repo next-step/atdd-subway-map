@@ -1,6 +1,4 @@
-package subway.line;
-
-import subway.station.Station;
+package subway.entity;
 
 import javax.persistence.*;
 
@@ -18,6 +16,9 @@ public class Line {
 
     @Column(nullable = false)
     private Integer distance;
+
+    @Embedded
+    private Sections sections = new Sections();
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(
@@ -51,11 +52,23 @@ public class Line {
         this.downStation = downStation;
     }
 
-    public void updateLine(
-        LineUpdateRequest request
-    ) {
-        this.name = request.getName();
-        this.color = request.getColor();
+    public void updateLine(String name, String color) {
+        this.name = name;
+        this.color = color;
+    }
+
+    public void createSection(Section section) {
+        this.sections.createSection(section);
+    }
+
+    public void addSection(Section section) {
+        this.sections.addSection(section);
+        this.downStation = section.getUpStation();
+        this.distance = section.getDistance();
+    }
+
+    public void removeSection(Long stationId) {
+        this.sections.removeSection(stationId);
     }
 
     public Long getId() {
@@ -72,6 +85,10 @@ public class Line {
 
     public Integer getDistance() {
         return distance;
+    }
+
+    public Sections getSections() {
+        return sections;
     }
 
     public Station getUpStation() {

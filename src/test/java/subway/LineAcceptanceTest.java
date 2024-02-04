@@ -10,8 +10,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
-import subway.line.LineRequest;
-import subway.line.LineUpdateRequest;
+import subway.dto.line.LineRequest;
+import subway.dto.line.LineUpdateRequest;
+import subway.fixture.StationFixture;
 
 import java.util.List;
 
@@ -25,7 +26,7 @@ public class LineAcceptanceTest {
     @BeforeEach
     void setUp() {
         for (String name : List.of("강남역", "역삼역", "선릉역")) {
-            StationAcceptanceTest.requestCreateStation(name);
+            StationFixture.createStation(name);
         }
     }
 
@@ -163,7 +164,7 @@ public class LineAcceptanceTest {
 
     }
 
-    private ExtractableResponse<Response> requestCreateLine(
+    public static ExtractableResponse<Response> requestCreateLine(
         LineRequest request
     ) {
         return RestAssured
@@ -176,7 +177,7 @@ public class LineAcceptanceTest {
             .extract();
     }
 
-    private  ExtractableResponse<Response> requestGetLine(
+    public static ExtractableResponse<Response> requestGetLine(
         Long id
     ) {
         return RestAssured
@@ -188,7 +189,7 @@ public class LineAcceptanceTest {
             .extract();
     }
 
-    private ExtractableResponse<Response> requestGetLines() {
+    public static ExtractableResponse<Response> requestGetLines() {
         return RestAssured
             .when()
                 .get("/lines")

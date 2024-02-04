@@ -1,7 +1,11 @@
-package subway.station;
+package subway.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.dto.station.StationRequest;
+import subway.dto.station.StationResponse;
+import subway.entity.Station;
+import subway.repository.StationRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -9,7 +13,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional(readOnly = true)
 public class StationService {
-    private StationRepository stationRepository;
+    private final StationRepository stationRepository;
 
     public StationService(StationRepository stationRepository) {
         this.stationRepository = stationRepository;
@@ -37,5 +41,10 @@ public class StationService {
                 station.getId(),
                 station.getName()
         );
+    }
+
+    public Station findStation(Long id) {
+        return stationRepository.findById(id)
+            .orElseThrow(IllegalArgumentException::new);
     }
 }
