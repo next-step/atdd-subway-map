@@ -3,16 +3,20 @@ package subway.line;
 import static java.util.stream.Collectors.*;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.Predicate;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityNotFoundException;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
+import subway.section.Section;
 import subway.station.Station;
 
 @Entity
@@ -28,19 +32,15 @@ public class Line {
 	@Column(length = 20, nullable = false)
 	private String color;
 
-	@Column(nullable = false)
-	private Integer distance;
-
-	@OneToMany(mappedBy = "line")
-	private final List<LineStationMap> lineStationMaps = new ArrayList<>();
+	@OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
+	private final List<Section> sections = new ArrayList<>();
 
 	protected Line() {
 	}
 
-	public Line(String name, String color, Integer distance) {
+	public Line(String name, String color) {
 		this.name = name;
 		this.color = color;
-		this.distance = distance;
 	}
 
 	public Long getId() {
@@ -55,12 +55,8 @@ public class Line {
 		return color;
 	}
 
-	public Integer getDistance() {
-		return distance;
-	}
-
-	public List<LineStationMap> getLineStationMaps() {
-		return lineStationMaps;
+	public List<Section> getSections() {
+		return sections;
 	}
 
 	public void changeName(String name) {
@@ -71,24 +67,113 @@ public class Line {
 		this.color = color;
 	}
 
-	public Line addLineStationMap(LineStationMap lineStationMap) {
-		this.lineStationMaps.add(lineStationMap);
-		return this;
+	public void addSection(Station upStation, Station downStation, Integer distance) {
+		checkExistingStation(upStation);
+		checkFinalStation(upStation);
+		Section section = new Section(this, upStation, downStation, distance);
+		this.sections.add(section);
+	}
+
+	private void checkExistingStation(Station upStation) {
+		List<Long> existsStationIds = sections
+			.stream()
+			.map(section -> section.getUpStation().getId())
+			.collect(toList());
+
+		if (existsStationIds.contains(upStation.getId())) {
+			throw new IllegalArgumentException("추가 할려는 정류장은 이미 해당 노선에 존재하는 정류장입니다.");
+		}
+	}
+
+	public void checkFinalStation(Station station) {
+		if (sections.isEmpty()) {
+			return;
+		}
+
+		if (!getFinalStation().getId().equals(station.getId())) {
+			throw new IllegalArgumentException("해당 노선의 마지막 정류장이 아닙니다.");
+		}
 	}
 
 	public Station getFinalStation() {
-		List<Long> upperIds = lineStationMaps.stream()
-			.map(LineStationMap::getUpperStationId)
+		if (sections.isEmpty()) {
+			return new Station("");
+		}
+
+		List<Long> upStationIds = sections.stream()
+			.map(section -> section.getUpStation().getId())
 			.collect(toList());
-		return lineStationMaps.stream()
-			.filter(isFinalStation(upperIds))
+
+		return sections.stream()
+			.filter(isFinalStation(upStationIds))
 			.findFirst()
-			.orElseThrow()
-			.getStation();
+			.orElseThrow(EntityNotFoundException::new)
+			.getDownStation();
 	}
 
-	private Predicate<LineStationMap> isFinalStation(List<Long> upperIds) {
-		return lineStationMap -> !upperIds.contains(lineStationMap.getStation().getId())
-			&& !lineStationMap.getUpperStationId().equals(0L);
+	private Predicate<Section> isFinalStation(List<Long> upStationIds) {
+		return section -> !upStationIds.contains(section.getDownStation().getId());
+	}
+
+	public List<Station> getSortedStations() {
+		Station finalStation = getFinalStation();
+		List<Station> stations = sections.stream()
+			.sorted(stationComparator())
+			.map(Section::getUpStation)
+			.collect(toList());
+		stations.add(finalStation);
+		return stations;
+	}
+
+	private static Comparator<Section> stationComparator() {
+		return (section, nextSection) -> {
+			final int sort = 1;
+			Long downStationId = section.getDownStation().getId();
+			Long nextUpStationId = nextSection.getUpStation().getId();
+
+			if (downStationId.equals(nextUpStationId)) {
+				return -sort;
+			}
+
+			return sort;
+		};
+	}
+
+	public void removeStation(Station station) {
+		checkDeletableStation(station);
+
+		Section section = getSectionMatchesDownStation(station);
+
+		sections.remove(section);
+	}
+
+	private void checkDeletableStation(Station station) {
+		checkFinalStation(station);
+		checkIncludedThisLine(station);
+		checkOnlyTwoStations();
+	}
+
+	private void checkOnlyTwoStations() {
+		if (sections.size() < 2) {
+			throw new IllegalArgumentException("해당 노선은 두개의 정류장만 존재 하므로, 삭제할 수 없습니다.");
+		}
+	}
+
+	private void checkIncludedThisLine(Station targetStation) {
+		boolean isIncluded = getSortedStations().stream().anyMatch(isIncludedStation(targetStation));
+		if (!isIncluded) {
+			throw new IllegalArgumentException("해당 노선에 포함되지 않는 정류장입니다.");
+		}
+	}
+
+	private static Predicate<Station> isIncludedStation(Station targetStation) {
+		return station -> station.getId().equals(targetStation.getId());
+	}
+
+	private Section getSectionMatchesDownStation(Station station) {
+		return sections.stream()
+			.filter(section -> section.getDownStation().getId().equals(station.getId()))
+			.findFirst()
+			.orElseThrow(() -> new EntityNotFoundException(""));
 	}
 }
