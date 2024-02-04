@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.jdbc.Sql;
 import subway.common.Line;
 import subway.common.Section;
 import subway.common.Station;
@@ -20,7 +21,8 @@ import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFOR
 
 @DisplayName("지하철 노선 구간 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@DirtiesContext(classMode = BEFORE_EACH_TEST_METHOD)
+//@DirtiesContext(classMode = BEFORE_EACH_TEST_METHOD)
+@Sql("/truncate.sql")
 public class LineSectionAcceptanceTest {
 
     StationResponse A역;

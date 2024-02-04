@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.jdbc.Sql;
 import subway.common.Station;
 
 import java.util.List;
@@ -16,7 +17,7 @@ import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFOR
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@DirtiesContext(classMode = BEFORE_EACH_TEST_METHOD)
+@Sql("/truncate.sql")
 public class StationAcceptanceTest {
     final Station.RequestBody 강남역 = Station.랜덤_REQUEST_BODY();
     final Station.RequestBody 역삼역 = Station.랜덤_REQUEST_BODY();
