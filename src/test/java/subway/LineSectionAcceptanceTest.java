@@ -13,6 +13,7 @@ import org.springframework.test.context.jdbc.Sql;
 import subway.common.Line;
 import subway.common.Section;
 import subway.common.Station;
+import subway.common.exception.ErrorMessage;
 import subway.common.util.AcceptanceTest;
 import subway.interfaces.line.dto.LineResponse;
 import subway.interfaces.station.dto.StationResponse;
@@ -86,8 +87,7 @@ public class LineSectionAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
 
         // Then
-        String failMessage = response.jsonPath().getString("message");
-        assertThat(failMessage).isEqualTo("이미 포함된 하행역");
+        assertFail(response, ErrorMessage.이미_포함된_하행역);
     }
 
     /**
@@ -105,8 +105,7 @@ public class LineSectionAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
 
         // Then
-        String failMessage = response.jsonPath().getString("message");
-        assertThat(failMessage).isEqualTo("잘못된 상행역");
+        assertFail(response, ErrorMessage.잘못된_상행역);
     }
 
     /**
@@ -152,8 +151,7 @@ public class LineSectionAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
 
         //Then
-        String failMessage = response.jsonPath().getString("message");
-        assertThat(failMessage).isEqualTo("잘못된 하행역");
+        assertFail(response, ErrorMessage.잘못된_하행역);
     }
 
     /**
@@ -171,8 +169,11 @@ public class LineSectionAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
 
         //Then
-        String failMessage = response.jsonPath().getString("message");
-        assertThat(failMessage).isEqualTo("유일한 구간");
+        assertFail(response, ErrorMessage.유일한구간);
+    }
 
+    private void assertFail(ExtractableResponse<Response> response, String message) {
+        String failMessage = response.jsonPath().getString("message");
+        assertThat(failMessage).isEqualTo(message);
     }
 }

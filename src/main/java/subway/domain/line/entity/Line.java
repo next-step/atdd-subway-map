@@ -3,6 +3,7 @@ package subway.domain.line.entity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import subway.common.exception.CustomException;
+import subway.common.exception.ErrorMessage;
 import subway.domain.station.entity.Station;
 
 import javax.persistence.*;
@@ -72,11 +73,11 @@ public class Line {
 
     public void add(Section section) {
         if (!this.getDownStation().equals(section.getUpStation())) {
-            throw new InvalidParameterException("잘못된 상행역");
+            throw new InvalidParameterException(ErrorMessage.잘못된_상행역);
         }
 
         if (this.contains(section.getDownStation())) {
-            throw new CustomException.Conflict("이미 포함된 하행역");
+            throw new CustomException.Conflict(ErrorMessage.이미_포함된_하행역);
         }
         this.sections.add(section);
         section.setLine(this);
@@ -87,11 +88,11 @@ public class Line {
         Section lastSection = this.sections.get(this.sections.size()-1);
 
         if (!lastSection.getDownStation().getId().equals(sectionId)) {
-            throw new InvalidParameterException("잘못된 하행역");
+            throw new InvalidParameterException(ErrorMessage.잘못된_하행역);
         }
 
         if(this.sections.size() == 1) {
-            throw new InvalidParameterException("유일한 구간");
+            throw new InvalidParameterException(ErrorMessage.유일한구간);
         }
 
         lastSection.setLine(null);
