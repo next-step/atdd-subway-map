@@ -17,7 +17,7 @@ public class Line {
     private String color;
 
     // TODO: Line 도메인 안에 Section 관리 로직을 분리할 수 있도록 Embedded 적용하기
-    @OneToMany(mappedBy = "line", cascade = CascadeType.PERSIST, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.PERSIST, orphanRemoval = true)
     private final List<Section> sections = new ArrayList<>();
 
     private Line(String name, String color) {
@@ -27,9 +27,9 @@ public class Line {
 
     protected Line() {}
 
-    public static Line create(String name, String color, Station upStation, Station downStation, Integer distance) {
+    public static Line create(String name, String color, Station upStation, Station downStation, int distance) {
         Line line = new Line(name, color);
-        Section section = Section.create(upStation, downStation, line, distance);
+        Section section = Section.create(upStation, downStation, distance);
         line.sections.add(section);
         return line;
     }
@@ -85,6 +85,9 @@ public class Line {
     private void validateStationsOfSection(Section section) {
         if (sections.isEmpty()) {
             return;
+        }
+        if (section.getUpStation() == section.getDownStation()) {
+            throw new LineSectionException("상행역과 하행역을 동일할 수 없습니다.");
         }
         if (isDownStationAlreadyIncluded(section.getDownStation())) {
             throw new LineSectionException("이미 노선에 포함된 역은 하행역으로 지정할 수 없습니다.");

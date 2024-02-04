@@ -2,15 +2,15 @@ package subway.exception;
 
 public class ErrorResponse {
 
-    private Integer code;
+    private int code;
     private String message;
 
-    public ErrorResponse(Integer code, String message) {
+    public ErrorResponse(int code, String message) {
         this.code = code;
         this.message = message;
     }
 
-    public Integer getCode() {
+    public int getCode() {
         return code;
     }
 

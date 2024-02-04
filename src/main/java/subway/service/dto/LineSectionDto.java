@@ -7,9 +7,9 @@ public class LineSectionDto {
     private Long id;
     private StationDto upStation;
     private StationDto downStation;
-    private Integer distance;
+    private int distance;
 
-    public LineSectionDto(Long id, StationDto upStation, StationDto downStation, Integer distance) {
+    public LineSectionDto(Long id, StationDto upStation, StationDto downStation, int distance) {
         this.id = id;
         this.upStation = upStation;
         this.downStation = downStation;
@@ -28,7 +28,7 @@ public class LineSectionDto {
         return downStation;
     }
 
-    public Integer getDistance() {
+    public int getDistance() {
         return distance;
     }
 

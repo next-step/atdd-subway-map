@@ -11,21 +11,18 @@ public class Section {
     private Station upStation;
     @ManyToOne(fetch = FetchType.LAZY)
     private Station downStation;
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Line line;
-    private Integer distance;
+    private int distance;
 
     protected Section () {}
 
-    private Section(Station upStation, Station downStation, Line line, Integer distance) {
+    private Section(Station upStation, Station downStation, int distance) {
         this.upStation = upStation;
         this.downStation = downStation;
-        this.line = line;
         this.distance = distance;
     }
 
-    public static Section create(Station upStation, Station downStation, Line line, Integer distance) {
-        return new Section(upStation, downStation, line, distance);
+    public static Section create(Station upStation, Station downStation, int distance) {
+        return new Section(upStation, downStation, distance);
     }
 
     public Long getId() {
@@ -40,11 +37,7 @@ public class Section {
         return downStation;
     }
 
-    public Line getLine() {
-        return line;
-    }
-
-    public Integer getDistance() {
+    public int getDistance() {
         return distance;
     }
 }

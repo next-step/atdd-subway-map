@@ -65,7 +65,7 @@ public class LineService {
 
         Line line = findLineByIdOrFail(command.getLineId());
 
-        Section section = Section.create(upStation, downStation, line, command.getDistance());
+        Section section = Section.create(upStation, downStation, command.getDistance());
         line.addSection(section);
 
         return LineSectionDto.from(section);

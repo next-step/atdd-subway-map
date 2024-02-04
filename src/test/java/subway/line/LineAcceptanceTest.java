@@ -1,41 +1,26 @@
 package subway.line;
 
-import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
 import subway.controller.dto.LineCreateRequestBody;
 import subway.controller.dto.LineUpdateRequestBody;
+import subway.helper.AcceptanceTest;
 import subway.helper.api.LineApi;
 import subway.helper.api.StationApi;
-import subway.helper.db.Truncator;
 import subway.helper.fixture.LineFixture;
 import subway.helper.fixture.StationFixture;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class LineAcceptanceTest {
+public class LineAcceptanceTest extends AcceptanceTest {
     private final String routePrefix = "/lines";
     private static Long 강남역Id;
     private static Long 신논현역Id;
     private static Long 역삼역Id;
-
-    @Autowired
-    private Truncator truncator;
-
-    @AfterEach
-    void clear() {
-        truncator.truncateAll();
-    }
 
     @BeforeEach
     void createStationFixture() {
@@ -51,32 +36,21 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선을 생성한다.")
     @Test
     void createSubwayLine() {
-        LineCreateRequestBody lineCreateRequestBody = new LineCreateRequestBody(
-            "신분당선", "bg-red-600", 1L, 2L, 10
-        );
-
         // when
-        RestAssured.given().log().all()
-                .body(lineCreateRequestBody)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post(routePrefix)
-                .then().log().all()
-                .statusCode(HttpStatus.CREATED.value());
+        LineCreateRequestBody 신분당선 = LineFixture.신분당선(강남역Id, 신논현역Id);
+        LineApi.노선생성요청(신분당선);
 
         // then
-        JsonPath getLinesResponseJson = LineApi.getLines();
+        JsonPath getLinesResponseJson = LineApi.노선목록조회요청();
 
         assertThat(getLinesResponseJson.getList("color", String.class))
-                .containsExactly(lineCreateRequestBody.getColor());
+                .containsExactly(신분당선.getColor());
 
         assertThat(getLinesResponseJson.getList("name", String.class))
-                .containsExactly(lineCreateRequestBody.getName());
+                .containsExactly(신분당선.getName());
 
         assertThat(getLinesResponseJson.getList("stations[0].id", Long.class))
-                .containsExactly(
-                        lineCreateRequestBody.getUpStationId(),
-                        lineCreateRequestBody.getDownStationId()
-                );
+                .containsExactly(신분당선.getUpStationId(), 신분당선.getDownStationId());
     }
 
     /**
@@ -88,23 +62,15 @@ public class LineAcceptanceTest {
     @Test
     void getSubwayLineList() {
         // given
-        JsonPath fixture1 = LineApi.createLine(LineFixture.신분당선(강남역Id, 신논현역Id));
-        JsonPath fixture2 = LineApi.createLine(LineFixture.이호선(강남역Id, 역삼역Id));
+        JsonPath 신분당선 = LineApi.노선생성요청(LineFixture.신분당선(강남역Id, 신논현역Id));
+        JsonPath 이호선 = LineApi.노선생성요청(LineFixture.이호선(강남역Id, 역삼역Id));
 
         // when
-        JsonPath getLinesResponseJson =
-                RestAssured.given().log().all()
-                        .when().get(routePrefix)
-                        .then().log().all()
-                        .statusCode(HttpStatus.OK.value())
-                        .extract().jsonPath();
+        JsonPath response = LineApi.노선목록조회요청();
 
         // then
-        assertThat(getLinesResponseJson.getList("name", String.class))
-                .containsExactly(
-                        fixture1.getString("name"),
-                        fixture2.getString("name")
-                );
+        assertThat(response.getList("name", String.class))
+                .containsExactly(신분당선.getString("name"), 이호선.getString("name"));
     }
 
     /**
@@ -116,26 +82,20 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선 상세 정보를 조회한다.")
     @Test
     void getSubwayLine() {
-        JsonPath createdFixture = LineApi.createLine(LineFixture.신분당선(강남역Id, 신논현역Id));
+        JsonPath 신분당선 = LineApi.노선생성요청(LineFixture.신분당선(강남역Id, 신논현역Id));
 
         // when
-        JsonPath response =
-                RestAssured.given().log().all()
-                        .pathParam("id", createdFixture.getLong("id"))
-                        .when().get(routePrefix + "/{id}")
-                        .then().log().all()
-                        .statusCode(HttpStatus.OK.value())
-                        .extract().jsonPath();
+        JsonPath response = LineApi.노선조회요청(신분당선.getLong("id"));
 
         // then
         assertThat(response.getString("name"))
-                .isEqualTo(createdFixture.getString("name"));
+                .isEqualTo(신분당선.getString("name"));
 
         assertThat(response.getString("color"))
-                .isEqualTo(createdFixture.getString("color"));
+                .isEqualTo(신분당선.getString("color"));
 
         assertThat(response.getList("stations.id", Long.class))
-                .isEqualTo(createdFixture.getList("stations.id", Long.class)
+                .isEqualTo(신분당선.getList("stations.id", Long.class)
         );
         assertThat(response.getString("distance")).isNullOrEmpty();
     }
@@ -150,30 +110,23 @@ public class LineAcceptanceTest {
     @Test
     void updateSubwayLine() {
         // given
-        JsonPath createdFixture = LineApi.createLine(LineFixture.신분당선(강남역Id, 신논현역Id));
+        JsonPath 신분당선 = LineApi.노선생성요청(LineFixture.신분당선(강남역Id, 신논현역Id));
 
         // when
-        LineUpdateRequestBody lineUpdateRequestBody = new LineUpdateRequestBody("구분당선", "bg-blue-600");
-
-        RestAssured.given().log().all()
-                .pathParam("id", createdFixture.getLong("id"))
-                .body(lineUpdateRequestBody)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().put(routePrefix + "/{id}")
-                .then().log().all()
-                .statusCode(HttpStatus.OK.value());
+        LineUpdateRequestBody requestBody = new LineUpdateRequestBody("구분당선", "bg-blue-600");
+        LineApi.노선수정요청(신분당선.getLong("id"), requestBody);
 
         // then
-        JsonPath getLineJsonPath = LineApi.getLine(createdFixture.getLong("id"));
+        JsonPath getLineJsonPath = LineApi.노선조회요청(신분당선.getLong("id"));
 
         assertThat(getLineJsonPath.getString("name"))
-                .isEqualTo(lineUpdateRequestBody.getName());
+                .isEqualTo(requestBody.getName());
 
         assertThat(getLineJsonPath.getString("color"))
-                .isEqualTo(lineUpdateRequestBody.getColor());
+                .isEqualTo(requestBody.getColor());
 
         assertThat(getLineJsonPath.getList("stations.id", Long.class))
-                .isEqualTo(createdFixture.getList("stations.id", Long.class));
+                .isEqualTo(신분당선.getList("stations.id", Long.class));
     }
 
     /**
@@ -185,17 +138,14 @@ public class LineAcceptanceTest {
     @Test
     void deleteSubwayLine() {
         // given
-        JsonPath createdFixture = LineApi.createLine(LineFixture.신분당선(강남역Id, 신논현역Id));
+        JsonPath 신분당선 = LineApi.노선생성요청(LineFixture.신분당선(강남역Id, 신논현역Id));
 
         // when
-        RestAssured.given().log().all()
-                .pathParam("id", createdFixture.getLong("id"))
-                .when().delete(routePrefix + "/{id}")
-                .then().log().all().statusCode(HttpStatus.NO_CONTENT.value());
+        LineApi.노선삭제요청(신분당선.getLong("id"));
 
         // then
-        assertThat(LineApi.getLines()
+        assertThat(LineApi.노선목록조회요청()
                 .getList("name", String.class))
-                .doesNotContain(createdFixture.getString("name"));
+                .doesNotContain(신분당선.getString("name"));
     }
 }

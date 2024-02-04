@@ -3,12 +3,10 @@ package subway.line;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
+import subway.helper.AcceptanceTest;
 import subway.helper.api.LineApi;
 import subway.helper.api.StationApi;
-import subway.helper.db.Truncator;
 import subway.helper.fixture.LineFixture;
 import subway.helper.fixture.SectionFixture;
 import subway.helper.fixture.StationFixture;
@@ -16,22 +14,11 @@ import subway.helper.fixture.StationFixture;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 구간 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class SectionAcceptanceTest {
-    private final String routePrefix = "/lines";
+public class SectionAcceptanceTest extends AcceptanceTest {
     private static Long 강남역Id;
     private static Long 신논현역Id;
     private static Long 논현역Id;
     private static Long 신분당선Id;
-
-    @Autowired
-    private Truncator truncator;
-
-    @AfterEach
-    void clear() {
-        truncator.truncateAll();
-    }
-
 
     @BeforeEach
     void createFixture() {
@@ -40,7 +27,7 @@ public class SectionAcceptanceTest {
         신논현역Id = StationApi.create(StationFixture.신논현역).getLong("id");
         논현역Id = StationApi.create(StationFixture.논현역).getLong("id");
         // line
-        신분당선Id = LineApi.createLine(LineFixture.신분당선(강남역Id, 신논현역Id)).getLong("id");
+        신분당선Id = LineApi.노선생성요청(LineFixture.신분당선(강남역Id, 신논현역Id)).getLong("id");
     }
 
     @Nested
@@ -54,13 +41,13 @@ public class SectionAcceptanceTest {
         @Test
         void createLineSectionFailForUpStationValidation() {
             // when
-            ExtractableResponse<Response> response = LineApi.createSection(
+            ExtractableResponse<Response> response = LineApi.구간생성요청(
                     신분당선Id, SectionFixture.추가구간(강남역Id, 논현역Id)
             );
 
             // then
             assertThat(response.statusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY.value());
-            assertThat(LineApi.getSection(신분당선Id).getList("stations.id", Long.class))
+            assertThat(LineApi.구간조회요청(신분당선Id).getList("stations.id", Long.class))
                     .containsExactly(강남역Id, 신논현역Id);
         }
 
@@ -73,13 +60,13 @@ public class SectionAcceptanceTest {
         @Test
         void createLineSectionFailForDownStationValidation() {
             // when
-            ExtractableResponse<Response> response = LineApi.createSection(
+            ExtractableResponse<Response> response = LineApi.구간생성요청(
                     신분당선Id, SectionFixture.추가구간(논현역Id, 강남역Id)
             );
 
             // then
             assertThat(response.statusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY.value());
-            assertThat(LineApi.getSection(신분당선Id).getList("stations.id", Long.class))
+            assertThat(LineApi.노선조회요청(신분당선Id).getList("stations.id", Long.class))
                     .containsExactly(강남역Id, 신논현역Id);
         }
 
@@ -93,13 +80,13 @@ public class SectionAcceptanceTest {
         @Test
         void createLineSection() {
             // when
-            ExtractableResponse<Response> response = LineApi.createSection(
+            ExtractableResponse<Response> response = LineApi.구간생성요청(
                     신분당선Id, SectionFixture.추가구간(신논현역Id, 논현역Id)
             );
 
             // then
             assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-            assertThat(LineApi.getSection(신분당선Id).getList("stations.id", Long.class))
+            assertThat(LineApi.구간조회요청(신분당선Id).getList("stations.id", Long.class))
                     .containsExactly(강남역Id, 신논현역Id, 논현역Id);
         }
     }
@@ -116,11 +103,11 @@ public class SectionAcceptanceTest {
         @Test
         void deleteLineSectionFailWithOneLine() {
             // when
-            ExtractableResponse<Response> response = LineApi.deleteSection(신분당선Id, 신논현역Id);
+            ExtractableResponse<Response> response = LineApi.구간삭제요청(신분당선Id, 신논현역Id);
 
             // then
             assertThat(response.statusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY.value());
-            assertThat(LineApi.getSection(신분당선Id).getList("stations.id", Long.class))
+            assertThat(LineApi.구간조회요청(신분당선Id).getList("stations.id", Long.class))
                     .containsExactly(강남역Id, 신논현역Id);
         }
 
@@ -133,11 +120,11 @@ public class SectionAcceptanceTest {
         @Test
         void deleteLineSectionFailWithUpStation() {
             // when
-            ExtractableResponse<Response> response = LineApi.deleteSection(신분당선Id, 강남역Id);
+            ExtractableResponse<Response> response = LineApi.구간삭제요청(신분당선Id, 강남역Id);
 
             // then
             assertThat(response.statusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY.value());
-            assertThat(LineApi.getSection(신분당선Id).getList("stations.id", Long.class))
+            assertThat(LineApi.구간조회요청(신분당선Id).getList("stations.id", Long.class))
                     .containsExactly(강남역Id, 신논현역Id);
         }
 
@@ -150,14 +137,14 @@ public class SectionAcceptanceTest {
         @Test
         void deleteLineSectionSuccess() {
             // given
-            LineApi.createSection(신분당선Id, SectionFixture.추가구간(신논현역Id, 논현역Id));
+            LineApi.구간생성요청(신분당선Id, SectionFixture.추가구간(신논현역Id, 논현역Id));
 
             // when
-            ExtractableResponse<Response> response = LineApi.deleteSection(신분당선Id, 논현역Id);
+            ExtractableResponse<Response> response = LineApi.구간삭제요청(신분당선Id, 논현역Id);
 
             // then
             assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-            assertThat(LineApi.getSection(신분당선Id).getList("stations.id", Long.class))
+            assertThat(LineApi.구간조회요청(신분당선Id).getList("stations.id", Long.class))
                     .containsExactly(강남역Id, 신논현역Id);
         }
 

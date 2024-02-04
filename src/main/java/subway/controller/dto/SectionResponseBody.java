@@ -4,9 +4,9 @@ public class SectionResponseBody {
     private Long id;
     private StationResponseBody upStation;
     private StationResponseBody downStation;
-    private Integer distance;
+    private int distance;
 
-    public SectionResponseBody(Long id, StationResponseBody upStation, StationResponseBody downStation, Integer distance) {
+    public SectionResponseBody(Long id, StationResponseBody upStation, StationResponseBody downStation, int distance) {
         this.id = id;
         this.upStation = upStation;
         this.downStation = downStation;
@@ -25,7 +25,7 @@ public class SectionResponseBody {
         return downStation;
     }
 
-    public Integer getDistance() {
+    public int getDistance() {
         return distance;
     }
 }

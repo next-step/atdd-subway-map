@@ -4,9 +4,9 @@ public class SaveLineSectionCommand {
     private Long lineId;
     private Long upStationId;
     private Long downStationId;
-    private Integer distance;
+    private int distance;
 
-    public SaveLineSectionCommand(Long lineId, Long upStationId, Long downStationId, Integer distance) {
+    public SaveLineSectionCommand(Long lineId, Long upStationId, Long downStationId, int distance) {
         this.lineId = lineId;
         this.upStationId = upStationId;
         this.downStationId = downStationId;
@@ -25,7 +25,7 @@ public class SaveLineSectionCommand {
         return downStationId;
     }
 
-    public Integer getDistance() {
+    public int getDistance() {
         return distance;
     }
 }

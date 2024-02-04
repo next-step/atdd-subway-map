@@ -5,10 +5,9 @@ import org.springframework.stereotype.Component;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import javax.persistence.metamodel.EntityType;
-import javax.persistence.metamodel.Metamodel;
 import javax.transaction.Transactional;
-import java.util.Set;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class Truncator {
@@ -21,24 +20,23 @@ public class Truncator {
 
     @Transactional
     public void truncateAll() {
-        Metamodel metamodel = em.getMetamodel();
-        Set<EntityType<?>> entities = metamodel.getEntities();
-
-        for (EntityType<?> entityType : entities) {
-            String originalTableName = entityType.getName();
-            String snakeCaseTableName = convertCamelCaseToSnakeCase(originalTableName);
-            truncateTable(snakeCaseTableName);
+        for (String tableName : getAllTablesFromSchema()) {
+            truncateTable(tableName);
         }
     }
 
-    private String convertCamelCaseToSnakeCase(String camelCase) {
-        return camelCase.replaceAll("([a-z])([A-Z])", "$1_$2").toLowerCase();
+    private List<String> getAllTablesFromSchema() {
+        Query query = em.createNativeQuery(
+                "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = SCHEMA()"
+        );
+        List<String> tableNames = query.getResultList();
+        return tableNames.stream().map(String::toLowerCase).collect(Collectors.toList());
     }
 
-    private void truncateTable(String tableName) {
+    private void truncateTable(String name) {
         em.createNativeQuery("SET REFERENTIAL_INTEGRITY FALSE").executeUpdate();
 
-        Query truncateQuery = em.createNativeQuery("TRUNCATE TABLE " + tableName + " RESTART IDENTITY");
+        Query truncateQuery = em.createNativeQuery("TRUNCATE TABLE " + name + " RESTART IDENTITY");
         truncateQuery.executeUpdate();
 
         em.createNativeQuery("SET REFERENTIAL_INTEGRITY TRUE").executeUpdate();

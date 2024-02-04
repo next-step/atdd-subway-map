@@ -12,9 +12,9 @@ public class SectionCreateRequestBody {
     private Long downStationId;
     @NotBlank
     @Min(value = 1)
-    private Integer distance;
+    private int distance;
 
-    public SectionCreateRequestBody(Long upStationId, Long downStationId, Integer distance) {
+    public SectionCreateRequestBody(Long upStationId, Long downStationId, int distance) {
         this.upStationId = upStationId;
         this.downStationId = downStationId;
         this.distance = distance;
@@ -28,7 +28,7 @@ public class SectionCreateRequestBody {
         return downStationId;
     }
 
-    public Integer getDistance() {
+    public int getDistance() {
         return distance;
     }
 
