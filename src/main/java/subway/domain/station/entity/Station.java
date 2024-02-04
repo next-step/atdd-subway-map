@@ -1,6 +1,6 @@
-package subway.service.station;
+package subway.domain.station.entity;
 
-import subway.service.line.Line;
+import subway.domain.line.entity.Section;
 
 import javax.persistence.*;
 import java.util.List;
@@ -14,7 +14,7 @@ public class Station {
     private String name;
 
     @ManyToMany
-    private List<Line> lines;
+    private List<Section> sections;
 
     public Station() {
     }

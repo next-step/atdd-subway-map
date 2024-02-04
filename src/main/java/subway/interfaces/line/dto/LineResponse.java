@@ -1,7 +1,7 @@
-package subway.controller.line;
+package subway.interfaces.line.dto;
 
-import subway.controller.station.StationResponse;
-import subway.service.line.Line;
+import subway.interfaces.station.dto.StationResponse;
+import subway.domain.line.entity.Line;
 
 public class LineResponse {
     private final Long id;

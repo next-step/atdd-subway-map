@@ -5,11 +5,9 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.http.MediaType;
-import subway.controller.station.StationResponse;
+import subway.interfaces.station.dto.StationResponse;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class Station {
 

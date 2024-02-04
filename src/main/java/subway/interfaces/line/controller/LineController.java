@@ -1,9 +1,11 @@
-package subway.controller.line.controller;
+package subway.interfaces.line.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import subway.controller.line.LineResponse;
-import subway.service.line.LineService;
+import subway.interfaces.line.dto.LinePatchRequest;
+import subway.interfaces.line.dto.LineRequest;
+import subway.interfaces.line.dto.LineResponse;
+import subway.domain.line.service.LineService;
 
 import java.net.URI;
 import java.util.List;

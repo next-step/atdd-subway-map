@@ -1,6 +1,6 @@
-package subway.service.line;
+package subway.domain.line.entity;
 
-import subway.service.station.Station;
+import subway.domain.station.entity.Station;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -18,22 +18,19 @@ public class Line {
     @Column(length = 20, nullable = false)
     private String color;
 
-    @ManyToOne
-    @JoinColumn(nullable = false)
-    private Station upStation;
+    @OneToMany(mappedBy = "line")
+    private List<Section> sections;
 
-    @ManyToOne
-    @JoinColumn(nullable = false)
-    private Station downStation;
-
-    public Line(){
+    public Line() {
 
     }
-    public Line(String name, String color, Station upStation, Station downStation) {
+
+    public Line(String name, String color, Section section) {
         this.name = name;
         this.color = color;
-        this.upStation = upStation;
-        this.downStation = downStation;
+        this.sections = new ArrayList<>();
+        this.sections.add(section);
+        section.setLine(this);
     }
 
     public Long getId() {
@@ -49,11 +46,11 @@ public class Line {
     }
 
     public Station getUpStation() {
-        return upStation;
+        return sections.get(0).getUpStation();
     }
 
     public Station getDownStation() {
-        return downStation;
+        return sections.get(sections.size() - 1).getDownStation();
     }
 
     public void changeName(String name) {
@@ -80,5 +77,9 @@ public class Line {
             return;
         }
         this.color = color;
+    }
+
+    public List<Section> getSections() {
+        return this.sections;
     }
 }

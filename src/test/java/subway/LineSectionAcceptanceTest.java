@@ -1,7 +1,6 @@
 package subway;
 
 
-import io.restassured.common.mapper.TypeRef;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,10 +12,8 @@ import org.springframework.test.annotation.DirtiesContext;
 import subway.common.Line;
 import subway.common.Section;
 import subway.common.Station;
-import subway.controller.line.LineResponse;
-import subway.controller.station.StationResponse;
-
-import java.util.List;
+import subway.interfaces.line.dto.LineResponse;
+import subway.interfaces.station.dto.StationResponse;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD;

@@ -1,4 +1,4 @@
-package subway.controller;
+package subway.interfaces.common;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
