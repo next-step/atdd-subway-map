@@ -1,6 +1,7 @@
 package subway.domain;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import javax.persistence.CascadeType;
@@ -36,7 +37,7 @@ public class Line {
     private Long downStationId;
 
     @OneToMany(mappedBy = "line", orphanRemoval = true, cascade = CascadeType.ALL)
-    private Set<Section> sections = Collections.emptySet();
+    private Set<Section> sections = new HashSet<>();
 
     public Line() {
     }
@@ -50,7 +51,7 @@ public class Line {
         this.upStationId = upStationId;
         this.downStationId = downStationId;
 
-        Section section = new Section(this, upStationId, downStation, distance);
+        Section section = new Section(this, upStationId, downStationId, distance);
         sections.add(section);
     }
 
@@ -63,5 +64,19 @@ public class Line {
     public void registSection(Section section) {
         this.downStationId = section.getDownStationId();
         sections.add(section);
+    }
+
+    public void deleteSection(Station station) {
+        // 지하철 노선에 등록된 역(하행 종점역)만 제거할수 있다.
+        if (!downStationId.equals(station.getId())) {
+            throw new IllegalArgumentException("지하철 노선에 등록된 역(하행 종점역)만 제거할 수 있습니다.");
+        }
+        if (sections.size() == 1) {
+            throw new RuntimeException("지하철 구간을 삭제할 수 없습니다");
+        }
+        sections.remove(sections.stream()
+            .filter(section -> section.getDownStationId().equals(station.getId()))
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("지하철 구간을 삭제할 수 없습니다")));
     }
 }

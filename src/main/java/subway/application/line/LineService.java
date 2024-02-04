@@ -100,4 +100,13 @@ public class LineService {
         SectionRegister sectionRegister = new SectionRegister();
         sectionRegister.registSectionInLine(stations, line, section);
     }
+
+    @Transactional
+    public void deleteSection(Long id, Long stationId) {
+        Station station = stationRepository.findById(stationId)
+            .orElseThrow(() -> new IllegalArgumentException("지하철역을 찾을 수 없습니다"));
+        Line line = lineRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("노선이 존재하지 않습니다"));
+        line.deleteSection(station);
+    }
 }

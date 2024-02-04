@@ -38,4 +38,13 @@ class RequestFixtures {
             .extract();
     }
 
+    public static ExtractableResponse<Response> 지하철구간_삭제하기(Long lineId, Long stationId) {
+        String url = String.format("/lines/%d/sections", lineId);
+        return RestAssured.given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .queryParam("stationId", stationId)
+            .when().delete(url)
+            .then().log().all()
+            .extract();
+    }
 }

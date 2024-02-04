@@ -11,7 +11,7 @@ public class Fixtures {
 
     public static Map<String, String> getCreateStationParams(String name) {
         Map<String, String> params = new HashMap<>();
-        params.put("name", "판교역");
+        params.put("name", name);
         return params;
     }
 
