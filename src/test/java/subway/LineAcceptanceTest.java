@@ -22,8 +22,8 @@ import subway.fixture.SectionRequestFixture;
 import subway.fixture.StationFixture;
 import subway.line.LineResponse;
 import subway.line.LineUpdateRequest;
+import subway.line.SectionRequest;
 import subway.rest.Rest;
-import subway.section.SectionRequest;
 import subway.station.StationResponse;
 
 class LineAcceptanceTest extends AcceptanceTest {
