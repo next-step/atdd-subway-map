@@ -36,4 +36,27 @@ public class LineCommand {
             return distance;
         }
     }
+
+    public static class SectionDeleteCommand {
+        private final Long lineId;
+        private final Long stationId;
+
+
+        private SectionDeleteCommand(Long lineId, Long stationId) {
+            this.lineId = lineId;
+            this.stationId = stationId;
+        }
+
+        public static SectionDeleteCommand of(Long lineId, Long stationId) {
+            return new SectionDeleteCommand(lineId, stationId);
+        }
+
+        public Long getLineId() {
+            return lineId;
+        }
+
+        public Long getStationId() {
+            return stationId;
+        }
+    }
 }

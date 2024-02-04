@@ -32,4 +32,11 @@ public class SectionService {
         line.add(section);
         return LineResponse.from(line);
     }
+
+    @Transactional
+    public LineResponse removeSection(LineCommand.SectionDeleteCommand command) {
+        Line line = lineReader.readBy(command.getLineId());
+        line.remove(command.getStationId());
+        return LineResponse.from(line);
+    }
 }

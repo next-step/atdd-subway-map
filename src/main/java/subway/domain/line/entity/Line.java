@@ -97,6 +97,22 @@ public class Line {
         section.setLine(this);
     }
 
+
+    public void remove(Long sectionId) {
+        Section lastSection = this.sections.get(this.sections.size()-1);
+
+        if (!lastSection.getDownStation().getId().equals(sectionId)) {
+            throw new InvalidParameterException("잘못된 하행역");
+        }
+
+        if(this.sections.size() == 1) {
+            throw new InvalidParameterException("유일한 구간");
+        }
+
+        lastSection.setLine(null);
+        this.sections.remove(lastSection);
+    }
+
     public boolean contains(Station station) {
         return this.sections.stream().anyMatch(section -> section.getUpStation().equals(station));
     }
@@ -110,4 +126,5 @@ public class Line {
                 ", sections=" + sections +
                 '}';
     }
+
 }
