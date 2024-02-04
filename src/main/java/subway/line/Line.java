@@ -16,7 +16,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
-import subway.section.Section;
 import subway.station.Station;
 
 @Entity
