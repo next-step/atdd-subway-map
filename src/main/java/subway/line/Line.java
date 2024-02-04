@@ -3,13 +3,9 @@ package subway.line;
 import subway.line.section.CannotAddSectionException;
 import subway.line.section.CannotDeleteSectionException;
 import subway.line.section.Section;
-import subway.station.Station;
+import subway.line.section.Sections;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Entity
 public class Line {
@@ -20,8 +16,8 @@ public class Line {
     private String name;
     @Column(nullable = false)
     private String color;
-    @OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST}, orphanRemoval = true)
-    private List<Section> sections = new ArrayList<>();
+    @Embedded
+    private Sections sections = new Sections();
 
     public Line() {
     }
@@ -43,7 +39,7 @@ public class Line {
         return color;
     }
 
-    public List<Section> getSections() {
+    public Sections getSections() {
         return sections;
     }
 
@@ -56,27 +52,12 @@ public class Line {
     }
 
     public void addSection(Section section) throws CannotAddSectionException {
-        if (!sections.isEmpty()) {
-            Station downStation = sections.get(sections.size() - 1).getDownStation();
-            if (!downStation.equals(section.getUpStation())) {
-                throw new CannotAddSectionException("노선 등록 시 상행역은 현재 하행 종점역이어야 합니다.");
-            }
-            List<Station> allStation = sections.stream().flatMap(section1 -> Stream.of(section1.getUpStation(), section1.getDownStation())).distinct().collect(Collectors.toList());
-            if (allStation.contains(section.getDownStation())) {
-                throw new CannotAddSectionException("이미 구간에 등록된 역입니다.");
-            }
-        }
-        sections.add(section);
+        sections.addSection(section);
+
     }
 
     public void deleteSection(Long stationId) throws CannotDeleteSectionException {
-        if (sections.size() == 1)
-            throw new CannotDeleteSectionException("구간이 한개인 경우 삭제할 수 없습니다.");
-        Station downStation = sections.get(sections.size() - 1).getDownStation();
-        if (!downStation.getId().equals(stationId)) {
-            throw new CannotDeleteSectionException("삭제 역이 하행 종점역이 아닙니다.");
-        }
-        sections.remove(sections.size() - 1);
+        sections.deleteSection(stationId);
     }
 
     @Override

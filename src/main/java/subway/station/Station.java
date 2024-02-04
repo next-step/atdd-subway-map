@@ -18,6 +18,10 @@ public class Station {
         this.name = name;
     }
 
+    public boolean match(Long stationId) {
+        return id.equals(stationId);
+    }
+
     public Long getId() {
         return id;
     }
@@ -33,6 +37,4 @@ public class Station {
                 ", name='" + name + '\'' +
                 '}';
     }
-
-
 }

@@ -27,11 +27,7 @@ public class LineService {
     }
 
     private LineResponse createLineResponse(Line line) {
-        List<Station> stations = line.getSections().stream()
-                .map(Section::getUpStation)
-                .collect(Collectors.toList());
-        stations.add(line.getSections().get(line.getSections().size() - 1).getDownStation());
-        return new LineResponse(line.getId(), line.getName(), line.getColor(), stations);
+        return new LineResponse(line.getId(), line.getName(), line.getColor(), line.getSections().allStations());
     }
 
     public LineResponse createLine(LineRequest lineRequest) throws StationNotFoundException, CannotAddSectionException {
@@ -67,7 +63,7 @@ public class LineService {
     }
 
     private LineSectionResponse createLineSectionResponse(Line line) {
-        List<SectionResponse> sectionResponses = line.getSections().stream()
+        List<SectionResponse> sectionResponses = line.getSections().get().stream()
                 .map(this::createSectionResponse)
                 .collect(Collectors.toList());
         return new LineSectionResponse(line.getId(), line.getName(), sectionResponses);
