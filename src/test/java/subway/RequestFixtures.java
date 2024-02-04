@@ -62,4 +62,38 @@ class RequestFixtures {
             .then().log().all()
             .extract();
     }
+
+    public static ExtractableResponse<Response> 지하철_노선_목록_조회하기() {
+        return RestAssured.given().log().all()
+            .when().get("/lines")
+            .then().log().all()
+            .extract();
+    }
+
+    public static ExtractableResponse<Response> 지하철_노선_조회하기(String id) {
+        String path = String.format("/lines/%s", id);
+        return RestAssured.given().log().all()
+            .when().get(path)
+            .then().log().all()
+            .extract();
+    }
+
+    public static ExtractableResponse<Response> 지하철_노선_수정하기(Long id,
+        Map<String, String> updateParams) {
+        String path = String.format("/lines/%d", id);
+        return RestAssured.given().log().all()
+            .body(updateParams)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().put(path)
+            .then().log().all()
+            .extract();
+    }
+
+    public static ExtractableResponse<Response> 지하철_노선_삭제하기(Long id) {
+        String path = String.format("/lines/%d", id);
+        return RestAssured.given().log().all()
+            .when().delete(path)
+            .then().log().all()
+            .extract();
+    }
 }
