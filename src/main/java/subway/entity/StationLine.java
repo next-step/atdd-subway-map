@@ -25,7 +25,6 @@ public class StationLine {
 
     private int distance;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "stationLine", cascade = CascadeType.REMOVE)
     private List<StationSection> sections = new ArrayList<>();
 

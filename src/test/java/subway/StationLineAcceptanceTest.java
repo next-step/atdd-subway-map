@@ -31,9 +31,6 @@ public class StationLineAcceptanceTest {
     public static final String ID_KEY = "id";
     public static final String NAME_KEY = "name";
     public static final String COLOR_KEY = "color";
-    public static final String UP_STATION_ID_KEY = "upStationId";
-    public static final String DOWN_STATION_ID_KEY = "downStationId";
-    public static final String DISTANCE_KEY = "distance";
 
     @BeforeEach
     void 초기_지하철_역_설정() {
