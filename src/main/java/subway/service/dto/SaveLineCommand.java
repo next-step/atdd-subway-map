@@ -1,13 +1,15 @@
 package subway.service.dto;
 
-public class SaveLineDto {
+import subway.domain.Line;
+
+public class SaveLineCommand {
     private final String name;
     private final String color;
     private final Long upStationId;
     private final Long downStationId;
     private final int distance;
 
-    public SaveLineDto(String name, String color, Long upStationId, Long downStationId, int distance) {
+    public SaveLineCommand(String name, String color, Long upStationId, Long downStationId, int distance) {
         this.name = name;
         this.color = color;
         this.upStationId = upStationId;

@@ -2,13 +2,9 @@ package subway.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import subway.controller.dto.LineCreateRequestBody;
-import subway.controller.dto.LineResponseBody;
-import subway.controller.dto.LineUpdateRequestBody;
+import subway.controller.dto.*;
 import subway.service.LineService;
-import subway.service.dto.LineDto;
-import subway.service.dto.SaveLineDto;
-import subway.service.dto.UpdateLineDto;
+import subway.service.dto.*;
 
 import java.net.URI;
 import java.util.List;
@@ -22,19 +18,13 @@ public class LineController {
         this.lineService = lineService;
     }
 
-    @PostMapping()
+    @PostMapping
     public ResponseEntity<LineResponseBody> createLine(@RequestBody LineCreateRequestBody lineCreateRequestBody) {
-        LineDto line = lineService.saveLine(new SaveLineDto(
-                lineCreateRequestBody.getName(),
-                lineCreateRequestBody.getColor(),
-                lineCreateRequestBody.getUpStationId(),
-                lineCreateRequestBody.getDownStationId(),
-                lineCreateRequestBody.getDistance()
-        ));
+        LineDto line = lineService.saveLine(lineCreateRequestBody.toCommand());
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(LineResponseBody.create(line));
     }
 
-    @GetMapping()
+    @GetMapping
     public ResponseEntity<List<LineResponseBody>> showLines() {
         List<LineDto> lines = lineService.findAllLines();
         return ResponseEntity.ok().body(LineResponseBody.create(lines));
@@ -51,17 +41,30 @@ public class LineController {
             @PathVariable Long id,
             @RequestBody LineUpdateRequestBody lineUpdateRequestBody
     ) {
-        lineService.updateLine(new UpdateLineDto(
-                id,
-                lineUpdateRequestBody.getName(),
-                lineUpdateRequestBody.getColor()
-        ));
+        lineService.updateLine(lineUpdateRequestBody.toCommand(id));
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteLine(@PathVariable Long id) {
         lineService.deleteLineById(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/sections")
+    public ResponseEntity<SectionResponseBody> createLineSection(
+            @PathVariable Long id,
+            @RequestBody SectionCreateRequestBody sectionCreateRequestBody
+    ) {
+        lineService.saveLineSection(sectionCreateRequestBody.toCommand(id));
+        return ResponseEntity.created(URI.create("/lines/" + id)).build();
+    }
+
+    @DeleteMapping("/{id}/sections")
+    public ResponseEntity<Void> deleteLineSection(
+            @PathVariable("id") Long lineId,
+            @RequestParam("stationId") Long stationId) {
+        lineService.deleteLineSection(lineId, stationId);
         return ResponseEntity.noContent().build();
     }
 }

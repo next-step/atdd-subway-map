@@ -9,13 +9,13 @@ public class LineResponseBody {
     private final Long id;
     private final String name;
     private final String color;
-    private final List<StationResponse> stations;
+    private final List<StationResponseBody> stations;
 
     private LineResponseBody(LineDto lineDto) {
         this.id = lineDto.getId();
         this.name = lineDto.getName();
         this.color = lineDto.getColor();
-        this.stations = lineDto.getStations();
+        this.stations = StationResponseBody.create(lineDto.getStations());
     }
 
     public static List<LineResponseBody> create (List<LineDto> lineDtoList) {
@@ -40,7 +40,7 @@ public class LineResponseBody {
         return color;
     }
 
-    public List<StationResponse> getStations() {
+    public List<StationResponseBody> getStations() {
         return stations;
     }
 }

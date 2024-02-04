@@ -1,6 +1,6 @@
 package subway.service.dto;
 
-import subway.controller.dto.StationResponse;
+import subway.domain.Line;
 
 import java.util.List;
 
@@ -8,9 +8,9 @@ public class LineDto {
     private Long id;
     private String name;
     private String color;
-    private List<StationResponse> stations;
+    private List<StationDto> stations;
 
-    public LineDto(Long id, String name, String color, List<StationResponse> stations) {
+    public LineDto(Long id, String name, String color, List<StationDto> stations) {
         this.id = id;
         this.name = name;
         this.color = color;
@@ -29,7 +29,11 @@ public class LineDto {
         return color;
     }
 
-    public List<StationResponse> getStations() {
+    public List<StationDto> getStations() {
         return stations;
+    }
+
+    public static LineDto from(Line line) {
+        return new LineDto(line.getId(), line.getName(), line.getColor(), StationDto.from(line.getAllStations()));
     }
 }
