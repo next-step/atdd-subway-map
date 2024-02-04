@@ -40,7 +40,7 @@ public class LineCreateRequest {
 	}
 
 	public Line toEntity() {
-		return new Line(name, color, distance);
+		return new Line(name, color);
 	}
 
 	public static Builder builder() {
