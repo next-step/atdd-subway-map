@@ -17,15 +17,16 @@ public class DatabaseCleaner extends AbstractTestExecutionListener {
 
         final EntityManager em = getEm(testContext);
 
-        ApplicationContext ac = testContext.getApplicationContext();
-
         em.createNativeQuery("SET REFERENTIAL_INTEGRITY FALSE").executeUpdate();
+
         for (EntityType<?> entity : em.getMetamodel().getEntities()) {
             String tableName = entity.getJavaType().getAnnotation(Table.class).name();
             em.createNativeQuery("TRUNCATE TABLE " + tableName).executeUpdate();
             em.createNativeQuery("ALTER TABLE " + tableName + " ALTER COLUMN ID RESTART WITH 1").executeUpdate();
             em.flush();
         }
+
+        em.createNativeQuery("SET REFERENTIAL_INTEGRITY TRUE").executeUpdate();
     }
 
     private EntityManager getEm(TestContext testContext) {
