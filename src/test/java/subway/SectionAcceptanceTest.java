@@ -133,23 +133,6 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         assertThat(message).isEqualTo("새로운 구간의 하행역은 노선에 존재하는 역에 생성할 수 없습니다.");
     }
 
-    /**
-     * WHEN 새로운 지하철 구간 생성시 노선의 길이 보다 작거나 같다면
-     * Then 새로운 구간을 생성할 수 없다
-     */
-    @ParameterizedTest
-    @ValueSource(ints = {10, 9})
-    void 실패_새로운_지하철_구간_생성시_노선_길이보다_작거나_같다면_예외가_발생한다(int distance) {
-        // given
-        SectionCreateRequest request = sectionCreateRequest(선릉역_ID, 양재역_ID, distance);
-
-        // when
-        String message = 구간_생성_요청(request, OK.value())
-                .as(ExceptionResponse.class).getMessage();
-
-        // then
-        assertThat(message).isEqualTo("새로운 구간의 길이는 노선의 길이 보다 작거나 같을 수 없습니다.");
-    }
 
     /**
      * WHEN 새로운 지하철 구간 생성시 노선의 하행 종점역에 생성하면

@@ -2,7 +2,7 @@ package subway.controller.dto;
 
 import lombok.Builder;
 
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
@@ -13,6 +13,7 @@ public class SectionCreateRequest {
     private Long downStationId;
     @NotNull
     private Long upStationId;
+    @Min(1)
     private long distance;
 
     public SectionCreateRequest() {

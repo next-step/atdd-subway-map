@@ -26,10 +26,9 @@ public class SectionService {
         Station upStation = stations.findBy(request.getUpStationId());
         Station downStation = stations.findBy(request.getDownStationId());
         sections.validateRegisterStationBy(upStation, downStation);
-        sections.validateLineDistance(request.getDistance());
 
         Section section = sectionRepository.save(
-                new Section(line, upStation, downStation, sections.calculateSectionDistance(request.getDistance()))
+                new Section(line, upStation, downStation, request.getDistance())
         );
 
         return section.id();

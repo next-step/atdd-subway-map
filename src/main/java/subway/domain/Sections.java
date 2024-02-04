@@ -43,30 +43,13 @@ public class Sections {
         }
     }
 
-    public void validateLineDistance(long distance) {
-        long sectionDistance = calculateSectionDistance(distance);
-        if (sectionDistance <= NON_SECTION_DISTANCE) {
-            throw new ApplicationException("새로운 구간의 길이는 노선의 길이 보다 작거나 같을 수 없습니다.");
-        }
-    }
-
-    private long totalLineDistance() {
-        return sections.stream()
-                .mapToLong(Section::distance)
-                .sum();
-    }
-
-    public long calculateSectionDistance(long distance) {
-        return distance - totalLineDistance();
-    }
-
     public void validateDeleteSection(Long stationId) {
         validateSectionCount();
         validateLastSection(stationId);
     }
 
     private void validateSectionCount() {
-        if(sections.size() == 1){
+        if (sections.size() == 1) {
             throw new ApplicationException("구간이 한개만 있을 경우 구간을 제거할 수 없습니다.");
         }
     }
