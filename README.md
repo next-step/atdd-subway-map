@@ -106,3 +106,25 @@
       - 1개의 구간만 존재할 경우(역이 2개만 존재할 경우)
       - 하행 종점역을 제거하는 것이 아닌 경우
       - 해당 역이 존재하지 않을 경우
+
+### Review 정리  
+
+1. 생성 혹은 수정을 의도하는 메서드명의 `prefix`를 명확하게 작성할 것
+   - 가령, 노선 수정과 메서드를 `saveStationLine`로 작명해 놓았다면, 내부 구현을 모르는 다른 개발자에게 혼란을 줄 수 있음.
+       ```
+       // 생성
+       public StationLine createStationLine() {}
+    
+       // 수정
+       public StationLine updateStationLine() {}
+       ```
+
+2. DTO(Data Transfer Object)에 비즈니스 로직을 두는 것은 지양할 것
+   - 가령, 매개변수의 수를 줄이기 위한 의도일 경우 정적 팩토리 메서드 활용
+     ```
+     StationSectionRequest mergedRequest = StationSectionRequest.mergeForCreateLine(stationLineId, request);
+     StationSectionResponse stationSectionResponse = stationLineService.createStationSection(mergedRequest);
+     ```
+3. Entity 객체에 `@JsonIgnore`를 사용하는 것은 지양하고, DTO에 활용하는 것을 지향할 것
+4. javadoc을 사용하지 않고, 읽기 좋은 코드를 만들기 위해 노력해볼 것
+5. 인수 테스트 주석을 작성할 때, 잘 읽힐 수 있는 단어를 최대한 사용해볼 것 
