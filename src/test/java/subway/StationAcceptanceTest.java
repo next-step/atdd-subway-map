@@ -22,7 +22,7 @@ import subway.domain.StationResponse;
 @DirtiesContext
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class StationAcceptanceTest {
+public class StationAcceptanceTest extends BaseAcceptanceTest {
     /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다
@@ -69,7 +69,6 @@ public class StationAcceptanceTest {
         Map<String, String> param2 = Map.of("name", "선릉역");
 
         createStation(param1);
-
         createStation(param2);
         //when
         List<StationResponse> response =
@@ -99,12 +98,5 @@ public class StationAcceptanceTest {
 
         //then
         when().get("/station/{id}", 1).then().statusCode(HttpStatus.NOT_FOUND.value()).log().all();
-    }
-
-    void createStation(Map<String, String> param1) {
-        given().body(param1)
-               .contentType(MediaType.APPLICATION_JSON_VALUE).log().all()
-               .when().post("/stations")
-               .then().log().all();
     }
 }

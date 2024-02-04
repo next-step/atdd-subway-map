@@ -23,14 +23,11 @@ import subway.domain.StationResponse;
 
 @DisplayName("지하철 노선 관련 기능")
 @SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
-public class LineAcceptanceTest {
-    @Autowired
-    DatabaseCleanUp databaseCleanUp;
+public class LineAcceptanceTest extends BaseAcceptanceTest{
+
 
     @BeforeEach
     void setUp() {
-        databaseCleanUp.execute();
-
         Map<String, String> param1 = Map.of("name", "역삼역");
         Map<String, String> param2 = Map.of("name", "선릉역");
         Map<String, String> param3 = Map.of("name", "왕십리역");
@@ -178,13 +175,6 @@ public class LineAcceptanceTest {
             "downStationId", downStationId.toString(),
             "distance", distance.toString()
         );
-    }
-
-    void createStation(Map<String, String> param) {
-        given().body(param)
-               .contentType(MediaType.APPLICATION_JSON_VALUE).log().all()
-               .when().post("/stations")
-               .then().log().all();
     }
 
 }
