@@ -1,4 +1,4 @@
-package subway;
+package subway.station;
 
 import javax.persistence.*;
 
@@ -24,4 +24,5 @@ public class Station {
     public String getName() {
         return name;
     }
+
 }
