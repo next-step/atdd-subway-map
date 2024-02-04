@@ -4,18 +4,21 @@ import io.restassured.RestAssured;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
+import subway.fixture.AcceptanceTest;
 import subway.fixture.LineSteps;
 import subway.fixture.StationSteps;
 import subway.line.Color;
 import subway.line.LineResponse;
 import subway.station.StationResponse;
 
+import javax.persistence.EntityManager;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,17 +26,15 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AcceptanceTest
 @Transactional
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class LineAcceptanceTest {
+class LineAcceptanceTest {
 
     private static StationResponse 선릉역;
     private static StationResponse 삼성역;
 
     @LocalServerPort
     private int port;
-
 
     @BeforeEach
     void setUp() {
@@ -57,7 +58,7 @@ public class LineAcceptanceTest {
 
     @DisplayName("지하철 노선을 생성한다")
     @Test
-    public void create_line() {
+    void create_line() {
 
         //given
         Map<String, Object> param = new HashMap<>();
@@ -87,7 +88,7 @@ public class LineAcceptanceTest {
     //Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
     @DisplayName("지하철 노선 목록을 조회한다")
     @Test
-    public void findLines() {
+    void findLines() {
 
 
 
@@ -121,7 +122,7 @@ public class LineAcceptanceTest {
     //Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
     @DisplayName("지하철 노선을 조회한다")
     @Test
-    public void findLine() {
+    void findLine() {
 
 
         //given
@@ -145,7 +146,7 @@ public class LineAcceptanceTest {
                     .as(LineResponse.class);
 
         // then
-        assertThat(actual.equals(lineResponse)).isTrue();
+        assertThat(actual).isEqualTo(lineResponse);
     }
 
 
@@ -155,7 +156,7 @@ public class LineAcceptanceTest {
     // Then 해당 지하철 노선 정보는 수정된다
     @DisplayName("지하철 노선 수정한다")
     @Test
-    public void updateLine() {
+    void updateLine() {
 
 
         //given
@@ -195,7 +196,7 @@ public class LineAcceptanceTest {
     // Then 해당 지하철 노선 정보는 삭제된다
     @DisplayName("지하철 노선을 삭제한다")
     @Test
-    public void deleteLine() {
+    void deleteLine() {
 
 
         //given

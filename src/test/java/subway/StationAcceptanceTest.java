@@ -4,26 +4,22 @@ import io.restassured.RestAssured;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.transaction.annotation.Transactional;
+import subway.fixture.AcceptanceTest;
 import subway.fixture.StationSteps;
 import subway.station.StationResponse;
 
-import javax.persistence.EntityManager;
 import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class StationAcceptanceTest {
+@AcceptanceTest
+@Transactional
+class StationAcceptanceTest {
     
     private final static String GET_STATIONS_URL = "/stations";
     private final static String POST_STATIONS_URL = "/stations";
@@ -32,14 +28,9 @@ public class StationAcceptanceTest {
     @LocalServerPort
     private int port;
 
-    //@Autowired
-    //private EntityManager em;
-
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
-        //em.createNativeQuery("TRUNCATE TABLE Station").executeUpdate();
-        //em.flush();
     }
 
     /**
@@ -75,7 +66,7 @@ public class StationAcceptanceTest {
      */
     @DisplayName("지하철역 목록을 조회한다.")
     @Test
-    public void findSubwayStation() {
+    void findSubwayStation() {
 
         // when
         StationResponse 강남역 = StationSteps.createStation("강남역");
@@ -102,7 +93,7 @@ public class StationAcceptanceTest {
      */
     @DisplayName("지하철역을 제거한다.")
     @Test
-    public void deleteSubwayStation() {
+    void deleteSubwayStation() {
 
         StationResponse 강남역 = StationSteps.createStation("강남역");
 
