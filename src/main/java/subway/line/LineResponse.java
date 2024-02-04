@@ -5,7 +5,6 @@ import static java.util.stream.Collectors.*;
 import java.util.List;
 
 import subway.dto.StationDTO;
-import subway.station.Station;
 
 public class LineResponse {
 	private final Long id;
@@ -20,8 +19,9 @@ public class LineResponse {
 		this.stations = station;
 	}
 
-	public static LineResponse of(Line line, List<Station> stations) {
-		List<StationDTO> stationDto = stations.stream()
+	public static LineResponse of(Line line) {
+		List<StationDTO> stationDto = line.getSortedStations()
+			.stream()
 			.map(StationDTO::of)
 			.collect(toList());
 		return new LineResponse(line.getId(), line.getName(), line.getColor(), stationDto);
