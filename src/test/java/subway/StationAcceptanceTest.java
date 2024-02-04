@@ -49,7 +49,7 @@ class StationAcceptanceTest extends AcceptanceTest {
     void createTwoStation() {
         // given
         String 강남역 = createStation("강남역").jsonPath().getString("name");
-        String 양재역 = createStation("양재역").jsonPath().getString("name");;
+        String 양재역 = createStation("양재역").jsonPath().getString("name");
 
         // when
         ExtractableResponse<Response> response = Rest.builder().get(STATIONS.path());
