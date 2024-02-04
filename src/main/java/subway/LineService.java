@@ -14,6 +14,8 @@ import subway.domain.LineRequest;
 import subway.domain.LineResponse;
 import subway.domain.Station;
 import subway.domain.Stations;
+import subway.exception.NoLineException;
+import subway.exception.NoStationException;
 
 @Service
 @AllArgsConstructor
@@ -45,13 +47,19 @@ public class LineService {
     }
 
     public LineResponse getLine(Long id) {
-        Line line = lineRepository.findById(id).orElseThrow(() -> new NoStationException(id + "에 해당하는 지하철 역이 존재하지 않습니다."));
+        Line line = lineRepository.findById(id).orElseThrow(() -> new NoLineException(id + "에 해당하는 지하철 노선이 존재하지 않습니다."));
         return LineResponse.createLineResponse(line);
     }
 
     @Transactional
     public void updateLine(Long id, LineRequest lineRequest) {
-        Line line = lineRepository.findById(id).orElseThrow(() -> new NoStationException(id + "에 해당하는 지하철 역이 존재하지 않습니다."));
+        Line line = lineRepository.findById(id).orElseThrow(() -> new NoLineException(id + "에 해당하는 지하철 노선이 존재하지 않습니다."));
         line.updateLine(lineRequest.getName(), lineRequest.getColor());
+    }
+
+    @Transactional
+    public void deleteLine(Long id) {
+        Line line = lineRepository.findById(id).orElseThrow(() -> new NoLineException(id + "에 해당하는 지하철 노선이 존재하지 않습니다."));
+        lineRepository.delete(line);
     }
 }

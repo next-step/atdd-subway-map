@@ -1,6 +1,4 @@
-package subway;
-
-import java.util.function.Supplier;
+package subway.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

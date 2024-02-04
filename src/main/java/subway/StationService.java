@@ -4,19 +4,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
-import subway.domain.LineResponse;
 import subway.domain.Station;
 import subway.domain.StationRequest;
 import subway.domain.StationResponse;
-import subway.domain.Stations;
+import subway.exception.NoStationException;
 
 @Service
 @Transactional(readOnly = true)
 public class StationService {
-    private StationRepository stationRepository;
+    private final StationRepository stationRepository;
 
     public StationService(StationRepository stationRepository) {
         this.stationRepository = stationRepository;
