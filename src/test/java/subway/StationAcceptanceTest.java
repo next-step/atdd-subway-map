@@ -30,26 +30,15 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-
-        ExtractableResponse<Response> response =
-            RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = RequestFixtures.지하철역_생성_요청하기(
+            Fixtures.getCreateStationParams("강남역"));
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames =
-            RestAssured.given().log().all()
-                .when().get("/stations")
-                .then().log().all()
-                .extract().jsonPath().getList("name", String.class);
+        List<String> stationNames = RequestFixtures.지하철역_목록_조회_요청하기().jsonPath()
+            .getList("name", String.class);
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
@@ -63,29 +52,13 @@ public class StationAcceptanceTest {
     @Test
     void getStations() {
         // given
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-        RestAssured.given()
-            .body(params)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().post("/stations")
-            .then()
-            .extract();
+        RequestFixtures.지하철역_생성_요청하기(Fixtures.getCreateStationParams("강남역"));
 
-        params.put("name", "역삼역");
-        RestAssured.given()
-            .body(params)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().post("/stations")
-            .then()
-            .extract();
+        RequestFixtures.지하철역_생성_요청하기(Fixtures.getCreateStationParams("역삼역"));
 
         // when
-        List<String> stationNames =
-            RestAssured.given().log().all()
-                .when().get("/stations")
-                .then().log().all()
-                .extract().jsonPath().getList("name", String.class);
+        List<String> stationNames = RequestFixtures.지하철역_목록_조회_요청하기().jsonPath()
+            .getList("name", String.class);
 
         // then
         assertThat(stationNames).containsAnyOf("강남역", "역삼역");
@@ -101,28 +74,14 @@ public class StationAcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-        RestAssured.given()
-            .body(params)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().post("/stations")
-            .then()
-            .extract();
+        RequestFixtures.지하철역_생성_요청하기(Fixtures.getCreateStationParams("강남역"));
 
         // when
-        RestAssured.given().log().all()
-            .when().delete("/stations/1")
-            .then().log().all()
-            .extract();
-
+        RequestFixtures.지하철역_삭제_요청하기(1L);
 
         // then
-        List<String> stationNames =
-            RestAssured.given().log().all()
-                .when().get("/stations")
-                .then().log().all()
-                .extract().jsonPath().getList("name", String.class);
+        List<String> stationNames = RequestFixtures.지하철역_목록_조회_요청하기().jsonPath()
+            .getList("name", String.class);
         assertThat(stationNames).doesNotContain("강남역");
     }
 }

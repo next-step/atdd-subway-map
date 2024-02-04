@@ -29,21 +29,36 @@ class RequestFixtures {
 
     public static ExtractableResponse<Response> 지하철구간_등록하기(Long lineId,
         Map<String, String> params) {
-        String url = String.format("/lines/%d/sections", lineId);
+        String path = String.format("/lines/%d/sections", lineId);
         return RestAssured.given().log().all()
             .body(params)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().post(url)
+            .when().post(path)
             .then().log().all()
             .extract();
     }
 
     public static ExtractableResponse<Response> 지하철구간_삭제하기(Long lineId, Long stationId) {
-        String url = String.format("/lines/%d/sections", lineId);
+        String path = String.format("/lines/%d/sections", lineId);
         return RestAssured.given().log().all()
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .queryParam("stationId", stationId)
-            .when().delete(url)
+            .when().delete(path)
+            .then().log().all()
+            .extract();
+    }
+
+    public static ExtractableResponse<Response> 지하철역_목록_조회_요청하기() {
+        return RestAssured.given().log().all()
+            .when().get("/stations")
+            .then().log().all()
+            .extract();
+    }
+
+    public static ExtractableResponse<Response> 지하철역_삭제_요청하기(Long id) {
+        String path = String.format("/stations/%d", id);
+        return RestAssured.given().log().all()
+            .when().delete(path)
             .then().log().all()
             .extract();
     }

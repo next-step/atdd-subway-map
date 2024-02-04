@@ -40,11 +40,11 @@ class SectionAcceptanceTest {
     }
 
     /***
-     * given 지하철역 두개를 생성한다.
-     *       노선을 등록한다.
-     *       구간을 추가한다.
-     * when 구간을 삭제한다.
-     * then 성공적으로 삭제 처리된다.
+     * Given 지하철역 두개를 생성한다.
+     * Given 노선을 등록한다.
+     * Given 구간을 추가한다.
+     * When 구간을 삭제한다.
+     * Then 성공적으로 삭제 처리된다.
      */
     @Test
     void deleteSection() {
@@ -69,4 +69,5 @@ class SectionAcceptanceTest {
         // then
         assertThat(statusCode).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
+
 }
