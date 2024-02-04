@@ -8,7 +8,6 @@ import subway.line.dto.request.CreateLineRequest;
 import subway.line.dto.request.UpdateLineRequest;
 import subway.line.dto.response.LineResponse;
 import subway.line.repository.LineRepository;
-import subway.station.repository.StationRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,16 +18,12 @@ import java.util.stream.Collectors;
 public class LineService {
 
     private final LineRepository lineRepository;
-    private final StationRepository stationRepository;
 
     @Transactional
     public LineResponse creteLine(CreateLineRequest request) {
         Line line = Line.create(
                 request.getName(),
-                request.getColor(),
-                stationRepository.getById(request.getUpStationId()),
-                stationRepository.getById(request.getDownStationId()),
-                request.getDistance()
+                request.getColor()
         );
 
         Line savedLine = lineRepository.save(line);
