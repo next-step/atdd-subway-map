@@ -25,6 +25,16 @@ public class RestAssuredUtil {
                 .extract();
     }
 
+    public static ExtractableResponse<Response> put(Object params, String path) {
+        return RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().put(path)
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract();
+    }
+
     public static ExtractableResponse<Response> delete(String path) {
         return RestAssured.given().log().all()
                 .when().delete(path)
