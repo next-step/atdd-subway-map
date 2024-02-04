@@ -1,31 +1,22 @@
 package subway;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class LineAcceptanceTest {
+public class LineAcceptanceTest extends CommonAcceptanceTest{
 
-    @LocalServerPort
-    private int port;
-
-    @BeforeEach
-    void beforeEach() {
-        RestAssured.port = port;
+    void setUp() {
+        super.beforeEach();
+        StationRestAssuredCRUD.createStation("강남역");
+        StationRestAssuredCRUD.createStation("양재역");
     }
 
     /**
@@ -37,9 +28,7 @@ public class LineAcceptanceTest {
     void createLine() {
 
         //when
-        StationRestAssuredCRUD.createStation("강남역");
-        StationRestAssuredCRUD.createStation("양재역");
-
+        setUp();
         ExtractableResponse<Response> createResponse = LineRestAssuredCRUD.createStation("신분당선", "bg-red-600", 1L, 2L, 10);
         assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
@@ -59,8 +48,7 @@ public class LineAcceptanceTest {
     void createAndShowTwoLineList() {
 
         //given
-        StationRestAssuredCRUD.createStation("강남역");
-        StationRestAssuredCRUD.createStation("양재역");
+        setUp();
         StationRestAssuredCRUD.createStation("서현역");
 
         LineRestAssuredCRUD.createStation("신분당선", "bg-red-600", 1L, 2L, 10);
@@ -83,9 +71,7 @@ public class LineAcceptanceTest {
     void createAndShowLine() {
 
         //given
-        StationRestAssuredCRUD.createStation("강남역");
-        StationRestAssuredCRUD.createStation("양재역");
-
+        setUp();
         ExtractableResponse<Response> createResponse = LineRestAssuredCRUD.createStation("신분당선", "bg-red-600", 1L, 2L, 10);
 
         Long createdId = createResponse.body().jsonPath().getLong("id");
@@ -107,9 +93,7 @@ public class LineAcceptanceTest {
     void createAndModifyLine() {
 
         //given
-        StationRestAssuredCRUD.createStation("강남역");
-        StationRestAssuredCRUD.createStation("양재역");
-
+        setUp();
         ExtractableResponse<Response> createResponse = LineRestAssuredCRUD.createStation("신분당선", "bg-red-600", 1L, 2L, 10);
 
         Long createdId = createResponse.body().jsonPath().getLong("id");
@@ -134,10 +118,7 @@ public class LineAcceptanceTest {
     void createAndDeleteLine() {
 
         //given
-        StationRestAssuredCRUD.createStation("강남역");
-        StationRestAssuredCRUD.createStation("양재역");
-
-
+        setUp();
         ExtractableResponse<Response> createResponse = LineRestAssuredCRUD.createStation("신분당선", "bg-red-600", 1L, 2L, 10);
 
         Long createdId = createResponse.body().jsonPath().getLong("id");
