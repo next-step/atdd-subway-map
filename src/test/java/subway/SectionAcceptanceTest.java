@@ -67,11 +67,11 @@ public class SectionAcceptanceTest extends AcceptanceTest {
                 Arguments.of(
                         SectionCreateRequest
                                 .builder()
-                                .upStationId("1")
+                                .upStationId(1L)
                                 .build()),
                 Arguments.of(SectionCreateRequest
                         .builder()
-                        .downStationId("2")
+                        .downStationId(2L)
                         .build())
         );
     }
@@ -156,10 +156,10 @@ public class SectionAcceptanceTest extends AcceptanceTest {
                 );
     }
 
-    private SectionCreateRequest sectionCreateRequest(Long upStationId, Long downStationId, int distance) {
+    private SectionCreateRequest sectionCreateRequest(long upStationId, long downStationId, int distance) {
         return SectionCreateRequest.builder()
-                .upStationId(upStationId.toString())
-                .downStationId(downStationId.toString())
+                .upStationId(upStationId)
+                .downStationId(downStationId)
                 .distance(distance)
                 .build();
     }

@@ -23,8 +23,8 @@ public class SectionService {
         Sections sections = findBy(line);
 
         Stations stations = new Stations(stationRepository.findByIdIn(request.stationIds()));
-        Station upStation = stations.findBy(Long.parseLong(request.getUpStationId()));
-        Station downStation = stations.findBy(Long.parseLong(request.getDownStationId()));
+        Station upStation = stations.findBy(request.getUpStationId());
+        Station downStation = stations.findBy(request.getDownStationId());
         sections.validateRegisterStationBy(upStation, downStation);
         sections.validateLineDistance(request.getDistance());
 
