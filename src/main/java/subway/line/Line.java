@@ -84,7 +84,7 @@ public class Line {
 		}
 	}
 
-	public void checkFinalStation(Station station) {
+	private void checkFinalStation(Station station) {
 		if (sections.isEmpty()) {
 			return;
 		}
@@ -94,7 +94,7 @@ public class Line {
 		}
 	}
 
-	public Station getFinalStation() {
+	private Station getFinalStation() {
 		if (sections.isEmpty()) {
 			return new Station("");
 		}
@@ -147,26 +147,14 @@ public class Line {
 	}
 
 	private void checkDeletableStation(Station station) {
-		checkFinalStation(station);
-		checkIncludedThisLine(station);
 		checkOnlyTwoStations();
+		checkFinalStation(station);
 	}
 
 	private void checkOnlyTwoStations() {
 		if (sections.size() < 2) {
 			throw new IllegalArgumentException("해당 노선은 두개의 정류장만 존재 하므로, 삭제할 수 없습니다.");
 		}
-	}
-
-	private void checkIncludedThisLine(Station targetStation) {
-		boolean isIncluded = getSortedStations().stream().anyMatch(isIncludedStation(targetStation));
-		if (!isIncluded) {
-			throw new IllegalArgumentException("해당 노선에 포함되지 않는 정류장입니다.");
-		}
-	}
-
-	private static Predicate<Station> isIncludedStation(Station targetStation) {
-		return station -> station.getId().equals(targetStation.getId());
 	}
 
 	private Section getSectionMatchesDownStation(Station station) {
