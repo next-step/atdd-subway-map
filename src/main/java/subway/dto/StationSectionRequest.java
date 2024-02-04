@@ -16,9 +16,20 @@ public class StationSectionRequest {
         this.distance = distance;
     }
 
-    public StationSectionRequest updateStationLineId(Long stationLineId) {
+    public StationSectionRequest(Long upStationId, Long downStationId, int distance, Long stationLineId) {
+        this.upStationId = upStationId;
+        this.downStationId = downStationId;
+        this.distance = distance;
         this.stationLineId = stationLineId;
-        return this;
+    }
+
+    public static StationSectionRequest mergeForCreateLine(Long stationLineId, StationSectionRequest request) {
+        return new StationSectionRequest(
+                request.getUpStationId(),
+                request.getDownStationId(),
+                request.getDistance(),
+                stationLineId
+        );
     }
 
     public Long getUpStationId() {
