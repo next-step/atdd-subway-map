@@ -21,7 +21,6 @@ import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFOR
 
 @DisplayName("지하철 노선 구간 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-//@DirtiesContext(classMode = BEFORE_EACH_TEST_METHOD)
 @Sql("/truncate.sql")
 public class LineSectionAcceptanceTest {
 
