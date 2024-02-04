@@ -127,20 +127,23 @@ public class LineAcceptanceTest extends BaseAcceptanceTest{
         when().get("/lines/" + linePostResponse.getId()).then().log().all().statusCode(HttpStatus.SC_NOT_FOUND);
     }
 
-    private Map<String, String> getRequestParam_신분당선() {
+
+
+
+        private Map<String, String> getRequestParam_신분당선() {
         String lineName = "신분당선";
         String lineColor = "bg-red-600";
         long upStationId = 1L;
         long downStationId = 2L;
         Integer distance = 10;
 
-        return Map.of(
-            "name", lineName,
-            "color", lineColor,
-            "upStationId", Long.toString(upStationId),
-            "downStationId", Long.toString(downStationId),
-            "distance", distance.toString()
-        );
+            return Map.of(
+                "name", lineName,
+                "color", lineColor,
+                "upStationId", Long.toString(upStationId),
+                "downStationId", Long.toString(downStationId),
+                "distance", distance.toString()
+            );
     }
 
     private Map<String, String> getRequestParam_분당선() {
