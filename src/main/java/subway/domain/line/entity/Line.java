@@ -1,8 +1,10 @@
 package subway.domain.line.entity;
 
+import subway.common.exception.CustomException;
 import subway.domain.station.entity.Station;
 
 import javax.persistence.*;
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -81,5 +83,31 @@ public class Line {
 
     public List<Section> getSections() {
         return this.sections;
+    }
+
+    public void add(Section section) {
+        if (!this.getDownStation().equals(section.getUpStation())) {
+            throw new InvalidParameterException("잘못된 상행역");
+        }
+
+        if (this.contains(section.getDownStation())) {
+            throw new CustomException.Conflict("이미 포함된 하행역");
+        }
+        this.sections.add(section);
+        section.setLine(this);
+    }
+
+    public boolean contains(Station station) {
+        return this.sections.stream().anyMatch(section -> section.getUpStation().equals(station));
+    }
+
+    @Override
+    public String toString() {
+        return "Line{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", color='" + color + '\'' +
+                ", sections=" + sections +
+                '}';
     }
 }

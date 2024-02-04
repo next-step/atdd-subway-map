@@ -1,6 +1,7 @@
 package subway.infrastructure.line.dao;
 
 import org.springframework.stereotype.Component;
+import subway.domain.line.LineCommand;
 import subway.domain.line.entity.Line;
 import subway.domain.line.entity.Section;
 import subway.domain.station.entity.Station;
@@ -25,12 +26,17 @@ public class LineStore {
         this.stationRepository = stationRepository;
     }
 
+    public Section createSection(LineCommand.SectionAddCommand command) {
+        return this.createSection(command.getUpStationId(), command.getDownStationId(), command.getDistance());
+    }
     public Section createSection(LineRequest lineRequest) {
-        List<Station> stations = stationRepository.findAllById(List.of(lineRequest.getUpStationId(), lineRequest.getDownStationId()));
-        Station upStation = stations.stream().filter(station -> Objects.equals(station.getId(), lineRequest.getUpStationId())).findFirst().orElseThrow(() -> new EntityNotFoundException("station_id: " + lineRequest.getUpStationId()));
-        Station downStation = stations.stream().filter(station -> Objects.equals(station.getId(), lineRequest.getDownStationId())).findFirst().orElseThrow(() -> new EntityNotFoundException("station_id: " + lineRequest.getUpStationId()));
-
-        Section init = new Section(upStation, downStation, lineRequest.getDistance());
+        return this.createSection(lineRequest.getUpStationId(), lineRequest.getDownStationId(), lineRequest.getDistance());
+    }
+    private Section createSection(Long upStationId, Long downStationId, Long distance) {
+        List<Station> stations = stationRepository.findAllById(List.of(upStationId, downStationId));
+        Station upStation = stations.stream().filter(station -> Objects.equals(station.getId(), upStationId)).findFirst().orElseThrow(() -> new EntityNotFoundException("station_id: " + upStationId));
+        Station downStation = stations.stream().filter(station -> Objects.equals(station.getId(), downStationId)).findFirst().orElseThrow(() -> new EntityNotFoundException("station_id: " + downStationId));
+        Section init = new Section(upStation, downStation, distance);
         return sectionRepository.save(init);
     }
 
@@ -42,4 +48,6 @@ public class LineStore {
         sectionRepository.deleteAll(line.getSections());
         lineRepository.delete(line);
     }
+
+
 }

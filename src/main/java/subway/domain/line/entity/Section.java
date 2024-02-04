@@ -3,6 +3,8 @@ package subway.domain.line.entity;
 import subway.domain.station.entity.Station;
 
 import javax.persistence.*;
+import java.security.InvalidParameterException;
+import java.util.Objects;
 
 @Entity
 public class Section {
@@ -26,6 +28,9 @@ public class Section {
 
     public Section(){}
     public Section(Station upStation, Station downStation, Long distance) {
+        if(upStation.equals(downStation)) {
+            throw new InvalidParameterException();
+        }
         this.upStation = upStation;
         this.downStation = downStation;
         this.distance = distance;
@@ -41,5 +46,27 @@ public class Section {
 
     public Station getDownStation() {
         return this.downStation;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Section)) return false;
+        Section section = (Section) o;
+        return Objects.equals(id, section.id) && Objects.equals(getUpStation(), section.getUpStation()) && Objects.equals(getDownStation(), section.getDownStation()) && Objects.equals(distance, section.distance) && Objects.equals(line, section.line);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, getUpStation(), getDownStation(), distance, line);
+    }
+
+    @Override
+    public String toString() {
+        return "Section{" +
+                " upStation=" + upStation.getId() +
+                ", downStation=" + downStation.getId() +
+                ", distance=" + distance +
+                '}';
     }
 }
