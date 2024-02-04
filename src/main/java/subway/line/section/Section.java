@@ -63,8 +63,4 @@ public class Section {
                 ", distance=" + distance +
                 '}';
     }
-
-    public boolean matchCurrentDownStation(Station downStation) {
-        return this.upStation.equals(downStation);
-    }
 }

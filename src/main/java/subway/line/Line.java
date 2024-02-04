@@ -1,7 +1,5 @@
 package subway.line;
 
-import subway.line.section.CannotAddSectionException;
-import subway.line.section.CannotDeleteSectionException;
 import subway.line.section.Section;
 import subway.line.section.Sections;
 
@@ -51,12 +49,12 @@ public class Line {
         this.color = color;
     }
 
-    public void addSection(Section section) throws CannotAddSectionException {
+    public void addSection(Section section) {
         sections.addSection(section);
 
     }
 
-    public void deleteSection(Long stationId) throws CannotDeleteSectionException {
+    public void deleteSection(Long stationId) {
         sections.deleteSection(stationId);
     }
 

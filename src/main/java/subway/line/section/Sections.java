@@ -1,5 +1,7 @@
 package subway.line.section;
 
+import subway.Exception.ErrorCode;
+import subway.Exception.LineException;
 import subway.station.Station;
 
 import javax.persistence.CascadeType;
@@ -26,18 +28,18 @@ public class Sections {
         return sections;
     }
 
-    public void addSection(Section section) throws CannotAddSectionException {
+    public void addSection(Section section) {
         if (sections.isEmpty()) {
             sections.add(section);
             return;
         }
 
         if (!isLastDownStation(section.getUpStation())) {
-            throw new CannotAddSectionException("노선 등록 시 상행역은 현재 하행 종점역이어야 합니다.");
+            throw new LineException(ErrorCode.CANNOT_ADD_SECTION, "노선 등록 시 상행역은 현재 하행 종점역이어야 합니다.");
         }
 
         if (isDuplicatedStation(section)) {
-            throw new CannotAddSectionException("이미 구간에 등록된 역입니다.");
+            throw new LineException(ErrorCode.CANNOT_ADD_SECTION, "이미 구간에 등록된 역입니다.");
         }
 
         sections.add(section);
@@ -63,11 +65,11 @@ public class Sections {
         return lastDownStation().equals(upStation);
     }
 
-    public void deleteSection(Long stationId) throws CannotDeleteSectionException {
+    public void deleteSection(Long stationId) {
         if (sections.size() == 1)
-            throw new CannotDeleteSectionException("구간이 한개인 경우 삭제할 수 없습니다.");
+            throw new LineException(ErrorCode.CANNOT_DELETE_SECTION, "구간이 한개인 경우 삭제할 수 없습니다.");
         if (!isLastDownStation(stationId)) {
-            throw new CannotDeleteSectionException("삭제 역이 하행 종점역이 아닙니다.");
+            throw new LineException(ErrorCode.CANNOT_DELETE_SECTION, "삭제 역이 하행 종점역이 아닙니다.");
         }
         sections.remove(sections.size() - 1);
     }

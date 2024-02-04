@@ -64,9 +64,9 @@ public class SectionAcceptanceTest {
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(new SectionRequest(stationId3, stationId2, 16L))
-                .when().log().all()
+                .when()
                 .post("/lines/" + lineId + "/sections")
-                .then()
+                .then().log().all()
                 .statusCode(HttpStatus.BAD_REQUEST.value());
     }
 
@@ -88,12 +88,12 @@ public class SectionAcceptanceTest {
         // when
         // then
         RestAssured
-                .given().log().all()
+                .given()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(new SectionRequest(stationId1, stationId3, 13L))
-                .when().log().all()
+                .when()
                 .post("/lines/" + lineId + "/sections")
-                .then()
+                .then().log().all()
                 .statusCode(HttpStatus.BAD_REQUEST.value());
     }
 
@@ -146,7 +146,7 @@ public class SectionAcceptanceTest {
                 .param("stationId", stationId2)
                 .when()
                 .delete("/lines/" + lineId + "/sections")
-                .then()
+                .then().log().all()
                 .statusCode(HttpStatus.BAD_REQUEST.value());
     }
 
@@ -171,7 +171,7 @@ public class SectionAcceptanceTest {
                 .param("stationId", stationId2)
                 .when()
                 .delete("/lines/" + lineId + "/sections")
-                .then()
+                .then().log().all()
                 .statusCode(HttpStatus.BAD_REQUEST.value());
     }
 }

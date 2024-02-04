@@ -127,9 +127,10 @@
   - then 구간 제거 에러가 발생한다.
 
 ### Feedback 24.02.01
-- [ ] 예외 분기 처리 부분을 @ControllerAdvice 혹은 @ExceptionHandler 활용해보기
+- [x] 예외 분기 처리 부분을 @ControllerAdvice 혹은 @ExceptionHandler 활용해보기
+  - @RestControllerAdvice를 통한 전역 예외 처리
 - [x] Section 컬렉션에 대해서 일급 컬렉션으로 리팩토링 해보기
 - [x] 노선 삭제 인수 테스트 실패 이슈
   - Section - Line 간 FK 설정, Line 삭제 시 Section이 함께 삭제되도록 설정
-- [ ] 테스트별로 반복되는 코드들을 fixture로 관리해보기
+- [ ] 테스트별로 반복되는 코드들을 fixture 로 관리해보기
 - Section / Line 도메인 구조 수정

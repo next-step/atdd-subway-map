@@ -2,8 +2,6 @@ package subway.line;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import subway.line.section.CannotAddSectionException;
-import subway.line.section.CannotDeleteSectionException;
 import subway.line.section.SectionRequest;
 import subway.line.section.SectionResponse;
 import subway.station.StationNotFoundException;
@@ -20,7 +18,7 @@ public class LineController {
     }
 
     @PostMapping("/lines")
-    public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) throws StationNotFoundException, CannotAddSectionException {
+    public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) throws StationNotFoundException {
         LineResponse lineResponse = lineService.createLine(lineRequest);
         return ResponseEntity.created(URI.create("/lines/" + lineResponse.getId())).body(lineResponse);
     }
@@ -31,12 +29,12 @@ public class LineController {
     }
 
     @GetMapping("/lines/{id}")
-    public ResponseEntity<LineResponse> showLine(@PathVariable Long id) throws LineNotFoundException {
+    public ResponseEntity<LineResponse> showLine(@PathVariable Long id) {
         return ResponseEntity.ok().body(lineService.showLine(id));
     }
 
     @PutMapping("/lines/{id}")
-    public ResponseEntity<Void> updateLine(@PathVariable Long id, @RequestBody UpdateLineRequest updateLineRequest) throws LineNotFoundException {
+    public ResponseEntity<Void> updateLine(@PathVariable Long id, @RequestBody UpdateLineRequest updateLineRequest) {
         lineService.updateLine(id, updateLineRequest);
         return ResponseEntity.ok().build();
     }
@@ -48,27 +46,19 @@ public class LineController {
     }
 
     @GetMapping("/lines/{id}/sections")
-    public ResponseEntity<LineSectionResponse> showLineSections(@PathVariable Long id) throws LineNotFoundException {
+    public ResponseEntity<LineSectionResponse> showLineSections(@PathVariable Long id) {
         return ResponseEntity.ok().body(lineService.showLineSections(id));
     }
 
     @PostMapping("/lines/{id}/sections")
     public ResponseEntity<SectionResponse> addLineSection(@PathVariable Long id, @RequestBody SectionRequest sectionRequest) {
-        try {
-            SectionResponse sectionResponse = lineService.addLineSection(id, sectionRequest);
-            return ResponseEntity.created(URI.create("/lines/" + id + "/sections/" + sectionResponse.getId())).body(sectionResponse);
-        } catch (CannotAddSectionException e) {
-            return ResponseEntity.badRequest().build();
-        }
+        SectionResponse sectionResponse = lineService.addLineSection(id, sectionRequest);
+        return ResponseEntity.created(URI.create("/lines/" + id + "/sections/" + sectionResponse.getId())).body(sectionResponse);
     }
 
     @DeleteMapping("/lines/{id}/sections")
     public ResponseEntity<Void> deleteLineSection(@PathVariable Long id, @RequestParam Long stationId) {
-        try {
-            lineService.deleteLineSection(id, stationId);
-            return ResponseEntity.noContent().build();
-        } catch (CannotDeleteSectionException e) {
-            return ResponseEntity.badRequest().build();
-        }
+        lineService.deleteLineSection(id, stationId);
+        return ResponseEntity.noContent().build();
     }
 }

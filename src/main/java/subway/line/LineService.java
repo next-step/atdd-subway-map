@@ -1,9 +1,12 @@
 package subway.line;
 
 import org.springframework.stereotype.Service;
-import subway.line.section.*;
+import subway.Exception.ErrorCode;
+import subway.Exception.LineException;
+import subway.line.section.Section;
+import subway.line.section.SectionRequest;
+import subway.line.section.SectionResponse;
 import subway.station.Station;
-import subway.station.StationNotFoundException;
 import subway.station.StationRepository;
 import subway.station.StationResponse;
 
@@ -30,9 +33,9 @@ public class LineService {
         return new LineResponse(line.getId(), line.getName(), line.getColor(), line.getSections().allStations());
     }
 
-    public LineResponse createLine(LineRequest lineRequest) throws StationNotFoundException, CannotAddSectionException {
-        Station upStation = stationRepository.findById(lineRequest.getUpStationId()).orElseThrow(StationNotFoundException::new);
-        Station downStation = stationRepository.findById(lineRequest.getDownStationId()).orElseThrow(StationNotFoundException::new);
+    public LineResponse createLine(LineRequest lineRequest) {
+        Station upStation = stationRepository.findById(lineRequest.getUpStationId()).orElseThrow(() -> new LineException(ErrorCode.STATION_NOT_FOUND, ""));
+        Station downStation = stationRepository.findById(lineRequest.getDownStationId()).orElseThrow(() -> new LineException(ErrorCode.STATION_NOT_FOUND, ""));
 
         Line line = new Line(lineRequest.getName(), lineRequest.getColor());
         line.addSection(new Section(line, upStation, downStation, lineRequest.getDistance()));
@@ -48,12 +51,12 @@ public class LineService {
                 .collect(Collectors.toList());
     }
 
-    public LineResponse showLine(Long id) throws LineNotFoundException {
-        return createLineResponse(lineRepository.findById(id).orElseThrow(LineNotFoundException::new));
+    public LineResponse showLine(Long id) {
+        return createLineResponse(lineRepository.findById(id).orElseThrow(() -> new LineException(ErrorCode.LINE_NOT_FOUND, "")));
     }
 
-    public void updateLine(Long id, UpdateLineRequest updateLineRequest) throws LineNotFoundException {
-        Line line = lineRepository.findById(id).orElseThrow(LineNotFoundException::new);
+    public void updateLine(Long id, UpdateLineRequest updateLineRequest) {
+        Line line = lineRepository.findById(id).orElseThrow(() -> new LineException(ErrorCode.LINE_NOT_FOUND, ""));
         line.setName(updateLineRequest.getName());
         line.setColor(updateLineRequest.getColor());
     }
@@ -73,11 +76,11 @@ public class LineService {
         return new SectionResponse(section.getId(), createStationResponse(section.getUpStation()), createStationResponse(section.getDownStation()), section.getDistance());
     }
 
-    public LineSectionResponse showLineSections(Long id) throws LineNotFoundException {
-        return createLineSectionResponse(lineRepository.findById(id).orElseThrow(LineNotFoundException::new));
+    public LineSectionResponse showLineSections(Long id) {
+        return createLineSectionResponse(lineRepository.findById(id).orElseThrow(() -> new LineException(ErrorCode.LINE_NOT_FOUND, "")));
     }
 
-    public SectionResponse addLineSection(Long id, SectionRequest sectionRequest) throws CannotAddSectionException {
+    public SectionResponse addLineSection(Long id, SectionRequest sectionRequest) {
         Line line = lineRepository.findById(id).get();
 
         Station upStation = stationRepository.findById(sectionRequest.getUpStationId()).get();
@@ -88,7 +91,7 @@ public class LineService {
         return createSectionResponse(section);
     }
 
-    public void deleteLineSection(Long id, Long stationId) throws CannotDeleteSectionException {
+    public void deleteLineSection(Long id, Long stationId) {
         Line line = lineRepository.findById(id).get();
         line.deleteSection(stationId);
     }
