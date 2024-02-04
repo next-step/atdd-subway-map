@@ -134,7 +134,18 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선을 생성하고 생성한 지하철 노선을 삭제하면 해당 지하철 노선 정보는 삭제된다.")
     @Test
     void test5() {
+        //given
+        LineResponse linePostResponse = given()
+            .body(getRequestParam_신분당선())
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().post("/lines").then().log().all().extract().jsonPath().getObject(".", LineResponse.class);
 
+        //when & then
+        when()
+            .delete("/lines/" + linePostResponse.getId())
+            .then()
+            .log().all().statusCode(HttpStatus.SC_NO_CONTENT);
+        when().get("/lines/" + linePostResponse.getId()).then().log().all().statusCode(HttpStatus.SC_NOT_FOUND);
     }
 
     private Map<String, String> getRequestParam_신분당선() {
