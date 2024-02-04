@@ -1,15 +1,19 @@
 package subway;
 
 
+import io.restassured.common.mapper.TypeRef;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import subway.common.Line;
+import subway.common.Section;
 import subway.common.Station;
 import subway.controller.line.LineResponse;
 import subway.controller.station.StationResponse;
+
+import java.util.List;
 
 import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD;
 
@@ -17,6 +21,31 @@ import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFOR
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @DirtiesContext(classMode = BEFORE_EACH_TEST_METHOD)
 public class LineSectionAcceptanceTest {
+
+    StationResponse A역;
+    StationResponse B역;
+    StationResponse C역;
+    StationResponse D역;
+    StationResponse E역;
+    LineResponse A역_B역_노선;
+    Section.RequestBody B역_C역_구간;
+    Section.RequestBody C역_D역_구간;
+    Section.RequestBody D역_B역_구간;
+
+    @BeforeEach
+    void setUpFixture() {
+        A역 = Station.랜덤역생성();
+        B역 = Station.랜덤역생성();
+        C역 = Station.랜덤역생성();
+        D역 = Station.랜덤역생성();
+        E역 = Station.랜덤역생성();
+
+        A역_B역_노선 = Line.노선생성(A역.getId(), B역.getId());
+
+        B역_C역_구간 = Section.REQUEST_BODY(B역.getId(), C역.getId());
+        C역_D역_구간 = Section.REQUEST_BODY(C역.getId(), D역.getId());
+        D역_B역_구간 = Section.REQUEST_BODY(D역.getId(), B역.getId());
+    }
 
     /**
      * When  A역-B역 지하철 노선에 B역-C역 구간을 등록하면

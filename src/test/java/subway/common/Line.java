@@ -90,7 +90,16 @@ public class Line {
         StationResponse 하행역 = Station.랜덤역생성();
         return new Line.RequestBody(name, color, 상행역.getId(), 하행역.getId(), distance);
     }
+    public static Line.RequestBody REQUEST_BODY(Long upStationId, Long downStationId) {
+        final String name = RandomStringUtils.randomAlphanumeric(10);
+        final String color = RandomStringUtils.randomAlphanumeric(10);
+        final Long distance = 10L;
+        return new Line.RequestBody(name, color, upStationId, downStationId, distance);
+    }
     public static LineResponse 랜덤노선생성() {
         return Api.createLineBy(REQUEST_BODY()).as(LineResponse.class);
+    }
+    public static LineResponse 노선생성(Long upStationId, Long downStationId) {
+        return Api.createLineBy(REQUEST_BODY(upStationId, downStationId)).as(LineResponse.class);
     }
 }
