@@ -117,7 +117,19 @@ public class LineSectionAcceptanceTest {
     @DisplayName("지하철 노선 구간을 삭제한다.")
     @Test
     void deleteLineSection() {
+        // Given
+        Section.Api.createBy(A역_B역_노선.getId(), B역_C역_구간);
 
+        // When
+        ExtractableResponse<Response> response = Section.Api.deleteBy(A역_B역_노선.getId(), C역.getId());
+
+        // Then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        //Then
+        A역_B역_노선 = Line.Api.retrieveLineBy(A역_B역_노선.getId()).as(LineResponse.class);
+        assertThat(A역_B역_노선.getDownStation().getId()).isEqualTo(B역.getId());
+        assertThat(A역_B역_노선.getDownStation().getName()).isEqualTo(B역.getName());
     }
 
     /**
@@ -129,7 +141,18 @@ public class LineSectionAcceptanceTest {
     @DisplayName("삭제할 구간이 노선의 마지막 구간이 아닌 경우 삭제를 실패한다.")
     @Test
     void failDeleteLineSectionWithInvalidDownStation() {
+        // Given
+        Section.Api.createBy(A역_B역_노선.getId(), B역_C역_구간);
 
+        // When
+        ExtractableResponse<Response> response = Section.Api.deleteBy(A역_B역_노선.getId(), B역.getId());
+
+        // Then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+
+        //Then
+        String failMessage = response.jsonPath().getString("message");
+        assertThat(failMessage).isEqualTo("잘못된 하행역");
     }
 
     /**
@@ -140,6 +163,15 @@ public class LineSectionAcceptanceTest {
     @DisplayName("삭제할 구간이 노선의 유일한 구간인 경우 삭제를 실패한다.")
     @Test
     void failDeleteLineSectionWithLastSection() {
+        // When
+        ExtractableResponse<Response> response = Section.Api.deleteBy(A역_B역_노선.getId(), B역.getId());
+
+        // Then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+
+        //Then
+        String failMessage = response.jsonPath().getString("message");
+        assertThat(failMessage).isEqualTo("유일한 구간");
 
     }
 }
