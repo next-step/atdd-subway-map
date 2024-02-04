@@ -2,9 +2,9 @@ package subway.line;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import subway.Station;
-import subway.StationRepository;
-import subway.StationResponse;
+import subway.station.Station;
+import subway.station.StationRepository;
+import subway.station.StationResponse;
 
 import java.util.ArrayList;
 import java.util.List;
