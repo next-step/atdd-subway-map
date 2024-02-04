@@ -23,7 +23,8 @@ public class StationAcceptanceTest extends CommonAcceptanceTest{
     void createStation() {
 
         // when
-        ExtractableResponse<Response> response = StationRestAssuredCRUD.createStation("강남역");
+        String 강남역 = "강남역";
+        ExtractableResponse<Response> response = StationRestAssuredCRUD.createStation(강남역);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -32,7 +33,7 @@ public class StationAcceptanceTest extends CommonAcceptanceTest{
         List<String> stationNames = StationRestAssuredCRUD.showStations()
                 .jsonPath().getList("name", String.class);
 
-        assertThat(stationNames).containsAnyOf("강남역");
+        assertThat(stationNames).containsAnyOf(강남역);
     }
 
     /**
@@ -45,15 +46,17 @@ public class StationAcceptanceTest extends CommonAcceptanceTest{
     void findStationsTest() {
 
         //given
-        StationRestAssuredCRUD.createStation("강남역");
-        StationRestAssuredCRUD.createStation("선릉역");
+        String 강남역 = "강남역";
+        String 선릉역 = "선릉역";
+        StationRestAssuredCRUD.createStation(강남역);
+        StationRestAssuredCRUD.createStation(선릉역);
 
         //when
         List<String> stationList = StationRestAssuredCRUD.showStations()
                 .jsonPath().getList("name", String.class);
 
         //then
-        assertThat(stationList).containsAll(List.of("강남역", "선릉역"));
+        assertThat(stationList).containsAll(List.of(강남역, 선릉역));
     }
 
     /**
@@ -66,7 +69,8 @@ public class StationAcceptanceTest extends CommonAcceptanceTest{
     void deleteStationTest() {
 
         //given
-        ExtractableResponse<Response> createResponse = StationRestAssuredCRUD.createStation("강남역");
+        String 강남역 = "강남역";
+        ExtractableResponse<Response> createResponse = StationRestAssuredCRUD.createStation(강남역);
         Long deleteId = createResponse.body().jsonPath().getLong("id");
 
         //when
@@ -78,7 +82,7 @@ public class StationAcceptanceTest extends CommonAcceptanceTest{
         List<String> stationList = StationRestAssuredCRUD.showStations()
                 .jsonPath().getList("name", String.class);
 
-        assertThat(stationList).doesNotContain("강남역");
+        assertThat(stationList).doesNotContain(강남역);
     }
 
 }
