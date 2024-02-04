@@ -281,13 +281,6 @@ class LineAcceptanceTest extends AcceptanceTest {
 			.jsonPath()
 			.getLong("id");
 
-		long notExistsStationId = StationFixture.builder()
-			.stationName("노선에 존재하지 않는 정류장")
-			.build()
-			.create()
-			.jsonPath()
-			.getLong("id");
-
 		return Stream.of(
 			dynamicTest("구간 삭제를 위해 필요한 노선을 만든다.", () -> {
 				// then
