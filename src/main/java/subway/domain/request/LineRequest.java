@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SubwayLineRequest {
+public class LineRequest {
     private String name;
     private String color;
     private Long upStationId;
