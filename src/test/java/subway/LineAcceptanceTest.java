@@ -2,6 +2,7 @@ package subway;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -15,8 +16,8 @@ public class LineAcceptanceTest extends CommonAcceptanceTest{
     private static Long 강남역Id;
     private static Long 양재역Id;
 
+    @BeforeEach
     void createDefaultStations() {
-        super.beforeEach();
         강남역Id = extractResponseId(StationRestAssuredCRUD.createStation("강남역"));
         양재역Id = extractResponseId(StationRestAssuredCRUD.createStation("양재역"));
     }
@@ -38,8 +39,6 @@ public class LineAcceptanceTest extends CommonAcceptanceTest{
     void createLine() {
 
         //when
-        createDefaultStations();
-
         String 신분당선 = "신분당선";
         ExtractableResponse<Response> createResponse = LineRestAssuredCRUD.createStation(신분당선, "bg-red-600", 강남역Id, 양재역Id, 10);
         assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -64,7 +63,6 @@ public class LineAcceptanceTest extends CommonAcceptanceTest{
         String 수인분당선 = "수인분당선";
 
         //given
-        createDefaultStations();
         Long 서현역Id = extractResponseId(StationRestAssuredCRUD.createStation(서현역));
 
         LineRestAssuredCRUD.createStation(신분당선, "bg-red-600", 강남역Id, 양재역Id, 10);
@@ -87,8 +85,6 @@ public class LineAcceptanceTest extends CommonAcceptanceTest{
     void createAndShowLine() {
 
         //given
-        createDefaultStations();
-
         String 신분당선 = "신분당선";
         ExtractableResponse<Response> createResponse = LineRestAssuredCRUD.createStation(신분당선, "bg-red-600", 강남역Id, 양재역Id, 10);
 
@@ -111,8 +107,6 @@ public class LineAcceptanceTest extends CommonAcceptanceTest{
     void createAndModifyLine() {
 
         //given
-        createDefaultStations();
-
         String createStationName = "신분당선";
         ExtractableResponse<Response> createResponse = LineRestAssuredCRUD.createStation(createStationName, "bg-red-600", 강남역Id, 양재역Id, 10);
 
@@ -139,8 +133,6 @@ public class LineAcceptanceTest extends CommonAcceptanceTest{
     void createAndDeleteLine() {
 
         //given
-        createDefaultStations();
-
         String 신분당선 = "신분당선";
         ExtractableResponse<Response> createResponse = LineRestAssuredCRUD.createStation("신분당선", "bg-red-600", 강남역Id, 양재역Id, 10);
 
