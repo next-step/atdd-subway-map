@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -87,50 +88,68 @@ public class LineAcceptanceTest {
 
     @DisplayName("지하철 노선을 생성하고 생성한 지하철 노선을 조회하면 생성한 지하철 노선의 정보를 응답받을 수 있다.")
     @Test
-    void test3() {
+    void test_지하철_생성_노선_조회() {
         //given
-        Map<String, String> requestParam1 = getRequestParam_신분당선();
-
         LineResponse linePostResponse = given()
-            .body(requestParam1)
+            .body(getRequestParam_신분당선())
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .when().post("/lines").then().log().all().extract().jsonPath().getObject(".", LineResponse.class);
 
         //when
         LineResponse lineResponse_신분당선 = when().get("/lines/" + linePostResponse.getId()).then().extract().jsonPath().getObject(".", LineResponse.class);
-        assertThat(lineResponse_신분당선.getId()).isEqualTo(1);
-        assertThat(lineResponse_신분당선.getName()).isEqualTo(requestParam1.get("name"));
-        assertThat(lineResponse_신분당선.getColor()).isEqualTo(requestParam1.get("color"));
+        assertAll(
+            () -> assertThat(lineResponse_신분당선.getId()).isEqualTo(1),
+            () -> assertThat(lineResponse_신분당선.getName()).isEqualTo(getRequestParam_신분당선().get("name")),
+            () -> assertThat(lineResponse_신분당선.getColor()).isEqualTo(getRequestParam_신분당선().get("color"))
+        );
     }
 
     @DisplayName("지하철 노선을 생성하고 생성한 지하철 노선을 수정하면 해당 지하철 노선 정보는 수정된다.")
     @Test
-    void test4() {
+    void test_지하철_노선_수정() {
+        //given
+        LineResponse linePostResponse = given()
+            .body(getRequestParam_신분당선())
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().post("/lines").then().log().all().extract().jsonPath().getObject(".", LineResponse.class);
+        Map<String, String> putRequest = Map.of(
+            "name", "신분당선",
+            "color", "Red"
+        );
+        //when
+        given()
+            .body(putRequest)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when()
+            .put("/lines/" + linePostResponse.getId())
+            .then()
+            .log().all().statusCode(HttpStatus.SC_OK);
 
+        //then
+        LineResponse lineResponse_신분당선_수정 = when().get("/lines/" + linePostResponse.getId()).then().extract().jsonPath().getObject(".", LineResponse.class);
+        assertThat(lineResponse_신분당선_수정.getColor()).isEqualTo(putRequest.get("color"));shtj
     }
+
     @DisplayName("지하철 노선을 생성하고 생성한 지하철 노선을 삭제하면 해당 지하철 노선 정보는 삭제된다.")
     @Test
     void test5() {
 
     }
 
-
-
-
-        private Map<String, String> getRequestParam_신분당선() {
+    private Map<String, String> getRequestParam_신분당선() {
         String lineName = "신분당선";
         String lineColor = "bg-red-600";
         long upStationId = 1L;
         long downStationId = 2L;
         Integer distance = 10;
 
-            return Map.of(
-                "name", lineName,
-                "color", lineColor,
-                "upStationId", Long.toString(upStationId),
-                "downStationId", Long.toString(downStationId),
-                "distance", distance.toString()
-            );
+        return Map.of(
+            "name", lineName,
+            "color", lineColor,
+            "upStationId", Long.toString(upStationId),
+            "downStationId", Long.toString(downStationId),
+            "distance", distance.toString()
+        );
     }
 
     private Map<String, String> getRequestParam_분당선() {
