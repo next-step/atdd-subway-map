@@ -8,17 +8,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpMethod;
-import org.springframework.test.context.jdbc.Sql;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import subway.dto.StationDTO;
@@ -27,20 +22,11 @@ import subway.fixture.SectionRequestFixture;
 import subway.fixture.StationFixture;
 import subway.line.LineResponse;
 import subway.line.LineUpdateRequest;
-import subway.line.SectionRequest;
 import subway.rest.Rest;
+import subway.section.SectionRequest;
 import subway.station.StationResponse;
 
-@Sql(value = "/truncate.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class LineAcceptanceTest {
-	@LocalServerPort
-	private int port;
-
-	@BeforeEach
-	public void beforeEach() {
-		RestAssured.port = port;
-	}
+class LineAcceptanceTest extends AcceptanceTest {
 
 	/**
 	 * When 지하철 노선을 생성하면
@@ -229,7 +215,7 @@ class LineAcceptanceTest {
 				Rest.builder()
 					.uri(uri)
 					.body(exceptionRequestFixture)
-					.checkException("IllegalArgumentException", "존재하지 않는 정류장입니다.", HttpMethod.POST);
+					.checkException("EntityNotFoundException", "존재하지 않는 정류장입니다.", HttpMethod.POST);
 			}),
 			dynamicTest("이미 노선에 포함된 정류장을 추가 하려고 하는 경우 Exception 테스트",
 				() -> {
@@ -295,6 +281,13 @@ class LineAcceptanceTest {
 			.jsonPath()
 			.getLong("id");
 
+		long notExistsStationId = StationFixture.builder()
+			.stationName("노선에 존재하지 않는 정류장")
+			.build()
+			.create()
+			.jsonPath()
+			.getLong("id");
+
 		return Stream.of(
 			dynamicTest("구간 삭제를 위해 필요한 노선을 만든다.", () -> {
 				// then
@@ -329,18 +322,6 @@ class LineAcceptanceTest {
 				String linesGetUri1 = LINES.path(givenLineResponse.getId()).toUriString();
 				LineResponse actualLineResponse = Rest.builder().get(linesGetUri1).as(LineResponse.class);
 				assertThat(actualLineResponse).usingRecursiveComparison().isEqualTo(expectedLineResponse);
-			}),
-			dynamicTest("삭제 할려는 정류장이 해당 노선에 없을 경우 Exception", () -> {
-				int notExistsStationId = Integer.MAX_VALUE;
-				String uri = LINES.path(givenLineResponse.getId())
-					.path("/sections")
-					.queryParam("stationId", notExistsStationId)
-					.toUriString();
-
-				Rest.builder()
-					.uri(uri)
-					.body(Map.of("",""))
-					.checkException("IllegalArgumentException", "해당 노선에 포함되지 않는 정류장입니다.", HttpMethod.DELETE);
 			}),
 			dynamicTest("삭제 할려는 정류장이 마지막 정류장이 아닌 경우 Exception", () -> {
 				Long firstStationId = initLine.getStations()
