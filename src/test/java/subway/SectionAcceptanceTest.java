@@ -33,6 +33,10 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 
     private Long SHINBUNDANG_LINE_ID;
 
+    /**
+     * GIVEN 지하철 역을 생성하고
+     * GIVEN 노선을 생성한다
+     */
     @BeforeEach
     void setFixture() {
         GANGNAM_STATION_ID = createStation(GANGNAM_STATION.toCreateRequest(), CREATED.value())
@@ -50,14 +54,12 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     }
 
     /**
-     * GIVEN 지하철 역을 생성하고
-     * GIVEN 지하철 역에 노선을 등록하고
-     * WHEN 새로운 지하철 구간 등록시 상행 지하철역과 하행 지하철역을 등록하지 않으면
-     * Then 새로운 구간을 등록할 수 없다
+     * WHEN 새로운 지하철 구간 생성시 상행 지하철역과 하행 지하철역을 생성하지 않으면
+     * Then 새로운 구간을 생성할 수 없다
      */
     @ParameterizedTest
     @MethodSource("provideBlankSectionCreateRequest")
-    void 실패_새로운_지하철_구간_등록시_필수값을_모두_입력하지_않으면_예외가_발생한다(SectionCreateRequest request) {
+    void 실패_새로운_지하철_구간_생성시_필수값을_모두_입력하지_않으면_예외가_발생한다(SectionCreateRequest request) {
         // when
         ExtractableResponse<Response> response = post("/lines/{lineId}/sections", request, BAD_REQUEST.value(), SHINBUNDANG_LINE_ID);
 
@@ -80,13 +82,11 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     }
 
     /**
-     * GIVEN 지하철 역을 생성하고
-     * GIVEN 지하철 역에 노선을 등록하고
-     * WHEN 새로운 지하철 구간의 상행역을 노선의 하행 종점역이 아닌 곳에 등록하면
-     * Then 새로운 구간을 등록할 수 없다
+     * WHEN 새로운 지하철 구간의 상행역을 노선의 하행 종점역이 아닌 곳에 생성하면
+     * Then 새로운 구간을 생성할 수 없다
      */
     @Test
-    void 실패_새로운_구간_등록시_상행역을_노선의_하행_종점역에_등록하지_않으면_예외가_발생한다() {
+    void 실패_새로운_구간_생성시_상행역을_노선의_하행_종점역에_생성하지_않으면_예외가_발생한다() {
         // given
         SectionCreateRequest request = sectionCreateRequest(GANGNAM_STATION_ID, YANGJAE_STATION_ID, 10);
 
@@ -95,17 +95,15 @@ public class SectionAcceptanceTest extends AcceptanceTest {
                 .as(ExceptionResponse.class).getMessage();
 
         // then
-        assertThat(message).isEqualTo("새로운 구간의 상행역은 노선의 하행 종점역에만 등록할 수 있습니다.");
+        assertThat(message).isEqualTo("새로운 구간의 상행역은 노선의 하행 종점역에만 생성할 수 있습니다.");
     }
 
     /**
-     * GIVEN 지하철 역을 생성하고
-     * GIVEN 지하철 역에 노선을 등록하고
-     * WHEN 새로운 지하철 구간의 하행역을 노선의 존재하는 역에 등록하면
-     * Then 새로운 구간을 등록할 수 없다
+     * WHEN 새로운 지하철 구간의 하행역을 노선의 존재하는 역에 생성하면
+     * Then 새로운 구간을 생성할 수 없다
      */
     @Test
-    void 실패_새로운_구간_등록시_하행역을_노선의_존재하는_역에_등록하면_예외가_발생한다() {
+    void 실패_새로운_구간_생성시_하행역을_노선의_존재하는_역에_생성하면_예외가_발생한다() {
         // given
         SectionCreateRequest request = sectionCreateRequest(SEOLLEUNG_STATION_ID, GANGNAM_STATION_ID, 10);
 
@@ -114,17 +112,15 @@ public class SectionAcceptanceTest extends AcceptanceTest {
                 .as(ExceptionResponse.class).getMessage();
 
         // then
-        assertThat(message).isEqualTo("새로운 구간의 하행역은 노선에 존재하는 역에 등록할 수 없습니다.");
+        assertThat(message).isEqualTo("새로운 구간의 하행역은 노선에 존재하는 역에 생성할 수 없습니다.");
     }
 
     /**
-     * GIVEN 지하철 역을 생성하고
-     * GIVEN 지하철 역에 노선을 등록하고
-     * WHEN 새로운 지하철 구간의 상행역을 노선의 하행 종점역이 아닌 곳에 등록하면
-     * Then 새로운 구간을 등록할 수 없다
+     * WHEN 새로운 지하철 구간의 상행역을 노선의 하행 종점역이 아닌 곳에 생성하면
+     * Then 새로운 구간을 생성할 수 없다
      */
     @Test
-    void 실패_새로운_구간_등록시_하행역을_노선의_하행역에_등록하면_예외가_발생한다() {
+    void 실패_새로운_구간_생성시_하행역을_노선의_하행역에_생성하면_예외가_발생한다() {
         // given
         SectionCreateRequest request = sectionCreateRequest(YANGJAE_STATION_ID, SEOLLEUNG_STATION_ID, 10);
 
@@ -133,19 +129,16 @@ public class SectionAcceptanceTest extends AcceptanceTest {
                 .as(ExceptionResponse.class).getMessage();
 
         // then
-        assertThat(message).isEqualTo("새로운 구간의 하행역은 노선에 존재하는 역에 등록할 수 없습니다.");
+        assertThat(message).isEqualTo("새로운 구간의 하행역은 노선에 존재하는 역에 생성할 수 없습니다.");
     }
 
     /**
-     * GIVEN 지하철 역을 생성하고
-     * GIVEN 지하철 역에 노선을 등록하고
-     * GIVEN 구간을 등록하고
-     * WHEN 새로운 지하철 구간 등록시 노선의 길이 보다 작거나 같다면
-     * Then 새로운 구간을 등록할 수 없다
+     * WHEN 새로운 지하철 구간 생성시 노선의 길이 보다 작거나 같다면
+     * Then 새로운 구간을 생성할 수 없다
      */
     @ParameterizedTest
     @ValueSource(ints = {10, 9})
-    void 실패_새로운_지하철_구간_등록시_노선_길이보다_작거나_같다면_예외가_발생한다(int distance) {
+    void 실패_새로운_지하철_구간_생성시_노선_길이보다_작거나_같다면_예외가_발생한다(int distance) {
         // given
         SectionCreateRequest request = sectionCreateRequest(SEOLLEUNG_STATION_ID, YANGJAE_STATION_ID, distance);
 
@@ -158,14 +151,11 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     }
 
     /**
-     * GIVEN 지하철 역을 생성하고
-     * GIVEN 지하철 역에 노선을 등록하고
-     * GIVEN 구간을 등록하고
-     * WHEN 새로운 지하철 구간 등록시 노선의 하행 종점역에 등록하면
-     * Then 새로운 구간이 등록된다
+     * WHEN 새로운 지하철 구간 생성시 노선의 하행 종점역에 생성하면
+     * Then 새로운 구간이 생성된다
      */
     @Test
-    void 성공_새로운_지하철_구간_등록시_노선의_하행_종점역에_등록할_수_있다() {
+    void 성공_새로운_지하철_구간_생성시_노선의_하행_종점역에_생성할_수_있다() {
         // given
         SectionCreateRequest request = sectionCreateRequest(SEOLLEUNG_STATION_ID, YANGJAE_STATION_ID, 13);
 
@@ -192,9 +182,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     }
 
     /**
-     * GIVEN 지하철 역을 생성하고
-     * GIVEN 지하철 역에 노선을 등록하고
-     * GIVEN 구간을 등록하고
+     * GIVEN 구간을 생성하고
      * WHEN 지하철 구간 제거시 마지막 구간이 아닐 경우
      * Then 구간을 제거할 수 없다
      */
@@ -213,8 +201,6 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     }
 
     /**
-     * GIVEN 지하철 역을 생성하고
-     * GIVEN 지하철 역에 노선을 등록하고
      * WHEN 지하철 구간 제거시 구간이 한개만 있는 경우
      * Then 구간을 제거할 수 없다
      */
@@ -229,9 +215,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     }
 
     /**
-     * GIVEN 지하철 역을 생성하고
-     * GIVEN 지하철 역에 노선을 등록하고
-     * GIVEN 구간을 등록하고
+     * GIVEN 구간을 생성하고
      * WHEN 지하철 구간 제거시
      * Then 구간을 제거한다
      */

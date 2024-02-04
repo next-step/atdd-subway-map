@@ -30,7 +30,7 @@ public class Sections {
 
     private void validateUpStation(Station upStation) {
         if (sections.stream().anyMatch(section -> section.isUpStation(upStation))) {
-            throw new ApplicationException("새로운 구간의 상행역은 노선의 하행 종점역에만 등록할 수 있습니다.");
+            throw new ApplicationException("새로운 구간의 상행역은 노선의 하행 종점역에만 생성할 수 있습니다.");
         }
     }
 
@@ -39,7 +39,7 @@ public class Sections {
                 .anyMatch(section -> section.matchesStation(downStation));
 
         if (isDownStationRegistered) {
-            throw new ApplicationException("새로운 구간의 하행역은 노선에 존재하는 역에 등록할 수 없습니다.");
+            throw new ApplicationException("새로운 구간의 하행역은 노선에 존재하는 역에 생성할 수 없습니다.");
         }
     }
 
