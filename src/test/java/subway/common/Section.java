@@ -11,13 +11,13 @@ public class Section {
 
 
     public static class RequestBody {
-        public Long upStation;
-        public Long downStation;
+        public Long upStationId;
+        public Long downStationId;
         public Long distance;
 
-        private RequestBody(Long upStation, Long downStation, Long distance) {
-            this.upStation = upStation;
-            this.downStation = downStation;
+        private RequestBody(Long upStationId, Long downStationId, Long distance) {
+            this.upStationId = upStationId;
+            this.downStationId = downStationId;
             this.distance = distance;
         }
     }

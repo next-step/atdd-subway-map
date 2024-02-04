@@ -32,6 +32,7 @@ public class LineSectionAcceptanceTest {
     Section.RequestBody B역_C역_구간;
     Section.RequestBody C역_D역_구간;
     Section.RequestBody D역_B역_구간;
+    Section.RequestBody B역_A역_구간;
 
     @BeforeEach
     void setUpFixture() {
@@ -46,6 +47,7 @@ public class LineSectionAcceptanceTest {
         B역_C역_구간 = Section.REQUEST_BODY(B역.getId(), C역.getId());
         C역_D역_구간 = Section.REQUEST_BODY(C역.getId(), D역.getId());
         D역_B역_구간 = Section.REQUEST_BODY(D역.getId(), B역.getId());
+        B역_A역_구간 = Section.REQUEST_BODY(B역.getId(), A역.getId());
     }
 
     /**
@@ -69,7 +71,7 @@ public class LineSectionAcceptanceTest {
     }
 
     /**
-     * When A역-B역 노선에 D역-B역 구간을 등록하면
+     * When A역-B역 노선에 B역-A역 구간을 등록하면
      * Then 구간등록에 실패한다 (409)
      * Then 실패 메시지는 "이미 포함된 하행역" 이어야 한다.
      */
@@ -77,7 +79,7 @@ public class LineSectionAcceptanceTest {
     @Test
     void failEnrollSectionToLineWithAlreadyExist() {
         // When
-        ExtractableResponse<Response> response = Section.Api.createBy(A역_B역_노선.getId(), D역_B역_구간);
+        ExtractableResponse<Response> response = Section.Api.createBy(A역_B역_노선.getId(), B역_A역_구간);
 
         // Then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
