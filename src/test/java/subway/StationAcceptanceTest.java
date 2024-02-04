@@ -5,30 +5,16 @@ import static subway.location.enums.Location.*;
 
 import java.util.List;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.test.context.jdbc.Sql;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import subway.fixture.StationFixture;
 import subway.rest.Rest;
 
 @DisplayName("지하철역 관련 기능")
-@Sql(value = "/truncate.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class StationAcceptanceTest {
-    @LocalServerPort
-    private int port;
-
-    @BeforeEach
-    void beforeEach() {
-        RestAssured.port = port;
-    }
+class StationAcceptanceTest extends AcceptanceTest {
 
     /**
      * When 지하철역을 생성하면
