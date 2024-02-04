@@ -32,31 +32,39 @@ public class StationLineService {
     @Transactional
     public StationLineResponse createStationLine(StationLineRequest request) {
         StationLine stationLine = stationLineRepository.save(convertToStationLineEntity(request));
-        StationSection createdStationSection = stationSectionRepository.save(convertToStationSectionEntity(stationLine));
-        return convertToResponse(stationLine.setStationSection(createdStationSection));
+        StationSection createdStationSection = stationSectionRepository.save(convertToSectionEntity(stationLine));
+        return convertToLineResponse(stationLine.setStationSection(createdStationSection));
     }
 
     public List<StationLineResponse> findAllStationLines() {
         return stationLineRepository.findAll().stream()
-                .map(this::convertToResponse)
+                .map(this::convertToLineResponse)
                 .collect(Collectors.toList());
     }
 
     public StationLineResponse findStationLineById(Long stationLineId) {
-        return convertToResponse(stationLineRepository.findById(stationLineId)
-                .orElseThrow(EntityNotFoundException::new)); // TODO: Throw Custom Exception?
+        return convertToLineResponse(stationLineRepository.findById(stationLineId)
+                .orElseThrow(EntityNotFoundException::new));
     }
 
     @Transactional
     public void updateStationLine(Long stationLineId, StationLineRequest request) {
         StationLine stationLine = stationLineRepository.findById(stationLineId)
                 .orElseThrow(EntityNotFoundException::new);
-        convertToResponse(stationLineRepository.save(updateStationLine(request, stationLine)));
+        convertToLineResponse(stationLineRepository.save(updateStationLine(request, stationLine)));
     }
 
     @Transactional
     public void deleteStationLine(Long stationLineId) {
         stationLineRepository.deleteById(stationLineId);
+    }
+
+    private static Long findFirstStation(List<StationSection> stationSections) {
+        return stationSections.get(0).getUpStationId();
+    }
+
+    private StationResponse findStation(Long stationId) {
+        return convertToStationResponse(stationRepository.findById(stationId).orElseThrow(IllegalArgumentException::new));
     }
 
     private StationLine updateStationLine(StationLineRequest request, StationLine stationLine) {
@@ -75,7 +83,7 @@ public class StationLineService {
                 request.getDistance());
     }
 
-    private StationLineResponse convertToResponse(StationLine stationLine) {
+    private StationLineResponse convertToLineResponse(StationLine stationLine) {
         return new StationLineResponse(
                 stationLine.getId(),
                 stationLine.getName(),
@@ -83,30 +91,12 @@ public class StationLineService {
                 convertToStationResponses(stationLine.getSections()));
     }
 
-    private StationSection convertToStationSectionEntity(StationLine stationLine) {
+    private StationSection convertToSectionEntity(StationLine stationLine) {
         return new StationSection(
                 stationLine.getUpStationId(),
                 stationLine.getDownStationId(),
                 stationLine.getDistance(),
                 stationLine);
-    }
-
-    private List<StationResponse> convertToStationResponses(List<StationSection> stationSections) {
-        List<StationResponse> stationResponses = new ArrayList<>();
-
-        stationResponses.add(findStation(findFirstStation(stationSections)));
-        stationSections.forEach(stationSection -> stationResponses.add(findStation(stationSection.getDownStationId())));
-
-        return stationResponses;
-    }
-
-    private static Long findFirstStation(List<StationSection> stationSections) {
-        return stationSections.get(0).getUpStationId();
-    }
-
-    private StationResponse findStation(Long stationId) {
-        return convertToStationResponse(
-                stationRepository.findById(stationId).orElseThrow(IllegalArgumentException::new));
     }
 
     private StationResponse convertToStationResponse(Station station) {
@@ -116,7 +106,11 @@ public class StationLineService {
         );
     }
 
-    private Station findStationById(StationSection stationSection) {
-        return stationRepository.findById(stationSection.getUpStationId()).orElseThrow(EntityNotFoundException::new);
+    private List<StationResponse> convertToStationResponses(List<StationSection> stationSections) {
+        List<StationResponse> stationResponses = new ArrayList<>();
+        stationResponses.add(findStation(findFirstStation(stationSections)));
+        stationSections.forEach(stationSection -> stationResponses.add(findStation(stationSection.getDownStationId())));
+
+        return stationResponses;
     }
 }

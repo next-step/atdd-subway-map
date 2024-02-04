@@ -10,6 +10,7 @@ import java.util.List;
 public class StationLine {
 
     public static final int MIN_DELETE_REQUIRED_SECTIONS_SIZE = 1;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -45,11 +46,11 @@ public class StationLine {
         return this;
     }
 
-    public boolean canSave(StationSection toSaveSection) {
+    public boolean canSectionSave(StationSection toSaveSection) {
         if(toSaveSection.areStationsSame()) {
             return false;
         }
-        if(!toSaveSection.connectToLastUpStation(downStationId)) {
+        if(!toSaveSection.isConnectToLastUpStation(downStationId)) {
             return false;
         }
         return hasNoConnectingDownStation(toSaveSection);
@@ -60,11 +61,15 @@ public class StationLine {
                 .noneMatch(existSection -> existSection.isUpStationSameAsDownStation(toSaveSection));
     }
 
-    public boolean canDelete(Long stationIdToDelete) {
-        if(!this.downStationId.equals(stationIdToDelete)) {
+    public boolean canSectionDelete(Long stationId) {
+        if(!this.downStationId.equals(stationId)) {
             return false;
         }
         return sections.size() > MIN_DELETE_REQUIRED_SECTIONS_SIZE;
+    }
+
+    public void updateDownStation(Long downStationId) {
+        this.downStationId = downStationId;
     }
 
     public Long getId() {
@@ -93,10 +98,6 @@ public class StationLine {
 
     public List<StationSection> getSections() {
         return sections;
-    }
-
-    public void updateDownStation(Long downStationId) {
-        this.downStationId = downStationId;
     }
 
     public StationLine setStationSection(StationSection createdStationSection) {

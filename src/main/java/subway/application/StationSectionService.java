@@ -32,7 +32,7 @@ public class StationSectionService {
         if (!existStation(stationSection)) {
             throw new IllegalArgumentException("요청한 역은 존재하지 않습니다.");
         }
-        if (!stationLine.canSave(stationSection)) {
+        if (!stationLine.canSectionSave(stationSection)) {
             throw new IllegalArgumentException("요청한 구간을 저장할 수 없습니다.");
         }
         return convertToResponse(saveStationSection(stationSection.setStationLine(stationLine)));
@@ -42,7 +42,7 @@ public class StationSectionService {
     public void deleteStationSection(Long stationLineId, Long stationIdToDelete) {
         StationLine stationLine = findStationLineById(stationLineId);
 
-        if (!stationLine.canDelete(stationIdToDelete)) {
+        if (!stationLine.canSectionDelete(stationIdToDelete)) {
             throw new IllegalArgumentException("요청한 구간(혹은 역)을 삭제할 수 없습니다.");
         }
     }

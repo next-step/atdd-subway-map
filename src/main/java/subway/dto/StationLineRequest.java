@@ -2,9 +2,13 @@ package subway.dto;
 
 public class StationLineRequest {
     private final String name;
+
     private final String color;
+
     private final Long upStationId;
+
     private final Long downStationId;
+
     private final int distance;
 
     public StationLineRequest(String name, String color, Long upStationId, Long downStationId, int distance) {

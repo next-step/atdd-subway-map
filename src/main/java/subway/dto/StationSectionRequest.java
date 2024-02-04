@@ -10,6 +10,9 @@ public class StationSectionRequest {
 
     private Long stationLineId;
 
+    public StationSectionRequest() {
+    }
+
     public StationSectionRequest(Long upStationId, Long downStationId, int distance) {
         this.upStationId = upStationId;
         this.downStationId = downStationId;

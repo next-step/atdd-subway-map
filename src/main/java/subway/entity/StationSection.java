@@ -38,6 +38,29 @@ public class StationSection {
         this.stationLine = stationLine;
     }
 
+    public boolean isConnectToLastUpStation(Long downStationId) {
+        return this.upStationId.equals(downStationId);
+    }
+
+    public boolean areStationsSame() {
+        return upStationId.equals(downStationId);
+    }
+
+    public boolean isUpStationSameAsDownStation(StationSection toSaveSection) {
+        return upStationId.equals(toSaveSection.getDownStationId());
+    }
+
+    public void updateDownStationOfLine() {
+        this.stationLine.updateDownStation(this.downStationId);
+    }
+
+    public StationSection setStationLine(StationLine stationLine) {
+        this.stationLine = stationLine;
+        stationLine.getSections().add(this);
+
+        return this;
+    }
+
     private Long validateStationId(Long stationId, String fieldName) {
         if (stationId == null || stationId < MIN_STATION_ID_VALUE) {
             throw new IllegalArgumentException(fieldName + "은(는) 0보다 커야합니다.");
@@ -50,29 +73,6 @@ public class StationSection {
             throw new IllegalArgumentException("거리는 0보다 커야합니다.");
         }
         return distance;
-    }
-
-    public boolean connectToLastUpStation(Long downStationId) {
-        return this.upStationId.equals(downStationId);
-    }
-
-    public boolean areStationsSame() {
-        return upStationId.equals(downStationId);
-    }
-
-    public boolean isUpStationSameAsDownStation(StationSection toSaveSection) {
-        return upStationId.equals(toSaveSection.getDownStationId());
-    }
-
-    public StationSection setStationLine(StationLine stationLine) {
-        this.stationLine = stationLine;
-        stationLine.getSections().add(this);
-
-        return this;
-    }
-
-    public void updateDownStationOfLine() {
-        this.stationLine.updateDownStation(this.downStationId);
     }
 
     public Long getId() {
