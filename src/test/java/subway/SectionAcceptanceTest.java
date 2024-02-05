@@ -3,14 +3,23 @@ package subway;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.HashMap;
 import java.util.Map;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class SectionAcceptanceTest {
+
+    @Autowired
+    private HibernateUtil hibernateUtil;
+
+    @BeforeEach
+    void setUp() {
+        hibernateUtil.clear();
+    }
 
     /**
      * Given 지하철역 2개를 생성하고, 지하철 노선을 생성한다.
