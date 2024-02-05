@@ -5,9 +5,12 @@ import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
@@ -27,18 +30,25 @@ public class Line {
     private String name;
     @Column(length = 20, nullable = false)
     private String color;
-    @Embedded
-    private Stations stations;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "up_station_id")
+    private Station upStation;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "down_station_id")
+    private Station downStation;
 
     public Line() {
 
     }
 
-    public static Line of(LineRequest lineRequest, Stations stations) {
+    public static Line of(LineRequest lineRequest, Station upStation, Station downStation) {
         return Line.builder()
                    .name(lineRequest.getName())
                    .color(lineRequest.getColor())
-                   .stations(stations)
+                   .upStation(upStation)
+                   .downStation(downStation)
                    .build();
 
     }

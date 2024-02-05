@@ -13,7 +13,6 @@ import subway.domain.Line;
 import subway.domain.LineRequest;
 import subway.domain.LineResponse;
 import subway.domain.Station;
-import subway.domain.Stations;
 import subway.exception.NoLineException;
 import subway.exception.NoStationException;
 
@@ -27,9 +26,7 @@ public class LineService {
     public LineResponse saveLine(LineRequest lineRequest) {
         Station upStation = getStation(lineRequest.getUpStationId());
         Station downStation = getStation(lineRequest.getDownStationId());
-        Stations stations = Stations.of(upStation, downStation);
-        Line line = Line.of(lineRequest, stations);
-        stations.addLine(line);
+        Line line = Line.of(lineRequest, upStation, downStation);
         lineRepository.save(line);
         return createLineResponse(line);
     }

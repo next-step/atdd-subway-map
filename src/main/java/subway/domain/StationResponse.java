@@ -3,6 +3,7 @@ package subway.domain;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class StationResponse {
     private Long id;
@@ -28,11 +29,9 @@ public class StationResponse {
         );
     }
 
-    public static List<StationResponse> createStationsResponse(Stations stations) {
-        return stations.getStations()
-                       .stream()
-                       .map(StationResponse::createStationResponse)
-                       .collect(Collectors.toList());
-
+    public static List<StationResponse> createStationsResponse(Station upStation, Station downStation) {
+        return Stream.of(upStation, downStation)
+              .map(StationResponse::createStationResponse)
+              .collect(Collectors.toList());
     }
 }

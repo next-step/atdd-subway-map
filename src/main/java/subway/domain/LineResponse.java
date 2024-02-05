@@ -29,6 +29,6 @@ public class LineResponse {
         return new LineResponse(line.getId(),
                                 line.getName(),
                                 line.getColor(),
-                                StationResponse.createStationsResponse(line.getStations()));
+                                StationResponse.createStationsResponse(line.getUpStation(), line.getDownStation()));
     }
 }
