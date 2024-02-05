@@ -2,7 +2,6 @@ package subway.api.domain.service.impl;
 
 import static org.springframework.http.HttpStatus.*;
 
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
@@ -24,7 +23,8 @@ import subway.common.exception.StationNotFoundException;
  * @author : Rene Choi
  * @since : 2024/01/31
  */
-@Service
+@Deprecated
+// @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class SimpleSectionService implements SectionService {

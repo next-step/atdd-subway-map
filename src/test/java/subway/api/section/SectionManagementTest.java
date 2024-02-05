@@ -2,11 +2,16 @@ package subway.api.section;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static subway.fixture.LineFixtureCreator.*;
+import static subway.fixture.SectionFixtureCreator.*;
 import static subway.utils.resthelper.ExtractableResponseParser.*;
 import static subway.utils.resthelper.LineRequestExecutor.*;
 import static subway.utils.resthelper.SectionRequestExecutor.*;
 import static subway.utils.resthelper.StationRequestExecutor.*;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -14,8 +19,10 @@ import org.springframework.http.HttpStatus;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import subway.api.CommonAcceptanceTest;
+import subway.api.domain.dto.outport.StationInfo;
 import subway.api.interfaces.dto.request.LineCreateRequest;
 import subway.api.interfaces.dto.request.SectionCreateRequest;
+import subway.api.interfaces.dto.response.LineResponse;
 
 /**
  * @author : Rene Choi
@@ -62,6 +69,7 @@ public class SectionManagementTest extends CommonAcceptanceTest {
 	 * - Then 에러를 반환한다.
 	 */
 	@Test
+	@Disabled("요구 조건 변화에 따른 검증 로직 수정")
 	@DisplayName("구간 등록 - 예외 케이스 1 -> 새로운 구간은 상행역은 해당 노선에 등록되어 있는 하행 종점역이어야 한다는 조건을 불만족")
 	void createSection_Failure_1() {
 		// Given
@@ -92,6 +100,7 @@ public class SectionManagementTest extends CommonAcceptanceTest {
 	 * - Then 에러를 반환한다.
 	 */
 	@Test
+	@Disabled("요구 조건 변화에 따른 검증 로직 수정")
 	@DisplayName("구간 등록 - 예외 케이스 2 -> 이미 해당 노선에 등록되어있는 역은 새로운 구간의 하행역이 될 수 없다는 조건을 불만족")
 	void createSection_Failure_2() {
 		// Given
@@ -202,6 +211,204 @@ public class SectionManagementTest extends CommonAcceptanceTest {
 
 		// Then
 		assertEquals(HttpStatus.BAD_REQUEST.value(), deleteResponse.statusCode());
+	}
+
+	///////////// 등록 추가 요구 사항
+
+	/**
+	 * given - 노선에 A역과 C역이 등록되어 있을 때
+	 * when - A와 C 사이에 B역을 추가하는 요청
+	 * then - A-B, B-C 구간이 생성되며, 길이 조정 -> (상행) A역 - B역 - C역 (하행)
+	 */
+	@Test
+	@DisplayName("노선 가운데 역 추가 - 성공 케이스")
+	void addStationBetweenStations_Success() {
+		// given
+		ExtractableResponse<Response> stationCreateResponseA = executeCreateStationRequest("A역");
+		long stationAId = parseId(stationCreateResponseA); // 1
+		ExtractableResponse<Response> stationCreateResponseC = executeCreateStationRequest("C역");
+		long stationCId = parseId(stationCreateResponseC); // 2
+		LineCreateRequest lineCreateRequest = createLineCreateRequest("노선", stationAId, stationCId, 7L);  // A - C 노선
+		ExtractableResponse<Response> lineACCreateResponse = executeCreateLineRequest(lineCreateRequest);
+		long lineId = parseId(lineACCreateResponse);
+
+		ExtractableResponse<Response> newStationBCreateResponse = executeCreateStationRequest("B역");
+		long stationBId = parseId(newStationBCreateResponse); // 3
+
+		// when
+		SectionCreateRequest sectionCreateRequestAB = createSectionCreateRequestWithUpAndDownAndDistance(stationAId, stationBId, 4L);
+		ExtractableResponse<Response> sectionABCreateResponse = executeCreateSectionRequest(lineId, sectionCreateRequestAB);// A - B 신규 구간 생성
+
+		// then
+		// 1) HttpStatus code
+		assertEquals(HttpStatus.CREATED.value(), sectionABCreateResponse.statusCode());
+
+		// 2) 역 조회 검증
+		ExtractableResponse<Response> lineDetails = executeGetSpecificStationLineRequest(lineId);
+		LineResponse lineResponse = lineDetails.as(LineResponse.class);
+		List<String> stationNames = lineResponse.getStations().stream().map(StationInfo::getName).collect(Collectors.toList());
+		assertTrue(stationNames.contains("A역"));
+		assertTrue(stationNames.contains("B역"));
+		assertTrue(stationNames.contains("C역"));
+
+		// 3) 거리 재설정 검증
+
+		// assertEquals(4, line.calculateDistances("A역", "B역"));
+		// assertEquals(3, line.calculateDistances("B역", "C역"));
+		// assertEquals(7, line.calculateDistances("A역", "C역"));
+	}
+
+	/**
+	 * given - 노선에 Y역과 Z역이 등록되어 있을 때
+	 * when - 노선의 시작점에 X역 추가 요청
+	 * then -  X-Y, Y-Z 구간 생성 및 길이 조정
+	 */
+	@Test
+	@DisplayName("노선 처음에 역 추가 - 성공 케이스")
+	void addStationAtTheBeginning_Success() {
+		// given
+		ExtractableResponse<Response> stationCreateResponseY = executeCreateStationRequest("Y역");
+		long stationYId = parseId(stationCreateResponseY); // 1
+		ExtractableResponse<Response> stationCreateResponseZ = executeCreateStationRequest("Z역");
+		long stationZId = parseId(stationCreateResponseZ); // 2
+		LineCreateRequest lineCreateRequest = createLineCreateRequest("노선", stationYId, stationZId, 4L);  // Y - Z 노선
+		ExtractableResponse<Response> lineYZCreateResponse = executeCreateLineRequest(lineCreateRequest);
+		long lineId = parseId(lineYZCreateResponse);
+
+		ExtractableResponse<Response> newStationXCreateResponse = executeCreateStationRequest("X역");
+		long stationXId = parseId(newStationXCreateResponse); // 3
+
+		// when
+		SectionCreateRequest sectionCreateRequestXY = createSectionCreateRequestWithUpAndDownAndDistance(stationXId, stationYId, 3L);
+		ExtractableResponse<Response> sectionXYCreateResponse = executeCreateSectionRequest(lineId, sectionCreateRequestXY); // X - Y 신규 구간 생성
+
+		// then
+		// 1) HttpStatus code
+		assertEquals(HttpStatus.CREATED.value(), sectionXYCreateResponse.statusCode());
+
+		// 2) 역 조회 검증
+		ExtractableResponse<Response> lineDetails = executeGetSpecificStationLineRequest(lineId);
+		LineResponse lineResponse = lineDetails.as(LineResponse.class);
+		List<String> stationNames = lineResponse.getStations().stream().map(StationInfo::getName).collect(Collectors.toList());
+		assertTrue(stationNames.contains("X역"));
+		assertTrue(stationNames.contains("Y역"));
+		assertTrue(stationNames.contains("Z역"));
+
+		// 3) 거리 재설정 검증
+		// Line line = lineDetails.as(Line.class);
+		// assertEquals(4, line.calculateDistances("Y역", "Z역"));
+		// assertEquals(3, line.calculateDistances("X역", "Y역"));
+		// assertEquals(7, line.calculateDistances("X역", "Z역"));
+	}
+
+	/**
+	 * given - 지하철 노선에 A역과 C역이 등록되어 있을 때
+	 * when - 등록된 구간 외의 위치에 새 역 추가 시도
+	 * then -  에러 반환
+	 */
+	@Test
+	@DisplayName("노선 가운데 역 추가 - 예외 케이스")
+	void addStationBetweenStations_Failure() {
+
+	}
+
+	/**
+	 * given - 지하철 노선에 A역과 C역이 등록되어 있을 때
+	 * when -  이미 등록된 A역을 다시 추가 시도
+	 * then - 에러 반환
+	 */
+	@Test
+	@DisplayName("노선에 이미 등록된 역 추가 - 예외 케이스")
+	void addExistingStation_Failure() {
+	}
+
+	/**
+	 * given - 노선에 A역과 C역이 등록되어 있을 때
+	 * when - A와 C 사이에 이미 등록된 B역을 다시 추가하는 요청
+	 * then - 에러 반환
+	 */
+	@Test
+	@DisplayName("노선 가운데에 이미 등록된 역 추가 - 예외 케이스")
+	void addStationBetweenStationsWithExistingStation_Failure() {
+	}
+
+	/**
+	 * given - 노선에 A역, B역, C역이 순서대로 등록되어 있을 때
+	 * when - D역을 A와 B 사이에 추가하려고 할 때 새로운 길이가 기존 A-B 길이보다 큰 경우
+	 * then - 에러 반환
+	 */
+	@Test
+	@DisplayName("노선 가운데 역 추가 시 새로운 길이가 기존 길이보다 큰 경우 - 예외 케이스")
+	void addStationBetweenStationsWithInvalidDistance_Failure() {
+	}
+
+	/**
+	 * given - 노선의 시작점에 A역이 등록되어 있을 때
+	 * when - 이미 등록된 A역을 노선의 시작점에 다시 추가 시도
+	 * then - 에러 반환
+	 */
+	@Test
+	@DisplayName("노선의 시작점에 이미 등록된 역 추가 - 예외 케이스")
+	void addStationAtTheBeginningWithExistingStation_Failure() {
+	}
+
+	///////////// 삭제 추가 요구 사항
+
+	/**
+	 * 구간 제거 - 성공 케이스
+	 * - Given 지하철 노선이 존재하고, 해당 노선에 여러 역이 등록되어 있을 때
+	 * - When 노선의 중간에 위치한 역을 제거하려고 할 때
+	 * - Then 해당 역이 제거되고, 인접한 역들의 거리가 조정된다.
+	 * -> A - (3m) B - (4m) C -> B 삭제 -> A - (7m) C
+	 */
+	@Test
+	@DisplayName("노선의 중간 역 제거 - 성공 케이스")
+	void removeMiddleStation_Success() {
+	}
+
+	/**
+	 * 구간 제거 - 성공 케이스
+	 * - Given 지하철 노선이 존재하고, 해당 노선에 여러 역이 등록되어 있을 때
+	 * - When 노선의 상행 종점역을 제거하려고 할 때
+	 * - Then 상행 종점역이 제거되고, 다음 역이 상행 종점역이 된다.
+	 * -> (UpEnd) A - B - C -> A 삭제 -> (UpEnd) B - C
+	 */
+	@Test
+	@DisplayName("노선의 상행 종점역 제거 - 성공 케이스")
+	void removeUpEndStation_Success() {
+	}
+
+	/**
+	 * 구간 제거 - 예외 케이스
+	 * - Given 지하철 노선이 존재하고, 해당 노선에 역이 단 2개만 등록되어 있을 때
+	 * - When 노선의 중간에 위치한 역을 제거하려고 할 때 (사실상 중간 역이 없는 경우)
+	 * - Then 에러를 반환한다.
+	 */
+	@Test
+	@DisplayName("노선의 중간 역 제거 - 예외 케이스 (역이 2개만 있는 경우)")
+	void removeMiddleStation_Failure_WhenOnlyTwoStations() {
+	}
+
+	/**
+	 * given - 노선에 A역만 등록되어 있을 때
+	 * when - A역을 제거하는 요청
+	 * then - 에러 반환 (노선에 최소 한 개 이상의 역이 존재해야 함)
+	 */
+	@Test
+	@DisplayName("노선에서 유일한 역 제거 시도 - 예외 케이스")
+	void removeOnlyStation_Failure() {
+		// 구현 예정
+	}
+
+	/**
+	 * given - 노선에 등록된 역이 없을 때
+	 * when - 임의의 역을 제거하려는 요청
+	 * then - 에러 반환 (노선에 역이 없음)
+	 */
+	@Test
+	@DisplayName("노선에서 역 제거 시도 시 노선에 역이 없는 경우 - 예외 케이스")
+	void removeStationFromEmptyLine_Failure() {
+		// 구현 예정
 	}
 
 }

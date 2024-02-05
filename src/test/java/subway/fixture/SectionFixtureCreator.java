@@ -9,13 +9,16 @@ import subway.api.interfaces.dto.request.SectionCreateRequest;
 public class SectionFixtureCreator {
 
 	/**
-	 * currently not using
+	 * Station의 파라미터 순서에 유의하세요.
+	 * @param downStationId
+	 * @param upStationId
+	 * @param distance
+	 * @return
 	 */
-	// todo -> to be managed
-	public static SectionCreateRequest createSectionCreateRequest(Long downStationId, Long upStationId, Long distance) {
+	public static SectionCreateRequest createSectionCreateRequestWithUpAndDownAndDistance(Long upStationId, Long downStationId, Long distance) {
 		return SectionCreateRequest.builder()
-			.downStationId(downStationId)
 			.upStationId(upStationId)
+			.downStationId(downStationId)
 			.distance(distance)
 			.build();
 	}

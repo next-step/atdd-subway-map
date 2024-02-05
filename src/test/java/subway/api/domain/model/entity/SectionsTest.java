@@ -48,23 +48,24 @@ class SectionsTest {
 	}
 
 	@Test
-	@DisplayName("중간 구간 추가 - 성공 케이스")
+	@DisplayName("구간 추가 - 성공 케이스")
 	void addMiddleSection_Success() {
 		// given
-		Station upStation = new Station(1L, "강남역");
-		Station middleStation = new Station(3L, "선릉역");
-		Station downStation = new Station(2L, "역삼역");
-		Section firstSection = new Section(1L, upStation, downStation, 10L);
-		Section middleSectionToAdd = new Section(2L, upStation, middleStation, 5L);
+		Station station1 = new Station(1L, "강남역");
+		Station station2 = new Station(2L, "선릉역");
+		Station station3 = new Station(3L, "서초역");
+		Station station4 = new Station(4L, "잠실역");
+		Section firstSection = new Section(1L, station1,station2, 10L);
+		Section secondSection = new Section(2L, station3,station4, 5L);
 		Sections sections = new Sections();
 		sections.addSection(firstSection);
 
 		// when
-		sections.addSection(middleSectionToAdd);
+		sections.addSection(secondSection);
 
 		// then
 		assertThat(sections.getSections())
-			.containsExactlyInAnyOrder(firstSection, middleSectionToAdd);
+			.containsExactlyInAnyOrder(firstSection, secondSection);
 	}
 
 	@Test
