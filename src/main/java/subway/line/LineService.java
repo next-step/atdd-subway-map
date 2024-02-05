@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.station.StationResponse;
 import subway.station.StationService;
-import subway.station.StationsResponse;
 
 @Service
 @Transactional(readOnly = true)
@@ -32,11 +31,15 @@ public class LineService {
             .collect(Collectors.toList());
     }
 
-    public LineResponse findLineById(Long id) {
-        Line line = lineRepository.findById(id)
-                                  .orElseThrow(() -> new IllegalArgumentException("line을 찾을 수 없습니다."));
+    public LineResponse findLineResponseById(Long id) {
 
-        return createLineResponse(line);
+        return createLineResponse(findLineById(id));
+
+    }
+
+    public Line findLineById(Long id) {
+        return lineRepository.findById(id)
+                                  .orElseThrow(() -> new IllegalArgumentException("line을 찾을 수 없습니다."));
 
     }
 
@@ -57,7 +60,7 @@ public class LineService {
         List<StationResponse> stationResponses = stationService.findAllStationById(
             line.getFirstAndLastStationId());
 
-        return new LineResponse(line.getId(), line.getName(), line.getColor(), new StationsResponse(stationResponses));
+        return new LineResponse(line.getId(), line.getName(), line.getColor(), stationResponses);
     }
 
 }

@@ -5,6 +5,7 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static subway.acceptance.AcceptanceTestBase.assertStatusCode;
+import static subway.acceptance.ResponseParser.getIdFromResponse;
 import static subway.acceptance.ResponseParser.getStringIdFromResponse;
 import static subway.line.LineAcceptanceTestHelper.*;
 import static subway.section.SectionAcceptanceTestHelper.*;
@@ -26,13 +27,15 @@ public class SectionAcceptanceTest {
     final String 하행역 = "역삼역";
     private String 하행ID;
     final String 신규역 = "선릉역";
+    private Long 노선ID;
 
     @BeforeEach
     void setup() {
         상행ID = getStringIdFromResponse(지하철역_생성_요청(지하철_파라미터_생성(상행역)));
         하행ID = getStringIdFromResponse(지하철역_생성_요청(지하철_파라미터_생성(하행역)));
 
-        노선_생성_요청(노선_파라미터_생성("2호선", "1", "2"));
+        노선ID = getIdFromResponse(노선_생성_요청(노선_파라미터_생성("2호선", "1", "2")));
+
     }
 
     /**
@@ -51,7 +54,7 @@ public class SectionAcceptanceTest {
 
         //then
         assertStatusCode(response, CREATED);
-        assertThat(노선_하행ID조회(response)).isEqualTo(신규하행ID);
+        assertThat(노선_하행ID조회(노선ID)).isEqualTo(신규하행ID);
     }
 
     /**
@@ -70,7 +73,7 @@ public class SectionAcceptanceTest {
 
         //then
         assertStatusCode(response, BAD_REQUEST);
-        assertThat(노선_하행ID조회(response)).isEqualTo(하행ID);
+        assertThat(노선_하행ID조회(노선ID)).isEqualTo(하행ID);
     }
 
     /**
@@ -86,7 +89,7 @@ public class SectionAcceptanceTest {
 
         //then
         assertStatusCode(response, BAD_REQUEST);
-        assertThat(노선_하행ID조회(response)).isEqualTo(하행ID);
+        assertThat(노선_하행ID조회(노선ID)).isEqualTo(하행ID);
     }
 
     /**
@@ -108,7 +111,7 @@ public class SectionAcceptanceTest {
 
         //then
         assertStatusCode(removeResponse, NO_CONTENT);
-        assertThat(노선_하행ID조회(response)).isEqualTo(하행ID);
+        assertThat(노선_하행ID조회(노선ID)).isEqualTo(하행ID);
     }
 
     /**
@@ -129,7 +132,7 @@ public class SectionAcceptanceTest {
 
         //then
         assertStatusCode(removeResponse, BAD_REQUEST);
-        assertThat(노선_하행ID조회(response)).isEqualTo(신규하행ID);
+        assertThat(노선_하행ID조회(노선ID)).isEqualTo(신규하행ID);
     }
 
     /**
@@ -148,6 +151,6 @@ public class SectionAcceptanceTest {
 
         //then
         assertStatusCode(response, BAD_REQUEST);
-        assertThat(노선_하행ID조회(response)).isEqualTo(하행ID);
+        assertThat(노선_하행ID조회(노선ID)).isEqualTo(하행ID);
     }
 }

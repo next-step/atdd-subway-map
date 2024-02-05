@@ -44,6 +44,13 @@ public class LineAcceptanceTestHelper {
                           .then().log().all()
                           .extract();
     }
+    public static ExtractableResponse<Response> 노선_단건조회_요청(String lineId) {
+        return RestAssured.given().log().all()
+                          .contentType(MediaType.APPLICATION_JSON_VALUE)
+                          .when().get("/lines/" + lineId)
+                          .then().log().all()
+                          .extract();
+    }
 
     public static ExtractableResponse<Response> 노선_수정_요청(HashMap<String, String> updateParam,
         Long id) {

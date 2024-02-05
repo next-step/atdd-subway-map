@@ -43,7 +43,8 @@ public class SectionAcceptanceTestHelper {
                           .extract();
     }
 
-    public static String 노선_하행ID조회(ExtractableResponse<Response> response) {
-        return 노선_단건조회_요청(response).jsonPath().getString("stations[1].id");
+    public static String 노선_하행ID조회(Long lineId) {
+        return 노선_단건조회_요청(lineId.toString()).jsonPath().getString("stations[1].id");
+
     }
 }

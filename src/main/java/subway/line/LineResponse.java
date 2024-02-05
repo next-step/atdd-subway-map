@@ -1,14 +1,16 @@
 package subway.line;
 
-import subway.station.StationsResponse;
+import java.util.ArrayList;
+import java.util.List;
+import subway.station.StationResponse;
 
 public class LineResponse {
     private Long id;
     private String name;
     private String color;
-    private StationsResponse stations;
+    private List<StationResponse> stations = new ArrayList<>();
 
-    public LineResponse(Long id, String name, String color, StationsResponse stations) {
+    public LineResponse(Long id, String name, String color, List<StationResponse> stations) {
         this.id = id;
         this.name = name;
         this.color = color;
@@ -23,11 +25,11 @@ public class LineResponse {
         return color;
     }
 
-    public StationsResponse getStations() {
-        return stations;
-    }
-
     public String getName() {
         return name;
+    }
+
+    public List<StationResponse> getStations() {
+        return stations;
     }
 }
