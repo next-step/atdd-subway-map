@@ -9,7 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
-import subway.line.dto.response.LineResponse;
+import subway.domain.line.dto.response.LineResponse;
 
 import java.util.HashMap;
 import java.util.Map;
