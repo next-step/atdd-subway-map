@@ -1,7 +1,7 @@
-package subway.line.repository;
+package subway.domain.line.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import subway.line.domain.Line;
+import subway.domain.line.domain.Line;
 
 public interface LineRepository extends JpaRepository<Line, Long> {
     default Line getLineById(Long id) {

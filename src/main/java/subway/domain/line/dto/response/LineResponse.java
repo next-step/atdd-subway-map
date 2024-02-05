@@ -1,8 +1,8 @@
-package subway.line.dto.response;
+package subway.domain.line.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;
-import subway.line.domain.Line;
+import subway.domain.line.domain.Line;
 
 @Getter
 public class LineResponse {

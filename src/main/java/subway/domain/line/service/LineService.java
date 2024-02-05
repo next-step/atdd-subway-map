@@ -1,13 +1,13 @@
-package subway.line.service;
+package subway.domain.line.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import subway.line.domain.Line;
-import subway.line.dto.request.CreateLineRequest;
-import subway.line.dto.request.UpdateLineRequest;
-import subway.line.dto.response.LineResponse;
-import subway.line.repository.LineRepository;
+import subway.domain.line.domain.Line;
+import subway.domain.line.dto.request.CreateLineRequest;
+import subway.domain.line.dto.request.UpdateLineRequest;
+import subway.domain.line.dto.response.LineResponse;
+import subway.domain.line.repository.LineRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;

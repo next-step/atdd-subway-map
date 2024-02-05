@@ -1,4 +1,4 @@
-package subway.station.domain;
+package subway.domain.station.domain;
 
 import lombok.AccessLevel;
 import lombok.Getter;

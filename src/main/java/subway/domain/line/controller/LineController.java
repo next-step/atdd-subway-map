@@ -1,24 +1,27 @@
-package subway.line.controller;
+package subway.domain.line.controller;
 
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import subway.line.dto.request.CreateLineRequest;
-import subway.line.dto.request.UpdateLineRequest;
-import subway.line.dto.response.LineResponse;
-import subway.line.service.LineService;
+import subway.domain.line.dto.request.CreateLineRequest;
+import subway.domain.line.dto.request.CreateSectionRequest;
+import subway.domain.line.dto.request.UpdateLineRequest;
+import subway.domain.line.dto.response.LineResponse;
+import subway.domain.line.dto.response.SectionResponse;
+import subway.domain.line.service.SectionService;
+import subway.domain.line.service.LineService;
 
 import java.net.URI;
 import java.util.List;
 
 @RequiredArgsConstructor
-@Controller
+@RestController
 @RequestMapping("/lines")
 public class LineController {
 
     private final LineService lineService;
+    private final SectionService sectionService;
 
     @PostMapping
     public ResponseEntity<LineResponse> createLine(@RequestBody CreateLineRequest request) {
@@ -47,5 +50,11 @@ public class LineController {
     public ResponseEntity<Void> deleteLineById(@PathVariable Long lineId) {
         lineService.deleteLineById(lineId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{lineId}/sections")
+    public ResponseEntity<SectionResponse> createSection(@PathVariable Long lineId, @RequestBody CreateSectionRequest request) {
+        SectionResponse section = sectionService.createSection(lineId, request);
+        return ResponseEntity.created(URI.create("/lines/" + lineId)).body(section);
     }
 }

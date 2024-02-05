@@ -1,9 +1,10 @@
-package subway.line.domain;
+package subway.domain.line.domain;
 
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import subway.domain.station.domain.Station;
 
 import javax.persistence.*;
 import java.util.List;
@@ -47,6 +48,31 @@ public class Line {
         if (color != null) {
             this.color = color;
         }
+    }
 
+    public boolean isStationDirectionEqual(Long stationId) {
+        if(sections == null || sections.isEmpty()){
+            return true;
+        }
+
+        Section lastSection = sections.get(sections.size() - 1);
+        return lastSection.getDownStation().getId().equals(stationId);
+    }
+
+    public boolean containsSectionByStation(Long stationId) {
+        if(sections == null || sections.isEmpty()){
+            return true;
+        }
+
+        for (Section section : sections) {
+            Station upStation = section.getUpStation();
+            Station downStation = section.getUpStation();
+
+            if (upStation.getId().equals(stationId) || downStation.getId().equals(stationId)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
