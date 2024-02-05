@@ -1,9 +1,9 @@
 package subway.domain;
 
-import java.util.Objects;
 import lombok.Getter;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Getter
@@ -35,7 +35,7 @@ public class Station {
     }
 
     public boolean isStationInLine(Long lineId) {
-        return this.lineId.equals(lineId);
+        return this.lineId != null && this.lineId.equals(lineId);
     }
 
     public boolean equalsId(Long id) {
@@ -52,15 +52,11 @@ public class Station {
         }
         Station station = (Station) o;
         return Objects.equals(id, station.id) && Objects.equals(lineId,
-            station.lineId);
+                station.lineId);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(id, lineId);
-    }
-
-    public boolean isStationRegisteredToLine() {
-        return lineId != null;
     }
 }
