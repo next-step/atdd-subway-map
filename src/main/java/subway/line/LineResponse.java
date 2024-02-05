@@ -10,10 +10,10 @@ public class LineResponse {
     private String name;
     private List<StationResponse> stations;
 
-    public LineResponse(Long id, String name, List<StationResponse> stations) {
-        this.id = id;
-        this.name = name;
-        this.stations = stations;
+    public LineResponse(Line line) {
+        this.id = line.getId();
+        this.name = line.getName();
+        this.stations = List.of(new StationResponse(line.getDownStation()), new StationResponse(line.getDownStation()));
     }
 
     public Long getId() {

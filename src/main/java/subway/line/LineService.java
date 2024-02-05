@@ -29,26 +29,26 @@ public class LineService {
                 .orElseThrow(EntityNotFoundException::new);
 
         Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor(), upStation, downStation));
-        return line.createLineResponse();
+        return new LineResponse(line);
     }
 
     public List<LineResponse> findAllLines() {
         return lineRepository.findAll().stream()
-                .map(Line::createLineResponse)
+                .map(LineResponse::new)
                 .collect(Collectors.toList());
     }
 
     public LineResponse findLineById(Long id) {
-        return lineRepository.findById(id)
-                .orElseThrow(EntityNotFoundException::new)
-                .createLineResponse();
+        Line line = lineRepository.findById(id)
+                .orElseThrow(EntityNotFoundException::new);
+        return new LineResponse(line);
     }
 
     @Transactional
     public void updateLineById(Long id, LineUpdateRequest lineUpdateRequest) {
         lineRepository.findById(id)
                 .orElseThrow(EntityNotFoundException::new)
-                .update(lineUpdateRequest);
+                .update(lineUpdateRequest.getName(), lineUpdateRequest.getColor());
     }
 
     @Transactional

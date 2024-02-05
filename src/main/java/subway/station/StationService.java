@@ -18,12 +18,12 @@ public class StationService {
     @Transactional
     public StationResponse saveStation(StationRequest stationRequest) {
         Station station = stationRepository.save(new Station(stationRequest.getName()));
-        return station.createStationResponse();
+        return new StationResponse(station);
     }
 
     public List<StationResponse> findAllStations() {
         return stationRepository.findAll().stream()
-                .map(Station::createStationResponse)
+                .map(StationResponse::new)
                 .collect(Collectors.toList());
     }
 

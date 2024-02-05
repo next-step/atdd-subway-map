@@ -25,7 +25,4 @@ public class Station {
         return name;
     }
 
-    public StationResponse createStationResponse() {
-        return new StationResponse(id, name);
-    }
 }
