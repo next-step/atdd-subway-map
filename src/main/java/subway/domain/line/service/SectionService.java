@@ -3,6 +3,7 @@ package subway.domain.line.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.domain.line.LineCommand;
+import subway.domain.line.LineInfo;
 import subway.domain.line.entity.Line;
 import subway.domain.line.entity.Section;
 import subway.infrastructure.line.dao.LineReader;
@@ -25,18 +26,19 @@ public class SectionService {
         this.lineStore = lineStore;
         this.lineReader = lineReader;
     }
+
     @Transactional
-    public LineResponse saveSection(LineCommand.SectionAddCommand command) {
+    public LineInfo.Main saveSection(LineCommand.SectionAddCommand command) {
         Section section = lineStore.createSection(command);
         Line line = lineReader.readBy(command.getLineId());
         line.add(section);
-        return LineResponse.from(line);
+        return LineInfo.Main.from(line);
     }
 
     @Transactional
-    public LineResponse removeSection(LineCommand.SectionDeleteCommand command) {
+    public LineInfo.Main removeSection(LineCommand.SectionDeleteCommand command) {
         Line line = lineReader.readBy(command.getLineId());
         line.remove(command.getStationId());
-        return LineResponse.from(line);
+        return LineInfo.Main.from(line);
     }
 }

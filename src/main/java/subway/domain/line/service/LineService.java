@@ -2,6 +2,7 @@ package subway.domain.line.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.domain.line.LineInfo;
 import subway.domain.line.entity.Line;
 import subway.domain.line.entity.Section;
 import subway.infrastructure.line.dao.LineReader;
@@ -28,21 +29,21 @@ public class LineService {
     }
 
     @Transactional
-    public LineResponse saveLine(LineRequest.Line request) {
+    public LineInfo.Main saveLine(LineRequest.Line request) {
         Section section = lineStore.createSection(request);
         Line init = new Line(request.getName(), request.getColor(), section);
-        return LineResponse.from(lineStore.store(init));
+        return LineInfo.Main.from(lineStore.store(init));
     }
 
     @Transactional(readOnly = true)
-    public LineResponse retrieveBy(Long id) {
+    public LineInfo.Main retrieveBy(Long id) {
         Line line = lineReader.readBy(id);
-        return LineResponse.from(line);
+        return LineInfo.Main.from(line);
     }
 
     @Transactional(readOnly = true)
-    public List<LineResponse> listAll() {
-        return lineReader.listAll().stream().map(LineResponse::from).collect(Collectors.toList());
+    public List<LineInfo.Main> listAll() {
+        return lineReader.listAll().stream().map(LineInfo.Main::from).collect(Collectors.toList());
     }
 
     @Transactional

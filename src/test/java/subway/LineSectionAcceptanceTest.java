@@ -68,8 +68,9 @@ public class LineSectionAcceptanceTest {
 
         //Then
         A역_B역_노선 = Line.Api.retrieveLineBy(A역_B역_노선.getId()).as(LineResponse.class);
-        assertThat(A역_B역_노선.getDownStation().getId()).isEqualTo(C역.getId());
-        assertThat(A역_B역_노선.getDownStation().getName()).isEqualTo(C역.getName());
+        StationResponse A역_B역_마지막역 = A역_B역_노선.getStations().get(A역_B역_노선.getStations().size()-1);
+        assertThat(A역_B역_마지막역.getId()).isEqualTo(C역.getId());
+        assertThat(A역_B역_마지막역.getName()).isEqualTo(C역.getName());
     }
 
     /**
@@ -128,8 +129,9 @@ public class LineSectionAcceptanceTest {
 
         //Then
         A역_B역_노선 = Line.Api.retrieveLineBy(A역_B역_노선.getId()).as(LineResponse.class);
-        assertThat(A역_B역_노선.getDownStation().getId()).isEqualTo(B역.getId());
-        assertThat(A역_B역_노선.getDownStation().getName()).isEqualTo(B역.getName());
+        StationResponse A역_B역_마지막역 = A역_B역_노선.getStations().get(A역_B역_노선.getStations().size()-1);
+        assertThat(A역_B역_마지막역.getId()).isEqualTo(B역.getId());
+        assertThat(A역_B역_마지막역.getName()).isEqualTo(B역.getName());
     }
 
     /**
