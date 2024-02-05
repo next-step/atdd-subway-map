@@ -25,14 +25,12 @@ public class Line {
     @Column(length = 20, nullable = false)
     private String color;
 
-    @Getter
-    @OneToMany(mappedBy = "line")
-    private List<Section> sections;
+    @Embedded
+    private Sections sections = new Sections();
 
     public Line(String name, String color, Section section) {
         this.name = name;
         this.color = color;
-        this.sections = new ArrayList<>();
         this.sections.add(section);
         section.setLine(this);
     }
@@ -95,8 +93,8 @@ public class Line {
             throw new InvalidParameterException(ErrorMessage.유일한구간);
         }
 
-        lastSection.setLine(null);
         this.sections.remove(lastSection);
+        lastSection.setLine(null);
     }
 
     public boolean contains(Station station) {

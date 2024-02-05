@@ -7,7 +7,6 @@ import subway.domain.line.entity.Line;
 import subway.domain.line.entity.Section;
 import subway.domain.station.entity.Station;
 import subway.infrastructure.line.LineRepository;
-import subway.infrastructure.line.SectionRepository;
 import subway.infrastructure.station.StationRepository;
 import subway.interfaces.line.dto.LineRequest;
 
@@ -19,7 +18,6 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class LineStore {
     private final LineRepository lineRepository;
-    private final SectionRepository sectionRepository;
     private final StationRepository stationRepository;
 
     public Section createSection(LineCommand.SectionAddCommand command) {
@@ -32,8 +30,7 @@ public class LineStore {
         List<Station> stations = stationRepository.findAllById(List.of(upStationId, downStationId));
         Station upStation = stations.stream().filter(station -> Objects.equals(station.getId(), upStationId)).findFirst().orElseThrow(() -> new EntityNotFoundException("station_id: " + upStationId));
         Station downStation = stations.stream().filter(station -> Objects.equals(station.getId(), downStationId)).findFirst().orElseThrow(() -> new EntityNotFoundException("station_id: " + downStationId));
-        Section init = Section.of(upStation, downStation, distance);
-        return sectionRepository.save(init);
+        return Section.of(upStation, downStation, distance);
     }
 
     public Line store(Line init) {
@@ -41,7 +38,6 @@ public class LineStore {
     }
 
     public void remove(Line line) {
-        sectionRepository.deleteAll(line.getSections());
         lineRepository.delete(line);
     }
 

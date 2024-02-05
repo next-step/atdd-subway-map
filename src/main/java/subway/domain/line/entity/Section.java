@@ -29,7 +29,6 @@ public class Section {
 
     @Setter
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "line_id")
     private Line line;
 
     public static Section of(Station upStation, Station downStation, Long distance) {
