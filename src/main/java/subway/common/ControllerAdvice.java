@@ -10,7 +10,13 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class ControllerAdvice {
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ErrorResponse> handlerIllegalArgumentException(final IllegalArgumentException e) {
+    public ResponseEntity<ErrorResponse> handlerIllegalArgumentException(IllegalArgumentException e) {
+        return ResponseEntity.status(BAD_REQUEST)
+                             .body(new ErrorResponse(BAD_REQUEST.name(), e.getMessage()));
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ErrorResponse> handlerIllegalStateException(IllegalStateException e) {
         return ResponseEntity.status(BAD_REQUEST)
                              .body(new ErrorResponse(BAD_REQUEST.name(), e.getMessage()));
     }

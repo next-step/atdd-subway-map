@@ -7,13 +7,17 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static subway.acceptance.AcceptanceTestBase.assertStatusCode;
 import static subway.acceptance.ResponseParser.getIdFromResponse;
 import static subway.acceptance.ResponseParser.getStringIdFromResponse;
-import static subway.line.LineAcceptanceTestHelper.*;
-import static subway.section.SectionAcceptanceTestHelper.*;
-import static subway.station.StationAcceptanceTestHelper.*;
+import static subway.line.LineAcceptanceTestHelper.노선_생성_요청;
+import static subway.line.LineAcceptanceTestHelper.노선_파라미터_생성;
+import static subway.section.SectionAcceptanceTestHelper.구간_등록_요청;
+import static subway.section.SectionAcceptanceTestHelper.구간_제거_요청;
+import static subway.section.SectionAcceptanceTestHelper.구간_파라미터_생성;
+import static subway.section.SectionAcceptanceTestHelper.노선_하행ID조회;
+import static subway.station.StationAcceptanceTestHelper.지하철_파라미터_생성;
+import static subway.station.StationAcceptanceTestHelper.지하철역_생성_요청;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.util.HashMap;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -102,12 +106,10 @@ public class SectionAcceptanceTest {
     void removeTerminalStation() {
         //given
         String 신규하행ID = getStringIdFromResponse(지하철역_생성_요청(지하철_파라미터_생성(신규역)));
-        ExtractableResponse<Response> response = 구간_등록_요청(구간_파라미터_생성(하행ID, 신규하행ID), 노선ID);
-
-        HashMap<String, String> params = 구간제거_파라미터_생성(신규하행ID);
+        구간_등록_요청(구간_파라미터_생성(하행ID, 신규하행ID), 노선ID);
 
         //when
-        ExtractableResponse<Response> removeResponse = 구간_제거_요청(params);
+        ExtractableResponse<Response> removeResponse = 구간_제거_요청(신규하행ID, 노선ID);
 
         //then
         assertStatusCode(removeResponse, NO_CONTENT);
@@ -123,11 +125,10 @@ public class SectionAcceptanceTest {
     @DisplayName("하행 종점역이 아닌 역 제거 시 에러")
     void removeNonTerminalStation() {
         String 신규하행ID = getStringIdFromResponse(지하철역_생성_요청(지하철_파라미터_생성(신규역)));
-        ExtractableResponse<Response> response = 구간_등록_요청(구간_파라미터_생성(하행ID, 신규하행ID), 노선ID);
-        HashMap<String, String> params = 구간제거_파라미터_생성(하행ID);
+        구간_등록_요청(구간_파라미터_생성(하행ID, 신규하행ID), 노선ID);
 
         //when
-        ExtractableResponse<Response> removeResponse = 구간_제거_요청(params);
+        ExtractableResponse<Response> removeResponse = 구간_제거_요청(하행ID, 노선ID);
 
         //then
         assertStatusCode(removeResponse, BAD_REQUEST);
@@ -142,11 +143,9 @@ public class SectionAcceptanceTest {
     @Test
     @DisplayName("구간이 1개인 경우 역 제거 시 에러")
     void removeStationWhenSingleSection() {
-        //given
-        HashMap<String, String> params = 구간제거_파라미터_생성(하행ID);
 
         //when
-        ExtractableResponse<Response> response = 구간_제거_요청(params);
+        ExtractableResponse<Response> response = 구간_제거_요청(하행ID, 노선ID);
 
         //then
         assertStatusCode(response, BAD_REQUEST);

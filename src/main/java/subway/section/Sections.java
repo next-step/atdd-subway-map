@@ -13,7 +13,6 @@ public class Sections {
     @OneToMany(mappedBy = "line", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Section> sectionList = new ArrayList<>();
 
-
     public void addSection(Section section) {
         validSection(section);
         sectionList.add(section);
@@ -43,7 +42,7 @@ public class Sections {
         if (sectionList.isEmpty()) {
             throw new IllegalArgumentException("section is Empty");
         }
-        return getDownStationId(sectionList.size() - 1);
+        return getDownStationId(getLastIndex());
     }
 
     private Long getUpStationId(int index) {
@@ -59,4 +58,24 @@ public class Sections {
             .anyMatch(section::isSame);
     }
 
+    public void removeLastSection(Long stationId) {
+        if(sectionList.isEmpty()) {
+            throw new IllegalArgumentException("section is Empty");
+        }
+
+        Section section = sectionList.get(getLastIndex());
+        if(!isRemovable(stationId)) {
+            throw new IllegalStateException("해당 역을 삭제할 수 없습니다.");
+        }
+
+        sectionList.remove(getLastIndex());
+    }
+
+    private int getLastIndex() {
+        return sectionList.size() - 1;
+    }
+
+    private boolean isRemovable(Long stationId) {
+        return sectionList.size() > 1 && getLastDownStationId().equals(stationId);
+    }
 }

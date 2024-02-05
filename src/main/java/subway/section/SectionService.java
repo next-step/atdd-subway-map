@@ -15,16 +15,17 @@ public class SectionService {
     }
 
     @Transactional
-    public SectionResponse saveSection(Long lineId, SectionRequest request) {
+    public void saveSection(Long lineId, SectionRequest request) {
         Section section = request.toEntity();
         Line line = lineService.findLineById(lineId);
 
         line.addSection(section);
-        return createSectionResponse(section);
     }
 
-    private static SectionResponse createSectionResponse(Section section) {
-        return new SectionResponse(section.getId());
+    @Transactional
+    public void removeSection(Long lineId, Long stationId) {
+        Line line = lineService.findLineById(lineId);
+        line.removeStation(stationId);
     }
 
 }

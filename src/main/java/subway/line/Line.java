@@ -62,4 +62,7 @@ public class Line {
         return List.of(getUpStationId(), getDownStationId());
     }
 
+    public void removeStation(Long stationId) {
+        sections.removeLastSection(stationId);
+    }
 }
