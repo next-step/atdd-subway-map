@@ -8,13 +8,15 @@ import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.application.line.section.SectionRequest;
+import subway.application.station.StationResponse;
+import subway.domain.DomainException.LineException;
+import subway.domain.DomainException.StationException;
 import subway.domain.Line;
 import subway.domain.LineRepository;
 import subway.domain.Section;
-import subway.application.line.section.SectionRequest;
 import subway.domain.Station;
 import subway.domain.StationRepository;
-import subway.application.station.StationResponse;
 
 @Service
 @RequiredArgsConstructor
@@ -27,9 +29,9 @@ public class LineService {
     @Transactional
     public LineResponse createLine(LineRequest request) {
         Station upStation = stationRepository.findById(request.getUpStationId())
-            .orElseThrow(() -> new IllegalArgumentException("지하철을 찾을 수 없습니다."));
+            .orElseThrow(LineException::NotFoundException);
         Station downStation = stationRepository.findById(request.getDownStationId())
-            .orElseThrow(() -> new IllegalArgumentException("지하철을 찾을 수 없습니다."));
+            .orElseThrow(LineException::NotFoundException);
         Line createdLine = new Line(request.getName(), request.getColor(), request.getDistance(),
             upStation, downStation);
         lineRepository.save(createdLine);
@@ -73,7 +75,7 @@ public class LineService {
     @Transactional(readOnly = true)
     public LineResponse getLine(Long id) {
         Line line = lineRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("노선을 찾을 수 없습니다."));
+            .orElseThrow(LineException::NotFoundException);
         List<StationResponse> stations = stationRepository.findAllById(line.getStationIds())
             .stream()
             .map(station -> new StationResponse(station.getId(), station.getName()))
@@ -101,7 +103,7 @@ public class LineService {
     @Transactional
     public void registSection(Long lineId, SectionRequest request) {
         Line line = lineRepository.findById(lineId)
-            .orElseThrow(() -> new RuntimeException("노선이 존재하지 않습니다."));
+            .orElseThrow(LineException::NotFoundException);
         Section section = new Section(line, request.getUpStationId(), request.getDownStationId(),
             request.getDistance());
         line.registSection(section);
@@ -110,9 +112,9 @@ public class LineService {
     @Transactional
     public void deleteSection(Long id, Long stationId) {
         Station station = stationRepository.findById(stationId)
-            .orElseThrow(() -> new IllegalArgumentException("지하철역을 찾을 수 없습니다"));
+            .orElseThrow(StationException::NotFoundException);
         Line line = lineRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("노선이 존재하지 않습니다"));
+            .orElseThrow(LineException::NotFoundException);
         line.deleteSection(station.getId());
     }
 }

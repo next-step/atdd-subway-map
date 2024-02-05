@@ -12,6 +12,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import lombok.Getter;
+import subway.domain.DomainException.LineException;
 
 @Entity
 @Getter
@@ -52,7 +53,7 @@ public class Line {
         // 하행 종점 구간 변수명
         getLatestSections().stream()
             .findFirst()
-            .orElseThrow(() -> new IllegalArgumentException("새로운 구간의 상행역은 기존 구간의 하행역과 일치해야 합니다."));
+            .orElseThrow(LineException::InvalidSectionException);
 
         sections.add(section);
     }
@@ -66,18 +67,18 @@ public class Line {
             .anyMatch(
                 section -> section.getDownStationId().equals(newSection.getDownStationId()) ||
                     section.getUpStationId().equals(newSection.getUpStationId()))) {
-            throw new IllegalArgumentException("이미 해당 노선에 등록되어있는 역은 새로운 구간의 하행역이 될 수 없습니다.");
+            throw LineException.AlreadyRegisteredStationException();
         }
     }
 
     public void deleteSection(Long stationId) {
         if (sections.size() == 1) {
-            throw new RuntimeException("지하철 구간을 삭제할 수 없습니다");
+            throw LineException.NotRemoveException();
         }
         getLatestSections()
             .ifPresent(section -> {
                 if (!section.getDownStationId().equals(stationId)) {
-                    throw new IllegalArgumentException("지하철 노선에 등록된 역(하행 종점역)만 제거할 수 있습니다.");
+                    throw LineException.NotRemoveException();
                 }
                 sections.remove(section);
             });
