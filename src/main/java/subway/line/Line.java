@@ -1,6 +1,7 @@
 package subway.line;
 
-import subway.station.Station;
+import subway.line.section.Section;
+import subway.line.section.Sections;
 
 import javax.persistence.*;
 
@@ -13,27 +14,15 @@ public class Line {
     private String name;
     @Column(nullable = false)
     private String color;
-    @ManyToOne
-    @JoinColumn(name = "upStationId")
-    private Station upStation;
-    @ManyToOne
-    @JoinColumn(name = "downStationId")
-    private Station downStation;
+    @Embedded
+    private Sections sections = new Sections();
 
     public Line() {
-
     }
 
-    public Line(String name, String color, Station upStation, Station downStation) {
-        this(null, name, color, upStation, downStation);
-    }
-
-    public Line(Long id, String name, String color, Station upStation, Station downStation) {
-        this.id = id;
+    public Line(String name, String color) {
         this.name = name;
         this.color = color;
-        this.upStation = upStation;
-        this.downStation = downStation;
     }
 
     public Long getId() {
@@ -48,12 +37,8 @@ public class Line {
         return color;
     }
 
-    public Station getUpStation() {
-        return upStation;
-    }
-
-    public Station getDownStation() {
-        return downStation;
+    public Sections getSections() {
+        return sections;
     }
 
     public void setName(String name) {
@@ -62,5 +47,24 @@ public class Line {
 
     public void setColor(String color) {
         this.color = color;
+    }
+
+    public void addSection(Section section) {
+        sections.addSection(section);
+
+    }
+
+    public void deleteSection(Long stationId) {
+        sections.deleteSection(stationId);
+    }
+
+    @Override
+    public String toString() {
+        return "Line{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", color='" + color + '\'' +
+                ", sections=" + sections +
+                '}';
     }
 }

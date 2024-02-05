@@ -1,6 +1,7 @@
 package subway.station;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 public class Station {
@@ -17,11 +18,23 @@ public class Station {
         this.name = name;
     }
 
+    public boolean match(Long stationId) {
+        return id.equals(stationId);
+    }
+
     public Long getId() {
         return id;
     }
 
     public String getName() {
         return name;
+    }
+
+    @Override
+    public String toString() {
+        return "Station{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
     }
 }
