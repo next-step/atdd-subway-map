@@ -104,7 +104,7 @@ public class LineService {
     }
 
     private void validateNoDuplicateDownStation(final SectionRequest request) {
-        final List<Section> SectionListByDownStationId = sectionRepository.findByDownStation_Id(request.getDownStationId());
+        final List<Section> SectionListByDownStationId = sectionRepository.findByDownStationId(request.getDownStationId());
         for (Section section : SectionListByDownStationId) {
             if(this.isAlreadyRegistered(request, section)) {
                 throw new IllegalArgumentException();
