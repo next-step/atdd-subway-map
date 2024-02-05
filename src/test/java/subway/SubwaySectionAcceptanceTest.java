@@ -49,8 +49,7 @@ public class SubwaySectionAcceptanceTest {
     }
 
     /**
-     * When 지하철 구간을 추가하면
-     * Then 지하철 노선 조회시 추가된 구간을 확인할 수 있다.
+     * When 지하철 구간을 추가하면 Then 지하철 노선 조회시 추가된 구간을 확인할 수 있다.
      */
     @Test
     void 지하철구간_추가() {
@@ -77,8 +76,7 @@ public class SubwaySectionAcceptanceTest {
     }
 
     /**
-     * When 지하철 구간이 하행선이 아닌 곳에서 추가하면
-     * Then 400 에러가 리턴된다.
+     * When 지하철 구간이 하행선이 아닌 곳에서 추가하면 Then 400 에러가 리턴된다.
      */
     @Test
     void 지하철구간_추가_하행선아닌_경우() {
@@ -96,8 +94,7 @@ public class SubwaySectionAcceptanceTest {
     }
 
     /**
-     * When 지하철 구간으로 기존에 추가된 역을 추가하면
-     * Then 400 에러가 리턴된다.
+     * When 지하철 구간으로 기존에 추가된 역을 추가하면 Then 400 에러가 리턴된다.
      */
     @Test
     void 지하철구간_추가_기존_역을_추가하는_경우() {
@@ -115,9 +112,7 @@ public class SubwaySectionAcceptanceTest {
     }
 
     /**
-     * Given 3개의 역이 포함된 지하철 역이 주어지고
-     * When 하행 종점역을 삭제하면
-     * Then 정상 삭제가 된다.
+     * Given 3개의 역이 포함된 지하철 역이 주어지고 When 하행 종점역을 삭제하면 Then 정상 삭제가 된다.
      */
     @Test
     void 지하철구간_종점_제거() {
@@ -125,35 +120,34 @@ public class SubwaySectionAcceptanceTest {
         SubwaySectionApiRequester.addSections(lineId, downStationId, extraStationId, 10L);
 
         // When
-        final ExtractableResponse<Response> response = SubwaySectionApiRequester.deleteSection(lineId, extraStationId);
+        final ExtractableResponse<Response> response = SubwaySectionApiRequester.deleteSection(
+            lineId, extraStationId);
 
         // Then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         // Then
-        final List<Long> stationIdList = SubwayLineApiRequester.getLinesList().jsonPath().getList("id", Long.class);
+        final List<Long> stationIdList = SubwayLineApiRequester.getLinesList().jsonPath()
+            .getList("id", Long.class);
 
         assertThat(stationIdList).doesNotContain(extraStationId);
     }
 
     /**
-     * Given 2개의 역이 포함된 지하철 역이 주어지고
-     * When 하행 종점역을 삭제하면
-     * Then 에러가 발생한다.
+     * Given 2개의 역이 포함된 지하철 역이 주어지고 When 하행 종점역을 삭제하면 Then 에러가 발생한다.
      */
     @Test
     void 지하철구간_종점제거_2개역_존재_경우() {
         // When
-        final ExtractableResponse<Response> response = SubwaySectionApiRequester.deleteSection(lineId, extraStationId);
+        final ExtractableResponse<Response> response = SubwaySectionApiRequester.deleteSection(
+            lineId, downStationId);
 
         // Then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     /**
-     * Given 3개의 역이 포함된 지하철 역이 주어지고
-     * When 하행 종점역이 아닌 역을 삭제하면
-     * Then 에러가 발생한다.
+     * Given 3개의 역이 포함된 지하철 역이 주어지고 When 하행 종점역이 아닌 역을 삭제하면 Then 에러가 발생한다.
      */
     @Test
     void 지하철구간_종점제거_하행종점역이_아닌_경우() {
@@ -161,7 +155,10 @@ public class SubwaySectionAcceptanceTest {
         SubwaySectionApiRequester.addSections(lineId, downStationId, extraStationId, 10L);
 
         // When
-        final ExtractableResponse<Response> response = SubwaySectionApiRequester.deleteSection(lineId, upStationId);
+        final ExtractableResponse<Response> response = SubwaySectionApiRequester.deleteSection(
+            lineId,
+            downStationId
+        );
 
         // Then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
