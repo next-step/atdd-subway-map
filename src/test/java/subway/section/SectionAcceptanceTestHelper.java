@@ -10,11 +10,11 @@ import org.springframework.http.MediaType;
 
 public class SectionAcceptanceTestHelper {
 
-    public static ExtractableResponse<Response> 구간_등록_요청(HashMap<String, String> params) {
+    public static ExtractableResponse<Response> 구간_등록_요청(HashMap<String, String> params, Long lineId) {
         return RestAssured.given().log().all()
                           .body(params)
                           .contentType(MediaType.APPLICATION_JSON_VALUE)
-                          .when().post("/lines/1/sections")
+                          .when().post("/lines/"+lineId+"/sections")
                           .then().log().all()
                           .extract();
     }

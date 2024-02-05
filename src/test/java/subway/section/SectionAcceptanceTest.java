@@ -34,7 +34,7 @@ public class SectionAcceptanceTest {
         상행ID = getStringIdFromResponse(지하철역_생성_요청(지하철_파라미터_생성(상행역)));
         하행ID = getStringIdFromResponse(지하철역_생성_요청(지하철_파라미터_생성(하행역)));
 
-        노선ID = getIdFromResponse(노선_생성_요청(노선_파라미터_생성("2호선", "1", "2")));
+        노선ID = getIdFromResponse(노선_생성_요청(노선_파라미터_생성("2호선", 상행ID, 하행ID)));
 
     }
 
@@ -50,7 +50,7 @@ public class SectionAcceptanceTest {
         String 신규하행ID = getStringIdFromResponse(지하철역_생성_요청(지하철_파라미터_생성(신규역)));
 
         //when
-        ExtractableResponse<Response> response = 구간_등록_요청(구간_파라미터_생성(하행ID, 신규하행ID));
+        ExtractableResponse<Response> response = 구간_등록_요청(구간_파라미터_생성(하행ID, 신규하행ID), 노선ID);
 
         //then
         assertStatusCode(response, CREATED);
@@ -69,7 +69,7 @@ public class SectionAcceptanceTest {
         String 신규하행ID = getStringIdFromResponse(지하철역_생성_요청(지하철_파라미터_생성(신규역)));
 
         //when
-        ExtractableResponse<Response> response = 구간_등록_요청(구간_파라미터_생성(상행ID, 신규하행ID));
+        ExtractableResponse<Response> response = 구간_등록_요청(구간_파라미터_생성(상행ID, 신규하행ID), 노선ID);
 
         //then
         assertStatusCode(response, BAD_REQUEST);
@@ -85,7 +85,7 @@ public class SectionAcceptanceTest {
     @DisplayName("하행역이 이미 등록된 역일 때 구간 등록 에러")
     void registerSectionWithExistingStation() {
         //when
-        ExtractableResponse<Response> response = 구간_등록_요청(구간_파라미터_생성(하행ID, 상행ID));
+        ExtractableResponse<Response> response = 구간_등록_요청(구간_파라미터_생성(하행ID, 상행ID), 노선ID);
 
         //then
         assertStatusCode(response, BAD_REQUEST);
@@ -102,7 +102,7 @@ public class SectionAcceptanceTest {
     void removeTerminalStation() {
         //given
         String 신규하행ID = getStringIdFromResponse(지하철역_생성_요청(지하철_파라미터_생성(신규역)));
-        ExtractableResponse<Response> response = 구간_등록_요청(구간_파라미터_생성(하행ID, 신규하행ID));
+        ExtractableResponse<Response> response = 구간_등록_요청(구간_파라미터_생성(하행ID, 신규하행ID), 노선ID);
 
         HashMap<String, String> params = 구간제거_파라미터_생성(신규하행ID);
 
@@ -123,8 +123,7 @@ public class SectionAcceptanceTest {
     @DisplayName("하행 종점역이 아닌 역 제거 시 에러")
     void removeNonTerminalStation() {
         String 신규하행ID = getStringIdFromResponse(지하철역_생성_요청(지하철_파라미터_생성(신규역)));
-        ExtractableResponse<Response> response = 구간_등록_요청(구간_파라미터_생성(하행ID, 신규하행ID));
-
+        ExtractableResponse<Response> response = 구간_등록_요청(구간_파라미터_생성(하행ID, 신규하행ID), 노선ID);
         HashMap<String, String> params = 구간제거_파라미터_생성(하행ID);
 
         //when

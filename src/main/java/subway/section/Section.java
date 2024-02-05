@@ -21,6 +21,10 @@ public class Section {
     private Long downStationId;
     private Long distance;
 
+    public boolean isSame(Section section) {
+        return downStationId.equals(section.getUpStationId()) || downStationId.equals(section.downStationId);
+    }
+
     public Section() {
     }
 
@@ -60,4 +64,5 @@ public class Section {
     public void setLine(Line line) {
         this.line = line;
     }
+
 }
