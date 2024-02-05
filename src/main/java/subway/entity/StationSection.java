@@ -46,8 +46,8 @@ public class StationSection {
         return upStationId.equals(downStationId);
     }
 
-    public boolean isUpStationSameAsDownStation(StationSection toSaveSection) {
-        return upStationId.equals(toSaveSection.getDownStationId());
+    public boolean isUpStationSame(Long stationId) {
+        return upStationId.equals(stationId);
     }
 
     public void updateDownStationOfLine() {
@@ -56,7 +56,7 @@ public class StationSection {
 
     public StationSection setStationLine(StationLine stationLine) {
         this.stationLine = stationLine;
-        stationLine.getSections().add(this);
+        stationLine.getSections().addSection(this);
 
         return this;
     }

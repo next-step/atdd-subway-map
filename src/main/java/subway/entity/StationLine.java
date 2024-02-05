@@ -1,15 +1,9 @@
 package subway.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 public class StationLine {
-
-    public static final int MIN_DELETE_REQUIRED_SECTIONS_SIZE = 1;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,8 +19,8 @@ public class StationLine {
 
     private int distance;
 
-    @OneToMany(mappedBy = "stationLine", cascade = CascadeType.REMOVE)
-    private List<StationSection> sections = new ArrayList<>();
+    @Embedded
+    private StationSections sections = new StationSections();
 
     protected StationLine() {
     }
@@ -56,15 +50,14 @@ public class StationLine {
     }
 
     private boolean hasNoConnectingDownStation(StationSection toSaveSection) {
-        return sections.stream()
-                .noneMatch(existSection -> existSection.isUpStationSameAsDownStation(toSaveSection));
+        return sections.areAllUpStationsDifferentFrom(toSaveSection);
     }
 
     public boolean canSectionDelete(Long stationId) {
         if(!this.downStationId.equals(stationId)) {
             return false;
         }
-        return sections.size() > MIN_DELETE_REQUIRED_SECTIONS_SIZE;
+        return sections.isDeletionAllowed();
     }
 
     public void updateDownStation(Long downStationId) {
@@ -95,12 +88,12 @@ public class StationLine {
         return distance;
     }
 
-    public List<StationSection> getSections() {
+    public StationSections getSections() {
         return sections;
     }
 
-    public StationLine setStationSection(StationSection createdStationSection) {
-        this.sections.add(createdStationSection);
+    public StationLine addSection(StationSection createdStationSection) {
+        sections.addSection(createdStationSection);
         return this;
     }
 }

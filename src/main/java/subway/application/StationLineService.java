@@ -33,7 +33,7 @@ public class StationLineService {
     public StationLineResponse createStationLine(StationLineRequest request) {
         StationLine stationLine = stationLineRepository.save(convertToStationLineEntity(request));
         StationSection createdStationSection = stationSectionRepository.save(convertToSectionEntity(stationLine));
-        return convertToLineResponse(stationLine.setStationSection(createdStationSection));
+        return convertToLineResponse(stationLine.addSection(createdStationSection));
     }
 
     public List<StationLineResponse> findAllStationLines() {
@@ -106,10 +106,12 @@ public class StationLineService {
         );
     }
 
-    private List<StationResponse> convertToStationResponses(List<StationSection> stationSections) {
+    private List<StationResponse> convertToStationResponses(StationSections stationSections) {
         List<StationResponse> stationResponses = new ArrayList<>();
-        stationResponses.add(findStation(findFirstStation(stationSections)));
-        stationSections.forEach(stationSection -> stationResponses.add(findStation(stationSection.getDownStationId())));
+        stationResponses.add(findStation(stationSections.findFirstUpStation()));
+        stationSections
+                .getSections()
+                .forEach(stationSection -> stationResponses.add(findStation(stationSection.getDownStationId())));
 
         return stationResponses;
     }
