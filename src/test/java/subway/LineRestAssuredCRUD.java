@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class LineRestAssuredCRUD {
 
-    public static ExtractableResponse<Response> createStation(String lineName, String lineColor, Long upStationId, Long downStationId, int distance) {
+    public static ExtractableResponse<Response> createLine(String lineName, String lineColor, Long upStationId, Long downStationId, int distance) {
 
         Map<String, Object> param = new HashMap<>();
         param.put("name", lineName);
@@ -29,7 +29,7 @@ public class LineRestAssuredCRUD {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> showStationList() {
+    public static ExtractableResponse<Response> showLineList() {
         return RestAssured
                 .given().log().all()
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -39,7 +39,7 @@ public class LineRestAssuredCRUD {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> showStation(Long id) {
+    public static ExtractableResponse<Response> showLine(Long id) {
         return RestAssured
                 .given().log().all()
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -50,7 +50,7 @@ public class LineRestAssuredCRUD {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> modifyStation(Long id, String name, String color) {
+    public static ExtractableResponse<Response> modifyLine(Long id, String name, String color) {
         Map<String, Object> editParam = new HashMap<>();
         editParam.put("name", name);
         editParam.put("color", color);
@@ -66,7 +66,7 @@ public class LineRestAssuredCRUD {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> deleteStation(Long id) {
+    public static ExtractableResponse<Response> deleteLine(Long id) {
         return RestAssured
                 .given().log().all()
                     .contentType(MediaType.APPLICATION_JSON_VALUE)

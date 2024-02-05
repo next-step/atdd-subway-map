@@ -40,11 +40,11 @@ public class LineAcceptanceTest extends CommonAcceptanceTest{
 
         //when
         String 신분당선 = "신분당선";
-        ExtractableResponse<Response> createResponse = LineRestAssuredCRUD.createStation(신분당선, "bg-red-600", 강남역Id, 양재역Id, 10);
+        ExtractableResponse<Response> createResponse = LineRestAssuredCRUD.createLine(신분당선, "bg-red-600", 강남역Id, 양재역Id, 10);
         assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> lineNames = extractResponseNames(LineRestAssuredCRUD.showStationList());
+        List<String> lineNames = extractResponseNames(LineRestAssuredCRUD.showLineList());
         assertThat(lineNames).contains(신분당선);
 
     }
@@ -65,11 +65,11 @@ public class LineAcceptanceTest extends CommonAcceptanceTest{
         //given
         Long 서현역Id = extractResponseId(StationRestAssuredCRUD.createStation(서현역));
 
-        LineRestAssuredCRUD.createStation(신분당선, "bg-red-600", 강남역Id, 양재역Id, 10);
-        LineRestAssuredCRUD.createStation(수인분당선, "bg-yellow-600", 강남역Id, 서현역Id, 10);
+        LineRestAssuredCRUD.createLine(신분당선, "bg-red-600", 강남역Id, 양재역Id, 10);
+        LineRestAssuredCRUD.createLine(수인분당선, "bg-yellow-600", 강남역Id, 서현역Id, 10);
 
         //when
-        List<String> names = extractResponseNames(LineRestAssuredCRUD.showStationList());
+        List<String> names = extractResponseNames(LineRestAssuredCRUD.showLineList());
 
         // then
         assertThat(names).containsAll(List.of(신분당선, 수인분당선));
@@ -86,12 +86,12 @@ public class LineAcceptanceTest extends CommonAcceptanceTest{
 
         //given
         String 신분당선 = "신분당선";
-        ExtractableResponse<Response> createResponse = LineRestAssuredCRUD.createStation(신분당선, "bg-red-600", 강남역Id, 양재역Id, 10);
+        ExtractableResponse<Response> createResponse = LineRestAssuredCRUD.createLine(신분당선, "bg-red-600", 강남역Id, 양재역Id, 10);
 
         Long createdId = extractResponseId(createResponse);
 
         //when
-        String name = LineRestAssuredCRUD.showStation(createdId).jsonPath().getString("name");
+        String name = LineRestAssuredCRUD.showLine(createdId).jsonPath().getString("name");
 
         // then
         assertThat(name).isEqualTo(신분당선);
@@ -108,18 +108,18 @@ public class LineAcceptanceTest extends CommonAcceptanceTest{
 
         //given
         String createStationName = "신분당선";
-        ExtractableResponse<Response> createResponse = LineRestAssuredCRUD.createStation(createStationName, "bg-red-600", 강남역Id, 양재역Id, 10);
+        ExtractableResponse<Response> createResponse = LineRestAssuredCRUD.createLine(createStationName, "bg-red-600", 강남역Id, 양재역Id, 10);
 
         Long createdId = extractResponseId(createResponse);
 
         //when
         String modifyStationName = "수인분당선";
-        ExtractableResponse<Response> modifyResponse = LineRestAssuredCRUD.modifyStation(createdId, modifyStationName, "bg-yellow-600");
+        ExtractableResponse<Response> modifyResponse = LineRestAssuredCRUD.modifyLine(createdId, modifyStationName, "bg-yellow-600");
 
         // then
         assertThat(modifyResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
-        String name = LineRestAssuredCRUD.showStation(createdId).jsonPath().getString("name");
+        String name = LineRestAssuredCRUD.showLine(createdId).jsonPath().getString("name");
         assertThat(name).isEqualTo(modifyStationName);
     }
 
@@ -134,17 +134,17 @@ public class LineAcceptanceTest extends CommonAcceptanceTest{
 
         //given
         String 신분당선 = "신분당선";
-        ExtractableResponse<Response> createResponse = LineRestAssuredCRUD.createStation("신분당선", "bg-red-600", 강남역Id, 양재역Id, 10);
+        ExtractableResponse<Response> createResponse = LineRestAssuredCRUD.createLine("신분당선", "bg-red-600", 강남역Id, 양재역Id, 10);
 
         Long createdId = extractResponseId(createResponse);
 
         //when
-        ExtractableResponse<Response> deleteResponse = LineRestAssuredCRUD.deleteStation(createdId);
+        ExtractableResponse<Response> deleteResponse = LineRestAssuredCRUD.deleteLine(createdId);
 
         // then
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
-        List<String> names = extractResponseNames(LineRestAssuredCRUD.showStationList());
+        List<String> names = extractResponseNames(LineRestAssuredCRUD.showLineList());
         assertThat(names).doesNotContain(신분당선);
     }
 }
