@@ -63,15 +63,8 @@ public class LineAcceptanceTest extends BaseAcceptanceTest{
     @Test
     void test_지하철_노선_목록_조회() {
         //given
-        given()
-            .body(getRequestParam_신분당선())
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().post("/lines").then().log().all();
-
-        given()
-            .body(getRequestParam_분당선())
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().post("/lines").then().log().all();
+        지하철_노선_생성(getRequestParam_신분당선());
+        지하철_노선_생성(getRequestParam_분당선());
 
         //when
         List<LineResponse> lineResponses = when().get("/lines").then().extract().jsonPath().getList(".", LineResponse.class);
@@ -86,10 +79,7 @@ public class LineAcceptanceTest extends BaseAcceptanceTest{
     @Test
     void test_지하철_생성_노선_조회() {
         //given
-        LineResponse linePostResponse = given()
-            .body(getRequestParam_신분당선())
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().post("/lines").then().log().all().extract().jsonPath().getObject(".", LineResponse.class);
+        LineResponse linePostResponse = 지하철_노선_생성(getRequestParam_신분당선());
 
         //when
         LineResponse lineResponse_신분당선 = when().get("/lines/" + linePostResponse.getId()).then().extract().jsonPath().getObject(".", LineResponse.class);
@@ -104,10 +94,7 @@ public class LineAcceptanceTest extends BaseAcceptanceTest{
     @Test
     void test_지하철_노선_수정() {
         //given
-        LineResponse linePostResponse = given()
-            .body(getRequestParam_신분당선())
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().post("/lines").then().log().all().extract().jsonPath().getObject(".", LineResponse.class);
+        LineResponse linePostResponse = 지하철_노선_생성(getRequestParam_신분당선());
         Map<String, String> putRequest = Map.of(
             "name", "다른분당선",
             "color", "Red"
@@ -131,10 +118,7 @@ public class LineAcceptanceTest extends BaseAcceptanceTest{
     @Test
     void test_지하철_노선_삭제() {
         //given
-        LineResponse linePostResponse = given()
-            .body(getRequestParam_신분당선())
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().post("/lines").then().log().all().extract().jsonPath().getObject(".", LineResponse.class);
+        LineResponse linePostResponse = 지하철_노선_생성(getRequestParam_신분당선());
 
         //when & then
         when()
@@ -174,6 +158,20 @@ public class LineAcceptanceTest extends BaseAcceptanceTest{
             "downStationId", downStationId.toString(),
             "distance", distance.toString()
         );
+    }
+
+    private LineResponse 지하철_노선_생성(Map<String, String> lineRequestParam) {
+        return given()
+            .body(lineRequestParam)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().post("/lines").then().log().all().extract().jsonPath().getObject(".", LineResponse.class);
+    }
+
+    private void 지하철_노선_수정(Map<String, String> lineRequestParam) {
+        given()
+            .body(lineRequestParam)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().put("/lines").then().log().all();
     }
 
 }
