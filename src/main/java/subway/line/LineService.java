@@ -4,19 +4,24 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.station.StationResponse;
+import subway.station.StationService;
+import subway.station.StationsResponse;
 
 @Service
 @Transactional(readOnly = true)
 public class LineService {
     private final LineRepository lineRepository;
+    private final StationService stationService;
 
-    public LineService(LineRepository lineRepository) {
+    public LineService(LineRepository lineRepository, StationService stationService) {
         this.lineRepository = lineRepository;
+        this.stationService = stationService;
     }
 
     @Transactional
     public LineResponse saveLine(LineRequest request) {
-        Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
+        Line line = lineRepository.save(request.toEntity());
         return createLineResponse(line);
     }
 
@@ -49,6 +54,10 @@ public class LineService {
     }
 
     private LineResponse createLineResponse(Line line) {
-        return new LineResponse(line.getId(), line.getName());
+        List<StationResponse> stationResponses = stationService.findAllStationById(
+            line.getFirstAndLastStationId());
+
+        return new LineResponse(line.getId(), line.getName(), line.getColor(), new StationsResponse(stationResponses));
     }
+
 }

@@ -1,49 +1,39 @@
 package subway.line;
 
+import subway.section.Section;
+
 public class LineRequest {
     private String name;
     private String color;
-    private Long upStationId;
-    private Long downStationId;
-    private Long distance;
+    private String upStationId;
+    private String downStationId;
+    private String distance;
+
+    public Line toEntity() {
+        Line line = new Line(name, color);
+        Section section = new Section(line,getUpStationId(), getDownStationId(), getDistance());
+        line.addSection(section);
+
+        return line;
+    }
 
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getColor() {
         return color;
     }
 
-    public void setColor(String color) {
-        this.color = color;
-    }
-
     public Long getUpStationId() {
-        return upStationId;
-    }
-
-    public void setUpStationId(Long upStationId) {
-        this.upStationId = upStationId;
+        return Long.valueOf(upStationId);
     }
 
     public Long getDownStationId() {
-        return downStationId;
-    }
-
-    public void setDownStationId(Long downStationId) {
-        this.downStationId = downStationId;
+        return Long.valueOf(downStationId);
     }
 
     public Long getDistance() {
-        return distance;
-    }
-
-    public void setDistance(Long distance) {
-        this.distance = distance;
+        return Long.valueOf(distance);
     }
 }

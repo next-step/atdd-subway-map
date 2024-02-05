@@ -8,8 +8,19 @@ import static subway.acceptance.AcceptanceTestBase.assertStatusCode;
 import static subway.acceptance.ResponseParser.getIdFromResponse;
 import static subway.acceptance.ResponseParser.getNameFromResponse;
 import static subway.acceptance.ResponseParser.getNamesFromResponse;
-import static subway.line.LineAcceptanceTestHelper.*;
+import static subway.line.LineAcceptanceTestHelper.노선_단건조회_요청;
+import static subway.line.LineAcceptanceTestHelper.노선_삭제_요청;
+import static subway.line.LineAcceptanceTestHelper.노선_생성_요청;
+import static subway.line.LineAcceptanceTestHelper.노선_수정_요청;
+import static subway.line.LineAcceptanceTestHelper.노선_파라미터_생성;
+import static subway.line.LineAcceptanceTestHelper.노선목록_조회_요청;
+import static subway.line.LineAcceptanceTestHelper.노선수정_파라미터_생성;
+import static subway.station.StationAcceptanceTestHelper.지하철_파라미터_생성;
+import static subway.station.StationAcceptanceTestHelper.지하철역_생성_요청;
+
 import java.util.HashMap;
+import org.aspectj.lang.annotation.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import subway.acceptance.AcceptanceTest;
@@ -17,6 +28,13 @@ import subway.acceptance.AcceptanceTest;
 @DisplayName("노선 관련 기능")
 @AcceptanceTest
 public class LineAcceptanceTest {
+    final String 상행역 = "강남";
+    final String 하행역 = "역삼역";
+    @BeforeEach
+    void setUp() {
+        지하철역_생성_요청(지하철_파라미터_생성(상행역));
+        지하철역_생성_요청(지하철_파라미터_생성(하행역));
+    }
 
     /**
      * When 지하철 노선을 생성하면
