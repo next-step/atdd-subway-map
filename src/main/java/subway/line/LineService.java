@@ -17,16 +17,10 @@ import subway.station.StationRepository;
 public class LineService {
 	private final StationRepository stationRepository;
 	private final LineRepository lineRepository;
-	private final SectionRepository sectionRepository;
 
-	public LineService(
-		StationRepository stationRepository,
-		LineRepository lineRepository,
-		SectionRepository sectionRepository
-	) {
+	public LineService(StationRepository stationRepository, LineRepository lineRepository) {
 		this.stationRepository = stationRepository;
 		this.lineRepository = lineRepository;
-		this.sectionRepository = sectionRepository;
 	}
 
 	private Line findLineById(Long id) {
@@ -74,12 +68,7 @@ public class LineService {
 	@Transactional
 	public void delete(Long id) {
 		Line line = findLineById(id);
-		List<Section> sections = sectionRepository.findAllByLineId(line.getId());
-		List<Station> stations = line.getSortedStations();
-
-		sectionRepository.deleteAll(sections);
 		lineRepository.delete(line);
-		stationRepository.deleteAll(stations);
 	}
 
 	@Transactional
