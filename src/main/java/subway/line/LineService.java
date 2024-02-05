@@ -24,9 +24,9 @@ public class LineService {
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
         Station upStation = stationRepository.findById(lineRequest.getUpStationId())
-                .orElseThrow(() -> new EntityNotFoundException());
+                .orElseThrow(EntityNotFoundException::new);
         Station downStation = stationRepository.findById(lineRequest.getDownStationId())
-                .orElseThrow(() -> new EntityNotFoundException());
+                .orElseThrow(EntityNotFoundException::new);
 
         Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor(), upStation, downStation));
         return line.createLineResponse();
@@ -40,14 +40,14 @@ public class LineService {
 
     public LineResponse findLineById(Long id) {
         return lineRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException())
+                .orElseThrow(EntityNotFoundException::new)
                 .createLineResponse();
     }
 
     @Transactional
     public void updateLineById(Long id, LineUpdateRequest lineUpdateRequest) {
         lineRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException())
+                .orElseThrow(EntityNotFoundException::new)
                 .update(lineUpdateRequest);
     }
 
