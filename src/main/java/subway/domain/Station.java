@@ -1,6 +1,5 @@
 package subway.domain;
 
-import java.util.Objects;
 import lombok.Getter;
 
 import javax.persistence.*;
