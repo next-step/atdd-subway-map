@@ -21,12 +21,12 @@ import subway.domain.LineResponse;
 import subway.domain.StationResponse;
 
 @DisplayName("지하철 노선 관련 기능")
-@SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest extends BaseAcceptanceTest{
 
 
     @BeforeEach
     void setUp() {
+        databaseCleanUp.execute();
         Map<String, String> param1 = Map.of("name", "역삼역");
         Map<String, String> param2 = Map.of("name", "선릉역");
         Map<String, String> param3 = Map.of("name", "왕십리역");

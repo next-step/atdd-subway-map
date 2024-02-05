@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,15 +20,19 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import subway.domain.StationResponse;
 
-@DirtiesContext
 @DisplayName("지하철역 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationAcceptanceTest extends BaseAcceptanceTest {
     /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다
      * Then 지하철역 목록 조회 시 생성한 역을 찾을 수 있다
      */
+
+    @BeforeEach
+    @Test
+    void setUp() {
+        databaseCleanUp.execute();
+    }
     @DisplayName("지하철역을 생성한다.")
     @Test
     void testCreateStation() {
