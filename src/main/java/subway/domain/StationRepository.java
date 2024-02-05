@@ -6,5 +6,4 @@ import subway.domain.Station;
 
 public interface StationRepository extends JpaRepository<Station, Long> {
 
-    List<Station> findAllByLineId(Long lineId);
 }

@@ -1,9 +1,10 @@
 package subway.application.line;
 
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,7 +12,6 @@ import subway.domain.Line;
 import subway.domain.LineRepository;
 import subway.domain.Section;
 import subway.application.line.section.SectionRequest;
-import subway.domain.SectionRegister;
 import subway.domain.Station;
 import subway.domain.StationRepository;
 import subway.application.station.StationResponse;
@@ -44,32 +44,41 @@ public class LineService {
         );
     }
 
-    private String newStationName(Long id) {
-        return "지하철역" + id;
-    }
-
     @Transactional(readOnly = true)
     public List<LineResponse> getLines() {
-        return lineRepository.findAll().stream().map(line -> new LineResponse(
-            line.getId(),
-            line.getName(),
-            line.getColor(),
-            stationRepository.findAllByLineId(line.getId()).stream()
-                .map(station -> new StationResponse(
-                    station.getId(),
-                    station.getName()
-                )).collect(Collectors.toList())
-        )).collect(Collectors.toList());
+        Map<Long, Station> stationMap = stationRepository.findAll().stream()
+            .collect(Collectors.toMap(Station::getId, station -> station));
+        return lineRepository.findAll().stream().map(line -> {
+            Set<Station> lineStations = getLineStations(stationMap, line);
+            return new LineResponse(
+                line.getId(),
+                line.getName(),
+                line.getColor(),
+                lineStations.stream()
+                    .distinct()
+                    .map(station -> new StationResponse(station.getId(), station.getName()))
+                    .collect(Collectors.toList())
+            );
+        }).collect(Collectors.toList());
+    }
+
+    private Set<Station> getLineStations(Map<Long, Station> stationMap, Line line) {
+        return line.getSections().stream().flatMap(section -> {
+            Station upStation = stationMap.get(section.getUpStationId());
+            Station downStation = stationMap.get(section.getDownStationId());
+            return Stream.of(upStation, downStation);
+        }).collect(Collectors.toSet());
     }
 
     @Transactional(readOnly = true)
     public LineResponse getLine(Long id) {
-        Line line = lineRepository.findById(id).orElseThrow(RuntimeException::new);
-        List<StationResponse> stations = stationRepository.findAllByLineId(id).stream()
-            .map(station -> new StationResponse(
-                station.getId(),
-                station.getName()
-            )).collect(Collectors.toList());
+        Line line = lineRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("노선을 찾을 수 없습니다."));
+        List<StationResponse> stations = stationRepository.findAllById(line.getStationIds())
+            .stream()
+            .map(station -> new StationResponse(station.getId(), station.getName()))
+            .collect(Collectors.toList());
+
         return new LineResponse(
             line.getId(),
             line.getName(),
@@ -95,10 +104,7 @@ public class LineService {
             .orElseThrow(() -> new RuntimeException("노선이 존재하지 않습니다."));
         Section section = new Section(line, request.getUpStationId(), request.getDownStationId(),
             request.getDistance());
-        Set<Station> stations = new HashSet<>(stationRepository.findAllByLineId(
-            lineId));
-        SectionRegister sectionRegister = new SectionRegister();
-        sectionRegister.registSectionInLine(stations, line, section);
+        line.registSection(section);
     }
 
     @Transactional
@@ -107,6 +113,6 @@ public class LineService {
             .orElseThrow(() -> new IllegalArgumentException("지하철역을 찾을 수 없습니다"));
         Line line = lineRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("노선이 존재하지 않습니다"));
-        line.deleteSection(station);
+        line.deleteSection(station.getId());
     }
 }
