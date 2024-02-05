@@ -1,5 +1,6 @@
 package subway;
 
+import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,12 +14,14 @@ import org.springframework.test.annotation.DirtiesContext;
 import subway.dto.StationLineRequest;
 import subway.dto.StationSectionRequest;
 
+import java.util.List;
+
 import static config.fixtures.subway.StationLineMockData.호남선_생성;
-import static config.fixtures.subway.StationMockData.*;
+import static config.fixtures.subway.StationMockData.역_10개;
 import static config.fixtures.subway.StationSectionMockData.지하철_구간;
-import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static subway.StationLineSteps.지하철_노선_생성_요청_검증_포함;
+import static subway.StationLineSteps.지하철_노선_조회_요청;
 import static subway.StationSectionSteps.*;
 import static subway.StationSteps.지하철_역_생성_요청;
 import static utils.HttpResponseUtils.getCreatedLocationId;
@@ -256,20 +259,22 @@ public class StationSectionAcceptanceTest {
 
         // then
         assertThat(성공하는_삭제요청_응답.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertThat(convertStationIds(지하철_노선_조회_요청(getCreatedLocationId(response))))
+                .isEqualTo(List.of(1L, 2L));
+
     }
 
     /**
-      * Given 지하철 노선이 생성되고
-      * When  지하철 구간을 제거할 때,
-      * When  기존 1개의 구간만 존재할 경우(역이 2개만 존재할 경우)
-      * Then  지하철 구간 삭제에 실패한다.
-      */
+     * Given 지하철 노선이 생성되고
+     * When  지하철 구간을 제거할 때,
+     * When  기존 1개의 구간만 존재할 경우(역이 2개만 존재할 경우)
+     * Then  지하철 구간 삭제에 실패한다.
+     */
     @Test
     void 한개의_구간만_존재할_경우_삭제_실패() {
         // given
         StationLineRequest 호남선 = 호남선_생성(1L, 2L);
-        ExtractableResponse<Response> response =
-                지하철_노선_생성_요청_검증_포함(호남선);
+        ExtractableResponse<Response> response = 지하철_노선_생성_요청_검증_포함(호남선);
 
         // then
         ExtractableResponse<Response> 성공하는_삭제요청_응답 =
@@ -277,14 +282,16 @@ public class StationSectionAcceptanceTest {
 
         // then
         assertThat(성공하는_삭제요청_응답.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(convertStationIds(지하철_노선_조회_요청(getCreatedLocationId(response))))
+                .isEqualTo(List.of(1L, 2L));
     }
 
     /**
-      * Given 지하철 노선이 생성되고
-      * When  지하철 구간을 제거할 때,
-      * When  하행 종점역을 제거하는 것이 아닌 경우
-      * Then  지하철 구간 삭제에 실패한다.
-      */
+     * Given 지하철 노선이 생성되고
+     * When  지하철 구간을 제거할 때,
+     * When  하행 종점역을 제거하는 것이 아닌 경우
+     * Then  지하철 구간 삭제에 실패한다.
+     */
     @Test
     void 하행_종점역을_제거하는_것이_아닌_경우_삭제_실패() {
         // given
@@ -299,6 +306,8 @@ public class StationSectionAcceptanceTest {
 
         // then
         assertThat(성공하는_삭제요청_응답.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(convertStationIds(지하철_노선_조회_요청(getCreatedLocationId(response))))
+                .isEqualTo(List.of(1L, 2L, 4L));
     }
 
     /**
@@ -322,5 +331,11 @@ public class StationSectionAcceptanceTest {
 
         // then
         assertThat(성공하는_삭제요청_응답.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(convertStationIds(지하철_노선_조회_요청(getCreatedLocationId(response))))
+                .isEqualTo(List.of(1L, 2L, 4L));
+    }
+
+    private List<Long> convertStationIds(JsonPath jsonPath) {
+        return jsonPath.getList("stations.id", Long.class);
     }
 }
