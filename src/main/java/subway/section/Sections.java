@@ -7,7 +7,7 @@ import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
 
 @Embeddable
-public class SectionList {
+public class Sections {
 
     @OneToMany(mappedBy = "line", cascade={CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private List<Section> sections = new ArrayList<>();
@@ -22,5 +22,9 @@ public class SectionList {
 
     public void deleteSection(Section section) {
         sections.remove(section);
+    }
+
+    public int size() {
+        return sections.size();
     }
 }

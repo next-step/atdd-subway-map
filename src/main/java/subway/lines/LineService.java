@@ -3,6 +3,7 @@ package subway.lines;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.persistence.EntityNotFoundException;
@@ -23,7 +24,8 @@ public class LineService {
     private final StationRepository stationRepository;
     private final SectionRepository sectionRepository;
 
-    public LineService(LineRepository lineRepository, StationRepository stationRepository, SectionRepository sectionRepository) {
+    public LineService(LineRepository lineRepository, StationRepository stationRepository,
+        SectionRepository sectionRepository) {
         this.lineRepository = lineRepository;
         this.stationRepository = stationRepository;
         this.sectionRepository = sectionRepository;
@@ -32,14 +34,6 @@ public class LineService {
     @Transactional
     public LineResponse saveLine(LineCreateRequest lineCreateRequest) {
         final Line line = lineRepository.save(lineCreateRequest.getLine());
-        line.addSection(
-            new Section(
-                line,
-                lineCreateRequest.getUpStationId(),
-                lineCreateRequest.getDownStationId(),
-                lineCreateRequest.getDistance()
-            )
-        );
 
         return createLineResponse(line);
     }
@@ -71,9 +65,11 @@ public class LineService {
     public LineResponse addSection(Long id, SectionAddRequest sectionAddRequest) {
         final Line line = lineRepository.findById(id).orElseThrow(EntityNotFoundException::new);
 
-        sectionAddRequest.validateSectionToAdd(line);
-
-        line.addSection(sectionAddRequest.getSection(line));
+        line.addSection(
+            sectionAddRequest.getUpStationId(),
+            sectionAddRequest.getDownStationId(),
+            sectionAddRequest.getDistance()
+        );
 
         return createLineResponse(line);
     }
@@ -81,9 +77,13 @@ public class LineService {
     @Transactional
     public void deleteSection(Long id, SectionDeleteRequest sectionDeleteRequest) {
         final Line line = lineRepository.findById(id).orElseThrow(EntityNotFoundException::new);
-        sectionDeleteRequest.validateToDelete(line);
+        final Section sectionToDelete = line.getSections().stream()
+            .filter(section ->
+                Objects.equals(section.getDownStationId(), sectionDeleteRequest.getStationId())
+            )
+            .findFirst()
+            .orElseThrow(EntityNotFoundException::new);
 
-        final Section sectionToDelete = sectionRepository.findByLineIdAndDownStationId(id, sectionDeleteRequest.getStationId()).orElseThrow(EntityNotFoundException::new);
         line.deleteSection(sectionToDelete);
     }
 
