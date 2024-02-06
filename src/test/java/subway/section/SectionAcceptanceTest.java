@@ -8,6 +8,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 import subway.line.LineRequest;
 import subway.line.LineResponse;
@@ -28,6 +29,7 @@ public class SectionAcceptanceTest {
     private static Long SUSEO_STATION_ID;
     private static Long LINE_SHINBUNDANG_ID;
     private static SectionRequest SECTION_TWO;
+    private static SectionRequest SECTION_ERROR;
 
     @BeforeEach
     void setFixture() {
@@ -41,6 +43,7 @@ public class SectionAcceptanceTest {
                 new LineRequest(0L, "신분당선", "bg-red-600", 10L, SINSA_STATION_ID, GWANGGYO_STATION_ID),
                 "/lines").as(LineResponse.class).getId();
         SECTION_TWO = new SectionRequest(GWANGGYO_STATION_ID, SUSEO_STATION_ID, 30L);
+        SECTION_ERROR = new SectionRequest(SINSA_STATION_ID, SUSEO_STATION_ID, 40L);
     }
 
     /**
@@ -65,6 +68,23 @@ public class SectionAcceptanceTest {
     }
 
     /**
+     * When 신규 구간의 상행역과 노선의 하행종점역이 같지 않으면
+     * Then IllegalArgumentException이 발생한다.
+     */
+    @DisplayName("신규 구간의 상행역과 노선의 하행종점역이 같아야 한다.")
+    @Test
+    void cant_add_section_when_upStation_in_new_section_is_not_equal_line_downStation() {
+        // then
+        RestAssured.given().log().all()
+                .body(SECTION_ERROR)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines/" + LINE_SHINBUNDANG_ID + "/sections")
+                .then().log().all()
+                .statusCode(HttpStatus.BAD_REQUEST.value());
+    }
+
+    /**
      * When 지하철 구간을 삭제하면
      * Then 지하철 노선 조회 시 삭제된 구간을 찾을 수 없다
      */
@@ -84,7 +104,7 @@ public class SectionAcceptanceTest {
 
     /**
      * When 하행 종점역이 아닌 구간을 제거하면
-     * Then EntityNotFoundException이 발생한다.
+     * Then IllegalArgumentException이 발생한다.
      */
     @DisplayName("하행 종점역이 아닌 지하철 구간을 제거할 수 없다.")
     @Test
@@ -104,7 +124,7 @@ public class SectionAcceptanceTest {
 
     /**
      * When 구간이 한개 이하일 떄 구간 삭제 요청을 하면
-     * Then EntityNotFoundException이 발생한다.
+     * Then IllegalArgumentException이 발생한다.
      */
     @DisplayName("지하철 구간이 한 개 이하일 때 구간을 삭제할 수 없다.")
     @Test

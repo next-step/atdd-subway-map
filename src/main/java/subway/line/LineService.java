@@ -66,6 +66,11 @@ public class LineService {
                 .orElseThrow(() -> new EntityNotFoundException("해당 역을 하행종점역으로 등록할 수 없습니다."));
         Line line = lineRepository.findById(lineId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 라인을 찾을 수 없습니다."));
+
+        if (!line.getSections().isLastSection(upStation)) {
+            throw new IllegalArgumentException("상행역이 하행종점역과 같지 않습니다.");
+        }
+
         Section section = sectionRepository.save(sectionRequest.toEntity(upStation, downStation, line));
         return section.getId();
     }
