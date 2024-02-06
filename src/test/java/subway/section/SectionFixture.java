@@ -9,6 +9,8 @@ import org.springframework.http.MediaType;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public interface SectionFixture {
     default Long createStationId(String name) {
         Map<String, String> params = new HashMap<>();
@@ -49,6 +51,11 @@ public interface SectionFixture {
                 .when().post("/lines")
                 .then().log().all()
                 .extract().jsonPath().getLong("id");
+    }
+
+    default void assertFail(ExtractableResponse<Response> response, String message) {
+        String failMessage = response.jsonPath().getString("message");
+        assertThat(failMessage).isEqualTo(message);
     }
 
 

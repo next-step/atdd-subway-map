@@ -171,9 +171,4 @@ class SectionAcceptanceTest implements SectionFixture {
                 .extract();
         return response;
     }
-
-    private void assertFail(ExtractableResponse<Response> response, String message) {
-        String failMessage = response.jsonPath().getString("message");
-        assertThat(failMessage).isEqualTo(message);
-    }
 }
