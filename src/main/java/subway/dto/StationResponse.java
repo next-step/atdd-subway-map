@@ -1,9 +1,11 @@
-package subway.domain;
+package subway.dto;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import subway.domain.Station;
+import subway.domain.Stations;
 
 public class StationResponse {
     private Long id;

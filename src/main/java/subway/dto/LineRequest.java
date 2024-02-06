@@ -1,4 +1,4 @@
-package subway.domain;
+package subway.dto;
 
 import org.springframework.beans.factory.annotation.Value;
 

@@ -8,10 +8,9 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import io.restassured.http.ContentType;
-import subway.domain.LineResponse;
+import subway.dto.LineResponse;
 
 public class SectionAcceptanceTest extends BaseAcceptanceTest {
 

@@ -18,7 +18,7 @@ import org.springframework.test.annotation.DirtiesContext;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import subway.domain.StationResponse;
+import subway.dto.StationResponse;
 
 @DisplayName("지하철역 관련 기능")
 public class StationAcceptanceTest extends BaseAcceptanceTest {

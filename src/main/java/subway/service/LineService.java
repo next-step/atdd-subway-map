@@ -1,6 +1,6 @@
-package subway;
+package subway.service;
 
-import static subway.domain.LineResponse.createLineResponse;
+import static subway.dto.LineResponse.createLineResponse;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -9,9 +9,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.AllArgsConstructor;
+import subway.repository.LineRepository;
+import subway.repository.StationRepository;
 import subway.domain.Line;
-import subway.domain.LineRequest;
-import subway.domain.LineResponse;
+import subway.dto.LineRequest;
+import subway.dto.LineResponse;
 import subway.domain.Station;
 import subway.exception.NoLineException;
 import subway.exception.NoStationException;
@@ -58,5 +60,10 @@ public class LineService {
     public void deleteLine(Long id) {
         Line line = lineRepository.findById(id).orElseThrow(() -> new NoLineException(id + "에 해당하는 지하철 노선이 존재하지 않습니다."));
         lineRepository.delete(line);
+    }
+
+    public void addSection(SectionRequest sectionRequest) {
+        Section section = Section.fromRequest(sectionRequest);
+
     }
 }

@@ -1,8 +1,9 @@
-package subway.domain;
+package subway.dto;
 
 import java.util.List;
 
 import lombok.Getter;
+import subway.domain.Line;
 
 @Getter
 public class LineResponse {
