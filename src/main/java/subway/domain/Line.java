@@ -1,0 +1,63 @@
+package subway.domain;
+
+import java.util.Objects;
+
+import javax.persistence.Column;
+import javax.persistence.Embedded;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+
+@Entity
+@Table(name = "line")
+@Builder
+@Getter
+@AllArgsConstructor
+public class Line {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @Column(length = 20, nullable = false)
+    private String name;
+    @Column(length = 20, nullable = false)
+    private String color;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "up_station_id")
+    private Station upStation;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "down_station_id")
+    private Station downStation;
+
+    public Line() {
+
+    }
+
+    public static Line of(LineRequest lineRequest, Station upStation, Station downStation) {
+        return Line.builder()
+                   .name(lineRequest.getName())
+                   .color(lineRequest.getColor())
+                   .upStation(upStation)
+                   .downStation(downStation)
+                   .build();
+
+    }
+
+    public void updateLine(String name, String color) {
+        if (Objects.isNull(name) || Objects.isNull(color)) {
+            throw new IllegalArgumentException("값이 존재하지 않습니다.");
+        }
+        this.name = name;
+        this.color = color;
+    }
+}
