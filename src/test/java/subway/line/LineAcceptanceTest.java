@@ -8,11 +8,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.jdbc.Sql;
+import subway.station.Station;
 import subway.station.StationResponse;
 import util.RestAssuredUtil;
 
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -24,21 +24,23 @@ public class LineAcceptanceTest {
     private static Long GWANGGYO_STATION_ID;
     private static Long DAEHWA_STATION_ID;
     private static Long OGEUM_STATION_ID;
-    private static Line LINE_SHINBUNDANG;
-    private static Line LINE_THREE;
+    private static LineRequest LINE_SHINBUNDANG;
+    private static LineRequest LINE_THREE;
 
     @BeforeEach
     void setFixture() {
-        SINSA_STATION_ID = RestAssuredUtil.post(Map.of("name", "신사역"), "stations")
+        SINSA_STATION_ID = RestAssuredUtil.post(new Station("신사역"), "stations")
                 .as(StationResponse.class).getId();
-        GWANGGYO_STATION_ID = RestAssuredUtil.post(Map.of("name", "광교역"), "stations")
+        GWANGGYO_STATION_ID = RestAssuredUtil.post(new Station("광교역"), "stations")
                 .as(StationResponse.class).getId();
-        DAEHWA_STATION_ID = RestAssuredUtil.post(Map.of("name", "대화역"), "stations")
+        DAEHWA_STATION_ID = RestAssuredUtil.post(new Station("대화역"), "stations")
                 .as(StationResponse.class).getId();
-        OGEUM_STATION_ID = RestAssuredUtil.post(Map.of("name", "오금역"), "stations")
+        OGEUM_STATION_ID = RestAssuredUtil.post(new Station("오금역"), "stations")
                 .as(StationResponse.class).getId();
-        LINE_SHINBUNDANG = new Line("신분당선", "bg-red-600", 10L, SINSA_STATION_ID, GWANGGYO_STATION_ID);
-        LINE_THREE = new Line("3호선", "bg-navy-600", 20L, DAEHWA_STATION_ID, OGEUM_STATION_ID);
+
+
+        LINE_SHINBUNDANG = new LineRequest(0L, "신분당선", "bg-red-600", 10L, SINSA_STATION_ID, GWANGGYO_STATION_ID);
+        LINE_THREE = new LineRequest(0L ,"3호선", "bg-navy-600", 20L, DAEHWA_STATION_ID, OGEUM_STATION_ID);
     }
 
     /**
