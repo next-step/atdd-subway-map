@@ -16,6 +16,10 @@ public class ExtractableResponseParser {
 		return createResponse.jsonPath().getLong("id");
 	}
 
+	public static List<Long> parseStationIds(ExtractableResponse<Response> response) {
+		return response.jsonPath().getList("stations.id", Long.class);
+	}
+
 	public static List<LineResponse> parseLines(ExtractableResponse<Response> response) {
 		return response.jsonPath().getList("", LineResponse.class);
 	}
