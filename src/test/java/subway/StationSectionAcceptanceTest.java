@@ -1,5 +1,6 @@
 package subway;
 
+import config.annotations.AcceptanceTest;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -27,8 +28,7 @@ import static subway.StationSteps.지하철_역_생성_요청;
 import static utils.HttpResponseUtils.getCreatedLocationId;
 
 @DisplayName("지하철 구간 관리")
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@AcceptanceTest
 public class StationSectionAcceptanceTest {
 
     @BeforeEach

@@ -1,5 +1,6 @@
 package subway;
 
+import config.annotations.AcceptanceTest;
 import config.fixtures.subway.StationLineMockData;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
@@ -7,11 +8,8 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
 import subway.dto.StationLineRequest;
 import subway.dto.StationLineResponse;
-import subway.entity.StationLine;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,8 +22,7 @@ import static subway.StationSteps.지하철_역_생성_요청;
 import static utils.HttpResponseUtils.getCreatedLocationId;
 
 @DisplayName("지하철 노선 관련 기능")
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@AcceptanceTest
 public class StationLineAcceptanceTest {
 
     public static final String ID_KEY = "id";
