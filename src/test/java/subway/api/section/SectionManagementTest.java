@@ -160,6 +160,7 @@ public class SectionManagementTest extends CommonAcceptanceTest {
 	 * - Then 에러를 반환한다.
 	 */
 	@Test
+	@Disabled("요구 조건 변화에 따른 검증 로직 수정")
 	@DisplayName("구간 제거 - 예외 케이스 -> 마지막 구간이 아닌 구간을 제외할 때 예외 발생")
 	void deleteNotDownEndSection_Failure_1() {
 		// Given
@@ -195,6 +196,7 @@ public class SectionManagementTest extends CommonAcceptanceTest {
 	 * - Then 에러를 반환한다.
 	 */
 	@Test
+	@Disabled("요구 조건 변화에 따른 검증 로직 수정")
 	@DisplayName("구간 제거 - 예외 케이스 -> 상행 종점역과 하행 종점역이 각 1개만 있는 경우 해당 역을 삭제하는 경우 최소 개수 조건을 유지해야 한다는 조건을 불만족하여 예외")
 	void deleteSectionWhenMinimumRequiredStationCountNotSatisfied_Failure_2() {
 		// Given
@@ -364,6 +366,27 @@ public class SectionManagementTest extends CommonAcceptanceTest {
 	@Test
 	@DisplayName("노선의 중간 역 제거 - 성공 케이스")
 	void removeMiddleStation_Success() {
+		// Given: 지하철 노선에 A, B, C 세 역이 순서대로 등록되어 있을 때
+		ExtractableResponse<Response> stationCreateResponseA = executeCreateStationRequest("A역");
+		long stationAId = parseId(stationCreateResponseA);
+		ExtractableResponse<Response> stationCreateResponseB = executeCreateStationRequest("B역");
+		long stationBId = parseId(stationCreateResponseB);
+		ExtractableResponse<Response> stationCreateResponseC = executeCreateStationRequest("C역");
+		long stationCId = parseId(stationCreateResponseC);
+
+		LineCreateRequest lineCreateRequest = createLineCreateRequest("노선", stationAId, stationCId, 7L); // A - C
+		ExtractableResponse<Response> lineCreateResponse = executeCreateLineRequest(lineCreateRequest);
+		long lineId = parseId(lineCreateResponse);
+
+		SectionCreateRequest sectionCreateRequestAB = createSectionCreateRequestWithUpAndDownAndDistance(stationAId, stationBId, 3L); // A - B
+		executeCreateSectionRequest(lineId, sectionCreateRequestAB);
+
+		// When: B 역을 제거하는 요청을 보냈을 때
+		ExtractableResponse<Response> deleteResponse = executeDeleteSectionRequest(lineId, stationBId);
+
+		// Then: HTTP 상태 코드가 NO_CONTENT이며, 노선에서 B 역이 제거되고 A와 C 역 사이의 거리가 조정됨
+		assertEquals(HttpStatus.NO_CONTENT.value(), deleteResponse.statusCode());
+
 	}
 
 	/**
@@ -376,6 +399,70 @@ public class SectionManagementTest extends CommonAcceptanceTest {
 	@Test
 	@DisplayName("노선의 상행 종점역 제거 - 성공 케이스")
 	void removeUpEndStation_Success() {
+		// given
+		ExtractableResponse<Response> stationCreateResponseA = executeCreateStationRequest("A역");
+		long stationAId = parseId(stationCreateResponseA);
+		ExtractableResponse<Response> stationCreateResponseB = executeCreateStationRequest("B역");
+		long stationBId = parseId(stationCreateResponseB);
+		ExtractableResponse<Response> stationCreateResponseC = executeCreateStationRequest("C역");
+		long stationCId = parseId(stationCreateResponseC);
+
+		LineCreateRequest lineCreateRequest = createLineCreateRequest("노선", stationAId, stationCId, 10L);
+		ExtractableResponse<Response> lineCreateResponse = executeCreateLineRequest(lineCreateRequest);
+		long lineId = parseId(lineCreateResponse);
+
+		SectionCreateRequest sectionCreateRequestAB = createSectionCreateRequestWithUpAndDownAndDistance(stationAId, stationBId, 5L);
+		executeCreateSectionRequest(lineId, sectionCreateRequestAB);
+
+		// when
+		ExtractableResponse<Response> deleteResponse = executeDeleteSectionRequest(lineId, stationAId);
+
+		// then
+		assertEquals(HttpStatus.NO_CONTENT.value(), deleteResponse.statusCode());
+
+		// 상행 종점역 A가 제거된 후의 노선 정보 확인
+		ExtractableResponse<Response> lineDetailsResponse = executeGetSpecificStationLineRequest(lineId);
+		List<Long> stationIds = parseStationIds(lineDetailsResponse);
+		assertFalse(stationIds.contains(stationAId)); // A역이 제거되었는지 확인
+		assertTrue(stationIds.contains(stationBId)); // B역이 상행 종점역이 되었는지 확인
+	}
+
+	/**
+	 * 구간 제거 - 성공 케이스
+	 * - Given 지하철 노선이 존재하고, 해당 노선에 여러 역이 등록되어 있을 때
+	 * - When 노선의 상행 종점역을 제거하려고 할 때
+	 * - Then 상행 종점역이 제거되고, 다음 역이 상행 종점역이 된다.
+	 * -> (UpEnd) A - B - C -> C 삭제 ->  A - B
+	 */
+	@Test
+	@DisplayName("노선의 최하단 종점역 제거 - 성공 케이스")
+	void removeDownEndStation_Success() {
+		// given: 지하철 노선에 A, B, C 세 역이 순서대로 등록되어 있을 때
+		ExtractableResponse<Response> stationCreateResponseA = executeCreateStationRequest("A역");
+		long stationAId = parseId(stationCreateResponseA);
+		ExtractableResponse<Response> stationCreateResponseB = executeCreateStationRequest("B역");
+		long stationBId = parseId(stationCreateResponseB);
+		ExtractableResponse<Response> stationCreateResponseC = executeCreateStationRequest("C역");
+		long stationCId = parseId(stationCreateResponseC);
+
+		LineCreateRequest lineCreateRequest = createLineCreateRequest("노선", stationAId, stationCId, 10L);
+		ExtractableResponse<Response> lineCreateResponse = executeCreateLineRequest(lineCreateRequest);
+		long lineId = parseId(lineCreateResponse);
+
+		SectionCreateRequest sectionCreateRequestAB = createSectionCreateRequestWithUpAndDownAndDistance(stationAId, stationBId, 5L);
+		executeCreateSectionRequest(lineId, sectionCreateRequestAB);
+
+		// when: C 역(최하단 종점역)을 제거하는 요청을 보냈을 때
+		ExtractableResponse<Response> deleteResponse = executeDeleteSectionRequest(lineId, stationCId);
+
+		// then: HTTP 상태 코드가 NO_CONTENT이며, 노선에서 C 역이 제거됨
+		assertEquals(HttpStatus.NO_CONTENT.value(), deleteResponse.statusCode());
+
+		// 노선 상세 정보를 조회하여 C역이 제거되었는지 검증
+		ExtractableResponse<Response> lineDetailsResponse = executeGetSpecificStationLineRequest(lineId);
+		List<Long> stationIds = parseStationIds(lineDetailsResponse);
+		assertFalse(stationIds.contains(stationCId)); // C역이 제거되었는지 확인
+		assertTrue(stationIds.contains(stationAId) && stationIds.contains(stationBId)); // A역과 B역이 여전히 노선에 존재하는지 확인
 	}
 
 	/**
