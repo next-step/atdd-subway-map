@@ -32,4 +32,20 @@ public class Sections {
         stations.add(0, sections.get(0).getUpStation());
         return stations;
     }
+
+    public boolean hasUnderOneSection() {
+        return sections.size() <= 1;
+    }
+
+    public boolean isLastSection(Station station) {
+        return lastSection().eqDownStation(station);
+    }
+
+    public Section lastSection() {
+        return sections.get(sections.size() -1);
+    }
+
+    public void removeSection(Section section) {
+        sections.remove(section);
+    }
 }

@@ -52,4 +52,13 @@ public class LineController {
         Long sectionId = lineService.saveSection(id, sectionRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(sectionId);
     }
+
+    @DeleteMapping("/lines/{id}/sections")
+    public ResponseEntity<Void> deleteSection(
+            @PathVariable Long id,
+            @RequestParam Long stationId
+    ) {
+        lineService.deleteSection(id, stationId);
+        return ResponseEntity.noContent().build();
+    }
 }

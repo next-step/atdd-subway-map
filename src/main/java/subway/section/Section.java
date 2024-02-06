@@ -56,4 +56,8 @@ public class Section {
     public Line getLine() {
         return line;
     }
+
+    public boolean eqDownStation(Station station) {
+        return downStation.equals(station);
+    }
 }

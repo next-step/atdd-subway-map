@@ -69,4 +69,22 @@ public class LineService {
         Section section = sectionRepository.save(sectionRequest.toEntity(upStation, downStation, line));
         return section.getId();
     }
+
+    @Transactional
+    public void deleteSection(Long lineId, Long stationId) {
+        Line line = lineRepository.findById(lineId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 라인을 찾을 수 없습니다."));
+        Station station = stationRepository.findById(stationId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 역을 찾을 수 없습니다."));
+
+        if (line.getSections().hasUnderOneSection()) {
+            throw new IllegalArgumentException("노선에는 하나 이상의 구간이 존재해야 합니다.");
+        }
+
+        if (!line.getSections().isLastSection(station)) {
+            throw new IllegalArgumentException("노선의 마지막 구간이 아닙니다.");
+        }
+
+        line.getSections().removeSection(line.getSections().lastSection());
+    }
 }

@@ -44,7 +44,7 @@ public class SectionAcceptanceTest {
 
     /**
      * When 지하철 구간을 생성하면
-     * Then 지하철 노선 목록 조회 시 생성한 구간을 찾을 수 있다
+     * Then 지하철 노선 조회 시 생성한 구간을 찾을 수 있다
      */
     @DisplayName("지하철 구간을 생성한다.")
     @Test
@@ -61,5 +61,23 @@ public class SectionAcceptanceTest {
         assertThat(res.getStations().get(0).getName()).isEqualTo("신사역");
         assertThat(res.getStations().get(1).getName()).isEqualTo("광교역");
         assertThat(res.getStations().get(2).getName()).isEqualTo("수서역");
+    }
+
+    /**
+     * When 지하철 구간을 삭제하면
+     * Then 지하철 노선 조회 시 삭제된 구간을 찾을 수 없다
+     */
+    @DisplayName("지하철 구간을 삭제한다.")
+    @Test
+    void deleteSection() {
+        // when
+        RestAssuredUtil.post(SECTION_TWO, "/lines/" + LINE_SHINBUNDANG_ID + "/sections");
+        RestAssuredUtil.delete("/lines/" + LINE_SHINBUNDANG_ID + "/sections" + "?stationId=" + SUSEO_STATION_ID);
+
+        // then
+        List<String> stationNames
+                = RestAssuredUtil.get("/lines/" + LINE_SHINBUNDANG_ID)
+                .jsonPath().getList("stations.name", String.class);
+        assertThat(stationNames).doesNotContain("수서역");
     }
 }
