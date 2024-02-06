@@ -1,5 +1,9 @@
 package subway.line;
 
+import subway.section.Section;
+import subway.section.Sections;
+import subway.station.Station;
+
 import javax.persistence.*;
 import java.util.List;
 
@@ -13,26 +17,25 @@ public class Line {
     private String name;
     @Column(length = 20, nullable = false)
     private String color;
-    @Column(nullable = false)
-    private Long distance;
 
-    @Column(nullable = false)
-    private Long upStationId;
-    @Column(nullable = false)
-    private Long downStationId;
+    @Embedded
+    private Sections sections = new Sections();
 
     public Line() {
     }
 
+    public Line(String name, String color) {
+        this.name = name;
+        this.color = color;
+    }
+
     public Line(
             String name, String color, Long distance,
-            Long upStationId, Long downStationId
+            Station upStation, Station downStation
     ) {
         this.name = name;
         this.color = color;
-        this.distance = distance;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
+        this.sections = new Sections(List.of(new Section(upStation, downStation, distance, this)));
     }
 
     public Long getId() {
@@ -47,20 +50,8 @@ public class Line {
         return color;
     }
 
-    public Long getDistance() {
-        return distance;
-    }
-
-    public Long getUpStationId() {
-        return upStationId;
-    }
-
-    public Long getDownStationId() {
-        return downStationId;
-    }
-
-    public List<Long> stationIds() {
-        return List.of(upStationId, downStationId);
+    public Sections getSections() {
+        return sections;
     }
 
     public void update(String name, String color) {
