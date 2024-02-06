@@ -1,4 +1,4 @@
-package subway;
+package subway.steps;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -10,11 +10,11 @@ import static io.restassured.RestAssured.given;
 
 public class StationSteps {
 
-    static void 지하철_역_생성_요청(List<StationRequest> requests) {
+    public static void 지하철_역_생성_요청(List<StationRequest> requests) {
         requests.forEach(StationSteps::지하철_역_생성_요청);
     }
 
-    static void 지하철_역_생성_요청(StationRequest request) {
+    public static void 지하철_역_생성_요청(StationRequest request) {
         given()
             .body(request)
             .contentType(MediaType.APPLICATION_JSON_VALUE)

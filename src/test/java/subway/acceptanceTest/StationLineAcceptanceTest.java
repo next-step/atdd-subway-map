@@ -1,4 +1,4 @@
-package subway;
+package subway.acceptanceTest;
 
 import config.annotations.AcceptanceTest;
 import config.fixtures.subway.StationLineMockData;
@@ -17,8 +17,8 @@ import java.util.stream.IntStream;
 
 import static config.fixtures.subway.StationMockData.역_10개;
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.StationLineSteps.*;
-import static subway.StationSteps.지하철_역_생성_요청;
+import static subway.steps.StationLineSteps.*;
+import static subway.steps.StationSteps.지하철_역_생성_요청;
 import static utils.HttpResponseUtils.getCreatedLocationId;
 
 @DisplayName("지하철 노선 관련 기능")

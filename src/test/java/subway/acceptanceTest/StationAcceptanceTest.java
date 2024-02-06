@@ -1,4 +1,4 @@
-package subway;
+package subway.acceptanceTest;
 
 import config.annotations.AcceptanceTest;
 import io.restassured.RestAssured;

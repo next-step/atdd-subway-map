@@ -1,4 +1,4 @@
-package subway;
+package subway.steps;
 
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
@@ -16,7 +16,7 @@ public class StationLineSteps {
      *
      * @return 지하철 노선 목록을 나타내는 jsonPath 반환
      */
-    static JsonPath 모든_지하철_노선_조회_요청() {
+    public static JsonPath 모든_지하철_노선_조회_요청() {
         return given().log().all()
                 .when()
                 .get("/lines")
@@ -31,7 +31,7 @@ public class StationLineSteps {
      * @param stationLineId 지하철 노선 ID
      * @return 지하철 노선 정보를 나타내는 jsonPath 반환
      */
-    static JsonPath 지하철_노선_조회_요청(Long stationLineId) {
+    public static JsonPath 지하철_노선_조회_요청(Long stationLineId) {
         return given().log().all()
                 .when()
                 .get("/lines/" + stationLineId)
@@ -45,7 +45,7 @@ public class StationLineSteps {
      * @param request 지하철 요청 정보를 담은 객체
      * @return REST Assured 기반으로 생성된 Response 객체
      */
-    static ExtractableResponse<Response> 지하철_노선_생성_요청_검증_포함(StationLineRequest request) {
+    public static ExtractableResponse<Response> 지하철_노선_생성_요청_검증_포함(StationLineRequest request) {
         return given().log().all()
                 .body(request)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -62,7 +62,7 @@ public class StationLineSteps {
      * @param request       지하철 수정 정보를 담은 객체
      * @param stationLineId 수정할 지하철 노선 ID
      */
-    static void 지하철_노선_수정_요청(StationLineRequest request, Long stationLineId) {
+    public static void 지하철_노선_수정_요청(StationLineRequest request, Long stationLineId) {
         given().log().all()
                 .body(request)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -78,7 +78,7 @@ public class StationLineSteps {
      *
      * @param stationLineId 삭제할 지하철 노선 ID
      */
-    static void 지하철_노선_삭제_요청(Long stationLineId) {
+    public static void 지하철_노선_삭제_요청(Long stationLineId) {
         given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()

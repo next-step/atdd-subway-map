@@ -1,4 +1,4 @@
-package subway;
+package subway.acceptanceTest;
 
 import config.annotations.AcceptanceTest;
 import io.restassured.path.json.JsonPath;
@@ -9,9 +9,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.annotation.DirtiesContext;
 import subway.dto.StationLineRequest;
 import subway.dto.StationSectionRequest;
 
@@ -21,10 +19,10 @@ import static config.fixtures.subway.StationLineMockData.호남선_생성;
 import static config.fixtures.subway.StationMockData.역_10개;
 import static config.fixtures.subway.StationSectionMockData.지하철_구간;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static subway.StationLineSteps.지하철_노선_생성_요청_검증_포함;
-import static subway.StationLineSteps.지하철_노선_조회_요청;
-import static subway.StationSectionSteps.*;
-import static subway.StationSteps.지하철_역_생성_요청;
+import static subway.steps.StationLineSteps.지하철_노선_생성_요청_검증_포함;
+import static subway.steps.StationLineSteps.지하철_노선_조회_요청;
+import static subway.steps.StationSectionSteps.*;
+import static subway.steps.StationSteps.지하철_역_생성_요청;
 import static utils.HttpResponseUtils.getCreatedLocationId;
 
 @DisplayName("지하철 구간 관리")
