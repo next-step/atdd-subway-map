@@ -7,13 +7,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-
-import java.util.HashMap;
-import java.util.Map;
+import org.springframework.test.context.jdbc.Sql;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.BEFORE_TEST_METHOD;
 
+@Sql(scripts = "/truncate.sql", executionPhase = BEFORE_TEST_METHOD)
 @DisplayName("지하철 구간에 대한 인수테스트 입니다.")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class SectionAcceptanceTest implements SectionFixture {
@@ -101,21 +100,77 @@ class SectionAcceptanceTest implements SectionFixture {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
 
-    private ExtractableResponse<Response> createSection(Long upStationId, Long downStationId, Long LineId) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("distance", 10);
-        params.put("upStationId", upStationId);
-        params.put("downStationId", downStationId);
+    /**
+     * Given 지하철 노선의 구간을 생성 한 후
+     * When 특정 구간을 삭제할 때 등록된 구간의 마지막 노선과 일치하지 않는다면
+     * Then 예외를 발생시킨다.
+     */
+    @DisplayName("구간에 대한 삭제는 등록된 마지막 노선에 대해서만 가능하며 아닐 시 예외를 발생시킨다.")
+    @Test
+    void fail_delete_station_isLastDownStation() {
+        // given
+        Long lineId = createLineId();
+        Long stationId = createStationId("상행선1");
+        Long downStationId = createStationId("하행선1");
+        createSection(stationId, downStationId, lineId);
+        createSection(downStationId, createStationId("하행선2"), lineId);
 
+        // when
+        ExtractableResponse<Response> response = deleteSection(lineId, stationId);
+
+        // then
+        assertFail(response, "하행 종점역과 다릅니다. 하행 종점역만 삭제가 가능합니다.");
+    }
+
+    /**
+     * Given 지하철 노선의 구간을 생성 한 후
+     * When 특정 구간을 삭제 시 현재 남아있는 구간이 한개이면
+     * Then 예외를 발생시킨다.
+     */
+    @DisplayName("구간삭제 시 남아있는 구간이 한개이면 예외를 발생시킨다.")
+    @Test
+    void fail_station_hasMoreThanOne() {
+        // given
+        Long lineId = createLineId();
+        Long stationId = createStationId("하행선1");
+        createSection(createStationId("상행선1"), stationId, lineId);
+
+        // when
+        ExtractableResponse<Response> response = deleteSection(lineId, stationId);
+
+        // then
+        assertFail(response, "노선의 구간이 하나인 경우 삭제가 불가합니다.");
+    }
+
+    /**
+     * Given 지하철 노선의 구간을 생성 한 후
+     * When 특정 구간을 삭제 시 조건에 통과되면
+     * Then 정상적으로 진행이 된다.
+     */
+    @DisplayName("조건을 만족할 경우 정상 삭제가 진행된다.")
+    @Test
+    void success_delete_station() {
+        // given
+        Long lineId = createLineId();
+        Long stationId1 = createStationId("하행선1");
+        Long stationId2 = createStationId("하행선2");
+        createSection(createStationId("상행선1"), stationId1, lineId);
+        createSection(stationId1, stationId2, lineId);
+
+        // when
+        ExtractableResponse<Response> response = deleteSection(lineId, stationId2);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    private static ExtractableResponse<Response> deleteSection(Long lineId, Long stationId) {
         ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines/" + LineId + "/sections")
+                .when().delete("/lines/" + lineId + "/sections?stationId=" + stationId)
                 .then().log().all()
                 .extract();
         return response;
     }
-
 
     private void assertFail(ExtractableResponse<Response> response, String message) {
         String failMessage = response.jsonPath().getString("message");

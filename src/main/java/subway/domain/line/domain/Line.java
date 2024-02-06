@@ -51,7 +51,7 @@ public class Line {
     }
 
     public boolean isStationDirectionEqual(Long stationId) {
-        if(sections == null || sections.isEmpty()){
+        if (sections == null || sections.isEmpty()) {
             return true;
         }
 
@@ -60,7 +60,7 @@ public class Line {
     }
 
     public boolean containsSectionByStation(Long stationId) {
-        if(sections == null || sections.isEmpty()){
+        if (sections == null || sections.isEmpty()) {
             return true;
         }
 
@@ -74,5 +74,21 @@ public class Line {
         }
 
         return true;
+    }
+
+    public boolean isLastDownStation(Long stationId) {
+        if (sections == null || sections.isEmpty()) {
+            return false;
+        }
+
+        return sections.get(sections.size() - 1).getDownStation().getId().equals(stationId);
+    }
+
+    public boolean hasMoreThanOne(Long stationId) {
+        if (sections == null || sections.isEmpty()) {
+            return false;
+        }
+
+        return sections.size() > 1;
     }
 }

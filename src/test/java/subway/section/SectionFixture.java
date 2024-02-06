@@ -1,6 +1,8 @@
 package subway.section;
 
 import io.restassured.RestAssured;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
@@ -19,6 +21,21 @@ public interface SectionFixture {
                 .then().log().all()
                 .statusCode(HttpStatus.CREATED.value())
                 .extract().jsonPath().getLong("id");
+    }
+
+    default ExtractableResponse<Response> createSection(Long upStationId, Long downStationId, Long LineId) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("distance", 10);
+        params.put("upStationId", upStationId);
+        params.put("downStationId", downStationId);
+
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines/" + LineId + "/sections")
+                .then().log().all()
+                .extract();
+        return response;
     }
 
     default Long createLineId() {
