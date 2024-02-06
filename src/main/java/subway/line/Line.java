@@ -1,13 +1,14 @@
 package subway.line;
 
 import java.util.List;
-import javax.persistence.Embedded;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import subway.section.Section;
-import subway.section.Sections;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+import subway.station.Station;
 
 @Entity
 public class Line {
@@ -15,21 +16,24 @@ public class Line {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(length = 20, nullable = false)
     private String name;
     private String color;
+    private Long upStationId;
+    private Long downStationId;
+    private Long distance;
+    @OneToMany
+    @JoinColumn(name = "id")
+    private List<Station> stations;
 
-    @Embedded
-    private final Sections sections = new Sections();
-
-    public Line(String name, String color) {
+    public Line(String name, String color, Long upStationId, Long downStationId, Long distance) {
         this.name = name;
         this.color = color;
+        this.upStationId = upStationId;
+        this.downStationId = downStationId;
+        this.distance = distance;
     }
 
-    public void addSection(final Section section) {
-        sections.addSection(section);
-        section.setLine(this);
-    }
     public Line() {
     }
 
@@ -41,7 +45,6 @@ public class Line {
     public Long getId() {
         return id;
     }
-
     public String getName() {
         return name;
     }
@@ -50,19 +53,39 @@ public class Line {
         return color;
     }
 
+    public void setColor(String color) {
+        this.color = color;
+    }
+
     public Long getUpStationId() {
-        return sections.getFirstUpStationId();
+        return upStationId;
+    }
+
+    public void setUpStationId(Long upStationId) {
+        this.upStationId = upStationId;
     }
 
     public Long getDownStationId() {
-        return sections.getLastDownStationId();
+        return downStationId;
     }
 
-    public List<Long> getFirstAndLastStationId() {
-        return List.of(getUpStationId(), getDownStationId());
+    public void setDownStationId(Long downStationId) {
+        this.downStationId = downStationId;
     }
 
-    public void removeStation(Long stationId) {
-        sections.removeLastSection(stationId);
+    public Long getDistance() {
+        return distance;
+    }
+
+    public void setDistance(Long distance) {
+        this.distance = distance;
+    }
+
+    public List<Station> getStations() {
+        return stations;
+    }
+
+    public void setStations(List<Station> stations) {
+        this.stations = stations;
     }
 }
