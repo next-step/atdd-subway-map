@@ -6,9 +6,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.jdbc.Sql;
-import subway.line.presentaion.request.CreateLineRequest;
-import subway.line.presentaion.request.UpdateLineRequest;
-import subway.station.presentaion.request.CreateStationRequest;
+import subway.line.presentation.request.CreateLineRequest;
+import subway.line.presentation.request.UpdateLineRequest;
+import subway.station.presentation.request.CreateStationRequest;
 
 import java.util.List;
 
@@ -39,7 +39,7 @@ public class LineAcceptanceTest {
 
         // then
         List<String> lineNames =
-                selectLines().jsonPath().getList("name", String.class);
+                selectLines().jsonPath().getList("lines.name", String.class);
         assertThat(lineNames).containsAnyOf(신분당선);
     }
 
@@ -68,7 +68,7 @@ public class LineAcceptanceTest {
 
         // when & then
         List<String> lineNames =
-                selectLines().jsonPath().getList("name", String.class);
+                selectLines().jsonPath().getList("lines.name", String.class);
         assertThat(lineNames).containsAnyOf(신분당선, 수인분당선);
     }
 

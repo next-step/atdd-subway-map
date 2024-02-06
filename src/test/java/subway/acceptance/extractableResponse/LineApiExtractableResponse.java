@@ -4,8 +4,8 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.MediaType;
-import subway.line.presentaion.request.CreateLineRequest;
-import subway.line.presentaion.request.UpdateLineRequest;
+import subway.line.presentation.request.CreateLineRequest;
+import subway.line.presentation.request.UpdateLineRequest;
 
 public class LineApiExtractableResponse {
 

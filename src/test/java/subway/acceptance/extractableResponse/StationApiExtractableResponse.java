@@ -4,7 +4,7 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.MediaType;
-import subway.station.presentaion.request.CreateStationRequest;
+import subway.station.presentation.request.CreateStationRequest;
 
 public class StationApiExtractableResponse {
 
@@ -17,19 +17,6 @@ public class StationApiExtractableResponse {
                 .then().log().all()
                 .extract();
     }
-
-//    public static ExtractableResponse<Response> createStationByStationName(String stationName) {
-//        Map<String, String> params = new HashMap<>();
-//        params.put("name", stationName);
-//
-//        return RestAssured
-//                .given().log().all()
-//                .body(params)
-//                .contentType(MediaType.APPLICATION_JSON_VALUE)
-//                .when().post("/stations")
-//                .then().log().all()
-//                .extract();
-//    }
 
     public static ExtractableResponse<Response> selectStations() {
         return RestAssured

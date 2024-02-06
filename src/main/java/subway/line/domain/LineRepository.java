@@ -8,8 +8,4 @@ public interface LineRepository extends JpaRepository<Line, Long> {
 
     Optional<Line> findById(Long id);
 
-//    List<Line> findAllByUseStatus(UseStatus useStatus);
-
-//    Optional<Line> findByIdAndUseStatus(Long id, UseStatus useStatus);
-
 }

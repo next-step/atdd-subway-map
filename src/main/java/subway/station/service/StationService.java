@@ -4,10 +4,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.station.domain.Station;
 import subway.station.domain.StationRepository;
-import subway.station.presentaion.request.CreateStationRequest;
-import subway.station.presentaion.response.StationResponse;
+import subway.station.presentation.request.CreateStationRequest;
+import subway.station.presentation.response.CreateStationResponse;
+import subway.station.presentation.response.ShowAllStationsResponse;
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -20,15 +20,15 @@ public class StationService {
     }
 
     @Transactional
-    public StationResponse saveStation(CreateStationRequest createStationRequest) {
+    public CreateStationResponse saveStation(CreateStationRequest createStationRequest) {
         Station station = stationRepository.save(new Station(createStationRequest.getName()));
-        return createStationResponse(station);
+        return CreateStationResponse.from(station);
     }
 
-    public List<StationResponse> findAllStations() {
-        return stationRepository.findAll().stream()
-                .map(this::createStationResponse)
-                .collect(Collectors.toList());
+    public ShowAllStationsResponse findAllStations() {
+        return ShowAllStationsResponse.of(stationRepository.findAll().stream()
+                .map(StationDto::from)
+                .collect(Collectors.toList()));
     }
 
     @Transactional
@@ -36,10 +36,4 @@ public class StationService {
         stationRepository.deleteById(id);
     }
 
-    private StationResponse createStationResponse(Station station) {
-        return new StationResponse(
-                station.getId(),
-                station.getName()
-        );
-    }
 }

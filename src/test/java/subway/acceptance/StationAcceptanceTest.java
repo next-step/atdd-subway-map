@@ -4,7 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
-import subway.station.presentaion.request.CreateStationRequest;
+import subway.station.presentation.request.CreateStationRequest;
 
 import java.util.List;
 
@@ -30,7 +30,7 @@ public class StationAcceptanceTest {
 
         // then
         List<String> stationNames =
-                selectStations().jsonPath().getList("name", String.class);
+                selectStations().jsonPath().getList("stations.name", String.class);
         assertThat(stationNames).containsAnyOf(강남역);
     }
 
@@ -50,7 +50,7 @@ public class StationAcceptanceTest {
 
         // when
         List<String> stationNames =
-                selectStations().jsonPath().getList("name", String.class);
+                selectStations().jsonPath().getList("stations.name", String.class);
 
         // then
         assertThat(stationNames).containsAnyOf(강남역, 광화문역);
@@ -73,7 +73,7 @@ public class StationAcceptanceTest {
 
         // then
         List<String> stationNames =
-                selectStations().jsonPath().getList("name", String.class);
+                selectStations().jsonPath().getList("stations.name", String.class);
         assertThat(stationNames).doesNotContain(강남역);
     }
 
