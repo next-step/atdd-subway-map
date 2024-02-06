@@ -1,9 +1,9 @@
-package subway.line;
+package subway.application.line;
 
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import subway.station.StationResponse;
+import subway.application.station.StationResponse;
 
 @AllArgsConstructor
 @Getter

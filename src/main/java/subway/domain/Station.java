@@ -1,4 +1,4 @@
-package subway.station;
+package subway.domain;
 
 import lombok.Getter;
 
@@ -11,8 +11,6 @@ public class Station {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column
-    private Long lineId;
     @Column(length = 20, nullable = false)
     private String name;
 
@@ -24,12 +22,9 @@ public class Station {
         this.name = name;
     }
 
-    public Station(String name, Long lineId) {
-        this.name = name;
-        this.lineId = lineId;
+
+    public boolean equalsId(Long id) {
+        return this.id.equals(id);
     }
 
-    public void updateLineId(Long lineId) {
-        this.lineId = lineId;
-    }
 }
