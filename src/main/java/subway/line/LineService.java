@@ -22,33 +22,23 @@ public class LineService {
 
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
-        Line line = lineRepository.save(lineRequest.toEntity());
         Station upStation = stationRepository.findById(lineRequest.getUpStationId())
                 .orElseThrow(() -> new EntityNotFoundException("해당 역을 상행종점역으로 등록할 수 없습니다."));
         Station downStation = stationRepository.findById(lineRequest.getDownStationId())
                 .orElseThrow(() -> new EntityNotFoundException("해당 역을 하행종점역으로 등록할 수 없습니다."));
-
+        Line line = lineRepository.save(lineRequest.toEntity(upStation, downStation));
         return new LineResponse(line, List.of(upStation, downStation));
     }
 
     public List<LineResponse> findAllLines() {
-        List<Station> stations = stationRepository.findAll();
         return lineRepository.findAll().stream()
-                .map(line -> new LineResponse(
-                                line,
-                                stations.stream()
-                                        .filter(station -> line.stationIds().contains(station.getId()))
-                                        .collect(Collectors.toList())
-                        )
-                )
+                .map(line -> new LineResponse(line, line.getSections().transferToStations()))
                 .collect(Collectors.toList());
     }
 
     public LineResponse findById(Long id) {
         Line line = lineRepository.getReferenceById(id);
-        List<Station> stations = stationRepository.findAll().stream()
-                .filter(station -> line.stationIds().contains(station.getId()))
-                .collect(Collectors.toList());
+        List<Station> stations = line.getSections().transferToStations();
         return new LineResponse(line, stations);
     }
 
