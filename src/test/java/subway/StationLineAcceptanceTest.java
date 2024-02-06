@@ -130,17 +130,19 @@ public class StationLineAcceptanceTest {
         // given
         StationLineRequest 신분당선 = StationLineMockData.신분당선;
         StationLineRequest 분당선 = StationLineMockData.분당선;
+        StationLineRequest 신림선 = StationLineMockData.신림선;
 
-        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청_검증_포함(신분당선);
-        지하철_노선_생성_요청_검증_포함(분당선);
+        ExtractableResponse<Response> 신분당선_생성요청_응답 = 지하철_노선_생성_요청_검증_포함(신분당선);
+        ExtractableResponse<Response> 분당선_생성요청_응답 = 지하철_노선_생성_요청_검증_포함(분당선);
+        ExtractableResponse<Response> 신림선_생성요청_응답 = 지하철_노선_생성_요청_검증_포함(신림선);
 
         // when
-        지하철_노선_삭제_요청(getCreatedLocationId(createResponse));
+        지하철_노선_삭제_요청(getCreatedLocationId(분당선_생성요청_응답));
 
         // then
         assertThat(convertStationLineResponses(모든_지하철_노선_조회_요청())).usingRecursiveComparison()
                 .ignoringFields("id", "stations")
-                .isEqualTo(List.of(분당선));
+                .isEqualTo(List.of(신분당선, 신림선));
     }
 
     private List<StationLineResponse> convertStationLineResponses(JsonPath jsonPath) {
