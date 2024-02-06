@@ -17,4 +17,5 @@ public interface SectionFactory {
 	Section createSection(SectionCreateCommand command, Station upStation, Station downStation);
 
 	void deleteByLine(Line line);
+
 }

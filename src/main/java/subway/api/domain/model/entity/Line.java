@@ -36,7 +36,7 @@ public class Line {
 	private String color;
 
 	@Embedded
-	private Sections sections = new Sections();
+	private Sections sectionCollection = new Sections();
 
 	public static Line from(LineCreateCommand createCommand) {
 		return ModelMapperBasedObjectMapper.convert(createCommand, Line.class);
@@ -53,19 +53,19 @@ public class Line {
 	}
 
 	public boolean isContainsAnyStation(Long stationId) {
-		return sections.isContainsAnyStation(stationId);
+		return sectionCollection.isContainsAnyStation(stationId);
 	}
 
 	public void addSection(Section section) {
-		this.sections.addSection(section);
+		this.sectionCollection.addSection(section);
 	}
 
 	public boolean isSectionCountBelowThreshold(long size) {
-		return sections.isSizeBelow(size);
+		return sectionCollection.isSizeBelow(size);
 	}
 
 	public void removeLastSection() {
-		sections.removeLastSection();
+		sectionCollection.removeLastSection();
 	}
 
 	public boolean isNotDownEndStation(Long stationId) {
@@ -73,10 +73,18 @@ public class Line {
 	}
 
 	public boolean isDownEndStation(Long stationId) {
-		return sections.isDownEndStation(stationId);
+		return sectionCollection.isDownEndStation(stationId);
 	}
 
 	public List<Station> parseStations() {
-		return this.sections.parseStations();
+		return this.sectionCollection.parseStations();
+	}
+
+	public void insertSection(Section newSection) {
+		sectionCollection.insertSection(newSection);
+	}
+
+	public void removeStation(Long stationId) {
+		sectionCollection.removeStation(stationId);
 	}
 }

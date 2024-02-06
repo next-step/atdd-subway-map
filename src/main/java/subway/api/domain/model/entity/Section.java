@@ -15,6 +15,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import subway.common.exception.SectionInsertionNotValidException;
 
 /**
  * @author : Rene Choi
@@ -64,9 +65,13 @@ public class Section implements Comparable<Section> {
 		return Objects.hash(upStation, downStation, distance);
 	}
 
+	/**
+	 * 섹션에 대한 정렬은 UpStation id를 기준으로
+	 */
 	@Override
 	public int compareTo(Section other) {
-		return this.id.compareTo(other.id);
+		return this.fetchUpStationId().compareTo(other.fetchUpStationId());
+		// return this.id.compareTo(other.id);
 	}
 
 	public static Section of(Station upStation, Station downStation, Long distance) {
@@ -93,6 +98,14 @@ public class Section implements Comparable<Section> {
 		return this.downStation.getName();
 	}
 
+	public boolean isDownEndStation(String stationName) {
+		return this.fetchDownStationName().equals(stationName);
+	}
+
+	public boolean isUpEndStation(String stationName) {
+		return this.fetchUpStationName().equals(stationName);
+	}
+
 	public boolean isDownEndStation(Long stationId) {
 		return this.fetchDownStationId().equals(stationId);
 	}
@@ -103,6 +116,48 @@ public class Section implements Comparable<Section> {
 
 	public boolean isAnyStation(Long stationId) {
 		return isDownEndStation(stationId) || isUpEndStation(stationId);
+	}
+
+	public boolean isBothStationSame(Station upStation, Station downStation) {
+		return isSameUpStation(upStation) && isSameDownStation(downStation);
+	}
+
+	public boolean isSameUpStation(Station upStation) {
+		return this.upStation.equals(upStation);
+	}
+
+	public boolean isSameDownStation(Station downStation) {
+		return this.downStation.equals(downStation);
+	}
+
+	public void validateInsertion(Section other) {
+		if (this.isBothStationSame(other.getUpStation(), other.getDownStation())) {
+			throw new SectionInsertionNotValidException("이미 등록된 구간입니다.");
+		}
+	}
+
+	public boolean canInsertBetween(Section newSection) {
+		return this.isSameUpStation(newSection.getUpStation()) || this.isSameDownStation(newSection.getDownStation());
+	}
+
+	public Section adjustForUpMatch(Section newSection) {
+		return Section.builder()
+			.upStation(newSection.getDownStation())
+			.downStation(this.getDownStation())
+			.distance(calculateInsertionDistance(newSection))
+			.build();
+	}
+
+	public Section adjustForDownMatch(Section newSection) {
+		return Section.builder()
+			.upStation(this.getUpStation())
+			.downStation(newSection.getUpStation())
+			.distance(calculateInsertionDistance(newSection))
+			.build();
+	}
+
+	private long calculateInsertionDistance(Section newSection) {
+		return this.getDistance() - newSection.getDistance();
 	}
 
 }

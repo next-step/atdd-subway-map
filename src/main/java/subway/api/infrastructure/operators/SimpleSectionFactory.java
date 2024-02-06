@@ -37,6 +37,7 @@ public class SimpleSectionFactory implements SectionFactory {
 
 	@Override
 	public void deleteByLine(Line line) {
-		sectionRepository.deleteAll(line.getSections());
+		sectionRepository.deleteAll(line.getSectionCollection());
 	}
+
 }
