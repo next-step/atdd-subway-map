@@ -20,4 +20,8 @@ public class Station {
     public Station(String name) {
         this.name = name;
     }
+
+    public boolean isStationId(Long StationId) {
+        return this.id.equals(StationId);
+    }
 }

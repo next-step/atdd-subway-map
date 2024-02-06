@@ -56,7 +56,7 @@ public class Line {
         }
 
         Section lastSection = sections.get(sections.size() - 1);
-        return lastSection.getDownStation().getId().equals(stationId);
+        return lastSection.isDownStation(stationId);
     }
 
     public boolean containsSectionByStation(Long stationId) {

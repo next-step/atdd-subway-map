@@ -48,4 +48,8 @@ public class Section {
                 .distance(distance)
                 .build();
     }
+
+    public boolean isDownStation(Long stationId) {
+        return this.downStation.isStationId(stationId);
+    }
 }
