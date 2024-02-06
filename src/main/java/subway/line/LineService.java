@@ -2,6 +2,9 @@ package subway.line;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.section.Section;
+import subway.section.SectionRepository;
+import subway.section.SectionRequest;
 import subway.station.Station;
 import subway.station.StationRepository;
 
@@ -14,10 +17,12 @@ import java.util.stream.Collectors;
 public class LineService {
     private final LineRepository lineRepository;
     private final StationRepository stationRepository;
+    private final SectionRepository sectionRepository;
 
-    public LineService(LineRepository lineRepository, StationRepository stationRepository) {
+    public LineService(LineRepository lineRepository, StationRepository stationRepository, SectionRepository sectionRepository) {
         this.lineRepository = lineRepository;
         this.stationRepository = stationRepository;
+        this.sectionRepository = sectionRepository;
     }
 
     @Transactional
@@ -51,5 +56,17 @@ public class LineService {
     @Transactional
     public void deleteStationById(Long id) {
         lineRepository.deleteById(id);
+    }
+
+    @Transactional
+    public Long saveSection(Long lineId, SectionRequest sectionRequest) {
+        Station upStation = stationRepository.findById(sectionRequest.getUpStationId())
+                .orElseThrow(() -> new EntityNotFoundException("해당 역을 상행종점역으로 등록할 수 없습니다."));
+        Station downStation = stationRepository.findById(sectionRequest.getDownStationId())
+                .orElseThrow(() -> new EntityNotFoundException("해당 역을 하행종점역으로 등록할 수 없습니다."));
+        Line line = lineRepository.findById(lineId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 라인을 찾을 수 없습니다."));
+        Section section = sectionRepository.save(sectionRequest.toEntity(upStation, downStation, line));
+        return section.getId();
     }
 }
