@@ -33,12 +33,6 @@ class LineAcceptanceTest {
     public static final String STATION_NAME_TWO = "역2";
 
 
-    @Autowired
-    private LineRepository lineRepository;
-
-    @Autowired
-    private StationRepository stationRepository;
-
     /**
      * Given 지하철 역이 2개 존재하고
      * When 지하철 노선을 생성하면
@@ -78,6 +72,12 @@ class LineAcceptanceTest {
         });
 
     }
+
+    @Autowired
+    private LineRepository lineRepository;
+
+    @Autowired
+    private StationRepository stationRepository;
 
 
     /**
@@ -211,6 +211,46 @@ class LineAcceptanceTest {
         SoftAssertions.assertSoftly(softAssertions -> {
             assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
             assertThat(getLineListResponse().jsonPath().getList("id")).doesNotContain(line.getId());
+        });
+
+    }
+
+    /**
+     * Given 지하철 역이 2개 존재하고
+     * When 지하철 노선을 생성하면
+     * Then 지하철 노선이 생성된다.
+     * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
+     */
+    @DisplayName("지하철 노선을 생성한다.")
+    @Test
+    void createLineSections() {
+        // given
+        Station upStation = stationRepository.save(StationFixture.giveOne(STATION_NAME));
+        Station downStation = stationRepository.save(StationFixture.giveOne(STATION_NAME_TWO));
+
+        // when
+        Map<String, Object> request = createLineRequest(
+            LINE_TWO,
+            COLOR_ONE,
+            upStation.getId(),
+            downStation.getId(),
+            DISTANCE
+        );
+        ExtractableResponse<Response> response =
+            RestAssured.given().log().all()
+                .body(request)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines")
+                .then().log().all()
+                .extract();
+
+        // then
+        SoftAssertions.assertSoftly(softAssertions -> {
+            assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+            List<String> lineNames = getLineListResponse()
+                .jsonPath()
+                .getList("name", String.class);
+            assertThat(lineNames).containsAnyOf(LINE_TWO);
         });
 
     }
