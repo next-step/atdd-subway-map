@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.AllArgsConstructor;
+import subway.domain.Section;
+import subway.dto.SectionRequest;
 import subway.repository.LineRepository;
 import subway.repository.StationRepository;
 import subway.domain.Line;
@@ -62,8 +64,13 @@ public class LineService {
         lineRepository.delete(line);
     }
 
-    public void addSection(SectionRequest sectionRequest) {
-        Section section = Section.fromRequest(sectionRequest);
-
+    public void addSection(Long lineId, SectionRequest sectionRequest) {
+        Line line = lineRepository.findById(lineId).orElseThrow(() -> new NoLineException(lineId + "에 해당하는 지하철 노선이 존재하지 않습니다."));
+        Station upStation = stationRepository.findById(sectionRequest.getUpStationId())
+                                             .orElseThrow(() -> new NoStationException(sectionRequest.getUpStationId() + "에 해당하는 지하철 역이 존재하지 않습니다."));
+        Station downStation = stationRepository.findById(sectionRequest.getDownStationId())
+                                               .orElseThrow(() -> new NoStationException(sectionRequest.getDownStationId() + "에 해당하는 지하철 역이 존재하지 않습니다."));
+        Section section = Section.from(upStation, downStation, sectionRequest.getDistance());
+        line.addSection(section);
     }
 }
