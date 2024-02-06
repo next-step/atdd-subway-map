@@ -1,17 +1,18 @@
 package subway;
 
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
+
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("구간 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -37,18 +38,18 @@ class SectionAcceptanceTest {
     void registSection() {
         // given
         Long upStationId = RequestFixtures.지하철역_생성_요청하기(Fixtures.getCreateStationParams("판교역"))
-            .jsonPath().getLong("id");
+                .jsonPath().getLong("id");
         Long downStationId = RequestFixtures.지하철역_생성_요청하기(Fixtures.getCreateStationParams("강남역"))
-            .jsonPath().getLong("id");
+                .jsonPath().getLong("id");
         Long lineId = RequestFixtures.지하철노선_생성_요청하기(
-            Fixtures.getCreateLineParams("신분당선", "bg-red-600", upStationId.toString(),
-                downStationId.toString())).jsonPath().getLong("id");
+                Fixtures.getCreateLineParams("신분당선", "bg-red-600", upStationId.toString(),
+                        downStationId.toString())).jsonPath().getLong("id");
         Long newDownStationId = RequestFixtures.지하철역_생성_요청하기(Fixtures.getCreateStationParams("신사역"))
-            .jsonPath().getLong("id");
+                .jsonPath().getLong("id");
 
         Map<String, String> params = Fixtures.getRegistSectionParams(downStationId.toString(),
-            newDownStationId.toString(),
-            Integer.toString(10));
+                newDownStationId.toString(),
+                Integer.toString(10));
         int statusCode = RequestFixtures.지하철구간_등록하기(lineId, params).statusCode();
         assertThat(statusCode).isEqualTo(HttpStatus.OK.value());
     }
@@ -66,17 +67,17 @@ class SectionAcceptanceTest {
     void deleteSection() {
         // given
         Long upStationId = RequestFixtures.지하철역_생성_요청하기(Fixtures.getCreateStationParams("판교역"))
-            .jsonPath().getLong("id");
+                .jsonPath().getLong("id");
         Long downStationId = RequestFixtures.지하철역_생성_요청하기(Fixtures.getCreateStationParams("강남역"))
-            .jsonPath().getLong("id");
+                .jsonPath().getLong("id");
         Long lineId = RequestFixtures.지하철노선_생성_요청하기(
-            Fixtures.getCreateLineParams("신분당선", "bg-red-600", upStationId.toString(),
-                downStationId.toString())).jsonPath().getLong("id");
+                Fixtures.getCreateLineParams("신분당선", "bg-red-600", upStationId.toString(),
+                        downStationId.toString())).jsonPath().getLong("id");
         Long newDownStationId = RequestFixtures.지하철역_생성_요청하기(Fixtures.getCreateStationParams("선릉역"))
-            .jsonPath().getLong("id");
+                .jsonPath().getLong("id");
         Map<String, String> params = Fixtures.getRegistSectionParams(downStationId.toString(),
-            newDownStationId.toString(),
-            Integer.toString(10));
+                newDownStationId.toString(),
+                Integer.toString(10));
         int statusCode = RequestFixtures.지하철구간_등록하기(lineId, params).statusCode();
         assertThat(statusCode).isEqualTo(HttpStatus.OK.value());
 
@@ -99,12 +100,12 @@ class SectionAcceptanceTest {
     void deleteSectionFail() {
         // given
         Long upStationId = RequestFixtures.지하철역_생성_요청하기(Fixtures.getCreateStationParams("판교역"))
-            .jsonPath().getLong("id");
+                .jsonPath().getLong("id");
         Long downStationId = RequestFixtures.지하철역_생성_요청하기(Fixtures.getCreateStationParams("강남역"))
-            .jsonPath().getLong("id");
+                .jsonPath().getLong("id");
         Long lineId = RequestFixtures.지하철노선_생성_요청하기(
-            Fixtures.getCreateLineParams("신분당선", "bg-red-600", upStationId.toString(),
-                downStationId.toString())).jsonPath().getLong("id");
+                Fixtures.getCreateLineParams("신분당선", "bg-red-600", upStationId.toString(),
+                        downStationId.toString())).jsonPath().getLong("id");
 
         // when
         ExtractableResponse<Response> response = RequestFixtures.지하철구간_삭제하기(lineId, downStationId);
@@ -124,17 +125,17 @@ class SectionAcceptanceTest {
     void deleteSectionFail2() {
         // given
         Long upStationId = RequestFixtures.지하철역_생성_요청하기(Fixtures.getCreateStationParams("판교역"))
-            .jsonPath().getLong("id");
+                .jsonPath().getLong("id");
         Long downStationId = RequestFixtures.지하철역_생성_요청하기(Fixtures.getCreateStationParams("강남역"))
-            .jsonPath().getLong("id");
+                .jsonPath().getLong("id");
         Long lineId = RequestFixtures.지하철노선_생성_요청하기(
-            Fixtures.getCreateLineParams("신분당선", "bg-red-600", upStationId.toString(),
-                downStationId.toString())).jsonPath().getLong("id");
+                Fixtures.getCreateLineParams("신분당선", "bg-red-600", upStationId.toString(),
+                        downStationId.toString())).jsonPath().getLong("id");
         Long newDownStationId = RequestFixtures.지하철역_생성_요청하기(Fixtures.getCreateStationParams("선릉역"))
-            .jsonPath().getLong("id");
+                .jsonPath().getLong("id");
         Map<String, String> params = Fixtures.getRegistSectionParams(downStationId.toString(),
-            newDownStationId.toString(),
-            Integer.toString(10));
+                newDownStationId.toString(),
+                Integer.toString(10));
         int statusCode = RequestFixtures.지하철구간_등록하기(lineId, params).statusCode();
         assertThat(statusCode).isEqualTo(HttpStatus.OK.value());
 
@@ -156,17 +157,17 @@ class SectionAcceptanceTest {
     void registSectionFail() {
         // given
         Long upStationId = RequestFixtures.지하철역_생성_요청하기(Fixtures.getCreateStationParams("판교역"))
-            .jsonPath().getLong("id");
+                .jsonPath().getLong("id");
         Long downStationId = RequestFixtures.지하철역_생성_요청하기(Fixtures.getCreateStationParams("강남역"))
-            .jsonPath().getLong("id");
+                .jsonPath().getLong("id");
         Long lineId = RequestFixtures.지하철노선_생성_요청하기(
-            Fixtures.getCreateLineParams("신분당선", "bg-red-600", upStationId.toString(),
-                downStationId.toString())).jsonPath().getLong("id");
+                Fixtures.getCreateLineParams("신분당선", "bg-red-600", upStationId.toString(),
+                        downStationId.toString())).jsonPath().getLong("id");
         Long newDownStationId = RequestFixtures.지하철역_생성_요청하기(Fixtures.getCreateStationParams("선릉역"))
-            .jsonPath().getLong("id");
+                .jsonPath().getLong("id");
         Map<String, String> params = Fixtures.getRegistSectionParams(downStationId.toString(),
-            newDownStationId.toString(),
-            Integer.toString(10));
+                newDownStationId.toString(),
+                Integer.toString(10));
         int statusCode = RequestFixtures.지하철구간_등록하기(lineId, params).statusCode();
         assertThat(statusCode).isEqualTo(HttpStatus.OK.value());
 
@@ -175,8 +176,6 @@ class SectionAcceptanceTest {
         // then
         assertThat(statusCode).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
-
-    // 새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 한다.
 
     /***
      * Given 지하철역 두개를 생성한다.
@@ -190,17 +189,17 @@ class SectionAcceptanceTest {
     void registSectionFail2() {
         // given
         Long upStationId = RequestFixtures.지하철역_생성_요청하기(Fixtures.getCreateStationParams("판교역"))
-            .jsonPath().getLong("id");
+                .jsonPath().getLong("id");
         Long downStationId = RequestFixtures.지하철역_생성_요청하기(Fixtures.getCreateStationParams("강남역"))
-            .jsonPath().getLong("id");
+                .jsonPath().getLong("id");
         Long lineId = RequestFixtures.지하철노선_생성_요청하기(
-            Fixtures.getCreateLineParams("신분당선", "bg-red-600", upStationId.toString(),
-                downStationId.toString())).jsonPath().getLong("id");
+                Fixtures.getCreateLineParams("신분당선", "bg-red-600", upStationId.toString(),
+                        downStationId.toString())).jsonPath().getLong("id");
         Long newDownStationId = RequestFixtures.지하철역_생성_요청하기(Fixtures.getCreateStationParams("선릉역"))
-            .jsonPath().getLong("id");
+                .jsonPath().getLong("id");
         Map<String, String> params = Fixtures.getRegistSectionParams(downStationId.toString(),
-            newDownStationId.toString(),
-            Integer.toString(10));
+                newDownStationId.toString(),
+                Integer.toString(10));
         int statusCode = RequestFixtures.지하철구간_등록하기(lineId, params).statusCode();
         assertThat(statusCode).isEqualTo(HttpStatus.OK.value());
 

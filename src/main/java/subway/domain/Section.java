@@ -1,14 +1,8 @@
 package subway.domain;
 
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import lombok.Getter;
-import subway.domain.Line;
+
+import javax.persistence.*;
 
 @Entity
 @Getter
@@ -38,13 +32,15 @@ public class Section {
         this.distance = distance;
     }
 
-    public Long getUpStationId() {
-        return upStationId;
+    public boolean isDownStationId(Long stationId) {
+        return downStationId.equals(stationId);
     }
 
-    public Long getDownStationId() {
-        return downStationId;
+    public boolean isUpStationId(Long stationId) {
+        return upStationId.equals(stationId);
     }
 
-
+    public boolean isUpStationOrDownStation(Long upStationId, Long downStationId) {
+        return isUpStationId(upStationId) || this.isDownStationId(downStationId);
+    }
 }

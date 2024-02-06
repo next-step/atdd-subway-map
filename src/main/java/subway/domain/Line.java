@@ -1,18 +1,13 @@
 package subway.domain;
 
+import lombok.Getter;
+import subway.domain.DomainException.LineException;
+
+import javax.persistence.*;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import lombok.Getter;
-import subway.domain.DomainException.LineException;
 
 @Entity
 @Getter
@@ -29,7 +24,7 @@ public class Line {
     private String color;
 
     @OneToMany(mappedBy = "line", orphanRemoval = true, cascade = CascadeType.ALL)
-    private Set<Section> sections = new HashSet<>();
+    private final Set<Section> sections = new HashSet<>();
 
     public Line() {
     }
@@ -50,10 +45,12 @@ public class Line {
 
     public void registSection(Section section) {
         validateNewSectionStationNotInExistingInStations(section);
-        // 하행 종점 구간 변수명
-        getLatestSections().stream()
-            .findFirst()
-            .orElseThrow(LineException::InvalidSectionException);
+        Section lastSection = getLatestSections().stream()
+                .findFirst()
+                .orElseThrow(LineException::InvalidSectionException);
+        if (!lastSection.getDownStationId().equals(section.getUpStationId())) {
+            throw LineException.InvalidSectionException();
+        }
 
         sections.add(section);
     }
@@ -64,9 +61,8 @@ public class Line {
 
     private void validateNewSectionStationNotInExistingInStations(Section newSection) {
         if (sections.stream()
-            .anyMatch(
-                section -> section.getDownStationId().equals(newSection.getDownStationId()) ||
-                    section.getUpStationId().equals(newSection.getUpStationId()))) {
+                .anyMatch(
+                        section -> section.isUpStationOrDownStation(newSection.getUpStationId(), newSection.getDownStationId()))) {
             throw LineException.AlreadyRegisteredStationException();
         }
     }
@@ -76,12 +72,12 @@ public class Line {
             throw LineException.NotRemoveException();
         }
         getLatestSections()
-            .ifPresent(section -> {
-                if (!section.getDownStationId().equals(stationId)) {
-                    throw LineException.NotRemoveException();
-                }
-                sections.remove(section);
-            });
+                .ifPresent(section -> {
+                    if (!section.getDownStationId().equals(stationId)) {
+                        throw LineException.NotRemoveException();
+                    }
+                    sections.remove(section);
+                });
     }
 
     public Set<Long> getStationIds() {
