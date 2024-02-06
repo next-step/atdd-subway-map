@@ -20,20 +20,16 @@ public class StationLineService {
 
     private final StationLineRepository stationLineRepository;
 
-    private final StationSectionRepository stationSectionRepository;
-
-    public StationLineService(StationRepository stationRepository, StationLineRepository stationLineRepository,
-                              StationSectionRepository stationSectionRepository) {
+    public StationLineService(StationRepository stationRepository, StationLineRepository stationLineRepository) {
         this.stationRepository = stationRepository;
         this.stationLineRepository = stationLineRepository;
-        this.stationSectionRepository = stationSectionRepository;
     }
 
     @Transactional
     public StationLineResponse createStationLine(StationLineRequest request) {
-        StationLine stationLine = stationLineRepository.save(convertToStationLineEntity(request));
-        StationSection createdStationSection = stationSectionRepository.save(convertToSectionEntity(stationLine));
-        return convertToLineResponse(stationLine.addSection(createdStationSection));
+        StationLine stationLine = convertToStationLineEntity(request);
+        stationLine.addSection(convertToSectionEntity(stationLine));
+        return convertToLineResponse(stationLineRepository.save(stationLine));
     }
 
     public List<StationLineResponse> findAllStationLines() {
