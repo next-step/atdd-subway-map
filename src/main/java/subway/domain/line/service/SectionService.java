@@ -51,7 +51,7 @@ public class SectionService {
     public void deleteSection(Long lineId, Long stationId) {
         Line line = lineRepository.getLineById(lineId);
 
-        if (!line.isLastDownStation(stationId)) {
+        if (!line.isStationDirectionEqual(stationId)) {
             throw new GlobalException("하행 종점역과 다릅니다. 하행 종점역만 삭제가 가능합니다.");
         }
 

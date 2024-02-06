@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import subway.domain.station.domain.Station;
 
 import javax.persistence.*;
-import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -24,8 +23,8 @@ public class Line {
     @Column(length = 20)
     private String color;
 
-    @OneToMany(mappedBy = "line")
-    List<Section> sections;
+    @Embedded
+    private Sections sections = new Sections();
 
     @Builder
     private Line(String name, String color) {
@@ -51,20 +50,20 @@ public class Line {
     }
 
     public boolean isStationDirectionEqual(Long stationId) {
-        if (sections == null || sections.isEmpty()) {
+        if (sections.isSectionsNullOrEmpty()) {
             return true;
         }
 
-        Section lastSection = sections.get(sections.size() - 1);
+        Section lastSection = sections.getLastSection();
         return lastSection.isDownStation(stationId);
     }
 
     public boolean containsSectionByStation(Long stationId) {
-        if (sections == null || sections.isEmpty()) {
+        if (sections.isSectionsNullOrEmpty()) {
             return true;
         }
 
-        for (Section section : sections) {
+        for (Section section : sections.getSections()) {
             Station upStation = section.getUpStation();
             Station downStation = section.getUpStation();
 
@@ -76,19 +75,7 @@ public class Line {
         return true;
     }
 
-    public boolean isLastDownStation(Long stationId) {
-        if (sections == null || sections.isEmpty()) {
-            return false;
-        }
-
-        return sections.get(sections.size() - 1).getDownStation().getId().equals(stationId);
-    }
-
     public boolean hasMoreThanOne(Long stationId) {
-        if (sections == null || sections.isEmpty()) {
-            return false;
-        }
-
-        return sections.size() > 1;
+        return sections.hasMoreThanOne(stationId);
     }
 }
