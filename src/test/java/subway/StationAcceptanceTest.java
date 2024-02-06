@@ -1,28 +1,29 @@
 package subway;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static subway.api.StationApi.createStation;
+import static subway.api.StationApi.deleteStation;
+import static subway.api.StationApi.getStations;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+import org.springframework.test.context.jdbc.Sql;
+import subway.fixture.StationFixture;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@Sql("/truncate.sql")
 public class StationAcceptanceTest {
 	@DisplayName("지하철역을 생성한다.")
 	@Test
 	void create_station() {
 		// when
-		Map<String, String> body = createBody("강남역");
-		ExtractableResponse<Response> response = createStation(body);
+		ExtractableResponse<Response> response = createStation(StationFixture.강남역_생성_요청());
 
 		// then
 		assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -36,22 +37,22 @@ public class StationAcceptanceTest {
 	@Test
 	void get_stations() {
 		// given
-		createStation(createBody("강남역1"));
-		createStation(createBody("강남역2"));
+		createStation(StationFixture.강남역_생성_요청());
+		createStation(StationFixture.압구정역_생성_요청());
 
 		// when
 		List<String> stationNames = getStations();
 
 		// then
-		assertThat(stationNames).containsAnyOf("강남역1");
-		assertThat(stationNames).containsAnyOf("강남역2");
+		assertThat(stationNames).containsAnyOf(StationFixture.강남역_생성_요청().getName());
+		assertThat(stationNames).containsAnyOf(StationFixture.압구정역_생성_요청().getName());
 	}
 
 	@DisplayName("지하철 역을 삭제한다.")
 	@Test
 	void delete_station() {
 		// given
-		ExtractableResponse<Response> response = createStation(createBody("강남역1"));
+		ExtractableResponse<Response> response = createStation(StationFixture.강남역_생성_요청());
 		long stationId = response.body().jsonPath().getLong("id");
 
 		// when
@@ -59,52 +60,5 @@ public class StationAcceptanceTest {
 
 		// then
 		assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-	}
-
-	private Map<String, String> createBody(String stationName) {
-		Map<String, String> params = new HashMap<>();
-		params.put("name", stationName);
-
-		return params;
-	}
-
-	private ExtractableResponse<Response> createStation(Map<String, String> params) {
-		return RestAssured.given()
-				.log()
-				.all()
-				.body(params)
-				.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.when()
-				.post("/stations")
-				.then()
-				.log()
-				.all()
-				.extract();
-	}
-
-	private List<String> getStations() {
-		return RestAssured.given()
-				.log()
-				.all()
-				.when()
-				.get("/stations")
-				.then()
-				.log()
-				.all()
-				.extract()
-				.jsonPath()
-				.getList("name", String.class);
-	}
-
-	private ExtractableResponse<Response> deleteStation(Long id) {
-		return RestAssured.given()
-				.log()
-				.all()
-				.when()
-				.delete("/stations/" + id)
-				.then()
-				.log()
-				.all()
-				.extract();
 	}
 }
