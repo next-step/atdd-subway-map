@@ -32,7 +32,7 @@ public class LineAcceptanceTest {
     @Test
     void createLine() {
         // when
-        LineSteps.createLine("신분당선", "bg-red-600", 1L, 2L);
+        LineSteps.createLine("신분당선", "bg-red-600", 1L, 2L, 10L);
 
         // then
         List<String> lineNames = LineSteps.getLineNames();
@@ -48,8 +48,8 @@ public class LineAcceptanceTest {
     @Test
     void getLines() {
         // given
-        LineSteps.createLine("신분당선", "bg-red-600", 1L, 2L);
-        LineSteps.createLine("분당선", "bg-green-600", 1L, 3L);
+        LineSteps.createLine("신분당선", "bg-red-600", 1L, 2L, 10L);
+        LineSteps.createLine("분당선", "bg-green-600", 1L, 3L, 10L);
 
         // when
         List<String> lineNames = LineSteps.getLineNames();
@@ -68,7 +68,7 @@ public class LineAcceptanceTest {
     @Test
     void getLine() {
         // given
-        ExtractableResponse<Response> line = LineSteps.createLine("신분당선", "bg-red-600", 1L, 2L);
+        ExtractableResponse<Response> line = LineSteps.createLine("신분당선", "bg-red-600", 1L, 2L, 10L);
         String locationHeader = line.header("Location");
 
         // when
@@ -87,7 +87,7 @@ public class LineAcceptanceTest {
     @Test
     void updateLine() {
         // given
-        ExtractableResponse<Response> line = LineSteps.createLine("신분당선", "bg-red-600", 1L, 2L);
+        ExtractableResponse<Response> line = LineSteps.createLine("신분당선", "bg-red-600", 1L, 2L, 10L);
         String locationHeader = line.header("Location");
 
         // when
@@ -107,7 +107,7 @@ public class LineAcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        ExtractableResponse<Response> line = LineSteps.createLine("신분당선", "bg-red-600", 1L, 2L);
+        ExtractableResponse<Response> line = LineSteps.createLine("신분당선", "bg-red-600", 1L, 2L, 10L);
         String locationHeader = line.header("Location");
 
         // when

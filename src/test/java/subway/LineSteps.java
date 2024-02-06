@@ -5,19 +5,22 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import subway.station.StationResponse;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class LineSteps {
 
-    public static ExtractableResponse<Response> createLine(String name, String color, Long upStationId, Long downStationId) {
+    public static ExtractableResponse<Response> createLine(String name, String color, Long upStationId, Long downStationId, Long distance) {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
         params.put("color", color);
         params.put("upStationId", String.valueOf(upStationId));
         params.put("downStationId", String.valueOf(downStationId));
+        params.put("distance", String.valueOf(distance));
 
         return RestAssured.given().log().all()
                 .body(params)
@@ -45,6 +48,15 @@ public class LineSteps {
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
                 .extract();
+    }
+
+    public static List<String> getLineStationNames(String locationHeader) {
+        return getLine(locationHeader)
+                .jsonPath()
+                .getList("stations", StationResponse.class)
+                .stream()
+                .map(station -> station.getName())
+                .collect(Collectors.toList());
     }
 
     public static void updateLine(String name, String color, String locationHeader) {

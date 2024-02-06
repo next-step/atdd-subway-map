@@ -1,20 +1,10 @@
-package subway.line;
+package subway.section;
 
-public class LineRequest {
+public class SectionRequest {
 
-    private String name;
-    private String color;
     private Long upStationId;
     private Long downStationId;
     private Long distance;
-
-    public String getName() {
-        return name;
-    }
-
-    public String getColor() {
-        return color;
-    }
 
     public Long getUpStationId() {
         return upStationId;

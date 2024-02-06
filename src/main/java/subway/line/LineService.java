@@ -2,6 +2,7 @@ package subway.line;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.section.SectionRequest;
 import subway.station.Station;
 import subway.station.StationRepository;
 
@@ -28,7 +29,7 @@ public class LineService {
         Station downStation = stationRepository.findById(lineRequest.getDownStationId())
                 .orElseThrow(EntityNotFoundException::new);
 
-        Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor(), upStation, downStation));
+        Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor(), upStation, downStation, lineRequest.getDistance()));
         return new LineResponse(line);
     }
 
@@ -54,5 +55,18 @@ public class LineService {
     @Transactional
     public void deleteLineById(Long id) {
         lineRepository.deleteById(id);
+    }
+
+    @Transactional
+    public LineResponse saveSection(Long id, SectionRequest sectionRequest) {
+        Line line = lineRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+        Station upStation = stationRepository.findById(sectionRequest.getUpStationId())
+                .orElseThrow(EntityNotFoundException::new);
+        Station downStation = stationRepository.findById(sectionRequest.getDownStationId())
+                .orElseThrow(EntityNotFoundException::new);
+
+        line.addSection(upStation, downStation, sectionRequest.getDistance());
+
+        return new LineResponse(line);
     }
 }
