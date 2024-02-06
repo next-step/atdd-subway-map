@@ -3,7 +3,7 @@ POST http://localhost:8080/stations
 Content-Type: application/json
 
 {
-  "name": "서초역"
+  "name": "C"
 }
 
 
