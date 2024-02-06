@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import lombok.AllArgsConstructor;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
+import subway.dto.SectionRequest;
 import subway.service.LineService;
 
 @RestController
@@ -52,7 +53,7 @@ public class LineController {
 
     @PostMapping("/lines/{id}/sections")
     public ResponseEntity<Void> createSection(@PathVariable Long id, @RequestBody SectionRequest sectionRequest) {
-        lineService.addSection(sectionRequest);
+        lineService.addSection(id, sectionRequest);
         return ResponseEntity.ok().build();
     }
 }
