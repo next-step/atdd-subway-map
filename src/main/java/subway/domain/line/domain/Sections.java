@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
 import java.util.ArrayList;
@@ -14,15 +15,15 @@ import java.util.List;
 @Embeddable
 public class Sections {
 
-    @OneToMany(mappedBy = "line")
+    @OneToMany(mappedBy = "line", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private List<Section> sections = new ArrayList<>();
 
-    public boolean isSectionsNullOrEmpty(){
+    public boolean isSectionsNullOrEmpty() {
         return sections == null || sections.isEmpty();
     }
 
     public boolean hasMoreThanOne(Long stationId) {
-        if (sections == null || sections.isEmpty()) {
+        if (isSectionsNullOrEmpty()) {
             return false;
         }
 
@@ -31,5 +32,9 @@ public class Sections {
 
     public Section getLastSection() {
         return sections.get(sections.size() - 1);
+    }
+
+    public void removeSection(){
+        sections.remove(sections.size() - 1);
     }
 }

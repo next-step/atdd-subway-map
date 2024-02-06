@@ -26,24 +26,13 @@ public class SectionService {
     public SectionResponse createSection(Long lineId, CreateSectionRequest request) {
 
         Line line = lineRepository.getLineById(lineId);
-
-        if (!line.isStationDirectionEqual(request.getUpStationId())) {
-            throw new GlobalException("새로운 구간의 상행역은 해당 노선의 하행 종점역과 일치해야합니다.");
-        }
-
-        if (!line.containsSectionByStation(request.getDownStationId())) {
-            throw new GlobalException("이미 존재하는 역입니다.");
-        }
-
         Section section = Section.create(
                 line,
                 getStation(request, "upStation"),
                 getStation(request, "downStation"),
                 request.getDistance()
         );
-
         Section savedSection = sectionRepository.save(section);
-
         return SectionResponse.from(savedSection);
     }
 
@@ -59,7 +48,7 @@ public class SectionService {
             throw new GlobalException("노선의 구간이 하나인 경우 삭제가 불가합니다.");
         }
 
-        sectionRepository.deleteByDownStationId(stationId);
+        line.removeSections();
     }
 
     private Station getStation(CreateSectionRequest request, String type) {

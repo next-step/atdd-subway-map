@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import subway.domain.station.domain.Station;
+import subway.global.exception.GlobalException;
 
 import javax.persistence.*;
 
@@ -41,6 +42,14 @@ public class Section {
     }
 
     public static Section create(Line line, Station upStation, Station downStation, Integer distance) {
+        if (!line.isStationDirectionEqual(upStation.getId())) {
+            throw new GlobalException("새로운 구간의 상행역은 해당 노선의 하행 종점역과 일치해야합니다.");
+        }
+
+        if (!line.containsSectionByStation(downStation.getId())) {
+            throw new GlobalException("이미 존재하는 역입니다.");
+        }
+
         return Section.builder()
                 .line(line)
                 .upStation(upStation)

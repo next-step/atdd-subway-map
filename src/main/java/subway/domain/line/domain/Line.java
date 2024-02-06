@@ -78,4 +78,8 @@ public class Line {
     public boolean hasMoreThanOne(Long stationId) {
         return sections.hasMoreThanOne(stationId);
     }
+
+    public void removeSections(){
+        sections.removeSection();
+    }
 }
