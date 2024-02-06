@@ -12,18 +12,7 @@ import java.util.Map;
 @Slf4j
 public class GlobalExceptionHandler {
     @ExceptionHandler(GlobalException.class)
-    protected ResponseEntity<?> handleException(GlobalException ex) {
-
-        log.info(ex.getMessage());
-
-        Map<String, String> response = new HashMap<>();
-        response.put("message", ex.getMessage());
-
-        return ResponseEntity.badRequest().body(response);
-    }
-
-    @ExceptionHandler(Exception.class)
-    protected ResponseEntity<?> handleException(Exception ex) {
+    protected ResponseEntity<Object> handleException(GlobalException ex) {
 
         log.info(ex.getMessage());
 
