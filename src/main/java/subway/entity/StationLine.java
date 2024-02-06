@@ -64,6 +64,15 @@ public class StationLine {
         this.downStationId = downStationId;
     }
 
+    public StationLine addSection(StationSection createdStationSection) {
+        sections.addSection(createdStationSection);
+        return this;
+    }
+
+    public void deleteSectionByStationId(Long stationIdToDelete) {
+        this.sections.deleteSection(stationIdToDelete);
+    }
+
     public Long getId() {
         return id;
     }
@@ -90,10 +99,5 @@ public class StationLine {
 
     public StationSections getSections() {
         return sections;
-    }
-
-    public StationLine addSection(StationSection createdStationSection) {
-        sections.addSection(createdStationSection);
-        return this;
     }
 }

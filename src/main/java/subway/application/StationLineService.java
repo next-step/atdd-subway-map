@@ -59,10 +59,6 @@ public class StationLineService {
         stationLineRepository.deleteById(stationLineId);
     }
 
-    private static Long findFirstStation(List<StationSection> stationSections) {
-        return stationSections.get(0).getUpStationId();
-    }
-
     private StationResponse findStation(Long stationId) {
         return convertToStationResponse(stationRepository.findById(stationId).orElseThrow(IllegalArgumentException::new));
     }
@@ -109,8 +105,7 @@ public class StationLineService {
     private List<StationResponse> convertToStationResponses(StationSections stationSections) {
         List<StationResponse> stationResponses = new ArrayList<>();
         stationResponses.add(findStation(stationSections.findFirstUpStation()));
-        stationSections
-                .getSections()
+        stationSections.getSections()
                 .forEach(stationSection -> stationResponses.add(findStation(stationSection.getDownStationId())));
 
         return stationResponses;

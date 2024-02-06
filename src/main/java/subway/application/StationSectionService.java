@@ -45,6 +45,7 @@ public class StationSectionService {
         if (!stationLine.canSectionDelete(stationIdToDelete)) {
             throw new IllegalArgumentException("요청한 구간(혹은 역)을 삭제할 수 없습니다.");
         }
+        stationLine.deleteSectionByStationId(stationIdToDelete);
     }
 
     private boolean existStation(StationSection stationSection) {

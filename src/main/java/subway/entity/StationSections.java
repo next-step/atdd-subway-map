@@ -32,6 +32,15 @@ public class StationSections {
         return sections.size() > MIN_DELETE_REQUIRED_SECTIONS_SIZE;
     }
 
+    public void deleteSection(Long stationIdToDelete) {
+        StationSection stationSectionToDelete = sections.stream()
+                .filter(section -> section.getDownStationId().equals(stationIdToDelete))
+                .findFirst()
+                .orElseThrow(RuntimeException::new);
+
+        sections.remove(stationSectionToDelete);
+    }
+
     public List<StationSection> getSections() {
         return sections;
     }
