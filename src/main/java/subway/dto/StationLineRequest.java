@@ -2,12 +2,16 @@ package subway.dto;
 
 public class StationLineRequest {
     private final String name;
+
     private final String color;
-    private final int upStationId;
-    private final int downStationId;
+
+    private final Long upStationId;
+
+    private final Long downStationId;
+
     private final int distance;
 
-    public StationLineRequest(String name, String color, int upStationId, int downStationId, int distance) {
+    public StationLineRequest(String name, String color, Long upStationId, Long downStationId, int distance) {
         this.name = name;
         this.color = color;
         this.upStationId = upStationId;
@@ -23,11 +27,11 @@ public class StationLineRequest {
         return color;
     }
 
-    public int getUpStationId() {
+    public Long getUpStationId() {
         return upStationId;
     }
 
-    public int getDownStationId() {
+    public Long getDownStationId() {
         return downStationId;
     }
 

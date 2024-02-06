@@ -1,22 +1,27 @@
 package subway.dto;
 
+import java.util.List;
+
 public class StationLineResponse {
     private final Long id;
+
     private final String name;
+
     private final String color;
-    private final int upStationId;
 
-    private final int downStationId;
+    private List<StationResponse> stations;
 
-    private final int distance;
-
-    public StationLineResponse(Long id, String name, String color, int upStationId, int downStationId, int distance) {
+    public StationLineResponse(Long id, String name, String color) {
         this.id = id;
         this.name = name;
         this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
-        this.distance = distance;
+    }
+
+    public StationLineResponse(Long id, String name, String color, List<StationResponse> stations) {
+        this.id = id;
+        this.name = name;
+        this.color = color;
+        this.stations = stations;
     }
 
     public Long getId() {
@@ -31,15 +36,7 @@ public class StationLineResponse {
         return color;
     }
 
-    public int getUpStationId() {
-        return upStationId;
-    }
-
-    public int getDownStationId() {
-        return downStationId;
-    }
-
-    public int getDistance() {
-        return distance;
+    public List<StationResponse> getStations() {
+        return stations;
     }
 }

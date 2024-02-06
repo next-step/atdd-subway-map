@@ -1,9 +1,6 @@
 package subway.entity;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 public class StationLine {
@@ -14,18 +11,21 @@ public class StationLine {
 
     private String name;
 
-    private String color; // TODO: Enum 분리 고려
+    private String color;
 
-    private int upStationId;
+    private Long upStationId;
 
-    private int downStationId;
+    private Long downStationId;
 
     private int distance;
 
-    public StationLine() {
+    @Embedded
+    private StationSections sections = new StationSections();
+
+    protected StationLine() {
     }
 
-    public StationLine(String name, String color, int upStationId, int downStationId, int distance) {
+    public StationLine(String name, String color, Long upStationId, Long downStationId, int distance) {
         this.name = name;
         this.color = color;
         this.upStationId = upStationId;
@@ -37,6 +37,40 @@ public class StationLine {
         this.name = name;
         this.color = color;
         return this;
+    }
+
+    public boolean canSectionSave(StationSection toSaveSection) {
+        if(toSaveSection.areStationsSame()) {
+            return false;
+        }
+        if(!toSaveSection.isConnectToLastUpStation(downStationId)) {
+            return false;
+        }
+        return hasNoConnectingDownStation(toSaveSection);
+    }
+
+    private boolean hasNoConnectingDownStation(StationSection toSaveSection) {
+        return sections.areAllUpStationsDifferentFrom(toSaveSection);
+    }
+
+    public boolean canSectionDelete(Long stationId) {
+        if(!this.downStationId.equals(stationId)) {
+            return false;
+        }
+        return sections.isDeletionAllowed();
+    }
+
+    public void updateDownStation(Long downStationId) {
+        this.downStationId = downStationId;
+    }
+
+    public void addSection(StationSection createdStationSection) {
+        sections.addSection(createdStationSection);
+    }
+
+    public void deleteSectionSection(Long stationIdToDelete) {
+        this.sections.deleteSection(stationIdToDelete);
+        this.downStationId = sections.findLastStationId();
     }
 
     public Long getId() {
@@ -51,15 +85,19 @@ public class StationLine {
         return color;
     }
 
-    public int getUpStationId() {
+    public Long getUpStationId() {
         return upStationId;
     }
 
-    public int getDownStationId() {
+    public Long getDownStationId() {
         return downStationId;
     }
 
     public int getDistance() {
         return distance;
+    }
+
+    public StationSections getSections() {
+        return sections;
     }
 }
