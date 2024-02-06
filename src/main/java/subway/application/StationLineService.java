@@ -47,7 +47,7 @@ public class StationLineService {
     public void updateStationLine(Long stationLineId, StationLineRequest request) {
         StationLine stationLine = stationLineRepository.findById(stationLineId)
                 .orElseThrow(EntityNotFoundException::new);
-        convertToLineResponse(stationLineRepository.save(updateStationLine(request, stationLine)));
+        convertToLineResponse(updateStationLine(request, stationLine));
     }
 
     @Transactional

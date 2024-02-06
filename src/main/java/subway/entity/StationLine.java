@@ -64,13 +64,13 @@ public class StationLine {
         this.downStationId = downStationId;
     }
 
-    public StationLine addSection(StationSection createdStationSection) {
+    public void addSection(StationSection createdStationSection) {
         sections.addSection(createdStationSection);
-        return this;
     }
 
-    public void deleteSectionByStationId(Long stationIdToDelete) {
+    public void deleteSectionSection(Long stationIdToDelete) {
         this.sections.deleteSection(stationIdToDelete);
+        this.downStationId = sections.findLastStationId();
     }
 
     public Long getId() {

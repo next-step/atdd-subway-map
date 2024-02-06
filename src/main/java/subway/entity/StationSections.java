@@ -41,6 +41,13 @@ public class StationSections {
         sections.remove(stationSectionToDelete);
     }
 
+    public Long findLastStationId() {
+        if (sections.isEmpty()) {
+            throw new RuntimeException();
+        }
+        return sections.get(sections.size() - 1).getDownStationId();
+    }
+
     public List<StationSection> getSections() {
         return sections;
     }

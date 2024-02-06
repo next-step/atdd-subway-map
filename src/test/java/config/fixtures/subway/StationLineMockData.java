@@ -1,6 +1,7 @@
 package config.fixtures.subway;
 
 import subway.dto.StationLineRequest;
+import subway.entity.StationLine;
 
 public class StationLineMockData {
 
@@ -18,4 +19,7 @@ public class StationLineMockData {
     public static StationLineRequest 호남선_생성(Long upStationId, Long downStationId) {
         return new StationLineRequest("호남선", "bg-blue-100", upStationId, downStationId, 10);
     };
+
+    public static final StationLine 이호선 =
+            new StationLine("이호선", "bg-green-600", 1L, 2L, 20);
 }
