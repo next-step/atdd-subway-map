@@ -1,35 +1,32 @@
 package subway;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.DynamicTest.*;
+import static subway.location.enums.Location.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
+import org.junit.jupiter.api.TestFactory;
+import org.springframework.http.HttpMethod;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import subway.create.LineCreator;
+import subway.dto.StationDTO;
+import subway.fixture.LineFixture;
+import subway.fixture.SectionRequestFixture;
+import subway.fixture.StationFixture;
 import subway.line.LineResponse;
 import subway.line.LineUpdateRequest;
+import subway.line.SectionRequest;
+import subway.rest.Rest;
+import subway.station.StationResponse;
 
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class LineAcceptanceTest {
-	@LocalServerPort
-	private int port;
-
-	@BeforeEach
-	public void beforeEach() {
-		RestAssured.port = port;
-	}
+class LineAcceptanceTest extends AcceptanceTest {
 
 	/**
 	 * When 지하철 노선을 생성하면
@@ -39,20 +36,15 @@ class LineAcceptanceTest {
 	@Test
 	void saveLine() {
 		// when
-		ExtractableResponse<Response> savedLine = LineCreator.init()
+		ExtractableResponse<Response> savedLine = LineFixture.builder()
 			.build()
-			.actionReturnExtractableResponse();
-		LineResponse actualResponse = savedLine.jsonPath().getObject("", LineResponse.class);
+			.create();
+		LineResponse actualResponse = savedLine.as(LineResponse.class);
 
-		String uri = String.format("/%s/%s", "lines", actualResponse.getId());
-		LineResponse expectedResponse = RestAssured
-			.given().log().all()
-			.when().get(uri)
-			.then().log().all()
-			.extract().jsonPath().getObject("", LineResponse.class);
+		String uri = LINES.path(actualResponse.getId()).toUriString();
+		LineResponse expectedResponse = Rest.builder().get(uri).as(LineResponse.class);
 
 		// then
-		assertThat(savedLine.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 		assertThat(actualResponse).usingRecursiveComparison().isEqualTo(expectedResponse);
 	}
 
@@ -65,24 +57,20 @@ class LineAcceptanceTest {
 	@Test
 	void createLineAndRetrieveLines() {
 		// given
-		LineCreator lineCreator1 = LineCreator.init().build();
-		LineCreator lineCreator2 = LineCreator.init().upStationName("남강역").downStationName("재양역").build();
-		LineResponse line1 = lineCreator1.actionReturnLineResponse();
-		LineResponse line2 = lineCreator2.actionReturnLineResponse();
+		LineFixture lineFixture1 = LineFixture.builder().build();
+		LineFixture lineFixture2 = LineFixture.builder().upStationName("남강역").downStationName("재양역").build();
+		LineResponse expectedLineResponse1 = lineFixture1.actionReturnLineResponse();
+		LineResponse expectedLineResponse2 = lineFixture2.actionReturnLineResponse();
 
 		// when
-		ExtractableResponse<Response> extractableResponse = RestAssured
-			.given().log().all()
-			.when().get("/lines")
-			.then().log().all()
-			.extract();
-
-		List<LineResponse> actualResponse = extractableResponse.jsonPath().getList("", LineResponse.class);
+		List<LineResponse> actualResponse = Rest.builder()
+			.get(LINES.path())
+			.jsonPath()
+			.getList("", LineResponse.class);
 
 		// then
-		assertThat(extractableResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
-		assertThat(actualResponse.get(0)).usingRecursiveComparison().isEqualTo(line1);
-		assertThat(actualResponse.get(1)).usingRecursiveComparison().isEqualTo(line2);
+		assertThat(actualResponse.get(0)).usingRecursiveComparison().isEqualTo(expectedLineResponse1);
+		assertThat(actualResponse.get(1)).usingRecursiveComparison().isEqualTo(expectedLineResponse2);
 	}
 
 	/**
@@ -94,22 +82,16 @@ class LineAcceptanceTest {
 	@Test
 	void createLineAndRetrieveLine() {
 		// given
-		LineResponse expectedResponse = LineCreator.init()
+		LineResponse expectedResponse = LineFixture.builder()
 			.build()
 			.actionReturnLineResponse();
 
 		// when
-		String uri = String.format("/%s/%s", "lines", expectedResponse.getId());
-		ExtractableResponse<Response> extractableResponse = RestAssured
-			.given().log().all()
-			.when().get(uri)
-			.then().log().all()
-			.extract();
-
-		LineResponse actualResponse = extractableResponse.jsonPath().getObject("", LineResponse.class);
+		String uri = LINES.path(expectedResponse.getId()).toUriString();
+		ExtractableResponse<Response> extractableResponse = Rest.builder().get(uri);
+		LineResponse actualResponse = extractableResponse.as(LineResponse.class);
 
 		// then
-		assertThat(extractableResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 		assertThat(actualResponse).usingRecursiveComparison().isEqualTo(expectedResponse);
 	}
 
@@ -124,33 +106,18 @@ class LineAcceptanceTest {
 		// given
 		String expectedName = "변경된 이름";
 		String expectedColor = "변경된 색깔";
-		LineResponse lineResponse = LineCreator.init()
+		LineResponse lineResponse = LineFixture.builder()
 			.build()
 			.actionReturnLineResponse();
 
 		// when
 		LineUpdateRequest request = new LineUpdateRequest(expectedName, expectedColor);
 
-		String uri = String.format("/%s/%s", "lines", lineResponse.getId());
-		ExtractableResponse<Response> extractableResponse =
-			RestAssured
-				.given().log().all()
-				.body(request)
-				.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.when().put(uri)
-				.then().log().all()
-				.extract();
-
-		LineResponse actualResponse = RestAssured
-			.given().log().all()
-			.body(request)
-			.contentType(MediaType.APPLICATION_JSON_VALUE)
-			.when().get(uri)
-			.then().log().all()
-			.extract().jsonPath().getObject("", LineResponse.class);
+		String uri = LINES.path(lineResponse.getId()).toUriString();
+		Rest.builder().uri(uri).body(request).put();
+		LineResponse actualResponse = Rest.builder().get(uri).as(LineResponse.class);
 
 		// then
-		assertThat(extractableResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 		assertThat(actualResponse.getName()).isEqualTo(expectedName);
 		assertThat(actualResponse.getColor()).isEqualTo(expectedColor);
 	}
@@ -164,20 +131,223 @@ class LineAcceptanceTest {
 	@Test
 	void deleteLine() {
 		// given
-		LineResponse lineResponse = LineCreator.init()
+		LineResponse lineResponse = LineFixture.builder()
 			.build()
 			.actionReturnLineResponse();
 
 		// when
-		String uri = String.format("/%s/%s", "lines", lineResponse.getId());
-		ExtractableResponse<Response> extractableResponse =
-			RestAssured
-				.given().log().all()
-				.when().delete(uri)
-				.then().log().all()
-				.extract();
+		String uri = LINES.path(lineResponse.getId()).toUriString();
+		Rest.builder().delete(uri);
 
 		// then
-		assertThat(extractableResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+		List<LineResponse> actualResponse = Rest.builder()
+			.get(LINES.path())
+			.jsonPath()
+			.getList("", LineResponse.class);
+
+		assertThat(actualResponse).isEmpty();
+	}
+
+	/**
+	 * Given 해당 노선에 구간을 추가하고
+	 * When 노선을 조회 하면
+	 * Then 구간이 추가된 노선을 응답 받을수 있다.
+	 */
+	@DisplayName("노선 구간 추가")
+	@TestFactory
+	Stream<DynamicTest> addSection() {
+		// given
+		LineResponse givenLineResponse = LineFixture.builder()
+			.build()
+			.actionReturnLineResponse();
+
+		long addedStationId = StationFixture.builder()
+			.stationName("추가된 정류장")
+			.build()
+			.create()
+			.jsonPath()
+			.getLong("id");
+
+		return Stream.of(
+			dynamicTest("구간 추가를 위해 필요한 노선을 만든다.", () -> {
+				// then
+				String uri = LINES.path(givenLineResponse.getId()).toUriString();
+				LineResponse actualLineResponse = Rest.builder()
+					.get(uri)
+					.as(LineResponse.class);
+				assertThat(actualLineResponse).usingRecursiveComparison().isEqualTo(givenLineResponse);
+			}),
+			dynamicTest("추가할 구간에 필요한 정류장을 생성한다.", () -> {
+				// then
+				String uri = STATIONS.path();
+				List<StationResponse> stationResponse = Rest.builder().get(uri).jsonPath().getList("", StationResponse.class);
+				assertThat(stationResponse).extracting(StationResponse::getId).contains(addedStationId);
+			}),
+			dynamicTest("입력 받은 구간을 등록한다.", () -> {
+				// when
+				Long finalStationId = getFinalStationId(givenLineResponse);
+
+				SectionRequest.Builder sectionRequestFixture = SectionRequestFixture.builder()
+					.upStationId(finalStationId)
+					.downStationId(addedStationId);
+
+				String addSectionPostUri = LINES.path(givenLineResponse.getId()).path("/sections").toUriString();
+				LineResponse expectedLineResponse = Rest.builder()
+					.uri(addSectionPostUri)
+					.body(sectionRequestFixture.build())
+					.post()
+					.as(LineResponse.class);
+
+				// then
+				String linesGetUri = LINES.path(givenLineResponse.getId()).toUriString();
+				LineResponse actualLineResponse = Rest.builder().get(linesGetUri).as(LineResponse.class);
+				assertThat(actualLineResponse).usingRecursiveComparison().isEqualTo(expectedLineResponse);
+			}),
+			dynamicTest("추가할려는 구간의 정류장이 존재하지 않는 경우 exception 테스트",
+				() -> {
+				SectionRequest exceptionRequestFixture =
+					SectionRequestFixture.builder()
+						.upStationId(Long.MAX_VALUE)
+						.downStationId(Long.MAX_VALUE)
+						.build();
+
+				String uri = LINES.path(givenLineResponse.getId()).path("/sections").toUriString();
+				Rest.builder()
+					.uri(uri)
+					.body(exceptionRequestFixture)
+					.checkException("EntityNotFoundException", "존재하지 않는 정류장입니다.", HttpMethod.POST);
+			}),
+			dynamicTest("이미 노선에 포함된 정류장을 추가 하려고 하는 경우 Exception 테스트",
+				() -> {
+				Long finalStationId = getFinalStationId(givenLineResponse);
+				SectionRequest exceptionRequestFixture =
+					SectionRequestFixture.builder()
+						.upStationId(finalStationId)
+						.downStationId(finalStationId)
+						.build();
+
+				String uri = LINES.path(givenLineResponse.getId()).path("/sections").toUriString();
+				Rest.builder()
+					.uri(uri)
+					.body(exceptionRequestFixture)
+					.checkException("IllegalArgumentException", "추가 할려는 정류장은 이미 해당 노선에 존재하는 정류장입니다.", HttpMethod.POST);
+			}),
+			dynamicTest("추가할려는 상행역이 마지막 정류장이 아닐 경우 Exception 테스트",
+				() -> {
+				long addedExceptionStationId = StationFixture.builder()
+					.stationName("비정상 테스트 정류장")
+					.build()
+					.create()
+					.jsonPath()
+					.getLong("id");
+
+				SectionRequest exceptionRequestFixture =
+					SectionRequestFixture.builder()
+						.upStationId(addedExceptionStationId)
+						.downStationId(addedExceptionStationId)
+						.build();
+
+				String uri = LINES.path(givenLineResponse.getId()).path("/sections").toUriString();
+				Rest.builder()
+					.uri(uri)
+					.body(exceptionRequestFixture)
+					.checkException("IllegalArgumentException", "해당 노선의 마지막 정류장이 아닙니다.", HttpMethod.POST);
+			})
+		);
+	}
+
+	private Long getFinalStationId(LineResponse lineResponse) {
+		int size = lineResponse.getStations().size();
+		return lineResponse.getStations().get(size - 1).getId();
+	}
+
+	@DisplayName("노선 구간 삭제")
+	@TestFactory
+	Stream<DynamicTest> deleteSection() {
+		// given
+		LineResponse givenLineResponse = LineFixture.builder()
+			.build()
+			.actionReturnLineResponse();
+
+		String linesGetUri = LINES.path(givenLineResponse.getId()).toUriString();
+		LineResponse initLine = Rest.builder()
+			.get(linesGetUri)
+			.as(LineResponse.class);
+
+		long addedStationId = StationFixture.builder()
+			.stationName("추가된 정류장")
+			.build()
+			.create()
+			.jsonPath()
+			.getLong("id");
+
+		return Stream.of(
+			dynamicTest("구간 삭제를 위해 필요한 노선을 만든다.", () -> {
+				// then
+				assertThat(initLine).usingRecursiveComparison().isEqualTo(givenLineResponse);
+			}),
+			dynamicTest("해당 노선에 정류장이 2개 밖에 없을 경우 Exception", () -> {
+				String uri = LINES.path(givenLineResponse.getId())
+					.path("/sections")
+					.queryParam("stationId", "2")
+					.toUriString();
+
+				Rest.builder()
+					.uri(uri)
+					.body(Map.of("",""))
+					.checkException("IllegalArgumentException", "해당 노선은 두개의 정류장만 존재 하므로, 삭제할 수 없습니다.", HttpMethod.DELETE);
+			}),
+			dynamicTest("삭제할 구간에 필요한 정류장을 추가한다.", () -> {
+				// when
+				Long finalStationId = getFinalStationId(givenLineResponse);
+				SectionRequest.Builder sectionRequestFixture = SectionRequestFixture.builder()
+					.upStationId(finalStationId)
+					.downStationId(addedStationId);
+
+				String addSectionPostUri = LINES.path(givenLineResponse.getId()).path("/sections").toUriString();
+				LineResponse expectedLineResponse = Rest.builder()
+					.uri(addSectionPostUri)
+					.body(sectionRequestFixture.build())
+					.post()
+					.as(LineResponse.class);
+
+				// then
+				String linesGetUri1 = LINES.path(givenLineResponse.getId()).toUriString();
+				LineResponse actualLineResponse = Rest.builder().get(linesGetUri1).as(LineResponse.class);
+				assertThat(actualLineResponse).usingRecursiveComparison().isEqualTo(expectedLineResponse);
+			}),
+			dynamicTest("삭제 할려는 정류장이 마지막 정류장이 아닌 경우 Exception", () -> {
+				Long firstStationId = initLine.getStations()
+					.stream()
+					.map(StationDTO::getId)
+					.findFirst()
+					.orElse(1L);
+
+				String uri = LINES.path(givenLineResponse.getId())
+					.path("/sections")
+					.queryParam("stationId", firstStationId)
+					.toUriString();
+
+				Rest.builder()
+					.uri(uri)
+					.body(Map.of("",""))
+					.checkException("IllegalArgumentException", "해당 노선의 마지막 정류장이 아닙니다.", HttpMethod.DELETE);
+			}),
+			dynamicTest("노선의 구간(마지막 정류장)을 삭제한다.", () -> {
+				String uri = LINES.path(givenLineResponse.getId())
+					.path("/sections")
+					.queryParam("stationId", addedStationId)
+					.toUriString();
+
+				Rest.builder().delete(uri);
+
+				String uris = LINES.path(givenLineResponse.getId()).toUriString();
+				LineResponse actualLineResponse = Rest.builder()
+					.get(uris)
+					.as(LineResponse.class);
+
+				assertThat(actualLineResponse).usingRecursiveComparison().isEqualTo(initLine);
+			})
+		);
 	}
 }

@@ -17,81 +17,75 @@ import subway.station.StationRepository;
 public class LineService {
 	private final StationRepository stationRepository;
 	private final LineRepository lineRepository;
-	private final LineStationMapRepository lineStationMapRepository;
 
-	public LineService(StationRepository stationRepository, LineRepository lineRepository,
-		LineStationMapRepository lineStationMapRepository) {
+	public LineService(StationRepository stationRepository, LineRepository lineRepository) {
 		this.stationRepository = stationRepository;
 		this.lineRepository = lineRepository;
-		this.lineStationMapRepository = lineStationMapRepository;
+	}
+
+	private Line findLineById(Long id) {
+		return lineRepository.findById(id)
+			.orElseThrow(EntityNotFoundException::new);
+	}
+
+	private Station findStationById(Long stationId) {
+		return stationRepository.findById(stationId)
+			.orElseThrow(() -> new EntityNotFoundException("존재하지 않는 정류장입니다."));
 	}
 
 	public List<LineResponse> lines() {
 		List<Line> lines = lineRepository.findAll();
 		return lines.stream()
-			.map(line ->
-				LineResponse.of(
-					line,
-					line.getLineStationMaps()
-						.stream()
-						.map(LineStationMap::getStation)
-						.collect(toList())
-				)
-			).collect(toList());
+			.map(LineResponse::of)
+			.collect(toList());
 	}
 
 	@Transactional
 	public LineResponse save(LineCreateRequest request) {
-		Line line = new Line(
-			request.getName(),
-			request.getColor(),
-			request.getDistance()
-		);
+		Line line = request.toEntity();
 		Line savedLine = lineRepository.save(line);
-		List<Station> stations = createLineStationMap(savedLine, request.getUpStationId(), request.getDownStationId());
-		return LineResponse.of(savedLine, stations);
+
+		Station upStation = findStationById(request.getUpStationId());
+		Station downStation = findStationById(request.getDownStationId());
+
+		savedLine.addSection(upStation, downStation, request.getDistance());
+
+		return LineResponse.of(savedLine);
 	}
 
-	private List<Station> createLineStationMap(Line line, Long upStationId, Long downStationId) {
-		LineStationMap upLane = saveLineStationMap(Lane.UP, line, 999, upStationId);
-		LineStationMap downLane = saveLineStationMap(Lane.DOWN, line, 999, downStationId);
-		return List.of(upLane.getStation(), downLane.getStation());
-	}
-
-	private LineStationMap saveLineStationMap(Lane lane, Line line, Integer sort, Long stationId) {
-		Station station = stationRepository.findById(stationId)
-			.orElseThrow(EntityNotFoundException::new);
-		LineStationMap lineStationMap = new LineStationMap(lane, line, sort, station);
-		return lineStationMapRepository.save(lineStationMap);
-	}
-
-	public LineResponse line(Long id) {
-		Line line = lineRepository.findById(id).orElseThrow();
-		List<LineStationMap> lineStationMap = lineStationMapRepository.findAllByLineId(line.getId());
-		List<Station> stations = lineStationMap.stream().map(LineStationMap::getStation).collect(toList());
-		return LineResponse.of(line, stations);
+	public LineResponse line(Long lineId) {
+		Line line = findLineById(lineId);
+		return LineResponse.of(line);
 	}
 
 	@Transactional
 	public void update(Long id, LineUpdateRequest request) {
-		Line line = finLineById(id);
+		Line line = findLineById(id);
 		line.changeName(request.getName());
 		line.changeColor(request.getColor());
 	}
 
-	private Line finLineById(Long id) {
-		return lineRepository.findById(id)
-			.orElseThrow(EntityNotFoundException::new);
+	@Transactional
+	public void delete(Long id) {
+		Line line = findLineById(id);
+		lineRepository.delete(line);
 	}
 
 	@Transactional
-	public void delete(Long id) {
-		Line line = finLineById(id);
-		List<LineStationMap> lineStationMaps = lineStationMapRepository.findAllByLineId(line.getId());
-		List<Station> stations = lineStationMaps.stream().map(LineStationMap::getStation).collect(toList());
+	public LineResponse addSection(Long lineId, SectionRequest request) {
+		Line line = findLineById(lineId);
 
-		lineStationMapRepository.deleteAll(lineStationMaps);
-		lineRepository.delete(line);
-		stationRepository.deleteAll(stations);
+		Station upStation = findStationById(request.getUpStationId());
+		Station downStation = findStationById(request.getDownStationId());
+		line.addSection(upStation, downStation, request.getDistance());
+
+		return LineResponse.of(line);
+	}
+
+	@Transactional
+	public void deleteSection(Long lineId, Long deleteTargetStationId) {
+		Line line = findLineById(lineId);
+		Station station = findStationById(deleteTargetStationId);
+		line.removeStation(station);
 	}
 }
