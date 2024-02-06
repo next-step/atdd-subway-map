@@ -11,11 +11,13 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import subway.dto.LineRequest;
 
 @Entity
 @Table(name = "line")
@@ -39,6 +41,9 @@ public class Line {
     @JoinColumn(name = "down_station_id")
     private Station downStation;
 
+    @Embedded
+    private Sections sections = new Sections();
+
     public Line() {
 
     }
@@ -59,5 +64,9 @@ public class Line {
         }
         this.name = name;
         this.color = color;
+    }
+
+    public void addSection(Section section) {
+        sections.add(section);
     }
 }
