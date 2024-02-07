@@ -6,12 +6,15 @@ import io.restassured.response.Response;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import subway.station.Station;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 구간 관련 기능")
 public class SectionAcceptanceTest extends CommonAcceptanceTest{
@@ -43,22 +46,24 @@ public class SectionAcceptanceTest extends CommonAcceptanceTest{
         paraMap.put("downStationId", 삼성역Id);
         paraMap.put("distance", 10);
 
-        ExtractableResponse<Response> ex = RestAssured
+        ExtractableResponse<Response> addResponse = RestAssured
                 .given().log().all()
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
                     .pathParam("id", lineNum)
                 .body(paraMap)
                     .when()
-                    .put("/lines/{id}/sections")
+                    .post("/lines/{id}/sections")
                 .then().log().all()
                 .extract();
 
-        //then
-        ExtractableResponse<Response> response = LineRestAssuredCRUD.showLine(lineNum);
-        List<Map<String, Object>> stationList = response.jsonPath().getList("stations");
+        assertThat(addResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
-        List<Integer> idList = stationList.stream().filter(x -> x.containsKey("id")).map(m -> Integer.parseInt(m.get("id").toString())).collect(Collectors.toList());
-        Long maxStationId = idList.stream().mapToLong(v -> v).max().orElse(0);
+        //then
+        ExtractableResponse<Response> line = LineRestAssuredCRUD.showLine(lineNum);
+
+        List<Station> stations = line.jsonPath().getList("stations", Station.class);
+
+        Long maxStationId = stations.stream().mapToLong(v -> v.getId()).max().orElse(0);
 
         Assertions.assertThat(maxStationId).isEqualTo(삼성역Id);
     }
