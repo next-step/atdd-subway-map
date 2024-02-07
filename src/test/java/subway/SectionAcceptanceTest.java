@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 
 import java.util.List;
 
@@ -20,6 +21,7 @@ public class SectionAcceptanceTest {
         StationSteps.createStation("강남역");
         StationSteps.createStation("역삼역");
         StationSteps.createStation("선릉역");
+        StationSteps.createStation("삼성역");
         LineSteps.createLine("2호선", "green", 1L, 2L, 10L);
     }
 
@@ -37,6 +39,21 @@ public class SectionAcceptanceTest {
         // then
         List<String> lineStationNames = LineSteps.getLineStationNames(locationHeader);
         assertThat(lineStationNames).contains("역삼역", "선릉역");
+    }
+
+    /**
+     * When 새로운 구간의 상행역이 해당 노선에 등록되어있는 하행 종점역이 아닌 구간을 등록하면
+     * Then 에러를 반환한다.
+     */
+    @DisplayName("새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이 아니면 에러를 반환한다.")
+    @Test
+    void validateNextSection() {
+        // when
+        ExtractableResponse<Response> response = SectionSteps.createSection(1L, 3L, 4L, 10L);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.jsonPath().getString("message")).isEqualTo("구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이 아닙니다.");
     }
 
 }

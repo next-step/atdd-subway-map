@@ -1,5 +1,6 @@
 package subway.line;
 
+import subway.exception.SubwayException;
 import subway.section.Section;
 import subway.station.Station;
 
@@ -49,7 +50,16 @@ public class Line {
 
     public void addSection(Station upStation, Station downStation, Long distance) {
         Section section = new Section(this, upStation, downStation, distance);
+        if (sections.size() > 0){
+            validateNextSection(section);
+        }
         this.sections.add(section);
+    }
+
+    private void validateNextSection(Section section) {
+        if (!this.downStation.isEquals(section.getUpStation())) {
+            throw new SubwayException("구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이 아닙니다.");
+        }
     }
 
     public Long getId() {

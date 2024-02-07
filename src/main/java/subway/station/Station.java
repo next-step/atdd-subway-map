@@ -25,4 +25,7 @@ public class Station {
         return name;
     }
 
+    public boolean isEquals(Station station) {
+        return this.id == station.getId();
+    }
 }
