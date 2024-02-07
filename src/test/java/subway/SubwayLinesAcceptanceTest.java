@@ -22,7 +22,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
-import subway.lines.LinesResponse;
+import subway.lines.LineResponse;
 import subway.station.Station;
 import subway.station.StationRepository;
 import subway.station.StationResponse;
@@ -38,15 +38,12 @@ public class SubwayLinesAcceptanceTest {
     private String 파란색 = "bg-blue-600";
 
     @Autowired
-    private StationRepository stationRepository;
-
-    @Autowired
     private DatabaseCleaner databaseCleaner;
 
     @BeforeEach
     void setUp() {
-        stationRepository.save(new Station("강남역"));
-        stationRepository.save(new Station("역삼역"));
+        StationApiRequester.createStation("강남역");
+        StationApiRequester.createStation("역삼역");
     }
 
     @AfterEach
@@ -61,17 +58,17 @@ public class SubwayLinesAcceptanceTest {
     @Test
     void 지하철노선_생성() {
         // When
-        final ExtractableResponse<Response> createResponse = createLines(일호선, 빨간색, 1L, 2L, 10L);
+        final ExtractableResponse<Response> createResponse =SubwayLineApiRequester.createLines(일호선, 빨간색, 1L, 2L, 10L);
 
         // Then
         assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // Then
-        final LinesResponse createdLines = createResponse.as(LinesResponse.class);
+        final LineResponse createdLines = createResponse.as(LineResponse.class);
 
-        final LinesResponse[] linesList = getLinesList().as(LinesResponse[].class);
+        final LineResponse[] linesList = SubwayLineApiRequester.getLinesList().as(LineResponse[].class);
 
-        final LinesResponse foundLines = Arrays.stream(linesList)
+        final LineResponse foundLines = Arrays.stream(linesList)
             .filter(current -> Objects.equals(current.getId(), createdLines.getId()))
             .findFirst().orElse(null);
 
@@ -84,15 +81,14 @@ public class SubwayLinesAcceptanceTest {
      * When 지하철 노선 목록을 조회하면
      * Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
      */
-    @DirtiesContext
     @Test
     void 지하철노선_목록_조회() {
         // Given
-        createLines(일호선, 빨간색, 1L, 2L, 10L);
-        createLines(이호선, 빨간색, 1L, 2L, 10L);
+        SubwayLineApiRequester.createLines(일호선, 빨간색, 1L, 2L, 10L);
+        SubwayLineApiRequester.createLines(이호선, 빨간색, 1L, 2L, 10L);
 
         // When
-        final ExtractableResponse<Response> listResponse = getLinesList();
+        final ExtractableResponse<Response> listResponse = SubwayLineApiRequester.getLinesList();
 
         // Then
         assertThat(listResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -110,18 +106,19 @@ public class SubwayLinesAcceptanceTest {
     @Test
     void 지하철노선_조회() {
         // Given
-        final LinesResponse createdLines = createLines(일호선, 빨간색, 1L, 2L, 10L).as(
-            LinesResponse.class);
+        final LineResponse createdLines = SubwayLineApiRequester.createLines(일호선, 빨간색, 1L, 2L, 10L).as(
+            LineResponse.class);
 
         // When
-        final ExtractableResponse<Response> getResponse = getLines(
+        final ExtractableResponse<Response> getResponse = SubwayLineApiRequester.getLines(
             createdLines.getId());
 
         // Then
         assertThat(getResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         // Then
-        final LinesResponse foundLines = getResponse.as(LinesResponse.class);
+        final LineResponse foundLines = getResponse.as(LineResponse.class);
+        assertThat(foundLines).isNotNull();
         isSameLines(foundLines, createdLines);
     }
 
@@ -133,20 +130,21 @@ public class SubwayLinesAcceptanceTest {
     @Test
     void 지하철노선_수정() {
         // Given
-        final LinesResponse createdLines = createLines(일호선, 빨간색, 1L, 2L, 10L).as(
-            LinesResponse.class);
+        final LineResponse createdLines = SubwayLineApiRequester.createLines(일호선, 빨간색, 1L, 2L, 10L).as(
+            LineResponse.class);
 
         // When
-        final ExtractableResponse<Response> updateResponse = updateLines(createdLines.getId(), 이호선,
+        final ExtractableResponse<Response> updateResponse = SubwayLineApiRequester.updateLines(createdLines.getId(), 이호선,
             파란색);
 
         // Then
         assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         // Then
-        final LinesResponse foundLines = getLines(createdLines.getId()).as(LinesResponse.class);
-        assertThat(foundLines.getName()).isEqualTo(이호선);
-        assertThat(foundLines.getColor()).isEqualTo(파란색);
+        final LineResponse foundLine = SubwayLineApiRequester.getLines(createdLines.getId()).as(LineResponse.class);
+        assertThat(foundLine).isNotNull();
+        assertThat(foundLine.getName()).isEqualTo(이호선);
+        assertThat(foundLine.getColor()).isEqualTo(파란색);
     }
 
     /**
@@ -157,91 +155,21 @@ public class SubwayLinesAcceptanceTest {
     @Test
     void 지하철노선_삭제() {
         // Given
-        final LinesResponse createdLines = createLines(일호선, 빨간색, 1L, 2L, 10L)
-            .as(LinesResponse.class);
+        final LineResponse createdLines = SubwayLineApiRequester.createLines(일호선, 빨간색, 1L, 2L, 10L)
+            .as(LineResponse.class);
 
         // When
-        final ExtractableResponse<Response> deleteResponse = deleteLines(createdLines.getId());
+        final ExtractableResponse<Response> deleteResponse = SubwayLineApiRequester.deleteLines(createdLines.getId());
 
         // Then
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         // Then
-        final List<Long> idList = getLinesList().jsonPath().getList("id", Long.class);
+        final List<Long> idList = SubwayLineApiRequester.getLinesList().jsonPath().getList("id", Long.class);
         assertThat(idList).doesNotContain(createdLines.getId());
     }
 
-    private static ExtractableResponse<Response> getLinesList() {
-        return RestAssured
-            .given().log().all()
-            .when()
-            .get("/lines")
-            .then().log().all()
-            .extract();
-    }
-
-    private ExtractableResponse<Response> createLines(String name, String color, Long upStationId,
-        Long downStationId, Long distance) {
-        final Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-        params.put("color", color);
-        params.put("upStationId", upStationId.toString());
-        params.put("downStationId", downStationId.toString());
-        params.put("distance", distance.toString());
-
-        return RestAssured
-            .given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .body(params)
-            .when()
-            .post("/lines")
-            .then().log().all()
-            .extract();
-    }
-
-    private static ExtractableResponse<Response> getLines(Long id) {
-        return RestAssured
-            .given().log().all()
-            .when()
-            .get("/lines/" + id)
-            .then().log().all()
-            .extract();
-    }
-
-    private ExtractableResponse<Response> updateLines(Long id, String name, String color) {
-        final Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-        params.put("color", color);
-
-        return RestAssured
-            .given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .body(params)
-            .when()
-            .put("/lines/" + id)
-            .then().log().all()
-            .extract();
-    }
-
-    private static ExtractableResponse<Response> deleteLines(Long id) {
-        return RestAssured
-            .given().log().all()
-            .when()
-            .delete("/lines/" + id)
-            .then().log().all()
-            .extract();
-    }
-
-    private static void isSameLines(LinesResponse foundLines, LinesResponse createdLines) {
-        assertThat(foundLines.getName()).isEqualTo(createdLines.getName());
-        assertThat(foundLines.getColor()).isEqualTo(createdLines.getColor());
-
-        final List<Long> foundStationIdList = foundLines
-            .getStations().stream().map(StationResponse::getId)
-            .collect(Collectors.toList());
-        final List<Long> createdStationIdList = createdLines
-            .getStations().stream().map(StationResponse::getId)
-            .collect(Collectors.toList());
-        assertThat(foundStationIdList).containsAll(createdStationIdList);
+    private static void isSameLines(LineResponse foundLines, LineResponse createdLines) {
+        assertThat(foundLines).usingRecursiveComparison().isEqualTo(createdLines);
     }
 }
