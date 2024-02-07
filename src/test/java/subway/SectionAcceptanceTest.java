@@ -37,8 +37,8 @@ public class SectionAcceptanceTest {
         String locationHeader = response.header("Location");
 
         // then
-        List<String> lineStationNames = LineSteps.getLineStationNames(locationHeader);
-        assertThat(lineStationNames).contains("역삼역", "선릉역");
+        List<Long> lineStationIds = LineSteps.getLineStationIds(locationHeader);
+        assertThat(lineStationIds).contains(2L, 3L);
     }
 
     /**
@@ -69,6 +69,26 @@ public class SectionAcceptanceTest {
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(response.jsonPath().getString("message")).isEqualTo("이미 등록되어있는 역입니다.");
+    }
+
+    /**
+     * Given 구간을 생성하고
+     * When 그 구간을 삭제하면
+     * Then 노선 조회 시 등록한 역을 찾을 수 없다
+     */
+    @DisplayName("지하철역을 삭제하면 지하철역 목록 조회 시 생성한 역을 찾을 수 없다.")
+    @Test
+    void deleteSection() {
+        // given
+        ExtractableResponse<Response> response = SectionSteps.createSection(1L, 2L, 3L, 10L);
+        String locationHeader = response.header("Location");
+
+        // when
+        SectionSteps.deleteSection(1L, 3L);
+
+        // then
+        List<Long> lineStationIds = LineSteps.getLineStationIds(locationHeader);
+        assertThat(lineStationIds).doesNotContain(3L);
     }
 
 }

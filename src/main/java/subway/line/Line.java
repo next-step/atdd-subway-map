@@ -50,7 +50,7 @@ public class Line {
 
     public void addSection(Station upStation, Station downStation, Long distance) {
         Section section = new Section(this, upStation, downStation, distance);
-        if (sections.size() > 0){
+        if (sections.size() > 0) {
             validateNextSection(section);
             validateDuplicateStation(section);
         }
@@ -71,6 +71,15 @@ public class Line {
 
     private boolean isContains(Station station) {
         return this.sections.stream().anyMatch(section -> section.getUpStation().equals(station));
+    }
+
+    public void removeSection(Long stationId) {
+        Section deleteSection = this.sections.stream()
+                .filter(section -> section.getDownStation().isEquals(stationId))
+                .findFirst()
+                .orElseThrow(() -> new SubwayException("역을 찾을 수 없습니다."));
+
+        this.sections.remove(deleteSection);
     }
 
     public Long getId() {
@@ -96,4 +105,5 @@ public class Line {
     public List<Section> getSections() {
         return sections;
     }
+
 }

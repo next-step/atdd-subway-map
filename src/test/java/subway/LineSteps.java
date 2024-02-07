@@ -50,12 +50,12 @@ public class LineSteps {
                 .extract();
     }
 
-    public static List<String> getLineStationNames(String locationHeader) {
+    public static List<Long> getLineStationIds(String locationHeader) {
         return getLine(locationHeader)
                 .jsonPath()
                 .getList("stations", StationResponse.class)
                 .stream()
-                .map(station -> station.getName())
+                .map(station -> station.getId())
                 .collect(Collectors.toList());
     }
 

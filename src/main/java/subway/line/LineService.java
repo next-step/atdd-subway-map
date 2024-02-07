@@ -69,4 +69,10 @@ public class LineService {
 
         return new LineResponse(line);
     }
+
+    @Transactional
+    public void deleteSection(Long lineId, Long stationId) {
+        Line line = lineRepository.findById(lineId).orElseThrow(EntityNotFoundException::new);
+        line.removeSection(stationId);
+    }
 }

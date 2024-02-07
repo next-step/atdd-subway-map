@@ -25,4 +25,11 @@ public class SectionSteps {
                 .extract();
     }
 
+    public static void deleteSection(Long lineId, Long stationId) {
+        RestAssured.given().log().all()
+                .queryParam("stationId", stationId)
+                .when().delete("/lines/" + lineId + "/sections")
+                .then().log().all();
+    }
+
 }
