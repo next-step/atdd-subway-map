@@ -1,20 +1,40 @@
 package subway.line;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
+import static subway.acceptance.AcceptanceTestBase.assertStatusCode;
+import static subway.acceptance.ResponseParser.getIdFromResponse;
+import static subway.acceptance.ResponseParser.getNameFromResponse;
+import static subway.acceptance.ResponseParser.getNamesFromResponse;
+import static subway.line.LineAcceptanceTestHelper.노선_단건조회_요청;
+import static subway.line.LineAcceptanceTestHelper.노선_삭제_요청;
+import static subway.line.LineAcceptanceTestHelper.노선_생성_요청;
+import static subway.line.LineAcceptanceTestHelper.노선_수정_요청;
+import static subway.line.LineAcceptanceTestHelper.노선_파라미터_생성;
+import static subway.line.LineAcceptanceTestHelper.노선목록_조회_요청;
+import static subway.line.LineAcceptanceTestHelper.노선수정_파라미터_생성;
+import static subway.station.StationAcceptanceTestHelper.지하철_파라미터_생성;
+import static subway.station.StationAcceptanceTestHelper.지하철역_생성_요청;
 
-import io.restassured.RestAssured;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
 import java.util.HashMap;
+import org.aspectj.lang.annotation.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import subway.acceptance.AcceptanceTest;
 
 @DisplayName("노선 관련 기능")
 @AcceptanceTest
 public class LineAcceptanceTest {
+    final String 상행역 = "강남";
+    final String 하행역 = "역삼역";
+    @BeforeEach
+    void setUp() {
+        지하철역_생성_요청(지하철_파라미터_생성(상행역));
+        지하철역_생성_요청(지하철_파라미터_생성(하행역));
+    }
 
     /**
      * When 지하철 노선을 생성하면
@@ -24,13 +44,13 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선 생성")
     void createLine() {
         // given
-        HashMap<String, String> params = 노선_파라미터_생성();
+        HashMap<String, String> params = 노선_파라미터_생성("신분당선", "1", "2");
 
         // when
-        ExtractableResponse<Response> response = 노선_생성(params);
+        var response = 노선_생성_요청(params);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(response.statusCode()).isEqualTo(CREATED.value());
     }
 
     /**
@@ -42,22 +62,15 @@ public class LineAcceptanceTest {
     @DisplayName("노선 목록 조회")
     void fineLine() {
         // given
-        HashMap<String, String> params = 노선_파라미터_생성();
-        노선_생성(params);
-        params = 노선_파라미터_생성2();
-        노선_생성(params);
+        노선_생성_요청(노선_파라미터_생성("신분당선", "1", "2"));
+        노선_생성_요청(노선_파라미터_생성("2호선", "1", "10"));
 
         // when
-        ExtractableResponse<Response> response =
-            RestAssured.given().log().all()
-                       .contentType(MediaType.APPLICATION_JSON_VALUE)
-                       .when().get("/lines")
-                       .then().log().all()
-                       .extract();
+        var response = 노선목록_조회_요청();
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.jsonPath().getList("name", String.class).size()).isEqualTo(2);
+        assertStatusCode(response, OK);
+        assertThat(getNamesFromResponse(response).size()).isEqualTo(2);
     }
 
     /**
@@ -69,20 +82,15 @@ public class LineAcceptanceTest {
     @DisplayName("노선 단건 조회")
     void findLineDetail() {
         // given
-        HashMap<String, String> params = 노선_파라미터_생성();
-        ExtractableResponse<Response> createResponse = 노선_생성(params);
+        HashMap<String, String> params = 노선_파라미터_생성("신분당선", "1", "2");
+        var createResponse = 노선_생성_요청(params);
 
         // when
-        ExtractableResponse<Response> response =
-            RestAssured.given().log().all()
-                       .contentType(MediaType.APPLICATION_JSON_VALUE)
-                       .when().get("/lines/"+createResponse.jsonPath().getString("id"))
-                       .then().log().all()
-                       .extract();
+        var response = 노선_단건조회_요청(createResponse);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.jsonPath().getString("name")).isEqualTo(params.get("name"));
+        assertStatusCode(response, OK);
+        assertThat(getNameFromResponse(response)).isEqualTo(params.get("name"));
     }
 
 
@@ -95,24 +103,16 @@ public class LineAcceptanceTest {
     @DisplayName("노선 수정")
     void modifyLine() {
         // given
-        HashMap<String, String> params = 노선_파라미터_생성();
-        ExtractableResponse<Response> createResponse = 노선_생성(params);
-        HashMap<String, String> updateParam = new HashMap<>();
-        updateParam.put("name", "다른분당선");
-        updateParam.put("color", "bg-red-600");
-
+        var createResponse = 노선_생성_요청(노선_파라미터_생성("신분당선", "1", "2"));
+        Long id = getIdFromResponse(createResponse);
+        HashMap<String, String> updateParam = 노선수정_파라미터_생성();
 
         // when
-        ExtractableResponse<Response> response =
-            RestAssured.given().log().all()
-                       .body(updateParam)
-                       .contentType(MediaType.APPLICATION_JSON_VALUE)
-                       .when().put("/lines/"+createResponse.jsonPath().getString("id"))
-                       .then().log().all()
-                       .extract();
+        var response = 노선_수정_요청(updateParam, id);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertStatusCode(response, OK);
+        assertThat(getNameFromResponse(노선_단건조회_요청(createResponse))).isEqualTo(updateParam.get("name"));
     }
 
     /**
@@ -124,46 +124,14 @@ public class LineAcceptanceTest {
     @DisplayName("노선 삭제")
     void removeLine() {
         // given
-        HashMap<String, String> params = 노선_파라미터_생성();
-        ExtractableResponse<Response> createResponse = 노선_생성(params);
+        var createResponse = 노선_생성_요청(노선_파라미터_생성("신분당선", "1", "2"));
+        Long id = getIdFromResponse(createResponse);
 
         // when
-        ExtractableResponse<Response> response =
-            RestAssured.given().log().all()
-                       .contentType(MediaType.APPLICATION_JSON_VALUE)
-                       .when().delete("/lines/"+createResponse.jsonPath().getString("id"))
-                       .then().log().all()
-                       .extract();
+        var response = 노선_삭제_요청(id);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertStatusCode(response, NO_CONTENT);
     }
 
-    private static ExtractableResponse<Response> 노선_생성(HashMap<String, String> params) {
-        return RestAssured.given().log().all()
-                          .body(params)
-                          .contentType(MediaType.APPLICATION_JSON_VALUE)
-                          .when().post("/lines")
-                          .then().log().all()
-                          .extract();
-    }
-
-    private static HashMap<String, String> 노선_파라미터_생성() {
-        HashMap<String, String> params = new HashMap<>();
-        params.put("name", "신분당선");
-        params.put("color", "bg-red-600");
-        params.put("upStationId", "1");
-        params.put("downStationId", "2");
-        params.put("distance", "10");
-        return params;
-    }
-    private static HashMap<String, String> 노선_파라미터_생성2() {
-        HashMap<String, String> params = new HashMap<>();
-        params.put("name", "2호선");
-        params.put("color", "bg-green-600");
-        params.put("upStationId", "5");
-        params.put("downStationId", "20");
-        params.put("distance", "50");
-        return params;
-    }
 }
