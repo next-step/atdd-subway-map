@@ -2,23 +2,23 @@ package subway.line.presentation.request;
 
 public class AddSectionRequest {
 
-    private Long downStationId;
-
     private Long upStationId;
+
+    private Long downStationId;
 
     private Integer distance;
 
     private AddSectionRequest() {
     }
 
-    private AddSectionRequest(Long downStationId, Long upStationId, Integer distance) {
+    private AddSectionRequest(Long upStationId, Long downStationId, Integer distance) {
         this.upStationId = upStationId;
         this.downStationId = downStationId;
         this.distance = distance;
     }
 
-    public static AddSectionRequest of(Long downStationId, Long upStationId, Integer distance) {
-        return new AddSectionRequest(downStationId, upStationId, distance);
+    public static AddSectionRequest of(Long upStationId, Long downStationId, Integer distance) {
+        return new AddSectionRequest(upStationId, downStationId, distance);
     }
 
     public Long getUpStationId() {

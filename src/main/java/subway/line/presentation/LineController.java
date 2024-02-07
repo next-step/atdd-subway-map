@@ -2,12 +2,10 @@ package subway.line.presentation;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import subway.line.presentation.request.AddSectionRequest;
 import subway.line.presentation.request.CreateLineRequest;
 import subway.line.presentation.request.UpdateLineRequest;
-import subway.line.presentation.response.CreateLineResponse;
-import subway.line.presentation.response.ShowAllLinesResponse;
-import subway.line.presentation.response.ShowLineResponse;
-import subway.line.presentation.response.UpdateLineResponse;
+import subway.line.presentation.response.*;
 import subway.line.service.LineService;
 
 import java.net.URI;
@@ -47,6 +45,12 @@ public class LineController {
     public ResponseEntity<Void> deleteLine(@PathVariable Long id) {
         lineService.deleteLine(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/lines/{id}/section")
+    public ResponseEntity<AddSectionResponse> addSection(@PathVariable Long id, @RequestBody AddSectionRequest addSectionRequest) {
+        AddSectionResponse line = lineService.addSection(id, addSectionRequest);
+        return ResponseEntity.created(URI.create("/lines/" + line.getId() + "section")).body(line);
     }
 
 }

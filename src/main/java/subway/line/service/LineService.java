@@ -3,15 +3,14 @@ package subway.line.service;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.server.ResponseStatusException;
 import subway.line.domain.Line;
 import subway.line.domain.LineRepository;
+import subway.line.presentation.request.AddSectionRequest;
 import subway.line.presentation.request.CreateLineRequest;
 import subway.line.presentation.request.UpdateLineRequest;
-import subway.line.presentation.response.CreateLineResponse;
-import subway.line.presentation.response.ShowAllLinesResponse;
-import subway.line.presentation.response.ShowLineResponse;
-import subway.line.presentation.response.UpdateLineResponse;
+import subway.line.presentation.response.*;
 import subway.section.domain.Section;
 import subway.section.domain.SectionRepository;
 import subway.station.domain.Station;
@@ -76,6 +75,20 @@ public class LineService {
     @Transactional
     public void deleteLine(final Long id) {
         lineRepository.deleteById(id);
+    }
+
+    @Transactional
+    public AddSectionResponse addSection(Long id, AddSectionRequest addSectionRequest) {
+        Station upStation = stationRepository.getById(addSectionRequest.getUpStationId());
+        Station downStation = stationRepository.getById(addSectionRequest.getDownStationId());
+        Section section = sectionRepository.save(new Section(upStation, downStation, addSectionRequest.getDistance()));
+
+        Line line = lineRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "없는 지하철 노선입니다."));
+
+        line.addSection(section);
+
+        return AddSectionResponse.from(line);
     }
 
 }

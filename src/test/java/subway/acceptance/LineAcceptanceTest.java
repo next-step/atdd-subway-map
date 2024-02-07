@@ -40,7 +40,7 @@ public class LineAcceptanceTest {
         // then
         List<String> lineNames =
                 selectLines().jsonPath().getList("lines.name", String.class);
-        assertThat(lineNames).containsAnyOf(신분당선);
+        assertThat(lineNames).contains(신분당선);
     }
 
     /**
@@ -69,7 +69,7 @@ public class LineAcceptanceTest {
         // when & then
         List<String> lineNames =
                 selectLines().jsonPath().getList("lines.name", String.class);
-        assertThat(lineNames).containsAnyOf(신분당선, 수인분당선);
+        assertThat(lineNames).contains(신분당선, 수인분당선);
     }
 
     /**
@@ -94,7 +94,7 @@ public class LineAcceptanceTest {
     }
 
     /**
-     * Given 지하철 노선을 생성하고
+     * Given 지하철 노선을 생성하고
      * When 생성한 지하철 노선을 수정하면
      * Then 해당 지하철 노선 정보는 수정된다.
      */

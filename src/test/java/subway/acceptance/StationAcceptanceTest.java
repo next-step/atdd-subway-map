@@ -31,7 +31,7 @@ public class StationAcceptanceTest {
         // then
         List<String> stationNames =
                 selectStations().jsonPath().getList("stations.name", String.class);
-        assertThat(stationNames).containsAnyOf(강남역);
+        assertThat(stationNames).contains(강남역);
     }
 
     /**
@@ -53,7 +53,7 @@ public class StationAcceptanceTest {
                 selectStations().jsonPath().getList("stations.name", String.class);
 
         // then
-        assertThat(stationNames).containsAnyOf(강남역, 광화문역);
+        assertThat(stationNames).contains(강남역, 광화문역);
     }
 
     /**
