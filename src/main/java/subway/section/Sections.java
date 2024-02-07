@@ -2,6 +2,8 @@ package subway.section;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
@@ -62,4 +64,12 @@ public class Sections {
     private boolean isRemovable(Long stationId) {
         return sectionList.size() > 1 && getLastDownStationId().equals(stationId);
     }
+
+    public List<Long> getAllStationId() {
+        return sectionList.stream()
+                          .flatMap((section) -> {
+                              return Stream.of(section.getUpStationId(), section.getDownStationId());
+                          }).collect(Collectors.toList());
+    }
+
 }

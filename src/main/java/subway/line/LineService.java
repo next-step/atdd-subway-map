@@ -59,7 +59,7 @@ public class LineService {
 
     private LineResponse createLineResponse(Line line) {
         List<StationResponse> stationResponses = stationService.findAllStationById(
-            line.getFirstAndLastStationId());
+            line.getAllStationId());
 
         return new LineResponse(line.getId(), line.getName(), line.getColor(), stationResponses);
     }
