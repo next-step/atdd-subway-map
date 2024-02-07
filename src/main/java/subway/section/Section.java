@@ -21,8 +21,8 @@ public class Section {
     private Long downStationId;
     private Long distance;
 
-    public boolean isSame(Section section) {
-        return downStationId.equals(section.getUpStationId()) || downStationId.equals(section.downStationId);
+    public boolean isDuplicated(Section section) {
+        return downStationId.equals(section.upStationId) || upStationId.equals(section.upStationId);
     }
 
     public Section() {

@@ -42,7 +42,7 @@ public class Sections {
 
     public boolean isDupleCate(Section section) {
         return sectionList.stream()
-            .anyMatch(section::isSame);
+            .anyMatch(section::isDuplicated);
     }
 
     public void removeLastSection(Long stationId) {
