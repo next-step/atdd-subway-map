@@ -93,4 +93,23 @@ public class SectionAcceptanceTest {
         assertThat(lineStationIds).doesNotContain(3L);
     }
 
+    /**
+     * Given 구간을 생성하고
+     * When 마지막 구간이 아닌 구간을 삭제하면
+     * Then 에러를 반환한다.
+     */
+    @DisplayName("마지막 구간만 제거할 수 있다.")
+    @Test
+    void validateLastSection() {
+        // given
+        SectionSteps.createSection(1L, 2L, 3L, 10L);
+
+        // when
+        ExtractableResponse<Response> response = SectionSteps.deleteSection(1L, 2L);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.jsonPath().getString("message")).isEqualTo("마지막 구간만 제거할 수 있습니다.");
+    }
+
 }

@@ -66,6 +66,7 @@ public class LineService {
                 .orElseThrow(EntityNotFoundException::new);
 
         line.addSection(upStation, downStation, sectionRequest.getDistance());
+        line.updateDownStation(downStation);
 
         return new LineResponse(line);
     }

@@ -3,7 +3,6 @@ package subway;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import java.util.HashMap;
@@ -25,11 +24,12 @@ public class SectionSteps {
                 .extract();
     }
 
-    public static void deleteSection(Long lineId, Long stationId) {
-        RestAssured.given().log().all()
+    public static ExtractableResponse<Response> deleteSection(Long lineId, Long stationId) {
+        return RestAssured.given().log().all()
                 .queryParam("stationId", stationId)
                 .when().delete("/lines/" + lineId + "/sections")
-                .then().log().all();
+                .then().log().all()
+                .extract();
     }
 
 }

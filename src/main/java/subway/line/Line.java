@@ -48,6 +48,10 @@ public class Line {
         this.color = color;
     }
 
+    public void updateDownStation(Station downStation) {
+        this.downStation = downStation;
+    }
+
     public void addSection(Station upStation, Station downStation, Long distance) {
         Section section = new Section(this, upStation, downStation, distance);
         if (sections.size() > 0) {
@@ -74,12 +78,19 @@ public class Line {
     }
 
     public void removeSection(Long stationId) {
+        validateLastStation(stationId);
         Section deleteSection = this.sections.stream()
                 .filter(section -> section.getDownStation().isEquals(stationId))
                 .findFirst()
                 .orElseThrow(() -> new SubwayException("역을 찾을 수 없습니다."));
 
         this.sections.remove(deleteSection);
+    }
+
+    private void validateLastStation(Long stationId) {
+        if (!this.downStation.isEquals(stationId)) {
+            throw new SubwayException("마지막 구간만 제거할 수 있습니다.");
+        }
     }
 
     public Long getId() {
