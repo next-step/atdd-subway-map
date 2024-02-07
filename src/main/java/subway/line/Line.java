@@ -11,26 +11,21 @@ import java.util.List;
 @Entity
 public class Line {
 
+    @OneToMany(mappedBy = "line", cascade = CascadeType.PERSIST, orphanRemoval = true)
+    List<Section> sections = new ArrayList<>();
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     @Column(length = 20, nullable = false)
     private String name;
-
     @Column(length = 20, nullable = false)
     private String color;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "up_station_id")
     private Station upStation;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "down_station_id")
     private Station downStation;
-
-    @OneToMany(mappedBy = "line", cascade = CascadeType.PERSIST, orphanRemoval = true)
-    List<Section> sections = new ArrayList<>();
 
     public Line() {
     }
@@ -78,7 +73,9 @@ public class Line {
     }
 
     public void removeSection(Long stationId) {
-        validateLastStation(stationId);
+        validateLastSection();
+        validateEndSection(stationId);
+
         Section deleteSection = this.sections.stream()
                 .filter(section -> section.getDownStation().isEquals(stationId))
                 .findFirst()
@@ -87,7 +84,13 @@ public class Line {
         this.sections.remove(deleteSection);
     }
 
-    private void validateLastStation(Long stationId) {
+    private void validateLastSection() {
+        if (sections.size() < 2) {
+            throw new SubwayException("구간이 1개인 경우 역을 삭제할 수 없습니다.");
+        }
+    }
+
+    private void validateEndSection(Long stationId) {
         if (!this.downStation.isEquals(stationId)) {
             throw new SubwayException("마지막 구간만 제거할 수 있습니다.");
         }

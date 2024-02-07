@@ -100,7 +100,7 @@ public class SectionAcceptanceTest {
      */
     @DisplayName("마지막 구간만 제거할 수 있다.")
     @Test
-    void validateLastSection() {
+    void validateEndSection() {
         // given
         SectionSteps.createSection(1L, 2L, 3L, 10L);
 
@@ -112,4 +112,18 @@ public class SectionAcceptanceTest {
         assertThat(response.jsonPath().getString("message")).isEqualTo("마지막 구간만 제거할 수 있습니다.");
     }
 
+    /**
+     * When 구간이 1개인 경우 삭제하면
+     * Then 에러를 반환한다.
+     */
+    @DisplayName("구간이 1개인 경우 역을 삭제할 수 없다.")
+    @Test
+    void validateLastSection() {
+        // when
+        ExtractableResponse<Response> response = SectionSteps.deleteSection(1L, 2L);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.jsonPath().getString("message")).isEqualTo("구간이 1개인 경우 역을 삭제할 수 없습니다.");
+    }
 }
