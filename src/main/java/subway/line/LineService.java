@@ -20,7 +20,8 @@ public class LineService {
 
     @Transactional
     public LineResponse saveLine(LineRequest request) {
-        Line line = lineRepository.save(request.toEntity());
+        Line entity = request.toEntity();
+        Line line = lineRepository.save(entity);
         return createLineResponse(line);
     }
 
