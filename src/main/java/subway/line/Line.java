@@ -11,21 +11,26 @@ import java.util.List;
 @Entity
 public class Line {
 
-    @OneToMany(mappedBy = "line", cascade = CascadeType.PERSIST, orphanRemoval = true)
-    List<Section> sections = new ArrayList<>();
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(length = 20, nullable = false)
     private String name;
+
     @Column(length = 20, nullable = false)
     private String color;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "up_station_id")
     private Station upStation;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "down_station_id")
     private Station downStation;
+
+    @OneToMany(mappedBy = "line", cascade = CascadeType.PERSIST, orphanRemoval = true)
+    List<Section> sections = new ArrayList<>();
 
     public Line() {
     }
