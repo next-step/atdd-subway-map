@@ -52,6 +52,7 @@ public class Line {
         Section section = new Section(this, upStation, downStation, distance);
         if (sections.size() > 0){
             validateNextSection(section);
+            validateDuplicateStation(section);
         }
         this.sections.add(section);
     }
@@ -60,6 +61,16 @@ public class Line {
         if (!this.downStation.isEquals(section.getUpStation())) {
             throw new SubwayException("구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이 아닙니다.");
         }
+    }
+
+    private void validateDuplicateStation(Section section) {
+        if (isContains(section.getDownStation())) {
+            throw new SubwayException("이미 등록되어있는 역입니다.");
+        }
+    }
+
+    private boolean isContains(Station station) {
+        return this.sections.stream().anyMatch(section -> section.getUpStation().equals(station));
     }
 
     public Long getId() {

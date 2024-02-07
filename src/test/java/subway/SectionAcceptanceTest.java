@@ -56,4 +56,19 @@ public class SectionAcceptanceTest {
         assertThat(response.jsonPath().getString("message")).isEqualTo("구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이 아닙니다.");
     }
 
+    /**
+     * When 이미 해당 노선에 등록되어있는 역을 등록하면
+     * Then 에러를 반환한다.
+     */
+    @DisplayName("이미 해당 노선에 등록되어있는 역이면 에러를 반환한다.")
+    @Test
+    void validateDuplicateStation() {
+        // when
+        ExtractableResponse<Response> response = SectionSteps.createSection(1L, 2L, 1L, 10L);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.jsonPath().getString("message")).isEqualTo("이미 등록되어있는 역입니다.");
+    }
+
 }
