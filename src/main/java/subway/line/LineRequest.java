@@ -11,7 +11,7 @@ public class LineRequest {
 
     public Line toEntity() {
         Line line = new Line(name, color);
-        Section section = new Section(line,getUpStationId(), getDownStationId(), getDistance());
+        Section section = new Section(getUpStationId(), getDownStationId(), getDistance());
         line.addSection(section);
 
         return line;

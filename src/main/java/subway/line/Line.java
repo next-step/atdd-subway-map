@@ -28,7 +28,6 @@ public class Line {
 
     public void addSection(final Section section) {
         sections.addSection(section);
-        section.setLine(this);
     }
     public Line() {
     }
