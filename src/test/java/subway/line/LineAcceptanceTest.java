@@ -9,7 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
-import subway.line.dto.response.LineResponse;
+import subway.domain.line.dto.response.LineResponse;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,7 +30,7 @@ class LineAcceptanceTest implements LineFixture {
     @Test
     void createStationLine() {
         // when
-        ExtractableResponse<Response> response = createLineByNameAndStation("신분당선", "지하철1", "지하철2");
+        ExtractableResponse<Response> response = createLineByNameAndStation("신분당선");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -51,8 +51,8 @@ class LineAcceptanceTest implements LineFixture {
     @Test
     void getLines() {
         // given
-        createLineByNameAndStation("신분당선", "지하철1", "지하철2");
-        createLineByNameAndStation("수인분당선", "지하철3", "지하철4");
+        createLineByNameAndStation("신분당선");
+        createLineByNameAndStation("수인분당선");
 
         // when
         ExtractableResponse<Response> lineResponse = getLinesExtractableResponse();
@@ -144,7 +144,7 @@ class LineAcceptanceTest implements LineFixture {
     }
 
     private long getLineId() {
-        long lindId = createLineByNameAndStation("신분당선", "지하철1", "지하철2").jsonPath().getLong("id");
+        long lindId = createLineByNameAndStation("신분당선").jsonPath().getLong("id");
         return lindId;
     }
 
