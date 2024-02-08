@@ -1,20 +1,17 @@
 package subway;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 import subway.line.presentation.request.LineCreateRequest;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static subway.LineSteps.*;
+import static subway.SectionSteps.createSection;
+import static subway.SectionSteps.deleteSection;
 
 @Sql(value = "/sql/truncate.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 @DisplayName("구간 관련 기능")
@@ -110,17 +107,93 @@ public class SectionAcceptanceTest {
         assertThat(response.jsonPath().getString("message")).isEqualTo("이미 등록된 상태입니다.");
     }
 
-    private ExtractableResponse<Response> createSection(Long lineId, Long upStationId, Long downStationId, int distance) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("downStationId", downStationId);
-        params.put("upStationId", upStationId);
-        params.put("distance", distance);
+    /**
+     * given : 구간을 생성한다.
+     * when : 생성한 구간을 제거한다.
+     * then : 노선에서 구간이 제거된다.
+     */
+    @Test
+    void 구간을_생성하고_구간을_제거한다() {
+        //given
+        Long 선릉역_id = StationSteps.createStation("선릉역");
+        Long 역삼역_id = StationSteps.createStation("역삼역");
+        Long 강남역_id = StationSteps.createStation("강남역");
 
-        return RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines/" + lineId + "/sections")
-                .then().log().all()
-                .extract();
+        LineCreateRequest lineCreateRequest = new LineCreateRequest(
+                "2호선",
+                "green",
+                선릉역_id,
+                역삼역_id,
+                10
+        );
+        Long 이호선_id = createLine(lineCreateRequest);
+        createSection(이호선_id, 역삼역_id, 강남역_id, 20);
+
+        // when
+        ExtractableResponse<Response> response = deleteSection(이호선_id, 강남역_id);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(204);
+    }
+
+    /**
+     * given : 구간을 생성한다.
+     * when : 생성한 구간을 제거한다.
+     * then : 제거할 구간의 역이 하행종점역이 아니면 실패한다.
+     */
+    @Test
+    void 마지막역이_아니면_구간을_제거가_실패한다() {
+        //given
+        Long 선릉역_id = StationSteps.createStation("선릉역");
+        Long 역삼역_id = StationSteps.createStation("역삼역");
+        Long 강남역_id = StationSteps.createStation("강남역");
+
+        LineCreateRequest lineCreateRequest = new LineCreateRequest(
+                "2호선",
+                "green",
+                선릉역_id,
+                역삼역_id,
+                10
+        );
+        Long 이호선_id = createLine(lineCreateRequest);
+        createSection(이호선_id, 역삼역_id, 강남역_id, 20);
+
+        // when
+        ExtractableResponse<Response> response = deleteSection(이호선_id, 역삼역_id);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(400);
+        assertThat(response.jsonPath().getString("message")).isEqualTo("지하철 역이 일치하지 않습니다.");
+    }
+
+    /**
+     * given : 구간을 생성한다.
+     * when : 생성한 구간을 제거한다.
+     * then : 제거할 구간의 역이 노선의 마지막 역이면 실패한다.
+     */
+    @Test
+    void 노선에_1개의_역만_남으면_구간제거가_실패한다() {
+        //given
+        Long 선릉역_id = StationSteps.createStation("선릉역");
+        Long 역삼역_id = StationSteps.createStation("역삼역");
+        Long 강남역_id = StationSteps.createStation("강남역");
+
+        LineCreateRequest lineCreateRequest = new LineCreateRequest(
+                "2호선",
+                "green",
+                선릉역_id,
+                역삼역_id,
+                10
+        );
+        Long 이호선_id = createLine(lineCreateRequest);
+        createSection(이호선_id, 역삼역_id, 강남역_id, 20);
+        deleteSection(이호선_id, 강남역_id);
+
+        // when
+        ExtractableResponse<Response> response = deleteSection(이호선_id, 역삼역_id);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(400);
+        assertThat(response.jsonPath().getString("message")).isEqualTo("지하철역이 충분하지 않습니다.");
     }
 }
