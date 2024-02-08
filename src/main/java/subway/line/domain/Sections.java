@@ -22,6 +22,18 @@ public class Sections {
     }
 
     public void addSection(Section section) {
-        this.sections.add(section);
+        sections.add(section);
+    }
+
+    public void deleteLastSection() {
+        Section section = getLastSection();
+        sections.remove(section);
+    }
+
+    public Section getLastSection() {
+        if (sections.isEmpty()) {
+            return null;
+        }
+        return sections.get(sections.size() - 1);
     }
 }
