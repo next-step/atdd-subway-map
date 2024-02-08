@@ -8,15 +8,16 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
-import subway.line.LineCreateRequest;
-import subway.line.LineUpdateRequest;
+import subway.line.presentation.request.LineCreateRequest;
+import subway.line.presentation.request.LineUpdateRequest;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static io.restassured.path.json.JsonPath.from;
+import static subway.LineSteps.*;
+import static subway.StationSteps.createStation;
 
 @Sql(value = "/sql/truncate.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 @DisplayName("지하철역 관련 기능")
@@ -198,47 +199,5 @@ public class LineAcceptanceTest {
                 .extract();
     }
 
-    private Long createStation(String stationName) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", stationName);
 
-        return RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract()
-                .response().jsonPath().getLong("id");
-    }
-
-    private ExtractableResponse<Response> getLines() {
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when().get("/lines")
-                .then().log().all()
-                .extract();
-        return response;
-    }
-
-    private ExtractableResponse<Response> getLine(Long lineId) {
-        return RestAssured.given().log().all()
-                .when().get("/lines/" + lineId)
-                .then().log().all()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> putLine(Long lineId, LineUpdateRequest request) {
-        return RestAssured.given().log().all()
-                .body(request)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().put("/lines/" + lineId)
-                .then().log().all()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> deleteLine(Long lineId) {
-        return RestAssured.given().log().all()
-                .when().delete("/lines/" + lineId)
-                .then().log().all()
-                .extract();
-    }
 }
