@@ -5,21 +5,24 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 
-import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.jdbc.Sql;
 import subway.fixture.LineFixture;
 import subway.fixture.StationFixture;
 import subway.util.RestAssuredUtil;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@Sql("/truncate_table.sql")
+//@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @DisplayName("지하철역 노선 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {
-
     private static ExtractableResponse<Response> 신림역;
     private static ExtractableResponse<Response> 보라매역;
     private static ExtractableResponse<Response> 판교역;
@@ -73,11 +76,17 @@ public class LineAcceptanceTest {
     @Test
     void findAllLine() {
         //given
+        Long 신림선_고유번호 = 신림역.jsonPath().getLong("id");
+        Long 보라매역_고유번호 = 보라매역.jsonPath().getLong("id");
+        Long 신림선_길이 = 10L;
         RestAssuredUtil.생성_요청(
-                LineFixture.createLineParams(신림선, BLUE, 신림역.jsonPath().getLong("id"), 보라매역.jsonPath().getLong("id"), 20L), "/lines");
+                LineFixture.createLineParams(신림선, BLUE, 신림선_고유번호, 보라매역_고유번호, 신림선_길이), "/lines");
 
+        Long 판교역_고유번호 = 판교역.jsonPath().getLong("id");
+        Long 청계산입구역_고유번호 = 청계산입구역.jsonPath().getLong("id");
+        Long 신분당선_길이 = 10L;
         RestAssuredUtil.생성_요청(
-                LineFixture.createLineParams(신분당선, RED, 판교역.jsonPath().getLong("id"), 청계산입구역.jsonPath().getLong("id"), 20L), "/lines");
+                LineFixture.createLineParams(신분당선, RED, 판교역_고유번호, 청계산입구역_고유번호, 신분당선_길이), "/lines");
 
         //when
         ExtractableResponse<Response> lineList = RestAssuredUtil.조회_요청("/lines");
@@ -96,8 +105,11 @@ public class LineAcceptanceTest {
     @Test
     void findLine() {
         //given
+        Long 신림선_고유번호 = 신림역.jsonPath().getLong("id");
+        Long 보라매역_고유번호 = 보라매역.jsonPath().getLong("id");
+        Long distance = 10L;
         ExtractableResponse<Response> createResponse = RestAssuredUtil.생성_요청(
-                LineFixture.createLineParams(신림선, BLUE, 신림역.jsonPath().getLong("id"), 보라매역.jsonPath().getLong("id"), 20L), "/lines");
+                LineFixture.createLineParams(신림선, BLUE, 신림선_고유번호, 보라매역_고유번호, distance), "/lines");
 
         //when
         ExtractableResponse<Response> findResponse = RestAssuredUtil.조회_요청("/lines/" + createResponse.jsonPath().getLong("id"));
@@ -105,6 +117,7 @@ public class LineAcceptanceTest {
         //then
         assertThat(findResponse.jsonPath().getString("color")).isEqualTo(BLUE);
         assertThat(findResponse.jsonPath().getString("name")).isEqualTo(신림선);
+        assertThat(findResponse.jsonPath().getList("stations")).isEqualTo(List.of());
     }
 
     /**

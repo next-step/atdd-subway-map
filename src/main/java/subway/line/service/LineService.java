@@ -8,11 +8,13 @@ import subway.line.entity.Line;
 import subway.line.repository.LineRepository;
 import subway.line.request.LineCreateRequest;
 import subway.line.request.LineUpdateRequest;
+import subway.section.entity.Section;
+import subway.section.repository.SectionRepository;
 import subway.station.entity.Station;
 import subway.station.repository.StationRepository;
 import subway.station.response.StationResponse;
 
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,9 +24,12 @@ public class LineService {
 
     private StationRepository stationRepository;
 
-    public LineService(LineRepository lineRepository, StationRepository stationRepository) {
+    private SectionRepository sectionRepository;
+
+    public LineService(LineRepository lineRepository, StationRepository stationRepository, SectionRepository sectionRepository) {
         this.lineRepository = lineRepository;
         this.stationRepository = stationRepository;
+        this.sectionRepository = sectionRepository;
     }
 
     @Transactional
@@ -32,26 +37,26 @@ public class LineService {
         Station upStation = getStationById(lineCreateRequest.getUpStationId());
         Station downStation = getStationById(lineCreateRequest.getDownStationId());
 
-        Line line = lineRepository.save(
-                Line.builder()
-                        .name(lineCreateRequest.getName())
-                        .color(lineCreateRequest.getColor())
-                        .upStation(upStation)
-                        .downStation(downStation)
-                        .distance(lineCreateRequest.getDistance())
-                        .build());
+        Section section = Section.builder()
+                .upStation(upStation)
+                .downStation(downStation)
+                .distance(lineCreateRequest.getDistance())
+                .build();
+
+        Line line = Line.builder()
+                .name(lineCreateRequest.getName())
+                .color(lineCreateRequest.getColor())
+                .distance(lineCreateRequest.getDistance())
+                .sections(Collections.singletonList(section))
+                .build();
+
+        line = lineRepository.save(line);
 
         return LineResponse.builder()
                 .id(line.getId())
                 .name(line.getName())
-                .upStation(StationResponse.builder()
-                        .id(line.getUpStation().getId())
-                        .name(line.getUpStation().getName())
-                        .build())
-                .downStation(StationResponse.builder()
-                        .id(line.getDownStation().getId())
-                        .name(line.getDownStation().getName())
-                        .build())
+                .color(line.getColor())
+                .stations(convertStationsToStationResponses(line.getSections()))
                 .build();
     }
 
@@ -72,14 +77,8 @@ public class LineService {
                 .map(line -> LineResponse.builder().id(line.getId())
                         .name(line.getName())
                         .color(line.getColor())
-                        .upStation(StationResponse.builder()
-                                .id(line.getUpStation().getId())
-                                .name(line.getUpStation().getName())
-                                .build())
-                        .downStation(StationResponse.builder()
-                                .id(line.getUpStation().getId())
-                                .name(line.getUpStation().getName())
-                                .build()).build())
+                        .stations(convertStationsToStationResponses(line.getSections()))
+                        .build())
                 .collect(Collectors.toList());
     }
 
@@ -90,14 +89,7 @@ public class LineService {
                 .id(findLine.getId())
                 .color(findLine.getColor())
                 .name(findLine.getName())
-                .upStation(StationResponse.builder()
-                        .id(findLine.getUpStation().getId())
-                        .name(findLine.getUpStation().getName())
-                        .build())
-                .downStation(StationResponse.builder()
-                        .id(findLine.getUpStation().getId())
-                        .name(findLine.getUpStation().getName())
-                        .build())
+                .stations(convertStationsToStationResponses(findLine.getSections()))
                 .build();
     }
 
@@ -110,4 +102,24 @@ public class LineService {
         return stationRepository.findById(stationId)
                 .orElseThrow(() -> new NotFoundException("지하철역이 존재하지 않습니다."));
     }
+
+    private List<StationResponse> convertStationsToStationResponses(List<Section> sections) {
+        Set<StationResponse> stationResponses = new HashSet<>();
+        for (Section section : sections) {
+            StationResponse upStationResponse = StationResponse.builder()
+                    .id(section.getUpStation().getId())
+                    .name(section.getUpStation().getName())
+                    .build();
+
+            StationResponse downStationResponse = StationResponse.builder()
+                    .id(section.getDownStation().getId())
+                    .name(section.getDownStation().getName())
+                    .build();
+
+            stationResponses.add(upStationResponse);
+            stationResponses.add(downStationResponse);
+        }
+        return new ArrayList<>(stationResponses);
+    }
+
 }
