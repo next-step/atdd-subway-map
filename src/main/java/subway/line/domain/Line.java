@@ -39,7 +39,7 @@ public class Line {
         this.color = color;
     }
 
-    public void changeDownStation(Long stationId) {
+    public void changeDownStationId(Long stationId) {
         this.downStationId = stationId;
     }
 
