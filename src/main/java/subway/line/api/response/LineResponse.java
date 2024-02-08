@@ -1,8 +1,9 @@
-package subway.line;
+package subway.line.api.response;
 
 import lombok.Builder;
 import lombok.Getter;
-import subway.StationResponse;
+import subway.line.domain.Line;
+import subway.station.StationResponse;
 
 import java.util.ArrayList;
 import java.util.List;

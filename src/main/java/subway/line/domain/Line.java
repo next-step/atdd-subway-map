@@ -1,4 +1,4 @@
-package subway.line;
+package subway.line.domain;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -19,6 +19,8 @@ public class Line {
     private Long upStationId;
     private Long downStationId;
     private int distance;
+    @Embedded
+    private Sections sections;
 
     @Builder
     public Line(String name, String color, Long upStationId, Long downStationId, int distance) {
@@ -36,4 +38,15 @@ public class Line {
     public void updateColor(String color) {
         this.color = color;
     }
+
+    public void changeDownStation(Long stationId) {
+        this.downStationId = stationId;
+    }
+
+    public void changeDistance(int distance) {
+        this.distance += distance;
+
+    }
+
+
 }

@@ -1,9 +1,14 @@
-package subway.line;
+package subway.line.api;
 
 import org.springframework.stereotype.Service;
-import subway.Station;
-import subway.StationRepository;
-import subway.StationResponse;
+import subway.line.presentation.request.LineCreateRequest;
+import subway.line.api.response.LineResponse;
+import subway.line.presentation.request.LineUpdateRequest;
+import subway.line.domain.Line;
+import subway.line.repository.LineRepository;
+import subway.station.Station;
+import subway.station.StationRepository;
+import subway.station.StationResponse;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
