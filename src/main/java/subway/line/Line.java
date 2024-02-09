@@ -13,7 +13,6 @@ public class Line {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column
     private String name;
     private String color;
     private Long upStationId;
@@ -81,7 +80,12 @@ public class Line {
         return false;
     }
 
-    public void deleteStation(Long stationId) {
-        stations.removeIf(station -> station.getId() == stationId);
+    public void deleteStation(Long deleteStationId, Long sectionUpStationId) {
+        if(deleteStationId != downStationId){
+            throw new IllegalArgumentException("노선의 하행 종점역이 아닙니다.");
+        }
+
+        stations.removeIf(station -> station.getId() == deleteStationId);
+        downStationId = sectionUpStationId;
     }
 }

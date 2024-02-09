@@ -12,15 +12,20 @@ public class SectionService {
 
     private LineRepository lineRepository;
     private StationRepository stationRepository;
+    private SectionRepository sectionRepository;
 
-    public SectionService(LineRepository lineRepository, StationRepository stationRepository) {
+    public SectionService(LineRepository lineRepository, StationRepository stationRepository, SectionRepository sectionRepository) {
         this.lineRepository = lineRepository;
         this.stationRepository = stationRepository;
+        this.sectionRepository = sectionRepository;
     }
 
     @Transactional
-    public void addSection(Long id, SectionRequest sectionRequest) {
-        Line line = lineRepository.findById(id).orElseThrow();
+    public void addSection(Long lineId, SectionRequest sectionRequest) {
+
+        Line line = lineRepository.findById(lineId).orElseThrow();
+        int currentLineDistance = line.getDistance();
+        sectionRepository.save(sectionRequest.createSection(lineId, currentLineDistance));
 
         Station newSectionDownStation = stationRepository.findById(sectionRequest.getDownStationId()).orElseThrow();
 
@@ -37,9 +42,11 @@ public class SectionService {
     }
 
     @Transactional
-    public void deleteStation(Long lineId, Long stationId) {
+    public void deleteStation(Long lineId, Long deleteStationId) {
         Line line = lineRepository.findById(lineId).orElseThrow();
-        line.deleteStation(stationId);
-        stationRepository.deleteById(stationId);
+        Section section = sectionRepository.findByDownStationIdAndLineId(deleteStationId, lineId);
+
+        line.deleteStation(deleteStationId, section.getUpStationId());
+        stationRepository.deleteById(deleteStationId);
     }
 }

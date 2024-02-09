@@ -12,9 +12,6 @@ import subway.common.CommonAcceptanceTest;
 import subway.common.LineRestAssuredCRUD;
 import subway.common.SectionRestAssuredCRUD;
 import subway.common.StationRestAssuredCRUD;
-import subway.station.Station;
-
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -47,12 +44,9 @@ public class SectionAcceptanceTest extends CommonAcceptanceTest {
 
         //then
         ExtractableResponse<Response> line = LineRestAssuredCRUD.showLine(lineNum);
+        Long 노선의_하행_종점역 = line.jsonPath().getLong("downStationId");
 
-        List<Station> stations = line.jsonPath().getList("stations", Station.class);
-
-        Long maxStationId = stations.stream().mapToLong(v -> v.getId()).max().orElse(0);
-
-        Assertions.assertThat(maxStationId).isEqualTo(삼성역Id);
+        Assertions.assertThat(노선의_하행_종점역).isEqualTo(삼성역Id);
     }
 
 
@@ -135,10 +129,10 @@ public class SectionAcceptanceTest extends CommonAcceptanceTest {
 
         //then
         lineResponse = LineRestAssuredCRUD.showLine(lineId);
-        List<Station> stations = lineResponse.jsonPath().getList("stations", Station.class);
-        Long maxStationId = stations.stream().mapToLong(v -> v.getId()).max().orElse(0);
 
-        Assertions.assertThat(maxStationId).isEqualTo(선릉역Id);
+        Long 노선의_하행_종점역 = lineResponse.jsonPath().getLong("downStationId");
+
+        Assertions.assertThat(노선의_하행_종점역).isEqualTo(선릉역Id);
     }
 
     /**
