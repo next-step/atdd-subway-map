@@ -98,7 +98,7 @@ public class SectionAcceptanceTest {
      * When 마지막 구간이 아닌 구간을 삭제하면
      * Then 에러를 반환한다.
      */
-    @DisplayName("마지막 구간만 제거할 수 있다.")
+    @DisplayName("마지막 구간이 아닌 구간을 삭제하면 에러를 반환한다.")
     @Test
     void validateEndSection() {
         // given
@@ -116,7 +116,7 @@ public class SectionAcceptanceTest {
      * When 구간이 1개인 경우 삭제하면
      * Then 에러를 반환한다.
      */
-    @DisplayName("구간이 1개인 경우 역을 삭제할 수 없다.")
+    @DisplayName("구간이 1개인 경우 삭제하면 에러를 반환한다.")
     @Test
     void validateLastSection() {
         // when
