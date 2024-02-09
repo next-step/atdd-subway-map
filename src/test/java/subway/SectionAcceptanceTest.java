@@ -1,23 +1,23 @@
 package subway;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+import subway.common.CommonAcceptanceTest;
+import subway.common.LineRestAssuredCRUD;
+import subway.common.SectionRestAssuredCRUD;
+import subway.common.StationRestAssuredCRUD;
 import subway.station.Station;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 구간 관련 기능")
-public class SectionAcceptanceTest extends CommonAcceptanceTest{
+public class SectionAcceptanceTest extends CommonAcceptanceTest {
 
     Long extractResponseId(ExtractableResponse<Response> response) {
         return response.body().jsonPath().getLong("id");
@@ -40,22 +40,7 @@ public class SectionAcceptanceTest extends CommonAcceptanceTest{
 
         //when
         Long 삼성역Id = extractResponseId(StationRestAssuredCRUD.createStation("삼성역"));
-
-        Map<String, Object> paraMap = new HashMap<>();
-        paraMap.put("upStationId", 선릉역Id);
-        paraMap.put("downStationId", 삼성역Id);
-        paraMap.put("distance", 10);
-
-        ExtractableResponse<Response> addResponse = RestAssured
-                .given().log().all()
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                    .pathParam("id", lineNum)
-                .body(paraMap)
-                    .when()
-                    .post("/lines/{id}/sections")
-                .then().log().all()
-                .extract();
-
+        ExtractableResponse<Response> addResponse = SectionRestAssuredCRUD.addSection(선릉역Id, 삼성역Id, 10, lineNum);
         assertThat(addResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         //then
@@ -85,20 +70,7 @@ public class SectionAcceptanceTest extends CommonAcceptanceTest{
         Long lineNum = lineResponse.jsonPath().getLong("id");
 
         //when
-        Map<String, Object> paraMap = new HashMap<>();
-        paraMap.put("upStationId", 선릉역Id);
-        paraMap.put("downStationId", 강남역Id);
-        paraMap.put("distance", 10);
-
-        ExtractableResponse<Response> addResponse = RestAssured
-                .given().log().all()
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                    .pathParam("id", lineNum)
-                    .body(paraMap)
-                .when()
-                    .post("/lines/{id}/sections")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> addResponse = SectionRestAssuredCRUD.addSection(선릉역Id, 강남역Id, 10, lineNum);
 
         //then
         assertThat(addResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
@@ -122,20 +94,7 @@ public class SectionAcceptanceTest extends CommonAcceptanceTest{
         //when
         Long 잠실역Id = extractResponseId(StationRestAssuredCRUD.createStation("잠실역"));
         Long 삼성역Id = extractResponseId(StationRestAssuredCRUD.createStation("삼성역"));
-        Map<String, Object> paraMap = new HashMap<>();
-        paraMap.put("upStationId", 잠실역Id);
-        paraMap.put("downStationId", 삼성역Id);
-        paraMap.put("distance", 10);
-
-        ExtractableResponse<Response> addResponse = RestAssured
-                .given().log().all()
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                    .pathParam("id", lineNum)
-                    .body(paraMap)
-                .when()
-                    .post("/lines/{id}/sections")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> addResponse = SectionRestAssuredCRUD.addSection(잠실역Id, 삼성역Id, 10, lineNum);
 
         //then
         assertThat(addResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());

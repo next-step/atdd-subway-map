@@ -1,5 +1,6 @@
 package subway.line;
 
+import subway.section.SectionRequest;
 import subway.station.Station;
 
 import javax.persistence.*;
@@ -19,7 +20,7 @@ public class Line {
     private Long downStationId;
     private int distance;
 
-    @OneToMany(mappedBy = "line")
+    @OneToMany(mappedBy = "line", orphanRemoval = true)
     private List<Station> stations = new ArrayList<>();
 
     public Line() {}
@@ -65,8 +66,9 @@ public class Line {
         this.color = color;
     }
 
-    public void changeDownStationId(Long id) {
-        this.downStationId = id;
+    public void changeDownStationId(SectionRequest sectionRequest) {
+        this.downStationId = sectionRequest.getDownStationId();
+        this.distance = sectionRequest.getDistance();
     }
 
     public boolean isExistStation(Station newStation) {

@@ -5,13 +5,15 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
+import subway.common.CommonAcceptanceTest;
+import subway.common.StationRestAssuredCRUD;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
-public class StationAcceptanceTest extends CommonAcceptanceTest{
+public class StationAcceptanceTest extends CommonAcceptanceTest {
 
     /**
      * When 지하철역을 생성하면

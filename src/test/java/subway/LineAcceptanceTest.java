@@ -6,13 +6,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
+import subway.common.CommonAcceptanceTest;
+import subway.common.LineRestAssuredCRUD;
+import subway.common.StationRestAssuredCRUD;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
-public class LineAcceptanceTest extends CommonAcceptanceTest{
+public class LineAcceptanceTest extends CommonAcceptanceTest {
     private static Long 강남역Id;
     private static Long 양재역Id;
 

@@ -33,6 +33,6 @@ public class SectionService {
         }
 
         newSectionDownStation.mappingLine(line);
-        line.changeDownStationId(sectionRequest.getDownStationId());
+        line.changeDownStationId(sectionRequest);
     }
 }
