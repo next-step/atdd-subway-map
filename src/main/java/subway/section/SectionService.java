@@ -22,16 +22,17 @@ public class SectionService {
     public void addSection(Long id, SectionRequest sectionRequest) {
         Line line = lineRepository.findById(id).orElseThrow();
 
-        Station station = stationRepository.findById(sectionRequest.getDownStationId()).orElseThrow();
+        Station newSectionDownStation = stationRepository.findById(sectionRequest.getDownStationId()).orElseThrow();
 
-        if(line.isExistStation(station)){
+        if(line.isExistStation(newSectionDownStation)){
             throw new IllegalArgumentException("구간의 하행역이 이미 노선에 등록된 역입니다.");
         }
 
-        if(sectionRequest.getUpStationId() == line.getDownStationId()) {
-            station.mappingLine(line);
-
-            line.changeDownStationId(sectionRequest.getDownStationId());
+        if(sectionRequest.getUpStationId() != line.getDownStationId()) {
+            throw new IllegalArgumentException("구간의 상행역과 노선의 하행역이 일치하지 않습니다.");
         }
+
+        newSectionDownStation.mappingLine(line);
+        line.changeDownStationId(sectionRequest.getDownStationId());
     }
 }

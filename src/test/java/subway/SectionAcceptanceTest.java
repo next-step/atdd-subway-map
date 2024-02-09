@@ -120,8 +120,8 @@ public class SectionAcceptanceTest extends CommonAcceptanceTest{
         Long lineNum = lineResponse.jsonPath().getLong("id");
 
         //when
-        Long 삼성역Id = extractResponseId(StationRestAssuredCRUD.createStation("삼성역"));
         Long 잠실역Id = extractResponseId(StationRestAssuredCRUD.createStation("잠실역"));
+        Long 삼성역Id = extractResponseId(StationRestAssuredCRUD.createStation("삼성역"));
         Map<String, Object> paraMap = new HashMap<>();
         paraMap.put("upStationId", 잠실역Id);
         paraMap.put("downStationId", 삼성역Id);
