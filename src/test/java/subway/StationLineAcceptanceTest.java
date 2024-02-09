@@ -1,20 +1,16 @@
 package subway;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.jdbc.Sql;
+import utils.StationLineManager;
+import utils.StationManager;
 
 @DisplayName("지하철역 노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -24,9 +20,9 @@ public class StationLineAcceptanceTest {
 
     @BeforeEach
     void setUp() {
-        saveStation("지하철역");
-        saveStation("새로운지하철역");
-        saveStation("또다른지하철역");
+        StationManager.save("지하철역");
+        StationManager.save("새로운지하철역");
+        StationManager.save("또다른지하철역");
     }
 
     /**
@@ -38,7 +34,7 @@ public class StationLineAcceptanceTest {
     @Test
     void createStationLine() {
         // when
-        ExtractableResponse<Response> response = saveStationLine("신분당선", "bg-red-600", 1L, 2L, 10L);
+        ExtractableResponse<Response> response = StationLineManager.save("신분당선", "bg-red-600", 1L, 2L, 10L);
 
         // then
         String result = response.jsonPath().getString("name");
@@ -55,16 +51,11 @@ public class StationLineAcceptanceTest {
     @Test
     void findAllStationLine() {
         // given
-        saveStationLine("신분당선", "bg-red-600", 1L, 2L, 10L);
-        saveStationLine("분당선", "bg-green-600", 1L, 3L, 10L);
-
+        StationLineManager.save("신분당선", "bg-red-600", 1L, 2L, 10L);
+        StationLineManager.save("분당선", "bg-green-600", 1L, 3L, 10L);
 
         // when
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .when().get("/lines")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = StationLineManager.findAll();
 
         // then
         List<String> stations = response.jsonPath().getList("name", String.class);
@@ -81,14 +72,10 @@ public class StationLineAcceptanceTest {
     @Test
     void findStationLine() {
         // given
-        saveStationLine("신분당선", "bg-red-600", 1L, 2L, 10L);
+        StationLineManager.save("신분당선", "bg-red-600", 1L, 2L, 10L);
 
         // when
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .when().get("/lines/{id}", 1)
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = StationLineManager.findById(1L);
 
         // then
         String result = response.jsonPath().getString("name");
@@ -105,26 +92,13 @@ public class StationLineAcceptanceTest {
     @Test
     void updateStationLine() {
         // given
-        saveStationLine("신분당선", "bg-red-600", 1L, 2L, 10L);
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "다른 분당선");
-        params.put("color", "bg-red-600");
+        StationLineManager.save("신분당선", "bg-red-600", 1L, 2L, 10L);;
 
         // when
-        RestAssured
-                .given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().put("/lines/{id}", 1)
-                .then().log().all()
-                .statusCode(HttpStatus.OK.value()); // 상태 코드로 1차 검증
+        StationLineManager.update(1L, "다른 분당선", "bg-red-600");
 
-        // then (직접 조회해서 2차 검증)
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .when().get("/lines/{id}", 1)
-                .then().log().all()
-                .extract();
+        // then
+        ExtractableResponse<Response> response = StationLineManager.findById(1L);
         Assertions.assertThat(response.jsonPath().getString("name")).isEqualTo("다른 분당선");
     }
 
@@ -138,42 +112,9 @@ public class StationLineAcceptanceTest {
     @Test
     void deleteStationLine() {
         // given
-        saveStationLine("신분당선", "bg-red-600", 1L, 2L, 10L);
+        StationLineManager.save("신분당선", "bg-red-600", 1L, 2L, 10L);
 
         // when
-        RestAssured
-                .given().log().all()
-                .when().delete("/lines/{id}", 1)
-                .then().log().all()
-                .statusCode(HttpStatus.NO_CONTENT.value());
-    }
-
-    private static void saveStation(String name) {
-        Map<String, String> param = new HashMap<>();
-        param.put("name", name);
-
-        RestAssured.given()
-                .body(param)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then()
-                .statusCode(HttpStatus.CREATED.value());
-    }
-
-    private static ExtractableResponse<Response> saveStationLine(String name, String color, long upStationId, long downStationId, long distance) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-        params.put("color", color);
-        params.put("upStationId", String.valueOf(upStationId));
-        params.put("downStationId", String.valueOf(downStationId));
-        params.put("distance", String.valueOf(distance));
-
-        return RestAssured
-                .given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().log().all()
-                .extract();
+        StationLineManager.delete(1L);
     }
 }

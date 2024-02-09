@@ -1,21 +1,17 @@
 package subway;
 
-import io.restassured.RestAssured;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import org.springframework.test.annotation.DirtiesContext;
 import subway.station.StationResponse;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import utils.StationManager;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -31,26 +27,14 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .body(params)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/stations")
-                        .then().log().all()
-                        .extract();
+        ExtractableResponse<Response> response = StationManager.save("강남역");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
+        response = StationManager.findAll();
+        List<String> stationNames = response.jsonPath().getList("name", String.class);
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
@@ -65,31 +49,15 @@ public class StationAcceptanceTest {
     @Test
     void findAllStations() {
         // Given
-        saveStation("지하철역이름");
-        saveStation("새로운지하철역이름");
-        saveStation("또다른지하철역이름");
+        StationManager.save("지하철역이름");
+        StationManager.save("새로운지하철역이름");
+        StationManager.save("또다른지하철역이름");
 
         // 조회
-        ExtractableResponse<Response> response = RestAssured
-                .given()
-                .when().get("/stations")
-                .then()
-                .extract();
+        ExtractableResponse<Response> response = StationManager.findAll();
 
         List<StationResponse> stationResponses = response.jsonPath().getList(".", StationResponse.class);
         assertThat(stationResponses.size()).isEqualTo(3);
-    }
-
-    private static void saveStation(String name) {
-        Map<String, String> param = new HashMap<>();
-        param.put("name", name);
-
-        RestAssured.given()
-                .body(param)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then()
-                .statusCode(HttpStatus.CREATED.value());
     }
 
     /**
@@ -102,23 +70,17 @@ public class StationAcceptanceTest {
     @Test
     void deleteStation() {
         // Given
-        saveStation("지하철역이름");
-        saveStation("새로운지하철역이름");
-        saveStation("또다른지하철역이름");
+        StationManager.save("지하철역이름");
+        StationManager.save("새로운지하철역이름");
+        StationManager.save("또다른지하철역이름");
 
         // When
-        RestAssured
-                .given().log().all()
-                .when().delete("/stations/1")
-                .then().log().all();
+        StationManager.delete(1L);
 
         // then
-        List<StationResponse> stationResponses = RestAssured
-                .given()
-                .when().get("/stations")
-                .then()
-                .extract().jsonPath().getList(".", StationResponse.class);
+        ExtractableResponse<Response> response = StationManager.findAll();
 
+        List<StationResponse> stationResponses = response.jsonPath().getList(".", StationResponse.class);
         assertThat(stationResponses.size()).isEqualTo(2);
     }
 }
