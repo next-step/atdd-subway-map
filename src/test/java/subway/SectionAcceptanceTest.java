@@ -176,8 +176,28 @@ public class SectionAcceptanceTest extends CommonAcceptanceTest {
      * When 마지막 구간을 제거하면
      * Then 서버오류가 발생한다.
      */
+    @Test
+    @DisplayName("노선의 마지막 구간을 제거하면 서버오류가 발생한다.")
     void deleteLastSectionException() {
+        //given
+        Long 강남역Id = extractResponseId(StationRestAssuredCRUD.createStation("강남역"));
+        Long 선릉역Id = extractResponseId(StationRestAssuredCRUD.createStation("선릉역"));
+        ExtractableResponse<Response> lineResponse = LineRestAssuredCRUD.createLine("2호선", "bg-red-600", 강남역Id, 선릉역Id, 7);
+        Long lineId = lineResponse.jsonPath().getLong("id");
 
+        //when
+        ExtractableResponse<Response> deleteResponse = RestAssured
+                .given().log().all()
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                    .pathParam("lineId", lineId)
+                    .queryParam("stationId", 선릉역Id)
+                .when()
+                    .delete("/lines/{lineId}/sections")
+                .then().log().all()
+                .extract();
+
+        //then
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
 
