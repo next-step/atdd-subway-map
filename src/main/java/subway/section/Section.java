@@ -37,6 +37,14 @@ public class Section {
         this.distance = distance;
     }
 
+    public boolean equalsUpStation(Station station) {
+        return this.upStation.equals(station);
+    }
+
+    public boolean equalsDownStation(Station station) {
+        return this.downStation.equals(station);
+    }
+
     public Long getId() {
         return id;
     }
@@ -56,4 +64,5 @@ public class Section {
     public Long getDistance() {
         return distance;
     }
+
 }

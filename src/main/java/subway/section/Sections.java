@@ -81,7 +81,7 @@ public class Sections {
 
     private Station findNextStation(Station upStation) {
         return sections.stream()
-                .filter(section -> upStation.equals(section.getUpStation()))
+                .filter(section -> section.equalsUpStation(upStation))
                 .map(Section::getDownStation)
                 .findFirst()
                 .get();
@@ -97,7 +97,7 @@ public class Sections {
 
     private boolean isStartStation(Station upStation) {
         return sections.stream()
-                .noneMatch(section -> upStation.equals(section.getDownStation()));
+                .noneMatch(section -> section.equalsDownStation(upStation));
     }
 
     private Station getEndStation() {
@@ -110,7 +110,7 @@ public class Sections {
 
     private boolean isEndStation(Station downStation) {
         return sections.stream()
-                .noneMatch(section -> downStation.equals(section.getUpStation()));
+                .noneMatch(section -> section.equalsUpStation(downStation));
     }
 
 }
