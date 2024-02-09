@@ -23,9 +23,14 @@ public class SectionService {
         Line line = lineRepository.findById(id).orElseThrow();
 
         Station station = stationRepository.findById(sectionRequest.getDownStationId()).orElseThrow();
-        station.mappingLine(line);
+
+        if(line.isExistStation(station)){
+            throw new IllegalArgumentException("구간의 하행역이 이미 노선에 등록된 역입니다.");
+        }
 
         if(sectionRequest.getUpStationId() == line.getDownStationId()) {
+            station.mappingLine(line);
+
             line.changeDownStationId(sectionRequest.getDownStationId());
         }
     }

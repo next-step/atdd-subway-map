@@ -68,4 +68,14 @@ public class Line {
     public void changeDownStationId(Long id) {
         this.downStationId = id;
     }
+
+    public boolean isExistStation(Station newStation) {
+        for(Station station : stations) {
+            if(newStation.getId() == station.getId()){
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
