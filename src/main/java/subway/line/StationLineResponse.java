@@ -1,6 +1,9 @@
 package subway.line;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import subway.section.StationSection;
 import subway.station.StationResponse;
 
 public class StationLineResponse {
@@ -9,11 +12,25 @@ public class StationLineResponse {
     private String color;
     private List<StationResponse> stations;
 
-    public StationLineResponse(long id, String name, String color, List<StationResponse> stations) {
-        this.id = id;
-        this.name = name;
-        this.color = color;
-        this.stations = stations;
+    public StationLineResponse(StationLine stationLine) {
+        this.id = stationLine.getId();
+        this.name = stationLine.getName();
+        this.color = stationLine.getColor();
+        this.stations = getStationsResponse(stationLine);
+
+    }
+
+    private List<StationResponse> getStationsResponse(StationLine stationLine) {
+        List<StationResponse> stations = new ArrayList<>();
+
+        for (StationSection stationSection : stationLine.getStationSections()) {
+            stations.add(new StationResponse(stationSection.getUpStation()));
+            stations.add(new StationResponse(stationSection.getDownStation()));
+        }
+
+        return stations.stream()
+                .distinct()
+                .collect(Collectors.toList());
     }
 
     public long getId() {

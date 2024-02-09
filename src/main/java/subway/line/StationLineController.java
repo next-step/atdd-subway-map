@@ -28,7 +28,7 @@ public class StationLineController {
 
     @GetMapping("/lines/{id}")
     public ResponseEntity<StationLineResponse> showStationLine(@PathVariable Long id) {
-        return ResponseEntity.ok().body(stationLineService.findStationLineById(id));
+        return ResponseEntity.ok().body(new StationLineResponse(stationLineService.findStationLineById(id)));
     }
 
     @GetMapping("/lines")

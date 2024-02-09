@@ -36,7 +36,7 @@ public class StationSectionManager {
     public static void remove(long lineId, long stationId) {
         RestAssured
                 .given()
-                .when().delete("lines/{lineId}/sections/{stationId}", lineId, stationId )
+                .when().delete("lines/{lineId}/sections/{stationId}", lineId, stationId)
                 .then()
                 .statusCode(HttpStatus.NO_CONTENT.value());
     }
@@ -44,7 +44,7 @@ public class StationSectionManager {
     public static void removeFailure(long lineId, long stationId) {
         RestAssured
                 .given()
-                .when().delete("lines/{lineId}/sections/{stationId}", lineId, stationId )
+                .when().delete("lines/{lineId}/sections/{stationId}", lineId, stationId)
                 .then()
                 .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }

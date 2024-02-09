@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.section.StationSection;
+import subway.section.StationSectionRequest;
 import subway.station.Station;
 import subway.station.StationRepository;
 import subway.station.StationResponse;
@@ -23,16 +25,12 @@ public class StationLineService {
     public StationLineResponse saveStationLine(StationLineRequest stationLineRequest) {
         Station upStation = findStationById(stationLineRequest.getUpStationId());
         Station downStation = findStationById(stationLineRequest.getDownStationId());
-        StationLine stationLine = stationLineRepository.save(new StationLine(stationLineRequest.getName(), stationLineRequest.getColor(), upStation, downStation, stationLineRequest.getDistance()));
-        return new StationLineResponse(
-                stationLine.getId(),
-                stationLine.getName(),
-                stationLine.getColor(),
-                List.of(
-                        createStationResponse(stationLine.getUpStation()),
-                        createStationResponse(stationLine.getDownStation()
-                        )
-                ));
+        StationLine stationLine = new StationLine(stationLineRequest.getName(), stationLineRequest.getColor(), stationLineRequest.getDistance());
+        StationSection stationSection = new StationSection(stationLine, upStation, downStation, stationLineRequest.getDistance());
+
+        stationLine.addStationSection(stationSection);
+        StationLine result = stationLineRepository.save(stationLine);
+        return new StationLineResponse(result);
     }
 
     private Station findStationById(long id) {
@@ -41,35 +39,18 @@ public class StationLineService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 역이 존재하지 않습니다"));
     }
 
-    public StationLineResponse findStationLineById(Long id) {
-        StationLine stationLine = stationLineRepository.findById(id).stream()
+    public StationLine findStationLineById(Long id) {
+        return stationLineRepository.findById(id).stream()
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("아이디에 맞는 노선이 존재하지 않습니다"));
-
-        return new StationLineResponse(
-                stationLine.getId(),
-                stationLine.getName(),
-                stationLine.getColor(),
-                List.of(
-                        createStationResponse(stationLine.getUpStation()),
-                        createStationResponse(stationLine.getDownStation()
-                        )
-                ));
     }
 
     public List<StationLineResponse> findAllStationLine() {
         List<StationLine> stationLines = stationLineRepository.findAll();
 
         return stationLines.stream()  // 상행역, 하행역을 단순 id 값이 아닌 엔티티로 리팩토링하면 아래와 같은 로직으로 수행 가능할 것 같다.
-                .map(stationLine -> new StationLineResponse(
-                        stationLine.getId(),
-                        stationLine.getName(),
-                        stationLine.getColor(),
-                        List.of(
-                                createStationResponse(stationLine.getUpStation()),
-                                createStationResponse(stationLine.getDownStation())
-                        )
-                )).collect(Collectors.toList());
+                .map(StationLineResponse::new)
+                .collect(Collectors.toList());
     }
 
     @Transactional
@@ -86,10 +67,23 @@ public class StationLineService {
         stationLineRepository.deleteById(id);
     }
 
-    private StationResponse createStationResponse(Station station) {
-        return new StationResponse(
-                station.getId(),
-                station.getName()
-        );
+    public void registerStationSection(StationLine stationLine, StationSection stationSection) {
+        stationLine.addStationSection(stationSection);
+    }
+
+    public void deleteStationSection(StationLine stationLine, Station station) {
+        stationLine.deleteStationSection(station);
+    }
+
+    public boolean isSingleSection(StationLine stationLine) {
+        return stationLine.isSingleSection();
+    }
+
+    public boolean isExistSection(StationLine stationLine, StationSection stationSection) {
+        return stationLine.isExistSection(stationSection);
+    }
+
+    public boolean isConnectedSection(StationLine stationLine, StationSection stationSection) {
+        return stationLine.isConnectedSection(stationSection);
     }
 }

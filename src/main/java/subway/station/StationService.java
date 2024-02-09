@@ -17,7 +17,10 @@ public class StationService {
 
     @Transactional
     public StationResponse saveStation(StationRequest stationRequest) {
+        System.out.println("StationService.saveStation");
+        System.out.println("stationRequest = " + stationRequest);
         Station station = stationRepository.save(new Station(stationRequest.getName()));
+        System.out.println("saved station = " + station);
         return createStationResponse(station);
     }
 
@@ -27,15 +30,16 @@ public class StationService {
                 .collect(Collectors.toList());
     }
 
+    public Station findById(long id) {
+        return stationRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 역이 존재하지 않습니다"));
+    }
+
     @Transactional
     public void deleteStationById(Long id) {
         stationRepository.deleteById(id);
     }
 
     private StationResponse createStationResponse(Station station) {
-        return new StationResponse(
-                station.getId(),
-                station.getName()
-        );
+        return new StationResponse(station);
     }
 }
