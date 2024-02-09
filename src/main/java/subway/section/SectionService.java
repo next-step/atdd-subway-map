@@ -25,7 +25,7 @@ public class SectionService {
 
         Line line = lineRepository.findById(lineId).orElseThrow();
         int currentLineDistance = line.getDistance();
-        sectionRepository.save(sectionRequest.createSection(lineId, currentLineDistance));
+        Section section = sectionRepository.save(sectionRequest.createSection(currentLineDistance));
 
         Station newSectionDownStation = stationRepository.findById(sectionRequest.getDownStationId()).orElseThrow();
 
@@ -38,15 +38,15 @@ public class SectionService {
         }
 
         newSectionDownStation.mappingLine(line);
+        section.mappingLine(line);
         line.changeDownStationId(sectionRequest);
     }
 
     @Transactional
     public void deleteStation(Long lineId, Long deleteStationId) {
         Line line = lineRepository.findById(lineId).orElseThrow();
-        Section section = sectionRepository.findByDownStationIdAndLineId(deleteStationId, lineId);
 
-        line.deleteStation(deleteStationId, section.getUpStationId());
+        line.deleteStation(deleteStationId);
         stationRepository.deleteById(deleteStationId);
     }
 }

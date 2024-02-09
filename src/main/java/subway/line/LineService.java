@@ -2,6 +2,8 @@ package subway.line;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.section.Section;
+import subway.section.SectionRepository;
 import subway.station.Station;
 import subway.station.StationRepository;
 import subway.station.StationResponse;
@@ -14,14 +16,17 @@ import java.util.List;
 public class LineService {
     private LineRepository lineRepository;
     private StationRepository stationRepository;
+    private SectionRepository sectionRepository;
 
-    public LineService(LineRepository lineRepository, StationRepository stationRepository) {
+    public LineService(LineRepository lineRepository, StationRepository stationRepository, SectionRepository sectionRepository) {
         this.lineRepository = lineRepository;
         this.stationRepository = stationRepository;
+        this.sectionRepository = sectionRepository;
     }
 
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
+
         Station station1 = stationRepository.findById(lineRequest.getUpStationId()).orElseThrow();
         Station station2 = stationRepository.findById(lineRequest.getDownStationId()).orElseThrow();
 
@@ -30,6 +35,10 @@ public class LineService {
         station2.mappingLine(line);
 
         line = lineRepository.save(line);
+
+        Section section = lineRequest.createSection();
+        section.mappingLine(line);
+        sectionRepository.save(section);
 
         return createLineResponse(line);
     }

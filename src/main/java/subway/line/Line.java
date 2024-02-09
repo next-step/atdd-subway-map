@@ -1,5 +1,6 @@
 package subway.line;
 
+import subway.section.Section;
 import subway.section.SectionRequest;
 import subway.station.Station;
 
@@ -21,6 +22,9 @@ public class Line {
 
     @OneToMany(mappedBy = "line", orphanRemoval = true)
     private List<Station> stations = new ArrayList<>();
+
+    @OneToMany(mappedBy = "line")
+    private List<Section> sections = new ArrayList<>();
 
     public Line() {}
 
@@ -60,6 +64,10 @@ public class Line {
         return stations;
     }
 
+    public List<Section> getSections() {
+        return sections;
+    }
+
     public void changeLineInfo(String name, String color) {
         this.name = name;
         this.color = color;
@@ -80,12 +88,20 @@ public class Line {
         return false;
     }
 
-    public void deleteStation(Long deleteStationId, Long sectionUpStationId) {
+    public void deleteStation(Long deleteStationId) {
+        if(sections.size() == 1) {
+            throw new IllegalArgumentException("구간이 1개 남은 경우 삭제할 수 없습니다.");
+        }
+
         if(deleteStationId != downStationId){
             throw new IllegalArgumentException("노선의 하행 종점역이 아닙니다.");
         }
 
         stations.removeIf(station -> station.getId() == deleteStationId);
-        downStationId = sectionUpStationId;
+
+        downStationId = sections.stream()
+                .filter(v -> v.getDownStationId() == deleteStationId)
+                .findAny().get()
+                .getUpStationId();
     }
 }

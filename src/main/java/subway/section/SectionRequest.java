@@ -18,7 +18,7 @@ public class SectionRequest {
         return distance;
     }
 
-    public Section createSection(Long lineId, int currentLineDistance) {
-        return new Section(upStationId, downStationId, lineId, distance-currentLineDistance);
+    public Section createSection(int currentLineDistance) {
+        return new Section(upStationId, downStationId, distance-currentLineDistance);
     }
 }

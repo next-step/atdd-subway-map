@@ -1,9 +1,8 @@
 package subway.section;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import subway.line.Line;
+
+import javax.persistence.*;
 
 @Entity
 public class Section {
@@ -13,15 +12,17 @@ public class Section {
     private Long id;
     private Long upStationId;
     private Long downStationId;
-    private Long lineId;
     private int distance;
+
+    @ManyToOne
+    @JoinColumn(name = "line_id")
+    private Line line;
 
     public Section() {}
 
-    public Section(Long upStationId, Long downStationId, Long lineId, int distance) {
+    public Section(Long upStationId, Long downStationId, int distance) {
         this.upStationId = upStationId;
         this.downStationId = downStationId;
-        this.lineId = lineId;
         this.distance = distance;
     }
 
@@ -37,11 +38,16 @@ public class Section {
         return downStationId;
     }
 
-    public Long getLineId() {
-        return lineId;
-    }
-
     public int getDistance() {
         return distance;
+    }
+
+    public Line getLine() {
+        return line;
+    }
+
+    public void mappingLine(Line line) {
+        this.line = line;
+        line.getSections().add(this);
     }
 }
