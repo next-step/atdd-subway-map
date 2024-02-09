@@ -23,32 +23,9 @@ public class StationSectionController {
     public StationSectionController(StationSectionService stationSectionService) {
         this.stationSectionService = stationSectionService;
     }
-
-    /**
-     * 노선에 역을 추가한다.
-     * {
-     *     "id": 1,
-     *     "name": "신분당선",
-     *     "color": "bg-red-600",
-     *     "stations": [
-     *         {
-     *             "id": 1,
-     *             "name": "A"
-     *         },
-     *         {
-     *             "id": 2,
-     *             "name": "B"
-     *         }
-     *     ]
-     * }
-     *
-     */
     @PostMapping("/lines/{id}/sections")
     public ResponseEntity<StationLineResponse> createStationSection(@PathVariable long id, @RequestBody StationSectionRequest stationSectionRequest) {
-        System.out.println("StationSectionController.createStationSection");
-        System.out.println("stationSectionRequest = " + stationSectionRequest);
         StationLine stationLine = stationSectionService.saveStationSection(id, stationSectionRequest);
-        System.out.println("last stationLine = " + stationLine);
 
         return ResponseEntity.created(URI.create("/lines/" + stationLine.getId())).body(
                 new StationLineResponse(stationLine));

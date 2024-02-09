@@ -17,10 +17,7 @@ public class StationService {
 
     @Transactional
     public StationResponse saveStation(StationRequest stationRequest) {
-        System.out.println("StationService.saveStation");
-        System.out.println("stationRequest = " + stationRequest);
         Station station = stationRepository.save(new Station(stationRequest.getName()));
-        System.out.println("saved station = " + station);
         return createStationResponse(station);
     }
 

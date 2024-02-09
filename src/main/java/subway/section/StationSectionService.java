@@ -58,7 +58,6 @@ public class StationSectionService {
             throw new IllegalArgumentException("삭제할 구간이 존재하지 않습니다.");
         }
 
-        // 제거할 수 없는 역입니까?
         if (!stationLine.isRemoveFinalSection(station)) {
             throw new IllegalArgumentException("삭제할 구간이 올바르지 않습니다.");
         }

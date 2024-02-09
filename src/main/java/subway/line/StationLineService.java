@@ -48,7 +48,7 @@ public class StationLineService {
     public List<StationLineResponse> findAllStationLine() {
         List<StationLine> stationLines = stationLineRepository.findAll();
 
-        return stationLines.stream()  // 상행역, 하행역을 단순 id 값이 아닌 엔티티로 리팩토링하면 아래와 같은 로직으로 수행 가능할 것 같다.
+        return stationLines.stream()
                 .map(StationLineResponse::new)
                 .collect(Collectors.toList());
     }
@@ -73,10 +73,6 @@ public class StationLineService {
 
     public void deleteStationSection(StationLine stationLine, Station station) {
         stationLine.deleteStationSection(station);
-    }
-
-    public boolean isSingleSection(StationLine stationLine) {
-        return stationLine.isSingleSection();
     }
 
     public boolean isExistSection(StationLine stationLine, StationSection stationSection) {
