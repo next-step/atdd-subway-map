@@ -143,11 +143,38 @@ public class SectionAcceptanceTest extends CommonAcceptanceTest {
 
     /**
      * Given 지하철 노선에 새로운 구간 2개를 등록하고
-     * When 중간 구간을 제거하면
+     * When 마지막 구간이 아닌 역을 제거하면
      * Then 서버오류가 발생한다.
      */
+    @Test
+    @DisplayName("지하철 노선에서 마지막 구간이 아닌 역을 제거하면 서버오류가 발생한다.")
     void deleteMiddleSectionException() {
 
+        //given
+        Long 강남역Id = extractResponseId(StationRestAssuredCRUD.createStation("강남역"));
+        Long 선릉역Id = extractResponseId(StationRestAssuredCRUD.createStation("선릉역"));
+        ExtractableResponse<Response> lineResponse = LineRestAssuredCRUD.createLine("2호선", "bg-red-600", 강남역Id, 선릉역Id, 7);
+        Long lineId = lineResponse.jsonPath().getLong("id");
+
+        Long 삼성역Id = extractResponseId(StationRestAssuredCRUD.createStation("삼성역"));
+        SectionRestAssuredCRUD.addSection(선릉역Id, 삼성역Id, 10, lineId);
+
+        Long 잠실역Id = extractResponseId(StationRestAssuredCRUD.createStation("잠실역"));
+        SectionRestAssuredCRUD.addSection(삼성역Id, 잠실역Id, 13, lineId);
+
+        //when
+        ExtractableResponse<Response> deleteResponse = RestAssured
+                .given().log().all()
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                    .pathParam("lineId", lineId)
+                    .queryParam("stationId", 삼성역Id)
+                .when()
+                    .delete("/lines/{lineId}/sections")
+                .then().log().all()
+                .extract();
+
+        //then
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
     /**
