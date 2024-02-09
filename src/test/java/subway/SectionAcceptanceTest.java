@@ -109,7 +109,36 @@ public class SectionAcceptanceTest extends CommonAcceptanceTest{
      * When 지하철 노선의 하행역과 새로운 구간의 상행역이 일치하지 않은 구간을 추가하면
      * Then 예외가 발생한다.
      */
+    @Test
+    @DisplayName("새로운 구간의 상행역이 지하철 노선의 하행역과 일치하지 않는 경우 구간 등록 오류 테스트")
     void addSectionNotMatchException() {
+
+        //given
+        Long 강남역Id = extractResponseId(StationRestAssuredCRUD.createStation("강남역"));
+        Long 선릉역Id = extractResponseId(StationRestAssuredCRUD.createStation("선릉역"));
+        ExtractableResponse<Response> lineResponse = LineRestAssuredCRUD.createLine("2호선", "bg-red-600", 강남역Id, 선릉역Id, 7);
+        Long lineNum = lineResponse.jsonPath().getLong("id");
+
+        //when
+        Long 삼성역Id = extractResponseId(StationRestAssuredCRUD.createStation("삼성역"));
+        Long 잠실역Id = extractResponseId(StationRestAssuredCRUD.createStation("잠실역"));
+        Map<String, Object> paraMap = new HashMap<>();
+        paraMap.put("upStationId", 잠실역Id);
+        paraMap.put("downStationId", 삼성역Id);
+        paraMap.put("distance", 10);
+
+        ExtractableResponse<Response> addResponse = RestAssured
+                .given().log().all()
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                    .pathParam("id", lineNum)
+                    .body(paraMap)
+                .when()
+                    .post("/lines/{id}/sections")
+                .then().log().all()
+                .extract();
+
+        //then
+        assertThat(addResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
 
     }
 
