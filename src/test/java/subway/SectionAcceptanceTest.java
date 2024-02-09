@@ -110,6 +110,7 @@ public class SectionAcceptanceTest extends CommonAcceptanceTest {
     @Test
     @DisplayName("지하철 노선에서 구간을 제거한다.")
     void deleteSection() {
+
         //given
         Long 강남역Id = extractResponseId(StationRestAssuredCRUD.createStation("강남역"));
         Long 선릉역Id = extractResponseId(StationRestAssuredCRUD.createStation("선릉역"));
@@ -126,7 +127,7 @@ public class SectionAcceptanceTest extends CommonAcceptanceTest {
                     .pathParam("lineId", lineId)
                     .queryParam("stationId", 삼성역Id)
                 .when()
-                    .delete("/lines/{lineId}/sections?stationId={stationId}")
+                    .delete("/lines/{lineId}/sections")
                 .then().log().all()
                 .extract();
 

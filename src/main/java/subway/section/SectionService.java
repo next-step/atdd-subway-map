@@ -35,4 +35,11 @@ public class SectionService {
         newSectionDownStation.mappingLine(line);
         line.changeDownStationId(sectionRequest);
     }
+
+    @Transactional
+    public void deleteStation(Long lineId, Long stationId) {
+        Line line = lineRepository.findById(lineId).orElseThrow();
+        line.deleteStation(stationId);
+        stationRepository.deleteById(stationId);
+    }
 }

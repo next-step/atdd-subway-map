@@ -80,4 +80,8 @@ public class Line {
 
         return false;
     }
+
+    public void deleteStation(Long stationId) {
+        stations.removeIf(station -> station.getId() == stationId);
+    }
 }
