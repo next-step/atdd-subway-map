@@ -18,16 +18,16 @@ public class Sections {
     public Sections() {
     }
 
-    public void addSection(Section section, Station downStation) {
+    public void addSection(Section section) {
         if (sections.size() > 0) {
-            validateNextSection(section, downStation);
+            validateNextSection(section);
             validateDuplicateStation(section);
         }
         this.sections.add(section);
     }
 
-    private void validateNextSection(Section section, Station downStation) {
-        if (!downStation.isEquals(section.getUpStation())) {
+    private void validateNextSection(Section section) {
+        if (!getEndStation().isEquals(section.getUpStation())) {
             throw new SubwayException("구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이 아닙니다.");
         }
     }
@@ -42,9 +42,9 @@ public class Sections {
         return this.sections.stream().anyMatch(section -> section.getUpStation().equals(station));
     }
 
-    public void removeSection(Long stationId, Station downStation) {
+    public void removeSection(Long stationId) {
         validateLastSection();
-        validateEndSection(stationId, downStation);
+        validateEndSection(stationId);
 
         Section deleteSection = this.sections.stream()
                 .filter(section -> section.getDownStation().isEquals(stationId))
@@ -60,14 +60,15 @@ public class Sections {
         }
     }
 
-    private void validateEndSection(Long stationId, Station downStation) {
-        if (!downStation.isEquals(stationId)) {
+    private void validateEndSection(Long stationId) {
+        if (!getEndStation().isEquals(stationId)) {
             throw new SubwayException("마지막 구간만 제거할 수 있습니다.");
         }
     }
 
-    public List<Station> getOrderedStations(Station upStation) {
+    public List<Station> getOrderedStations() {
         List<Station> stations = new ArrayList<>();
+        Station upStation = getStartStation();
         stations.add(upStation);
 
         for (int i = 0; i < sections.size(); i++) {
@@ -79,12 +80,37 @@ public class Sections {
     }
 
     private Station findNextStation(Station upStation) {
-        for (Section section : sections) {
-            if (section.getUpStation().equals(upStation)) {
-                return section.getDownStation();
-            }
-        }
-        return null;
+        return sections.stream()
+                .filter(section -> upStation.equals(section.getUpStation()))
+                .map(Section::getDownStation)
+                .findFirst()
+                .get();
+    }
+
+    private Station getStartStation() {
+        return sections.stream()
+                .map(Section::getUpStation)
+                .filter(upStation -> isStartStation(upStation))
+                .findFirst()
+                .get();
+    }
+
+    private boolean isStartStation(Station upStation) {
+        return sections.stream()
+                .noneMatch(section -> upStation.equals(section.getDownStation()));
+    }
+
+    private Station getEndStation() {
+        return sections.stream()
+                .map(Section::getDownStation)
+                .filter(downStation -> isEndStation(downStation))
+                .findFirst()
+                .get();
+    }
+
+    private boolean isEndStation(Station downStation) {
+        return sections.stream()
+                .noneMatch(section -> downStation.equals(section.getUpStation()));
     }
 
 }

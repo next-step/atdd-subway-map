@@ -20,14 +20,6 @@ public class Line {
     @Column(length = 20, nullable = false)
     private String color;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "up_station_id")
-    private Station upStation;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "down_station_id")
-    private Station downStation;
-
     @Embedded
     private Sections sections = new Sections();
 
@@ -37,11 +29,9 @@ public class Line {
     public Line(String name, String color, Station upStation, Station downStation, Long distance) {
         this.name = name;
         this.color = color;
-        this.upStation = upStation;
-        this.downStation = downStation;
 
         Section section = new Section(this, upStation, downStation, distance);
-        sections.addSection(section, downStation);
+        sections.addSection(section);
     }
 
     public void update(String name, String color) {
@@ -50,12 +40,11 @@ public class Line {
     }
 
     public void addSection(Section section) {
-        this.sections.addSection(section, downStation);
-        this.downStation = section.getDownStation();
+        this.sections.addSection(section);
     }
 
     public void removeSection(Long stationId) {
-        this.sections.removeSection(stationId, downStation);
+        this.sections.removeSection(stationId);
     }
 
     public Long getId() {
@@ -71,7 +60,7 @@ public class Line {
     }
 
     public List<Station> getOrderedStations() {
-        return sections.getOrderedStations(this.upStation);
+        return sections.getOrderedStations();
     }
 
 }
