@@ -37,20 +37,19 @@ public class LineService {
         Station upStation = getStationById(lineCreateRequest.getUpStationId());
         Station downStation = getStationById(lineCreateRequest.getDownStationId());
 
-        Section section = Section.builder()
-                .upStation(upStation)
-                .downStation(downStation)
-                .distance(lineCreateRequest.getDistance())
-                .build();
-
         Line line = Line.builder()
                 .name(lineCreateRequest.getName())
                 .color(lineCreateRequest.getColor())
-                .distance(lineCreateRequest.getDistance())
-                .sections(Collections.singletonList(section))
                 .build();
 
         line = lineRepository.save(line);
+
+        line.addSection(Section.builder()
+                .upStation(upStation)
+                .downStation(downStation)
+                .distance(lineCreateRequest.getDistance())
+                .line(line)
+                .build());
 
         return LineResponse.builder()
                 .id(line.getId())
@@ -84,7 +83,6 @@ public class LineService {
 
     public LineResponse findLine(Long id) {
         Line findLine = getLineById(id);
-
         return LineResponse.builder()
                 .id(findLine.getId())
                 .color(findLine.getColor())

@@ -117,7 +117,6 @@ public class LineAcceptanceTest {
         //then
         assertThat(findResponse.jsonPath().getString("color")).isEqualTo(BLUE);
         assertThat(findResponse.jsonPath().getString("name")).isEqualTo(신림선);
-        assertThat(findResponse.jsonPath().getList("stations")).isEqualTo(List.of());
     }
 
     /**

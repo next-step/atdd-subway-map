@@ -4,8 +4,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.AccessLevel;
+import subway.exception.InvalidDownStationException;
+import subway.exception.SingleSectionDeleteException;
 import subway.section.entity.Section;
-import subway.station.entity.Station;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -29,15 +30,10 @@ public class Line {
     @OneToMany(mappedBy = "line", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Section> sections = new ArrayList<>();
 
-    @Column(nullable = false)
-    private Long distance;
-
     @Builder
-    public Line(String name, String color, List<Section> sections, Long distance) {
+    public Line(String name, String color) {
         this.name = name;
         this.color = color;
-        this.sections = sections;
-        this.distance = distance;
     }
 
     public void update(String name, String color) {
@@ -45,9 +41,41 @@ public class Line {
         this.color = color;
     }
 
-    public void addSection(Station upStation, Station downStation, Long distance) {
-        Section section = new Section();
-        section.updateSection(upStation, downStation, distance);
+    public void addSection(Section section) {
         this.getSections().add(section);
     }
+
+    public void deleteSection(Long stationId) {
+        if (sections.size() == 1)
+            throw new SingleSectionDeleteException("구간이 한개인 경우 삭제할 수 없습니다.");
+
+        Long downStationId = findDownStationId();
+        if (downStationId != stationId) {
+            throw new InvalidDownStationException("삭제 역이 하행 종점역이 아닙니다.");
+        }
+        sections.remove(sections.size() - 1);
+    }
+
+    public Long findDownStationId() {
+        Long downStationId = null;
+
+        for (int i = this.sections.size() - 1; i >= 0; i--) {
+            Section section = this.sections.get(i);
+            if (section.getDownStation() != null) {
+                downStationId = section.getDownStation().getId();
+                break;
+            }
+        }
+        return downStationId;
+    }
+
+    public List<Long> getStationIds() {
+        List<Long> stationIds = new ArrayList<>();
+        for (Section section : this.sections) {
+            stationIds.add(section.getUpStation().getId());
+            stationIds.add(section.getDownStation().getId());
+        }
+        return stationIds;
+    }
+
 }

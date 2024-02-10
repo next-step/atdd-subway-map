@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import subway.exception.CheckDuplicateStationException;
 import subway.line.entity.Line;
 import subway.station.entity.Station;
 
@@ -34,15 +35,9 @@ public class Section {
 
     @Builder
     public Section(Line line, Station upStation, Station downStation, Long distance) {
+        this.upStation = upStation;
+        this.downStation = downStation;
+        this.distance = distance;
         this.line = line;
-        this.upStation = upStation;
-        this.downStation = downStation;
-        this.distance = distance;
-    }
-
-    public void updateSection(Station upStation, Station downStation, Long distance) {
-        this.upStation = upStation;
-        this.downStation = downStation;
-        this.distance = distance;
     }
 }
