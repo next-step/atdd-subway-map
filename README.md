@@ -94,6 +94,6 @@ POST /lines/{lineId}/sections
 * 지하철 노선에 등록된 역(하행 종점역)만 제거할 수 있다. 즉, 마지막 구간만 제거할 수 있다.
 * 지하철 노선에 상행 종점역과 하행 종점역만 있는 경우(구간이 1개인 경우) 역을 삭제할 수 없다.
 * 새로운 구간 제거시 위 조건에 부합하지 않는 경우 에러 처리한다.
-  ```
-  DELETE /lines/{lineId}/stations?stationId=:id
-  ```
+```
+DELETE /lines/{lineId}/stations?stationId=:id
+```
