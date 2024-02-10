@@ -20,12 +20,12 @@ public class SectionApiExtractableResponse {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> deleteSection(Long lineId, Long sectionId) {
+    public static ExtractableResponse<Response> deleteSection(Long lineId, Long stationId) {
         return RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .pathParam("lineId", lineId)
-                .queryParam("sectionId", sectionId)
+                .queryParam("stationId", stationId)
                 .when().delete("/lines/{lineId}/sections")
                 .then().log().all()
                 .extract();

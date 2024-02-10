@@ -3,7 +3,7 @@ package subway.line.domain;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 import subway.exception.AlreadyExistDownStationException;
-import subway.exception.InvalidSectionUpStationException;
+import subway.exception.IsNotLastStationException;
 import subway.section.domain.Section;
 import subway.station.domain.Station;
 
@@ -73,24 +73,37 @@ public class Line {
         section.setLine(this);
     }
 
-    public void addSection(Section section) {
-        validAddSection(section);
-        registerSection(section);
-    }
-
-    private void validAddSection(Section section) {
-        if (!this.sections.get(this.sections.size() - 1).checkAddStation(section.getUpStation())) {
-            throw new InvalidSectionUpStationException();
+    public void addSection(Section addedSection) {
+        if (isLastStation(addedSection.getUpStation())) {
+            throw new IsNotLastStationException();
         }
-
-        boolean isExistDownStation = getStations().stream()
-                .anyMatch(st ->
-                        st.equals(section.getDownStation())
-                );
-
-        if (isExistDownStation) {
+        if (isExistDownStation(addedSection)) {
             throw new AlreadyExistDownStationException();
         }
+        registerSection(addedSection);
+    }
+
+    public void deleteSection(Station deletedStation) {
+        if (isLastStation(deletedStation)) {
+            throw new IsNotLastStationException();
+        }
+        this.sections.get(getLastSectionIndex()).delete();
+        this.sections.remove(getLastSectionIndex());
+    }
+
+    private boolean isExistDownStation(Section section){
+        return getStations().stream()
+                .anyMatch(comparedStation ->
+                        comparedStation.equals(section.getDownStation())
+                );
+    }
+
+    private boolean isLastStation(Station station) {
+        return !this.sections.get(getLastSectionIndex()).equalsLastStation(station);
+    }
+
+    private int getLastSectionIndex() {
+        return this.sections.size() - 1;
     }
 
     public Long getLineId() {

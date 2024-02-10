@@ -7,6 +7,7 @@ import subway.station.domain.Station;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
@@ -48,8 +49,12 @@ public class Section {
         return new Section(upStation, downStation, distance);
     }
 
-    public boolean checkAddStation(Station upStation) {
-        return this.downStation.equals(upStation);
+    public boolean equalsLastStation(Station station) {
+        return this.downStation.equals(station);
+    }
+
+    public void delete() {
+        deleted_at = Timestamp.valueOf(LocalDateTime.now());
     }
 
     public Long getSectionId() {

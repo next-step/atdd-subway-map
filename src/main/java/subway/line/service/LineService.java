@@ -3,6 +3,7 @@ package subway.line.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.exception.NotFoundLineException;
+import subway.exception.NotFoundStationException;
 import subway.line.domain.Line;
 import subway.line.domain.LineRepository;
 import subway.line.presentation.request.AddSectionRequest;
@@ -32,8 +33,10 @@ public class LineService {
 
     @Transactional
     public CreateLineResponse saveLine(CreateLineRequest createLineRequest) {
-        Station upStation = stationRepository.getById(createLineRequest.getUpStationId());
-        Station downStation = stationRepository.getById(createLineRequest.getDownStationId());
+        Station upStation = stationRepository.findById(createLineRequest.getUpStationId())
+                .orElseThrow(() -> new NotFoundLineException());
+        Station downStation = stationRepository.findById(createLineRequest.getDownStationId())
+                .orElseThrow(() -> new NotFoundLineException());
         Section section = sectionRepository.save(Section.of(upStation, downStation, createLineRequest.getDistance()));
 
         Line line = lineRepository.save(
@@ -77,8 +80,10 @@ public class LineService {
 
     @Transactional
     public AddSectionResponse addSection(Long lineId, AddSectionRequest addSectionRequest) {
-        Station upStation = stationRepository.getById(addSectionRequest.getUpStationId());
-        Station downStation = stationRepository.getById(addSectionRequest.getDownStationId());
+        Station upStation = stationRepository.findById(addSectionRequest.getUpStationId())
+                .orElseThrow(() -> new NotFoundLineException());
+        Station downStation = stationRepository.findById(addSectionRequest.getDownStationId())
+                .orElseThrow(() -> new NotFoundLineException());
         Section section = sectionRepository.save(Section.of(upStation, downStation, addSectionRequest.getDistance()));
 
         Line line = lineRepository.findById(lineId)
@@ -90,8 +95,13 @@ public class LineService {
     }
 
     @Transactional
-    public void deleteSection(final Long lineId, final Long sectionId) {
-        sectionRepository.deleteById(sectionId);
+    public void deleteSection(final Long lineId, final Long stationId) {
+        Line line = lineRepository.findById(lineId)
+                .orElseThrow(() -> new NotFoundLineException());
+        Station deletedStation = stationRepository.findById(stationId)
+                .orElseThrow(() -> new NotFoundStationException());
+
+        line.deleteSection(deletedStation);
     }
 
 }
