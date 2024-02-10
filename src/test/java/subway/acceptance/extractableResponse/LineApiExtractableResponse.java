@@ -58,7 +58,7 @@ public class LineApiExtractableResponse {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> createSection(AddSectionRequest addSectionRequest, Long id) {
+    public static ExtractableResponse<Response> addSection(AddSectionRequest addSectionRequest, Long id) {
         return RestAssured
                 .given().log().all()
                 .body(addSectionRequest)

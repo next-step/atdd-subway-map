@@ -7,6 +7,7 @@ import subway.station.domain.Station;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.Objects;
 
 @Entity
 @Where(clause = "deleted_at IS NULL")
@@ -37,10 +38,22 @@ public class Section {
     protected Section() {
     }
 
-    public Section(Station upStation, Station downStation, Integer distance) {
+    private Section(Station upStation, Station downStation, Integer distance) {
         this.upStation = upStation;
         this.downStation = downStation;
         this.distance = distance;
+    }
+
+    public static Section of(Station upStation, Station downStation, Integer distance) {
+        return new Section(upStation, downStation, distance);
+    }
+
+    public boolean checkAddStation(Station upStation) {
+        return this.downStation.equals(upStation);
+    }
+
+    private Long getId() {
+        return this.id;
     }
 
     public Line getLine() {
@@ -65,6 +78,18 @@ public class Section {
 
     public Timestamp getDeleted_at() {
         return deleted_at;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        Section section = (Section) o;
+        return Objects.equals(id, section.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
 }

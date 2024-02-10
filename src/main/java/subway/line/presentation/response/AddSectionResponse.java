@@ -35,6 +35,7 @@ public class AddSectionResponse {
                 line.getName(),
                 line.getColor(),
                 line.getStations().stream()
+                        .distinct()
                         .map(StationDto::from)
                         .collect(Collectors.toList()),
                 line.getDistance()

@@ -1,10 +1,8 @@
 package subway.line.service;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.server.ResponseStatusException;
+import subway.exception.NotFoundLineException;
 import subway.line.domain.Line;
 import subway.line.domain.LineRepository;
 import subway.line.presentation.request.AddSectionRequest;
@@ -36,7 +34,7 @@ public class LineService {
     public CreateLineResponse saveLine(CreateLineRequest createLineRequest) {
         Station upStation = stationRepository.getById(createLineRequest.getUpStationId());
         Station downStation = stationRepository.getById(createLineRequest.getDownStationId());
-        Section section = sectionRepository.save(new Section(upStation, downStation, createLineRequest.getDistance()));
+        Section section = sectionRepository.save(Section.of(upStation, downStation, createLineRequest.getDistance()));
 
         Line line = lineRepository.save(
                 Line.from(
@@ -44,7 +42,7 @@ public class LineService {
                 )
         );
 
-        line.addSection(section);
+        line.registerSection(section);
 
         return CreateLineResponse.from(line);
     }
@@ -57,7 +55,7 @@ public class LineService {
 
     public ShowLineResponse findLine(Long id) {
         Line line = lineRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "없는 지하철 노선입니다."));
+                .orElseThrow(() -> new NotFoundLineException());
 
         return ShowLineResponse.from(line);
     }
@@ -65,7 +63,7 @@ public class LineService {
     @Transactional
     public UpdateLineResponse updateLine(Long id, UpdateLineRequest updateLineRequest) {
         Line line = lineRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "없는 지하철 노선입니다."));
+                .orElseThrow(() -> new NotFoundLineException());
 
         line.updateLine(updateLineRequest.getColor(), updateLineRequest.getDistance());
 
@@ -81,10 +79,10 @@ public class LineService {
     public AddSectionResponse addSection(Long id, AddSectionRequest addSectionRequest) {
         Station upStation = stationRepository.getById(addSectionRequest.getUpStationId());
         Station downStation = stationRepository.getById(addSectionRequest.getDownStationId());
-        Section section = sectionRepository.save(new Section(upStation, downStation, addSectionRequest.getDistance()));
+        Section section = sectionRepository.save(Section.of(upStation, downStation, addSectionRequest.getDistance()));
 
         Line line = lineRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "없는 지하철 노선입니다."));
+                .orElseThrow(() -> new NotFoundLineException());
 
         line.addSection(section);
 

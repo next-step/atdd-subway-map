@@ -2,13 +2,18 @@ package subway.line.domain;
 
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
+import subway.exception.AlreadyExistDownStationException;
+import subway.exception.InvalidSectionUpStationException;
 import subway.section.domain.Section;
 import subway.station.domain.Station;
+import subway.station.service.StationDto;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Entity
 @Where(clause = "deleted_at IS NULL")
@@ -56,17 +61,38 @@ public class Line {
     public List<Station> getStations() {
         List<Station> stations = new ArrayList<>();
 
-        for (Section section : sections) {
+        for (Section section : this.sections) {
             stations.add(section.getUpStation());
-            stations.add(section.getDownStation());
         }
+
+        stations.add(this.sections.get(this.sections.size()-1).getDownStation());
 
         return stations;
     }
 
-    public void addSection(Section section) {
+    public void registerSection(Section section) {
         this.sections.add(section);
         section.setLine(this);
+    }
+
+    public void addSection(Section section) {
+        validAddSection(section);
+        registerSection(section);
+    }
+
+    private void validAddSection(Section section) {
+        if (!this.sections.get(this.sections.size() - 1).checkAddStation(section.getUpStation())) {
+            throw new InvalidSectionUpStationException();
+        }
+
+        boolean isExistDownStation = getStations().stream()
+                .anyMatch(st ->
+                        st.equals(section.getDownStation())
+                );
+
+        if (isExistDownStation) {
+            throw new AlreadyExistDownStationException();
+        }
     }
 
     public Long getId() {
@@ -87,6 +113,18 @@ public class Line {
 
     public List<Section> getSections() {
         return sections;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        Line line = (Line) o;
+        return Objects.equals(id, line.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
 }
