@@ -110,11 +110,11 @@ public class StationLineAcceptanceTest extends E2ETestInitializer {
         long lineId = savedResponse.jsonPath().getLong("id");
 
         // when
-        StationLineManager.update(lineId, "다른 분당선", "bg-red-600");
+        StationLineManager.update(lineId, SECOND_LINE_NAME, SECOND_LINE_COLOR);
 
         // then
         ExtractableResponse<Response> response = StationLineManager.findById(lineId);
-        Assertions.assertThat(response.jsonPath().getString("name")).isEqualTo("다른 분당선");
+        Assertions.assertThat(response.jsonPath().getString("name")).isEqualTo(SECOND_LINE_NAME);
     }
 
     /**

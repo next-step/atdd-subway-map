@@ -68,7 +68,6 @@ public class StationSectionAcceptanceTest extends E2ETestInitializer {
      * Exception
      * 1. 등록하려는 역이 이미 등록되어 있는 경우
      * 2. 등록하려는 역의 상행역이 현재 노선의 하행역이 아닌 경우
-     *
      */
     @DisplayName("잘못된 구간을 등록하면 예외가 발생한다.")
     @ParameterizedTest
