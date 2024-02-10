@@ -1,4 +1,4 @@
-package utils;
+package utils.line;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import subway.line.StationLineRequest;
 
 /**
  * 지하철역 노선 관리자 유틸 클래스
@@ -29,17 +30,10 @@ public class StationLineManager {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> save(String name, String color, long upStationId, long downStationId, long distance) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-        params.put("color", color);
-        params.put("upStationId", String.valueOf(upStationId));
-        params.put("downStationId", String.valueOf(downStationId));
-        params.put("distance", String.valueOf(distance));
-
+    public static ExtractableResponse<Response> save(StationLineRequest stationLineRequest) {
         return RestAssured
                 .given()
-                .body(params)
+                .body(stationLineRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/lines")
                 .then()

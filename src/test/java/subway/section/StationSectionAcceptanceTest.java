@@ -14,22 +14,39 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
-import utils.StationLineManager;
-import utils.StationManager;
-import utils.StationSectionManager;
+import subway.line.StationLineRequest;
+import subway.line.StationLineResponse;
+import utils.line.StationLineManager;
+import utils.station.StationManager;
+import utils.section.StationSectionManager;
 
 @DisplayName("지하철역 구간 관리 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class StationSectionAcceptanceTest {
 
+    public static final long DISTANCE = 10L;
+    public static final int ALL_STATIONS_COUNT = 3;
+    public static final int ONE_REMOVE_STATIONS_COUNT = 2;
+
+    public static final String FIRST_LINE_NAME = "신분당선";
+    public static final String FIRST_LINE_COLOR = "bg-red-600";
+
+    private static StationLineResponse savedLine;
+    private static StationLineRequest saveLineRequest;
+
+    private static long savedFirstStationId;
+    private static long savedSecondStationId;
+    private static long savedThirdStationId;
+
     @BeforeEach
     void setUp() {
+        savedFirstStationId = StationManager.save("지하철역").jsonPath().getLong("id");
+        savedSecondStationId = StationManager.save("새로운지하철역").jsonPath().getLong("id");
+        savedThirdStationId = StationManager.save("또다른지하철역").jsonPath().getLong("id");
 
-        StationManager.save("A"); // 1
-        StationManager.save("C"); // 2
-        StationManager.save("B"); // 3
-        StationLineManager.save("신분당선", "bg-red-600", 1L, 2L, 7L);  // A - C
+        saveLineRequest = new StationLineRequest(FIRST_LINE_NAME, FIRST_LINE_COLOR, savedFirstStationId, savedSecondStationId, DISTANCE);
+        savedLine = StationLineManager.save(saveLineRequest).as(StationLineResponse.class);  // A - C
     }
 
     /**
@@ -42,13 +59,13 @@ public class StationSectionAcceptanceTest {
     @Test
     void createStationSection() {
         // when
-        StationSectionRequest requestDto = new StationSectionRequest(2L, 3L, 3L); // C - B 구간
+        StationSectionRequest requestDto = new StationSectionRequest(savedSecondStationId, savedThirdStationId, DISTANCE); // C - B 구간
 
-        ExtractableResponse<Response> response = StationSectionManager.save(1L, requestDto); // 노선에 구간 추가
+        ExtractableResponse<Response> response = StationSectionManager.save(savedLine.getId(), requestDto); // 노선에 구간 추가
 
         // then
         List<Long> result = response.jsonPath().getList("stations");
-        Assertions.assertThat(result.size()).isEqualTo(3);  // A - C - B
+        Assertions.assertThat(result.size()).isEqualTo(ALL_STATIONS_COUNT);  // A - C - B
     }
 
     /**
@@ -65,7 +82,7 @@ public class StationSectionAcceptanceTest {
         // 현재 노선: A(1) - C(2)
 
         // when
-        StationSectionManager.saveFailure(1L, requestDto);
+        StationSectionManager.saveFailure(savedLine.getId(), requestDto);
     }
 
     /**
@@ -81,18 +98,18 @@ public class StationSectionAcceptanceTest {
     @Test
     void deleteStationSection() {
         // when
-        StationSectionRequest requestDto = new StationSectionRequest(2L, 3L, 3L); // C - B 구간
-        StationSectionManager.save(1L, requestDto); // 노선에 구간 추가
+        StationSectionRequest requestDto = new StationSectionRequest(savedSecondStationId, savedThirdStationId, DISTANCE); // C - B 구간
+        StationSectionManager.save(savedLine.getId(), requestDto); // 노선에 구간 추가
 
         // 구간 제거
-        StationSectionManager.remove(1L, 3L);
+        StationSectionManager.remove(savedLine.getId(), savedThirdStationId);
 
         // 조회
-        ExtractableResponse<Response> response = StationLineManager.findById(1L);
+        ExtractableResponse<Response> response = StationLineManager.findById(savedLine.getId());
 
         // then
         List<Long> result = response.jsonPath().getList("stations");
-        Assertions.assertThat(result.size()).isEqualTo(2);  // A - C
+        Assertions.assertThat(result.size()).isEqualTo(ONE_REMOVE_STATIONS_COUNT); // A - C
     }
 
     /**
@@ -109,13 +126,13 @@ public class StationSectionAcceptanceTest {
         // 현재 노선: A(1) - C(2)
 
         // when
-        StationSectionManager.removeFailure(1L, stationId);
+        StationSectionManager.removeFailure(savedLine.getId(), stationId);
     }
 
     private static Stream<Arguments> invalidSaveStationSectionParameters() {
         return Stream.of(
-                Arguments.of(new StationSectionRequest(2L, 1L, 3L)), // (A - C) - (C - A) // 이미 등록된 역(A)
-                Arguments.of(new StationSectionRequest(1L, 3L, 3L))  // A - C - (A - B) // 상행역이 하행역이 아닐 때
+                Arguments.of(new StationSectionRequest(savedSecondStationId, savedFirstStationId, DISTANCE)), // (A - C) - (C - A) // 이미 등록된 역(A)
+                Arguments.of(new StationSectionRequest(savedFirstStationId, savedThirdStationId, DISTANCE))  // A - C - (A - B) // 상행역이 하행역이 아닐 때
         );
     }
 }

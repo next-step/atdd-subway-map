@@ -1,4 +1,4 @@
-package utils;
+package utils.section;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;

@@ -32,11 +32,11 @@ public class StationLine {
     private List<StationSection> stationSections = new ArrayList<>();
 
     @Column
-    private int distance;
+    private long distance;
 
     public StationLine() {}
 
-    public StationLine(String name, String color, int distance) {
+    public StationLine(String name, String color, long distance) {
         this.name = name;
         this.color = color;
         this.distance = distance;

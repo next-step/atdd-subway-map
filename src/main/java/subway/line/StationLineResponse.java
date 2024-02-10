@@ -12,6 +12,8 @@ public class StationLineResponse {
     private String color;
     private List<StationResponse> stations;
 
+    public StationLineResponse() {}
+
     public StationLineResponse(StationLine stationLine) {
         this.id = stationLine.getId();
         this.name = stationLine.getName();
@@ -47,5 +49,15 @@ public class StationLineResponse {
 
     public List<StationResponse> getStations() {
         return stations;
+    }
+
+    @Override
+    public String toString() {
+        return "StationLineResponse{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", color='" + color + '\'' +
+                ", stations=" + stations +
+                '}';
     }
 }

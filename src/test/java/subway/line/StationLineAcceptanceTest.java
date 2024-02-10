@@ -1,4 +1,4 @@
-package subway;
+package subway.line;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -9,8 +9,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
-import utils.StationLineManager;
-import utils.StationManager;
+import utils.line.StationLineManager;
+import utils.station.StationManager;
 
 @DisplayName("지하철역 노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -18,11 +18,27 @@ import utils.StationManager;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class StationLineAcceptanceTest {
 
+    public static final long DISTANCE = 10L;
+    public static final String FIRST_LINE_NAME = "신분당선";
+    public static final String FIRST_LINE_COLOR = "bg-red-600";
+    public static final String SECOND_LINE_NAME = "분당선";
+    public static final String SECOND_LINE_COLOR = "bg-green-600";
+    private StationLineRequest saveLineRequest;
+    private StationLineRequest saveAnotherLineRequest;
+    private StationLineRequest updateLineRequest;
+
+    private long savedFirstStationId;
+    private long savedSecondStationId;
+    private long savedThirdStationId;
+
     @BeforeEach
     void setUp() {
-        StationManager.save("지하철역");
-        StationManager.save("새로운지하철역");
-        StationManager.save("또다른지하철역");
+        savedFirstStationId = StationManager.save("지하철역").jsonPath().getLong("id");
+        savedSecondStationId = StationManager.save("새로운지하철역").jsonPath().getLong("id");
+        savedThirdStationId = StationManager.save("또다른지하철역").jsonPath().getLong("id");
+
+        saveLineRequest = new StationLineRequest(FIRST_LINE_NAME, FIRST_LINE_COLOR, savedFirstStationId, savedSecondStationId, DISTANCE);
+        saveAnotherLineRequest = new StationLineRequest(SECOND_LINE_NAME, SECOND_LINE_COLOR, savedFirstStationId, savedSecondStationId, DISTANCE);
     }
 
     /**
@@ -34,11 +50,11 @@ public class StationLineAcceptanceTest {
     @Test
     void createStationLine() {
         // when
-        ExtractableResponse<Response> response = StationLineManager.save("신분당선", "bg-red-600", 1L, 2L, 10L);
+        ExtractableResponse<Response> response = StationLineManager.save(saveLineRequest);
 
         // then
         String result = response.jsonPath().getString("name");
-        Assertions.assertThat(result).isEqualTo("신분당선");
+        Assertions.assertThat(result).isEqualTo(saveLineRequest.getName());
     }
 
     /**
@@ -51,15 +67,16 @@ public class StationLineAcceptanceTest {
     @Test
     void findAllStationLine() {
         // given
-        StationLineManager.save("신분당선", "bg-red-600", 1L, 2L, 10L);
-        StationLineManager.save("분당선", "bg-green-600", 1L, 3L, 10L);
+
+        StationLineManager.save(saveLineRequest);
+        StationLineManager.save(saveAnotherLineRequest);
 
         // when
         ExtractableResponse<Response> response = StationLineManager.findAll();
 
         // then
         List<String> stations = response.jsonPath().getList("name", String.class);
-        Assertions.assertThat(stations).containsExactly("신분당선", "분당선");
+        Assertions.assertThat(stations).containsExactly(saveLineRequest.getName(), saveAnotherLineRequest.getName());
     }
 
     /**
@@ -72,14 +89,14 @@ public class StationLineAcceptanceTest {
     @Test
     void findStationLine() {
         // given
-        StationLineManager.save("신분당선", "bg-red-600", 1L, 2L, 10L);
+        StationLineManager.save(saveLineRequest);
 
         // when
-        ExtractableResponse<Response> response = StationLineManager.findById(1L);
+        ExtractableResponse<Response> response = StationLineManager.findById(savedFirstStationId);
 
         // then
         String result = response.jsonPath().getString("name");
-        Assertions.assertThat(result).isEqualTo("신분당선");
+        Assertions.assertThat(result).isEqualTo(saveLineRequest.getName());
     }
 
     /**
@@ -92,13 +109,14 @@ public class StationLineAcceptanceTest {
     @Test
     void updateStationLine() {
         // given
-        StationLineManager.save("신분당선", "bg-red-600", 1L, 2L, 10L);;
+        ExtractableResponse<Response> savedResponse = StationLineManager.save(saveLineRequest);
+        long lineId = savedResponse.jsonPath().getLong("id");
 
         // when
-        StationLineManager.update(1L, "다른 분당선", "bg-red-600");
+        StationLineManager.update(lineId, "다른 분당선", "bg-red-600");
 
         // then
-        ExtractableResponse<Response> response = StationLineManager.findById(1L);
+        ExtractableResponse<Response> response = StationLineManager.findById(lineId);
         Assertions.assertThat(response.jsonPath().getString("name")).isEqualTo("다른 분당선");
     }
 
@@ -112,9 +130,9 @@ public class StationLineAcceptanceTest {
     @Test
     void deleteStationLine() {
         // given
-        StationLineManager.save("신분당선", "bg-red-600", 1L, 2L, 10L);
+        StationLineManager.save(saveLineRequest);
 
         // when
-        StationLineManager.delete(1L);
+        StationLineManager.delete(savedFirstStationId);
     }
 }
