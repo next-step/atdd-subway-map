@@ -1,6 +1,9 @@
 package subway.line;
 
+import subway.section.Section;
+import subway.section.Sections;
 import subway.station.Station;
+
 import javax.persistence.*;
 import java.util.List;
 
@@ -17,22 +20,31 @@ public class Line {
     @Column(length = 20, nullable = false)
     private String color;
 
-    @ManyToOne
-    @JoinColumn(name = "up_station_id")
-    private Station upStation;
-
-    @ManyToOne
-    @JoinColumn(name = "down_station_id")
-    private Station downStation;
+    @Embedded
+    private Sections sections = new Sections();
 
     public Line() {
     }
 
-    public Line(String name, String color, Station upStation, Station downStation) {
+    public Line(String name, String color, Station upStation, Station downStation, Long distance) {
         this.name = name;
         this.color = color;
-        this.upStation = upStation;
-        this.downStation = downStation;
+
+        Section section = new Section(this, upStation, downStation, distance);
+        sections.addSection(section);
+    }
+
+    public void update(String name, String color) {
+        this.name = name;
+        this.color = color;
+    }
+
+    public void addSection(Section section) {
+        this.sections.addSection(section);
+    }
+
+    public void removeSection(Long stationId) {
+        this.sections.removeSection(stationId);
     }
 
     public Long getId() {
@@ -47,20 +59,8 @@ public class Line {
         return color;
     }
 
-    public Station getUpStation() {
-        return upStation;
+    public List<Station> getOrderedStations() {
+        return sections.getOrderedStations();
     }
 
-    public Station getDownStation() {
-        return downStation;
-    }
-
-    public LineResponse createLineResponse() {
-        return new LineResponse(id, name, List.of(upStation.createStationResponse(), downStation.createStationResponse()));
-    }
-
-    public void update(LineUpdateRequest lineUpdateRequest) {
-        this.name = lineUpdateRequest.getName();
-        this.color = lineUpdateRequest.getColor();
-    }
 }

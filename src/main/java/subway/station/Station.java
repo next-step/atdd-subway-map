@@ -25,7 +25,11 @@ public class Station {
         return name;
     }
 
-    public StationResponse createStationResponse() {
-        return new StationResponse(id, name);
+    public boolean isEquals(Station station) {
+        return this.id.equals(station.getId());
+    }
+
+    public boolean isEquals(Long stationId) {
+        return this.id.equals(stationId);
     }
 }

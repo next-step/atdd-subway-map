@@ -1,19 +1,14 @@
 package subway;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -24,9 +19,9 @@ public class LineAcceptanceTest {
 
     @BeforeEach
     void setUp() {
-        createStation("강남역");
-        createStation("역삼역");
-        createStation("선릉역");
+        StationSteps.createStation("강남역");
+        StationSteps.createStation("역삼역");
+        StationSteps.createStation("선릉역");
     }
 
     /**
@@ -37,10 +32,10 @@ public class LineAcceptanceTest {
     @Test
     void createLine() {
         // when
-        createLine("신분당선", "bg-red-600", 1L, 2L);
+        LineSteps.createLine("신분당선", "bg-red-600", 1L, 2L, 10L);
 
         // then
-        List<String> lineNames = getLineNames();
+        List<String> lineNames = LineSteps.getLineNames();
         assertThat(lineNames).containsAnyOf("신분당선");
     }
 
@@ -53,11 +48,11 @@ public class LineAcceptanceTest {
     @Test
     void getLines() {
         // given
-        createLine("신분당선", "bg-red-600", 1L, 2L);
-        createLine("분당선", "bg-green-600", 1L, 3L);
+        LineSteps.createLine("신분당선", "bg-red-600", 1L, 2L, 10L);
+        LineSteps.createLine("분당선", "bg-green-600", 1L, 3L, 10L);
 
         // when
-        List<String> lineNames = getLineNames();
+        List<String> lineNames = LineSteps.getLineNames();
 
         // then
         assertThat(lineNames).containsAnyOf("신분당선", "분당선");
@@ -73,11 +68,11 @@ public class LineAcceptanceTest {
     @Test
     void getLine() {
         // given
-        ExtractableResponse<Response> line = createLine("신분당선", "bg-red-600", 1L, 2L);
+        ExtractableResponse<Response> line = LineSteps.createLine("신분당선", "bg-red-600", 1L, 2L, 10L);
         String locationHeader = line.header("Location");
 
         // when
-        ExtractableResponse<Response> response = getLine(locationHeader);
+        ExtractableResponse<Response> response = LineSteps.getLine(locationHeader);
 
         // then
         assertThat(response.jsonPath().getString("name")).isEqualTo("신분당선");
@@ -92,12 +87,12 @@ public class LineAcceptanceTest {
     @Test
     void updateLine() {
         // given
-        ExtractableResponse<Response> line = createLine("신분당선", "bg-red-600", 1L, 2L);
+        ExtractableResponse<Response> line = LineSteps.createLine("신분당선", "bg-red-600", 1L, 2L, 10L);
         String locationHeader = line.header("Location");
 
         // when
-        updateLine("다른분당선", "bg-red-600", locationHeader);
-        ExtractableResponse<Response> response = getLine(locationHeader);
+        LineSteps.updateLine("다른분당선", "bg-red-600", locationHeader);
+        ExtractableResponse<Response> response = LineSteps.getLine(locationHeader);
 
         // then
         assertThat(response.jsonPath().getString("name")).isEqualTo("다른분당선");
@@ -112,80 +107,15 @@ public class LineAcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        ExtractableResponse<Response> line = createLine("신분당선", "bg-red-600", 1L, 2L);
+        ExtractableResponse<Response> line = LineSteps.createLine("신분당선", "bg-red-600", 1L, 2L, 10L);
         String locationHeader = line.header("Location");
 
         // when
-        deleteLine(locationHeader);
-        List<String> lineNames = getLineNames();
+        LineSteps.deleteLine(locationHeader);
+        List<String> lineNames = LineSteps.getLineNames();
 
         // then
         assertThat(lineNames).doesNotContain("신분당선");
-    }
-
-    private static ExtractableResponse<Response> createStation(String name) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-
-        return RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .statusCode(HttpStatus.CREATED.value())
-                .extract();
-    }
-
-    private ExtractableResponse<Response> createLine(String name, String color, Long upStationId, Long downStationId) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-        params.put("color", color);
-        params.put("upStationId", String.valueOf(upStationId));
-        params.put("downStationId", String.valueOf(downStationId));
-
-        return RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().log().all()
-                .statusCode(HttpStatus.CREATED.value())
-                .extract();
-    }
-
-    private static List<String> getLineNames() {
-        return RestAssured.given().log().all()
-                .when().get("/lines")
-                .then().log().all()
-                .extract().jsonPath().getList("name", String.class);
-    }
-
-    private static ExtractableResponse<Response> getLine(String locationHeader) {
-        return RestAssured.given().log().all()
-                .when().get(locationHeader)
-                .then().log().all()
-                .statusCode(HttpStatus.OK.value())
-                .extract();
-    }
-
-    private static void updateLine(String name, String color, String locationHeader) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-        params.put("color", color);
-
-        RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().patch(locationHeader)
-                .then().log().all()
-                .statusCode(HttpStatus.OK.value())
-                .extract();
-    }
-
-    private static void deleteLine(String locationHeader) {
-        RestAssured.given().log().all()
-                .when().delete(locationHeader)
-                .then().log().all()
-                .statusCode(HttpStatus.NO_CONTENT.value());
     }
 
 }
