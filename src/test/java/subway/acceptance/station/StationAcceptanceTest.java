@@ -1,4 +1,4 @@
-package subway.acceptance;
+package subway.acceptance.station;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,12 +9,15 @@ import subway.station.presentation.request.CreateStationRequest;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.acceptance.extractableResponse.StationApiExtractableResponse.*;
+import static subway.acceptance.station.StationApiExtractableResponse.*;
 
 @DisplayName("지하철역 관련 기능")
 @Sql("/truncate.sql")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationAcceptanceTest {
+
+    private String 강남역 = "강남역";
+    private String 광화문역 = "광화문역";
 
     /**
      * When 지하철역을 생성하면
@@ -25,7 +28,6 @@ public class StationAcceptanceTest {
     @Test
     void 지하철_역을_생성() {
         // when & then
-        String 강남역 = "강남역";
         createStation(CreateStationRequest.from(강남역));
 
         // then
@@ -43,8 +45,6 @@ public class StationAcceptanceTest {
     @Test
     void 지하철_역_목록을_조회() {
         // given
-        String 강남역 = "강남역";
-        String 광화문역 = "광화문역";
         createStation(CreateStationRequest.from(강남역));
         createStation(CreateStationRequest.from(광화문역));
 
@@ -65,7 +65,6 @@ public class StationAcceptanceTest {
     @Test
     void 지하철_역을_삭제() {
         // given
-        String 강남역 = "강남역";
         Long stationId = createStation(CreateStationRequest.from(강남역)).jsonPath().getLong("stationId");
 
         // when
