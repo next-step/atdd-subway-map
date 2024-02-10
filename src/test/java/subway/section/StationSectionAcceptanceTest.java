@@ -12,23 +12,19 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
+import subway.E2ETestInitializer;
 import subway.line.StationLineRequest;
 import subway.line.StationLineResponse;
 import utils.line.StationLineManager;
-import utils.station.StationManager;
 import utils.section.StationSectionManager;
+import utils.station.StationManager;
 
 @DisplayName("지하철역 구간 관리 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class StationSectionAcceptanceTest {
+public class StationSectionAcceptanceTest extends E2ETestInitializer {
 
     public static final long DISTANCE = 10L;
     public static final int ALL_STATIONS_COUNT = 3;
     public static final int ONE_REMOVE_STATIONS_COUNT = 2;
-
     public static final String FIRST_LINE_NAME = "신분당선";
     public static final String FIRST_LINE_COLOR = "bg-red-600";
 
@@ -87,11 +83,8 @@ public class StationSectionAcceptanceTest {
 
     /**
      * Given 지하철 노선을 생성하고 A역 - C역 - B역 구간을 등록한다.
-     * When stationId에 해당하는 역을 제거한다.
+     * When B역을 제거한다.
      * Then A역 - C역 순으로 구간이 등록되어 있다.
-     * Exception
-     * 1. 노선에 포함된 역이 한 개인 경우
-     * 2. 제거하려는 역의 번호가 노선의 하행역이 아닌 경우
      */
     // TODO: 지하철 구간 제거 인수 테스트 메서드 생성
     @DisplayName("지하철 구간을 제거한다.")

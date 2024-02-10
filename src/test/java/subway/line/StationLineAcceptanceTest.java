@@ -7,22 +7,19 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
+import subway.E2ETestInitializer;
 import utils.line.StationLineManager;
 import utils.station.StationManager;
 
 @DisplayName("지하철역 노선 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-//@Sql("/truncate.sql")  // 어떤 방식이 더 효율적인걸까..?
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class StationLineAcceptanceTest {
+public class StationLineAcceptanceTest extends E2ETestInitializer {
 
-    public static final long DISTANCE = 10L;
     public static final String FIRST_LINE_NAME = "신분당선";
     public static final String FIRST_LINE_COLOR = "bg-red-600";
     public static final String SECOND_LINE_NAME = "분당선";
     public static final String SECOND_LINE_COLOR = "bg-green-600";
+    public static final long DISTANCE = 10L;
+
     private StationLineRequest saveLineRequest;
     private StationLineRequest saveAnotherLineRequest;
     private StationLineRequest updateLineRequest;

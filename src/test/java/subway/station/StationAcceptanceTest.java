@@ -7,15 +7,12 @@ import io.restassured.response.Response;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.annotation.DirtiesContext;
+import subway.E2ETestInitializer;
 import utils.station.StationManager;
 
 @DisplayName("지하철역 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class StationAcceptanceTest {
+public class StationAcceptanceTest extends E2ETestInitializer {
 
     public static final int ALL_STATIONS_COUNT = 3;
     public static final int ONE_REMOVE_STATIONS_COUNT = 2;
@@ -47,7 +44,6 @@ public class StationAcceptanceTest {
      * Given 2개의 지하철역을 생성하고
      * When 지하철역 목록을 조회하면
      * Then 2개의 지하철역을 응답 받는다
-     * 인수 테스트란, End to End Test 인데, Controller -> Service -> Repository 까지 테스트 흐름이 움직이기 때문에 통합 테스트와 비슷한 성격을 띄는 것 같은데, 맞나...?
      */
     // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
     @DisplayName("지하철역 목록을 조회한다.")
