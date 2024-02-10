@@ -15,7 +15,7 @@ public class Station {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "station_id")
-    private Long id;
+    private Long stationId;
 
     @Column(length = 20, nullable = false)
     private String name;
@@ -30,8 +30,8 @@ public class Station {
         this.name = name;
     }
 
-    public Long getId() {
-        return id;
+    public Long getStationId() {
+        return stationId;
     }
 
     public String getName() {
@@ -42,12 +42,12 @@ public class Station {
     public boolean equals(Object o) {
         if (this == o) return true;
         Station station = (Station) o;
-        return Objects.equals(id, station.getId());
+        return Objects.equals(stationId, station.getStationId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(stationId);
     }
 
 }

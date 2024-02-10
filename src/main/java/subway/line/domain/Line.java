@@ -6,14 +6,12 @@ import subway.exception.AlreadyExistDownStationException;
 import subway.exception.InvalidSectionUpStationException;
 import subway.section.domain.Section;
 import subway.station.domain.Station;
-import subway.station.service.StationDto;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Entity
 @Where(clause = "deleted_at IS NULL")
@@ -23,7 +21,7 @@ public class Line {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "line_id")
-    private Long id;
+    private Long lineId;
 
     @Column(length = 20, nullable = false)
     private String name;
@@ -65,7 +63,7 @@ public class Line {
             stations.add(section.getUpStation());
         }
 
-        stations.add(this.sections.get(this.sections.size()-1).getDownStation());
+        stations.add(this.sections.get(this.sections.size() - 1).getDownStation());
 
         return stations;
     }
@@ -95,8 +93,8 @@ public class Line {
         }
     }
 
-    public Long getId() {
-        return id;
+    public Long getLineId() {
+        return lineId;
     }
 
     public String getName() {
@@ -119,12 +117,12 @@ public class Line {
     public boolean equals(Object o) {
         if (this == o) return true;
         Line line = (Line) o;
-        return Objects.equals(id, line.getId());
+        return Objects.equals(lineId, line.getLineId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(lineId);
     }
 
 }

@@ -21,7 +21,7 @@ public class LineController {
     @PostMapping("/lines")
     public ResponseEntity<CreateLineResponse> createLine(@RequestBody CreateLineRequest createLineRequest) {
         CreateLineResponse line = lineService.saveLine(createLineRequest);
-        return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
+        return ResponseEntity.created(URI.create("/lines/" + line.getLineId())).body(line);
     }
 
     @GetMapping(value = "/lines")
@@ -29,28 +29,34 @@ public class LineController {
         return ResponseEntity.ok().body(lineService.findAllLines());
     }
 
-    @GetMapping("/lines/{id}")
-    public ResponseEntity<ShowLineResponse> showLine(@PathVariable Long id) {
-        ShowLineResponse line = lineService.findLine(id);
+    @GetMapping("/lines/{lineId}")
+    public ResponseEntity<ShowLineResponse> showLine(@PathVariable Long lineId) {
+        ShowLineResponse line = lineService.findLine(lineId);
         return ResponseEntity.ok().body(line);
     }
 
-    @PutMapping("/lines/{id}")
-    public ResponseEntity<UpdateLineResponse> updateLine(@PathVariable Long id, @RequestBody UpdateLineRequest updateLineRequest) {
-        UpdateLineResponse line = lineService.updateLine(id, updateLineRequest);
+    @PutMapping("/lines/{lineId}")
+    public ResponseEntity<UpdateLineResponse> updateLine(@PathVariable Long lineId, @RequestBody UpdateLineRequest updateLineRequest) {
+        UpdateLineResponse line = lineService.updateLine(lineId, updateLineRequest);
         return ResponseEntity.ok().body(line);
     }
 
-    @DeleteMapping("/lines/{id}")
-    public ResponseEntity<Void> deleteLine(@PathVariable Long id) {
-        lineService.deleteLine(id);
+    @DeleteMapping("/lines/{lineId}")
+    public ResponseEntity<Void> deleteLine(@PathVariable Long lineId) {
+        lineService.deleteLine(lineId);
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/lines/{id}/section")
-    public ResponseEntity<AddSectionResponse> addSection(@PathVariable Long id, @RequestBody AddSectionRequest addSectionRequest) {
-        AddSectionResponse line = lineService.addSection(id, addSectionRequest);
-        return ResponseEntity.created(URI.create("/lines/" + line.getId() + "section")).body(line);
+    @PostMapping("/lines/{lineId}/section")
+    public ResponseEntity<AddSectionResponse> addSection(@PathVariable Long lineId, @RequestBody AddSectionRequest addSectionRequest) {
+        AddSectionResponse line = lineService.addSection(lineId, addSectionRequest);
+        return ResponseEntity.created(URI.create("/lines/" + line.getLineId() + "section")).body(line);
+    }
+
+    @DeleteMapping("/lines/{lineId}/sections")
+    public ResponseEntity<Void> deleteSection(@PathVariable Long lineId, @RequestParam Long sectionId) {
+        lineService.deleteSection(lineId, sectionId);
+        return ResponseEntity.noContent().build();
     }
 
 }

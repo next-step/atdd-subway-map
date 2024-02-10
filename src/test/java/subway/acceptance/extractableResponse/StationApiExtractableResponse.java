@@ -26,11 +26,11 @@ public class StationApiExtractableResponse {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> deleteStation(Long id) {
+    public static ExtractableResponse<Response> deleteStation(Long stationId) {
         return RestAssured
                 .given().log().all()
-                .pathParam("id", id)
-                .when().delete("/stations/{id}")
+                .pathParam("stationId", stationId)
+                .when().delete("/stations/{stationId}")
                 .then().log().all()
                 .extract();
     }

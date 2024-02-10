@@ -4,23 +4,23 @@ import subway.station.domain.Station;
 
 public class CreateStationResponse {
 
-    private Long id;
+    private Long stationId;
     private String name;
 
-    public CreateStationResponse(Long id, String name) {
-        this.id = id;
+    public CreateStationResponse(Long stationId, String name) {
+        this.stationId = stationId;
         this.name = name;
     }
 
     public static CreateStationResponse from(Station station) {
         return new CreateStationResponse(
-                station.getId(),
+                station.getStationId(),
                 station.getName()
         );
     }
 
-    public Long getId() {
-        return id;
+    public Long getStationId() {
+        return stationId;
     }
 
     public String getName() {

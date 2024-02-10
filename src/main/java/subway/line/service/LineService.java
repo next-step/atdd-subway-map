@@ -53,16 +53,16 @@ public class LineService {
                 .collect(Collectors.toList()));
     }
 
-    public ShowLineResponse findLine(Long id) {
-        Line line = lineRepository.findById(id)
+    public ShowLineResponse findLine(Long lineId) {
+        Line line = lineRepository.findById(lineId)
                 .orElseThrow(() -> new NotFoundLineException());
 
         return ShowLineResponse.from(line);
     }
 
     @Transactional
-    public UpdateLineResponse updateLine(Long id, UpdateLineRequest updateLineRequest) {
-        Line line = lineRepository.findById(id)
+    public UpdateLineResponse updateLine(Long lineId, UpdateLineRequest updateLineRequest) {
+        Line line = lineRepository.findById(lineId)
                 .orElseThrow(() -> new NotFoundLineException());
 
         line.updateLine(updateLineRequest.getColor(), updateLineRequest.getDistance());
@@ -71,22 +71,27 @@ public class LineService {
     }
 
     @Transactional
-    public void deleteLine(final Long id) {
-        lineRepository.deleteById(id);
+    public void deleteLine(final Long lineId) {
+        lineRepository.deleteById(lineId);
     }
 
     @Transactional
-    public AddSectionResponse addSection(Long id, AddSectionRequest addSectionRequest) {
+    public AddSectionResponse addSection(Long lineId, AddSectionRequest addSectionRequest) {
         Station upStation = stationRepository.getById(addSectionRequest.getUpStationId());
         Station downStation = stationRepository.getById(addSectionRequest.getDownStationId());
         Section section = sectionRepository.save(Section.of(upStation, downStation, addSectionRequest.getDistance()));
 
-        Line line = lineRepository.findById(id)
+        Line line = lineRepository.findById(lineId)
                 .orElseThrow(() -> new NotFoundLineException());
 
         line.addSection(section);
 
-        return AddSectionResponse.from(line);
+        return AddSectionResponse.from(section);
+    }
+
+    @Transactional
+    public void deleteSection(final Long lineId, final Long sectionId) {
+        sectionRepository.deleteById(sectionId);
     }
 
 }

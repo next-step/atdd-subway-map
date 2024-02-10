@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 public class ShowLineResponse {
 
-    private Long id;
+    private Long lineId;
 
     private String name;
 
@@ -21,8 +21,8 @@ public class ShowLineResponse {
     private ShowLineResponse() {
     }
 
-    public ShowLineResponse(Long id, String name, String color, List<StationDto> stations, Integer distance) {
-        this.id = id;
+    public ShowLineResponse(Long lineId, String name, String color, List<StationDto> stations, Integer distance) {
+        this.lineId = lineId;
         this.name = name;
         this.color = color;
         this.stations = stations;
@@ -31,7 +31,7 @@ public class ShowLineResponse {
 
     public static ShowLineResponse from(Line line) {
         return new ShowLineResponse(
-                line.getId(),
+                line.getLineId(),
                 line.getName(),
                 line.getColor(),
                 line.getStations().stream()
@@ -42,8 +42,8 @@ public class ShowLineResponse {
         );
     }
 
-    public Long getId() {
-        return id;
+    public Long getLineId() {
+        return lineId;
     }
 
     public String getName() {

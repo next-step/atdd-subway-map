@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 public class CreateLineResponse {
 
-    private Long id;
+    private Long lineId;
 
     private String name;
 
@@ -21,8 +21,8 @@ public class CreateLineResponse {
     private CreateLineResponse() {
     }
 
-    private CreateLineResponse(Long id, String name, String color, List<StationDto> stations, Integer distance) {
-        this.id = id;
+    private CreateLineResponse(Long lineId, String name, String color, List<StationDto> stations, Integer distance) {
+        this.lineId = lineId;
         this.name = name;
         this.color = color;
         this.stations = stations;
@@ -31,7 +31,7 @@ public class CreateLineResponse {
 
     public static CreateLineResponse from(Line line) {
         return new CreateLineResponse(
-                line.getId(),
+                line.getLineId(),
                 line.getName(),
                 line.getColor(),
                 line.getStations().stream()
@@ -42,8 +42,8 @@ public class CreateLineResponse {
         );
     }
 
-    public Long getId() {
-        return id;
+    public Long getLineId() {
+        return lineId;
     }
 
     public String getName() {

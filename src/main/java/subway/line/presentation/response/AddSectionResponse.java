@@ -1,61 +1,55 @@
 package subway.line.presentation.response;
 
-import subway.line.domain.Line;
+import subway.section.domain.Section;
 import subway.station.service.StationDto;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class AddSectionResponse {
 
-    private Long id;
+    private Long lineId;
 
-    private String name;
+    private Long sectionId;
 
-    private String color;
+    private StationDto upStation;
 
-    private List<StationDto> stations;
+    private StationDto downStation;
 
     private Integer distance;
 
     private AddSectionResponse() {
     }
 
-    private AddSectionResponse(Long id, String name, String color, List<StationDto> stations, Integer distance) {
-        this.id = id;
-        this.name = name;
-        this.color = color;
-        this.stations = stations;
+    private AddSectionResponse(Long lineId, Long sectionId, StationDto upStation, StationDto downStation, Integer distance) {
+        this.lineId = lineId;
+        this.sectionId = sectionId;
+        this.upStation = upStation;
+        this.downStation = downStation;
         this.distance = distance;
     }
 
-    public static AddSectionResponse from(Line line) {
+    public static AddSectionResponse from(Section section) {
         return new AddSectionResponse(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                line.getStations().stream()
-                        .distinct()
-                        .map(StationDto::from)
-                        .collect(Collectors.toList()),
-                line.getDistance()
+                section.getLine().getLineId(),
+                section.getSectionId(),
+                StationDto.from(section.getUpStation()),
+                StationDto.from(section.getDownStation()),
+                section.getDistance()
         );
     }
 
-    public Long getId() {
-        return id;
+    public Long getLineId() {
+        return lineId;
     }
 
-    public String getName() {
-        return name;
+    public Long getSectionId() {
+        return sectionId;
     }
 
-    public String getColor() {
-        return color;
+    public StationDto getUpStation() {
+        return upStation;
     }
 
-    public List<StationDto> getStations() {
-        return stations;
+    public StationDto getDownStation() {
+        return downStation;
     }
 
     public Integer getDistance() {

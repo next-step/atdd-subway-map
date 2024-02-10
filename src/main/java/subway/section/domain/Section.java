@@ -17,7 +17,7 @@ public class Section {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "section_id")
-    private Long id;
+    private Long sectionId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "line_id")
@@ -52,8 +52,8 @@ public class Section {
         return this.downStation.equals(upStation);
     }
 
-    private Long getId() {
-        return this.id;
+    public Long getSectionId() {
+        return this.sectionId;
     }
 
     public Line getLine() {
@@ -84,12 +84,12 @@ public class Section {
     public boolean equals(Object o) {
         if (this == o) return true;
         Section section = (Section) o;
-        return Objects.equals(id, section.getId());
+        return Objects.equals(sectionId, section.getSectionId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(sectionId);
     }
 
 }

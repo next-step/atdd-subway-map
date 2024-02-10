@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.jdbc.Sql;
 import subway.line.presentation.request.AddSectionRequest;
 import subway.line.presentation.request.CreateLineRequest;
+import subway.line.presentation.request.DeleteSectionRequest;
 import subway.station.presentation.request.CreateStationRequest;
 
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static subway.acceptance.extractableResponse.LineApiExtractableResponse.*;
 import static subway.acceptance.extractableResponse.StationApiExtractableResponse.*;
+import static subway.acceptance.extractableResponse.SectionApiExtractableResponse.*;
 
 @DisplayName("지하철 구간 관련 기능")
 @Sql("/truncate.sql")
@@ -34,13 +36,13 @@ public class SectionAcceptanceTest {
         String 신논현역 = "신논현역";
         String 강남역 = "강남역";
 
-        Long 논현역_ID = createStation(CreateStationRequest.from(논현역)).jsonPath().getLong("id");
-        Long 신논현역_ID = createStation(CreateStationRequest.from(신논현역)).jsonPath().getLong("id");
+        Long 논현역_ID = createStation(CreateStationRequest.from(논현역)).jsonPath().getLong("stationId");
+        Long 신논현역_ID = createStation(CreateStationRequest.from(신논현역)).jsonPath().getLong("stationId");
         CreateLineRequest 신분당선_생성_정보 = CreateLineRequest.of(신분당선, "bg-red-600", 논현역_ID, 신논현역_ID, 10);
-        Long 신분당선_ID = createLine(신분당선_생성_정보).jsonPath().getLong("id");
+        Long 신분당선_ID = createLine(신분당선_생성_정보).jsonPath().getLong("lineId");
 
         // when
-        Long 강남역_ID = createStation(CreateStationRequest.from(강남역)).jsonPath().getLong("id");
+        Long 강남역_ID = createStation(CreateStationRequest.from(강남역)).jsonPath().getLong("stationId");
         AddSectionRequest 구간_생성_정보 = AddSectionRequest.of(신논현역_ID, 강남역_ID, 15);
         assertThat(addSection(구간_생성_정보, 신분당선_ID).statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
@@ -63,14 +65,14 @@ public class SectionAcceptanceTest {
         String 강남역 = "강남역";
         String 양재역 = "양재역";
 
-        Long 논현역_ID = createStation(CreateStationRequest.from(논현역)).jsonPath().getLong("id");
-        Long 신논현역_ID = createStation(CreateStationRequest.from(신논현역)).jsonPath().getLong("id");
+        Long 논현역_ID = createStation(CreateStationRequest.from(논현역)).jsonPath().getLong("stationId");
+        Long 신논현역_ID = createStation(CreateStationRequest.from(신논현역)).jsonPath().getLong("stationId");
         CreateLineRequest 신분당선_생성_정보 = CreateLineRequest.of(신분당선, "bg-red-600", 논현역_ID, 신논현역_ID, 10);
-        Long 신분당선_ID = createLine(신분당선_생성_정보).jsonPath().getLong("id");
+        Long 신분당선_ID = createLine(신분당선_생성_정보).jsonPath().getLong("lineId");
 
         // when
-        Long 강남역_ID = createStation(CreateStationRequest.from(강남역)).jsonPath().getLong("id");
-        Long 양재역_ID = createStation(CreateStationRequest.from(양재역)).jsonPath().getLong("id");
+        Long 강남역_ID = createStation(CreateStationRequest.from(강남역)).jsonPath().getLong("stationId");
+        Long 양재역_ID = createStation(CreateStationRequest.from(양재역)).jsonPath().getLong("stationId");
         AddSectionRequest 구간_생성_정보 = AddSectionRequest.of(양재역_ID, 강남역_ID, 15);
 
         // then
@@ -88,21 +90,48 @@ public class SectionAcceptanceTest {
         String 신분당선 = "신분당선";
         String 논현역 = "논현역";
         String 신논현역 = "신논현역";
-        String 강남역 = "강남역";
-        String 양재역 = "양재역";
 
-        Long 논현역_ID = createStation(CreateStationRequest.from(논현역)).jsonPath().getLong("id");
-        Long 신논현역_ID = createStation(CreateStationRequest.from(신논현역)).jsonPath().getLong("id");
+        Long 논현역_ID = createStation(CreateStationRequest.from(논현역)).jsonPath().getLong("stationId");
+        Long 신논현역_ID = createStation(CreateStationRequest.from(신논현역)).jsonPath().getLong("stationId");
         CreateLineRequest 신분당선_생성_정보 = CreateLineRequest.of(신분당선, "bg-red-600", 논현역_ID, 신논현역_ID, 10);
-        Long 신분당선_ID = createLine(신분당선_생성_정보).jsonPath().getLong("id");
+        Long 신분당선_ID = createLine(신분당선_생성_정보).jsonPath().getLong("lineId");
 
         // when
-        Long 강남역_ID = createStation(CreateStationRequest.from(강남역)).jsonPath().getLong("id");
-        Long 양재역_ID = createStation(CreateStationRequest.from(양재역)).jsonPath().getLong("id");
         AddSectionRequest 구간_생성_정보 = AddSectionRequest.of(신논현역_ID, 논현역_ID, 15);
 
         // then
         assertThat(addSection(구간_생성_정보, 신분당선_ID).statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    /**
+     * Given 지하철 구간을 생성하고
+     * When 생성한 지하철 구간을 삭제하면
+     * Then 해당 지하철 구간 정보는 삭제된다.
+     */
+    @DisplayName("지하철 구간을 삭제한다.")
+    @Test
+    void 지하철_구간을_삭제() {
+        // given
+        String 신분당선 = "신분당선";
+        String 논현역 = "논현역";
+        String 신논현역 = "신논현역";
+        String 강남역 = "강남역";
+
+        Long 논현역_ID = createStation(CreateStationRequest.from(논현역)).jsonPath().getLong("stationId");
+        Long 신논현역_ID = createStation(CreateStationRequest.from(신논현역)).jsonPath().getLong("stationId");
+        CreateLineRequest 신분당선_생성_정보 = CreateLineRequest.of(신분당선, "bg-red-600", 논현역_ID, 신논현역_ID, 10);
+        Long 신분당선_ID = createLine(신분당선_생성_정보).jsonPath().getLong("lineId");
+
+        Long 강남역_ID = createStation(CreateStationRequest.from(강남역)).jsonPath().getLong("stationId");
+        AddSectionRequest 구간_생성_정보 = AddSectionRequest.of(신논현역_ID, 강남역_ID, 15);
+        Long 신논현역_강남역_구간_ID = addSection(구간_생성_정보, 신분당선_ID).jsonPath().getLong("sectionId");
+
+        // when
+        deleteSection(신분당선_ID, 신논현역_강남역_구간_ID);
+
+        // then
+        List<String> responseLineName = selectLine(신분당선_ID).jsonPath().get("stations.name");
+        assertThat(responseLineName).doesNotContain(강남역);
     }
 
 }

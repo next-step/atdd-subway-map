@@ -28,43 +28,32 @@ public class LineApiExtractableResponse {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> selectLine(Long id) {
+    public static ExtractableResponse<Response> selectLine(Long lineId) {
         return RestAssured
                 .given().log().all()
-                .pathParam("id", id)
+                .pathParam("id", lineId)
                 .when().get("/lines/{id}")
                 .then().log().all()
                 .extract();
     }
 
-    public static ExtractableResponse<Response> modifyLine(Long id, UpdateLineRequest updateLineRequest) {
+    public static ExtractableResponse<Response> updateLine(Long lineId, UpdateLineRequest updateLineRequest) {
         return RestAssured
                 .given().log().all()
                 .body(updateLineRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .pathParam("id", id)
+                .pathParam("id", lineId)
                 .when().put("/lines/{id}")
                 .then().log().all()
                 .extract();
     }
 
-    public static ExtractableResponse<Response> deleteLine(Long id) {
+    public static ExtractableResponse<Response> deleteLine(Long lineId) {
         return RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .pathParam("id", id)
+                .pathParam("id", lineId)
                 .when().delete("/lines/{id}")
-                .then().log().all()
-                .extract();
-    }
-
-    public static ExtractableResponse<Response> addSection(AddSectionRequest addSectionRequest, Long id) {
-        return RestAssured
-                .given().log().all()
-                .body(addSectionRequest)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .pathParam("id", id)
-                .when().post("/lines/{id}/section")
                 .then().log().all()
                 .extract();
     }

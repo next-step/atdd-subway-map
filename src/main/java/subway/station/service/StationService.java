@@ -32,8 +32,8 @@ public class StationService {
     }
 
     @Transactional
-    public void deleteStationById(Long id) {
-        stationRepository.deleteById(id);
+    public void deleteStationById(Long stationId) {
+        stationRepository.deleteById(stationId);
     }
 
 }

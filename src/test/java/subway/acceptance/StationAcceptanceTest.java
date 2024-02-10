@@ -66,10 +66,10 @@ public class StationAcceptanceTest {
     void 지하철_역을_삭제() {
         // given
         String 강남역 = "강남역";
-        Long id = createStation(CreateStationRequest.from(강남역)).jsonPath().getLong("id");
+        Long stationId = createStation(CreateStationRequest.from(강남역)).jsonPath().getLong("stationId");
 
         // when
-        deleteStation(id);
+        deleteStation(stationId);
 
         // then
         List<String> stationNames =

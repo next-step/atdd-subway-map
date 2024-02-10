@@ -6,18 +6,18 @@ import java.util.List;
 
 public class SectionResponse {
 
-    private Long id;
+    private Long sectionId;
     private Integer distance;
     private List<StationDto> stations;
 
-    public SectionResponse(Long id, Integer distance, List<StationDto> stationDtos) {
-        this.id = id;
+    public SectionResponse(Long sectionId, Integer distance, List<StationDto> stationDtos) {
+        this.sectionId = sectionId;
         this.distance = distance;
         this.stations = stationDtos;
     }
 
-    public Long getId() {
-        return id;
+    public Long getSectionId() {
+        return sectionId;
     }
 
     public Integer getDistance() {
