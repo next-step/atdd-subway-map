@@ -102,4 +102,24 @@ public class StationLine {
     public boolean isRemoveFinalSection(Station station) {
         return getLastStationSection().isMatchDownStation(station);
     }
+
+    public void validateSaveSection(StationSection stationSection) {
+        if (isExistSection(stationSection)) {
+            throw new IllegalArgumentException("이미 등록된 구간입니다.");
+        }
+
+        if (!isConnectedSection(stationSection)) {
+            throw new IllegalArgumentException("구간이 올바르게 이어지지 않습니다.");
+        }
+    }
+
+    public void validateDeleteSection(Station station) {
+        if (isSingleSection()) {
+            throw new IllegalArgumentException("삭제할 구간이 존재하지 않습니다.");
+        }
+
+        if (!isRemoveFinalSection(station)) {
+            throw new IllegalArgumentException("삭제할 구간이 올바르지 않습니다.");
+        }
+    }
 }
