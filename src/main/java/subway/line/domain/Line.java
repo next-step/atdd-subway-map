@@ -3,6 +3,7 @@ package subway.line.domain;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 import subway.exception.AlreadyExistDownStationException;
+import subway.exception.DeleteSectionException;
 import subway.exception.IsNotLastStationException;
 import subway.section.domain.Section;
 import subway.station.domain.Station;
@@ -87,11 +88,14 @@ public class Line {
         if (isLastStation(deletedStation)) {
             throw new IsNotLastStationException();
         }
+        if (sections.size() == 1) {
+            throw new DeleteSectionException();
+        }
         this.sections.get(getLastSectionIndex()).delete();
         this.sections.remove(getLastSectionIndex());
     }
 
-    private boolean isExistDownStation(Section section){
+    private boolean isExistDownStation(Section section) {
         return getStations().stream()
                 .anyMatch(comparedStation ->
                         comparedStation.equals(section.getDownStation())

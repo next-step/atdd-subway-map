@@ -7,15 +7,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.jdbc.Sql;
 import subway.line.presentation.request.AddSectionRequest;
 import subway.line.presentation.request.CreateLineRequest;
-import subway.line.presentation.request.DeleteSectionRequest;
 import subway.station.presentation.request.CreateStationRequest;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.acceptance.extractableResponse.LineApiExtractableResponse.*;
-import static subway.acceptance.extractableResponse.StationApiExtractableResponse.*;
-import static subway.acceptance.extractableResponse.SectionApiExtractableResponse.*;
+import static subway.acceptance.extractableResponse.LineApiExtractableResponse.createLine;
+import static subway.acceptance.extractableResponse.LineApiExtractableResponse.selectLine;
+import static subway.acceptance.extractableResponse.SectionApiExtractableResponse.addSection;
+import static subway.acceptance.extractableResponse.SectionApiExtractableResponse.deleteSection;
+import static subway.acceptance.extractableResponse.StationApiExtractableResponse.createStation;
 
 @DisplayName("지하철 구간 관련 기능")
 @Sql("/truncate.sql")
@@ -104,6 +105,54 @@ public class SectionAcceptanceTest {
     }
 
     /**
+     * When 지하철 노선에 등록된 역(하행 종점역)이 아닌 역을 삭제하면
+     * Then 구간이 삭제되지 않는다.
+     */
+    @DisplayName("지하철 노선에 등록된 역(하행 종점역)이 아닌 역을 삭제하면 구간이 삭제되지 않는다.")
+    @Test
+    void 등록되지_않은_하행역을_삭제() {
+        // given
+        String 신분당선 = "신분당선";
+        String 논현역 = "논현역";
+        String 신논현역 = "신논현역";
+        String 강남역 = "강남역";
+
+        Long 논현역_ID = createStation(CreateStationRequest.from(논현역)).jsonPath().getLong("stationId");
+        Long 신논현역_ID = createStation(CreateStationRequest.from(신논현역)).jsonPath().getLong("stationId");
+        CreateLineRequest 신분당선_생성_정보 = CreateLineRequest.of(신분당선, "bg-red-600", 논현역_ID, 신논현역_ID, 10);
+        Long 신분당선_ID = createLine(신분당선_생성_정보).jsonPath().getLong("lineId");
+
+        Long 강남역_ID = createStation(CreateStationRequest.from(강남역)).jsonPath().getLong("stationId");
+        AddSectionRequest 구간_생성_정보 = AddSectionRequest.of(신논현역_ID, 강남역_ID, 15);
+        addSection(구간_생성_정보, 신분당선_ID);
+
+        // when & then
+        assertThat(deleteSection(신분당선_ID, 논현역_ID).statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    /**
+     * When 지하철 노선의 구간이 1개인데 역을 삭제하면
+     * Then 역이 삭제되지 않는다.
+     */
+    @DisplayName("지하철 노선에 상행 종점역과 하행 종점역만 있는 경우(구간이 1개인 경우) 역이 삭제되지 않는다.")
+    @Test
+    void 남은_구간이_한개인_노선의_역_삭제() {
+        // given
+        String 신분당선 = "신분당선";
+        String 논현역 = "논현역";
+        String 신논현역 = "신논현역";
+        String 강남역 = "강남역";
+
+        Long 논현역_ID = createStation(CreateStationRequest.from(논현역)).jsonPath().getLong("stationId");
+        Long 신논현역_ID = createStation(CreateStationRequest.from(신논현역)).jsonPath().getLong("stationId");
+        CreateLineRequest 신분당선_생성_정보 = CreateLineRequest.of(신분당선, "bg-red-600", 논현역_ID, 신논현역_ID, 10);
+        Long 신분당선_ID = createLine(신분당선_생성_정보).jsonPath().getLong("lineId");
+
+        // when & then
+        assertThat(deleteSection(신분당선_ID, 신논현역_ID).statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    /**
      * Given 지하철 구간을 생성하고
      * When 생성한 지하철 구간을 삭제하면
      * Then 해당 지하철 구간 정보는 삭제된다.
@@ -132,32 +181,6 @@ public class SectionAcceptanceTest {
         // then
         List<String> responseLineName = selectLine(신분당선_ID).jsonPath().get("stations.name");
         assertThat(responseLineName).doesNotContain(강남역);
-    }
-
-    /**
-     * When 지하철 노선에 등록된 역(하행 종점역)이 아닌 역을 제거하면
-     * Then 구간이 삭제되지 않는다.
-     */
-    @DisplayName("지하철 노선에 등록된 역(하행 종점역)이 아닌 역을 제거하면 구간이 삭제되지 않는다.")
-    @Test
-    void 등록되지_않은_하행역을_삭제() {
-        // given
-        String 신분당선 = "신분당선";
-        String 논현역 = "논현역";
-        String 신논현역 = "신논현역";
-        String 강남역 = "강남역";
-
-        Long 논현역_ID = createStation(CreateStationRequest.from(논현역)).jsonPath().getLong("stationId");
-        Long 신논현역_ID = createStation(CreateStationRequest.from(신논현역)).jsonPath().getLong("stationId");
-        CreateLineRequest 신분당선_생성_정보 = CreateLineRequest.of(신분당선, "bg-red-600", 논현역_ID, 신논현역_ID, 10);
-        Long 신분당선_ID = createLine(신분당선_생성_정보).jsonPath().getLong("lineId");
-
-        Long 강남역_ID = createStation(CreateStationRequest.from(강남역)).jsonPath().getLong("stationId");
-        AddSectionRequest 구간_생성_정보 = AddSectionRequest.of(신논현역_ID, 강남역_ID, 15);
-        addSection(구간_생성_정보, 신분당선_ID);
-
-        // when & then
-        assertThat(deleteSection(신분당선_ID, 논현역_ID).statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
 }

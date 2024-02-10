@@ -5,7 +5,6 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.MediaType;
 import subway.line.presentation.request.AddSectionRequest;
-import subway.line.presentation.request.DeleteSectionRequest;
 
 public class SectionApiExtractableResponse {
 
