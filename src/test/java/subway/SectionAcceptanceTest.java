@@ -44,8 +44,8 @@ public class SectionAcceptanceTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(201);
-        assertThat(response.jsonPath().getLong("downStationId")).isEqualTo(2);
-        assertThat(response.jsonPath().getLong("upStationId")).isEqualTo(3);
+        assertThat(response.jsonPath().getLong("downStationId")).isEqualTo(3);
+        assertThat(response.jsonPath().getLong("upStationId")).isEqualTo(2);
     }
 
     /**
@@ -186,11 +186,10 @@ public class SectionAcceptanceTest {
                 10
         );
         Long 이호선_id = createLine(lineCreateRequest);
-        createSection(이호선_id, 역삼역_id, 강남역_id, 20);
-        deleteSection(이호선_id, 강남역_id);
+        deleteSection(이호선_id, 역삼역_id);
 
         // when
-        ExtractableResponse<Response> response = deleteSection(이호선_id, 역삼역_id);
+        ExtractableResponse<Response> response = deleteSection(이호선_id, 선릉역_id);
 
         // then
         assertThat(response.statusCode()).isEqualTo(400);

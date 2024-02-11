@@ -30,21 +30,18 @@ public class SectionService {
     public SectionResponse create(Long lineId, SectionCreateRequest request) {
         Line line = getLine(lineId);
 
-        validateSequence(request, line);
-        validateUniqueness(request, line);
+        if (line.getSections() != null) {
+            validateSequence(request, line);
+            validateUniqueness(request, line);
+        }
 
         Section section = SectionCreateRequest.toEntity(
-                request.getDownStationId(),
                 request.getUpStationId(),
+                request.getDownStationId(),
                 request.getDistance()
         );
-        section.addLine(line);
         Section savedSection = sectionRepository.save(section);
-
         line.getSections().addSection(savedSection);
-        line.changeDownStationId(request.getDownStationId());
-        line.changeDistance(request.getDistance());
-
         return SectionResponse.of(savedSection);
     }
 
@@ -52,15 +49,12 @@ public class SectionService {
     public void delete(Long lineId, Long stationId) {
         Line line = getLine(lineId);
 
-        validateDownStationId(stationId, line);
         validateLastStation(line);
-
-        Section section = line.getSections().getLastSection();
-        line.changeDownStationId(section.getDownStationId());
-        line.changeDistance(-section.getDistance());
+        validateDownStationId(stationId, line);
 
         line.getSections().deleteLastSection();
     }
+
 
     private Line getLine(Long lineId) {
         return lineRepository.findById(lineId).orElseThrow(
@@ -68,8 +62,9 @@ public class SectionService {
         );
     }
 
+    // 라인의 섹션
     private void validateSequence(SectionCreateRequest request, Line line) {
-        if (line.getDownStationId() != request.getUpStationId()) {
+        if (line.getSections().getDownStationId() != request.getUpStationId()) {
             throw new SectionMismatchException();
         }
     }
@@ -87,7 +82,7 @@ public class SectionService {
     }
 
     private void validateDownStationId(Long stationId, Line line) {
-        if (line.getDownStationId() != stationId) {
+        if (line.getSections().getDownStationId() != stationId) {
             throw new StationNotMatchException();
         }
     }
