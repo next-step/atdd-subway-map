@@ -86,38 +86,22 @@ public class LineService {
     public LineResponse createLineSection(final Long lineId, final SectionRequest request) {
         final Line line = this.findLineById(lineId);
 
-        Sections sections = line.getSections();
-        Long upStationId = request.getUpStationId();
-        Long downStationId = request.getDownStationId();
+        final Sections sections = line.getSections();
+        final Long upStationId = request.getUpStationId();
+        final Long downStationId = request.getDownStationId();
 
         if (sections.isSectionRegistered(upStationId, downStationId)) {
             throw new IllegalArgumentException();
         }
 
-        this.validateNoDuplicateDownStation(request);
-
         final Station requestUpStation = this.findStationById(upStationId);
         final Station requestDownStation = this.findStationById(downStationId);
 
         final Section section = new Section(line, requestUpStation, requestDownStation, request.getDistance());
-        sectionRepository.save(section);
 
         line.addSection(section);
 
         return LineResponse.convertToDto(line);
-    }
-
-    private void validateNoDuplicateDownStation(final SectionRequest request) {
-        final List<Section> SectionListByDownStationId = sectionRepository.findByDownStationId(request.getDownStationId());
-        for (Section section : SectionListByDownStationId) {
-            if(this.isAlreadyRegistered(request, section)) {
-                throw new IllegalArgumentException();
-            }
-        }
-    }
-
-    private boolean isAlreadyRegistered(final SectionRequest request, final Section section) {
-        return request.getUpStationId().equals(section.getDownStation().getId());
     }
 
     @Transactional

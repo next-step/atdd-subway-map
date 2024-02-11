@@ -44,6 +44,13 @@ public class Sections {
                 );
     }
 
+    public void ensureNoDuplicateDownStation(final Section newSection) {
+        final boolean hasDuplicateDownStation = this.getSections().stream()
+                .anyMatch(section -> newSection.getDownStation().getId().equals(section.getUpStation().getId()));
+
+        if (hasDuplicateDownStation) throw new IllegalArgumentException();
+    }
+
     public List<Section> getSections() {
         return sections;
     }

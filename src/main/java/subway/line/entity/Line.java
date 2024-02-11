@@ -44,6 +44,7 @@ public class Line {
     }
 
     public void addSection(final Section section) {
+        this.sections.ensureNoDuplicateDownStation(section);
         this.sections.addSection(section);
         this.addLineDistance(section.getDistance());
     }
