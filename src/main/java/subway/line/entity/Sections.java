@@ -25,6 +25,10 @@ public class Sections {
         this.sections.add(section);
     }
 
+    public void removeSection(final Section section) {
+        this.sections.remove(section);
+    }
+
     public static Sections from(final List<Section> sections) {
         return new Sections(sections);
     }

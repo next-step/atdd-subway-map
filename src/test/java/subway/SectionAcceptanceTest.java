@@ -13,6 +13,8 @@ import subway.line.dto.SectionRequest;
 import subway.station.entity.Station;
 import subway.station.repository.StationRepository;
 
+import java.util.List;
+
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -92,8 +94,8 @@ public class SectionAcceptanceTest extends BaseTest{
                 .extract()
                 .jsonPath();
 
-        final String newDownStationName = getLineResponse.get("stations[1].name");
-        assertThat(newDownStationName).isNotEqualTo("지하철역");
+        List<String> names = getLineResponse.get("stations.name");
+        assertThat(names).containsOnly("강남역", "역삼역");
     }
 
     private ExtractableResponse<Response> 지하철_구간_삭제_요청(Long targetStation) {

@@ -48,7 +48,6 @@ public class LineService {
 
     public LineResponse getSubwayLine(final Long lindId) {
         final Line line = this.findLineById(lindId);
-
         return LineResponse.convertToDto(line);
     }
 
@@ -129,13 +128,10 @@ public class LineService {
             throw new IllegalArgumentException();
         }
 
-        List<Section> sections = line.getSections().getSections();
-        for (Section section : sections) {
-            if (section.getDownStation().getId().equals(stationId)) {
-                line.subtractLineDistance(section.getDistance());
-                break;
-            }
-        }
+        final Section sectionToRemove = line.getSections().getSections().stream()
+                .filter(section -> section.getDownStation().getId().equals(stationId))
+                .findFirst().orElseThrow(() -> new IllegalArgumentException());
 
+        line.removeSection(sectionToRemove);
     }
 }

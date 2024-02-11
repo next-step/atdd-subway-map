@@ -28,7 +28,7 @@ public class Line {
     protected Line() {
     }
 
-    public Line(String name, String color, Station upStation, Station downStation, int distance) {
+    public Line(final String name, final String color, final Station upStation, final Station downStation, final int distance) {
         this.name = name;
         this.color = color;
         this.distance = distance;
@@ -38,21 +38,26 @@ public class Line {
         this.sections = Sections.from(sectionList);
     }
 
-    public void updateDetails(String name, String color) {
+    public void updateDetails(final String name, final String color) {
         this.name = name;
         this.color = color;
     }
 
-    public void addSection(Section section) {
+    public void addSection(final Section section) {
         this.sections.addSection(section);
         this.addLineDistance(section.getDistance());
+    }
+
+    public void removeSection(final Section section) {
+        this.sections.removeSection(section);
+        this.subtractLineDistance(section.getDistance());
     }
 
     private void addLineDistance(final int distance) {
         this.distance += distance;
     }
 
-    public void subtractLineDistance(final int distance) {
+    private void subtractLineDistance(final int distance) {
         this.distance -= distance;
     }
 
