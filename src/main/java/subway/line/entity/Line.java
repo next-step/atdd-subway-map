@@ -50,9 +50,13 @@ public class Line {
         this.addLineDistance(section.getDistance());
     }
 
-    public void removeSection(final Section section) {
-        this.sections.removeSection(section);
-        this.subtractLineDistance(section.getDistance());
+    public void removeSection(final Station station) {
+        this.ensureRemovableSection(station.getId());
+
+        final Section sectionToRemove = this.sections.findSectionByDownStation(station);
+        this.sections.removeSection(sectionToRemove);
+
+        this.subtractLineDistance(sectionToRemove.getDistance());
     }
 
     public void ensureRemovableSection(final Long stationId) {

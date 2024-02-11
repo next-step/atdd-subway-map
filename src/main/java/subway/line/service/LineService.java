@@ -112,12 +112,7 @@ public class LineService {
             throw new IllegalArgumentException();
         }
 
-        line.ensureRemovableSection(stationId);
-
-        final Section sectionToRemove = line.getSections().getSections().stream()
-                .filter(section -> section.getDownStation().getId().equals(stationId))
-                .findFirst().orElseThrow(() -> new IllegalArgumentException());
-
-        line.removeSection(sectionToRemove);
+        Station station = stationRepository.findById(stationId).orElseThrow(() -> new IllegalArgumentException());
+        line.removeSection(station);
     }
 }

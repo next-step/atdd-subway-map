@@ -1,5 +1,7 @@
 package subway.line.entity;
 
+import subway.station.entity.Station;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
@@ -56,6 +58,14 @@ public class Sections {
                 .anyMatch(section -> newSection.getDownStation().getId().equals(section.getUpStation().getId()));
 
         if (hasDuplicateDownStation) throw new IllegalArgumentException();
+    }
+
+    public Section findSectionByDownStation(final Station station) {
+        final Section targetSection = this.getSections().stream()
+                .filter(section -> section.getDownStation().getId().equals(station.getId()))
+                .findFirst().orElseThrow(() -> new IllegalArgumentException());
+
+        return targetSection;
     }
 
     public List<Section> getSections() {
