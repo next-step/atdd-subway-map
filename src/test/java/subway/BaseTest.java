@@ -21,7 +21,7 @@ public abstract class BaseTest {
         dataBaseCleaner.execute();
     }
 
-    protected ExtractableResponse<Response> callCreateApi(final Object requestBody, final String path) {
+    protected ExtractableResponse<Response> callPostApi(final Object requestBody, final String path) {
         final ExtractableResponse<Response> response =
                 given()
                     .log().all()
@@ -37,20 +37,90 @@ public abstract class BaseTest {
         return response;
     }
 
-    protected ExtractableResponse<Response> callCreateApi(final Object requestBody, final String path, final Long pathVariable) {
+    protected ExtractableResponse<Response> callPostApi(final Object requestBody, final String path, final Long pathVariable) {
         final ExtractableResponse<Response> response =
                 given()
-                        .log().all()
-                        .body(requestBody)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when()
-                        .post(path, pathVariable)
-                        .then()
-                        .statusCode(HttpStatus.CREATED.value())
-                        .log().all()
-                        .extract();
+                    .log().all()
+                    .body(requestBody)
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                    .post(path, pathVariable)
+                .then()
+                    .statusCode(HttpStatus.CREATED.value())
+                    .log().all()
+                .extract();
 
         return response;
+    }
+
+    protected ExtractableResponse<Response> callGetApi(final String path) {
+        final ExtractableResponse<Response> response =
+                given()
+                    .log().all()
+                .when()
+                    .get(path)
+                .then()
+                    .statusCode(HttpStatus.OK.value())
+                    .log().all()
+                .extract();
+
+        return response;
+    }
+
+    protected ExtractableResponse<Response> callGetApi(final String path, final Long pathVariable) {
+        final ExtractableResponse<Response> response =
+                given()
+                    .log().all()
+                .when()
+                    .get(path, pathVariable)
+                .then()
+                    .statusCode(HttpStatus.OK.value())
+                    .log().all()
+                .extract();
+
+        return response;
+    }
+
+    protected ExtractableResponse<Response> callPutApi(final Object requestBody, final String path, final Long pathVariable) {
+        final ExtractableResponse<Response> response =
+                given()
+                    .log().all()
+                    .body(requestBody)
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                    .put(path, pathVariable)
+                .then()
+                    .statusCode(HttpStatus.OK.value())
+                    .log().all()
+                .extract();
+
+        return response;
+    }
+
+    protected void callDeleteApi(final String path, final Long pathVariable) {
+        given()
+        .when()
+            .delete(path, pathVariable)
+        .then()
+            .statusCode(HttpStatus.NO_CONTENT.value())
+            .log().all();
+    }
+
+    protected void callDeleteApi(final String paramName, final Object Param, final String path, final Long pathVariable) {
+        given().log().all()
+            .param(paramName, Param)
+        .when()
+            .delete(path, pathVariable)
+        .then()
+            .statusCode(HttpStatus.NO_CONTENT.value())
+            .log().all();
+    }
+
+    protected Long getIdFromApiResponse(final ExtractableResponse<Response> response) {
+        final String location = response.header("Location");
+        final String entityId = location.replaceAll(".*/(\\d+)$", "$1");
+
+        return Long.parseLong(entityId);
     }
 
 }

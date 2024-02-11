@@ -10,13 +10,12 @@ import subway.station.dto.StationRequest;
 
 import java.util.List;
 
-import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
 public class StationAcceptanceTest extends BaseTest {
 
-    private static final String API_PATH = "/stations";
+    private static final String STATION_API_PATH = "/stations";
 
     /**
      * When 지하철역을 생성하면
@@ -27,15 +26,15 @@ public class StationAcceptanceTest extends BaseTest {
     @Test
     void 지하철역_생성() {
         // when
-        final String stationName = "강남역";
-        final StationRequest request = new StationRequest(stationName);
-        final ExtractableResponse<Response> response = callCreateApi(request, API_PATH);
+        final StationRequest request = new StationRequest("강남역");
+        final ExtractableResponse<Response> response = callPostApi(request, STATION_API_PATH);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        final JsonPath jsonPath = this.getStationList();
+        final ExtractableResponse<Response> 지하철역_조회_요청 = callGetApi(STATION_API_PATH);
+        final JsonPath jsonPath = 지하철역_조회_요청.jsonPath();
         final List<String> stationNames = jsonPath.getList("name", String.class);
 
         assertThat(stationNames).containsAnyOf("강남역");
@@ -50,16 +49,15 @@ public class StationAcceptanceTest extends BaseTest {
     @Test
     void 지하철역_목록_조회() {
         // given
-        final String 역이름_교대역 = "교대역";
-        final StationRequest 교대역_생성_요청 = new StationRequest(역이름_교대역);
-        callCreateApi(교대역_생성_요청, API_PATH);
+        final StationRequest 교대역_생성_요청 = new StationRequest("교대역");
+        callPostApi(교대역_생성_요청, STATION_API_PATH);
 
-        final String 역이름_역삼역 = "역삼역";
-        final StationRequest 역삼역_생성_요청 = new StationRequest(역이름_역삼역);
-        callCreateApi(역삼역_생성_요청, API_PATH);
+        final StationRequest 역삼역_생성_요청 = new StationRequest("역삼역");
+        callPostApi(역삼역_생성_요청, STATION_API_PATH);
 
         // when
-        final JsonPath jsonPath = this.getStationList();
+        final ExtractableResponse<Response> 지하철역_조회_요청 = callGetApi(STATION_API_PATH);
+        final JsonPath jsonPath = 지하철역_조회_요청.jsonPath();
 
         // then
         final List<String> stationNames = jsonPath.getList("name", String.class);
@@ -78,39 +76,18 @@ public class StationAcceptanceTest extends BaseTest {
         // given
         final String stationName = "강남역";
         final StationRequest request = new StationRequest(stationName);
-        final ExtractableResponse<Response> createStationResponse = callCreateApi(request, API_PATH);
+        final ExtractableResponse<Response> createStationResponse = callPostApi(request, STATION_API_PATH);
 
         // when
-        final String location = createStationResponse.header("Location");
-        final String stationId = location.replaceAll(".*/(\\d+)$", "$1");
-
-        given()
-        .when()
-            .delete("/stations/{id}", stationId)
-        .then()
-            .statusCode(HttpStatus.NO_CONTENT.value())
-            .log().all();
+        final Long stationId = getIdFromApiResponse(createStationResponse);
+        callDeleteApi(STATION_API_PATH + "/{id}", stationId);
 
         // then
-        final JsonPath jsonPathAfterStationDeletion = this.getStationList();
+        final ExtractableResponse<Response> 지하철역_조회_요청 = callGetApi(STATION_API_PATH);
+        final JsonPath jsonPathAfterStationDeletion = 지하철역_조회_요청.jsonPath();
         final List<String> stationNames = jsonPathAfterStationDeletion.getList("name", String.class);
 
         assertThat(stationNames).doesNotContain("강남역");
-    }
-
-    private JsonPath getStationList() {
-        final JsonPath response =
-                given()
-                    .log().all()
-                .when()
-                    .get("/stations")
-                .then()
-                    .statusCode(HttpStatus.OK.value())
-                    .log().all()
-                .extract()
-                    .jsonPath();
-
-        return response;
     }
 
 }

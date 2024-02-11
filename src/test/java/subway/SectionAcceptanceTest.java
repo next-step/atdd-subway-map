@@ -6,26 +6,20 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import subway.line.dto.LineRequest;
 import subway.line.dto.SectionRequest;
-import subway.station.entity.Station;
-import subway.station.repository.StationRepository;
+import subway.station.dto.StationRequest;
 
 import java.util.List;
 
-import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 구간 관련 기능")
 public class SectionAcceptanceTest extends BaseTest{
 
-    @Autowired
-    private StationRepository stationRepository;
-
     private static final String LINE_API_PATH = "/lines";
     private static final String SECTION_API_PATH = "/lines/{id}/sections";
+    private static final String STATION_API_PATH = "/stations";
 
     private Long 강남역_ID;
     private Long 역삼역_ID;
@@ -37,14 +31,17 @@ public class SectionAcceptanceTest extends BaseTest{
     void setUp() {
         super.setUp();
 
-        final Station 강남역 = stationRepository.save(new Station("강남역"));
-        강남역_ID = 강남역.getId();
+        final StationRequest 강남역_생성_요청 = new StationRequest("강남역");
+        final ExtractableResponse<Response> 강남역_생성_응답 = callPostApi(강남역_생성_요청, STATION_API_PATH);
+        강남역_ID = getIdFromApiResponse(강남역_생성_응답);
 
-        final Station 역삼역 = stationRepository.save(new Station("역삼역"));
-        역삼역_ID = 역삼역.getId();
+        final StationRequest 역삼역_생성_요청 = new StationRequest("역삼역");
+        final ExtractableResponse<Response> 역삼역_생성_응답 = callPostApi(역삼역_생성_요청, STATION_API_PATH);
+        역삼역_ID = getIdFromApiResponse(역삼역_생성_응답);
 
-        final Station 지하철역 = stationRepository.save(new Station("지하철역"));
-        지하철역_ID = 지하철역.getId();
+        final StationRequest 지하역_생성_요청 = new StationRequest("지하철역");
+        final ExtractableResponse<Response> 지하철역_생성_응답 = callPostApi(지하역_생성_요청, STATION_API_PATH);
+        지하철역_ID = getIdFromApiResponse(지하철역_생성_응답);
     }
 
     /**
@@ -59,7 +56,7 @@ public class SectionAcceptanceTest extends BaseTest{
         this.신분당선_생성();
 
         // when
-        JsonPath createSectionResponse = this.신분당선_구간_연장_역삼역_지하철역();
+        final JsonPath createSectionResponse = this.신분당선_구간_연장_역삼역_지하철역();
 
         // then
         final String lineName = createSectionResponse.get("name");
@@ -82,36 +79,19 @@ public class SectionAcceptanceTest extends BaseTest{
         this.신분당선_구간_연장_역삼역_지하철역();
 
         // when
-        this.지하철_구간_삭제_요청(지하철역_ID);
+        callDeleteApi("stationId", 지하철역_ID, SECTION_API_PATH, 신분당선_ID);
 
         // then
-        final JsonPath getLineResponse = given()
-                .when()
-                .get(LINE_API_PATH + "/{id}", 신분당선_ID)
-                .then()
-                .statusCode(HttpStatus.OK.value())
-                .log().all()
-                .extract()
-                .jsonPath();
+        ExtractableResponse<Response> 신분당선_조회_요청 = callGetApi(LINE_API_PATH + "/{id}", 신분당선_ID);
+        final JsonPath getLineResponse = 신분당선_조회_요청.jsonPath();
 
         List<String> names = getLineResponse.get("stations.name");
         assertThat(names).containsOnly("강남역", "역삼역");
     }
 
-    private ExtractableResponse<Response> 지하철_구간_삭제_요청(Long targetStation) {
-        return given().log().all()
-                .param("stationId", targetStation)
-                .when()
-                .delete(SECTION_API_PATH, 신분당선_ID)
-                .then()
-                .statusCode(HttpStatus.NO_CONTENT.value())
-                .log().all()
-                .extract();
-    }
-
     private JsonPath 신분당선_구간_연장_역삼역_지하철역() {
         final SectionRequest sectionRequest = new SectionRequest(역삼역_ID, 지하철역_ID, 5);
-        final ExtractableResponse<Response> createSectionResponse = callCreateApi(sectionRequest, SECTION_API_PATH, 신분당선_ID);
+        final ExtractableResponse<Response> createSectionResponse = callPostApi(sectionRequest, SECTION_API_PATH, 신분당선_ID);
         final JsonPath jsonPath = createSectionResponse.jsonPath();
 
         return jsonPath;
@@ -119,9 +99,8 @@ public class SectionAcceptanceTest extends BaseTest{
 
     private void 신분당선_생성() {
         final LineRequest lineRequest = new LineRequest("신분당선", "bg-red-600", 강남역_ID, 역삼역_ID, 10);
-        final ExtractableResponse<Response> createLineResponse = callCreateApi(lineRequest, LINE_API_PATH);
-        final String location = createLineResponse.header("Location");
-        신분당선_ID = Long.parseLong(location.replaceAll(".*/(\\d+)$", "$1"));
+        final ExtractableResponse<Response> createLineResponse = callPostApi(lineRequest, LINE_API_PATH);
+        신분당선_ID = getIdFromApiResponse(createLineResponse);
     }
 
 }
