@@ -54,6 +54,12 @@ public class Line {
         this.subtractLineDistance(section.getDistance());
     }
 
+    public void ensureRemovableSection(final Long stationId) {
+        if (!sections.isLastStation(stationId)) {
+            throw new IllegalArgumentException();
+        }
+    }
+
     private void addLineDistance(final int distance) {
         this.distance += distance;
     }

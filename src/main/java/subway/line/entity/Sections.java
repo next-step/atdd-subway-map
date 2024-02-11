@@ -37,6 +37,13 @@ public class Sections {
         return sections.size();
     }
 
+    public boolean isLastStation(final long stationId) {
+        if (sections.isEmpty()) return false;
+
+        Section lastSection = sections.get(sections.size() - 1);
+        return lastSection.getDownStation().getId().equals(stationId);
+    }
+
     public boolean isSectionRegistered(final long upStationId, final long downStationId) {
         return this.getSections().stream()
                 .anyMatch(section ->

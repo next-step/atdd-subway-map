@@ -116,6 +116,16 @@ public abstract class BaseTest {
             .log().all();
     }
 
+    protected void callDeleteApiWithServerError(final String paramName, final Object Param, final String path, final Long pathVariable) {
+        given().log().all()
+            .param(paramName, Param)
+        .when()
+            .delete(path, pathVariable)
+        .then()
+            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+            .log().all();
+    }
+
     protected Long getIdFromApiResponse(final ExtractableResponse<Response> response) {
         final String location = response.header("Location");
         final String entityId = location.replaceAll(".*/(\\d+)$", "$1");

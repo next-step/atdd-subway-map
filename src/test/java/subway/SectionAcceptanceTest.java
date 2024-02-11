@@ -89,6 +89,17 @@ public class SectionAcceptanceTest extends BaseTest{
         assertThat(names).containsOnly("강남역", "역삼역");
     }
 
+    @DisplayName("지하철 구간 삭제 시 마지막 구간이 아니라면 오류가 발생한다.")
+    @Test
+    void 지하철_구간_삭제_시_마지막_구간이_아니라면_삭제_불가() {
+        // given
+        this.신분당선_생성();
+        this.신분당선_구간_연장_역삼역_지하철역();
+
+        // then
+        callDeleteApiWithServerError("stationId", 역삼역_ID, SECTION_API_PATH, 신분당선_ID);
+    }
+
     private JsonPath 신분당선_구간_연장_역삼역_지하철역() {
         final SectionRequest sectionRequest = new SectionRequest(역삼역_ID, 지하철역_ID, 5);
         final ExtractableResponse<Response> createSectionResponse = callPostApi(sectionRequest, SECTION_API_PATH, 신분당선_ID);
