@@ -27,15 +27,16 @@ public class StationService {
                 .collect(Collectors.toList());
     }
 
+    public Station findById(long id) {
+        return stationRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 역이 존재하지 않습니다"));
+    }
+
     @Transactional
     public void deleteStationById(Long id) {
         stationRepository.deleteById(id);
     }
 
     private StationResponse createStationResponse(Station station) {
-        return new StationResponse(
-                station.getId(),
-                station.getName()
-        );
+        return new StationResponse(station);
     }
 }

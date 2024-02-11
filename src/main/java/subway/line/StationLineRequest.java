@@ -5,9 +5,9 @@ public class StationLineRequest {
     private String color;
     private long upStationId;
     private long downStationId;
-    private int distance;
+    private long distance;
 
-    public StationLineRequest(String name, String color, long upStationId, long downStationId, int distance) {
+    public StationLineRequest(String name, String color, long upStationId, long downStationId, long distance) {
         this.name = name;
         this.color = color;
         this.upStationId = upStationId;
@@ -31,7 +31,18 @@ public class StationLineRequest {
         return downStationId;
     }
 
-    public int getDistance() {
+    public long getDistance() {
         return distance;
+    }
+
+    @Override
+    public String toString() {
+        return "StationLineRequest{" +
+                "name='" + name + '\'' +
+                ", color='" + color + '\'' +
+                ", upStationId=" + upStationId +
+                ", downStationId=" + downStationId +
+                ", distance=" + distance +
+                '}';
     }
 }
