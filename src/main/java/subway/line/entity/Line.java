@@ -19,14 +19,6 @@ public class Line {
     @Column(length = 20, nullable = false)
     private String color;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "up_station_id")
-    private Station upStation;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "down_station_id")
-    private Station downStation;
-
     @Column(nullable = false)
     private int distance;
 
@@ -39,8 +31,6 @@ public class Line {
     public Line(String name, String color, Station upStation, Station downStation, int distance) {
         this.name = name;
         this.color = color;
-        this.upStation = upStation;
-        this.downStation = downStation;
         this.distance = distance;
 
         List<Section> sectionList = new ArrayList<>();
@@ -53,13 +43,16 @@ public class Line {
         this.color = color;
     }
 
-    public void addDownStation(final Station newDownStation, final int distance) {
-        this.downStation = newDownStation;
+    public void addSection(Section section) {
+        this.sections.addSection(section);
+        this.addLineDistance(section.getDistance());
+    }
+
+    private void addLineDistance(final int distance) {
         this.distance += distance;
     }
 
-    public void subtractDownStation(final Station preDownStation, final int distance) {
-        this.downStation = preDownStation;
+    public void subtractLineDistance(final int distance) {
         this.distance -= distance;
     }
 
@@ -73,14 +66,6 @@ public class Line {
 
     public String getColor() {
         return color;
-    }
-
-    public Station getUpStation() {
-        return upStation;
-    }
-
-    public Station getDownStation() {
-        return downStation;
     }
 
     public int getDistance() {

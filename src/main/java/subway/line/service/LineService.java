@@ -8,6 +8,7 @@ import subway.line.dto.LineUpdateRequest;
 import subway.line.dto.SectionRequest;
 import subway.line.entity.Line;
 import subway.line.entity.Section;
+import subway.line.entity.Sections;
 import subway.line.repository.LineRepository;
 import subway.line.repository.SectionRepository;
 import subway.station.entity.Station;
@@ -86,19 +87,23 @@ public class LineService {
     public LineResponse createLineSection(final Long lineId, final SectionRequest request) {
         final Line line = this.findLineById(lineId);
 
-        if (this.isSectionRegistered(request, line)) {
+        Sections sections = line.getSections();
+        Long upStationId = request.getUpStationId();
+        Long downStationId = request.getDownStationId();
+
+        if (sections.isSectionRegistered(upStationId, downStationId)) {
             throw new IllegalArgumentException();
         }
 
         this.validateNoDuplicateDownStation(request);
 
-        final Station requestUpStation = this.findStationById(request.getUpStationId());
-        final Station requestDownStation = this.findStationById(request.getDownStationId());
+        final Station requestUpStation = this.findStationById(upStationId);
+        final Station requestDownStation = this.findStationById(downStationId);
 
         final Section section = new Section(line, requestUpStation, requestDownStation, request.getDistance());
         sectionRepository.save(section);
 
-        line.addDownStation(requestDownStation, request.getDistance());
+        line.addSection(section);
 
         return LineResponse.convertToDto(line);
     }
@@ -116,11 +121,6 @@ public class LineService {
         return request.getUpStationId().equals(section.getDownStation().getId());
     }
 
-    private boolean isSectionRegistered(final SectionRequest request, final Line line) {
-        return request.getDownStationId().equals(line.getDownStation().getId())
-                && request.getUpStationId().equals(line.getUpStation().getId());
-    }
-
     @Transactional
     public void deleteLineSection(final Long lineId, final Long stationId) {
         Line line = this.findLineById(lineId);
@@ -132,7 +132,7 @@ public class LineService {
         List<Section> sections = line.getSections().getSections();
         for (Section section : sections) {
             if (section.getDownStation().getId().equals(stationId)) {
-                line.subtractDownStation(section.getUpStation(), section.getDistance());
+                line.subtractLineDistance(section.getDistance());
                 break;
             }
         }
