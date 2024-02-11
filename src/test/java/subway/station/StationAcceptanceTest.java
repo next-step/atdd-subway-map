@@ -3,8 +3,10 @@ package subway.station;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -14,10 +16,21 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static subway.fixture.StationFixture.loadStations;
+import static subway.fixture.StationFixture.newStation;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationAcceptanceTest {
+
+    @Autowired
+    private StationRepository stationRepository;
+
+    @BeforeEach
+    void setUp() {
+        stationRepository.deleteAllInBatch();
+    }
+
     /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다
@@ -55,8 +68,8 @@ public class StationAcceptanceTest {
     @Test
     void getStations() {
         // given
-        createStation("강남역");
-        createStation("역삼역");
+        newStation("강남역");
+        newStation("역삼역");
 
         // when
         ExtractableResponse<Response> response = loadStations();
@@ -77,7 +90,7 @@ public class StationAcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        ExtractableResponse<Response> createdResponse = createStation("강남역");
+        ExtractableResponse<Response> createdResponse = newStation("강남역");
         Long stationId = createdResponse.jsonPath().getLong("id");
 
         // when
@@ -91,22 +104,5 @@ public class StationAcceptanceTest {
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
         List<String> stationNames = loadStations().jsonPath().getList("name", String.class);
         assertThat(stationNames).doesNotContain("강남역");
-    }
-
-    private ExtractableResponse<Response> loadStations() {
-        return RestAssured.given().log().all()
-                .when().get("/stations")
-                .then().log().all()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> createStation(String stationName) {
-        StationRequest request = new StationRequest(stationName);
-        return RestAssured.given().log().all()
-                .body(request)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
     }
 }

@@ -13,12 +13,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import subway.section.SectionRepository;
 import subway.station.StationRepository;
-import subway.station.StationRequest;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static subway.fixture.StationFixture.newStation;
 
 @DisplayName("지하철 노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -48,8 +48,8 @@ public class LineAcceptanceTest {
     @Test
     void createLine() {
         // given
-        ExtractableResponse<Response> 강남역 = createStation("강남역");
-        ExtractableResponse<Response> 건대입구역 = createStation("건대입구역");
+        ExtractableResponse<Response> 강남역 = newStation("강남역");
+        ExtractableResponse<Response> 건대입구역 = newStation("건대입구역");
         String 강남역_ID = 강남역.jsonPath().getString("id");
         String 건대입구역_ID = 건대입구역.jsonPath().getString("id");
 
@@ -87,9 +87,9 @@ public class LineAcceptanceTest {
     @Test
     void getLines() {
         // given
-        ExtractableResponse<Response> 강남역 = createStation("강남역");
-        ExtractableResponse<Response> 건대입구역 = createStation("건대입구역");
-        ExtractableResponse<Response> 군자역 = createStation("군자역");
+        ExtractableResponse<Response> 강남역 = newStation("강남역");
+        ExtractableResponse<Response> 건대입구역 = newStation("건대입구역");
+        ExtractableResponse<Response> 군자역 = newStation("군자역");
         String 강남역_ID = 강남역.jsonPath().getString("id");
         String 건대입구역_ID = 건대입구역.jsonPath().getString("id");
         String 군자역_ID = 군자역.jsonPath().getString("id");
@@ -129,8 +129,8 @@ public class LineAcceptanceTest {
     @Test
     void getLine() {
         // given
-        ExtractableResponse<Response> 강남역 = createStation("강남역");
-        ExtractableResponse<Response> 건대입구역 = createStation("건대입구역");
+        ExtractableResponse<Response> 강남역 = newStation("강남역");
+        ExtractableResponse<Response> 건대입구역 = newStation("건대입구역");
         String 강남역_ID = 강남역.jsonPath().getString("id");
         String 건대입구역_ID = 건대입구역.jsonPath().getString("id");
 
@@ -164,8 +164,8 @@ public class LineAcceptanceTest {
     @Test
     void updateLine() {
         // given
-        ExtractableResponse<Response> 강남역 = createStation("강남역");
-        ExtractableResponse<Response> 건대입구역 = createStation("건대입구역");
+        ExtractableResponse<Response> 강남역 = newStation("강남역");
+        ExtractableResponse<Response> 건대입구역 = newStation("건대입구역");
         String 강남역_ID = 강남역.jsonPath().getString("id");
         String 건대입구역_ID = 건대입구역.jsonPath().getString("id");
 
@@ -205,8 +205,8 @@ public class LineAcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        ExtractableResponse<Response> 강남역 = createStation("강남역");
-        ExtractableResponse<Response> 건대입구역 = createStation("건대입구역");
+        ExtractableResponse<Response> 강남역 = newStation("강남역");
+        ExtractableResponse<Response> 건대입구역 = newStation("건대입구역");
         String 강남역_ID = 강남역.jsonPath().getString("id");
         String 건대입구역_ID = 건대입구역.jsonPath().getString("id");
 
@@ -241,11 +241,11 @@ public class LineAcceptanceTest {
         @Test
         void success() {
             // given
-            ExtractableResponse<Response> 성수역 = createStation("성수역");
+            ExtractableResponse<Response> 성수역 = newStation("성수역");
             String 성수역_ID = 성수역.jsonPath().getString("id");
-            ExtractableResponse<Response> 건대입구역 = createStation("건대입구역");
+            ExtractableResponse<Response> 건대입구역 = newStation("건대입구역");
             String 건대입구역_ID = 건대입구역.jsonPath().getString("id");
-            ExtractableResponse<Response> 구의역 = createStation("구의역");
+            ExtractableResponse<Response> 구의역 = newStation("구의역");
             String 구의역_ID = 구의역.jsonPath().getString("id");
 
             ExtractableResponse<Response> 이호선 = createLine(
@@ -288,9 +288,9 @@ public class LineAcceptanceTest {
         @Test
         void duplicateStationError() {
             // given
-            ExtractableResponse<Response> 성수역 = createStation("성수역");
+            ExtractableResponse<Response> 성수역 = newStation("성수역");
             String 성수역_ID = 성수역.jsonPath().getString("id");
-            ExtractableResponse<Response> 구의역 = createStation("구의역");
+            ExtractableResponse<Response> 구의역 = newStation("구의역");
             String 구의역_ID = 구의역.jsonPath().getString("id");
 
             ExtractableResponse<Response> 이호선 = createLine(
@@ -331,13 +331,13 @@ public class LineAcceptanceTest {
         @Test
         void invalidUpStationError() {
             // given
-            ExtractableResponse<Response> 성수역 = createStation("성수역");
+            ExtractableResponse<Response> 성수역 = newStation("성수역");
             String 성수역_ID = 성수역.jsonPath().getString("id");
-            ExtractableResponse<Response> 건대입구역 = createStation("건대입구역");
+            ExtractableResponse<Response> 건대입구역 = newStation("건대입구역");
             String 건대입구역_ID = 건대입구역.jsonPath().getString("id");
-            ExtractableResponse<Response> 구의역 = createStation("구의역");
+            ExtractableResponse<Response> 구의역 = newStation("구의역");
             String 구의역_ID = 구의역.jsonPath().getString("id");
-            ExtractableResponse<Response> 잠실역 = createStation("잠실역");
+            ExtractableResponse<Response> 잠실역 = newStation("잠실역");
             String 잠실역_ID = 잠실역.jsonPath().getString("id");
 
             ExtractableResponse<Response> 이호선 = createLine(
@@ -384,11 +384,11 @@ public class LineAcceptanceTest {
         @Test
         void success() {
             // given
-            ExtractableResponse<Response> 건대입구역 = createStation("건대입구역");
+            ExtractableResponse<Response> 건대입구역 = newStation("건대입구역");
             String 건대입구역_ID = 건대입구역.jsonPath().getString("id");
-            ExtractableResponse<Response> 구의역 = createStation("구의역");
+            ExtractableResponse<Response> 구의역 = newStation("구의역");
             String 구의역_ID = 구의역.jsonPath().getString("id");
-            ExtractableResponse<Response> 강남역 = createStation("강남역");
+            ExtractableResponse<Response> 강남역 = newStation("강남역");
             String 강남역_ID = 강남역.jsonPath().getString("id");
 
             ExtractableResponse<Response> 이호선 = createLine(
@@ -429,11 +429,11 @@ public class LineAcceptanceTest {
         @Test
         void invalidLastStationError() {
             // given
-            ExtractableResponse<Response> 건대입구역 = createStation("건대입구역");
+            ExtractableResponse<Response> 건대입구역 = newStation("건대입구역");
             String 건대입구역_ID = 건대입구역.jsonPath().getString("id");
-            ExtractableResponse<Response> 구의역 = createStation("구의역");
+            ExtractableResponse<Response> 구의역 = newStation("구의역");
             String 구의역_ID = 구의역.jsonPath().getString("id");
-            ExtractableResponse<Response> 강남역 = createStation("강남역");
+            ExtractableResponse<Response> 강남역 = newStation("강남역");
             String 강남역_ID = 강남역.jsonPath().getString("id");
 
             ExtractableResponse<Response> 이호선 = createLine(
@@ -471,9 +471,9 @@ public class LineAcceptanceTest {
         @Test
         void invalidSectionSizeError() {
             // given
-            ExtractableResponse<Response> 건대입구역 = createStation("건대입구역");
+            ExtractableResponse<Response> 건대입구역 = newStation("건대입구역");
             String 건대입구역_ID = 건대입구역.jsonPath().getString("id");
-            ExtractableResponse<Response> 구의역 = createStation("구의역");
+            ExtractableResponse<Response> 구의역 = newStation("구의역");
             String 구의역_ID = 구의역.jsonPath().getString("id");
 
             ExtractableResponse<Response> 이호선 = createLine(
@@ -497,17 +497,6 @@ public class LineAcceptanceTest {
             assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
             assertThat(response.body().asString()).isEqualTo("노선에 남은 구간이 1개뿐이라 삭제할 수 없습니다.");
         }
-    }
-
-
-    private ExtractableResponse<Response> createStation(String stationName) {
-        StationRequest request = new StationRequest(stationName);
-        return RestAssured.given().log().all()
-                .body(request)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
     }
 
     private ExtractableResponse<Response> createLine(String lineName, String lineColor, String upStationId, String downStationId, String distance) {
