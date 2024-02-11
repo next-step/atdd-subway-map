@@ -63,7 +63,7 @@ public class SectionAcceptanceTest extends BaseTest{
         final String lineName = createSectionResponse.get("name");
         assertThat(lineName).isEqualTo("신분당선");
 
-        final String newDownStationName = createSectionResponse.get("stations[1].name");
+        final String newDownStationName = createSectionResponse.get("stations[2].name");
         assertThat(newDownStationName).isEqualTo("지하철역");
     }
 
@@ -80,14 +80,7 @@ public class SectionAcceptanceTest extends BaseTest{
         this.신분당선_구간_연장_역삼역_지하철역();
 
         // when
-        given().log().all()
-                .param("stationId", 지하철역_ID)
-                .when()
-                .delete(SECTION_API_PATH, 신분당선_ID)
-                .then()
-                .statusCode(HttpStatus.NO_CONTENT.value())
-                .log().all()
-                .extract();
+        this.지하철_구간_삭제_요청(지하철역_ID);
 
         // then
         final JsonPath getLineResponse = given()
@@ -101,6 +94,17 @@ public class SectionAcceptanceTest extends BaseTest{
 
         final String newDownStationName = getLineResponse.get("stations[1].name");
         assertThat(newDownStationName).isNotEqualTo("지하철역");
+    }
+
+    private ExtractableResponse<Response> 지하철_구간_삭제_요청(Long targetStation) {
+        return given().log().all()
+                .param("stationId", targetStation)
+                .when()
+                .delete(SECTION_API_PATH, 신분당선_ID)
+                .then()
+                .statusCode(HttpStatus.NO_CONTENT.value())
+                .log().all()
+                .extract();
     }
 
     private JsonPath 신분당선_구간_연장_역삼역_지하철역() {

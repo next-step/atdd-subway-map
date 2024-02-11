@@ -1,11 +1,14 @@
 package subway.line.dto;
 
 import subway.line.entity.Line;
-import subway.station.entity.Station;
+import subway.line.entity.Section;
 import subway.station.dto.StationResponse;
+import subway.station.entity.Station;
 
-import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class LineResponse {
 
@@ -14,11 +17,17 @@ public class LineResponse {
     private String color;
     private List<StationResponse> stations;
 
-    public LineResponse(Long id, String name, String color, List<StationResponse> stations) {
+    public LineResponse(final Long id, final String name, final String color, final List<StationResponse> stations) {
         this.id = id;
         this.name = name;
         this.color = color;
         this.stations = stations;
+    }
+
+    public LineResponse(final Long id, final String name, final String color) {
+        this.id = id;
+        this.name = name;
+        this.color = color;
     }
 
     public Long getId() {
@@ -37,18 +46,23 @@ public class LineResponse {
         return stations;
     }
 
-    public static LineResponse convertToDto(Line line) {
-        List<StationResponse> stations = new ArrayList<>();
+    public static LineResponse convertToDto(final Line line) {
+        final List<Section> sections = line.getSections().getSections();
 
-        Station upStation = line.getUpStation();
-        if (upStation != null) {
-            stations.add(new StationResponse(upStation.getId(), upStation.getName()));
+        if (sections.isEmpty()) {
+            return new LineResponse(line.getId(), line.getName(), line.getColor());
         }
 
-        Station downStation = line.getDownStation();
-        if (downStation != null) {
-            stations.add(new StationResponse(downStation.getId(), downStation.getName()));
+        final Set<Station> stationsOrdered = new LinkedHashSet<>();
+
+        for (Section section : sections) {
+            stationsOrdered.add(section.getUpStation());
+            stationsOrdered.add(section.getDownStation());
         }
+
+        final List<StationResponse> stations = stationsOrdered.stream()
+                .map(station -> new StationResponse(station.getId(), station.getName()))
+                .collect(Collectors.toList());
 
         return new LineResponse(line.getId(), line.getName(), line.getColor(), stations);
     }
