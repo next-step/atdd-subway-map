@@ -26,4 +26,7 @@ public class Station {
         return name;
     }
 
+    public boolean equalStation(long stationId) {
+        return id == stationId;
+    }
 }
