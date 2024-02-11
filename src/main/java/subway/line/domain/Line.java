@@ -16,19 +16,14 @@ public class Line {
     private Long id;
     private String name;
     private String color;
-    private Long upStationId;
-    private Long downStationId;
-    private int distance;
     @Embedded
     private Sections sections;
 
     @Builder
-    public Line(String name, String color, Long upStationId, Long downStationId, int distance) {
+    public Line(String name, String color) {
         this.name = name;
         this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
-        this.distance = distance;
+        this.sections = new Sections();
     }
 
     public void updateName(String name) {
@@ -38,15 +33,4 @@ public class Line {
     public void updateColor(String color) {
         this.color = color;
     }
-
-    public void changeDownStationId(Long stationId) {
-        this.downStationId = stationId;
-    }
-
-    public void changeDistance(int distance) {
-        this.distance += distance;
-
-    }
-
-
 }

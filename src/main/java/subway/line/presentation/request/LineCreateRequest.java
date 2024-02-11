@@ -24,9 +24,6 @@ public class LineCreateRequest {
         return Line.builder()
                 .name(request.getName())
                 .color(request.getColor())
-                .upStationId(request.getUpStationId())
-                .downStationId(request.getDownStationId())
-                .distance(request.getDistance())
                 .build();
     }
 }
