@@ -3,6 +3,7 @@ package subway.controller.dto;
 import lombok.Builder;
 import lombok.Getter;
 import subway.domain.Section;
+import subway.domain.Sections;
 import subway.domain.Station;
 
 import java.util.ArrayList;
@@ -28,9 +29,9 @@ public class StationResponse {
                 .build();
     }
 
-    public static List<StationResponse> sectionsToStationResponses(List<Section> sections) {
+    public static List<StationResponse> sectionsToStationResponses(Sections sections) {
         Set<StationResponse> stationResponses = new HashSet<>();
-        for (Section section : sections) {
+        for (Section section : sections.getSections()) {
             StationResponse upStationResponse = StationResponse.builder()
                     .id(section.getUpStation().getId())
                     .name(section.getUpStation().getName())
