@@ -5,8 +5,12 @@ import org.springframework.transaction.annotation.Transactional;
 import subway.line.dto.LineRequest;
 import subway.line.dto.LineResponse;
 import subway.line.dto.LineUpdateRequest;
+import subway.line.dto.SectionRequest;
 import subway.line.entity.Line;
+import subway.line.entity.Section;
+import subway.line.entity.Sections;
 import subway.line.repository.LineRepository;
+import subway.line.repository.SectionRepository;
 import subway.station.entity.Station;
 import subway.station.repository.StationRepository;
 
@@ -20,10 +24,12 @@ public class LineService {
 
     private final LineRepository lineRepository;
     private final StationRepository stationRepository;
+    private final SectionRepository sectionRepository;
 
-    public LineService(LineRepository lineRepository, StationRepository stationRepository) {
+    public LineService(final LineRepository lineRepository, final StationRepository stationRepository, final SectionRepository sectionRepository) {
         this.lineRepository = lineRepository;
         this.stationRepository = stationRepository;
+        this.sectionRepository = sectionRepository;
     }
 
     @Transactional
@@ -42,7 +48,6 @@ public class LineService {
 
     public LineResponse getSubwayLine(final Long lindId) {
         final Line line = this.findLineById(lindId);
-
         return LineResponse.convertToDto(line);
     }
 
@@ -75,5 +80,39 @@ public class LineService {
     private Line findLineById(final Long lindId) {
         return lineRepository.findById(lindId)
                 .orElseThrow(() -> new EntityNotFoundException("Line not found. Line Id: " + lindId));
+    }
+
+    @Transactional
+    public LineResponse createLineSection(final Long lineId, final SectionRequest request) {
+        final Line line = this.findLineById(lineId);
+
+        final Sections sections = line.getSections();
+        final Long upStationId = request.getUpStationId();
+        final Long downStationId = request.getDownStationId();
+
+        if (sections.isSectionRegistered(upStationId, downStationId)) {
+            throw new IllegalArgumentException();
+        }
+
+        final Station requestUpStation = this.findStationById(upStationId);
+        final Station requestDownStation = this.findStationById(downStationId);
+
+        final Section section = new Section(line, requestUpStation, requestDownStation, request.getDistance());
+
+        line.addSection(section);
+
+        return LineResponse.convertToDto(line);
+    }
+
+    @Transactional
+    public void deleteLineSection(final Long lineId, final Long stationId) {
+        Line line = this.findLineById(lineId);
+
+        if (line.getSections().size() == 1) {
+            throw new IllegalArgumentException();
+        }
+
+        Station station = stationRepository.findById(stationId).orElseThrow(() -> new IllegalArgumentException());
+        line.removeSection(station);
     }
 }

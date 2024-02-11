@@ -3,32 +3,19 @@ package subway;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import subway.station.dto.StationRequest;
-import subway.station.repository.StationRepository;
 
 import java.util.List;
 
-import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class StationAcceptanceTest {
+public class StationAcceptanceTest extends BaseTest {
 
-    @Autowired
-    private StationRepository stationRepository;
-
-    @AfterEach
-    void tearDown() {
-        stationRepository.deleteAll();
-    }
+    private static final String STATION_API_PATH = "/stations";
 
     /**
      * When 지하철역을 생성하면
@@ -39,15 +26,15 @@ public class StationAcceptanceTest {
     @Test
     void 지하철역_생성() {
         // when
-        final String stationName = "강남역";
-        final StationRequest request = new StationRequest(stationName);
-        final ExtractableResponse<Response> response = this.createStation(request);
+        final StationRequest request = new StationRequest("강남역");
+        final ExtractableResponse<Response> response = callPostApi(request, STATION_API_PATH);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        final JsonPath jsonPath = this.getStationList();
+        final ExtractableResponse<Response> 지하철역_조회_요청 = callGetApi(STATION_API_PATH);
+        final JsonPath jsonPath = 지하철역_조회_요청.jsonPath();
         final List<String> stationNames = jsonPath.getList("name", String.class);
 
         assertThat(stationNames).containsAnyOf("강남역");
@@ -62,16 +49,15 @@ public class StationAcceptanceTest {
     @Test
     void 지하철역_목록_조회() {
         // given
-        final String 역이름_교대역 = "교대역";
-        final StationRequest 교대역_생성_요청 = new StationRequest(역이름_교대역);
-        this.createStation(교대역_생성_요청);
+        final StationRequest 교대역_생성_요청 = new StationRequest("교대역");
+        callPostApi(교대역_생성_요청, STATION_API_PATH);
 
-        final String 역이름_역삼역 = "역삼역";
-        final StationRequest 역삼역_생성_요청 = new StationRequest(역이름_역삼역);
-        this.createStation(역삼역_생성_요청);
+        final StationRequest 역삼역_생성_요청 = new StationRequest("역삼역");
+        callPostApi(역삼역_생성_요청, STATION_API_PATH);
 
         // when
-        final JsonPath jsonPath = this.getStationList();
+        final ExtractableResponse<Response> 지하철역_조회_요청 = callGetApi(STATION_API_PATH);
+        final JsonPath jsonPath = 지하철역_조회_요청.jsonPath();
 
         // then
         final List<String> stationNames = jsonPath.getList("name", String.class);
@@ -90,55 +76,18 @@ public class StationAcceptanceTest {
         // given
         final String stationName = "강남역";
         final StationRequest request = new StationRequest(stationName);
-        final ExtractableResponse<Response> createStationResponse = this.createStation(request);
+        final ExtractableResponse<Response> createStationResponse = callPostApi(request, STATION_API_PATH);
 
         // when
-        final String location = createStationResponse.header("Location");
-        final String stationId = location.replaceAll(".*/(\\d+)$", "$1");
-
-        given()
-        .when()
-            .delete("/stations/{id}", stationId)
-        .then()
-            .statusCode(HttpStatus.NO_CONTENT.value())
-            .log().all();
+        final Long stationId = getIdFromApiResponse(createStationResponse);
+        callDeleteApi(STATION_API_PATH + "/{id}", stationId);
 
         // then
-        final JsonPath jsonPathAfterStationDeletion = this.getStationList();
+        final ExtractableResponse<Response> 지하철역_조회_요청 = callGetApi(STATION_API_PATH);
+        final JsonPath jsonPathAfterStationDeletion = 지하철역_조회_요청.jsonPath();
         final List<String> stationNames = jsonPathAfterStationDeletion.getList("name", String.class);
 
         assertThat(stationNames).doesNotContain("강남역");
-    }
-
-    private JsonPath getStationList() {
-        final JsonPath response =
-                given()
-                    .log().all()
-                .when()
-                    .get("/stations")
-                .then()
-                    .statusCode(HttpStatus.OK.value())
-                    .log().all()
-                .extract()
-                    .jsonPath();
-
-        return response;
-    }
-
-    private ExtractableResponse<Response> createStation(final StationRequest request) {
-        final ExtractableResponse<Response> response =
-                given()
-                    .log().all()
-                    .body(request)
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                    .post("/stations")
-                .then()
-                    .statusCode(HttpStatus.CREATED.value())
-                    .log().all()
-                .extract();
-
-        return response;
     }
 
 }
