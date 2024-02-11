@@ -11,7 +11,7 @@ import java.util.List;
 public class Sections {
 
     @OrderBy("id ASC")
-    @OneToMany(mappedBy = "line", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "line", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Section> sections = new ArrayList<>();;
 
     protected Sections() {

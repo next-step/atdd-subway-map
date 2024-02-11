@@ -108,10 +108,10 @@ public class SectionAcceptanceTest extends BaseTest{
         callDeleteApi("stationId", 지하철역_ID, SECTION_API_PATH, 신분당선_ID);
 
         // then
-        ExtractableResponse<Response> 신분당선_조회_요청 = callGetApi(LINE_API_PATH + "/{id}", 신분당선_ID);
+        final ExtractableResponse<Response> 신분당선_조회_요청 = callGetApi(LINE_API_PATH + "/{id}", 신분당선_ID);
         final JsonPath getLineResponse = 신분당선_조회_요청.jsonPath();
 
-        List<String> names = getLineResponse.get("stations.name");
+        final List<String> names = getLineResponse.get("stations.name");
         assertThat(names).containsOnly("강남역", "역삼역");
     }
 
