@@ -1,7 +1,6 @@
-package subway.station.entity;
+package subway.domain;
 
 import javax.persistence.*;
-import java.util.Objects;
 
 @Entity
 public class Station {

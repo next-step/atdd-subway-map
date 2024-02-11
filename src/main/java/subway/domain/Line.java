@@ -1,16 +1,17 @@
-package subway.line.entity;
+package subway.domain;
 
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.AccessLevel;
 import subway.exception.InvalidDownStationException;
 import subway.exception.SingleSectionDeleteException;
-import subway.section.entity.Section;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 @Getter
@@ -57,25 +58,14 @@ public class Line {
     }
 
     public Long findDownStationId() {
-        Long downStationId = null;
-
-        for (int i = this.sections.size() - 1; i >= 0; i--) {
-            Section section = this.sections.get(i);
-            if (section.getDownStation() != null) {
-                downStationId = section.getDownStation().getId();
-                break;
-            }
-        }
-        return downStationId;
+        return this.sections.get(this.sections.size()-1).getDownStation().getId();
     }
 
     public List<Long> getStationIds() {
-        List<Long> stationIds = new ArrayList<>();
-        for (Section section : this.sections) {
-            stationIds.add(section.getUpStation().getId());
-            stationIds.add(section.getDownStation().getId());
-        }
-        return stationIds;
+        return this.sections.stream()
+                .flatMap(section -> Stream.of(section.getUpStation().getId(), section.getDownStation().getId()))
+                .collect(Collectors.toList());
+
     }
 
 }

@@ -1,12 +1,8 @@
-package subway.section.entity;
+package subway.domain;
 
-import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import subway.exception.CheckDuplicateStationException;
-import subway.line.entity.Line;
-import subway.station.entity.Station;
 
 import javax.persistence.*;
 

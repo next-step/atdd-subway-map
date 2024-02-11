@@ -1,11 +1,13 @@
-package subway.line.controller;
+package subway.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import subway.line.service.LineService;
-import subway.line.request.LineCreateRequest;
-import subway.line.response.LineResponse;
-import subway.line.request.LineUpdateRequest;
+import subway.controller.dto.LineCreateRequest;
+import subway.controller.dto.LineUpdateRequest;
+import subway.controller.dto.LineResponse;
+import subway.service.LineService;
+import subway.controller.dto.SectionCreateRequest;
+import subway.controller.dto.SectionResponse;
 
 import javax.validation.Valid;
 import java.net.URI;
@@ -20,7 +22,7 @@ public class LineController {
         this.lineService = lineService;
     }
 
-    @PostMapping()
+    @PostMapping
     public ResponseEntity<LineResponse> createLine(@Valid @RequestBody LineCreateRequest lineCreateRequest) {
         LineResponse lineResponse = lineService.saveLine(lineCreateRequest);
         return ResponseEntity.created(URI.create("/lines/" + lineResponse.getId())).body(lineResponse);
@@ -45,6 +47,18 @@ public class LineController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteLine(@PathVariable Long id) {
         lineService.deleteLine(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/sections")
+    public ResponseEntity<SectionResponse> createSection(@PathVariable Long id, @Valid @RequestBody SectionCreateRequest sectionCreateRequest) {
+        SectionResponse sectionResponse = lineService.saveLineSection(id, sectionCreateRequest);
+        return ResponseEntity.created(URI.create("/lines/" + sectionResponse.getId() + "/sections")).body(sectionResponse);
+    }
+
+    @DeleteMapping("/{id}/sections")
+    public ResponseEntity<Void> deleteSection(@PathVariable Long id, @RequestParam Long stationId) {
+        lineService.deleteLineSection(id, stationId);
         return ResponseEntity.noContent().build();
     }
 }

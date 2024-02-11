@@ -14,12 +14,9 @@ import subway.fixture.LineFixture;
 import subway.fixture.StationFixture;
 import subway.util.RestAssuredUtil;
 
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Sql("/truncate_table.sql")
-//@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @DisplayName("지하철역 노선 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {

@@ -1,11 +1,12 @@
-package subway.station.service;
+package subway.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import subway.station.entity.Station;
-import subway.station.repository.StationRepository;
-import subway.station.request.StationRequest;
-import subway.station.response.StationResponse;
+import subway.exception.NotFoundException;
+import subway.domain.Station;
+import subway.domain.repository.StationRepository;
+import subway.controller.dto.StationRequest;
+import subway.controller.dto.StationResponse;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -41,5 +42,10 @@ public class StationService {
                 station.getId(),
                 station.getName()
         );
+    }
+
+    public Station getStationById(Long stationId) {
+        return stationRepository.findById(stationId)
+                .orElseThrow(() -> new NotFoundException("지하철역이 존재하지 않습니다."));
     }
 }

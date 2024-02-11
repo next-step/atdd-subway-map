@@ -1,10 +1,10 @@
-package subway.station.controller;
+package subway.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import subway.station.request.StationRequest;
-import subway.station.response.StationResponse;
-import subway.station.service.StationService;
+import subway.controller.dto.StationRequest;
+import subway.controller.dto.StationResponse;
+import subway.service.StationService;
 
 import java.net.URI;
 import java.util.List;
@@ -18,13 +18,13 @@ public class StationController {
         this.stationService = stationService;
     }
 
-    @PostMapping()
+    @PostMapping
     public ResponseEntity<StationResponse> createStation(@RequestBody StationRequest stationRequest) {
         StationResponse station = stationService.saveStation(stationRequest);
         return ResponseEntity.created(URI.create("/stations/" + station.getId())).body(station);
     }
 
-    @GetMapping()
+    @GetMapping
     public ResponseEntity<List<StationResponse>> showStations() {
         return ResponseEntity.ok().body(stationService.findAllStations());
     }
