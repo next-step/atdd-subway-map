@@ -119,7 +119,8 @@ public abstract class BaseTest {
     }
 
     protected void callDeleteApi(final String paramName, final Object Param, final String path, final Long pathVariable) {
-        given().log().all()
+        given()
+            .log().all()
             .param(paramName, Param)
         .when()
             .delete(path, pathVariable)
@@ -129,7 +130,8 @@ public abstract class BaseTest {
     }
 
     protected void callDeleteApiWithServerError(final String paramName, final Object Param, final String path, final Long pathVariable) {
-        given().log().all()
+        given()
+            .log().all()
             .param(paramName, Param)
         .when()
             .delete(path, pathVariable)
