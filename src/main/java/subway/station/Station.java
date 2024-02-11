@@ -3,6 +3,7 @@ package subway.station;
 import javax.persistence.*;
 
 @Entity
+@Table(name = "station")
 public class Station {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,4 +26,7 @@ public class Station {
         return name;
     }
 
+    public boolean equalStation(long stationId) {
+        return id == stationId;
+    }
 }

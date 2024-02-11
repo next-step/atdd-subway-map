@@ -73,4 +73,19 @@ public class Line {
     }
 
 
+    public boolean isLastStation(long upStationId) {
+        return downStation.equalStation(upStationId);
+    }
+
+    public void extendDownStation(Station downStation) {
+        this.downStation = downStation;
+    }
+
+    public void addDistance(int distance) {
+        this.distance += distance;
+    }
+
+    public void changeDownStation(Station upStation) {
+        this.downStation = upStation;
+    }
 }
