@@ -100,6 +100,16 @@ public class SectionAcceptanceTest extends BaseTest{
         callDeleteApiWithServerError("stationId", 역삼역_ID, SECTION_API_PATH, 신분당선_ID);
     }
 
+    @DisplayName("지하철 구간 삭제 시 구간이 하나 밖에 없다면 오류가 발생한다.")
+    @Test
+    void 지하철_구간_삭제_시_구간이_하나라면_삭제_불가() {
+        // given
+        this.신분당선_생성();
+
+        // then
+        callDeleteApiWithServerError("stationId", 역삼역_ID, SECTION_API_PATH, 신분당선_ID);
+    }
+
     private JsonPath 신분당선_구간_연장_역삼역_지하철역() {
         final SectionRequest sectionRequest = new SectionRequest(역삼역_ID, 지하철역_ID, 5);
         final ExtractableResponse<Response> createSectionResponse = callPostApi(sectionRequest, SECTION_API_PATH, 신분당선_ID);
