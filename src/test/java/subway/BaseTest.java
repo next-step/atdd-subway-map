@@ -53,6 +53,18 @@ public abstract class BaseTest {
         return response;
     }
 
+    protected void callPostApiWithServerError(final Object requestBody, final String path, final Long pathVariable) {
+        given()
+            .log().all()
+            .body(requestBody)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+            .post(path, pathVariable)
+        .then()
+            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+            .log().all();
+    }
+
     protected ExtractableResponse<Response> callGetApi(final String path) {
         final ExtractableResponse<Response> response =
                 given()
