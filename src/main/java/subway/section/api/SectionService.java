@@ -12,6 +12,8 @@ import subway.section.SectionRepository;
 import subway.section.api.response.SectionResponse;
 import subway.section.domain.Section;
 import subway.section.presentation.request.SectionCreateRequest;
+import subway.station.Station;
+import subway.station.StationRepository;
 
 import javax.persistence.EntityNotFoundException;
 
@@ -20,10 +22,12 @@ public class SectionService {
 
     private final SectionRepository sectionRepository;
     private final LineRepository lineRepository;
+    private final StationRepository stationRepository;
 
-    public SectionService(SectionRepository sectionRepository, LineRepository lineRepository) {
+    public SectionService(SectionRepository sectionRepository, LineRepository lineRepository, StationRepository stationRepository) {
         this.sectionRepository = sectionRepository;
         this.lineRepository = lineRepository;
+        this.stationRepository = stationRepository;
     }
 
     @Transactional
@@ -49,12 +53,12 @@ public class SectionService {
     public void delete(Long lineId, Long stationId) {
         Line line = getLine(lineId);
 
+        validateStationId(stationId);
         validateLastStation(line);
         validateDownStationId(stationId, line);
 
         line.getSections().deleteLastSection();
     }
-
 
     private Line getLine(Long lineId) {
         return lineRepository.findById(lineId).orElseThrow(
@@ -87,4 +91,9 @@ public class SectionService {
         }
     }
 
+    private void validateStationId(Long stationId) {
+        stationRepository.findById(stationId).orElseThrow(
+                () -> new EntityNotFoundException("지하철역을 찾을 수 없습니다.")
+        );
+    }
 }
