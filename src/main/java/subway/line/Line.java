@@ -60,7 +60,7 @@ public class Line {
         newSection.registerLine(this);
     }
 
-    public Long deleteStation(Station deleteStation) {
+    public Long deleteSection(Station deleteStation) {
         return sections.deleteStation(deleteStation);
     }
 

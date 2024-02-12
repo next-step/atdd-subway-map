@@ -63,8 +63,8 @@ public class SectionAcceptanceTest extends CommonAcceptanceTest {
      * Then 400에러가 발생한다.
      */
     @Test
-    @DisplayName("하행역이 지하철 노선에 등록된 역인 구간을 추가하면 서버오류가 발생한다.")
-    void addSectionExistStationException() {
+    @DisplayName("하행역이 지하철 노선에 등록된 역인 구간을 추가하면 400에러가 발생한다.")
+    void addSectionExistDownStationException() {
         //given
         createLine();
 
@@ -81,7 +81,7 @@ public class SectionAcceptanceTest extends CommonAcceptanceTest {
      * Then 400에러가 발생한다.
      */
     @Test
-    @DisplayName("지하철 노선의 하행역과 새로운 구간의 생행역이 일치하지 않는 구간을 등록하면 서버오류가 발생한다.")
+    @DisplayName("지하철 노선의 하행역과 새로운 구간의 생행역이 일치하지 않는 구간을 등록하면 400에러가 발생한다.")
     void addSectionNotMatchException() {
         //given
         createLine();
@@ -90,6 +90,25 @@ public class SectionAcceptanceTest extends CommonAcceptanceTest {
         Long 잠실역Id = extractResponseId(StationRestAssuredCRUD.createStation("잠실역"));
         Long 삼성역Id = extractResponseId(StationRestAssuredCRUD.createStation("삼성역"));
         ExtractableResponse<Response> addResponse = SectionRestAssuredCRUD.addSection(잠실역Id, 삼성역Id, 10, 이호선Id);
+
+        //then
+        assertThat(addResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    /**
+     * Given 지하철 노선을 등록하고
+     * When 존재하지 않는 지하철역을 포함한 구간을 추가하면
+     * Then 400에러가 발생한다.
+     */
+    @Test
+    @DisplayName("존재하지 않는 지하철역을 포함한 구간을 추가하면 400에러가 발생한다.")
+    void addSectionNotExistStationException() {
+        //given
+        createLine();
+        Long 삼성역Id = 10L;
+
+        //when
+        ExtractableResponse<Response> addResponse = SectionRestAssuredCRUD.addSection(선릉역Id, 삼성역Id, 10, 이호선Id);
 
         //then
         assertThat(addResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -127,7 +146,7 @@ public class SectionAcceptanceTest extends CommonAcceptanceTest {
      * Then 500에러가 발생한다.
      */
     @Test
-    @DisplayName("지하철 노선에서 마지막 구간이 아닌 역을 제거하면 서버오류가 발생한다.")
+    @DisplayName("지하철 노선에서 마지막 구간이 아닌 역을 제거하면 500에러가 발생한다.")
     void deleteMiddleSectionException() {
         //given
         createLine();
@@ -151,7 +170,7 @@ public class SectionAcceptanceTest extends CommonAcceptanceTest {
      * Then 500에러가 발생한다.
      */
     @Test
-    @DisplayName("노선의 마지막 구간을 제거하면 서버오류가 발생한다.")
+    @DisplayName("노선의 마지막 구간을 제거하면 500에러가 발생한다.")
     void deleteLastSectionException() {
         //given
         createLine();
@@ -161,5 +180,28 @@ public class SectionAcceptanceTest extends CommonAcceptanceTest {
 
         //then
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    }
+
+    /**
+     * Given 지하철 노선을 등록하고
+     * When 존재하지 않는 지하철역을 포함한 구간을 삭제하면
+     * Then 400에러가 발생한다.
+     */
+    @Test
+    @DisplayName("존재하지 않는 지하철역을 포함한 구간을 삭제하면 400에러가 발생한다.")
+    void deleteSectionNotExistStationException() {
+        //given
+        createLine();
+
+        Long 삼성역Id = extractResponseId(StationRestAssuredCRUD.createStation("삼성역"));
+        SectionRestAssuredCRUD.addSection(선릉역Id, 삼성역Id, 10, 이호선Id);
+
+        Long 잠실역Id = 10L;
+
+        //when
+        ExtractableResponse<Response> deleteResponse = SectionRestAssuredCRUD.deleteSection(이호선Id, 잠실역Id);
+
+        //then
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 }
