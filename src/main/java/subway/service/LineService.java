@@ -9,16 +9,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.AllArgsConstructor;
-import subway.domain.Section;
-import subway.dto.SectionRequest;
-import subway.repository.LineRepository;
-import subway.repository.StationRepository;
 import subway.domain.Line;
+import subway.domain.Section;
+import subway.domain.Station;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
-import subway.domain.Station;
+import subway.dto.SectionRequest;
 import subway.exception.NoLineException;
 import subway.exception.NoStationException;
+import subway.repository.LineRepository;
+import subway.repository.StationRepository;
 
 @Service
 @AllArgsConstructor
@@ -26,6 +26,7 @@ import subway.exception.NoStationException;
 public class LineService {
     private final LineRepository lineRepository;
     private final StationRepository stationRepository;
+
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
         Station upStation = getStation(lineRequest.getUpStationId());

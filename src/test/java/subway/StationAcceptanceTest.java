@@ -12,7 +12,6 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
@@ -32,8 +31,9 @@ public class StationAcceptanceTest extends BaseAcceptanceTest {
 
     @BeforeEach
     void setUp() {
-    databaseCleanUp.execute();
+        databaseCleanUp.execute();
     }
+
     @DisplayName("지하철역을 생성한다.")
     @Test
     void testCreateStation() {

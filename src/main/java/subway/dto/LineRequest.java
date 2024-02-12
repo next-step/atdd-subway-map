@@ -1,7 +1,5 @@
 package subway.dto;
 
-import org.springframework.beans.factory.annotation.Value;
-
 import lombok.Getter;
 
 @Getter
