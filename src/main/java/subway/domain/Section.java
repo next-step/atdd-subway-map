@@ -1,5 +1,7 @@
 package subway.domain;
 
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -35,16 +37,24 @@ public class Section {
 
     }
 
-    public static Section from(Station upStation, Station downStation, int distance) {
+    public static Section of(Station upStation, Station downStation, int distance) {
         return new Section(upStation, downStation, distance);
     }
 
-    public boolean isPossibleToAdd(Station upStationOfSection) {
-        return downStation.equals(upStationOfSection);
+    public boolean isPossibleToAdd(Station nextUpStation) {
+        return downStation.equals(nextUpStation);
     }
 
     public Station getUpStation() {
         return upStation;
+    }
+
+    public Station getDownStation() {
+        return downStation;
+    }
+
+    public int getDistance() {
+        return distance;
     }
 
 }

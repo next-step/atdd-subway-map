@@ -32,15 +32,6 @@ public class Line {
     private String name;
     @Column(length = 20, nullable = false)
     private String color;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "up_station_id")
-    private Station upStation;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "down_station_id")
-    private Station downStation;
-
     @Embedded
     private Sections sections = new Sections();
 
@@ -49,13 +40,13 @@ public class Line {
     }
 
     public static Line of(LineRequest lineRequest, Station upStation, Station downStation) {
-        return Line.builder()
+        Line line = Line.builder()
                    .name(lineRequest.getName())
                    .color(lineRequest.getColor())
-                   .upStation(upStation)
-                   .downStation(downStation)
+                   .sections(new Sections())
                    .build();
-
+        line.addSection(new Section(upStation, downStation, lineRequest.getDistance()));
+        return line;
     }
 
     public void updateLine(String name, String color) {

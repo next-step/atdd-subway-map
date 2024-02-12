@@ -11,7 +11,7 @@ import subway.exception.IllegalSectionException;
 
 @Embeddable
 public class Sections {
-    @OneToMany(mappedBy = "sections", cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Section> sections;
 
     protected Sections() {
@@ -23,6 +23,10 @@ public class Sections {
     }
 
     public void add(Section section) {
+        if (sections.isEmpty()) {
+            sections.add(section);
+            return;
+        }
         Section lastSection = sections.get(sections.size() - 1);
         if (!lastSection.isPossibleToAdd(section.getUpStation())) {
             throw new IllegalSectionException("기존 노선의 하행 종점역과 추가하려는 구간의 상행역이 달라 추가할 수 없습니다.");
@@ -32,5 +36,9 @@ public class Sections {
 
     public Section getLastSection() {
         return sections.get(sections.size() - 1);
+    }
+
+    public List<Section> getSections() {
+        return sections;
     }
 }

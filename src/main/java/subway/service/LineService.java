@@ -64,13 +64,15 @@ public class LineService {
         lineRepository.delete(line);
     }
 
+    @Transactional
     public void addSection(Long lineId, SectionRequest sectionRequest) {
         Line line = lineRepository.findById(lineId).orElseThrow(() -> new NoLineException(lineId + "에 해당하는 지하철 노선이 존재하지 않습니다."));
         Station upStation = stationRepository.findById(sectionRequest.getUpStationId())
                                              .orElseThrow(() -> new NoStationException(sectionRequest.getUpStationId() + "에 해당하는 지하철 역이 존재하지 않습니다."));
         Station downStation = stationRepository.findById(sectionRequest.getDownStationId())
                                                .orElseThrow(() -> new NoStationException(sectionRequest.getDownStationId() + "에 해당하는 지하철 역이 존재하지 않습니다."));
-        Section section = Section.from(upStation, downStation, sectionRequest.getDistance());
+        Section section = Section.of(upStation, downStation, sectionRequest.getDistance());
         line.addSection(section);
+        lineRepository.save(line);
     }
 }

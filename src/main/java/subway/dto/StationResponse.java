@@ -1,9 +1,12 @@
 package subway.dto;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import subway.domain.Section;
+import subway.domain.Sections;
 import subway.domain.Station;
 
 public class StationResponse {
@@ -30,9 +33,12 @@ public class StationResponse {
         );
     }
 
-    public static List<StationResponse> createStationsResponse(Station upStation, Station downStation) {
-        return Stream.of(upStation, downStation)
-              .map(StationResponse::createStationResponse)
-              .collect(Collectors.toList());
+    public static List<StationResponse> createStationsResponse(Sections sections) {
+        return sections.getSections().stream()
+                       .flatMap(section ->
+                                    Stream.of(section.getUpStation(), section.getDownStation()))
+                       .distinct()
+                       .map(StationResponse::createStationResponse)
+                       .collect(Collectors.toList());
     }
 }

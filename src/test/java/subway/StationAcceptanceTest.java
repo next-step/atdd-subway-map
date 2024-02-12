@@ -3,6 +3,7 @@ package subway;
 import static io.restassured.RestAssured.given;
 import static io.restassured.RestAssured.when;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_CLASS;
 
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +22,7 @@ import io.restassured.response.Response;
 import subway.dto.StationResponse;
 
 @DisplayName("지하철역 관련 기능")
+@DirtiesContext(classMode = BEFORE_CLASS)
 public class StationAcceptanceTest extends BaseAcceptanceTest {
     /**
      * When 지하철역을 생성하면
@@ -29,9 +31,8 @@ public class StationAcceptanceTest extends BaseAcceptanceTest {
      */
 
     @BeforeEach
-    @Test
     void setUp() {
-        databaseCleanUp.execute();
+    databaseCleanUp.execute();
     }
     @DisplayName("지하철역을 생성한다.")
     @Test
