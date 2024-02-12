@@ -91,4 +91,30 @@ public class SectionAcceptanceTest extends BaseAcceptanceTest {
                .contentType(MediaType.APPLICATION_JSON_VALUE)
                .when().post("/lines/" + lineResponse.getId() + "/sections").then().statusCode(HttpStatus.SC_BAD_REQUEST);
     }
+
+    @DirtiesContext(methodMode = MethodMode.AFTER_METHOD)
+    @Test
+    void 노선에_등록된_구간이_2개_이상_있을때_마지막_구간을_제거하면_노선_조회시_제거된_마지막_구간의_상행역이_전체_노선의_하행종점역이_된다() throws JsonProcessingException {
+        //given
+        LineResponse lineResponse = createLine(getRequestParam_신분당선());
+        SectionRequest sectionRequest = new SectionRequest(2L, 4L, 10);
+        addSection(sectionRequest);
+
+        //when
+        given().body(mapper.writeValueAsString(sectionRequest))
+               .contentType(MediaType.APPLICATION_JSON_VALUE)
+               .when().delete("/lines/" + lineResponse.getId() + "/sections")
+               .then().statusCode(HttpStatus.SC_NO_CONTENT);
+
+        //then
+        LineResponse lineResponseAfterRemoveSection = when().get("/lines" + lineResponse.getId()).then().log().all().extract().jsonPath().getObject(".", LineResponse.class);
+        List<SectionResponse> sectionsResponse = lineResponseAfterRemoveSection.getSections();
+
+        assertAll(
+            () -> assertThat(sectionsResponse).hasSize(1),
+            () -> assertThat(sectionsResponse.get(sectionsResponse.size() - 1).getDownStationId()).isEqualTo(sectionRequest.getUpStationId())
+        );
+
+    }
+
 }
