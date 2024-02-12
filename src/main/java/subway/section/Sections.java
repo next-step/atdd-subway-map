@@ -1,5 +1,6 @@
 package subway.section;
 
+import exception.BadRequestException;
 import subway.station.Station;
 
 import javax.persistence.Embeddable;
@@ -27,11 +28,11 @@ public class Sections {
 
     public void addSection(Section newSection) {
         if(isExistStation(newSection.getDownStation())){
-            throw new IllegalArgumentException("구간의 하행역이 이미 노선에 등록된 역입니다.");
+            throw new BadRequestException("새로운 구간의 하행역이 이미 노선에 등록된 역입니다.");
         }
 
         if(!newSection.getUpStation().equals(lastSection().getDownStation())) {
-            throw new IllegalArgumentException("구간의 상행역과 노선의 하행역이 일치하지 않습니다.");
+            throw new BadRequestException("새로운 구간의 상행역과 노선의 하행역이 일치하지 않습니다.");
         }
     }
 

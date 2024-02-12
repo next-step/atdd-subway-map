@@ -27,4 +27,16 @@ public class SectionRestAssuredCRUD {
                 .then().log().all()
                 .extract();
     }
+
+    public static ExtractableResponse<Response> deleteSection(Long lineId, Long stationId) {
+        return RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .pathParam("lineId", lineId)
+                .queryParam("stationId", stationId)
+                .when()
+                .delete("/lines/{lineId}/sections")
+                .then().log().all()
+                .extract();
+    }
 }
