@@ -7,15 +7,15 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.jdbc.Sql;
 import subway.fixture.LineFixture;
 import subway.fixture.SectionFixture;
 import subway.fixture.StationFixture;
+import subway.support.annotation.AcceptanceTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static subway.util.RestAssuredUtil.*;
 
-@Sql("/truncate_table.sql")
+@AcceptanceTest
 @DisplayName("지하철 구간 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class SectionAcceptanceTest {

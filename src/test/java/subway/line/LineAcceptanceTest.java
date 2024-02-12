@@ -9,14 +9,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 
-import org.springframework.test.context.jdbc.Sql;
 import subway.fixture.LineFixture;
 import subway.fixture.StationFixture;
+import subway.support.annotation.AcceptanceTest;
 import subway.util.RestAssuredUtil;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Sql("/truncate_table.sql")
+@AcceptanceTest
 @DisplayName("지하철역 노선 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {
