@@ -1,7 +1,5 @@
 package subway.line;
 
-import subway.section.Section;
-
 public class LineRequest {
     private String name;
     private String color;
@@ -30,10 +28,6 @@ public class LineRequest {
     }
 
     public Line createLine() {
-        return new Line(name, color, upStationId, downStationId, distance);
-    }
-
-    public Section createSection() {
-        return new Section(upStationId, downStationId, distance);
+        return new Line(name, color, distance);
     }
 }

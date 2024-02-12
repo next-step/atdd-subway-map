@@ -3,7 +3,6 @@ package subway;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -12,6 +11,8 @@ import subway.common.CommonAcceptanceTest;
 import subway.common.LineRestAssuredCRUD;
 import subway.common.SectionRestAssuredCRUD;
 import subway.common.StationRestAssuredCRUD;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -44,9 +45,9 @@ public class SectionAcceptanceTest extends CommonAcceptanceTest {
 
         //then
         ExtractableResponse<Response> line = LineRestAssuredCRUD.showLine(lineNum);
-        Long 노선의_하행_종점역 = line.jsonPath().getLong("downStationId");
+        List<Long> ids = line.jsonPath().getList("stations.id", Long.class);
 
-        Assertions.assertThat(노선의_하행_종점역).isEqualTo(삼성역Id);
+        assertThat(ids).contains(삼성역Id);
     }
 
 
@@ -129,10 +130,9 @@ public class SectionAcceptanceTest extends CommonAcceptanceTest {
 
         //then
         lineResponse = LineRestAssuredCRUD.showLine(lineId);
+        List<Long> stationIds = lineResponse.jsonPath().getList("stations.id", Long.class);
 
-        Long 노선의_하행_종점역 = lineResponse.jsonPath().getLong("downStationId");
-
-        Assertions.assertThat(노선의_하행_종점역).isEqualTo(선릉역Id);
+        assertThat(stationIds).doesNotContain(삼성역Id);
     }
 
     /**
@@ -199,6 +199,4 @@ public class SectionAcceptanceTest extends CommonAcceptanceTest {
         //then
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
-
-
 }

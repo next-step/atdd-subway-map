@@ -1,8 +1,10 @@
 package subway.section;
 
 import subway.line.Line;
+import subway.station.Station;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 public class Section {
@@ -10,8 +12,12 @@ public class Section {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long upStationId;
-    private Long downStationId;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    private Station upStation;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    private Station downStation;
     private int distance;
 
     @ManyToOne
@@ -20,9 +26,9 @@ public class Section {
 
     public Section() {}
 
-    public Section(Long upStationId, Long downStationId, int distance) {
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
+    public Section(Station upStation, Station downStation, int distance) {
+        this.upStation = upStation;
+        this.downStation = downStation;
         this.distance = distance;
     }
 
@@ -30,12 +36,12 @@ public class Section {
         return id;
     }
 
-    public Long getUpStationId() {
-        return upStationId;
+    public Station getUpStation() {
+        return upStation;
     }
 
-    public Long getDownStationId() {
-        return downStationId;
+    public Station getDownStation() {
+        return downStation;
     }
 
     public int getDistance() {
@@ -46,8 +52,21 @@ public class Section {
         return line;
     }
 
-    public void mappingLine(Line line) {
+    public void registerLine(Line line) {
         this.line = line;
         line.getSections().add(this);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Section section = (Section) o;
+        return getDistance() == section.getDistance() && Objects.equals(getId(), section.getId()) && Objects.equals(getUpStation(), section.getUpStation()) && Objects.equals(getDownStation(), section.getDownStation()) && Objects.equals(getLine(), section.getLine());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getUpStation(), getDownStation(), getDistance(), getLine());
     }
 }

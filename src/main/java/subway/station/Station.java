@@ -1,8 +1,7 @@
 package subway.station;
 
-import subway.line.Line;
-
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 public class Station {
@@ -12,10 +11,6 @@ public class Station {
 
     @Column(length = 20, nullable = false)
     private String name;
-
-    @ManyToOne
-    @JoinColumn(name = "line_id")
-    private Line line;
 
     public Station() {
     }
@@ -32,12 +27,16 @@ public class Station {
         return name;
     }
 
-    public Line getLine() {
-        return line;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Station station = (Station) o;
+        return Objects.equals(getId(), station.getId()) && Objects.equals(getName(), station.getName());
     }
 
-    public void mappingLine(Line line) {
-        this.line = line;
-        line.getStations().add(this);
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getName());
     }
 }

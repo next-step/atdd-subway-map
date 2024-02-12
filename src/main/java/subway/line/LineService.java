@@ -9,14 +9,16 @@ import subway.station.StationRepository;
 import subway.station.StationResponse;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
 public class LineService {
-    private LineRepository lineRepository;
-    private StationRepository stationRepository;
-    private SectionRepository sectionRepository;
+    private final LineRepository lineRepository;
+    private final StationRepository stationRepository;
+    private final SectionRepository sectionRepository;
 
     public LineService(LineRepository lineRepository, StationRepository stationRepository, SectionRepository sectionRepository) {
         this.lineRepository = lineRepository;
@@ -27,40 +29,28 @@ public class LineService {
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
 
-        Station station1 = stationRepository.findById(lineRequest.getUpStationId()).orElseThrow();
-        Station station2 = stationRepository.findById(lineRequest.getDownStationId()).orElseThrow();
+        Station upStation = stationRepository.findById(lineRequest.getUpStationId()).orElseThrow();
+        Station downStation = stationRepository.findById(lineRequest.getDownStationId()).orElseThrow();
 
         Line line = lineRequest.createLine();
-        station1.mappingLine(line);
-        station2.mappingLine(line);
-
         line = lineRepository.save(line);
 
-        Section section = lineRequest.createSection();
-        section.mappingLine(line);
+        Section section = new Section(upStation, downStation, lineRequest.getDistance());
+        section.registerLine(line);
         sectionRepository.save(section);
 
         return createLineResponse(line);
     }
 
     public List<LineResponse> findAllLines() {
-        List<LineResponse> lineResponses = new ArrayList<>();
-
-        List<Line> lines = lineRepository.findAll();
-        for(Line line : lines) {
-            List<Station> stations = new ArrayList<>();
-            stations.add(stationRepository.findById(line.getUpStationId()).orElseThrow());
-            stations.add(stationRepository.findById(line.getDownStationId()).orElseThrow());
-
-            lineResponses.add(createLineResponse(line, stations));
-        }
-
-        return lineResponses;
+        return lineRepository.findAll().stream()
+                .map(this::createLineResponse)
+                .collect(Collectors.toList());
     }
 
     public LineResponse findLine(Long id) {
         Line line = lineRepository.findById(id).orElseThrow();
-        return createLineResponse(line, line.getStations());
+        return createLineResponse(line);
     }
 
     @Transactional
@@ -74,20 +64,16 @@ public class LineService {
         lineRepository.deleteById(id);
     }
 
-    private LineResponse createLineResponse(Line line, List<Station> stations) {
-        List<StationResponse> stationResponses = new ArrayList<>();
-        for(Station station : stations) {
-            stationResponses.add(new StationResponse(station));
-        }
-
-        return new LineResponse(line, stationResponses);
-    }
-
     private LineResponse createLineResponse(Line line) {
-        List<StationResponse> stationResponses = new ArrayList<>();
-        for(Station station : line.getStations()) {
-            stationResponses.add(new StationResponse(station));
+        List<StationResponse> stations = new ArrayList<>();
+
+        for(Section section : line.getSections()) {
+            stations.add(new StationResponse(section.getDownStation()));
+            stations.add(new StationResponse(section.getUpStation()));
         }
-        return new LineResponse(line, stationResponses);
+
+        stations = new ArrayList<>(new HashSet<>(stations));
+
+        return new LineResponse(line, stations);
     }
 }

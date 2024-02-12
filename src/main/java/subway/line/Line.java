@@ -1,12 +1,12 @@
 package subway.line;
 
 import subway.section.Section;
-import subway.section.SectionRequest;
+import subway.section.Sections;
 import subway.station.Station;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 public class Line {
@@ -16,23 +16,16 @@ public class Line {
     private Long id;
     private String name;
     private String color;
-    private Long upStationId;
-    private Long downStationId;
     private int distance;
 
-    @OneToMany(mappedBy = "line", orphanRemoval = true)
-    private List<Station> stations = new ArrayList<>();
-
-    @OneToMany(mappedBy = "line")
-    private List<Section> sections = new ArrayList<>();
+    @Embedded
+    private Sections sections = new Sections();
 
     public Line() {}
 
-    public Line(String name, String color, Long upStationId, Long downStationId, int distance) {
+    public Line(String name, String color, int distance) {
         this.name = name;
         this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
         this.distance = distance;
     }
 
@@ -48,24 +41,12 @@ public class Line {
         return color;
     }
 
-    public Long getUpStationId() {
-        return upStationId;
-    }
-
-    public Long getDownStationId() {
-        return downStationId;
-    }
-
     public int getDistance() {
         return distance;
     }
 
-    public List<Station> getStations() {
-        return stations;
-    }
-
     public List<Section> getSections() {
-        return sections;
+        return sections.getSections();
     }
 
     public void changeLineInfo(String name, String color) {
@@ -73,35 +54,26 @@ public class Line {
         this.color = color;
     }
 
-    public void changeDownStationId(SectionRequest sectionRequest) {
-        this.downStationId = sectionRequest.getDownStationId();
-        this.distance = sectionRequest.getDistance();
+    public void addSection(Section newSection) {
+        sections.addSection(newSection);
+        this.distance += newSection.getDistance();
+        newSection.registerLine(this);
     }
 
-    public boolean isExistStation(Station newStation) {
-        for(Station station : stations) {
-            if(newStation.getId() == station.getId()){
-                return true;
-            }
-        }
-
-        return false;
+    public Long deleteStation(Station deleteStation) {
+        return sections.deleteStation(deleteStation);
     }
 
-    public void deleteStation(Long deleteStationId) {
-        if(sections.size() == 1) {
-            throw new IllegalArgumentException("구간이 1개 남은 경우 삭제할 수 없습니다.");
-        }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Line line = (Line) o;
+        return getDistance() == line.getDistance() && Objects.equals(getId(), line.getId()) && Objects.equals(getName(), line.getName()) && Objects.equals(getColor(), line.getColor()) && Objects.equals(getSections(), line.getSections());
+    }
 
-        if(deleteStationId != downStationId){
-            throw new IllegalArgumentException("노선의 하행 종점역이 아닙니다.");
-        }
-
-        stations.removeIf(station -> station.getId() == deleteStationId);
-
-        downStationId = sections.stream()
-                .filter(v -> v.getDownStationId() == deleteStationId)
-                .findAny().get()
-                .getUpStationId();
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getName(), getColor(), getDistance(), getSections());
     }
 }
