@@ -10,10 +10,12 @@ import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFOR
 import java.util.List;
 import java.util.Map;
 
+import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.MethodMode;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,13 +31,13 @@ public class SectionAcceptanceTest extends BaseAcceptanceTest {
 
     @BeforeEach
     void setUp() {
-        databaseCleanUp.execute();
         createStation(역삼역);
         createStation(선릉역);
         createStation(강남역);
         createStation(왕십리역);
     }
 
+    @DirtiesContext(methodMode = MethodMode.AFTER_METHOD)
     @Test
     void test_특정_노선에_구간을_등록하면_노선_조회시_등록한_구간을_확인할_수_있다() {
         //when
@@ -53,6 +55,7 @@ public class SectionAcceptanceTest extends BaseAcceptanceTest {
         );
     }
 
+    @DirtiesContext(methodMode = MethodMode.AFTER_METHOD)
     @Test
     void 노선이_주어졌을때_해당_노선의_하행_종점역과_새로_등록하려는_구간의_상행_종점역이_같으면_해당_구간을_등록할_수_있다() throws JsonProcessingException {
         //given
@@ -74,5 +77,18 @@ public class SectionAcceptanceTest extends BaseAcceptanceTest {
             () -> assertThat(sectionResponses.get(sectionResponses.size() - 1).getDownStationName()).isEqualTo("왕십리역"),
             () -> assertThat(sectionResponses.get(sectionResponses.size() - 1).getDistance()).isEqualTo(10)
         );
+    }
+
+    @DirtiesContext(methodMode = MethodMode.AFTER_METHOD)
+    @Test
+    void 노선이_주어졌을때_해당_노선의_하행_종점역과_새로_등록하려는_구간의_상행_종점역이_다르면_에러를_반환한다() throws JsonProcessingException {
+        //given
+        LineResponse lineResponse = createLine(getRequestParam_신분당선());
+
+        //when
+        SectionRequest sectionRequest = new SectionRequest(1L, 4L, 10);
+        given().body(mapper.writeValueAsString(sectionRequest))
+               .contentType(MediaType.APPLICATION_JSON_VALUE)
+               .when().post("/lines/" + lineResponse.getId() + "/sections").then().statusCode(HttpStatus.SC_BAD_REQUEST);
     }
 }
