@@ -1,14 +1,12 @@
 package subway;
 
 import static io.restassured.RestAssured.given;
-import static io.restassured.RestAssured.responseSpecification;
 import static io.restassured.RestAssured.when;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_CLASS;
 
 import java.util.List;
-import java.util.Map;
 
 import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,7 +18,6 @@ import org.springframework.test.annotation.DirtiesContext.MethodMode;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.restassured.http.ContentType;
 import subway.dto.LineResponse;
 import subway.dto.SectionRequest;
 import subway.dto.SectionResponse;
@@ -44,8 +41,8 @@ public class SectionAcceptanceTest extends BaseAcceptanceTest {
         LineResponse lineResponse = createLine(getRequestParam_신분당선());
         //then
         LineResponse response = when()
-                                .get("/lines/" + lineResponse.getId())
-                                .then().log().all().extract().jsonPath().getObject(".", LineResponse.class);
+            .get("/lines/" + lineResponse.getId())
+            .then().log().all().extract().jsonPath().getObject(".", LineResponse.class);
         List<SectionResponse> sectionsResponse = response.getSections();
         assertAll(
             () -> assertThat(sectionsResponse).hasSize(1),
@@ -63,9 +60,7 @@ public class SectionAcceptanceTest extends BaseAcceptanceTest {
 
         //when
         SectionRequest sectionRequest = new SectionRequest(2L, 4L, 10);
-        given().body(mapper.writeValueAsString(sectionRequest))
-               .contentType(MediaType.APPLICATION_JSON_VALUE)
-               .when().post("/lines/" + lineResponse.getId() + "/sections").then().log().all();
+        addSection(lineResponse, sectionRequest);
 
         //then
         LineResponse lineAfterResponse = when().get("/lines/" + lineResponse.getId())
@@ -98,23 +93,27 @@ public class SectionAcceptanceTest extends BaseAcceptanceTest {
         //given
         LineResponse lineResponse = createLine(getRequestParam_신분당선());
         SectionRequest sectionRequest = new SectionRequest(2L, 4L, 10);
-        addSection(sectionRequest);
+        addSection(lineResponse, sectionRequest);
 
         //when
-        given().body(mapper.writeValueAsString(sectionRequest))
-               .contentType(MediaType.APPLICATION_JSON_VALUE)
-               .when().delete("/lines/" + lineResponse.getId() + "/sections")
-               .then().statusCode(HttpStatus.SC_NO_CONTENT);
+        when()
+            .delete("/lines/" + lineResponse.getId() + "/sections")
+            .then().statusCode(HttpStatus.SC_NO_CONTENT);
 
         //then
-        LineResponse lineResponseAfterRemoveSection = when().get("/lines" + lineResponse.getId()).then().log().all().extract().jsonPath().getObject(".", LineResponse.class);
+        LineResponse lineResponseAfterRemoveSection = when().get("/lines/" + lineResponse.getId()).then().log().all().extract().jsonPath().getObject(".", LineResponse.class);
         List<SectionResponse> sectionsResponse = lineResponseAfterRemoveSection.getSections();
 
         assertAll(
             () -> assertThat(sectionsResponse).hasSize(1),
             () -> assertThat(sectionsResponse.get(sectionsResponse.size() - 1).getDownStationId()).isEqualTo(sectionRequest.getUpStationId())
         );
+    }
 
+    private void addSection(LineResponse lineResponse, SectionRequest sectionRequest) throws JsonProcessingException {
+        given().body(mapper.writeValueAsString(sectionRequest))
+               .contentType(MediaType.APPLICATION_JSON_VALUE)
+               .when().post("/lines/" + lineResponse.getId() + "/sections").then().log().all();
     }
 
 }

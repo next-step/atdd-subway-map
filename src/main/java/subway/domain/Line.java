@@ -60,4 +60,8 @@ public class Line {
     public void addSection(Section section) {
         sections.add(section);
     }
+
+    public void deleteSection() {
+        sections.remove();
+    }
 }

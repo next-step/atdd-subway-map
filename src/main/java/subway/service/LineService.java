@@ -75,4 +75,11 @@ public class LineService {
         line.addSection(section);
         lineRepository.save(line);
     }
+
+    @Transactional
+    public void deleteSection(Long id) {
+        Line line = lineRepository.findById(id).orElseThrow(() -> new NoLineException(id + "에 해당하는 지하철 노선이 존재하지 않습니다."));
+        line.deleteSection();
+        lineRepository.save(line);
+    }
 }

@@ -41,4 +41,8 @@ public class Sections {
     public List<Section> getSections() {
         return sections;
     }
+
+    public void remove() {
+        sections.remove(sections.size() - 1);
+    }
 }
