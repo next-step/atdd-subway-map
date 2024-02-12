@@ -1,27 +1,22 @@
-package subway.line.entity;
+package subway.domain;
 
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.AccessLevel;
-import subway.station.entity.Station;
 
 import javax.persistence.*;
 
-
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor()
 @Entity
-public class Line {
+public class Section {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 20, nullable = false)
-    private String name;
-
-    @Column(length = 20, nullable = false)
-    private String color;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "line_id")
+    private Line line;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "up_station_id")
@@ -35,16 +30,10 @@ public class Line {
     private Long distance;
 
     @Builder
-    public Line(String name, String color, Station upStation, Station downStation, Long distance) {
-        this.name = name;
-        this.color = color;
+    public Section(Line line, Station upStation, Station downStation, Long distance) {
         this.upStation = upStation;
         this.downStation = downStation;
         this.distance = distance;
-    }
-
-    public void update(String name, String color) {
-        this.name = name;
-        this.color = color;
+        this.line = line;
     }
 }

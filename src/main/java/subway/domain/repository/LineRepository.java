@@ -1,7 +1,7 @@
-package subway.line.repository;
+package subway.domain.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import subway.line.entity.Line;
+import subway.domain.Line;
 
 public interface LineRepository extends JpaRepository<Line, Long> {
 }
