@@ -28,6 +28,6 @@ public class LineRequest {
     }
 
     public Line createLine() {
-        return new Line(name, color, upStationId, downStationId, distance);
+        return new Line(name, color, distance);
     }
 }
