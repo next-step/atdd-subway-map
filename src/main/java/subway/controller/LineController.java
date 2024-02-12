@@ -2,12 +2,8 @@ package subway.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import subway.controller.dto.LineCreateRequest;
-import subway.controller.dto.LineUpdateRequest;
-import subway.controller.dto.LineResponse;
+import subway.controller.dto.*;
 import subway.service.LineService;
-import subway.controller.dto.SectionCreateRequest;
-import subway.controller.dto.SectionResponse;
 
 import javax.validation.Valid;
 import java.net.URI;

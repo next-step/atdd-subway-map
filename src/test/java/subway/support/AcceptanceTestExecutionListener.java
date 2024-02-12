@@ -1,7 +1,5 @@
 package subway.support;
 
-import io.restassured.RestAssured;
-import org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.TestContext;
 import org.springframework.test.context.support.AbstractTestExecutionListener;
@@ -11,31 +9,10 @@ import java.util.List;
 public class AcceptanceTestExecutionListener extends AbstractTestExecutionListener {
 
     @Override
-    public void beforeTestMethod(TestContext testContext) {
-        ServletWebServerApplicationContext context = getWebServerApplicationContext(testContext);
-        RestAssured.port = getServerPort(context);
-    }
-
-    @Override
     public void afterTestMethod(TestContext testContext) {
         JdbcTemplate jdbcTemplate = getJdbcTemplate(testContext);
         List<String> truncateQueries = getTruncateQueries(jdbcTemplate);
         truncateTables(jdbcTemplate, truncateQueries);
-    }
-
-    private int getServerPort(ServletWebServerApplicationContext context) {
-        return context.getWebServer().getPort();
-    }
-
-    private ServletWebServerApplicationContext getWebServerApplicationContext(TestContext testContext) {
-        org.springframework.context.ApplicationContext applicationContext = testContext.getApplicationContext();
-
-        if (applicationContext instanceof ServletWebServerApplicationContext) {
-            return (ServletWebServerApplicationContext) applicationContext;
-        } else {
-            throw new IllegalStateException(
-                    "The ApplicationContext is not an instance of ServletWebServerApplicationContext");
-        }
     }
 
     private JdbcTemplate getJdbcTemplate(TestContext testContext) {

@@ -2,19 +2,15 @@ package subway.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.controller.dto.*;
+import subway.domain.Line;
+import subway.domain.Section;
+import subway.domain.Station;
+import subway.domain.repository.LineRepository;
+import subway.domain.repository.SectionRepository;
 import subway.exception.CheckDuplicateStationException;
 import subway.exception.InvalidUpStationException;
 import subway.exception.NotFoundException;
-import subway.domain.Line;
-import subway.domain.repository.LineRepository;
-import subway.controller.dto.LineCreateRequest;
-import subway.controller.dto.LineUpdateRequest;
-import subway.controller.dto.LineResponse;
-import subway.domain.Section;
-import subway.domain.repository.SectionRepository;
-import subway.controller.dto.SectionCreateRequest;
-import subway.controller.dto.SectionResponse;
-import subway.domain.Station;
 
 import java.util.List;
 import java.util.stream.Collectors;

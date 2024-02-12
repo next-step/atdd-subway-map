@@ -5,10 +5,8 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-
 import subway.fixture.LineFixture;
 import subway.fixture.StationFixture;
 import subway.support.annotation.AcceptanceTest;

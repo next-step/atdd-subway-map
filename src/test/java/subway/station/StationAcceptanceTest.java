@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import subway.fixture.StationFixture;
 import subway.support.annotation.AcceptanceTest;
 import subway.util.RestAssuredUtil;
+
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
