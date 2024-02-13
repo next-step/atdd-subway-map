@@ -7,19 +7,19 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
-import subway.line.LineCreateRequest;
-import subway.line.LineUpdateRequest;
+import org.springframework.test.context.jdbc.Sql;
+import subway.line.presentation.request.LineCreateRequest;
+import subway.line.presentation.request.LineUpdateRequest;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static io.restassured.path.json.JsonPath.from;
-import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER_CLASS;
+import static subway.LineSteps.*;
+import static subway.StationSteps.createStation;
 
-@DirtiesContext(classMode = AFTER_CLASS)
+@Sql(value = "/sql/truncate.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {
@@ -31,14 +31,14 @@ public class LineAcceptanceTest {
     @Test
     void 지하철노선을_생성하고_조회한다() {
         // given
-        createStation("건대입구");
-        createStation("어린이대공원");
+        Long 건대입구_id = createStation("건대입구");
+        Long 어린이대공원_id = createStation("어린이대공원");
 
         LineCreateRequest lineCreateRequest = new LineCreateRequest(
                 "신분당선",
                 "bg-red-600",
-                1L,
-                2L,
+                건대입구_id,
+                어린이대공원_id,
                 10
         );
 
@@ -61,15 +61,15 @@ public class LineAcceptanceTest {
     @Test
     void 생성한_지하철노선을_모두_조회한다() {
         // given
-        createStation("건대입구");
-        createStation("어린이대공원");
-        createStation("군자");
+        Long 건대입구_id = createStation("건대입구");
+        Long 어린이대공원_id = createStation("어린이대공원");
+        Long 군자_id = createStation("군자");
 
         LineCreateRequest lineCreateRequest_1 = new LineCreateRequest(
                 "신분당선",
                 "bg-red-600",
-                1L,
-                2L,
+                건대입구_id,
+                어린이대공원_id,
                 10
         );
         createLine(lineCreateRequest_1);
@@ -77,8 +77,8 @@ public class LineAcceptanceTest {
         LineCreateRequest lineCreateRequest_2 = new LineCreateRequest(
                 "분당선",
                 "bg-green-600",
-                1L,
-                3L,
+                건대입구_id,
+                군자_id,
                 20
         );
         createLine(lineCreateRequest_2);
@@ -105,14 +105,14 @@ public class LineAcceptanceTest {
     @Test
     void 한개의_지하철_노선을_조회한다() {
         // given
-        createStation("건대입구");
-        createStation("어린이대공원");
+        Long 건대입구_id = createStation("건대입구");
+        Long 어린이대공원_id = createStation("어린이대공원");
 
         LineCreateRequest lineCreateRequest = new LineCreateRequest(
                 "신분당선",
                 "bg-red-600",
-                1L,
-                2L,
+                건대입구_id,
+                어린이대공원_id,
                 10
         );
         ExtractableResponse<Response> extractableResponse = createLine(lineCreateRequest);
@@ -136,14 +136,14 @@ public class LineAcceptanceTest {
     @Test
     void 지하철노선_정보를_수정한다() {
         // given
-        createStation("건대입구");
-        createStation("어린이대공원");
+        Long 건대입구_id = createStation("건대입구");
+        Long 어린이대공원_id = createStation("어린이대공원");
 
         LineCreateRequest lineCreateRequest = new LineCreateRequest(
                 "신분당선",
                 "bg-red-600",
-                1L,
-                2L,
+                건대입구_id,
+                어린이대공원_id,
                 10
         );
         ExtractableResponse<Response> extractableResponse = createLine(lineCreateRequest);
@@ -169,14 +169,14 @@ public class LineAcceptanceTest {
     @Test
     void 지하철노선을_삭제한다() {
         // given
-        createStation("건대입구");
-        createStation("어린이대공원");
+        Long 건대입구_id = createStation("건대입구");
+        Long 어린이대공원_id = createStation("어린이대공원");
 
         LineCreateRequest lineCreateRequest = new LineCreateRequest(
                 "신분당선",
                 "bg-red-600",
-                1L,
-                2L,
+                건대입구_id,
+                어린이대공원_id,
                 10
         );
         ExtractableResponse<Response> extractableResponse = createLine(lineCreateRequest);
@@ -199,46 +199,5 @@ public class LineAcceptanceTest {
                 .extract();
     }
 
-    private ExtractableResponse<Response> createStation(String stationName) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", stationName);
 
-        return RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> getLines() {
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when().get("/lines")
-                .then().log().all()
-                .extract();
-        return response;
-    }
-
-    private ExtractableResponse<Response> getLine(Long lineId) {
-        return RestAssured.given().log().all()
-                .when().get("/lines/" + lineId)
-                .then().log().all()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> putLine(Long lineId, LineUpdateRequest request) {
-        return RestAssured.given().log().all()
-                .body(request)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().put("/lines/" + lineId)
-                .then().log().all()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> deleteLine(Long lineId) {
-        return RestAssured.given().log().all()
-                .when().delete("/lines/" + lineId)
-                .then().log().all()
-                .extract();
-    }
 }

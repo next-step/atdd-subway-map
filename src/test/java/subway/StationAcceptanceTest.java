@@ -1,22 +1,17 @@
 package subway;
 
-import io.restassured.RestAssured;
-import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.jdbc.Sql;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER_CLASS;
+import static subway.StationSteps.*;
 
-@DirtiesContext(classMode = AFTER_CLASS)
+@Sql(value = "/sql/truncate.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationAcceptanceTest {
@@ -52,8 +47,7 @@ public class StationAcceptanceTest {
     @Test
     void test2() {
         // given
-        ExtractableResponse<Response> station = createStation("건대입구역");
-        Long stationId = getStationId(station);
+        Long stationId = createStation("건대입구역");
         String id = String.valueOf(stationId);
 
         // when
@@ -72,8 +66,7 @@ public class StationAcceptanceTest {
     @Test
     void test3() {
         // given
-        ExtractableResponse<Response> station = createStation("건대입구역");
-        Long stationId = getStationId(station);
+        Long stationId = createStation("건대입구역");
         String id = String.valueOf(stationId + 1);
 
         // when
@@ -82,38 +75,5 @@ public class StationAcceptanceTest {
         // then
         assertThat(response.getStatusCode()).isNotEqualTo(204);
         assertThat(response.getStatusCode()).isEqualTo(500);
-    }
-
-    private ExtractableResponse<Response> createStation(String stationName) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", stationName);
-
-        return RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
-    }
-
-    private List<String> getStations() {
-        List<String> stationNames = RestAssured.given().log().all()
-                .when().get("/stations")
-                .then().log().all()
-                .extract()
-                .response().jsonPath().getList("name", String.class);
-        return stationNames;
-    }
-
-    private Response deleteStation(String id) {
-        return RestAssured.given().log().all()
-                .when().delete("/stations/" + id)
-                .then().log().all()
-                .extract()
-                .response();
-    }
-
-    private long getStationId(ExtractableResponse<Response> station) {
-        return station.response().jsonPath().getLong("id");
     }
 }

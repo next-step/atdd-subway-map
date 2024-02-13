@@ -1,6 +1,7 @@
-package subway.line;
+package subway.line.presentation.request;
 
 import lombok.Getter;
+import subway.line.domain.Line;
 
 @Getter
 public class LineCreateRequest {
@@ -23,9 +24,6 @@ public class LineCreateRequest {
         return Line.builder()
                 .name(request.getName())
                 .color(request.getColor())
-                .upStationId(request.getUpStationId())
-                .downStationId(request.getDownStationId())
-                .distance(request.getDistance())
                 .build();
     }
 }
