@@ -1,4 +1,4 @@
-package subway.line;
+package subway.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,14 +21,14 @@ public class Line {
     @Column(length = 20, nullable = false)
     private String name;
 
-    @Column(length = 10, nullable = false)
+    @Column(length = 20, nullable = false)
     private String color;
 
     @Column(nullable = false)
-    private Integer upStationId;
+    private Long upStationId;
 
     @Column(nullable = false)
-    private Integer downStationId;
+    private Long downStationId;
 
     @Column(nullable = false)
     private Integer distance;

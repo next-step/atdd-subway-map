@@ -24,163 +24,164 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ActiveProfiles("acceptance")
 public class LineAcceptanceTest {
 
-    @Autowired
-    private DatabaseCleanup databaseCleanup;
+  @Autowired
+  private DatabaseCleanup databaseCleanup;
 
-    @BeforeEach
-    void setUp() {
-        databaseCleanup.execute();
-    }
+  @BeforeEach
+  void setUp() {
+    databaseCleanup.execute();
+  }
 
-    /**
-     * When 지하철 노선을 생성하면
-     * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
-     */
-    @DisplayName("지하철 노선을 생성한다.")
-    @Test
-    void createLine() {
-        // when
-        ExtractableResponse<Response> response = LineFixture.createLine(
-                "신분당선",
-                "bg-red-600",
-                1L,
-                2L,
-                10
-        );
+  /**
+   * When 지하철 노선을 생성하면 Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
+   */
+  @DisplayName("지하철 노선을 생성한다.")
+  @Test
+  void createLine() {
+    // when
+    Map<String, Object> params = new HashMap<>();
+    params.put("name", "신분당선");
+    params.put("color", "bg-red-600");
+    params.put("upStationId", 1L);
+    params.put("downStationId", 2L);
+    params.put("distance", 10);
+    ExtractableResponse<Response> response = LineFixture.지하철노선_생성_요청(params);
 
-        // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+    // then
+    assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
-        // then
-        List<String> lineNames =
-                RestAssured.given().log().all()
-                        .when().get("/lines")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
-        assertThat(lineNames).containsAnyOf("신분당선");
-    }
+    // then
+    List<String> lineNames =
+        RestAssured.given().log().all()
+            .when().get("/lines")
+            .then().log().all()
+            .extract().jsonPath().getList("name", String.class);
+    assertThat(lineNames).containsAnyOf("신분당선");
+  }
 
-    /**
-     * Given 2개의 지하철 노선을 생성하고
-     * When 지하철 노선 목록을 조회하면
-     * Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
-     */
-    @DisplayName("지하철 노선 목록을 조회한다.")
-    @Test
-    void getLines() {
-        // given
-        ExtractableResponse<Response> sinbundangLine = LineFixture.createLine(
-                "신분당선",
-                "bg-red-600",
-                1L,
-                2L,
-                10
-        );
-        ExtractableResponse<Response> line2 = LineFixture.createLine(
-                "2호선",
-                "bg-green-600",
-                2L,
-                3L,
-                10
-        );
+  /**
+   * Given 2개의 지하철 노선을 생성하고 When 지하철 노선 목록을 조회하면 Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
+   */
+  @DisplayName("지하철 노선 목록을 조회한다.")
+  @Test
+  void getLines() {
+    // given
+    ExtractableResponse<Response> 신분당선 = LineFixture.지하철노선_생성_요청(
+        Map.of(
+            "name", "신분당선",
+            "color", "bg-red-600",
+            "upStationId", 1L,
+            "downStationId", 2L,
+            "distance", 10
+        )
+    );
+    ExtractableResponse<Response> line2 = LineFixture.지하철노선_생성_요청(
+        Map.of(
+            "name", "2호선",
+            "color", "bg-green-600",
+            "upStationId", 1L,
+            "downStationId", 2L,
+            "distance", 10
+        )
+    );
 
-        // when
-        List<String> lineNames = LineFixture.getLines().jsonPath().getList("name", String.class);
+    // when
+    List<String> lineNames = LineFixture.getLines().jsonPath().getList("name", String.class);
 
-        // then
-        assertThat(lineNames).containsAnyOf("신분당선", "2호선");
-    }
+    // then
+    assertThat(lineNames).containsAnyOf("신분당선", "2호선");
+  }
 
-    /**
-     * Given 지하철 노선을 생성하고
-     * When 생성한 지하철 노선을 조회하면
-     * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
-     */
-    @DisplayName("지하철노선을 조회한다.")
-    @Test
-    void getLine() {
-        // given
-        ExtractableResponse<Response> createResponse = LineFixture.createLine(
-                "신분당선",
-                "bg-red-600",
-                1L,
-                2L,
-                10
-        );
+  /**
+   * Given 지하철 노선을 생성하고 When 생성한 지하철 노선을 조회하면 Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
+   */
+  @DisplayName("지하철노선을 조회한다.")
+  @Test
+  void getLine() {
+    // given
+    ExtractableResponse<Response> createResponse = LineFixture.지하철노선_생성_요청(
+        Map.of(
+            "name", "신분당선",
+            "color", "bg-red-600",
+            "upStationId", 1L,
+            "downStationId", 2L,
+            "distance", 10
+        )
+    );
 
-        // when
-        String lineName =
-                RestAssured.given().log().all()
-                        .pathParam("lineId", createResponse.jsonPath().getLong("id"))
-                        .when().get("/lines/{lineId}")
-                        .then().log().all()
-                        .extract().jsonPath().getString("name");
+    // when
+    String lineName =
+        RestAssured.given().log().all()
+            .pathParam("lineId", createResponse.jsonPath().getLong("id"))
+            .when().get("/lines/{lineId}")
+            .then().log().all()
+            .extract().jsonPath().getString("name");
 
-        // then
-        assertThat(lineName).isEqualTo("신분당선");
-    }
+    // then
+    assertThat(lineName).isEqualTo("신분당선");
+  }
 
-    /**
-     * Given 지하철 노선을 생성하고
-     * When 생성한 지하철 노선을 수정하면
-     * Then 해당 지하철 노선 정보는 수정된다
-     */
-    @DisplayName("지하철 노선을 수정한다.")
-    @Test
-    void updateLine() {
-        // given
-        ExtractableResponse<Response> createResponse = LineFixture.createLine(
-                "신분당선",
-                "bg-red-600",
-                1L,
-                2L,
-                10
-        );
+  /**
+   * Given 지하철 노선을 생성하고 When 생성한 지하철 노선을 수정하면 Then 해당 지하철 노선 정보는 수정된다
+   */
+  @DisplayName("지하철 노선을 수정한다.")
+  @Test
+  void updateLine() {
+    // given
+    ExtractableResponse<Response> createResponse = LineFixture.지하철노선_생성_요청(
+        Map.of(
+            "name", "신분당선",
+            "color", "bg-red-600",
+            "upStationId", 1L,
+            "downStationId", 2L,
+            "distance", 10
+        )
+    );
 
-        // when
-        final Map<String, Object> updateParams = new HashMap<>();
-        updateParams.put("name", "다른분당선");
-        updateParams.put("color", "bg-red-600");
+    // when
+    final Map<String, Object> updateParams = new HashMap<>();
+    updateParams.put("name", "다른분당선");
+    updateParams.put("color", "bg-red-600");
 
-        ExtractableResponse<Response> updateResponse =
-                RestAssured.given().log().all()
-                        .body(updateParams)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .pathParam("lineId", createResponse.jsonPath().getLong("id"))
-                        .when().put("/lines/{lineId}")
-                        .then().log().all()
-                        .extract();
+    ExtractableResponse<Response> updateResponse =
+        RestAssured.given().log().all()
+            .body(updateParams)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .pathParam("lineId", createResponse.jsonPath().getLong("id"))
+            .when().put("/lines/{lineId}")
+            .then().log().all()
+            .extract();
 
-        // then
-        assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
-    }
+    // then
+    assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+  }
 
-    /**
-     * Given 지하철 노선을 생성하고
-     * When 생성한 지하철 노선을 삭제하면
-     * Then 해당 지하철 노선 정보는 삭제된다
-     */
-    @DisplayName("지하철 노선을 제거한다.")
-    @Test
-    void deleteLine() {
-        // given
-        ExtractableResponse<Response> createResponse = LineFixture.createLine(
-                "신분당선",
-                "bg-red-600",
-                1L,
-                2L,
-                10
-        );
+  /**
+   * Given 지하철 노선을 생성하고 When 생성한 지하철 노선을 삭제하면 Then 해당 지하철 노선 정보는 삭제된다
+   */
+  @DisplayName("지하철 노선을 제거한다.")
+  @Test
+  void deleteLine() {
+    // given
+    ExtractableResponse<Response> createResponse = LineFixture.지하철노선_생성_요청(
+        Map.of(
+            "name", "신분당선",
+            "color", "bg-red-600",
+            "upStationId", 1L,
+            "downStationId", 2L,
+            "distance", 10
+        )
+    );
 
-        // when
-        ExtractableResponse<Response> deleteResponse =
-                RestAssured.given().log().all()
-                        .pathParam("lineId", createResponse.jsonPath().getLong("id"))
-                        .when().delete("/lines/{lineId}")
-                        .then().log().all()
-                        .extract();
+    // when
+    ExtractableResponse<Response> deleteResponse =
+        RestAssured.given().log().all()
+            .pathParam("lineId", createResponse.jsonPath().getLong("id"))
+            .when().delete("/lines/{lineId}")
+            .then().log().all()
+            .extract();
 
-        // then
-        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-    }
+    // then
+    assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+  }
 }
