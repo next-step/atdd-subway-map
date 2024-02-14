@@ -11,6 +11,7 @@ import subway.exception.IllegalSectionException;
 
 @Embeddable
 public class Sections {
+    public static final int ONLY_ONE_SECTION = 1;
     @OneToMany(cascade = CascadeType.ALL)
     private List<Section> sections;
 
@@ -43,6 +44,9 @@ public class Sections {
     }
 
     public void remove() {
+        if (ONLY_ONE_SECTION == sections.size()) {
+            throw new IllegalSectionException("해당 노선에 구간이 1개만 남아 있어 삭제할 수 없습니다.");
+        }
         sections.remove(sections.size() - 1);
     }
 }
