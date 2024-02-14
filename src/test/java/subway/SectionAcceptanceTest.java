@@ -106,6 +106,16 @@ public class SectionAcceptanceTest extends BaseAcceptanceTest {
             () -> assertThat(sectionsResponse.get(sectionsResponse.size() - 1).getDownStationId()).isEqualTo(sectionRequest.getUpStationId())
         );
     }
+    @Test
+    void 지하철_노선에_상행_종점역과_하행_종점역만_있는_경우_구간이_1개인_경우_역을_삭제할_수_없다() {
+        //given
+        LineResponse lineResponse = createLine(getRequestParam_신분당선());
+
+        //when & then
+        when()
+            .delete("/lines/" + lineResponse.getId() + "/sections")
+            .then().statusCode(HttpStatus.SC_BAD_REQUEST);
+    }
 
     private void addSection(LineResponse lineResponse, SectionRequest sectionRequest) throws JsonProcessingException {
         given().body(mapper.writeValueAsString(sectionRequest))
