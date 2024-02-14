@@ -94,7 +94,7 @@ public class SectionAcceptanceTest extends BaseAcceptanceTest {
 
         //when
         when()
-            .delete("/lines/" + lineResponse.getId() + "/sections")
+            .delete("/lines/" + lineResponse.getId() +"/sections?stationId=" + 4L)
             .then().statusCode(HttpStatus.SC_NO_CONTENT);
 
         //then
@@ -107,13 +107,23 @@ public class SectionAcceptanceTest extends BaseAcceptanceTest {
         );
     }
     @Test
+    void 노선에_등록된_구간이_2개_이상_있을때_요청한_역이_기존_노선의_하행종점역과_다르면_구간을_삭제할_수_없다() {
+        //given
+        LineResponse lineResponse = createLine(getRequestParam_신분당선());
+
+        //when & then
+        when()
+            .delete("/lines/" + lineResponse.getId() + "/sections?stationId=" + 4L)
+            .then().statusCode(HttpStatus.SC_BAD_REQUEST);
+    }
+    @Test
     void 지하철_노선에_상행_종점역과_하행_종점역만_있는_경우_구간이_1개인_경우_역을_삭제할_수_없다() {
         //given
         LineResponse lineResponse = createLine(getRequestParam_신분당선());
 
         //when & then
         when()
-            .delete("/lines/" + lineResponse.getId() + "/sections")
+            .delete("/lines/" + lineResponse.getId() + "/sections?stationId=" + 2L)
             .then().statusCode(HttpStatus.SC_BAD_REQUEST);
     }
 
