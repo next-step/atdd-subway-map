@@ -1,10 +1,15 @@
 package subway.line;
 
 import javax.persistence.Column;
+import javax.persistence.ConstraintMode;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
 @Entity
 public class Section {
@@ -13,8 +18,9 @@ public class Section {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Column
-  private Long lineId;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "line_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+  private Line line;
 
   @Column
   private Long upStationId;
@@ -53,8 +59,8 @@ public class Section {
     return distance;
   }
 
-  public void registerLine(final Long lineId) {
-    this.lineId = lineId;
+  public void registerLine(final Line line) {
+    this.line = line;
   }
 
 }

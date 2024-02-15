@@ -1,2 +1,3 @@
 TRUNCATE TABLE line;
+TRUNCATE TABLE section;
 TRUNCATE TABLE station;

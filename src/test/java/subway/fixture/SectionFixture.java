@@ -7,7 +7,12 @@ import org.springframework.http.MediaType;
 
 public class SectionFixture {
 
-  public static void createSection(final Long upStationId, final Long downStationId, final int distance) {
+  public static void createSection(
+      final Long lineId,
+      final Long upStationId,
+      final Long downStationId,
+      final int distance
+  ) {
     Map<String, Object> params = new HashMap<>();
     params.put("upStationId", upStationId);
     params.put("downStationId", downStationId);
@@ -17,7 +22,7 @@ public class SectionFixture {
         .given()
         .body(params)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when().post("/lines/{id}/sections")
+        .when().post("/lines/{id}/sections", lineId)
         .then();
   }
 

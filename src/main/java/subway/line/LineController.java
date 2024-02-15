@@ -45,7 +45,7 @@ public class LineController {
   }
 
   @DeleteMapping("/{id}")
-  public ResponseEntity<Void> deleteStation(@PathVariable Long id) {
+  public ResponseEntity<Void> deleteLine(@PathVariable Long id) {
     lineService.deleteLineById(id);
     return ResponseEntity.noContent().build();
   }
@@ -55,7 +55,7 @@ public class LineController {
       @PathVariable final Long id,
       @RequestBody SectionCreateRequest request
   ) {
-    lineService.saveSection(id, request);
+    lineService.saveSection(id, request.getUpStationId(), request.getDownStationId(), request.getDistance());
     return ResponseEntity.created(URI.create("/lines/" + id + "sections")).build();
   }
 

@@ -3,6 +3,7 @@ package subway;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -312,8 +313,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
       final var 강남역 = StationFixture.createStation("강남역");
       final var 논현역 = StationFixture.createStation("논현역");
       final var line = LineFixture.createLine("신분당선", "bg-red-600", 청계산입구역.getId(), 강남역.getId(), 10);
-      SectionFixture.createSection(강남역.getId(), 논현역.getId(), 10);
-
 
       // when
       Map<String, Object> params = new HashMap<>();
@@ -348,14 +347,12 @@ public class LineAcceptanceTest extends AcceptanceTest {
       final var 강남역 = StationFixture.createStation("강남역");
       final var 논현역 = StationFixture.createStation("논현역");
       final var line = LineFixture.createLine("신분당선", "bg-red-600", 청계산입구역.getId(), 강남역.getId(), 10);
-      SectionFixture.createSection(강남역.getId(), 논현역.getId(), 10);
 
       // when
       final var response = RestAssured
           .given().log().all()
           .queryParam("stationId", 논현역.getId())
-          // TODO default accept header check
-//          .accept(ContentType.ANY)
+          .accept(ContentType.ANY)
           .contentType(MediaType.APPLICATION_JSON_VALUE)
           .when().delete("/lines/{id}/sections", line.getId())
           .then().log().all()
@@ -384,7 +381,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
       final var 강남역 = StationFixture.createStation("강남역");
       final var 논현역 = StationFixture.createStation("논현역");
       final var line = LineFixture.createLine("신분당선", "bg-red-600", 청계산입구역.getId(), 강남역.getId(), 10);
-      SectionFixture.createSection(강남역.getId(), 논현역.getId(), 10);
+      SectionFixture.createSection(line.getId(), 강남역.getId(), 논현역.getId(), 10);
 
       // when
       final var response = RestAssured

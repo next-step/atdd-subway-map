@@ -1,5 +1,6 @@
 package subway.line;
 
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -8,7 +9,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
-import subway.station.Station;
 
 @Entity
 public class Line {
@@ -32,7 +32,7 @@ public class Line {
   private int distance;
 
   @OneToMany(mappedBy = "line", fetch = FetchType.LAZY)
-  private List<Station> stations;
+  private final List<Section> sections = new ArrayList<>();
 
   public Line(String name, String color, Long upStationId, Long downStationId, int distance) {
     this.name = name;
@@ -65,8 +65,12 @@ public class Line {
     return downStationId;
   }
 
-  public List<Station> getStations() {
-    return stations;
+  public int getDistance() {
+    return distance;
+  }
+
+  public List<Section> getSections() {
+    return sections;
   }
 
   public void updateLine(final String name, final String color) {
@@ -74,9 +78,19 @@ public class Line {
     this.color = color;
   }
 
-  public void addSection(Section section) {
+  public void addSection(final Section section) {
+    // 새 라인의 경우 section 검증 제외
+    if (!isNewLine()) {
+      LineValidator.checkSectionForAddition(this, section);
+    }
+
     this.downStationId = section.getDownStationId();
     this.distance += section.getDistance();
+    this.sections.add(section);
+    section.registerLine(this);
   }
 
+  private boolean isNewLine() {
+    return this.getSections().isEmpty();
+  }
 }
