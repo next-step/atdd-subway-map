@@ -346,12 +346,12 @@ public class LineAcceptanceTest extends AcceptanceTest {
       final var 강남역 = StationFixture.createStation("강남역");
       final var 논현역 = StationFixture.createStation("논현역");
       final var line = LineFixture.createLine("신분당선", "bg-red-600", 청계산입구역.getId(), 강남역.getId(), 10);
-      final var newSection = SectionFixture.createSection(line.getId(), 강남역.getId(), 논현역.getId(), 10);
+      SectionFixture.createSection(line.getId(), 강남역.getId(), 논현역.getId(), 10);
 
       // when
       final var response = RestAssured
           .given().log().all()
-          .queryParam("sectionId", newSection.getId())
+          .queryParam("stationId", 논현역.getId())
           .contentType(MediaType.APPLICATION_JSON_VALUE)
           .when().delete("/lines/{id}/sections", line.getId())
           .then().log().all()
@@ -385,7 +385,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
       // when
       final var response = RestAssured
           .given().log().all()
-          .queryParam("sectionId", 1)
+          .queryParam("stationId", 강남역.getId())
           .contentType(MediaType.APPLICATION_JSON_VALUE)
           .when().delete("/lines/{id}/sections", line.getId())
           .then().log().all()

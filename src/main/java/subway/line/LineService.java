@@ -106,13 +106,16 @@ public class LineService {
   @Transactional
   public void deleteSection(
       final Long lineId,
-      final Long sectionId
+      final Long stationId
   ) {
     final var line = lineRepository.findById(lineId)
         .orElseThrow(() -> new BusinessException("노선 정보를 찾을 수 없습니다."));
 
-    final var section = sectionRepository.findById(sectionId)
+    final var section = line.getSections().stream()
+        .filter(it -> it.getDownStationId().equals(stationId))
+        .findAny()
         .orElseThrow(() -> new BusinessException("구간 정보를 찾을 수 없습니다."));
+
     line.removeSection(section);
   }
 
