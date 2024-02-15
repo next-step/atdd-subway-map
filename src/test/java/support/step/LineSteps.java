@@ -11,6 +11,10 @@ public class LineSteps {
 
 
     public static final String LINE_BASE_PATH = "/lines";
+    public static final String LINE_RESOURCE_PATH = LINE_BASE_PATH + "/{lineId}";
+    public static final String NAME = "name";
+    public static final String ID = "id";
+    public static final String COLOR = "color";
 
     public static ExtractableResponse<Response> 지하철_노선_생성_요청(Map<String, Object> request) {
         return RestAssured.given().log().all()
@@ -32,7 +36,7 @@ public class LineSteps {
     public static ExtractableResponse<Response> 지하철_노선_단일_조회_요청(Long 노선_아이디) {
         return RestAssured.given().log().all()
             .accept(MediaType.APPLICATION_JSON_VALUE)
-            .when().get(LINE_BASE_PATH + "/{lineId}", 노선_아이디)
+            .when().get(LINE_RESOURCE_PATH, 노선_아이디)
             .then().log().all()
             .extract();
     }
@@ -41,7 +45,7 @@ public class LineSteps {
         return RestAssured.given().log().all()
             .body(body)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().put(LINE_BASE_PATH + "/{lineId}", 노선_아이디)
+            .when().put(LINE_RESOURCE_PATH, 노선_아이디)
             .then().log().all()
             .extract();
     }
@@ -49,30 +53,30 @@ public class LineSteps {
     public static ExtractableResponse<Response> 지하철_노선_삭제_요청(Long 노선_아이디) {
         return RestAssured.given().log().all()
             .accept(MediaType.APPLICATION_JSON_VALUE)
-            .when().delete(LINE_BASE_PATH + "/{lineId}", 노선_아이디)
+            .when().delete(LINE_RESOURCE_PATH, 노선_아이디)
             .then().log().all()
             .extract();
     }
 
     public static List<String> 지하철_노선_응답에서_이름_목록_추출(ExtractableResponse<Response> 지하철_노선_응답) {
         return 지하철_노선_응답.jsonPath()
-            .getList("name", String.class);
+            .getList(NAME, String.class);
     }
 
     public static List<Long> 지하철_노선_응답에서_아이디_목록_추출(ExtractableResponse<Response> 지하철_노선_응답) {
         return 지하철_노선_응답.jsonPath()
-            .getList("id", Long.class);
+            .getList(ID, Long.class);
     }
 
     public static Long 지하철_노선_응답에서_아이디_추출(ExtractableResponse<Response> 지하철_노선_응답) {
-        return 지하철_노선_응답.jsonPath().getLong("id");
+        return 지하철_노선_응답.jsonPath().getLong(ID);
     }
 
     public static String 지하철_노선_응답에서_이름_추출(ExtractableResponse<Response> 지하철_노선_응답) {
-        return 지하철_노선_응답.jsonPath().get("name");
+        return 지하철_노선_응답.jsonPath().get(NAME);
     }
 
     public static String 지하철_노선_응답에서_색상_추출(ExtractableResponse<Response> 지하철_노선_응답) {
-        return 지하철_노선_응답.jsonPath().get("color");
+        return 지하철_노선_응답.jsonPath().get(COLOR);
     }
 }
