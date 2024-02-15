@@ -33,7 +33,11 @@ public class LineResponse {
     return stations;
   }
 
-  public static LineResponse from(final Line line, final StationResponse upStation, final StationResponse downStation) {
+  public static LineResponse from(
+      final Line line,
+      final StationResponse upStation,
+      final StationResponse downStation
+  ) {
     return new LineResponse(
         line.getId(),
         line.getName(),
@@ -45,4 +49,15 @@ public class LineResponse {
     );
   }
 
+  public static LineResponse from(
+      final Line line,
+      final List<StationResponse> stations
+  ) {
+    return new LineResponse(
+        line.getId(),
+        line.getName(),
+        line.getColor(),
+        stations
+    );
+  }
 }

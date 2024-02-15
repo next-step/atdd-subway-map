@@ -11,12 +11,14 @@ public class LineValidator {
     }
 
     // 이미 해당 노선에 등록되어있는 역은 새로운 구간의 하행역이 될 수 없다.
-    line.getStations().stream()
-        .filter(station -> station.getId().equals(section.getDownStationId()))
+    line.getSections().stream()
+        .filter(it ->
+            it.getUpStationId().equals(section.getDownStationId())
+                || it.getUpStationId().equals(section.getUpStationId())
+        )
         .findAny()
         .ifPresent(station -> {
           throw new RuntimeException("이미 해당 노선에 등록되어있는 역은 새로운 구간의 하행역이 될 수 없습니다.");
         });
   }
-
 }

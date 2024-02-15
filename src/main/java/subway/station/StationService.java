@@ -1,5 +1,6 @@
 package subway.station;
 
+import java.util.Collection;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,7 +11,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional(readOnly = true)
 public class StationService {
-    private StationRepository stationRepository;
+    private final StationRepository stationRepository;
 
     public StationService(StationRepository stationRepository) {
         this.stationRepository = stationRepository;
@@ -31,6 +32,12 @@ public class StationService {
     public Optional<StationResponse> findById(long id) {
         return stationRepository.findById(id)
             .map(StationResponse::from);
+    }
+
+    public List<StationResponse> findByIds(Collection<Long> ids) {
+        return stationRepository.findAllByIdIn(ids).stream()
+            .map(StationResponse::from)
+            .collect(Collectors.toList());
     }
 
     @Transactional
