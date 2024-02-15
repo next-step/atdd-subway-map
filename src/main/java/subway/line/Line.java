@@ -2,6 +2,7 @@ package subway.line;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -31,8 +32,8 @@ public class Line {
   @Column(nullable = false)
   private int distance;
 
-  @OneToMany(mappedBy = "line", fetch = FetchType.LAZY)
-  private final List<Section> sections = new ArrayList<>();
+  @OneToMany(mappedBy = "line", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, orphanRemoval = true)
+  private List<Section> sections = new ArrayList<>();
 
   public Line(String name, String color, Long upStationId, Long downStationId, int distance) {
     this.name = name;

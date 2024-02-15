@@ -24,8 +24,4 @@ public class SectionCreateRequest {
     return distance;
   }
 
-  public Section to() {
-    return new Section(upStationId, downStationId, distance);
-  }
-
 }

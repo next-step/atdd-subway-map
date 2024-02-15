@@ -96,7 +96,7 @@ public class LineService {
   ) {
     final var line = lineRepository.findById(lineId)
         .orElseThrow(() -> new BusinessException("노선 정보를 찾을 수 없습니다."));
-    final var section = new Section(upStationId, downStationId, distance);
+    final var section = new Section(null, upStationId, downStationId, distance, line);
 
     line.addSection(section);
 
@@ -114,8 +114,6 @@ public class LineService {
     final var section = sectionRepository.findById(sectionId)
         .orElseThrow(() -> new BusinessException("구간 정보를 찾을 수 없습니다."));
     line.removeSection(section);
-
-    sectionRepository.deleteById(sectionId);
   }
 
 }
