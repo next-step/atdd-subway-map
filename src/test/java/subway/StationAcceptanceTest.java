@@ -3,6 +3,7 @@ package subway;
 import static io.restassured.RestAssured.given;
 import static io.restassured.RestAssured.when;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_CLASS;
 
 import java.util.HashMap;
 import java.util.List;
@@ -11,16 +12,17 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.MethodMode;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import subway.domain.StationResponse;
+import subway.dto.StationResponse;
 
 @DisplayName("지하철역 관련 기능")
+@DirtiesContext(methodMode = MethodMode.AFTER_METHOD)
 public class StationAcceptanceTest extends BaseAcceptanceTest {
     /**
      * When 지하철역을 생성하면
@@ -29,10 +31,10 @@ public class StationAcceptanceTest extends BaseAcceptanceTest {
      */
 
     @BeforeEach
-    @Test
     void setUp() {
         databaseCleanUp.execute();
     }
+
     @DisplayName("지하철역을 생성한다.")
     @Test
     void testCreateStation() {

@@ -13,16 +13,14 @@ import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 
-import subway.domain.LineResponse;
-import subway.domain.StationResponse;
-
+import subway.dto.LineResponse;
+import subway.dto.StationResponse;
+@DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
 @DisplayName("지하철 노선 관련 기능")
-public class LineAcceptanceTest extends BaseAcceptanceTest{
-
+public class LineAcceptanceTest extends BaseAcceptanceTest {
 
     @BeforeEach
     void setUp() {
@@ -100,13 +98,7 @@ public class LineAcceptanceTest extends BaseAcceptanceTest{
             "color", "Red"
         );
         //when
-        given()
-            .body(putRequest)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when()
-            .put("/lines/" + linePostResponse.getId())
-            .then()
-            .log().all().statusCode(HttpStatus.SC_OK);
+        지하철_노선_수정(putRequest, linePostResponse.getId());
 
         //then
         LineResponse lineResponse_신분당선_수정 = when().get("/lines/" + linePostResponse.getId()).then().extract().jsonPath().getObject(".", LineResponse.class);
@@ -128,38 +120,6 @@ public class LineAcceptanceTest extends BaseAcceptanceTest{
         when().get("/lines/" + linePostResponse.getId()).then().log().all().statusCode(HttpStatus.SC_NOT_FOUND);
     }
 
-    private Map<String, String> getRequestParam_신분당선() {
-        String lineName = "신분당선";
-        String lineColor = "bg-red-600";
-        long upStationId = 1L;
-        long downStationId = 2L;
-        Integer distance = 10;
-
-        return Map.of(
-            "name", lineName,
-            "color", lineColor,
-            "upStationId", Long.toString(upStationId),
-            "downStationId", Long.toString(downStationId),
-            "distance", distance.toString()
-        );
-    }
-
-    private Map<String, String> getRequestParam_분당선() {
-        String lineName = "분당선";
-        String lineColor = "bg-yellow-600";
-        Long upStationId = 3L;
-        Long downStationId = 4L;
-        Integer distance = 2;
-
-        return Map.of(
-            "name", lineName,
-            "color", lineColor,
-            "upStationId", upStationId.toString(),
-            "downStationId", downStationId.toString(),
-            "distance", distance.toString()
-        );
-    }
-
     private LineResponse 지하철_노선_생성(Map<String, String> lineRequestParam) {
         return given()
             .body(lineRequestParam)
@@ -167,11 +127,21 @@ public class LineAcceptanceTest extends BaseAcceptanceTest{
             .when().post("/lines").then().log().all().extract().jsonPath().getObject(".", LineResponse.class);
     }
 
-    private void 지하철_노선_수정(Map<String, String> lineRequestParam) {
+    private void 지하철_노선_수정(Map<String, String> lineRequestParam, Long lineId) {
         given()
             .body(lineRequestParam)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().put("/lines").then().log().all();
+            .when()
+            .put("/lines/" + lineId)
+            .then()
+            .log().all().statusCode(HttpStatus.SC_OK);
+    }
+
+    void createStation(Map<String, String> param) {
+        given().body(param)
+               .contentType(MediaType.APPLICATION_JSON_VALUE).log().all()
+               .when().post("/stations")
+               .then().log().all();
     }
 
 }

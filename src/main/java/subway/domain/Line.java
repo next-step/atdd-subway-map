@@ -5,17 +5,15 @@ import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import subway.dto.LineRequest;
 
 @Entity
 @Table(name = "line")
@@ -30,27 +28,21 @@ public class Line {
     private String name;
     @Column(length = 20, nullable = false)
     private String color;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "up_station_id")
-    private Station upStation;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "down_station_id")
-    private Station downStation;
+    @Embedded
+    private Sections sections = new Sections();
 
     public Line() {
 
     }
 
     public static Line of(LineRequest lineRequest, Station upStation, Station downStation) {
-        return Line.builder()
-                   .name(lineRequest.getName())
-                   .color(lineRequest.getColor())
-                   .upStation(upStation)
-                   .downStation(downStation)
-                   .build();
-
+        Line line = Line.builder()
+                        .name(lineRequest.getName())
+                        .color(lineRequest.getColor())
+                        .sections(new Sections())
+                        .build();
+        line.addSection(new Section(upStation, downStation, lineRequest.getDistance()));
+        return line;
     }
 
     public void updateLine(String name, String color) {
@@ -59,5 +51,13 @@ public class Line {
         }
         this.name = name;
         this.color = color;
+    }
+
+    public void addSection(Section section) {
+        sections.add(section);
+    }
+
+    public void deleteLastSection(Station station) {
+        sections.removeLastSection(station);
     }
 }

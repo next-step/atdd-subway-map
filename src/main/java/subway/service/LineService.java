@@ -1,6 +1,6 @@
-package subway;
+package subway.service;
 
-import static subway.domain.LineResponse.createLineResponse;
+import static subway.dto.LineResponse.createLineResponse;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -10,11 +10,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.AllArgsConstructor;
 import subway.domain.Line;
-import subway.domain.LineRequest;
-import subway.domain.LineResponse;
+import subway.domain.Section;
 import subway.domain.Station;
+import subway.dto.LineRequest;
+import subway.dto.LineResponse;
+import subway.dto.SectionRequest;
 import subway.exception.NoLineException;
 import subway.exception.NoStationException;
+import subway.repository.LineRepository;
+import subway.repository.StationRepository;
 
 @Service
 @AllArgsConstructor
@@ -22,6 +26,7 @@ import subway.exception.NoStationException;
 public class LineService {
     private final LineRepository lineRepository;
     private final StationRepository stationRepository;
+
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
         Station upStation = getStation(lineRequest.getUpStationId());
@@ -58,5 +63,25 @@ public class LineService {
     public void deleteLine(Long id) {
         Line line = lineRepository.findById(id).orElseThrow(() -> new NoLineException(id + "에 해당하는 지하철 노선이 존재하지 않습니다."));
         lineRepository.delete(line);
+    }
+
+    @Transactional
+    public void addSection(Long lineId, SectionRequest sectionRequest) {
+        Line line = lineRepository.findById(lineId).orElseThrow(() -> new NoLineException(lineId + "에 해당하는 지하철 노선이 존재하지 않습니다."));
+        Station upStation = stationRepository.findById(sectionRequest.getUpStationId())
+                                             .orElseThrow(() -> new NoStationException(sectionRequest.getUpStationId() + "에 해당하는 지하철 역이 존재하지 않습니다."));
+        Station downStation = stationRepository.findById(sectionRequest.getDownStationId())
+                                               .orElseThrow(() -> new NoStationException(sectionRequest.getDownStationId() + "에 해당하는 지하철 역이 존재하지 않습니다."));
+        Section section = Section.of(upStation, downStation, sectionRequest.getDistance());
+        line.addSection(section);
+        lineRepository.save(line);
+    }
+
+    @Transactional
+    public void deleteSection(Long lineId, Long stationId) {
+        Line line = lineRepository.findById(lineId).orElseThrow(() -> new NoLineException(lineId + "에 해당하는 지하철 노선이 존재하지 않습니다."));
+        Station station = stationRepository.findById(stationId).orElseThrow(() -> new NoStationException(stationId + "에 해당하는 지하철 역이 존재하지 않습니다."));
+        line.deleteLastSection(station);
+        lineRepository.save(line);
     }
 }

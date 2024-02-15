@@ -1,15 +1,16 @@
-package subway;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+package subway.service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import subway.domain.Station;
-import subway.domain.StationRequest;
-import subway.domain.StationResponse;
+import subway.dto.StationRequest;
+import subway.dto.StationResponse;
 import subway.exception.NoStationException;
+import subway.repository.StationRepository;
 
 @Service
 @Transactional(readOnly = true)
@@ -28,8 +29,8 @@ public class StationService {
 
     public List<StationResponse> findAllStations() {
         return stationRepository.findAll().stream()
-                .map(StationResponse::createStationResponse)
-                .collect(Collectors.toList());
+                                .map(StationResponse::createStationResponse)
+                                .collect(Collectors.toList());
     }
 
     @Transactional

@@ -1,6 +1,4 @@
-package subway.domain;
-
-import org.springframework.beans.factory.annotation.Value;
+package subway.dto;
 
 import lombok.Getter;
 
