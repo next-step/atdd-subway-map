@@ -352,7 +352,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
       final var response = RestAssured
           .given().log().all()
           .queryParam("stationId", 논현역.getId())
-          .accept(ContentType.ANY)
           .contentType(MediaType.APPLICATION_JSON_VALUE)
           .when().delete("/lines/{id}/sections", line.getId())
           .then().log().all()
@@ -387,8 +386,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
       final var response = RestAssured
           .given().log().all()
           .queryParam("stationId", 논현역.getId())
-          // TODO default accept header check
-//          .accept(ContentType.ANY)
           .contentType(MediaType.APPLICATION_JSON_VALUE)
           .when().delete("/lines/{id}/sections", line.getId())
           .then().log().all()
@@ -417,8 +414,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
       final var response = RestAssured
           .given().log().all()
           .queryParam("stationId", 강남역.getId())
-          // TODO default accept header check
-//          .accept(ContentType.ANY)
           .contentType(MediaType.APPLICATION_JSON_VALUE)
           .when().delete("/lines/{id}/sections", line.getId())
           .then().log().all()
