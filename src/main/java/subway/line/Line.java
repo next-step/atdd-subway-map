@@ -90,6 +90,14 @@ public class Line {
     section.registerLine(this);
   }
 
+  public void removeSection(final Section section) {
+    LineValidator.checkSectionForRemove(this, section);
+
+    this.downStationId = section.getUpStationId();
+    this.distance -= section.getDistance();
+    this.sections.remove(section);
+  }
+
   private boolean isNewLine() {
     return this.getSections().isEmpty();
   }

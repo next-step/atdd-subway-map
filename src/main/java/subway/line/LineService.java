@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.common.BusinessException;
 import subway.station.StationResponse;
 import subway.station.StationService;
 
@@ -58,7 +59,7 @@ public class LineService {
   public LineResponse findById(Long id) {
     // TODO fetch join
     final var line = lineRepository.findById(id)
-        .orElseThrow(() -> new RuntimeException("노선 정보를 찾을 수 없습니다."));
+        .orElseThrow(() -> new BusinessException("노선 정보를 찾을 수 없습니다."));
 
     final var sections = line.getSections();
     final var stationIds = Stream.concat(
@@ -76,30 +77,45 @@ public class LineService {
   @Transactional
   public void updateLine(final Long id, final LineUpdateRequest request) {
     final var line = lineRepository.findById(id)
-        .orElseThrow(() -> new RuntimeException("노선 정보를 찾을 수 없습니다."));
+        .orElseThrow(() -> new BusinessException("노선 정보를 찾을 수 없습니다."));
 
     line.updateLine(request.getName(), request.getColor());
   }
 
   @Transactional
-  public void deleteLineById(final Long id) {
+  public void deleteLine(final Long id) {
     lineRepository.deleteById(id);
   }
 
   @Transactional
-  public void saveSection(
+  public SectionResponse saveSection(
       final Long lineId,
       final Long upStationId,
       final Long downStationId,
       final int distance
   ) {
     final var line = lineRepository.findById(lineId)
-        .orElseThrow(() -> new RuntimeException("노선 정보를 찾을 수 없습니다."));
+        .orElseThrow(() -> new BusinessException("노선 정보를 찾을 수 없습니다."));
     final var section = new Section(upStationId, downStationId, distance);
 
     line.addSection(section);
 
-    sectionRepository.save(section);
+    return SectionResponse.from(sectionRepository.save(section));
+  }
+
+  @Transactional
+  public void deleteSection(
+      final Long lineId,
+      final Long sectionId
+  ) {
+    final var line = lineRepository.findById(lineId)
+        .orElseThrow(() -> new BusinessException("노선 정보를 찾을 수 없습니다."));
+
+    final var section = sectionRepository.findById(sectionId)
+        .orElseThrow(() -> new BusinessException("구간 정보를 찾을 수 없습니다."));
+    line.removeSection(section);
+
+    sectionRepository.deleteById(sectionId);
   }
 
 }

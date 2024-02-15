@@ -47,6 +47,10 @@ public class Section {
   protected Section() {
   }
 
+  public Long getId() {
+    return id;
+  }
+
   public Long getUpStationId() {
     return upStationId;
   }

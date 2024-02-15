@@ -3,7 +3,6 @@ package subway;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -347,11 +346,12 @@ public class LineAcceptanceTest extends AcceptanceTest {
       final var 강남역 = StationFixture.createStation("강남역");
       final var 논현역 = StationFixture.createStation("논현역");
       final var line = LineFixture.createLine("신분당선", "bg-red-600", 청계산입구역.getId(), 강남역.getId(), 10);
+      final var newSection = SectionFixture.createSection(line.getId(), 강남역.getId(), 논현역.getId(), 10);
 
       // when
       final var response = RestAssured
           .given().log().all()
-          .queryParam("stationId", 논현역.getId())
+          .queryParam("sectionId", newSection.getId())
           .contentType(MediaType.APPLICATION_JSON_VALUE)
           .when().delete("/lines/{id}/sections", line.getId())
           .then().log().all()
@@ -385,7 +385,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
       // when
       final var response = RestAssured
           .given().log().all()
-          .queryParam("stationId", 논현역.getId())
+          .queryParam("sectionId", 1)
           .contentType(MediaType.APPLICATION_JSON_VALUE)
           .when().delete("/lines/{id}/sections", line.getId())
           .then().log().all()
@@ -409,11 +409,12 @@ public class LineAcceptanceTest extends AcceptanceTest {
       final var 청계산입구역 = StationFixture.createStation("청계산입구역");
       final var 강남역 = StationFixture.createStation("강남역");
       final var line = LineFixture.createLine("신분당선", "bg-red-600", 청계산입구역.getId(), 강남역.getId(), 10);
+      final var sectionId = 1;
 
       // when
       final var response = RestAssured
           .given().log().all()
-          .queryParam("stationId", 강남역.getId())
+          .queryParam("sectionId", sectionId)
           .contentType(MediaType.APPLICATION_JSON_VALUE)
           .when().delete("/lines/{id}/sections", line.getId())
           .then().log().all()
