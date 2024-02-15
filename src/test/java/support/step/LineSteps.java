@@ -16,9 +16,9 @@ public class LineSteps {
     public static final String ID = "id";
     public static final String COLOR = "color";
 
-    public static ExtractableResponse<Response> 지하철_노선_생성_요청(Map<String, Object> request) {
+    public static ExtractableResponse<Response> 지하철_노선_생성_요청(Map<String, Object> body) {
         return RestAssured.given().log().all()
-            .body(request)
+            .body(body)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .when().post(LINE_BASE_PATH)
             .then().log().all()

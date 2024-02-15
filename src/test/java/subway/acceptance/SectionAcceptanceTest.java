@@ -9,7 +9,11 @@
 //import org.junit.jupiter.api.Test;
 //import org.springframework.http.HttpStatus;
 //import support.annotation.AcceptanceTest;
+//import support.step.SectionSteps;
 //import static org.assertj.core.api.Assertions.assertThat;
+//import static support.fixture.LineFixture.이호선_생성;
+//import static support.step.LineSteps.지하철_노선_생성_요청;
+//import static support.step.LineSteps.지하철_노선_응답에서_아이디_추출;
 //
 //// 윤태한님, 이주오님
 //
@@ -29,10 +33,12 @@
 //    @Test
 //    void createSection() {
 //        // given
-//        var 이호선 = LineFixture.save(이호선_Fixture).as(LineResponse.class);
+//        Long 이호선_아이디 = 지하철_노선_응답에서_아이디_추출(지하철_노선_생성_요청(이호선_생성()));
 //
 //        // when
-//        ExtractableResponse<Response> response = SectionFixture.save(이호선.getId(), 강남역_선릉역_구간_Fixture);// then
+//        ExtractableResponse<Response> response = SectionSteps.지하철_구간_생성_요청(이호선_아이디, SectionFixture.구간_생성(
+//
+//        ))
 //        var 강남_선릉_구간 = response.as(SectionResponse.class);
 //
 //        // then

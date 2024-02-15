@@ -7,7 +7,8 @@ import static support.fixture.LineFixture.이호선;
 import static support.fixture.LineFixture.이호선_생성;
 import static support.fixture.LineFixture.일호선;
 import static support.fixture.LineFixture.일호선_생성;
-import static support.fixture.StationFixture.*;
+import static support.fixture.StationFixture.강남역_생성;
+import static support.fixture.StationFixture.교대역_생성;
 import static support.step.LineSteps.지하철_노선_단일_조회_요청;
 import static support.step.LineSteps.지하철_노선_목록_조회_요청;
 import static support.step.LineSteps.지하철_노선_삭제_요청;
@@ -28,7 +29,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import support.annotation.AcceptanceTest;
-import support.fixture.StationFixture;
 
 @DisplayName("지하철 노선 관련 기능")
 @AcceptanceTest
@@ -42,14 +42,17 @@ class LineAcceptanceTest {
 
 
     /**
-     * Given 지하철 역이 2개 존재하고 When 지하철 노선을 생성하면 Then 지하철 노선이 생성된다. Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
+     * Given 지하철 역이 2개 존재하고
+     * When 지하철 노선을 생성하면
+     * Then 지하철 노선이 생성된다.
+     * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
      */
     @DisplayName("지하철 노선을 생성한다.")
     @Test
     void createLine() {
         // given
-        var 강남역_아이디 = 지하철역_응답에서_아이디_추출(지하철_역_생성_요청(강남역_생성()));
-        var 교대역_아이디 = 지하철역_응답에서_아이디_추출(지하철_역_생성_요청(교대역_생성()));
+        Long 강남역_아이디 = 지하철역_응답에서_아이디_추출(지하철_역_생성_요청(강남역_생성()));
+        Long 교대역_아이디 = 지하철역_응답에서_아이디_추출(지하철_역_생성_요청(교대역_생성()));
 
         // when
         ExtractableResponse<Response> 지하철_라인_생성_응답 = 지하철_노선_생성_요청(
@@ -103,7 +106,7 @@ class LineAcceptanceTest {
     @Test
     void getLine() {
         // given
-        var 일호선_아이디 = 지하철_노선_응답에서_아이디_추출(지하철_노선_생성_요청(일호선_생성()));
+        Long 일호선_아이디 = 지하철_노선_응답에서_아이디_추출(지하철_노선_생성_요청(일호선_생성()));
 
         // when
         ExtractableResponse<Response> 지하철_노선_단일_조희_응답 = 지하철_노선_단일_조회_요청(일호선_아이디);
@@ -125,7 +128,7 @@ class LineAcceptanceTest {
     @Test
     void updateLine() {
         // given
-        var 일호선_아이디 = 지하철_노선_응답에서_아이디_추출(지하철_노선_생성_요청(일호선_생성()));
+        Long 일호선_아이디 = 지하철_노선_응답에서_아이디_추출(지하철_노선_생성_요청(일호선_생성()));
         // when
         ExtractableResponse<Response> 지하철_노선_수정_응답 = 지하철_노선_수정_요청(일호선_아이디, 노선_수정(LINE_TWO, COLOR_TWO));
 
@@ -148,7 +151,7 @@ class LineAcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        var 일호선_아이디 = 지하철_노선_응답에서_아이디_추출(지하철_노선_생성_요청(일호선_생성()));
+        Long 일호선_아이디 = 지하철_노선_응답에서_아이디_추출(지하철_노선_생성_요청(일호선_생성()));
 
         // when
         ExtractableResponse<Response> 지하철_노선_삭제_응답 = 지하철_노선_삭제_요청(일호선_아이디);

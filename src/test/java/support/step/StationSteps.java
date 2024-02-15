@@ -24,9 +24,9 @@ public class StationSteps {
     }
 
 
-    public static ExtractableResponse<Response> 지하철_역_생성_요청(Map<String, String> request) {
+    public static ExtractableResponse<Response> 지하철_역_생성_요청(Map<String, Object> body) {
         return RestAssured.given()
-            .body(request)
+            .body(body)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .when().post(STATION_BASE_PATH)
             .then()
