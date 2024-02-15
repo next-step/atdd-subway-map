@@ -1,4 +1,4 @@
-package subway.line;
+package subway.acceptance;
 
 import java.util.List;
 import java.util.Optional;

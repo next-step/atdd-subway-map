@@ -1,4 +1,4 @@
-package subway.line;
+package subway.acceptance;
 
 
 import javax.validation.constraints.NotBlank;
