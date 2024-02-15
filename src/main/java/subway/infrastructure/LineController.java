@@ -6,6 +6,7 @@ import subway.application.LineService;
 import subway.application.dto.LineCreateRequest;
 import subway.application.dto.LineResponse;
 import subway.application.dto.LineUpdateRequest;
+import subway.application.dto.SectionCreateRequest;
 
 import java.net.URI;
 import java.util.List;
@@ -25,17 +26,17 @@ public class LineController {
 
     @GetMapping(value = "/lines")
     public ResponseEntity<List<LineResponse>> showLines() {
-        return ResponseEntity.ok().body(lineService.findAllLines());
+        return ResponseEntity.ok().body(lineService.showLines());
     }
 
     @GetMapping(value = "/lines/{id}")
     public ResponseEntity<LineResponse> showLine(@PathVariable Long id) {
-        return ResponseEntity.ok().body(lineService.findLineById(id));
+        return ResponseEntity.ok().body(lineService.findById(id));
     }
 
     @PutMapping(value = "/lines/{id}")
     public ResponseEntity<LineResponse> updateLine(@PathVariable Long id, @RequestBody LineUpdateRequest lineRequest) {
-        lineService.updateLineById(id, lineRequest);
+        lineService.updateLine(id, lineRequest);
         return ResponseEntity.ok().build();
     }
 
@@ -43,5 +44,11 @@ public class LineController {
     public ResponseEntity<Void> deleteLine(@PathVariable Long id) {
         lineService.deleteLineById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/lines/{lineId}/sections")
+    public ResponseEntity<Void> addSection(@PathVariable Long lineId, @RequestBody SectionCreateRequest request) {
+        lineService.addSection(lineId, request);
+        return ResponseEntity.created(URI.create("/lines/" + lineId + "/sections")).build();
     }
 }

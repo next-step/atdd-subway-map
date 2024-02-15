@@ -1,40 +1,63 @@
 package subway.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.AccessLevel;
-
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-@Getter
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Line {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 20, nullable = false)
     private String name;
-
-    @Column(length = 20, nullable = false)
     private String color;
 
-    @Column(nullable = false)
-    private Long upStationId;
+    @OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
+    private List<Section> sections = new ArrayList<>();
 
-    @Column(nullable = false)
-    private Long downStationId;
 
-    @Column(nullable = false)
-    private Integer distance;
+    public Line() {
+    }
 
-    public void updateLine(final String name, final String color) {
+    public Line(String name, String color) {
         this.name = name;
         this.color = color;
+    }
+
+    // Test1 : Test 의존적인 생성자 추가
+    public Line(Long id, String name, String color) {
+        this.id = id;
+        this.name = name;
+        this.color = color;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public List<Section> getSections() {
+        return sections;
+    }
+
+    public void update(final String name, final String color) {
+        if (name != null) {
+            this.name = name;
+        }
+        if (color != null) {
+            this.color = color;
+        }
+    }
+
+    public void addSection(Station upStation, Station downStation, int distance) {
+        this.sections.add(new Section(this, upStation, downStation, distance));
     }
 }
