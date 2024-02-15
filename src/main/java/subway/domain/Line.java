@@ -57,7 +57,29 @@ public class Line {
         }
     }
 
+//    새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 한다.
+//    이미 해당 노선에 등록되어있는 역은 새로운 구간의 하행역이 될 수 없다.
     public void addSection(Station upStation, Station downStation, int distance) {
-        this.sections.add(new Section(this, upStation, downStation, distance));
+        if (sections.size() == 0) {
+            sections.add(new Section(this, upStation, downStation, distance));
+            return;
+        }
+        if (!sections.get(sections.size() - 1).getDownStationId().getId().equals(upStation.getId())) {
+            throw new RuntimeException("상행역은 해당 노선에 등록되어있는 하행 종점역이어야 합니다.");
+        }
+        if (sections.stream().anyMatch(section -> section.getUpStationId().getId().equals(upStation.getId()) || section.getDownStationId().getId().equals(downStation.getId()))) {
+            throw new RuntimeException("이미 해당 노선에 등록되어있는 역은 새로운 구간의 하행역이 될 수 없습니다.");
+        }
+        sections.add(new Section(this, upStation, downStation, distance));
+    }
+
+    public void deleteSection(Long stationId) {
+        if (sections.size() < 2) {
+            throw new RuntimeException("노선에는 두개 이상의 구간이 존재해야 합니다.");
+        }
+        if (!sections.get(sections.size() - 1).getDownStationId().getId().equals(stationId)) {
+            throw new RuntimeException("하행 종점역을 찾을 수 없거나 마지막 종점역만 제거할 수 있습니다.");
+        }
+        sections.remove(sections.size() - 1);
     }
 }

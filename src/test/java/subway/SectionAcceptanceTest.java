@@ -3,12 +3,15 @@ package subway;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import subway.application.dto.LineResponse;
 import subway.application.dto.StationResponse;
 import subway.fixture.LineFixture;
@@ -21,7 +24,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("구간 관리 관련 기능")
 @SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
+@ActiveProfiles("acceptance")
 public class SectionAcceptanceTest {
+    @Autowired
+    private DatabaseCleanup databaseCleanup;
+
+    @BeforeEach
+    void setUp() {
+        databaseCleanup.execute();
+    }
 
   /**
    * Given 지하철 노선이 생성을 요청 하고
@@ -83,7 +94,7 @@ public class SectionAcceptanceTest {
         // when
         ExtractableResponse<Response> response = RestAssured
             .given().contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().delete("/lines/{lineId}/sections?stationId={stationId}", 이호선, 역삼역)
+            .when().delete("/lines/{lineId}/sections?stationId={stationId}", 이호선, 선릉역)
             .then().extract();
 
         // then

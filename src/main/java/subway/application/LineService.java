@@ -74,6 +74,7 @@ public class LineService {
                 .build();
     }
 
+    @Transactional
     public void addSection(Long lineId, SectionCreateRequest request) {
         Line line = lineRepository.findById(lineId)
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 노선입니다."));
@@ -83,5 +84,13 @@ public class LineService {
                 stationRepository.findById(request.getDownStationId())
                         .orElseThrow(() -> new RuntimeException("존재하지 않는 역입니다.")),
                 request.getDistance());
+    }
+
+    @Transactional
+    public void deleteSection(Long lineId, Long stationId) {
+        Line line = lineRepository.findById(lineId)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 노선입니다."));
+
+        line.deleteSection(stationId);
     }
 }
