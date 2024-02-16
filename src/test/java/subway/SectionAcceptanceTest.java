@@ -60,6 +60,30 @@ public class SectionAcceptanceTest {
     /**
      * Given 지하철 노선이 생성을 요청 하고
      * Given 지하철 노선에 새로운 구간 추가를 요청 하고
+     * When 새로운 구간의 상행역이 해당 노선에 등록되어있는 하행 종점역이 아니면
+     * Then 구간이 추가되지 않는다.
+     */
+    @DisplayName("새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 한다.")
+    @Test
+    void createSectionWithInvalidUpStation() {
+        // given
+        Long 강남역 = 지하철역_생성_요청("강남역");
+        Long 역삼역 = 지하철역_생성_요청("역삼역");
+        Long 선릉역 = 지하철역_생성_요청("선릉역");
+        Long 삼성역 = 지하철역_생성_요청("삼성역");
+
+        Long 이호선 = 지하철노선_생성_요청(강남역, 역삼역);
+
+        // when
+        ExtractableResponse<Response> response = 지하철구간_생성_요청(삼성역, 강남역, 이호선);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    /**
+     * Given 지하철 노선이 생성을 요청 하고
+     * Given 지하철 노선에 새로운 구간 추가를 요청 하고
      * When 지하철 노선에 구간 제거를 요청 하면
      * Then 노선에 구간이 제거된다.
      */
