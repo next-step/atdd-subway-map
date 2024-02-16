@@ -47,9 +47,14 @@ public class LineService {
                 .collect(Collectors.toList());
     }
 
-    public LineResponse findById(Long id) {
+    public LineResponse fineLineResponseById(Long id) {
         return lineRepository.findById(id)
                 .map(this::createLineResponse)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 노선입니다."));
+    }
+
+    public Line findById(Long id) {
+        return lineRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 노선입니다."));
     }
 

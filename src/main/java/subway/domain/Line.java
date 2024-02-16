@@ -74,8 +74,11 @@ public class Line {
     }
 
     public void deleteSection(Long stationId) {
-        if (sections.size() < 2) {
-            throw new RuntimeException("노선에는 두개 이상의 구간이 존재해야 합니다.");
+        if (sections.size() == 0) {
+            throw new RuntimeException("노선에는 구간이 존재해야 합니다.");
+        }
+        if (sections.size() == 1) {
+            throw new RuntimeException("상행 종점역과 하행 종점역만 있는 경우(구간이 1개인 경우) 역을 삭제할 수 없습니다.");
         }
         if (!sections.get(sections.size() - 1).getDownStationId().getId().equals(stationId)) {
             throw new RuntimeException("하행 종점역을 찾을 수 없거나 마지막 종점역만 제거할 수 있습니다.");
