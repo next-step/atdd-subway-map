@@ -25,13 +25,6 @@ public class Line {
         this.color = color;
     }
 
-    // Test1 : Test 의존적인 생성자 추가
-    public Line(Long id, String name, String color) {
-        this.id = id;
-        this.name = name;
-        this.color = color;
-    }
-
     public Long getId() {
         return id;
     }
