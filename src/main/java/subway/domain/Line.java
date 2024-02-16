@@ -60,7 +60,7 @@ public class Line {
 //    새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 한다.
 //    이미 해당 노선에 등록되어있는 역은 새로운 구간의 하행역이 될 수 없다.
     public void addSection(Station upStation, Station downStation, int distance) {
-        if (sections.size() == 0) {
+        if (sections.isEmpty()) {
             sections.add(new Section(this, upStation, downStation, distance));
             return;
         }
@@ -74,7 +74,7 @@ public class Line {
     }
 
     public void deleteSection(Long stationId) {
-        if (sections.size() == 0) {
+        if (sections.isEmpty()) {
             throw new RuntimeException("노선에는 구간이 존재해야 합니다.");
         }
         if (sections.size() == 1) {
