@@ -35,45 +35,36 @@ public class SectionAcceptanceTest {
         databaseCleanup.execute();
     }
 
-  /**
-   * Given 지하철 노선이 생성을 요청 하고
-   * When 지하철 노선에 새로운 구간 추가를 요청 하면
-   * Then 노선에 새로운 구간이 추가된다.
-   */
-  @DisplayName("구간을 등록한다.")
-  @Test
-  void createSection() {
-    // given
-    Long 강남역 = 지하철역_생성_요청("강남역");
-    Long 역삼역 = 지하철역_생성_요청("역삼역");
-    Long 선릉역 = 지하철역_생성_요청("선릉역");
+    /**
+     * Given 지하철 노선이 생성을 요청 하고
+     * When 지하철 노선에 새로운 구간 추가를 요청 하면
+     * Then 노선에 새로운 구간이 추가된다.
+     */
+    @DisplayName("구간을 등록한다.")
+    @Test
+    void createSection() {
+        // given
+        Long 강남역 = 지하철역_생성_요청("강남역");
+        Long 역삼역 = 지하철역_생성_요청("역삼역");
+        Long 선릉역 = 지하철역_생성_요청("선릉역");
 
-    Long 이호선 = 지하철노선_생성_요청(강남역, 역삼역);
+        Long 이호선 = 지하철노선_생성_요청(강남역, 역삼역);
 
-    // when
-    Map<String, Object> params = new HashMap<>();
-    params.put("upStationId", 역삼역);
-    params.put("downStationId", 선릉역);
-    params.put("distance", 10);
+        // when
+        ExtractableResponse<Response> response = 지하철구간_생성_요청(역삼역, 선릉역, 이호선);
 
-    ExtractableResponse<Response> response = RestAssured
-        .given().body(params)
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when().post("/lines/{lineId}/sections", 이호선)
-        .then().extract();
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+    }
 
-    // then
-    assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-  }
-
-  /**
-   * Given 지하철 노선이 생성을 요청 하고
-   * Given 지하철 노선에 새로운 구간 추가를 요청 하고
-   * When 지하철 노선에 구간 제거를 요청 하면
-   * Then 노선에 구간이 제거된다.
-   */
-  @DisplayName("구간을 제거한다.")
-  @Test
+    /**
+     * Given 지하철 노선이 생성을 요청 하고
+     * Given 지하철 노선에 새로운 구간 추가를 요청 하고
+     * When 지하철 노선에 구간 제거를 요청 하면
+     * Then 노선에 구간이 제거된다.
+     */
+    @DisplayName("구간을 제거한다.")
+    @Test
     void deleteSection() {
         // given
         Long 강남역 = 지하철역_생성_요청("강남역");
@@ -82,37 +73,43 @@ public class SectionAcceptanceTest {
 
         Long 이호선 = 지하철노선_생성_요청(강남역, 역삼역);
 
-        Map<String, Object> params = new HashMap<>();
-        params.put("upStationId", 역삼역);
-        params.put("downStationId", 선릉역);
-        params.put("distance", 10);
-
-        RestAssured.given().body(params)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().post("/lines/{lineId}/sections", 이호선)
-            .then().extract();
+        지하철구간_생성_요청(역삼역, 선릉역, 이호선);
 
         // when
         ExtractableResponse<Response> response = RestAssured
-            .given().contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().delete("/lines/{lineId}/sections?stationId={stationId}", 이호선, 선릉역)
-            .then().extract();
+                .given().contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().delete("/lines/{lineId}/sections?stationId={stationId}", 이호선, 선릉역)
+                .then().extract();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
-  private static Long 지하철노선_생성_요청(Long 상행역, Long 하행역) {
-    Map<String, Object> params = new HashMap<>();
-    params.put("name", "2호선");
-    params.put("color", "bg-green-600");
-    params.put("upStationId", 상행역);
-    params.put("downStationId", 하행역);
-    params.put("distance", 10);
-    return LineFixture.지하철노선_생성_요청(params).as(LineResponse.class).getId();
-  }
+    private static ExtractableResponse<Response> 지하철구간_생성_요청(Long upStationId, Long downStationId, Long lineId) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("upStationId", upStationId);
+        params.put("downStationId", downStationId);
+        params.put("distance", 10);
 
-  private static Long 지하철역_생성_요청(String name) {
-    return StationFixture.지하철역_생성_요청(name).as(StationResponse.class).getId();
-  }
+        ExtractableResponse<Response> response = RestAssured
+                .given().body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines/{lineId}/sections", lineId)
+                .then().extract();
+        return response;
+    }
+
+    private static Long 지하철노선_생성_요청(Long 상행역, Long 하행역) {
+        return LineFixture.지하철노선_생성_요청(Map.of(
+                "name", "이호선",
+                "color", "green",
+                "upStationId", 상행역,
+                "downStationId", 하행역,
+                "distance", 10
+        )).as(LineResponse.class).getId();
+    }
+
+    private static Long 지하철역_생성_요청(String name) {
+        return StationFixture.지하철역_생성_요청(name).as(StationResponse.class).getId();
+    }
 }
