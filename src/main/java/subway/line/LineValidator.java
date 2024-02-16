@@ -32,7 +32,7 @@ public class LineValidator {
       throw new BusinessException("노선의 마지막 구간만 제거할 수 있습니다.");
     }
 
-    // 이미 해당 노선에 등록되어있는 역은 새로운 구간의 하행역이 될 수 없다.
+    // 대상 구간이 노선의 유일한 구간인 경우 삭제할 수 없다.
     if (line.getSections().size() == 1) {
       throw new BusinessException("노선에 구간이 최소 하나 이상 존재해야 합니다.");
     }
