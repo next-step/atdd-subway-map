@@ -132,6 +132,47 @@ public class SectionAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
+    @DisplayName("지하철 노선에 등록된 역(하행 종점역)만 제거할 수 있다. 즉, 마지막 구간만 제거할 수 있다.")
+    @Test
+    void deleteSectionWithInvalidStation() {
+        // given
+        Long 강남역 = 지하철역_생성_요청("강남역");
+        Long 역삼역 = 지하철역_생성_요청("역삼역");
+        Long 선릉역 = 지하철역_생성_요청("선릉역");
+
+        Long 이호선 = 지하철노선_생성_요청(강남역, 역삼역);
+
+        지하철구간_생성_요청(역삼역, 선릉역, 이호선);
+
+        // when
+        ExtractableResponse<Response> response = RestAssured
+                .given().contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().delete("/lines/{lineId}/sections?stationId={stationId}", 이호선, 역삼역)
+                .then().extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @DisplayName("지하철 노선에 상행 종점역과 하행 종점역만 있는 경우(구간이 1개인 경우) 역을 삭제할 수 없다.")
+    @Test
+    void deleteSectionWithInvalidSize() {
+        // given
+        Long 강남역 = 지하철역_생성_요청("강남역");
+        Long 역삼역 = 지하철역_생성_요청("역삼역");
+
+        Long 이호선 = 지하철노선_생성_요청(강남역, 역삼역);
+
+        // when
+        ExtractableResponse<Response> response = RestAssured
+                .given().contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().delete("/lines/{lineId}/sections?stationId={stationId}", 이호선, 역삼역)
+                .then().extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
     private static ExtractableResponse<Response> 지하철구간_생성_요청(Long upStationId, Long downStationId, Long lineId) {
         Map<String, Object> params = new HashMap<>();
         params.put("upStationId", upStationId);
