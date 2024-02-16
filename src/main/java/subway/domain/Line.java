@@ -57,10 +57,10 @@ public class Line {
             sections.add(new Section(this, upStation, downStation, distance));
             return;
         }
-        if (!sections.get(sections.size() - 1).getDownStationId().getId().equals(upStation.getId())) {
+        if (!sections.get(sections.size() - 1).getDownStation().getId().equals(upStation.getId())) {
             throw new RuntimeException("상행역은 해당 노선에 등록되어있는 하행 종점역이어야 합니다.");
         }
-        if (sections.stream().anyMatch(section -> section.getUpStationId().getId().equals(upStation.getId()) || section.getDownStationId().getId().equals(downStation.getId()))) {
+        if (sections.stream().anyMatch(section -> section.getUpStationId().getId().equals(upStation.getId()) || section.getDownStation().getId().equals(downStation.getId()))) {
             throw new RuntimeException("이미 해당 노선에 등록되어있는 역은 새로운 구간의 하행역이 될 수 없습니다.");
         }
         sections.add(new Section(this, upStation, downStation, distance));
@@ -73,7 +73,7 @@ public class Line {
         if (sections.size() == 1) {
             throw new RuntimeException("상행 종점역과 하행 종점역만 있는 경우(구간이 1개인 경우) 역을 삭제할 수 없습니다.");
         }
-        if (!sections.get(sections.size() - 1).getDownStationId().getId().equals(stationId)) {
+        if (!sections.get(sections.size() - 1).getDownStation().getId().equals(stationId)) {
             throw new RuntimeException("하행 종점역을 찾을 수 없거나 마지막 종점역만 제거할 수 있습니다.");
         }
         sections.remove(sections.size() - 1);

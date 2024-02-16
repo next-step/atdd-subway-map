@@ -10,11 +10,11 @@ public class Section {
 
     @ManyToOne
     @JoinColumn(name = "up_station_id")
-    private Station upStationId;
+    private Station upStation;
 
     @ManyToOne
     @JoinColumn(name = "down_station_id")
-    private Station downStationId;
+    private Station downStation;
     private int distance;
 
     @ManyToOne
@@ -26,8 +26,8 @@ public class Section {
 
     public Section(Line line, Station upStation, Station downStation, int distance) {
         this.line = line;
-        this.upStationId = upStation;
-        this.downStationId = downStation;
+        this.upStation = upStation;
+        this.downStation = downStation;
         this.distance = distance;
     }
 
@@ -36,11 +36,11 @@ public class Section {
     }
 
     public Station getUpStationId() {
-        return upStationId;
+        return upStation;
     }
 
-    public Station getDownStationId() {
-        return downStationId;
+    public Station getDownStation() {
+        return downStation;
     }
 
     public int getDistance() {
