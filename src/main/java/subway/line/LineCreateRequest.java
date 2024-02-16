@@ -2,23 +2,15 @@ package subway.line;
 
 public class LineCreateRequest {
 
-  private final String name;
+  private String name;
 
-  private final String color;
+  private String color;
 
-  private final Long upStationId;
+  private Long upStationId;
 
-  private final Long downStationId;
+  private Long downStationId;
 
-  private final int distance;
-
-  public LineCreateRequest(String name, String color, Long upStationId, Long downStationId, Integer distance) {
-    this.name = name;
-    this.color = color;
-    this.upStationId = upStationId;
-    this.downStationId = downStationId;
-    this.distance = distance;
-  }
+  private int distance;
 
   public String getName() {
     return name;
@@ -32,13 +24,14 @@ public class LineCreateRequest {
     return downStationId;
   }
 
+  public int getDistance() {
+    return distance;
+  }
+
   public Line to() {
     return new Line(
         this.name,
-        this.color,
-        this.upStationId,
-        this.downStationId,
-        this.distance
+        this.color
     );
   }
 

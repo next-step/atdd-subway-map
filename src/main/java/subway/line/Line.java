@@ -20,27 +20,15 @@ public class Line {
   @Column(length = 20, nullable = false)
   private String name;
 
-  @Column(length = 20, nullable = false)
+  @Column(length = 20)
   private String color;
-
-  @Column
-  private Long upStationId;
-
-  @Column
-  private Long downStationId;
-
-  @Column(nullable = false)
-  private int distance;
 
   @OneToMany(mappedBy = "line", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, orphanRemoval = true)
   private List<Section> sections = new ArrayList<>();
 
-  public Line(String name, String color, Long upStationId, Long downStationId, int distance) {
+  public Line(String name, String color) {
     this.name = name;
     this.color = color;
-    this.upStationId = upStationId;
-    this.downStationId = downStationId;
-    this.distance = distance;
   }
 
   protected Line() {
@@ -58,18 +46,6 @@ public class Line {
     return color;
   }
 
-  public Long getUpStationId() {
-    return upStationId;
-  }
-
-  public Long getDownStationId() {
-    return downStationId;
-  }
-
-  public int getDistance() {
-    return distance;
-  }
-
   public List<Section> getSections() {
     return sections;
   }
@@ -85,17 +61,12 @@ public class Line {
       LineValidator.checkSectionForAddition(this, section);
     }
 
-    this.downStationId = section.getDownStationId();
-    this.distance += section.getDistance();
     this.sections.add(section);
     section.registerLine(this);
   }
 
   public void removeSection(final Section section) {
     LineValidator.checkSectionForRemove(this, section);
-
-    this.downStationId = section.getUpStationId();
-    this.distance -= section.getDistance();
     this.sections.remove(section);
   }
 

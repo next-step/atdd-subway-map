@@ -2,15 +2,9 @@ package subway.line;
 
 public class SectionCreateRequest {
 
-  private final Long downStationId;
-  private final Long upStationId;
-  private final int distance;
-
-  public SectionCreateRequest(Long downStationId, Long upStationId, int distance) {
-    this.downStationId = downStationId;
-    this.upStationId = upStationId;
-    this.distance = distance;
-  }
+  private Long downStationId;
+  private Long upStationId;
+  private int distance;
 
   public Long getDownStationId() {
     return downStationId;

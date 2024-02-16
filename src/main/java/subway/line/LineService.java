@@ -1,10 +1,8 @@
 package subway.line;
 
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.common.BusinessException;
@@ -16,16 +14,13 @@ import subway.station.StationService;
 public class LineService {
 
   private final LineRepository lineRepository;
-  private final SectionRepository sectionRepository;
   private final StationService stationService;
 
   public LineService(
       final LineRepository lineRepository,
-      final SectionRepository sectionRepository,
       final StationService stationService
   ) {
     this.lineRepository = lineRepository;
-    this.sectionRepository = sectionRepository;
     this.stationService = stationService;
   }
 
@@ -37,39 +32,23 @@ public class LineService {
         .orElseThrow(() -> new RuntimeException("하행역 정보를 찾을 수 없습니다."));
 
     final var line = lineRepository.save(request.to());
-    this.saveSection(line.getId(), upStation.getId(), downStation.getId(), line.getDistance());
+    this.saveSection(line.getId(), upStation.getId(), downStation.getId(), request.getDistance());
 
     return LineResponse.from(line, upStation, downStation);
   }
 
   public List<LineResponse> findAllLines() {
-    // TODO fetch join
-    final var lines = lineRepository.findAll();
-    final Map<Long /* station ID */, StationResponse> stationById = stationService.findAllStations().stream()
-        .collect(Collectors.toMap(StationResponse::getId, Function.identity()));
+    final var lines = lineRepository.findAllWithSectionsUsingFetchJoin();
 
     return lines.stream()
-        .map(line -> LineResponse.from(
-            line,
-            stationById.get(line.getUpStationId()),
-            stationById.get(line.getDownStationId())
-        )).collect(Collectors.toList());
+        .map(line -> LineResponse.from(line, this.getStations(line)))
+        .collect(Collectors.toList());
   }
 
   public LineResponse findById(Long id) {
-    // TODO fetch join
-    final var line = lineRepository.findById(id)
+    final var line = lineRepository.findByIdWithSectionsUsingFetchJoin(id)
         .orElseThrow(() -> new BusinessException("노선 정보를 찾을 수 없습니다."));
-
-    final var sections = line.getSections();
-    final var stationIds = Stream.concat(
-        sections.stream()
-            .map(Section::getUpStationId),
-        sections.stream()
-            .map(Section::getDownStationId)
-    ).collect(Collectors.toSet());
-
-    final var stations = stationService.findByIds(stationIds);
+    final var stations = getStations(line);
 
     return LineResponse.from(line, stations);
   }
@@ -88,7 +67,7 @@ public class LineService {
   }
 
   @Transactional
-  public SectionResponse saveSection(
+  public void saveSection(
       final Long lineId,
       final Long upStationId,
       final Long downStationId,
@@ -99,8 +78,6 @@ public class LineService {
     final var section = new Section(null, upStationId, downStationId, distance, line);
 
     line.addSection(section);
-
-    return SectionResponse.from(sectionRepository.save(section));
   }
 
   @Transactional
@@ -108,7 +85,7 @@ public class LineService {
       final Long lineId,
       final Long stationId
   ) {
-    final var line = lineRepository.findById(lineId)
+    final var line = lineRepository.findByIdWithSectionsUsingFetchJoin(lineId)
         .orElseThrow(() -> new BusinessException("노선 정보를 찾을 수 없습니다."));
 
     final var section = line.getSections().stream()
@@ -119,4 +96,16 @@ public class LineService {
     line.removeSection(section);
   }
 
+  private List<StationResponse> getStations(Line line) {
+    if (line.getSections().isEmpty()) {
+      return Collections.emptyList();
+    }
+
+    List<Long> stationIds = line.getSections().stream()
+        .map(Section::getDownStationId)
+        .collect(Collectors.toList());
+    stationIds.add(0, line.getSections().get(0).getUpStationId());
+
+    return stationService.findByIds(stationIds);
+  }
 }

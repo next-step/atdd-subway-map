@@ -17,7 +17,6 @@ import subway.fixture.LineFixture;
 import subway.fixture.SectionFixture;
 import subway.fixture.StationFixture;
 import subway.line.LineResponse;
-import subway.line.LineUpdateRequest;
 import subway.station.StationResponse;
 
 @DisplayName("지하철 노선 관련 기능")
@@ -154,12 +153,11 @@ public class LineAcceptanceTest extends AcceptanceTest {
       final var upStation = StationFixture.createStation("강남역");
       final var downStation = StationFixture.createStation("청계산입구역");
       final var createdLine = LineFixture.createLine("신분당선", "bg-red-600", upStation.getId(), downStation.getId(), 10);
-      final var updateParam = new LineUpdateRequest("2호선", "bg-green-800");
 
       // when
       Map<String, Object> params = new HashMap<>();
-      params.put("name", updateParam.getName());
-      params.put("color", updateParam.getColor());
+      params.put("name", "2호선");
+      params.put("color", "bg-green-800");
 
       final var response = RestAssured
           .given().log().all()
@@ -178,8 +176,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
       // then
       assertThat(line.isPresent()).isTrue();
-      assertThat(line.get().getName()).isEqualTo(updateParam.getName());
-      assertThat(line.get().getColor()).isEqualTo(updateParam.getColor());
+      assertThat(line.get().getName()).isEqualTo("2호선");
+      assertThat(line.get().getColor()).isEqualTo("bg-green-800");
     }
 
     /**
@@ -257,12 +255,10 @@ public class LineAcceptanceTest extends AcceptanceTest {
           .map(StationResponse::getId)
           .collect(Collectors.toList());
 
-      assertThat(stationIds).containsAll(
-          List.of(
-              upStation.getId(),
-              downStation.getId(),
-              newStation.getId()
-          )
+      assertThat(stationIds).containsExactly(
+          upStation.getId(),
+          downStation.getId(),
+          newStation.getId()
       );
     }
 
