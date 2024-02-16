@@ -3,6 +3,8 @@ package subway;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.restassured.RestAssured;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -39,20 +41,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
       final var downStation = StationFixture.createStation("청계산입구역");
 
       // when
-      Map<String, Object> params = new HashMap<>();
-      params.put("name", lineName);
-      params.put("color", "bg-red-600");
-      params.put("upStationId", upStation.getId());
-      params.put("downStationId", downStation.getId());
-      params.put("distance", 10);
-
-      final var response = RestAssured
-          .given().log().all()
-          .body(params)
-          .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .when().post("/lines")
-          .then().log().all()
-          .extract();
+      final var response = createLineRequest(lineName, upStation, downStation);
 
       final var line = LineFixture.getLines().stream()
           .filter(it -> lineName.equals(it.getName()))
@@ -93,12 +82,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
       );
 
       // when
-      final var response = RestAssured
-          .given().log().all()
-          .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .when().get("/lines")
-          .then().log().all()
-          .extract();
+      final var response = getLinesRequest();
 
       final var lineIds = response.jsonPath().getList("id", Long.class);
 
@@ -125,12 +109,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
       final var createdLine = LineFixture.createLine("신분당선", "bg-red-600", upStation.getId(), downStation.getId(), 10);
 
       // when
-      final var response = RestAssured
-          .given().log().all()
-          .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .when().get("/lines/{id}", createdLine.getId())
-          .then().log().all()
-          .extract();
+      final var response = getLineRequest(createdLine);
 
       final var line = response.as(LineResponse.class);
 
@@ -159,13 +138,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
       params.put("name", "2호선");
       params.put("color", "bg-green-800");
 
-      final var response = RestAssured
-          .given().log().all()
-          .body(params)
-          .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .when().put("/lines/{id}", createdLine.getId())
-          .then().log().all()
-          .extract();
+      final var response = updateLineRequest(createdLine, params);
 
       final var line = LineFixture.getLines().stream()
           .filter(it -> createdLine.getId().equals(it.getId()))
@@ -194,12 +167,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
       final var deletedLine = LineFixture.createLine("신분당선", "bg-red-600", upStation.getId(), downStation.getId(), 10);
 
       // when
-      final var response = RestAssured
-          .given().log().all()
-          .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .when().delete("/lines/{id}", deletedLine.getId())
-          .then().log().all()
-          .extract();
+      final var response = deleteLineRequest(deletedLine);
 
       final var remainingLineIds = LineFixture.getLines().stream()
           .map(LineResponse::getId)
@@ -212,6 +180,64 @@ public class LineAcceptanceTest extends AcceptanceTest {
       assertThat(deletedLine.getId()).isNotIn(remainingLineIds);
     }
 
+    private ExtractableResponse<Response> createLineRequest(
+        final String lineName,
+        final StationResponse upStation,
+        final StationResponse downStation
+    ) {
+      Map<String, Object> params = new HashMap<>();
+      params.put("name", lineName);
+      params.put("color", "bg-red-600");
+      params.put("upStationId", upStation.getId());
+      params.put("downStationId", downStation.getId());
+      params.put("distance", 10);
+
+      final var response = RestAssured
+          .given().log().all()
+          .body(params)
+          .contentType(MediaType.APPLICATION_JSON_VALUE)
+          .when().post("/lines")
+          .then().log().all()
+          .extract();
+      return response;
+    }
+
+    private ExtractableResponse<Response> getLinesRequest() {
+      return RestAssured
+          .given().log().all()
+          .contentType(MediaType.APPLICATION_JSON_VALUE)
+          .when().get("/lines")
+          .then().log().all()
+          .extract();
+    }
+
+    private ExtractableResponse<Response> getLineRequest(LineResponse createdLine) {
+      return RestAssured
+          .given().log().all()
+          .contentType(MediaType.APPLICATION_JSON_VALUE)
+          .when().get("/lines/{id}", createdLine.getId())
+          .then().log().all()
+          .extract();
+    }
+
+    private ExtractableResponse<Response> updateLineRequest(LineResponse createdLine, Map<String, Object> params) {
+      return RestAssured
+          .given().log().all()
+          .body(params)
+          .contentType(MediaType.APPLICATION_JSON_VALUE)
+          .when().put("/lines/{id}", createdLine.getId())
+          .then().log().all()
+          .extract();
+    }
+
+    private ExtractableResponse<Response> deleteLineRequest(LineResponse deletedLine) {
+      return RestAssured
+          .given().log().all()
+          .contentType(MediaType.APPLICATION_JSON_VALUE)
+          .when().delete("/lines/{id}", deletedLine.getId())
+          .then().log().all()
+          .extract();
+    }
   }
 
   @Nested
@@ -232,18 +258,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
       final var newStation = StationFixture.createStation("논현역");
 
       // when
-      Map<String, Object> params = new HashMap<>();
-      params.put("upStationId", downStation.getId());
-      params.put("downStationId", newStation.getId());
-      params.put("distance", 10);
-
-      final var response = RestAssured
-          .given().log().all()
-          .body(params)
-          .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .when().post("/lines/{id}/sections", line.getId())
-          .then().log().all()
-          .extract();
+      final var response = createSectionRequest(downStation, line, newStation);
 
       // then
       assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -276,18 +291,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
       final var newStation = StationFixture.createStation("논현역");
 
       // when
-      Map<String, Object> params = new HashMap<>();
-      params.put("upStationId", upStation.getId());
-      params.put("downStationId", newStation.getId());
-      params.put("distance", 10);
-
-      final var response = RestAssured
-          .given().log().all()
-          .body(params)
-          .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .when().post("/lines/{id}/sections", line.getId())
-          .then().log().all()
-          .extract();
+      final var response = createSectionRequest(upStation, line, newStation);
 
       // then
       assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -310,18 +314,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
       final var line = LineFixture.createLine("신분당선", "bg-red-600", 청계산입구역.getId(), 강남역.getId(), 10);
 
       // when
-      Map<String, Object> params = new HashMap<>();
-      params.put("upStationId", 논현역.getId());
-      params.put("downStationId", 강남역.getId());
-      params.put("distance", 10);
-
-      final var response = RestAssured
-          .given().log().all()
-          .body(params)
-          .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .when().post("/lines/{id}/sections", line.getId())
-          .then().log().all()
-          .extract();
+      final var response = createSectionRequest(논현역, line, 강남역);
 
       // then
       assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -345,13 +338,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
       SectionFixture.createSection(line.getId(), 강남역.getId(), 논현역.getId(), 10);
 
       // when
-      final var response = RestAssured
-          .given().log().all()
-          .queryParam("stationId", 논현역.getId())
-          .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .when().delete("/lines/{id}/sections", line.getId())
-          .then().log().all()
-          .extract();
+      final var response = deleteSectionRequest(논현역, line);
 
       // then
       assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
@@ -379,13 +366,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
       SectionFixture.createSection(line.getId(), 강남역.getId(), 논현역.getId(), 10);
 
       // when
-      final var response = RestAssured
-          .given().log().all()
-          .queryParam("stationId", 강남역.getId())
-          .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .when().delete("/lines/{id}/sections", line.getId())
-          .then().log().all()
-          .extract();
+      final var response = deleteSectionRequest(강남역, line);
 
       // then
       assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -405,16 +386,10 @@ public class LineAcceptanceTest extends AcceptanceTest {
       final var 청계산입구역 = StationFixture.createStation("청계산입구역");
       final var 강남역 = StationFixture.createStation("강남역");
       final var line = LineFixture.createLine("신분당선", "bg-red-600", 청계산입구역.getId(), 강남역.getId(), 10);
-      final var sectionId = 1;
+      final var stationId = 1;
 
       // when
-      final var response = RestAssured
-          .given().log().all()
-          .queryParam("sectionId", sectionId)
-          .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .when().delete("/lines/{id}/sections", line.getId())
-          .then().log().all()
-          .extract();
+      final var response = deleteSectionRequest(강남역, line);
 
       // then
       assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -423,6 +398,38 @@ public class LineAcceptanceTest extends AcceptanceTest {
       // TODO 에러 응답 내용 추가
     }
 
+    private ExtractableResponse<Response> createSectionRequest(
+        final StationResponse upStation,
+        final LineResponse line,
+        final StationResponse newStation
+    ) {
+      Map<String, Object> params = new HashMap<>();
+      params.put("upStationId", upStation.getId());
+      params.put("downStationId", newStation.getId());
+      params.put("distance", 10);
+
+      final var response = RestAssured
+          .given().log().all()
+          .body(params)
+          .contentType(MediaType.APPLICATION_JSON_VALUE)
+          .when().post("/lines/{id}/sections", line.getId())
+          .then().log().all()
+          .extract();
+      return response;
+    }
+
+    private ExtractableResponse<Response> deleteSectionRequest(
+        final StationResponse downStation,
+        final LineResponse line
+    ) {
+      return RestAssured
+          .given().log().all()
+          .queryParam("stationId", downStation.getId())
+          .contentType(MediaType.APPLICATION_JSON_VALUE)
+          .when().delete("/lines/{id}/sections", line.getId())
+          .then().log().all()
+          .extract();
+    }
   }
 
 }
