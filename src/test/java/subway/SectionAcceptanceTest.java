@@ -16,6 +16,7 @@ import subway.application.dto.LineResponse;
 import subway.application.dto.StationResponse;
 import subway.fixture.LineFixture;
 import subway.fixture.StationFixture;
+import subway.utils.DatabaseCleanup;
 
 import java.util.HashMap;
 import java.util.Map;

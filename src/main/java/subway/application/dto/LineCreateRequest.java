@@ -10,7 +10,7 @@ public class LineCreateRequest {
   private Long downStationId;
   private String name;
   private String color;
-  private int distance;
+  private Integer distance;
 
   public Line to() {
     return new Line(name, color);

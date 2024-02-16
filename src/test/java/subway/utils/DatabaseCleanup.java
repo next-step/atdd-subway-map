@@ -1,10 +1,9 @@
-package subway;
+package subway.utils;
 
-import org.apache.catalina.filters.RemoteIpFilter;
+import com.google.common.base.CaseFormat;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
-import com.google.common.base.CaseFormat;
 
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;

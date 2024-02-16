@@ -15,9 +15,9 @@ class LineTest {
 
         Line line = new Line("이호선", "green");
 
-        Station upStation = new Station("강남역");
-        Station downStation = new Station("역삼역");
-        Station newStation = new Station("선릉역");
+        Station upStation = new Station(1L, "강남역");
+        Station downStation = new Station(2L, "역삼역");
+        Station newStation = new Station(3L, "선릉역");
         int distance = 10;
 
         line.addSection(upStation, downStation, distance);

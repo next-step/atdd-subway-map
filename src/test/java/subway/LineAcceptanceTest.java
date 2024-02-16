@@ -11,7 +11,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
+import subway.application.dto.StationResponse;
 import subway.fixture.LineFixture;
+import subway.fixture.StationFixture;
+import subway.utils.DatabaseCleanup;
 
 import java.util.HashMap;
 import java.util.List;
@@ -39,11 +42,14 @@ public class LineAcceptanceTest {
   @Test
   void createLine() {
     // when
+    Long 강남역 = 지하철역_생성_요청("강남역");
+    Long 역삼역 = 지하철역_생성_요청("역삼역");
+
     Map<String, Object> params = new HashMap<>();
-    params.put("name", "신분당선");
-    params.put("color", "bg-red-600");
-    params.put("upStationId", 1L);
-    params.put("downStationId", 2L);
+    params.put("name", "이호선");
+    params.put("color", "green");
+    params.put("upStationId", 강남역);
+    params.put("downStationId", 역삼역);
     params.put("distance", 10);
     ExtractableResponse<Response> response = LineFixture.지하철노선_생성_요청(params);
 
@@ -56,7 +62,7 @@ public class LineAcceptanceTest {
             .when().get("/lines")
             .then().log().all()
             .extract().jsonPath().getList("name", String.class);
-    assertThat(lineNames).containsAnyOf("신분당선");
+    assertThat(lineNames).containsAnyOf("이호선");
   }
 
   /**
@@ -66,21 +72,25 @@ public class LineAcceptanceTest {
   @Test
   void getLines() {
     // given
+    Long 강남역 = 지하철역_생성_요청("강남역");
+    Long 역삼역 = 지하철역_생성_요청("역삼역");
+    Long 신논현역 = 지하철역_생성_요청("신논현역");
+
     ExtractableResponse<Response> 신분당선 = LineFixture.지하철노선_생성_요청(
         Map.of(
             "name", "신분당선",
-            "color", "bg-red-600",
-            "upStationId", 1L,
-            "downStationId", 2L,
+            "color", "red",
+            "upStationId", 강남역,
+            "downStationId", 신논현역,
             "distance", 10
         )
     );
-    ExtractableResponse<Response> line2 = LineFixture.지하철노선_생성_요청(
+    ExtractableResponse<Response> 이호선 = LineFixture.지하철노선_생성_요청(
         Map.of(
-            "name", "2호선",
-            "color", "bg-green-600",
-            "upStationId", 1L,
-            "downStationId", 2L,
+            "name", "이호선",
+            "color", "green",
+            "upStationId", 강남역,
+            "downStationId", 역삼역,
             "distance", 10
         )
     );
@@ -89,7 +99,7 @@ public class LineAcceptanceTest {
     List<String> lineNames = LineFixture.getLines().jsonPath().getList("name", String.class);
 
     // then
-    assertThat(lineNames).containsAnyOf("신분당선", "2호선");
+    assertThat(lineNames).containsAnyOf("신분당선", "이호선");
   }
 
   /**
@@ -99,26 +109,29 @@ public class LineAcceptanceTest {
   @Test
   void getLine() {
     // given
-    ExtractableResponse<Response> createResponse = LineFixture.지하철노선_생성_요청(
-        Map.of(
-            "name", "신분당선",
-            "color", "bg-red-600",
-            "upStationId", 1L,
-            "downStationId", 2L,
-            "distance", 10
-        )
+    Long 강남역 = 지하철역_생성_요청("강남역");
+    Long 역삼역 = 지하철역_생성_요청("역삼역");
+
+    ExtractableResponse<Response> 이호선 = LineFixture.지하철노선_생성_요청(
+            Map.of(
+                    "name", "이호선",
+                    "color", "green",
+                    "upStationId", 강남역,
+                    "downStationId", 역삼역,
+                    "distance", 10
+            )
     );
 
     // when
     String lineName =
         RestAssured.given().log().all()
-            .pathParam("lineId", createResponse.jsonPath().getLong("id"))
+            .pathParam("lineId", 이호선.jsonPath().getLong("id"))
             .when().get("/lines/{lineId}")
             .then().log().all()
             .extract().jsonPath().getString("name");
 
     // then
-    assertThat(lineName).isEqualTo("신분당선");
+    assertThat(lineName).isEqualTo("이호선");
   }
 
   /**
@@ -128,26 +141,29 @@ public class LineAcceptanceTest {
   @Test
   void updateLine() {
     // given
-    ExtractableResponse<Response> createResponse = LineFixture.지하철노선_생성_요청(
-        Map.of(
-            "name", "신분당선",
-            "color", "bg-red-600",
-            "upStationId", 1L,
-            "downStationId", 2L,
-            "distance", 10
-        )
+    Long 강남역 = 지하철역_생성_요청("강남역");
+    Long 역삼역 = 지하철역_생성_요청("역삼역");
+
+    ExtractableResponse<Response> 이호선 = LineFixture.지하철노선_생성_요청(
+            Map.of(
+                    "name", "이호선",
+                    "color", "red",
+                    "upStationId", 강남역,
+                    "downStationId", 역삼역,
+                    "distance", 10
+            )
     );
 
     // when
     final Map<String, Object> updateParams = new HashMap<>();
-    updateParams.put("name", "다른분당선");
-    updateParams.put("color", "bg-red-600");
+    updateParams.put("name", "이호선new");
+    updateParams.put("color", "green");
 
     ExtractableResponse<Response> updateResponse =
         RestAssured.given().log().all()
             .body(updateParams)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .pathParam("lineId", createResponse.jsonPath().getLong("id"))
+            .pathParam("lineId", 이호선.jsonPath().getLong("id"))
             .when().put("/lines/{lineId}")
             .then().log().all()
             .extract();
@@ -163,25 +179,33 @@ public class LineAcceptanceTest {
   @Test
   void deleteLine() {
     // given
-    ExtractableResponse<Response> createResponse = LineFixture.지하철노선_생성_요청(
-        Map.of(
-            "name", "신분당선",
-            "color", "bg-red-600",
-            "upStationId", 1L,
-            "downStationId", 2L,
-            "distance", 10
-        )
+    Long 강남역 = 지하철역_생성_요청("강남역");
+    Long 역삼역 = 지하철역_생성_요청("역삼역");
+
+    ExtractableResponse<Response> 이호선 = LineFixture.지하철노선_생성_요청(
+            Map.of(
+                    "name", "이호선",
+                    "color", "red",
+                    "upStationId", 강남역,
+                    "downStationId", 역삼역,
+                    "distance", 10
+            )
     );
 
     // when
     ExtractableResponse<Response> deleteResponse =
         RestAssured.given().log().all()
-            .pathParam("lineId", createResponse.jsonPath().getLong("id"))
+            .pathParam("lineId", 이호선.jsonPath().getLong("id"))
             .when().delete("/lines/{lineId}")
             .then().log().all()
             .extract();
 
     // then
     assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+  }
+
+
+  private static Long 지하철역_생성_요청(String name) {
+    return StationFixture.지하철역_생성_요청(name).as(StationResponse.class).getId();
   }
 }

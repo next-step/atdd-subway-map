@@ -26,7 +26,7 @@ public class LineService {
     }
 
     @Transactional
-    public LineResponse saveLine(LineCreateRequest lineCreateRequest) {
+    public LineResponse createLine(LineCreateRequest lineCreateRequest) {
         Line line = lineRepository.save(lineCreateRequest.to());
         if (lineCreateRequest.getUpStationId() != null && lineCreateRequest.getDownStationId() != null && lineCreateRequest.getDistance() != 0) {
             line.addSection(
