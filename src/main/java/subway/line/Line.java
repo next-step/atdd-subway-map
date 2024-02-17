@@ -1,10 +1,15 @@
 package subway.line;
 
+import java.util.ArrayList;
+import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
 @Entity
 public class Line {
@@ -15,24 +20,15 @@ public class Line {
   @Column(length = 20, nullable = false)
   private String name;
 
-  @Column(length = 20, nullable = false)
+  @Column(length = 20)
   private String color;
 
-  @Column
-  private Long upStationId;
+  @OneToMany(mappedBy = "line", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, orphanRemoval = true)
+  private List<Section> sections = new ArrayList<>();
 
-  @Column
-  private Long downStationId;
-
-  @Column(nullable = false)
-  private int distance;
-
-  public Line(String name, String color, Long upStationId, Long downStationId, int distance) {
+  public Line(String name, String color) {
     this.name = name;
     this.color = color;
-    this.upStationId = upStationId;
-    this.downStationId = downStationId;
-    this.distance = distance;
   }
 
   protected Line() {
@@ -50,12 +46,8 @@ public class Line {
     return color;
   }
 
-  public Long getUpStationId() {
-    return upStationId;
-  }
-
-  public Long getDownStationId() {
-    return downStationId;
+  public List<Section> getSections() {
+    return sections;
   }
 
   public void updateLine(final String name, final String color) {
@@ -63,4 +55,22 @@ public class Line {
     this.color = color;
   }
 
+  public void addSection(final Section section) {
+    // 새 라인의 경우 section 검증 제외
+    if (!isNewLine()) {
+      LineValidator.checkSectionForAddition(this, section);
+    }
+
+    this.sections.add(section);
+    section.registerLine(this);
+  }
+
+  public void removeSection(final Section section) {
+    LineValidator.checkSectionForRemove(this, section);
+    this.sections.remove(section);
+  }
+
+  private boolean isNewLine() {
+    return this.getSections().isEmpty();
+  }
 }
