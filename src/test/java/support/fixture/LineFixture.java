@@ -25,6 +25,7 @@ public class LineFixture {
         return 노선_생성(이호선, 초록색, 강남역.getId(), 교대역.getId(), 10L);
     }
 
+
     public static Map<String, Object> 노선_생성(
         String name,
         String color,

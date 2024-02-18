@@ -58,15 +58,16 @@ public class LineSteps {
             .extract();
     }
 
-    public static List<String> 지하철_노선_응답에서_노선_이름_목록_추출(ExtractableResponse<Response> 지하철_노선_응답) {
-        return 지하철_노선_응답.jsonPath()
+    public static List<String> 지하철_노선_목록_응답에서_노선_이름_목록_추출(ExtractableResponse<Response> 지하철_노선_목록_응답) {
+        return 지하철_노선_목록_응답.jsonPath()
             .getList(NAME, String.class);
     }
 
-    public static List<Long> 지하철_노선_응답에서_노선_아이디_목록_추출(ExtractableResponse<Response> 지하철_노선_응답) {
-        return 지하철_노선_응답.jsonPath()
+    public static List<Long> 지하철_노선_목록_응답에서_노선_아이디_목록_추출(ExtractableResponse<Response> 지하철_노선_목록_응답) {
+        return 지하철_노선_목록_응답.jsonPath()
             .getList(ID, Long.class);
     }
+
 
     public static Long 지하철_노선_응답에서_노선_아이디_추출(ExtractableResponse<Response> 지하철_노선_응답) {
         return 지하철_노선_응답.jsonPath().getLong(ID);
@@ -89,7 +90,12 @@ public class LineSteps {
         return 지하철_노선_응답에서_역_아이디_추출(지하철_노선_응답, -1);
     }
 
+    public static List<Long> 지하철_노선_응답에서_역_아이디_목록_추출(ExtractableResponse<Response> 지하철_노선_응답) {
+        return 지하철_노선_응답.jsonPath().getList("stations.id", Long.class);
+    }
+
     public static long 지하철_노선_응답에서_역_아이디_추출(ExtractableResponse<Response> 지하철_노선_응답, long idx) {
         return 지하철_노선_응답.jsonPath().getLong(String.format("stations[%d].id", idx));
     }
+
 }

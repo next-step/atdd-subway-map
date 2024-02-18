@@ -47,15 +47,18 @@ public class Line {
     }
 
     public void addSection(Section section) {
-        if (sections.invalidUpStation(section) || sections.alreadyExistsStation(section)) {
-            throw new IllegalArgumentException("invalid section");
-        }
         section.setLine(this);
         this.sections.addSection(section);
+    }
+
+    public void removeSection(Long downStationId) {
+        this.sections.removeSection(downStationId);
     }
 
 
     public List<Station> getAllStations() {
         return this.sections.getStations();
     }
+
+
 }

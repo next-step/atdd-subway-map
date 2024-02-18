@@ -21,6 +21,9 @@ public class Sections {
     private List<Section> sections = new ArrayList<>();
 
     public void addSection(Section section) {
+        if (invalidUpStation(section) || alreadyExistsStation(section)) {
+            throw new IllegalArgumentException("invalid section");
+        }
         this.sections.add(section);
     }
 
@@ -44,7 +47,18 @@ public class Sections {
     }
 
 
+    public void removeSection(Long downStationId) {
+        if(isNotLastStation(station) || getSectionSize() < 2) {
+            throw new IllegalArgumentException("invalid remove section");
+        }
+        sections.remove(sections.size() - 1);
+    }
+
     public Station getEndStation() {
         return sections.get(sections.size() - 1).getDownStation();
+    }
+
+    public int getSectionSize() {
+        return this.sections.size();
     }
 }

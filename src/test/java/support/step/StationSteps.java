@@ -5,7 +5,6 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.List;
 import java.util.Map;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 public class StationSteps {
@@ -46,7 +45,7 @@ public class StationSteps {
         return 지하철역_응답.jsonPath().getLong(ID);
     }
 
-    public static List<String> 지하철역_응답에서_역_이름_목록_추출(ExtractableResponse<Response> 지하철역_응답) {
+    public static List<String> 지하철역_목록_응답에서_역_이름_목록_추출(ExtractableResponse<Response> 지하철역_응답) {
         return 지하철역_응답.jsonPath().getList(NAME, String.class);
     }
 }

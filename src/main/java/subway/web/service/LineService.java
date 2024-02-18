@@ -71,6 +71,13 @@ public class LineService {
         return new LineResponse(line);
     }
 
+    @Transactional
+    public LineResponse removeSection(Long lineId, Long downStationId) {
+        Line line = getLine(lineId);
+        line.removeSection(downStationId);
+        return new LineResponse(line);
+    }
+
 
     // TODO: custom exception & exception handler
     private Line getLine(Long id) {
@@ -80,5 +87,6 @@ public class LineService {
     private Station getStationById(Long stationId) {
         return stationRepository.findById(stationId).orElseThrow(() -> new RuntimeException("not found station"));
     }
+
 
 }

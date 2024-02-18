@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import subway.web.dto.request.AddSectionRequest;
 import subway.web.dto.request.LineCreateRequest;
@@ -67,6 +68,15 @@ public class LineController {
         @RequestBody AddSectionRequest addSectionRequest
     ) {
         LineResponse lineResponse = lineService.addSection(id, addSectionRequest);
+        return ResponseEntity.ok(lineResponse);
+    }
+
+    @DeleteMapping("/{id}/sections")
+    public ResponseEntity<LineResponse> removeSection(
+        @PathVariable Long id,
+        @RequestParam(name = "stationId") Long stationId
+    ) {
+        LineResponse lineResponse = lineService.removeSection(id, stationId);
         return ResponseEntity.ok(lineResponse);
     }
 
