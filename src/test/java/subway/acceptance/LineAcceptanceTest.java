@@ -4,9 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static support.fixture.LineFixture.노선_생성;
 import static support.fixture.LineFixture.노선_수정;
 import static support.fixture.LineFixture.이호선;
-import static support.fixture.LineFixture.이호선_생성;
+import static support.fixture.LineFixture.강남역_교대역_구간_이호선_생성;
 import static support.fixture.LineFixture.일호선;
-import static support.fixture.LineFixture.일호선_생성;
+import static support.fixture.LineFixture.서울역_청량리역_구간_일호선_생성;
 import static support.fixture.StationFixture.강남역_생성;
 import static support.fixture.StationFixture.교대역_생성;
 import static support.step.LineSteps.지하철_노선_단일_조회_요청;
@@ -82,8 +82,8 @@ class LineAcceptanceTest {
     @Test
     void getLineList() {
         // given
-        지하철_노선_생성_요청(일호선_생성());
-        지하철_노선_생성_요청(이호선_생성());
+        지하철_노선_생성_요청(서울역_청량리역_구간_일호선_생성());
+        지하철_노선_생성_요청(강남역_교대역_구간_이호선_생성());
 
         // when
         ExtractableResponse<Response> 지하철_노선_목록_조회_응답 = 지하철_노선_목록_조회_요청();
@@ -106,7 +106,7 @@ class LineAcceptanceTest {
     @Test
     void getLine() {
         // given
-        Long 일호선_아이디 = 지하철_노선_응답에서_노선_아이디_추출(지하철_노선_생성_요청(일호선_생성()));
+        Long 일호선_아이디 = 지하철_노선_응답에서_노선_아이디_추출(지하철_노선_생성_요청(서울역_청량리역_구간_일호선_생성()));
 
         // when
         ExtractableResponse<Response> 지하철_노선_단일_조희_응답 = 지하철_노선_단일_조회_요청(일호선_아이디);
@@ -128,7 +128,7 @@ class LineAcceptanceTest {
     @Test
     void updateLine() {
         // given
-        Long 일호선_아이디 = 지하철_노선_응답에서_노선_아이디_추출(지하철_노선_생성_요청(일호선_생성()));
+        Long 일호선_아이디 = 지하철_노선_응답에서_노선_아이디_추출(지하철_노선_생성_요청(서울역_청량리역_구간_일호선_생성()));
         // when
         ExtractableResponse<Response> 지하철_노선_수정_응답 = 지하철_노선_수정_요청(일호선_아이디, 노선_수정(LINE_TWO, COLOR_TWO));
 
@@ -151,7 +151,7 @@ class LineAcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        Long 일호선_아이디 = 지하철_노선_응답에서_노선_아이디_추출(지하철_노선_생성_요청(일호선_생성()));
+        Long 일호선_아이디 = 지하철_노선_응답에서_노선_아이디_추출(지하철_노선_생성_요청(서울역_청량리역_구간_일호선_생성()));
 
         // when
         ExtractableResponse<Response> 지하철_노선_삭제_응답 = 지하철_노선_삭제_요청(일호선_아이디);

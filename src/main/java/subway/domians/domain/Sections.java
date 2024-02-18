@@ -3,7 +3,6 @@ package subway.domians.domain;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.persistence.CascadeType;
@@ -25,17 +24,6 @@ public class Sections {
         this.sections.add(section);
     }
 
-    public Optional<Station> getUpStation() {
-        var first = this.sections.stream().findFirst();
-        return first.map(Section::getUpStation);
-    }
-
-    public List<Station> getStations() {
-        return this.sections.stream()
-            .flatMap(section -> Stream.of(section.getUpStation(), section.getDownStation()))
-            .collect(Collectors.toList());
-    }
-
     public boolean invalidUpStation(Section section) {
         if (!this.sections.isEmpty()) {
             Station endStation = this.getEndStation();
@@ -45,12 +33,18 @@ public class Sections {
     }
 
     public boolean alreadyExistsStation(Section section) {
-        return sections.stream()
-            .map(Section::getDownStation)
+        return this.getStations().stream()
             .anyMatch(station -> station.getId().equals(section.getDownStation().getId()));
     }
 
-    private Station getEndStation() {
+    public List<Station> getStations() {
+        return this.sections.stream()
+            .flatMap(section -> Stream.of(section.getUpStation(), section.getDownStation()))
+            .collect(Collectors.toList());
+    }
+
+
+    public Station getEndStation() {
         return sections.get(sections.size() - 1).getDownStation();
     }
 }

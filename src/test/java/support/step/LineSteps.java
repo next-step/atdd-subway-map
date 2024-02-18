@@ -80,7 +80,16 @@ public class LineSteps {
         return 지하철_노선_응답.jsonPath().get(COLOR);
     }
 
+    public static Long 지하철_노선_응답에서_노선의_상행_종점역_아이디_추출(ExtractableResponse<Response> 지하철_노선_응답) {
+        return 지하철_노선_응답에서_역_아이디_추출(지하철_노선_응답, 0);
+    }
+
+
     public static Long 지하철_노선_응답에서_노선의_하행_종점역_아이디_추출(ExtractableResponse<Response> 지하철_노선_응답) {
-        return 지하철_노선_응답.jsonPath().getLong("stations[-1].id");
+        return 지하철_노선_응답에서_역_아이디_추출(지하철_노선_응답, -1);
+    }
+
+    public static long 지하철_노선_응답에서_역_아이디_추출(ExtractableResponse<Response> 지하철_노선_응답, long idx) {
+        return 지하철_노선_응답.jsonPath().getLong(String.format("stations[%d].id", idx));
     }
 }

@@ -15,7 +15,6 @@ public class SectionSteps {
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .when().post("/lines/{lineId}/sections", lineId)
             .then()
-            .statusCode(HttpStatus.OK.value())
             .extract();
     }
 }

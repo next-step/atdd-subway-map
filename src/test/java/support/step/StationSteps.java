@@ -30,7 +30,6 @@ public class StationSteps {
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .when().post(STATION_BASE_PATH)
             .then()
-            .statusCode(HttpStatus.CREATED.value())
             .extract();
     }
 

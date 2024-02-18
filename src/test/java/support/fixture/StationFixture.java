@@ -9,6 +9,7 @@ public class StationFixture {
     public static final String 청량리역 = "청량리역";
     public static final String 강남역 = "강남역";
     public static final String 교대역 = "교대역";
+    public static final String 낙성대 = "낙성대역";
     public static final String 봉천역 = "봉천역";
     public static final String NAME = "name";
 
@@ -27,6 +28,12 @@ public class StationFixture {
     public static Map<String, Object> 교대역_생성() {
         return 지허철역_생성(교대역);
     }
+
+
+    public static Map<String, Object> 낙성대역_생성() {
+        return 지허철역_생성(낙성대);
+    }
+
 
     public static Map<String, Object> 봉천역_생성() {
         return 지허철역_생성(봉천역);
