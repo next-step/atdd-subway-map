@@ -1,21 +1,16 @@
 package support.fixture;
 
-import subway.station.StationResponse;
-import support.step.StationSteps;
+import java.util.Map;
 
 public class SectionFixture {
 
-    public Long upStationId;
-    public Long downStationId;
-    public Long distance;
-
-    private SectionFixture(Long upStationId, Long downStationId, Long distance) {
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
-        this.distance = distance;
+    public static Map<String, Object> 구간_생성(Long downStationId, Long upStationId, Long distance) {
+        return Map.of(
+            "downStationId", downStationId,
+            "upStationId", upStationId,
+            "distance", distance
+        );
     }
-
-
 }
 
 

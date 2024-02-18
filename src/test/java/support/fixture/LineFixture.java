@@ -1,7 +1,7 @@
 package support.fixture;
 
 import java.util.Map;
-import subway.station.StationResponse;
+import subway.web.dto.response.StationResponse;
 import support.step.StationSteps;
 
 public class LineFixture {

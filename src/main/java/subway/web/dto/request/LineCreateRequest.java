@@ -1,4 +1,4 @@
-package subway.acceptance;
+package subway.web.dto.request;
 
 
 import lombok.Getter;
@@ -6,15 +6,15 @@ import lombok.Getter;
 @Getter
 public class LineCreateRequest {
 
-    private String name;
+    private final String name;
 
-    private String color;
+    private final String color;
 
-    private Long upStationId;
+    private final Long upStationId;
 
-    private Long downStationId;
+    private final Long downStationId;
 
-    private Long distance;
+    private final Long distance;
 
     public LineCreateRequest(String name, String color, Long upStationId, Long downStationId, Long distance) {
         this.name = name;

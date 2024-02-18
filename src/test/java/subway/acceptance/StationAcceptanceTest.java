@@ -8,8 +8,8 @@ import static support.fixture.StationFixture.교대역_생성;
 import static support.step.StationSteps.지하철_역_삭제_요청;
 import static support.step.StationSteps.지하철_역_생성_요청;
 import static support.step.StationSteps.지하철역_목록_조회_요청;
-import static support.step.StationSteps.지하철역_응답에서_아이디_추출;
-import static support.step.StationSteps.지하철역_응답에서_이름_목록_추출;
+import static support.step.StationSteps.지하철역_응답에서_역_아이디_추출;
+import static support.step.StationSteps.지하철역_응답에서_역_이름_목록_추출;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.List;
@@ -39,7 +39,7 @@ class StationAcceptanceTest {
         assertThat(강남역_생성_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        assertThat(지하철역_응답에서_이름_목록_추출(지하철역_목록_조회_요청())).containsAnyOf(강남역);
+        assertThat(지하철역_응답에서_역_이름_목록_추출(지하철역_목록_조회_요청())).containsAnyOf(강남역);
     }
 
     /**
@@ -61,7 +61,7 @@ class StationAcceptanceTest {
         SoftAssertions.assertSoftly(softAssertions -> {
             assertThat(지하철역_목록_조회_응답.statusCode()).isEqualTo(HttpStatus.OK.value());
             assertThat(지하철역_목록_조회_응답.body().as(List.class)).hasSize(2);
-            assertThat(지하철역_응답에서_이름_목록_추출(지하철역_목록_조회_응답)).containsAnyOf(강남역, 교대역);
+            assertThat(지하철역_응답에서_역_이름_목록_추출(지하철역_목록_조회_응답)).containsAnyOf(강남역, 교대역);
         });
 
     }
@@ -77,7 +77,7 @@ class StationAcceptanceTest {
     void deleteStation() {
         // given
         지하철_역_생성_요청(교대역_생성());
-        Long 강남역_아이디 = 지하철역_응답에서_아이디_추출(지하철_역_생성_요청(강남역_생성()));
+        Long 강남역_아이디 = 지하철역_응답에서_역_아이디_추출(지하철_역_생성_요청(강남역_생성()));
 
         // when
         ExtractableResponse<Response> 지하철역_삭제_응답 = 지하철_역_삭제_요청(강남역_아이디);
@@ -85,7 +85,7 @@ class StationAcceptanceTest {
         // then
         SoftAssertions.assertSoftly(softAssertions -> {
             assertThat(지하철역_삭제_응답.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-            assertThat(지하철역_응답에서_이름_목록_추출(지하철역_목록_조회_요청())).doesNotContain(강남역);
+            assertThat(지하철역_응답에서_역_이름_목록_추출(지하철역_목록_조회_요청())).doesNotContain(강남역);
         });
 
     }

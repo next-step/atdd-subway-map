@@ -58,25 +58,29 @@ public class LineSteps {
             .extract();
     }
 
-    public static List<String> 지하철_노선_응답에서_이름_목록_추출(ExtractableResponse<Response> 지하철_노선_응답) {
+    public static List<String> 지하철_노선_응답에서_노선_이름_목록_추출(ExtractableResponse<Response> 지하철_노선_응답) {
         return 지하철_노선_응답.jsonPath()
             .getList(NAME, String.class);
     }
 
-    public static List<Long> 지하철_노선_응답에서_아이디_목록_추출(ExtractableResponse<Response> 지하철_노선_응답) {
+    public static List<Long> 지하철_노선_응답에서_노선_아이디_목록_추출(ExtractableResponse<Response> 지하철_노선_응답) {
         return 지하철_노선_응답.jsonPath()
             .getList(ID, Long.class);
     }
 
-    public static Long 지하철_노선_응답에서_아이디_추출(ExtractableResponse<Response> 지하철_노선_응답) {
+    public static Long 지하철_노선_응답에서_노선_아이디_추출(ExtractableResponse<Response> 지하철_노선_응답) {
         return 지하철_노선_응답.jsonPath().getLong(ID);
     }
 
-    public static String 지하철_노선_응답에서_이름_추출(ExtractableResponse<Response> 지하철_노선_응답) {
+    public static String 지하철_노선_응답에서_노선_이름_추출(ExtractableResponse<Response> 지하철_노선_응답) {
         return 지하철_노선_응답.jsonPath().get(NAME);
     }
 
-    public static String 지하철_노선_응답에서_색상_추출(ExtractableResponse<Response> 지하철_노선_응답) {
+    public static String 지하철_노선_응답에서_노선_색상_추출(ExtractableResponse<Response> 지하철_노선_응답) {
         return 지하철_노선_응답.jsonPath().get(COLOR);
+    }
+
+    public static Long 지하철_노선_응답에서_노선의_하행_종점역_아이디_추출(ExtractableResponse<Response> 지하철_노선_응답) {
+        return 지하철_노선_응답.jsonPath().getLong("stations[1].id");
     }
 }

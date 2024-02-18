@@ -43,11 +43,11 @@ public class StationSteps {
     }
 
 
-    public static Long 지하철역_응답에서_아이디_추출(ExtractableResponse<Response> 지하철역_응답) {
+    public static Long 지하철역_응답에서_역_아이디_추출(ExtractableResponse<Response> 지하철역_응답) {
         return 지하철역_응답.jsonPath().getLong(ID);
     }
 
-    public static List<String> 지하철역_응답에서_이름_목록_추출(ExtractableResponse<Response> 지하철역_응답) {
+    public static List<String> 지하철역_응답에서_역_이름_목록_추출(ExtractableResponse<Response> 지하철역_응답) {
         return 지하철역_응답.jsonPath().getList(NAME, String.class);
     }
 }

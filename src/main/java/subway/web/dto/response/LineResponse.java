@@ -1,8 +1,10 @@
-package subway.acceptance;
+package subway.web.dto.response;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.Getter;
-import subway.station.Station;
+import subway.domians.domain.Line;
+import subway.domians.domain.Station;
 
 @Getter
 public class LineResponse {
@@ -30,17 +32,13 @@ public class LineResponse {
 
     private final List<StationDto> stations;
 
-    private final Long distance;
-
     public LineResponse(Line line) {
         this.id = line.getId();
         this.name = line.getName();
         this.color = line.getColor();
-        this.distance = line.getDistance();
-        this.stations = List.of(
-            new StationDto(line.getUpStation()),
-            new StationDto(line.getDownStation())
-        );
+        this.stations = line.getAllStations().stream()
+            .map(StationDto::new)
+            .collect(Collectors.toList());
     }
 
 
