@@ -1,7 +1,6 @@
 package subway.domians.domain;
 
 import java.util.List;
-import java.util.Optional;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -48,13 +47,13 @@ public class Line {
     }
 
     public void addSection(Section section) {
+        if (sections.invalidUpStation(section) || sections.alreadyExistsStation(section)) {
+            throw new IllegalArgumentException("invalid section");
+        }
         section.setLine(this);
         this.sections.addSection(section);
     }
 
-    public Optional<Station> getUpStation() {
-        return this.sections.getUpStation();
-    }
 
     public List<Station> getAllStations() {
         return this.sections.getStations();

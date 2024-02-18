@@ -81,6 +81,6 @@ public class LineSteps {
     }
 
     public static Long 지하철_노선_응답에서_노선의_하행_종점역_아이디_추출(ExtractableResponse<Response> 지하철_노선_응답) {
-        return 지하철_노선_응답.jsonPath().getLong("stations[1].id");
+        return 지하철_노선_응답.jsonPath().getLong("stations[-1].id");
     }
 }

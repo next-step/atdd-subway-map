@@ -10,6 +10,7 @@ import subway.domians.domain.Section;
 import subway.domians.domain.Station;
 import subway.domians.repository.LineRepository;
 import subway.domians.repository.StationRepository;
+import subway.web.dto.request.AddSectionRequest;
 import subway.web.dto.request.LineCreateRequest;
 import subway.web.dto.request.LineUpdateRequest;
 import subway.web.dto.response.LineResponse;
@@ -42,27 +43,42 @@ public class LineService {
     }
 
     public LineResponse findLine(Long id) {
-        Line line = lineRepository.findById(id).orElseThrow(() -> new RuntimeException("not found line"));
+        Line line = getLine(id);
         return new LineResponse(line);
     }
 
     @Transactional
     public void updateLine(Long id, LineUpdateRequest lineUpdateRequest) {
-        Line line = lineRepository.findById(id).orElseThrow(() -> new RuntimeException("not found line"));
+        Line line = getLine(id);
         line.updateName(lineUpdateRequest.getName());
         line.updateColor(lineUpdateRequest.getColor());
     }
 
     @Transactional
     public void removeLine(Long id) {
-        Line line = lineRepository.findById(id).orElseThrow(() -> new RuntimeException("not found line"));
+        Line line = getLine(id);
         lineRepository.delete(line);
     }
 
-    // TODO: custom exceoption & exception handler
+    @Transactional
+    public LineResponse addSection(Long lineId, AddSectionRequest addSectionRequest) {
+        Line line = getLine(lineId);
+        Station upStation = getStationById(addSectionRequest.getUpStationId());
+        Station downStation = getStationById(addSectionRequest.getDownStationId());
+        line.addSection(
+            Section.of(line, upStation, downStation, addSectionRequest.getDistance())
+        );
+        return new LineResponse(line);
+    }
+
+
+    // TODO: custom exception & exception handler
+    private Line getLine(Long id) {
+        return lineRepository.findById(id).orElseThrow(() -> new RuntimeException("not found line"));
+    }
+
     private Station getStationById(Long stationId) {
         return stationRepository.findById(stationId).orElseThrow(() -> new RuntimeException("not found station"));
     }
-
 
 }

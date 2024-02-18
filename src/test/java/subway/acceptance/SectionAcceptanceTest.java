@@ -46,14 +46,14 @@ class SectionAcceptanceTest {
 
         // when
         ExtractableResponse<Response> 지하철_구간_등록_응답 = 지하철_구간_등록_요청(이호선_아이디, SectionFixture.구간_생성(
-            이호선_아이디,
             구간의_상행역_아이디,
-            구간의_하행역_아이디
+            구간의_하행역_아이디,
+            10L
         ));
 
         // then
         SoftAssertions.assertSoftly(softAssertions -> {
-            assertThat(지하철_구간_등록_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+            assertThat(지하철_구간_등록_응답.statusCode()).isEqualTo(HttpStatus.OK.value());
             assertThat(지하철_노선_응답에서_노선의_하행_종점역_아이디_추출(지하철_노선_단일_조회_요청(이호선_아이디))).isEqualTo(구간의_하행역_아이디);
         });
 

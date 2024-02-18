@@ -4,10 +4,10 @@ import java.util.Map;
 
 public class SectionFixture {
 
-    public static Map<String, Object> 구간_생성(Long downStationId, Long upStationId, Long distance) {
+    public static Map<String, Object> 구간_생성(Long upStationId, Long downStationId, Long distance) {
         return Map.of(
-            "downStationId", downStationId,
             "upStationId", upStationId,
+            "downStationId", downStationId,
             "distance", distance
         );
     }

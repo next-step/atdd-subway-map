@@ -2,6 +2,7 @@ package subway.domians.domain;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -33,5 +34,23 @@ public class Sections {
         return this.sections.stream()
             .flatMap(section -> Stream.of(section.getUpStation(), section.getDownStation()))
             .collect(Collectors.toList());
+    }
+
+    public boolean invalidUpStation(Section section) {
+        if (!this.sections.isEmpty()) {
+            Station endStation = this.getEndStation();
+            return !Objects.equals(endStation.getId(), section.getUpStation().getId());
+        }
+        return false;
+    }
+
+    public boolean alreadyExistsStation(Section section) {
+        return sections.stream()
+            .map(Section::getDownStation)
+            .anyMatch(station -> station.getId().equals(section.getDownStation().getId()));
+    }
+
+    private Station getEndStation() {
+        return sections.get(sections.size() - 1).getDownStation();
     }
 }
