@@ -3,6 +3,7 @@ package subway.domians.domain;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.persistence.CascadeType;
@@ -28,8 +29,9 @@ public class Sections {
     }
 
     public boolean invalidUpStation(Section section) {
-        if (!this.sections.isEmpty()) {
-            Station endStation = this.getEndStation();
+        Optional<Station> optionalStation = getEndStation();
+        if (optionalStation.isPresent()) {
+            Station endStation = optionalStation.get();
             return !Objects.equals(endStation.getId(), section.getUpStation().getId());
         }
         return false;
@@ -48,17 +50,30 @@ public class Sections {
 
 
     public void removeSection(Long downStationId) {
-        if(isNotLastStation(station) || getSectionSize() < 2) {
-            throw new IllegalArgumentException("invalid remove section");
+        if (isNotLastStation(downStationId) || getSectionSize() < 2) {
+            throw new IllegalArgumentException("invalid section");
         }
         sections.remove(sections.size() - 1);
     }
 
-    public Station getEndStation() {
-        return sections.get(sections.size() - 1).getDownStation();
+    public Optional<Station> getEndStation() {
+        if (sections.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(sections.get(sections.size() - 1).getDownStation());
     }
 
     public int getSectionSize() {
         return this.sections.size();
+    }
+
+    private boolean isNotLastStation(Long stationId) {
+        Optional<Station> optionalStation = getEndStation();
+        if (optionalStation.isPresent()) {
+            Station endStation = optionalStation.get();
+            return !Objects.equals(endStation.getId(), stationId);
+        } else {
+            return false;
+        }
     }
 }

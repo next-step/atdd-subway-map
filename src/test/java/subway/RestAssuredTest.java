@@ -15,7 +15,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class RestAssuredTest {
 
-    @Disabled
     @DisplayName("구글 페이지 접근 테스트")
     @Test
     void accessGoogle() {
