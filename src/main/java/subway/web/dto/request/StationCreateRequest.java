@@ -1,4 +1,4 @@
-package subway.station;
+package subway.web.dto.request;
 
 public class StationCreateRequest {
 
