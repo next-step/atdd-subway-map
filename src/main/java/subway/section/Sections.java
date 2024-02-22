@@ -2,20 +2,29 @@ package subway.section;
 
 import subway.station.Station;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Embeddable;
+import javax.persistence.FetchType;
+import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Embeddable
 public class Sections {
 
-    private final List<Section> values;
+    @OneToMany(mappedBy = "line", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Section> values = new ArrayList<>();
+
+    protected Sections() {
+    }
 
     public Sections(List<Section> values) {
         this.values = values;
     }
 
     public List<Station> getAllStations() {
-        Station firstStation = getFirstStationId();
+        Station firstStation = getFirstStation();
         List<Station> downStations = getDownStations();
         List<Station> stations = new ArrayList<>();
         stations.add(firstStation);
@@ -23,7 +32,7 @@ public class Sections {
         return stations;
     }
 
-    private Station getFirstStationId() {
+    private Station getFirstStation() {
         return values.stream()
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("노선에 구간이 존재하지 않습니다."))
