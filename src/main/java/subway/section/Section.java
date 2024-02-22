@@ -1,5 +1,8 @@
 package subway.section;
 
+import subway.line.Line;
+import subway.station.Station;
+
 import javax.persistence.*;
 import java.util.Objects;
 
@@ -10,14 +13,17 @@ public class Section {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "line_id", nullable = false)
-    private Long lineId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "line_id")
+    private Line line;
 
-    @Column(name = "up_station_id", nullable = false)
-    private Long upStationId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "up_station_id")
+    private Station upStation;
 
-    @Column(name = "down_station_id", nullable = false)
-    private Long downStationId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "down_station_id")
+    private Station downStation;
 
     @Column(nullable = false)
     private Long distance;
@@ -25,40 +31,36 @@ public class Section {
     protected Section() {
     }
 
-    public Section(Long lineId, Long upStationId, Long downStationId, Long distance) {
-        this(null, lineId, upStationId, downStationId, distance);
+    public Section(Line line, Station upStation, Station downStation, Long distance) {
+        this(null, line, upStation, downStation, distance);
     }
 
-    public Section(Long id, Long lineId, Long upStationId, Long downStationId, Long distance) {
+    public Section(Long id, Line line, Station upStation, Station downStation, Long distance) {
         this.id = id;
-        this.lineId = lineId;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
+        this.line = line;
+        this.upStation = upStation;
+        this.downStation = downStation;
         this.distance = distance;
     }
 
-    public boolean containStationId(Long stationId) {
-        return upStationId.equals(stationId) || downStationId.equals(stationId);
+    public boolean containStation(Station station) {
+        return upStation.equals(station) || downStation.equals(station);
     }
 
     public Long getId() {
         return id;
     }
 
-    public Long getLineId() {
-        return lineId;
+    public Station getUpStation() {
+        return upStation;
     }
 
-    public Long getUpStationId() {
-        return upStationId;
+    public Station getDownStation() {
+        return downStation;
     }
 
     public Long getDownStationId() {
-        return downStationId;
-    }
-
-    public Long getDistance() {
-        return distance;
+        return downStation.getId();
     }
 
     @Override

@@ -32,7 +32,7 @@ public class LineAddSectionService {
         Sections sections = findSectionsByLine(line);
         Station upStation = findStationByStationId(request.getUpStationId());
         Station downStation = findStationByStationId(request.getDownStationId());
-        Section section = new Section(line.getId(), upStation.getId(), downStation.getId(), request.getDistance());
+        Section section = new Section(line, upStation, downStation, request.getDistance());
         sections.addSection(section);
         sectionRepository.save(sections.getLastSection());
         return mapToResponse(line, sections);
@@ -53,7 +53,7 @@ public class LineAddSectionService {
     }
 
     private LineAddedSectionResponse mapToResponse(Line line, Sections sections) {
-        List<Station> stations = stationRepository.findAllByIdIn(sections.getStationIds());
+        List<Station> stations = sections.getAllStations();
         return new LineAddedSectionResponse(line.getId(), line.getName(), line.getColor(), mapToStationResponses(stations));
     }
 

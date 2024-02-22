@@ -1,5 +1,7 @@
 package subway.section;
 
+import subway.station.Station;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -12,25 +14,25 @@ public class Sections {
         this.values = values;
     }
 
-    public List<Long> getStationIds() {
-        Long firstStationId = getFirstStationId();
-        List<Long> downStationIds = getDownStationIds();
-        List<Long> stationIds = new ArrayList<>();
-        stationIds.add(firstStationId);
-        stationIds.addAll(downStationIds);
-        return stationIds;
+    public List<Station> getAllStations() {
+        Station firstStation = getFirstStationId();
+        List<Station> downStations = getDownStations();
+        List<Station> stations = new ArrayList<>();
+        stations.add(firstStation);
+        stations.addAll(downStations);
+        return stations;
     }
 
-    private Long getFirstStationId() {
+    private Station getFirstStationId() {
         return values.stream()
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("노선에 구간이 존재하지 않습니다."))
-                .getUpStationId();
+                .getUpStation();
     }
 
-    private List<Long> getDownStationIds() {
+    private List<Station> getDownStations() {
         return values.stream()
-                .map(Section::getDownStationId)
+                .map(Section::getDownStation)
                 .collect(Collectors.toList());
     }
 
@@ -47,16 +49,17 @@ public class Sections {
     }
 
     private void validateLastStation(Section section) {
-        Long lastStationId = getLastSection().getDownStationId();
-        if (!lastStationId.equals(section.getUpStationId())) {
-            throw new IllegalArgumentException("새로운 구간의 상행역은 노선의 하행 종착역과 같아야 합니다. upStationId: " + section.getUpStationId());
+        Station lastStation = getLastSection().getDownStation();
+        Station upStation = section.getUpStation();
+        if (!lastStation.equals(upStation)) {
+            throw new IllegalArgumentException("새로운 구간의 상행역은 노선의 하행 종착역과 같아야 합니다. upStationId: " + upStation.getId());
         }
     }
 
     private void validateDuplicateStation(Section section) {
-        Long downStationId = section.getDownStationId();
-        if (values.stream().anyMatch(value -> value.containStationId(downStationId))) {
-            throw new IllegalArgumentException("주어진 하행역은 이미 노선에 등록되어 있는 등록된 역입니다. downStationId: " + downStationId);
+        Station downStation = section.getDownStation();
+        if (values.stream().anyMatch(value -> value.containStation(downStation))) {
+            throw new IllegalArgumentException("주어진 하행역은 이미 노선에 등록되어 있는 등록된 역입니다. downStationId: " + downStation.getId());
         }
     }
 

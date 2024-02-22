@@ -44,7 +44,7 @@ public class LineCreateService {
     }
 
     private void saveSection(Line line, Station upStation, Station downStation, Long distance) {
-        Section section = new Section(line.getId(), upStation.getId(), downStation.getId(), distance);
+        Section section = new Section(line, upStation, downStation, distance);
         sectionRepository.save(section);
     }
 

@@ -16,7 +16,6 @@ public class LineRemoveSectionService {
         this.sectionRepository = sectionRepository;
     }
 
-
     public void deleteSection(Long lineId, Long stationdId) {
         Sections sections = findSectionsByLineId(lineId);
         sections.validateRemovableLastSection(stationdId);

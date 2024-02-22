@@ -1,6 +1,10 @@
 package subway.line;
 
+import subway.section.Section;
+
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -15,6 +19,9 @@ public class Line {
 
     @Column(length = 20, nullable = false)
     private String color;
+
+    @OneToMany(mappedBy = "line", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Section> sections = new ArrayList<>();
 
     protected Line() {
     }

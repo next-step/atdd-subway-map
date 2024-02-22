@@ -3,7 +3,6 @@ package subway.line.load;
 import org.springframework.stereotype.Service;
 import subway.line.Line;
 import subway.line.LineRepository;
-import subway.section.Section;
 import subway.section.SectionRepository;
 import subway.section.Sections;
 import subway.station.Station;
@@ -42,7 +41,7 @@ public class LineLoadService {
 
     private LineLoadedResponse mapToResponse(Line line) {
         Sections sections = new Sections(sectionRepository.findAllByLineIdOrderById(line.getId()));
-        List<Station> stations = stationRepository.findAllByIdIn(sections.getStationIds());
+        List<Station> stations = sections.getAllStations();
         return new LineLoadedResponse(line.getId(), line.getName(), line.getColor(), mapToStationResponses(stations));
     }
 
