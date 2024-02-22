@@ -2,6 +2,7 @@ package subway.line.delete;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.line.Line;
 import subway.line.LineRepository;
 
 @Transactional
@@ -15,13 +16,12 @@ public class LineDeleteService {
     }
 
     public void deleteLine(Long lineId) {
-        validateExistLine(lineId);
-        lineRepository.deleteById(lineId);
+        Line line = findLineByLineId(lineId);
+        lineRepository.delete(line);
     }
 
-    private void validateExistLine(Long lineId) {
-        if (!lineRepository.existsById(lineId)) {
-            throw new IllegalArgumentException("존재하지 않는 노선입니다. lineId: " + lineId);
-        }
+    private Line findLineByLineId(Long lineId) {
+        return lineRepository.findById(lineId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 노선입니다. lineId: " + lineId));
     }
 }

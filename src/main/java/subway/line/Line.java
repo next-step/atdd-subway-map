@@ -1,6 +1,9 @@
 package subway.line;
 
+import subway.station.Station;
+
 import javax.persistence.*;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -16,29 +19,34 @@ public class Line {
     @Column(length = 20, nullable = false)
     private String color;
 
-    @Column(name = "up_station_id", nullable = false)
-    private Long upStationId;
-
-    @Column(name = "down_station_id", nullable = false)
-    private Long downStationId;
-
-    @Column(nullable = false)
-    private Long distance;
+    @Embedded
+    private Sections sections;
 
     protected Line() {
     }
 
-    public Line(String name, String color, Long upStationId, Long downStationId, Long distance) {
+    public Line(String name, String color, Station upStation, Station downStation, Long distance) {
         this.name = name;
         this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
-        this.distance = distance;
+        this.sections = new Sections(new Section(this, upStation, downStation, distance));
     }
 
     public void update(String name, String color) {
         this.name = name;
         this.color = color;
+    }
+
+    public void addNewSection(Station upStation, Station downStation, Long distance) {
+        Section section = new Section(this, upStation, downStation, distance);
+        sections.addSection(section);
+    }
+
+    public void removeStation(Station station) {
+        sections.removeStation(station);
+    }
+
+    public List<Station> getAllStations() {
+        return sections.getAllStations();
     }
 
     public Long getId() {
@@ -51,18 +59,6 @@ public class Line {
 
     public String getColor() {
         return color;
-    }
-
-    public Long getUpStationId() {
-        return upStationId;
-    }
-
-    public Long getDownStationId() {
-        return downStationId;
-    }
-
-    public Long getDistance() {
-        return distance;
     }
 
     @Override

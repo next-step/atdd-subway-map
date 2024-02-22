@@ -1,6 +1,9 @@
 package subway.line.load;
 
+import subway.line.Line;
+
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class LineLoadedResponse {
 
@@ -14,6 +17,14 @@ public class LineLoadedResponse {
         this.name = name;
         this.color = color;
         this.stations = stations;
+    }
+
+    public static LineLoadedResponse from(Line line) {
+        return new LineLoadedResponse(line.getId(), line.getName(), line.getColor(),
+                line.getAllStations().stream()
+                        .map(LineLoadedStationResponse::from)
+                        .collect(Collectors.toList())
+        );
     }
 
     public Long getId() {

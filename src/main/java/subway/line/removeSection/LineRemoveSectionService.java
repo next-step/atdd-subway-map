@@ -1,4 +1,4 @@
-package subway.line.create;
+package subway.line.removeSection;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -9,21 +9,25 @@ import subway.station.StationRepository;
 
 @Transactional
 @Service
-public class LineCreateService {
+public class LineRemoveSectionService {
 
     private final LineRepository lineRepository;
     private final StationRepository stationRepository;
 
-    public LineCreateService(LineRepository lineRepository, StationRepository stationRepository) {
+    public LineRemoveSectionService(LineRepository lineRepository, StationRepository stationRepository) {
         this.lineRepository = lineRepository;
         this.stationRepository = stationRepository;
     }
 
-    public LineCreatedResponse createLine(LineCreateRequest request) {
-        Station upStation = findStationByStationId(request.getUpStationId());
-        Station downStation = findStationByStationId(request.getDownStationId());
-        Line line = new Line(request.getName(), request.getColor(), upStation, downStation, request.getDistance());
-        return LineCreatedResponse.from(lineRepository.save(line));
+    public void deleteSection(Long lineId, Long stationId) {
+        Line line = findLineByLineId(lineId);
+        Station station = findStationByStationId(stationId);
+        line.removeStation(station);
+    }
+
+    private Line findLineByLineId(Long lineId) {
+        return lineRepository.findById(lineId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 노선입니다. lineId: " + lineId));
     }
 
     private Station findStationByStationId(Long stationId) {
