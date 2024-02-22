@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import subway.section.SectionRepository;
 
 import java.util.HashMap;
 import java.util.List;
@@ -24,10 +25,14 @@ import static subway.fixture.StationFixture.newStation;
 public class StationAcceptanceTest {
 
     @Autowired
+    private SectionRepository sectionRepository;
+
+    @Autowired
     private StationRepository stationRepository;
 
     @BeforeEach
     void setUp() {
+        sectionRepository.deleteAllInBatch();
         stationRepository.deleteAllInBatch();
     }
 
