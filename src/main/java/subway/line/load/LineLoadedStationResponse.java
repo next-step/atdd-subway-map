@@ -1,5 +1,7 @@
 package subway.line.load;
 
+import subway.station.Station;
+
 public class LineLoadedStationResponse {
 
     private final Long id;
@@ -16,5 +18,9 @@ public class LineLoadedStationResponse {
 
     public String getName() {
         return name;
+    }
+
+    public static LineLoadedStationResponse from(Station station) {
+        return new LineLoadedStationResponse(station.getId(), station.getName());
     }
 }
