@@ -23,19 +23,15 @@ public class Line {
     private String color;
 
     @Embedded
-    private Sections sections = new Sections(new ArrayList<>());
+    private Sections sections;
 
     protected Line() {
     }
 
-    public Line(String name, String color) {
-        this(null, name, color);
-    }
-
-    public Line(Long id, String name, String color) {
-        this.id = id;
+    public Line(String name, String color, Station upStation, Station downStation, Long distance) {
         this.name = name;
         this.color = color;
+        this.sections = new Sections(new Section(this, upStation, downStation, distance));
     }
 
     public void update(String name, String color) {

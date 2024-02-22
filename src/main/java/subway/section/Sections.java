@@ -19,6 +19,10 @@ public class Sections {
     protected Sections() {
     }
 
+    public Sections(Section section) {
+        this.values.add(section);
+    }
+
     public Sections(List<Section> values) {
         this.values = values;
     }
@@ -32,7 +36,7 @@ public class Sections {
         return stations;
     }
 
-    private Station getFirstStation() {
+    public Station getFirstStation() {
         return values.stream()
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("노선에 구간이 존재하지 않습니다."))

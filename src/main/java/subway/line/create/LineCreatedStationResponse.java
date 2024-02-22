@@ -1,5 +1,7 @@
 package subway.line.create;
 
+import subway.station.Station;
+
 public class LineCreatedStationResponse {
 
     private final Long id;
@@ -8,6 +10,10 @@ public class LineCreatedStationResponse {
     public LineCreatedStationResponse(Long id, String name) {
         this.id = id;
         this.name = name;
+    }
+
+    public static LineCreatedStationResponse from(Station station) {
+        return new LineCreatedStationResponse(station.getId(), station.getName());
     }
 
     public Long getId() {
