@@ -1,11 +1,8 @@
 package subway.line;
 
-import subway.section.Section;
-import subway.section.Sections;
 import subway.station.Station;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 

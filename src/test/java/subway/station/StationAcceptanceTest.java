@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import subway.section.SectionRepository;
+import subway.line.SectionRepository;
 
 import java.util.HashMap;
 import java.util.List;
