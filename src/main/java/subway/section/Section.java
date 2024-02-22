@@ -59,10 +59,6 @@ public class Section {
         return downStation;
     }
 
-    public Long getDownStationId() {
-        return downStation.getId();
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

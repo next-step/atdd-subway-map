@@ -23,10 +23,6 @@ public class Sections {
         this.values.add(section);
     }
 
-    public Sections(List<Section> values) {
-        this.values = values;
-    }
-
     public List<Station> getAllStations() {
         Station firstStation = getFirstStation();
         List<Station> downStations = getDownStations();
@@ -61,6 +57,11 @@ public class Sections {
         values.add(section);
     }
 
+    public void removeStation(Station station) {
+        validateRemovableLastSection(station);
+        values.removeIf(value -> value.containStation(station));
+    }
+
     private void validateLastStation(Section section) {
         Station lastStation = getLastSection().getDownStation();
         Station upStation = section.getUpStation();
@@ -76,15 +77,15 @@ public class Sections {
         }
     }
 
-    public void validateRemovableLastSection(Long stationId) {
-        validateLatestSection(stationId);
+    public void validateRemovableLastSection(Station station) {
+        validateLatestSection(station);
         validateSize();
     }
 
-    private void validateLatestSection(Long stationId) {
+    private void validateLatestSection(Station station) {
         Section lastSection = getLastSection();
-        if (!lastSection.getDownStationId().equals(stationId)) {
-            throw new IllegalArgumentException("노선의 하행 종착역만 삭제할 수 있습니다. stationId: " + stationId);
+        if (!lastSection.getDownStation().equals(station)) {
+            throw new IllegalArgumentException("노선의 하행 종착역만 삭제할 수 있습니다. stationId: " + station.getId());
         }
     }
 
