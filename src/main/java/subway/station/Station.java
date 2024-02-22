@@ -27,6 +27,10 @@ public class Station {
         return name;
     }
 
+    public boolean isNotSameStation(Station other) {
+        return !this.equals(other);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

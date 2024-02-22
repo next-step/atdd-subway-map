@@ -65,7 +65,7 @@ public class Sections {
     private void validateLastStation(Section section) {
         Station lastStation = getLastSection().getDownStation();
         Station upStation = section.getUpStation();
-        if (!lastStation.equals(upStation)) {
+        if (lastStation.isNotSameStation(upStation)) {
             throw new IllegalArgumentException("새로운 구간의 상행역은 노선의 하행 종착역과 같아야 합니다. upStationId: " + upStation.getId());
         }
     }
@@ -84,7 +84,7 @@ public class Sections {
 
     private void validateLatestSection(Station station) {
         Section lastSection = getLastSection();
-        if (!lastSection.getDownStation().equals(station)) {
+        if (lastSection.getDownStation().isNotSameStation(station)) {
             throw new IllegalArgumentException("노선의 하행 종착역만 삭제할 수 있습니다. stationId: " + station.getId());
         }
     }
