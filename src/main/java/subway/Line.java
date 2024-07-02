@@ -11,6 +11,9 @@ public class Line {
     @Column(length = 20, nullable = false)
     private String name;
 
+    @Column(length = 20, nullable = false)
+    private String color;
+
     @Column(nullable = false)
     private Long upStationId;
 
