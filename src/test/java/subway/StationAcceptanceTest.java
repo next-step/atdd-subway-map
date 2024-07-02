@@ -4,8 +4,8 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -56,11 +56,12 @@ public class StationAcceptanceTest {
      * Then 2개의 지하철역을 응답 받는다
      */
     @DisplayName("지하철역 목록을 조회한다.")
-    @Test
-    void showStations() {
+    @ParameterizedTest
+    @CsvSource({"강남역, 잠실역", "역삼역, 삼성역", "삼성역, 선릉역"})
+    void showStations(String name1, String name2) {
         // given
-        StationTestApi.createStation("선릉역");
-        StationTestApi.createStation("잠실역");
+        StationTestApi.createStation(name1);
+        StationTestApi.createStation(name2);
 
         // when
         ExtractableResponse<Response> response = StationTestApi.showStations();
@@ -71,7 +72,7 @@ public class StationAcceptanceTest {
         // then
         List<String> stationNames = response.jsonPath().getList("name", String.class);
         assertThat(stationNames.size()).isEqualTo(2);
-        assertThat(stationNames).containsExactlyInAnyOrder("선릉역", "잠실역");
+        assertThat(stationNames).containsExactlyInAnyOrder(name1, name2);
     }
 
     /**
@@ -80,10 +81,11 @@ public class StationAcceptanceTest {
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
     @DisplayName("지하철역을 삭제한다.")
-    @Test
-    void deleteStation() {
+    @ParameterizedTest
+    @ValueSource(strings = {"강남역", "역삼역", "삼성역"})
+    void deleteStation(String name) {
         // given
-        long id = StationTestApi.createStation("서초역").jsonPath().getLong("id");
+        long id = StationTestApi.createStation(name).jsonPath().getLong("id");
 
         // when
         ExtractableResponse<Response> response = StationTestApi.deleteStation(id);
@@ -93,6 +95,6 @@ public class StationAcceptanceTest {
 
         // then
         List<String> stationNames = StationTestApi.showStations().jsonPath().getList("name", String.class);
-        assertThat(stationNames).doesNotContain("서초역");
+        assertThat(stationNames).doesNotContain(name);
     }
 }
