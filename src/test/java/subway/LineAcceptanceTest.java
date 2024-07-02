@@ -124,13 +124,53 @@ public class LineAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         //then
-        String testingName =
+        String testingName = getJsonPath("/lines/2", "name");
+        assertThat(testingName).isEqualTo(insertedName);
+    }
+
+    /**
+     * Given: 특정 지하철 노선이 등록되어 있고,
+     * When: 관리자가 해당 노선을 수정하면,
+     * Then: 해당 노선의 정보가 수정된다.
+     */
+    @DisplayName("지하철 노선을 수정한다.")
+    @DirtiesContext
+    @Test
+    @Sql(scripts = {"StationInsert.sql", "LineInsert.sql"})
+    void 지하철_노선_수정_테스트() {
+
+        //when
+        String changingName = "구분당선";
+        String changingColor = "blue";
+
+        Map<String, String> params = new HashMap<>();
+        params.put("name", changingName);
+        params.put("color", changingColor);
+
+        ExtractableResponse<Response> response =
                 RestAssured.given().log().all()
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().get("/lines/2")
+                        .body(params)
+                        .when().patch("/lines/1")
                         .then().log().all()
-                        .extract().jsonPath().getString("name");
+                        .extract();
 
-        assertThat(testingName).isEqualTo(insertedName);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        //then
+        String testingName = getJsonPath("/lines/1", "name");
+        String testingColor = getJsonPath("/lines/1", "color");
+
+        assertThat(testingName).isEqualTo(changingName);
+        assertThat(testingColor).isEqualTo(changingColor);
+
+    }
+
+    String getJsonPath(String url ,String field) {
+        return RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().get(url)
+                .then().log().all()
+                .extract().jsonPath().getString(field);
     }
 }
