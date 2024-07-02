@@ -1,6 +1,5 @@
 package subway;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
@@ -9,7 +8,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import subway.internal.StationTestApi;
 
 import java.util.List;
@@ -75,12 +73,7 @@ public class StationAcceptanceTest {
         long id = StationTestApi.createStation("서초역").jsonPath().getLong("id");
 
         // when
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().delete("/stations/" + id)
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = StationTestApi.deleteStation(id);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());

@@ -30,4 +30,13 @@ public class StationTestApi {
                 .then().log().all()
                 .extract();
     }
+
+    public static ExtractableResponse<Response> deleteStation(Long id) {
+        return RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().delete("/stations/" + id)
+                .then().log().all()
+                .extract();
+    }
 }
