@@ -21,4 +21,13 @@ public class StationTestApi {
                 .then().log().all()
                 .extract();
     }
+
+    public static ExtractableResponse<Response> showStations() {
+        return RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().get("/stations")
+                .then().log().all()
+                .extract();
+    }
 }

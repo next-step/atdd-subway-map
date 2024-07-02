@@ -1,6 +1,5 @@
 package subway;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
@@ -34,11 +33,7 @@ public class StationAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
+        List<String> stationNames = StationTestApi.showStations().jsonPath().getList("name", String.class);
         assertThat(stationNames).containsAnyOf(name);
     }
 
@@ -55,12 +50,7 @@ public class StationAcceptanceTest {
         StationTestApi.createStation("잠실역");
 
         // when
-        ExtractableResponse<Response> response =
-                RestAssured
-                        .given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract();
+        ExtractableResponse<Response> response = StationTestApi.showStations();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
