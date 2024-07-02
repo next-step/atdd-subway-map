@@ -4,6 +4,7 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -57,7 +58,29 @@ public class StationAcceptanceTest {
      * When 지하철역 목록을 조회하면
      * Then 2개의 지하철역을 응답 받는다
      */
-    // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
+    @DisplayName("지하철역 목록을 조회한다.")
+    @Test
+    void showStations() {
+        // given
+        createStation("선릉역");
+        createStation("잠실역");
+
+        // when
+        ExtractableResponse<Response> response =
+                RestAssured
+                        .given().log().all()
+                        .when().get("/stations")
+                        .then().log().all()
+                        .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        // then
+        List<String> stationNames = response.jsonPath().getList("name", String.class);
+        assertThat(stationNames.size()).isEqualTo(2);
+        assertThat(stationNames).containsExactlyInAnyOrder("선릉역", "잠실역");
+    }
 
     /**
      * Given 지하철역을 생성하고
