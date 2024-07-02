@@ -9,11 +9,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+import subway.internal.StationTestApi;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -30,16 +28,7 @@ public class StationAcceptanceTest {
     @ValueSource(strings = {"강남역", "역삼역", "삼성역"})
     void createStation(String name) {
         // when
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .body(params)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/stations")
-                        .then().log().all()
-                        .extract();
+        ExtractableResponse<Response> response = StationTestApi.createStation(name);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -62,8 +51,8 @@ public class StationAcceptanceTest {
     @Test
     void showStations() {
         // given
-        createStation("선릉역");
-        createStation("잠실역");
+        StationTestApi.createStation("선릉역");
+        StationTestApi.createStation("잠실역");
 
         // when
         ExtractableResponse<Response> response =
