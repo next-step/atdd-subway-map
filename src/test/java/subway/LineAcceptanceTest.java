@@ -77,7 +77,7 @@ public class LineAcceptanceTest {
     @Sql(scripts = {"StationInsert.sql", "LineInsert.sql"})
     void 지하철_노선_목록_조회() {
         //given
-        List<String> insertedLineList = List.of("신분당선", "분당선");
+        List<String> insertedLines = List.of("신분당선", "분당선");
 
         //when
         ExtractableResponse<Response> response =
@@ -90,13 +90,47 @@ public class LineAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         //then
-        List<String> responseLineList =
+        List<String> testingLines =
                 RestAssured.given().log().all()
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .when().get("/lines")
                         .then().log().all()
                         .extract().jsonPath().getList("name", String.class);
-        boolean isWellRead = insertedLineList.containsAll(responseLineList);
+        boolean isWellRead = insertedLines.containsAll(testingLines);
         assertThat(isWellRead).isTrue();
+    }
+
+    /**
+     * Given: 특정 지하철 노선이 등록되어 있고,
+     * When: 관리자가 해당 노선을 조회하면,
+     * Then: 해당 노선의 정보가 반환된다.
+     */
+    @DisplayName("지하철 노선을 조회한다.")
+    @DirtiesContext
+    @Test
+    @Sql(scripts = {"StationInsert.sql", "LineInsert.sql"})
+    void 지하철_단일노선_조회() {
+        //given
+        String insertedName = "분당선";
+
+        //when
+        ExtractableResponse<Response> response =
+                RestAssured.given().log().all()
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .when().get("/lines/2")
+                        .then().log().all()
+                        .extract();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        //then
+        String testingName =
+                RestAssured.given().log().all()
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .when().get("/lines/2")
+                        .then().log().all()
+                        .extract().jsonPath().getString("name");
+
+        assertThat(testingName).isEqualTo(insertedName);
     }
 }
