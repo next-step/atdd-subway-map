@@ -82,7 +82,6 @@ public class LineAcceptanceTest {
         //when
         ExtractableResponse<Response> response =
                 RestAssured.given().log().all()
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .when().get("/lines")
                         .then().log().all()
                         .extract();
@@ -90,12 +89,8 @@ public class LineAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         //then
-        List<String> testingLines =
-                RestAssured.given().log().all()
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().get("/lines")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
+        List<String> testingLines = getLines();
+
         boolean isWellRead = insertedLines.containsAll(testingLines);
         assertThat(isWellRead).isTrue();
     }
@@ -116,7 +111,6 @@ public class LineAcceptanceTest {
         //when
         ExtractableResponse<Response> response =
                 RestAssured.given().log().all()
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .when().get("/lines/2")
                         .then().log().all()
                         .extract();
@@ -166,11 +160,49 @@ public class LineAcceptanceTest {
 
     }
 
+    /**
+     * Given: 특정 지하철 노선이 등록되어 있고,
+     * When: 관리자가 해당 노선을 삭제하면,
+     * Then: 해당 노선이 삭제되고 노선 목록에서 제외된다.
+     */
+    @DisplayName("지하철 노선을 삭제한다.")
+    @DirtiesContext
+    @Test
+    @Sql(scripts = {"StationInsert.sql", "LineInsert.sql"})
+    void 지하철_노선_삭제_테스트() {
+        //given
+        String insertedID = "2";
+        String insertedName = "분당선";
+
+        //when
+        ExtractableResponse<Response> response =
+                RestAssured.given().log().all()
+                        .when().delete("/lines/" + insertedID)
+                        .then().log().all()
+                        .extract();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        //then
+        List<String> lines = getLines();
+        assertThat(lines).isNotIn(insertedName);
+
+    }
+
+
     String getJsonPath(String url ,String field) {
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().get(url)
                 .then().log().all()
                 .extract().jsonPath().getString(field);
+    }
+
+    List<String> getLines() {
+        return RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().get("/lines")
+                .then().log().all()
+                .extract().jsonPath().getList("name", String.class);
     }
 }
