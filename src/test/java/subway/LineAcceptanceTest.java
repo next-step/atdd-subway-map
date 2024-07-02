@@ -65,4 +65,38 @@ public class LineAcceptanceTest {
         boolean isLineInserted = lineList.stream().anyMatch(name -> name == lineName);
         assertThat(isLineInserted).isTrue();
     }
+
+    /**
+     * Given: 여러 개의 지하철 노선이 등록되어 있고,
+     * When: 관리자가 지하철 노선 목록을 조회하면,
+     * Then: 모든 지하철 노선 목록이 반환된다.
+     */
+    @DisplayName("지하철 노선목록을 조회한다.")
+    @DirtiesContext
+    @Test
+    @Sql(scripts = {"StationInsert.sql", "LineInsert.sql"})
+    void 지하철_노선_목록_조회() {
+        //given
+        List<String> insertedLineList = List.of("신분당선", "분당선");
+
+        //when
+        ExtractableResponse<Response> response =
+                RestAssured.given().log().all()
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .when().get("/lines")
+                        .then().log().all()
+                        .extract();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        //then
+        List<String> responseLineList =
+                RestAssured.given().log().all()
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .when().get("/lines")
+                        .then().log().all()
+                        .extract().jsonPath().getList("name", String.class);
+        boolean isWellRead = insertedLineList.containsAll(responseLineList);
+        assertThat(isWellRead).isTrue();
+    }
 }
