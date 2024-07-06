@@ -1,10 +1,11 @@
-package subway;
+package subway.acceptance;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
@@ -32,16 +33,17 @@ public class LineAcceptanceTest {
      * Then: 해당 노선이 생성되고 노선 목록에 포함된다.
      */
     @DisplayName("노선을 생성한다.")
-    @Test
-    void createLine() {
+    @ParameterizedTest
+    @CsvSource(value = {"1호선,남색,1,1,5", "2호선,초록색,2,3,10"})
+    void createLine(String name, String color, Long upStationId, Long downStationId, Long distance) {
         // when
-        ExtractableResponse<Response> response = LineTestApi.createLine("1호선", "남색", 1L, 1L, 5L);
+        ExtractableResponse<Response> response = LineTestApi.createLine(name, color, upStationId, downStationId, distance);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
         List<String> lineNames = LineTestApi.showLines().jsonPath().getList("name");
-        assertThat(lineNames).containsAnyOf("1호선");
+        assertThat(lineNames).containsAnyOf(name);
     }
 }

@@ -1,20 +1,25 @@
 package subway;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/lines")
+@RequiredArgsConstructor
 public class LineController {
+
+    private final LineService lineService;
 
     @PostMapping()
     public ResponseEntity<CreateLineResponse> createLine(@RequestBody CreateLineRequest request) {
-        long tempId = 1L;
-        return ResponseEntity.created(URI.create("/lines/" + tempId)).body(
+        Long id = lineService.createLine(request);
+        return ResponseEntity.created(URI.create("/lines/" + id)).body(
                 new CreateLineResponse(
                         request.getName(),
                         request.getColor(),
@@ -27,13 +32,13 @@ public class LineController {
 
     @GetMapping()
     public ResponseEntity<List<LineResponse>> showLines() {
-        List<LineResponse> response = new ArrayList<>();
-        response.add(new LineResponse(
-                1L,
-                "1호선",
-                "남색",
+        List<Line> lines = lineService.getLines();
+        List<LineResponse> response = lines.stream().map((line) -> new LineResponse(
+                line.getId(),
+                line.getName(),
+                line.getColor(),
                 new ArrayList<>()
-        ));
+        )).collect(Collectors.toList());
         return ResponseEntity.ok().body(response);
     }
 }
