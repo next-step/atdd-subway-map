@@ -23,12 +23,18 @@ public class LineController {
     @PostMapping()
     public ResponseEntity<CreateLineResponse> createLine(@RequestBody CreateLineRequest request) {
         Long id = lineService.createLine(request.toCommand());
-        return ResponseEntity.created(URI.create("/lines/" + id)).body(CreateLineResponse.from(request));
+        return ResponseEntity.created(URI.create("/lines/" + id)).body(CreateLineResponse.from(request, id));
     }
 
     @GetMapping()
     public ResponseEntity<List<LineView.Main>> showLines() {
         List<LineView.Main> views = lineReader.getAllLines();
         return ResponseEntity.ok().body(views);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<LineView.Main> showLine(@PathVariable Long id) {
+        LineView.Main view = lineReader.getOneById(id);
+        return ResponseEntity.ok().body(view);
     }
 }

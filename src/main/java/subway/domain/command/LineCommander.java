@@ -9,7 +9,6 @@ import subway.domain.repository.LineRepository;
 @Service
 @RequiredArgsConstructor
 public class LineCommander {
-
     private final LineRepository lineRepository;
 
     @Transactional

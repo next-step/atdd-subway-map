@@ -26,6 +26,24 @@ public class LineReaderTest extends BaseTestSetup {
     private LineRepository lineRepository;
 
     @Nested
+    @DisplayName("getLine")
+    class GetLineTest {
+        @ParameterizedTest
+        @AutoSource
+        @Repeat(5)
+        public void sut_returns_line(Line line) {
+            // given
+            lineRepository.save(line);
+
+            // when
+            LineView.Main actual = sut.getOneById(line.getId());
+
+            // then
+            assertThat(line.getName()).isEqualTo(actual.getName());
+        }
+    }
+
+    @Nested
     @DisplayName("getLines")
     class GetLinesTest {
         @ParameterizedTest

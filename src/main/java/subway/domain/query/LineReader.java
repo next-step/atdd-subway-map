@@ -21,6 +21,14 @@ public class LineReader {
     private final StationRepository stationRepository;
 
     @Transactional(readOnly = true)
+    public LineView.Main getOneById(Long id) {
+        Line line = lineRepository.findById(id).orElseThrow(() -> new RuntimeException("Not found Line"));
+        List<Station> stations = stationRepository.findAllById(List.of(line.getUpStationId(), line.getDownStationId()));
+        return joinAndTransform(line, stations);
+    }
+
+
+    @Transactional(readOnly = true)
     public List<LineView.Main> getAllLines() {
         List<Line> lines = lineRepository.findAll();
         List<Station> stations = stationRepository.findAllById(
@@ -54,6 +62,29 @@ public class LineReader {
                     upDownStation
             );
         }).collect(Collectors.toList());
+    }
+
+    private LineView.Main joinAndTransform(Line line, List<Station> stations) {
+        Map<Long, Station> stationMap = new HashMap<>();
+        stations.forEach((station -> stationMap.putIfAbsent(station.getId(), station)));
+
+        List<StationView.Main> upDownStation = new ArrayList<>();
+        Station upStation = stationMap.get(line.getUpStationId());
+        Station downStation = stationMap.get(line.getDownStationId());
+        if (upStation != null) {
+            upDownStation.add(transform(upStation));
+        }
+
+        if (downStation != null) {
+            upDownStation.add(transform(downStation));
+        }
+
+        return new LineView.Main(
+                line.getId(),
+                line.getName(),
+                line.getColor(),
+                upDownStation
+        );
     }
 
     private StationView.Main transform(Station station) {

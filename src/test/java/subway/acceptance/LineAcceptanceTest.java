@@ -41,7 +41,7 @@ public class LineAcceptanceTest extends BaseTestSetup {
      * When: 관리자가 지하철 노선 목록을 조회하면,
      * Then: 2개의 지하철 노선 목록이 반환된다.
      */
-    @DisplayName("노션 목록을 조회한다.")
+    @DisplayName("노선 목록을 조회한다.")
     @Test
     void showLines() {
         // given
@@ -69,5 +69,29 @@ public class LineAcceptanceTest extends BaseTestSetup {
 
         List<String> lineTwoStationNames = LineApiResponseExtractor.extractUpDownStationNames(response, "2호선");
         assertThat(lineTwoStationNames).containsExactly("역삼역", "잠실역");
+    }
+
+    /**
+     * Given: 특정 지하철 노선이 등록되어 있고,
+     * When: 관리자가 해당 노선을 조회하면,
+     * Then: 해당 노선의 정보가 반환된다.
+     */
+    @DisplayName("노선을 조회한다.")
+    @Test
+    void showLine() {
+        // given
+        Long seoulId = StationApiResponseExtractor.extractId(StationTestApi.createStation("서울역"));
+        Long cityHallId = StationApiResponseExtractor.extractId(StationTestApi.createStation("시청역"));
+        Long id = LineApiResponseExtractor.Single.extractId(LineTestApi.createLine(LineFixture.lineOneCreateRequest(seoulId, cityHallId)));
+
+        // when
+        ExtractableResponse<Response> response = LineTestApi.showLine(id);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        // then
+        assertThat(LineApiResponseExtractor.Single.extractName(response)).isEqualTo("1호선");
+        assertThat(LineApiResponseExtractor.Single.extractUpDownStationNames(response)).containsExactly("서울역", "시청역");
     }
 }

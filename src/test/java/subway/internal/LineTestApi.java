@@ -33,4 +33,13 @@ public class LineTestApi {
                 .then().log().all()
                 .extract();
     }
+
+    public static ExtractableResponse<Response> showLine(Long id) {
+        return RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().get("/lines/" + id)
+                .then().log().all()
+                .extract();
+    }
 }
