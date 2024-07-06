@@ -1,8 +1,13 @@
-package subway;
+package subway.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import subway.domain.entity.Line;
+import subway.domain.service.LineService;
+import subway.controller.dto.CreateLineRequest;
+import subway.controller.dto.CreateLineResponse;
+import subway.controller.dto.LineResponse;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -18,7 +23,8 @@ public class LineController {
 
     @PostMapping()
     public ResponseEntity<CreateLineResponse> createLine(@RequestBody CreateLineRequest request) {
-        Long id = lineService.createLine(request);
+        Long id = lineService.createLine(request.toCommand());
+
         return ResponseEntity.created(URI.create("/lines/" + id)).body(
                 new CreateLineResponse(
                         request.getName(),

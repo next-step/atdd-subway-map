@@ -1,7 +1,8 @@
-package subway;
+package subway.controller.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import subway.domain.entity.Station;
 
 import java.util.List;
 

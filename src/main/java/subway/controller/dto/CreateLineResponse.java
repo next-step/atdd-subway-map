@@ -1,11 +1,11 @@
-package subway;
+package subway.controller.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class CreateLineRequest {
+public class CreateLineResponse {
     private String name;
     private String color;
     private Long upStationId;

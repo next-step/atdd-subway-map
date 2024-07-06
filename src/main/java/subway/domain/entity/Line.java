@@ -1,7 +1,8 @@
-package subway;
+package subway.domain.entity;
 
 import lombok.Builder;
 import lombok.Getter;
+import subway.domain.contract.LineCommand;
 
 import javax.persistence.*;
 
@@ -27,6 +28,8 @@ public class Line {
     @Column(nullable = false)
     private Long distance;
 
+    protected Line() {}
+
     @Builder
     public Line(String name, String color, Long upStationId, Long downStationId, Long distance) {
         this.name = name;
@@ -36,6 +39,13 @@ public class Line {
         this.distance = distance;
     }
 
-    protected Line() {
+    public static Line createLine(LineCommand.CreateLine command) {
+        return new Line(
+                command.getName(),
+                command.getColor(),
+                command.getUpStationId(),
+                command.getDownStationId(),
+                command.getDistance()
+        );
     }
 }

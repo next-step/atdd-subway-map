@@ -1,11 +1,12 @@
 package subway.acceptance;
 
+import autoparams.AutoSource;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.http.HttpStatus;
+import subway.controller.dto.CreateLineRequest;
 import subway.internal.BaseTestSetup;
 import subway.internal.LineTestApi;
 
@@ -21,16 +22,16 @@ public class LineAcceptanceTest extends BaseTestSetup {
      */
     @DisplayName("노선을 생성한다.")
     @ParameterizedTest
-    @CsvSource(value = {"1호선,남색,1,1,5", "2호선,초록색,2,3,10"})
-    void createLine(String name, String color, Long upStationId, Long downStationId, Long distance) {
+    @AutoSource
+    void createLine(CreateLineRequest request) {
         // when
-        ExtractableResponse<Response> response = LineTestApi.createLine(name, color, upStationId, downStationId, distance);
+        ExtractableResponse<Response> response = LineTestApi.createLine(request);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
         List<String> lineNames = LineTestApi.showLines().jsonPath().getList("name");
-        assertThat(lineNames).containsAnyOf(name);
+        assertThat(lineNames).containsAnyOf(request.getName());
     }
 }

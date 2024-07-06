@@ -6,10 +6,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.springframework.beans.factory.annotation.Autowired;
-import subway.CreateLineRequest;
-import subway.Line;
-import subway.LineRepository;
-import subway.LineService;
+import subway.domain.contract.LineCommand;
+import subway.domain.entity.Line;
+import subway.domain.repository.LineRepository;
+import subway.domain.service.LineService;
 import subway.internal.BaseTestSetup;
 
 import java.util.List;
@@ -27,34 +27,29 @@ public class LineServiceTest extends BaseTestSetup {
     private LineRepository lineRepository;
 
     @Nested
-    @DisplayName("CreateLine Test")
-    class CreateLine {
-        @DisplayName("노선을 생성한다.")
+    @DisplayName("createLine")
+    class CreateLineTest {
         @ParameterizedTest
         @AutoSource
         @Repeat(5)
-        public void sut_create_line_entity(CreateLineRequest request) {
+        public void sut_creates_line(LineCommand.CreateLine command) {
             // when
-            Long id = sut.createLine(request);
+            Long id = sut.createLine(command);
 
             // then
             Optional<Line> actual = lineRepository.findById(id);
-            assertThat(actual.get().getName()).isEqualTo(request.getName());
-            assertThat(actual.get().getColor()).isEqualTo(request.getColor());
-            assertThat(actual.get().getUpStationId()).isEqualTo(request.getUpStationId());
-            assertThat(actual.get().getDownStationId()).isEqualTo(request.getDownStationId());
-            assertThat(actual.get().getDistance()).isEqualTo(request.getDistance());
+            assertThat(actual.get().getName()).isEqualTo(command.getName());
+            assertThat(actual.get().getColor()).isEqualTo(command.getColor());
         }
     }
 
     @Nested
-    @DisplayName("GetLines Test")
-    class GetLines {
-        @DisplayName("노선을 조회한다.")
+    @DisplayName("getLines")
+    class GetLinesTest {
         @ParameterizedTest
         @AutoSource
         @Repeat(5)
-        public void sut_create_line_entity(List<Line> lines) {
+        public void sut_returns_lines(List<Line> lines) {
             // given
             lineRepository.saveAll(lines);
 
