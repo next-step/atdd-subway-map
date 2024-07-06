@@ -28,6 +28,7 @@ dependencies {
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'io.rest-assured:rest-assured:4.5.1'
+    testImplementation 'io.github.autoparams:autoparams:8.3.0'
 
     runtimeOnly 'com.h2database:h2'
 }
