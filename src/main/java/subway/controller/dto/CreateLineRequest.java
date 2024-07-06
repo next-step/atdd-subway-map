@@ -2,8 +2,10 @@ package subway.controller.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.ToString;
 import subway.domain.contract.LineCommand;
 
+@ToString
 @Getter
 @AllArgsConstructor
 public class CreateLineRequest {

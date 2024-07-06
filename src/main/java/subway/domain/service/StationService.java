@@ -3,17 +3,16 @@ package subway.domain.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.controller.dto.StationRequest;
+import subway.controller.dto.StationResponse;
 import subway.domain.entity.Station;
 import subway.domain.repository.StationRepository;
-import subway.controller.dto.StationResponse;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional(readOnly = true)
 public class StationService {
-    private StationRepository stationRepository;
+    private final StationRepository stationRepository;
 
     public StationService(StationRepository stationRepository) {
         this.stationRepository = stationRepository;
@@ -25,6 +24,8 @@ public class StationService {
         return createStationResponse(station);
     }
 
+
+    @Transactional(readOnly = true)
     public List<StationResponse> findAllStations() {
         return stationRepository.findAll().stream()
                 .map(this::createStationResponse)

@@ -7,9 +7,14 @@ import org.springframework.http.MediaType;
 import subway.controller.dto.CreateLineRequest;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class LineTestApi {
+    public static void createLines(List<CreateLineRequest> requests) {
+        requests.forEach(LineTestApi::createLine);
+    }
+
     public static ExtractableResponse<Response> createLine(CreateLineRequest request) {
         return RestAssured
                 .given().log().all()
