@@ -4,20 +4,19 @@ import autoparams.AutoSource;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.params.ParameterizedTest;
-import subway.domain.contract.LineCommand;
+import subway.domain.command.LineCommand;
 import subway.domain.entity.Line;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class LineTest {
     @Nested
-    class CreateLine {
-        @DisplayName("createLine")
+    class Init {
         @ParameterizedTest
         @AutoSource
         public void sut_returns_new_line(LineCommand.CreateLine command) {
             // when
-            Line actual = Line.createLine(command);
+            Line actual = Line.init(command);
 
             // then
             assertThat(actual.getName()).isEqualTo(command.getName());

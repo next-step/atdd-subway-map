@@ -1,4 +1,4 @@
-package subway.domain.contract;
+package subway.domain.command;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

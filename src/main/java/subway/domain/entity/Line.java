@@ -2,7 +2,7 @@ package subway.domain.entity;
 
 import lombok.Builder;
 import lombok.Getter;
-import subway.domain.contract.LineCommand;
+import subway.domain.command.LineCommand;
 
 import javax.persistence.*;
 
@@ -39,7 +39,7 @@ public class Line {
         this.distance = distance;
     }
 
-    public static Line createLine(LineCommand.CreateLine command) {
+    public static Line init(LineCommand.CreateLine command) {
         return new Line(
                 command.getName(),
                 command.getColor(),

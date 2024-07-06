@@ -13,4 +13,14 @@ public class CreateLineResponse {
     private Long upStationId;
     private Long downStationId;
     private Long distance;
+
+    public static CreateLineResponse from(CreateLineRequest request) {
+        return new CreateLineResponse(
+                request.getName(),
+                request.getColor(),
+                request.getUpStationId(),
+                request.getDownStationId(),
+                request.getDistance()
+        );
+    }
 }

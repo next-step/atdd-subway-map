@@ -3,7 +3,7 @@ package subway.controller.dto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
-import subway.domain.contract.LineCommand;
+import subway.domain.command.LineCommand;
 
 @ToString
 @Getter

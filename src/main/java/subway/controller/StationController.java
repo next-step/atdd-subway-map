@@ -1,36 +1,38 @@
 package subway.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import subway.controller.dto.StationRequest;
-import subway.domain.service.StationService;
-import subway.controller.dto.StationResponse;
+import subway.domain.command.StationCommander;
+import subway.domain.view.StationView;
+import subway.domain.query.StationReader;
 
 import java.net.URI;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 public class StationController {
-    private StationService stationService;
-
-    public StationController(StationService stationService) {
-        this.stationService = stationService;
-    }
+    private final StationCommander stationCommander;
+    private final StationReader stationReader;
 
     @PostMapping("/stations")
-    public ResponseEntity<StationResponse> createStation(@RequestBody StationRequest stationRequest) {
-        StationResponse station = stationService.saveStation(stationRequest);
-        return ResponseEntity.created(URI.create("/stations/" + station.getId())).body(station);
+    public ResponseEntity<StationView.Main> createStation(@RequestBody StationRequest stationRequest) {
+        Long id = stationCommander.createStation(stationRequest.getName());
+        StationView.Main view = stationReader.getOneById(id);
+        return ResponseEntity.created(URI.create("/stations/" + id)).body(view);
     }
 
     @GetMapping(value = "/stations")
-    public ResponseEntity<List<StationResponse>> showStations() {
-        return ResponseEntity.ok().body(stationService.findAllStations());
+    public ResponseEntity<List<StationView.Main>> showStations() {
+        List<StationView.Main> views = stationReader.getAll();
+        return ResponseEntity.ok().body(views);
     }
 
     @DeleteMapping("/stations/{id}")
     public ResponseEntity<Void> deleteStation(@PathVariable Long id) {
-        stationService.deleteStationById(id);
+        stationCommander.deleteStationById(id);
         return ResponseEntity.noContent().build();
     }
 }
