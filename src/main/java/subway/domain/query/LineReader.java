@@ -12,6 +12,7 @@ import subway.domain.repository.StationRepository;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -23,71 +24,40 @@ public class LineReader {
     @Transactional(readOnly = true)
     public LineView.Main getOneById(Long id) {
         Line line = lineRepository.findById(id).orElseThrow(() -> new RuntimeException("Not found Line"));
-        List<Station> stations = stationRepository.findAllById(List.of(line.getUpStationId(), line.getDownStationId()));
-        return joinAndTransform(line, stations);
+        Map<Long, Station> stationMap = getStationMapByIds(List.of(line.getUpStationId(), line.getDownStationId()));
+        return joinAndTransform(line, stationMap);
     }
 
 
     @Transactional(readOnly = true)
     public List<LineView.Main> getAllLines() {
         List<Line> lines = lineRepository.findAll();
-        List<Station> stations = stationRepository.findAllById(
+        Map<Long, Station> stationMap = getStationMapByIds(
                 lines.stream()
-                        .flatMap(line -> Arrays.stream(new Long[] { line.getUpStationId(), line.getDownStationId() }))
+                        .flatMap(line -> Stream.of(line.getUpStationId(), line.getDownStationId()))
                         .collect(Collectors.toSet())
         );
-        return joinAndTransform(lines, stations);
+        return lines.stream().map(line -> joinAndTransform(line, stationMap)).collect(Collectors.toList());
     }
 
-    private List<LineView.Main> joinAndTransform(List<Line> lines, List<Station> stations) {
+    private Map<Long, Station> getStationMapByIds(Iterable<Long> ids) {
         Map<Long, Station> stationMap = new HashMap<>();
-        stations.forEach((station -> stationMap.putIfAbsent(station.getId(), station)));
-
-        return lines.stream().map(line -> {
-            List<StationView.Main> upDownStation = new ArrayList<>();
-            Station upStation = stationMap.get(line.getUpStationId());
-            Station downStation = stationMap.get(line.getDownStationId());
-            if (upStation != null) {
-                upDownStation.add(transform(upStation));
-            }
-
-            if (downStation != null) {
-                upDownStation.add(transform(downStation));
-            }
-
-            return new LineView.Main(
-                    line.getId(),
-                    line.getName(),
-                    line.getColor(),
-                    upDownStation
-            );
-        }).collect(Collectors.toList());
+        stationRepository.findAllById(ids).forEach((station -> stationMap.putIfAbsent(station.getId(), station)));
+        return stationMap;
     }
 
-    private LineView.Main joinAndTransform(Line line, List<Station> stations) {
-        Map<Long, Station> stationMap = new HashMap<>();
-        stations.forEach((station -> stationMap.putIfAbsent(station.getId(), station)));
-
+    private LineView.Main joinAndTransform(Line line, Map<Long, Station> stationMap) {
         List<StationView.Main> upDownStation = new ArrayList<>();
         Station upStation = stationMap.get(line.getUpStationId());
         Station downStation = stationMap.get(line.getDownStationId());
         if (upStation != null) {
-            upDownStation.add(transform(upStation));
+            upDownStation.add(new StationView.Main(upStation.getId(), upStation.getName()));
         }
 
         if (downStation != null) {
-            upDownStation.add(transform(downStation));
+            upDownStation.add(new StationView.Main(downStation.getId(), downStation.getName()));
         }
 
-        return new LineView.Main(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                upDownStation
-        );
-    }
-
-    private StationView.Main transform(Station station) {
-        return new StationView.Main(station.getId(), station.getName());
+        return new LineView.Main(line.getId(), line.getName(), line.getColor(), upDownStation);
     }
 }
