@@ -2,22 +2,22 @@ package subway;
 
 public class LineCreateRequest {
 
-    private String lineName;
+    private String name;
     private String color;
     private Long upStationId;
     private Long downStationId;
     private Long distance;
 
-    public LineCreateRequest(String lineName, String color, Long upStationId, Long downStationId, Long distance) {
-        this.lineName = lineName;
+    public LineCreateRequest(String name, String color, Long upStationId, Long downStationId, Long distance) {
+        this.name = name;
         this.color = color;
         this.upStationId = upStationId;
         this.downStationId = downStationId;
         this.distance = distance;
     }
 
-    public String getLineName() {
-        return lineName;
+    public String getName() {
+        return name;
     }
 
     public String getColor() {
