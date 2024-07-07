@@ -1,41 +1,58 @@
 package subway;
 
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 @Component
-public class LineFacade implements LineService{
+public class LineFacade {
 
-    private final LineServiceImpl lineService;
+    private final LineService lineService;
     private final StationService stationService;
 
-    public LineFacade(LineServiceImpl lineService, StationService stationService) {
+    public LineFacade(LineService lineService, StationService stationService) {
         this.lineService = lineService;
         this.stationService = stationService;
     }
 
-    @Override
-    public void createLine(LineCreateRequest lineCreateRequest) {
-        lineService.createLine(lineCreateRequest);
+    @Transactional
+    public LineResponse createLine(LineCreateRequest lineCreateRequest) throws HttpException{
+        Line line = lineService.createLine(lineCreateRequest);
+        return makeLineResponse(line);
     }
 
 
-    public LineResponse readLine(Long id) {
-        return null;
+    public LineResponse readLine(Long id) throws HttpException{
+        Line line = lineService.readLine(id);
+        return makeLineResponse(line);
     }
 
 
-    public List<LineResponse> readLines() {
-        return null;
+    public List<LineResponse> readLines() throws HttpException{
+        List<Line> lines = lineService.readLines();
+        List<LineResponse> linesResponse = new ArrayList<>();
+        for (Line line: lines) {
+            linesResponse.add(makeLineResponse(line));
+        }
+        return linesResponse;
     }
 
-    @Override
-    public void updateLine(LineUpdateDTO lineUpdateDTO) {
+    public void updateLine(LineUpdateDTO lineUpdateDTO) throws HttpException {
         lineService.updateLine(lineUpdateDTO);
     }
 
-    @Override
-    public void deleteLine(Long id) {
+    public void deleteLine(Long id) throws HttpException {
         lineService.deleteLine(id);
     }
+
+    private LineResponse makeLineResponse(Line line) throws HttpException{
+        LineResponse lineResponse = new LineResponse(line.getId(), line.getName(), line.getColor());
+        StationResponse upStation = stationService.findStation(line.getUpStationId());
+        StationResponse downStation = stationService.findStation(line.getDownStationId());
+        return lineResponse
+                .addStation(upStation)
+                .addStation(downStation);
+    }
+
 }
