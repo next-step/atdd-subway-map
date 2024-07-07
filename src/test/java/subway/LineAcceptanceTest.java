@@ -29,7 +29,7 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선을 생성한다.")
     @DirtiesContext
     @Test
-    @Sql(scripts = {"StationInsert.sql"})
+    @Sql(scripts = {"StationInsert.sql", "LineInsert.sql"})
     void 지하철_노선_생성_테스트() {
         //given
         Map<String, String> params = new HashMap<>();
@@ -62,7 +62,7 @@ public class LineAcceptanceTest {
                 .then().log().all()
                 .extract().jsonPath().getList("name", String.class);
 
-        boolean isLineInserted = lineList.stream().anyMatch(name -> name == lineName);
+        boolean isLineInserted = lineList.stream().anyMatch(name -> name.equals(lineName));
         assertThat(isLineInserted).isTrue();
     }
 
