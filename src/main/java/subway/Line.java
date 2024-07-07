@@ -26,11 +26,49 @@ public class Line {
     public Line() {
     }
 
-    public Line(String name, Long upStationId, Long downStationId, Long distance) {
-        this.name = name;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
-        this.distance = distance;
+    public Line(Builder builder) {
+        this.name = builder.name;
+        this.upStationId = builder.upStationId;
+        this.downStationId = builder.downStationId;
+        this.distance = builder.distance;
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder {
+        private String name;
+        private Long upStationId;
+        private Long downStationId;
+        private Long distance;
+
+
+
+        public Builder name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Builder upStationId(Long upStationId) {
+            this.upStationId = upStationId;
+            return this;
+        }
+
+        public Builder downStationId(Long downStationId) {
+            this.downStationId = downStationId;
+            return this;
+        }
+
+        public Builder distance(Long distance) {
+            this.distance = distance;
+            return this;
+        }
+
+        public Line build() {
+            return new Line(this);
+        }
+
     }
 
     public Long getId() {
