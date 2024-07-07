@@ -28,6 +28,7 @@ public class Line {
 
     public Line(Builder builder) {
         this.name = builder.name;
+        this.color = builder.color;
         this.upStationId = builder.upStationId;
         this.downStationId = builder.downStationId;
         this.distance = builder.distance;
@@ -39,6 +40,7 @@ public class Line {
 
     public static class Builder {
         private String name;
+        private String color;
         private Long upStationId;
         private Long downStationId;
         private Long distance;
@@ -47,6 +49,11 @@ public class Line {
 
         public Builder name(String name) {
             this.name = name;
+            return this;
+        }
+
+        public Builder color(String color) {
+            this.color = color;
             return this;
         }
 
@@ -89,5 +96,17 @@ public class Line {
 
     public Long getDistance() {
         return distance;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void changeName(String name) {
+        this.name = name;
+    }
+
+    public void changeColor(String color) {
+        this.color = color;
     }
 }
