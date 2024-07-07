@@ -74,7 +74,28 @@ public class StationAcceptanceTest {
      * When 그 지하철역을 삭제하면
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
-    // TODO: 지하철역 제거 인수 테스트 메서드 생성
+    @DisplayName("지하철 역을 삭제한다")
+    @Test
+    void removesStationTest() {
+        //given
+        Long gangnamId = createStation(STATION_NAME_GANGNAM).jsonPath().getLong("id");
+        Long yeogsamId = createStation(STATION_NAME_YEOGSAM).jsonPath().getLong("id");
+
+        //when
+        ExtractableResponse<Response> removeResponse = removeStation(yeogsamId);
+        assertThat(removeResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        //then
+        ExtractableResponse<Response> loadResponse = showStations();
+
+        List<Long> stationsIds = loadResponse.jsonPath().getList("id", Long.class);
+        assertThat(stationsIds).contains(gangnamId);
+        assertThat(stationsIds).doesNotContain(yeogsamId);
+
+        List<String> stationNames = loadResponse.jsonPath().getList("name", String.class);
+        assertThat(stationNames).contains(STATION_NAME_GANGNAM);
+        assertThat(stationNames).doesNotContain(STATION_NAME_YEOGSAM);
+    }
 
 
     private ExtractableResponse<Response> createStation(String stationName) {
@@ -93,6 +114,14 @@ public class StationAcceptanceTest {
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().get("/stations")
+                .then().log().all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> removeStation(Long stationId) {
+        return RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().delete("/stations/" + stationId)
                 .then().log().all()
                 .extract();
     }
