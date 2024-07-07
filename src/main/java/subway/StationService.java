@@ -21,6 +21,11 @@ public class StationService {
         return createStationResponse(station);
     }
 
+    public StationResponse findStation(Long id) throws HttpException{
+        Station station = stationRepository.findById(id).orElseThrow(() -> new HttpException(ErrorCode.BAD_REQUEST));
+        return createStationResponse(station);
+    }
+
     public List<StationResponse> findAllStations() {
         return stationRepository.findAll().stream()
                 .map(this::createStationResponse)
