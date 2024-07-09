@@ -1,11 +1,9 @@
 package subway.acceptance;
 
-import autoparams.AutoSource;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
 import org.springframework.http.HttpStatus;
 import subway.controller.dto.CreateLineRequest;
 import subway.controller.dto.UpdateLineRequest;
@@ -23,9 +21,13 @@ public class LineAcceptanceTest extends BaseTestSetup {
      * Then: 해당 노선이 생성되고 노선 목록에 포함된다.
      */
     @DisplayName("노선을 생성한다.")
-    @ParameterizedTest
-    @AutoSource
-    void createLine(CreateLineRequest request) {
+    @Test
+    void createLine() {
+        // given
+        Long seoulId = StationApiResponseExtractor.extractId(StationTestApi.createStation("서울역"));
+        Long cityHallId = StationApiResponseExtractor.extractId(StationTestApi.createStation("시청역"));
+        CreateLineRequest request = LineFixture.lineOneCreateRequest(seoulId, cityHallId);
+
         // when
         ExtractableResponse<Response> response = LineTestApi.createLine(request);
 
@@ -108,9 +110,9 @@ public class LineAcceptanceTest extends BaseTestSetup {
         Long seoulId = StationApiResponseExtractor.extractId(StationTestApi.createStation("서울역"));
         Long cityHallId = StationApiResponseExtractor.extractId(StationTestApi.createStation("시청역"));
         Long id = LineApiResponseExtractor.Single.extractId(LineTestApi.createLine(LineFixture.lineOneCreateRequest(seoulId, cityHallId)));
+        UpdateLineRequest request = new UpdateLineRequest("변경된 호선", "bg-red-600", seoulId, cityHallId, 10L);
 
         // when
-        UpdateLineRequest request = new UpdateLineRequest("변경된 호선", "bg-red-600", seoulId, cityHallId, 10L);
         ExtractableResponse<Response> response = LineTestApi.updateLine(id, request);
 
         // then

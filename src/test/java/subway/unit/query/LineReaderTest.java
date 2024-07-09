@@ -64,6 +64,9 @@ public class LineReaderTest extends BaseTestSetup {
         @Repeat(5)
         public void sut_returns_lines(List<Line> lines) {
             // given
+            lines.forEach((line) -> {
+
+            });
             lineRepository.saveAll(lines);
 
             // when
