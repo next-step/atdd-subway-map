@@ -56,7 +56,8 @@ public class SubwayLineAcceptanceTest {
 
     private ExtractableResponse<Response> requestCreateSubwayLine(String name, String color, Long upStationId, Long downStationId) {
 
-        return RestAssured.given().body(
+        return RestAssured.given().log().all()
+                .body(
 //                        SubwayLineRequest(
 //                                name,
 //                                color,
@@ -66,9 +67,8 @@ public class SubwayLineAcceptanceTest {
                         Map.of("name", name, "color", color, "upStationId", 1, "downStationId", 2, "distance", 10)
                 )
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/subwayline")
-                .then()
+                .when().post("/subwaylines")
+                .then().log().all()
                 .extract();
     }
 
