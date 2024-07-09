@@ -24,9 +24,10 @@ public class LineAcceptanceTest extends BaseTestSetup {
     @Test
     void createLine() {
         // given
-        Long seoulId = StationApiResponseExtractor.extractId(StationTestApi.createStation("서울역"));
-        Long cityHallId = StationApiResponseExtractor.extractId(StationTestApi.createStation("시청역"));
-        CreateLineRequest request = LineFixture.lineOneCreateRequest(seoulId, cityHallId);
+        CreateLineRequest request = LineFixture.prepareLineOneCreateRequest(
+                StationApiResponseExtractor.Single.extractId(StationTestApi.createSeoulStation()),
+                StationApiResponseExtractor.Single.extractId(StationTestApi.createCityHallStation())
+        );
 
         // when
         ExtractableResponse<Response> response = LineTestApi.createLine(request);
@@ -48,13 +49,15 @@ public class LineAcceptanceTest extends BaseTestSetup {
     @Test
     void showLines() {
         // given
-        Long seoulId = StationApiResponseExtractor.extractId(StationTestApi.createStation("서울역"));
-        Long cityHallId = StationApiResponseExtractor.extractId(StationTestApi.createStation("시청역"));
-        LineTestApi.createLine(LineFixture.lineOneCreateRequest(seoulId, cityHallId));
+        LineTestApi.createLine(LineFixture.prepareLineOneCreateRequest(
+                StationApiResponseExtractor.Single.extractId(StationTestApi.createSeoulStation()),
+                StationApiResponseExtractor.Single.extractId(StationTestApi.createCityHallStation())
+        ));
 
-        Long yeoksamId = StationApiResponseExtractor.extractId(StationTestApi.createStation("역삼역"));
-        Long jamsilId = StationApiResponseExtractor.extractId(StationTestApi.createStation("잠실역"));
-        LineTestApi.createLine(LineFixture.lineTwoCreateRequest(yeoksamId, jamsilId));
+        LineTestApi.createLine(LineFixture.prepareLineTwoCreateRequest(
+                StationApiResponseExtractor.Single.extractId(StationTestApi.createYeoksamStation()),
+                StationApiResponseExtractor.Single.extractId(StationTestApi.createJamsilStation())
+        ));
 
         // when
         ExtractableResponse<Response> response = LineTestApi.showLines();
@@ -66,7 +69,6 @@ public class LineAcceptanceTest extends BaseTestSetup {
         List<String> lineNames = LineApiResponseExtractor.extractNames(response);
         assertThat(lineNames).containsExactly("1호선", "2호선");
 
-        // then
         List<String> lineOneStationNames = LineApiResponseExtractor.extractUpDownStationNames(response, "1호선");
         assertThat(lineOneStationNames).containsExactly("서울역", "시청역");
 
@@ -83,9 +85,11 @@ public class LineAcceptanceTest extends BaseTestSetup {
     @Test
     void showLine() {
         // given
-        Long seoulId = StationApiResponseExtractor.extractId(StationTestApi.createStation("서울역"));
-        Long cityHallId = StationApiResponseExtractor.extractId(StationTestApi.createStation("시청역"));
-        Long id = LineApiResponseExtractor.Single.extractId(LineTestApi.createLine(LineFixture.lineOneCreateRequest(seoulId, cityHallId)));
+        ExtractableResponse<Response> createdLine = LineTestApi.createLine(LineFixture.prepareLineOneCreateRequest(
+                StationApiResponseExtractor.Single.extractId(StationTestApi.createSeoulStation()),
+                StationApiResponseExtractor.Single.extractId(StationTestApi.createCityHallStation())
+        ));
+        Long id = LineApiResponseExtractor.Single.extractId(createdLine);
 
         // when
         ExtractableResponse<Response> response = LineTestApi.showLine(id);
@@ -107,10 +111,18 @@ public class LineAcceptanceTest extends BaseTestSetup {
     @Test
     void updateLine() {
         // given
-        Long seoulId = StationApiResponseExtractor.extractId(StationTestApi.createStation("서울역"));
-        Long cityHallId = StationApiResponseExtractor.extractId(StationTestApi.createStation("시청역"));
-        Long id = LineApiResponseExtractor.Single.extractId(LineTestApi.createLine(LineFixture.lineOneCreateRequest(seoulId, cityHallId)));
-        UpdateLineRequest request = new UpdateLineRequest("변경된 호선", "bg-red-600", seoulId, cityHallId, 10L);
+        ExtractableResponse<Response> createdLine = LineTestApi.createLine(LineFixture.prepareLineOneCreateRequest(
+                StationApiResponseExtractor.Single.extractId(StationTestApi.createSeoulStation()),
+                StationApiResponseExtractor.Single.extractId(StationTestApi.createCityHallStation())
+        ));
+        Long id = LineApiResponseExtractor.Single.extractId(createdLine);
+        UpdateLineRequest request = new UpdateLineRequest(
+                "2호선",
+                "#00A84D",
+                StationApiResponseExtractor.Single.extractId(StationTestApi.createYeoksamStation()),
+                StationApiResponseExtractor.Single.extractId(StationTestApi.createJamsilStation()),
+                10L
+        );
 
         // when
         ExtractableResponse<Response> response = LineTestApi.updateLine(id, request);
@@ -120,8 +132,9 @@ public class LineAcceptanceTest extends BaseTestSetup {
 
         // then
         ExtractableResponse<Response> updatedLine = LineTestApi.showLine(id);
-        assertThat(LineApiResponseExtractor.Single.extractName(updatedLine)).isEqualTo("변경된 호선");
-        assertThat(LineApiResponseExtractor.Single.extractColor(updatedLine)).isEqualTo("bg-red-600");
+        assertThat(LineApiResponseExtractor.Single.extractName(updatedLine)).isEqualTo("2호선");
+        assertThat(LineApiResponseExtractor.Single.extractColor(updatedLine)).isEqualTo("#00A84D");
+        assertThat(LineApiResponseExtractor.Single.extractUpDownStationNames(response)).containsExactly("역삼역", "잠실역");
     }
 
     /**
@@ -134,9 +147,11 @@ public class LineAcceptanceTest extends BaseTestSetup {
     @Test
     void deleteLine() {
         // given
-        Long seoulId = StationApiResponseExtractor.extractId(StationTestApi.createStation("서울역"));
-        Long cityHallId = StationApiResponseExtractor.extractId(StationTestApi.createStation("시청역"));
-        Long id = LineApiResponseExtractor.Single.extractId(LineTestApi.createLine(LineFixture.lineOneCreateRequest(seoulId, cityHallId)));
+        ExtractableResponse<Response> createdLine = LineTestApi.createLine(LineFixture.prepareLineOneCreateRequest(
+                StationApiResponseExtractor.Single.extractId(StationTestApi.createSeoulStation()),
+                StationApiResponseExtractor.Single.extractId(StationTestApi.createCityHallStation())
+        ));
+        Long id = LineApiResponseExtractor.Single.extractId(createdLine);
 
         // when
         ExtractableResponse<Response> response = LineTestApi.deleteLine(id);

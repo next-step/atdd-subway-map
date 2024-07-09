@@ -1,15 +1,18 @@
 package subway.internal;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.springframework.http.MediaType;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 public class StationApiResponseExtractor {
-    public static Long extractId(ExtractableResponse<Response> response) {
-        return response.jsonPath().getLong("id");
+    public static class Single {
+        public static Long extractId(ExtractableResponse<Response> response) {
+            return response.jsonPath().getLong("id");
+        }
+    }
+
+    public static List<String> extractNames(ExtractableResponse<Response> response) {
+        return response.jsonPath().getList("name", String.class);
     }
 }

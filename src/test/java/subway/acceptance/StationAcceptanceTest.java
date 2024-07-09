@@ -8,6 +8,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.http.HttpStatus;
 import subway.internal.BaseTestSetup;
+import subway.internal.StationApiResponseExtractor;
 import subway.internal.StationTestApi;
 
 import java.util.List;
@@ -32,7 +33,7 @@ public class StationAcceptanceTest extends BaseTestSetup {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames = StationTestApi.showStations().jsonPath().getList("name", String.class);
+        List<String> stationNames = StationApiResponseExtractor.extractNames(StationTestApi.showStations());
         assertThat(stationNames).containsAnyOf(name);
     }
 
@@ -56,7 +57,7 @@ public class StationAcceptanceTest extends BaseTestSetup {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         // then
-        List<String> stationNames = response.jsonPath().getList("name", String.class);
+        List<String> stationNames = StationApiResponseExtractor.extractNames(response);
         assertThat(stationNames.size()).isEqualTo(2);
         assertThat(stationNames).containsExactlyInAnyOrder(name1, name2);
     }
@@ -71,7 +72,7 @@ public class StationAcceptanceTest extends BaseTestSetup {
     @ValueSource(strings = {"강남역", "역삼역", "삼성역"})
     void deleteStation(String name) {
         // given
-        long id = StationTestApi.createStation(name).jsonPath().getLong("id");
+        long id = StationApiResponseExtractor.Single.extractId(StationTestApi.createStation(name));
 
         // when
         ExtractableResponse<Response> response = StationTestApi.deleteStation(id);
@@ -80,7 +81,7 @@ public class StationAcceptanceTest extends BaseTestSetup {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         // then
-        List<String> stationNames = StationTestApi.showStations().jsonPath().getList("name", String.class);
+        List<String> stationNames = StationApiResponseExtractor.extractNames(StationTestApi.showStations());
         assertThat(stationNames).doesNotContain(name);
     }
 }

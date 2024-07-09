@@ -9,6 +9,22 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class StationTestApi {
+    public static ExtractableResponse<Response> createSeoulStation() {
+        return createStation("서울역");
+    }
+
+    public static ExtractableResponse<Response> createCityHallStation() {
+        return createStation("시청역");
+    }
+
+    public static ExtractableResponse<Response> createYeoksamStation() {
+        return createStation("역삼역");
+    }
+
+    public static ExtractableResponse<Response> createJamsilStation() {
+        return createStation("잠실역");
+    }
+
     public static ExtractableResponse<Response> createStation(String name) {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
