@@ -29,7 +29,7 @@ public class LineService {
 
 
     public Line readLine(Long id) throws HttpException {
-        return lineRepository.findById(id).orElseThrow(() -> new HttpException(ErrorCode.BAD_REQUEST));
+        return lineRepository.findById(id).orElseThrow(() -> new HttpException(ErrorCode.MISSING_ID));
     }
 
 
@@ -40,14 +40,13 @@ public class LineService {
     @Transactional
     public void updateLine(LineUpdateDTO dto) throws HttpException {
         Line line = lineRepository.findById(dto.getId())
-                .orElseThrow(() -> new HttpException(ErrorCode.BAD_REQUEST));
+                .orElseThrow(() -> new HttpException(ErrorCode.MISSING_ID));
         line.changeColor(dto.getColor());
         line.changeName(dto.getName());
-        lineRepository.save(line);
     }
 
     @Transactional
-    public void deleteLine(Long id) throws HttpException {
+    public void deleteLine(Long id) {
         lineRepository.deleteById(id);
     }
 }
