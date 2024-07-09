@@ -74,7 +74,9 @@ public class StationAcceptanceTest {
         ExtractableResponse<Response> response = addStation("강남역");
 
         // when
-        deleteStation(response.body().jsonPath().getString("id"));
+        String location = response.header("Location");
+        String stationId = location.substring(location.lastIndexOf("/") + 1);
+        deleteStation(stationId);
 
         // then
         List<String> stationNames = getStationNames();
@@ -120,10 +122,7 @@ public class StationAcceptanceTest {
             .extract().jsonPath().getList("id", String.class);
 
         for (String stationId : stationIds) {
-            RestAssured.given().log().all()
-                .when().delete("/stations/" + stationId)
-                .then().log().all()
-                .statusCode(HttpStatus.NO_CONTENT.value());
+            deleteStation(stationId);
         }
     }
 
