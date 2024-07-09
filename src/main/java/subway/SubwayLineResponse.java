@@ -16,9 +16,9 @@ public final class SubwayLineResponse {
         this.stations = stations;
     }
 
-    public static SubwayLineResponse from(SubwayLine subwayLine, List<Station> stations) {
-        List<StationResponse> stationResponses = stations.stream()
-                .map(station -> new StationResponse(station.getId(), station.getName()))
+    public static SubwayLineResponse from(SubwayLine subwayLine) {
+        List<StationResponse> stationResponses = subwayLine.getStations().stream()
+                .map(StationResponse::from)
                 .collect(Collectors.toList());
 
         return new SubwayLineResponse(

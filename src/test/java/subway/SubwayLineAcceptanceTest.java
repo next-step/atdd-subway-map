@@ -67,7 +67,7 @@ public class SubwayLineAcceptanceTest {
                         Map.of("name", name, "color", color, "upStationId", 1, "downStationId", 2, "distance", 10)
                 )
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/subwaylines")
+                .when().post("/subway-lines")
                 .then().log().all()
                 .extract();
     }
@@ -78,6 +78,26 @@ public class SubwayLineAcceptanceTest {
      * when 지하철역 노선목록을 조회하면
      * then 지하철역 노선3개가 조회된다.
      */
+    @Test
+    void getAllSubwayLine() {
+        //given
+        requestCreateSubwayLine("신분당선", "bg-red", 1L, 10L);
+        requestCreateSubwayLine("1호선", "bg-red", 1L, 10L);
+        requestCreateSubwayLine("2호선", "bg-red", 1L, 10L);
+
+        //when
+        var getAllResponse = requestGetAllSubwayLine();
+
+        //then
+        assertThat(getAllResponse.jsonPath().getList(".").size()).isEqualTo(3);
+    }
+
+    private ExtractableResponse<Response> requestGetAllSubwayLine() {
+        return RestAssured
+                .when().get("/subway-lines")
+                .then()
+                .extract();
+    }
 
 
     /**

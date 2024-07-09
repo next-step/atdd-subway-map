@@ -1,9 +1,8 @@
 package subway;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class SubwayLine {
@@ -11,6 +10,7 @@ public class SubwayLine {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true, nullable = false)
     private String name;
 
     private String color;
@@ -20,6 +20,9 @@ public class SubwayLine {
     private Long downStationId;
 
     private Long distance;
+
+    @OneToMany(mappedBy = "subwayLine")
+    private List<Station> stations = new ArrayList<>();
 
     public SubwayLine(String name, String color, Long upStationId, Long downStationId, Long distance) {
         this.name = name;
@@ -54,5 +57,9 @@ public class SubwayLine {
 
     public Long getDistance() {
         return distance;
+    }
+
+    public List<Station> getStations() {
+        return new ArrayList<>(this.stations);
     }
 }
