@@ -17,4 +17,7 @@ public class LineUpdateRequest {
         this.name = name;
         this.color = color;
     }
+
+    public LineUpdateRequest() {
+    }
 }

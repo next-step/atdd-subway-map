@@ -16,6 +16,9 @@ public class LineCreateRequest {
         this.distance = distance;
     }
 
+    public LineCreateRequest() {
+    }
+
     public String getName() {
         return name;
     }
