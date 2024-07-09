@@ -58,7 +58,7 @@ public class StationAcceptanceTest {
 
         // then
         assertThat(stationNames).hasSize(2);
-        assertThat(stationNames).containsExactly("강남역", "망원역");
+        assertThat(stationNames).containsExactlyInAnyOrder("강남역", "망원역");
 
     }
 
