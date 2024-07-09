@@ -42,7 +42,7 @@ public class LineFacade {
         lineService.updateLine(lineUpdateDTO);
     }
 
-    public void deleteLine(Long id) throws HttpException {
+    public void deleteLine(Long id) {
         lineService.deleteLine(id);
     }
 
