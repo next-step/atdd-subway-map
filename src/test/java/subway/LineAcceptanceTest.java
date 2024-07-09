@@ -57,10 +57,7 @@ public class LineAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         //then
-        List<String> lineList = RestAssured.given().log().all()
-                .when().get("/lines")
-                .then().log().all()
-                .extract().jsonPath().getList("name", String.class);
+        List<String> lineList = getAPIResponse("/lines").jsonPath().getList("name", String.class);
 
         boolean isLineInserted = lineList.stream().anyMatch(name -> name.equals(lineName));
         assertThat(isLineInserted).isTrue();
@@ -79,11 +76,7 @@ public class LineAcceptanceTest {
         List<String> insertedLines = List.of("신분당선", "분당선");
 
         //when
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .when().get("/lines")
-                        .then().log().all()
-                        .extract();
+        ExtractableResponse<Response> response = getAPIResponse("/lines");
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
@@ -107,16 +100,12 @@ public class LineAcceptanceTest {
         String insertedName = "분당선";
 
         //when
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .when().get("/lines/2")
-                        .then().log().all()
-                        .extract();
+        ExtractableResponse<Response> response = getAPIResponse("/lines/2");
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         //then
-        String testingName = getJsonPath("/lines/2", "name");
+        String testingName = response.jsonPath().getString("name");
         assertThat(testingName).isEqualTo(insertedName);
     }
 
@@ -149,8 +138,9 @@ public class LineAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         //then
-        String testingName = getJsonPath("/lines/1", "name");
-        String testingColor = getJsonPath("/lines/1", "color");
+        ExtractableResponse getApiResponse = getAPIResponse("/lines/1");
+        String testingName = getApiResponse.jsonPath().getString("name");
+        String testingColor = getApiResponse.jsonPath().getString("color");
 
         assertThat(testingName).isEqualTo(changingName);
         assertThat(testingColor).isEqualTo(changingColor);
@@ -186,12 +176,12 @@ public class LineAcceptanceTest {
     }
 
 
-    String getJsonPath(String url ,String field) {
+    ExtractableResponse<Response> getAPIResponse(String url) {
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().get(url)
                 .then().log().all()
-                .extract().jsonPath().getString(field);
+                .extract();
     }
 
     List<String> getLines() {
