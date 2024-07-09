@@ -3,6 +3,8 @@ package subway.domain.query;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.domain.exception.SubwayDomainException;
+import subway.domain.exception.SubwayDomainExceptionType;
 import subway.domain.view.LineView;
 import subway.domain.view.StationView;
 import subway.domain.entity.Line;
@@ -23,7 +25,7 @@ public class LineReader {
 
     @Transactional(readOnly = true)
     public LineView.Main getOneById(Long id) {
-        Line line = lineRepository.findById(id).orElseThrow(() -> new RuntimeException("Not found Line"));
+        Line line = lineRepository.findById(id).orElseThrow(() -> new SubwayDomainException(SubwayDomainExceptionType.NOT_FOUND_LINE));
         Map<Long, Station> stationMap = getStationMapByIds(List.of(line.getUpStationId(), line.getDownStationId()));
         return joinAndTransform(line, stationMap);
     }

@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.domain.entity.Line;
+import subway.domain.exception.SubwayDomainException;
+import subway.domain.exception.SubwayDomainExceptionType;
 import subway.domain.repository.LineRepository;
 
 @Service
@@ -19,14 +21,14 @@ public class LineCommander {
 
     @Transactional
     public void updateLine(LineCommand.UpdateLine command) {
-        Line line = lineRepository.findById(command.getId()).orElseThrow(() -> new RuntimeException("Not Found line"));
+        Line line = lineRepository.findById(command.getId()).orElseThrow(() -> new SubwayDomainException(SubwayDomainExceptionType.NOT_FOUND_LINE));
         line.update(command);
         lineRepository.save(line);
     }
 
     @Transactional
     public void deleteLineById(Long id) {
-        Line line = lineRepository.findById(id).orElseThrow(() -> new RuntimeException("Not Found line"));
+        Line line = lineRepository.findById(id).orElseThrow(() -> new SubwayDomainException(SubwayDomainExceptionType.NOT_FOUND_LINE));
         lineRepository.delete(line);
     }
 }

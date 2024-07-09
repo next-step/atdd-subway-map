@@ -6,6 +6,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.springframework.beans.factory.annotation.Autowired;
+import subway.domain.exception.SubwayDomainException;
+import subway.domain.exception.SubwayDomainExceptionType;
 import subway.domain.view.LineView;
 import subway.domain.entity.Line;
 import subway.domain.query.LineReader;
@@ -16,6 +18,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 
 public class LineReaderTest extends BaseTestSetup {
 
@@ -40,6 +43,16 @@ public class LineReaderTest extends BaseTestSetup {
 
             // then
             assertThat(line.getName()).isEqualTo(actual.getName());
+        }
+
+        @ParameterizedTest
+        @AutoSource
+        public void sut_throws_error_if_not_found_line(Long id) {
+            // when
+            SubwayDomainException actual = (SubwayDomainException) catchThrowable(() -> sut.getOneById(id));
+
+            // then
+            assertThat(actual.getExceptionType()).isEqualTo(SubwayDomainExceptionType.NOT_FOUND_LINE);
         }
     }
 

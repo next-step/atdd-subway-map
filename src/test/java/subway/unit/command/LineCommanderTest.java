@@ -10,6 +10,8 @@ import subway.domain.command.LineCommand;
 import subway.domain.command.LineCommander;
 import subway.domain.entity.Line;
 import subway.domain.repository.LineRepository;
+import subway.domain.exception.SubwayDomainException;
+import subway.domain.exception.SubwayDomainExceptionType;
 import subway.fixtures.LineFixture;
 import subway.internal.BaseTestSetup;
 
@@ -17,6 +19,7 @@ import java.lang.reflect.Field;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 
 public class LineCommanderTest extends BaseTestSetup {
 
@@ -63,6 +66,16 @@ public class LineCommanderTest extends BaseTestSetup {
             assertThat(actual.get().getName()).isEqualTo(command.getName());
             assertThat(actual.get().getColor()).isEqualTo(command.getColor());
         }
+
+        @ParameterizedTest
+        @AutoSource
+        public void sut_throws_error_if_not_found_line(LineCommand.UpdateLine command) {
+            // when
+            SubwayDomainException actual = (SubwayDomainException) catchThrowable(() -> sut.updateLine(command));
+
+            // then
+            assertThat(actual.getExceptionType()).isEqualTo(SubwayDomainExceptionType.NOT_FOUND_LINE);
+        }
     }
 
     @Nested
@@ -82,6 +95,16 @@ public class LineCommanderTest extends BaseTestSetup {
             // then
             Optional<Line> actual = lineRepository.findById(line.getId());
             assertThat(actual).isEmpty();
+        }
+
+        @ParameterizedTest
+        @AutoSource
+        public void sut_throws_error_if_not_found_line(Long id) {
+            // when
+            SubwayDomainException actual = (SubwayDomainException) catchThrowable(() -> sut.deleteLineById(id));
+
+            // then
+            assertThat(actual.getExceptionType()).isEqualTo(SubwayDomainExceptionType.NOT_FOUND_LINE);
         }
     }
 

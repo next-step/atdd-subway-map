@@ -2,6 +2,8 @@ package subway.domain.query;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import subway.domain.exception.SubwayDomainException;
+import subway.domain.exception.SubwayDomainExceptionType;
 import subway.domain.view.StationView;
 import subway.domain.entity.Station;
 import subway.domain.repository.StationRepository;
@@ -19,7 +21,7 @@ public class StationReader {
         return stationRepository
                 .findById(id)
                 .map(this::transform)
-                .orElseThrow(() -> new RuntimeException("Not Found Station"));
+                .orElseThrow(() -> new SubwayDomainException(SubwayDomainExceptionType.NOT_FOUND_STATION));
     }
 
     public List<StationView.Main> getAll() {
