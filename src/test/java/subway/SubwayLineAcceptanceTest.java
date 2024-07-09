@@ -67,7 +67,7 @@ public class SubwayLineAcceptanceTest {
                         Map.of("name", name, "color", color, "upStationId", 1, "downStationId", 2, "distance", 10)
                 )
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/subway-lines")
+                .when().post("/lines")
                 .then().log().all()
                 .extract();
     }
@@ -90,11 +90,13 @@ public class SubwayLineAcceptanceTest {
 
         //then
         assertThat(getAllResponse.jsonPath().getList(".").size()).isEqualTo(3);
+        assertThat(getAllResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
     }
 
     private ExtractableResponse<Response> requestGetAllSubwayLine() {
         return RestAssured
-                .when().get("/subway-lines")
+                .when().get("/lines")
                 .then()
                 .extract();
     }
@@ -103,16 +105,32 @@ public class SubwayLineAcceptanceTest {
     /**
      * 스토리 3: 나는 관리자로서 특정 지하철 노선을 조회하여 해당 노선의 정보를 확인하고 싶다.
      * given 지하철역 노선이 등록되어있는 경우
-     *when 해당 지하철역 노선을 조회한다
+     * when 해당 지하철역 노선을 조회한다
      * then: 지하철역 노선이 조회된다.
      */
+    @Test
+    void getSubwayLine() {
+        //given
+        var createdResponse = requestCreateSubwayLine("신분당선", "bg-red", 1L, 10L);
+        var createdId = createdResponse.jsonPath().getLong("id");
+        //when
+        var getResponse = requestGetSubwayLine(createdId);
 
-    /**
-     * 스토리 3: 나는 관리자로서 특정 지하철 노선을 조회하여 해당 노선의 정보를 확인하고 싶다.
-     * given 지하철역 노선이 등록되지 않은 경우
-     * when 해당 지하철역 노선을 조회한다
-     * then: 지하철역 노선이 조회되지 않는다..
-     */
+        //then
+        assertThat(getResponse.jsonPath().getString("name")).isEqualTo("신분당선");
+        assertThat(getResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+    }
+
+    private ExtractableResponse<Response> requestGetSubwayLine(Long id) {
+        return RestAssured
+                .given()
+                .pathParam("id", id)
+                .when()
+                .get("/lines/{id}")
+                .then()
+                .extract();
+    }
 
     /**
      * 스토리 4: 나는 관리자로서 지하철 노선을 수정하여 변경된 정보를 반영하고 싶다.
@@ -120,6 +138,31 @@ public class SubwayLineAcceptanceTest {
      * when: 노선의 이름을 수정한다..
      * then: 이름이 수정된다.
      */
+    @Test
+    void updateSubwayLine() {
+        //given
+        var createdResponse = requestCreateSubwayLine("신분당선", "bg-red", 1L, 10L);
+        var createdId = createdResponse.jsonPath().getLong("id");
+        //when
+        var updatedResponse = requestUpdateSubwayLine(createdId, "다른분당선", "bg-red-001");
+
+        //then
+        assertThat(updatedResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+        var getResponse = requestGetSubwayLine(createdId);
+        assertThat(getResponse.jsonPath().getString("name")).isEqualTo("다른분당선");
+        assertThat(getResponse.jsonPath().getString("color")).isEqualTo("bg-red-001");
+    }
+
+    private ExtractableResponse<Response> requestUpdateSubwayLine(Long id, String name, String color) {
+        return RestAssured
+                .given()
+                .pathParam("id", id)
+                .body(Map.of("name", name, "color", color))
+                .when()
+                .put("/lines/{id}")
+                .then()
+                .extract();
+    }
 
 
     /**
@@ -128,5 +171,30 @@ public class SubwayLineAcceptanceTest {
      * when: 노선을 삭제한다.
      * then: 노선이 삭제된다.
      */
+    @Test
+    void deleteSubwayLine() {
+        //given
+        var createdResponse = requestCreateSubwayLine("신분당선", "bg-red", 1L, 10L);
+        var createdId = createdResponse.jsonPath().getLong("id");
+        //when
+        var deletedResponse = requestDeleteSubwayLine(createdId);
+
+        //then
+        assertThat(deletedResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        var getAllResponse = requestGetAllSubwayLine();
+        var stationIds = getAllResponse.jsonPath().getList("id", Long.class);
+
+        assertThat(stationIds).doesNotContain(createdId);
+    }
+
+    private ExtractableResponse<Response> requestDeleteSubwayLine(Long id) {
+        return RestAssured
+                .given()
+                .pathParam("id", id)
+                .when()
+                .delete("/lines/{id}")
+                .then()
+                .extract();
+    }
 
 }

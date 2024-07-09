@@ -17,16 +17,16 @@ public class SubwayLineController {
         this.subwayLineService = subwayLineService;
     }
 
-    @PostMapping("/subway-lines")
+    @PostMapping("/lines")
     ResponseEntity<SubwayLineResponse> createSubwayLine(@RequestBody SubwayLineRequest request) {
         var response = subwayLineService.saveSubwayLine(request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    @GetMapping("/subway-lines")
+    @GetMapping("/lines")
     ResponseEntity<List<SubwayLineResponse>> showSubwayLines() {
         var response = subwayLineService.findAllSubwayLines();
         return ResponseEntity.ok(response);
     }
-    
+
 }
