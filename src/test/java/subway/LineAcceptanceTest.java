@@ -18,6 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 
 @DisplayName("노선관련 기능")
+@Sql(scripts = {"StationInsert.sql", "LineInsert.sql"})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {
 
@@ -29,7 +30,6 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선을 생성한다.")
     @DirtiesContext
     @Test
-    @Sql(scripts = {"StationInsert.sql", "LineInsert.sql"})
     void 지하철_노선_생성_테스트() {
         //given
         Map<String, String> params = new HashMap<>();
@@ -74,7 +74,6 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선목록을 조회한다.")
     @DirtiesContext
     @Test
-    @Sql(scripts = {"StationInsert.sql", "LineInsert.sql"})
     void 지하철_노선_목록_조회() {
         //given
         List<String> insertedLines = List.of("신분당선", "분당선");
@@ -103,7 +102,6 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선을 조회한다.")
     @DirtiesContext
     @Test
-    @Sql(scripts = {"StationInsert.sql", "LineInsert.sql"})
     void 지하철_단일노선_조회() {
         //given
         String insertedName = "분당선";
@@ -130,7 +128,6 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선을 수정한다.")
     @DirtiesContext
     @Test
-    @Sql(scripts = {"StationInsert.sql", "LineInsert.sql"})
     void 지하철_노선_수정_테스트() {
 
         //when
@@ -168,7 +165,6 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선을 삭제한다.")
     @DirtiesContext
     @Test
-    @Sql(scripts = {"StationInsert.sql", "LineInsert.sql"})
     void 지하철_노선_삭제_테스트() {
         //given
         String insertedID = "2";
