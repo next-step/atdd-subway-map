@@ -8,7 +8,6 @@ import subway.domain.view.LineView;
 import subway.domain.query.LineReader;
 import subway.domain.command.LineCommander;
 import subway.controller.dto.CreateLineRequest;
-import subway.controller.dto.CreateLineResponse;
 
 import java.net.URI;
 import java.util.*;
@@ -22,9 +21,10 @@ public class LineController {
     private final LineReader lineReader;
 
     @PostMapping()
-    public ResponseEntity<CreateLineResponse> createLine(@RequestBody CreateLineRequest request) {
+    public ResponseEntity<LineView.Main> createLine(@RequestBody CreateLineRequest request) {
         Long id = lineService.createLine(request.toCommand());
-        return ResponseEntity.created(URI.create("/lines/" + id)).body(CreateLineResponse.from(request, id));
+        LineView.Main view = lineReader.getOneById(id);
+        return ResponseEntity.created(URI.create("/lines/" + id)).body(view);
     }
 
     @PutMapping("/{id}")
