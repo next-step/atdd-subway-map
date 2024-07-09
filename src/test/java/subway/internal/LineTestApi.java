@@ -5,16 +5,9 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.MediaType;
 import subway.controller.dto.CreateLineRequest;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import subway.controller.dto.UpdateLineRequest;
 
 public class LineTestApi {
-    public static void createLines(List<CreateLineRequest> requests) {
-        requests.forEach(LineTestApi::createLine);
-    }
-
     public static ExtractableResponse<Response> createLine(CreateLineRequest request) {
         return RestAssured
                 .given().log().all()
@@ -39,6 +32,16 @@ public class LineTestApi {
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().get("/lines/" + id)
+                .then().log().all()
+                .extract();
+    }
+
+    public static ExtractableResponse<Response> updateLine(Long id, UpdateLineRequest params) {
+        return RestAssured
+                .given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().put("/lines/" + id)
                 .then().log().all()
                 .extract();
     }

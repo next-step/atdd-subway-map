@@ -15,4 +15,16 @@ public class LineCommand {
         private Long downStationId;
         private Long distance;
     }
+
+    @ToString
+    @Getter
+    @AllArgsConstructor
+    public static class UpdateLine {
+        private Long id;
+        private String name;
+        private String color;
+        private Long upStationId;
+        private Long downStationId;
+        private Long distance;
+    }
 }

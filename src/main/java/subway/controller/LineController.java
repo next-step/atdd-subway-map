@@ -3,6 +3,7 @@ package subway.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import subway.controller.dto.UpdateLineRequest;
 import subway.domain.view.LineView;
 import subway.domain.query.LineReader;
 import subway.domain.command.LineCommander;
@@ -24,6 +25,16 @@ public class LineController {
     public ResponseEntity<CreateLineResponse> createLine(@RequestBody CreateLineRequest request) {
         Long id = lineService.createLine(request.toCommand());
         return ResponseEntity.created(URI.create("/lines/" + id)).body(CreateLineResponse.from(request, id));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<LineView.Main> updateLine(
+            @PathVariable Long id,
+            @RequestBody UpdateLineRequest request
+    ) {
+        lineService.updateLine(request.toCommand(id));
+        LineView.Main view = lineReader.getOneById(id);
+        return ResponseEntity.ok().body(view);
     }
 
     @GetMapping()

@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.springframework.http.HttpStatus;
 import subway.controller.dto.CreateLineRequest;
+import subway.controller.dto.UpdateLineRequest;
 import subway.fixtures.LineFixture;
 import subway.internal.*;
 
@@ -93,5 +94,31 @@ public class LineAcceptanceTest extends BaseTestSetup {
         // then
         assertThat(LineApiResponseExtractor.Single.extractName(response)).isEqualTo("1호선");
         assertThat(LineApiResponseExtractor.Single.extractUpDownStationNames(response)).containsExactly("서울역", "시청역");
+    }
+
+    /**
+     * Given: 특정 지하철 노선이 등록되어 있고,
+     * When: 관리자가 해당 노선을 수정하면,
+     * Then: 해당 노선의 정보가 수정된다.
+     */
+    @DisplayName("노선을 수정한다.")
+    @Test
+    void updateLine() {
+        // given
+        Long seoulId = StationApiResponseExtractor.extractId(StationTestApi.createStation("서울역"));
+        Long cityHallId = StationApiResponseExtractor.extractId(StationTestApi.createStation("시청역"));
+        Long id = LineApiResponseExtractor.Single.extractId(LineTestApi.createLine(LineFixture.lineOneCreateRequest(seoulId, cityHallId)));
+
+        // when
+        UpdateLineRequest request = new UpdateLineRequest("변경된 호선", "bg-red-600", seoulId, cityHallId, 10L);
+        ExtractableResponse<Response> response = LineTestApi.updateLine(id, request);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        // then
+        ExtractableResponse<Response> updatedLine = LineTestApi.showLine(id);
+        assertThat(LineApiResponseExtractor.Single.extractName(updatedLine)).isEqualTo("변경된 호선");
+        assertThat(LineApiResponseExtractor.Single.extractColor(updatedLine)).isEqualTo("bg-red-600");
     }
 }

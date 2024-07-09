@@ -15,6 +15,10 @@ public class LineApiResponseExtractor {
             return response.jsonPath().getString("name");
         }
 
+        public static String extractColor(ExtractableResponse<Response> response) {
+            return response.jsonPath().getString("color");
+        }
+
         public static List<String> extractUpDownStationNames(ExtractableResponse<Response> response) {
             return response.jsonPath().getList("stations.name");
         }

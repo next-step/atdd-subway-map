@@ -16,4 +16,11 @@ public class LineCommander {
         Line line = lineRepository.save(Line.init(command));
         return line.getId();
     }
+
+    @Transactional
+    public void updateLine(LineCommand.UpdateLine command) {
+        Line line = lineRepository.findById(command.getId()).orElseThrow(() -> new RuntimeException("Not Found line"));
+        line.update(command);
+        lineRepository.save(line);
+    }
 }

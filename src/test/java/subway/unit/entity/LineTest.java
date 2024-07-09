@@ -12,6 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class LineTest {
     @Nested
     class Init {
+        @DisplayName("init")
         @ParameterizedTest
         @AutoSource
         public void sut_returns_new_line(LineCommand.CreateLine command) {
@@ -24,6 +25,28 @@ public class LineTest {
             assertThat(actual.getUpStationId()).isEqualTo(command.getUpStationId());
             assertThat(actual.getDownStationId()).isEqualTo(command.getDownStationId());
             assertThat(actual.getDistance()).isEqualTo(command.getDistance());
+        }
+    }
+
+    @Nested
+    class Update {
+        @DisplayName("update")
+        @ParameterizedTest
+        @AutoSource
+        public void sut_updated(
+                Line sut,
+                LineCommand.UpdateLine command
+        ) {
+            // when
+            sut.update(command);
+
+
+            // then
+            assertThat(sut.getName()).isEqualTo(command.getName());
+            assertThat(sut.getColor()).isEqualTo(command.getColor());
+            assertThat(sut.getUpStationId()).isEqualTo(command.getUpStationId());
+            assertThat(sut.getDownStationId()).isEqualTo(command.getDownStationId());
+            assertThat(sut.getDistance()).isEqualTo(command.getDistance());
         }
     }
 }

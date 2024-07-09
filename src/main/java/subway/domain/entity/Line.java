@@ -28,7 +28,8 @@ public class Line {
     @Column(nullable = false)
     private Long distance;
 
-    protected Line() {}
+    protected Line() {
+    }
 
     @Builder
     public Line(String name, String color, Long upStationId, Long downStationId, Long distance) {
@@ -47,5 +48,13 @@ public class Line {
                 command.getDownStationId(),
                 command.getDistance()
         );
+    }
+
+    public void update(LineCommand.UpdateLine command) {
+        this.name = command.getName();
+        this.color = command.getColor();
+        this.upStationId = command.getUpStationId();
+        this.downStationId = command.getDownStationId();
+        this.distance = command.getDistance();
     }
 }

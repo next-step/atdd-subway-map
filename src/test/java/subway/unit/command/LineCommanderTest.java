@@ -10,8 +10,10 @@ import subway.domain.command.LineCommand;
 import subway.domain.command.LineCommander;
 import subway.domain.entity.Line;
 import subway.domain.repository.LineRepository;
+import subway.fixtures.LineFixture;
 import subway.internal.BaseTestSetup;
 
+import java.lang.reflect.Field;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -38,6 +40,38 @@ public class LineCommanderTest extends BaseTestSetup {
             Optional<Line> actual = lineRepository.findById(id);
             assertThat(actual.get().getName()).isEqualTo(command.getName());
             assertThat(actual.get().getColor()).isEqualTo(command.getColor());
+        }
+    }
+
+    @Nested
+    @DisplayName("updateLine")
+    class UpdateLineTest {
+        @ParameterizedTest
+        @AutoSource
+        @Repeat(5)
+        public void sut_updates_line(LineCommand.UpdateLine command) {
+            // given
+            Line line = LineFixture.prepareLineOne(1L, 5L);
+            lineRepository.save(line);
+            setId(command, line.getId());
+
+            // when
+            sut.updateLine(command);
+
+            // then
+            Optional<Line> actual = lineRepository.findById(command.getId());
+            assertThat(actual.get().getName()).isEqualTo(command.getName());
+            assertThat(actual.get().getColor()).isEqualTo(command.getColor());
+        }
+    }
+
+    private static void setId(LineCommand.UpdateLine command, Long id) {
+        try {
+            Field idField = LineCommand.UpdateLine.class.getDeclaredField("id");
+            idField.setAccessible(true);
+            idField.set(command, id);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 }
