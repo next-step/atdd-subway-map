@@ -48,4 +48,10 @@ public class LineController {
         LineView.Main view = lineReader.getOneById(id);
         return ResponseEntity.ok().body(view);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteLine(@PathVariable Long id) {
+        lineService.deleteLineById(id);
+        return ResponseEntity.noContent().build();
+    }
 }

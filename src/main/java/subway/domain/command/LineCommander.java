@@ -23,4 +23,10 @@ public class LineCommander {
         line.update(command);
         lineRepository.save(line);
     }
+
+    @Transactional
+    public void deleteLineById(Long id) {
+        Line line = lineRepository.findById(id).orElseThrow(() -> new RuntimeException("Not Found line"));
+        lineRepository.delete(line);
+    }
 }

@@ -45,4 +45,13 @@ public class LineTestApi {
                 .then().log().all()
                 .extract();
     }
+
+    public static ExtractableResponse<Response> deleteLine(Long id) {
+        return RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().delete("/lines/" + id)
+                .then().log().all()
+                .extract();
+    }
 }

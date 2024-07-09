@@ -121,4 +121,29 @@ public class LineAcceptanceTest extends BaseTestSetup {
         assertThat(LineApiResponseExtractor.Single.extractName(updatedLine)).isEqualTo("변경된 호선");
         assertThat(LineApiResponseExtractor.Single.extractColor(updatedLine)).isEqualTo("bg-red-600");
     }
+
+    /**
+     * 지하철 노선 삭제
+     * Given: 특정 지하철 노선이 등록되어 있고,
+     * When: 관리자가 해당 노선을 삭제하면,
+     * Then: 해당 노선이 삭제되고 노선 목록에서 제외된다.
+     */
+    @DisplayName("노선을 삭제한다.")
+    @Test
+    void deleteLine() {
+        // given
+        Long seoulId = StationApiResponseExtractor.extractId(StationTestApi.createStation("서울역"));
+        Long cityHallId = StationApiResponseExtractor.extractId(StationTestApi.createStation("시청역"));
+        Long id = LineApiResponseExtractor.Single.extractId(LineTestApi.createLine(LineFixture.lineOneCreateRequest(seoulId, cityHallId)));
+
+        // when
+        ExtractableResponse<Response> response = LineTestApi.deleteLine(id);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        // then
+        List<String> lineNames = LineApiResponseExtractor.extractNames(LineTestApi.showLines());
+        assertThat(lineNames).doesNotContain("1호선");
+    }
 }

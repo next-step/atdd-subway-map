@@ -65,6 +65,26 @@ public class LineCommanderTest extends BaseTestSetup {
         }
     }
 
+    @Nested
+    @DisplayName("deleteLineById")
+    class DeleteLineTest {
+        @ParameterizedTest
+        @AutoSource
+        @Repeat(5)
+        public void sut_deletes_line() {
+            // given
+            Line line = LineFixture.prepareLineOne(1L, 5L);
+            lineRepository.save(line);
+
+            // when
+            sut.deleteLineById(line.getId());
+
+            // then
+            Optional<Line> actual = lineRepository.findById(line.getId());
+            assertThat(actual).isEmpty();
+        }
+    }
+
     private static void setId(LineCommand.UpdateLine command, Long id) {
         try {
             Field idField = LineCommand.UpdateLine.class.getDeclaredField("id");
