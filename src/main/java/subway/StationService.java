@@ -37,6 +37,14 @@ public class StationService {
         stationRepository.deleteById(id);
     }
 
+    public void validateSectionCreate(SectionCreateDTO dto) throws HttpException {
+        Station upStation = stationRepository.findById(dto.getUpStationId())
+                .orElseThrow(() -> new HttpException(ErrorCode.UP_STATION_NOT_VALID));
+
+        Station downStation = stationRepository.findById(dto.getDownStationId())
+                .orElseThrow(() -> new HttpException(ErrorCode.DOWN_STATION_NOT_VALID));
+    }
+
     private StationResponse createStationResponse(Station station) {
         return new StationResponse(
                 station.getId(),
