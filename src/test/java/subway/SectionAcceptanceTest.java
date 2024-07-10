@@ -89,7 +89,23 @@ public class SectionAcceptanceTest {
     @DirtiesContext
     @Test
     void 이미_구간에_존재하는_역_등록() {
+        //given
+        int testingLineNumber = 1;
+        String terminalStationName = "강남역";
+        String upStationId = "5";
+        String downStationId = "4";
+        String distance = "10";
+        Map<String, String> params = new HashMap<>();
+        params.put("upStationId", upStationId);
+        params.put("downStationId", downStationId);
+        params.put("distance", distance);
 
+        //when
+        ExtractableResponse response = postAPIResponse("/lines/" + testingLineNumber + "/sections", params);
+
+        //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.body()).isEqualTo(ErrorCode.DOWN_STATION_NOT_VALID.getMessage());
     }
 
     /**
