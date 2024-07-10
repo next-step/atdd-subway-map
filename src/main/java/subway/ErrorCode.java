@@ -4,7 +4,9 @@ import org.springframework.http.HttpStatus;
 
 public enum ErrorCode {
     BAD_REQUEST(HttpStatus.BAD_REQUEST, "잘못된 요청입니다."),
-    MISSING_ID(HttpStatus.BAD_REQUEST, "해당 id 로 data 를 찾을 수 없습니다.");
+    MISSING_ID(HttpStatus.BAD_REQUEST, "해당 id 로 data 를 찾을 수 없습니다."),
+    UP_STATION_NOT_VALID(HttpStatus.BAD_REQUEST, "기존 하행종점역이 반드시 upStationId 로 등록되어야 합니다"),
+    DOWN_STATION_NOT_VALID(HttpStatus.BAD_REQUEST, "이미 등록되어 있는 역은 새로운 하행종점역으로 등록할 수 없습니다.");
     private HttpStatus httpStatus;
     private String message;
 
