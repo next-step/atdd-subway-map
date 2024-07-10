@@ -49,4 +49,9 @@ public class LineService {
     public void deleteLine(Long id) {
         lineRepository.deleteById(id);
     }
+
+    public void validateSectionCreate(SectionCreateDTO dto) throws HttpException {
+        Line line = lineRepository.findById(dto.getLineId())
+                .orElseThrow(() -> new HttpException(ErrorCode.MISSING_ID));
+    }
 }
