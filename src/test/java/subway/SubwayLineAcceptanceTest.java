@@ -90,7 +90,7 @@ public class SubwayLineAcceptanceTest {
 
         //then
         assertThat(getAllResponse.jsonPath().getList(".").size()).isEqualTo(3);
-        assertThat(getAllResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(getAllResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
     }
 
@@ -118,7 +118,7 @@ public class SubwayLineAcceptanceTest {
 
         //then
         assertThat(getResponse.jsonPath().getString("name")).isEqualTo("신분당선");
-        assertThat(getResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(getResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
     }
 
@@ -147,7 +147,7 @@ public class SubwayLineAcceptanceTest {
         var updatedResponse = requestUpdateSubwayLine(createdId, "다른분당선", "bg-red-001");
 
         //then
-        assertThat(updatedResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(updatedResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
         var getResponse = requestGetSubwayLine(createdId);
         assertThat(getResponse.jsonPath().getString("name")).isEqualTo("다른분당선");
         assertThat(getResponse.jsonPath().getString("color")).isEqualTo("bg-red-001");
@@ -158,6 +158,7 @@ public class SubwayLineAcceptanceTest {
                 .given()
                 .pathParam("id", id)
                 .body(Map.of("name", name, "color", color))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .put("/lines/{id}")
                 .then()

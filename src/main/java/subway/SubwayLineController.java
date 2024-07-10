@@ -2,14 +2,12 @@ package subway;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
+@RequestMapping("/lines")
 public class SubwayLineController {
     private final SubwayLineService subwayLineService;
 
@@ -17,16 +15,35 @@ public class SubwayLineController {
         this.subwayLineService = subwayLineService;
     }
 
-    @PostMapping("/lines")
+    @PostMapping
     ResponseEntity<SubwayLineResponse> createSubwayLine(@RequestBody SubwayLineRequest request) {
         var response = subwayLineService.saveSubwayLine(request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    @GetMapping("/lines")
+    @GetMapping
     ResponseEntity<List<SubwayLineResponse>> showSubwayLines() {
         var response = subwayLineService.findAllSubwayLines();
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/{id}")
+    ResponseEntity<SubwayLineResponse> showSubwayLine(@PathVariable Long id) {
+        var response = subwayLineService.findSubwayLine(id);
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/{id}")
+    ResponseEntity<Void> updateSubwayLine(@PathVariable Long id, @RequestBody SubwayLineUpdateRequest request) {
+        subwayLineService.updateSubwayLine(id, request);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{id}")
+    ResponseEntity<Void> deleteSubwayLine(@PathVariable Long id) {
+        subwayLineService.deleteSubwayLine(id);
+        return ResponseEntity.noContent().build();
+    }
+
 
 }
