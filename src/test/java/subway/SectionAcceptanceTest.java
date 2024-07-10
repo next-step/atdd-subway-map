@@ -150,6 +150,7 @@ public class SectionAcceptanceTest {
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.body()).isEqualTo(ErrorCode.IS_NOT_TERMINAL_STATION.getMessage());
     }
 
     /**
@@ -160,7 +161,16 @@ public class SectionAcceptanceTest {
     @DirtiesContext
     @Test
     void 구간_제거시_구간이_1개인경우_실패() {
+        int testingLineNumber = 3;
+        int removingStationId = 7;
+        String removingStationName = "사당역";
 
+        //when
+        ExtractableResponse response = deleteAPIResponse("/lines/" + testingLineNumber + "/stations?stationId=" + removingStationId);
+
+        //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.body()).isEqualTo(ErrorCode.CANNOT_REMOVE_LAST_SECTION.getMessage());
     }
 
     /**
@@ -171,6 +181,17 @@ public class SectionAcceptanceTest {
     @DirtiesContext
     @Test
     void 노선_번호로_등록되어있는_구간_조회() {
+        // given
+        int testingLineNumber = 2;
+        List<String> testingStations = List.of("수서역", "서울역", "사당역");
+
+        //when
+        ExtractableResponse response = getAPIResponse("/lines/" + testingLineNumber + "/sections");
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        //then
+        List<String> responseStations = response.jsonPath().getList("stations.name");
+        assertThat(responseStations.containsAll(testingStations));
 
     }
 
