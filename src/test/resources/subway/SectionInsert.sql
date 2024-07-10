@@ -6,3 +6,5 @@ INSERT INTO section(up_station_id, down_station_id, distance, line_id)
 VALUES (1, 5, 10 , 2);
 INSERT INTO section(up_station_id, down_station_id, distance, line_id)
 VALUES (5, 7, 10 , 2);
+INSERT INTO section(up_station_id, down_station_id, distance, line_id)
+VALUES (6, 7, 10 , 3);
