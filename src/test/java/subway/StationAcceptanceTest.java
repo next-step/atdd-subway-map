@@ -19,23 +19,25 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class StationAcceptanceTest {
+    public static final String GANGNAM_STATION = "강남역";
+    public static final String SEOUL_STATION = "서울역";
+
     /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다
      * Then 지하철역 목록 조회 시 생성한 역을 찾을 수 있다
      */
-    @DisplayName("지하철역을 생성한다.")
+    @DisplayName("지하철역을 생성한다")
     @Test
     void createStation() {
         // when
-        var createResponse = requestCreateStation("강남역");
+        var createResponse = requestCreateStation(GANGNAM_STATION);
         // then
         assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
         var getAllResponse = requestGetAllStations();
-        List<String> stationNames = getAllResponse.jsonPath().getList("name", String.class);
-        assertThat(stationNames).containsAnyOf("강남역");
+        assertThat(extractNames(getAllResponse)).containsAnyOf(GANGNAM_STATION);
     }
 
     /**
@@ -43,21 +45,19 @@ public class StationAcceptanceTest {
      * When 지하철역 목록을 조회하면
      * Then 2개의 지하철역을 응답 받는다
      */
-    @DisplayName("지하철역 목록을 조회한다.")
+    @DisplayName("지하철역 목록을 조회한다")
     @Test
     void getAllStation() {
         //given
-        requestCreateStation("강남역");
-        requestCreateStation("서울역");
+        requestCreateStation(GANGNAM_STATION);
+        requestCreateStation(SEOUL_STATION);
 
         //when
         var getAllResponse = requestGetAllStations();
 
         //then
         assertThat(getAllResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
-
-        var stationCount = getAllResponse.jsonPath().getList(".").size();
-        assertThat(stationCount).isEqualTo(2);
+        assertThat(extractIds(getAllResponse).size()).isEqualTo(2);
 
     }
 
@@ -66,11 +66,11 @@ public class StationAcceptanceTest {
      * When 그 지하철역을 삭제하면
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
-    @DisplayName("지하철역을 제거한다.")
+    @DisplayName("지하철역을 제거한다")
     @Test
     void deleteStation() {
         //given
-        var createdResponse = requestCreateStation("서울역");
+        var createdResponse = requestCreateStation(SEOUL_STATION);
         var createdId = createdResponse.jsonPath().getLong("id");
 
         //when
@@ -78,9 +78,7 @@ public class StationAcceptanceTest {
 
         //then
         var getAllResponse = requestGetAllStations();
-
-        var stationIds = getAllResponse.jsonPath().getList("id", Long.class);
-        assertThat(stationIds).doesNotContain(createdId);
+        assertThat(extractIds(getAllResponse)).doesNotContain(createdId);
     }
 
     private ExtractableResponse<Response> requestCreateStation(String name) {
@@ -110,5 +108,13 @@ public class StationAcceptanceTest {
                 .delete("/stations/{id}")
                 .then()
                 .extract();
+    }
+
+    private List<String> extractNames(ExtractableResponse<Response> response) {
+        return response.jsonPath().getList("name", String.class);
+    }
+
+    private List<Long> extractIds(ExtractableResponse<Response> response) {
+        return response.jsonPath().getList("id", Long.class);
     }
 }

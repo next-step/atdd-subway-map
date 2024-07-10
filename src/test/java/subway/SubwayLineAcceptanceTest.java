@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 
+import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -30,6 +31,7 @@ public class SubwayLineAcceptanceTest {
      * when 지하철역 노선을 생성하면
      * /then 지하철역 노선이 생성된다
      */
+    @DisplayName("지하철 노선을 생성한다")
     @Test
     void createSubwayLine() {
         //when
@@ -45,19 +47,21 @@ public class SubwayLineAcceptanceTest {
      * when 지하철역 노선목록을 조회하면
      * then 지하철역 노선3개가 조회된다
      */
+
+    @DisplayName("지하철 노선 목록을 조회한다")
     @Test
     void getAllSubwayLine() {
         //given
         requestCreateSubwayLine(LINE_SINBUNDANG, COLOR_RED);
         requestCreateSubwayLine(LINE_ONE, COLOR_RED);
         requestCreateSubwayLine(LINE_TWO, COLOR_RED);
+
         //when
         var getAllResponse = requestGetAllSubwayLine();
 
         //then
         assertThat(getAllResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
-        var count = getAllResponse.jsonPath().getList(".").size();
-        assertThat(count).isEqualTo(3);
+        assertThat(extractIds(getAllResponse).size()).isEqualTo(3);
     }
 
     /**
@@ -65,6 +69,8 @@ public class SubwayLineAcceptanceTest {
      * when 해당 지하철역 노선을 조회한다
      * then: 지하철역 노선이 조회된다
      */
+
+    @DisplayName("지하철 노선을 조회한다")
     @Test
     void getSubwayLine() {
         //given
@@ -81,9 +87,10 @@ public class SubwayLineAcceptanceTest {
 
     /**
      * given: 노선이 등록된 경우
-     * when: 노선의 이름을 수정한다
-     * then: 이름이 수정된다
+     * when: 노선의 이름과 색을 수정한다
+     * then: 이름과 색이 수정된다
      */
+    @DisplayName("지하철 노선의 이름과 색을 수정한다")
     @Test
     void updateSubwayLine() {
         //given
@@ -106,6 +113,7 @@ public class SubwayLineAcceptanceTest {
      * when: 노선을 삭제한다
      * then: 노선이 삭제된다
      */
+    @DisplayName("지하철 노선을 삭제한다")
     @Test
     void deleteSubwayLine() {
         //given
@@ -119,8 +127,7 @@ public class SubwayLineAcceptanceTest {
         assertThat(deletedResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         var getAllResponse = requestGetAllSubwayLine();
-        var stationIds = getAllResponse.jsonPath().getList("id", Long.class);
-        assertThat(stationIds).doesNotContain(createdId);
+        assertThat(extractIds(getAllResponse)).doesNotContain(createdId);
     }
 
     private ExtractableResponse<Response> requestCreateSubwayLine(String name, String color) {
@@ -194,5 +201,7 @@ public class SubwayLineAcceptanceTest {
         return response.jsonPath().getString("color");
     }
 
-
+    private List<Long> extractIds(ExtractableResponse<Response> response) {
+        return response.jsonPath().getList("id", Long.class);
+    }
 }
