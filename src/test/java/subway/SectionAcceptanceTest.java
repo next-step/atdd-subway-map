@@ -46,7 +46,7 @@ public class SectionAcceptanceTest {
 
         //then
         ExtractableResponse getResponse = getAPIResponse("/lines/" + testingLineNumber + "/sections");
-        List<String> stations = getResponse.jsonPath().getList("name");
+        List<String> stations = getResponse.jsonPath().getList("stations.name");
         String testingName = stations.get(stations.size() - 1);
         assertThat(testingName).isEqualTo(terminalStationName);
 
@@ -105,17 +105,30 @@ public class SectionAcceptanceTest {
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(response.body()).isEqualTo(ErrorCode.DOWN_STATION_NOT_VALID.getMessage());
+        assertThat(response.body().asString()).isEqualTo(ErrorCode.DOWN_STATION_NOT_VALID.getMessage());
     }
 
     /**
      * given: 기존 구간이 등록되어있고,
-     * when: 관리자가 기존 구간을 제거하면,
-     * then: 구간이 제거된다.
+     * when: 관리자가 기존 구간(하행종점역)을 제거하면,
+     * then: 구간목록에서 구간(하행종점역)이 제거된다.
      */
     @DirtiesContext
     @Test
     void 구간_제거_테스트() {
+        // given
+        int testingLineNumber = 2;
+        int removingStationId = 7;
+        String removingStationName = "사당역";
+
+        //when
+        ExtractableResponse response = deleteAPIResponse("/lines/" + testingLineNumber + "/stations?stationId=" + removingStationId);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        //then
+        ExtractableResponse getResponse = getAPIResponse("/lines/" + testingLineNumber + "/sections");
+        List<String> stations = getResponse.jsonPath().getList("stations.name");
+        assertThat(stations.stream().anyMatch(station -> station.equals(removingStationName))).isFalse();
 
     }
 
