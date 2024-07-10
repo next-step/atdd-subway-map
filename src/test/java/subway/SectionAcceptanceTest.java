@@ -1,0 +1,147 @@
+package subway;
+
+import io.restassured.RestAssured;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.jdbc.Sql;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import static org.assertj.core.api.Assertions.assertThat;
+
+@DisplayName("구간관련 기능")
+@Sql(scripts = {"StationInsert.sql", "LineInsert.sql", "SectionInsert.sql"})
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+public class SectionAcceptanceTest {
+
+    /**
+     * given: 기존에 노선과 역이 등록되어 있고,
+     * when: 관리자가 구간을 등록하면
+     * then: 구간의 하행 종점역이 바뀐다.
+     */
+    @DirtiesContext
+    @Test
+    void 구간_등록_테스트() {
+        //given
+        int testingLineNumber = 1;
+        String terminalStationName = "강남역";
+        String upStationId = "5";
+        String downStationId = "6";
+        String distance = "10";
+        Map<String, String> params = new HashMap<>();
+        params.put("upStationId", upStationId);
+        params.put("downStationId", downStationId);
+        params.put("distance", distance);
+
+        //when
+        ExtractableResponse response = postAPIResponse("/lines/" + testingLineNumber + "/sections", params);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        //then
+        ExtractableResponse getResponse = getAPIResponse("/lines/" + testingLineNumber + "/sections");
+        List<String> stations = getResponse.jsonPath().getList("name");
+        String testingName = stations.get(stations.size() - 1);
+        assertThat(testingName).isEqualTo(terminalStationName);
+
+    }
+
+    /**
+     * given: 기존 노선과 역이 등록되어 있고,
+     * when: 관리자가 구간을 등록할 때 상행역이 구간의 하행종점역이 아니면
+     * then: 잘못된 요청이라는 응답을 받는다.
+     */
+    @DirtiesContext
+    @Test
+    void 구간_등록시_상행역은_하행종점역이_아니면_실패() {
+
+    }
+
+
+    /**
+     * given: 기존 역이 해당노선에 등록되어 있고,
+     * when: 관리자가 기존 역을 구간에 등록하면,
+     * then: 잘못된 요청이라는 응답을 받는다.
+     */
+    @DirtiesContext
+    @Test
+    void 이미_구간에_존재하는_역_등록() {
+
+    }
+
+    /**
+     * given: 기존 구간이 등록되어있고,
+     * when: 관리자가 기존 구간을 제거하면,
+     * then: 구간이 제거된다.
+     */
+    @DirtiesContext
+    @Test
+    void 구간_제거_테스트() {
+
+    }
+
+    /**
+     * given: 기존 구간이 등록되어있고,
+     * when: 관리자가 구간을 제거할 때, 하행 종점역이 아니면
+     * then: 잘못된 요청이라는 응답을 받는다.
+     */
+    @DirtiesContext
+    @Test
+    void 구간_제거시_하행종점역이_아니면_실패() {
+
+    }
+
+    /**
+     * given: 기존 구간이 등록되어있고,
+     * when: 관리자가 구간을 제거할 때, 구간이 1개인 경우
+     * then: 잘못된 요청이라는 응답을 받는다.
+     */
+    @DirtiesContext
+    @Test
+    void 구간_제거시_구간이_1개인경우_실패() {
+
+    }
+
+    /**
+     * given: 기존 구간이 노선에 등록되어있고,
+     * when: 관리자가 노선 번호로 조회할때,
+     * then: 노선에 등록되어 있는 구간들이 모두 응답에 포함된다..
+     */
+    @DirtiesContext
+    @Test
+    void 노선_번호로_등록되어있는_구간_조회() {
+
+    }
+
+    ExtractableResponse<Response> postAPIResponse(String url, Map<String, String> body) {
+        return RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(body)
+                .when().post(url)
+                .then().log().all()
+                .extract();
+    }
+
+    ExtractableResponse<Response> getAPIResponse(String url) {
+        return RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().get(url)
+                .then().log().all()
+                .extract();
+    }
+
+    ExtractableResponse<Response> deleteAPIResponse(String url) {
+        return RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().get(url)
+                .then().log().all()
+                .extract();
+    }
+
+}
