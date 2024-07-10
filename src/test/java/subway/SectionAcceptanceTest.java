@@ -60,6 +60,23 @@ public class SectionAcceptanceTest {
     @DirtiesContext
     @Test
     void 구간_등록시_상행역은_하행종점역이_아니면_실패() {
+        //given
+        int testingLineNumber = 1;
+        String terminalStationName = "강남역";
+        String upStationId = "6";
+        String downStationId = "7";
+        String distance = "10";
+        Map<String, String> params = new HashMap<>();
+        params.put("upStationId", upStationId);
+        params.put("downStationId", downStationId);
+        params.put("distance", distance);
+
+        //when
+        ExtractableResponse response = postAPIResponse("/lines/" + testingLineNumber + "/sections", params);
+
+        //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.body()).isEqualTo(ErrorCode.UP_STATION_NOT_VALID.getMessage());
 
     }
 
