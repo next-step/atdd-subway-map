@@ -19,79 +19,144 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class SubwayLineAcceptanceTest {
+    public static final String LINE_SINBUNDANG = "신분당선";
+    public static final String LINE_ONE = "1호선";
+    public static final String LINE_TWO = "2호선";
+    public static final String COLOR_RED = "bg-red-001";
+    public static final String COLOR_BLUE = "bg-blue-001";
+
     /*
-     * 스토리 1: 나는 관리자로서 지하철 노선을 생성하여 새로운 노선을 추가하고 싶다.
      * given 지하철 정보를 입력하고
      * when 지하철역 노선을 생성하면
      * /then 지하철역 노선이 생성된다
      */
-
     @Test
     void createSubwayLine() {
         //when
-        var createdResponse = requestCreateSubwayLine("신분당선", "bg-red", 1L, 10L);
+        var createdResponse = requestCreateSubwayLine(LINE_SINBUNDANG, COLOR_RED);
 
         //then
-        assertThat(createdResponse.jsonPath().getString("name")).isEqualTo("신분당선");
         assertThat(createdResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-    }
-
-//    class MockSubwayLineRequest{
-//        private String name;
-//        private String color;
-//        private Long upStationId;
-//        private Long downStationId;
-//        private Long distance;
-//
-//        SubwayLineRequest toRequest(String name = "newtork"){
-//
-//        }
-//        String toJson(){
-//            var objectMapper = new ObjectMapper();
-//            return toRequest().writeValueAsString()
-//
-//        }
-//    }
-
-    private ExtractableResponse<Response> requestCreateSubwayLine(String name, String color, Long upStationId, Long downStationId) {
-
-        return RestAssured.given().log().all()
-                .body(
-//                        SubwayLineRequest(
-//                                name,
-//                                color,
-//                                upStationId,
-//                                downStationId
-//                        ).toJsonString()
-                        Map.of("name", name, "color", color, "upStationId", 1, "downStationId", 2, "distance", 10)
-                )
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().log().all()
-                .extract();
+        assertThat(extractName(createdResponse)).isEqualTo(LINE_SINBUNDANG);
     }
 
     /**
-     * 스토리 2: 나는 관리자로서 지하철 노선 목록을 조회하여 모든 노선을 관리하고 싶다.
      * given 지하철노선이 3개일때
      * when 지하철역 노선목록을 조회하면
-     * then 지하철역 노선3개가 조회된다.
+     * then 지하철역 노선3개가 조회된다
      */
     @Test
     void getAllSubwayLine() {
         //given
-        requestCreateSubwayLine("신분당선", "bg-red", 1L, 10L);
-        requestCreateSubwayLine("1호선", "bg-red", 1L, 10L);
-        requestCreateSubwayLine("2호선", "bg-red", 1L, 10L);
-
+        requestCreateSubwayLine(LINE_SINBUNDANG, COLOR_RED);
+        requestCreateSubwayLine(LINE_ONE, COLOR_RED);
+        requestCreateSubwayLine(LINE_TWO, COLOR_RED);
         //when
         var getAllResponse = requestGetAllSubwayLine();
 
         //then
-        assertThat(getAllResponse.jsonPath().getList(".").size()).isEqualTo(3);
         assertThat(getAllResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+        var count = getAllResponse.jsonPath().getList(".").size();
+        assertThat(count).isEqualTo(3);
+    }
 
+    /**
+     * given 지하철역 노선이 등록되어있는 경우
+     * when 해당 지하철역 노선을 조회한다
+     * then: 지하철역 노선이 조회된다
+     */
+    @Test
+    void getSubwayLine() {
+        //given
+        var createdResponse = requestCreateSubwayLine(LINE_SINBUNDANG, COLOR_RED);
+        var createdId = createdResponse.jsonPath().getLong("id");
+
+        //when
+        var getResponse = requestGetSubwayLine(createdId);
+
+        //then
+        assertThat(getResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(extractName(getResponse)).isEqualTo(LINE_SINBUNDANG);
+    }
+
+    /**
+     * given: 노선이 등록된 경우
+     * when: 노선의 이름을 수정한다
+     * then: 이름이 수정된다
+     */
+    @Test
+    void updateSubwayLine() {
+        //given
+        var createdResponse = requestCreateSubwayLine(LINE_SINBUNDANG, COLOR_RED);
+        var createdId = createdResponse.jsonPath().getLong("id");
+
+        //when
+        var updatedResponse = requestUpdateSubwayLine(createdId, LINE_ONE, COLOR_BLUE);
+
+        //then
+        assertThat(updatedResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        var getResponse = requestGetSubwayLine(createdId);
+        assertThat(extractName(getResponse)).isEqualTo(LINE_ONE);
+        assertThat(extractColor(getResponse)).isEqualTo(COLOR_BLUE);
+    }
+
+    /**
+     * given: 노선이 등록된 경우
+     * when: 노선을 삭제한다
+     * then: 노선이 삭제된다
+     */
+    @Test
+    void deleteSubwayLine() {
+        //given
+        var createdResponse = requestCreateSubwayLine(LINE_SINBUNDANG, COLOR_RED);
+        var createdId = createdResponse.jsonPath().getLong("id");
+
+        //when
+        var deletedResponse = requestDeleteSubwayLine(createdId);
+
+        //then
+        assertThat(deletedResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        var getAllResponse = requestGetAllSubwayLine();
+        var stationIds = getAllResponse.jsonPath().getList("id", Long.class);
+        assertThat(stationIds).doesNotContain(createdId);
+    }
+
+    private ExtractableResponse<Response> requestCreateSubwayLine(String name, String color) {
+        var body = Map.of("name", name,
+                "color", color,
+                "upStationId", 10L,
+                "downStationId", 1L,
+                "distance", 10
+        );
+        var contentType = MediaType.APPLICATION_JSON_VALUE;
+        var path = "/lines";
+
+        return RestAssured.given().log().all()
+                .body(body)
+                .contentType(contentType)
+                .when().post(path)
+                .then().log().all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> requestUpdateSubwayLine(Long id, String name, String color) {
+        var body = Map.of(
+                "name", name,
+                "color", color
+        );
+        var contentType = MediaType.APPLICATION_JSON_VALUE;
+
+        return RestAssured
+                .given()
+                .pathParam("id", id)
+                .body(body)
+                .contentType(contentType)
+                .when()
+                .put("/lines/{id}")
+                .then()
+                .extract();
     }
 
     private ExtractableResponse<Response> requestGetAllSubwayLine() {
@@ -99,27 +164,6 @@ public class SubwayLineAcceptanceTest {
                 .when().get("/lines")
                 .then()
                 .extract();
-    }
-
-
-    /**
-     * 스토리 3: 나는 관리자로서 특정 지하철 노선을 조회하여 해당 노선의 정보를 확인하고 싶다.
-     * given 지하철역 노선이 등록되어있는 경우
-     * when 해당 지하철역 노선을 조회한다
-     * then: 지하철역 노선이 조회된다.
-     */
-    @Test
-    void getSubwayLine() {
-        //given
-        var createdResponse = requestCreateSubwayLine("신분당선", "bg-red", 1L, 10L);
-        var createdId = createdResponse.jsonPath().getLong("id");
-        //when
-        var getResponse = requestGetSubwayLine(createdId);
-
-        //then
-        assertThat(getResponse.jsonPath().getString("name")).isEqualTo("신분당선");
-        assertThat(getResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
-
     }
 
     private ExtractableResponse<Response> requestGetSubwayLine(Long id) {
@@ -132,62 +176,6 @@ public class SubwayLineAcceptanceTest {
                 .extract();
     }
 
-    /**
-     * 스토리 4: 나는 관리자로서 지하철 노선을 수정하여 변경된 정보를 반영하고 싶다.
-     * given: 노선이 등로고딘 경우
-     * when: 노선의 이름을 수정한다..
-     * then: 이름이 수정된다.
-     */
-    @Test
-    void updateSubwayLine() {
-        //given
-        var createdResponse = requestCreateSubwayLine("신분당선", "bg-red", 1L, 10L);
-        var createdId = createdResponse.jsonPath().getLong("id");
-        //when
-        var updatedResponse = requestUpdateSubwayLine(createdId, "다른분당선", "bg-red-001");
-
-        //then
-        assertThat(updatedResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-        var getResponse = requestGetSubwayLine(createdId);
-        assertThat(getResponse.jsonPath().getString("name")).isEqualTo("다른분당선");
-        assertThat(getResponse.jsonPath().getString("color")).isEqualTo("bg-red-001");
-    }
-
-    private ExtractableResponse<Response> requestUpdateSubwayLine(Long id, String name, String color) {
-        return RestAssured
-                .given()
-                .pathParam("id", id)
-                .body(Map.of("name", name, "color", color))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .put("/lines/{id}")
-                .then()
-                .extract();
-    }
-
-
-    /**
-     * 스토리 5: 나는 관리자로서 특정 지하철 노선을 삭제하여 불필요한 노선을 제거하고 싶다.
-     * given: 노선이 등록된 경우
-     * when: 노선을 삭제한다.
-     * then: 노선이 삭제된다.
-     */
-    @Test
-    void deleteSubwayLine() {
-        //given
-        var createdResponse = requestCreateSubwayLine("신분당선", "bg-red", 1L, 10L);
-        var createdId = createdResponse.jsonPath().getLong("id");
-        //when
-        var deletedResponse = requestDeleteSubwayLine(createdId);
-
-        //then
-        assertThat(deletedResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-        var getAllResponse = requestGetAllSubwayLine();
-        var stationIds = getAllResponse.jsonPath().getList("id", Long.class);
-
-        assertThat(stationIds).doesNotContain(createdId);
-    }
-
     private ExtractableResponse<Response> requestDeleteSubwayLine(Long id) {
         return RestAssured
                 .given()
@@ -197,5 +185,14 @@ public class SubwayLineAcceptanceTest {
                 .then()
                 .extract();
     }
+
+    private String extractName(ExtractableResponse<Response> response) {
+        return response.jsonPath().getString("name");
+    }
+
+    private String extractColor(ExtractableResponse<Response> response) {
+        return response.jsonPath().getString("color");
+    }
+
 
 }
