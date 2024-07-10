@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-//@org.springframework.transaction.annotation.Transactional(readOnly = true)
 public class SubwayLineService {
     private final SubwayLineRepository subwayLineRepository;
 

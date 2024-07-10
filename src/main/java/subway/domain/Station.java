@@ -7,11 +7,12 @@ public class Station {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(length = 20, nullable = false)
     private String name;
 
-    @ManyToOne(fetch = FetchType.LAZY)//
-    @JoinColumn(name = "subway_line_id", nullable = false) // snake_case로 수정
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "subway_line_id")
     private SubwayLine subwayLine;
 
     public Station() {
