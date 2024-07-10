@@ -140,7 +140,16 @@ public class SectionAcceptanceTest {
     @DirtiesContext
     @Test
     void 구간_제거시_하행종점역이_아니면_실패() {
+        // given
+        int testingLineNumber = 2;
+        int removingStationId = 5;
+        String removingStationName = "서울역";
 
+        //when
+        ExtractableResponse response = deleteAPIResponse("/lines/" + testingLineNumber + "/stations?stationId=" + removingStationId);
+
+        //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     /**
@@ -185,7 +194,7 @@ public class SectionAcceptanceTest {
     ExtractableResponse<Response> deleteAPIResponse(String url) {
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().get(url)
+                .when().delete(url)
                 .then().log().all()
                 .extract();
     }
