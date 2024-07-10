@@ -42,7 +42,7 @@ public class SectionAcceptanceTest {
 
         //when
         ExtractableResponse response = postAPIResponse("/lines/" + testingLineNumber + "/sections", params);
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         //then
         ExtractableResponse getResponse = getAPIResponse("/lines/" + testingLineNumber + "/sections");
@@ -76,7 +76,7 @@ public class SectionAcceptanceTest {
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(response.body()).isEqualTo(ErrorCode.UP_STATION_NOT_VALID.getMessage());
+        assertThat(response.body().asString()).isEqualTo(ErrorCode.UP_STATION_NOT_VALID.getMessage());
 
     }
 
@@ -122,7 +122,7 @@ public class SectionAcceptanceTest {
         String removingStationName = "사당역";
 
         //when
-        ExtractableResponse response = deleteAPIResponse("/lines/" + testingLineNumber + "/stations?stationId=" + removingStationId);
+        ExtractableResponse response = deleteAPIResponse("/lines/" + testingLineNumber + "/sections?stationId=" + removingStationId);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         //then
@@ -146,11 +146,11 @@ public class SectionAcceptanceTest {
         String removingStationName = "서울역";
 
         //when
-        ExtractableResponse response = deleteAPIResponse("/lines/" + testingLineNumber + "/stations?stationId=" + removingStationId);
+        ExtractableResponse response = deleteAPIResponse("/lines/" + testingLineNumber + "/sections?stationId=" + removingStationId);
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(response.body()).isEqualTo(ErrorCode.IS_NOT_TERMINAL_STATION.getMessage());
+        assertThat(response.body().asString()).isEqualTo(ErrorCode.IS_NOT_TERMINAL_STATION.getMessage());
     }
 
     /**
@@ -166,11 +166,11 @@ public class SectionAcceptanceTest {
         String removingStationName = "사당역";
 
         //when
-        ExtractableResponse response = deleteAPIResponse("/lines/" + testingLineNumber + "/stations?stationId=" + removingStationId);
+        ExtractableResponse response = deleteAPIResponse("/lines/" + testingLineNumber + "/sections?stationId=" + removingStationId);
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(response.body()).isEqualTo(ErrorCode.CANNOT_REMOVE_LAST_SECTION.getMessage());
+        assertThat(response.body().asString()).isEqualTo(ErrorCode.CANNOT_REMOVE_LAST_SECTION.getMessage());
     }
 
     /**
