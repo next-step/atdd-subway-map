@@ -6,4 +6,8 @@ public class HttpException extends Exception {
     public HttpException(ErrorCode errorCode) {
         this.errorCode = errorCode;
     }
+
+    public ErrorCode getErrorCode() {
+        return errorCode;
+    }
 }
