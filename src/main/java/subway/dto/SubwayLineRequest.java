@@ -1,4 +1,6 @@
-package subway;
+package subway.dto;
+
+import subway.domain.SubwayLine;
 
 public final class SubwayLineRequest {
     private final String name;

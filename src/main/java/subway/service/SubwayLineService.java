@@ -1,6 +1,11 @@
-package subway;
+package subway.service;
 
 import org.springframework.stereotype.Service;
+import subway.domain.SubwayLine;
+import subway.dto.SubwayLineRequest;
+import subway.dto.SubwayLineResponse;
+import subway.dto.SubwayLineUpdateRequest;
+import subway.repository.SubwayLineRepository;
 
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;

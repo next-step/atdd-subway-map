@@ -1,4 +1,6 @@
-package subway;
+package subway.dto;
+
+import subway.domain.SubwayLine;
 
 import java.util.List;
 import java.util.stream.Collectors;

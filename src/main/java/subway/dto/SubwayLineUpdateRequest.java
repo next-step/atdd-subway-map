@@ -1,4 +1,4 @@
-package subway;
+package subway.dto;
 
 public final class SubwayLineUpdateRequest {
     private final String name;
