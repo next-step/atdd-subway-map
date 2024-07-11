@@ -47,8 +47,8 @@ public class SectionAcceptanceTest {
 
         //then
         ExtractableResponse getResponse = getAPIResponse("/lines/" + testingLineNumber + "/sections");
-        List<String> stations = getResponse.jsonPath().getList("stations.name");
-        String testingName = stations.get(stations.size() - 1);
+        List<String> downStations = getResponse.jsonPath().getList("downStations.name");
+        String testingName = downStations.get(downStations.size() - 1);
         assertThat(testingName).isEqualTo(terminalStationName);
 
     }
@@ -123,7 +123,7 @@ public class SectionAcceptanceTest {
         // given
         int testingLineNumber = 2;
         int removingStationId = 7;
-        String removingStationName = "사당역";
+        String removingDownStation = "사당역";
 
         //when
         ExtractableResponse response = deleteAPIResponse("/lines/" + testingLineNumber + "/sections?stationId=" + removingStationId);
@@ -131,8 +131,8 @@ public class SectionAcceptanceTest {
 
         //then
         ExtractableResponse getResponse = getAPIResponse("/lines/" + testingLineNumber + "/sections");
-        List<String> stations = getResponse.jsonPath().getList("stations.name");
-        assertThat(stations.stream().anyMatch(station -> station.equals(removingStationName))).isFalse();
+        List<String> downStations = getResponse.jsonPath().getList("downStations.name");
+        assertThat(downStations.stream().anyMatch(station -> station.equals(removingDownStation))).isFalse();
 
     }
 
@@ -190,15 +190,18 @@ public class SectionAcceptanceTest {
     void 노선_번호로_등록되어있는_구간_조회() {
         // given
         int testingLineNumber = 2;
-        List<String> testingStations = List.of("수서역", "서울역", "사당역");
+        List<String> testingUpStations = List.of("수서역", "서울역");
+        List<String> testingDownStations = List.of("서울역", "사당역");
 
         //when
         ExtractableResponse response = getAPIResponse("/lines/" + testingLineNumber + "/sections");
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         //then
-        List<String> responseStations = response.jsonPath().getList("stations.name");
-        assertThat(responseStations.containsAll(testingStations));
+        List<String> upStations = response.jsonPath().getList("upStations.name");
+        List<String> downStations = response.jsonPath().getList("downStations.name");
+        assertThat(upStations.containsAll(testingUpStations));
+        assertThat(downStations.containsAll(testingDownStations));
 
     }
 
