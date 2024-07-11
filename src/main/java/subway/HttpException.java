@@ -1,6 +1,6 @@
 package subway;
 
-public class HttpException extends Exception {
+public class HttpException extends RuntimeException {
     private ErrorCode errorCode;
 
     public HttpException(ErrorCode errorCode) {
