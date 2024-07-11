@@ -1,10 +1,10 @@
-INSERT INTO section(up_station_id, down_station_id, distance, line_id)
-VALUES (1, 4, 10 , 1);
-INSERT INTO section(up_station_id, down_station_id, distance, line_id)
-VALUES (4, 5, 10 , 1);
-INSERT INTO section(up_station_id, down_station_id, distance, line_id)
-VALUES (1, 5, 10 , 2);
-INSERT INTO section(up_station_id, down_station_id, distance, line_id)
-VALUES (5, 7, 10 , 2);
-INSERT INTO section(up_station_id, down_station_id, distance, line_id)
-VALUES (6, 7, 10 , 3);
+INSERT INTO section(up_station_id, down_station_id, distance, line_id, section_order)
+VALUES (1, 4, 10 , 1, 0);
+INSERT INTO section(up_station_id, down_station_id, distance, line_id, section_order)
+VALUES (4, 5, 10 , 1, 1);
+INSERT INTO section(up_station_id, down_station_id, distance, line_id, section_order)
+VALUES (1, 5, 10 , 2, 0);
+INSERT INTO section(up_station_id, down_station_id, distance, line_id, section_order)
+VALUES (5, 7, 10 , 2, 1);
+INSERT INTO section(up_station_id, down_station_id, distance, line_id, section_order)
+VALUES (6, 7, 10 , 3, 0);
