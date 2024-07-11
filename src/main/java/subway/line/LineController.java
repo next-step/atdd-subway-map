@@ -1,8 +1,8 @@
-package subway;
+package subway.line;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import subway.commons.HttpException;
 
 import java.net.URI;
 import java.util.List;

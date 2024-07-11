@@ -1,4 +1,4 @@
-package subway;
+package subway.commons;
 
 import org.springframework.http.HttpStatus;
 

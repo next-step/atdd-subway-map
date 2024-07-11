@@ -1,4 +1,4 @@
-package subway;
+package subway.line;
 
 public class LineUpdateDTO {
     private Long id;

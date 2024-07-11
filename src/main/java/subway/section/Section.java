@@ -1,4 +1,4 @@
-package subway;
+package subway.section;
 
 import javax.persistence.*;
 

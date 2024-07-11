@@ -1,4 +1,4 @@
-package subway;
+package subway.commons;
 
 public class HttpException extends RuntimeException {
     private ErrorCode errorCode;

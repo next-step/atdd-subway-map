@@ -1,6 +1,9 @@
-package subway;
+package subway.section;
 
 import org.springframework.stereotype.Component;
+import subway.station.StationResponse;
+import subway.station.StationService;
+import subway.line.LineService;
 
 import java.util.*;
 
