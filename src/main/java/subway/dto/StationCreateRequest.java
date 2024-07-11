@@ -1,6 +1,6 @@
-package subway;
+package subway.dto;
 
-public class StationRequest {
+public class StationCreateRequest {
     private String name;
 
     public String getName() {
