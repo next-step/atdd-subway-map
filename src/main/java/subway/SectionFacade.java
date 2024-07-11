@@ -39,16 +39,12 @@ public class SectionFacade {
         String lineName = lineService.readLine(firstSection.getLineId()).getName();
         SectionResponse sectionResponse = new SectionResponse(firstSection.getLineId(), lineName);
 
-        Map<Long, String> stationMap = new HashMap<>();
+
         for(Section section: sections) {
             StationResponse upStationResponse = stationService.findStation(section.getUpStationId());
             StationResponse downStationResponse = stationService.findStation(section.getDownStationId());
-            stationMap.put(upStationResponse.getId(), upStationResponse.getName());
-            stationMap.put(downStationResponse.getId(), downStationResponse.getName());
-        }
-        for (Map.Entry<Long, String> entry : stationMap.entrySet()) {
-            StationResponse stationResponse = new StationResponse(entry.getKey(), entry.getValue());
-            sectionResponse.addUpStation(stationResponse);
+            sectionResponse.addUpStation(upStationResponse);
+            sectionResponse.addDownStation(downStationResponse);
         }
 
         return sectionResponse;
