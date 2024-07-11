@@ -7,24 +7,22 @@ public class SectionResponse {
     private Long lineId;
     private String lineName;
 
-    private List<StationResponse> stations = new ArrayList<>();
+    private List<StationResponse> upStations = new ArrayList<>();
+    private List<StationResponse> downStations = new ArrayList<>();
+    public SectionResponse() {
+    }
 
     public SectionResponse(Long lineId, String lineName) {
         this.lineId = lineId;
         this.lineName = lineName;
     }
 
-    public void addStation(StationResponse response) {
-        stations.add(response);
+    public void addUpStation(StationResponse response) {
+        upStations.add(response);
     }
 
-    public SectionResponse() {
-    }
-
-    public SectionResponse(Long lineId, String lineName, List<StationResponse> stations) {
-        this.lineId = lineId;
-        this.lineName = lineName;
-        this.stations = stations;
+    public void addDownStation(StationResponse response) {
+        downStations.add(response);
     }
 
     public Long getLineId() {
@@ -35,7 +33,11 @@ public class SectionResponse {
         return lineName;
     }
 
-    public List<StationResponse> getStations() {
-        return stations;
+    public List<StationResponse> getUpStations() {
+        return upStations;
+    }
+
+    public List<StationResponse> getDownStations() {
+        return downStations;
     }
 }
