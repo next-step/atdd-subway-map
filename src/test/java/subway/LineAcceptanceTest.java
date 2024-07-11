@@ -73,7 +73,7 @@ public class LineAcceptanceTest {
     @Test
     void 지하철_노선_목록_조회() {
         //given
-        List<String> insertedLines = List.of("신분당선", "분당선");
+        List<String> insertedLines = List.of("신분당선", "분당선", "2호선");
 
         //when
         ExtractableResponse<Response> response = getAPIResponse("/lines");
