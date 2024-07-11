@@ -28,6 +28,7 @@ public class SectionAcceptanceTest {
      */
     @DirtiesContext
     @Test
+    @DisplayName("기존의 노선에 구간을 등록한다.")
     void 구간_등록_테스트() {
         //given
         int testingLineNumber = 1;
@@ -59,6 +60,7 @@ public class SectionAcceptanceTest {
      */
     @DirtiesContext
     @Test
+    @DisplayName("구간 등록할 때 하행종점역이 아니면 실패한다.")
     void 구간_등록시_상행역은_하행종점역이_아니면_실패() {
         //given
         int testingLineNumber = 1;
@@ -88,6 +90,7 @@ public class SectionAcceptanceTest {
      */
     @DirtiesContext
     @Test
+    @DisplayName("구간안에 등록하고자 하는 역이 이미 존재하였을 때 실패한다.")
     void 이미_구간에_존재하는_역_등록() {
         //given
         int testingLineNumber = 1;
@@ -115,6 +118,7 @@ public class SectionAcceptanceTest {
      */
     @DirtiesContext
     @Test
+    @DisplayName("기존 구간에서 하행 종점역을 제거하면 구간이 제거된다.")
     void 구간_제거_테스트() {
         // given
         int testingLineNumber = 2;
@@ -139,6 +143,7 @@ public class SectionAcceptanceTest {
      */
     @DirtiesContext
     @Test
+    @DisplayName("구간을 제거 할 때 상행역이 하행 종점역이 아니면 실패한다.")
     void 구간_제거시_하행종점역이_아니면_실패() {
         // given
         int testingLineNumber = 2;
@@ -160,6 +165,7 @@ public class SectionAcceptanceTest {
      */
     @DirtiesContext
     @Test
+    @DisplayName("구간을 제거 할 때 남은 구간이 한개인 경우 실패한다.")
     void 구간_제거시_구간이_1개인경우_실패() {
         int testingLineNumber = 3;
         int removingStationId = 7;
@@ -180,6 +186,7 @@ public class SectionAcceptanceTest {
      */
     @DirtiesContext
     @Test
+    @DisplayName("노선본호로 등록되어 있는 모든 구간을 조회한다.")
     void 노선_번호로_등록되어있는_구간_조회() {
         // given
         int testingLineNumber = 2;
