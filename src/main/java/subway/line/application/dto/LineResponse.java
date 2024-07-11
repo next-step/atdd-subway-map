@@ -1,6 +1,8 @@
 package subway.line.application.dto;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import subway.StationResponse;
 import subway.line.domain.Line;
@@ -56,10 +58,14 @@ public class LineResponse {
     }
 
     public static LineResponse from(Line line) {
-        List<StationResponse> stations = List.of(
-            new StationResponse(line.getUpStation().getId(), line.getUpStation().getName()),
-            new StationResponse(line.getDownStation().getId(), line.getDownStation().getName())
-        );
+        List<StationResponse> stations = line.getSections().stream()
+            .flatMap(section -> Stream.of(
+                new StationResponse(section.getUpStationId(), section.getUpStationName()),
+                new StationResponse(section.getDownStationId(), section.getDownStationName())
+            ))
+            .distinct()
+            .collect(Collectors.toList());
+
         return new LineResponse(line.getId(), line.getName(), line.getColor(), stations);
     }
 }

@@ -9,6 +9,7 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import subway.line.application.dto.LineRequest;
+import subway.line.application.dto.SectionRequest;
 
 public class TestFixture {
 
@@ -87,6 +88,32 @@ public class TestFixture {
         return RestAssured.given().log().all()
             .when().delete("/lines/" + id)
             .then().log().all()
+            .extract();
+    }
+
+
+    public static ExtractableResponse<Response> addSection(Long lineId, Long upStationId, Long downStationId, int distance) {
+        SectionRequest request = new SectionRequest(upStationId, downStationId, distance);
+        return RestAssured
+            .given()
+            .log().all()
+            .body(request)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when()
+            .post("/lines/" + lineId + "/sections")
+            .then()
+            .log().all()
+            .extract();
+    }
+
+    public static ExtractableResponse<Response> removeSection(Long lineId, Long stationId) {
+        return RestAssured
+            .given()
+            .log().all()
+            .when()
+            .delete("/lines/" + lineId + "/sections?stationId=" + stationId)
+            .then()
+            .log().all()
             .extract();
     }
 }
