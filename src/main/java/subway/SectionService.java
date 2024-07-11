@@ -17,7 +17,7 @@ public class SectionService {
     }
 
     @Transactional
-    public Long createSection(SectionCreateDTO dto) throws HttpException{
+    public Long createSection(SectionCreateDTO dto) {
         validateCreate(dto);
         Section section = Section.builder()
                 .upStationId(dto.getUpStationId())
@@ -34,14 +34,14 @@ public class SectionService {
     }
 
     @Transactional
-    public void deleteSection(SectionDeleteDTO dto) throws HttpException {
+    public void deleteSection(SectionDeleteDTO dto) {
         validateDelete(dto);
         Section deletingSection = sectionRepository.findByLineIdAndDownStationId(dto.getLineId(), dto.getStationId())
                 .orElseThrow(() -> new HttpException(ErrorCode.IS_NOT_TERMINAL_STATION));
         sectionRepository.delete(deletingSection);
     }
 
-    private void validateCreate(SectionCreateDTO dto) throws HttpException {
+    private void validateCreate(SectionCreateDTO dto) {
         List<Section> currentSections = readSections(dto.getLineId());
         // 하행 종점이 같은 것이 존재하면 x
         boolean isExist = currentSections.stream().anyMatch(section -> section.getDownStationId() == dto.getDownStationId());
@@ -62,7 +62,7 @@ public class SectionService {
 
     }
 
-    private void validateDelete(SectionDeleteDTO dto) throws HttpException {
+    private void validateDelete(SectionDeleteDTO dto) {
         List<Section> currentSections = readSections(dto.getLineId());
         if(currentSections.size() == 1) {
             throw new HttpException(ErrorCode.CANNOT_REMOVE_LAST_SECTION);

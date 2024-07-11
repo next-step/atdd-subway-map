@@ -17,19 +17,19 @@ public class LineFacade {
     }
 
     @Transactional
-    public LineResponse createLine(LineCreateRequest lineCreateRequest) throws HttpException{
+    public LineResponse createLine(LineCreateRequest lineCreateRequest) {
         Line line = lineService.createLine(lineCreateRequest);
         return makeLineResponse(line);
     }
 
 
-    public LineResponse readLine(Long id) throws HttpException{
+    public LineResponse readLine(Long id) {
         Line line = lineService.readLine(id);
         return makeLineResponse(line);
     }
 
 
-    public List<LineResponse> readLines() throws HttpException{
+    public List<LineResponse> readLines() {
         List<Line> lines = lineService.readLines();
         List<LineResponse> linesResponse = new ArrayList<>();
         for (Line line: lines) {
@@ -38,7 +38,7 @@ public class LineFacade {
         return linesResponse;
     }
 
-    public void updateLine(LineUpdateDTO lineUpdateDTO) throws HttpException {
+    public void updateLine(LineUpdateDTO lineUpdateDTO) {
         lineService.updateLine(lineUpdateDTO);
     }
 
@@ -46,7 +46,7 @@ public class LineFacade {
         lineService.deleteLine(id);
     }
 
-    private LineResponse makeLineResponse(Line line) throws HttpException{
+    private LineResponse makeLineResponse(Line line) {
         LineResponse lineResponse = new LineResponse(line.getId(), line.getName(), line.getColor());
         StationResponse upStation = stationService.findStation(line.getUpStationId());
         StationResponse downStation = stationService.findStation(line.getDownStationId());

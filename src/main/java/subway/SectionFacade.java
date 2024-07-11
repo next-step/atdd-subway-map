@@ -19,22 +19,22 @@ public class SectionFacade {
         this.sectionService = sectionService;
     }
 
-    public Long createSection(SectionCreateDTO dto) throws HttpException {
+    public Long createSection(SectionCreateDTO dto) {
         lineService.validateSectionCreate(dto);
         stationService.validateSectionCreate(dto);
         return sectionService.createSection(dto);
     }
 
-    public SectionResponse readSections(Long lineId) throws HttpException {
+    public SectionResponse readSections(Long lineId) {
         List<Section> sections = sectionService.readSections(lineId);
         return makeSectionResponse(sections);
     }
 
-    public void deleteSection(SectionDeleteDTO dto) throws HttpException {
+    public void deleteSection(SectionDeleteDTO dto) {
         sectionService.deleteSection(dto);
     }
 
-    private SectionResponse makeSectionResponse(List<Section> sections) throws HttpException {
+    private SectionResponse makeSectionResponse(List<Section> sections) {
         Section firstSection = sections.get(0);
         String lineName = lineService.readLine(firstSection.getLineId()).getName();
         SectionResponse sectionResponse = new SectionResponse(firstSection.getLineId(), lineName);
@@ -48,7 +48,7 @@ public class SectionFacade {
         }
         for (Map.Entry<Long, String> entry : stationMap.entrySet()) {
             StationResponse stationResponse = new StationResponse(entry.getKey(), entry.getValue());
-            sectionResponse.addStation(stationResponse);
+            sectionResponse.addUpStation(stationResponse);
         }
 
         return sectionResponse;

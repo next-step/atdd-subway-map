@@ -21,7 +21,7 @@ public class StationService {
         return createStationResponse(station);
     }
 
-    public StationResponse findStation(Long id) throws HttpException{
+    public StationResponse findStation(Long id) {
         Station station = stationRepository.findById(id).orElseThrow(() -> new HttpException(ErrorCode.BAD_REQUEST));
         return createStationResponse(station);
     }
@@ -37,7 +37,7 @@ public class StationService {
         stationRepository.deleteById(id);
     }
 
-    public void validateSectionCreate(SectionCreateDTO dto) throws HttpException {
+    public void validateSectionCreate(SectionCreateDTO dto) {
         Station upStation = stationRepository.findById(dto.getUpStationId())
                 .orElseThrow(() -> new HttpException(ErrorCode.UP_STATION_NOT_VALID));
 
