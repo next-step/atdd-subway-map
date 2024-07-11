@@ -1,6 +1,8 @@
 package subway.section;
 
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+import subway.line.Line;
 import subway.station.StationResponse;
 import subway.station.StationService;
 import subway.line.LineService;
@@ -25,22 +27,22 @@ public class SectionFacade {
     public Long createSection(SectionCreateDTO dto) {
         lineService.validateSectionCreate(dto);
         stationService.validateSectionCreate(dto);
-        return sectionService.createSection(dto);
+        Line line = lineService.readLine(dto.getLineId());
+        return sectionService.createSection(dto, line);
     }
 
     public SectionResponse readSections(Long lineId) {
         List<Section> sections = sectionService.readSections(lineId);
         return makeSectionResponse(sections);
     }
-
     public void deleteSection(SectionDeleteDTO dto) {
         sectionService.deleteSection(dto);
     }
 
     private SectionResponse makeSectionResponse(List<Section> sections) {
         Section firstSection = sections.get(0);
-        String lineName = lineService.readLine(firstSection.getLineId()).getName();
-        SectionResponse sectionResponse = new SectionResponse(firstSection.getLineId(), lineName);
+        String lineName = lineService.readLine(firstSection.getLine().getId()).getName();
+        SectionResponse sectionResponse = new SectionResponse(firstSection.getLine().getId(), lineName);
 
 
         for(Section section: sections) {

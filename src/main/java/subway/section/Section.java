@@ -1,5 +1,7 @@
 package subway.section;
 
+import subway.line.Line;
+
 import javax.persistence.*;
 
 @Entity
@@ -18,17 +20,21 @@ public class Section {
     @Column(nullable = false)
     private Long distance;
 
-    @Column(nullable = false)
-    private Long lineId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "line_id", nullable = false)
+    private Line line;
+
+    @Column(name = "section_order")
+    private Integer sectionOrder;
 
     public Section() {
     }
 
-    public Section(Long upStationId, Long downStationId, Long distance, Long lineId) {
+    public Section(Long upStationId, Long downStationId, Long distance, Line line) {
         this.upStationId = upStationId;
         this.downStationId = downStationId;
         this.distance = distance;
-        this.lineId = lineId;
+        this.line = line;
     }
 
     public static Builder builder() {
@@ -39,7 +45,7 @@ public class Section {
         private Long upStationId;
         private Long downStationId;
         private Long distance;
-        private Long lineId;
+        private Line line;
 
         public Builder() {
         }
@@ -59,13 +65,13 @@ public class Section {
             return this;
         }
 
-        public Builder lineId(Long lineId) {
-            this.lineId = lineId;
+        public Builder line(Line line) {
+            this.line = line;
             return this;
         }
 
         public Section build() {
-            return new Section(this.upStationId, this.downStationId, this.distance, this.lineId);
+            return new Section(this.upStationId, this.downStationId, this.distance, this.line);
         }
 
 
@@ -87,7 +93,11 @@ public class Section {
         return distance;
     }
 
-    public Long getLineId() {
-        return lineId;
+    public Line getLine() {
+        return line;
+    }
+
+    public Integer getSectionOrder() {
+        return sectionOrder;
     }
 }

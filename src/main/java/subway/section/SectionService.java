@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.commons.ErrorCode;
 import subway.commons.HttpException;
+import subway.line.Line;
 
 import java.util.List;
 
@@ -19,15 +20,15 @@ public class SectionService {
     }
 
     @Transactional
-    public Long createSection(SectionCreateDTO dto) {
-        validateCreate(dto);
+    public Long createSection(SectionCreateDTO dto, Line line) {
+
         Section section = Section.builder()
                 .upStationId(dto.getUpStationId())
                 .downStationId(dto.getDownStationId())
                 .distance(dto.getDistance())
-                .lineId(dto.getLineId())
+                .line(line)
                 .build();
-        sectionRepository.save(section);
+        line.addSection(section);
         return section.getId();
     }
 
@@ -37,41 +38,10 @@ public class SectionService {
 
     @Transactional
     public void deleteSection(SectionDeleteDTO dto) {
-        validateDelete(dto);
+
         Section deletingSection = sectionRepository.findByLineIdAndDownStationId(dto.getLineId(), dto.getStationId())
                 .orElseThrow(() -> new HttpException(ErrorCode.IS_NOT_TERMINAL_STATION));
-        sectionRepository.delete(deletingSection);
-    }
-
-    private void validateCreate(SectionCreateDTO dto) {
-        List<Section> currentSections = readSections(dto.getLineId());
-        // 하행 종점이 같은 것이 존재하면 x
-        boolean isExist = currentSections.stream().anyMatch(section -> section.getDownStationId() == dto.getDownStationId());
-        if(isExist) {
-            throw new HttpException(ErrorCode.DOWN_STATION_NOT_VALID);
-        }
-        // 상행 종점이 같은 것이 존재하면 x
-        isExist = currentSections.stream().anyMatch(section -> section.getUpStationId() == dto.getUpStationId());
-        if(isExist) {
-            throw new HttpException(ErrorCode.UP_STATION_NOT_VALID);
-        }
-        // 등록하는 상행역이 기존 하행종점과 같지 않으면 x
-        Section lastSection = currentSections.get(currentSections.size() -1);
-        if(lastSection.getDownStationId() != dto.getUpStationId()) {
-            throw new HttpException(ErrorCode.UP_STATION_NOT_VALID);
-        }
-
-
-    }
-
-    private void validateDelete(SectionDeleteDTO dto) {
-        List<Section> currentSections = readSections(dto.getLineId());
-        if(currentSections.size() == 1) {
-            throw new HttpException(ErrorCode.CANNOT_REMOVE_LAST_SECTION);
-        }
-        Section lastSection = currentSections.get(currentSections.size() -1);
-        if(lastSection.getDownStationId() != dto.getStationId()) {
-            throw new HttpException(ErrorCode.IS_NOT_TERMINAL_STATION);
-        }
+        Line line = deletingSection.getLine();
+        line.deleteSection(dto.getStationId());
     }
 }
