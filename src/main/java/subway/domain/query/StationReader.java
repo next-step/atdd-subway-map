@@ -2,11 +2,9 @@ package subway.domain.query;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import subway.domain.exception.SubwayDomainException;
-import subway.domain.exception.SubwayDomainExceptionType;
-import subway.domain.view.StationView;
 import subway.domain.entity.station.Station;
 import subway.domain.repository.StationRepository;
+import subway.domain.view.StationView;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,10 +16,7 @@ public class StationReader {
     private final StationRepository stationRepository;
 
     public StationView.Main getOneById(Long id) {
-        return stationRepository
-                .findById(id)
-                .map(this::transform)
-                .orElseThrow(() -> new SubwayDomainException(SubwayDomainExceptionType.NOT_FOUND_STATION));
+        return transform(stationRepository.findByIdOrThrow(id));
     }
 
     public List<StationView.Main> getAll() {

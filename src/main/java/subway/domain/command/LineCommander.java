@@ -39,10 +39,7 @@ public class LineCommander {
     }
 
     private void verifyStationExist(Long upStationId, Long downStationId) {
-        Optional<Station> upStation = this.stationRepository.findById(upStationId);
-        upStation.orElseThrow(() -> new SubwayDomainException(SubwayDomainExceptionType.NOT_FOUND_STATION));
-
-        Optional<Station> downStation = this.stationRepository.findById(downStationId);
-        downStation.orElseThrow(() -> new SubwayDomainException(SubwayDomainExceptionType.NOT_FOUND_STATION));
+        this.stationRepository.findByIdOrThrow(upStationId);
+        this.stationRepository.findByIdOrThrow(downStationId);
     }
 }
