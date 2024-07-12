@@ -32,7 +32,7 @@ public class LineService {
 
 
     public Line readLine(Long id) {
-        return lineRepository.findById(id).orElseThrow(() -> new HttpException(ErrorCode.MISSING_ID));
+        return lineRepository.findById(id).orElseThrow(() -> new HttpException(ErrorCode.MISSING_ID, id.toString()));
     }
 
 
@@ -43,7 +43,7 @@ public class LineService {
     @Transactional
     public void updateLine(LineUpdateDTO dto) {
         Line line = lineRepository.findById(dto.getId())
-                .orElseThrow(() -> new HttpException(ErrorCode.MISSING_ID));
+                .orElseThrow(() -> new HttpException(ErrorCode.MISSING_ID, dto.getId().toString()));
         line.changeColor(dto.getColor());
         line.changeName(dto.getName());
     }
@@ -54,7 +54,6 @@ public class LineService {
     }
 
     public void validateSectionCreate(SectionCreateDTO dto) {
-        Line line = lineRepository.findById(dto.getLineId())
-                .orElseThrow(() -> new HttpException(ErrorCode.MISSING_ID));
+        Line line = lineRepository.findById(dto.getLineId()).orElseThrow(() -> new HttpException(ErrorCode.MISSING_ID, dto.getLineId().toString()));
     }
 }

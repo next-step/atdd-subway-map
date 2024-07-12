@@ -12,6 +12,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
 import subway.commons.ErrorCode;
 
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -108,8 +109,9 @@ public class SectionAcceptanceTest {
         ExtractableResponse response = postAPIResponse("/lines/" + testingLineNumber + "/sections", params);
 
         //then
+        String errorMessage = MessageFormat.format(ErrorCode.DOWN_STATION_NOT_VALID.getMessage(), downStationId);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(response.body().asString()).isEqualTo(ErrorCode.DOWN_STATION_NOT_VALID.getMessage());
+        assertThat(response.body().asString()).isEqualTo(errorMessage);
     }
 
     /**
@@ -155,8 +157,9 @@ public class SectionAcceptanceTest {
         ExtractableResponse response = deleteAPIResponse("/lines/" + testingLineNumber + "/sections?stationId=" + removingStationId);
 
         //then
+        String errorMessage = MessageFormat.format(ErrorCode.IS_NOT_TERMINAL_STATION.getMessage(), Integer.toString(removingStationId));
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(response.body().asString()).isEqualTo(ErrorCode.IS_NOT_TERMINAL_STATION.getMessage());
+        assertThat(response.body().asString()).isEqualTo(errorMessage);
     }
 
     /**

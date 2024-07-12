@@ -40,7 +40,7 @@ public class SectionService {
     public void deleteSection(SectionDeleteDTO dto) {
 
         Section deletingSection = sectionRepository.findByLineIdAndDownStationId(dto.getLineId(), dto.getStationId())
-                .orElseThrow(() -> new HttpException(ErrorCode.IS_NOT_TERMINAL_STATION));
+                .orElseThrow(() -> new HttpException(ErrorCode.IS_NOT_TERMINAL_STATION, dto.getStationId().toString()));
         Line line = deletingSection.getLine();
         line.deleteSection(dto.getStationId());
     }

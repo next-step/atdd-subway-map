@@ -45,7 +45,7 @@ public class StationService {
                 .orElseThrow(() -> new HttpException(ErrorCode.UP_STATION_NOT_VALID));
 
         Station downStation = stationRepository.findById(dto.getDownStationId())
-                .orElseThrow(() -> new HttpException(ErrorCode.DOWN_STATION_NOT_VALID));
+                .orElseThrow(() -> new HttpException(ErrorCode.DOWN_STATION_NOT_VALID, dto.getDownStationId().toString()));
     }
 
     private StationResponse createStationResponse(Station station) {
