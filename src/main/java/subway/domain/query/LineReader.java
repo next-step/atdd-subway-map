@@ -5,8 +5,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.domain.entity.line.Line;
 import subway.domain.entity.station.Station;
-import subway.domain.exception.SubwayDomainException;
-import subway.domain.exception.SubwayDomainExceptionType;
 import subway.domain.repository.LineRepository;
 import subway.domain.repository.StationRepository;
 import subway.domain.view.LineView;
@@ -48,7 +46,9 @@ public class LineReader {
                         )
                         .collect(Collectors.toSet())
         );
-        return lines.stream().map(line -> joinAndTransform(line, stationMap)).collect(Collectors.toList());
+        return lines.stream()
+                .map(line -> joinAndTransform(line, stationMap))
+                .collect(Collectors.toList());
     }
 
     private Map<Long, Station> getStationMapByIds(Iterable<Long> ids) {
