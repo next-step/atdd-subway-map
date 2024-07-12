@@ -32,8 +32,8 @@ public class StationCommanderTest extends BaseTestSetup {
             Long id = sut.createStation(name);
 
             // then
-            Optional<Station> actual = stationRepository.findById(id);
-            assertThat(actual.get().getName()).isEqualTo(name);
+            Station actual = stationRepository.findByIdOrThrow(id);
+            assertThat(actual.getName()).isEqualTo(name);
         }
     }
 

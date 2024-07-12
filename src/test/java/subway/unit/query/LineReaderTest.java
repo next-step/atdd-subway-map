@@ -6,19 +6,15 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.springframework.beans.factory.annotation.Autowired;
-import subway.domain.entity.station.Station;
+import subway.domain.entity.line.Line;
 import subway.domain.exception.SubwayDomainException;
 import subway.domain.exception.SubwayDomainExceptionType;
-import subway.domain.repository.StationRepository;
-import subway.domain.view.LineView;
-import subway.domain.entity.line.Line;
 import subway.domain.query.LineReader;
 import subway.domain.repository.LineRepository;
+import subway.domain.view.LineView;
 import subway.internal.BaseTestSetup;
 
-import javax.transaction.Transactional;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 

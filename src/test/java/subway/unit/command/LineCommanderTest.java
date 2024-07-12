@@ -11,7 +11,6 @@ import org.springframework.transaction.support.TransactionTemplate;
 import subway.domain.command.LineCommand;
 import subway.domain.command.LineCommander;
 import subway.domain.entity.line.Line;
-import subway.domain.entity.line.LineSection;
 import subway.domain.entity.station.Station;
 import subway.domain.exception.SubwayDomainException;
 import subway.domain.exception.SubwayDomainExceptionType;
@@ -19,13 +18,13 @@ import subway.domain.repository.LineRepository;
 import subway.domain.repository.StationRepository;
 import subway.fixtures.LineFixture;
 import subway.internal.BaseTestSetup;
-import subway.internal.LineSectionFetcher;
 
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 public class LineCommanderTest extends BaseTestSetup {
 
@@ -75,42 +74,20 @@ public class LineCommanderTest extends BaseTestSetup {
 
             // then
             transactionTemplate.execute(status -> {
-                Line actual = lineRepository.findById(id).get();
-                assertThat(actual.getName()).isEqualTo(command.getName());
-                assertThat(actual.getColor()).isEqualTo(command.getColor());
+                Line actual = lineRepository.findByIdOrThrow(id);
+                assertAll("assert created line",
+                        () -> assertThat(actual.getName()).isEqualTo(command.getName()),
+                        () -> assertThat(actual.getColor()).isEqualTo(command.getColor()),
 
-                assertThat(actual.getSections().size()).isEqualTo(1);
-                assertThat(actual.getSections().get(0).getUpStationId()).isEqualTo(command.getUpStationId());
-                assertThat(actual.getSections().get(0).getDownStationId()).isEqualTo(command.getDownStationId());
-                assertThat(actual.getSections().get(0).getDistance()).isEqualTo(command.getDistance());
+                        // section
+                        () -> assertThat(actual.getSections().size()).isEqualTo(1),
+                        () -> assertThat(actual.getSections().get(0).getUpStationId()).isEqualTo(command.getUpStationId()),
+                        () -> assertThat(actual.getSections().get(0).getDownStationId()).isEqualTo(command.getDownStationId()),
+                        () -> assertThat(actual.getSections().get(0).getDistance()).isEqualTo(command.getDistance())
+                );
                 return null;
             });
         }
-
-//        @ParameterizedTest
-//        @AutoSource
-//        @Repeat(5)
-//        public void sut_creates_one_section(String lineName, String color, Long distance) {
-//            // given
-//            Pair<Station, Station> upDownStation = addUpDownStation();
-//            LineCommand.CreateLine command = new LineCommand.CreateLine(
-//                    lineName,
-//                    color,
-//                    upDownStation.getFirst().getId(),
-//                    upDownStation.getSecond().getId(),
-//                    distance
-//            );
-//
-//            // when
-//            Long id = sut.createLine(command);
-//
-//            // then
-//            List<LineSection> sections = lineSectionFetcher.findAllByLine(lineRepository.findById(id).get());
-//            assertThat(sections.size()).isEqualTo(1);
-//            assertThat(sections.get(0).getUpStationId()).isEqualTo(command.getUpStationId());
-//            assertThat(sections.get(0).getDownStationId()).isEqualTo(command.getDownStationId());
-//            assertThat(sections.get(0).getDistance()).isEqualTo(command.getDistance());
-//        }
 
         @ParameterizedTest
         @AutoSource
@@ -171,9 +148,9 @@ public class LineCommanderTest extends BaseTestSetup {
             sut.updateLine(command);
 
             // then
-            Optional<Line> actual = lineRepository.findById(command.getId());
-            assertThat(actual.get().getName()).isEqualTo(command.getName());
-            assertThat(actual.get().getColor()).isEqualTo(command.getColor());
+            Line actual = lineRepository.findByIdOrThrow(command.getId());
+            assertThat(actual.getName()).isEqualTo(command.getName());
+            assertThat(actual.getColor()).isEqualTo(command.getColor());
         }
 
         @ParameterizedTest
