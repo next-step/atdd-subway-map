@@ -27,14 +27,14 @@ public class LineCommander {
 
     @Transactional
     public void updateLine(LineCommand.UpdateLine command) {
-        Line line = lineRepository.findById(command.getId()).orElseThrow(() -> new SubwayDomainException(SubwayDomainExceptionType.NOT_FOUND_LINE));
+        Line line = lineRepository.findByIdOrThrow(command.getId());
         line.update(command);
         lineRepository.save(line);
     }
 
     @Transactional
     public void deleteLineById(Long id) {
-        Line line = lineRepository.findById(id).orElseThrow(() -> new SubwayDomainException(SubwayDomainExceptionType.NOT_FOUND_LINE));
+        Line line = lineRepository.findByIdOrThrow(id);
         lineRepository.delete(line);
     }
 

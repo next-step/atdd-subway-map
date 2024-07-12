@@ -28,7 +28,7 @@ public class LineReader {
 
     @Transactional(readOnly = true)
     public LineView.Main getOneById(Long id) {
-        Line line = lineRepository.findById(id).orElseThrow(() -> new SubwayDomainException(SubwayDomainExceptionType.NOT_FOUND_LINE));
+        Line line = lineRepository.findByIdOrThrow(id);
         Map<Long, Station> stationMap = getStationMapByIds(
                 line.getSections().stream()
                         .flatMap(section -> Stream.of(section.getUpStationId(), section.getDownStationId()))

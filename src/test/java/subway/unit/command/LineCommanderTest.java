@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
+import org.springframework.transaction.support.TransactionTemplate;
 import subway.domain.command.LineCommand;
 import subway.domain.command.LineCommander;
 import subway.domain.entity.line.Line;
@@ -38,20 +39,18 @@ public class LineCommanderTest extends BaseTestSetup {
     private StationRepository stationRepository;
 
     @Autowired
-    private LineSectionFetcher lineSectionFetcher;
+    TransactionTemplate transactionTemplate;
 
     private Pair<Station, Station> addUpDownStation() {
         Station upStation = new Station("삼성역");
         Station downStation = new Station("잠실역");
-        stationRepository.save(upStation);
-        stationRepository.save(downStation);
+        stationRepository.saveAll(List.of(upStation, downStation));
         return Pair.of(upStation, downStation);
     }
 
     private Line addLine(Long upStationId, Long downStationId) {
         Line line = LineFixture.prepareLineOne(upStationId, downStationId);
-        lineRepository.save(line);
-        return line;
+        return lineRepository.save(line);
     }
 
     @Nested
@@ -75,35 +74,43 @@ public class LineCommanderTest extends BaseTestSetup {
             Long id = sut.createLine(command);
 
             // then
-            Line actual = lineRepository.findById(id).get();
-            assertThat(actual.getName()).isEqualTo(command.getName());
-            assertThat(actual.getColor()).isEqualTo(command.getColor());
+            transactionTemplate.execute(status -> {
+                Line actual = lineRepository.findById(id).get();
+                assertThat(actual.getName()).isEqualTo(command.getName());
+                assertThat(actual.getColor()).isEqualTo(command.getColor());
+
+                assertThat(actual.getSections().size()).isEqualTo(1);
+                assertThat(actual.getSections().get(0).getUpStationId()).isEqualTo(command.getUpStationId());
+                assertThat(actual.getSections().get(0).getDownStationId()).isEqualTo(command.getDownStationId());
+                assertThat(actual.getSections().get(0).getDistance()).isEqualTo(command.getDistance());
+                return null;
+            });
         }
 
-        @ParameterizedTest
-        @AutoSource
-        @Repeat(5)
-        public void sut_creates_one_section(String lineName, String color, Long distance) {
-            // given
-            Pair<Station, Station> upDownStation = addUpDownStation();
-            LineCommand.CreateLine command = new LineCommand.CreateLine(
-                    lineName,
-                    color,
-                    upDownStation.getFirst().getId(),
-                    upDownStation.getSecond().getId(),
-                    distance
-            );
-
-            // when
-            Long id = sut.createLine(command);
-
-            // then
-            List<LineSection> sections = lineSectionFetcher.findAllByLine(lineRepository.findById(id).get());
-            assertThat(sections.size()).isEqualTo(1);
-            assertThat(sections.get(0).getUpStationId()).isEqualTo(command.getUpStationId());
-            assertThat(sections.get(0).getDownStationId()).isEqualTo(command.getDownStationId());
-            assertThat(sections.get(0).getDistance()).isEqualTo(command.getDistance());
-        }
+//        @ParameterizedTest
+//        @AutoSource
+//        @Repeat(5)
+//        public void sut_creates_one_section(String lineName, String color, Long distance) {
+//            // given
+//            Pair<Station, Station> upDownStation = addUpDownStation();
+//            LineCommand.CreateLine command = new LineCommand.CreateLine(
+//                    lineName,
+//                    color,
+//                    upDownStation.getFirst().getId(),
+//                    upDownStation.getSecond().getId(),
+//                    distance
+//            );
+//
+//            // when
+//            Long id = sut.createLine(command);
+//
+//            // then
+//            List<LineSection> sections = lineSectionFetcher.findAllByLine(lineRepository.findById(id).get());
+//            assertThat(sections.size()).isEqualTo(1);
+//            assertThat(sections.get(0).getUpStationId()).isEqualTo(command.getUpStationId());
+//            assertThat(sections.get(0).getDownStationId()).isEqualTo(command.getDownStationId());
+//            assertThat(sections.get(0).getDistance()).isEqualTo(command.getDistance());
+//        }
 
         @ParameterizedTest
         @AutoSource
