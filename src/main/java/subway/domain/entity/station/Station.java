@@ -1,4 +1,4 @@
-package subway.domain.entity;
+package subway.domain.entity.station;
 
 import lombok.Getter;
 

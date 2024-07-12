@@ -116,13 +116,7 @@ public class LineAcceptanceTest extends BaseTestSetup {
                 StationApiResponseExtractor.Single.extractId(StationTestApi.createCityHallStation())
         ));
         Long id = LineApiResponseExtractor.Single.extractId(createdLine);
-        UpdateLineRequest request = new UpdateLineRequest(
-                "2호선",
-                "#00A84D",
-                StationApiResponseExtractor.Single.extractId(StationTestApi.createYeoksamStation()),
-                StationApiResponseExtractor.Single.extractId(StationTestApi.createJamsilStation()),
-                10L
-        );
+        UpdateLineRequest request = new UpdateLineRequest("2호선", "#00A84D");
 
         // when
         ExtractableResponse<Response> response = LineTestApi.updateLine(id, request);
@@ -134,7 +128,6 @@ public class LineAcceptanceTest extends BaseTestSetup {
         ExtractableResponse<Response> updatedLine = LineTestApi.showLine(id);
         assertThat(LineApiResponseExtractor.Single.extractName(updatedLine)).isEqualTo("2호선");
         assertThat(LineApiResponseExtractor.Single.extractColor(updatedLine)).isEqualTo("#00A84D");
-        assertThat(LineApiResponseExtractor.Single.extractUpDownStationNames(response)).containsExactly("역삼역", "잠실역");
     }
 
     /**

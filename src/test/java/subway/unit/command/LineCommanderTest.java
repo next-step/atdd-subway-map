@@ -9,15 +9,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
 import subway.domain.command.LineCommand;
 import subway.domain.command.LineCommander;
-import subway.domain.entity.Line;
-import subway.domain.entity.Station;
+import subway.domain.entity.line.Line;
+import subway.domain.entity.line.LineSection;
+import subway.domain.entity.station.Station;
 import subway.domain.exception.SubwayDomainException;
 import subway.domain.exception.SubwayDomainExceptionType;
 import subway.domain.repository.LineRepository;
 import subway.domain.repository.StationRepository;
 import subway.fixtures.LineFixture;
 import subway.internal.BaseTestSetup;
+import subway.internal.LineSectionFetcher;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -33,6 +36,9 @@ public class LineCommanderTest extends BaseTestSetup {
 
     @Autowired
     private StationRepository stationRepository;
+
+    @Autowired
+    private LineSectionFetcher lineSectionFetcher;
 
     private Pair<Station, Station> addUpDownStation() {
         Station upStation = new Station("삼성역");
@@ -69,9 +75,34 @@ public class LineCommanderTest extends BaseTestSetup {
             Long id = sut.createLine(command);
 
             // then
-            Optional<Line> actual = lineRepository.findById(id);
-            assertThat(actual.get().getName()).isEqualTo(command.getName());
-            assertThat(actual.get().getColor()).isEqualTo(command.getColor());
+            Line actual = lineRepository.findById(id).get();
+            assertThat(actual.getName()).isEqualTo(command.getName());
+            assertThat(actual.getColor()).isEqualTo(command.getColor());
+        }
+
+        @ParameterizedTest
+        @AutoSource
+        @Repeat(5)
+        public void sut_creates_one_section(String lineName, String color, Long distance) {
+            // given
+            Pair<Station, Station> upDownStation = addUpDownStation();
+            LineCommand.CreateLine command = new LineCommand.CreateLine(
+                    lineName,
+                    color,
+                    upDownStation.getFirst().getId(),
+                    upDownStation.getSecond().getId(),
+                    distance
+            );
+
+            // when
+            Long id = sut.createLine(command);
+
+            // then
+            List<LineSection> sections = lineSectionFetcher.findAllByLine(lineRepository.findById(id).get());
+            assertThat(sections.size()).isEqualTo(1);
+            assertThat(sections.get(0).getUpStationId()).isEqualTo(command.getUpStationId());
+            assertThat(sections.get(0).getDownStationId()).isEqualTo(command.getDownStationId());
+            assertThat(sections.get(0).getDistance()).isEqualTo(command.getDistance());
         }
 
         @ParameterizedTest
@@ -123,18 +154,11 @@ public class LineCommanderTest extends BaseTestSetup {
         @ParameterizedTest
         @AutoSource
         @Repeat(5)
-        public void sut_updates_line(String lineName, String color, Long distance) {
+        public void sut_updates_line(String lineName, String color) {
             // given
             Line line = addLine(111L, 211L);
-            Pair<Station, Station> upDownStation = addUpDownStation();
 
-            LineCommand.UpdateLine command = new LineCommand.UpdateLine(
-                    line.getId(),
-                    lineName, color,
-                    upDownStation.getFirst().getId(),
-                    upDownStation.getSecond().getId(),
-                    distance
-            );
+            LineCommand.UpdateLine command = new LineCommand.UpdateLine(line.getId(), lineName, color);
 
             // when
             sut.updateLine(command);
@@ -153,52 +177,6 @@ public class LineCommanderTest extends BaseTestSetup {
 
             // then
             assertThat(actual.getExceptionType()).isEqualTo(SubwayDomainExceptionType.NOT_FOUND_LINE);
-        }
-
-        @ParameterizedTest
-        @AutoSource
-        @Repeat(5)
-        public void sut_throws_if_not_found_upStation(String lineName, String color, Long distance) {
-            // given
-            Line line = addLine(111L, 211L);
-            Pair<Station, Station> upDownStation = addUpDownStation();
-
-            LineCommand.UpdateLine command = new LineCommand.UpdateLine(
-                    line.getId(),
-                    lineName, color,
-                    123123L,
-                    upDownStation.getSecond().getId(),
-                    distance
-            );
-
-            // when
-            SubwayDomainException actual = (SubwayDomainException) catchThrowable(() -> sut.updateLine(command));
-
-            // then
-            assertThat(actual.getExceptionType()).isEqualTo(SubwayDomainExceptionType.NOT_FOUND_STATION);
-        }
-
-        @ParameterizedTest
-        @AutoSource
-        @Repeat(5)
-        public void sut_throws_if_not_found_downStation(String lineName, String color, Long distance) {
-            // given
-            Line line = addLine(111L, 211L);
-            Pair<Station, Station> upDownStation = addUpDownStation();
-
-            LineCommand.UpdateLine command = new LineCommand.UpdateLine(
-                    line.getId(),
-                    lineName, color,
-                    upDownStation.getFirst().getId(),
-                    123123L,
-                    distance
-            );
-
-            // when
-            SubwayDomainException actual = (SubwayDomainException) catchThrowable(() -> sut.updateLine(command));
-
-            // then
-            assertThat(actual.getExceptionType()).isEqualTo(SubwayDomainExceptionType.NOT_FOUND_STATION);
         }
     }
 

@@ -6,14 +6,19 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.springframework.beans.factory.annotation.Autowired;
+import subway.domain.entity.station.Station;
 import subway.domain.exception.SubwayDomainException;
 import subway.domain.exception.SubwayDomainExceptionType;
+import subway.domain.repository.StationRepository;
 import subway.domain.view.LineView;
-import subway.domain.entity.Line;
+import subway.domain.entity.line.Line;
 import subway.domain.query.LineReader;
 import subway.domain.repository.LineRepository;
 import subway.internal.BaseTestSetup;
 
+import javax.transaction.Transactional;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,6 +33,23 @@ public class LineReaderTest extends BaseTestSetup {
     @Autowired
     private LineRepository lineRepository;
 
+    private void addLines(List<Line> lines) {
+        for (Line line : lines) {
+            line.getSections().forEach(section -> {
+                // section 에 line 연결
+                try {
+                    Field lineField = section.getClass().getDeclaredField("line");
+                    lineField.setAccessible(true);
+                    lineField.set(section, line);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            });
+
+        }
+        lineRepository.saveAll(lines);
+    }
+
     @Nested
     @DisplayName("getLine")
     class GetLineTest {
@@ -36,7 +58,7 @@ public class LineReaderTest extends BaseTestSetup {
         @Repeat(5)
         public void sut_returns_line(Line line) {
             // given
-            lineRepository.save(line);
+            addLines(List.of(line));
 
             // when
             LineView.Main actual = sut.getOneById(line.getId());
@@ -64,10 +86,7 @@ public class LineReaderTest extends BaseTestSetup {
         @Repeat(5)
         public void sut_returns_lines(List<Line> lines) {
             // given
-            lines.forEach((line) -> {
-
-            });
-            lineRepository.saveAll(lines);
+            addLines(lines);
 
             // when
             List<LineView.Main> actual = sut.getAllLines();

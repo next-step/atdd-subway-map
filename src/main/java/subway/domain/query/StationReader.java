@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import subway.domain.exception.SubwayDomainException;
 import subway.domain.exception.SubwayDomainExceptionType;
 import subway.domain.view.StationView;
-import subway.domain.entity.Station;
+import subway.domain.entity.station.Station;
 import subway.domain.repository.StationRepository;
 
 import java.util.List;

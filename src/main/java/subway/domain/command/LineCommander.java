@@ -3,8 +3,8 @@ package subway.domain.command;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import subway.domain.entity.Line;
-import subway.domain.entity.Station;
+import subway.domain.entity.line.Line;
+import subway.domain.entity.station.Station;
 import subway.domain.exception.SubwayDomainException;
 import subway.domain.exception.SubwayDomainExceptionType;
 import subway.domain.repository.LineRepository;
@@ -28,7 +28,6 @@ public class LineCommander {
     @Transactional
     public void updateLine(LineCommand.UpdateLine command) {
         Line line = lineRepository.findById(command.getId()).orElseThrow(() -> new SubwayDomainException(SubwayDomainExceptionType.NOT_FOUND_LINE));
-        verifyStationExist(command.getUpStationId(), command.getDownStationId());
         line.update(command);
         lineRepository.save(line);
     }

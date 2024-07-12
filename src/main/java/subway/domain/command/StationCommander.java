@@ -3,7 +3,7 @@ package subway.domain.command;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import subway.domain.entity.Station;
+import subway.domain.entity.station.Station;
 import subway.domain.repository.StationRepository;
 
 @Service

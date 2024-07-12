@@ -6,7 +6,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import subway.domain.command.StationCommander;
-import subway.domain.entity.Station;
+import subway.domain.entity.station.Station;
 import subway.domain.repository.StationRepository;
 import subway.internal.BaseTestSetup;
 
