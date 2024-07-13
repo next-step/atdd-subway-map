@@ -4,9 +4,9 @@ import autoparams.AutoSource;
 import autoparams.Repeat;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.util.Pair;
 import org.springframework.transaction.support.TransactionTemplate;
 import subway.domain.command.LineCommand;
 import subway.domain.command.LineCommander;
@@ -19,8 +19,10 @@ import subway.domain.repository.StationRepository;
 import subway.fixtures.LineFixture;
 import subway.internal.BaseTestSetup;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
@@ -38,16 +40,16 @@ public class LineCommanderTest extends BaseTestSetup {
     private StationRepository stationRepository;
 
     @Autowired
-    TransactionTemplate transactionTemplate;
+    private TransactionTemplate transactionTemplate;
 
-    private Pair<Station, Station> addUpDownStation() {
-        Station upStation = new Station("삼성역");
-        Station downStation = new Station("잠실역");
-        stationRepository.saveAll(List.of(upStation, downStation));
-        return Pair.of(upStation, downStation);
+    private List<Station> insertStations(String... stationNames) {
+        List<Station> stations = Arrays.stream(stationNames)
+                .map(Station::new)
+                .collect(Collectors.toList());
+        return stationRepository.saveAll(stations);
     }
 
-    private Line addLine(Long upStationId, Long downStationId) {
+    private Line insertLine(Long upStationId, Long downStationId) {
         Line line = LineFixture.prepareLineOne(upStationId, downStationId);
         return lineRepository.save(line);
     }
@@ -60,12 +62,12 @@ public class LineCommanderTest extends BaseTestSetup {
         @Repeat(5)
         public void sut_creates_line(String lineName, String color, Long distance) {
             // given
-            Pair<Station, Station> upDownStation = addUpDownStation();
+            List<Station> upDownStation = insertStations("삼성역", "잠실역");
             LineCommand.CreateLine command = new LineCommand.CreateLine(
                     lineName,
                     color,
-                    upDownStation.getFirst().getId(),
-                    upDownStation.getSecond().getId(),
+                    upDownStation.get(0).getId(),
+                    upDownStation.get(1).getId(),
                     distance
             );
 
@@ -94,12 +96,12 @@ public class LineCommanderTest extends BaseTestSetup {
         @Repeat(5)
         public void sut_throws_if_not_found_upStation(String lineName, String color, Long distance) {
             // given
-            Pair<Station, Station> upDownStation = addUpDownStation();
+            List<Station> upDownStation = insertStations("삼성역", "잠실역");
             LineCommand.CreateLine command = new LineCommand.CreateLine(
                     lineName,
                     color,
                     123213L,
-                    upDownStation.getSecond().getId(),
+                    upDownStation.get(1).getId(),
                     distance
             );
 
@@ -115,11 +117,11 @@ public class LineCommanderTest extends BaseTestSetup {
         @Repeat(5)
         public void sut_throws_if_not_found_downStation(String lineName, String color, Long distance) {
             // given
-            Pair<Station, Station> upDownStation = addUpDownStation();
+            List<Station> upDownStation = insertStations("삼성역", "잠실역");
             LineCommand.CreateLine command = new LineCommand.CreateLine(
                     lineName,
                     color,
-                    upDownStation.getFirst().getId(),
+                    upDownStation.get(0).getId(),
                     123213L,
                     distance
             );
@@ -140,8 +142,7 @@ public class LineCommanderTest extends BaseTestSetup {
         @Repeat(5)
         public void sut_updates_line(String lineName, String color) {
             // given
-            Line line = addLine(111L, 211L);
-
+            Line line = insertLine(111L, 211L);
             LineCommand.UpdateLine command = new LineCommand.UpdateLine(line.getId(), lineName, color);
 
             // when
@@ -155,7 +156,7 @@ public class LineCommanderTest extends BaseTestSetup {
 
         @ParameterizedTest
         @AutoSource
-        public void sut_throws_error_if_not_found_line(LineCommand.UpdateLine command) {
+        public void sut_throws_if_not_found_line(LineCommand.UpdateLine command) {
             // when
             SubwayDomainException actual = (SubwayDomainException) catchThrowable(() -> sut.updateLine(command));
 
@@ -172,7 +173,7 @@ public class LineCommanderTest extends BaseTestSetup {
         @Repeat(5)
         public void sut_deletes_line() {
             // given
-            Line line = addLine(111L, 211L);
+            Line line = insertLine(111L, 211L);
 
             // when
             sut.deleteLineById(line.getId());
@@ -184,12 +185,91 @@ public class LineCommanderTest extends BaseTestSetup {
 
         @ParameterizedTest
         @AutoSource
-        public void sut_throws_error_if_not_found_line(Long id) {
+        public void sut_throws_if_not_found_line(Long id) {
             // when
             SubwayDomainException actual = (SubwayDomainException) catchThrowable(() -> sut.deleteLineById(id));
 
             // then
             assertThat(actual.getExceptionType()).isEqualTo(SubwayDomainExceptionType.NOT_FOUND_LINE);
+        }
+    }
+
+    @Nested
+    @DisplayName("addSection")
+    class AddSectionTest {
+        @Test
+        public void sut_throws_if_not_found_line() {
+            // given
+            List<Station> upDownStation = insertStations("삼성역", "잠실역");
+            LineCommand.AddSection command = new LineCommand.AddSection(
+                    1728321378313L,
+                    upDownStation.get(0).getId(),
+                    upDownStation.get(1).getId(),
+                    20L
+            );
+
+            // when
+            SubwayDomainException actual = (SubwayDomainException) catchThrowable(() -> sut.addSection(command));
+
+            // then
+            assertThat(actual.getExceptionType()).isEqualTo(SubwayDomainExceptionType.NOT_FOUND_LINE);
+        }
+
+        @Test
+        public void sut_throws_if_not_found_upStation() {
+            // given
+            List<Station> stations = insertStations("삼성역", "잠실역");
+            Line line = insertLine(stations.get(0).getId(), stations.get(1).getId());
+            LineCommand.AddSection command = new LineCommand.AddSection(
+                    line.getId(),
+                    17238123L,
+                    stations.get(1).getId(),
+                    20L
+            );
+
+            // when
+            SubwayDomainException actual = (SubwayDomainException) catchThrowable(() -> sut.addSection(command));
+
+            // then
+            assertThat(actual.getExceptionType()).isEqualTo(SubwayDomainExceptionType.NOT_FOUND_STATION);
+        }
+
+        @Test
+        public void sut_throws_if_not_found_downStation() {
+            // given
+            List<Station> stations = insertStations("삼성역", "잠실역");
+            Line line = insertLine(stations.get(0).getId(), stations.get(1).getId());
+            LineCommand.AddSection command = new LineCommand.AddSection(
+                    line.getId(),
+                    stations.get(0).getId(),
+                    12783L,
+                    20L
+            );
+
+            // when
+            SubwayDomainException actual = (SubwayDomainException) catchThrowable(() -> sut.addSection(command));
+
+            // then
+            assertThat(actual.getExceptionType()).isEqualTo(SubwayDomainExceptionType.NOT_FOUND_STATION);
+        }
+
+        @Test
+        public void sut_throws_if_upStation_not_equal_to_last_line_downStation() {
+            // given
+            List<Station> stations = insertStations("삼성역", "잠실역", "선릉역", "강남역");
+            Line line = insertLine(stations.get(0).getId(), stations.get(1).getId());
+            LineCommand.AddSection command = new LineCommand.AddSection(
+                    line.getId(),
+                    stations.get(0).getId(),
+                    stations.get(2).getId(),
+                    20L
+            );
+
+            // when
+            SubwayDomainException actual = (SubwayDomainException) catchThrowable(() -> sut.addSection(command));
+
+            // then
+            assertThat(actual.getExceptionType()).isEqualTo(SubwayDomainExceptionType.INVALID_UP_STATION);
         }
     }
 }

@@ -4,6 +4,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 import subway.domain.command.LineCommand;
+import subway.domain.exception.SubwayDomainException;
+import subway.domain.exception.SubwayDomainExceptionType;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -38,12 +40,18 @@ public class Line {
 
     public static Line init(LineCommand.CreateLine command) {
         Line line = new Line(command.getName(), command.getColor(), new ArrayList<>());
-        LineSection section = new LineSection(line, command.getUpStationId(), command.getDownStationId(), command.getDistance());
-        line.addSection(section);
+        line.addSection(command.getUpStationId(), command.getDownStationId(), command.getDistance());
         return line;
     }
 
-    public void addSection(LineSection section) {
+    public void addSection(Long upStationId, Long downStationId, Long distance) {
+        // 새로운 구간의 상행역이 노선의 하행종창역이 아니도록 구간인 경우 에러
+        if (!sections.isEmpty() && !sections.get(sections.size() - 1).getDownStationId().equals(upStationId)) {
+            throw new SubwayDomainException(SubwayDomainExceptionType.INVALID_UP_STATION);
+        }
+
+
+        LineSection section = new LineSection(this, upStationId, downStationId, distance);
         this.sections.add(section);
     }
 

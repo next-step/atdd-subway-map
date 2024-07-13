@@ -24,4 +24,14 @@ public class LineCommand {
         private String name;
         private String color;
     }
+
+    @ToString
+    @Getter
+    @AllArgsConstructor
+    public static class AddSection {
+        private Long lineId;
+        private Long upStationId;
+        private Long downStationId;
+        private Long distance;
+    }
 }

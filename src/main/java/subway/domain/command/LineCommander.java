@@ -4,13 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.domain.entity.line.Line;
-import subway.domain.entity.station.Station;
-import subway.domain.exception.SubwayDomainException;
-import subway.domain.exception.SubwayDomainExceptionType;
 import subway.domain.repository.LineRepository;
 import subway.domain.repository.StationRepository;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -36,6 +31,14 @@ public class LineCommander {
     public void deleteLineById(Long id) {
         Line line = lineRepository.findByIdOrThrow(id);
         lineRepository.delete(line);
+    }
+
+    @Transactional
+    public void addSection(LineCommand.AddSection command) {
+        Line line = lineRepository.findByIdOrThrow(command.getLineId());
+        verifyStationExist(command.getUpStationId(), command.getDownStationId());
+        line.addSection(command.getUpStationId(), command.getDownStationId(), command.getDistance());
+        lineRepository.save(line);
     }
 
     private void verifyStationExist(Long upStationId, Long downStationId) {

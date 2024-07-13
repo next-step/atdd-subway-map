@@ -9,12 +9,20 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class StationTestApi {
+    public static ExtractableResponse<Response> createCityHallStation() {
+        return createStation("시청역");
+    }
+
     public static ExtractableResponse<Response> createSeoulStation() {
         return createStation("서울역");
     }
 
-    public static ExtractableResponse<Response> createCityHallStation() {
-        return createStation("시청역");
+    public static ExtractableResponse<Response> createYongsanStation() {
+        return createStation("용산역");
+    }
+
+    public static ExtractableResponse<Response> createGuroStation() {
+        return createStation("구로역");
     }
 
     public static ExtractableResponse<Response> createYeoksamStation() {
