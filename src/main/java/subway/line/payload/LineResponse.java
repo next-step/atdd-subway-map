@@ -1,9 +1,11 @@
 package subway.line.payload;
 
 import subway.line.domain.Line;
+import subway.station.Station;
 import subway.station.StationResponse;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class LineResponse {
 
@@ -22,12 +24,14 @@ public class LineResponse {
         this.stations = stations;
     }
 
-    public static LineResponse from(Line line) {
+    public static LineResponse from(Line line, List<Station> stations) {
         return new LineResponse(
                 line.getId(),
                 line.getName(),
                 line.getColor(),
-                List.of(StationResponse.from(line.getUpStation()), StationResponse.from(line.getDownStation()))
+                stations.stream()
+                        .map(StationResponse::from)
+                        .collect(Collectors.toList())
         );
     }
 
@@ -46,4 +50,6 @@ public class LineResponse {
     public List<StationResponse> getStations() {
         return stations;
     }
+
+
 }

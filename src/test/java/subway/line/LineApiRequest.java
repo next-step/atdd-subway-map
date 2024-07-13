@@ -31,7 +31,7 @@ public class LineApiRequest {
                 .extract().response();
     }
 
-    public static Response getLine(final String url) {
+    public static Response 노선을_조회한다(final String url) {
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().get(url)
