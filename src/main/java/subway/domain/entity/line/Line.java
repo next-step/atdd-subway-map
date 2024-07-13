@@ -83,5 +83,8 @@ public class Line {
         if (!sections.get(sections.size() - 1).getDownStationId().equals(stationId)) {
             throw new SubwayDomainException(SubwayDomainExceptionType.INVALID_STATION);
         }
+
+        // 마지막 section 에서 제거
+        sections.remove(sections.size() -1);
     }
 }

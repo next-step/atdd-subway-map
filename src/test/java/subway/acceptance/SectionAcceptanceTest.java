@@ -139,4 +139,26 @@ public class SectionAcceptanceTest extends BaseTestSetup {
      * When: 노선의 마지막 역을 삭제하면
      * Then: 해당 역을 하행역으로 하는 구간이 삭제된다.
      */
+    @DisplayName("요청한 역을 노선의 하행역으로 하는 구간을 삭제한다.")
+    @Test
+    void deleteSection() {
+        // given
+        Long cityHallId = StationApiResponseExtractor.Single.extractId(StationTestApi.createCityHallStation());
+        Long yongsanId = StationApiResponseExtractor.Single.extractId(StationTestApi.createYongsanStation());
+        Long guroId = StationApiResponseExtractor.Single.extractId(StationTestApi.createGuroStation());
+        Long lineOneId = LineApiResponseExtractor.Single.extractId(
+                LineTestApi.createLine(LineFixture.prepareLineOneCreateRequest(cityHallId, yongsanId))
+        );
+        LineTestApi.addSection(new AddSectionRequest(yongsanId, guroId, 10L), lineOneId);
+
+        // when
+        ExtractableResponse<Response> response = LineTestApi.deleteSection(lineOneId, guroId);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        // then
+        List<String> lineNames = LineApiResponseExtractor.Single.extractUpDownStationNames(LineTestApi.showLine(lineOneId));
+        assertThat(lineNames).doesNotContain("구로역");
+    }
 }

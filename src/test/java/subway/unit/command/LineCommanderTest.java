@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
@@ -349,6 +350,38 @@ public class LineCommanderTest extends BaseTestSetup {
 
             // then
             assertThat(actual.getExceptionType()).isEqualTo(SubwayDomainExceptionType.INVALID_STATION);
+        }
+
+        @Test
+        public void sut_delete_section() {
+            // given
+            List<Station> stations = insertStations("삼성역", "잠실역", "선릉역", "강남역");
+            Line line = insertLine(stations.get(0).getId(), stations.get(1).getId());
+            sut.addSection(new LineCommand.AddSection(
+                    line.getId(),
+                    stations.get(1).getId(),
+                    stations.get(2).getId(),
+                    20L
+            ));
+
+            LineCommand.DeleteSection command = new LineCommand.DeleteSection(
+                    line.getId(),
+                    stations.get(2).getId()
+            );
+
+            // when
+            sut.deleteSection(command);
+
+            // then
+            transactionTemplate.execute(status -> {
+                Line actual = lineRepository.findByIdOrThrow(line.getId());
+                assertThat(actual.getSections().size()).isEqualTo(1);
+                assertThat(actual.getSections().stream()
+                        .flatMap(section -> Stream.of(section.getUpStationId(), section.getDownStationId()))
+                        .collect(Collectors.toList())
+                ).doesNotContain(stations.get(2).getId());
+                return null;
+            });
         }
     }
 }
