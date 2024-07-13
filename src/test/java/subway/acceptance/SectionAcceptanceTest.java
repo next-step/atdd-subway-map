@@ -41,6 +41,22 @@ public class SectionAcceptanceTest extends BaseTestSetup {
      * When: 구간의 하행역이 노선에 이미 포함된 역이라면
      * Then: 하행역이 잘못되었다는 오류가 발생한다.
      */
+    @DisplayName("하행역을 잘못입력했다면 오류가 발생한다.")
+    @Test
+    void registerSection_error_downStation_invalid() {
+        // given
+        Long cityHallId = StationApiResponseExtractor.Single.extractId(StationTestApi.createCityHallStation());
+        Long yongsanId = StationApiResponseExtractor.Single.extractId(StationTestApi.createCityHallStation());
+        Long lineOneId = LineApiResponseExtractor.Single.extractId(
+                LineTestApi.createLine(LineFixture.prepareLineOneCreateRequest(cityHallId, yongsanId))
+        );
+
+        // when
+        ExtractableResponse<Response> response = LineTestApi.addSection(new AddSectionRequest(yongsanId, yongsanId, 10L), lineOneId);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
 
     /**
      * Given: 특정 지하철 노선이 등록되어 있고

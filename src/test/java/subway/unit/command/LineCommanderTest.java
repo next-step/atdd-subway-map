@@ -271,5 +271,24 @@ public class LineCommanderTest extends BaseTestSetup {
             // then
             assertThat(actual.getExceptionType()).isEqualTo(SubwayDomainExceptionType.INVALID_UP_STATION);
         }
+
+        @Test
+        public void sut_throws_if_downStation_already_existed() {
+            // given
+            List<Station> stations = insertStations("삼성역", "잠실역", "선릉역", "강남역");
+            Line line = insertLine(stations.get(0).getId(), stations.get(1).getId());
+            LineCommand.AddSection command = new LineCommand.AddSection(
+                    line.getId(),
+                    stations.get(1).getId(),
+                    stations.get(0).getId(),
+                    20L
+            );
+
+            // when
+            SubwayDomainException actual = (SubwayDomainException) catchThrowable(() -> sut.addSection(command));
+
+            // then
+            assertThat(actual.getExceptionType()).isEqualTo(SubwayDomainExceptionType.INVALID_DOWN_STATION);
+        }
     }
 }
