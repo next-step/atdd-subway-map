@@ -10,6 +10,7 @@ public enum SubwayDomainExceptionType {
     NOT_FOUND_LINE(HttpStatus.NOT_FOUND.value(), "NOT_FOUND_LINE", "not found line"),
     INVALID_UP_STATION(HttpStatus.BAD_REQUEST.value(), "INVALID_UP_STATION", "invalid up-station"),
     INVALID_DOWN_STATION(HttpStatus.BAD_REQUEST.value(), "INVALID_DOWN_STATION", "invalid down-station"),
+    INVALID_STATION(HttpStatus.BAD_REQUEST.value(), "INVALID_STATION", "invalid station"),
     ;
 
     private final int status;

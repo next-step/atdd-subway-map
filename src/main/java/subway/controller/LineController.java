@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import subway.controller.dto.AddSectionRequest;
 import subway.controller.dto.CreateLineRequest;
 import subway.controller.dto.UpdateLineRequest;
+import subway.domain.command.LineCommand;
 import subway.domain.command.LineCommander;
 import subway.domain.query.LineReader;
 import subway.domain.view.LineView;
@@ -63,5 +64,14 @@ public class LineController {
     ) {
         lineCommander.addSection(request.toCommand(lineId));
         return ResponseEntity.created(URI.create("/lines/" + lineId)).build();
+    }
+
+    @DeleteMapping("/{lineId}/sections")
+    public ResponseEntity<Void> deleteLine(
+            @PathVariable Long lineId,
+            @RequestParam Long stationId
+    ) {
+        lineCommander.deleteSection(new LineCommand.DeleteSection(lineId, stationId));
+        return ResponseEntity.noContent().build();
     }
 }

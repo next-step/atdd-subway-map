@@ -34,4 +34,12 @@ public class LineCommand {
         private Long downStationId;
         private Long distance;
     }
+
+    @ToString
+    @Getter
+    @AllArgsConstructor
+    public static class DeleteSection {
+        private Long lineId;
+        private Long stationId;
+    }
 }

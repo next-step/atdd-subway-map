@@ -41,6 +41,13 @@ public class LineCommander {
         lineRepository.save(line);
     }
 
+    @Transactional
+    public void deleteSection(LineCommand.DeleteSection command) {
+        Line line = lineRepository.findByIdOrThrow(command.getLineId());
+        line.deleteSection(command.getStationId());
+        lineRepository.save(line);
+    }
+
     private void verifyStationExist(Long upStationId, Long downStationId) {
         this.stationRepository.findByIdOrThrow(upStationId);
         this.stationRepository.findByIdOrThrow(downStationId);

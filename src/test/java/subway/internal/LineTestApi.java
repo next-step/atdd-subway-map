@@ -65,4 +65,13 @@ public class LineTestApi {
                 .then().log().all()
                 .extract();
     }
+
+    public static ExtractableResponse<Response> deleteSection(Long lineId, Long stationId) {
+        return RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().delete("/lines/" + lineId + "/sections?stationId=" + stationId)
+                .then().log().all()
+                .extract();
+    }
 }

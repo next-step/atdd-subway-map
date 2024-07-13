@@ -92,6 +92,24 @@ public class SectionAcceptanceTest extends BaseTestSetup {
      * When: 노선의 처음 역을 삭제하면
      * Then: 오류가 발생한다.
      */
+    @DisplayName("삭제할 역을 잘못입력했다면 오류가 발생한다.")
+    @Test
+    void deleteSection_error_station_invalid() {
+        // given
+        Long cityHallId = StationApiResponseExtractor.Single.extractId(StationTestApi.createCityHallStation());
+        Long yongsanId = StationApiResponseExtractor.Single.extractId(StationTestApi.createYongsanStation());
+        Long guroId = StationApiResponseExtractor.Single.extractId(StationTestApi.createGuroStation());
+        Long lineOneId = LineApiResponseExtractor.Single.extractId(
+                LineTestApi.createLine(LineFixture.prepareLineOneCreateRequest(cityHallId, yongsanId))
+        );
+        LineTestApi.addSection(new AddSectionRequest(yongsanId, guroId, 10L), lineOneId);
+
+        // when
+        ExtractableResponse<Response> response = LineTestApi.deleteSection(lineOneId, cityHallId);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
 
     /**
      * Given: 한개의 노선과 한개의 구간이 등록되어 있고
