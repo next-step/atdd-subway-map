@@ -291,6 +291,34 @@ public class LineCommanderTest extends BaseTestSetup {
             // then
             assertThat(actual.getExceptionType()).isEqualTo(SubwayDomainExceptionType.INVALID_DOWN_STATION);
         }
+
+        @Test
+        public void sut_add_section() {
+            // given
+            List<Station> stations = insertStations("삼성역", "잠실역", "선릉역", "강남역");
+            Line line = insertLine(stations.get(0).getId(), stations.get(1).getId());
+            LineCommand.AddSection command = new LineCommand.AddSection(
+                    line.getId(),
+                    stations.get(1).getId(),
+                    stations.get(2).getId(),
+                    20L
+            );
+
+            // when
+            sut.addSection(command);
+
+            // then
+            transactionTemplate.execute(status -> {
+                Line actual = lineRepository.findByIdOrThrow(line.getId());
+                assertAll("assert section added",
+                        () -> assertThat(actual.getSections().size()).isEqualTo(2),
+                        () -> assertThat(actual.getSections().get(1).getUpStationId()).isEqualTo(command.getUpStationId()),
+                        () -> assertThat(actual.getSections().get(1).getDownStationId()).isEqualTo(command.getDownStationId()),
+                        () -> assertThat(actual.getSections().get(1).getDistance()).isEqualTo(command.getDistance())
+                );
+                return null;
+            });
+        }
     }
 
     @Nested
