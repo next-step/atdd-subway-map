@@ -4,7 +4,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.support.TransactionTemplate;
 import subway.domain.entity.line.Line;
 import subway.domain.exception.SubwayDomainException;
 import subway.domain.exception.SubwayDomainExceptionType;
@@ -19,9 +18,6 @@ public class LineRepositoryTest extends BaseTestSetup {
 
     @Autowired
     LineRepository sut;
-
-    @Autowired
-    TransactionTemplate transactionTemplate;
 
     @Nested
     @DisplayName("findByIdOrThrow")

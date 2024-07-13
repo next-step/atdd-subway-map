@@ -4,7 +4,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.support.TransactionTemplate;
 import subway.domain.entity.station.Station;
 import subway.domain.exception.SubwayDomainException;
 import subway.domain.exception.SubwayDomainExceptionType;
@@ -15,12 +14,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 
 public class StationRepositoryTest extends BaseTestSetup {
-
     @Autowired
-    StationRepository sut;
-
-    @Autowired
-    TransactionTemplate transactionTemplate;
+    private StationRepository sut;
 
     @Nested
     @DisplayName("findByIdOrThrow")
