@@ -60,9 +60,9 @@ public class LineReader {
     private LineView.Main joinAndTransform(Line line, Map<Long, Station> stationMap) {
         List<StationView.Main> allStations = line.getSections().stream()
                 .flatMap(section -> Stream.of(stationMap.get(section.getUpStationId()), stationMap.get(section.getDownStationId()))
-                .filter(Objects::nonNull)
-                .map(station -> new StationView.Main(station.getId(), station.getName()))
-        ).collect(Collectors.toList());
+                        .filter(Objects::nonNull)
+                        .map(station -> new StationView.Main(station.getId(), station.getName()))
+                ).collect(Collectors.toList());
 
         return new LineView.Main(line.getId(), line.getName(), line.getColor(), allStations);
     }

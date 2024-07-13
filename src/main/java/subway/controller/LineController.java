@@ -62,6 +62,6 @@ public class LineController {
             @RequestBody AddSectionRequest request
     ) {
         lineCommander.addSection(request.toCommand(lineId));
-        return ResponseEntity.ok().build();
+        return ResponseEntity.created(URI.create("/lines/" + lineId)).build();
     }
 }
