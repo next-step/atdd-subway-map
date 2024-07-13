@@ -86,4 +86,23 @@ public class SectionAcceptanceTest extends BaseTestSetup {
         List<String> stationNames = LineApiResponseExtractor.Single.extractUpDownStationNames(LineTestApi.showLine(lineOneId));
         assertThat(stationNames).containsAnyOf("구로역");
     }
+
+    /**
+     * Given: 한개의 노선과 두개의 구간이 등록되어 있고
+     * When: 노선의 처음 역을 삭제하면
+     * Then: 오류가 발생한다.
+     */
+
+    /**
+     * Given: 한개의 노선과 한개의 구간이 등록되어 있고
+     * When: 노선의 마지막 역을 삭제하면
+     * Then: 오류가 발생한다.
+     */
+
+
+    /**
+     * Given: 한개의 노선과 두개의 구간이 등록되어 있고
+     * When: 노선의 마지막 역을 삭제하면
+     * Then: 해당 역을 하행역으로 하는 구간이 삭제된다.
+     */
 }
