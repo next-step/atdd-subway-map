@@ -310,6 +310,24 @@ public class LineCommanderTest extends BaseTestSetup {
         }
 
         @Test
+        public void sut_throws_if_section_size_one() {
+            // given
+            List<Station> stations = insertStations("삼성역", "잠실역", "선릉역", "강남역");
+            Line line = insertLine(stations.get(0).getId(), stations.get(1).getId());
+
+            LineCommand.DeleteSection command = new LineCommand.DeleteSection(
+                    line.getId(),
+                    stations.get(1).getId()
+            );
+
+            // when
+            SubwayDomainException actual = (SubwayDomainException) catchThrowable(() -> sut.deleteSection(command));
+
+            // then
+            assertThat(actual.getExceptionType()).isEqualTo(SubwayDomainExceptionType.INVALID_SECTION_SIZE);
+        }
+
+        @Test
         public void sut_throws_if_station_not_equal_to_last_line_downStation() {
             // given
             List<Station> stations = insertStations("삼성역", "잠실역", "선릉역", "강남역");
@@ -332,62 +350,5 @@ public class LineCommanderTest extends BaseTestSetup {
             // then
             assertThat(actual.getExceptionType()).isEqualTo(SubwayDomainExceptionType.INVALID_STATION);
         }
-
-//        @Test
-//        public void sut_throws_if_not_found_downStation() {
-//            // given
-//            List<Station> stations = insertStations("삼성역", "잠실역");
-//            Line line = insertLine(stations.get(0).getId(), stations.get(1).getId());
-//            LineCommand.AddSection command = new LineCommand.AddSection(
-//                    line.getId(),
-//                    stations.get(0).getId(),
-//                    12783L,
-//                    20L
-//            );
-//
-//            // when
-//            SubwayDomainException actual = (SubwayDomainException) catchThrowable(() -> sut.addSection(command));
-//
-//            // then
-//            assertThat(actual.getExceptionType()).isEqualTo(SubwayDomainExceptionType.NOT_FOUND_STATION);
-//        }
-//
-//        @Test
-//        public void sut_throws_if_upStation_not_equal_to_last_line_downStation() {
-//            // given
-//            List<Station> stations = insertStations("삼성역", "잠실역", "선릉역", "강남역");
-//            Line line = insertLine(stations.get(0).getId(), stations.get(1).getId());
-//            LineCommand.AddSection command = new LineCommand.AddSection(
-//                    line.getId(),
-//                    stations.get(0).getId(),
-//                    stations.get(2).getId(),
-//                    20L
-//            );
-//
-//            // when
-//            SubwayDomainException actual = (SubwayDomainException) catchThrowable(() -> sut.addSection(command));
-//
-//            // then
-//            assertThat(actual.getExceptionType()).isEqualTo(SubwayDomainExceptionType.INVALID_UP_STATION);
-//        }
-//
-//        @Test
-//        public void sut_throws_if_downStation_already_existed() {
-//            // given
-//            List<Station> stations = insertStations("삼성역", "잠실역", "선릉역", "강남역");
-//            Line line = insertLine(stations.get(0).getId(), stations.get(1).getId());
-//            LineCommand.AddSection command = new LineCommand.AddSection(
-//                    line.getId(),
-//                    stations.get(1).getId(),
-//                    stations.get(0).getId(),
-//                    20L
-//            );
-//
-//            // when
-//            SubwayDomainException actual = (SubwayDomainException) catchThrowable(() -> sut.addSection(command));
-//
-//            // then
-//            assertThat(actual.getExceptionType()).isEqualTo(SubwayDomainExceptionType.INVALID_DOWN_STATION);
-//        }
     }
 }

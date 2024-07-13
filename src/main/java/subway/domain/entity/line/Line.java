@@ -75,8 +75,12 @@ public class Line {
     }
 
     public void deleteSection(Long stationId) {
+        if (sections.size() <= 1) {
+            throw new SubwayDomainException(SubwayDomainExceptionType.INVALID_SECTION_SIZE);
+        }
+
         // 삭제할 역이 노선의 하행종창역이 아닌 경우 에러
-        if (!sections.isEmpty() && !sections.get(sections.size() - 1).getDownStationId().equals(stationId)) {
+        if (!sections.get(sections.size() - 1).getDownStationId().equals(stationId)) {
             throw new SubwayDomainException(SubwayDomainExceptionType.INVALID_STATION);
         }
     }

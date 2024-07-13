@@ -88,6 +88,28 @@ public class SectionAcceptanceTest extends BaseTestSetup {
     }
 
     /**
+     * Given: 한개의 노선과 한개의 구간이 등록되어 있고
+     * When: 노선의 마지막 역을 삭제하면
+     * Then: 오류가 발생한다.
+     */
+    @DisplayName("노선에 구간이 한개뿐이라면 오류가 발생한다.")
+    @Test
+    void deleteSection_error_only_one_section() {
+        // given
+        Long cityHallId = StationApiResponseExtractor.Single.extractId(StationTestApi.createCityHallStation());
+        Long yongsanId = StationApiResponseExtractor.Single.extractId(StationTestApi.createYongsanStation());
+        Long lineOneId = LineApiResponseExtractor.Single.extractId(
+                LineTestApi.createLine(LineFixture.prepareLineOneCreateRequest(cityHallId, yongsanId))
+        );
+
+        // when
+        ExtractableResponse<Response> response = LineTestApi.deleteSection(lineOneId, yongsanId);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    /**
      * Given: 한개의 노선과 두개의 구간이 등록되어 있고
      * When: 노선의 처음 역을 삭제하면
      * Then: 오류가 발생한다.
@@ -110,12 +132,6 @@ public class SectionAcceptanceTest extends BaseTestSetup {
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
-
-    /**
-     * Given: 한개의 노선과 한개의 구간이 등록되어 있고
-     * When: 노선의 마지막 역을 삭제하면
-     * Then: 오류가 발생한다.
-     */
 
 
     /**
