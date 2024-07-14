@@ -45,14 +45,23 @@ public class LineService {
     }
 
     public LineResponse findLine(Long lineId) {
-        Line line = lineRepository.findById(lineId).orElseThrow(
-            () -> new LineException(LineExceptionType.LINE_NOT_FOUND)
-        );
+        Line line = findLineById(lineId);
         List<Line> relatedLines = lineRepository.findByName(line.getName());
 
         List<StationResponse> stations = getStationResponsesByStationIds(getStationIds(relatedLines));
 
         return createLineResponse(line, stations);
+    }
+
+    @Transactional
+    public void updateLine(Long lineId, LineRequest lineRequest) {
+        Line line = findLineById(lineId);
+        line.update(lineRequest.getName(), lineRequest.getColor());
+    }
+
+    private Line findLineById(Long lineId) {
+        return lineRepository.findById(lineId)
+            .orElseThrow(() -> new LineException(LineExceptionType.LINE_NOT_FOUND));
     }
 
     private List<StationResponse> getStationResponsesByStationIds(Iterable<Long> stationIds) {
@@ -88,4 +97,5 @@ public class LineService {
             .distinct()
             .collect(Collectors.toList());
     }
+
 }

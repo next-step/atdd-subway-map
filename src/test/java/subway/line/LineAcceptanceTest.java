@@ -98,6 +98,43 @@ public class LineAcceptanceTest {
         assertThat(stationNames).containsExactlyInAnyOrder("신사역", "논현역", "강남역");
     }
 
+    /**
+     * Given 특정 지하철 노선이 등록되어 있고
+     * When 해당 노선을 수정하면
+     * Then 해당 노선의 정보가 수정된다.
+     */
+    @DisplayName("지하철 노선을 수정한다.")
+    @Test
+    void updateLine() {
+        //given
+        String id = addLine(createParams("신분당선", "bg-red-600", addStation("신사역"), addStation("논현역"), 10L))
+            .jsonPath().getString("id");
+
+        //when
+        Map<String, Object> params = updateParams("1호선", "bg-blue-600");
+
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+            .body(params)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().put("/lines/" + id)
+            .then().log().all()
+            .extract();
+
+        //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        //then
+        ExtractableResponse<Response> response2 = RestAssured.given().log().all()
+            .when().get("/lines/" + id)
+            .then().log().all()
+            .extract();
+
+        //then
+        String lineName = response2.jsonPath().getString("name");
+        assertThat(lineName).isEqualTo("1호선");
+
+    }
+
     private static Map<String, Object> createParams(String name, String color, Long upStationId, Long downStationId, Long distance) {
         Map<String, Object> params = new HashMap<>();
         params.put("name", name);
@@ -105,6 +142,13 @@ public class LineAcceptanceTest {
         params.put("upStationId", upStationId);
         params.put("downStationId", downStationId);
         params.put("distance", distance);
+        return params;
+    }
+
+    private static Map<String, Object> updateParams(String name, String color) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("name", name);
+        params.put("color", color);
         return params;
     }
 
