@@ -29,17 +29,32 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선을 생성한다.")
     @Test
     void createLine() {
-
         // when
         Long upStationId = addStation("신사역");
         Long downStationId = addStation("논현역");
+        Map<String, Object> params = createParams("신분당선", "bg-red-600", upStationId, downStationId, 10L);
 
+        ExtractableResponse<Response> response = addLine(params);
+
+        //then
+        String name = response.jsonPath().getString("name");
+        assertThat(name).isEqualTo("신분당선");
+
+        List<Long> stationIds = response.jsonPath().getList("stations.id", Long.class);
+        assertThat(stationIds).containsExactlyInAnyOrder(upStationId, downStationId);
+    }
+
+    private static Map<String, Object> createParams(String name, String color, Long upStationId, Long downStationId, Long distance) {
         Map<String, Object> params = new HashMap<>();
-        params.put("name", "신분당선");
-        params.put("color", "bg-red-600");
+        params.put("name", name);
+        params.put("color", color);
         params.put("upStationId", upStationId);
         params.put("downStationId", downStationId);
-        params.put("distance", "10");
+        params.put("distance", distance);
+        return params;
+    }
+
+    private static ExtractableResponse<Response> addLine(Map<String, Object> params) {
 
         ExtractableResponse<Response> response =
             RestAssured.given().log().all()
@@ -50,12 +65,7 @@ public class LineAcceptanceTest {
                 .extract();
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
-        //then
-        String name = response.jsonPath().getString("name");
-        assertThat(name).isEqualTo("신분당선");
-
-        List<Long> stationIds = response.jsonPath().getList("stations.id", Long.class);
-        assertThat(stationIds).containsExactlyInAnyOrder(upStationId, downStationId);
+        return response;
     }
 
     private static Long addStation(String stationName) {
@@ -77,4 +87,5 @@ public class LineAcceptanceTest {
 
         return stationId;
     }
+
 }
