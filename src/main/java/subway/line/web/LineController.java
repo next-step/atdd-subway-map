@@ -5,6 +5,7 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,5 +28,10 @@ public class LineController {
     @GetMapping(value = "/lines")
     public ResponseEntity<List<LineResponse>> showLines() {
         return ResponseEntity.ok().body(lineService.findAllLines());
+    }
+
+    @GetMapping(value = "/lines/{lineId}")
+    public ResponseEntity<LineResponse> showLine(@PathVariable Long lineId) {
+        return ResponseEntity.ok().body(lineService.findLine(lineId));
     }
 }

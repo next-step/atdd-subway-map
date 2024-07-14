@@ -11,6 +11,8 @@ import subway.line.application.dto.LineRequest;
 import subway.line.application.dto.LineResponse;
 import subway.line.domain.Line;
 import subway.line.domain.LineRepository;
+import subway.line.exception.LineException;
+import subway.line.exception.LineExceptionType;
 import subway.station.application.dto.StationResponse;
 import subway.station.domain.Station;
 import subway.station.domain.StationRepository;
@@ -42,9 +44,24 @@ public class LineService {
             .collect(Collectors.toList());
     }
 
+    public LineResponse findLine(Long lineId) {
+        Line line = lineRepository.findById(lineId).orElseThrow(
+            () -> new LineException(LineExceptionType.LINE_NOT_FOUND)
+        );
+        List<Line> relatedLines = lineRepository.findByName(line.getName());
+
+        List<StationResponse> stations = getStationResponsesByStationIds(getStationIds(relatedLines));
+
+        return createLineResponse(line, stations);
+    }
+
     private List<StationResponse> getStationResponsesByStationIds(Iterable<Long> stationIds) {
-        Map<Long, Station> stationMap = stationRepository.findAllById(stationIds).stream()
-            .collect(Collectors.toMap(Station::getId, station -> station));
+        Map<String, Station> stationMap = stationRepository.findAllById(stationIds).stream()
+            .collect(Collectors.toMap(
+                Station::getName,
+                station -> station,
+                (existing, replacement) -> existing
+            ));
 
         return stationMap.values().stream()
             .map(station -> new StationResponse(station.getId(), station.getName()))
@@ -61,16 +78,14 @@ public class LineService {
     }
 
     private LineResponse createGroupedLineResponse(List<Line> lines) {
-        Line representativeLine = lines.get(0);
+        List<Long> stationIds = getStationIds(lines);
+        return createLineResponse(lines.get(0), getStationResponsesByStationIds(stationIds));
+    }
 
-        List<Long> stationIds = lines.stream()
+    private static List<Long> getStationIds(List<Line> lines) {
+        return lines.stream()
             .flatMap(line -> Stream.of(line.getUpStationId(), line.getDownStationId()))
             .distinct()
             .collect(Collectors.toList());
-
-        List<StationResponse> stations = getStationResponsesByStationIds(stationIds);
-
-        return createLineResponse(representativeLine, stations);
     }
-
 }

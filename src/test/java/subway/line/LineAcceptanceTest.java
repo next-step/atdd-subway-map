@@ -49,7 +49,7 @@ public class LineAcceptanceTest {
      * When 지하철 노선 목록을 조회하면
      * Then 모든 지하철 노선 목록이 조회된다.
      */
-    @DisplayName("지하철 노선을 목록을 조회한다.")
+    @DisplayName("지하철 노선 목록을 조회한다.")
     @Test
     void showLines() {
         //given
@@ -69,6 +69,33 @@ public class LineAcceptanceTest {
         assertThat(lineNames).hasSize(2);
         assertThat(lineNames).containsExactlyInAnyOrder("신분당선", "2호선");
 
+    }
+
+    /**
+     * Given 특정 지하철 노선이 등록되어 있고
+     * When 해당 노선을 조회하면
+     * Then 해당 지하철 노선 목록이 조회된다.
+     */
+    @DisplayName("지하철 노선을 조회한다.")
+    @Test
+    void showLine() {
+        //given
+        String id = addLine(createParams("신분당선", "bg-red-600", addStation("신사역"), addStation("논현역"), 10L))
+            .jsonPath().getString("id");
+        addLine(createParams("신분당선", "bg-red-600", addStation("논현역"), addStation("강남역"), 10L));
+
+        //when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+            .when().get("/lines/" + id)
+            .then().log().all()
+            .extract();
+
+        //then
+        String lineName = response.jsonPath().getString("name");
+        assertThat(lineName).isEqualTo("신분당선");
+
+        List<String> stationNames = response.jsonPath().getList("stations.name", String.class);
+        assertThat(stationNames).containsExactlyInAnyOrder("신사역", "논현역", "강남역");
     }
 
     private static Map<String, Object> createParams(String name, String color, Long upStationId, Long downStationId, Long distance) {
