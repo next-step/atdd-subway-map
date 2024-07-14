@@ -1,5 +1,6 @@
 package subway.station.web;
 
+import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,12 +11,10 @@ import subway.station.application.dto.StationResponse;
 import subway.station.application.StationService;
 
 @RestController
+@AllArgsConstructor
 public class StationController {
-    private StationService stationService;
 
-    public StationController(StationService stationService) {
-        this.stationService = stationService;
-    }
+    private StationService stationService;
 
     @PostMapping("/stations")
     public ResponseEntity<StationResponse> createStation(@RequestBody StationRequest stationRequest) {

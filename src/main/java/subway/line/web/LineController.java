@@ -1,6 +1,7 @@
 package subway.line.web;
 
 import java.net.URI;
+import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -10,13 +11,10 @@ import subway.line.application.dto.LineRequest;
 import subway.line.application.dto.LineResponse;
 
 @RestController
+@AllArgsConstructor
 public class LineController {
 
     private LineService lineService;
-
-    public LineController(LineService lineService) {
-        this.lineService = lineService;
-    }
 
     @PostMapping("/lines")
     public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {

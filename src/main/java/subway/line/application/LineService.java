@@ -1,6 +1,7 @@
 package subway.line.application;
 
 import java.util.List;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.line.application.dto.LineRequest;
@@ -11,15 +12,11 @@ import subway.station.application.StationService;
 
 @Service
 @Transactional(readOnly = true)
+@AllArgsConstructor
 public class LineService {
 
     private LineRepository lineRepository;
     private StationService stationService;
-
-    public LineService(LineRepository lineRepository, StationService stationService) {
-        this.lineRepository = lineRepository;
-        this.stationService = stationService;
-    }
 
     public LineResponse saveLine(LineRequest lineRequest) {
         Line line = lineRepository.save(
