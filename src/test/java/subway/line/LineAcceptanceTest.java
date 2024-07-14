@@ -135,6 +135,38 @@ public class LineAcceptanceTest {
 
     }
 
+    /**
+     * Given 특정 지하철 노선이 등록되어 있고
+     * When 해당 노선을 삭제하면
+     * Then 해당 노선이 삭제되고 노선 목록에서 제외된다.
+     */
+    @DisplayName("지하철 노선을 삭제한다.")
+    @Test
+    void deleteLine() {
+        //given
+        String id = addLine(createParams("신분당선", "bg-red-600", addStation("신사역"), addStation("논현역"), 10L))
+            .jsonPath().getString("id");
+
+        //when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+            .when().delete("/lines/" + id)
+            .then().log().all()
+            .extract();
+
+        //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        //then
+        ExtractableResponse<Response> response2 = RestAssured.given().log().all()
+            .when().get("/lines")
+            .then().log().all()
+            .extract();
+
+        List<String> lineNames = response2.jsonPath().getList("name", String.class);
+        assertThat(lineNames).doesNotContain("신분당선");
+
+    }
+
     private static Map<String, Object> createParams(String name, String color, Long upStationId, Long downStationId, Long distance) {
         Map<String, Object> params = new HashMap<>();
         params.put("name", name);

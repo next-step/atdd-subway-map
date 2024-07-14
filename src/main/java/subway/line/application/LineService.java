@@ -59,6 +59,12 @@ public class LineService {
         line.update(lineRequest.getName(), lineRequest.getColor());
     }
 
+    @Transactional
+    public void deleteLine(Long lineId) {
+        Line line = findLineById(lineId);
+        lineRepository.delete(line);
+    }
+
     private Line findLineById(Long lineId) {
         return lineRepository.findById(lineId)
             .orElseThrow(() -> new LineException(LineExceptionType.LINE_NOT_FOUND));
@@ -97,5 +103,4 @@ public class LineService {
             .distinct()
             .collect(Collectors.toList());
     }
-
 }
