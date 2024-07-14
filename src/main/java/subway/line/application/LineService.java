@@ -3,6 +3,7 @@ package subway.line.application;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +33,15 @@ public class LineService {
         return createLineResponse(line, stations);
     }
 
+    public List<LineResponse> findAllLines() {
+        Map<String, List<Line>> groupedLines = lineRepository.findAll().stream()
+            .collect(Collectors.groupingBy(Line::getName));
+
+        return groupedLines.values().stream()
+            .map(this::createGroupedLineResponse)
+            .collect(Collectors.toList());
+    }
+
     private List<StationResponse> getStationResponsesByStationIds(Iterable<Long> stationIds) {
         Map<Long, Station> stationMap = stationRepository.findAllById(stationIds).stream()
             .collect(Collectors.toMap(Station::getId, station -> station));
@@ -48,6 +58,19 @@ public class LineService {
             line.getColor(),
             stations
         );
+    }
+
+    private LineResponse createGroupedLineResponse(List<Line> lines) {
+        Line representativeLine = lines.get(0);
+
+        List<Long> stationIds = lines.stream()
+            .flatMap(line -> Stream.of(line.getUpStationId(), line.getDownStationId()))
+            .distinct()
+            .collect(Collectors.toList());
+
+        List<StationResponse> stations = getStationResponsesByStationIds(stationIds);
+
+        return createLineResponse(representativeLine, stations);
     }
 
 }

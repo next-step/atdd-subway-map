@@ -1,5 +1,6 @@
 package subway.station.application;
 
+import com.sun.xml.bind.v2.TODO;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +21,7 @@ public class StationService {
 
     @Transactional
     public StationResponse saveStation(StationRequest stationRequest) {
+        //TODO : 지하철역 이름 중복 체크 기능 추가
         Station station = stationRepository.save(new Station(stationRequest.getName()));
         return createStationResponse(station);
     }
