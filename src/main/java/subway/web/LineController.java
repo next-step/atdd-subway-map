@@ -1,7 +1,10 @@
-package subway;
+package subway.web;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import subway.dto.in.LineRequest;
+import subway.dto.out.LineResponse;
+import subway.application.LineService;
 
 import java.net.URI;
 import java.util.List;
