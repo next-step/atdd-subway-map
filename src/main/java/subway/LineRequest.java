@@ -1,15 +1,15 @@
 package subway;
 
-public class BuildLineRequest {
+public class LineRequest {
     private String name;
 
     public String getName() {
         return name;
     }
 
-    public BuildLineRequest() {}
+    public LineRequest() {}
 
-    public BuildLineRequest(String name) {
+    public LineRequest(String name) {
         this.name = name;
     }
 }

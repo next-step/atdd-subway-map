@@ -1,10 +1,10 @@
 package subway;
 
-public class BuildLineResponse {
+public class LineResponse {
     private Long id;
     private String name;
 
-    public BuildLineResponse(Long id, String name) {
+    public LineResponse(Long id, String name) {
         this.id = id;
         this.name = name;
     }
