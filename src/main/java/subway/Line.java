@@ -11,4 +11,19 @@ public class Line {
     private Long id;
 
     private String name;
+
+    protected Line() {
+    }
+
+    public Line(String name) {
+        this.name = name;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
 }
