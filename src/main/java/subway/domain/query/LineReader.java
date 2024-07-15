@@ -4,16 +4,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.domain.entity.line.Line;
+import subway.domain.entity.line.LineSection;
 import subway.domain.entity.station.Station;
 import subway.domain.repository.LineRepository;
 import subway.domain.repository.StationRepository;
 import subway.domain.view.LineView;
 import subway.domain.view.StationView;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -27,11 +25,7 @@ public class LineReader {
     @Transactional(readOnly = true)
     public LineView.Main getOneById(Long id) {
         Line line = lineRepository.findByIdOrThrow(id);
-        Map<Long, Station> stationMap = getStationMapByIds(
-                line.getSections().stream()
-                        .flatMap(section -> Stream.of(section.getUpStationId(), section.getDownStationId()))
-                        .collect(Collectors.toSet())
-        );
+        Map<Long, Station> stationMap = getStationMapByIds(line.getSections().getAllStationIds());
         return joinAndTransform(line, stationMap);
     }
 
@@ -39,13 +33,10 @@ public class LineReader {
     @Transactional(readOnly = true)
     public List<LineView.Main> getAllLines() {
         List<Line> lines = lineRepository.findAll();
-        Map<Long, Station> stationMap = getStationMapByIds(
-                lines.stream()
-                        .flatMap(line -> line.getSections().stream()
-                                .flatMap(section -> Stream.of(section.getUpStationId(), section.getDownStationId()))
-                        )
-                        .collect(Collectors.toSet())
-        );
+        List<Long> stationIds = lines.stream()
+                .flatMap(line -> line.getSections().getAllStationIds().stream())
+                .collect(Collectors.toList());
+        Map<Long, Station> stationMap = getStationMapByIds(stationIds);
         return lines.stream()
                 .map(line -> joinAndTransform(line, stationMap))
                 .collect(Collectors.toList());
@@ -59,11 +50,15 @@ public class LineReader {
 
     private LineView.Main joinAndTransform(Line line, Map<Long, Station> stationMap) {
         List<StationView.Main> allStations = line.getSections().stream()
-                .flatMap(section -> Stream.of(stationMap.get(section.getUpStationId()), stationMap.get(section.getDownStationId()))
-                        .filter(Objects::nonNull)
-                        .map(station -> new StationView.Main(station.getId(), station.getName()))
-                ).collect(Collectors.toList());
+                .flatMap(section -> extractStationInSection(section, stationMap))
+                .collect(Collectors.toList());
 
         return new LineView.Main(line.getId(), line.getName(), line.getColor(), allStations);
+    }
+
+    private Stream<StationView.Main> extractStationInSection(LineSection section, Map<Long, Station> stationMap) {
+        return Stream.of(stationMap.get(section.getUpStationId()), stationMap.get(section.getDownStationId()))
+                .filter(Objects::nonNull)
+                .map(station -> new StationView.Main(station.getId(), station.getName()));
     }
 }

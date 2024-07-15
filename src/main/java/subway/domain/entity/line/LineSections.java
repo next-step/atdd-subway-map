@@ -10,6 +10,7 @@ import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Embeddable
@@ -31,10 +32,7 @@ public class LineSections implements Iterable<LineSection> {
     }
 
     private void verifyDownStationAlreadyExisted(Long downStationId) {
-        boolean existed = data.stream()
-                .flatMap(section -> Stream.of(section.getUpStationId(), section.getDownStationId()))
-                .anyMatch(existedStationId -> existedStationId.equals(downStationId));
-        if (existed) {
+        if (getAllStationIds().stream().anyMatch(existedStationId -> existedStationId.equals(downStationId))) {
             throw new SubwayDomainException(SubwayDomainExceptionType.INVALID_DOWN_STATION);
         }
     }
@@ -63,6 +61,23 @@ public class LineSections implements Iterable<LineSection> {
 
     public LineSection getLastSection() {
         return data.isEmpty() ? null : data.get(size() - 1);
+    }
+
+    private List<Long> getAllUpStationIds() {
+        return data.stream()
+                .map(LineSection::getUpStationId)
+                .collect(Collectors.toList());
+    }
+
+    public List<Long> getAllStationIds() {
+        // 모든 상행선 가져오기
+        List<Long> stationIds = getAllUpStationIds();
+
+        // 마지막 하행선 추가
+        if (getLastSection() != null) {
+            stationIds.add(getLastSection().getDownStationId());
+        }
+        return stationIds;
     }
 
     @Override
