@@ -136,6 +136,33 @@ public class LineAcceptanceTest {
         assertThat(amendResponse.jsonPath().getString("name")).isEqualTo(경의선);
     }
 
+    /**
+     * Given: 특정 지하철 노선이 등록되어 있고,
+     * When: 관리자가 해당 노선을 삭제하면,
+     * Then: 해당 노선이 삭제되고 노선 목록에서 제외된다.
+     */
+    @DisplayName("지하철 노선을 삭제한다.")
+    @Test
+    void deleteLine() {
+        //given
+        ExtractableResponse<Response> createResponse = createLine(new LineRequest(수인분당선));
+        Long id = createResponse.jsonPath().getLong("id");
+        createLine(new LineRequest(경의선));
+
+        //when
+        deleteLine(id);
+
+        //then
+        assertThat(loadLine(id).statusCode()).isNotEqualTo(HttpStatus.OK.value());
+
+        //then
+        ExtractableResponse<Response> response = loadLines();
+        List<String> names = response.jsonPath().getList("name", String.class);
+        assertThat(names).size().isEqualTo(1);
+        assertThat(names).doesNotContain(수인분당선);
+        assertThat(names).contains(경의선);
+    }
+
     private ExtractableResponse<Response> createLine(LineRequest request) {
         return RestAssured.given().log().all()
                 .body(request)
@@ -166,6 +193,13 @@ public class LineAcceptanceTest {
                 .body(request)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().patch("/lines")
+                .then().log().all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> deleteLine(Long id) {
+        return RestAssured.given().log().all()
+                .when().delete("/lines/" + id)
                 .then().log().all()
                 .extract();
     }
