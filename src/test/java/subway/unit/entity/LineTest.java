@@ -27,9 +27,9 @@ public class LineTest {
 
                     // section
                     () -> assertThat(actual.getSections().size()).isEqualTo(1),
-                    () -> assertThat(actual.getSections().get(0).getUpStationId()).isEqualTo(command.getUpStationId()),
-                    () -> assertThat(actual.getSections().get(0).getDownStationId()).isEqualTo(command.getDownStationId()),
-                    () -> assertThat(actual.getSections().get(0).getDistance()).isEqualTo(command.getDistance())
+                    () -> assertThat(actual.getSections().getLastSection().getUpStationId()).isEqualTo(command.getUpStationId()),
+                    () -> assertThat(actual.getSections().getLastSection().getDownStationId()).isEqualTo(command.getDownStationId()),
+                    () -> assertThat(actual.getSections().getLastSection().getDistance()).isEqualTo(command.getDistance())
             );
         }
     }
