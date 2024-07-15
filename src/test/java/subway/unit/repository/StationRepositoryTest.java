@@ -8,7 +8,7 @@ import subway.domain.entity.station.Station;
 import subway.domain.exception.SubwayDomainException;
 import subway.domain.exception.SubwayDomainExceptionType;
 import subway.domain.repository.StationRepository;
-import subway.internal.BaseTestSetup;
+import subway.setup.BaseTestSetup;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;

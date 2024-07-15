@@ -1,19 +1,18 @@
 package subway.acceptance;
 
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.http.HttpStatus;
-import subway.internal.BaseTestSetup;
-import subway.internal.StationApiResponseExtractor;
-import subway.internal.StationTestApi;
+import subway.setup.BaseTestSetup;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static subway.acceptance.step.BaseStepAsserter.응답_상태값이_올바른지_검증한다;
+import static subway.acceptance.step.StationStep.*;
+import static subway.acceptance.step.StationStepAsserter.*;
+import static subway.acceptance.step.StationStepExtractor.역_추출기;
 
 @DisplayName("지하철역 관련 기능")
 public class StationAcceptanceTest extends BaseTestSetup {
@@ -22,19 +21,18 @@ public class StationAcceptanceTest extends BaseTestSetup {
      * Then 지하철역이 생성된다
      * Then 지하철역 목록 조회 시 생성한 역을 찾을 수 있다
      */
-    @DisplayName("지하철역을 생성한다.")
     @ParameterizedTest
     @ValueSource(strings = {"강남역", "역삼역", "삼성역"})
-    void createStation(String name) {
+    void 새로운_역_생성_테스트(String 역이름) {
         // when
-        ExtractableResponse<Response> response = StationTestApi.createStation(name);
+        var 역생성_응답값 = 역을_생성한다(역이름);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        응답_상태값이_올바른지_검증한다(역생성_응답값, HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames = StationApiResponseExtractor.extractNames(StationTestApi.showStations());
-        assertThat(stationNames).containsAnyOf(name);
+        List<String> 역_이름_목록 = 역_추출기.모든_역의_이름을_추출한다(역_목록을_조회한다());
+        역_목록에_지정된_역이_포함되는지_검증한다(역_이름_목록, 역이름);
     }
 
     /**
@@ -42,24 +40,23 @@ public class StationAcceptanceTest extends BaseTestSetup {
      * When 지하철역 목록을 조회하면
      * Then 2개의 지하철역을 응답 받는다
      */
-    @DisplayName("지하철역 목록을 조회한다.")
     @ParameterizedTest
     @CsvSource({"강남역, 잠실역", "역삼역, 삼성역", "삼성역, 선릉역"})
-    void showStations(String name1, String name2) {
+    void 역_목록_조회_테스트(String 첫번째역, String 두번째역) {
         // given
-        StationTestApi.createStation(name1);
-        StationTestApi.createStation(name2);
+        역을_생성한다(첫번째역);
+        역을_생성한다(두번째역);
 
         // when
-        ExtractableResponse<Response> response = StationTestApi.showStations();
+        var 역_목록조회_응답값 = 역_목록을_조회한다();
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        응답_상태값이_올바른지_검증한다(역_목록조회_응답값, HttpStatus.OK.value());
 
         // then
-        List<String> stationNames = StationApiResponseExtractor.extractNames(response);
-        assertThat(stationNames.size()).isEqualTo(2);
-        assertThat(stationNames).containsExactlyInAnyOrder(name1, name2);
+        List<String> 역_이름_목록 = 역_추출기.모든_역의_이름을_추출한다(역_목록조회_응답값);
+        역_목록의_크기를_검증한다(역_이름_목록, 2);
+        역_목록에_지정된_역들이_포함되는지_검증한다(역_이름_목록, 첫번째역, 두번째역);
     }
 
     /**
@@ -67,21 +64,20 @@ public class StationAcceptanceTest extends BaseTestSetup {
      * When 그 지하철역을 삭제하면
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
-    @DisplayName("지하철역을 삭제한다.")
     @ParameterizedTest
     @ValueSource(strings = {"강남역", "역삼역", "삼성역"})
-    void deleteStation(String name) {
+    void 역_삭제_테스트(String 역이름) {
         // given
-        long id = StationApiResponseExtractor.Single.extractId(StationTestApi.createStation(name));
+        long 역_id = 역_추출기.단일_id_를_추출한다(역을_생성한다(역이름));
 
         // when
-        ExtractableResponse<Response> response = StationTestApi.deleteStation(id);
+        var 역삭제_응답값 = 역을_삭제한다(역_id);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        응답_상태값이_올바른지_검증한다(역삭제_응답값, HttpStatus.NO_CONTENT.value());
 
         // then
-        List<String> stationNames = StationApiResponseExtractor.extractNames(StationTestApi.showStations());
-        assertThat(stationNames).doesNotContain(name);
+        List<String> 역_이름_목록 = 역_추출기.모든_역의_이름을_추출한다(역_목록을_조회한다());
+        역_목록에_지정된_역이_포함되지_않는지_검증한다(역_이름_목록, 역이름);
     }
 }

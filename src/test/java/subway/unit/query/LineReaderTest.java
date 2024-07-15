@@ -12,7 +12,7 @@ import subway.domain.exception.SubwayDomainExceptionType;
 import subway.domain.query.LineReader;
 import subway.domain.repository.LineRepository;
 import subway.domain.view.LineView;
-import subway.internal.BaseTestSetup;
+import subway.setup.BaseTestSetup;
 
 import java.lang.reflect.Field;
 import java.util.List;

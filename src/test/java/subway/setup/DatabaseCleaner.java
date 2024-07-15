@@ -1,4 +1,4 @@
-package subway.internal;
+package subway.setup;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.transaction.support.TransactionTemplate;

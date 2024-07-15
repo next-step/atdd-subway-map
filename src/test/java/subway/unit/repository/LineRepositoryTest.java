@@ -9,7 +9,7 @@ import subway.domain.exception.SubwayDomainException;
 import subway.domain.exception.SubwayDomainExceptionType;
 import subway.domain.repository.LineRepository;
 import subway.fixtures.LineFixture;
-import subway.internal.BaseTestSetup;
+import subway.setup.BaseTestSetup;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;

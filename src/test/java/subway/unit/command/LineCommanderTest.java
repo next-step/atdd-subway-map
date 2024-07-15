@@ -13,7 +13,7 @@ import subway.domain.entity.station.Station;
 import subway.domain.exception.SubwayDomainException;
 import subway.domain.exception.SubwayDomainExceptionType;
 import subway.domain.repository.LineRepository;
-import subway.internal.BaseTestSetup;
+import subway.setup.BaseTestSetup;
 import subway.unit.testing.LineDbUtil;
 import subway.unit.testing.StationDbUtil;
 

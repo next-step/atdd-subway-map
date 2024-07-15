@@ -1,43 +1,45 @@
 package subway.acceptance;
 
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import subway.controller.dto.CreateLineRequest;
-import subway.controller.dto.UpdateLineRequest;
-import subway.fixtures.LineFixture;
-import subway.internal.*;
+import subway.setup.BaseTestSetup;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static subway.acceptance.fixtures.LineAcceptanceFixture.이호선_생성_요청값을_생성한다;
+import static subway.acceptance.fixtures.LineAcceptanceFixture.일호선_생성_요청값을_생성한다;
+import static subway.acceptance.step.BaseStepAsserter.응답_상태값이_올바른지_검증한다;
+import static subway.acceptance.step.LineStep.*;
+import static subway.acceptance.step.LineStepAsserter.*;
+import static subway.acceptance.step.LineStepExtractor.노선_추출기;
+import static subway.acceptance.step.StationStep.*;
+import static subway.acceptance.step.StationStepAsserter.역_목록에_지정된_역들이_포함되는지_검증한다;
+import static subway.acceptance.step.StationStepExtractor.역_추출기;
 
-@DisplayName("지하철 노선 관련 기능")
+@DisplayName("지하철 노선 관련 인수 테스트")
 public class LineAcceptanceTest extends BaseTestSetup {
     /**
      * When: 관리자가 노선을 생성하면,
      * Then: 해당 노선이 생성되고 노선 목록에 포함된다.
      */
-    @DisplayName("노선을 생성한다.")
     @Test
-    void createLine() {
+    void 노선_생성_테스트() {
         // given
-        CreateLineRequest request = LineFixture.prepareLineOneCreateRequest(
-                StationApiResponseExtractor.Single.extractId(StationTestApi.createSeoulStation()),
-                StationApiResponseExtractor.Single.extractId(StationTestApi.createCityHallStation())
+        var 알호선_생성_요청값 = 일호선_생성_요청값을_생성한다(
+                역_추출기.단일_id_를_추출한다(서울역을_생성한다()),
+                역_추출기.단일_id_를_추출한다(시청역을_생성한다())
         );
 
         // when
-        ExtractableResponse<Response> response = LineTestApi.createLine(request);
+        var 노선생성_응답값 = 노선을_생성한다(알호선_생성_요청값);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        응답_상태값이_올바른지_검증한다(노선생성_응답값, HttpStatus.CREATED.value());
 
         // then
-        List<String> lineNames = LineApiResponseExtractor.extractNames(LineTestApi.showLines());
-        assertThat(lineNames).containsAnyOf(request.getName());
+        List<String> 모든_노선명 = 노선_추출기.모든_노선명_목록을_추출한다(노선_목록을_조회한다());
+        노선_목록에_지정된_노선이_포함되는지_검증한다(모든_노선명, "1호선");
     }
 
     /**
@@ -45,35 +47,34 @@ public class LineAcceptanceTest extends BaseTestSetup {
      * When: 관리자가 지하철 노선 목록을 조회하면,
      * Then: 2개의 지하철 노선 목록이 반환된다.
      */
-    @DisplayName("노선 목록을 조회한다.")
     @Test
-    void showLines() {
+    void 노선_목록_조회_테스트() {
         // given
-        LineTestApi.createLine(LineFixture.prepareLineOneCreateRequest(
-                StationApiResponseExtractor.Single.extractId(StationTestApi.createSeoulStation()),
-                StationApiResponseExtractor.Single.extractId(StationTestApi.createCityHallStation())
+        노선을_생성한다(일호선_생성_요청값을_생성한다(
+                역_추출기.단일_id_를_추출한다(서울역을_생성한다()),
+                역_추출기.단일_id_를_추출한다(시청역을_생성한다())
         ));
 
-        LineTestApi.createLine(LineFixture.prepareLineTwoCreateRequest(
-                StationApiResponseExtractor.Single.extractId(StationTestApi.createYeoksamStation()),
-                StationApiResponseExtractor.Single.extractId(StationTestApi.createJamsilStation())
+        노선을_생성한다(이호선_생성_요청값을_생성한다(
+                역_추출기.단일_id_를_추출한다(역삼역을_생성한다()),
+                역_추출기.단일_id_를_추출한다(잠실역을_생성한다())
         ));
 
         // when
-        ExtractableResponse<Response> response = LineTestApi.showLines();
+        var 노선목록조회_응답값 = 노선_목록을_조회한다();
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        응답_상태값이_올바른지_검증한다(노선목록조회_응답값, HttpStatus.OK.value());
 
         // then
-        List<String> lineNames = LineApiResponseExtractor.extractNames(response);
-        assertThat(lineNames).containsExactly("1호선", "2호선");
+        List<String> 모든_노선명 = 노선_추출기.모든_노선명_목록을_추출한다(노선목록조회_응답값);
+        노선_목록에_지정된_노선들이_포함되는지_검증한다(모든_노선명, "1호선", "2호선");
 
-        List<String> lineOneStationNames = LineApiResponseExtractor.extractUpDownStationNames(response, "1호선");
-        assertThat(lineOneStationNames).containsExactly("서울역", "시청역");
+        List<String> 일호선_역_이름_목록 = 노선_추출기.모든_노선에_포함된_역_이름을_추출한다(노선목록조회_응답값, "1호선");
+        역_목록에_지정된_역들이_포함되는지_검증한다(일호선_역_이름_목록, "서울역", "시청역");
 
-        List<String> lineTwoStationNames = LineApiResponseExtractor.extractUpDownStationNames(response, "2호선");
-        assertThat(lineTwoStationNames).containsExactly("역삼역", "잠실역");
+        List<String> 이호선_역_이름_목록 = 노선_추출기.모든_노선에_포함된_역_이름을_추출한다(노선목록조회_응답값, "2호선");
+        역_목록에_지정된_역들이_포함되는지_검증한다(이호선_역_이름_목록, "역삼역", "잠실역");
     }
 
     /**
@@ -81,25 +82,26 @@ public class LineAcceptanceTest extends BaseTestSetup {
      * When: 관리자가 해당 노선을 조회하면,
      * Then: 해당 노선의 정보가 반환된다.
      */
-    @DisplayName("노선을 조회한다.")
     @Test
-    void showLine() {
+    void 노선_조회_테스트() {
         // given
-        ExtractableResponse<Response> createdLine = LineTestApi.createLine(LineFixture.prepareLineOneCreateRequest(
-                StationApiResponseExtractor.Single.extractId(StationTestApi.createSeoulStation()),
-                StationApiResponseExtractor.Single.extractId(StationTestApi.createCityHallStation())
+        var 일호선_생성_응답값 = 노선을_생성한다(일호선_생성_요청값을_생성한다(
+                역_추출기.단일_id_를_추출한다(서울역을_생성한다()),
+                역_추출기.단일_id_를_추출한다(시청역을_생성한다())
         ));
-        Long id = LineApiResponseExtractor.Single.extractId(createdLine);
+        Long id = 노선_추출기.단일_id_를_추출한다(일호선_생성_응답값);
 
         // when
-        ExtractableResponse<Response> response = LineTestApi.showLine(id);
+        var 노선조회_응답값 = 노선을_조회한다(id);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        응답_상태값이_올바른지_검증한다(노선조회_응답값, HttpStatus.OK.value());
 
         // then
-        assertThat(LineApiResponseExtractor.Single.extractName(response)).isEqualTo("1호선");
-        assertThat(LineApiResponseExtractor.Single.extractUpDownStationNames(response)).containsExactly("서울역", "시청역");
+        노선_이름이_일치하는지_검증한다(노선_추출기.단일_노선명을_추출한다(노선조회_응답값), "1호선");
+
+        List<String> 일호선_역_이름_목록 = 노선_추출기.단일_노선에_포함된_역_이름을_추출한다(노선조회_응답값);
+        역_목록에_지정된_역들이_포함되는지_검증한다(일호선_역_이름_목록, "서울역", "시청역");
     }
 
     /**
@@ -107,27 +109,25 @@ public class LineAcceptanceTest extends BaseTestSetup {
      * When: 관리자가 해당 노선을 수정하면,
      * Then: 해당 노선의 정보가 수정된다.
      */
-    @DisplayName("노선을 수정한다.")
     @Test
-    void updateLine() {
+    void 노선_수정_테스트() {
         // given
-        ExtractableResponse<Response> createdLine = LineTestApi.createLine(LineFixture.prepareLineOneCreateRequest(
-                StationApiResponseExtractor.Single.extractId(StationTestApi.createSeoulStation()),
-                StationApiResponseExtractor.Single.extractId(StationTestApi.createCityHallStation())
+        var 일호선_생성_응답값 = 노선을_생성한다(일호선_생성_요청값을_생성한다(
+                역_추출기.단일_id_를_추출한다(서울역을_생성한다()),
+                역_추출기.단일_id_를_추출한다(시청역을_생성한다())
         ));
-        Long id = LineApiResponseExtractor.Single.extractId(createdLine);
-        UpdateLineRequest request = new UpdateLineRequest("2호선", "#00A84D");
+        Long 노선_id = 노선_추출기.단일_id_를_추출한다(일호선_생성_응답값);
 
         // when
-        ExtractableResponse<Response> response = LineTestApi.updateLine(id, request);
+        var 노선수정_응답값 = 노선을_수정한다(노선_id, "2호선", "#00A84D");
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        응답_상태값이_올바른지_검증한다(노선수정_응답값, HttpStatus.OK.value());
 
         // then
-        ExtractableResponse<Response> updatedLine = LineTestApi.showLine(id);
-        assertThat(LineApiResponseExtractor.Single.extractName(updatedLine)).isEqualTo("2호선");
-        assertThat(LineApiResponseExtractor.Single.extractColor(updatedLine)).isEqualTo("#00A84D");
+        var 노선조회_응답값 = 노선을_조회한다(노선_id);
+        노선_이름이_일치하는지_검증한다(노선_추출기.단일_노선명을_추출한다(노선조회_응답값), "2호선");
+        노선_색상이_일치하는지_검증한다(노선_추출기.단일_색상을_추출한다(노선조회_응답값), "#00A84D");
     }
 
     /**
@@ -136,24 +136,23 @@ public class LineAcceptanceTest extends BaseTestSetup {
      * When: 관리자가 해당 노선을 삭제하면,
      * Then: 해당 노선이 삭제되고 노선 목록에서 제외된다.
      */
-    @DisplayName("노선을 삭제한다.")
     @Test
-    void deleteLine() {
+    void 노선_삭제_테스트() {
         // given
-        ExtractableResponse<Response> createdLine = LineTestApi.createLine(LineFixture.prepareLineOneCreateRequest(
-                StationApiResponseExtractor.Single.extractId(StationTestApi.createSeoulStation()),
-                StationApiResponseExtractor.Single.extractId(StationTestApi.createCityHallStation())
+        var 일호선_생성_응답값 = 노선을_생성한다(일호선_생성_요청값을_생성한다(
+                역_추출기.단일_id_를_추출한다(서울역을_생성한다()),
+                역_추출기.단일_id_를_추출한다(시청역을_생성한다())
         ));
-        Long id = LineApiResponseExtractor.Single.extractId(createdLine);
+        Long id = 노선_추출기.단일_id_를_추출한다(일호선_생성_응답값);
 
         // when
-        ExtractableResponse<Response> response = LineTestApi.deleteLine(id);
+        var 노선삭제_응답값 = 노선을_삭제한다(id);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        응답_상태값이_올바른지_검증한다(노선삭제_응답값, HttpStatus.NO_CONTENT.value());
 
         // then
-        List<String> lineNames = LineApiResponseExtractor.extractNames(LineTestApi.showLines());
-        assertThat(lineNames).doesNotContain("1호선");
+        List<String> 모든_노선명 = 노선_추출기.모든_노선명_목록을_추출한다(노선_목록을_조회한다());
+        노선_목록에_지정된_노선이_포함되지_않는지_검증한다(모든_노선명, "1호선");
     }
 }
