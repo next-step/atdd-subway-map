@@ -30,7 +30,19 @@ public class LineService {
 
     @Transactional(readOnly = true)
     public LineResponse loadLine(Long id) {
-        Line line = lineRepository.findById(id).orElseThrow(() -> new NoSuchElementException("존재하지 않는 노선이에요."));
+        Line line = findById(id);
+        return new LineResponse(line.getId(), line.getName());
+    }
+
+    private Line findById(Long id) {
+        return lineRepository.findById(id).orElseThrow(NoSuchElementException::new);
+    }
+
+    @Transactional
+    public LineResponse amendLine(LineRequest request) {
+        Line line = findById(request.getId());
+        line.amend(request.getName());
+        lineRepository.save(line);
         return new LineResponse(line.getId(), line.getName());
     }
 }

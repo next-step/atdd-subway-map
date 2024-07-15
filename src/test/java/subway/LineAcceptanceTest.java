@@ -116,6 +116,26 @@ public class LineAcceptanceTest {
         assertThat(fail.statusCode()).isNotEqualTo(HttpStatus.OK.value());
     }
 
+    /**
+     * Given: 특정 지하철 노선이 등록되어 있고,
+     * When: 관리자가 해당 노선을 수정하면,
+     * Then: 해당 노선의 정보가 수정된다.
+     */
+    @DisplayName("지하철 노선을 수정한다.")
+    @Test
+    void amendLine() {
+        //given
+        ExtractableResponse<Response> createResponse = createLine(new LineRequest(수인분당선));
+        Long id = createResponse.jsonPath().getLong("id");
+
+        //when
+        ExtractableResponse<Response> amendResponse = amendLine(new LineRequest(id, 경의선));
+
+        //then
+        assertThat(amendResponse.jsonPath().getLong("id")).isEqualTo(id);
+        assertThat(amendResponse.jsonPath().getString("name")).isEqualTo(경의선);
+    }
+
     private ExtractableResponse<Response> createLine(LineRequest request) {
         return RestAssured.given().log().all()
                 .body(request)
@@ -137,6 +157,15 @@ public class LineAcceptanceTest {
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().get("/lines/" + id)
+                .then().log().all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> amendLine(LineRequest request) {
+        return RestAssured.given().log().all()
+                .body(request)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().patch("/lines")
                 .then().log().all()
                 .extract();
     }

@@ -26,4 +26,8 @@ public class Line {
     public String getName() {
         return name;
     }
+
+    public void amend(String name) {
+        this.name = name;
+    }
 }
