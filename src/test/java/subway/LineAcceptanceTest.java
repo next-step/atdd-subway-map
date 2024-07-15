@@ -10,8 +10,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -88,6 +91,31 @@ public class LineAcceptanceTest {
         assertThat(names).doesNotContain("존재하지않는노선");
     }
 
+    /**
+     * Given: 특정 지하철 노선이 등록되어 있고,
+     * When: 관리자가 해당 노선을 조회하면,
+     * Then: 해당 노선의 정보가 반환된다.
+     */
+    @DisplayName("특정 노선의 정보를 조회한다")
+    @Test
+    void loadLine() {
+        //given
+        ExtractableResponse<Response> createResponse = createLine(new LineRequest(수인분당선));
+        Long id = createResponse.jsonPath().getLong("id");
+        String name = createResponse.jsonPath().getString("name");
+
+        //when
+        ExtractableResponse<Response> success = loadLine(id);
+
+        //then
+        assertThat(success.jsonPath().getLong("id")).isEqualTo(id);
+        assertThat(success.jsonPath().getString("name")).isEqualTo(name);
+
+        //then
+        ExtractableResponse<Response> fail = loadLine(99999999L);
+        assertThat(fail.statusCode()).isNotEqualTo(HttpStatus.OK.value());
+    }
+
     private ExtractableResponse<Response> createLine(LineRequest request) {
         return RestAssured.given().log().all()
                 .body(request)
@@ -101,6 +129,14 @@ public class LineAcceptanceTest {
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().get("/lines")
+                .then().log().all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> loadLine(Long id) {
+        return RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().get("/lines/" + id)
                 .then().log().all()
                 .extract();
     }
