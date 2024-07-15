@@ -1,8 +1,7 @@
 package subway.domain.entity.line;
 
 import lombok.NonNull;
-import subway.domain.exception.SubwayDomainException;
-import subway.domain.exception.SubwayDomainExceptionType;
+import subway.domain.exception.*;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
@@ -22,7 +21,7 @@ public class LineSections implements Iterable<LineSection> {
     protected void addSection(LineSection section) {
         // 새로운 구간의 상행역이 노선의 하행종창역이 아니도록 구간인 경우 에러
         if (!data.isEmpty() && !getLastSection().getDownStationId().equals(section.getUpStationId())) {
-            throw new SubwayDomainException(SubwayDomainExceptionType.INVALID_UP_STATION);
+            throw new InvalidUpStationException(section.getUpStationId());
         }
 
         // 새로운 구간의 하행역이 이미 노선에 포함되어 있는 경우 에러
@@ -33,7 +32,7 @@ public class LineSections implements Iterable<LineSection> {
 
     private void verifyDownStationAlreadyExisted(Long downStationId) {
         if (getAllStationIds().stream().anyMatch(existedStationId -> existedStationId.equals(downStationId))) {
-            throw new SubwayDomainException(SubwayDomainExceptionType.INVALID_DOWN_STATION);
+            throw new InvalidDownStationException(downStationId);
         }
     }
 
@@ -44,7 +43,7 @@ public class LineSections implements Iterable<LineSection> {
 
         // 삭제할 역이 노선의 하행종창역이 아닌 경우 에러
         if (!getLastSection().getDownStationId().equals(stationId)) {
-            throw new SubwayDomainException(SubwayDomainExceptionType.INVALID_STATION);
+            throw new InvalidStationException(stationId);
         }
 
         // 마지막 section 에서 제거
