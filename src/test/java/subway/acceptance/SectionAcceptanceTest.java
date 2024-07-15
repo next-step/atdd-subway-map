@@ -110,7 +110,7 @@ public class SectionAcceptanceTest extends BaseTestSetup {
 
     /**
      * Given: 한개의 노선과 두개의 구간이 등록되어 있고
-     * When: 노선의 처음 역을 삭제하면
+     * When: 하행 종점역이 아닌 역을 삭제하면
      * Then: 오류가 발생한다.
      */
     @Test
