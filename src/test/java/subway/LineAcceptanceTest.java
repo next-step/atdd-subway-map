@@ -16,6 +16,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {
+    private final String 수인분당선 = "수인분당선";
+    private final String 경의선 = "경의선";
 
     /**
      * Given: 새로운 지하철 노선 정보를 입력하고,
@@ -26,7 +28,6 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선을 생성한다.")
     @Test
     void createLine() {
-        final String 수인분당선 = "수인분당선";
         //given
         LineRequest request = new LineRequest(수인분당선);
 
@@ -44,8 +45,7 @@ public class LineAcceptanceTest {
      */
     @DisplayName("지하철 노선을 생성하고 목록에 포함되었는지 확인한다")
     @Test
-    void createAndLoadLines() {
-        final String 수인분당선 = "수인분당선";
+    void createAndLoadLine() {
         //given
         createLine(new LineRequest(수인분당선));
 
@@ -59,6 +59,32 @@ public class LineAcceptanceTest {
         List<String> names = response.jsonPath().getList("name", String.class);
         assertThat(names).size().isEqualTo(1);
         assertThat(names).contains(수인분당선);
+        assertThat(names).doesNotContain("존재하지않는노선");
+    }
+
+    /**
+     * Given: 여러 개의 지하철 노선이 등록되어 있고,
+     * When: 관리자가 지하철 노선 목록을 조회하면,
+     * Then: 모든 지하철 노선 목록이 반환된다.
+     */
+    @DisplayName("지하철 노선의 모든 목록을 조회한다")
+    @Test
+    void loadAllLines() {
+        //given
+        createLine(new LineRequest(수인분당선));
+        createLine(new LineRequest(경의선));
+
+        //when
+        ExtractableResponse<Response> response = loadLines();
+
+        //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        //then
+        List<String> names = response.jsonPath().getList("name", String.class);
+        assertThat(names).size().isEqualTo(2);
+        assertThat(names).contains(수인분당선);
+        assertThat(names).contains(경의선);
         assertThat(names).doesNotContain("존재하지않는노선");
     }
 
