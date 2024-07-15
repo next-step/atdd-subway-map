@@ -78,7 +78,7 @@ public class StationAcceptanceTest {
     }
 
 
-    private long createStation(String stationName) {
+    static long createStation(String stationName) {
         Map<String, String> params = new HashMap<>();
         params.put("name", stationName);
 
