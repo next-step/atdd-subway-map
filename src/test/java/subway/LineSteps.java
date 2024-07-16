@@ -28,14 +28,14 @@ public class LineSteps {
                 .extract().jsonPath().getList("name", String.class);
     }
 
-    static LineResponse findByLineId(String lineId) {
+    static LineResponse findByLineId(Long lineId) {
         return RestAssured.given().log().all()
                 .when().get("/lines/" + lineId)
                 .then().log().all()
                 .extract().as(LineResponse.class);
     }
 
-    static void updateLine(String lineId, String name, String color) {
+    static void updateLine(Long lineId, String name, String color) {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
         params.put("color", color);

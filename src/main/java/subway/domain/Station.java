@@ -12,13 +12,13 @@ public class Station {
     @Column(length = 20, nullable = false)
     private String name;
 
-    @OneToMany(mappedBy = "upStation")
-    private List<Line> lineAsUpStation;
+    @OneToMany(mappedBy = "upStation", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Section> sectionAsUpStation;
 
-    @OneToMany(mappedBy = "downStation")
-    private List<Line> lineAsDownStation;
+    @OneToMany(mappedBy = "downStation", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Section> sectionAsDownStation;
 
-    public Station() {
+    protected Station() {
     }
 
     public Station(String name) {

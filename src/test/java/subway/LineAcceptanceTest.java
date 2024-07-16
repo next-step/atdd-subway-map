@@ -3,9 +3,11 @@ package subway;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.jdbc.Sql;
 import subway.presentation.LineRequest;
 import subway.presentation.LineResponse;
@@ -18,6 +20,19 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @Sql(scripts = "classpath:truncate-tables.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 public class LineAcceptanceTest {
+    private Long 강남역;
+    private Long 을지로4가역;
+    private Long 또다른역;
+    private LineRequest sinbundangLineRequest;
+
+    @BeforeEach
+    void setup() {
+        강남역 = Long.valueOf(StationSteps.createStation("강남역").body().jsonPath().getString("id"));
+        을지로4가역 = Long.valueOf(StationSteps.createStation("을지로4가역").body().jsonPath().getString("id"));
+        또다른역 = Long.valueOf(StationSteps.createStation("또다른역").body().jsonPath().getString("id"));
+        sinbundangLineRequest = new LineRequest("신분당선", "bg-red-600", 강남역, 을지로4가역, 10);
+    }
+
     /**
      * Given: 새로운 지하철 노선 정보를 입력하고,
      * When: 관리자가 노선을 생성하면,
@@ -27,9 +42,6 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선을 생성한다.")
     void createLine() {
         // given
-        Long 강남역 = Long.valueOf(StationSteps.createStation("강남역").body().jsonPath().getString("id"));
-        Long 을지로4가역 = Long.valueOf(StationSteps.createStation("을지로4가역").body().jsonPath().getString("id"));
-
         LineRequest newLine = new LineRequest("신분당선", "bg-red-600", 강남역, 을지로4가역, 10);
 
         // when
@@ -38,7 +50,7 @@ public class LineAcceptanceTest {
         // then
         List<String> allLineNames = LineSteps.findAllLineNames();
         Assertions.assertThat(allLineNames).containsAnyOf("신분당선");
-        assertThat(response.statusCode()).isEqualTo(201);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
 
     /**
@@ -50,11 +62,6 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선 목록을 조회한다.")
     void retrieveAllLines() {
         // given
-        Long 강남역 = Long.valueOf(StationSteps.createStation("강남역").body().jsonPath().getString("id"));
-        Long 을지로4가역 = Long.valueOf(StationSteps.createStation("을지로4가역").body().jsonPath().getString("id"));
-        Long 또다른역 = Long.valueOf(StationSteps.createStation("또다른역").body().jsonPath().getString("id"));
-
-        LineRequest sinbundangLineRequest = new LineRequest("신분당선", "bg-red-600", 강남역, 을지로4가역, 10);
         LineRequest fifthLineRequest = new LineRequest("5호선", "bg-purple-400", 강남역, 또다른역, 10);
 
         LineSteps.createLine(sinbundangLineRequest);
@@ -68,7 +75,6 @@ public class LineAcceptanceTest {
     }
 
     /**
-     * 지하철 노선 조회
      * Given: 특정 지하철 노선이 등록되어 있고,
      * When: 관리자가 해당 노선을 조회하면,
      * Then: 해당 노선의 정보가 반환된다.
@@ -77,17 +83,12 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선을 조회한다.")
     void retrieveLine() {
         // given
-        Long 강남역 = Long.valueOf(StationSteps.createStation("강남역").body().jsonPath().getString("id"));
-        Long 을지로4가역 = Long.valueOf(StationSteps.createStation("을지로4가역").body().jsonPath().getString("id"));
-        Long 또다른역 = Long.valueOf(StationSteps.createStation("또다른역").body().jsonPath().getString("id"));
-
-        LineRequest sinbundangLineRequest = new LineRequest("신분당선", "bg-red-600", 강남역, 을지로4가역, 10);
         LineRequest fifthLineRequest = new LineRequest("5호선", "bg-purple-400", 강남역, 또다른역, 10);
 
         LineSteps.createLine(sinbundangLineRequest);
 
         ExtractableResponse<Response> response = LineSteps.createLine(fifthLineRequest);
-        String fifthLineId = response.body().jsonPath().getString("id");
+        Long fifthLineId = Long.valueOf(response.body().jsonPath().getString("id"));
 
         // when
         LineResponse findline = LineSteps.findByLineId(fifthLineId);
@@ -99,7 +100,6 @@ public class LineAcceptanceTest {
     }
 
     /**
-     * 지하철 노선 수정
      * Given: 특정 지하철 노선이 등록되어 있고,
      * When: 관리자가 해당 노선을 수정하면,
      * Then: 해당 노선의 정보가 수정된다.
@@ -108,13 +108,8 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선을 수정한다.")
     void updateLine() {
         // given
-        Long 강남역 = Long.valueOf(StationSteps.createStation("강남역").body().jsonPath().getString("id"));
-        Long 을지로4가역 = Long.valueOf(StationSteps.createStation("을지로4가역").body().jsonPath().getString("id"));
-
-        LineRequest sinbundangLineRequest = new LineRequest("신분당선", "bg-red-600", 강남역, 을지로4가역, 10);
-
         ExtractableResponse<Response> response = LineSteps.createLine(sinbundangLineRequest);
-        String sinbundangLineId = response.body().jsonPath().getString("id");
+        Long sinbundangLineId = Long.valueOf(response.body().jsonPath().getString("id"));
 
         // when
         LineSteps.updateLine(sinbundangLineId, "신분당선2호선", "bg-red-700");
@@ -128,20 +123,14 @@ public class LineAcceptanceTest {
 
 
     /**
-     * 지하철 노선 삭제
      * Given: 특정 지하철 노선이 등록되어 있고,
      * When: 관리자가 해당 노선을 삭제하면,
-     * When: 관리자가 해당 노선을 삭제하면,
+     * Then: 관리자가 해당 노선을 삭제하면,
      */
     @Test
     @DisplayName("지하철 노선을 삭제한다.")
     void deleteLine() {
         // given
-        Long 강남역 = Long.valueOf(StationSteps.createStation("강남역").body().jsonPath().getString("id"));
-        Long 을지로4가역 = Long.valueOf(StationSteps.createStation("을지로4가역").body().jsonPath().getString("id"));
-
-        LineRequest sinbundangLineRequest = new LineRequest("신분당선", "bg-red-600", 강남역, 을지로4가역, 10);
-
         ExtractableResponse<Response> response = LineSteps.createLine(sinbundangLineRequest);
         String sinbundangLineId = response.body().jsonPath().getString("id");
 

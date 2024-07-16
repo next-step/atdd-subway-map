@@ -33,6 +33,6 @@ public class StationService {
 
     @Transactional
     public void deleteStationById(Long id) {
-        stationRepository.deleteById(id);
+        stationRepository.deleteById(id); // 구간에 포함되어 있는 경우 삭제할 수 없음
     }
 }

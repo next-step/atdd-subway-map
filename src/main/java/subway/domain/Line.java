@@ -1,5 +1,7 @@
 package subway.domain;
 
+import subway.presentation.LineRequest;
+
 import javax.persistence.*;
 
 @Entity
@@ -14,26 +16,31 @@ public class Line {
     @Column(length = 20, nullable = false)
     private String color;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "up_station_id")
-    private Station upStation;
+    @Embedded
+    private Sections sections = new Sections();
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "down_station_id")
-    private Station downStation;
-
-    private Integer distance;
-
-    public Line() {
+    protected Line() {
 
     }
 
-    public Line(String name, String color, Station upStation, Station downStation, Integer distance) {
+    public Line(String name, String color) {
         this.name = name;
         this.color = color;
-        this.upStation = upStation;
-        this.downStation = downStation;
-        this.distance = distance;
+    }
+
+    public static Line createLine(Station upStation, Station downStation, LineRequest lineRequest) {
+        Line createdLine = new Line(lineRequest.getName(), lineRequest.getColor());
+
+        Sections sections = createdLine.getSections();
+        Section requestSection = Section.createSection(
+                createdLine,
+                upStation,
+                downStation,
+                lineRequest.getDistance()
+        );
+        sections.addSections(requestSection);
+
+        return createdLine;
     }
 
     public String getName() {
@@ -48,16 +55,16 @@ public class Line {
         return color;
     }
 
+    public Sections getSections() {
+        return sections;
+    }
+
     public Station getUpStation() {
-        return upStation;
+        return sections.getUpStation();
     }
 
     public Station getDownStation() {
-        return downStation;
-    }
-
-    public Integer getDistance() {
-        return distance;
+        return sections.getDownStation();
     }
 
     public void changeName(String name) {
