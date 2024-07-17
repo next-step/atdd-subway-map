@@ -1,4 +1,4 @@
-package subway;
+package subway.model.response;
 
 public class StationResponse {
     private Long id;
