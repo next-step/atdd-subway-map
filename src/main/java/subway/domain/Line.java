@@ -1,19 +1,21 @@
-package subway;
+package subway.domain;
 
 import javax.persistence.*;
 
 @Entity
-public class Station {
+public class Line {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "line_id")
     private Long id;
-    @Column(length = 20, nullable = false)
+
     private String name;
 
-    public Station() {
+    protected Line() {
     }
 
-    public Station(String name) {
+    public Line(String name) {
         this.name = name;
     }
 
@@ -23,5 +25,9 @@ public class Station {
 
     public String getName() {
         return name;
+    }
+
+    public void amend(String name) {
+        this.name = name;
     }
 }
