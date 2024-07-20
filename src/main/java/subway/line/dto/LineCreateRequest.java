@@ -1,6 +1,7 @@
-package subway.line;
+package subway.line.dto;
 
 import subway.Station;
+import subway.line.Line;
 
 public class LineCreateRequest {
 

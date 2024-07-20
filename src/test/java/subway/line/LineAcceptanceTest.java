@@ -10,6 +10,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 import subway.StationRequest;
+import subway.line.dto.LineCreateRequest;
+import subway.line.dto.LineModifyRequest;
+import subway.line.dto.LineSectionAppendRequest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -19,9 +22,15 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {
 
+  private final long 종합운동장역_아이디 = 1L;
+  private final long 잠실새내역_아이디 = 2L;
+  private final long 잠실역_아이디 = 3L;
+  private final long 봉은사_아이디 = 4L;
+  private final long 이호선_노선_아이디 = 1L;
+
   @DisplayName("지하철의 새로운 노선을 추가한다.")
   @Test
-  public void testCreateLine(){
+  public void testCreateLine() {
     //도메인 제약 테스트를 추가하기 위해 노선의 조건에서 색상이 중복되지 않고 거리가 100이하여야 한다고 가정한다
 
     //given 역을 생성하고
@@ -188,6 +197,147 @@ public class LineAcceptanceTest {
       .body(new LineCreateRequest(name, color, upStationId, downStationId, distance))
       .contentType(MediaType.APPLICATION_JSON_VALUE)
       .when().post("/lines")
+      .then().log().all()
+      .extract();
+  }
+
+  private ExtractableResponse<Response> 지하철_노선_구간을_등록(Long lineId, Long upStationId, Long downStationId, int distance) {
+    return RestAssured.given().log().all()
+      .body(new LineSectionAppendRequest(upStationId, downStationId, distance))
+      .contentType(MediaType.APPLICATION_JSON_VALUE)
+      .when().post(String.format("/lines/%d/sections", lineId))
+      .then().log().all()
+      .extract();
+  }
+
+  /**
+   Given 지하철 노선을 등록 한다.
+   When 지하철 노선 구간을 등록 한다.
+   Then 새로운 요청의 상행 역은 마지막 구간의 하행 역이 아닐 경우 오류가 발생해야 한다.
+   */
+  @DisplayName("지하철 노선 구간을 등록할 때 요청의 상행 역이 마지막 구간의 하행 역이 아니게 요청 한다.")
+  @Test
+  public void testAppendSubwayLineSection() {
+    //given
+    지하철_역을_생성("종합운동장");
+    지하철_역을_생성("잠실새내");
+    지하철_역을_생성("잠실");
+    지하철_역을_생성("봉은사");
+    지하철_노선을_생성("2호선", "green", 종합운동장역_아이디, 잠실새내역_아이디, 10);
+    지하철_노선_구간을_등록(1L, 종합운동장역_아이디, 잠실새내역_아이디, 10);
+
+    //when
+    ExtractableResponse 지하철_노선_구간_마지막_하행_역이_요청의_상행_역이_아닌_요청 =
+      지하철_노선_구간을_등록(이호선_노선_아이디, 잠실역_아이디, 봉은사_아이디, 10);
+
+    //then
+    assertThat(지하철_노선_구간_마지막_하행_역이_요청의_상행_역이_아닌_요청.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+  }
+
+  /**
+   Given 지하철 노선을 등록 한다.
+   When 지하철 노선 구간을 등록 한다.
+   Then 새로운 요청의 상행 역이 마지막 구간의 하행 역과 동일 하다면 정상적으로 구간이 등록된다.
+   */
+  @DisplayName("지하철 노선 구간을 새로운 요청의 상행 역이 마지막 구간의 하행 역이게 요청 한다.")
+  @Test
+  public void testTrueAppendLineSection() {
+    //given
+    지하철_역을_생성("종합운동장");
+    지하철_역을_생성("잠실새내");
+    지하철_역을_생성("잠실");
+    지하철_노선을_생성("2호선", "green", 종합운동장역_아이디, 잠실새내역_아이디, 10);
+    지하철_노선_구간을_등록(이호선_노선_아이디, 종합운동장역_아이디, 잠실새내역_아이디, 10);
+    //when
+    ExtractableResponse 지하철_노선_구간_마지막_하행_역이_요청의_상행_역인_요청 =
+      지하철_노선_구간을_등록(이호선_노선_아이디, 잠실새내역_아이디, 잠실역_아이디, 10);
+
+    //then
+    assertThat(지하철_노선_구간_마지막_하행_역이_요청의_상행_역인_요청.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+  }
+
+  /**
+   Given 지하철 노선을 등록 한다.
+   When 지하철 노선 구간을 등록 한다.
+   Then 새로운 요청의 하행 역이 해당 구간 역에 등록 되어 있는 역이라면 오류가 발생한다.
+   */
+  @DisplayName("지하철 노선 구간을 등록 할때 요청의 하행 역이 이미 노선에 존재한다.")
+  @Test
+  public void testAppendLineSection() {
+    //given
+    지하철_역을_생성("종합운동장");
+    지하철_역을_생성("잠실새내");
+    지하철_역을_생성("잠실");
+    지하철_노선을_생성("2호선", "green", 종합운동장역_아이디, 잠실새내역_아이디, 10);
+    지하철_노선_구간을_등록(이호선_노선_아이디, 종합운동장역_아이디, 잠실새내역_아이디, 10);
+    지하철_노선_구간을_등록(이호선_노선_아이디, 잠실새내역_아이디, 잠실역_아이디, 10);
+
+    //when
+    ExtractableResponse 지하철_노선_구간_요청의_하행_역이_이미_존재하는_요청 =
+      지하철_노선_구간을_등록(이호선_노선_아이디, 잠실역_아이디, 종합운동장역_아이디, 10);
+
+    //then
+    assertThat(지하철_노선_구간_요청의_하행_역이_이미_존재하는_요청.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+  }
+  /**
+   Given 지하철 노선 및 지하철 노선 구간을 등록 한다.
+   When 지하철 노선 구간을 삭제 한다.
+   Then 마지막 하행 종점 역이 아닌 경우 삭제할 수 없다. -> 조건 불 충분시 오류가 발생 해야 한다.
+        노선 구간이 1개인 경우 삭제할 수 없다. -> 조건 불 충분시 오류가 발생 해야 한다.
+        삭제된 지하철 노선 구간 결과 에서 요청 결과가 삭제 되 었는지 확인 한다.
+   */
+  @DisplayName("지하철 노선 구간의 마지막 하행 역이 삭제 요청 역이 아니 라면 오류를 발생 시킨다.")
+  @Test
+  public void testRemoveSubwayLineSection() {
+    //given
+    지하철_역을_생성("종합운동장");
+    지하철_역을_생성("잠실새내");
+    지하철_역을_생성("잠실");
+    지하철_노선을_생성("2호선", "green", 종합운동장역_아이디, 잠실새내역_아이디, 10);
+    지하철_노선_구간을_등록(이호선_노선_아이디, 종합운동장역_아이디, 잠실새내역_아이디, 10);
+    지하철_노선_구간을_등록(이호선_노선_아이디, 잠실새내역_아이디, 잠실역_아이디, 10);
+
+    //when
+    ExtractableResponse 노선의_마지막_하행_역이_삭제_요청의_역이_아닌_삭제_요청 = 지하철_노선_구간_삭제_요청(잠실새내역_아이디);
+
+    //then
+    assertThat(노선의_마지막_하행_역이_삭제_요청의_역이_아닌_삭제_요청.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+  }
+
+  @DisplayName("지하철 노선 구간의 마지막 하행 역이 요청의 상행 역과 동일 할때.삭제를 요청 한다.")
+  @Test
+  public void testRemoveSubwayLineSection2() {
+    지하철_역을_생성("종합운동장");
+    지하철_역을_생성("잠실새내");
+    지하철_역을_생성("잠실");
+    지하철_노선을_생성("2호선", "green", 종합운동장역_아이디, 잠실새내역_아이디, 10);
+    지하철_노선_구간을_등록(이호선_노선_아이디, 종합운동장역_아이디, 잠실새내역_아이디, 10);
+    지하철_노선_구간을_등록(이호선_노선_아이디, 잠실새내역_아이디, 잠실역_아이디, 10);
+
+    ExtractableResponse 노선의_마지막_하행_역이_삭제_요청_역인_삭제_요청 = 지하철_노선_구간_삭제_요청(잠실역_아이디);
+
+    assertThat(노선의_마지막_하행_역이_삭제_요청_역인_삭제_요청.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+  }
+
+  @DisplayName("지하철 노선 구간이 1개일때 지하철 노선 구간 삭제를 요청 하면 오류가 발생 한다.")
+  @Test
+  public void testRemoveSubwayLineSection3() {
+    지하철_역을_생성("종합운동장");
+    지하철_역을_생성("잠실새내");
+    지하철_노선을_생성("2호선", "green", 종합운동장역_아이디, 잠실새내역_아이디, 10);
+    지하철_노선_구간을_등록(이호선_노선_아이디, 종합운동장역_아이디, 잠실새내역_아이디, 10);
+
+    ExtractableResponse 지하철_노선_구간이_1개일_경우_삭제_요청 = 지하철_노선_구간_삭제_요청(잠실새내역_아이디);
+
+    assertThat(지하철_노선_구간이_1개일_경우_삭제_요청.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+  }
+
+
+  private ExtractableResponse 지하철_노선_구간_삭제_요청(Long stationId) {
+    return RestAssured.given().log().all()
+      .param("stationId", stationId)
+      .contentType(MediaType.APPLICATION_JSON_VALUE)
+      .when().delete("/lines/1/sections")
       .then().log().all()
       .extract();
   }
