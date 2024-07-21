@@ -106,6 +106,25 @@ public class SectionAcceptanceTest extends AcceptanceTestBase {
     @DisplayName("지하철 구간 제거에 성공한다")
     @Test
     void deleteSection() {
+        //given
+        var upStationId = new StationRequestBuilder.Builder().name(GANGNAM_STATION).build().requestCreate().extractId();
+        var downStationId = new StationRequestBuilder.Builder().name(SEOUL_STATION).build().requestCreate().extractId();
+        var subwayLine = new LineRequestBuilder.Builder().upStationId(upStationId).downStationId(downStationId).distance(10L).name(LINE_SINBUNDANG).color(COLOR_BLUE).build().requestCreate();
+        var newDownStationId = new StationRequestBuilder.Builder().name(PANGYO_STATION).build().requestCreate().extractId();
+        new SectionRequestBuilder.Builder()
+                .upStationId(downStationId)
+                .downStationId(newDownStationId)
+                .distance(10L)
+                .build()
+                .requestCreate(subwayLine.extractId());
+
+        //when
+        var response = SectionRequestBuilder.requestDelete(subwayLine.extractId(), newDownStationId);
+
+        //then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(LineRequestBuilder.requestGet(subwayLine.extractId()).extractDownStationId()
+        ).isNotEqualTo(newDownStationId);
     }
 
     //given: 구간이 2개 이상인 지하철 노선이 등록되어 있다
@@ -114,6 +133,23 @@ public class SectionAcceptanceTest extends AcceptanceTestBase {
     @DisplayName("노선의 하행 종점역 이외의 역은 삭제할 수 없다")
     @Test
     void failToDeleteSection() {
+        //given
+        var upStationId = new StationRequestBuilder.Builder().name(GANGNAM_STATION).build().requestCreate().extractId();
+        var downStationId = new StationRequestBuilder.Builder().name(SEOUL_STATION).build().requestCreate().extractId();
+        var subwayLine = new LineRequestBuilder.Builder().upStationId(upStationId).downStationId(downStationId).distance(10L).name(LINE_SINBUNDANG).color(COLOR_BLUE).build().requestCreate();
+        var newDownStationId = new StationRequestBuilder.Builder().name(PANGYO_STATION).build().requestCreate().extractId();
+        new SectionRequestBuilder.Builder()
+                .upStationId(downStationId)
+                .downStationId(newDownStationId)
+                .distance(10L)
+                .build()
+                .requestCreate(subwayLine.extractId());
+
+        //when
+        var response = SectionRequestBuilder.requestDelete(subwayLine.extractId(), downStationId);
+
+        //then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     //given: 구간이 1개인 지하철 노선이 등록되어있다
@@ -122,5 +158,15 @@ public class SectionAcceptanceTest extends AcceptanceTestBase {
     @DisplayName("노선의 구간이 1개인 경우 역을 삭제할 수 없다")
     @Test
     void failToDeleteSection2() {
+        //given
+        var upStationId = new StationRequestBuilder.Builder().name(GANGNAM_STATION).build().requestCreate().extractId();
+        var downStationId = new StationRequestBuilder.Builder().name(SEOUL_STATION).build().requestCreate().extractId();
+        var subwayLine = new LineRequestBuilder.Builder().upStationId(upStationId).downStationId(downStationId).distance(10L).name(LINE_SINBUNDANG).color(COLOR_BLUE).build().requestCreate();
+
+        //when
+        var response = SectionRequestBuilder.requestDelete(subwayLine.extractId(), downStationId);
+
+        //then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 }

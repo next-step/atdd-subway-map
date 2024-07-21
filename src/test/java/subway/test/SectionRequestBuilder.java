@@ -16,6 +16,18 @@ public class SectionRequestBuilder {
         this.distance = builder.distance;
     }
 
+    public static SectionResponseHelper requestDelete(Long lineId, Long stationId) {
+        var response = RestAssured
+                .given()
+                .pathParam("id", lineId)
+                .queryParam("stationId", stationId)
+                .when()
+                .delete("/lines/{id}/sections")
+                .then()
+                .extract();
+        return new SectionResponseHelper(response);
+    }
+
     public SectionResponseHelper requestCreate(Long lineId) {
         var body = Map.of(
                 "upStationId", this.upStationId,
