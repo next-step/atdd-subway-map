@@ -13,6 +13,8 @@ public final class SubwayLineResponse {
     private final Long id;
     private final String name;
     private final String color;
+    private final Long upStationId;
+    private final Long downStationId;
     private final List<StationResponse> stations;
 
     public static SubwayLineResponse from(SubwayLine subwayLine) {
@@ -24,6 +26,8 @@ public final class SubwayLineResponse {
                 subwayLine.getId(),
                 subwayLine.getName(),
                 subwayLine.getColor(),
+                subwayLine.getUpStation().getId(),
+                subwayLine.getDownStation().getId(),
                 stationResponses
         );
     }

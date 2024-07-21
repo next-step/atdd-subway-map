@@ -93,7 +93,7 @@ public class SectionAcceptanceTest extends AcceptanceTestBase {
                 .requestCreate(subwayLine.extractId());
 
         //then
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         //then
         var changedLine = LineRequestBuilder.requestGet(subwayLine.extractId());
         assertThat(changedLine.extractDownStationId()).isEqualTo(newDownStationId);

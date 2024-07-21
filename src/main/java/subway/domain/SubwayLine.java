@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -55,6 +56,29 @@ public class SubwayLine {
         this.sections.add(section);
         section.assignSubwayLine(this);
     }
+
+    public void addSection(Section section) {
+        if (!canAddSection(section)) {
+            throw new UnsupportedOperationException();
+        }
+        this.distance = this.distance + section.getDistance();
+        this.downStation = section.getDownStation();
+        this.sections.add(section);
+        section.assignOrder(this.sections.size());
+        section.assignSubwayLine(this);
+    }
+
+
+    private boolean canAddSection(Section section) {
+        var sectionUpStationId = section.getUpStation().getId();
+        if (!Objects.equals(sectionUpStationId, this.downStation.getId())) {
+            return false;
+        }
+        var sectionDownStationId = section.getDownStation().getId();
+        return this.getStations().stream()
+                .noneMatch(s -> Objects.equals(sectionDownStationId, s.getId()));
+    }
+
 
     public void updateBasicInfo(String name, String color) {
         this.name = name;

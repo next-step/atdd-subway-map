@@ -11,7 +11,7 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"line_id", "order"})})
+@Table(name = "subway_section")
 public class Section {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,7 +28,7 @@ public class Section {
     @Column(nullable = false)
     private Long distance;
 
-    @Column(nullable = false)
+    @Column(name = "section_order", nullable = false)
     private Integer order = 1;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -47,6 +47,10 @@ public class Section {
 
     public void assignSubwayLine(SubwayLine subwayLine) {
         this.subwayLine = subwayLine;
+    }
+
+    public void assignOrder(Integer order) {
+        this.order = order;
     }
 
     public List<Station> getStations() {

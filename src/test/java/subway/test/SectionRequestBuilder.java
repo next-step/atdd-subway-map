@@ -18,7 +18,7 @@ public class SectionRequestBuilder {
 
     public SectionResponseHelper requestCreate(Long lineId) {
         var body = Map.of(
-                "updStationId", this.upStationId,
+                "upStationId", this.upStationId,
                 "downStationId", this.downStationId,
                 "distance", this.distance
         );

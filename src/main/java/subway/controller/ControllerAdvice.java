@@ -9,7 +9,12 @@ import javax.persistence.EntityNotFoundException;
 @RestControllerAdvice
 public class ControllerAdvice {
     @ExceptionHandler({EntityNotFoundException.class})
-    public ResponseEntity<Void> handle(Exception ex) {
+    public ResponseEntity<Void> handle(EntityNotFoundException ex) {
         return ResponseEntity.noContent().build();
+    }
+
+    @ExceptionHandler({UnsupportedOperationException.class})
+    public ResponseEntity<Void> handle(UnsupportedOperationException ex) {
+        return ResponseEntity.badRequest().build();
     }
 }

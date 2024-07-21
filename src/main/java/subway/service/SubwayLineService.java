@@ -52,7 +52,7 @@ public class SubwayLineService {
         subwayLineRepository.deleteById(id);
     }
 
-    private SubwayLine findSubwayLineOrElseThrow(Long id) {
+    public SubwayLine findSubwayLineOrElseThrow(Long id) {
         return subwayLineRepository
                 .findById(id)
                 .orElseThrow(EntityNotFoundException::new);
