@@ -1,29 +1,41 @@
 package subway;
 
-import io.restassured.RestAssured;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import subway.test.AcceptanceTestBase;
-
-import java.util.List;
-import java.util.Map;
+import subway.test.LineRequestBuilder;
+import subway.test.StationRequestBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.StationAcceptanceTest.GANGNAM_STATION;
-import static subway.StationAcceptanceTest.SEOUL_STATION;
+import static subway.test.Constants.*;
 
 
 @DisplayName("지하철노선 관련 기능")
 public class SubwayLineAcceptanceTest extends AcceptanceTestBase {
-    public static final String LINE_SINBUNDANG = "신분당선";
-    public static final String LINE_ONE = "1호선";
-    public static final String LINE_TWO = "2호선";
-    public static final String COLOR_RED = "bg-red-001";
-    public static final String COLOR_BLUE = "bg-blue-001";
+
+    LineRequestBuilder.Builder defaultBuilder;
+
+    @BeforeEach
+    void beforeEach() {
+        var upStationResponse = new StationRequestBuilder.Builder()
+                .name(GANGNAM_STATION)
+                .build()
+                .requestCreate();
+
+        var downStationResponse =
+                new StationRequestBuilder.Builder()
+                        .name(SEOUL_STATION)
+                        .build()
+                        .requestCreate();
+        this.defaultBuilder = new LineRequestBuilder.Builder()
+                .name(LINE_SINBUNDANG)
+                .color(COLOR_RED)
+                .distance(10L)
+                .upStationId(upStationResponse.extractId())
+                .downStationId(downStationResponse.extractId());
+    }
 
     /*
      * given 지하철 정보를 입력하고
@@ -34,13 +46,11 @@ public class SubwayLineAcceptanceTest extends AcceptanceTestBase {
     @Test
     void createSubwayLine() {
         //when
+        var createdResponse = defaultBuilder.build().requestCreate();
 
-        var upStationResponse = requestCreateStation(GANGNAM_STATION);
-        var downStationResponse = requestCreateStation(SEOUL_STATION);
-        var createdResponse = requestCreateSubwayLine(LINE_SINBUNDANG, COLOR_RED, extractId(upStationResponse), extractId(downStationResponse), 3L);
         //then
-        assertThat(createdResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(extractName(createdResponse)).isEqualTo(LINE_SINBUNDANG);
+        assertThat(createdResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(createdResponse.extractName()).isEqualTo(LINE_SINBUNDANG);
     }
 
     /**
@@ -53,18 +63,16 @@ public class SubwayLineAcceptanceTest extends AcceptanceTestBase {
     @Test
     void getAllSubwayLine() {
         //given
-        var upStationResponse = requestCreateStation(GANGNAM_STATION);
-        var downStationResponse = requestCreateStation(SEOUL_STATION);
-        requestCreateSubwayLine(LINE_SINBUNDANG, COLOR_RED, extractId(upStationResponse), extractId(downStationResponse), 3L);
-        requestCreateSubwayLine(LINE_ONE, COLOR_RED, extractId(upStationResponse), extractId(downStationResponse), 3L);
-        requestCreateSubwayLine(LINE_TWO, COLOR_RED, extractId(upStationResponse), extractId(downStationResponse), 3L);
+        defaultBuilder.name(LINE_SINBUNDANG).build().requestCreate();
+        defaultBuilder.name(LINE_ONE).build().requestCreate();
+        defaultBuilder.name(LINE_TWO).build().requestCreate();
 
         //when
-        var getAllResponse = requestGetAllSubwayLine();
+        var getAllResponse = LineRequestBuilder.requestGetAll();
 
         //then
-        assertThat(getAllResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(extractIds(getAllResponse).size()).isEqualTo(3);
+        assertThat(getAllResponse.getStatusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(getAllResponse.extractIds().size()).isEqualTo(3);
     }
 
     /**
@@ -77,17 +85,15 @@ public class SubwayLineAcceptanceTest extends AcceptanceTestBase {
     @Test
     void getSubwayLine() {
         //given
-        var upStationResponse = requestCreateStation(GANGNAM_STATION);
-        var downStationResponse = requestCreateStation(SEOUL_STATION);
-        var createdResponse = requestCreateSubwayLine(LINE_SINBUNDANG, COLOR_RED, extractId(upStationResponse), extractId(downStationResponse), 3L);
-        var createdId = createdResponse.jsonPath().getLong("id");
+        var createdResponse = defaultBuilder.build().requestCreate();
+        var createdId = createdResponse.extractId();
 
         //when
-        var getResponse = requestGetSubwayLine(createdId);
+        var getResponse = LineRequestBuilder.requestGet(createdId);
 
         //then
-        assertThat(getResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(extractName(getResponse)).isEqualTo(LINE_SINBUNDANG);
+        assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(getResponse.extractName()).isEqualTo(LINE_SINBUNDANG);
     }
 
     /**
@@ -99,20 +105,22 @@ public class SubwayLineAcceptanceTest extends AcceptanceTestBase {
     @Test
     void updateSubwayLine() {
         //given
-        var upStationResponse = requestCreateStation(GANGNAM_STATION);
-        var downStationResponse = requestCreateStation(SEOUL_STATION);
-        var createdResponse = requestCreateSubwayLine(LINE_SINBUNDANG, COLOR_RED, extractId(upStationResponse), extractId(downStationResponse), 3L);
-        var createdId = createdResponse.jsonPath().getLong("id");
+        var createdResponse = defaultBuilder.build().requestCreate();
+        var createdId = createdResponse.extractId();
 
         //when
-        var updatedResponse = requestUpdateSubwayLine(createdId, LINE_ONE, COLOR_BLUE);
+        var updatedResponse = new LineRequestBuilder.Builder()
+                .name(LINE_ONE)
+                .color(COLOR_BLUE)
+                .build()
+                .requestUpdate(createdId);
 
         //then
-        assertThat(updatedResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertThat(updatedResponse.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
-        var getResponse = requestGetSubwayLine(createdId);
-        assertThat(extractName(getResponse)).isEqualTo(LINE_ONE);
-        assertThat(extractColor(getResponse)).isEqualTo(COLOR_BLUE);
+        var getResponse = LineRequestBuilder.requestGet(createdId);
+        assertThat(getResponse.extractName()).isEqualTo(LINE_ONE);
+        assertThat(getResponse.extractColor()).isEqualTo(COLOR_BLUE);
     }
 
     /**
@@ -124,110 +132,16 @@ public class SubwayLineAcceptanceTest extends AcceptanceTestBase {
     @Test
     void deleteSubwayLine() {
         //given
-        var upStationResponse = requestCreateStation(GANGNAM_STATION);
-        var downStationResponse = requestCreateStation(SEOUL_STATION);
-        var createdResponse = requestCreateSubwayLine(LINE_SINBUNDANG, COLOR_RED, extractId(upStationResponse), extractId(downStationResponse), 3L);
-        var createdId = createdResponse.jsonPath().getLong("id");
+        var createdResponse = defaultBuilder.build().requestCreate();
+        var createdId = createdResponse.extractId();
 
         //when
-        var deletedResponse = requestDeleteSubwayLine(createdId);
+        var deletedResponse = LineRequestBuilder.requestDelete(createdId);
 
         //then
-        assertThat(deletedResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertThat(deletedResponse.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
-        var getAllResponse = requestGetAllSubwayLine();
-        assertThat(extractIds(getAllResponse)).doesNotContain(createdId);
-    }
-
-    private ExtractableResponse<Response> requestCreateSubwayLine(String name, String color, Long upStationId, Long downStationId, Long distance) {
-        var body = Map.of("name", name,
-                "color", color,
-                "upStationId", upStationId,
-                "downStationId", downStationId,
-                "distance", distance
-        );
-        var contentType = MediaType.APPLICATION_JSON_VALUE;
-        var path = "/lines";
-
-        return RestAssured.given().log().all()
-                .body(body)
-                .contentType(contentType)
-                .when().post(path)
-                .then().log().all()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> requestUpdateSubwayLine(Long id, String name, String color) {
-        var body = Map.of(
-                "name", name,
-                "color", color
-        );
-        var contentType = MediaType.APPLICATION_JSON_VALUE;
-
-        return RestAssured
-                .given()
-                .pathParam("id", id)
-                .body(body)
-                .contentType(contentType)
-                .when()
-                .put("/lines/{id}")
-                .then()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> requestCreateStation(String name) {
-        var body = Map.of("name", name);
-        var contentType = MediaType.APPLICATION_JSON_VALUE;
-        var path = "/stations";
-
-        return RestAssured.given().log().all()
-                .body(body)
-                .contentType(contentType)
-                .when().post(path)
-                .then().log().all()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> requestGetAllSubwayLine() {
-        return RestAssured
-                .when().get("/lines")
-                .then()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> requestGetSubwayLine(Long id) {
-        return RestAssured
-                .given()
-                .pathParam("id", id)
-                .when()
-                .get("/lines/{id}")
-                .then()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> requestDeleteSubwayLine(Long id) {
-        return RestAssured
-                .given()
-                .pathParam("id", id)
-                .when()
-                .delete("/lines/{id}")
-                .then()
-                .extract();
-    }
-
-    private String extractName(ExtractableResponse<Response> response) {
-        return response.jsonPath().getString("name");
-    }
-
-    private String extractColor(ExtractableResponse<Response> response) {
-        return response.jsonPath().getString("color");
-    }
-
-    private List<Long> extractIds(ExtractableResponse<Response> response) {
-        return response.jsonPath().getList("id", Long.class);
-    }
-
-    private Long extractId(ExtractableResponse<Response> response) {
-        return response.jsonPath().getLong("id");
+        var getAllResponse = LineRequestBuilder.requestGetAll();
+        assertThat(getAllResponse.extractIds()).doesNotContain(createdId);
     }
 }

@@ -1,23 +1,25 @@
 package subway;
 
-import io.restassured.RestAssured;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import subway.test.AcceptanceTestBase;
-
-import java.util.List;
-import java.util.Map;
+import subway.test.StationRequestBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static subway.test.Constants.GANGNAM_STATION;
+import static subway.test.Constants.SEOUL_STATION;
 
 @DisplayName("지하철역 관련 기능")
 public class StationAcceptanceTest extends AcceptanceTestBase {
-    public static final String GANGNAM_STATION = "강남역";
-    public static final String SEOUL_STATION = "서울역";
+    StationRequestBuilder.Builder defaultBuilder;
+
+    @BeforeEach
+    void beforeEach() {
+        this.defaultBuilder = new StationRequestBuilder.Builder()
+                .name(GANGNAM_STATION);
+    }
 
     /**
      * When 지하철역을 생성하면
@@ -28,13 +30,13 @@ public class StationAcceptanceTest extends AcceptanceTestBase {
     @Test
     void createStation() {
         // when
-        var createResponse = requestCreateStation(GANGNAM_STATION);
+        var createResponse = defaultBuilder.name(GANGNAM_STATION).build().requestCreate();
         // then
-        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        var getAllResponse = requestGetAllStations();
-        assertThat(extractNames(getAllResponse)).containsAnyOf(GANGNAM_STATION);
+        var getAllResponse = StationRequestBuilder.requestGetAll();
+        assertThat(getAllResponse.extractNames()).containsAnyOf(GANGNAM_STATION);
     }
 
     /**
@@ -46,16 +48,15 @@ public class StationAcceptanceTest extends AcceptanceTestBase {
     @Test
     void getAllStation() {
         //given
-        requestCreateStation(GANGNAM_STATION);
-        requestCreateStation(SEOUL_STATION);
+        this.defaultBuilder.name(GANGNAM_STATION).build().requestCreate();
+        this.defaultBuilder.name(SEOUL_STATION).build().requestCreate();
 
         //when
-        var getAllResponse = requestGetAllStations();
+        var getAllResponse = StationRequestBuilder.requestGetAll();
 
         //then
-        assertThat(getAllResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(extractIds(getAllResponse).size()).isEqualTo(2);
-
+        assertThat(getAllResponse.getStatusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(getAllResponse.extractIds().size()).isEqualTo(2);
     }
 
     /**
@@ -67,51 +68,14 @@ public class StationAcceptanceTest extends AcceptanceTestBase {
     @Test
     void deleteStation() {
         //given
-        var createdResponse = requestCreateStation(SEOUL_STATION);
-        var createdId = createdResponse.jsonPath().getLong("id");
+        var createdResponse = this.defaultBuilder.build().requestCreate();
+        var createdId = createdResponse.extractId();
 
         //when
-        requestDeleteStation(createdId);
+        StationRequestBuilder.requestDelete(createdId);
 
         //then
-        var getAllResponse = requestGetAllStations();
-        assertThat(extractIds(getAllResponse)).doesNotContain(createdId);
-    }
-
-    private ExtractableResponse<Response> requestCreateStation(String name) {
-        var body = Map.of("name", name);
-        var contentType = MediaType.APPLICATION_JSON_VALUE;
-        var path = "/stations";
-
-        return RestAssured.given().log().all()
-                .body(body)
-                .contentType(contentType)
-                .when().post(path)
-                .then().log().all()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> requestGetAllStations() {
-        return RestAssured
-                .when().get("/stations")
-                .then()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> requestDeleteStation(Long id) {
-        return RestAssured.given()
-                .pathParam("id", id)
-                .when()
-                .delete("/stations/{id}")
-                .then()
-                .extract();
-    }
-
-    private List<String> extractNames(ExtractableResponse<Response> response) {
-        return response.jsonPath().getList("name", String.class);
-    }
-
-    private List<Long> extractIds(ExtractableResponse<Response> response) {
-        return response.jsonPath().getList("id", Long.class);
+        var getAllResponse = StationRequestBuilder.requestGetAll();
+        assertThat(getAllResponse.extractIds()).doesNotContain(createdId);
     }
 }
