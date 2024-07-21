@@ -13,4 +13,6 @@ public class Constants {
     //station name
     public static final String GANGNAM_STATION = "강남역";
     public static final String SEOUL_STATION = "서울역";
+    public static final String PANGYO_STATION = "판교역";
+    public static final String YONGSAN_STATION = "용산역";
 }

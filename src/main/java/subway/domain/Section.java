@@ -11,6 +11,7 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"line_id", "order"})})
 public class Section {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,13 +21,15 @@ public class Section {
     @JoinColumn(name = "up_station_id", nullable = false)
     private Station upStation;
 
-
     @ManyToOne
     @JoinColumn(name = "down_station_id", nullable = false)
     private Station downStation;
 
     @Column(nullable = false)
     private Long distance;
+
+    @Column(nullable = false)
+    private Integer order = 1;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "line_id")

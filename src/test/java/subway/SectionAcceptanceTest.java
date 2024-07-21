@@ -2,7 +2,14 @@ package subway;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 import subway.test.AcceptanceTestBase;
+import subway.test.LineRequestBuilder;
+import subway.test.SectionRequestBuilder;
+import subway.test.StationRequestBuilder;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static subway.test.Constants.*;
 
 public class SectionAcceptanceTest extends AcceptanceTestBase {
 
@@ -13,6 +20,25 @@ public class SectionAcceptanceTest extends AcceptanceTestBase {
     @DisplayName("지하철 노선 구간을 등록한다")
     @Test
     void createSection() {
+        //given
+        var upStationId = new StationRequestBuilder.Builder().name(GANGNAM_STATION).build().requestCreate().extractId();
+        var downStationId = new StationRequestBuilder.Builder().name(SEOUL_STATION).build().requestCreate().extractId();
+        var subwayLine = new LineRequestBuilder.Builder().upStationId(upStationId).downStationId(downStationId).distance(10L).name(LINE_SINBUNDANG).color(COLOR_BLUE).build().requestCreate();
+        var newDownStationId = new StationRequestBuilder.Builder().name(PANGYO_STATION).build().requestCreate().extractId();
+
+        //when
+        var response = new SectionRequestBuilder.Builder()
+                .upStationId(downStationId)
+                .downStationId(newDownStationId)
+                .distance(10L)
+                .build()
+                .requestCreate(subwayLine.extractId());
+
+        //then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED.value());
+        //then
+        var changedLine = LineRequestBuilder.requestGet(subwayLine.extractId());
+        assertThat(changedLine.extractDownStationId()).isEqualTo(newDownStationId);
     }
 
     //given: 지하철 노선이 등록되어 있다
@@ -21,6 +47,23 @@ public class SectionAcceptanceTest extends AcceptanceTestBase {
     @DisplayName("구간의 상행역이 노선의 하행 종점역이 아닌 경우 구간을 등록할 수 없다")
     @Test
     void failToCreateSection() {
+        //given
+        var upStationId = new StationRequestBuilder.Builder().name(GANGNAM_STATION).build().requestCreate().extractId();
+        var downStationId = new StationRequestBuilder.Builder().name(SEOUL_STATION).build().requestCreate().extractId();
+        var subwayLine = new LineRequestBuilder.Builder().upStationId(upStationId).downStationId(downStationId).distance(10L).name(LINE_SINBUNDANG).color(COLOR_BLUE).build().requestCreate();
+        var otherStationId1 = new StationRequestBuilder.Builder().name(PANGYO_STATION).build().requestCreate().extractId();
+        var otherStationId2 = new StationRequestBuilder.Builder().name(YONGSAN_STATION).build().requestCreate().extractId();
+
+        //when
+        var response = new SectionRequestBuilder.Builder()
+                .upStationId(otherStationId1)
+                .downStationId(otherStationId2)
+                .distance(10L)
+                .build()
+                .requestCreate(subwayLine.extractId());
+
+        //then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     //given: 지하철 노선이 등록되어 있다
@@ -29,6 +72,31 @@ public class SectionAcceptanceTest extends AcceptanceTestBase {
     @DisplayName("구간의 하행역이 이미 노선에 등록된 경우 구간을 등록할 수 없다")
     @Test
     void failToCreateSection2() {
+        //given
+        var upStationId = new StationRequestBuilder.Builder().name(GANGNAM_STATION).build().requestCreate().extractId();
+        var downStationId = new StationRequestBuilder.Builder().name(SEOUL_STATION).build().requestCreate().extractId();
+        var subwayLine = new LineRequestBuilder.Builder().upStationId(upStationId).downStationId(downStationId).distance(10L).name(LINE_SINBUNDANG).color(COLOR_BLUE).build().requestCreate();
+        var newDownStationId = new StationRequestBuilder.Builder().name(PANGYO_STATION).build().requestCreate().extractId();
+        new SectionRequestBuilder.Builder()
+                .upStationId(downStationId)
+                .downStationId(newDownStationId)
+                .distance(10L)
+                .build()
+                .requestCreate(subwayLine.extractId());
+
+        //when
+        var response = new SectionRequestBuilder.Builder()
+                .upStationId(newDownStationId)
+                .downStationId(downStationId)
+                .distance(10L)
+                .build()
+                .requestCreate(subwayLine.extractId());
+
+        //then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED.value());
+        //then
+        var changedLine = LineRequestBuilder.requestGet(subwayLine.extractId());
+        assertThat(changedLine.extractDownStationId()).isEqualTo(newDownStationId);
     }
 
     //given: 구간이 2개 이상인 지하철 노선이 등록되어 있다

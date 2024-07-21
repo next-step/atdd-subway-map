@@ -20,13 +20,20 @@ public class LineResponseHelper {
         return this.response.jsonPath().getLong("id");
     }
 
-
     public String extractName() {
         return this.response.jsonPath().getString("name");
     }
 
     public String extractColor() {
         return this.response.jsonPath().getString("color");
+    }
+
+    public Long extractUpStationId() {
+        return this.response.jsonPath().getLong("upStationId");
+    }
+
+    public Long extractDownStationId() {
+        return this.response.jsonPath().getLong("downStationId");
     }
 
     public Integer getStatusCode() {

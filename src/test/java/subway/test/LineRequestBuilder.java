@@ -39,6 +39,17 @@ public class LineRequestBuilder {
         return new LineResponseHelper(response);
     }
 
+    public static LineResponseHelper requestGetWithSections(Long id) {
+        var response = RestAssured
+                .given()
+                .pathParam("id", id)
+                .when()
+                .get("/lines/{id}/sections")
+                .then()
+                .extract();
+        return new LineResponseHelper(response);
+    }
+
     public static LineResponseHelper requestDelete(Long id) {
         var response = RestAssured
                 .given()
@@ -125,6 +136,5 @@ public class LineRequestBuilder {
         public LineRequestBuilder build() {
             return new LineRequestBuilder(this);
         }
-
     }
 }
