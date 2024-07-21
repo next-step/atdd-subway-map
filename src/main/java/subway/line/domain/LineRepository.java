@@ -1,9 +1,13 @@
 package subway.line.domain;
 
-import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
+import subway.line.domain.entity.Line;
+import subway.line.exception.LineNotFoundException;
 
 public interface LineRepository extends JpaRepository<Line, Long> {
 
-    List<Line> findByName(String name);
+    default Line findByIdOrThrow(Long id) {
+        return findById(id)
+            .orElseThrow(() -> new LineNotFoundException(id));
+    }
 }

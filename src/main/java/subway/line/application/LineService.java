@@ -1,18 +1,16 @@
 package subway.line.application;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.line.application.dto.LineRequest;
 import subway.line.application.dto.LineResponse;
-import subway.line.domain.Line;
+import subway.line.domain.entity.Line;
 import subway.line.domain.LineRepository;
-import subway.line.exception.LineException;
-import subway.line.exception.LineExceptionType;
+import subway.line.domain.entity.LineSection;
+import subway.line.domain.entity.LineSections;
 import subway.station.application.dto.StationResponse;
 import subway.station.domain.Station;
 import subway.station.domain.StationRepository;
@@ -27,58 +25,49 @@ public class LineService {
 
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
-        Line line = lineRepository.save(
-            new Line(lineRequest.getName(), lineRequest.getColor(), lineRequest.getUpStationId(), lineRequest.getDownStationId(), lineRequest.getDistance()));
 
-        List<StationResponse> stations = getStationResponsesByStationIds(List.of(line.getUpStationId(), line.getDownStationId()));
+        Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor(), new LineSections()));
+        LineSection lineSection = new LineSection(line, stationRepository.findByIdOrThrow(lineRequest.getUpStationId()), stationRepository.findByIdOrThrow(lineRequest.getDownStationId()), lineRequest.getDistance());
 
-        return createLineResponse(line, stations);
+        line.getLineSections().addSection(lineSection);
+
+        return getLineResponseByLine(line);
     }
 
     public List<LineResponse> findAllLines() {
-        Map<String, List<Line>> groupedLines = lineRepository.findAll().stream()
-            .collect(Collectors.groupingBy(Line::getName));
+        List<Line> lines = lineRepository.findAll();
 
-        return groupedLines.values().stream()
-            .map(this::createGroupedLineResponse)
+        return lines.stream()
+            .map(this::getLineResponseByLine)
             .collect(Collectors.toList());
     }
 
     public LineResponse findLine(Long lineId) {
-        Line line = findLineById(lineId);
-        List<Line> relatedLines = lineRepository.findByName(line.getName());
+        Line line = lineRepository.findByIdOrThrow(lineId);
 
-        List<StationResponse> stations = getStationResponsesByStationIds(getStationIds(relatedLines));
-
-        return createLineResponse(line, stations);
+        return getLineResponseByLine(line);
     }
 
     @Transactional
     public void updateLine(Long lineId, LineRequest lineRequest) {
-        Line line = findLineById(lineId);
+        Line line = lineRepository.findByIdOrThrow(lineId);
         line.update(lineRequest.getName(), lineRequest.getColor());
     }
 
     @Transactional
     public void deleteLine(Long lineId) {
-        Line line = findLineById(lineId);
+        Line line = lineRepository.findByIdOrThrow(lineId);
         lineRepository.delete(line);
     }
 
-    private Line findLineById(Long lineId) {
-        return lineRepository.findById(lineId)
-            .orElseThrow(() -> new LineException(LineExceptionType.LINE_NOT_FOUND));
+    private LineResponse getLineResponseByLine(Line line) {
+        return createLineResponse(line, getStationResponsesByLine(line));
     }
 
-    private List<StationResponse> getStationResponsesByStationIds(Iterable<Long> stationIds) {
-        Map<String, Station> stationMap = stationRepository.findAllById(stationIds).stream()
-            .collect(Collectors.toMap(
-                Station::getName,
-                station -> station,
-                (existing, replacement) -> existing
-            ));
+    private List<StationResponse> getStationResponsesByLine(Line line) {
+        List<Station> stations = line.getLineSections().getStations();
 
-        return stationMap.values().stream()
+        return stations.stream()
             .map(station -> new StationResponse(station.getId(), station.getName()))
             .collect(Collectors.toList());
     }
@@ -92,15 +81,4 @@ public class LineService {
         );
     }
 
-    private LineResponse createGroupedLineResponse(List<Line> lines) {
-        List<Long> stationIds = getStationIds(lines);
-        return createLineResponse(lines.get(0), getStationResponsesByStationIds(stationIds));
-    }
-
-    private static List<Long> getStationIds(List<Line> lines) {
-        return lines.stream()
-            .flatMap(line -> Stream.of(line.getUpStationId(), line.getDownStationId()))
-            .distinct()
-            .collect(Collectors.toList());
-    }
 }
