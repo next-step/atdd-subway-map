@@ -1,10 +1,16 @@
 package subway.domain;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SubwayLine {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -13,12 +19,16 @@ public class SubwayLine {
     @Column(unique = true, nullable = false)
     private String name;
 
+    @Column(nullable = false)
     private String color;
 
+    @Column(nullable = false)
     private Long upStationId;
 
+    @Column(nullable = false)
     private Long downStationId;
-
+    
+    @Column(nullable = false)
     private Long distance;
 
     @OneToMany(mappedBy = "subwayLine")
@@ -32,36 +42,9 @@ public class SubwayLine {
         this.distance = distance;
     }
 
-    protected SubwayLine() {
-    }
-
     public void updateBasicInfo(String name, String color) {
         this.name = name;
         this.color = color;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getColor() {
-        return color;
-    }
-
-    public Long getUpStationId() {
-        return upStationId;
-    }
-
-    public Long getDownStationId() {
-        return downStationId;
-    }
-
-    public Long getDistance() {
-        return distance;
     }
 
     public List<Station> getStations() {

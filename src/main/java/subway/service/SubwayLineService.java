@@ -1,5 +1,6 @@
 package subway.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import subway.domain.SubwayLine;
 import subway.dto.SubwayLineRequest;
@@ -13,12 +14,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class SubwayLineService {
     private final SubwayLineRepository subwayLineRepository;
-
-    public SubwayLineService(SubwayLineRepository subwayLineRepository) {
-        this.subwayLineRepository = subwayLineRepository;
-    }
 
     @Transactional
     public SubwayLineResponse saveSubwayLine(SubwayLineRequest request) {

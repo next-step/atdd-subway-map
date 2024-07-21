@@ -1,5 +1,6 @@
 package subway.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,12 +13,9 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/lines")
+@RequiredArgsConstructor
 public class SubwayLineController {
     private final SubwayLineService subwayLineService;
-
-    public SubwayLineController(SubwayLineService subwayLineService) {
-        this.subwayLineService = subwayLineService;
-    }
 
     @PostMapping
     ResponseEntity<SubwayLineResponse> createSubwayLine(@RequestBody SubwayLineRequest request) {
