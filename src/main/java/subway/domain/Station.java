@@ -17,12 +17,7 @@ public class Station {
     @Column(length = 20, nullable = false)
     private String name;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "subway_line_id", nullable = false)
-    private SubwayLine subwayLine;
-
     public Station(String name) {
         this.name = name;
     }
-
 }

@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static subway.StationAcceptanceTest.GANGNAM_STATION;
+import static subway.StationAcceptanceTest.SEOUL_STATION;
 
 
 @DisplayName("지하철노선 관련 기능")
@@ -32,8 +34,10 @@ public class SubwayLineAcceptanceTest extends AcceptanceTestBase {
     @Test
     void createSubwayLine() {
         //when
-        var createdResponse = requestCreateSubwayLine(LINE_SINBUNDANG, COLOR_RED);
 
+        var upStationResponse = requestCreateStation(GANGNAM_STATION);
+        var downStationResponse = requestCreateStation(SEOUL_STATION);
+        var createdResponse = requestCreateSubwayLine(LINE_SINBUNDANG, COLOR_RED, extractId(upStationResponse), extractId(downStationResponse), 3L);
         //then
         assertThat(createdResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(extractName(createdResponse)).isEqualTo(LINE_SINBUNDANG);
@@ -49,9 +53,11 @@ public class SubwayLineAcceptanceTest extends AcceptanceTestBase {
     @Test
     void getAllSubwayLine() {
         //given
-        requestCreateSubwayLine(LINE_SINBUNDANG, COLOR_RED);
-        requestCreateSubwayLine(LINE_ONE, COLOR_RED);
-        requestCreateSubwayLine(LINE_TWO, COLOR_RED);
+        var upStationResponse = requestCreateStation(GANGNAM_STATION);
+        var downStationResponse = requestCreateStation(SEOUL_STATION);
+        requestCreateSubwayLine(LINE_SINBUNDANG, COLOR_RED, extractId(upStationResponse), extractId(downStationResponse), 3L);
+        requestCreateSubwayLine(LINE_ONE, COLOR_RED, extractId(upStationResponse), extractId(downStationResponse), 3L);
+        requestCreateSubwayLine(LINE_TWO, COLOR_RED, extractId(upStationResponse), extractId(downStationResponse), 3L);
 
         //when
         var getAllResponse = requestGetAllSubwayLine();
@@ -71,7 +77,9 @@ public class SubwayLineAcceptanceTest extends AcceptanceTestBase {
     @Test
     void getSubwayLine() {
         //given
-        var createdResponse = requestCreateSubwayLine(LINE_SINBUNDANG, COLOR_RED);
+        var upStationResponse = requestCreateStation(GANGNAM_STATION);
+        var downStationResponse = requestCreateStation(SEOUL_STATION);
+        var createdResponse = requestCreateSubwayLine(LINE_SINBUNDANG, COLOR_RED, extractId(upStationResponse), extractId(downStationResponse), 3L);
         var createdId = createdResponse.jsonPath().getLong("id");
 
         //when
@@ -91,7 +99,9 @@ public class SubwayLineAcceptanceTest extends AcceptanceTestBase {
     @Test
     void updateSubwayLine() {
         //given
-        var createdResponse = requestCreateSubwayLine(LINE_SINBUNDANG, COLOR_RED);
+        var upStationResponse = requestCreateStation(GANGNAM_STATION);
+        var downStationResponse = requestCreateStation(SEOUL_STATION);
+        var createdResponse = requestCreateSubwayLine(LINE_SINBUNDANG, COLOR_RED, extractId(upStationResponse), extractId(downStationResponse), 3L);
         var createdId = createdResponse.jsonPath().getLong("id");
 
         //when
@@ -114,7 +124,9 @@ public class SubwayLineAcceptanceTest extends AcceptanceTestBase {
     @Test
     void deleteSubwayLine() {
         //given
-        var createdResponse = requestCreateSubwayLine(LINE_SINBUNDANG, COLOR_RED);
+        var upStationResponse = requestCreateStation(GANGNAM_STATION);
+        var downStationResponse = requestCreateStation(SEOUL_STATION);
+        var createdResponse = requestCreateSubwayLine(LINE_SINBUNDANG, COLOR_RED, extractId(upStationResponse), extractId(downStationResponse), 3L);
         var createdId = createdResponse.jsonPath().getLong("id");
 
         //when
@@ -127,12 +139,12 @@ public class SubwayLineAcceptanceTest extends AcceptanceTestBase {
         assertThat(extractIds(getAllResponse)).doesNotContain(createdId);
     }
 
-    private ExtractableResponse<Response> requestCreateSubwayLine(String name, String color) {
+    private ExtractableResponse<Response> requestCreateSubwayLine(String name, String color, Long upStationId, Long downStationId, Long distance) {
         var body = Map.of("name", name,
                 "color", color,
-                "upStationId", 10L,
-                "downStationId", 1L,
-                "distance", 10
+                "upStationId", upStationId,
+                "downStationId", downStationId,
+                "distance", distance
         );
         var contentType = MediaType.APPLICATION_JSON_VALUE;
         var path = "/lines";
@@ -160,6 +172,19 @@ public class SubwayLineAcceptanceTest extends AcceptanceTestBase {
                 .when()
                 .put("/lines/{id}")
                 .then()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> requestCreateStation(String name) {
+        var body = Map.of("name", name);
+        var contentType = MediaType.APPLICATION_JSON_VALUE;
+        var path = "/stations";
+
+        return RestAssured.given().log().all()
+                .body(body)
+                .contentType(contentType)
+                .when().post(path)
+                .then().log().all()
                 .extract();
     }
 
@@ -200,5 +225,9 @@ public class SubwayLineAcceptanceTest extends AcceptanceTestBase {
 
     private List<Long> extractIds(ExtractableResponse<Response> response) {
         return response.jsonPath().getList("id", Long.class);
+    }
+
+    private Long extractId(ExtractableResponse<Response> response) {
+        return response.jsonPath().getLong("id");
     }
 }

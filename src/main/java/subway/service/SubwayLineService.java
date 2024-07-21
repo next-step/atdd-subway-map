@@ -2,6 +2,7 @@ package subway.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import subway.domain.Section;
 import subway.domain.SubwayLine;
 import subway.dto.SubwayLineRequest;
 import subway.dto.SubwayLineResponse;
@@ -17,10 +18,14 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class SubwayLineService {
     private final SubwayLineRepository subwayLineRepository;
+    private final StationService stationService;
 
     @Transactional
     public SubwayLineResponse saveSubwayLine(SubwayLineRequest request) {
-        var subwayLine = subwayLineRepository.save(request.toSubwayLine());
+        var upStation = stationService.findStationOrElseThrow(request.getUpStationId());
+        var downStation = stationService.findStationOrElseThrow(request.getDownStationId());
+        var section = Section.of(request.getDistance(), upStation, downStation);
+        var subwayLine = subwayLineRepository.save(SubwayLine.of(request.getName(), request.getColor(), section));
         return SubwayLineResponse.from(subwayLine);
     }
 

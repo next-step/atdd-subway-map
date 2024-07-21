@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Entity
 @Getter
@@ -22,24 +24,36 @@ public class SubwayLine {
     @Column(nullable = false)
     private String color;
 
-    @Column(nullable = false)
-    private Long upStationId;
+    private Long distance = 0L;
 
-    @Column(nullable = false)
-    private Long downStationId;
-    
-    @Column(nullable = false)
-    private Long distance;
+    @ManyToOne
+    @JoinColumn(name = "up_station_id", nullable = false)
+    private Station upStation;
 
-    @OneToMany(mappedBy = "subwayLine")
-    private List<Station> stations = new ArrayList<>();
+    @ManyToOne
+    @JoinColumn(name = "down_station_id", nullable = false)
+    private Station downStation;
 
-    public SubwayLine(String name, String color, Long upStationId, Long downStationId, Long distance) {
+    @OneToMany(mappedBy = "subwayLine", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Section> sections = new ArrayList<>();
+
+    private SubwayLine(String name, String color) {
         this.name = name;
         this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
-        this.distance = distance;
+    }
+
+    public static SubwayLine of(String name, String color, Section section) {
+        var subwayLine = new SubwayLine(name, color);
+        subwayLine.addFirstSection(section);
+        return subwayLine;
+    }
+
+    public void addFirstSection(Section section) {
+        this.distance = section.getDistance();
+        this.upStation = section.getUpStation();
+        this.downStation = section.getDownStation();
+        this.sections.add(section);
+        section.assignSubwayLine(this);
     }
 
     public void updateBasicInfo(String name, String color) {
@@ -47,7 +61,20 @@ public class SubwayLine {
         this.color = color;
     }
 
+    public List<Station> getNonEndStations() {
+        return getStations()
+                .stream()
+                .filter(station -> !station.equals(upStation) && !station.equals(downStation))
+                .collect(Collectors.toList());
+    }
+
     public List<Station> getStations() {
-        return new ArrayList<>(this.stations);
+        return Stream.concat(
+                        Stream.of(upStation, downStation),
+                        sections.stream()
+                                .flatMap(section -> section.getStations().stream())
+                )
+                .distinct()
+                .collect(Collectors.toList());
     }
 }
