@@ -23,4 +23,10 @@ public class SectionService {
         subwayLine.addSection(section);
         return new SectionResponse(section.getId());
     }
+
+    @Transactional
+    public void delete(Long lineId, Long stationId) {
+        var subwayLine = subwayLineService.findSubwayLineOrElseThrow(lineId);
+        subwayLine.removeStation(stationId);
+    }
 }

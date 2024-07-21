@@ -19,4 +19,10 @@ public class SectionController {
         var response = sectionService.save(lineId, request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
+
+    @DeleteMapping
+    ResponseEntity<Void> deleteSection(@PathVariable Long lineId, Long stationId) {
+        sectionService.delete(lineId, stationId);
+        return ResponseEntity.noContent().build();
+    }
 }

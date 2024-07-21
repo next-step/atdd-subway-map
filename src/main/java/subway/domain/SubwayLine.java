@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -75,8 +76,7 @@ public class SubwayLine {
             return false;
         }
         var sectionDownStationId = section.getDownStation().getId();
-        return this.getStations().stream()
-                .noneMatch(s -> Objects.equals(sectionDownStationId, s.getId()));
+        return !this.hasStation(sectionDownStationId);
     }
 
 
@@ -85,11 +85,23 @@ public class SubwayLine {
         this.color = color;
     }
 
-    public List<Station> getNonEndStations() {
-        return getStations()
+    public void removeStation(Long stationId) {
+        if (!canRemove(stationId)) throw new UnsupportedOperationException();
+        this.sections.sort(Comparator.comparingInt(Section::getOrder));
+        var removedSection = this.sections.remove(this.sections.size() - 1);
+        this.downStation = this.sections.get(this.sections.size() - 1).getDownStation();
+        distance -= removedSection.getDistance();
+    }
+
+    private boolean canRemove(Long stationId) {
+        if (this.sections.size() < 2) return false;
+        return Objects.equals(stationId, this.downStation.getId());
+    }
+
+    private boolean hasStation(Long stationId) {
+        return this.getStations()
                 .stream()
-                .filter(station -> !station.equals(upStation) && !station.equals(downStation))
-                .collect(Collectors.toList());
+                .anyMatch(s -> Objects.equals(stationId, s.getId()));
     }
 
     public List<Station> getStations() {

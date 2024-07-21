@@ -122,7 +122,9 @@ public class SectionAcceptanceTest extends AcceptanceTestBase {
         var response = SectionRequestBuilder.requestDelete(subwayLine.extractId(), newDownStationId);
 
         //then
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        //then
         assertThat(LineRequestBuilder.requestGet(subwayLine.extractId()).extractDownStationId()
         ).isNotEqualTo(newDownStationId);
     }
