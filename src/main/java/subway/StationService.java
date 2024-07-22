@@ -32,6 +32,10 @@ public class StationService {
         stationRepository.deleteById(id);
     }
 
+    public Station findStationById(Long id) {
+        return stationRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 역이 존재하지 않습니다."));
+    }
+
     private StationResponse createStationResponse(Station station) {
         return new StationResponse(
                 station.getId(),
