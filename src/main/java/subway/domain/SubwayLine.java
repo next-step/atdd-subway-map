@@ -50,7 +50,7 @@ public class SubwayLine {
         return subwayLine;
     }
 
-    public void addFirstSection(Section section) {
+    private void addFirstSection(Section section) {
         this.distance = section.getDistance();
         this.upStation = section.getUpStation();
         this.downStation = section.getDownStation();

@@ -1,17 +1,31 @@
 package subway;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import subway.test.AcceptanceTestBase;
-import subway.test.LineRequestBuilder;
-import subway.test.SectionRequestBuilder;
-import subway.test.StationRequestBuilder;
+import subway.test.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.test.Constants.*;
+import static subway.test.Constants.COLOR_BLUE;
+import static subway.test.Constants.LINE_SINBUNDANG;
 
 public class SectionAcceptanceTest extends AcceptanceTestBase {
+    LineRequestBuilder.Builder defaultLineBuilder;
+    SectionRequestBuilder.Builder defaultSectionBuilder;
+
+    @BeforeEach
+    void beforeEach() {
+        defaultLineBuilder = new LineRequestBuilder.Builder()
+                .distance(10L)
+                .name(LINE_SINBUNDANG)
+                .color(COLOR_BLUE);
+
+        defaultSectionBuilder = new SectionRequestBuilder.Builder()
+                .distance(10L);
+
+    }
+
 
     //given: 지하철 노선이 등록되어 있다
     //when: 노선의 하행 종점역을 상행역으로 하는 구간을 등록한다
@@ -21,24 +35,23 @@ public class SectionAcceptanceTest extends AcceptanceTestBase {
     @Test
     void createSection() {
         //given
-        var upStationId = new StationRequestBuilder.Builder().name(GANGNAM_STATION).build().requestCreate().extractId();
-        var downStationId = new StationRequestBuilder.Builder().name(SEOUL_STATION).build().requestCreate().extractId();
-        var subwayLine = new LineRequestBuilder.Builder().upStationId(upStationId).downStationId(downStationId).distance(10L).name(LINE_SINBUNDANG).color(COLOR_BLUE).build().requestCreate();
-        var newDownStationId = new StationRequestBuilder.Builder().name(PANGYO_STATION).build().requestCreate().extractId();
+        var data = createLineWithOneSection();
+        var newDownStationId = createStation();
 
         //when
-        var response = new SectionRequestBuilder.Builder()
-                .upStationId(downStationId)
+        var response = defaultSectionBuilder
+                .upStationId(data.downStationId)
                 .downStationId(newDownStationId)
-                .distance(10L)
                 .build()
-                .requestCreate(subwayLine.extractId());
+                .requestCreate(data.subwayLineId);
 
         //then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED.value());
         //then
-        var changedLine = LineRequestBuilder.requestGet(subwayLine.extractId());
-        assertThat(changedLine.extractDownStationId()).isEqualTo(newDownStationId);
+        var changedDownStationId = LineRequestBuilder
+                .requestGet(data.subwayLineId)
+                .extractDownStationId();
+        assertThat(changedDownStationId).isEqualTo(newDownStationId);
     }
 
     //given: 지하철 노선이 등록되어 있다
@@ -48,19 +61,15 @@ public class SectionAcceptanceTest extends AcceptanceTestBase {
     @Test
     void failToCreateSection() {
         //given
-        var upStationId = new StationRequestBuilder.Builder().name(GANGNAM_STATION).build().requestCreate().extractId();
-        var downStationId = new StationRequestBuilder.Builder().name(SEOUL_STATION).build().requestCreate().extractId();
-        var subwayLine = new LineRequestBuilder.Builder().upStationId(upStationId).downStationId(downStationId).distance(10L).name(LINE_SINBUNDANG).color(COLOR_BLUE).build().requestCreate();
-        var otherStationId1 = new StationRequestBuilder.Builder().name(PANGYO_STATION).build().requestCreate().extractId();
-        var otherStationId2 = new StationRequestBuilder.Builder().name(YONGSAN_STATION).build().requestCreate().extractId();
+        var data = createLineWithTwoSection();
+        var newDownStationId = createStation();
 
         //when
-        var response = new SectionRequestBuilder.Builder()
-                .upStationId(otherStationId1)
-                .downStationId(otherStationId2)
-                .distance(10L)
+        var response = defaultSectionBuilder
+                .upStationId(data.middleStationId)
+                .downStationId(newDownStationId)
                 .build()
-                .requestCreate(subwayLine.extractId());
+                .requestCreate(data.subwayLineId);
 
         //then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -73,30 +82,17 @@ public class SectionAcceptanceTest extends AcceptanceTestBase {
     @Test
     void failToCreateSection2() {
         //given
-        var upStationId = new StationRequestBuilder.Builder().name(GANGNAM_STATION).build().requestCreate().extractId();
-        var downStationId = new StationRequestBuilder.Builder().name(SEOUL_STATION).build().requestCreate().extractId();
-        var subwayLine = new LineRequestBuilder.Builder().upStationId(upStationId).downStationId(downStationId).distance(10L).name(LINE_SINBUNDANG).color(COLOR_BLUE).build().requestCreate();
-        var newDownStationId = new StationRequestBuilder.Builder().name(PANGYO_STATION).build().requestCreate().extractId();
-        new SectionRequestBuilder.Builder()
-                .upStationId(downStationId)
-                .downStationId(newDownStationId)
-                .distance(10L)
-                .build()
-                .requestCreate(subwayLine.extractId());
+        var data = createLineWithTwoSection();
 
         //when
-        var response = new SectionRequestBuilder.Builder()
-                .upStationId(newDownStationId)
-                .downStationId(downStationId)
-                .distance(10L)
+        var response = defaultSectionBuilder
+                .upStationId(data.downStationId)
+                .downStationId(data.middleStationId)
                 .build()
-                .requestCreate(subwayLine.extractId());
+                .requestCreate(data.subwayLineId);
 
         //then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        //then
-        var changedLine = LineRequestBuilder.requestGet(subwayLine.extractId());
-        assertThat(changedLine.extractDownStationId()).isEqualTo(newDownStationId);
     }
 
     //given: 구간이 2개 이상인 지하철 노선이 등록되어 있다
@@ -107,26 +103,16 @@ public class SectionAcceptanceTest extends AcceptanceTestBase {
     @Test
     void deleteSection() {
         //given
-        var upStationId = new StationRequestBuilder.Builder().name(GANGNAM_STATION).build().requestCreate().extractId();
-        var downStationId = new StationRequestBuilder.Builder().name(SEOUL_STATION).build().requestCreate().extractId();
-        var subwayLine = new LineRequestBuilder.Builder().upStationId(upStationId).downStationId(downStationId).distance(10L).name(LINE_SINBUNDANG).color(COLOR_BLUE).build().requestCreate();
-        var newDownStationId = new StationRequestBuilder.Builder().name(PANGYO_STATION).build().requestCreate().extractId();
-        new SectionRequestBuilder.Builder()
-                .upStationId(downStationId)
-                .downStationId(newDownStationId)
-                .distance(10L)
-                .build()
-                .requestCreate(subwayLine.extractId());
+        var data = createLineWithTwoSection();
 
         //when
-        var response = SectionRequestBuilder.requestDelete(subwayLine.extractId(), newDownStationId);
-
+        var response = SectionRequestBuilder.requestDelete(data.subwayLineId, data.downStationId);
         //then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         //then
-        assertThat(LineRequestBuilder.requestGet(subwayLine.extractId()).extractDownStationId()
-        ).isNotEqualTo(newDownStationId);
+        var changedDownStationId = LineRequestBuilder.requestGet(data.subwayLineId).extractDownStationId();
+        assertThat(changedDownStationId).isNotEqualTo(data.downStationId);
     }
 
     //given: 구간이 2개 이상인 지하철 노선이 등록되어 있다
@@ -136,19 +122,10 @@ public class SectionAcceptanceTest extends AcceptanceTestBase {
     @Test
     void failToDeleteSection() {
         //given
-        var upStationId = new StationRequestBuilder.Builder().name(GANGNAM_STATION).build().requestCreate().extractId();
-        var downStationId = new StationRequestBuilder.Builder().name(SEOUL_STATION).build().requestCreate().extractId();
-        var subwayLine = new LineRequestBuilder.Builder().upStationId(upStationId).downStationId(downStationId).distance(10L).name(LINE_SINBUNDANG).color(COLOR_BLUE).build().requestCreate();
-        var newDownStationId = new StationRequestBuilder.Builder().name(PANGYO_STATION).build().requestCreate().extractId();
-        new SectionRequestBuilder.Builder()
-                .upStationId(downStationId)
-                .downStationId(newDownStationId)
-                .distance(10L)
-                .build()
-                .requestCreate(subwayLine.extractId());
+        var data = createLineWithTwoSection();
 
         //when
-        var response = SectionRequestBuilder.requestDelete(subwayLine.extractId(), downStationId);
+        var response = SectionRequestBuilder.requestDelete(data.subwayLineId, data.middleStationId);
 
         //then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -161,14 +138,66 @@ public class SectionAcceptanceTest extends AcceptanceTestBase {
     @Test
     void failToDeleteSection2() {
         //given
-        var upStationId = new StationRequestBuilder.Builder().name(GANGNAM_STATION).build().requestCreate().extractId();
-        var downStationId = new StationRequestBuilder.Builder().name(SEOUL_STATION).build().requestCreate().extractId();
-        var subwayLine = new LineRequestBuilder.Builder().upStationId(upStationId).downStationId(downStationId).distance(10L).name(LINE_SINBUNDANG).color(COLOR_BLUE).build().requestCreate();
+        var data = createLineWithOneSection();
 
         //when
-        var response = SectionRequestBuilder.requestDelete(subwayLine.extractId(), downStationId);
+        var response = SectionRequestBuilder.requestDelete(data.subwayLineId, data.downStationId);
 
         //then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    private Data createLineWithOneSection() {
+        var upStationId = createStation();
+        var downStationId = createStation();
+        var subwayLineId = defaultLineBuilder
+                .upStationId(upStationId)
+                .downStationId(downStationId)
+                .build()
+                .requestCreate()
+                .extractId();
+        return new Data(upStationId, downStationId, subwayLineId);
+    }
+
+    private Data createLineWithTwoSection() {
+        var upStationId = createStation();
+        var downStationId = createStation();
+        var middleStationId = createStation();
+        var subwayLineId = defaultLineBuilder
+                .upStationId(upStationId)
+                .downStationId(middleStationId)
+                .build()
+                .requestCreate()
+                .extractId();
+
+        defaultSectionBuilder
+                .upStationId(middleStationId)
+                .downStationId(downStationId)
+                .build()
+                .requestCreate(subwayLineId);
+
+        return new Data(upStationId, downStationId, middleStationId, subwayLineId);
+    }
+
+    private Long createStation() {
+        return new StationRequestBuilder.Builder().name(RandomGenerator.generateString(5)).build().requestCreate().extractId();
+    }
+
+    class Data {
+        Long upStationId;
+        Long downStationId;
+        Long subwayLineId;
+        Long middleStationId;
+
+        public Data(Long upStationId, Long downStationId, Long middleStationId, Long subwayLineId) {
+            this(upStationId, downStationId, subwayLineId);
+            this.middleStationId = middleStationId;
+        }
+
+        public Data(Long upStationId, Long downStationId, Long subwayLineId) {
+            this.upStationId = upStationId;
+            this.downStationId = downStationId;
+            this.subwayLineId = subwayLineId;
+        }
     }
 }
