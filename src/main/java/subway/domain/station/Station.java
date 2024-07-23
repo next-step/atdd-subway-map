@@ -1,6 +1,10 @@
-package subway.station;
+package subway.domain.station;
+
+import subway.domain.section.Section;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Station {

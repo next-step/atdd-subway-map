@@ -1,4 +1,4 @@
-package subway;
+package subway.station;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import subway.util.TestUtil;
 
 import java.util.HashMap;
 import java.util.List;
@@ -30,7 +31,7 @@ public class StationAcceptanceTest {
         Map<String, String> params = new HashMap<>();
         params.put("name", "강남역");
 
-        Response response = createStation("강남역");
+        Response response = TestUtil.createStation("강남역");
 
 
         // then
@@ -55,8 +56,8 @@ public class StationAcceptanceTest {
     void showStation() {
         // given
 
-        createStation("서울역");
-        createStation("수원역");
+        TestUtil.createStation("서울역");
+        TestUtil.createStation("수원역");
 
         // when
         List<String> stationNames =
@@ -108,4 +109,5 @@ public class StationAcceptanceTest {
                         .extract().jsonPath().getList("name", String.class);
         assertThat(stationNames).doesNotContain("정자역");
     }
+
 }

@@ -1,16 +1,16 @@
-package subway.line;
+package subway.dto.line;
 
 public class LineRequest {
     private String name;
     private String color;
-    private int upStationId;
-    private int downStationId;
-    private int distance;
+    private Long upStationId;
+    private Long downStationId;
+    private Long distance;
 
     public LineRequest() {
     }
 
-    public LineRequest(String name, String color, int upStationId, int downStationId, int distance) {
+    public LineRequest(String name, String color, Long upStationId, Long downStationId, Long distance) {
         this.name = name;
         this.color = color;
         this.upStationId = upStationId;
@@ -27,19 +27,16 @@ public class LineRequest {
     }
 
     public Long getUpStationId() {
-        return (long) upStationId;
+        return upStationId;
     }
 
     public Long getDownStationId() {
         return (long) downStationId;
     }
 
-    public int getDistance() {
+    public Long getDistance() {
         return distance;
     }
 
-    public Line getLine(){
-        return new Line(name, color, getUpStationId(),
-                getDownStationId(), distance);
-    }
+
 }
