@@ -5,11 +5,9 @@ import io.restassured.response.Response;
 
 import java.util.List;
 
-public class LineResponseHelper {
-    private final ExtractableResponse<Response> response;
-
+public class LineResponseHelper extends ResponseHelper {
     public LineResponseHelper(ExtractableResponse<Response> response) {
-        this.response = response;
+        super(response);
     }
 
     public List<Long> extractIds() {

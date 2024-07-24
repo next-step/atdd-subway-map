@@ -3,12 +3,12 @@ package subway;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
 import subway.test.AcceptanceTestBase;
 import subway.test.LineRequestBuilder;
 import subway.test.StationRequestBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static subway.test.Constants.*;
 
 
@@ -49,7 +49,7 @@ public class SubwayLineAcceptanceTest extends AcceptanceTestBase {
         var createdResponse = defaultBuilder.build().requestCreate();
 
         //then
-        assertThat(createdResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertTrue(createdResponse.isCreated());
         assertThat(createdResponse.extractName()).isEqualTo(LINE_SINBUNDANG);
     }
 
@@ -71,7 +71,7 @@ public class SubwayLineAcceptanceTest extends AcceptanceTestBase {
         var getAllResponse = LineRequestBuilder.requestGetAll();
 
         //then
-        assertThat(getAllResponse.getStatusCode()).isEqualTo(HttpStatus.OK.value());
+        assertTrue(getAllResponse.isOk());
         assertThat(getAllResponse.extractIds().size()).isEqualTo(3);
     }
 
@@ -92,7 +92,7 @@ public class SubwayLineAcceptanceTest extends AcceptanceTestBase {
         var getResponse = LineRequestBuilder.requestGet(createdId);
 
         //then
-        assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK.value());
+        assertTrue(getResponse.isOk());
         assertThat(getResponse.extractName()).isEqualTo(LINE_SINBUNDANG);
     }
 
@@ -116,7 +116,7 @@ public class SubwayLineAcceptanceTest extends AcceptanceTestBase {
                 .requestUpdate(createdId);
 
         //then
-        assertThat(updatedResponse.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertTrue(updatedResponse.isNoContent());
 
         var getResponse = LineRequestBuilder.requestGet(createdId);
         assertThat(getResponse.extractName()).isEqualTo(LINE_ONE);
@@ -139,7 +139,7 @@ public class SubwayLineAcceptanceTest extends AcceptanceTestBase {
         var deletedResponse = LineRequestBuilder.requestDelete(createdId);
 
         //then
-        assertThat(deletedResponse.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertTrue(deletedResponse.isNoContent());
 
         var getAllResponse = LineRequestBuilder.requestGetAll();
         assertThat(getAllResponse.extractIds()).doesNotContain(createdId);

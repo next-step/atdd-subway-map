@@ -5,11 +5,9 @@ import io.restassured.response.Response;
 
 import java.util.List;
 
-public class StationResponseHelper {
-    private final ExtractableResponse<Response> response;
-
+public class StationResponseHelper extends ResponseHelper {
     public StationResponseHelper(ExtractableResponse<Response> response) {
-        this.response = response;
+        super(response);
     }
 
     public Long extractId() {
@@ -22,9 +20,5 @@ public class StationResponseHelper {
 
     public List<String> extractNames() {
         return this.response.jsonPath().getList("name", String.class);
-    }
-
-    public Integer getStatusCode() {
-        return this.response.statusCode();
     }
 }

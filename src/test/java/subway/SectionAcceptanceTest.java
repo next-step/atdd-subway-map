@@ -3,10 +3,10 @@ package subway;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
 import subway.test.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static subway.test.Constants.COLOR_BLUE;
 import static subway.test.Constants.LINE_SINBUNDANG;
 
@@ -46,7 +46,7 @@ public class SectionAcceptanceTest extends AcceptanceTestBase {
                 .requestCreate(data.subwayLineId);
 
         //then
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertTrue(response.isCreated());
         //then
         var changedDownStationId = LineRequestBuilder
                 .requestGet(data.subwayLineId)
@@ -72,7 +72,7 @@ public class SectionAcceptanceTest extends AcceptanceTestBase {
                 .requestCreate(data.subwayLineId);
 
         //then
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertTrue(response.isBadRequest());
     }
 
     //given: 지하철 노선이 등록되어 있다
@@ -92,7 +92,7 @@ public class SectionAcceptanceTest extends AcceptanceTestBase {
                 .requestCreate(data.subwayLineId);
 
         //then
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertTrue(response.isBadRequest());
     }
 
     //given: 구간이 2개 이상인 지하철 노선이 등록되어 있다
@@ -108,7 +108,7 @@ public class SectionAcceptanceTest extends AcceptanceTestBase {
         //when
         var response = SectionRequestBuilder.requestDelete(data.subwayLineId, data.downStationId);
         //then
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertTrue(response.isNoContent());
 
         //then
         var changedDownStationId = LineRequestBuilder.requestGet(data.subwayLineId).extractDownStationId();
@@ -128,7 +128,7 @@ public class SectionAcceptanceTest extends AcceptanceTestBase {
         var response = SectionRequestBuilder.requestDelete(data.subwayLineId, data.middleStationId);
 
         //then
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertTrue(response.isBadRequest());
     }
 
     //given: 구간이 1개인 지하철 노선이 등록되어있다
@@ -144,7 +144,7 @@ public class SectionAcceptanceTest extends AcceptanceTestBase {
         var response = SectionRequestBuilder.requestDelete(data.subwayLineId, data.downStationId);
 
         //then
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertTrue(response.isBadRequest());
     }
 
     private Data createLineWithOneSection() {

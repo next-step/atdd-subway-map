@@ -3,11 +3,11 @@ package subway;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
 import subway.test.AcceptanceTestBase;
 import subway.test.StationRequestBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static subway.test.Constants.GANGNAM_STATION;
 import static subway.test.Constants.SEOUL_STATION;
 
@@ -32,7 +32,7 @@ public class StationAcceptanceTest extends AcceptanceTestBase {
         // when
         var createResponse = defaultBuilder.name(GANGNAM_STATION).build().requestCreate();
         // then
-        assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertTrue(createResponse.isCreated());
 
         // then
         var getAllResponse = StationRequestBuilder.requestGetAll();
@@ -55,7 +55,7 @@ public class StationAcceptanceTest extends AcceptanceTestBase {
         var getAllResponse = StationRequestBuilder.requestGetAll();
 
         //then
-        assertThat(getAllResponse.getStatusCode()).isEqualTo(HttpStatus.OK.value());
+        assertTrue(getAllResponse.isOk());
         assertThat(getAllResponse.extractIds().size()).isEqualTo(2);
     }
 
