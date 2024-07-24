@@ -7,9 +7,23 @@ public class ErrorResponse {
     private String code;
     private String description;
 
+    public ErrorResponse () {}
+
     public ErrorResponse(ErrorCode collectedErrorResponse) {
         this.status = collectedErrorResponse.getStatus();
         this.code = collectedErrorResponse.getCode();
         this.description = collectedErrorResponse.getDescription();
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public String getDescription() {
+        return description;
     }
 }

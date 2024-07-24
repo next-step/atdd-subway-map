@@ -8,7 +8,8 @@ public class LinesResponse {
 
     private List<LineResponse> lineResponseList = new ArrayList<>();
 
-    public LinesResponse() {}
+    public LinesResponse() {
+    }
 
     public LinesResponse(List<LineResponse> lineResponse) {
         this.lineResponseList = lineResponse;
@@ -24,8 +25,12 @@ public class LinesResponse {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
         LinesResponse that = (LinesResponse) obj;
         return Objects.equals(lineResponseList, that.lineResponseList);
     }

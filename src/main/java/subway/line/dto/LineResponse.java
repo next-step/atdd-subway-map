@@ -31,8 +31,8 @@ public class LineResponse {
         this.distance = distance;
     }
 
-    public void addCreateStationResponses(List<StationResponse> stationResponses) {
-        for(StationResponse stationResponse : stationResponses) {
+    public void addStationResponses(List<StationResponse> stationResponses) {
+        for (StationResponse stationResponse : stationResponses) {
             stations.add(stationResponse);
         }
     }
@@ -50,14 +50,16 @@ public class LineResponse {
     }
 
     public Long getDistance() {
-        return this.distance;
+        return distance;
     }
 
     public List<StationResponse> getStations() {
         return this.stations;
     }
 
-    public void setId(Long id) { this.id = id; }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     @Override
     public boolean equals(Object obj) {
@@ -75,5 +77,4 @@ public class LineResponse {
     public int hashCode() {
         return Objects.hash(id, name, color, distance, stations);
     }
-
 }

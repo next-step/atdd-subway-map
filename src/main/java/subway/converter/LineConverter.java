@@ -3,7 +3,6 @@ package subway.converter;
 import subway.line.dto.LineResponse;
 import subway.line.entity.Line;
 import subway.station.dto.StationResponse;
-import subway.station.entity.Station;
 
 import java.util.List;
 
@@ -15,22 +14,29 @@ public class LineConverter {
         throw new UnsupportedOperationException("Utility class");
     }
 
-    public static LineResponse convertToLineResponseByLineAndStations(Line line, List<StationResponse> stationResponses) {
-        LineResponse lineResponse = new LineResponse(line.getId(), line.getName(), line.getColor(), line.getDistance());
-        lineResponse.addCreateStationResponses(stationResponses);
-
-        return lineResponse;
-    }
-
     public static LineResponse convertToLineResponseByLine(final Line line) {
         List<StationResponse> stationResponses = line.getSections().getSections().stream()
-                .map(section -> {
-                    Station station = section.getStation();
-                    return new StationResponse(station.getId(), station.getName());
-                }).collect(toList());
+                .flatMap(section -> section.getStations().stream())
+                .map(station -> new StationResponse(station.getId(), station.getName()))
+                .distinct()
+                .collect(toList());
 
         return convertToLineResponseByLineAndStations(line, stationResponses);
     }
 
+    public static LineResponse convertToLineResponseByLineAndStations(Line line, List<StationResponse> stationResponses) {
+        LineResponse lineResponse = new LineResponse(line.getId(), line.getName(), line.getColor(), line.getDistance());
+        lineResponse.addStationResponses(stationResponses);
+
+        return lineResponse;
+    }
+
+    public static List<Long> convertToStationIds(Line line) {
+        return line.getSections().getSections().stream()
+                .flatMap(sectionValue -> sectionValue.getStations().stream())
+                .map(station -> station.getId())
+                .distinct()
+                .collect(toList());
+    }
 
 }
