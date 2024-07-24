@@ -27,6 +27,6 @@ public class SectionService {
     @Transactional
     public void delete(Long lineId, Long stationId) {
         var subwayLine = subwayLineService.findSubwayLineOrElseThrow(lineId);
-        subwayLine.removeStation(stationId);
+        subwayLine.removeSection(stationId);
     }
 }

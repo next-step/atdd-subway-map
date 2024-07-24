@@ -5,12 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Entity
 @Getter
@@ -36,8 +31,8 @@ public class SubwayLine {
     @JoinColumn(name = "down_station_id", nullable = false)
     private Station downStation;
 
-    @OneToMany(mappedBy = "subwayLine", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Section> sections = new ArrayList<>();
+    @Embedded
+    private Sections sections = new Sections();
 
     private SubwayLine(String name, String color) {
         this.name = name;
@@ -51,66 +46,29 @@ public class SubwayLine {
     }
 
     private void addFirstSection(Section section) {
-        this.distance = section.getDistance();
         this.upStation = section.getUpStation();
-        this.downStation = section.getDownStation();
-        this.sections.add(section);
-        section.assignSubwayLine(this);
+        addSection(section);
     }
 
     public void addSection(Section section) {
-        if (!canAddSection(section)) {
-            throw new UnsupportedOperationException();
-        }
         this.distance = this.distance + section.getDistance();
         this.downStation = section.getDownStation();
-        this.sections.add(section);
-        section.assignOrder(this.sections.size());
+        this.sections.addSection(section);
         section.assignSubwayLine(this);
     }
-
-
-    private boolean canAddSection(Section section) {
-        var sectionUpStationId = section.getUpStation().getId();
-        if (!Objects.equals(sectionUpStationId, this.downStation.getId())) {
-            return false;
-        }
-        var sectionDownStationId = section.getDownStation().getId();
-        return !this.hasStation(sectionDownStationId);
-    }
-
 
     public void updateBasicInfo(String name, String color) {
         this.name = name;
         this.color = color;
     }
 
-    public void removeStation(Long stationId) {
-        if (!canRemove(stationId)) throw new UnsupportedOperationException();
-        this.sections.sort(Comparator.comparingInt(Section::getOrder));
-        var removedSection = this.sections.remove(this.sections.size() - 1);
-        this.downStation = this.sections.get(this.sections.size() - 1).getDownStation();
+    public void removeSection(Long stationId) {
+        var removedSection = sections.removeSection(stationId);
+        this.downStation = removedSection.getUpStation();
         distance -= removedSection.getDistance();
     }
 
-    private boolean canRemove(Long stationId) {
-        if (this.sections.size() < 2) return false;
-        return Objects.equals(stationId, this.downStation.getId());
-    }
-
-    private boolean hasStation(Long stationId) {
-        return this.getStations()
-                .stream()
-                .anyMatch(s -> Objects.equals(stationId, s.getId()));
-    }
-
     public List<Station> getStations() {
-        return Stream.concat(
-                        Stream.of(upStation, downStation),
-                        sections.stream()
-                                .flatMap(section -> section.getStations().stream())
-                )
-                .distinct()
-                .collect(Collectors.toList());
+        return this.sections.getStations();
     }
 }

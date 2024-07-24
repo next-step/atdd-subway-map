@@ -5,8 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.Arrays;
-import java.util.List;
 
 @Entity
 @Getter
@@ -28,9 +26,6 @@ public class Section {
     @Column(nullable = false)
     private Long distance;
 
-    @Column(name = "section_order", nullable = false)
-    private Integer order = 1;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "line_id")
     private SubwayLine subwayLine;
@@ -49,11 +44,19 @@ public class Section {
         this.subwayLine = subwayLine;
     }
 
-    public void assignOrder(Integer order) {
-        this.order = order;
+    public boolean isUpStationId(Long id) {
+        return this.upStation.getId().equals(id);
     }
 
-    public List<Station> getStations() {
-        return Arrays.asList(upStation, downStation);
+    public boolean isDownStationId(Long id) {
+        return this.downStation.getId().equals(id);
+    }
+
+    public Long getUpStationId() {
+        return this.upStation.getId();
+    }
+
+    public Long getDownStationId() {
+        return this.downStation.getId();
     }
 }
