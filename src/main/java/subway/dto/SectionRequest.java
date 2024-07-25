@@ -7,7 +7,8 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 @NoArgsConstructor(force = true)
-public final class SubwayLineUpdateRequest {
-    private final String name;
-    private final String color;
+public class SectionRequest {
+    private final Long upStationId;
+    private final Long downStationId;
+    private final Long distance;
 }

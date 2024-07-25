@@ -1,0 +1,29 @@
+package subway.test;
+
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
+import org.springframework.http.HttpStatus;
+
+public class ResponseHelper {
+    public ExtractableResponse<Response> response;
+
+    public ResponseHelper(ExtractableResponse<Response> response) {
+        this.response = response;
+    }
+
+    public boolean isBadRequest() {
+        return response.statusCode() == HttpStatus.BAD_REQUEST.value();
+    }
+
+    public boolean isCreated() {
+        return response.statusCode() == HttpStatus.CREATED.value();
+    }
+
+    public boolean isOk() {
+        return response.statusCode() == HttpStatus.OK.value();
+    }
+
+    public boolean isNoContent() {
+        return response.statusCode() == HttpStatus.NO_CONTENT.value();
+    }
+}

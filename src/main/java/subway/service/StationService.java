@@ -1,5 +1,6 @@
 package subway.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.domain.Station;
@@ -7,17 +8,15 @@ import subway.dto.StationCreateRequest;
 import subway.dto.StationResponse;
 import subway.repository.StationRepository;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class StationService {
     private final StationRepository stationRepository;
-
-    public StationService(StationRepository stationRepository) {
-        this.stationRepository = stationRepository;
-    }
 
     @Transactional
     public StationResponse saveStation(StationCreateRequest stationCreateRequest) {
@@ -42,4 +41,9 @@ public class StationService {
                 station.getName()
         );
     }
+
+    public Station findStationOrElseThrow(Long stationId) {
+        return stationRepository.findById(stationId).orElseThrow(EntityNotFoundException::new);
+    }
+
 }

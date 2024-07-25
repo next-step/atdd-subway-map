@@ -1,10 +1,15 @@
 package subway.domain;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SubwayLine {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -13,26 +18,43 @@ public class SubwayLine {
     @Column(unique = true, nullable = false)
     private String name;
 
+    @Column(nullable = false)
     private String color;
 
-    private Long upStationId;
+    private Long distance = 0L;
 
-    private Long downStationId;
+    @ManyToOne
+    @JoinColumn(name = "up_station_id", nullable = false)
+    private Station upStation;
 
-    private Long distance;
+    @ManyToOne
+    @JoinColumn(name = "down_station_id", nullable = false)
+    private Station downStation;
 
-    @OneToMany(mappedBy = "subwayLine")
-    private List<Station> stations = new ArrayList<>();
+    @Embedded
+    private Sections sections = new Sections();
 
-    public SubwayLine(String name, String color, Long upStationId, Long downStationId, Long distance) {
+    private SubwayLine(String name, String color) {
         this.name = name;
         this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
-        this.distance = distance;
     }
 
-    protected SubwayLine() {
+    public static SubwayLine of(String name, String color, Section section) {
+        var subwayLine = new SubwayLine(name, color);
+        subwayLine.addFirstSection(section);
+        return subwayLine;
+    }
+
+    private void addFirstSection(Section section) {
+        this.upStation = section.getUpStation();
+        addSection(section);
+    }
+
+    public void addSection(Section section) {
+        this.distance = this.distance + section.getDistance();
+        this.downStation = section.getDownStation();
+        this.sections.addSection(section);
+        section.assignSubwayLine(this);
     }
 
     public void updateBasicInfo(String name, String color) {
@@ -40,31 +62,13 @@ public class SubwayLine {
         this.color = color;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getColor() {
-        return color;
-    }
-
-    public Long getUpStationId() {
-        return upStationId;
-    }
-
-    public Long getDownStationId() {
-        return downStationId;
-    }
-
-    public Long getDistance() {
-        return distance;
+    public void removeSection(Long stationId) {
+        var removedSection = sections.removeSection(stationId);
+        this.downStation = removedSection.getUpStation();
+        distance -= removedSection.getDistance();
     }
 
     public List<Station> getStations() {
-        return new ArrayList<>(this.stations);
+        return this.sections.getStations();
     }
 }

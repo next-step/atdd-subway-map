@@ -1,9 +1,12 @@
 package subway.dto;
 
-public class StationCreateRequest {
-    private String name;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
-    public String getName() {
-        return name;
-    }
+@Getter
+@RequiredArgsConstructor
+@NoArgsConstructor(force = true)
+public final class StationCreateRequest {
+    private final String name;
 }
