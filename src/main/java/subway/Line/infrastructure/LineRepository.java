@@ -5,5 +5,4 @@ import subway.Line.domain.Line;
 
 public interface LineRepository extends JpaRepository<Line, Long> {
 
-
 }

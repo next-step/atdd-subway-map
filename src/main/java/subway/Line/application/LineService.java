@@ -1,5 +1,8 @@
 package subway.Line.application;
 
+import static subway.global.exception.ExceptionCode.NOT_FOUND_LINE;
+import static subway.global.exception.ExceptionCode.NOT_FOUND_STATION;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -10,9 +13,11 @@ import subway.Line.domain.Line;
 import subway.Line.presentation.dto.LineRequest;
 import subway.Line.presentation.dto.LineResponse;
 import subway.Line.infrastructure.LineRepository;
+import subway.Line.presentation.dto.SectionRequest;
 import subway.Station.domain.Station;
 import subway.Station.infrastructure.StationRepository;
 import subway.Station.presentation.dto.StationResponse;
+import subway.global.exception.BadRequestException;
 
 @Service
 @Transactional(readOnly = true)
@@ -98,7 +103,7 @@ public class LineService {
     @Transactional
     public void updateLine(Long lineId, LineRequest lineRequest) {
         Line line = lineRepository.findById(lineId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 지하철 노선은 존재하지 않습니다. id=" + lineId));
+                .orElseThrow(() -> new BadRequestException(NOT_FOUND_LINE));
 
         String name = lineRequest.getName();
         if (Objects.nonNull(name)) {
@@ -113,5 +118,20 @@ public class LineService {
     @Transactional
     public void deleteLine(Long lineId) {
         lineRepository.deleteById(lineId);
+    }
+
+    @Transactional
+    public void addSection(Long lineId, SectionRequest sectionRequest) {
+        Line line = this.lineRepository.findById(lineId)
+                .orElseThrow(() -> new BadRequestException(NOT_FOUND_LINE));
+        line.addSection(sectionRequest.getUpStationId(), sectionRequest.getDownStationId(), sectionRequest.getDistance());
+    }
+
+    @Transactional
+    public void deleteSection(Long lineId, Long stationId) {
+        Line line = this.lineRepository.findById(lineId)
+                .orElseThrow(() -> new BadRequestException(NOT_FOUND_LINE));
+
+        line.deleteSection(stationId);
     }
 }
