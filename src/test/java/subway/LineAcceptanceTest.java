@@ -17,24 +17,23 @@ import org.springframework.test.annotation.DirtiesContext;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import subway.line.Line;
 import subway.line.LineRequest;
 
 @DisplayName("노선 관련 기능")
 @SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class LineAcceptanceTest {
-    private Long stationId1;
-    private Long stationId2;
-    private Long stationId3;
-    private Long stationId4;
+    private Long 사당;
+    private Long 방배;
+    private Long 서초;
+    private Long 교대;
 
     @BeforeEach
     void init() {
-        stationId1 = getStationId(createStation("station1"));
-        stationId2 = getStationId(createStation("station2"));
-        stationId3 = getStationId(createStation("station3"));
-        stationId4 = getStationId(createStation("station4"));
+        사당 = getStationId(createStation("station1"));
+        방배 = getStationId(createStation("station2"));
+        서초 = getStationId(createStation("station3"));
+        교대 = getStationId(createStation("station4"));
     }
 
     /**
@@ -48,7 +47,7 @@ class LineAcceptanceTest {
         // Given
         String newLineName = "사당";
         // When
-        ExtractableResponse<Response> response = createLine(new LineRequest(newLineName, "red", stationId1, stationId2, 10L));
+        ExtractableResponse<Response> response = createLine(new LineRequest(newLineName, "red", 사당, 방배, 10L));
         // Then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
@@ -66,15 +65,15 @@ class LineAcceptanceTest {
     @Test
     void testGetAllLine() {
         // Given
-        String lineName1 = "사당";
-        String lineName2 = "방배";
-        createLine(new LineRequest(lineName1, "red", stationId1, stationId2, 10L));
-        createLine(new LineRequest(lineName2, "blue", stationId3, stationId4, 10L));
+        String 경춘선 = "1호선";
+        String 서부선 = "2호선";
+        createLine(new LineRequest(경춘선, "red", 사당, 방배, 10L));
+        createLine(new LineRequest(서부선, "blue", 서초, 교대, 10L));
         // When
         ExtractableResponse<Response> lineInfo = getAllLines();
         // Then
         List<String> lineNames = lineInfo.body().jsonPath().getList("name", String.class);
-        assertThat(lineNames).containsExactly(lineName1, lineName2);
+        assertThat(lineNames).containsExactly(경춘선, 서부선);
     }
 
     /**
@@ -87,7 +86,7 @@ class LineAcceptanceTest {
     void testGetLine() {
         // Given
         String lineName1 = "사당";
-        ExtractableResponse<Response> response = createLine(new LineRequest(lineName1, "red", stationId1, stationId2, 10L));
+        ExtractableResponse<Response> response = createLine(new LineRequest(lineName1, "red", 사당, 방배, 10L));
         // When
         String url = response.response().getHeader("Location");
         ExtractableResponse<Response> lineInfo = getLine(url);
@@ -107,10 +106,10 @@ class LineAcceptanceTest {
         // Given
         String previousLineName = "사당";
         String newLineName = "방배";
-        ExtractableResponse<Response> createLineResponse = createLine(new LineRequest(previousLineName, "red", stationId1, stationId2, 10L));
+        ExtractableResponse<Response> createLineResponse = createLine(new LineRequest(previousLineName, "red", 사당, 방배, 10L));
         // When
         Map<String, String> updateLineInfoParam = Map.of("name", newLineName, "color", "red");
-        updateLine(updateLineInfoParam, 1L);
+        updateLine(updateLineInfoParam, 사당);
         // Then
         ExtractableResponse<Response> lineInfo = getLine(createLineResponse.response().getHeader("Location"));
         String lineName = lineInfo.body().jsonPath().get("name");
@@ -127,7 +126,7 @@ class LineAcceptanceTest {
     void testRemoveLine() {
         // Given
         String lineName1 = "사당";
-        ExtractableResponse<Response> createLineResponse = createLine(new LineRequest(lineName1, "red", stationId1, stationId2, 10L));
+        ExtractableResponse<Response> createLineResponse = createLine(new LineRequest(lineName1, "red", 사당, 방배, 10L));
         // When
         String url = createLineResponse.response().getHeader("Location");
         deleteStation(url);

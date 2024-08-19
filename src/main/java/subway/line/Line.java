@@ -1,6 +1,7 @@
 package subway.line;
 
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -8,6 +9,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+import subway.section.Section;
+import subway.section.Sections;
 import subway.station.Station;
 
 @Entity
@@ -18,29 +21,17 @@ public class Line {
     private Long id;
     @Column(length = 20, nullable = false)
     private String name;
-
     @Column(length = 20, nullable = false)
     private String color;
-
-    @ManyToOne
-    @JoinColumn(name = "up_station_id", nullable = false)
-    private Station upStation;
-
-    @ManyToOne
-    @JoinColumn(name = "down_station_id", nullable = false)
-    private Station downStation;
-
-    @Column(nullable = false)
-    private Long distance;
+    @Embedded
+    private Sections sections;
 
     public Line() {}
 
-    public Line(String name, String color, Station upStation, Station downStation, Long distance) {
+    public Line(String name, String color, Sections sections) {
         this.name = name;
         this.color = color;
-        this.upStation = upStation;
-        this.downStation = downStation;
-        this.distance = distance;
+        this.sections = sections;
     }
 
     public Long getId() {
@@ -55,12 +46,8 @@ public class Line {
         return color;
     }
 
-    public Station getUpStation() {
-        return upStation;
-    }
-
-    public Station getDownStation() {
-        return downStation;
+    public Sections getSections() {
+        return sections;
     }
 
     public void updateLine(LineRequest lineRequest) {
@@ -68,4 +55,11 @@ public class Line {
         color = lineRequest.getColor();
     }
 
+    public void addSection(Section section) {
+        sections.addSection(section);
+    }
+
+    public Section deleteSection(Station toRemoveStation) {
+        return sections.deleteSection(toRemoveStation);
+    }
 }

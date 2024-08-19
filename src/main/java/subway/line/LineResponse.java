@@ -15,7 +15,7 @@ public class LineResponse {
         id = line.getId();
         name = line.getName();
         color = line.getColor();
-        stations = List.of(line.getUpStation(), line.getDownStation());
+        stations = line.getSections().toStationList();
     }
 
     public Long getId() {

@@ -1,5 +1,7 @@
 package subway.station;
 
+import java.util.Objects;
+
 import javax.persistence.*;
 
 @Entity
@@ -24,4 +26,5 @@ public class Station {
     public String getName() {
         return name;
     }
+
 }
